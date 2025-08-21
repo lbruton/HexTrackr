@@ -1,14 +1,46 @@
-# HexTrackr v6.66 - Node.js Application Docker Setup
+# HexTrackr v6.66 - Node.js Application Docker Setup with PostgreSQL
 
 services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: hextrackr-postgres
+    environment:
+      POSTGRES_DB: hextrackr
+      POSTGRES_USER: hextrackr
+      POSTGRES_PASSWORD: hextrackr123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./data:/app/data # For CSV file access
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hextrackr -d hextrackr"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # HexTrackr Application
   hextrackr:
     build: .
     container_name: hextrackr-app
     ports:
-      - "3040:3232"
+      - "3040:3040"
     volumes:
       - ./data:/app/data
       - ./uploads:/app/uploads
     environment:
       - NODE_ENV=production
+      - PGHOST=postgres
+      - PGPORT=5432
+      - PGDATABASE=hextrackr
+      - PGUSER=hextrackr
+      - PGPASSWORD=hextrackr123
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
+
+volumes:
+  postgres_data:

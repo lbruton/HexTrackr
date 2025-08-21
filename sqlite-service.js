@@ -151,39 +151,205 @@ class SQLiteService {
     }
 
     /**
-     * Bulk insert vulnerabilities (for large CSV uploads)
+     * Optimized bulk insert vulnerabilities using single transaction
      */
     async bulkInsertVulnerabilities(vulnerabilities, progressCallback) {
         if (!this.isReady) {
             throw new Error('Database not initialized');
         }
 
-        const batchSize = 1000; // Process in batches
-        const totalBatches = Math.ceil(vulnerabilities.length / batchSize);
-        
-        console.log(`🔄 Starting bulk insert of ${vulnerabilities.length} vulnerabilities in ${totalBatches} batches`);
+        console.log(`🔄 Starting optimized bulk insert of ${vulnerabilities.length} vulnerabilities`);
 
-        for (let i = 0; i < totalBatches; i++) {
-            const start = i * batchSize;
-            const end = Math.min(start + batchSize, vulnerabilities.length);
-            const batch = vulnerabilities.slice(start, end);
+        if (typeof(openDatabase) !== 'undefined') {
+            return this.bulkInsertWebSQLOptimized(vulnerabilities, progressCallback);
+        } else {
+            return this.bulkInsertIndexedDBOptimized(vulnerabilities, progressCallback);
+        }
+    }
+
+    /**
+     * Optimized Web SQL bulk insert with single transaction
+     */
+    async bulkInsertWebSQLOptimized(vulnerabilities, progressCallback) {
+        return new Promise((resolve, reject) => {
+            // Single transaction for better performance
+            this.db.transaction(tx => {
+                vulnerabilities.forEach((vuln, index) => {
+                    // Check for existing record to track VPR changes
+                    tx.executeSql(`
+                        SELECT vpr_score, severity FROM vulnerabilities 
+                        WHERE hostname = ? AND cve = ? AND definition_id = ?
+                    `, [vuln.hostname || '', vuln.cve || '', vuln.definitionId || ''], 
+                    (tx, result) => {
+                        let isVprChange = false;
+                        if (result.rows.length > 0) {
+                            const existing = result.rows.item(0);
+                            const existingVpr = parseFloat(existing.vpr_score) || 0;
+                            const newVpr = parseFloat(vuln.vpr_score || vuln.vprScore) || 0;
+                            
+                            if (Math.abs(existingVpr - newVpr) > 0.1 || existing.severity !== vuln.severity) {
+                                isVprChange = true;
+                                console.log(`📊 VPR Change: ${vuln.hostname}/${vuln.cve}: ${existingVpr} → ${newVpr}`);
+                            }
+                        }
+                        
+                        // Insert/update vulnerability record
+                        tx.executeSql(`
+                            INSERT OR REPLACE INTO vulnerabilities (
+                                hostname, ip_address, vendor, product, version, cve, severity, score, vpr_score,
+                                description, solution, exploit_available, patch_available, created_date, updated_date,
+                                scan_date, file_source, definition_id, state, raw_data
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        `, [
+                            vuln.hostname || '', vuln.ip_address || vuln.ipAddress || '',
+                            vuln.vendor || '', vuln.product || '', vuln.version || '',
+                            vuln.cve || '', vuln.severity || '', vuln.score || vuln.cvssScore || 0,
+                            vuln.vpr_score || vuln.vprScore || 0, vuln.description || vuln.definitionName || '',
+                            vuln.solution || '', vuln.exploit_available || vuln.exploitAvailable || 0,
+                            vuln.patch_available || vuln.patchAvailable || 0,
+                            vuln.created_date || vuln.createdDate || new Date().toISOString(),
+                            new Date().toISOString(), vuln.scan_date || vuln.date || new Date().toISOString(),
+                            vuln.file_source || vuln.fileSource || 'Unknown',
+                            vuln.definitionId || vuln.definition_id || '', vuln.state || 'ACTIVE',
+                            JSON.stringify(vuln)
+                        ]);
+                        
+                        // Insert into VPR history for trend tracking
+                        tx.executeSql(`
+                            INSERT OR REPLACE INTO vpr_history (
+                                hostname, cve, definition_id, vpr_score, severity, scan_date, file_source, created_date
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        `, [
+                            vuln.hostname || '', vuln.cve || '',
+                            vuln.definitionId || vuln.definition_id || '',
+                            vuln.vpr_score || vuln.vprScore || 0, vuln.severity || '',
+                            vuln.scan_date || vuln.date || new Date().toISOString(),
+                            vuln.file_source || vuln.fileSource || 'Unknown',
+                            new Date().toISOString()
+                        ]);
+                    });
+                    
+                    // Update progress every 1000 records
+                    if (index % 1000 === 0 || index === vulnerabilities.length - 1) {
+                        const progress = Math.round(((index + 1) / vulnerabilities.length) * 100);
+                        if (progressCallback) {
+                            progressCallback(progress, index + 1, vulnerabilities.length);
+                        }
+                    }
+                });
+            }, 
+            error => {
+                console.error('❌ Optimized bulk insert failed:', error);
+                reject(error);
+            }, 
+            () => {
+                console.log('✅ Optimized bulk insert completed successfully');
+                resolve();
+            });
+        });
+    }
+
+    /**
+     * Optimized IndexedDB bulk insert with progress tracking
+     */
+    async bulkInsertIndexedDBOptimized(vulnerabilities, progressCallback) {
+        if (!this.db) {
+            throw new Error('IndexedDB not initialized');
+        }
+
+        const batchSize = 100; // Smaller batches for IndexedDB
+        let processed = 0;
+        
+        for (let i = 0; i < vulnerabilities.length; i += batchSize) {
+            const batch = vulnerabilities.slice(i, i + batchSize);
             
-            if (typeof(openDatabase) !== 'undefined') {
-                await this.insertBatchWebSQL(batch);
-            } else {
-                await this.insertBatchIndexedDB(batch);
-            }
-            
-            const progress = Math.round(((i + 1) / totalBatches) * 100);
-            if (progressCallback) {
-                progressCallback(progress, i + 1, totalBatches);
-            }
-            
-            // Small delay to prevent UI blocking
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await new Promise((resolve, reject) => {
+                const transaction = this.db.transaction(['vulnerabilities'], 'readwrite');
+                const store = transaction.objectStore('vulnerabilities');
+                
+                let batchProcessed = 0;
+                
+                for (const vuln of batch) {
+                    try {
+                        // Create vulnerability record
+                        const vulnRecord = {
+                            id: vuln.id || `${vuln.hostname || 'unknown'}-${vuln.cve || vuln.definitionId || Date.now()}-${Math.random()}`,
+                            hostname: vuln.hostname || '',
+                            ip_address: vuln.ip_address || vuln.ipAddress || '',
+                            vendor: vuln.vendor || '',
+                            product: vuln.product || '',
+                            version: vuln.version || '',
+                            cve: vuln.cve || '',
+                            severity: vuln.severity || '',
+                            score: parseFloat(vuln.score || vuln.cvssScore) || 0,
+                            vpr_score: parseFloat(vuln.vpr_score || vuln.vprScore) || 0,
+                            description: vuln.description || '',
+                            solution: vuln.solution || '',
+                            exploit_available: vuln.exploit_available || vuln.exploitAvailable || false,
+                            patch_available: vuln.patch_available || vuln.patchAvailable || false,
+                            created_date: vuln.created_date || vuln.createdDate || new Date().toISOString(),
+                            updated_date: new Date().toISOString(),
+                            source_file: vuln.source_file || vuln.sourceFile || '',
+                            definition_id: vuln.definition_id || vuln.definitionId || '',
+                            plugin_id: vuln.plugin_id || vuln.pluginId || '',
+                            family: vuln.family || '',
+                            port: vuln.port || '',
+                            protocol: vuln.protocol || '',
+                            asset_uuid: vuln.asset_uuid || vuln.assetUuid || '',
+                            scan_uuid: vuln.scan_uuid || vuln.scanUuid || '',
+                            schedule_uuid: vuln.schedule_uuid || vuln.scheduleUuid || '',
+                            first_found: vuln.first_found || vuln.firstFound || '',
+                            last_found: vuln.last_found || vuln.lastFound || '',
+                            state: vuln.state || 'OPEN',
+                            acceptance_status: vuln.acceptance_status || vuln.acceptanceStatus || '',
+                            recast_status: vuln.recast_status || vuln.recastStatus || '',
+                            can_exploit: vuln.can_exploit || vuln.canExploit || false,
+                            malware_exploit: vuln.malware_exploit || vuln.malwareExploit || false,
+                            remote_code_execution: vuln.remote_code_execution || vuln.remoteCodeExecution || false,
+                            dos_vulnerability: vuln.dos_vulnerability || vuln.dosVulnerability || false
+                        };
+
+                        const request = store.put(vulnRecord);
+                        
+                        request.onsuccess = () => {
+                            batchProcessed++;
+                            processed++;
+                            
+                            if (batchProcessed === batch.length) {
+                                // Update progress
+                                if (progressCallback) {
+                                    const progress = (processed / vulnerabilities.length) * 100;
+                                    const currentBatch = Math.ceil(processed / batchSize);
+                                    const totalBatches = Math.ceil(vulnerabilities.length / batchSize);
+                                    progressCallback(progress, currentBatch, totalBatches);
+                                }
+                            }
+                        };
+                        
+                        request.onerror = () => {
+                            console.error('Error inserting vulnerability:', request.error);
+                            batchProcessed++;
+                        };
+                        
+                    } catch (error) {
+                        console.error('Error processing vulnerability:', error);
+                        batchProcessed++;
+                    }
+                }
+                
+                transaction.oncomplete = () => {
+                    resolve();
+                };
+                
+                transaction.onerror = () => {
+                    console.error('❌ IndexedDB transaction failed:', transaction.error);
+                    reject(transaction.error);
+                };
+            });
         }
         
-        console.log('✅ Bulk insert completed successfully');
+        console.log(`✅ IndexedDB bulk insert completed: ${processed} records processed`);
+        return processed;
     }
 
     /**

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HexTrackr - Vulnerability Dashboard v6.66</title>
+    <title>HexTrackr - Vulnerability Dashboard v2.3.0</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -25,13 +26,19 @@
             }
         }
     </script>
-    <!-- Keep Bootstrap for existing components -->
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- ApexCharts for sparklines -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <!-- Sortable for drag/drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <!-- Crypto for encryption -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <!-- External service scripts -->
     <script src="turso-service.js"></script>
     <script src="cisco-api-service-enhanced.js"></script>
     <script src="dnac-api-service.js"></script>
@@ -40,7 +47,32 @@
     <script src="integration-service.js"></script>
     <script src="sqlite-service.js"></script>
     <style>
-        /* Vulnerability-specific customizations on top of unified design system */
+        /* HexTrackr Custom Styles */
+        :root {
+            --hex-50: #f0f9ff;
+            --hex-100: #e0f2fe;
+            --hex-500: #0ea5e9;
+            --hex-600: #0284c7;
+            --hex-700: #0369a1;
+            --hex-800: #075985;
+            --hex-900: #0c4a6e;
+        }
+        
+        /* Custom gradient backgrounds */
+        .bg-gradient-hex {
+            background: linear-gradient(135deg, var(--hex-800) 0%, var(--hex-700) 50%, var(--hex-600) 100%);
+        }
+        
+        .bg-gradient-light {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        
+        /* Utility classes */
+        .min-h-screen {
+            min-height: 100vh;
+        }
+        
+        /* Vulnerability-specific customizations */
         
         /* Responsive Layout Improvements */
         .main-container {
@@ -296,6 +328,18 @@
             opacity: 0.3;
         }
 
+        /* Sparkline containers for severity cards */
+        .sparkline-container {
+            height: 50px !important;
+            margin: 8px 0 !important;
+            opacity: 0.8;
+            border-radius: 4px;
+        }
+
+        .sparkline-container .apexcharts-canvas {
+            max-height: 50px !important;
+        }
+
         /* Change indicators for severity cards */
         .change-indicator {
             display: flex !important;
@@ -367,7 +411,7 @@
                         <h1 class="text-2xl font-bold text-white tracking-tight">
                             HexTrackr
                             <span class="text-hex-100 font-normal ml-2 text-lg">
-                                Vulnerability Dashboard v6.66
+                                Vulnerability Dashboard v2.3.0
                             </span>
                         </h1>
                     </div>
@@ -395,10 +439,20 @@
             <!-- Modern Upload Section -->
             <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
                 <div class="bg-gradient-to-r from-hex-600 to-hex-700 px-6 py-4">
-                    <h2 class="text-xl font-semibold text-white flex items-center">
-                        <i class="fas fa-cloud-upload-alt mr-3"></i>
-                        Upload Vulnerability Data
-                    </h2>
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-semibold text-white flex items-center">
+                            <i class="fas fa-cloud-upload-alt mr-3"></i>
+                            Upload Vulnerability Data
+                        </h2>
+                        <div class="flex gap-3">
+                            <button class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-white/20 hover:border-white/40 transition-all duration-200" onclick="toggleUploadArea()">
+                                <i class="fas fa-upload me-1"></i>Upload More Data
+                            </button>
+                            <button class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-white/20 hover:border-white/40 transition-all duration-200" onclick="showToolsModal()">
+                                <i class="fas fa-plug me-1"></i>Connect APIs
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="p-6">
                     <div class="upload-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-hex-400 hover:bg-hex-50/50 transition-all duration-200 cursor-pointer" id="uploadArea">
@@ -425,29 +479,17 @@
             </div>
 
                 <!-- Trend Chart Section (Hidden initially) -->
-                <div class="row mb-4" id="trendChartSection" style="display: none;">
-                    <div class="col-12">
-                        <div class="hex-card chart-container">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="mb-0 text-hex-primary">
-                                        <i class="fas fa-chart-line me-2"></i>Vulnerability Trends Over Time
-                                    </h5>
-                                    <small class="text-muted">Track vulnerability severity changes across imports</small>
-                                </div>
-                                <div class="btn-group">
-                                    <button class="btn btn-sm btn-hex-secondary" onclick="toggleUploadArea()">
-                                        <i class="fas fa-upload me-1"></i>Upload More Data
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-primary" onclick="showToolsModal()">
-                                        <i class="fas fa-plug me-1"></i>Connect APIs
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body p-4">
-                                <div id="trendChart" class="chart-wrapper" style="height: 350px; background: rgba(255,255,255,0.95); border-radius: 8px; padding: 20px;"></div>
-                            </div>
+                <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-6" id="trendChartSection" style="display: none;">
+                    <div class="card-header bg-gradient-to-r from-hex-50 to-hex-100 px-6 py-4 border-b border-gray-200">
+                        <div>
+                            <h5 class="mb-0 text-hex-primary font-semibold">
+                                <i class="fas fa-chart-line me-2"></i>Vulnerability Trends Over Time
+                            </h5>
+                            <small class="text-gray-600">Track vulnerability severity changes across imports</small>
                         </div>
+                    </div>
+                    <div class="p-6">
+                        <div id="trendChart" class="chart-wrapper" style="height: 450px; background: rgba(255,255,255,0.95); border-radius: 8px; padding: 20px;"></div>
                     </div>
                 </div>
 
@@ -470,6 +512,7 @@
                                 </div>
                             </div>
                             <h3 class="font-semibold text-gray-900">Critical VPR Total</h3>
+                            <div id="criticalSparkline" class="sparkline-container" style="height: 50px; margin: 8px 0;"></div>
                             <p class="text-sm text-gray-500">Click to filter</p>
                         </div>
                     </div>
@@ -492,6 +535,7 @@
                                 </div>
                             </div>
                             <h3 class="font-semibold text-gray-900">High VPR Total</h3>
+                            <div id="highSparkline" class="sparkline-container" style="height: 50px; margin: 8px 0;"></div>
                             <p class="text-sm text-gray-500">Click to filter</p>
                         </div>
                     </div>
@@ -514,6 +558,7 @@
                                 </div>
                             </div>
                             <h3 class="font-semibold text-gray-900">Medium VPR Total</h3>
+                            <div id="mediumSparkline" class="sparkline-container" style="height: 50px; margin: 8px 0;"></div>
                             <p class="text-sm text-gray-500">Click to filter</p>
                         </div>
                     </div>
@@ -536,6 +581,7 @@
                                 </div>
                             </div>
                             <h3 class="font-semibold text-gray-900">Low VPR Total</h3>
+                            <div id="lowSparkline" class="sparkline-container" style="height: 50px; margin: 8px 0;"></div>
                             <p class="text-sm text-gray-500">Click to filter</p>
                         </div>
                     </div>
@@ -543,56 +589,60 @@
             </div>
 
                 <!-- View Controls -->
-                <div class="row mb-4">
-                    <!-- View Mode Toggles -->
-                    <div class="col-12 mb-3">
-                        <div class="d-flex justify-content-center">
-                            <div class="view-toggle-enhanced">
-                                <div class="btn-group shadow-sm" role="group" aria-label="View modes">
-                                    <input type="radio" class="btn-check" name="viewMode" id="assetView" value="asset" checked>
-                                    <label class="btn btn-outline-primary px-4 py-2" for="assetView">
-                                        <i class="fas fa-server me-2"></i>Asset View
-                                    </label>
-                                    
-                                    <input type="radio" class="btn-check" name="viewMode" id="vulnView" value="vuln">
-                                    <label class="btn btn-outline-primary px-4 py-2" for="vulnView">
-                                        <i class="fas fa-bug me-2"></i>Vulnerability View
-                                    </label>
-
-                                    <input type="radio" class="btn-check" name="viewMode" id="tableView" value="table">
-                                    <label class="btn btn-outline-primary px-4 py-2" for="tableView">
-                                        <i class="fas fa-table me-2"></i>Table View
-                                    </label>
-                                </div>
+                <!-- Modern Search and Filter Navigation Bar -->
+                <nav class="navbar navbar-expand-lg bg-white shadow-sm rounded-lg border mb-4 p-3">
+                    <div class="container-fluid">
+                        <!-- View Toggles -->
+                        <div class="navbar-brand mb-0 me-4">
+                            <div class="btn-group" role="group" aria-label="View toggles">
+                                <input type="radio" class="btn-check" name="viewMode" id="assetView" value="asset" checked>
+                                <label class="btn btn-outline-primary" for="assetView">
+                                    <i class="fas fa-server me-2"></i>Asset View
+                                </label>
+                                
+                                <input type="radio" class="btn-check" name="viewMode" id="vulnView" value="vuln">
+                                <label class="btn btn-outline-primary" for="vulnView">
+                                    <i class="fas fa-bug me-2"></i>Vulnerability View
+                                </label>
+                                
+                                <input type="radio" class="btn-check" name="viewMode" id="tableView" value="table">
+                                <label class="btn btn-outline-primary" for="tableView">
+                                    <i class="fas fa-table me-2"></i>Table View
+                                </label>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Search and Filters -->
-                    <div class="col-12">
-                        <div class="row">
-                            <!-- Full-width Search Box -->
-                            <div class="col-lg-8 mb-3">
-                                <div class="search-box-enhanced">
-                                    <div class="input-group input-group-lg">
-                                        <span class="input-group-text bg-light">
-                                            <i class="fas fa-search text-primary"></i>
-                                        </span>
-                                        <input type="text" class="form-control" id="searchInput" 
-                                               placeholder="Search assets, vulnerabilities, CVEs, hostnames...">
-                                        <button class="btn btn-outline-secondary" type="button" id="clearSearch">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+
+                        <!-- Collapsible content for search and filters -->
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSearchFilters" aria-controls="navbarSearchFilters" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+
+                        <div class="collapse navbar-collapse" id="navbarSearchFilters">
+                            <div class="navbar-nav w-100">
+                                <div class="row w-100 g-3 align-items-end">
+                                    <!-- Search Box -->
+                                    <div class="col-xl-4 col-lg-5">
+                                        <div class="search-container">
+                                            <label class="form-label small fw-bold text-muted mb-1">
+                                                <i class="fas fa-search me-1"></i>Search
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="searchInput" 
+                                                       placeholder="Assets, CVEs, hostnames..." 
+                                                       autocomplete="off">
+                                                <button class="btn btn-outline-secondary" type="button" id="clearSearch" title="Clear search">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Sort and Filter Controls -->
-                            <div class="col-lg-4 mb-3">
-                                <div class="filter-controls-enhanced">
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            <label for="severityFilter" class="form-label mb-1 small fw-bold">Filter:</label>
+                                    
+                                    <!-- Severity Filter -->
+                                    <div class="col-xl-2 col-lg-3 col-md-4">
+                                        <div class="filter-container">
+                                            <label for="severityFilter" class="form-label small fw-bold text-muted mb-1">
+                                                <i class="fas fa-filter me-1"></i>Severity
+                                            </label>
                                             <select class="form-select" id="severityFilter">
                                                 <option value="">All Severities</option>
                                                 <option value="critical">🔴 Critical</option>
@@ -601,22 +651,69 @@
                                                 <option value="low">🟢 Low</option>
                                             </select>
                                         </div>
-                                        <div class="col-6">
-                                            <label for="sortBy" class="form-label mb-1 small fw-bold">Sort by:</label>
-                                            <select class="form-select" id="sortBy">
-                                                <option value="critical">Critical Count</option>
-                                                <option value="high">High Count</option>
-                                                <option value="medium">Medium Count</option>
-                                                <option value="total">Total Vulns</option>
-                                                <option value="hostname">Hostname</option>
+                                    </div>
+                                    
+                                    <!-- Ticket Status Filter -->
+                                    <div class="col-xl-2 col-lg-3 col-md-4">
+                                        <div class="filter-container">
+                                            <label for="ticketFilter" class="form-label small fw-bold text-muted mb-1">
+                                                <i class="fas fa-ticket-alt me-1"></i>Tickets
+                                            </label>
+                                            <select class="form-select" id="ticketFilter">
+                                                <option value="">All Items</option>
+                                                <option value="open">📋 Has Open Ticket</option>
+                                                <option value="closed">✅ Has Closed Ticket</option>
+                                                <option value="none">❌ No Ticket</option>
                                             </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Sort Options -->
+                                    <div class="col-xl-2 col-lg-3 col-md-4">
+                                        <div class="filter-container">
+                                            <label for="sortSelect" class="form-label small fw-bold text-muted mb-1">
+                                                <i class="fas fa-sort me-1"></i>Sort by
+                                            </label>
+                                            <select class="form-select" id="sortSelect">
+                                                <option value="hostname-asc">Hostname A-Z</option>
+                                                <option value="hostname-desc">Hostname Z-A</option>
+                                                <option value="severity-high">Severity (High to Low)</option>
+                                                <option value="severity-low">Severity (Low to High)</option>
+                                                <option value="tickets-open">Open Tickets First</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="col-xl-2 col-lg-12 col-md-12">
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <button class="btn btn-outline-primary" onclick="refreshData()" title="Refresh data">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                            <div class="dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-cog me-1"></i>Actions
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li><a class="dropdown-item" href="#" onclick="exportData()">
+                                                        <i class="fas fa-download me-2"></i>Export Data
+                                                    </a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="showToolsModal()">
+                                                        <i class="fas fa-tools me-2"></i>API Settings
+                                                    </a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" href="#" onclick="clearVulnData()">
+                                                        <i class="fas fa-trash me-2"></i>Clear All Data
+                                                    </a></li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </nav>
 
                 <!-- Data Display Area -->
                 <div id="assetCardsContainer" class="row">
@@ -721,15 +818,71 @@
                     </div>
                 </div>
 
-                <!-- Last Upload Info -->
+                <!-- Enhanced Footer Section -->
                 <div class="row mt-4">
                     <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6 class="card-subtitle mb-2 text-muted">Last Upload Information</h6>
-                                <p class="card-text mb-0" id="lastUploadInfo">No data uploaded yet</p>
+                        <footer class="bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg border shadow-sm">
+                            <div class="card border-0 bg-transparent">
+                                <div class="card-body py-4">
+                                    <div class="row align-items-center">
+                                        <!-- Status Information -->
+                                        <div class="col-lg-6">
+                                            <div class="d-flex align-items-center mb-3 mb-lg-0">
+                                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                                    <i class="fas fa-database text-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-1 fw-bold text-dark">Data Status</h6>
+                                                    <p class="mb-0 text-muted small" id="lastUploadInfo">No data uploaded yet</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Application Info -->
+                                        <div class="col-lg-6 text-lg-end">
+                                            <div class="d-flex align-items-center justify-content-lg-end">
+                                                <div class="me-3">
+                                                    <div class="d-flex align-items-center text-muted small">
+                                                        <i class="fas fa-shield-alt text-primary me-2"></i>
+                                                        <span class="fw-bold">HexTrackr</span>
+                                                        <span class="mx-2">•</span>
+                                                        <span>v2.3.0</span>
+                                                        <span class="mx-2">•</span>
+                                                        <span>© 2025</span>
+                                                    </div>
+                                                    <div class="text-muted small mt-1">
+                                                        Vulnerability Management Dashboard
+                                                    </div>
+                                                </div>
+                                                <div class="bg-success bg-opacity-10 rounded-circle p-2">
+                                                    <i class="fas fa-heart text-success"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Quick Actions Bar -->
+                                    <div class="row mt-3 pt-3 border-top border-light">
+                                        <div class="col-12">
+                                            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="showToolsModal()">
+                                                    <i class="fas fa-cog me-1"></i>Settings
+                                                </button>
+                                                <a href="tickets.html" class="btn btn-sm btn-outline-success">
+                                                    <i class="fas fa-ticket-alt me-1"></i>Tickets
+                                                </a>
+                                                <button class="btn btn-sm btn-outline-info" onclick="exportData()">
+                                                    <i class="fas fa-download me-1"></i>Export
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning" onclick="refreshData()">
+                                                    <i class="fas fa-sync-alt me-1"></i>Refresh
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </footer>
                     </div>
                 </div>
 
@@ -899,7 +1052,7 @@
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="database-tab" data-bs-toggle="tab" data-bs-target="#database-pane" type="button" role="tab">
-                                <i class="fas fa-database me-2"></i>Database Settings
+                                <i class="fas fa-server me-2"></i>Server Storage
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -918,12 +1071,20 @@
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h6 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Cisco Security</h6>
-                                            <a href="https://developer.cisco.com/docs/security-advisories/" 
-                                               target="_blank" 
-                                               class="btn btn-outline-info btn-sm"
-                                               title="View Cisco Security API Documentation">
-                                                <i class="fas fa-book me-1"></i>Docs
-                                            </a>
+                                            <div class="btn-group">
+                                                <a href="https://developer.cisco.com/site/devnet-oauth/" 
+                                                   target="_blank" 
+                                                   class="btn btn-outline-primary btn-sm"
+                                                   title="Get Cisco API Keys">
+                                                    <i class="fas fa-key me-1"></i>Get API Key
+                                                </a>
+                                                <a href="https://developer.cisco.com/docs/security-advisories/" 
+                                                   target="_blank" 
+                                                   class="btn btn-outline-info btn-sm"
+                                                   title="View Cisco Security API Documentation">
+                                                    <i class="fas fa-book me-1"></i>Docs
+                                                </a>
+                                            </div>
                                         </div>
                                         <div class="card-body">
                                             <div class="mb-3">
@@ -942,6 +1103,7 @@
                                                     <i class="fas fa-sync me-1"></i>Sync Advisories
                                                 </button>
                                             </div>
+                                            <div id="ciscoTestResult" class="mt-3" style="display: none;"></div>
                                             <div class="mt-2">
                                                 <small class="text-muted">
                                                     <i class="fas fa-info-circle me-1"></i>
@@ -1054,24 +1216,26 @@
                                 <div class="col-md-8">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h6><i class="fas fa-database me-2"></i>SQLite Database Configuration</h6>
+                                            <h6><i class="fas fa-cloud-upload-alt me-2"></i>Cloud Storage Configuration</h6>
                                         </div>
                                         <div class="card-body">
-                                            <div class="alert alert-success" role="alert">
-                                                <i class="fas fa-check-circle me-2"></i>
-                                                <strong>SQLite Enabled!</strong> No storage quota limits - unlimited vulnerability data storage.
+                                            <div class="alert alert-info" role="alert">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                <strong>Server Storage Enabled!</strong> Choose your preferred cloud database provider for unlimited, synchronized vulnerability data storage.
                                             </div>
+                                            
+                                            <h6 class="mb-3"><i class="fas fa-database me-2"></i>Turso Cloud Database</h6>
                                             <div class="mb-3">
-                                                <label for="tursoUrl" class="form-label">Database URL (Optional - Turso Cloud)</label>
+                                                <label for="tursoUrl" class="form-label">Database URL</label>
                                                 <input type="text" class="form-control" id="tursoUrl" placeholder="libsql://your-database.turso.io">
-                                                <div class="form-text">Leave empty to use local SQLite storage</div>
+                                                <div class="form-text">Your Turso database connection URL</div>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="tursoAuthToken" class="form-label">Auth Token (Optional)</label>
+                                                <label for="tursoAuthToken" class="form-label">Auth Token</label>
                                                 <input type="password" class="form-control" id="tursoAuthToken" placeholder="Enter Turso auth token">
-                                                <div class="form-text">Only required for Turso cloud database</div>
+                                                <div class="form-text">Required for Turso cloud database authentication</div>
                                             </div>
-                                            <div class="d-flex gap-2">
+                                            <div class="d-flex gap-2 mb-4">
                                                 <button class="btn btn-primary" onclick="testDatabaseConnection()">
                                                     <i class="fas fa-plug me-2"></i>Test Connection
                                                 </button>
@@ -1079,21 +1243,29 @@
                                                     <i class="fas fa-database me-2"></i>Initialize Database
                                                 </button>
                                             </div>
+                                            
+                                            <div class="alert alert-light border" role="alert">
+                                                <i class="fas fa-plus-circle me-2"></i>
+                                                <strong>Coming Soon:</strong> Additional cloud providers (AWS RDS, Azure SQL, PostgreSQL, MongoDB Atlas)
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h6><i class="fas fa-info-circle me-2"></i>Database Status</h6>
+                                            <h6><i class="fas fa-server me-2"></i>Storage Status</h6>
                                         </div>
                                         <div class="card-body">
                                             <div id="databaseStatus">
                                                 <div class="mb-2">
-                                                    <strong>Type:</strong> <span class="badge bg-success">SQLite</span>
+                                                    <strong>Type:</strong> <span class="badge bg-primary">Local SQLite</span>
                                                 </div>
                                                 <div class="mb-2">
                                                     <strong>Status:</strong> <span class="badge bg-success">Active</span>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <strong>Cloud Sync:</strong> <span class="text-muted">Not Connected</span>
                                                 </div>
                                                 <div class="mb-2">
                                                     <strong>Storage:</strong> <span class="text-success">Unlimited</span>
@@ -1228,8 +1400,11 @@
                 radio.addEventListener('change', updateCardViews);
             });
 
-            // Sort dropdown
-            document.getElementById('sortBy').addEventListener('change', updateCardViews);
+            // Sort dropdown - check if element exists
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', updateCardViews);
+            }
             
             // Pagination event listeners
             document.getElementById('assetItemsPerPage').addEventListener('change', function() {
@@ -1267,70 +1442,261 @@
             });
         }
 
+        // Enhanced file processing with PostgreSQL backend support
+        async function processFile(file) {
+            try {
+                console.log(`📁 Processing file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+                
+                // Check if this is the large Cisco CSV file
+                const isLargeCiscoFile = file.name.includes('cisco-vulnerabilities') && file.size > 50 * 1024 * 1024;
+                
+                if (isLargeCiscoFile) {
+                    // Handle large CSV file via PostgreSQL API
+                    await processLargeCsvViaAPI(file);
+                    return;
+                }
+                
+                // For smaller files, check if we can use PostgreSQL API first
+                if (file.size > 10 * 1024 * 1024) { // Files larger than 10MB
+                    try {
+                        await uploadCsvToAPI(file);
+                        return;
+                    } catch (error) {
+                        console.warn('⚠️ API upload failed, falling back to client-side processing:', error);
+                    }
+                }
+                
+                // Fallback to existing client-side processing
+                await processFileClientSide(file);
+                
+            } catch (error) {
+                console.error('❌ File processing failed:', error);
+                hideUploadProgress();
+                alert(`Failed to process file: ${error.message}`);
+            }
+        }
+
+        // Process large CSV via PostgreSQL API
+        async function processLargeCsvViaAPI(file) {
+            try {
+                showUploadProgress(file.name, file.size, 'Processing via server database...');
+                
+                console.log('🚀 Processing large CSV file via PostgreSQL API...');
+                
+                const response = await fetch('/api/import/cisco-csv', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('✅ Large CSV import successful:', result);
+                    
+                    // Update progress
+                    updateUploadProgress(100, `Successfully imported ${result.totalProcessed} records`);
+                    
+                    // Refresh data from database
+                    await loadVulnerabilitiesFromAPI();
+                    
+                    setTimeout(() => {
+                        hideUploadProgress();
+                        alert(`✅ Successfully imported ${result.totalProcessed} vulnerability records from ${result.fileSize} file!`);
+                    }, 1000);
+                    
+                } else {
+                    throw new Error(result.error || 'API import failed');
+                }
+                
+            } catch (error) {
+                console.error('❌ Large CSV API processing failed:', error);
+                hideUploadProgress();
+                alert(`Failed to process large CSV file: ${error.message}`);
+                throw error;
+            }
+        }
+
+        // Upload CSV file to API for processing
+        async function uploadCsvToAPI(file) {
+            try {
+                showUploadProgress(file.name, file.size, 'Uploading to server...');
+                
+                const formData = new FormData();
+                formData.append('csvFile', file);
+                formData.append('csvType', 'vulnerabilities');
+
+                const response = await fetch('/api/import/upload-csv', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('✅ CSV upload and import successful:', result);
+                    
+                    updateUploadProgress(100, `Successfully imported ${result.totalProcessed} records`);
+                    
+                    // Refresh data from database
+                    await loadVulnerabilitiesFromAPI();
+                    
+                    setTimeout(() => {
+                        hideUploadProgress();
+                        alert(`✅ Successfully imported ${result.totalProcessed} records from ${result.filename}!`);
+                    }, 1000);
+                    
+                } else {
+                    throw new Error(result.error || 'Upload failed');
+                }
+                
+            } catch (error) {
+                console.error('❌ CSV upload failed:', error);
+                throw error;
+            }
+        }
+
+        // Load vulnerabilities from PostgreSQL API
+        async function loadVulnerabilitiesFromAPI() {
+            try {
+                console.log('📊 Loading vulnerabilities from PostgreSQL database...');
+                
+                const response = await fetch('/api/vulnerabilities/search?limit=1000');
+                const result = await response.json();
+                
+                if (result.success) {
+                    window.vulnData = result.data;
+                    console.log(`✅ Loaded ${result.data.length} vulnerabilities from database`);
+                    
+                    // Update statistics
+                    await loadVulnerabilityStatsFromAPI();
+                    
+                    // Refresh UI
+                    filterAndDisplayVulnerabilities();
+                    
+                } else {
+                    throw new Error(result.error || 'Failed to load data');
+                }
+                
+            } catch (error) {
+                console.error('❌ Failed to load vulnerabilities from API:', error);
+                // Fall back to existing data if available
+                if (!window.vulnData || window.vulnData.length === 0) {
+                    console.warn('⚠️ No fallback data available');
+                }
+            }
+        }
+
+        // Load vulnerability statistics from API
+        async function loadVulnerabilityStatsFromAPI() {
+            try {
+                const response = await fetch('/api/vulnerabilities/stats');
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Update dashboard with real statistics
+                    updateDashboardStats(result.data);
+                    console.log('✅ Updated dashboard with real database statistics');
+                } else {
+                    console.warn('⚠️ Failed to load stats from API:', result.error);
+                }
+                
+            } catch (error) {
+                console.error('❌ Failed to load stats from API:', error);
+            }
+        }
+
+        // Update dashboard statistics display
+        function updateDashboardStats(stats) {
+            // Update the dashboard counters with real data
+            const totalElement = document.querySelector('[data-stat="total"]');
+            const criticalElement = document.querySelector('[data-stat="critical"]');
+            const highElement = document.querySelector('[data-stat="high"]');
+            const openElement = document.querySelector('[data-stat="open"]');
+            
+            if (totalElement) totalElement.textContent = stats.total || 0;
+            if (criticalElement) criticalElement.textContent = stats.critical || 0;
+            if (highElement) highElement.textContent = stats.high || 0;
+            if (openElement) openElement.textContent = stats.open || 0;
+        }
+
         function handleFileUpload(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
             Array.from(files).forEach(async file => {
-                console.log(`📁 Processing file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
-                
-                // Initialize SQLite if not ready
-                if (!window.sqliteService.isReady) {
-                    console.log('🔄 Initializing SQLite database...');
-                    const initialized = await window.sqliteService.initialize();
-                    if (!initialized) {
-                        alert('⚠️ Database initialization failed. Using localStorage fallback.');
-                        processWithLocalStorage(file);
+                // Use the new enhanced processing function
+                await processFile(file);
+            });
+        }
+
+        // Original client-side processing for backwards compatibility
+        async function processFileClientSide(file) {
+            console.log(`📁 Processing file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+            
+            // Initialize SQLite if not ready
+            if (!window.sqliteService.isReady) {
+                console.log('🔄 Initializing SQLite database...');
+                const initialized = await window.sqliteService.initialize();
+                if (!initialized) {
+                    alert('⚠️ Database initialization failed. Using localStorage fallback.');
+                    processWithLocalStorage(file);
+                    return;
+                }
+            }
+            
+            // Show upload progress modal
+            showUploadProgress(file.name, file.size);
+            
+            // For SQLite, we can parse the entire file at once - it's much more efficient
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: async function(results) {
+                    console.log(`📊 CSV parsing completed: ${results.data.length} records`);
+                    
+                    if (results.errors && results.errors.length > 0) {
+                        console.warn('⚠️ CSV parsing warnings:', results.errors);
+                    }
+                    
+                    if (!results.data || results.data.length === 0) {
+                        hideUploadProgress();
+                        alert('No data found in CSV file');
                         return;
                     }
-                }
-                
-                // Show upload progress modal
-                showUploadProgress(file.name, file.size);
-                
-                Papa.parse(file, {
-                    header: true,
-                    skipEmptyLines: true,
-                    chunk: function(results, parser) {
-                        // Process in chunks for large files
-                        processVulnDataChunk(results.data, file, parser);
-                    },
-                    complete: function(results) {
-                        console.log('📊 CSV parsing completed');
+                    
+                    try {
+                        // Map CSV data to our format
+                        console.log('🔄 Mapping CSV data...');
+                        updateUploadProgress(20, 'Mapping CSV data...');
                         
-                        // Check if data exists (small files) or was processed in chunks (large files)
-                        if (results && results.data && results.data.length > 0 && results.data.length <= 10000) {
-                            // Small file - process normally
-                            console.log(`💾 Processing ${results.data.length} records from small file...`);
-                            processVulnData(results.data, file);
-                        } else {
-                            // Large file was processed in chunks - save any remaining buffer
-                            console.log('✅ Large file processing completed via chunks');
-                            
-                            // Save any remaining buffer
-                            if (chunkBuffer.length > 0) {
-                                console.log(`💾 Saving final ${chunkBuffer.length} records...`);
-                                processBufferToSQLite(file).then(() => {
-                                    console.log('✅ Final batch saved successfully');
-                                    hideUploadProgress();
-                                    updateDashboard();
-                                }).catch(error => {
-                                    console.error('❌ Failed to save final batch:', error);
-                                    hideUploadProgress();
-                                    alert(`Error saving final data: ${error.message}`);
-                                });
-                            } else {
-                                hideUploadProgress();
-                                updateDashboard();
-                            }
-                        }
-                    },
-                    error: function(error) {
-                        console.error('Error parsing CSV:', error);
+                        const mappedData = results.data.map(row => mapCSVRow(row, file));
+                        
+                        console.log(`💾 Saving ${mappedData.length} records to SQLite...`);
+                        updateUploadProgress(40, 'Saving to database...');
+                        
+                        // Use optimized bulk insert with progress callback
+                        await window.sqliteService.bulkInsertVulnerabilities(mappedData, (progress, batch, total) => {
+                            const overallProgress = 40 + (progress * 0.6); // 40% + 60% for database
+                            updateUploadProgress(overallProgress, `Saving batch ${batch}/${total}...`);
+                        });
+                        
+                        console.log('✅ Upload completed successfully');
                         hideUploadProgress();
-                        alert('Error parsing CSV file: ' + error.message);
+                        loadExistingData();
+                        
+                    } catch (error) {
+                        console.error('❌ Failed to process CSV:', error);
+                        hideUploadProgress();
+                        alert(`Error processing CSV: ${error.message}`);
                     }
-                });
+                },
+                error: function(error) {
+                    console.error('Error parsing CSV:', error);
+                    hideUploadProgress();
+                    alert('Error parsing CSV file: ' + error.message);
+                }
             });
         }
 
@@ -1351,47 +1717,6 @@
                     alert('Error parsing CSV file: ' + error.message);
                 }
             });
-        }
-
-        let chunkBuffer = [];
-        let chunkCount = 0;
-        let totalProcessed = 0;
-
-        function processVulnDataChunk(data, file, parser) {
-            console.log(`📦 Processing chunk ${++chunkCount} with ${data.length} records`);
-            
-            chunkBuffer = chunkBuffer.concat(data);
-            totalProcessed += data.length;
-            
-            // Update progress
-            updateUploadProgress(totalProcessed);
-            
-            // Process buffer when it reaches optimal size (5000 records)
-            if (chunkBuffer.length >= 5000) {
-                processBufferToSQLite(file);
-            }
-        }
-
-        async function processBufferToSQLite(file) {
-            if (chunkBuffer.length === 0) return;
-            
-            console.log(`💾 Saving ${chunkBuffer.length} records to SQLite...`);
-            
-            // Map CSV data to our format
-            const mappedData = chunkBuffer.map(row => mapCSVRow(row, file));
-            
-            try {
-                await window.sqliteService.bulkInsertVulnerabilities(mappedData, (progress) => {
-                    updateUploadProgress(totalProcessed, `Saving batch... ${progress}%`);
-                });
-                
-                console.log(`✅ Batch saved successfully`);
-                chunkBuffer = []; // Clear buffer
-                
-            } catch (error) {
-                console.error('❌ Failed to save batch:', error);
-                alert(`Error saving data to database: ${error.message}`);
-            }
         }
 
         function mapCSVRow(row, file) {
@@ -2004,6 +2329,7 @@
             
             // Create sparklines if we have historical data
             if (historyData.length > 1) {
+                console.log(`📊 Creating sparklines with ${historyData.length} data points`);
                 const criticalTrend = historyData.slice(-7).map(h => h.stats.severityVPR ? h.stats.severityVPR.critical : 0);
                 const highTrend = historyData.slice(-7).map(h => h.stats.severityVPR ? h.stats.severityVPR.high : 0);
                 const mediumTrend = historyData.slice(-7).map(h => h.stats.severityVPR ? h.stats.severityVPR.medium : 0);
@@ -2012,14 +2338,25 @@
                 // Clear existing sparklines
                 ['#criticalSparkline', '#highSparkline', '#mediumSparkline', '#lowSparkline'].forEach(id => {
                     const container = document.querySelector(id);
-                    if (container) container.innerHTML = '';
+                    if (container) {
+                        container.innerHTML = '';
+                        console.log(`🧹 Cleared sparkline container ${id}`);
+                    } else {
+                        console.warn(`⚠️ Sparkline container ${id} not found`);
+                    }
                 });
                 
-                // Create new sparklines
-                createSeveritySparkline('#criticalSparkline', criticalTrend, '#ff6b6b', 'Critical');
-                createSeveritySparkline('#highSparkline', highTrend, '#ffa726', 'High');
-                createSeveritySparkline('#mediumSparkline', mediumTrend, '#42a5f5', 'Medium');
-                createSeveritySparkline('#lowSparkline', lowTrend, '#66bb6a', 'Low');
+                // Create new sparklines with error handling
+                try {
+                    createSeveritySparkline('#criticalSparkline', criticalTrend, '#ff6b6b', 'Critical');
+                    createSeveritySparkline('#highSparkline', highTrend, '#ffa726', 'High');
+                    createSeveritySparkline('#mediumSparkline', mediumTrend, '#42a5f5', 'Medium');
+                    createSeveritySparkline('#lowSparkline', lowTrend, '#66bb6a', 'Low');
+                } catch (error) {
+                    console.error('❌ Error creating sparklines:', error);
+                }
+            } else {
+                console.log(`📊 Not enough historical data for sparklines (${historyData.length} points)`);
             }
         }
 
@@ -2140,6 +2477,10 @@
             searchTerm = document.getElementById('searchInput').value.toLowerCase();
             severityFilter = document.getElementById('severityFilter').value;
             
+            // Get ticket filter value
+            const ticketFilterElement = document.getElementById('ticketFilter');
+            const ticketFilter = ticketFilterElement ? ticketFilterElement.value : '';
+            
             // Apply filters to vulnData
             filteredData = vulnData.filter(item => {
                 const matchesSearch = !searchTerm || 
@@ -2151,7 +2492,26 @@
                 
                 const matchesSeverity = !severityFilter || (item.severity && item.severity.toLowerCase() === severityFilter);
                 
-                return matchesSearch && matchesSeverity;
+                // Check ticket filter
+                let matchesTickets = true;
+                if (ticketFilter) {
+                    const ticketStatus = getAssetTicketStatus(item.hostname);
+                    switch (ticketFilter) {
+                        case 'open':
+                            matchesTickets = ticketStatus.status === 'open';
+                            break;
+                        case 'closed':
+                            matchesTickets = ticketStatus.status === 'closed';
+                            break;
+                        case 'none':
+                            matchesTickets = ticketStatus.status === 'none';
+                            break;
+                        default:
+                            matchesTickets = true;
+                    }
+                }
+                
+                return matchesSearch && matchesSeverity && matchesTickets;
             });
             
             // Update the current view
@@ -2209,11 +2569,30 @@
                 assetGroups[item.hostname].vulnerabilities.push(item);
             });
 
-            const sortBy = document.getElementById('sortBy').value;
+            const sortSelect = document.getElementById('sortSelect');
+            const sortBy = sortSelect ? sortSelect.value : 'hostname-asc';
+            
+            // Parse the sort value (which now includes direction)
+            let sortField, sortDirection;
+            if (sortBy.includes('-')) {
+                [sortField, sortDirection] = sortBy.split('-');
+            } else {
+                sortField = sortBy;
+                sortDirection = 'asc';
+            }
+            
             const sortedAssets = Object.values(assetGroups).sort((a, b) => {
-                if (sortBy === 'hostname') return a.hostname.localeCompare(b.hostname);
-                if (sortBy === 'total') return (b.vulnerabilities.length) - (a.vulnerabilities.length);
-                return b.severityCounts[sortBy] - a.severityCounts[sortBy];
+                let comparison = 0;
+                
+                if (sortField === 'hostname') {
+                    comparison = a.hostname.localeCompare(b.hostname);
+                } else if (sortField === 'total') {
+                    comparison = (b.vulnerabilities.length) - (a.vulnerabilities.length);
+                } else {
+                    comparison = b.severityCounts[sortField] - a.severityCounts[sortField];
+                }
+                
+                return sortDirection === 'desc' ? -comparison : comparison;
             });
 
             // Store current data for pagination
@@ -2295,7 +2674,18 @@
                 }
             });
 
-            const sortBy = document.getElementById('sortBy').value;
+            const sortSelect = document.getElementById('sortSelect');
+            const sortBy = sortSelect ? sortSelect.value : 'severity-high';
+            
+            // Parse the sort value 
+            let sortField, sortDirection;
+            if (sortBy.includes('-')) {
+                [sortField, sortDirection] = sortBy.split('-');
+            } else {
+                sortField = sortBy;
+                sortDirection = 'desc';
+            }
+            
             let sortedVulns = Object.values(vulnGroups);
             
             if (sortBy === 'hostname') {
@@ -2325,6 +2715,225 @@
             createPagination('vulnPaginationContainer', currentVulnPage, totalItems, vulnItemsPerPage, goToVulnPage);
         }
 
+        // Utility Functions
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        function applySorting(sortValue) {
+            if (!vulnData || vulnData.length === 0) return;
+            
+            let dataToSort = filteredData && filteredData.length > 0 ? filteredData : vulnData;
+            
+            switch (sortValue) {
+                case 'hostname-asc':
+                    dataToSort.sort((a, b) => (a.hostname || '').localeCompare(b.hostname || ''));
+                    break;
+                case 'hostname-desc':
+                    dataToSort.sort((a, b) => (b.hostname || '').localeCompare(a.hostname || ''));
+                    break;
+                case 'severity-high':
+                    dataToSort.sort((a, b) => {
+                        const severityOrder = { 'critical': 4, 'high': 3, 'medium': 2, 'low': 1, 'info': 0 };
+                        return (severityOrder[b.severity?.toLowerCase()] || 0) - (severityOrder[a.severity?.toLowerCase()] || 0);
+                    });
+                    break;
+                case 'severity-low':
+                    dataToSort.sort((a, b) => {
+                        const severityOrder = { 'critical': 4, 'high': 3, 'medium': 2, 'low': 1, 'info': 0 };
+                        return (severityOrder[a.severity?.toLowerCase()] || 0) - (severityOrder[b.severity?.toLowerCase()] || 0);
+                    });
+                    break;
+                case 'tickets-open':
+                    dataToSort.sort((a, b) => {
+                        const aTickets = getAssetTicketStatus(a.hostname);
+                        const bTickets = getAssetTicketStatus(b.hostname);
+                        return (bTickets.status === 'open' ? 1 : 0) - (aTickets.status === 'open' ? 1 : 0);
+                    });
+                    break;
+                default:
+                    // Default sort by hostname
+                    dataToSort.sort((a, b) => (a.hostname || '').localeCompare(b.hostname || ''));
+            }
+            
+            // Update the array references
+            if (filteredData && filteredData.length > 0) {
+                filteredData = [...dataToSort];
+            } else {
+                vulnData = [...dataToSort];
+            }
+        }
+        
+        function showToast(message, type = 'info') {
+            // Create toast if it doesn't exist
+            let toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+            
+            const toastId = 'toast-' + Date.now();
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = 'toast show';
+            toast.setAttribute('role', 'alert');
+            
+            const bgClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-primary';
+            
+            toast.innerHTML = `
+                <div class="toast-header ${bgClass} text-white">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                    <strong class="me-auto">HexTrackr</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (document.getElementById(toastId)) {
+                    toast.remove();
+                }
+            }, 5000);
+        }
+
+        // Ticket Status Functions
+        function getAssetTicketStatus(hostname) {
+            // Check localStorage for ticket data from tickets page
+            const ticketData = JSON.parse(localStorage.getItem('hextrackr_tickets') || '[]');
+            const assetTickets = ticketData.filter(ticket => 
+                ticket.device === hostname || ticket.hostname === hostname
+            );
+            
+            if (assetTickets.length === 0) {
+                return { status: 'none', count: 0, indicator: '' };
+            }
+            
+            const openTickets = assetTickets.filter(ticket => 
+                ticket.status === 'Open' || ticket.status === 'In Progress'
+            ).length;
+            
+            const closedTickets = assetTickets.filter(ticket => 
+                ticket.status === 'Closed' || ticket.status === 'Resolved'
+            ).length;
+            
+            if (openTickets > 0) {
+                return { 
+                    status: 'open', 
+                    count: openTickets, 
+                    total: assetTickets.length,
+                    indicator: `<span class="badge bg-warning text-dark me-2" title="${openTickets} open ticket(s)">
+                        <i class="fas fa-ticket-alt me-1"></i>${openTickets}
+                    </span>`
+                };
+            } else if (closedTickets > 0) {
+                return { 
+                    status: 'closed', 
+                    count: closedTickets, 
+                    total: assetTickets.length,
+                    indicator: `<span class="badge bg-success me-2" title="${closedTickets} closed ticket(s)">
+                        <i class="fas fa-check-circle me-1"></i>${closedTickets}
+                    </span>`
+                };
+            }
+            
+            return { status: 'none', count: 0, indicator: '' };
+        }
+        
+        function getTicketIndicator(ticketStatus) {
+            if (ticketStatus.status === 'open') {
+                return `<span class="badge bg-warning text-dark ms-2" title="Has ${ticketStatus.count} open ticket(s)">
+                    <i class="fas fa-exclamation-triangle me-1"></i>Tickets
+                </span>`;
+            } else if (ticketStatus.status === 'closed') {
+                return `<span class="badge bg-success ms-2" title="Has ${ticketStatus.count} closed ticket(s)">
+                    <i class="fas fa-check-circle me-1"></i>Resolved
+                </span>`;
+            }
+            return '';
+        }
+        
+        // Filter Functions
+        function applyTicketFilter(assets, filterValue) {
+            if (!filterValue) return assets;
+            
+            return assets.filter(asset => {
+                const ticketStatus = getAssetTicketStatus(asset.hostname);
+                
+                switch (filterValue) {
+                    case 'open':
+                        return ticketStatus.status === 'open';
+                    case 'closed':
+                        return ticketStatus.status === 'closed';
+                    case 'none':
+                        return ticketStatus.status === 'none';
+                    default:
+                        return true;
+                }
+            });
+        }
+        
+        function refreshData() {
+            // Refresh data and apply current filters
+            console.log('🔄 Refreshing data...');
+            loadExistingData();
+            updateCardViews();
+            showToast('Data refreshed successfully!', 'success');
+        }
+        
+        function exportData() {
+            // Export current filtered data as CSV
+            const data = currentAssetGroupData || vulnData;
+            if (data.length === 0) {
+                alert('No data to export');
+                return;
+            }
+            
+            // Convert to CSV
+            const headers = ['Hostname', 'IP Address', 'Vendor', 'Critical', 'High', 'Medium', 'Low', 'Total', 'Ticket Status'];
+            const csvData = data.map(asset => [
+                asset.hostname,
+                asset.ipAddress || '',
+                asset.vendor || '',
+                asset.severityCounts?.critical || 0,
+                asset.severityCounts?.high || 0,
+                asset.severityCounts?.medium || 0,
+                asset.severityCounts?.low || 0,
+                asset.vulnerabilities?.length || 0,
+                getAssetTicketStatus(asset.hostname).status
+            ]);
+            
+            const csv = [headers, ...csvData].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+            
+            // Download CSV file
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `hextrackr-export-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Data exported successfully!', 'success');
+        }
+
         function createAssetCard(asset) {
             const totalVulns = asset.vulnerabilities.length;
             const criticalCount = asset.severityCounts.critical;
@@ -2332,14 +2941,20 @@
             const mediumCount = asset.severityCounts.medium;
             const lowCount = asset.severityCounts.low;
             
+            // Check for ticket status
+            const ticketStatus = getAssetTicketStatus(asset.hostname);
+            const ticketIndicator = getTicketIndicator(ticketStatus);
+            
             return `
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card asset-card h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h6 class="mb-0" onclick="showAssetDetails('${asset.hostname}')" style="cursor: pointer;">
                                 <i class="fas fa-server me-2"></i>${asset.hostname}
+                                ${ticketIndicator}
                             </h6>
                             <div class="card-actions">
+                                ${ticketStatus.indicator}
                                 <button class="btn btn-sm btn-outline-primary me-1" onclick="editAsset('${asset.hostname}')" title="Edit Asset">
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -2470,16 +3085,31 @@
             const dataToShow = searchTerm || severityFilter ? filteredData : vulnData;
             
             // Sort data
-            const sortBy = document.getElementById('sortBy').value;
+            const sortSelect = document.getElementById('sortSelect');
+            const sortBy = sortSelect ? sortSelect.value : 'hostname-asc';
             let sortedData = [...dataToShow];
             
-            if (sortBy === 'hostname') {
-                sortedData.sort((a, b) => (a.hostname || '').localeCompare(b.hostname || ''));
-            } else if (sortBy === 'critical' || sortBy === 'high' || sortBy === 'medium' || sortBy === 'low') {
+            // Parse the sort value
+            let sortField, sortDirection;
+            if (sortBy.includes('-')) {
+                [sortField, sortDirection] = sortBy.split('-');
+            } else {
+                sortField = sortBy;
+                sortDirection = 'asc';
+            }
+            
+            if (sortField === 'hostname') {
                 sortedData.sort((a, b) => {
-                    if (a.severity === sortBy && b.severity !== sortBy) return -1;
-                    if (a.severity !== sortBy && b.severity === sortBy) return 1;
-                    return (b.vprScore || 0) - (a.vprScore || 0);
+                    const comparison = (a.hostname || '').localeCompare(b.hostname || '');
+                    return sortDirection === 'desc' ? -comparison : comparison;
+                });
+            } else if (sortField === 'severity') {
+                sortedData.sort((a, b) => {
+                    const severityOrder = { 'critical': 4, 'high': 3, 'medium': 2, 'low': 1, 'info': 0 };
+                    const aScore = severityOrder[a.severity?.toLowerCase()] || 0;
+                    const bScore = severityOrder[b.severity?.toLowerCase()] || 0;
+                    const comparison = bScore - aScore;
+                    return sortDirection === 'low' ? -comparison : comparison;
                 });
             } else {
                 sortedData.sort((a, b) => (b.vprScore || 0) - (a.vprScore || 0));
@@ -2604,14 +3234,27 @@
 
         // Create small sparkline charts for severity indicators
         function createSeveritySparkline(containerId, data, color, title) {
+            // Check if container exists before creating chart
+            const container = document.querySelector(containerId);
+            if (!container) {
+                console.warn(`🚫 Sparkline container ${containerId} not found`);
+                return null;
+            }
+
+            // Don't create chart if no data
+            if (!data || data.length === 0) {
+                console.warn(`📊 No data provided for sparkline ${containerId}`);
+                return null;
+            }
+
             const options = {
                 series: [{
                     data: data
                 }],
                 chart: {
                     type: 'line',
-                    width: 60,
-                    height: 30,
+                    width: '100%',
+                    height: 50,
                     sparkline: {
                         enabled: true
                     }
@@ -2641,9 +3284,15 @@
                 }
             };
 
-            const chart = new ApexCharts(document.querySelector(containerId), options);
-            chart.render();
-            return chart;
+            try {
+                const chart = new ApexCharts(container, options);
+                chart.render();
+                console.log(`✅ Sparkline created for ${containerId}`);
+                return chart;
+            } catch (error) {
+                console.error(`❌ Error creating sparkline for ${containerId}:`, error);
+                return null;
+            }
         }
 
         function showAssetDetails(hostname) {
@@ -2813,8 +3462,8 @@
             if (savedData) {
                 try {
                     vulnData = JSON.parse(savedData);
-                    if (vulnData.length > 0) {
-                        const stats = calculateStatistics(vulnData);
+                    if (vulnData && Array.isArray(vulnData) && vulnData.length > 0) {
+                        const stats = calculateStatistics(vulnData, new Date());
                         updateStatCards(stats);
                         updateCardViews();
                         
@@ -2823,6 +3472,15 @@
                         document.getElementById('trendChartSection').style.display = 'block';
                         // Update trend chart after a short delay to ensure DOM is ready
                         setTimeout(updateTrendChart, 100);
+                    } else {
+                        // Initialize empty data
+                        vulnData = [];
+                        updateStatCards({
+                            severityVPR: { critical: 0, high: 0, medium: 0, low: 0, info: 0 },
+                            vendor: {},
+                            total: 0,
+                            date: new Date()
+                        });
                     }
                 } catch (error) {
                     console.error('Error loading saved data:', error);
@@ -2918,7 +3576,7 @@
             ];
 
             vulnData = sampleData;
-            const stats = calculateStatistics(vulnData);
+            const stats = calculateStatistics(vulnData, new Date());
             updateStatCards(stats);
             updateCardViews();
             
@@ -2975,14 +3633,32 @@
                 });
                 
                 // Clear card containers
-                document.getElementById('assetCardsContainer').innerHTML = '<div class="col-12"><div class="alert alert-info">No vulnerability data available</div></div>';
-                document.getElementById('vulnCardsContainer').innerHTML = '<div class="col-12"><div class="alert alert-info">No vulnerability data available</div></div>';
+                document.getElementById('assetCardsContainer').innerHTML = '<div class="col-12"><div class="alert alert-info text-center p-4"><h5 class="mb-2"><i class="fas fa-database me-2"></i>No Data Available</h5><p class="mb-0 text-muted">Upload vulnerability data to get started</p></div></div>';
+                document.getElementById('vulnCardsContainer').innerHTML = '<div class="col-12"><div class="alert alert-info text-center p-4"><h5 class="mb-2"><i class="fas fa-shield-alt me-2"></i>No Vulnerabilities</h5><p class="mb-0 text-muted">Upload data to view vulnerabilities</p></div></div>';
                 
-                // Clear upload info
+                // Clear table view
+                const tableContainer = document.getElementById('tableContainer');
+                if (tableContainer) {
+                    tableContainer.innerHTML = '<div class="alert alert-info text-center p-4"><h5 class="mb-2"><i class="fas fa-table me-2"></i>No Data Available</h5><p class="mb-0 text-muted">Upload vulnerability data to view in table format</p></div>';
+                }
+                
+                // Hide trend chart and show upload area
+                document.getElementById('trendChartSection').style.display = 'none';
+                document.getElementById('uploadArea').style.display = 'block';
+                
+                // Clear upload info and show "No data uploaded"
                 const uploadInfo = document.getElementById('lastUploadInfo');
                 if (uploadInfo) {
-                    uploadInfo.innerHTML = '<span class="text-muted">No data uploaded</span>';
+                    uploadInfo.innerHTML = '<span class="text-muted">No data uploaded yet</span>';
                 }
+                
+                // Clear sparklines
+                ['criticalSparkline', 'highSparkline', 'mediumSparkline', 'lowSparkline'].forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.innerHTML = '';
+                    }
+                });
                 
                 alert('✅ All vulnerability data has been cleared successfully!');
                 
@@ -3405,7 +4081,7 @@ Would you like to:
                     // Update dashboard if needed
                     if (result.results.correlatedDevices?.success) {
                         console.log('📊 DNAC devices correlated with vulnerability data');
-                        updateDashboard();
+                        loadExistingData();
                     }
                 } else {
                     alert(`❌ DNAC Sync Failed:\n\n${result.error}`);
@@ -3439,11 +4115,53 @@ Would you like to:
 
         // Show Tools & Settings Modal
         function showToolsModal() {
-            const modal = new bootstrap.Modal(document.getElementById('toolsModal'));
-            loadCiscoCredentials(); // Load existing credentials
-            loadDNACCredentials(); // Load DNAC credentials
-            loadDatabaseConfig(); // Load database configuration
-            modal.show();
+            console.log('🔧 showToolsModal() called');
+            
+            try {
+                const modalElement = document.getElementById('toolsModal');
+                console.log('📋 Modal element found:', modalElement);
+                
+                if (!modalElement) {
+                    console.error('❌ toolsModal element not found');
+                    return;
+                }
+                
+                const modal = new bootstrap.Modal(modalElement);
+                console.log('🚀 Bootstrap modal created:', modal);
+                
+                // Only load configurations that have corresponding form elements
+                try {
+                    if (document.getElementById('dnacUrl')) {
+                        loadDNACCredentials();
+                        console.log('✅ DNAC credentials loaded');
+                    }
+                } catch (error) {
+                    console.error('❌ Error loading DNAC credentials:', error);
+                }
+                
+                try {
+                    if (document.getElementById('ciscoApiKey')) {
+                        loadCiscoCredentials();
+                        console.log('✅ Cisco credentials loaded');
+                    }
+                } catch (error) {
+                    console.error('❌ Error loading Cisco credentials:', error);
+                }
+                
+                try {
+                    if (document.getElementById('tursoUrl')) {
+                        loadDatabaseConfig();
+                        console.log('✅ Database config loaded');
+                    }
+                } catch (error) {
+                    console.error('❌ Error loading database config:', error);
+                }
+                
+                modal.show();
+                console.log('✅ Modal.show() called - should be visible now');
+            } catch (error) {
+                console.error('❌ Error in showToolsModal():', error);
+            }
         }
 
         // Load database configuration
@@ -3712,8 +4430,8 @@ Would you like to:
 
         // Save Cisco credentials with encryption
         function saveCiscoCredentials() {
-            const clientId = document.getElementById('ciscoClientId').value.trim();
-            const clientSecret = document.getElementById('ciscoClientSecret').value.trim();
+            const clientId = document.getElementById('ciscoApiKey').value.trim();
+            const clientSecret = document.getElementById('ciscoSecret').value.trim();
 
             if (!clientId || !clientSecret) {
                 alert('Please enter both Client ID and Client Secret');
@@ -3729,12 +4447,15 @@ Would you like to:
             const encrypted = encryptData(credentials);
             if (encrypted) {
                 localStorage.setItem('hextrackr_cisco_credentials', encrypted);
-                document.getElementById('ciscoStatus').textContent = 'Configured';
-                document.getElementById('ciscoStatus').className = 'badge bg-success ms-2';
+                const statusElement = document.getElementById('ciscoStatus');
+                if (statusElement) {
+                    statusElement.textContent = 'Configured';
+                    statusElement.className = 'badge bg-success ms-2';
+                }
                 
                 // Clear the input fields for security
-                document.getElementById('ciscoClientId').value = '';
-                document.getElementById('ciscoClientSecret').value = '';
+                document.getElementById('ciscoApiKey').value = '';
+                document.getElementById('ciscoSecret').value = '';
                 
                 alert('✅ Cisco API credentials encrypted and saved securely!');
             } else {
@@ -3748,24 +4469,37 @@ Would you like to:
             if (encrypted) {
                 const credentials = decryptData(encrypted);
                 if (credentials) {
-                    document.getElementById('ciscoClientId').value = credentials.clientId;
-                    document.getElementById('ciscoClientSecret').value = credentials.clientSecret;
-                    document.getElementById('ciscoStatus').textContent = 'Configured';
-                    document.getElementById('ciscoStatus').className = 'badge bg-success ms-2';
+                    // Use correct element IDs from the modal
+                    const clientIdElement = document.getElementById('ciscoApiKey');
+                    const clientSecretElement = document.getElementById('ciscoSecret');
+                    const statusElement = document.getElementById('ciscoStatus');
+                    
+                    if (clientIdElement) clientIdElement.value = credentials.clientId;
+                    if (clientSecretElement) clientSecretElement.value = credentials.clientSecret;
+                    if (statusElement) {
+                        statusElement.textContent = 'Configured';
+                        statusElement.className = 'badge bg-success ms-2';
+                    }
                 } else {
-                    document.getElementById('ciscoStatus').textContent = 'Decryption Failed';
-                    document.getElementById('ciscoStatus').className = 'badge bg-danger ms-2';
+                    const statusElement = document.getElementById('ciscoStatus');
+                    if (statusElement) {
+                        statusElement.textContent = 'Decryption Failed';
+                        statusElement.className = 'badge bg-danger ms-2';
+                    }
                 }
             } else {
-                document.getElementById('ciscoStatus').textContent = 'Not Configured';
-                document.getElementById('ciscoStatus').className = 'badge bg-secondary ms-2';
+                const statusElement = document.getElementById('ciscoStatus');
+                if (statusElement) {
+                    statusElement.textContent = 'Not Configured';
+                    statusElement.className = 'badge bg-secondary ms-2';
+                }
             }
         }
 
         // Test Enhanced Cisco API connection
         async function testCiscoAPIEnhanced() {
-            const clientId = document.getElementById('ciscoClientId').value.trim();
-            const clientSecret = document.getElementById('ciscoClientSecret').value.trim();
+            const clientId = document.getElementById('ciscoApiKey').value.trim();
+            const clientSecret = document.getElementById('ciscoSecret').value.trim();
 
             if (!clientId || !clientSecret) {
                 alert('Please enter credentials first');
@@ -3773,9 +4507,11 @@ Would you like to:
             }
 
             const resultDiv = document.getElementById('ciscoTestResult');
-            resultDiv.style.display = 'block';
-            resultDiv.className = 'alert alert-info';
-            resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Testing enhanced connection...';
+            if (resultDiv) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'alert alert-info';
+                resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Testing enhanced connection...';
+            }
 
             try {
                 // Initialize the enhanced API service
@@ -3786,10 +4522,11 @@ Would you like to:
                     const token = await apiService.authenticate();
                     
                     if (token) {
-                        resultDiv.className = 'alert alert-success';
-                        resultDiv.innerHTML = `
-                            <i class="fas fa-check-circle me-2"></i>
-                            <strong>✅ Enhanced Connection Successful!</strong><br>
+                        if (resultDiv) {
+                            resultDiv.className = 'alert alert-success';
+                            resultDiv.innerHTML = `
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>✅ Enhanced Connection Successful!</strong><br>
                             <div class="mt-2">
                                 <span class="badge bg-success me-1">Authentication</span>
                                 <span class="badge bg-info me-1">Rate Limiting Active</span>
@@ -3801,7 +4538,8 @@ Would you like to:
                                     <a href="https://developer.cisco.com/docs/security-advisories/" target="_blank">View API Documentation</a>
                                 </small>
                             </div>
-                        `;
+                            `;
+                        }
                     } else {
                         throw new Error('Authentication failed');
                     }
@@ -3818,23 +4556,27 @@ Would you like to:
 
                     if (tokenResponse.ok) {
                         const tokenData = await tokenResponse.json();
-                        resultDiv.className = 'alert alert-success';
-                        resultDiv.innerHTML = `
-                            <i class="fas fa-check-circle me-2"></i>
-                            <strong>✅ Basic Connection Successful!</strong><br>
-                            <small class="text-warning">Note: Load cisco-api-service-enhanced.js for full features</small>
-                        `;
+                        if (resultDiv) {
+                            resultDiv.className = 'alert alert-success';
+                            resultDiv.innerHTML = `
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>✅ Basic Connection Successful!</strong><br>
+                                <small class="text-warning">Note: Load cisco-api-service-enhanced.js for full features</small>
+                            `;
+                        }
                     } else {
                         throw new Error(`Authentication failed: ${tokenResponse.status}`);
                     }
                 }
             } catch (error) {
-                resultDiv.className = 'alert alert-danger';
-                resultDiv.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>❌ Connection Failed!</strong><br>
-                    Error: ${error.message}
-                `;
+                if (resultDiv) {
+                    resultDiv.className = 'alert alert-danger';
+                    resultDiv.innerHTML = `
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>❌ Connection Failed!</strong><br>
+                        Error: ${error.message}
+                    `;
+                }
             }
         }
 
@@ -3886,53 +4628,151 @@ Would you like to:
             }
         }
 
-        // Test Cisco API connection (legacy)
-        async function testCiscoAPI() {
-            const clientId = document.getElementById('ciscoClientId').value.trim();
-            const clientSecret = document.getElementById('ciscoClientSecret').value.trim();
-
-            if (!clientId || !clientSecret) {
-                alert('Please enter credentials first');
-                return;
-            }
-
-            const resultDiv = document.getElementById('ciscoTestResult');
-            resultDiv.style.display = 'block';
-            resultDiv.className = 'alert alert-info';
-            resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Testing connection...';
-
+        // Quick login function for testing (admin/admin123)
+        async function quickLogin() {
             try {
-                // Get OAuth token from Cisco
-                const tokenResponse = await fetch('https://cloudsso.cisco.com/as/token.oauth2', {
+                const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Accept': 'application/json'
+                        'Content-Type': 'application/json'
                     },
-                    body: `client_id=${encodeURIComponent(clientId)}&client_secret=${encodeURIComponent(clientSecret)}&grant_type=client_credentials`
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: 'admin123'
+                    })
                 });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('hextrackr_jwt_token', data.token);
+                    console.log('✅ Logged in successfully as admin');
+                    return true;
+                } else {
+                    console.error('❌ Login failed:', response.status);
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                return false;
+            }
+        }
+
+        // Test Cisco API connection (via server proxy)
+        async function testCiscoAPI() {
+            // Use provided test credentials (swapped - Client ID is typically longer)
+            const clientId = 'FScXCaVYjRJ6nxdSfpTd7Gu6';
+            const clientSecret = 'na6st3rkeyddn7u3t8guavtj';
+
+            console.log('🔧 Testing Cisco API via server proxy...');
+            
+            const resultDiv = document.getElementById('ciscoTestResult');
+            if (resultDiv) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'alert alert-info';
+                resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Testing connection via server proxy...';
+            }
+
+            try {
+                console.log('📡 Requesting OAuth token via server proxy...');
+                
+                // Get JWT token for API authentication
+                let jwtToken = localStorage.getItem('hextrackr_jwt_token');
+                if (!jwtToken) {
+                    console.log('🔐 No JWT token found, logging in as admin...');
+                    const loginSuccess = await quickLogin();
+                    if (!loginSuccess) {
+                        throw new Error('Failed to login. Please check server connection.');
+                    }
+                    jwtToken = localStorage.getItem('hextrackr_jwt_token');
+                }
+                
+                // Use server proxy to avoid CORS issues
+                const tokenResponse = await fetch('/api/cisco/oauth/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`
+                    },
+                    body: JSON.stringify({
+                        client_id: clientId,
+                        client_secret: clientSecret
+                    })
+                });
+
+                console.log('📊 Proxy token response status:', tokenResponse.status);
 
                 if (tokenResponse.ok) {
                     const tokenData = await tokenResponse.json();
-                    resultDiv.className = 'alert alert-success';
-                    resultDiv.innerHTML = `
-                        <i class="fas fa-check-circle me-2"></i>
-                        <strong>✅ Connection Successful!</strong><br>
-                        Access token received. API is ready to use.
-                    `;
+                    console.log('✅ Token obtained successfully via proxy!');
+                    console.log('🔑 Token type:', tokenData.token_type);
+                    console.log('⏰ Expires in:', tokenData.expires_in, 'seconds');
                     
-                    // Store the token temporarily for testing
-                    window.ciscoAccessToken = tokenData.access_token;
+                    // Test API call with the token via proxy
+                    const advisoryResponse = await fetch(`/api/cisco/advisories?access_token=${tokenData.access_token}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${jwtToken}`
+                        }
+                    });
+                    
+                    console.log('📋 Advisory API response status:', advisoryResponse.status);
+                    
+                    if (advisoryResponse.ok) {
+                        const advisoryData = await advisoryResponse.json();
+                        console.log('✅ Successfully retrieved advisories via proxy!');
+                        console.log('📊 Advisory count:', advisoryData.advisories?.length || 0);
+                        
+                        if (resultDiv) {
+                            resultDiv.className = 'alert alert-success';
+                            resultDiv.innerHTML = `
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>✅ Connection Successful!</strong><br>
+                                <div class="mt-2">
+                                    <span class="badge bg-success me-1">Authentication ✓</span>
+                                    <span class="badge bg-info me-1">Server Proxy ✓</span>
+                                    <span class="badge bg-primary me-1">API Access ✓</span>
+                                    <span class="badge bg-warning">Advisories: ${advisoryData.advisories?.length || 0}</span>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-success">
+                                        🎉 CORS issue resolved! Using server-side proxy.<br>
+                                        Token expires in ${tokenData.expires_in} seconds
+                                    </small>
+                                </div>
+                            `;
+                        }
+                        
+                        // Store the token temporarily for potential additional testing
+                        window.ciscoAccessToken = tokenData.access_token;
+                        console.log('🎉 Cisco API test completed successfully via proxy!');
+                        
+                    } else {
+                        const errorData = await advisoryResponse.json().catch(() => ({ error: 'Unknown error' }));
+                        console.error('❌ Advisory API failed:', errorData);
+                        throw new Error(`Advisory API failed: ${advisoryResponse.status} - ${errorData.error || 'Unknown error'}`);
+                    }
                 } else {
-                    throw new Error(`Authentication failed: ${tokenResponse.status}`);
+                    const errorData = await tokenResponse.json().catch(() => ({ error: 'Unknown error' }));
+                    console.error('❌ Token request failed:', errorData);
+                    throw new Error(`Authentication failed: ${tokenResponse.status} - ${errorData.error || 'Unknown error'}`);
                 }
             } catch (error) {
-                resultDiv.className = 'alert alert-danger';
-                resultDiv.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>❌ Connection Failed!</strong><br>
-                    ${error.message}
-                `;
+                console.error('❌ Test failed with error:', error);
+                
+                if (resultDiv) {
+                    resultDiv.className = 'alert alert-danger';
+                    resultDiv.innerHTML = `
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>❌ Connection Failed!</strong><br>
+                        ${error.message}
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                Check console for detailed error information.<br>
+                                Make sure the server is running and you're logged in.
+                            </small>
+                        </div>
+                    `;
+                }
             }
         }
 
@@ -4085,10 +4925,17 @@ Would you like to:
             if (confirm('⚠️ Are you sure you want to clear all API credentials? This cannot be undone.')) {
                 localStorage.removeItem('hextrackr_cisco_credentials');
                 localStorage.removeItem('hextrackr_encryption_key');
-                document.getElementById('ciscoClientId').value = '';
-                document.getElementById('ciscoClientSecret').value = '';
-                document.getElementById('ciscoStatus').textContent = 'Not Configured';
-                document.getElementById('ciscoStatus').className = 'badge bg-secondary ms-2';
+                
+                const clientIdElement = document.getElementById('ciscoApiKey');
+                const clientSecretElement = document.getElementById('ciscoSecret');
+                const statusElement = document.getElementById('ciscoStatus');
+                
+                if (clientIdElement) clientIdElement.value = '';
+                if (clientSecretElement) clientSecretElement.value = '';
+                if (statusElement) {
+                    statusElement.textContent = 'Not Configured';
+                    statusElement.className = 'badge bg-secondary ms-2';
+                }
                 alert('✅ All API credentials have been cleared.');
             }
         }
@@ -4104,6 +4951,45 @@ Would you like to:
                     document.getElementById('ciscoStatus').className = 'badge bg-success ms-2';
                 }
             }
+
+            // Add event listeners for new navigation controls
+            const searchInput = document.getElementById('searchInput');
+            const severityFilter = document.getElementById('severityFilter');
+            const ticketFilter = document.getElementById('ticketFilter');
+            const sortSelect = document.getElementById('sortSelect');
+            const clearSearchBtn = document.getElementById('clearSearch');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(filterAndDisplayData, 300));
+            }
+            
+            if (clearSearchBtn) {
+                clearSearchBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    filterAndDisplayData();
+                });
+            }
+            
+            if (severityFilter) {
+                severityFilter.addEventListener('change', filterAndDisplayData);
+            }
+            
+            if (ticketFilter) {
+                ticketFilter.addEventListener('change', filterAndDisplayData);
+            }
+            
+            if (sortSelect) {
+                sortSelect.addEventListener('change', function() {
+                    applySorting(this.value);
+                    updateCardViews();
+                });
+            }
+            
+            // View mode change handlers (if radio buttons exist)
+            const viewModeRadios = document.querySelectorAll('input[name="viewMode"]');
+            viewModeRadios.forEach(radio => {
+                radio.addEventListener('change', updateCardViews);
+            });
 
             // Initialize Turso integration
             setTimeout(async () => {

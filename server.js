@@ -11,7 +11,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = process.env.PORT || 3232;
+const PORT = process.env.PORT || 3040;
 const JWT_SECRET = process.env.JWT_SECRET || 'hextrackr-secret-key-change-in-production';
 
 // Database setup
@@ -29,8 +29,8 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://cdn.tailwindcss.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://cdn.tailwindcss.com"],
             imgSrc: ["'self'", "data:", "https:"],
             fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
             connectSrc: ["'self'", "https://cloudsso.cisco.com", "https://api.cisco.com"]
@@ -50,11 +50,14 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Import database service
+const databaseService = require('./database-service.js');
+
 // File upload configuration
 const upload = multer({
     dest: 'uploads/',
     limits: {
-        fileSize: 60 * 1024 * 1024 // 60MB limit
+        fileSize: 100 * 1024 * 1024 // 100MB limit for large CSV files
     }
 });
 
@@ -93,6 +96,142 @@ const authenticateToken = (req, res, next) => {
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
+// Large CSV Import Endpoints
+
+// Import the large 64MB Cisco vulnerabilities CSV
+app.post('/api/import/cisco-csv', async (req, res) => {
+    try {
+        console.log('🚀 Starting large Cisco CSV import...');
+        
+        // Check if the large CSV file exists
+        const largeCsvPath = path.join(__dirname, 'cisco-vulnerabilities-08_19_2025_-09_02_16-cdt.csv');
+        
+        if (!fs.existsSync(largeCsvPath)) {
+            return res.status(404).json({
+                success: false,
+                error: 'Large CSV file not found',
+                path: largeCsvPath
+            });
+        }
+
+        // Get file stats
+        const stats = fs.statSync(largeCsvPath);
+        console.log(`📊 File size: ${(stats.size / 1024 / 1024).toFixed(2)} MB`);
+
+        // Start streaming import
+        const result = await databaseService.importCsvFile(largeCsvPath, 'vulnerabilities');
+        
+        res.json({
+            success: true,
+            message: 'CSV import completed successfully',
+            ...result,
+            fileSize: `${(stats.size / 1024 / 1024).toFixed(2)} MB`
+        });
+
+    } catch (error) {
+        console.error('❌ CSV import error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message,
+            details: 'Failed to import large CSV file'
+        });
+    }
+});
+
+// Upload and import CSV files
+app.post('/api/import/upload-csv', upload.single('csvFile'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                error: 'No file uploaded'
+            });
+        }
+
+        const csvType = req.body.csvType || 'vulnerabilities';
+        console.log(`🚀 Importing uploaded CSV: ${req.file.originalname} (${csvType})`);
+
+        // Import the uploaded file
+        const result = await databaseService.importCsvFile(req.file.path, csvType);
+
+        // Clean up uploaded file
+        fs.unlinkSync(req.file.path);
+
+        res.json({
+            success: true,
+            message: 'CSV file imported successfully',
+            filename: req.file.originalname,
+            ...result
+        });
+
+    } catch (error) {
+        console.error('❌ Upload CSV import error:', error);
+        
+        // Clean up file on error
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
+
+        res.status(500).json({
+            success: false,
+            error: error.message,
+            details: 'Failed to import uploaded CSV file'
+        });
+    }
+});
+
+// Get vulnerability statistics
+app.get('/api/vulnerabilities/stats', async (req, res) => {
+    try {
+        const stats = await databaseService.getVulnerabilityStats();
+        res.json({
+            success: true,
+            data: stats
+        });
+    } catch (error) {
+        console.error('❌ Stats error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Search vulnerabilities with filters
+app.get('/api/vulnerabilities/search', async (req, res) => {
+    try {
+        const filters = {
+            search: req.query.search,
+            severity: req.query.severity,
+            status: req.query.status,
+            limit: parseInt(req.query.limit) || 100
+        };
+
+        const vulnerabilities = await databaseService.searchVulnerabilities(filters);
+        
+        res.json({
+            success: true,
+            data: vulnerabilities,
+            count: vulnerabilities.length
+        });
+    } catch (error) {
+        console.error('❌ Search error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Get import progress (for real-time updates)
+app.get('/api/import/status', (req, res) => {
+    // This could be enhanced with real-time progress tracking
+    res.json({
+        success: true,
+        message: 'Import status endpoint - enhance with real-time progress tracking'
+    });
 });
 
 // Debug: List available files
@@ -429,6 +568,84 @@ app.get('/api/tenable/vpr/:cve', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Tenable VPR API error:', error);
         res.status(500).json({ error: 'Failed to fetch VPR data' });
+    }
+});
+
+// Cisco PSIRT API proxy to handle CORS
+app.post('/api/cisco/oauth/token', authenticateToken, async (req, res) => {
+    const { client_id, client_secret } = req.body;
+    
+    if (!client_id || !client_secret) {
+        return res.status(400).json({ error: 'Client ID and Client Secret are required' });
+    }
+    
+    try {
+        console.log('🔧 Proxying Cisco OAuth request...');
+        
+        const response = await fetch('https://cloudsso.cisco.com/as/token.oauth2', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
+            },
+            body: new URLSearchParams({
+                grant_type: 'client_credentials',
+                client_id: client_id,
+                client_secret: client_secret
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            console.log('✅ Cisco OAuth token obtained successfully');
+            res.json(data);
+        } else {
+            console.error('❌ Cisco OAuth error:', data);
+            res.status(response.status).json(data);
+        }
+    } catch (error) {
+        console.error('🔥 Cisco API proxy error:', error);
+        res.status(500).json({ 
+            error: 'Failed to connect to Cisco API',
+            details: error.message 
+        });
+    }
+});
+
+// Cisco PSIRT advisories proxy
+app.get('/api/cisco/advisories', authenticateToken, async (req, res) => {
+    const { access_token } = req.query;
+    
+    if (!access_token) {
+        return res.status(400).json({ error: 'Access token is required' });
+    }
+    
+    try {
+        console.log('📡 Fetching Cisco security advisories...');
+        
+        const response = await fetch('https://api.cisco.com/security/advisories/v2/advisories', {
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+                'Accept': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            console.log(`✅ Retrieved ${data.advisories?.length || 0} Cisco advisories`);
+            res.json(data);
+        } else {
+            console.error('❌ Cisco advisories error:', data);
+            res.status(response.status).json(data);
+        }
+    } catch (error) {
+        console.error('🔥 Cisco advisories proxy error:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch Cisco advisories',
+            details: error.message 
+        });
     }
 });
 

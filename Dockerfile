@@ -4,8 +4,8 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Install SQLite and other necessary packages
-RUN apk add --no-cache sqlite sqlite-dev python3 make g++ curl
+# Install PostgreSQL client, SQLite and other necessary packages
+RUN apk add --no-cache postgresql-client sqlite sqlite-dev python3 make g++ curl
 
 # Copy package files
 COPY package*.json ./
