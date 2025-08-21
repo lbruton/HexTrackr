@@ -419,7 +419,7 @@
                 
                 <!-- Action Buttons -->
                 <div class="flex items-center space-x-3">
-                    <button onclick="showToolsModal()" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30">
+                    <button id="toolsButton" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30">
                         <i class="fas fa-tools mr-2"></i>
                         <span class="hidden sm:inline">Tools & Settings</span>
                         <span class="sm:hidden">Tools</span>
@@ -445,10 +445,10 @@
                             Upload Vulnerability Data
                         </h2>
                         <div class="flex gap-3">
-                            <button class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-white/20 hover:border-white/40 transition-all duration-200" onclick="toggleUploadArea()">
+                            <button id="uploadToggleButton" class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-white/20 hover:border-white/40 transition-all duration-200">
                                 <i class="fas fa-upload me-1"></i>Upload More Data
                             </button>
-                            <button class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-white/20 hover:border-white/40 transition-all duration-200" onclick="showToolsModal()">
+                            <button id="connectApisButton" class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-white/20 hover:border-white/40 transition-all duration-200">
                                 <i class="fas fa-plug me-1"></i>Connect APIs
                             </button>
                         </div>
@@ -465,7 +465,7 @@
                                 <p class="text-gray-500 mt-1">Supports multiple CSV files from various vulnerability scanners</p>
                             </div>
                             <input type="file" id="fileInput" class="hidden" accept=".csv" multiple>
-                            <button class="inline-flex items-center px-6 py-3 bg-hex-600 hover:bg-hex-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg" onclick="document.getElementById('fileInput').click()">
+                            <button id="selectFileButton" class="inline-flex items-center px-6 py-3 bg-hex-600 hover:bg-hex-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">
                                 <i class="fas fa-file-upload mr-2"></i>
                                 Choose Files
                             </button>
@@ -496,7 +496,7 @@
             <!-- Modern Severity Dashboard -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Critical Vulnerabilities -->
-                <div class="bg-white rounded-xl shadow-lg border-l-4 border-red-500 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="filterBySeverity('critical')" data-severity="critical">
+                <div id="criticalCard" class="bg-white rounded-xl shadow-lg border-l-4 border-red-500 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group" data-severity="critical">
                     <div class="p-6 text-center">
                         <div class="w-14 h-14 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
                             <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
@@ -519,7 +519,7 @@
                 </div>
 
                 <!-- High Vulnerabilities -->
-                <div class="bg-white rounded-xl shadow-lg border-l-4 border-orange-500 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="filterBySeverity('high')" data-severity="high">
+                <div id="highCard" class="bg-white rounded-xl shadow-lg border-l-4 border-orange-500 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group" data-severity="high">
                     <div class="p-6 text-center">
                         <div class="w-14 h-14 mx-auto mb-4 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
                             <i class="fas fa-exclamation-circle text-orange-600 text-xl"></i>
@@ -542,7 +542,7 @@
                 </div>
 
                 <!-- Medium Vulnerabilities -->
-                <div class="bg-white rounded-xl shadow-lg border-l-4 border-yellow-500 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="filterBySeverity('medium')" data-severity="medium">
+                <div id="mediumCard" class="bg-white rounded-xl shadow-lg border-l-4 border-yellow-500 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group" data-severity="medium">
                     <div class="p-6 text-center">
                         <div class="w-14 h-14 mx-auto mb-4 bg-yellow-100 rounded-full flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
                             <i class="fas fa-info-circle text-yellow-600 text-xl"></i>
@@ -565,7 +565,7 @@
                 </div>
 
                 <!-- Low Vulnerabilities -->
-                <div class="bg-white rounded-xl shadow-lg border-l-4 border-green-500 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group" onclick="filterBySeverity('low')" data-severity="low">
+                <div id="lowCard" class="bg-white rounded-xl shadow-lg border-l-4 border-green-500 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group" data-severity="low">
                     <div class="p-6 text-center">
                         <div class="w-14 h-14 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
                             <i class="fas fa-shield-alt text-green-600 text-xl"></i>
@@ -687,7 +687,7 @@
                                     <!-- Action Buttons -->
                                     <div class="col-xl-2 col-lg-12 col-md-12">
                                         <div class="d-flex gap-2 justify-content-end">
-                                            <button class="btn btn-outline-primary" onclick="refreshData()" title="Refresh data">
+                                            <button id="refreshButton" class="btn btn-outline-primary" title="Refresh data">
                                                 <i class="fas fa-sync-alt"></i>
                                             </button>
                                             <div class="dropdown">
@@ -889,7 +889,7 @@
                 <!-- Data Management -->
                 <div class="row mt-3">
                     <div class="col-12 text-center">
-                        <button class="btn btn-outline-danger" onclick="clearVulnData()">
+                        <button id="clearDataButton" class="btn btn-outline-danger">
                             <i class="fas fa-trash-alt me-2"></i>Clear All Data
                         </button>
                     </div>
@@ -1368,6 +1368,41 @@
         });
 
         function setupEventListeners() {
+            // Secure event listeners to replace inline onclick handlers
+            
+            // Header buttons
+            const toolsButton = document.getElementById('toolsButton');
+            if (toolsButton) toolsButton.addEventListener('click', showToolsModal);
+            
+            const uploadToggleButton = document.getElementById('uploadToggleButton');
+            if (uploadToggleButton) uploadToggleButton.addEventListener('click', toggleUploadArea);
+            
+            const connectApisButton = document.getElementById('connectApisButton');
+            if (connectApisButton) connectApisButton.addEventListener('click', showToolsModal);
+            
+            const selectFileButton = document.getElementById('selectFileButton');
+            if (selectFileButton) selectFileButton.addEventListener('click', () => document.getElementById('fileInput').click());
+            
+            // Vulnerability severity cards
+            const criticalCard = document.getElementById('criticalCard');
+            if (criticalCard) criticalCard.addEventListener('click', () => filterBySeverity('critical'));
+            
+            const highCard = document.getElementById('highCard');
+            if (highCard) highCard.addEventListener('click', () => filterBySeverity('high'));
+            
+            const mediumCard = document.getElementById('mediumCard');
+            if (mediumCard) mediumCard.addEventListener('click', () => filterBySeverity('medium'));
+            
+            const lowCard = document.getElementById('lowCard');
+            if (lowCard) lowCard.addEventListener('click', () => filterBySeverity('low'));
+            
+            // Action buttons
+            const refreshButton = document.getElementById('refreshButton');
+            if (refreshButton) refreshButton.addEventListener('click', refreshData);
+            
+            const clearDataButton = document.getElementById('clearDataButton');
+            if (clearDataButton) clearDataButton.addEventListener('click', clearVulnData);
+
             // File upload handlers
             const fileInput = document.getElementById('fileInput');
             const uploadArea = document.getElementById('uploadArea');
