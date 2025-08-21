@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Database files
+data/*.db
+data/*.sqlite
+*.db
+*.sqlite
+
+# Log files
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+
+# CSV uploads (keep sample files)
+uploads/*.csv
+!uploads/sample*.csv
+!uploads/test*.csv
+
+# Large CSV files (keep smaller test files)
+*vulnerabilities*.csv
+!test-import.csv
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Backup files
+*.backup
+*.bak

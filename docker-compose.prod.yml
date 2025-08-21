@@ -1,0 +1,52 @@
+# HexTrackr Production Docker Setup
+# Optimized for GitHub repo deployment
+
+version: '3.8'
+
+services:
+  hextrackr:
+    build: .
+    container_name: hextrackr-prod
+    ports:
+      - "80:3232"      # Standard HTTP port
+      - "443:3232"     # HTTPS redirect (add SSL later)
+    volumes:
+      # Persistent data (survives container updates)
+      - hextrackr_data:/app/data
+      - hextrackr_uploads:/app/uploads
+      # Config files (can be customized)
+      - ./config:/app/config:ro
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET:-change-this-in-production}
+      - DATABASE_PATH=/app/data/hextrackr.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3232/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Nginx reverse proxy for SSL/performance
+  nginx:
+    image: nginx:alpine
+    container_name: hextrackr-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - hextrackr
+    restart: unless-stopped
+
+volumes:
+  hextrackr_data:
+    driver: local
+  hextrackr_uploads:
+    driver: local
+
+networks:
+  default:
+    name: hextrackr-network

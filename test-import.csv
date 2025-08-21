@@ -1,0 +1,21 @@
+asset.name,asset.display_ipv4_address,definition.family,definition.id,definition.cve,definition.name,severity,definition.vpr.score
+web-server-01,192.168.1.10,Web Applications,10001,CVE-2023-0001,Apache HTTP Server Buffer Overflow,critical,95.5
+db-server-02,192.168.1.20,Databases,10002,CVE-2023-0002,MySQL SQL Injection Vulnerability,high,87.2
+web-server-03,192.168.1.30,Web Applications,10003,CVE-2023-0003,Nginx Configuration Error,medium,54.8
+app-server-01,192.168.1.40,Application Servers,10004,CVE-2023-0004,Tomcat Remote Code Execution,critical,91.3
+firewall-01,192.168.1.50,Network Devices,10005,CVE-2023-0005,Cisco ASA Information Disclosure,low,23.2
+web-server-01,192.168.1.10,Web Applications,10006,CVE-2023-0006,OpenSSL Memory Leak,medium,48.7
+mail-server-01,192.168.1.60,Mail Servers,10007,CVE-2023-0007,Exchange Server Privilege Escalation,high,78.9
+dns-server-01,192.168.1.70,DNS Servers,10008,CVE-2023-0008,BIND DNS Cache Poisoning,medium,51.4
+proxy-server-01,192.168.1.80,Proxy Servers,10009,CVE-2023-0009,Squid HTTP Request Smuggling,high,69.8
+backup-server-01,192.168.1.90,Backup Systems,10010,CVE-2023-0010,Veeam Authentication Bypass,critical,88.7
+dc-server-01,192.168.1.100,Domain Controllers,10011,CVE-2023-0011,Active Directory Privilege Escalation,critical,92.4
+web-server-04,192.168.1.110,Web Applications,10012,CVE-2023-0012,IIS Buffer Overflow,high,76.3
+db-server-03,192.168.1.120,Databases,10013,CVE-2023-0013,Oracle SQL Injection,critical,89.6
+app-server-02,192.168.1.130,Application Servers,10014,CVE-2023-0014,JBoss Remote Code Execution,critical,94.2
+load-balancer-01,192.168.1.140,Network Devices,10015,CVE-2023-0015,F5 BIG-IP Authentication Bypass,high,82.1
+web-server-05,192.168.1.150,Web Applications,10016,CVE-2023-0016,Apache Struts RCE,critical,96.8
+storage-server-01,192.168.1.160,Storage Systems,10017,CVE-2023-0017,NetApp Information Disclosure,medium,47.5
+vpn-server-01,192.168.1.170,VPN Systems,10018,CVE-2023-0018,Fortinet SSL VPN Buffer Overflow,critical,93.7
+monitoring-server-01,192.168.1.180,Monitoring,10019,CVE-2023-0019,SolarWinds Remote Code Execution,critical,97.3
+backup-server-02,192.168.1.190,Backup Systems,10020,CVE-2023-0020,Veritas NetBackup Privilege Escalation,high,71.9
