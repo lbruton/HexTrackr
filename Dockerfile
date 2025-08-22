@@ -4,8 +4,8 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Install PostgreSQL client, SQLite and other necessary packages
-RUN apk add --no-cache postgresql-client sqlite sqlite-dev python3 make g++ curl
+# Install PostgreSQL client and other necessary packages (removed SQLite)
+RUN apk add --no-cache postgresql-client python3 make g++ curl
 
 # Copy package files
 COPY package*.json ./
@@ -16,19 +16,15 @@ RUN npm ci --only=production && npm rebuild
 # Copy application files (excluding node_modules from host)
 COPY . .
 
-# Create SQLite database directory
+# Create data directory for file uploads
 RUN mkdir -p /app/data
 
-# Initialize SQLite database
-COPY scripts/init-db.sql /app/scripts/
-RUN sqlite3 /app/data/hextrackr.db < /app/scripts/init-db.sql
+# Expose correct port for HexTrackr
+EXPOSE 3040
 
-# Expose port
-EXPOSE 3232
-
-# Health check
+# Health check for correct port
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3232/health || exit 1
+  CMD curl -f http://localhost:3040/health || exit 1
 
 # Start the application
 CMD ["npm", "start"]

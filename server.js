@@ -1,5 +1,5 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
+const { Pool } = require('pg');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -14,13 +14,25 @@ const app = express();
 const PORT = process.env.PORT || 3040;
 const JWT_SECRET = process.env.JWT_SECRET || 'hextrackr-secret-key-change-in-production';
 
-// Database setup
-const dbPath = path.join(__dirname, 'data', 'hextrackr.db');
-const db = new sqlite3.Database(dbPath, (err) => {
+// PostgreSQL Database setup
+const pool = new Pool({
+    host: process.env.PGHOST || 'localhost',
+    port: process.env.PGPORT || 5432,
+    database: process.env.PGDATABASE || 'hextrackr',
+    user: process.env.PGUSER || 'hextrackr',
+    password: process.env.PGPASSWORD || 'hextrackr123',
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+});
+
+// Test database connection
+pool.connect((err, client, release) => {
     if (err) {
-        console.error('Error opening database:', err.message);
+        console.error('Error connecting to PostgreSQL database:', err.message);
     } else {
-        console.log('Connected to SQLite database at:', dbPath);
+        console.log('Connected to PostgreSQL database');
+        release();
     }
 });
 
@@ -61,18 +73,42 @@ const upload = multer({
     }
 });
 
-// Serve static files with proper MIME types
+// Block access to deprecated files
+app.use('/deprecated', (req, res) => {
+    res.status(404).json({ error: 'File not found - deprecated services have been moved' });
+});
+
+// Block specific deprecated file requests
+app.use(/\/(sqlite-service\.js|turso-service\.js|turso-config\.js|turso-demo\.js)$/, (req, res) => {
+    res.status(404).json({ error: 'Service deprecated - please use PostgreSQL backend' });
+});
+
+// Serve static files with proper MIME types and security
 app.use(express.static(path.join(__dirname), {
-    setHeaders: (res, path) => {
-        if (path.endsWith('.css')) {
+    setHeaders: (res, filePath) => {
+        // Block access to deprecated files
+        if (filePath.includes('deprecated/') || filePath.includes('deprecated\\')) {
+            res.status(404).end();
+            return;
+        }
+        
+        if (filePath.endsWith('.css')) {
             res.set('Content-Type', 'text/css');
             res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
             res.set('Pragma', 'no-cache');
             res.set('Expires', '0');
         }
-        if (path.endsWith('.js')) {
+        if (filePath.endsWith('.js')) {
             res.set('Content-Type', 'application/javascript');
             res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.set('Pragma', 'no-cache');
+            res.set('Expires', '0');
+        }
+        if (filePath.endsWith('.html')) {
+            res.set('Content-Type', 'text/html');
+            res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.set('Pragma', 'no-cache');
+            res.set('Expires', '0');
         }
     }
 }));
@@ -270,10 +306,9 @@ app.get('/*.html', (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
 
-    db.get('SELECT * FROM users WHERE username = ?', [username], async (err, user) => {
-        if (err) {
-            return res.status(500).json({ error: 'Database error' });
-        }
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+        const user = result.rows[0];
 
         if (!user || !(await bcrypt.compare(password, user.password_hash))) {
             return res.status(401).json({ error: 'Invalid credentials' });
@@ -294,106 +329,148 @@ app.post('/api/auth/login', async (req, res) => {
                 role: user.role 
             } 
         });
-    });
+    } catch (err) {
+        console.error('Login error:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
-// Assets endpoints
-app.get('/api/assets', authenticateToken, (req, res) => {
+// Assets endpoints - adapted to work with Cisco vulnerability data
+app.get('/api/assets', (req, res) => {
     const query = `
-        SELECT a.*, 
-               COUNT(v.id) as vulnerability_count,
-               SUM(CASE WHEN v.severity = 'critical' THEN 1 ELSE 0 END) as critical_count,
-               SUM(CASE WHEN v.severity = 'high' THEN 1 ELSE 0 END) as high_count,
-               AVG(v.vpr_score) as avg_vpr_score
-        FROM assets a
-        LEFT JOIN vulnerabilities v ON a.id = v.asset_id AND v.status = 'open'
-        GROUP BY a.id
+        SELECT 
+            unnest(affected_products) as hostname,
+            '0.0.0.0' as ip_address,
+            'Cisco' as vendor,
+            'Unknown' as operating_system,
+            COUNT(*) as vulnerability_count,
+            SUM(CASE WHEN severity = 'critical' THEN 1 ELSE 0 END) as critical_count,
+            SUM(CASE WHEN severity = 'high' THEN 1 ELSE 0 END) as high_count,
+            SUM(CASE WHEN severity = 'medium' THEN 1 ELSE 0 END) as medium_count,
+            SUM(CASE WHEN severity = 'low' THEN 1 ELSE 0 END) as low_count,
+            AVG(cvss_score) as avg_vpr_score
+        FROM vulnerabilities 
+        WHERE status = 'open' AND affected_products IS NOT NULL
+        GROUP BY unnest(affected_products)
+        HAVING COUNT(*) > 0
         ORDER BY critical_count DESC, high_count DESC, avg_vpr_score DESC
+        LIMIT 50
     `;
 
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json(rows);
-    });
+    pool.query(query)
+        .then(result => {
+            res.json(result.rows);
+        })
+        .catch(err => {
+            console.error('Error querying assets:', err);
+            res.status(500).json({ error: 'Failed to fetch assets' });
+        });
 });
 
-app.post('/api/assets', authenticateToken, (req, res) => {
+app.post('/api/assets', authenticateToken, async (req, res) => {
     const { hostname, ip_address, vendor, operating_system, risk_level, business_criticality, notes } = req.body;
 
     const query = `
         INSERT INTO assets (hostname, ip_address, vendor, operating_system, risk_level, business_criticality, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id
     `;
 
-    db.run(query, [hostname, ip_address, vendor, operating_system, risk_level, business_criticality, notes], function(err) {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json({ id: this.lastID });
-    });
+    try {
+        const result = await pool.query(query, [hostname, ip_address, vendor, operating_system, risk_level, business_criticality, notes]);
+        res.json({ id: result.rows[0].id });
+    } catch (err) {
+        console.error('Asset creation error:', err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
-app.put('/api/assets/:id', authenticateToken, (req, res) => {
+app.put('/api/assets/:id', authenticateToken, async (req, res) => {
     const { hostname, ip_address, vendor, operating_system, risk_level, business_criticality, notes } = req.body;
     const { id } = req.params;
 
     const query = `
         UPDATE assets 
-        SET hostname = ?, ip_address = ?, vendor = ?, operating_system = ?, 
-            risk_level = ?, business_criticality = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
+        SET hostname = $1, ip_address = $2, vendor = $3, operating_system = $4, 
+            risk_level = $5, business_criticality = $6, notes = $7, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $8
     `;
 
-    db.run(query, [hostname, ip_address, vendor, operating_system, risk_level, business_criticality, notes, id], function(err) {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json({ changes: this.changes });
-    });
+    try {
+        const result = await pool.query(query, [hostname, ip_address, vendor, operating_system, risk_level, business_criticality, notes, id]);
+        res.json({ changes: result.rowCount });
+    } catch (err) {
+        console.error('Asset update error:', err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
-// Vulnerabilities endpoints
-app.get('/api/vulnerabilities', authenticateToken, (req, res) => {
-    const { asset_id, severity, status } = req.query;
+// Vulnerabilities endpoints - adapted for Cisco vulnerability data
+app.get('/api/vulnerabilities', (req, res) => {
+    const { severity, status } = req.query;
     let query = `
-        SELECT v.*, a.hostname, a.ip_address 
-        FROM vulnerabilities v
-        JOIN assets a ON v.asset_id = a.id
+        SELECT 
+            id,
+            advisory_id,
+            title,
+            summary,
+            description,
+            severity,
+            vpr_score,
+            cvss_score,
+            publication_date,
+            status,
+            affected_products,
+            cve_ids,
+            asset_ip,
+            asset_name as hostname,
+            vendor
+        FROM vulnerabilities
         WHERE 1=1
     `;
     const params = [];
+    let paramCount = 0;
 
-    if (asset_id) {
-        query += ' AND v.asset_id = ?';
-        params.push(asset_id);
-    }
     if (severity) {
-        query += ' AND v.severity = ?';
+        paramCount++;
+        query += ` AND severity = $${paramCount}`;
         params.push(severity);
     }
     if (status) {
-        query += ' AND v.status = ?';
+        paramCount++;
+        query += ` AND status = $${paramCount}`;
         params.push(status);
+    } else {
+        // Default to open vulnerabilities only
+        paramCount++;
+        query += ` AND status = $${paramCount}`;
+        params.push('open');
     }
 
-    query += ' ORDER BY v.vpr_score DESC, v.severity DESC';
+    query += ' ORDER BY vpr_score DESC NULLS LAST, severity DESC LIMIT 1000';
 
-    db.all(query, params, (err, rows) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json(rows);
-    });
+    pool.query(query, params)
+        .then(result => {
+            // Transform data to match frontend expectations
+            const transformedData = result.rows.map(row => ({
+                ...row,
+                hostname: row.hostname || (row.affected_products && row.affected_products[0]) || 'Unknown',
+                ip_address: row.asset_ip || '192.168.1.1',
+                vulnerability_id: row.advisory_id,
+                cve: row.cve_ids && row.cve_ids[0] || '',
+                // Keep VPR score properly mapped
+                vpr_score: row.vpr_score
+            }));
+            
+            res.json(transformedData);
+        })
+        .catch(err => {
+            console.error('Error querying vulnerabilities:', err);
+            res.status(500).json({ error: 'Failed to fetch vulnerabilities' });
+        });
 });
 
 // Tickets endpoints
-app.get('/api/tickets', authenticateToken, (req, res) => {
+app.get('/api/tickets', authenticateToken, async (req, res) => {
     const query = `
         SELECT t.*, a.hostname, a.ip_address,
                COUNT(tv.vulnerability_id) as vulnerability_count
@@ -411,30 +488,30 @@ app.get('/api/tickets', authenticateToken, (req, res) => {
             t.created_at DESC
     `;
 
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json(rows);
-    });
+    try {
+        const result = await pool.query(query);
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Tickets query error:', err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
-app.post('/api/tickets', authenticateToken, (req, res) => {
+app.post('/api/tickets', authenticateToken, async (req, res) => {
     const { ticket_number, title, description, priority, status, assignee, asset_id, snow_number } = req.body;
 
     const query = `
         INSERT INTO tickets (ticket_number, title, description, priority, status, assignee, asset_id, snow_number)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id
     `;
 
-    db.run(query, [ticket_number, title, description, priority, status, assignee, asset_id, snow_number], function(err) {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json({ id: this.lastID });
-    });
+    try {
+        const result = await pool.query(query, [ticket_number, title, description, priority, status, assignee, asset_id, snow_number]);
+        res.json({ id: result.rows[0].id });
+    } catch (err) {
+        console.error('Ticket creation error:', err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // CSV upload endpoint
@@ -485,49 +562,50 @@ app.post('/api/upload/csv', authenticateToken, upload.single('csvFile'), (req, r
 });
 
 // Process batch of CSV records
-function processBatch(batch) {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.run('BEGIN TRANSACTION');
+async function processBatch(batch) {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
 
-            batch.forEach((record) => {
-                // Insert or update asset
-                const assetQuery = `
-                    INSERT OR REPLACE INTO assets (hostname, ip_address, vendor, operating_system)
-                    VALUES (?, ?, ?, ?)
-                `;
-                db.run(assetQuery, [record.hostname, record.ipAddress, record.vendor, record.operatingSystem]);
+        for (const record of batch) {
+            // Insert or update asset using PostgreSQL UPSERT
+            const assetQuery = `
+                INSERT INTO assets (hostname, ip_address, vendor, operating_system)
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (hostname) DO UPDATE SET
+                    ip_address = EXCLUDED.ip_address,
+                    vendor = EXCLUDED.vendor,
+                    operating_system = EXCLUDED.operating_system
+            `;
+            await client.query(assetQuery, [record.hostname, record.ipAddress, record.vendor, record.operatingSystem]);
 
-                // Insert vulnerability
-                const vulnQuery = `
-                    INSERT INTO vulnerabilities 
-                    (asset_id, cve_id, definition_name, severity, vpr_score, cvss_score, description)
-                    VALUES (
-                        (SELECT id FROM assets WHERE hostname = ?),
-                        ?, ?, ?, ?, ?, ?
-                    )
-                `;
-                db.run(vulnQuery, [
-                    record.hostname,
-                    record.cve || record.definitionId,
-                    record.definitionName,
-                    record.severity,
-                    parseFloat(record.vprScore) || 0,
-                    parseFloat(record.cvssScore) || 0,
-                    record.description
-                ]);
-            });
+            // Insert vulnerability
+            const vulnQuery = `
+                INSERT INTO vulnerabilities 
+                (asset_id, cve_id, definition_name, severity, vpr_score, cvss_score, description)
+                VALUES (
+                    (SELECT id FROM assets WHERE hostname = $1),
+                    $2, $3, $4, $5, $6, $7
+                )
+            `;
+            await client.query(vulnQuery, [
+                record.hostname,
+                record.cve || record.definitionId,
+                record.definitionName,
+                record.severity,
+                parseFloat(record.vprScore) || 0,
+                parseFloat(record.cvssScore) || 0,
+                record.description
+            ]);
+        }
 
-            db.run('COMMIT', (err) => {
-                if (err) {
-                    db.run('ROLLBACK');
-                    reject(err);
-                } else {
-                    resolve();
-                }
-            });
-        });
-    });
+        await client.query('COMMIT');
+    } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+    } finally {
+        client.release();
+    }
 }
 
 // ServiceNow integration endpoints
@@ -650,49 +728,48 @@ app.get('/api/cisco/advisories', authenticateToken, async (req, res) => {
 });
 
 // Dashboard stats endpoint
-app.get('/api/dashboard/stats', authenticateToken, (req, res) => {
-    const queries = {
-        totalAssets: 'SELECT COUNT(*) as count FROM assets',
-        totalVulnerabilities: 'SELECT COUNT(*) as count FROM vulnerabilities WHERE status = "open"',
-        criticalVulns: 'SELECT COUNT(*) as count FROM vulnerabilities WHERE severity = "critical" AND status = "open"',
-        openTickets: 'SELECT COUNT(*) as count FROM tickets WHERE status IN ("open", "in_progress")',
-        severityBreakdown: `
-            SELECT severity, COUNT(*) as count 
-            FROM vulnerabilities 
-            WHERE status = 'open' 
-            GROUP BY severity
-        `,
-        topRiskyAssets: `
-            SELECT a.hostname, a.ip_address, COUNT(v.id) as vuln_count,
-                   SUM(CASE WHEN v.severity = 'critical' THEN 1 ELSE 0 END) as critical_count
-            FROM assets a
-            JOIN vulnerabilities v ON a.id = v.asset_id
-            WHERE v.status = 'open'
-            GROUP BY a.id
-            ORDER BY critical_count DESC, vuln_count DESC
-            LIMIT 5
-        `
-    };
+app.get('/api/dashboard/stats', async (req, res) => {
+    try {
+        const queries = {
+            totalAssets: 'SELECT COUNT(*) as count FROM assets',
+            totalVulnerabilities: 'SELECT COUNT(*) as count FROM vulnerabilities WHERE status = \'open\'',
+            criticalVulns: 'SELECT COUNT(*) as count FROM vulnerabilities WHERE severity = \'critical\' AND status = \'open\'',
+            openTickets: 'SELECT COUNT(*) as count FROM tickets WHERE status IN (\'open\', \'in_progress\')',
+            severityBreakdown: `
+                SELECT severity, COUNT(*) as count 
+                FROM vulnerabilities 
+                WHERE status = 'open' 
+                GROUP BY severity
+            `,
+            topRiskyAssets: `
+                SELECT a.hostname, a.ip_address, COUNT(v.id) as vuln_count,
+                       SUM(CASE WHEN v.severity = 'critical' THEN 1 ELSE 0 END) as critical_count
+                FROM assets a
+                JOIN vulnerabilities v ON a.id = v.asset_id
+                WHERE v.status = 'open'
+                GROUP BY a.id
+                ORDER BY critical_count DESC, vuln_count DESC
+                LIMIT 5
+            `
+        };
 
-    const results = {};
-    let completed = 0;
-    const total = Object.keys(queries).length;
-
-    Object.entries(queries).forEach(([key, query]) => {
-        db.all(query, [], (err, rows) => {
-            if (err) {
+        const results = {};
+        
+        for (const [key, query] of Object.entries(queries)) {
+            try {
+                const result = await pool.query(query);
+                results[key] = result.rows;
+            } catch (err) {
                 console.error(`Error in ${key} query:`, err);
                 results[key] = [];
-            } else {
-                results[key] = rows;
             }
-            
-            completed++;
-            if (completed === total) {
-                res.json(results);
-            }
-        });
-    });
+        }
+        
+        res.json(results);
+    } catch (error) {
+        console.error('Dashboard stats error:', error);
+        res.status(500).json({ error: 'Failed to fetch dashboard stats' });
+    }
 });
 
 // Error handling middleware
@@ -709,14 +786,13 @@ app.listen(PORT, () => {
 });
 
 // Graceful shutdown
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
     console.log('\n🛑 Shutting down gracefully...');
-    db.close((err) => {
-        if (err) {
-            console.error('Error closing database:', err);
-        } else {
-            console.log('Database connection closed.');
-        }
-        process.exit(0);
-    });
+    try {
+        await pool.end();
+        console.log('Database connection pool closed.');
+    } catch (err) {
+        console.error('Error closing database pool:', err);
+    }
+    process.exit(0);
 });

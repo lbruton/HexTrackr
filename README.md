@@ -1,4 +1,6 @@
-# HexTrackr - Network Administration Vulnerability Management & Ticketing Platform
+# HexTrackr v2.3.0 - Network Administration Vulnerability Management & Ticketing Platform
+
+> **Version 2.3.0** (Formerly VulnTracker) - Advanced vulnerability management and tracking system
 
 A comprehensive vulnerability management and ticketing workflow tool designed specifically for network administrators. HexTrackr integrates vulnerability data from multiple sources (Cisco, Tenable, weekly reports) with a specialized ticketing system to streamline network security operations.
 

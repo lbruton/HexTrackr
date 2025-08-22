@@ -1091,9 +1091,10 @@
             initializeSortable();
             loadExistingData();
             
-            // If no data exists, load sample data
+            // PRODUCTION MODE: Sample data loading disabled
             if (vulnData.length === 0) {
-                loadSampleData();
+                console.log('PRODUCTION MODE: No sample data loading for legacy page');
+                // loadSampleData(); // DISABLED FOR PRODUCTION
             }
         });
 

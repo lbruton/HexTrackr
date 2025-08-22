@@ -38,14 +38,13 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <!-- Crypto for encryption -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <!-- External service scripts -->
-    <script src="turso-service.js"></script>
+    <!-- Deprecated Turso service moved to /deprecated folder -->
+    <!-- <script src="deprecated/turso-service.js"></script> -->
     <script src="cisco-api-service-enhanced.js"></script>
     <script src="dnac-api-service.js"></script>
     <script src="tenable-vpr-service.js"></script>
     <script src="servicenow-api-service.js"></script>
     <script src="integration-service.js"></script>
-    <script src="sqlite-service.js"></script>
     <style>
         /* HexTrackr Custom Styles */
         :root {
@@ -445,8 +444,11 @@
                             Upload Vulnerability Data
                         </h2>
                         <div class="flex gap-3">
-                            <button id="uploadToggleButton" class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-white/20 hover:border-white/40 transition-all duration-200">
-                                <i class="fas fa-upload me-1"></i>Upload More Data
+                            <button id="uploadCsvButton" class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-white/20 hover:border-white/40 transition-all duration-200">
+                                <i class="fas fa-file-csv me-1"></i>Upload CSV
+                            </button>
+                            <button id="uploadJsonButton" class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-white/20 hover:border-white/40 transition-all duration-200">
+                                <i class="fas fa-file-code me-1"></i>Upload JSON
                             </button>
                             <button id="connectApisButton" class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-white/20 hover:border-white/40 transition-all duration-200">
                                 <i class="fas fa-plug me-1"></i>Connect APIs
@@ -481,11 +483,24 @@
                 <!-- Trend Chart Section (Hidden initially) -->
                 <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-6" id="trendChartSection" style="display: none;">
                     <div class="card-header bg-gradient-to-r from-hex-50 to-hex-100 px-6 py-4 border-b border-gray-200">
-                        <div>
-                            <h5 class="mb-0 text-hex-primary font-semibold">
-                                <i class="fas fa-chart-line me-2"></i>Vulnerability Trends Over Time
-                            </h5>
-                            <small class="text-gray-600">Track vulnerability severity changes across imports</small>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0 text-hex-primary font-semibold">
+                                    <i class="fas fa-chart-line me-2"></i>Vulnerability Trends Over Time
+                                </h5>
+                                <small class="text-gray-600">Track vulnerability severity changes across imports</small>
+                            </div>
+                            <!-- Chart Controls -->
+                            <div class="d-flex gap-2">
+                                <select id="scoreTypeSelect" class="form-select form-select-sm" style="width: auto;" onchange="updateTrendChart(this.value, document.getElementById('metricTypeSelect').value)">
+                                    <option value="VPR">VPR Scores</option>
+                                    <option value="CVSS">CVSS Scores</option>
+                                </select>
+                                <select id="metricTypeSelect" class="form-select form-select-sm" style="width: auto;" onchange="updateTrendChart(document.getElementById('scoreTypeSelect').value, this.value)">
+                                    <option value="sum">Totals</option>
+                                    <option value="avg">Averages</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="p-6">
@@ -686,27 +701,16 @@
                                     
                                     <!-- Action Buttons -->
                                     <div class="col-xl-2 col-lg-12 col-md-12">
-                                        <div class="d-flex gap-2 justify-content-end">
+                                        <div class="d-flex gap-2 justify-content-end flex-wrap">
                                             <button id="refreshButton" class="btn btn-outline-primary" title="Refresh data">
                                                 <i class="fas fa-sync-alt"></i>
                                             </button>
-                                            <div class="dropdown">
-                                                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fas fa-cog me-1"></i>Actions
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end">
-                                                    <li><a class="dropdown-item" href="#" onclick="exportData()">
-                                                        <i class="fas fa-download me-2"></i>Export Data
-                                                    </a></li>
-                                                    <li><a class="dropdown-item" href="#" onclick="showToolsModal()">
-                                                        <i class="fas fa-tools me-2"></i>API Settings
-                                                    </a></li>
-                                                    <li><hr class="dropdown-divider"></li>
-                                                    <li><a class="dropdown-item text-danger" href="#" onclick="clearVulnData()">
-                                                        <i class="fas fa-trash me-2"></i>Clear All Data
-                                                    </a></li>
-                                                </ul>
-                                            </div>
+                                            <button id="exportButton" class="btn btn-outline-success" title="Export Data">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button id="settingsButton" class="btn btn-outline-info" title="Settings">
+                                                <i class="fas fa-cog"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -865,16 +869,16 @@
                                     <div class="row mt-3 pt-3 border-top border-light">
                                         <div class="col-12">
                                             <div class="d-flex flex-wrap gap-2 justify-content-center">
-                                                <button class="btn btn-sm btn-outline-primary" onclick="showToolsModal()">
+                                                <button id="footerSettingsButton" class="btn btn-sm btn-outline-primary">
                                                     <i class="fas fa-cog me-1"></i>Settings
                                                 </button>
                                                 <a href="tickets.html" class="btn btn-sm btn-outline-success">
                                                     <i class="fas fa-ticket-alt me-1"></i>Tickets
                                                 </a>
-                                                <button class="btn btn-sm btn-outline-info" onclick="exportData()">
+                                                <button id="footerExportButton" class="btn btn-sm btn-outline-info">
                                                     <i class="fas fa-download me-1"></i>Export
                                                 </button>
-                                                <button class="btn btn-sm btn-outline-warning" onclick="refreshData()">
+                                                <button id="footerRefreshButton" class="btn btn-sm btn-outline-warning">
                                                     <i class="fas fa-sync-alt me-1"></i>Refresh
                                                 </button>
                                             </div>
@@ -1221,9 +1225,10 @@
                                         <div class="card-body">
                                             <div class="alert alert-info" role="alert">
                                                 <i class="fas fa-info-circle me-2"></i>
-                                                <strong>Server Storage Enabled!</strong> Choose your preferred cloud database provider for unlimited, synchronized vulnerability data storage.
+                                                <strong>Server Storage Enabled!</strong> PostgreSQL database is configured for unlimited, synchronized vulnerability data storage.
                                             </div>
                                             
+                                            <!-- DEPRECATED: Turso Cloud Database section moved to /deprecated folder
                                             <h6 class="mb-3"><i class="fas fa-database me-2"></i>Turso Cloud Database</h6>
                                             <div class="mb-3">
                                                 <label for="tursoUrl" class="form-label">Database URL</label>
@@ -1243,10 +1248,11 @@
                                                     <i class="fas fa-database me-2"></i>Initialize Database
                                                 </button>
                                             </div>
+                                            -->
                                             
                                             <div class="alert alert-light border" role="alert">
-                                                <i class="fas fa-plus-circle me-2"></i>
-                                                <strong>Coming Soon:</strong> Additional cloud providers (AWS RDS, Azure SQL, PostgreSQL, MongoDB Atlas)
+                                                <i class="fas fa-server me-2"></i>
+                                                <strong>Current Setup:</strong> PostgreSQL backend with streaming CSV processing for optimal performance.
                                             </div>
                                         </div>
                                     </div>
@@ -1307,12 +1313,14 @@
                                             <button class="btn btn-outline-warning w-100 mb-2" onclick="clearVulnData()">
                                                 <i class="fas fa-trash me-2"></i>Clear All Data
                                             </button>
+                                            <!-- DEPRECATED: Turso backup/restore buttons moved to /deprecated folder
                                             <button class="btn btn-outline-info w-100 mb-2" onclick="backupToTurso()">
                                                 <i class="fas fa-cloud-upload-alt me-2"></i>Backup to Cloud
                                             </button>
                                             <button class="btn btn-outline-secondary w-100" onclick="restoreFromTurso()">
                                                 <i class="fas fa-cloud-download-alt me-2"></i>Restore from Cloud
                                             </button>
+                                            -->
                                         </div>
                                     </div>
                                 </div>
@@ -1332,6 +1340,19 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Production Environment Configuration
+        const PRODUCTION_MODE = true; // Set to false for development
+        
+        // Clear all sample data from localStorage in production mode
+        function clearSampleDataFromStorage() {
+            if (PRODUCTION_MODE) {
+                localStorage.removeItem('hextrackr_vuln_data');
+                localStorage.removeItem('vulnHistory');
+                localStorage.removeItem('hextrackr_tickets');
+                console.log('PRODUCTION MODE: Cleared all sample data from localStorage');
+            }
+        }
+        
         // Global variables
         let vulnData = [];
         let historyData = JSON.parse(localStorage.getItem('vulnHistory') || '[]');
@@ -1353,7 +1374,10 @@
         let severityFilter = '';
 
         // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // PRODUCTION: Clear sample data from localStorage first
+            clearSampleDataFromStorage();
+            
             setupEventListeners();
             initializeSortable();
             loadExistingData();
@@ -1361,9 +1385,17 @@
             // Check for device filter from tickets page
             checkForDeviceFilter();
             
-            // If no data exists, load sample data
-            if (vulnData.length === 0) {
-                loadSampleData();
+            // Load real data from API instead of sample data
+            try {
+                await loadVulnerabilitiesFromAPI();
+                if (!window.vulnData || window.vulnData.length === 0) {
+                    console.log('No data from API, PRODUCTION MODE: Not loading sample data');
+                    // loadSampleData(); // DISABLED FOR PRODUCTION
+                }
+            } catch (error) {
+                console.error('Failed to load data from API:', error);
+                console.log('PRODUCTION MODE: Not loading sample data fallback');
+                // loadSampleData(); // DISABLED FOR PRODUCTION
             }
         });
 
@@ -1374,8 +1406,21 @@
             const toolsButton = document.getElementById('toolsButton');
             if (toolsButton) toolsButton.addEventListener('click', showToolsModal);
             
-            const uploadToggleButton = document.getElementById('uploadToggleButton');
-            if (uploadToggleButton) uploadToggleButton.addEventListener('click', toggleUploadArea);
+            const uploadCsvButton = document.getElementById('uploadCsvButton');
+            if (uploadCsvButton) uploadCsvButton.addEventListener('click', () => {
+                // Set file input to accept CSV files
+                const fileInput = document.getElementById('fileInput');
+                fileInput.accept = '.csv';
+                fileInput.click();
+            });
+            
+            const uploadJsonButton = document.getElementById('uploadJsonButton');
+            if (uploadJsonButton) uploadJsonButton.addEventListener('click', () => {
+                // Set file input to accept JSON files
+                const fileInput = document.getElementById('fileInput');
+                fileInput.accept = '.json';
+                fileInput.click();
+            });
             
             const connectApisButton = document.getElementById('connectApisButton');
             if (connectApisButton) connectApisButton.addEventListener('click', showToolsModal);
@@ -1402,6 +1447,25 @@
             
             const clearDataButton = document.getElementById('clearDataButton');
             if (clearDataButton) clearDataButton.addEventListener('click', clearVulnData);
+
+            // Footer buttons
+            const footerSettingsButton = document.getElementById('footerSettingsButton');
+            if (footerSettingsButton) footerSettingsButton.addEventListener('click', showToolsModal);
+            
+            const footerExportButton = document.getElementById('footerExportButton');
+            if (footerExportButton) footerExportButton.addEventListener('click', exportData);
+            
+            const footerRefreshButton = document.getElementById('footerRefreshButton');
+            if (footerRefreshButton) footerRefreshButton.addEventListener('click', refreshData);
+
+            // Dropdown menu buttons (now simplified direct buttons)
+            const exportButton = document.getElementById('exportButton');
+            if (exportButton) exportButton.addEventListener('click', exportData);
+            
+            const settingsButton = document.getElementById('settingsButton');
+            if (settingsButton) settingsButton.addEventListener('click', showToolsModal);
+
+            // Remove old dropdown button references since we simplified the UI
 
             // File upload handlers
             const fileInput = document.getElementById('fileInput');
@@ -1475,6 +1539,50 @@
                 currentTablePage = 1;
                 updateTableView();
             });
+
+            // Event delegation for dynamically created buttons
+            document.addEventListener('click', function(e) {
+                // Asset card action buttons
+                if (e.target.closest('.asset-edit-btn')) {
+                    const hostname = e.target.closest('.asset-edit-btn').dataset.assetHostname;
+                    editAsset(hostname);
+                } else if (e.target.closest('.asset-delete-btn')) {
+                    const hostname = e.target.closest('.asset-delete-btn').dataset.assetHostname;
+                    deleteAsset(hostname);
+                } else if (e.target.closest('.asset-card-body')) {
+                    const hostname = e.target.closest('.asset-card-body').dataset.assetHostname;
+                    showAssetDetails(hostname);
+                } else if (e.target.closest('.asset-header')) {
+                    const hostname = e.target.closest('.asset-header').dataset.assetHostname;
+                    showAssetDetails(hostname);
+                }
+                
+                // Vulnerability card action buttons
+                else if (e.target.closest('.vuln-edit-btn')) {
+                    const vulnId = e.target.closest('.vuln-edit-btn').dataset.vulnId;
+                    editVulnerability(vulnId);
+                } else if (e.target.closest('.vuln-delete-btn')) {
+                    const vulnId = e.target.closest('.vuln-delete-btn').dataset.vulnId;
+                    deleteVulnerability(vulnId);
+                } else if (e.target.closest('.vuln-card-body')) {
+                    const vulnId = e.target.closest('.vuln-card-body').dataset.vulnId;
+                    const vulnName = e.target.closest('.vuln-card-body').dataset.vulnName;
+                    showVulnDetails(vulnId, vulnName);
+                }
+                
+                // Table action buttons
+                else if (e.target.closest('.table-edit-btn')) {
+                    const vulnId = e.target.closest('.table-edit-btn').dataset.vulnId;
+                    editVulnerability(vulnId);
+                } else if (e.target.closest('.table-view-btn')) {
+                    const vulnId = e.target.closest('.table-view-btn').dataset.vulnId;
+                    const vulnName = e.target.closest('.table-view-btn').dataset.vulnName;
+                    showVulnDetails(vulnId, vulnName);
+                } else if (e.target.closest('.table-delete-btn')) {
+                    const vulnId = e.target.closest('.table-delete-btn').dataset.vulnId;
+                    deleteVulnerability(vulnId);
+                }
+            });
         }
 
         // Enhanced file processing with PostgreSQL backend support
@@ -1482,27 +1590,8 @@
             try {
                 console.log(`📁 Processing file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
                 
-                // Check if this is the large Cisco CSV file
-                const isLargeCiscoFile = file.name.includes('cisco-vulnerabilities') && file.size > 50 * 1024 * 1024;
-                
-                if (isLargeCiscoFile) {
-                    // Handle large CSV file via PostgreSQL API
-                    await processLargeCsvViaAPI(file);
-                    return;
-                }
-                
-                // For smaller files, check if we can use PostgreSQL API first
-                if (file.size > 10 * 1024 * 1024) { // Files larger than 10MB
-                    try {
-                        await uploadCsvToAPI(file);
-                        return;
-                    } catch (error) {
-                        console.warn('⚠️ API upload failed, falling back to client-side processing:', error);
-                    }
-                }
-                
-                // Fallback to existing client-side processing
-                await processFileClientSide(file);
+                // Always use the API upload for all files (PostgreSQL backend)
+                await uploadCsvToAPI(file);
                 
             } catch (error) {
                 console.error('❌ File processing failed:', error);
@@ -1597,21 +1686,48 @@
             try {
                 console.log('📊 Loading vulnerabilities from PostgreSQL database...');
                 
-                const response = await fetch('/api/vulnerabilities/search?limit=1000');
-                const result = await response.json();
+                const response = await fetch('/api/vulnerabilities?limit=1000');
+                const vulnerabilities = await response.json();
                 
-                if (result.success) {
-                    window.vulnData = result.data;
-                    console.log(`✅ Loaded ${result.data.length} vulnerabilities from database`);
+                if (Array.isArray(vulnerabilities) && vulnerabilities.length > 0) {
+                    // Convert Cisco vulnerability data to the format expected by the frontend
+                    const convertedData = vulnerabilities.map(vuln => ({
+                        hostname: vuln.hostname || (vuln.affected_products && vuln.affected_products[0]) || 'Unknown Asset',
+                        ip_address: vuln.ip_address || '192.168.1.1', // Use actual IP or default
+                        vulnerability_id: vuln.advisory_id,
+                        title: vuln.title,
+                        severity: vuln.severity,
+                        cvss_score: vuln.cvss_score || 0,
+                        vpr_score: parseFloat(vuln.vpr_score) || 0, // Keep original property name for consistency
+                        vendor: vuln.vendor || 'Unknown',
+                        cve: vuln.cve_ids && vuln.cve_ids[0] ? vuln.cve_ids[0] : '',
+                        status: vuln.status,
+                        description: vuln.summary || vuln.description || vuln.title,
+                        publication_date: vuln.publication_date,
+                        affected_products: vuln.affected_products || []
+                    }));
                     
-                    // Update statistics
+                    // Set both local and window variables to the same data
+                    window.vulnData = convertedData;
+                    vulnData = convertedData;
+                    
+                    console.log(`✅ Loaded ${vulnerabilities.length} vulnerabilities from database`);
+                    
+                    // Calculate and update VPR statistics
+                    const stats = calculateStatistics(convertedData, new Date());
+                    updateStatCards(stats);
+                    
+                    // Update additional statistics
                     await loadVulnerabilityStatsFromAPI();
                     
-                    // Refresh UI
-                    filterAndDisplayVulnerabilities();
+                    // Refresh UI with slight delay to ensure DOM is ready
+                    setTimeout(() => {
+                        filterAndDisplayData();
+                        console.log('🔄 Display refreshed with real data');
+                    }, 100);
                     
                 } else {
-                    throw new Error(result.error || 'Failed to load data');
+                    throw new Error('No vulnerabilities returned from API');
                 }
                 
             } catch (error) {
@@ -1626,19 +1742,27 @@
         // Load vulnerability statistics from API
         async function loadVulnerabilityStatsFromAPI() {
             try {
-                const response = await fetch('/api/vulnerabilities/stats');
-                const result = await response.json();
-                
-                if (result.success) {
+                // Calculate stats from the loaded vulnerability data
+                if (window.vulnData && window.vulnData.length > 0) {
+                    const stats = {
+                        totalVulnerabilities: window.vulnData.length,
+                        severityBreakdown: {
+                            Critical: window.vulnData.filter(v => v.severity === 'Critical').length,
+                            High: window.vulnData.filter(v => v.severity === 'High').length,
+                            Medium: window.vulnData.filter(v => v.severity === 'Medium').length,
+                            Low: window.vulnData.filter(v => v.severity === 'Low').length
+                        }
+                    };
+                    
                     // Update dashboard with real statistics
-                    updateDashboardStats(result.data);
+                    updateDashboardStats(stats);
                     console.log('✅ Updated dashboard with real database statistics');
                 } else {
-                    console.warn('⚠️ Failed to load stats from API:', result.error);
+                    console.warn('⚠️ No vulnerability data available for stats calculation');
                 }
                 
             } catch (error) {
-                console.error('❌ Failed to load stats from API:', error);
+                console.error('❌ Failed to calculate stats:', error);
             }
         }
 
@@ -1666,25 +1790,52 @@
             });
         }
 
-        // Original client-side processing for backwards compatibility
+        // Process file using server-side API
         async function processFileClientSide(file) {
             console.log(`📁 Processing file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
-            
-            // Initialize SQLite if not ready
-            if (!window.sqliteService.isReady) {
-                console.log('🔄 Initializing SQLite database...');
-                const initialized = await window.sqliteService.initialize();
-                if (!initialized) {
-                    alert('⚠️ Database initialization failed. Using localStorage fallback.');
-                    processWithLocalStorage(file);
-                    return;
-                }
-            }
             
             // Show upload progress modal
             showUploadProgress(file.name, file.size);
             
-            // For SQLite, we can parse the entire file at once - it's much more efficient
+            // Use FormData to upload file to server API
+            const formData = new FormData();
+            formData.append('csvFile', file);
+            formData.append('csvType', 'vulnerabilities');
+            
+            try {
+                const response = await fetch('/api/import/upload-csv', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Upload failed: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                console.log(`✅ File processed successfully: ${result.recordsProcessed} records`);
+                
+                // Hide progress modal and refresh data
+                hideUploadProgress();
+                await loadVulnerabilitiesFromAPI();
+                showToast('✅ File uploaded successfully!', 'success');
+                
+            } catch (error) {
+                console.error('❌ Upload error:', error);
+                hideUploadProgress();
+                showToast(`❌ Upload failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Legacy client-side processing for backup (commented out)
+        /*
+        async function processFileClientSideOld(file) {
+            console.log(`📁 Processing file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+            
+            // Show upload progress modal
+            showUploadProgress(file.name, file.size);
+            
+            // For client-side processing, we can parse the entire file at once
             Papa.parse(file, {
                 header: true,
                 skipEmptyLines: true,
@@ -1734,6 +1885,7 @@
                 }
             });
         }
+        */
 
         function processWithLocalStorage(file) {
             // Fallback to original localStorage method for smaller files
@@ -2323,7 +2475,7 @@
             };
 
             data.forEach(item => {
-                // Sum VPR scores by severity
+                // Sum VPR scores by severity (simple approach)
                 if (item.severity && stats.severityVPR.hasOwnProperty(item.severity)) {
                     stats.severityVPR[item.severity] += item.vprScore || 0;
                 }
@@ -2350,6 +2502,9 @@
             document.getElementById('highValue').textContent = stats.severityVPR.high.toFixed(1);
             document.getElementById('mediumValue').textContent = stats.severityVPR.medium.toFixed(1);
             document.getElementById('lowValue').textContent = stats.severityVPR.low.toFixed(1);
+            document.getElementById('highValue').textContent = stats.severityVPR.high.toFixed(1);
+            document.getElementById('mediumValue').textContent = stats.severityVPR.medium.toFixed(1);
+            document.getElementById('lowValue').textContent = stats.severityVPR.low.toFixed(1);
 
             // Update change indicators if we have previous data
             if (previousStats) {
@@ -2365,10 +2520,26 @@
             // Create sparklines if we have historical data
             if (historyData.length > 1) {
                 console.log(`📊 Creating sparklines with ${historyData.length} data points`);
-                const criticalTrend = historyData.slice(-7).map(h => h.stats.severityVPR ? h.stats.severityVPR.critical : 0);
-                const highTrend = historyData.slice(-7).map(h => h.stats.severityVPR ? h.stats.severityVPR.high : 0);
-                const mediumTrend = historyData.slice(-7).map(h => h.stats.severityVPR ? h.stats.severityVPR.medium : 0);
-                const lowTrend = historyData.slice(-7).map(h => h.stats.severityVPR ? h.stats.severityVPR.low : 0);
+                
+                // Get current scoring preference (default to VPR)
+                const scoreType = document.getElementById('scoreTypeSelect')?.value || 'VPR';
+                const metricType = 'sum'; // Sparklines always show totals for now
+                
+                // Extract trend data based on scoring system
+                let criticalTrend, highTrend, mediumTrend, lowTrend;
+                
+                if (scoreType === 'VPR') {
+                    criticalTrend = historyData.slice(-7).map(h => h.stats.severityVPR ? h.stats.severityVPR.critical : 0);
+                    highTrend = historyData.slice(-7).map(h => h.stats.severityVPR ? h.stats.severityVPR.high : 0);
+                    mediumTrend = historyData.slice(-7).map(h => h.stats.severityVPR ? h.stats.severityVPR.medium : 0);
+                    lowTrend = historyData.slice(-7).map(h => h.stats.severityVPR ? h.stats.severityVPR.low : 0);
+                } else {
+                    // CVSS trends (will be available once we have data with CVSS calculations)
+                    criticalTrend = historyData.slice(-7).map(h => h.stats.severityCVSS ? h.stats.severityCVSS.critical : 0);
+                    highTrend = historyData.slice(-7).map(h => h.stats.severityCVSS ? h.stats.severityCVSS.high : 0);
+                    mediumTrend = historyData.slice(-7).map(h => h.stats.severityCVSS ? h.stats.severityCVSS.medium : 0);
+                    lowTrend = historyData.slice(-7).map(h => h.stats.severityCVSS ? h.stats.severityCVSS.low : 0);
+                }
                 
                 // Clear existing sparklines
                 ['#criticalSparkline', '#highSparkline', '#mediumSparkline', '#lowSparkline'].forEach(id => {
@@ -2516,8 +2687,8 @@
             const ticketFilterElement = document.getElementById('ticketFilter');
             const ticketFilter = ticketFilterElement ? ticketFilterElement.value : '';
             
-            // Apply filters to vulnData
-            filteredData = vulnData.filter(item => {
+            // Apply filters to window.vulnData (use real data instead of sample data)
+            filteredData = (window.vulnData || []).filter(item => {
                 const matchesSearch = !searchTerm || 
                     (item.hostname && item.hostname.toLowerCase().includes(searchTerm)) ||
                     (item.cve && item.cve.toLowerCase().includes(searchTerm)) ||
@@ -2556,7 +2727,7 @@
         function updateAssetCards() {
             const container = document.getElementById('assetCardsContainer');
             
-            if (vulnData.length === 0) {
+            if (!window.vulnData || window.vulnData.length === 0) {
                 container.innerHTML = `
                     <div class="col-12">
                         <div class="card asset-card text-center py-5">
@@ -2573,7 +2744,7 @@
             }
 
             // Use filtered data if search/filter is active, otherwise use all data
-            const dataToShow = searchTerm || severityFilter ? filteredData : vulnData;
+            const dataToShow = searchTerm || severityFilter ? filteredData : window.vulnData;
 
             if (dataToShow.length === 0) {
                 container.innerHTML = `
@@ -2593,14 +2764,17 @@
                 if (!assetGroups[item.hostname]) {
                     assetGroups[item.hostname] = {
                         hostname: item.hostname,
-                        ipAddress: item.ipAddress,
-                        vendor: item.vendor,
+                        ipAddress: item.ip_address || item.ipAddress,
+                        vendor: item.vendor || 'Unknown',
                         severityCounts: { critical: 0, high: 0, medium: 0, low: 0, info: 0 },
                         vulnerabilities: []
                     };
                 }
                 
-                assetGroups[item.hostname].severityCounts[item.severity]++;
+                const severity = (item.severity || '').toLowerCase();
+                if (assetGroups[item.hostname].severityCounts[severity] !== undefined) {
+                    assetGroups[item.hostname].severityCounts[severity]++;
+                }
                 assetGroups[item.hostname].vulnerabilities.push(item);
             });
 
@@ -2648,7 +2822,7 @@
         function updateVulnCards() {
             const container = document.getElementById('vulnCardsContainer');
             
-            if (vulnData.length === 0) {
+            if (!window.vulnData || window.vulnData.length === 0) {
                 container.innerHTML = `
                     <div class="col-12">
                         <div class="card vuln-card text-center py-5">
@@ -2764,9 +2938,9 @@
         }
         
         function applySorting(sortValue) {
-            if (!vulnData || vulnData.length === 0) return;
+            if (!window.vulnData || window.vulnData.length === 0) return;
             
-            let dataToSort = filteredData && filteredData.length > 0 ? filteredData : vulnData;
+            let dataToSort = filteredData && filteredData.length > 0 ? filteredData : window.vulnData;
             
             switch (sortValue) {
                 case 'hostname-asc':
@@ -2984,21 +3158,20 @@
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card asset-card h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0" onclick="showAssetDetails('${asset.hostname}')" style="cursor: pointer;">
+                            <h6 class="mb-0 asset-header" data-asset-hostname="${asset.hostname}" style="cursor: pointer;">
                                 <i class="fas fa-server me-2"></i>${asset.hostname}
                                 ${ticketIndicator}
                             </h6>
                             <div class="card-actions">
-                                ${ticketStatus.indicator}
-                                <button class="btn btn-sm btn-outline-primary me-1" onclick="editAsset('${asset.hostname}')" title="Edit Asset">
+                                <button class="btn btn-sm btn-outline-primary me-1 asset-edit-btn" data-asset-hostname="${asset.hostname}" title="Edit Asset">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAsset('${asset.hostname}')" title="Delete Asset">
+                                <button class="btn btn-sm btn-outline-danger asset-delete-btn" data-asset-hostname="${asset.hostname}" title="Delete Asset">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                         </div>
-                        <div class="card-body" onclick="showAssetDetails('${asset.hostname}')" style="cursor: pointer;">
+                        <div class="card-body asset-card-body" data-asset-hostname="${asset.hostname}" style="cursor: pointer;">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <span class="vendor-badge">${asset.vendor}</span>
                                 <p class="text-muted small mb-0">
@@ -3070,16 +3243,16 @@
                                     ${vuln.severity.toUpperCase()}
                                 </span>
                                 <div class="card-actions">
-                                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editVulnerability('${vuln.definitionId}')" title="Edit Vulnerability">
+                                    <button class="btn btn-sm btn-outline-primary me-1 vuln-edit-btn" data-vuln-id="${vuln.definitionId}" title="Edit Vulnerability">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteVulnerability('${vuln.definitionId}')" title="Delete Vulnerability">
+                                    <button class="btn btn-sm btn-outline-danger vuln-delete-btn" data-vuln-id="${vuln.definitionId}" title="Delete Vulnerability">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body" onclick="showVulnDetails('${vuln.definitionId}', '${vuln.definitionName}')" style="cursor: pointer;">
+                        <div class="card-body vuln-card-body" data-vuln-id="${vuln.definitionId}" data-vuln-name="${vuln.definitionName}" style="cursor: pointer;">
                             <h6 class="card-title">${vuln.definitionName.substring(0, 60)}${vuln.definitionName.length > 60 ? '...' : ''}</h6>
                             
                             <p class="card-text">
@@ -3103,7 +3276,7 @@
         function updateTableView() {
             const tableBody = document.getElementById('tableBody');
             
-            if (vulnData.length === 0) {
+            if (!window.vulnData || window.vulnData.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
                         <td colspan="8" class="text-center py-5">
@@ -3206,13 +3379,13 @@
                     </td>
                     <td>
                         <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-primary btn-sm" onclick="editVulnerability('${item.definitionId}')" title="Edit">
+                            <button class="btn btn-outline-primary btn-sm table-edit-btn" data-vuln-id="${item.definitionId}" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-outline-info btn-sm" onclick="showVulnDetails('${item.definitionId}', '${item.definitionName}')" title="View Details">
+                            <button class="btn btn-outline-info btn-sm table-view-btn" data-vuln-id="${item.definitionId}" data-vuln-name="${item.definitionName}" title="View Details">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn btn-outline-danger btn-sm" onclick="deleteVulnerability('${item.definitionId}')" title="Delete">
+                            <button class="btn btn-outline-danger btn-sm table-delete-btn" data-vuln-id="${item.definitionId}" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -3331,7 +3504,7 @@
         }
 
         function showAssetDetails(hostname) {
-            const asset = vulnData.filter(v => v.hostname === hostname);
+            const asset = (window.vulnData || []).filter(v => v.hostname === hostname);
             if (asset.length === 0) return;
 
             const assetInfo = asset[0];
@@ -3390,7 +3563,7 @@
 
         function showVulnDetails(definitionId, definitionName) {
             // Find all instances of this vulnerability across assets
-            const vulnInstances = vulnData.filter(v => 
+            const vulnInstances = (window.vulnData || []).filter(v => 
                 v.definitionId === definitionId || v.definitionName === definitionName
             );
             
@@ -3582,38 +3755,12 @@
         }
 
         function loadSampleData() {
-            // Sample data to demonstrate the interface
-            const sampleData = [
-                {
-                    hostname: 'web-server-01',
-                    ipAddress: '192.168.1.10',
-                    vendor: 'Apache',
-                    definitionId: 'CVE-2023-0001',
-                    cve: 'CVE-2023-0001',
-                    definitionName: 'Apache HTTP Server Buffer Overflow',
-                    severity: 'critical',
-                    vprScore: 9.8,
-                    state: 'ACTIVE',
-                    date: new Date().toLocaleDateString()
-                },
-                {
-                    hostname: 'db-server-01',
-                    ipAddress: '192.168.1.20',
-                    vendor: 'MySQL',
-                    definitionId: 'CVE-2023-0002',
-                    cve: 'CVE-2023-0002',
-                    definitionName: 'MySQL SQL Injection Vulnerability',
-                    severity: 'high',
-                    vprScore: 8.5,
-                    state: 'ACTIVE',
-                    date: new Date().toLocaleDateString()
-                }
-            ];
-
-            vulnData = sampleData;
-            const stats = calculateStatistics(vulnData, new Date());
-            updateStatCards(stats);
-            updateCardViews();
+            // Sample data completely disabled - using real database data only
+            vulnData = [];
+            console.log('🚫 Sample data loading disabled - using real database data only');
+            // const stats = calculateStatistics(vulnData, new Date());
+            // updateStatCards(stats);
+            // updateCardViews();
             
             // Add sample history for sparklines
             for (let i = 6; i >= 1; i--) {
@@ -3645,11 +3792,16 @@
             }
             
             try {
-                // Clear SQLite database if available
-                if (window.sqliteService && window.sqliteService.isReady) {
-                    await window.sqliteService.clearVulnerabilities();
-                    console.log('✅ SQLite database cleared');
+                // Clear database via API
+                const response = await fetch('/api/vulnerabilities', {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to clear database: ${response.statusText}`);
                 }
+                
+                console.log('✅ Database cleared via API');
                 
                 // Clear localStorage as well
                 localStorage.removeItem('hextrackr_vuln_data');
@@ -4256,7 +4408,8 @@ Would you like to:
             }
         }
 
-        // Backup to cloud
+        // DEPRECATED: Turso backup/restore functions moved to /deprecated folder
+        /*
         function backupToTurso() {
             if (window.syncVulnToTurso) {
                 window.syncVulnToTurso();
@@ -4266,7 +4419,6 @@ Would you like to:
             }
         }
 
-        // Restore from cloud
         function restoreFromTurso() {
             if (window.restoreVulnFromTurso) {
                 window.restoreVulnFromTurso();
@@ -4275,6 +4427,7 @@ Would you like to:
                 alert('⚠️ Restore service not available.');
             }
         }
+        */
 
         // Add Connect to APIs button functionality (legacy support)
         function showAPIModal() {
@@ -4295,28 +4448,60 @@ Would you like to:
             }
         }
 
-        function updateTrendChart() {
+        function updateTrendChart(scoreType = 'VPR', metricType = 'sum') {
             if (!historyData || historyData.length === 0) {
                 document.getElementById('trendChart').innerHTML = '<div class="text-center text-muted py-5">No historical data available</div>';
                 return;
             }
 
-            // Prepare data for the chart
+            // Prepare data for the chart based on scoreType and metricType
             const chartData = historyData.map(entry => {
                 const stats = calculateStatistics(entry.data, entry.date);
+                let dataSource;
+                
+                if (scoreType === 'VPR' && metricType === 'sum') {
+                    dataSource = stats.severityVPR;
+                } else if (scoreType === 'VPR' && metricType === 'avg') {
+                    dataSource = stats.severityVPRAvg;
+                } else if (scoreType === 'CVSS' && metricType === 'sum') {
+                    dataSource = stats.severityCVSS;
+                } else if (scoreType === 'CVSS' && metricType === 'avg') {
+                    dataSource = stats.severityCVSSAvg;
+                } else {
+                    dataSource = stats.severityVPR; // default fallback
+                }
+                
                 return {
                     date: new Date(entry.date).toLocaleDateString(),
-                    critical: stats.severityVPR.critical,
-                    high: stats.severityVPR.high,
-                    medium: stats.severityVPR.medium,
-                    low: stats.severityVPR.low
+                    critical: dataSource.critical || 0,
+                    high: dataSource.high || 0,
+                    medium: dataSource.medium || 0,
+                    low: dataSource.low || 0
                 };
             });
+
+            const chartTitle = `Vulnerability ${scoreType} ${metricType === 'sum' ? 'Totals' : 'Averages'} Over Time`;
+            const yAxisTitle = `${scoreType} Score ${metricType === 'sum' ? 'Sum' : 'Average'}`;
 
             const options = {
                 series: [
                     {
                         name: 'Critical',
+                        data: chartData.map(d => ({ x: d.date, y: d.critical }))
+                    },
+                    {
+                        name: 'High',
+                        data: chartData.map(d => ({ x: d.date, y: d.high }))
+                    },
+                    {
+                        name: 'Medium',
+                        data: chartData.map(d => ({ x: d.date, y: d.medium }))
+                    },
+                    {
+                        name: 'Low',
+                        data: chartData.map(d => ({ x: d.date, y: d.low }))
+                    }
+                ],
                         data: chartData.map(d => ({ x: d.date, y: d.critical }))
                     },
                     {
@@ -4351,7 +4536,7 @@ Would you like to:
                     width: 3
                 },
                 title: {
-                    text: 'Vulnerability Severity Trends',
+                    text: chartTitle,
                     align: 'left'
                 },
                 grid: {
@@ -4372,10 +4557,9 @@ Would you like to:
                 },
                 yaxis: {
                     title: {
-                        text: 'Average VPR Score'
+                        text: yAxisTitle
                     },
-                    min: 0,
-                    max: 10
+                    min: 0
                 },
                 legend: {
                     position: 'top',
@@ -5043,6 +5227,8 @@ Would you like to:
             }, 1000);
         });
 
+        // DEPRECATED: Turso Database Integration moved to /deprecated folder
+        /*
         // Turso Database Integration for Vulnerabilities
         // Auto-sync vulnerability data to Turso when data changes
         window.syncVulnToTurso = async function() {
@@ -5143,6 +5329,7 @@ Would you like to:
         // Expose Turso functions globally for vulnerabilities page
         window.syncVulnToTurso = window.syncVulnToTurso;
         window.restoreVulnFromTurso = window.restoreVulnFromTurso;
+        */
     </script>
 </body>
 </html>
