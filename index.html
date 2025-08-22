@@ -40,11 +40,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <!-- Deprecated Turso service moved to /deprecated folder -->
     <!-- <script src="deprecated/turso-service.js"></script> -->
-    <script src="cisco-api-service-enhanced.js"></script>
-    <script src="dnac-api-service.js"></script>
-    <script src="tenable-vpr-service.js"></script>
-    <script src="servicenow-api-service.js"></script>
-    <script src="integration-service.js"></script>
+    <!-- <script src="cisco-api-service-enhanced.js"></script> -->
+    <!-- <script src="dnac-api-service.js"></script> -->
+    <!-- <script src="tenable-vpr-service.js"></script> -->
+    <!-- <script src="servicenow-api-service.js"></script> -->
+    <!-- <script src="integration-service.js"></script> -->
     <style>
         /* HexTrackr Custom Styles */
         :root {
@@ -1118,45 +1118,6 @@
                                     </div>
                                 </div>
                                 
-                                <!-- DNAC Integration Section -->
-                                <div class="col-md-6 mb-4">
-                                    <div class="card border-primary">
-                                        <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
-                                            <h6 class="mb-0"><i class="fas fa-network-wired me-2"></i>Cisco DNA Center (DNAC)</h6>
-                                            <span class="badge bg-light text-primary">Network Admin</span>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="mb-3">
-                                                <label for="dnacUrl" class="form-label">DNAC URL</label>
-                                                <input type="text" class="form-control" id="dnacUrl" placeholder="https://dnac.company.com">
-                                                <div class="form-text">Your DNAC server URL</div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="dnacUsername" class="form-label">Username</label>
-                                                <input type="text" class="form-control" id="dnacUsername" placeholder="DNAC admin username">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="dnacPassword" class="form-label">Password</label>
-                                                <input type="password" class="form-control" id="dnacPassword" placeholder="DNAC admin password">
-                                            </div>
-                                            <div class="d-flex gap-2 mb-3">
-                                                <button class="btn btn-primary btn-sm" onclick="testDNACConnection()">
-                                                    <i class="fas fa-plug me-1"></i>Test Connection
-                                                </button>
-                                                <button class="btn btn-success btn-sm" onclick="syncDNACData()">
-                                                    <i class="fas fa-sync me-1"></i>Sync All Data
-                                                </button>
-                                            </div>
-                                            <div class="alert alert-info mb-0" role="alert">
-                                                <small>
-                                                    <i class="fas fa-lightbulb me-1"></i>
-                                                    <strong>Features:</strong> Device inventory, health monitoring, security advisories, compliance tracking, network topology
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
                                 <div class="col-md-6 mb-4">
                                     <div class="card">
                                         <div class="card-header">
@@ -1585,6 +1546,119 @@
             });
         }
 
+        // Simple client-side CSV processing (Primary method - user data as source of truth)
+        async function processFileSimple(file) {
+            try {
+                console.log(`📁 Processing file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+                
+                // Show upload progress
+                showUploadProgress(file.name, file.size);
+                
+                // Parse CSV using PapaParse
+                Papa.parse(file, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        console.log(`📊 CSV parsing completed: ${results.data.length} records`);
+                        
+                        if (results.errors && results.errors.length > 0) {
+                            console.warn('⚠️ CSV parsing warnings:', results.errors.slice(0, 5));
+                        }
+                        
+                        if (!results.data || results.data.length === 0) {
+                            hideUploadProgress();
+                            alert('No data found in CSV file');
+                            return;
+                        }
+                        
+                        // Process the CSV data
+                        processVulnerabilityData(results.data, file.name);
+                    },
+                    error: function(error) {
+                        console.error('❌ CSV parsing error:', error);
+                        hideUploadProgress();
+                        alert(`Failed to parse CSV: ${error.message}`);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('❌ File processing failed:', error);
+                hideUploadProgress();
+                alert(`Failed to process file: ${error.message}`);
+            }
+        }
+
+        // Process parsed vulnerability data from CSV
+        function processVulnerabilityData(data, fileName) {
+            console.log(`🔄 Processing ${data.length} vulnerability records from ${fileName}`);
+            
+            // Convert CSV data to our internal format
+            const vulnerabilities = data.map((row, index) => {
+                // Handle your CSV format with definition.vpr.score
+                const vprScore = parseFloat(row['definition.vpr.score']) || 0;
+                const cvssScore = parseFloat(row['definition.cvss.score']) || 0;
+                
+                return {
+                    id: `csv_${Date.now()}_${index}`,
+                    cve_id: row['definition.cve'] || row['cve'] || `CISCO-${Date.now()}-${index}`,
+                    title: row['definition.title'] || row['title'] || 'Unknown Vulnerability',
+                    description: row['definition.description'] || row['description'] || 'No description available',
+                    severity: row['definition.severity'] || row['severity'] || 'medium',
+                    vpr_score: vprScore,
+                    cvss_score: cvssScore,
+                    vendor: 'Cisco', // Since this is Cisco data
+                    affected_products: row['definition.affectedProducts'] || row['affected_products'] || 'Unknown',
+                    source: 'CSV Import',
+                    imported_date: new Date().toISOString(),
+                    file_source: fileName
+                };
+            });
+            
+            console.log(`✅ Converted ${vulnerabilities.length} vulnerabilities`);
+            console.log('Sample vulnerability:', vulnerabilities[0]);
+            
+            // Store in localStorage for persistence
+            storeVulnerabilityData(vulnerabilities, fileName);
+            
+            // Calculate and update statistics
+            const stats = calculateStatistics(vulnerabilities);
+            updateStatCards(stats);
+            
+            // Update data status
+            updateDataStatus(`${vulnerabilities.length} vulnerabilities loaded from ${fileName}`);
+            
+            // Hide progress and show success
+            hideUploadProgress();
+            showToast(`✅ Successfully imported ${vulnerabilities.length} vulnerabilities!`, 'success');
+            
+            // Store for historical tracking
+            saveHistoricalData(stats);
+        }
+
+        // Store vulnerability data in localStorage
+        function storeVulnerabilityData(vulnerabilities, source) {
+            try {
+                const existingData = JSON.parse(localStorage.getItem('hextrackr_vulnerabilities') || '[]');
+                
+                // Add source information and merge
+                const newData = vulnerabilities.map(v => ({...v, import_source: source}));
+                const mergedData = [...existingData, ...newData];
+                
+                // Store back
+                localStorage.setItem('hextrackr_vulnerabilities', JSON.stringify(mergedData));
+                localStorage.setItem('hextrackr_last_import', new Date().toISOString());
+                localStorage.setItem('hextrackr_total_count', mergedData.length);
+                
+                console.log(`💾 Stored ${mergedData.length} total vulnerabilities in localStorage`);
+                
+                // Also update global vulnData for immediate use
+                window.vulnData = mergedData;
+                
+            } catch (error) {
+                console.error('❌ Failed to store vulnerability data:', error);
+            }
+        }
+
         // Enhanced file processing with PostgreSQL backend support
         async function processFile(file) {
             try {
@@ -1784,9 +1858,11 @@
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
+            console.log(`📁 Processing ${files.length} file(s) for CSV import...`);
+            
             Array.from(files).forEach(async file => {
-                // Use the new enhanced processing function
-                await processFile(file);
+                // Use simple client-side processing as primary method
+                await processFileSimple(file);
             });
         }
 
@@ -2724,6 +2800,74 @@
             updateCardViews();
         }
 
+        // Helper functions for CSV processing
+
+        function updateDataStatus(message) {
+            const statusElement = document.querySelector('[data-status="status"]');
+            if (statusElement) {
+                statusElement.textContent = message;
+            } else {
+                // Try to find any element that shows data status
+                const dataStatusElements = document.querySelectorAll('*');
+                for (let element of dataStatusElements) {
+                    if (element.textContent && element.textContent.includes('No data uploaded yet')) {
+                        element.textContent = message;
+                        break;
+                    }
+                }
+            }
+            console.log(`📊 Data status updated: ${message}`);
+        }
+
+        function showToast(message, type = 'info') {
+            // Simple toast implementation
+            const toastContainer = document.getElementById('toastContainer') || document.body;
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} toast-message`;
+            toast.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <span>${message}</span>
+                    <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+                </div>
+            `;
+            toastContainer.appendChild(toast);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 5000);
+            
+            console.log(`🍞 Toast: ${message}`);
+        }
+
+        function saveHistoricalData(stats) {
+            try {
+                const historyKey = 'hextrackr_vulnerability_history';
+                const existingHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+                
+                const historyEntry = {
+                    date: new Date().toISOString(),
+                    stats: stats,
+                    timestamp: Date.now()
+                };
+                
+                existingHistory.push(historyEntry);
+                
+                // Keep only last 30 days of history
+                const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+                const recentHistory = existingHistory.filter(entry => entry.timestamp > thirtyDaysAgo);
+                
+                localStorage.setItem(historyKey, JSON.stringify(recentHistory));
+                console.log(`📈 Saved historical data point, ${recentHistory.length} total entries`);
+                
+            } catch (error) {
+                console.error('❌ Failed to save historical data:', error);
+            }
+        }
+
         function updateAssetCards() {
             const container = document.getElementById('assetCardsContainer');
             
@@ -2784,7 +2928,9 @@
             // Parse the sort value (which now includes direction)
             let sortField, sortDirection;
             if (sortBy.includes('-')) {
-                [sortField, sortDirection] = sortBy.split('-');
+                const parts = sortBy.split('-');
+                sortField = parts[0];
+                sortDirection = parts[1];
             } else {
                 sortField = sortBy;
                 sortDirection = 'asc';
@@ -2889,7 +3035,9 @@
             // Parse the sort value 
             let sortField, sortDirection;
             if (sortBy.includes('-')) {
-                [sortField, sortDirection] = sortBy.split('-');
+                const parts = sortBy.split('-');
+                sortField = parts[0];
+                sortDirection = parts[1];
             } else {
                 sortField = sortBy;
                 sortDirection = 'desc';
@@ -3300,7 +3448,9 @@
             // Parse the sort value
             let sortField, sortDirection;
             if (sortBy.includes('-')) {
-                [sortField, sortDirection] = sortBy.split('-');
+                const parts = sortBy.split('-');
+                sortField = parts[0];
+                sortDirection = parts[1];
             } else {
                 sortField = sortBy;
                 sortDirection = 'asc';
@@ -4201,101 +4351,6 @@ Would you like to:
             alert('Qualys API test functionality will be implemented in a future version');
         }
 
-        // DNAC Integration Functions
-        async function testDNACConnection() {
-            const baseUrl = document.getElementById('dnacUrl').value;
-            const username = document.getElementById('dnacUsername').value;
-            const password = document.getElementById('dnacPassword').value;
-
-            if (!baseUrl || !username || !password) {
-                alert('Please enter DNAC URL, username, and password');
-                return;
-            }
-
-            try {
-                // Configure DNAC service
-                window.dnacService.configure(baseUrl, username, password);
-                
-                // Test connection
-                const result = await window.dnacService.testConnection();
-                
-                if (result.success) {
-                    alert(`✅ DNAC Connection Successful!\n\nServer: ${baseUrl}\nTimestamp: ${result.timestamp}`);
-                    console.log('DNAC connection test result:', result);
-                } else {
-                    alert(`❌ DNAC Connection Failed:\n\n${result.error}`);
-                }
-            } catch (error) {
-                console.error('Error testing DNAC connection:', error);
-                alert(`❌ Error testing DNAC connection:\n\n${error.message}`);
-            }
-        }
-
-        async function syncDNACData() {
-            const baseUrl = document.getElementById('dnacUrl').value;
-            const username = document.getElementById('dnacUsername').value;
-            const password = document.getElementById('dnacPassword').value;
-
-            if (!baseUrl || !username || !password) {
-                alert('Please configure DNAC credentials first');
-                return;
-            }
-
-            try {
-                // Show loading indicator
-                const originalText = event.target.innerHTML;
-                event.target.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Syncing...';
-                event.target.disabled = true;
-
-                // Configure and sync all DNAC data
-                window.dnacService.configure(baseUrl, username, password);
-                const result = await window.dnacService.syncAllData();
-                
-                if (result.success) {
-                    const deviceCount = result.results.devices?.count || 0;
-                    const advisoryCount = result.results.advisories?.count || 0;
-                    const healthCount = result.results.health?.count || 0;
-                    
-                    alert(`✅ DNAC Sync Successful!\n\n` +
-                          `📱 Devices: ${deviceCount}\n` +
-                          `🔒 Security Advisories: ${advisoryCount}\n` +
-                          `🏥 Health Records: ${healthCount}\n\n` +
-                          `Timestamp: ${result.timestamp}`);
-                    
-                    // Store DNAC data globally for correlation
-                    window.dnacData = result.results;
-                    
-                    // Update dashboard if needed
-                    if (result.results.correlatedDevices?.success) {
-                        console.log('📊 DNAC devices correlated with vulnerability data');
-                        loadExistingData();
-                    }
-                } else {
-                    alert(`❌ DNAC Sync Failed:\n\n${result.error}`);
-                }
-            } catch (error) {
-                console.error('Error syncing DNAC data:', error);
-                alert(`❌ Error syncing DNAC data:\n\n${error.message}`);
-            } finally {
-                // Restore button
-                event.target.innerHTML = originalText;
-                event.target.disabled = false;
-            }
-        }
-
-        function loadDNACCredentials() {
-            try {
-                const status = window.dnacService.getStatus();
-                if (status.baseUrl) document.getElementById('dnacUrl').value = status.baseUrl;
-                if (status.username) document.getElementById('dnacUsername').value = status.username;
-                // Don't load password for security
-                
-                console.log('📋 DNAC credentials loaded');
-            } catch (error) {
-                console.error('Error loading DNAC credentials:', error);
-            }
-        }
-
         function syncFromAPIs() {
             alert('API synchronization functionality will be implemented in a future version');
         }
@@ -4317,15 +4372,6 @@ Would you like to:
                 console.log('🚀 Bootstrap modal created:', modal);
                 
                 // Only load configurations that have corresponding form elements
-                try {
-                    if (document.getElementById('dnacUrl')) {
-                        loadDNACCredentials();
-                        console.log('✅ DNAC credentials loaded');
-                    }
-                } catch (error) {
-                    console.error('❌ Error loading DNAC credentials:', error);
-                }
-                
                 try {
                     if (document.getElementById('ciscoApiKey')) {
                         loadCiscoCredentials();
@@ -4487,21 +4533,6 @@ Would you like to:
                 series: [
                     {
                         name: 'Critical',
-                        data: chartData.map(d => ({ x: d.date, y: d.critical }))
-                    },
-                    {
-                        name: 'High',
-                        data: chartData.map(d => ({ x: d.date, y: d.high }))
-                    },
-                    {
-                        name: 'Medium',
-                        data: chartData.map(d => ({ x: d.date, y: d.medium }))
-                    },
-                    {
-                        name: 'Low',
-                        data: chartData.map(d => ({ x: d.date, y: d.low }))
-                    }
-                ],
                         data: chartData.map(d => ({ x: d.date, y: d.critical }))
                     },
                     {
@@ -5329,7 +5360,6 @@ Would you like to:
         // Expose Turso functions globally for vulnerabilities page
         window.syncVulnToTurso = window.syncVulnToTurso;
         window.restoreVulnFromTurso = window.restoreVulnFromTurso;
-        */
     </script>
 </body>
 </html>
