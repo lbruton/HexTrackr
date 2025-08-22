@@ -450,8 +450,9 @@
                             <button id="uploadJsonButton" class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-white/20 hover:border-white/40 transition-all duration-200">
                                 <i class="fas fa-file-code me-1"></i>Upload JSON
                             </button>
-                            <button id="connectApisButton" class="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-white/20 hover:border-white/40 transition-all duration-200">
-                                <i class="fas fa-plug me-1"></i>Connect APIs
+                            <!-- DISABLED: API connections removed for standalone operation -->
+                            <button id="connectApisButton" class="btn btn-sm bg-gray-500 text-gray-300 border-gray-500 cursor-not-allowed" disabled>
+                                <i class="fas fa-ban me-1"></i>APIs Disabled
                             </button>
                         </div>
                     </div>
@@ -1055,8 +1056,9 @@
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="database-tab" data-bs-toggle="tab" data-bs-target="#database-pane" type="button" role="tab">
-                                <i class="fas fa-server me-2"></i>Server Storage
+                            <!-- DISABLED: Database functionality removed -->
+                            <button class="nav-link text-gray-400 cursor-not-allowed" disabled>
+                                <i class="fas fa-server me-2 text-gray-400"></i>Server Storage (Disabled)
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -1175,67 +1177,41 @@
                             </div>
                         </div>
 
-                        <!-- Database Settings Tab -->
+                        <!-- Database Settings Tab - DISABLED -->
                         <div class="tab-pane fade" id="database-pane" role="tabpanel">
                             <div class="row">
-                                <div class="col-md-8">
+                                <div class="col-12">
+                                    <div class="alert alert-warning" role="alert">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <strong>Database Functionality Disabled</strong>
+                                        <p class="mb-0 mt-2">All server storage, API connections, and external database features have been disabled for standalone operation. HexTrackr now operates entirely with browser localStorage for maximum stability and simplicity.</p>
+                                    </div>
                                     <div class="card">
                                         <div class="card-header">
-                                            <h6><i class="fas fa-cloud-upload-alt me-2"></i>Cloud Storage Configuration</h6>
+                                            <h6><i class="fas fa-laptop me-2"></i>Current Storage Configuration</h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="alert alert-info" role="alert">
                                                 <i class="fas fa-info-circle me-2"></i>
-                                                <strong>Server Storage Enabled!</strong> PostgreSQL database is configured for unlimited, synchronized vulnerability data storage.
+                                                <strong>Local Storage Active:</strong> Using browser localStorage for vulnerability data and ticket management.
                                             </div>
-                                            
-                                            <!-- DEPRECATED: Turso Cloud Database section moved to /deprecated folder
-                                            <h6 class="mb-3"><i class="fas fa-database me-2"></i>Turso Cloud Database</h6>
-                                            <div class="mb-3">
-                                                <label for="tursoUrl" class="form-label">Database URL</label>
-                                                <input type="text" class="form-control" id="tursoUrl" placeholder="libsql://your-database.turso.io">
-                                                <div class="form-text">Your Turso database connection URL</div>
+                                            <div class="mb-2">
+                                                <strong>Type:</strong> <span class="badge bg-primary">Browser localStorage</span>
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="tursoAuthToken" class="form-label">Auth Token</label>
-                                                <input type="password" class="form-control" id="tursoAuthToken" placeholder="Enter Turso auth token">
-                                                <div class="form-text">Required for Turso cloud database authentication</div>
+                                            <div class="mb-2">
+                                                <strong>Status:</strong> <span class="badge bg-success">Active</span>
                                             </div>
-                                            <div class="d-flex gap-2 mb-4">
-                                                <button class="btn btn-primary" onclick="testDatabaseConnection()">
-                                                    <i class="fas fa-plug me-2"></i>Test Connection
-                                                </button>
-                                                <button class="btn btn-success" onclick="initializeDatabase()">
-                                                    <i class="fas fa-database me-2"></i>Initialize Database
-                                                </button>
+                                            <div class="mb-2">
+                                                <strong>External APIs:</strong> <span class="badge bg-secondary">Disabled</span>
                                             </div>
-                                            -->
-                                            
-                                            <div class="alert alert-light border" role="alert">
-                                                <i class="fas fa-server me-2"></i>
-                                                <strong>Current Setup:</strong> PostgreSQL backend with streaming CSV processing for optimal performance.
+                                            <div class="mb-2">
+                                                <strong>Database Servers:</strong> <span class="badge bg-secondary">Disabled</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h6><i class="fas fa-server me-2"></i>Storage Status</h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <div id="databaseStatus">
-                                                <div class="mb-2">
-                                                    <strong>Type:</strong> <span class="badge bg-primary">Local SQLite</span>
-                                                </div>
-                                                <div class="mb-2">
-                                                    <strong>Status:</strong> <span class="badge bg-success">Active</span>
-                                                </div>
-                                                <div class="mb-2">
-                                                    <strong>Cloud Sync:</strong> <span class="text-muted">Not Connected</span>
-                                                </div>
-                                                <div class="mb-2">
-                                                    <strong>Storage:</strong> <span class="text-success">Unlimited</span>
+                            </div>
+                        </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1384,7 +1360,13 @@
             });
             
             const connectApisButton = document.getElementById('connectApisButton');
-            if (connectApisButton) connectApisButton.addEventListener('click', showToolsModal);
+            // DISABLED: API connections removed - button is now disabled
+            if (connectApisButton) {
+                connectApisButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    alert('API connections have been disabled for standalone operation. HexTrackr now runs entirely on local storage.');
+                });
+            }
             
             const selectFileButton = document.getElementById('selectFileButton');
             if (selectFileButton) selectFileButton.addEventListener('click', () => document.getElementById('fileInput').click());
@@ -1674,170 +1656,28 @@
             }
         }
 
-        // Process large CSV via PostgreSQL API
+        // Process large CSV via PostgreSQL API - DISABLED
         async function processLargeCsvViaAPI(file) {
-            try {
-                showUploadProgress(file.name, file.size, 'Processing via server database...');
-                
-                console.log('🚀 Processing large CSV file via PostgreSQL API...');
-                
-                const response = await fetch('/api/import/cisco-csv', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const result = await response.json();
-                
-                if (result.success) {
-                    console.log('✅ Large CSV import successful:', result);
-                    
-                    // Update progress
-                    updateUploadProgress(100, `Successfully imported ${result.totalProcessed} records`);
-                    
-                    // Refresh data from database
-                    await loadVulnerabilitiesFromAPI();
-                    
-                    setTimeout(() => {
-                        hideUploadProgress();
-                        alert(`✅ Successfully imported ${result.totalProcessed} vulnerability records from ${result.fileSize} file!`);
-                    }, 1000);
-                    
-                } else {
-                    throw new Error(result.error || 'API import failed');
-                }
-                
-            } catch (error) {
-                console.error('❌ Large CSV API processing failed:', error);
-                hideUploadProgress();
-                alert(`Failed to process large CSV file: ${error.message}`);
-                throw error;
-            }
+            alert('Server API functionality has been disabled. Using local CSV processing instead.');
+            return processFileSimple(file);
         }
 
-        // Upload CSV file to API for processing
+        // Upload CSV file to API for processing - DISABLED
         async function uploadCsvToAPI(file) {
-            try {
-                showUploadProgress(file.name, file.size, 'Uploading to server...');
-                
-                const formData = new FormData();
-                formData.append('csvFile', file);
-                formData.append('csvType', 'vulnerabilities');
-
-                const response = await fetch('/api/import/upload-csv', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-                
-                if (result.success) {
-                    console.log('✅ CSV upload and import successful:', result);
-                    
-                    updateUploadProgress(100, `Successfully imported ${result.totalProcessed} records`);
-                    
-                    // Refresh data from database
-                    await loadVulnerabilitiesFromAPI();
-                    
-                    setTimeout(() => {
-                        hideUploadProgress();
-                        alert(`✅ Successfully imported ${result.totalProcessed} records from ${result.filename}!`);
-                    }, 1000);
-                    
-                } else {
-                    throw new Error(result.error || 'Upload failed');
-                }
-                
-            } catch (error) {
-                console.error('❌ CSV upload failed:', error);
-                throw error;
-            }
+            alert('Server API functionality has been disabled. Using local CSV processing instead.');
+            return processFileSimple(file);
         }
 
-        // Load vulnerabilities from PostgreSQL API
+        // Load vulnerabilities from PostgreSQL API - DISABLED
         async function loadVulnerabilitiesFromAPI() {
-            try {
-                console.log('📊 Loading vulnerabilities from PostgreSQL database...');
-                
-                const response = await fetch('/api/vulnerabilities?limit=1000');
-                const vulnerabilities = await response.json();
-                
-                if (Array.isArray(vulnerabilities) && vulnerabilities.length > 0) {
-                    // Convert Cisco vulnerability data to the format expected by the frontend
-                    const convertedData = vulnerabilities.map(vuln => ({
-                        hostname: vuln.hostname || (vuln.affected_products && vuln.affected_products[0]) || 'Unknown Asset',
-                        ip_address: vuln.ip_address || '192.168.1.1', // Use actual IP or default
-                        vulnerability_id: vuln.advisory_id,
-                        title: vuln.title,
-                        severity: vuln.severity,
-                        cvss_score: vuln.cvss_score || 0,
-                        vpr_score: parseFloat(vuln.vpr_score) || 0, // Keep original property name for consistency
-                        vendor: vuln.vendor || 'Unknown',
-                        cve: vuln.cve_ids && vuln.cve_ids[0] ? vuln.cve_ids[0] : '',
-                        status: vuln.status,
-                        description: vuln.summary || vuln.description || vuln.title,
-                        publication_date: vuln.publication_date,
-                        affected_products: vuln.affected_products || []
-                    }));
-                    
-                    // Set both local and window variables to the same data
-                    window.vulnData = convertedData;
-                    vulnData = convertedData;
-                    
-                    console.log(`✅ Loaded ${vulnerabilities.length} vulnerabilities from database`);
-                    
-                    // Calculate and update VPR statistics
-                    const stats = calculateStatistics(convertedData, new Date());
-                    updateStatCards(stats);
-                    
-                    // Update additional statistics
-                    await loadVulnerabilityStatsFromAPI();
-                    
-                    // Refresh UI with slight delay to ensure DOM is ready
-                    setTimeout(() => {
-                        filterAndDisplayData();
-                        console.log('🔄 Display refreshed with real data');
-                    }, 100);
-                    
-                } else {
-                    throw new Error('No vulnerabilities returned from API');
-                }
-                
-            } catch (error) {
-                console.error('❌ Failed to load vulnerabilities from API:', error);
-                // Fall back to existing data if available
-                if (!window.vulnData || window.vulnData.length === 0) {
-                    console.warn('⚠️ No fallback data available');
-                }
-            }
+            console.log('📊 API database loading disabled - using localStorage');
+            return; // No longer loads from server
         }
 
-        // Load vulnerability statistics from API
+        // Load vulnerability statistics from API - DISABLED
         async function loadVulnerabilityStatsFromAPI() {
-            try {
-                // Calculate stats from the loaded vulnerability data
-                if (window.vulnData && window.vulnData.length > 0) {
-                    const stats = {
-                        totalVulnerabilities: window.vulnData.length,
-                        severityBreakdown: {
-                            Critical: window.vulnData.filter(v => v.severity === 'Critical').length,
-                            High: window.vulnData.filter(v => v.severity === 'High').length,
-                            Medium: window.vulnData.filter(v => v.severity === 'Medium').length,
-                            Low: window.vulnData.filter(v => v.severity === 'Low').length
-                        }
-                    };
-                    
-                    // Update dashboard with real statistics
-                    updateDashboardStats(stats);
-                    console.log('✅ Updated dashboard with real database statistics');
-                } else {
-                    console.warn('⚠️ No vulnerability data available for stats calculation');
-                }
-                
-            } catch (error) {
-                console.error('❌ Failed to calculate stats:', error);
-            }
+            console.log('📊 API statistics loading disabled - using local calculation');
+            return; // No longer loads from server
         }
 
         // Update dashboard statistics display
@@ -4298,15 +4138,11 @@ Would you like to:
             }
         }
 
-        // API Integration Functions
+        // API Integration Functions - DISABLED
         function testCiscoAPI() {
-            const apiKey = document.getElementById('ciscoApiKey').value;
-            const secret = document.getElementById('ciscoSecret').value;
-
-            if (!apiKey || !secret) {
-                alert('Please enter both API key and secret');
-                return;
-            }
+            alert('Cisco API integration has been disabled for standalone operation.');
+            return;
+        }
 
             // TODO: Implement actual Cisco API test
             alert('Cisco API test functionality will be implemented in a future version');
@@ -4830,81 +4666,16 @@ Would you like to:
             }
         }
 
-        // Enhanced vulnerability sync with new features
+        // Enhanced vulnerability sync - DISABLED
         async function syncCiscoVulnerabilitiesEnhanced() {
-            if (typeof CiscoAPIServiceEnhanced === 'undefined') {
-                alert('Enhanced API service not loaded. Please include cisco-api-service-enhanced.js');
-                return;
-            }
-
-            const credentials = decryptData(localStorage.getItem('hextrackr_cisco_credentials'));
-            if (!credentials) {
-                alert('Please configure and save Cisco API credentials first');
-                return;
-            }
-
-            try {
-                const apiService = new CiscoAPIServiceEnhanced(credentials.clientId, credentials.clientSecret);
-                
-                // Show progress
-                const progressHTML = `
-                    <div class="alert alert-info">
-                        <i class="fas fa-sync fa-spin me-2"></i>
-                        Syncing vulnerabilities with enhanced features...
-                        <div class="progress mt-2">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 50%"></div>
-                        </div>
-                    </div>
-                `;
-                document.body.insertAdjacentHTML('beforeend', progressHTML);
-
-                // Get enhanced vulnerability data
-                const vulnerabilities = await apiService.getVulnerabilities();
-                console.log('Enhanced vulnerabilities loaded:', vulnerabilities.length);
-                
-                // Process with VPR scoring and documentation links
-                if (vulnerabilities.length > 0) {
-                    alert(`✅ Successfully synced ${vulnerabilities.length} vulnerabilities with enhanced data!\n\nFeatures included:\n• VPR scoring\n• Documentation links\n• Exploitability analysis\n• Rate limiting protection`);
-                } else {
-                    alert('No vulnerabilities found to sync');
-                }
-
-                // Remove progress indicator
-                document.querySelector('.alert-info').remove();
-
-            } catch (error) {
-                console.error('Enhanced sync error:', error);
-                alert(`❌ Enhanced sync failed: ${error.message}`);
-            }
+            alert('API integrations have been disabled for standalone operation. Please use CSV upload instead.');
+            return;
         }
 
-        // Quick login function for testing (admin/admin123)
+        // Quick login function - DISABLED
         async function quickLogin() {
-            try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: 'admin',
-                        password: 'admin123'
-                    })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem('hextrackr_jwt_token', data.token);
-                    console.log('✅ Logged in successfully as admin');
-                    return true;
-                } else {
-                    console.error('❌ Login failed:', response.status);
-                    return false;
-                }
-            } catch (error) {
-                console.error('❌ Login error:', error);
-                return false;
-            }
+            alert('Authentication functions have been disabled for standalone operation.');
+            return false;
         }
 
         // Test Cisco API connection (via server proxy)

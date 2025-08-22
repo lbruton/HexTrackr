@@ -1,0 +1,545 @@
+{
+  "hextrackr_working_session": {
+    "version": "1.0.0",
+    "last_updated": "2025-08-22T15:21:00Z",
+    "project_name": "HexTrackr v2.3.0",
+    "project_type": "Network Administration Vulnerability Management & Ticketing Platform",
+    
+    "project_vision": {
+      "primary_purpose": "Central hub for network administrators managing network security vulnerabilities",
+      "core_mission": "Vulnerability-to-ticket lifecycle management with seamless integration between systems",
+      "target_users": "Network administrators managing enterprise security operations",
+      "key_integrations": [
+        "Cisco Security APIs (PSIRT openVuln)",
+        "Tenable VPR scoring system", 
+        "Weekly management vulnerability reports",
+        "ServiceNow ticketing integration",
+        "Future: JIRA and custom ticketing platforms"
+      ]
+    },
+
+    "future_roadmap": {
+      "short_term": [
+        "API Security Documentation for management review",
+        "Large-scale CSV processing optimization (314K+ records)",
+        "Performance optimization for enterprise deployment"
+      ],
+      "medium_term": [
+        "Network Mapping Tool with vulnerability overlays",
+        "Diff Viewer for vulnerability state comparison", 
+        "Ansible Integration for automated remediation",
+        "Advanced Analytics with predictive insights"
+      ],
+      "long_term": [
+        "Multi-System Integration (ServiceNow, JIRA, custom platforms)",
+        "Enterprise scalability and multi-tenant support",
+        "ML-powered vulnerability prioritization"
+      ]
+    },
+
+    "current_priorities": {
+      "immediate_tasks": [
+        "CRITICAL FIX: rEngine scripts auto-generating directories in wrong locations (StackTrackr instead of rEngine)",
+        "Disable all non-essential APIs and TURSO functionality",
+        "Create comprehensive function and element documentation",
+        "Fix JavaScript errors and optimize performance",
+        "Document all data entry/exit points"
+      ],
+      "blocked_items": [
+        "API integrations (to be disabled)",
+        "TURSO database features (to be disabled)",
+        "Non-essential external dependencies"
+      ],
+      "critical_fixes_needed": [
+        {
+          "issue": "rEngine auto-generation creating directories in wrong projects",
+          "description": "rEngine scripts are creating rAgents/, rMemory/, rProjects/, .ragents in StackTrackr directory instead of staying in rEngine/",
+          "current_workaround": "Created symlinks from StackTrackr back to rEngine and added to .gitignore",
+          "root_cause_analysis": "Multiple startup scripts had 'StackTrackr' references but hardcoded rEngine paths, potential working directory issues",
+          "fixes_applied": [
+            "Fixed launch-rEngine-services.sh: Changed 'StackTrackr' to 'rEngine Platform'",
+            "Fixed launch-system.sh: Changed 'StackTrackr System Launcher' to 'rEngine System Launcher'", 
+            "Fixed start-mcp-servers.sh: Changed 'StackTrackr MCP Servers' to 'rEngine MCP Servers'",
+            "Fixed one-click-startup.js: Changed 'StackTrackr AI System' to 'rEngine AI System'"
+          ],
+          "remaining_investigation": "Check why relative directory creation happens outside rEngine project scope",
+          "permanent_fix_needed": "Review all scripts for working directory assumptions and relative path usage",
+          "priority": "HIGH",
+          "status": "PARTIALLY_FIXED_WORKAROUND_APPLIED"
+        }
+      ]
+    },
+
+    "file_architecture": {
+      "root_directory": "/Volumes/DATA/GitHub/HexTrackr/",
+      "core_files": {
+        "index.html": {
+          "purpose": "Vulnerability Dashboard - Main application entry point",
+          "size_kb": 263,
+          "key_features": [
+            "VPR score cards (Critical, High, Medium, Low)",
+            "CSV upload and processing",
+            "Vulnerability data visualization",
+            "Asset/Vulnerability/Table view toggles"
+          ],
+          "dependencies": [
+            "PapaParse for CSV parsing",
+            "Tailwind CSS for styling",
+            "Bootstrap 5 for components",
+            "ApexCharts for data visualization"
+          ]
+        },
+        "tickets.html": {
+          "purpose": "Ticket Management System - Separate application",
+          "size_kb": 21,
+          "key_features": [
+            "Ticket creation with drag/drop device management",
+            "Multi-device support with dynamic fields",
+            "Export capabilities (CSV, Excel, JSON, PDF, HTML)",
+            "Search and filtering functionality"
+          ],
+          "dependencies": [
+            "app.js for full functionality",
+            "Bootstrap 5 for UI components",
+            "XLSX.js for Excel export",
+            "jsPDF for PDF generation"
+          ]
+        },
+        "app.js": {
+          "purpose": "Main JavaScript application logic for tickets",
+          "size_kb": 33,
+          "key_classes": [
+            "HexagonTicketsManager"
+          ],
+          "critical_functions": [
+            "setupDeviceManagement()",
+            "addDeviceField()",
+            "removeDeviceField()",
+            "initializeDragAndDrop()",
+            "saveTicket()",
+            "exportData()"
+          ]
+        }
+      },
+      "api_services": {
+        "cisco-api-service-enhanced.js": {
+          "purpose": "Cisco PSIRT API integration",
+          "status": "TO_BE_DISABLED",
+          "dependencies": ["External Cisco API"]
+        },
+        "dnac-api-service.js": {
+          "purpose": "Cisco DNAC API integration", 
+          "status": "TO_BE_DISABLED",
+          "dependencies": ["External Cisco DNAC API"]
+        },
+        "tenable-vpr-service.js": {
+          "purpose": "Tenable VPR scoring integration",
+          "status": "TO_BE_DISABLED", 
+          "dependencies": ["External Tenable API"]
+        },
+        "servicenow-api-service.js": {
+          "purpose": "ServiceNow ticket integration",
+          "status": "TO_BE_DISABLED",
+          "dependencies": ["External ServiceNow API"]
+        }
+      },
+      "database_services": {
+        "database-service.js": {
+          "purpose": "PostgreSQL database operations",
+          "status": "TO_BE_DISABLED",
+          "dependencies": ["PostgreSQL database"]
+        },
+        "server.js": {
+          "purpose": "Express.js backend server",
+          "status": "TO_BE_DISABLED", 
+          "dependencies": ["Node.js, Express, PostgreSQL"]
+        }
+      },
+      "deprecated_files": {
+        "turso-demo.js": {
+          "location": "deprecated/",
+          "status": "ALREADY_DISABLED"
+        }
+      }
+    },
+
+    "data_storage": {
+      "current_system": "Browser localStorage (client-side)",
+      "storage_keys": [
+        "hextrackr_vuln_data",
+        "hexTrackrTickets", 
+        "vulnHistory"
+      ],
+      "current_data_count": {
+        "vulnerabilities": 2,
+        "tickets": 0,
+        "history_entries": 6
+      },
+      "data_entry_points": [
+        "CSV file upload via PapaParse",
+        "Manual ticket creation forms",
+        "JSON data import (disabled APIs)"
+      ],
+      "data_exit_points": [
+        "CSV export functionality",
+        "Excel export (XLSX.js)",
+        "JSON export",
+        "PDF reports (jsPDF)",
+        "HTML reports"
+      ]
+    },
+
+    "dom_elements": {
+      "vulnerability_dashboard": {
+        "upload_section": [
+          "fileInput (hidden file input)",
+          "dragDropArea",
+          "uploadCsvBtn",
+          "uploadJsonBtn", 
+          "connectApisBtn"
+        ],
+        "vpr_cards": [
+          "criticalVprCard",
+          "highVprCard", 
+          "mediumVprCard",
+          "lowVprCard"
+        ],
+        "view_toggles": [
+          "assetViewRadio",
+          "vulnViewRadio",
+          "tableViewRadio"
+        ],
+        "filters": [
+          "severityFilter",
+          "statusFilter",
+          "sortSelect"
+        ]
+      },
+      "ticket_management": {
+        "modal_form": [
+          "ticketModal",
+          "dateSubmitted",
+          "dateDue", 
+          "hexagonTicket",
+          "serviceNowTicket",
+          "location",
+          "devicesContainer",
+          "supervisor",
+          "tech",
+          "status",
+          "notes"
+        ],
+        "device_management": [
+          "devicesContainer",
+          "addDeviceBtn",
+          "removeDeviceBtn", 
+          "dragHandle"
+        ],
+        "action_buttons": [
+          "saveTicketBtn",
+          "cancelBtn",
+          "exportCsvBtn",
+          "exportExcelBtn",
+          "exportJsonBtn",
+          "exportPdfBtn"
+        ]
+      }
+    },
+
+    "javascript_functions": {
+      "vulnerability_processing": [
+        {
+          "name": "processFileSimple",
+          "purpose": "Main CSV processing function",
+          "parameters": ["file"],
+          "dependencies": ["PapaParse", "processVulnerabilityData"]
+        },
+        {
+          "name": "processVulnerabilityData", 
+          "purpose": "Convert CSV data to internal format",
+          "parameters": ["data", "fileName"],
+          "dependencies": ["calculateStatistics", "updateStatCards"]
+        },
+        {
+          "name": "calculateStatistics",
+          "purpose": "Calculate VPR statistics from vulnerability data", 
+          "parameters": ["data", "date"],
+          "dependencies": []
+        },
+        {
+          "name": "updateStatCards",
+          "purpose": "Update VPR score display cards",
+          "parameters": ["stats"],
+          "dependencies": ["DOM elements"]
+        }
+      ],
+      "ticket_management": [
+        {
+          "name": "setupDeviceManagement",
+          "purpose": "Initialize device input functionality",
+          "parameters": [],
+          "dependencies": ["addDeviceField", "removeDeviceField"]
+        },
+        {
+          "name": "addDeviceField", 
+          "purpose": "Add new device input field",
+          "parameters": [],
+          "dependencies": ["setupDragAndDrop"]
+        },
+        {
+          "name": "removeDeviceField",
+          "purpose": "Remove device input field",
+          "parameters": ["deviceEntry"],
+          "dependencies": ["updateDeviceButtons"]
+        },
+        {
+          "name": "initializeDragAndDrop",
+          "purpose": "Setup drag/drop reordering for devices",
+          "parameters": [],
+          "dependencies": ["Sortable.js library"]
+        },
+        {
+          "name": "saveTicket",
+          "purpose": "Save ticket data to localStorage",
+          "parameters": [],
+          "dependencies": ["getDevices", "localStorage"]
+        }
+      ],
+      "utility_functions": [
+        {
+          "name": "showToast",
+          "purpose": "Display notification messages",
+          "parameters": ["message", "type", "duration"],
+          "dependencies": ["Bootstrap toast components"]
+        },
+        {
+          "name": "updateDataStatus",
+          "purpose": "Update status display text",
+          "parameters": ["message"],
+          "dependencies": ["DOM status element"]
+        },
+        {
+          "name": "loadExistingData",
+          "purpose": "Load data from localStorage on page load",
+          "parameters": [],
+          "dependencies": ["localStorage", "renderVulnerabilities"]
+        }
+      ]
+    },
+
+    "css_classes": {
+      "vulnerability_cards": [
+        "vpr-card",
+        "vpr-card-critical",
+        "vpr-card-high", 
+        "vpr-card-medium",
+        "vpr-card-low"
+      ],
+      "ticket_badges": [
+        "status-badge",
+        "status-open",
+        "status-in-progress",
+        "status-completed", 
+        "status-closed",
+        "devices-badge",
+        "supervisor-badge"
+      ],
+      "form_elements": [
+        "device-entry",
+        "drag-handle",
+        "sortable-container",
+        "devices-list"
+      ],
+      "utility_classes": [
+        "highlight",
+        "loading",
+        "empty-state",
+        "overdue"
+      ]
+    },
+
+    "external_apis": {
+      "cisco_psirt": {
+        "service_file": "cisco-api-service-enhanced.js",
+        "endpoint": "https://api.cisco.com/security/advisories/", 
+        "status": "TO_BE_DISABLED",
+        "authentication": "API key required",
+        "rate_limits": "Unknown - needs documentation"
+      },
+      "cisco_dnac": {
+        "service_file": "dnac-api-service.js",
+        "endpoint": "Custom DNAC instance",
+        "status": "TO_BE_DISABLED", 
+        "authentication": "OAuth/Token based",
+        "rate_limits": "Unknown - needs documentation"
+      },
+      "tenable_vpr": {
+        "service_file": "tenable-vpr-service.js",
+        "endpoint": "https://cloud.tenable.com/",
+        "status": "TO_BE_DISABLED",
+        "authentication": "API key required", 
+        "rate_limits": "Unknown - needs documentation"
+      },
+      "servicenow": {
+        "service_file": "servicenow-api-service.js",
+        "endpoint": "Custom ServiceNow instance",
+        "status": "TO_BE_DISABLED",
+        "authentication": "Basic/OAuth",
+        "rate_limits": "Unknown - needs documentation"
+      }
+    },
+
+    "database_connections": {
+      "postgresql": {
+        "service_file": "database-service.js",
+        "connection_string": "Environment variable based",
+        "status": "TO_BE_DISABLED",
+        "tables": ["vulnerabilities", "tickets", "assets"]
+      },
+      "turso": {
+        "service_file": "deprecated/turso-demo.js",
+        "status": "ALREADY_DISABLED",
+        "location": "Moved to deprecated folder"
+      }
+    },
+
+    "known_issues": {
+      "javascript_errors": [
+        {
+          "error": "Invalid or unexpected token",
+          "location": "index.html JavaScript section",
+          "status": "IDENTIFIED_NOT_FIXED",
+          "impact": "Minor - page still loads and functions"
+        },
+        {
+          "error": "Cannot set properties of null",
+          "location": "tickets.html statistics function",
+          "status": "IDENTIFIED_NOT_FIXED", 
+          "impact": "Statistics display may fail"
+        }
+      ],
+      "ui_issues": [
+        {
+          "issue": "In Progress status badge text wrapping on narrow views",
+          "location": "tickets.html table display",
+          "status": "IDENTIFIED_NOT_FIXED",
+          "priority": "LOW"
+        }
+      ],
+      "performance_issues": [
+        {
+          "issue": "Large CSV processing needs optimization",
+          "target": "314K+ records under 30 seconds",
+          "status": "REQUIRES_TESTING",
+          "priority": "HIGH"
+        }
+      ]
+    },
+
+    "testing_data": {
+      "vulnerability_test_file": "cisco-vulnerabilities-08_19_2025_-09_02_16-cdt.csv",
+      "ticket_test_data": "Currently empty - 0 tickets in storage",
+      "sample_devices": ["host01", "host30", "host03", "GRIMESNSWAN03", "GALENANSWAN09"]
+    },
+
+    "dependencies": {
+      "frontend_libraries": [
+        {
+          "name": "Tailwind CSS",
+          "version": "Latest from CDN",
+          "purpose": "Utility-first CSS framework",
+          "critical": true
+        },
+        {
+          "name": "Bootstrap 5",
+          "version": "5.3.0",
+          "purpose": "UI components and modal functionality", 
+          "critical": true
+        },
+        {
+          "name": "PapaParse",
+          "version": "5.3.0",
+          "purpose": "CSV parsing and processing",
+          "critical": true
+        },
+        {
+          "name": "ApexCharts", 
+          "version": "Latest from CDN",
+          "purpose": "Data visualization and charts",
+          "critical": false
+        },
+        {
+          "name": "Font Awesome",
+          "version": "6.4.0", 
+          "purpose": "Icon library",
+          "critical": false
+        },
+        {
+          "name": "Sortable.js",
+          "version": "1.15.0",
+          "purpose": "Drag and drop functionality",
+          "critical": true
+        },
+        {
+          "name": "XLSX.js",
+          "version": "Latest from CDN",
+          "purpose": "Excel file generation",
+          "critical": false
+        },
+        {
+          "name": "jsPDF",
+          "version": "Latest from CDN", 
+          "purpose": "PDF generation",
+          "critical": false
+        },
+        {
+          "name": "JSZip",
+          "version": "3.10.1",
+          "purpose": "File bundling for exports",
+          "critical": false
+        }
+      ],
+      "backend_dependencies": [
+        {
+          "name": "Node.js",
+          "purpose": "Backend runtime",
+          "status": "TO_BE_DISABLED"
+        },
+        {
+          "name": "Express.js",
+          "purpose": "Web server framework", 
+          "status": "TO_BE_DISABLED"
+        },
+        {
+          "name": "PostgreSQL",
+          "purpose": "Database system",
+          "status": "TO_BE_DISABLED"
+        }
+      ]
+    },
+
+    "git_status": {
+      "current_commit": "4fd94c9 - BACKUP: Complete system backup before backend rewrite",
+      "working_directory": "Clean - restored to stable state",
+      "branch": "main",
+      "repository": "lbruton/StackTrackr"
+    },
+
+    "session_context": {
+      "user_preferences": {
+        "communication_style": "Concise, direct responses",
+        "technical_detail": "Moderate depth with explanations", 
+        "format_preference": "Bullet points, short paragraphs",
+        "avoid": "Long explanations, unnecessary preambles"
+      },
+      "current_session_goal": "Create comprehensive documentation and disable non-essential functionality",
+      "completion_criteria": [
+        "All APIs documented and disabled",
+        "All functions and elements catalogued", 
+        "Data flow completely mapped",
+        "JavaScript errors identified and prioritized",
+        "Performance issues documented"
+      ]
+    }
+  }
+}
