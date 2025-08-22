@@ -66,6 +66,39 @@
           "permanent_fix_needed": "Review all scripts for working directory assumptions and relative path usage",
           "priority": "HIGH",
           "status": "PARTIALLY_FIXED_WORKAROUND_APPLIED"
+        },
+        {
+          "issue": "Mixed execution contexts for MCP services causing inconsistent startup",
+          "description": "MCP memory script runs in VS Code context while other services run in AppleScript Terminal windows, creating fragmented service management",
+          "identified_components": [
+            "MCP Memory Server: Runs in VS Code integrated terminal",
+            "Ollama/Smart Scribe: Runs in AppleScript Terminal windows", 
+            "Docker containers: Separate management",
+            "rEngineMCP: Runs in AppleScript Terminal windows",
+            "Document generation: Runs in AppleScript Terminal windows"
+          ],
+          "current_workaround": "Manual coordination across multiple execution contexts",
+          "improvement_opportunity": "Unified control panel/dashboard for all rEngine services",
+          "proposed_solution": {
+            "technology": "Python-based control panel with GUI (tkinter/PyQt/web interface)",
+            "features": [
+              "Start/Stop/Restart buttons for each service",
+              "Real-time status monitoring with visual indicators",
+              "Unified log viewing and management",
+              "Service health checks and automatic recovery",
+              "Single-click full system startup/shutdown",
+              "Integration with VS Code without terminal window clutter"
+            ],
+            "benefits": [
+              "Replace 5+ terminal windows with single control interface",
+              "Consistent execution context for all services",
+              "Better monitoring and debugging capabilities",
+              "Improved user experience and system reliability"
+            ]
+          },
+          "timeline": "Weekend project - high value improvement",
+          "priority": "MEDIUM-HIGH",
+          "status": "IDENTIFIED_FOR_FUTURE_IMPLEMENTATION"
         }
       ]
     },
