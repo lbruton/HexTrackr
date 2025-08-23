@@ -3,13 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HexTrackr - Vulnerability Management Platform</title>
+    <title>HexTrackr - Vulnerability Dashboard v2.3.0</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'hex': {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <!-- Mermaid.js for Network Diagrams -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        // Initialize Mermaid for NetOps/SecOps diagrams
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true },
+            sequence: { useMaxWidth: true }
+        });
+        // Make mermaid globally available
+        window.mermaid = mermaid;
+    </script>
     <style>
         /* HexTrackr Modern Theme */
         :root {
@@ -338,6 +376,113 @@
     </style>
 </head>
 <body>
+    <!-- HexTrackr Ecosystem Navigation Header -->
+    <nav class="navbar navbar-expand-lg fixed-top app-header">
+        <div class="container-fluid">
+            <!-- HexTrackr Brand -->
+            <a class="navbar-brand d-flex align-items-center" href="#" style="color: var(--hex-primary) !important;">
+                <i class="fas fa-shield-alt me-2" style="color: var(--hex-primary);"></i>
+                <span class="fw-bold">HexTrackr</span>
+                <span class="badge bg-gradient text-white ms-2" style="background: linear-gradient(45deg, var(--hex-primary), var(--hex-secondary)) !important; font-size: 0.7em;">v2.3.0</span>
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#hexNavbar">
+                <i class="fas fa-bars" style="color: var(--hex-primary);"></i>
+            </button>
+
+            <!-- Hex Ecosystem Navigation -->
+            <div class="collapse navbar-collapse" id="hexNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <!-- Active Tool -->
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="#" style="color: var(--hex-primary) !important;">
+                            <i class="fas fa-bug me-1"></i>Vulnerabilities
+                        </a>
+                    </li>
+                    
+                    <!-- Hex Ecosystem Tools -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="tickets.html" style="color: var(--hex-secondary);">
+                            <i class="fas fa-ticket-alt me-1"></i>HexTickets
+                        </a>
+                    </li>
+                    
+                    <!-- Config Diff Viewer -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showConfigDiffModal()" style="color: var(--hex-accent);">
+                            <i class="fas fa-code-branch me-1"></i>HexDiff
+                        </a>
+                    </li>
+                    
+                    <!-- Future Tools (Coming Soon) -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="hexToolsDropdown" role="button" data-bs-toggle="dropdown" style="color: #6c757d;">
+                            <i class="fas fa-th-large me-1"></i>More Tools
+                        </a>
+                        <ul class="dropdown-menu border-0 shadow-lg" style="border-radius: 12px;">
+                            <li><a class="dropdown-item text-muted" href="#"><i class="fas fa-map me-2"></i>HexMaps <small class="text-muted">(Coming Soon)</small></a></li>
+                            <li><a class="dropdown-item text-muted" href="#"><i class="fas fa-file-alt me-2"></i>HexDocs <small class="text-muted">(Coming Soon)</small></a></li>
+                            <li><a class="dropdown-item text-muted" href="#"><i class="fas fa-project-diagram me-2"></i>HexProjx <small class="text-muted">(Coming Soon)</small></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-plus me-2" style="color: var(--hex-accent);"></i>Request New Tool</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <!-- Right-side Actions -->
+                <div class="d-flex align-items-center">
+                    <!-- Quick Actions -->
+                    <button class="btn btn-outline-primary btn-sm me-2" onclick="toggleUploadArea()" title="Upload Data">
+                        <i class="fas fa-upload"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm me-2" onclick="showMermaidModal()" title="Network Diagrams">
+                        <i class="fas fa-sitemap"></i>
+                    </button>
+                    
+                    <!-- Settings Dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg" style="border-radius: 12px;">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-palette me-2"></i>Theme Settings</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-download me-2"></i>Export Data</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i>Help & Docs</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content with top padding for fixed header -->
+    <div style="padding-top: 80px;">
+        <!-- HexTrackr Dashboard -->
+        <div class="container-fluid px-4">
+            <!-- Page Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="h3 mb-1" style="color: var(--hex-primary);">
+                                <i class="fas fa-shield-alt me-2"></i>Vulnerability Dashboard
+                            </h1>
+                            <p class="text-muted mb-0">Monitor and manage security vulnerabilities across your infrastructure</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary" onclick="showMermaidModal()">
+                                <i class="fas fa-sitemap me-1"></i>Network Map
+                            </button>
+                            <button class="btn btn-primary" onclick="toggleUploadArea()">
+                                <i class="fas fa-plus me-1"></i>Add Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container-fluid">
         <!-- Header -->
         <div class="app-header py-3">
@@ -3182,6 +3327,396 @@
                 }
             }
         });
+
+        // Mermaid Network Diagram Modal Functions
+        function showMermaidModal() {
+            const modal = new bootstrap.Modal(document.getElementById('mermaidModal'));
+            modal.show();
+            generateNetworkDiagram();
+        }
+
+        function generateNetworkDiagram() {
+            const sampleNetworkDiagram = `
+                flowchart TD
+                    Internet[Internet Gateway]
+                    FW[Firewall<br/>Critical: ${document.getElementById('criticalValue').textContent}]
+                    Router[Core Router<br/>High: ${document.getElementById('highValue').textContent}]
+                    SW1[Switch 1<br/>Medium: ${document.getElementById('mediumValue').textContent}]
+                    SW2[Switch 2<br/>Low: ${document.getElementById('lowValue').textContent}]
+                    
+                    Internet --> FW
+                    FW --> Router
+                    Router --> SW1
+                    Router --> SW2
+                    
+                    classDef critical fill:#ff6b6b,stroke:#fff,color:#fff
+                    classDef high fill:#ffa726,stroke:#fff,color:#fff
+                    classDef medium fill:#42a5f5,stroke:#fff,color:#fff
+                    classDef low fill:#66bb6a,stroke:#fff,color:#fff
+                    
+                    class FW critical
+                    class Router high
+                    class SW1 medium
+                    class SW2 low
+            `;
+            
+            document.getElementById('mermaidDiagram').innerHTML = sampleNetworkDiagram;
+            if (window.mermaid) {
+                window.mermaid.init(undefined, document.getElementById('mermaidDiagram'));
+            }
+        }
+
+        // Config Diff Modal Functions
+        function showConfigDiffModal() {
+            const modal = new bootstrap.Modal(document.getElementById('configDiffModal'));
+            modal.show();
+            generateConfigTimeline();
+        }
+
+        function generateConfigTimeline() {
+            const timelineDiagram = `
+                timeline
+                    title Configuration Change Timeline
+                    2025-08-20 : VLAN 100 Created
+                               : Port Security Enabled
+                    2025-08-21 : SSH Hardening Applied
+                               : SNMP v3 Migration
+                    2025-08-22 : ACL Updates
+                               : Security Patches Applied
+            `;
+            
+            document.getElementById('configTimeline').innerHTML = timelineDiagram;
+            if (window.mermaid) {
+                window.mermaid.init(undefined, document.getElementById('configTimeline'));
+            }
+        }
+
+        function generateConfigFlow() {
+            const flowDiagram = `
+                flowchart TD
+                    A[Baseline Config] --> B{Change Detected?}
+                    B -->|Yes| C[Generate Diff]
+                    B -->|No| D[Monitor Continues]
+                    C --> E[Security Review]
+                    E --> F{Approved?}
+                    F -->|Yes| G[Deploy Change]
+                    F -->|No| H[Reject & Alert]
+                    G --> I[Update Baseline]
+                    H --> J[Log Rejection]
+                    
+                    classDef process fill:#667eea,stroke:#fff,color:#fff
+                    classDef decision fill:#ffa726,stroke:#fff,color:#fff
+                    classDef success fill:#66bb6a,stroke:#fff,color:#fff
+                    classDef danger fill:#ff6b6b,stroke:#fff,color:#fff
+                    
+                    class A,C,I process
+                    class B,F decision  
+                    class G,I success
+                    class H,J danger
+            `;
+            
+            document.getElementById('configFlow').innerHTML = flowDiagram;
+            if (window.mermaid) {
+                window.mermaid.init(undefined, document.getElementById('configFlow'));
+            }
+        }
+
+        function generateGitStyleDiff() {
+            const gitDiagram = `
+                gitGraph
+                   commit id: "Baseline Config"
+                   commit id: "VLAN Changes"
+                   branch security-update
+                   checkout security-update
+                   commit id: "Disable Telnet"
+                   commit id: "Enable SSH v2"
+                   commit id: "ACL Updates"
+                   checkout main
+                   commit id: "Port Security"
+                   merge security-update
+                   commit id: "Production Deploy"
+            `;
+            
+            document.getElementById('gitDiff').innerHTML = gitDiagram;
+            if (window.mermaid) {
+                window.mermaid.init(undefined, document.getElementById('gitDiff'));
+            }
+        }
+
+        function parseConfigDiff() {
+            const beforeConfig = document.getElementById('beforeConfig').value;
+            const afterConfig = document.getElementById('afterConfig').value;
+            
+            if (!beforeConfig.trim() || !afterConfig.trim()) {
+                alert('Please provide both before and after configurations');
+                return;
+            }
+            
+            // Simple diff visualization - would be expanded for real implementation
+            const diffDiagram = `
+                flowchart LR
+                    A[Before Config<br/>${beforeConfig.split('\n').length} lines] --> B[Analysis]
+                    C[After Config<br/>${afterConfig.split('\n').length} lines] --> B
+                    B --> D{Changes Found}
+                    D -->|Added| E[+ New Lines: ${Math.abs(afterConfig.split('\n').length - beforeConfig.split('\n').length)}]
+                    D -->|Modified| F[~ Changed Lines]
+                    D -->|Removed| G[- Deleted Lines]
+                    
+                    classDef added fill:#66bb6a,stroke:#fff,color:#fff
+                    classDef modified fill:#ffa726,stroke:#fff,color:#fff
+                    classDef removed fill:#ff6b6b,stroke:#fff,color:#fff
+                    
+                    class E added
+                    class F modified
+                    class G removed
+            `;
+            
+            document.getElementById('configDiffResult').innerHTML = diffDiagram;
+            document.getElementById('configDiffResult').style.display = 'block';
+            if (window.mermaid) {
+                window.mermaid.init(undefined, document.getElementById('configDiffResult'));
+            }
+        }
+
+        // Config Tab Management
+        function showConfigTab(tabName) {
+            // Hide all tabs
+            document.getElementById('timelineTab').style.display = 'none';
+            document.getElementById('flowTab').style.display = 'none';
+            document.getElementById('gitTab').style.display = 'none';
+            document.getElementById('compareTab').style.display = 'none';
+            
+            // Reset all tab buttons
+            const tabButtons = document.querySelectorAll('#configDiffModal .nav-link');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+                button.style.background = 'transparent';
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').style.display = 'block';
+            
+            // Activate selected tab button
+            event.target.classList.add('active');
+            event.target.style.background = 'var(--hex-accent)';
+            
+            // Auto-generate diagrams when tabs are shown
+            if (tabName === 'timeline') {
+                generateConfigTimeline();
+            } else if (tabName === 'flow') {
+                generateConfigFlow();
+            } else if (tabName === 'git') {
+                generateGitStyleDiff();
+            }
+        }
+
+        function updateMermaidFromCDP() {
+            const cdpInput = document.getElementById('cdpInput').value;
+            if (!cdpInput.trim()) {
+                alert('Please paste CDP neighbor output');
+                return;
+            }
+            
+            // Simple CDP parser - this would be expanded for real implementation
+            const cdpDiagram = `
+                flowchart TD
+                    ${cdpInput.includes('switch') ? 'SW[Switch]' : 'R[Router]'}
+                    ${cdpInput.includes('neighbor') ? 'NEI[Neighbor Device]' : ''}
+                    
+                    SW --> NEI
+                    
+                    classDef device fill:#667eea,stroke:#fff,color:#fff
+                    class SW,NEI device
+            `;
+            
+            document.getElementById('mermaidDiagram').innerHTML = cdpDiagram;
+            if (window.mermaid) {
+                window.mermaid.init(undefined, document.getElementById('mermaidDiagram'));
+            }
+        }
     </script>
+
+    <!-- Mermaid Network Diagram Modal -->
+    <div class="modal fade" id="mermaidModal" tabindex="-1" aria-labelledby="mermaidModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header" style="background: linear-gradient(135deg, var(--hex-primary), var(--hex-secondary)); color: white; border-radius: 16px 16px 0 0;">
+                    <h5 class="modal-title" id="mermaidModalLabel">
+                        <i class="fas fa-sitemap me-2"></i>Network Topology & Vulnerability Map
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- CDP Input Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-network-wired me-2"></i>HexMaps Preview - CDP Neighbor Discovery
+                                    </h6>
+                                    <p class="text-muted small mb-3">Paste Cisco "show cdp neighbors" output to auto-generate network topology</p>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <textarea class="form-control" id="cdpInput" rows="4" 
+                                                placeholder="Device ID        Local Intrfce     Holdtme    Capability  Platform  Port ID
+SW1.company.com   Gig 0/1           120           R S I      WS-C3750  Gig 0/24
+SW2.company.com   Gig 0/2           130           R S I      WS-C3750  Gig 0/12"></textarea>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <button class="btn btn-primary w-100 mb-2" onclick="updateMermaidFromCDP()">
+                                                <i class="fas fa-magic me-1"></i>Generate Topology
+                                            </button>
+                                            <button class="btn btn-outline-secondary w-100" onclick="generateNetworkDiagram()">
+                                                <i class="fas fa-sync me-1"></i>Sample Network
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mermaid Diagram Display -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="mermaid" id="mermaidDiagram">
+                                        <!-- Mermaid diagram will be rendered here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light" style="border-radius: 0 0 16px 16px;">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">
+                        <i class="fas fa-download me-1"></i>Export Diagram
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Config Diff Modal -->
+    <div class="modal fade" id="configDiffModal" tabindex="-1" aria-labelledby="configDiffModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" style="background: linear-gradient(135deg, var(--hex-dark), var(--hex-primary)); border: 2px solid var(--hex-accent);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--hex-accent);">
+                    <h5 class="modal-title text-white" id="configDiffModalLabel">
+                        <i class="fas fa-code-branch me-2" style="color: var(--hex-accent);"></i>
+                        HexDiff - Configuration Diff & Timeline Viewer
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="row g-0">
+                        <!-- Tabs Navigation -->
+                        <div class="col-12">
+                            <ul class="nav nav-tabs" style="background: var(--hex-primary); border-bottom: 2px solid var(--hex-accent);">
+                                <li class="nav-item">
+                                    <button class="nav-link active text-white" style="background: var(--hex-accent); border: none;" 
+                                            onclick="showConfigTab('timeline')">
+                                        <i class="fas fa-clock me-1"></i>Timeline
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link text-white" style="border: none;" 
+                                            onclick="showConfigTab('flow')">
+                                        <i class="fas fa-project-diagram me-1"></i>Change Flow
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link text-white" style="border: none;" 
+                                            onclick="showConfigTab('git')">
+                                        <i class="fas fa-code-branch me-1"></i>Git Style
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link text-white" style="border: none;" 
+                                            onclick="showConfigTab('compare')">
+                                        <i class="fas fa-exchange-alt me-1"></i>Compare Configs
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Tab Content -->
+                        <div class="col-12" style="background: var(--hex-dark); min-height: 500px;">
+                            <!-- Timeline Tab -->
+                            <div id="timelineTab" class="tab-pane p-4">
+                                <h6 class="text-white mb-3">
+                                    <i class="fas fa-clock me-2" style="color: var(--hex-accent);"></i>
+                                    Configuration Change Timeline
+                                </h6>
+                                <div id="configTimeline" class="mermaid-container bg-white rounded p-3"></div>
+                            </div>
+                            
+                            <!-- Flow Tab -->
+                            <div id="flowTab" class="tab-pane p-4" style="display: none;">
+                                <h6 class="text-white mb-3">
+                                    <i class="fas fa-project-diagram me-2" style="color: var(--hex-accent);"></i>
+                                    Change Management Flow
+                                </h6>
+                                <div id="configFlow" class="mermaid-container bg-white rounded p-3"></div>
+                                <button class="btn mt-3" style="background: var(--hex-accent); color: white;" 
+                                        onclick="generateConfigFlow()">
+                                    <i class="fas fa-sync me-2"></i>Generate Flow Diagram
+                                </button>
+                            </div>
+                            
+                            <!-- Git Style Tab -->
+                            <div id="gitTab" class="tab-pane p-4" style="display: none;">
+                                <h6 class="text-white mb-3">
+                                    <i class="fas fa-code-branch me-2" style="color: var(--hex-accent);"></i>
+                                    Git-Style Configuration History
+                                </h6>
+                                <div id="gitDiff" class="mermaid-container bg-white rounded p-3"></div>
+                                <button class="btn mt-3" style="background: var(--hex-accent); color: white;" 
+                                        onclick="generateGitStyleDiff()">
+                                    <i class="fas fa-code-branch me-2"></i>Show Git History
+                                </button>
+                            </div>
+                            
+                            <!-- Compare Tab -->
+                            <div id="compareTab" class="tab-pane p-4" style="display: none;">
+                                <h6 class="text-white mb-3">
+                                    <i class="fas fa-exchange-alt me-2" style="color: var(--hex-accent);"></i>
+                                    Configuration Comparison
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label text-white">Before Configuration:</label>
+                                        <textarea id="beforeConfig" class="form-control" rows="8" 
+                                                  placeholder="Paste your before configuration here..."></textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-white">After Configuration:</label>
+                                        <textarea id="afterConfig" class="form-control" rows="8" 
+                                                  placeholder="Paste your after configuration here..."></textarea>
+                                    </div>
+                                </div>
+                                <button class="btn mt-3" style="background: var(--hex-accent); color: white;" 
+                                        onclick="parseConfigDiff()">
+                                    <i class="fas fa-search me-2"></i>Analyze Differences
+                                </button>
+                                <div id="configDiffResult" class="mermaid-container bg-white rounded p-3 mt-3" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--hex-accent);">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Close
+                    </button>
+                    <button type="button" class="btn" style="background: var(--hex-accent); color: white;">
+                        <i class="fas fa-download me-2"></i>Export Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -1,1022 +1,1592 @@
-// HexTrackr Ticket Management JavaScript
-// This file handles all the interactive functionality for the ticket management system
-
-// Global variables
-let tickets = [];
-let currentPage = 1;
-let rowsPerPage = 25;
-let sortColumn = '';
-let sortDirection = 'asc';
-
-// DOM Content Loaded Event
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded - Starting HexTrackr initialization');
-    initializeApp();
-    loadTickets();
-    setupEventListeners();
-    console.log('HexTrackr initialization complete');
-});
-
-// Initialize the application
-function initializeApp() {
-    console.log('Starting HexTrackr initialization...');
-    
-    // Check for required libraries
-    checkRequiredLibraries();
-    
-    // Load saved settings from localStorage
-    loadSettings();
-    updateStatistics();
-    
-    // Set up pagination
-    updatePagination();
-    
-    console.log('HexTrackr Ticket Management initialized');
-}
-
-// Check if required libraries are loaded
-function checkRequiredLibraries() {
-    const libraries = {
-        'Bootstrap': typeof bootstrap !== 'undefined',
-        'XLSX': typeof XLSX !== 'undefined',
-        'jsPDF': typeof jsPDF !== 'undefined' || typeof window.jspdf !== 'undefined',
-        'JSZip': typeof JSZip !== 'undefined'
-    };
-    
-    console.log('Library check:', libraries);
-    
-    Object.entries(libraries).forEach(([name, loaded]) => {
-        if (!loaded) {
-            console.warn(`${name} library not loaded - some features may not work`);
-        }
-    });
-    
-    return libraries;
-}
-
-// Setup all event listeners
-function setupEventListeners() {
-    // File input handlers
-    setupFileHandlers();
-    
-    // Button handlers
-    setupButtonHandlers();
-    
-    // Table handlers
-    setupTableHandlers();
-    
-    // Modal handlers
-    setupModalHandlers();
-}
-
-// File handling setup
-function setupFileHandlers() {
-    const attachDocsBtn = document.getElementById('attachDocsBtn');
-    const importCsvBtn = document.getElementById('importCsvBtn');
-    const sharedDocsInput = document.getElementById('sharedDocsInput');
-    const csvImportInput = document.getElementById('csvImportInput');
-
-    if (attachDocsBtn) {
-        attachDocsBtn.addEventListener('click', function() {
-            sharedDocsInput.click();
-        });
+// HexTrackr - Hexagon Tickets Management System
+class HexagonTicketsManager {
+    constructor() {
+        this.tickets = [];
+        this.currentEditingId = null;
+        this.sharedDocumentation = []; // Store shared documentation files
+        this.sortColumn = null;
+        this.sortDirection = 'asc';
+        // Pagination properties
+        this.currentPage = 1;
+        this.rowsPerPage = 25;
+        this.init();
     }
 
-    if (importCsvBtn) {
-        importCsvBtn.addEventListener('click', function() {
-            csvImportInput.click();
-        });
-    }
-
-    if (sharedDocsInput) {
-        sharedDocsInput.addEventListener('change', handleDocumentAttachment);
-    }
-
-    if (csvImportInput) {
-        csvImportInput.addEventListener('change', handleCsvImport);
-    }
-}
-
-// Button handlers setup
-function setupButtonHandlers() {
-    // External link handlers
-    const hexagonLink = document.getElementById('hexagonLink');
-    const serviceNowLink = document.getElementById('serviceNowLink');
-    
-    if (hexagonLink) {
-        hexagonLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            openExternalLink('hexagon');
-        });
-    }
-    
-    if (serviceNowLink) {
-        serviceNowLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            openExternalLink('servicenow');
-        });
-    }
-
-    // Pagination handlers
-    const rowsPerPageSelect = document.getElementById('rowsPerPage');
-    if (rowsPerPageSelect) {
-        rowsPerPageSelect.addEventListener('change', function() {
-            rowsPerPage = parseInt(this.value);
-            currentPage = 1;
-            renderTickets();
-            updatePagination();
-        });
-    }
-}
-
-// Table handlers setup
-function setupTableHandlers() {
-    // Table sorting will be handled by the sortTable function
-    // which is called from onclick attributes in the HTML
-}
-
-// Modal handlers setup
-function setupModalHandlers() {
-    // Add any modal-specific handlers here
-    console.log('Modal handlers set up');
-}
-
-// Handle document attachment
-function handleDocumentAttachment(event) {
-    const files = event.target.files;
-    if (files.length > 0) {
-        showNotification(`${files.length} document(s) attached successfully`, 'success');
+    init() {
+        this.loadTickets();
+        this.loadSharedDocumentation();
+        this.setupEventListeners();
+        this.populateLocationFilter();
+        this.updateStatistics();
+        this.renderTickets();
         
-        // Here you would typically upload the files to a server
-        // For now, we'll just simulate the process
-        console.log('Documents attached:', Array.from(files).map(f => f.name));
-    }
-}
-
-// Handle CSV import
-function handleCsvImport(event) {
-    const file = event.target.files[0];
-    if (file && file.type === 'text/csv') {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const csv = e.target.result;
-                const importedTickets = parseCSV(csv);
-                
-                // Add imported tickets to the existing array
-                tickets = tickets.concat(importedTickets);
-                
-                showNotification(`${importedTickets.length} tickets imported successfully`, 'success');
-                renderTickets();
-                updateStatistics();
-            } catch (error) {
-                showNotification('Error importing CSV file: ' + error.message, 'error');
-            }
-        };
-        reader.readAsText(file);
-    } else {
-        showNotification('Please select a valid CSV file', 'error');
-    }
-}
-
-// Parse CSV data
-function parseCSV(csv) {
-    const lines = csv.split('\n');
-    const headers = lines[0].split(',').map(h => h.trim());
-    const tickets = [];
-    
-    for (let i = 1; i < lines.length; i++) {
-        if (lines[i].trim()) {
-            const values = lines[i].split(',').map(v => v.trim());
-            const ticket = {};
-            
-            headers.forEach((header, index) => {
-                ticket[header] = values[index] || '';
-            });
-            
-            // Add required fields if missing
-            ticket.id = ticket.id || Date.now() + Math.random();
-            ticket.dateSubmitted = ticket.dateSubmitted || new Date().toISOString().split('T')[0];
-            ticket.status = ticket.status || 'Open';
-            
-            tickets.push(ticket);
-        }
-    }
-    
-    return tickets;
-}
-
-// Open external links
-function openExternalLink(service) {
-    const urls = {
-        hexagon: 'https://hexagon.com',
-        servicenow: 'https://servicenow.com'
-    };
-    
-    const url = urls[service];
-    if (url) {
-        window.open(url, '_blank');
-        showNotification(`Opening ${service.charAt(0).toUpperCase() + service.slice(1)}...`, 'info');
-    }
-}
-
-// Export data functions
-// Export data function with enhanced debugging
-function exportData(format) {
-    console.log(`Export button clicked: ${format}`);
-    console.log(`Current tickets count: ${tickets.length}`);
-    
-    if (tickets.length === 0) {
-        showNotification('No data to export', 'warning');
-        console.log('Export cancelled: No tickets to export');
-        return;
+        // Set default date to today
+        document.getElementById('dateSubmitted').value = new Date().toISOString().split('T')[0];
+        
+        // Set default due date to 7 days from now
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + 7);
+        document.getElementById('dateDue').value = dueDate.toISOString().split('T')[0];
     }
 
-    try {
-        switch (format) {
-            case 'csv':
-                console.log('Attempting CSV export...');
-                exportToCSV();
-                break;
-            case 'excel':
-                console.log('Attempting Excel export...');
-                exportToExcel();
-                break;
-            case 'json':
-                console.log('Attempting JSON export...');
-                exportToJSON();
-                break;
-            case 'pdf':
-                console.log('Attempting PDF export...');
-                exportToPDF();
-                break;
-            case 'html':
-                console.log('Attempting HTML export...');
-                exportToHTML();
-                break;
-            default:
-                console.error('Unsupported export format:', format);
-                showNotification('Unsupported export format', 'error');
-        }
-    } catch (error) {
-        console.error('Export error:', error);
-        showNotification(`Export failed: ${error.message}`, 'error');
-    }
-}
-
-// Export to CSV
-function exportToCSV() {
-    const headers = ['Date Submitted', 'Date Due', 'Hexagon Ticket', 'ServiceNow Ticket', 'Location', 'Devices', 'Supervisor', 'Tech', 'Status'];
-    const csvContent = [
-        headers.join(','),
-        ...tickets.map(ticket => [
-            ticket.dateSubmitted || '',
-            ticket.dateDue || '',
-            ticket.hexagonTicket || '',
-            ticket.serviceNowTicket || '',
-            ticket.location || '',
-            ticket.devices || '',
-            ticket.supervisor || '',
-            ticket.tech || '',
-            ticket.status || ''
-        ].join(','))
-    ].join('\n');
-
-    downloadFile(csvContent, 'tickets.csv', 'text/csv');
-    showNotification('CSV exported successfully', 'success');
-}
-
-// Export to Excel (requires XLSX library)
-function exportToExcel() {
-    if (typeof XLSX === 'undefined') {
-        showNotification('Excel export library not loaded', 'error');
-        return;
-    }
-
-    const ws = XLSX.utils.json_to_sheet(tickets);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Tickets');
-    
-    XLSX.writeFile(wb, 'tickets.xlsx');
-    showNotification('Excel file exported successfully', 'success');
-}
-
-// Export to JSON
-function exportToJSON() {
-    const jsonContent = JSON.stringify(tickets, null, 2);
-    downloadFile(jsonContent, 'tickets.json', 'application/json');
-    showNotification('JSON exported successfully', 'success');
-}
-
-// Export to PDF (requires jsPDF library)
-function exportToPDF() {
-    if (typeof jsPDF === 'undefined') {
-        showNotification('PDF export library not loaded', 'error');
-        return;
-    }
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    doc.setFontSize(16);
-    doc.text('HexTrackr Tickets Report', 20, 20);
-    
-    // Add table
-    const headers = [['Date Submitted', 'Date Due', 'Hexagon #', 'ServiceNow #', 'Location', 'Status']];
-    const data = tickets.map(ticket => [
-        ticket.dateSubmitted || '',
-        ticket.dateDue || '',
-        ticket.hexagonTicket || '',
-        ticket.serviceNowTicket || '',
-        ticket.location || '',
-        ticket.status || ''
-    ]);
-
-    doc.autoTable({
-        head: headers,
-        body: data,
-        startY: 30,
-        styles: { fontSize: 8 }
-    });
-
-    doc.save('tickets.pdf');
-    showNotification('PDF exported successfully', 'success');
-}
-
-// Export to HTML
-function exportToHTML() {
-    const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>HexTrackr Tickets Report</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        h1 { color: #667eea; }
-    </style>
-</head>
-<body>
-    <h1>HexTrackr Tickets Report</h1>
-    <p>Generated on: ${new Date().toLocaleString()}</p>
-    <table>
-        <thead>
-            <tr>
-                <th>Date Submitted</th>
-                <th>Date Due</th>
-                <th>Hexagon Ticket</th>
-                <th>ServiceNow Ticket</th>
-                <th>Location</th>
-                <th>Devices</th>
-                <th>Supervisor</th>
-                <th>Tech</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${tickets.map(ticket => `
-                <tr>
-                    <td>${ticket.dateSubmitted || ''}</td>
-                    <td>${ticket.dateDue || ''}</td>
-                    <td>${ticket.hexagonTicket || ''}</td>
-                    <td>${ticket.serviceNowTicket || ''}</td>
-                    <td>${ticket.location || ''}</td>
-                    <td>${ticket.devices || ''}</td>
-                    <td>${ticket.supervisor || ''}</td>
-                    <td>${ticket.tech || ''}</td>
-                    <td>${ticket.status || ''}</td>
-                </tr>
-            `).join('')}
-        </tbody>
-    </table>
-</body>
-</html>`;
-
-    downloadFile(htmlContent, 'tickets.html', 'text/html');
-    showNotification('HTML report exported successfully', 'success');
-}
-
-// Download file helper
-function downloadFile(content, filename, mimeType) {
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-// Enhanced sortTable function with debugging
-function sortTable(column) {
-    console.log(`Sort table clicked: ${column}`);
-    console.log(`Current sort: ${sortColumn} ${sortDirection}`);
-    
-    if (sortColumn === column) {
-        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-        sortColumn = column;
-        sortDirection = 'asc';
-    }
-
-    console.log(`New sort: ${sortColumn} ${sortDirection}`);
-
-    // Update sort indicators
-    updateSortIndicators();
-    
-    try {
-        // Sort tickets
-        tickets.sort((a, b) => {
-            let aVal = a[column] || '';
-            let bVal = b[column] || '';
-            
-            // Handle dates
-            if (column.includes('date') || column.includes('Date')) {
-                aVal = new Date(aVal);
-                bVal = new Date(bVal);
-            }
-            
-            if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
-            if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
-            return 0;
+    setupEventListeners() {
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', () => {
+            this.currentPage = 1; // Reset to first page when searching
+            this.renderTickets();
         });
 
-        console.log('Tickets sorted successfully');
-        renderTickets();
+        // Filter functionality
+        document.getElementById('statusFilter').addEventListener('change', () => {
+            this.currentPage = 1; // Reset to first page when filtering
+            this.renderTickets();
+        });
+
+        document.getElementById('locationFilter').addEventListener('change', () => {
+            this.currentPage = 1; // Reset to first page when filtering
+            this.renderTickets();
+        });
+
+        // Pagination controls
+        document.getElementById('rowsPerPage').addEventListener('change', (e) => {
+            this.rowsPerPage = parseInt(e.target.value);
+            this.currentPage = 1; // Reset to first page
+            this.renderTickets();
+        });
+
+        // Device management
+        this.setupDeviceManagement();
+
+        // Modal events
+        document.getElementById('ticketModal').addEventListener('hidden.bs.modal', () => {
+            this.resetForm();
+        });
+
+        // Shared documentation handling
+        document.getElementById('attachDocsBtn').addEventListener('click', () => {
+            document.getElementById('sharedDocsInput').click();
+        });
+
+        document.getElementById('sharedDocsInput').addEventListener('change', (e) => {
+            this.handleSharedDocumentation(e.target.files);
+        });
+
+        // CSV import handling
+        document.getElementById('importCsvBtn').addEventListener('click', () => {
+            document.getElementById('csvImportInput').click();
+        });
+
+        document.getElementById('csvImportInput').addEventListener('change', (e) => {
+            this.handleCsvImport(e.target.files[0]);
+        });
+    }
+
+    setupDeviceManagement() {
+        const container = document.getElementById('devicesContainer');
         
-    } catch (error) {
-        console.error('Sort error:', error);
-        showNotification(`Sort failed: ${error.message}`, 'error');
-    }
-}
+        container.addEventListener('click', (e) => {
+            if (e.target.classList.contains('add-device-btn') || e.target.parentElement.classList.contains('add-device-btn')) {
+                this.addDeviceField();
+            } else if (e.target.classList.contains('remove-device-btn') || e.target.parentElement.classList.contains('remove-device-btn')) {
+                this.removeDeviceField(e.target.closest('.device-entry'));
+            }
+        });
 
-// Update sort indicators
-function updateSortIndicators() {
-    const headers = document.querySelectorAll('.sortable-header');
-    headers.forEach(header => {
-        header.classList.remove('sort-asc', 'sort-desc');
-        if (header.dataset.column === sortColumn) {
-            header.classList.add(`sort-${sortDirection}`);
-        }
-    });
-}
-
-// Enhanced loadTickets function with debugging
-function loadTickets() {
-    console.log('Loading tickets from localStorage...');
-    
-    const savedTickets = localStorage.getItem('hextrackr-tickets');
-    if (savedTickets) {
-        try {
-            tickets = JSON.parse(savedTickets);
-            console.log(`Loaded ${tickets.length} tickets from localStorage`);
-        } catch (error) {
-            console.error('Error parsing saved tickets:', error);
-            // Initialize with sample data if parsing fails
-            initializeSampleData();
-        }
-    } else {
-        console.log('No saved tickets found, initializing with sample data');
-        initializeSampleData();
-    }
-    
-    renderTickets();
-    updateStatistics();
-}
-
-// Initialize with sample data
-function initializeSampleData() {
-    tickets = [
-        {
-            id: 1,
-            dateSubmitted: '2024-01-15',
-            dateDue: '2024-01-30',
-            hexagonTicket: 'HEX-001',
-            serviceNowTicket: 'SNW-001',
-            location: 'Building A',
-            devices: 'Server Rack 1',
-            supervisor: 'John Smith',
-            tech: 'Jane Doe',
-            status: 'In Progress'
-        },
-        {
-            id: 2,
-            dateSubmitted: '2024-01-16',
-            dateDue: '2024-02-01',
-            hexagonTicket: 'HEX-002',
-            serviceNowTicket: 'SNW-002',
-            location: 'Building B',
-            devices: 'Network Switch',
-            supervisor: 'Mike Johnson',
-            tech: 'Bob Wilson',
-            status: 'Completed'
-        },
-        {
-            id: 3,
-            dateSubmitted: '2024-01-17',
-            dateDue: '2024-02-05',
-            hexagonTicket: 'HEX-003',
-            serviceNowTicket: 'SNW-003',
-            location: 'Building C',
-            devices: 'Firewall',
-            supervisor: 'Sarah Davis',
-            tech: 'Alice Brown',
-            status: 'Open'
-        }
-    ];
-    saveTickets();
-    console.log(`Initialized with ${tickets.length} sample tickets`);
-}
-
-// Save tickets to localStorage
-function saveTickets() {
-    localStorage.setItem('hextrackr-tickets', JSON.stringify(tickets));
-}
-
-// Render tickets table
-// Enhanced renderTickets function with debugging
-function renderTickets() {
-    console.log(`Rendering tickets: ${tickets.length} total, page ${currentPage}`);
-    
-    const tbody = document.getElementById('ticketsTableBody');
-    if (!tbody) {
-        console.error('Tickets table body not found');
-        return;
+        // Initialize drag and drop for existing device entries
+        this.initializeDragAndDrop();
     }
 
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    const pageTickets = tickets.slice(startIndex, endIndex);
-    
-    console.log(`Showing tickets ${startIndex + 1}-${Math.min(endIndex, tickets.length)} of ${tickets.length}`);
-
-    tbody.innerHTML = pageTickets.map(ticket => `
-        <tr>
-            <td>${ticket.dateSubmitted || ''}</td>
-            <td>${ticket.dateDue || ''}</td>
-            <td>${ticket.hexagonTicket || ''}</td>
-            <td>${ticket.serviceNowTicket || ''}</td>
-            <td>${ticket.location || ''}</td>
-            <td>${formatDevicesWithLinks(ticket.devices)}</td>
-            <td>${ticket.supervisor || ''}</td>
-            <td>${ticket.tech || ''}</td>
-            <td>
-                <span class="badge ${getStatusBadgeClass(ticket.status)}">
-                    ${ticket.status || 'Unknown'}
+    addDeviceField() {
+        const container = document.getElementById('devicesContainer');
+        const deviceEntry = document.createElement('div');
+        deviceEntry.className = 'device-entry mb-2';
+        deviceEntry.draggable = true;
+        
+        // Get the value from the last device input to smart increment
+        const lastInput = container.querySelector('.device-entry:last-child .device-input');
+        const suggestedValue = this.generateNextDeviceName(lastInput ? lastInput.value : '');
+        
+        deviceEntry.innerHTML = `
+            <div class="input-group">
+                <span class="input-group-text drag-handle" style="cursor: grab;">
+                    <i class="fas fa-grip-vertical"></i>
                 </span>
-            </td>
-            <td>
-                <div class="btn-group btn-group-sm" role="group">
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="editTicket(${ticket.id})" title="Edit">
-                        <i class="fas fa-edit"></i>
+                <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${suggestedValue}">
+                <button type="button" class="btn btn-outline-success add-device-btn">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button type="button" class="btn btn-outline-danger remove-device-btn">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        `;
+        
+        container.appendChild(deviceEntry);
+        this.updateDeviceButtons();
+        this.setupDragAndDrop(deviceEntry);
+        
+        // Focus and select the new input for easy editing
+        const newInput = deviceEntry.querySelector('.device-input');
+        newInput.focus();
+        newInput.select();
+    }
+
+    generateNextDeviceName(previousValue) {
+        if (!previousValue || previousValue.trim() === '') {
+            return '';
+        }
+
+        // Look for patterns like: nswan01, host30, server123, etc.
+        const match = previousValue.match(/^(.+?)(\d+)$/);
+        
+        if (match) {
+            const prefix = match[1]; // e.g., "nswan", "host", "server"
+            const number = parseInt(match[2], 10); // e.g., 1, 30, 123
+            const nextNumber = number + 1;
+            
+            // Preserve leading zeros if they exist
+            const originalNumberStr = match[2];
+            const paddedNumber = nextNumber.toString().padStart(originalNumberStr.length, '0');
+            
+            return prefix + paddedNumber;
+        }
+        
+        // If no numeric pattern found, return empty to let user type
+        return '';
+    }
+
+    removeDeviceField(deviceEntry) {
+        const container = document.getElementById('devicesContainer');
+        if (container.children.length > 1) {
+            deviceEntry.remove();
+            this.updateDeviceButtons();
+        }
+    }
+
+    updateDeviceButtons() {
+        const deviceEntries = document.querySelectorAll('.device-entry');
+        deviceEntries.forEach((entry, index) => {
+            const removeBtn = entry.querySelector('.remove-device-btn');
+            if (deviceEntries.length === 1) {
+                removeBtn.style.display = 'none';
+            } else {
+                removeBtn.style.display = 'block';
+            }
+        });
+    }
+
+    getDevices() {
+        const deviceInputs = document.querySelectorAll('.device-input');
+        const devices = [];
+        deviceInputs.forEach(input => {
+            if (input.value.trim()) {
+                devices.push(input.value.trim());
+            }
+        });
+        return devices;
+    }
+
+    setDevices(devices) {
+        const container = document.getElementById('devicesContainer');
+        container.innerHTML = '';
+        
+        if (devices.length === 0) {
+            devices = [''];
+        }
+        
+        devices.forEach((device, index) => {
+            const deviceEntry = document.createElement('div');
+            deviceEntry.className = 'device-entry mb-2';
+            deviceEntry.draggable = true;
+            
+            deviceEntry.innerHTML = `
+                <div class="input-group">
+                    <span class="input-group-text drag-handle" style="cursor: grab;">
+                        <i class="fas fa-grip-vertical"></i>
+                    </span>
+                    <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${device}">
+                    <button type="button" class="btn btn-outline-success add-device-btn">
+                        <i class="fas fa-plus"></i>
                     </button>
-                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteTicket(${ticket.id})" title="Delete">
-                        <i class="fas fa-trash"></i>
+                    <button type="button" class="btn btn-outline-danger remove-device-btn" ${devices.length === 1 ? 'style="display: none;"' : ''}>
+                        <i class="fas fa-minus"></i>
                     </button>
                 </div>
-            </td>
-        </tr>
-    `).join('');
-
-    updatePaginationInfo();
-    console.log('Tickets rendered successfully');
-}
-
-// Get status badge class
-function getStatusBadgeClass(status) {
-    switch (status?.toLowerCase()) {
-        case 'completed': return 'bg-success';
-        case 'in progress': return 'bg-warning';
-        case 'overdue': return 'bg-danger';
-        case 'open': return 'bg-info';
-        default: return 'bg-secondary';
+            `;
+            
+            container.appendChild(deviceEntry);
+            this.setupDragAndDrop(deviceEntry);
+        });
+        
+        this.updateDeviceButtons();
     }
-}
 
-// Update statistics
-function updateStatistics() {
-    const totalTickets = tickets.length;
-    const inProgress = tickets.filter(t => t.status === 'In Progress').length;
-    const completed = tickets.filter(t => t.status === 'Completed').length;
-    const overdue = tickets.filter(t => {
-        if (!t.dateDue) return false;
-        const dueDate = new Date(t.dateDue);
-        const today = new Date();
-        return dueDate < today && t.status !== 'Completed';
-    }).length;
+    // Drag and Drop functionality
+    initializeDragAndDrop() {
+        const container = document.getElementById('devicesContainer');
+        const deviceEntries = container.querySelectorAll('.device-entry');
+        
+        deviceEntries.forEach(entry => {
+            this.setupDragAndDrop(entry);
+        });
+    }
 
-    document.getElementById('totalTickets').textContent = totalTickets;
-    document.getElementById('inProgressTickets').textContent = inProgress;
-    document.getElementById('completedTickets').textContent = completed;
-    document.getElementById('overdueTickets').textContent = overdue;
-}
+    setupDragAndDrop(deviceEntry) {
+        // Add drag event listeners
+        deviceEntry.addEventListener('dragstart', this.handleDragStart.bind(this));
+        deviceEntry.addEventListener('dragend', this.handleDragEnd.bind(this));
+        deviceEntry.addEventListener('dragover', this.handleDragOver.bind(this));
+        deviceEntry.addEventListener('drop', this.handleDrop.bind(this));
+        deviceEntry.addEventListener('dragenter', this.handleDragEnter.bind(this));
+        deviceEntry.addEventListener('dragleave', this.handleDragLeave.bind(this));
+    }
 
-// Update pagination
-function updatePagination() {
-    const totalPages = Math.ceil(tickets.length / rowsPerPage);
-    const paginationControls = document.getElementById('paginationControls');
-    
-    if (!paginationControls) return;
+    handleDragStart(e) {
+        this.draggedElement = e.currentTarget;
+        e.currentTarget.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', e.currentTarget.outerHTML);
+    }
 
-    let paginationHTML = '';
-    
-    // Previous button
-    paginationHTML += `
-        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Previous</a>
-        </li>
-    `;
-    
-    // Page numbers
-    for (let i = 1; i <= totalPages; i++) {
-        if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
-            paginationHTML += `
-                <li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+    handleDragEnd(e) {
+        e.currentTarget.classList.remove('dragging');
+        
+        // Clean up any remaining drag-over classes
+        const container = document.getElementById('devicesContainer');
+        const entries = container.querySelectorAll('.device-entry');
+        entries.forEach(entry => {
+            entry.classList.remove('drag-over');
+        });
+        
+        // Remove any drag placeholder
+        const placeholder = container.querySelector('.drag-placeholder');
+        if (placeholder) {
+            placeholder.remove();
+        }
+        
+        this.draggedElement = null;
+    }
+
+    handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+
+    handleDragEnter(e) {
+        e.preventDefault();
+        if (e.currentTarget !== this.draggedElement) {
+            e.currentTarget.classList.add('drag-over');
+        }
+    }
+
+    handleDragLeave(e) {
+        e.currentTarget.classList.remove('drag-over');
+    }
+
+    handleDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const dropTarget = e.currentTarget;
+        
+        if (dropTarget !== this.draggedElement && this.draggedElement) {
+            const container = document.getElementById('devicesContainer');
+            const allEntries = Array.from(container.querySelectorAll('.device-entry'));
+            const draggedIndex = allEntries.indexOf(this.draggedElement);
+            const dropIndex = allEntries.indexOf(dropTarget);
+            
+            if (draggedIndex < dropIndex) {
+                // Moving down - insert after the drop target
+                dropTarget.parentNode.insertBefore(this.draggedElement, dropTarget.nextSibling);
+            } else {
+                // Moving up - insert before the drop target
+                dropTarget.parentNode.insertBefore(this.draggedElement, dropTarget);
+            }
+            
+            // Re-initialize drag and drop for all entries
+            this.initializeDragAndDrop();
+            
+            // Show visual feedback for successful reorder
+            this.showReorderFeedback();
+        }
+        
+        dropTarget.classList.remove('drag-over');
+        return false;
+    }
+
+    showReorderFeedback() {
+        const container = document.getElementById('devicesContainer');
+        const label = container.previousElementSibling;
+        
+        // Temporarily highlight the label to show reordering happened
+        label.style.color = '#28a745';
+        label.innerHTML = 'Devices <small class="text-muted">(Reordered! Drag to reorder boot sequence)</small>';
+        
+        setTimeout(() => {
+            label.style.color = '';
+            label.innerHTML = 'Devices <small class="text-muted">(Drag to reorder boot sequence)</small>';
+        }, 2000);
+    }
+
+    async saveTicket() {
+        // Only validate that location is required
+        const location = document.getElementById('location').value.trim();
+        if (!location) {
+            alert('Location is required.');
+            document.getElementById('location').focus();
+            return;
+        }
+
+        const ticket = {
+            id: this.currentEditingId || Date.now().toString(),
+            dateSubmitted: document.getElementById('dateSubmitted').value,
+            dateDue: document.getElementById('dateDue').value,
+            hexagonTicket: document.getElementById('hexagonTicket').value,
+            serviceNowTicket: document.getElementById('serviceNowTicket').value,
+            location: document.getElementById('location').value,
+            devices: this.getDevices(),
+            supervisor: document.getElementById('supervisor').value,
+            tech: document.getElementById('tech').value,
+            status: document.getElementById('status').value,
+            notes: document.getElementById('notes').value,
+            attachments: [], // No more attachments since we removed the file input
+            createdAt: this.currentEditingId ? this.getTicketById(this.currentEditingId).createdAt : new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        if (this.currentEditingId) {
+            const index = this.tickets.findIndex(t => t.id === this.currentEditingId);
+            this.tickets[index] = ticket;
+        } else {
+            this.tickets.push(ticket);
+        }
+
+        this.saveTickets();
+        this.renderTickets();
+        this.updateStatistics();
+        this.populateLocationFilter();
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('ticketModal'));
+        modal.hide();
+
+        // Show success message
+        this.showToast('Ticket saved successfully!', 'success');
+    }
+
+    editTicket(id) {
+        const ticket = this.getTicketById(id);
+        if (!ticket) return;
+
+        this.currentEditingId = id;
+        
+        document.getElementById('dateSubmitted').value = ticket.dateSubmitted;
+        document.getElementById('dateDue').value = ticket.dateDue;
+        document.getElementById('hexagonTicket').value = ticket.hexagonTicket;
+        document.getElementById('serviceNowTicket').value = ticket.serviceNowTicket;
+        document.getElementById('location').value = ticket.location;
+        document.getElementById('supervisor').value = ticket.supervisor;
+        document.getElementById('tech').value = ticket.tech;
+        document.getElementById('status').value = ticket.status;
+        document.getElementById('notes').value = ticket.notes || '';
+        
+        this.setDevices(ticket.devices || []);
+        
+        document.getElementById('ticketModalLabel').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Ticket';
+        
+        const modal = new bootstrap.Modal(document.getElementById('ticketModal'));
+        modal.show();
+    }
+
+    deleteTicket(id) {
+        if (confirm('Are you sure you want to delete this ticket?')) {
+            this.tickets = this.tickets.filter(t => t.id !== id);
+            this.saveTickets();
+            this.renderTickets();
+            this.updateStatistics();
+            this.populateLocationFilter();
+            this.showToast('Ticket deleted successfully!', 'success');
+        }
+    }
+
+    viewTicket(id) {
+        const ticket = this.getTicketById(id);
+        if (!ticket) return;
+
+        // Generate markdown content for the ticket
+        const markdownContent = this.generateMarkdown(ticket);
+        
+        // Display in the markdown view modal
+        document.getElementById('markdownContent').textContent = markdownContent;
+        document.getElementById('viewTicketModal').setAttribute('data-ticket-id', id);
+        
+        const modal = new bootstrap.Modal(document.getElementById('viewTicketModal'));
+        modal.show();
+    }
+
+    editTicketFromView() {
+        const ticketId = document.getElementById('viewTicketModal').getAttribute('data-ticket-id');
+        const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewTicketModal'));
+        viewModal.hide();
+        
+        setTimeout(() => {
+            this.editTicket(ticketId);
+        }, 300);
+    }
+
+    renderTickets() {
+        const tbody = document.getElementById('ticketsTableBody');
+        const filteredTickets = this.getFilteredTickets();
+
+        if (filteredTickets.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="text-center py-4">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h5>No tickets found</h5>
+                            <p>No tickets match your current search criteria.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            this.updatePaginationInfo(0, 0, 0, 0);
+            this.renderPaginationControls(0);
+            return;
+        }
+
+        // Calculate pagination
+        const totalItems = filteredTickets.length;
+        const totalPages = Math.ceil(totalItems / this.rowsPerPage);
+        
+        // Ensure current page is valid
+        if (this.currentPage > totalPages) {
+            this.currentPage = totalPages;
+        }
+        if (this.currentPage < 1) {
+            this.currentPage = 1;
+        }
+
+        const startIndex = (this.currentPage - 1) * this.rowsPerPage;
+        const endIndex = Math.min(startIndex + this.rowsPerPage, totalItems);
+        const paginatedTickets = filteredTickets.slice(startIndex, endIndex);
+
+        tbody.innerHTML = paginatedTickets.map(ticket => {
+            const isOverdue = new Date(ticket.dateDue) < new Date() && ticket.status !== 'Completed' && ticket.status !== 'Closed';
+            
+            return `
+                <tr class="${isOverdue ? 'overdue' : ''}" data-ticket-id="${ticket.id}">
+                    <td>${this.formatDate(ticket.dateSubmitted)}</td>
+                    <td>${this.formatDate(ticket.dateDue)} ${isOverdue ? '<span class="badge bg-danger">OVERDUE</span>' : ''}</td>
+                    <td><strong>${this.highlightSearch(ticket.hexagonTicket)}</strong></td>
+                    <td>${this.highlightSearch(ticket.serviceNowTicket || 'N/A')}</td>
+                    <td>${this.highlightSearch(ticket.location)}</td>
+                    <td>
+                        <div class="devices-list">
+                            ${ticket.devices.map(device => `<span class="device-tag">${this.highlightSearch(device)}</span>`).join('')}
+                        </div>
+                    </td>
+                    <td>${this.highlightSearch(ticket.supervisor)}</td>
+                    <td>${this.highlightSearch(ticket.tech)}</td>
+                    <td><span class="status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}">${ticket.status}</span></td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-primary action-btn" onclick="ticketManager.viewTicket('${ticket.id}')" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-warning action-btn" onclick="ticketManager.editTicket('${ticket.id}')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-success action-btn" onclick="ticketManager.bundleTicketFiles('${ticket.id}')" title="Download Bundle">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="btn btn-outline-danger action-btn" onclick="ticketManager.deleteTicket('${ticket.id}')" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        // Update pagination info and controls
+        this.updatePaginationInfo(startIndex + 1, endIndex, totalItems, totalPages);
+        this.renderPaginationControls(totalPages);
+    }
+
+    updatePaginationInfo(start, end, total, totalPages) {
+        const paginationInfo = document.getElementById('paginationInfo');
+        if (total === 0) {
+            paginationInfo.textContent = 'Showing 0 to 0 of 0 entries';
+        } else {
+            paginationInfo.textContent = `Showing ${start} to ${end} of ${total} entries`;
+        }
+    }
+
+    renderPaginationControls(totalPages) {
+        const paginationControls = document.getElementById('paginationControls');
+        
+        if (totalPages <= 1) {
+            paginationControls.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+
+        // Previous button
+        html += `
+            <li class="page-item ${this.currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="ticketManager.goToPage(${this.currentPage - 1}); return false;">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `;
+
+        // Page numbers with ellipsis logic
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        // Adjust start if we're near the end
+        if (endPage - startPage < maxVisiblePages - 1) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // First page and ellipsis if needed
+        if (startPage > 1) {
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="ticketManager.goToPage(1); return false;">1</a>
                 </li>
             `;
-        } else if (i === currentPage - 3 || i === currentPage + 3) {
-            paginationHTML += '<li class="page-item disabled"><span class="page-link">...</span></li>';
-        }
-    }
-    
-    // Next button
-    paginationHTML += `
-        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a>
-        </li>
-    `;
-    
-    paginationControls.innerHTML = paginationHTML;
-}
-
-// Update pagination info
-function updatePaginationInfo() {
-    const startIndex = (currentPage - 1) * rowsPerPage + 1;
-    const endIndex = Math.min(startIndex + rowsPerPage - 1, tickets.length);
-    const paginationInfo = document.getElementById('paginationInfo');
-    
-    if (paginationInfo) {
-        paginationInfo.textContent = `Showing ${startIndex} to ${endIndex} of ${tickets.length} entries`;
-    }
-}
-
-// Change page
-function changePage(page) {
-    const totalPages = Math.ceil(tickets.length / rowsPerPage);
-    if (page >= 1 && page <= totalPages) {
-        currentPage = page;
-        renderTickets();
-        updatePagination();
-    }
-}
-
-// Edit ticket
-function editTicket(id) {
-    console.log('Edit ticket called with ID:', id);
-    const ticket = tickets.find(t => t.id == id);
-    if (ticket) {
-        // You can implement a modal or form for editing here
-        showNotification(`Edit ticket ${ticket.hexagonTicket || id}`, 'info');
-        console.log('Edit ticket:', ticket);
-        
-        // For now, show a simple prompt to edit
-        const newStatus = prompt(`Edit status for ticket ${ticket.hexagonTicket || id}:`, ticket.status);
-        if (newStatus && newStatus !== ticket.status) {
-            ticket.status = newStatus;
-            saveTickets();
-            renderTickets();
-            updateStatistics();
-            showNotification('Ticket updated successfully', 'success');
-        }
-    } else {
-        console.error('Ticket not found with ID:', id);
-        showNotification('Ticket not found', 'error');
-    }
-}
-
-// Delete ticket
-function deleteTicket(id) {
-    console.log('Delete ticket called with ID:', id);
-    if (confirm('Are you sure you want to delete this ticket?')) {
-        const initialLength = tickets.length;
-        tickets = tickets.filter(t => t.id != id);
-        
-        if (tickets.length < initialLength) {
-            saveTickets();
-            renderTickets();
-            updateStatistics();
-            updatePagination();
-            showNotification('Ticket deleted successfully', 'success');
-            console.log('Ticket deleted successfully, remaining tickets:', tickets.length);
-        } else {
-            console.error('Ticket not found with ID:', id);
-            showNotification('Ticket not found', 'error');
-        }
-    }
-}
-
-// Show notification
-function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
-    notification.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
-    notification.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 5000);
-}
-
-// Load settings from localStorage
-function loadSettings() {
-    const savedSettings = localStorage.getItem('hextrackr-settings');
-    if (savedSettings) {
-        const settings = JSON.parse(savedSettings);
-        rowsPerPage = settings.rowsPerPage || 25;
-        
-        // Apply settings to UI
-        const rowsSelect = document.getElementById('rowsPerPage');
-        if (rowsSelect) {
-            rowsSelect.value = rowsPerPage;
-        }
-    }
-}
-
-// Save settings to localStorage
-function saveSettings() {
-    const settings = {
-        rowsPerPage: rowsPerPage
-    };
-    localStorage.setItem('hextrackr-settings', JSON.stringify(settings));
-}
-
-// Export this object for debugging and global access
-window.HexTrackrTickets = {
-    tickets,
-    exportData,
-    sortTable,
-    changePage,
-    editTicket,
-    deleteTicket,
-    showNotification,
-    renderTickets,
-    loadTickets,
-    initializeSampleData
-};
-
-// Submit new ticket from modal form
-function submitNewTicket() {
-    const form = document.getElementById('newTicketForm');
-    const formData = new FormData(form);
-    
-    // Create new ticket object
-    const newTicket = {
-        id: Date.now() + Math.random(), // Simple ID generation
-        dateSubmitted: document.getElementById('dateSubmitted').value,
-        dateDue: document.getElementById('dateDue').value,
-        hexagonTicket: document.getElementById('hexagonTicket').value,
-        serviceNowTicket: document.getElementById('serviceNowTicket').value,
-        location: document.getElementById('location').value,
-        devices: document.getElementById('devices').value,
-        supervisor: document.getElementById('supervisor').value,
-        tech: document.getElementById('tech').value,
-        status: document.getElementById('status').value,
-        description: document.getElementById('description').value
-    };
-    
-    // Validate required fields
-    if (!newTicket.dateSubmitted || !newTicket.dateDue) {
-        showNotification('Please fill in all required fields', 'error');
-        return;
-    }
-    
-    // Add to tickets array
-    tickets.push(newTicket);
-    
-    // Save to localStorage
-    localStorage.setItem('hextrackr_tickets', JSON.stringify(tickets));
-    
-    // Update the UI
-    renderTickets();
-    updateStatistics();
-    
-    // Close modal and reset form
-    const modal = bootstrap.Modal.getInstance(document.getElementById('ticketModal'));
-    modal.hide();
-    form.reset();
-    
-    showNotification('Ticket added successfully', 'success');
-}
-
-/**
- * Show toast notification
- */
-function showToast(message, type = 'info', duration = 3000) {
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.className = `alert alert-${type === 'info' ? 'primary' : type} alert-dismissible fade show position-fixed`;
-    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    toast.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    // Add to page
-    document.body.appendChild(toast);
-    
-    // Auto-remove after duration
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.classList.remove('show');
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    document.body.removeChild(toast);
-                }
-            }, 150);
-        }
-    }, duration);
-}
-
-/**
- * Format devices with clickable links to vulnerability dashboard
- * @param {string|Array} devices - Device names (comma-separated string or array)
- * @returns {string} HTML with clickable device links
- */
-function formatDevicesWithLinks(devices) {
-    if (!devices) return '';
-    
-    // Handle both string and array formats
-    const deviceArray = Array.isArray(devices) ? devices : devices.split(',').map(d => d.trim());
-    
-    return deviceArray.map(device => {
-        if (!device) return '';
-        
-        // Check if device has vulnerabilities
-        const hasVulns = window.integrationService ? 
-            window.integrationService.getVulnerabilitiesForDevice(device).length > 0 : false;
-        
-        const linkClass = hasVulns ? 'text-danger fw-bold' : 'text-primary';
-        const icon = hasVulns ? '<i class="fas fa-exclamation-triangle me-1"></i>' : '<i class="fas fa-server me-1"></i>';
-        const title = hasVulns ? 'Device has vulnerabilities - Click to view' : 'Click to view device in vulnerability dashboard';
-        
-        return `<a href="index.html?device=${encodeURIComponent(device)}" 
-                   class="${linkClass} text-decoration-none" 
-                   title="${title}"
-                   target="_blank">
-                   ${icon}${device}
-                </a>`;
-    }).join(', ');
-}
-
-/**
- * Check for URL parameters to highlight specific tickets
- */
-function checkForHighlightedTicket() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const highlightId = urlParams.get('highlight');
-    
-    if (highlightId) {
-        // Find the ticket and highlight it
-        setTimeout(() => {
-            const ticketRow = document.querySelector(`tr[data-ticket-id="${highlightId}"]`);
-            if (ticketRow) {
-                ticketRow.classList.add('table-warning');
-                ticketRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Show a toast notification
-                if (typeof showToast === 'function') {
-                    showToast('Ticket created from vulnerability!', 'success');
-                }
+            if (startPage > 2) {
+                html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
             }
-        }, 500);
-    }
-}
-
-/**
- * Enhanced ticket creation that integrates with vulnerability system
- */
-function createTicketFromVulnerability(vulnerabilityData) {
-    if (!window.integrationService) {
-        console.error('Integration service not available');
-        return;
-    }
-    
-    const ticket = window.integrationService.createTicketFromVulnerability(vulnerabilityData);
-    
-    // Refresh the tickets display
-    loadTickets();
-    
-    // Highlight the new ticket
-    setTimeout(() => {
-        const newTicketRow = document.querySelector(`tr[data-ticket-id="${ticket.id}"]`);
-        if (newTicketRow) {
-            newTicketRow.classList.add('table-success');
-            newTicketRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-    }, 100);
-    
-    return ticket;
-}
 
-/**
- * Enhanced loadTickets function that includes integration data
- */
-const originalLoadTickets = loadTickets;
-loadTickets = function() {
-    // Call original function
-    originalLoadTickets();
-    
-    // Check for highlighted tickets
-    checkForHighlightedTicket();
-    
-    // Update ticket display with vulnerability integration data
-    if (window.integrationService) {
-        updateTicketsWithVulnerabilityData();
+        // Page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            html += `
+                <li class="page-item ${i === this.currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="ticketManager.goToPage(${i}); return false;">${i}</a>
+                </li>
+            `;
+        }
+
+        // Last page and ellipsis if needed
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+            html += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="ticketManager.goToPage(${totalPages}); return false;">${totalPages}</a>
+                </li>
+            `;
+        }
+
+        // Next button
+        html += `
+            <li class="page-item ${this.currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="ticketManager.goToPage(${this.currentPage + 1}); return false;">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `;
+
+        paginationControls.innerHTML = html;
     }
-};
 
-/**
- * Update ticket display with vulnerability data
- */
-function updateTicketsWithVulnerabilityData() {
-    const ticketRows = document.querySelectorAll('#ticketsTableBody tr');
-    
-    ticketRows.forEach((row, index) => {
-        const ticket = tickets[index];
-        if (!ticket || !ticket.devices) return;
+    goToPage(page) {
+        this.currentPage = page;
+        this.renderTickets();
+    }
+
+    getFilteredTickets() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        const locationFilter = document.getElementById('locationFilter').value;
+
+        return this.tickets.filter(ticket => {
+            const matchesSearch = !searchTerm || 
+                ticket.hexagonTicket.toLowerCase().includes(searchTerm) ||
+                ticket.serviceNowTicket.toLowerCase().includes(searchTerm) ||
+                ticket.location.toLowerCase().includes(searchTerm) ||
+                ticket.supervisor.toLowerCase().includes(searchTerm) ||
+                ticket.tech.toLowerCase().includes(searchTerm) ||
+                ticket.devices.some(device => device.toLowerCase().includes(searchTerm));
+
+            const matchesStatus = !statusFilter || ticket.status === statusFilter;
+            const matchesLocation = !locationFilter || ticket.location === locationFilter;
+
+            return matchesSearch && matchesStatus && matchesLocation;
+        });
+    }
+
+    highlightSearch(text) {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        if (!searchTerm || !text) return text;
+
+        const regex = new RegExp(`(${searchTerm})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    updateStatistics() {
+        const total = this.tickets.length;
+        const open = this.tickets.filter(t => t.status === 'Open' || t.status === 'In Progress').length;
+        const completed = this.tickets.filter(t => t.status === 'Completed' || t.status === 'Closed').length;
+        const overdue = this.tickets.filter(t => {
+            return new Date(t.dateDue) < new Date() && t.status !== 'Completed' && t.status !== 'Closed';
+        }).length;
+
+        document.getElementById('totalTickets').textContent = total;
+        document.getElementById('openTickets').textContent = open;
+        document.getElementById('completedTickets').textContent = completed;
+        document.getElementById('overdueTickets').textContent = overdue;
+    }
+
+    populateLocationFilter() {
+        const locations = [...new Set(this.tickets.map(t => t.location))].sort();
+        const filter = document.getElementById('locationFilter');
+        const currentValue = filter.value;
         
-        // Add vulnerability count badge if device has vulnerabilities
-        const deviceCell = row.querySelector('td:nth-child(6)'); // Devices column
-        if (deviceCell && window.integrationService) {
-            const deviceNames = Array.isArray(ticket.devices) ? 
-                ticket.devices : ticket.devices.split(',').map(d => d.trim());
-            
-            let totalVulns = 0;
-            deviceNames.forEach(device => {
-                const vulns = window.integrationService.getVulnerabilitiesForDevice(device);
-                totalVulns += vulns.length;
+        filter.innerHTML = '<option value="">All Locations</option>';
+        locations.forEach(location => {
+            const option = document.createElement('option');
+            option.value = location;
+            option.textContent = location;
+            filter.appendChild(option);
+        });
+        
+        filter.value = currentValue;
+    }
+
+    resetForm() {
+        document.getElementById('ticketForm').reset();
+        this.currentEditingId = null;
+        document.getElementById('ticketModalLabel').innerHTML = '<i class="fas fa-plus me-2"></i>Add New Ticket';
+        
+        // Reset dates
+        document.getElementById('dateSubmitted').value = new Date().toISOString().split('T')[0];
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + 7);
+        document.getElementById('dateDue').value = dueDate.toISOString().split('T')[0];
+        
+        // Reset devices
+        this.setDevices(['']);
+    }
+
+    formatDate(dateString) {
+        // Handle date-only strings (YYYY-MM-DD) to avoid timezone issues
+        if (dateString && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            const [year, month, day] = dateString.split('-');
+            return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
             });
+        }
+        
+        // Fallback for other date formats
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+
+    getTicketById(id) {
+        return this.tickets.find(t => t.id === id);
+    }
+
+    loadTickets() {
+        const stored = localStorage.getItem('hexagonTickets');
+        if (stored) {
+            this.tickets = JSON.parse(stored);
+        }
+    }
+
+    saveTickets() {
+        localStorage.setItem('hexagonTickets', JSON.stringify(this.tickets));
+    }
+
+    showToast(message, type = 'info') {
+        // Create toast container if it doesn't exist
+        let toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toastContainer';
+            toastContainer.className = 'position-fixed top-0 end-0 p-3';
+            toastContainer.style.zIndex = '1055';
+            document.body.appendChild(toastContainer);
+        }
+
+        const toastId = 'toast-' + Date.now();
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0`;
+        toast.id = toastId;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+
+        toastContainer.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+
+        // Remove toast after it's hidden
+        toast.addEventListener('hidden.bs.toast', () => {
+            toast.remove();
+        });
+    }
+
+    // Individual Ticket PDF Download
+    downloadTicketPDF(id) {
+        const ticket = this.getTicketById(id);
+        if (!ticket) {
+            this.showToast('Ticket not found', 'error');
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+
+        // Title
+        doc.setFontSize(16);
+        doc.setTextColor(0, 102, 204); // Blue color
+        doc.text(`Hexagon Ticket [${ticket.hexagonTicket}]`, 20, 25);
+
+        // Content styling
+        doc.setTextColor(0, 0, 0); // Black color
+        doc.setFontSize(12);
+
+        let yPosition = 45;
+        const lineHeight = 8;
+        const sectionSpacing = 12;
+
+        // Site/Group
+        doc.setFont('helvetica', 'bold');
+        doc.text('Site/Group:', 20, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`${ticket.location}`, 20, yPosition + lineHeight);
+        yPosition += sectionSpacing;
+
+        // Subject
+        doc.setFont('helvetica', 'bold');
+        doc.text('Subject:', 20, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`NETOPS: Software Upgrades [${ticket.location}]`, 20, yPosition + lineHeight);
+        yPosition += sectionSpacing;
+
+        // Start Date
+        doc.setFont('helvetica', 'bold');
+        doc.text('Start Date:', 20, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.text(this.formatDate(ticket.dateSubmitted), 20, yPosition + lineHeight);
+        yPosition += sectionSpacing;
+
+        // Required Completion Date
+        doc.setFont('helvetica', 'bold');
+        doc.text('Required Completion Date:', 20, yPosition);
+        doc.setFont('helvetica', 'normal');
+        doc.text(this.formatDate(ticket.dateDue), 20, yPosition + lineHeight);
+        yPosition += sectionSpacing;
+
+        // Task Instruction
+        doc.setFont('helvetica', 'bold');
+        doc.text('Task Instruction:', 20, yPosition);
+        yPosition += lineHeight;
+        doc.setFont('helvetica', 'normal');
+        
+        const taskText = `There are critical security patches that must be applied within 30 days at the [${ticket.location}] site.`;
+        const splitTaskText = doc.splitTextToSize(taskText, 170);
+        doc.text(splitTaskText, 20, yPosition);
+        yPosition += splitTaskText.length * 6 + 8;
+
+        // Instructions with Service Now info
+        const instructionText = `Please schedule a maintenance outage of at least two hours and contact the ITCC @ 918-732-4822 with service now ticket number [${ticket.serviceNowTicket || 'TBD'}] to coordinate Netops to apply security updates and reboot the equipment.`;
+        const splitInstructionText = doc.splitTextToSize(instructionText, 170);
+        doc.text(splitInstructionText, 20, yPosition);
+        yPosition += splitInstructionText.length * 6 + 15;
+
+        // Devices section
+        doc.setFont('helvetica', 'bold');
+        doc.text('The devices will be updated and rebooted in the following order:', 20, yPosition);
+        yPosition += lineHeight + 5;
+
+        doc.setFont('helvetica', 'normal');
+        ticket.devices.forEach((device, index) => {
+            doc.text(`${index + 1}. ${device}`, 30, yPosition);
+            yPosition += lineHeight;
+        });
+
+        // Notes section (moved up)
+        if (ticket.notes) {
+            yPosition += 15;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Notes:', 20, yPosition);
+            yPosition += 8;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            const splitNotes = doc.splitTextToSize(ticket.notes, 170);
+            doc.text(splitNotes, 20, yPosition);
+            yPosition += splitNotes.length * 6;
+        }
+
+        // Add shared documentation info if available
+        if (this.sharedDocumentation.length > 0) {
+            yPosition += 15;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Attached Documentation:', 20, yPosition);
+            yPosition += 8;
             
-            if (totalVulns > 0) {
-                // Add vulnerability count badge
-                const badge = `<span class="badge bg-danger ms-2" title="${totalVulns} vulnerabilities found">
-                    ${totalVulns} vulns
-                </span>`;
-                deviceCell.innerHTML += badge;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            this.sharedDocumentation.forEach((doc_file, index) => {
+                doc.text(`${index + 1}. ${doc_file.name} (${this.formatFileSize(doc_file.size)})`, 25, yPosition);
+                yPosition += 6;
+            });
+            yPosition += 5;
+        }
+
+        // Footer with additional details
+        yPosition += 20;
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, yPosition);
+        doc.text(`Supervisor: ${ticket.supervisor}`, 20, yPosition + 6);
+        doc.text(`Tech: ${ticket.tech}`, 20, yPosition + 12);
+        doc.text(`Status: ${ticket.status}`, 20, yPosition + 18);
+
+        // Generate filename: sitename_date_ticketnumber
+        const siteName = ticket.location.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '');
+        const dateStr = ticket.dateSubmitted.replace(/-/g, '');
+        const ticketNum = ticket.hexagonTicket.replace(/[^a-zA-Z0-9]/g, '');
+        const filename = `${siteName}_${dateStr}_${ticketNum}.pdf`;
+
+        // Save the PDF
+        doc.save(filename);
+        this.showToast(`PDF downloaded: ${filename}`, 'success');
+    }
+
+    // File conversion helper
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // Bundle ticket files into zip
+    async bundleTicketFiles(id) {
+        const ticket = this.getTicketById(id);
+        if (!ticket) {
+            this.showToast('Ticket not found', 'error');
+            return;
+        }
+
+        try {
+            const zip = new JSZip();
+
+            // Generate the PDF content
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            // Title
+            doc.setFontSize(16);
+            doc.setTextColor(0, 102, 204);
+            doc.text(`Hexagon Ticket [${ticket.hexagonTicket}]`, 20, 25);
+
+            // Content styling
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
+
+            let yPosition = 45;
+            const lineHeight = 8;
+            const sectionSpacing = 12;
+
+            // Site/Group
+            doc.setFont('helvetica', 'bold');
+            doc.text('Site/Group:', 20, yPosition);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`${ticket.location}`, 20, yPosition + lineHeight);
+            yPosition += sectionSpacing;
+
+            // Subject
+            doc.setFont('helvetica', 'bold');
+            doc.text('Subject:', 20, yPosition);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`NETOPS: Software Upgrades [${ticket.location}]`, 20, yPosition + lineHeight);
+            yPosition += sectionSpacing;
+
+            // Start Date
+            doc.setFont('helvetica', 'bold');
+            doc.text('Start Date:', 20, yPosition);
+            doc.setFont('helvetica', 'normal');
+            doc.text(this.formatDate(ticket.dateSubmitted), 20, yPosition + lineHeight);
+            yPosition += sectionSpacing;
+
+            // Required Completion Date
+            doc.setFont('helvetica', 'bold');
+            doc.text('Required Completion Date:', 20, yPosition);
+            doc.setFont('helvetica', 'normal');
+            doc.text(this.formatDate(ticket.dateDue), 20, yPosition + lineHeight);
+            yPosition += sectionSpacing;
+
+            // Task Instruction
+            doc.setFont('helvetica', 'bold');
+            doc.text('Task Instruction:', 20, yPosition);
+            yPosition += lineHeight;
+            doc.setFont('helvetica', 'normal');
+            
+            const taskText = `There are critical security patches that must be applied within 30 days at the [${ticket.location}] site.`;
+            const splitTaskText = doc.splitTextToSize(taskText, 170);
+            doc.text(splitTaskText, 20, yPosition);
+            yPosition += splitTaskText.length * 6 + 8;
+
+            // Instructions with Service Now info
+            const instructionText = `Please schedule a maintenance outage of at least two hours and contact the ITCC @ 918-732-4822 with service now ticket number [${ticket.serviceNowTicket || 'TBD'}] to coordinate Netops to apply security updates and reboot the equipment.`;
+            const splitInstructionText = doc.splitTextToSize(instructionText, 170);
+            doc.text(splitInstructionText, 20, yPosition);
+            yPosition += splitInstructionText.length * 6 + 15;
+
+            // Devices section
+            doc.setFont('helvetica', 'bold');
+            doc.text('The devices will be updated and rebooted in the following order:', 20, yPosition);
+            yPosition += lineHeight + 5;
+
+            doc.setFont('helvetica', 'normal');
+            ticket.devices.forEach((device, index) => {
+                doc.text(`${index + 1}. ${device}`, 30, yPosition);
+                yPosition += lineHeight;
+            });
+
+            // Footer with additional details
+            yPosition += 20;
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, yPosition);
+            doc.text(`Supervisor: ${ticket.supervisor}`, 20, yPosition + 6);
+            doc.text(`Tech: ${ticket.tech}`, 20, yPosition + 12);
+            doc.text(`Status: ${ticket.status}`, 20, yPosition + 18);
+
+            if (ticket.notes) {
+                yPosition += 30;
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                doc.text('Notes:', 20, yPosition);
+                yPosition += 8;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                const splitNotes = doc.splitTextToSize(ticket.notes, 170);
+                doc.text(splitNotes, 20, yPosition);
+            }
+
+            // Generate base filename
+            const siteName = ticket.location.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '');
+            const dateStr = ticket.dateSubmitted.replace(/-/g, '');
+            const ticketNum = ticket.hexagonTicket.replace(/[^a-zA-Z0-9]/g, '');
+            const baseFilename = `${siteName}_${dateStr}_${ticketNum}`;
+
+            // Add PDF to zip
+            const pdfBlob = doc.output('blob');
+            zip.file(`${baseFilename}.pdf`, pdfBlob);
+
+            // Add shared documentation files (uploaded via "Attach Documentation")
+            if (this.sharedDocumentation && this.sharedDocumentation.length > 0) {
+                this.sharedDocumentation.forEach((doc_file, index) => {
+                    // Convert base64 back to blob
+                    const base64Data = doc_file.content.split(',')[1];
+                    const binaryString = atob(base64Data);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    zip.file(doc_file.name, bytes);
+                });
+            }
+
+            // Add attached files to zip
+            if (ticket.attachments && ticket.attachments.length > 0) {
+                ticket.attachments.forEach((attachment, index) => {
+                    // Convert base64 back to blob
+                    const base64Data = attachment.data.split(',')[1];
+                    const binaryString = atob(base64Data);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    
+                    // Rename file to match the base filename pattern
+                    const fileExt = attachment.name.split('.').pop();
+                    const newFileName = `${baseFilename}_attachment_${index + 1}.${fileExt}`;
+                    
+                    zip.file(newFileName, bytes);
+                });
+            }
+
+            // Generate and download zip
+            const zipBlob = await zip.generateAsync({type: 'blob'});
+            const url = URL.createObjectURL(zipBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${baseFilename}_bundle.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            this.showToast(`Bundle downloaded: ${baseFilename}_bundle.zip`, 'success');
+        } catch (error) {
+            console.error('Error creating bundle:', error);
+            this.showToast('Error creating bundle', 'error');
+        }
+    }
+
+    // Export Functions
+    exportData(format) {
+        const tickets = this.getFilteredTickets();
+        
+        if (tickets.length === 0) {
+            this.showToast('No tickets to export', 'error');
+            return;
+        }
+
+        switch (format) {
+            case 'csv':
+                this.exportCSV(tickets);
+                break;
+            case 'excel':
+                this.exportExcel(tickets);
+                break;
+            case 'json':
+                this.exportJSON(tickets);
+                break;
+            case 'pdf':
+                this.exportPDF(tickets);
+                break;
+            case 'html':
+                this.exportHTML(tickets);
+                break;
+        }
+    }
+
+    exportCSV(tickets) {
+        const headers = ['Date Submitted', 'Date Due', 'Hexagon Ticket #', 'Service Now #', 'Location', 'Devices', 'Supervisor', 'Tech', 'Status', 'Notes'];
+        const csvContent = [
+            headers.join(','),
+            ...tickets.map(ticket => [
+                ticket.dateSubmitted,
+                ticket.dateDue,
+                `"${ticket.hexagonTicket}"`,
+                `"${ticket.serviceNowTicket || ''}"`,
+                `"${ticket.location}"`,
+                `"${ticket.devices.join('; ')}"`,
+                `"${ticket.supervisor}"`,
+                `"${ticket.tech}"`,
+                `"${ticket.status}"`,
+                `"${ticket.notes || ''}"`
+            ].join(','))
+        ].join('\n');
+
+        this.downloadFile(csvContent, 'hexagon-tickets.csv', 'text/csv');
+    }
+
+    exportExcel(tickets) {
+        const ws = XLSX.utils.json_to_sheet(tickets.map(ticket => ({
+            'Date Submitted': ticket.dateSubmitted,
+            'Date Due': ticket.dateDue,
+            'Hexagon Ticket #': ticket.hexagonTicket,
+            'Service Now #': ticket.serviceNowTicket,
+            'Location': ticket.location,
+            'Devices': ticket.devices.join('; '),
+            'Supervisor': ticket.supervisor,
+            'Tech': ticket.tech,
+            'Status': ticket.status,
+            'Notes': ticket.notes || ''
+        })));
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Hexagon Tickets');
+        XLSX.writeFile(wb, 'hexagon-tickets.xlsx');
+    }
+
+    exportJSON(tickets) {
+        const jsonContent = JSON.stringify(tickets, null, 2);
+        this.downloadFile(jsonContent, 'hexagon-tickets.json', 'application/json');
+    }
+
+    exportPDF(tickets) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('l', 'mm', 'a4');
+
+        doc.setFontSize(18);
+        doc.text('Hexagon Tickets Report', 14, 22);
+        
+        doc.setFontSize(12);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 32);
+        doc.text(`Total Tickets: ${tickets.length}`, 14, 40);
+
+        const tableData = tickets.map(ticket => [
+            this.formatDate(ticket.dateSubmitted),
+            this.formatDate(ticket.dateDue),
+            ticket.hexagonTicket,
+            ticket.serviceNowTicket || 'N/A',
+            ticket.location,
+            ticket.devices.join(', '),
+            ticket.supervisor,
+            ticket.tech,
+            ticket.status
+        ]);
+
+        doc.autoTable({
+            head: [['Date Submitted', 'Date Due', 'Hexagon #', 'Service Now #', 'Location', 'Devices', 'Supervisor', 'Tech', 'Status']],
+            body: tableData,
+            startY: 50,
+            styles: { fontSize: 8 },
+            columnStyles: {
+                5: { cellWidth: 40 }
+            }
+        });
+
+        doc.save('hexagon-tickets.pdf');
+    }
+
+    exportHTML(tickets) {
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Hexagon Tickets Report</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    table { border-collapse: collapse; width: 100%; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    .header { margin-bottom: 20px; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>Hexagon Tickets Report</h1>
+                    <p>Generated on: ${new Date().toLocaleDateString()}</p>
+                    <p>Total Tickets: ${tickets.length}</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date Submitted</th>
+                            <th>Date Due</th>
+                            <th>Hexagon Ticket #</th>
+                            <th>Service Now #</th>
+                            <th>Location</th>
+                            <th>Devices</th>
+                            <th>Supervisor</th>
+                            <th>Tech</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tickets.map(ticket => `
+                            <tr>
+                                <td>${this.formatDate(ticket.dateSubmitted)}</td>
+                                <td>${this.formatDate(ticket.dateDue)}</td>
+                                <td>${ticket.hexagonTicket}</td>
+                                <td>${ticket.serviceNowTicket || 'N/A'}</td>
+                                <td>${ticket.location}</td>
+                                <td>${ticket.devices.join(', ')}</td>
+                                <td>${ticket.supervisor}</td>
+                                <td>${ticket.tech}</td>
+                                <td>${ticket.status}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        this.downloadFile(htmlContent, 'hexagon-tickets.html', 'text/html');
+    }
+
+    downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        this.showToast(`${filename} downloaded successfully!`, 'success');
+    }
+
+    // Handle shared documentation upload
+    async handleSharedDocumentation(files) {
+        if (files.length === 0) return;
+
+        this.sharedDocumentation = [];
+        
+        for (const file of files) {
+            try {
+                const base64Content = await this.fileToBase64(file);
+                this.sharedDocumentation.push({
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    content: base64Content
+                });
+            } catch (error) {
+                console.error('Error processing shared documentation:', error);
+                this.showToast(`Error uploading ${file.name}`, 'error');
             }
         }
-    });
+
+        this.saveSharedDocumentation();
+        this.showToast(`${files.length} documentation file(s) uploaded successfully!`, 'success');
+    }
+
+    // Save shared documentation to localStorage
+    saveSharedDocumentation() {
+        localStorage.setItem('hexagon_shared_docs', JSON.stringify(this.sharedDocumentation));
+    }
+
+    // Load shared documentation from localStorage
+    loadSharedDocumentation() {
+        const saved = localStorage.getItem('hexagon_shared_docs');
+        if (saved) {
+            this.sharedDocumentation = JSON.parse(saved);
+        }
+    }
+
+    // View ticket in markdown format
+    viewTicket(id) {
+        const ticket = this.getTicketById(id);
+        if (!ticket) {
+            this.showToast('Ticket not found', 'error');
+            return;
+        }
+
+        const markdown = this.generateMarkdown(ticket);
+        document.getElementById('markdownContent').textContent = markdown;
+        
+        // Store current ticket ID for potential editing
+        this.currentViewingId = id;
+        
+        const modal = new bootstrap.Modal(document.getElementById('viewTicketModal'));
+        modal.show();
+    }
+
+    // Generate markdown format for ticket
+    generateMarkdown(ticket) {
+        let markdown = `# Hexagon Work Request\n\n`;
+        
+        markdown += `**Ticket Information:**\n`;
+        markdown += `- Hexagon Ticket #: ${ticket.hexagonTicket || 'N/A'}\n`;
+        markdown += `- ServiceNow Ticket #: ${ticket.serviceNowTicket || 'N/A'}\n`;
+        markdown += `- Location: ${ticket.location || 'N/A'}\n`;
+        markdown += `- Status: ${ticket.status || 'N/A'}\n\n`;
+        
+        markdown += `**Timeline:**\n`;
+        markdown += `- Date Submitted: ${this.formatDate(ticket.dateSubmitted)}\n`;
+        markdown += `- Required Completion Date: ${this.formatDate(ticket.dateDue)}\n\n`;
+        
+        markdown += `**Task Instruction:**\n`;
+        markdown += `There are critical security patches that must be applied within 30 days at the [${ticket.location || 'SITE NAME'}] site.\n`;
+        markdown += `Please schedule a maintenance outage of at least two hours and contact the ITCC @\n`;
+        markdown += `918-732-4822 with service now ticket number [${ticket.serviceNowTicket || 'SERVICE NOW TICKET'}] to coordinate Netops to apply security\n`;
+        markdown += `updates and reboot the equipment.\n\n`;
+        
+        if (ticket.devices && ticket.devices.length > 0) {
+            markdown += `**Devices to be Updated:**\n`;
+            markdown += `The following devices will be updated and rebooted:\n\n`;
+            ticket.devices.forEach((device, index) => {
+                markdown += `${index + 1}. ${device}\n`;
+            });
+            markdown += '\n';
+        }
+
+        markdown += `**Personnel:**\n`;
+        markdown += `- Supervisor: ${ticket.supervisor || 'N/A'}\n`;
+        markdown += `- Technician: ${ticket.tech || 'N/A'}\n\n`;
+
+        if (ticket.notes && ticket.notes.trim()) {
+            markdown += `**Additional Notes:**\n${ticket.notes}\n\n`;
+        }
+
+        markdown += `---\n`;
+        markdown += `Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}\n`;
+
+        return markdown;
+    }
+
+    // Copy markdown to clipboard
+    copyMarkdownToClipboard() {
+        const content = document.getElementById('markdownContent').textContent;
+        navigator.clipboard.writeText(content).then(() => {
+            this.showToast('Markdown copied to clipboard!', 'success');
+        }).catch(err => {
+            console.error('Failed to copy markdown:', err);
+            this.showToast('Failed to copy markdown', 'error');
+        });
+    }
+
+    // Edit ticket from view modal
+    editTicketFromView() {
+        const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewTicketModal'));
+        viewModal.hide();
+        
+        setTimeout(() => {
+            this.editTicket(this.currentViewingId);
+        }, 300);
+    }
+
+    // Download bundle from view modal
+    downloadBundleFromView() {
+        this.bundleTicketFiles(this.currentViewingId);
+    }
+
+    // Handle CSV import
+    async handleCsvImport(file) {
+        if (!file) return;
+
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            this.showToast('Please select a CSV file', 'error');
+            return;
+        }
+
+        try {
+            const text = await file.text();
+            const tickets = this.parseCsvToTickets(text);
+            
+            if (tickets.length === 0) {
+                this.showToast('No valid tickets found in CSV file', 'warning');
+                return;
+            }
+
+            // Replace existing tickets with imported tickets
+            this.tickets = tickets;
+            this.saveTickets();
+            this.renderTickets();
+            this.updateStatistics();
+            this.populateLocationFilter();
+            
+            this.showToast(`Successfully imported ${tickets.length} ticket(s)! Previous data has been replaced.`, 'success');
+        } catch (error) {
+            console.error('Error importing CSV:', error);
+            this.showToast('Error importing CSV file. Please check the format.', 'error');
+        }
+    }
+
+    // Parse CSV text to tickets array
+    parseCsvToTickets(csvText) {
+        const lines = csvText.split('\n').filter(line => line.trim());
+        if (lines.length < 2) return [];
+
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        const tickets = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            const values = this.parseCsvLine(lines[i]);
+            if (values.length === headers.length) {
+                const ticket = {};
+                
+                headers.forEach((header, index) => {
+                    let value = values[index].trim().replace(/"/g, '');
+                    
+                    // Map CSV headers to ticket properties
+                    switch (header.toLowerCase()) {
+                        case 'date submitted':
+                        case 'datesubmitted':
+                            ticket.dateSubmitted = value;
+                            break;
+                        case 'date due':
+                        case 'datedue':
+                            ticket.dateDue = value;
+                            break;
+                        case 'hexagon ticket':
+                        case 'hexagon ticket #':
+                        case 'hexagonticket':
+                            ticket.hexagonTicket = value;
+                            break;
+                        case 'service now #':
+                        case 'servicenow ticket':
+                        case 'servicenow ticket #':
+                        case 'servicenowticket':
+                            ticket.serviceNowTicket = value;
+                            break;
+                        case 'location':
+                        case 'site/group':
+                            ticket.location = value;
+                            break;
+                        case 'devices':
+                            ticket.devices = value ? value.split(';').map(d => d.trim()).filter(d => d) : [];
+                            break;
+                        case 'supervisor':
+                            ticket.supervisor = value;
+                            break;
+                        case 'tech':
+                        case 'technician':
+                            ticket.tech = value;
+                            break;
+                        case 'status':
+                            ticket.status = value;
+                            break;
+                        case 'notes':
+                            ticket.notes = value;
+                            break;
+                    }
+                });
+
+                // Set defaults for missing fields
+                ticket.dateSubmitted = ticket.dateSubmitted || new Date().toISOString().split('T')[0];
+                ticket.dateDue = ticket.dateDue || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                ticket.hexagonTicket = ticket.hexagonTicket || '';
+                ticket.serviceNowTicket = ticket.serviceNowTicket || '';
+                ticket.devices = ticket.devices || [];
+                ticket.supervisor = ticket.supervisor || '';
+                ticket.tech = ticket.tech || '';
+                ticket.status = ticket.status || 'Open';
+                ticket.notes = ticket.notes || '';
+
+                // Generate ID and timestamps
+                ticket.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+                ticket.createdAt = new Date().toISOString();
+                ticket.updatedAt = new Date().toISOString();
+
+                // Only require location (consistent with form validation)
+                if (ticket.location && ticket.location.trim()) {
+                    tickets.push(ticket);
+                } else {
+                    console.log('Skipping ticket with missing location:', ticket);
+                }
+            }
+        }
+
+        return tickets;
+    }
+
+    // Parse CSV line handling quoted values
+    parseCsvLine(line) {
+        const values = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                values.push(current);
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        
+        values.push(current);
+        return values;
+    }
+
+    // Table sorting functionality
+    sortTable(column) {
+        // Update sort direction
+        if (this.sortColumn === column) {
+            this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.sortColumn = column;
+            this.sortDirection = 'asc';
+        }
+
+        // Update header visual indicators
+        this.updateSortHeaders();
+
+        // Sort the tickets array
+        this.tickets.sort((a, b) => {
+            let valueA = a[column] || '';
+            let valueB = b[column] || '';
+
+            // Handle date columns
+            if (column === 'dateSubmitted' || column === 'dateDue') {
+                valueA = new Date(valueA);
+                valueB = new Date(valueB);
+            } else if (typeof valueA === 'string') {
+                valueA = valueA.toLowerCase();
+                valueB = valueB.toLowerCase();
+            }
+
+            let comparison = 0;
+            if (valueA > valueB) {
+                comparison = 1;
+            } else if (valueA < valueB) {
+                comparison = -1;
+            }
+
+            return this.sortDirection === 'desc' ? comparison * -1 : comparison;
+        });
+
+        // Re-render the table
+        this.renderTickets();
+    }
+
+    updateSortHeaders() {
+        // Remove all sort classes
+        document.querySelectorAll('.sortable-header').forEach(header => {
+            header.classList.remove('sort-asc', 'sort-desc');
+        });
+
+        // Add appropriate class to current sort column
+        if (this.sortColumn) {
+            const header = document.querySelector(`[data-column="${this.sortColumn}"]`);
+            if (header) {
+                header.classList.add(this.sortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+        }
+    }
 }
 
-// Make integration functions globally available
-window.formatDevicesWithLinks = formatDevicesWithLinks;
-window.createTicketFromVulnerability = createTicketFromVulnerability;
-window.checkForHighlightedTicket = checkForHighlightedTicket;
-window.updateTicketsWithVulnerabilityData = updateTicketsWithVulnerabilityData;
+// Global functions for button onclick events
+let ticketManager;
 
-// Make key functions globally available
-window.exportData = exportData;
-window.sortTable = sortTable;
-window.editTicket = editTicket;
-window.deleteTicket = deleteTicket;
-window.submitNewTicket = submitNewTicket;
+function saveTicket() {
+    ticketManager.saveTicket();
+}
 
-// Add test function for debugging
-window.testButtonClick = function(buttonType, param = null) {
-    console.log(`Testing button click: ${buttonType}`, param);
-    
-    switch(buttonType) {
-        case 'export':
-            exportData(param || 'csv');
-            break;
-        case 'sort':
-            sortTable(param || 'dateSubmitted');
-            break;
-        case 'edit':
-            editTicket(param || 1);
-            break;
-        case 'delete':
-            deleteTicket(param || 1);
-            break;
-        default:
-            console.log('Unknown button type');
-    }
-};
+function editTicketFromView() {
+    ticketManager.editTicketFromView();
+}
 
-console.log('HexTrackr Tickets global functions exposed');
-console.log('Available functions:', Object.keys(window.HexTrackrTickets));
-console.log('Test with: testButtonClick("export", "csv") or testButtonClick("sort", "dateSubmitted")');
+function copyMarkdownToClipboard() {
+    ticketManager.copyMarkdownToClipboard();
+}
+
+function downloadBundleFromView() {
+    ticketManager.downloadBundleFromView();
+}
+
+function exportData(format) {
+    ticketManager.exportData(format);
+}
+
+function sortTable(column) {
+    ticketManager.sortTable(column);
+}
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    ticketManager = new HexagonTicketsManager();
+});

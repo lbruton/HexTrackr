@@ -1,202 +1,203 @@
-# HexTrackr - Vulnerability Management Platform
+# HexTrackr
 
-## 🎯 Overview
+A comprehensive web application for tracking and managing Hexagon service tickets within the VulnTrackr project ecosystem.
 
-HexTrackr is a modern, client-side vulnerability management platform designed for security teams to track, analyze, and manage security vulnerabilities across their infrastructure. Built with a clean, responsive design and powerful CSV import/export capabilities.
+## Features
 
-## ✨ Key Features
+### 📋 **Ticket Management**
+- **Create Tickets**: Add new tickets with comprehensive details
+- **Edit Tickets**: Modify existing ticket information
+- **View Tickets**: Detailed ticket viewing with all information
+- **Delete Tickets**: Remove tickets with confirmation
+- **Status Tracking**: Track ticket status (Open, In Progress, Completed, Closed)
 
-- **📊 Interactive Dashboard**: Modern card-based vulnerability visualization
-- **📁 CSV Import/Export**: Support for multiple vulnerability scanner formats
-- **🔍 Advanced Filtering**: Search and filter by severity, asset, or vulnerability type
-- **📈 VPR Analytics**: Vulnerability Priority Rating tracking and trends
-- **💾 Local Storage**: Client-side data persistence (no external dependencies)
-- **📱 Responsive Design**: Works on desktop, tablet, and mobile devices
+### 🖥️ **User Interface**
+- **Responsive Design**: Works on desktop, tablet, and mobile devices
+- **Bootstrap 5**: Modern, clean interface with professional styling
+- **Modal Forms**: User-friendly popup forms for data entry
+- **Real-time Search**: Instant search across all ticket fields
+- **Advanced Filtering**: Filter by status and location
+- **Statistics Dashboard**: Live statistics with visual cards
 
-## 🚀 Quick Start
+### 🔧 **Device Management**
+- **Multiple Devices**: Add multiple devices per ticket (host01, host30, host03, etc.)
+- **Dynamic Fields**: Add/remove device fields as needed
+- **Device Tags**: Visual display of all devices associated with a ticket
 
-### Simple Setup (Recommended)
+### 📊 **Export Capabilities**
+- **CSV Export**: Comma-separated values for spreadsheet applications
+- **Excel Export**: Native Excel format (.xlsx) with proper formatting
+- **JSON Export**: Machine-readable data format for integrations
+- **PDF Export**: Professional PDF reports with tables
+- **HTML Export**: Standalone HTML reports for sharing
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd HexTrackr
-   ```
+### 🏷️ **Data Fields**
+- **Date Submitted**: When the ticket was created
+- **Date Due**: Target completion date
+- **Hexagon Ticket #**: Primary ticket identifier
+- **Service Now #**: Secondary ticketing system reference
+- **Location**: Physical or logical location
+- **Devices**: Multiple device entries (host01, host30, host03, etc.)
+- **Supervisor**: Assigned supervisor
+- **Tech**: Assigned technician
+- **Status**: Current ticket status
+- **Notes**: Additional comments and details
 
-2. **Start a local web server**:
-   ```bash
-   # Using Python 3
-   python3 -m http.server 8080
-   
-   # Using Node.js
-   npx http-server -p 8080
-   
-   # Using PHP
-   php -S localhost:8080
-   ```
+### 🎯 **Advanced Features**
+- **Overdue Detection**: Automatic highlighting of overdue tickets
+- **Local Storage**: Data persistence in browser storage
+- **Search Highlighting**: Highlighted search terms in results
+- **Responsive Tables**: Mobile-friendly table display
+- **Toast Notifications**: User feedback for actions
+- **Form Validation**: Ensures data integrity
 
-3. **Open in browser**:
-   ```
-   http://localhost:8080
-   ```
+## Technical Specifications
 
-### Features Available
+### **Technology Stack**
+- **HTML5**: Semantic markup with accessibility features
+- **CSS3**: Modern styling with animations and responsive design
+- **JavaScript ES6+**: Modern JavaScript with classes and modules
+- **Bootstrap 5**: UI framework for responsive design
+- **Font Awesome**: Icon library for visual elements
 
-- ✅ **CSV Upload**: Import vulnerability data from Tenable, Qualys, Nessus, etc.
-- ✅ **Data Visualization**: Interactive charts and statistics
-- ✅ **Export Options**: Download filtered data as CSV or JSON
-- ✅ **Search & Filter**: Find specific vulnerabilities or assets
-- ✅ **VPR Tracking**: Monitor vulnerability priority ratings
+### **External Libraries**
+- **SheetJS (XLSX)**: Excel file generation
+- **jsPDF**: PDF generation
+- **jsPDF-AutoTable**: PDF table formatting
 
-## 📋 Supported CSV Formats
+### **Browser Compatibility**
+- Chrome 80+
+- Firefox 75+
+- Safari 13+
+- Edge 80+
 
-HexTrackr supports standard vulnerability scanner outputs with these fields:
+## Installation
 
-### Required Fields
-- `hostname` - Asset hostname or name
-- `ip_address` - Asset IP address
-- `severity` - Vulnerability severity (Critical, High, Medium, Low)
-- `plugin_name` - Vulnerability title/name
+1. **Clone or Download**: Copy the `hexagontickets/` folder to your web server
+2. **No Build Process**: Pure HTML/CSS/JavaScript - no compilation needed
+3. **Open in Browser**: Navigate to `index.html` in your web browser
 
-### Optional Fields  
-- `plugin_id` - Scanner plugin ID
-- `description` - Vulnerability description
-- `definition.vpr.score` - VPR score (for Tenable)
-- `first_found` - Discovery date
-- `last_found` - Last seen date
-- `state` - Vulnerability state (Open, Fixed, etc.)
+## File Structure
 
-### Example CSV Format
-```csv
-hostname,ip_address,plugin_id,plugin_name,severity,description,definition.vpr.score,first_found,last_found,state
-web-server-01,192.168.1.10,19506,Apache HTTP Server Security Update,high,Apache security vulnerability,7.4,2024-01-15,2024-08-21,Open
-db-server-01,192.168.1.20,11011,PostgreSQL Security Update,critical,PostgreSQL RCE vulnerability,9.2,2024-02-01,2024-08-20,Open
+```
+hexagontickets/
+├── index.html          # Main application page
+├── app.js              # JavaScript application logic
+├── styles.css          # Custom styling and themes
+└── README.md           # This documentation file
 ```
 
-## 🛠 Development
+## Usage Guide
 
-### Project Structure
-```
-HexTrackr/
-├── index.html              # Main application (single-page)
-├── unified-design-system.css # Custom styling
-├── test/                   # Sample data and test files
-│   └── sample-vulnerabilities.csv
-└── docs/                   # Documentation and guides
-```
+### **Adding a New Ticket**
+1. Click the "Add New Ticket" button
+2. Fill in all required fields:
+   - Date Submitted (defaults to today)
+   - Date Due (defaults to 7 days from today)
+   - Hexagon Ticket # (required)
+   - Location (required)
+   - Supervisor (required)
+   - Tech (required)
+   - Status (required)
+3. Add devices using the device management system:
+   - Enter first device name (e.g., "host01")
+   - Click the "+" button to add more devices
+   - Add additional devices (e.g., "host30", "host03")
+   - Use the "-" button to remove devices
+4. Optionally add Service Now # and Notes
+5. Click "Save Ticket"
 
-### Key Components
+### **Managing Devices**
+- **Single Device**: Enter one device name
+- **Multiple Devices**: Click "+" to add more device fields
+- **Remove Devices**: Click "-" to remove device fields
+- **Examples**: host01, host30, host03, server-prod-01, etc.
 
-1. **Frontend**: Pure HTML/CSS/JavaScript with Bootstrap + Tailwind
-2. **CSV Processing**: Papa Parse library for client-side parsing
-3. **Charts**: ApexCharts for interactive visualizations
-4. **Storage**: Browser localStorage for data persistence
+### **Searching and Filtering**
+- **Search Box**: Type any text to search across all fields
+- **Status Filter**: Filter by ticket status
+- **Location Filter**: Filter by location (auto-populated from existing tickets)
+- **Real-time Results**: Filters apply instantly
 
-### Adding Features
+### **Exporting Data**
+1. Apply any desired filters
+2. Click the appropriate export button:
+   - **CSV**: For Excel, Google Sheets, or other spreadsheet applications
+   - **Excel**: Native Excel format with proper formatting
+   - **JSON**: For programmatic access or data integration
+   - **PDF**: Professional reports for printing or sharing
+   - **HTML**: Standalone web pages for email or web sharing
 
-The application uses a modular JavaScript structure:
+### **Viewing and Editing**
+- **View**: Click the eye icon to see all ticket details
+- **Edit**: Click the pencil icon to modify ticket information
+- **Delete**: Click the trash icon to remove tickets (with confirmation)
 
-```javascript
-// Event listeners for UI interactions
-document.addEventListener('DOMContentLoaded', function() {
-    // Button event handlers
-    // File upload handling
-    // Data processing functions
-});
+## Data Management
 
-// Core functions
-function handleFileUpload(event) { /* CSV processing */ }
-function updateDashboard() { /* UI updates */ }
-function exportData(format) { /* Data export */ }
-```
+### **Storage**
+- Data is stored in browser's local storage
+- Persists between browser sessions
+- No server-side database required
 
-## 📊 Usage Guide
+### **Backup**
+- Export to JSON format for backup purposes
+- Import functionality can be added if needed
+- Data survives browser cache clears
 
-### Importing Data
+### **Security**
+- Client-side only application
+- No data transmitted to external servers
+- Suitable for sensitive internal use
 
-1. Click **"Upload More Data"** button
-2. Select CSV file(s) from your vulnerability scanner
-3. Review imported data in the dashboard
-4. Use filters to analyze specific vulnerabilities
+## Customization
 
-### Analyzing Vulnerabilities
+### **Styling**
+- Modify `styles.css` for custom colors and themes
+- Bootstrap variables can be overridden
+- Responsive breakpoints can be adjusted
 
-- **Dashboard Cards**: View VPR scores by severity
-- **Asset View**: See vulnerabilities grouped by asset
-- **Vulnerability View**: Browse individual vulnerabilities
-- **Table View**: Detailed spreadsheet-like interface
+### **Fields**
+- Add new fields by modifying the form in `index.html`
+- Update JavaScript in `app.js` to handle new fields
+- Export functions automatically include new fields
 
-### Exporting Data
+### **Validation**
+- HTML5 validation is used by default
+- Custom validation can be added in JavaScript
+- Required fields are marked with `required` attribute
 
-1. Apply desired filters
-2. Click export button
-3. Choose format (CSV, JSON, PDF)
-4. Download filtered dataset
+## Troubleshooting
 
-## 🔧 Configuration
+### **Common Issues**
+1. **Data Loss**: Export regularly as backup
+2. **Browser Support**: Use modern browsers for best experience
+3. **Mobile Display**: Some features optimized for desktop
+4. **Large Datasets**: Performance may vary with hundreds of tickets
 
-### Browser Storage
+### **Performance**
+- Optimized for up to 1000 tickets
+- Search and filtering are client-side
+- Export operations handle large datasets efficiently
 
-Data is stored locally in your browser's localStorage. To clear data:
+## Integration
 
-```javascript
-// Open browser console and run:
-localStorage.removeItem('vulnData');
-localStorage.removeItem('vulnHistory');
-```
+### **API Integration**
+- JSON export provides data for external systems
+- Can be integrated with ServiceNow or other ticketing systems
+- RESTful API can be added for server integration
 
-### Large File Handling
+### **Workflow Integration**
+- Designed to complement existing VulnTrackr workflows
+- Can be embedded in larger applications
+- Supports iframe embedding
 
-For large CSV files (>50MB), consider:
+## Support
 
-1. **Pre-processing**: Split large files into smaller chunks
-2. **Browser Memory**: Close other tabs to free memory
-3. **Processing Time**: Allow time for parsing large datasets
-
-## 📁 Sample Data
-
-Sample vulnerability data is included in `/test/sample-vulnerabilities.csv` for testing and demonstration purposes.
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**CSV Upload Not Working**:
-- Ensure file is valid CSV format
-- Check that required fields are present
-- Verify file size (<100MB recommended)
-
-**Data Not Displaying**:
-- Check browser console for errors
-- Verify CSV headers match expected format
-- Clear browser cache and reload
-
-**Performance Issues**:
-- Reduce dataset size for testing
-- Close unnecessary browser tabs
-- Use modern browser (Chrome, Firefox, Safari)
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📞 Support
-
-For issues and questions:
-- Check the troubleshooting section
-- Review sample CSV format
-- Open an issue on GitHub
+For questions, issues, or feature requests related to the Hexagon Tickets Management System, please refer to the main VulnTrackr project documentation or contact the development team.
 
 ---
 
-**Version**: 2.3.0 (Simplified)  
-**Last Updated**: $(date)  
-**Status**: ✅ Stable - Ready for Production Use
+**Version**: 1.0.0  
+**Last Updated**: August 20, 2025  
+**Part of**: VulnTrackr Project Ecosystem

@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr - Ticket Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* HexTrackr Design System Variables */
+        :root {
+            --hex-primary: #2c3e50;
+            --hex-secondary: #34495e;
+            --hex-accent: #e74c3c;
+            --hex-success: #27ae60;
+            --hex-warning: #f39c12;
+            --hex-info: #3498db;
+            --hex-light: #ecf0f1;
+            --hex-dark: #1a252f;
+            --hex-gradient: linear-gradient(135deg, var(--hex-primary), var(--hex-secondary));
+        }
+
+        body {
+            background: var(--hex-gradient);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .container-fluid {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            margin: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Header styling with HexTrackr colors */
+        .bg-primary {
+            background: var(--hex-gradient) !important;
+            border-radius: 12px;
+            border: 2px solid var(--hex-accent);
+        }
+
+        /* Button styling updates */
+        .btn-primary {
+            background: var(--hex-gradient);
+            border: 2px solid var(--hex-accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--hex-accent);
+            border-color: var(--hex-accent);
+        }
+
+        .btn-success {
+            background: var(--hex-success);
+            border-color: var(--hex-success);
+        }
+
+        .btn-outline-info {
+            border-color: var(--hex-info);
+            color: var(--hex-info);
+        }
+
+        .btn-outline-info:hover {
+            background: var(--hex-info);
+            border-color: var(--hex-info);
+        }
+
+        .btn-outline-warning {
+            border-color: var(--hex-warning);
+            color: var(--hex-warning);
+        }
+
+        .btn-outline-warning:hover {
+            background: var(--hex-warning);
+            border-color: var(--hex-warning);
+        }
+
+        /* Table styling */
+        .table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table thead {
+            background: var(--hex-gradient);
+            color: white;
+        }
+
+        /* Sortable table headers */
+        .sortable-header {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 25px !important;
+            transition: all 0.3s ease;
+        }
+        
+        .sortable-header:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sortable-header::after {
+            content: '\f0dc';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+        }
+        
+        .sortable-header.sort-asc::after {
+            content: '\f0de';
+            opacity: 1;
+            color: var(--hex-accent);
+        }
+        
+        .sortable-header.sort-desc::after {
+            content: '\f0dd';
+            opacity: 1;
+            color: var(--hex-accent);
+        }
+
+        /* Modal styling */
+        .modal-content {
+            border: 2px solid var(--hex-accent);
+            border-radius: 16px;
+        }
+
+        .modal-header {
+            background: var(--hex-gradient);
+            color: white;
+            border-radius: 14px 14px 0 0;
+        }
+
+        /* Form styling */
+        .form-control:focus {
+            border-color: var(--hex-accent);
+            box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+        }
+
+        /* Device container - keeping your exact functionality */
+        .sortable-container {
+            background: #f8f9fa;
+            border: 2px dashed var(--hex-accent);
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 60px;
+        }
+
+        .device-entry {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .drag-handle {
+            background: var(--hex-gradient);
+            color: white;
+            border: none;
+            cursor: grab;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .add-device-btn {
+            background: var(--hex-success);
+            border: none;
+            color: white;
+        }
+
+        .remove-device-btn {
+            background: var(--hex-accent);
+            border: none;
+            color: white;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container-fluid {
+                margin: 10px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="hex-header">
+        <nav class="navbar navbar-expand-lg hex-nav">
+            <div class="container-fluid">
+                <a class="navbar-brand text-white fw-bold" href="#" style="font-size: 1.5rem;">
+                    <i class="fas fa-hexagon me-2" style="color: var(--hex-accent);"></i>
+                    HexTickets
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                                <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('tickets')">
+                                <i class="fas fa-ticket-alt me-1"></i>Tickets
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('reports')">
+                                <i class="fas fa-chart-bar me-1"></i>Reports
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-external-link-alt me-1"></i>External Systems
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="openExternalLink('hexagon')">
+                                    <i class="fas fa-hexagon me-2"></i>Hexagon Portal
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="openExternalLink('servicenow')">
+                                    <i class="fas fa-snowflake me-2"></i>ServiceNow
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="index-new.html">
+                                    <i class="fas fa-shield-alt me-2"></i>Vulnerability Dashboard
+                                </a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="main-content fade-in">
+            
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="content-section">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="mb-0">
+                                <i class="fas fa-ticket-alt me-2" style="color: var(--hex-accent);"></i>
+                                Dual System Ticket Management
+                            </h2>
+                            <div>
+                                <button type="button" class="btn btn-hex-primary btn-lg me-2" data-bs-toggle="modal" data-bs-target="#ticketModal">
+                                    <i class="fas fa-plus me-2"></i>Create Ticket
+                                </button>
+                                <button type="button" class="btn btn-hex-secondary" onclick="importData()">
+                                    <i class="fas fa-upload me-2"></i>Import Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="hex-card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-ticket-alt fa-2x mb-2" style="color: var(--hex-info);"></i>
+                                <h4 class="card-title mb-1" id="totalTickets">0</h4>
+                                <p class="card-text text-muted">Total Tickets</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="hex-card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-clock fa-2x mb-2" style="color: var(--hex-warning);"></i>
+                                <h4 class="card-title mb-1" id="openTickets">0</h4>
+                                <p class="card-text text-muted">Open Tickets</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="hex-card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-check-circle fa-2x mb-2" style="color: var(--hex-success);"></i>
+                                <h4 class="card-title mb-1" id="completedTickets">0</h4>
+                                <p class="card-text text-muted">Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="hex-card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-exclamation-triangle fa-2x mb-2" style="color: var(--hex-accent);"></i>
+                                <h4 class="card-title mb-1" id="overdueTickets">0</h4>
+                                <p class="card-text text-muted">Overdue</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="hex-card">
+                            <div class="hex-card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-2">
+                                        <button class="btn btn-hex-secondary w-100" onclick="exportData('pdf')">
+                                            <i class="fas fa-file-pdf me-2"></i>Export PDF Report
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <button class="btn btn-hex-secondary w-100" onclick="exportData('markdown')">
+                                            <i class="fab fa-markdown me-2"></i>Export Markdown
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <button class="btn btn-hex-secondary w-100" onclick="exportData('csv')">
+                                            <i class="fas fa-file-csv me-2"></i>Export CSV
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tickets Section -->
+            <div id="ticketsSection" class="content-section" style="display: none;">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="hex-card">
+                            <div class="hex-card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-list me-2"></i>Ticket Management
+                                    </h5>
+                                    <div>
+                                        <select id="rowsPerPage" class="form-select form-select-sm d-inline-block w-auto me-2">
+                                            <option value="10">10 per page</option>
+                                            <option value="25" selected>25 per page</option>
+                                            <option value="50">50 per page</option>
+                                            <option value="100">100 per page</option>
+                                        </select>
+                                        <button class="btn btn-hex-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ticketModal">
+                                            <i class="fas fa-plus me-1"></i>New Ticket
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="hex-table table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="sortable-header" data-column="dateSubmitted" onclick="sortTable('dateSubmitted')">Date Submitted</th>
+                                                <th class="sortable-header" data-column="dateDue" onclick="sortTable('dateDue')">Date Due</th>
+                                                <th class="sortable-header" data-column="hexagonTicket" onclick="sortTable('hexagonTicket')">Hexagon Ticket #</th>
+                                                <th class="sortable-header" data-column="serviceNowTicket" onclick="sortTable('serviceNowTicket')">Service Now #</th>
+                                                <th class="sortable-header" data-column="location" onclick="sortTable('location')">Location</th>
+                                                <th class="sortable-header" data-column="devices" onclick="sortTable('devices')">Devices</th>
+                                                <th class="sortable-header" data-column="supervisor" onclick="sortTable('supervisor')">Supervisor</th>
+                                                <th class="sortable-header" data-column="tech" onclick="sortTable('tech')">Tech</th>
+                                                <th class="sortable-header" data-column="status" onclick="sortTable('status')">Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ticketTableBody">
+                                            <!-- Tickets will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Pagination -->
+                                <div class="d-flex justify-content-between align-items-center p-3">
+                                    <span id="paginationInfo" class="text-muted">Showing 0 to 0 of 0 entries</span>
+                                    <nav>
+                                        <ul class="pagination pagination-sm mb-0" id="paginationControls">
+                                            <!-- Pagination controls will be populated here -->
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Create/Edit Ticket Modal -->
+    <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ticketModalLabel">
+                        <i class="fas fa-ticket-alt me-2"></i>Create New Ticket
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="ticketForm">
+                        <div class="row">
+                            <!-- Basic Information -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="dateSubmitted" class="form-label">Date Submitted</label>
+                                    <input type="date" class="form-control" id="dateSubmitted" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="dateDue" class="form-label">Date Due</label>
+                                    <input type="date" class="form-control" id="dateDue" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="hexagonTicket" class="form-label">Hexagon Ticket #</label>
+                                    <input type="text" class="form-control" id="hexagonTicket" placeholder="HEX-2025-001">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="serviceNowTicket" class="form-label">ServiceNow Ticket #</label>
+                                    <input type="text" class="form-control" id="serviceNowTicket" placeholder="INC0000001">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="location" class="form-label">Location</label>
+                                    <input type="text" class="form-control" id="location" placeholder="Data Center A">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Status</label>
+                                    <select class="form-select" id="status">
+                                        <option value="Open">Open</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Device Input System -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-server me-2"></i>Devices 
+                                <small class="text-muted">(Auto-increment hostnames, drag to reorder boot sequence)</small>
+                            </label>
+                            <div class="device-container">
+                                <div id="devicesContainer" class="sortable-list">
+                                    <div class="device-entry" data-device-index="0">
+                                        <div class="input-group">
+                                            <span class="input-group-text drag-handle">
+                                                <i class="fas fa-grip-vertical"></i>
+                                            </span>
+                                            <input type="text" class="form-control device-input" placeholder="hostname01" value="hostname01">
+                                            <button type="button" class="btn add-device-btn" onclick="addDevice()">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                            <button type="button" class="btn remove-device-btn" onclick="removeDevice(this)" style="display: none;">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Click + to add devices with auto-incrementing names. Drag entries to set boot order.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="supervisor" class="form-label">Supervisor</label>
+                                    <input type="text" class="form-control" id="supervisor">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="tech" class="form-label">Tech</label>
+                                    <input type="text" class="form-control" id="tech">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" rows="4" placeholder="Detailed description of the work to be performed..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" rows="3" placeholder="Additional notes or comments..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-hex-primary" onclick="saveTicket()">
+                        <i class="fas fa-save me-2"></i>Save Ticket
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Ticket Modal -->
+    <div class="modal fade" id="viewTicketModal" tabindex="-1" aria-labelledby="viewTicketModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewTicketModalLabel">
+                        <i class="fas fa-eye me-2"></i>Ticket Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <button class="btn btn-hex-secondary btn-sm w-100 mb-2" onclick="generateMarkdown()">
+                                <i class="fab fa-markdown me-2"></i>Generate Markdown
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-hex-secondary btn-sm w-100 mb-2" onclick="generatePDF()">
+                                <i class="fas fa-file-pdf me-2"></i>Generate PDF
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-hex-secondary btn-sm w-100 mb-2" onclick="downloadBundle()">
+                                <i class="fas fa-archive me-2"></i>Download Bundle
+                            </button>
+                        </div>
+                    </div>
+                    <div id="ticketDetails" class="bg-light p-3 rounded">
+                        <!-- Ticket details will be populated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-hex-primary" onclick="editTicketFromView()">
+                        <i class="fas fa-edit me-2"></i>Edit Ticket
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script>
+        // HexTickets Enhanced JavaScript with Auto-Increment Device Management
+        
+        // Global variables
+        let tickets = [];
+        let currentPage = 1;
+        let rowsPerPage = 25;
+        let sortColumn = '';
+        let sortDirection = 'asc';
+        let currentEditingTicket = null;
+        let sortableInstance = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('HexTickets initializing...');
+            initializeApp();
+            setupDeviceSortable();
+            loadSampleData();
+            updateStatistics();
+            renderTickets();
+        });
+
+        function initializeApp() {
+            // Set default dates
+            const today = new Date().toISOString().split('T')[0];
+            const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            
+            document.getElementById('dateSubmitted').value = today;
+            document.getElementById('dateDue').value = nextWeek;
+
+            // Setup event listeners
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            // Pagination
+            const rowsSelect = document.getElementById('rowsPerPage');
+            if (rowsSelect) {
+                rowsSelect.addEventListener('change', function() {
+                    rowsPerPage = parseInt(this.value);
+                    currentPage = 1;
+                    renderTickets();
+                    updatePagination();
+                });
+            }
+        }
+
+        // Enhanced Device Management System
+        function setupDeviceSortable() {
+            const container = document.getElementById('devicesContainer');
+            if (container) {
+                sortableInstance = Sortable.create(container, {
+                    animation: 200,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    handle: '.drag-handle',
+                    onEnd: function(evt) {
+                        console.log('Device reordered:', evt.oldIndex, 'to', evt.newIndex);
+                        updateDeviceOrder();
+                    }
+                });
+            }
+        }
+
+        function addDevice() {
+            const container = document.getElementById('devicesContainer');
+            const deviceEntries = container.querySelectorAll('.device-entry');
+            
+            // Find the highest hostname number
+            let maxNumber = 0;
+            deviceEntries.forEach(entry => {
+                const input = entry.querySelector('.device-input');
+                const value = input.value;
+                const match = value.match(/hostname(\d+)/);
+                if (match) {
+                    maxNumber = Math.max(maxNumber, parseInt(match[1]));
+                }
+            });
+            
+            const nextNumber = maxNumber + 1;
+            const hostname = `hostname${nextNumber.toString().padStart(2, '0')}`;
+            
+            const newEntry = document.createElement('div');
+            newEntry.className = 'device-entry slide-up';
+            newEntry.setAttribute('data-device-index', deviceEntries.length);
+            
+            newEntry.innerHTML = `
+                <div class="input-group">
+                    <span class="input-group-text drag-handle">
+                        <i class="fas fa-grip-vertical"></i>
+                    </span>
+                    <input type="text" class="form-control device-input" value="${hostname}">
+                    <button type="button" class="btn add-device-btn" onclick="addDevice()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button type="button" class="btn remove-device-btn" onclick="removeDevice(this)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(newEntry);
+            updateDeviceButtons();
+            
+            // Focus the new input
+            newEntry.querySelector('.device-input').focus();
+        }
+
+        function removeDevice(button) {
+            const deviceEntry = button.closest('.device-entry');
+            const container = document.getElementById('devicesContainer');
+            
+            if (container.children.length > 1) {
+                deviceEntry.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    deviceEntry.remove();
+                    updateDeviceButtons();
+                    updateDeviceOrder();
+                }, 300);
+            }
+        }
+
+        function updateDeviceButtons() {
+            const container = document.getElementById('devicesContainer');
+            const entries = container.querySelectorAll('.device-entry');
+            
+            entries.forEach((entry, index) => {
+                const addBtn = entry.querySelector('.add-device-btn');
+                const removeBtn = entry.querySelector('.remove-device-btn');
+                
+                // Show add button only on last entry
+                addBtn.style.display = (index === entries.length - 1) ? 'block' : 'none';
+                
+                // Show remove button if more than one entry
+                removeBtn.style.display = (entries.length > 1) ? 'block' : 'none';
+            });
+        }
+
+        function updateDeviceOrder() {
+            const container = document.getElementById('devicesContainer');
+            const entries = container.querySelectorAll('.device-entry');
+            
+            entries.forEach((entry, index) => {
+                entry.setAttribute('data-device-index', index);
+            });
+        }
+
+        function getDevicesFromForm() {
+            const container = document.getElementById('devicesContainer');
+            const inputs = container.querySelectorAll('.device-input');
+            
+            return Array.from(inputs)
+                .map(input => input.value.trim())
+                .filter(value => value.length > 0);
+        }
+
+        // Section Navigation
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.style.display = 'none');
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionName + 'Section');
+            if (targetSection) {
+                targetSection.style.display = 'block';
+                targetSection.classList.add('fade-in');
+            }
+            
+            // Update navigation
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            
+            // Load section-specific data
+            if (sectionName === 'tickets') {
+                renderTickets();
+            }
+        }
+
+        // Ticket Management Functions
+        function saveTicket() {
+            const formData = {
+                id: currentEditingTicket ? currentEditingTicket.id : Date.now(),
+                dateSubmitted: document.getElementById('dateSubmitted').value,
+                dateDue: document.getElementById('dateDue').value,
+                hexagonTicket: document.getElementById('hexagonTicket').value,
+                serviceNowTicket: document.getElementById('serviceNowTicket').value,
+                location: document.getElementById('location').value,
+                devices: getDevicesFromForm().join(', '),
+                supervisor: document.getElementById('supervisor').value,
+                tech: document.getElementById('tech').value,
+                status: document.getElementById('status').value,
+                description: document.getElementById('description').value,
+                notes: document.getElementById('notes').value,
+                lastModified: new Date().toISOString()
+            };
+
+            if (currentEditingTicket) {
+                // Update existing ticket
+                const index = tickets.findIndex(t => t.id === currentEditingTicket.id);
+                if (index !== -1) {
+                    tickets[index] = formData;
+                }
+            } else {
+                // Add new ticket
+                tickets.push(formData);
+            }
+
+            // Close modal and refresh
+            const modal = bootstrap.Modal.getInstance(document.getElementById('ticketModal'));
+            modal.hide();
+            
+            resetForm();
+            updateStatistics();
+            renderTickets();
+            
+            console.log('Ticket saved:', formData);
+        }
+
+        function resetForm() {
+            document.getElementById('ticketForm').reset();
+            
+            // Reset device container
+            const container = document.getElementById('devicesContainer');
+            container.innerHTML = `
+                <div class="device-entry" data-device-index="0">
+                    <div class="input-group">
+                        <span class="input-group-text drag-handle">
+                            <i class="fas fa-grip-vertical"></i>
+                        </span>
+                        <input type="text" class="form-control device-input" placeholder="hostname01" value="hostname01">
+                        <button type="button" class="btn add-device-btn" onclick="addDevice()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button type="button" class="btn remove-device-btn" onclick="removeDevice(this)" style="display: none;">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            setupDeviceSortable();
+            currentEditingTicket = null;
+            
+            // Reset dates
+            const today = new Date().toISOString().split('T')[0];
+            const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            document.getElementById('dateSubmitted').value = today;
+            document.getElementById('dateDue').value = nextWeek;
+        }
+
+        // Table and Display Functions
+        function renderTickets() {
+            const tbody = document.getElementById('ticketTableBody');
+            if (!tbody || tickets.length === 0) {
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4"><i class="fas fa-inbox fa-2x text-muted mb-2"></i><br>No tickets found</td></tr>';
+                }
+                return;
+            }
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginatedTickets = tickets.slice(startIndex, endIndex);
+
+            tbody.innerHTML = paginatedTickets.map(ticket => `
+                <tr>
+                    <td>${formatDate(ticket.dateSubmitted)}</td>
+                    <td>${formatDate(ticket.dateDue)}</td>
+                    <td>${ticket.hexagonTicket || '-'}</td>
+                    <td>${ticket.serviceNowTicket || '-'}</td>
+                    <td>${ticket.location || '-'}</td>
+                    <td>${formatDevicesWithLinks(ticket.devices)}</td>
+                    <td>${ticket.supervisor || '-'}</td>
+                    <td>${ticket.tech || '-'}</td>
+                    <td><span class="badge status-${ticket.status.toLowerCase().replace(' ', '')}">${ticket.status}</span></td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary btn-sm" onclick="viewTicket(${ticket.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-warning btn-sm" onclick="editTicket(${ticket.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteTicket(${ticket.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            updatePagination();
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            return new Date(dateString).toLocaleDateString();
+        }
+
+        function formatDevicesWithLinks(devices) {
+            if (!devices) return '-';
+            
+            const deviceArray = devices.split(',').map(d => d.trim());
+            return deviceArray.map(device => 
+                `<a href="#" onclick="searchVulnerabilities('${device}')" class="text-decoration-none me-1">
+                    <span class="badge bg-secondary">${device}</span>
+                </a>`
+            ).join('');
+        }
+
+        function searchVulnerabilities(hostname) {
+            // Open vulnerability dashboard with search
+            const url = `index-new.html?search=${encodeURIComponent(hostname)}`;
+            window.open(url, '_blank');
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(tickets.length / rowsPerPage);
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, tickets.length);
+
+            // Update pagination info
+            const paginationInfo = document.getElementById('paginationInfo');
+            if (paginationInfo) {
+                paginationInfo.textContent = `Showing ${startIndex + 1} to ${endIndex} of ${tickets.length} entries`;
+            }
+
+            // Update pagination controls
+            const controls = document.getElementById('paginationControls');
+            if (controls) {
+                let paginationHTML = '';
+                
+                // Previous button
+                paginationHTML += `
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Previous</a>
+                    </li>
+                `;
+                
+                // Page numbers
+                for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                    paginationHTML += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                        </li>
+                    `;
+                }
+                
+                // Next button
+                paginationHTML += `
+                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a>
+                    </li>
+                `;
+                
+                controls.innerHTML = paginationHTML;
+            }
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(tickets.length / rowsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderTickets();
+            }
+        }
+
+        // Statistics Update
+        function updateStatistics() {
+            const total = tickets.length;
+            const open = tickets.filter(t => t.status === 'Open').length;
+            const completed = tickets.filter(t => t.status === 'Completed').length;
+            const overdue = tickets.filter(t => {
+                const dueDate = new Date(t.dateDue);
+                const today = new Date();
+                return dueDate < today && t.status !== 'Completed';
+            }).length;
+
+            document.getElementById('totalTickets').textContent = total;
+            document.getElementById('openTickets').textContent = open;
+            document.getElementById('completedTickets').textContent = completed;
+            document.getElementById('overdueTickets').textContent = overdue;
+        }
+
+        // Table Sorting
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+
+            tickets.sort((a, b) => {
+                let aVal = a[column] || '';
+                let bVal = b[column] || '';
+
+                if (column.includes('date')) {
+                    aVal = new Date(aVal);
+                    bVal = new Date(bVal);
+                }
+
+                if (sortDirection === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            // Update header classes
+            document.querySelectorAll('.sortable-header').forEach(header => {
+                header.classList.remove('sort-asc', 'sort-desc');
+            });
+
+            const activeHeader = document.querySelector(`[data-column="${column}"]`);
+            if (activeHeader) {
+                activeHeader.classList.add(`sort-${sortDirection}`);
+            }
+
+            renderTickets();
+        }
+
+        // Export Functions
+        function exportData(format) {
+            if (tickets.length === 0) {
+                alert('No data to export');
+                return;
+            }
+
+            switch (format) {
+                case 'csv':
+                    exportToCSV();
+                    break;
+                case 'pdf':
+                    exportToPDF();
+                    break;
+                case 'markdown':
+                    exportToMarkdown();
+                    break;
+                default:
+                    console.error('Unsupported export format:', format);
+            }
+        }
+
+        function exportToCSV() {
+            const headers = ['Date Submitted', 'Date Due', 'Hexagon Ticket', 'ServiceNow Ticket', 'Location', 'Devices', 'Supervisor', 'Tech', 'Status'];
+            const csvContent = [
+                headers.join(','),
+                ...tickets.map(ticket => [
+                    ticket.dateSubmitted || '',
+                    ticket.dateDue || '',
+                    ticket.hexagonTicket || '',
+                    ticket.serviceNowTicket || '',
+                    ticket.location || '',
+                    ticket.devices || '',
+                    ticket.supervisor || '',
+                    ticket.tech || '',
+                    ticket.status || ''
+                ].map(field => `"${field}"`).join(','))
+            ].join('\n');
+
+            downloadFile(csvContent, 'hextickets-export.csv', 'text/csv');
+        }
+
+        function exportToPDF() {
+            if (typeof jsPDF === 'undefined') {
+                alert('PDF export library not loaded');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(16);
+            doc.text('HexTickets - Ticket Report', 14, 22);
+            doc.setFontSize(10);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+
+            const tableData = tickets.map(ticket => [
+                formatDate(ticket.dateSubmitted),
+                formatDate(ticket.dateDue),
+                ticket.hexagonTicket || '-',
+                ticket.serviceNowTicket || '-',
+                ticket.location || '-',
+                ticket.devices || '-',
+                ticket.supervisor || '-',
+                ticket.tech || '-',
+                ticket.status || '-'
+            ]);
+
+            doc.autoTable({
+                head: [['Date Sub.', 'Date Due', 'Hexagon #', 'ServiceNow #', 'Location', 'Devices', 'Supervisor', 'Tech', 'Status']],
+                body: tableData,
+                startY: 35,
+                styles: { fontSize: 8 },
+                headStyles: { fillColor: [44, 62, 80] }
+            });
+
+            doc.save('hextickets-report.pdf');
+        }
+
+        function exportToMarkdown() {
+            let markdown = '# HexTickets - Ticket Report\n\n';
+            markdown += `Generated: ${new Date().toLocaleString()}\n\n`;
+            markdown += '| Date Submitted | Date Due | Hexagon # | ServiceNow # | Location | Devices | Supervisor | Tech | Status |\n';
+            markdown += '|----------------|----------|-----------|--------------|----------|---------|------------|------|--------|\n';
+
+            tickets.forEach(ticket => {
+                markdown += `| ${formatDate(ticket.dateSubmitted)} | ${formatDate(ticket.dateDue)} | ${ticket.hexagonTicket || '-'} | ${ticket.serviceNowTicket || '-'} | ${ticket.location || '-'} | ${ticket.devices || '-'} | ${ticket.supervisor || '-'} | ${ticket.tech || '-'} | ${ticket.status || '-'} |\n`;
+            });
+
+            downloadFile(markdown, 'hextickets-report.md', 'text/markdown');
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // External Links
+        function openExternalLink(system) {
+            const urls = {
+                hexagon: 'https://hexagon.com',
+                servicenow: 'https://servicenow.com'
+            };
+
+            if (urls[system]) {
+                window.open(urls[system], '_blank');
+                console.log(`Opening ${system}...`);
+            }
+        }
+
+        // Sample Data for Testing
+        function loadSampleData() {
+            tickets = [
+                {
+                    id: 1,
+                    dateSubmitted: '2025-08-20',
+                    dateDue: '2025-08-27',
+                    hexagonTicket: 'HEX-2025-001',
+                    serviceNowTicket: 'INC0000001',
+                    location: 'Data Center A',
+                    devices: 'srv001, srv002, srv003',
+                    supervisor: 'John Smith',
+                    tech: 'Mike Johnson',
+                    status: 'Open',
+                    description: 'Server maintenance and updates',
+                    notes: 'Scheduled during maintenance window'
+                },
+                {
+                    id: 2,
+                    dateSubmitted: '2025-08-21',
+                    dateDue: '2025-08-28',
+                    hexagonTicket: 'HEX-2025-002',
+                    serviceNowTicket: 'INC0000002',
+                    location: 'Network Room B',
+                    devices: 'switch01, router01',
+                    supervisor: 'Sarah Davis',
+                    tech: 'Alex Wilson',
+                    status: 'In Progress',
+                    description: 'Network infrastructure upgrade',
+                    notes: 'Phase 1 of 3'
+                }
+            ];
+        }
+
+    </script>
+</body>
+</html>
