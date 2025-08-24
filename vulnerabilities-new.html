@@ -175,6 +175,31 @@
             transform: translateY(-2px);
         }
 
+        .vulnerability-card[style*="cursor: pointer"]:hover {
+            background-color: var(--tblr-bg-surface-secondary);
+        }
+
+        /* Enhanced Modal Styling */
+        .modal-blur {
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-blur .modal-content {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--tblr-border-color);
+            background: linear-gradient(135deg, var(--tblr-bg-surface) 0%, var(--tblr-bg-surface-secondary) 100%);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--tblr-border-color);
+            background: var(--tblr-bg-surface-secondary);
+        }
+
         .vulnerability-title {
             font-size: 1rem;
             font-weight: 600;
@@ -742,38 +767,74 @@
         </div>
     </div>
 
-    <!-- Device Details Modal -->
-    <div class="modal fade" id="deviceModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
+    <!-- Enhanced Device Details Modal with Tabler.io Styling -->
+    <div class="modal modal-blur fade" id="deviceModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        <i class="fas fa-server me-2"></i>
-                        Device Details
+                        <i class="fas fa-server me-2 text-primary"></i>
+                        Device Security Overview
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close device details modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card">
+                    <div class="row g-3">
+                        <!-- Device Summary Card -->
+                        <div class="col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Device Information
+                                    </h3>
+                                </div>
                                 <div class="card-body">
-                                    <h6 class="card-title">Device Information</h6>
-                                    <div id="deviceInfo">
+                                    <div id="deviceInfo" class="space-y-3">
                                         <!-- Device info will be populated here -->
+                                    </div>
+                                    
+                                    <!-- VPR Summary Mini-Cards -->
+                                    <div class="mt-4">
+                                        <h4 class="h6 mb-3">VPR Risk Breakdown</h4>
+                                        <div class="row g-2" id="deviceVprSummary">
+                                            <!-- VPR mini-cards will be populated here -->
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-8">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Vulnerabilities</h6>
-                                    <div id="deviceVulnGrid" class="ag-theme-alpine device-grid-height"></div>
+                        
+                        <!-- Vulnerabilities Grid -->
+                        <div class="col-lg-8">
+                            <div class="card h-100">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-bug me-2"></i>
+                                        Active Vulnerabilities
+                                    </h3>
+                                    <div class="card-actions">
+                                        <button class="btn btn-outline-primary btn-sm" id="exportDeviceData">
+                                            <i class="fas fa-download me-1"></i>
+                                            Export
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div id="deviceVulnGrid" class="ag-theme-alpine" style="height: 500px; width: 100%;"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-primary" id="generateDeviceReport">
+                        <i class="fas fa-file-pdf me-2"></i>
+                        Generate Report
+                    </button>
                 </div>
             </div>
         </div>
@@ -845,6 +906,88 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="saveSettings">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Vulnerability Details Modal with Tabler.io Styling -->
+    <div class="modal modal-blur fade" id="vulnerabilityModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-bug me-2"></i>
+                        Vulnerability Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Vulnerability Information -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Vulnerability Information
+                                    </h6>
+                                </div>
+                                <div class="card-body" id="vulnerabilityInfo">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- VPR and Risk Summary -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-chart-line me-2"></i>
+                                        Risk Analysis
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row" id="vulnerabilityRiskSummary">
+                                        <!-- Populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Affected Assets -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-server me-2"></i>
+                                        Affected Assets
+                                    </h6>
+                                    <span class="badge bg-secondary" id="affectedAssetsCount">0 assets</span>
+                                </div>
+                                <div class="card-body">
+                                    <div id="vulnerabilityAssetsGrid" style="height: 300px; width: 100%;" class="ag-theme-alpine"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="vulnManager.exportVulnerabilityReport()">
+                        <i class="fas fa-download me-2"></i>
+                        Export Report
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="vulnManager.generateVulnerabilityPDF()">
+                        <i class="fas fa-file-pdf me-2"></i>
+                        Generate PDF
+                    </button>
                 </div>
             </div>
         </div>
@@ -1730,7 +1873,7 @@
 
                     return `
                     <div class="col-lg-6 col-xl-4 mb-3 fade-in">
-                        <div class="card vulnerability-card">
+                        <div class="card vulnerability-card" style="cursor: pointer;" onclick="vulnManager.viewVulnerabilityDetails(${JSON.stringify(primaryVuln).replace(/"/g, '&quot;')})">
                             <div class="card-body">
                                 <div class="vulnerability-title">
                                     ${description.substring(0, 100)}${description.length > 100 ? '...' : ''}
@@ -1740,7 +1883,7 @@
                                     <div>
                                         ${cve && cve.startsWith('CVE-') ? `
                                             <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}" 
-                                               target="_blank" class="vulnerability-cve">
+                                               target="_blank" class="vulnerability-cve" onclick="event.stopPropagation();">
                                                 ${cve}
                                             </a>
                                         ` : `
@@ -1791,14 +1934,14 @@
                                 ${cve && cve.startsWith('CVE-') ? `
                                     <div class="card-actions">
                                         <button class="btn btn-outline-primary" 
-                                                onclick="vulnManager.lookupCVE('${cve}')">
+                                                onclick="event.stopPropagation(); vulnManager.lookupCVE('${cve}')">
                                             <i class="fas fa-external-link-alt me-1"></i>Lookup CVE Details
                                         </button>
                                     </div>
                                 ` : `
                                     <div class="card-actions">
                                         <div class="text-muted text-center py-2">
-                                            <small>No CVE reference available</small>
+                                            <small>Click for details</small>
                                         </div>
                                     </div>
                                 `}
@@ -1834,45 +1977,110 @@
                 const device = this.devices.find(d => d.hostname === hostname);
                 if (!device) return;
 
-                // Populate device info
+                // Populate enhanced device info
                 document.getElementById('deviceInfo').innerHTML = `
-                    <p><strong>Hostname:</strong> ${device.hostname}</p>
-                    <p><strong>Total Vulnerabilities:</strong> ${device.totalCount}</p>
-                    <div class="row mt-3">
-                        <div class="col-6">
-                            <div class="text-center">
-                                <div class="text-danger h4">${device.criticalCount}</div>
-                                <small>Critical</small>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-sm-4 text-muted">Hostname:</div>
+                            <div class="col-sm-8 fw-bold">${device.hostname}</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-sm-4 text-muted">Total Risks:</div>
+                            <div class="col-sm-8">
+                                <span class="badge bg-secondary">${device.totalCount} vulnerabilities</span>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="text-center">
-                                <div class="text-warning h4">${device.highCount}</div>
-                                <small>High</small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-sm-4 text-muted">Total VPR:</div>
+                            <div class="col-sm-8">
+                                <span class="h5 text-danger fw-bold">${(device.totalVPR || 0).toFixed(1)}</span>
                             </div>
                         </div>
-                        <div class="col-6 mt-2">
-                            <div class="text-center">
-                                <div class="text-info h4">${device.mediumCount}</div>
-                                <small>Medium</small>
-                            </div>
-                        </div>
-                        <div class="col-6 mt-2">
-                            <div class="text-center">
-                                <div class="text-success h4">${device.lowCount}</div>
-                                <small>Low</small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-sm-4 text-muted">Risk Level:</div>
+                            <div class="col-sm-8">
+                                ${device.criticalCount > 0 ? '<span class="badge bg-red">Critical Risk</span>' :
+                                  device.highCount > 5 ? '<span class="badge bg-orange">High Risk</span>' :
+                                  device.mediumCount > 10 ? '<span class="badge bg-yellow">Medium Risk</span>' :
+                                  '<span class="badge bg-green">Low Risk</span>'}
                             </div>
                         </div>
                     </div>
                 `;
 
-                // Initialize device vulnerability grid
+                // Populate VPR summary mini-cards
+                document.getElementById('deviceVprSummary').innerHTML = `
+                    <div class="col-6">
+                        <div class="card card-sm">
+                            <div class="card-body text-center">
+                                <div class="text-red h3 mb-1">${device.criticalCount}</div>
+                                <div class="text-muted small">Critical</div>
+                                <div class="text-red fw-bold">${(device.criticalVPR || 0).toFixed(1)}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card card-sm">
+                            <div class="card-body text-center">
+                                <div class="text-orange h3 mb-1">${device.highCount}</div>
+                                <div class="text-muted small">High</div>
+                                <div class="text-orange fw-bold">${(device.highVPR || 0).toFixed(1)}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card card-sm">
+                            <div class="card-body text-center">
+                                <div class="text-yellow h3 mb-1">${device.mediumCount}</div>
+                                <div class="text-muted small">Medium</div>
+                                <div class="text-yellow fw-bold">${(device.mediumVPR || 0).toFixed(1)}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card card-sm">
+                            <div class="card-body text-center">
+                                <div class="text-green h3 mb-1">${device.lowCount}</div>
+                                <div class="text-muted small">Low</div>
+                                <div class="text-green fw-bold">${(device.lowVPR || 0).toFixed(1)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Initialize enhanced device vulnerability grid
                 const deviceGridDiv = document.getElementById('deviceVulnGrid');
                 deviceGridDiv.innerHTML = '';
 
                 const deviceColumnDefs = [
-                    { headerName: 'CVE', field: 'cve', width: 120 },
-                    { headerName: 'VPR', field: 'vpr_score', width: 80 },
+                    { 
+                        headerName: 'CVE', 
+                        field: 'cve', 
+                        width: 140,
+                        cellRenderer: (params) => {
+                            const cve = params.value;
+                            if (cve && cve.startsWith('CVE-')) {
+                                return `<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}" target="_blank" class="text-primary text-decoration-none">${cve}</a>`;
+                            }
+                            return cve || 'N/A';
+                        }
+                    },
+                    { 
+                        headerName: 'VPR', 
+                        field: 'vpr_score', 
+                        width: 80,
+                        cellRenderer: (params) => {
+                            const score = params.value || 0;
+                            const color = score >= 9 ? 'text-danger' : score >= 7 ? 'text-warning' : score >= 4 ? 'text-info' : 'text-success';
+                            return `<span class="${color} fw-bold">${score.toFixed(1)}</span>`;
+                        }
+                    },
                     { 
                         headerName: 'Severity', 
                         field: 'severity', 
@@ -1884,7 +2092,14 @@
                         }
                     },
                     { headerName: 'Plugin Name', field: 'plugin_name', flex: 1 },
-                    { headerName: 'Port', field: 'port', width: 80 }
+                    { 
+                        headerName: 'First Seen', 
+                        field: 'first_seen', 
+                        width: 120,
+                        cellRenderer: (params) => {
+                            return params.value ? new Date(params.value).toLocaleDateString() : 'N/A';
+                        }
+                    }
                 ];
 
                 const deviceGridOptions = {
@@ -1892,16 +2107,161 @@
                     rowData: device.vulnerabilities,
                     defaultColDef: {
                         resizable: true,
-                        sortable: true
+                        sortable: true,
+                        filter: true
                     },
                     pagination: true,
-                    paginationPageSize: 20
+                    paginationPageSize: 25,
+                    animateRows: true
                 };
 
                 new agGrid.Grid(deviceGridDiv, deviceGridOptions);
 
-                // Show modal
+                // Show enhanced modal
                 const modal = new bootstrap.Modal(document.getElementById('deviceModal'));
+                modal.show();
+            }
+
+            viewVulnerabilityDetails(vulnerability) {
+                if (!vulnerability) return;
+
+                // Populate enhanced vulnerability info
+                document.getElementById('vulnerabilityInfo').innerHTML = `
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-sm-4 text-muted">CVE ID:</div>
+                            <div class="col-sm-8">
+                                <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=${vulnerability.cve}" 
+                                   target="_blank" class="text-primary text-decoration-none fw-bold">${vulnerability.cve}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-sm-4 text-muted">Plugin Name:</div>
+                            <div class="col-sm-8 fw-bold">${vulnerability.plugin_name || 'N/A'}</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-sm-4 text-muted">Description:</div>
+                            <div class="col-sm-8">${vulnerability.description || vulnerability.plugin_name || 'No description available'}</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-sm-4 text-muted">Solution:</div>
+                            <div class="col-sm-8">${vulnerability.solution || 'No solution provided'}</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-sm-4 text-muted">First Seen:</div>
+                            <div class="col-sm-8">${vulnerability.first_seen ? new Date(vulnerability.first_seen).toLocaleDateString() : 'N/A'}</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-sm-4 text-muted">Port:</div>
+                            <div class="col-sm-8">
+                                <span class="badge bg-secondary">${vulnerability.port || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Populate risk analysis
+                const vprScore = vulnerability.vpr_score || 0;
+                const severity = vulnerability.severity || 'Low';
+                const severityColor = severity === 'Critical' ? 'red' : 
+                                    severity === 'High' ? 'orange' : 
+                                    severity === 'Medium' ? 'yellow' : 'green';
+                
+                document.getElementById('vulnerabilityRiskSummary').innerHTML = `
+                    <div class="col-6">
+                        <div class="card card-sm">
+                            <div class="card-body text-center">
+                                <div class="text-${vprScore >= 9 ? 'red' : vprScore >= 7 ? 'orange' : vprScore >= 4 ? 'yellow' : 'green'} h2 mb-1">${vprScore.toFixed(1)}</div>
+                                <div class="text-muted small">VPR Score</div>
+                                <div class="text-muted small mt-1">
+                                    ${vprScore >= 9 ? 'Critical Risk' : vprScore >= 7 ? 'High Risk' : vprScore >= 4 ? 'Medium Risk' : 'Low Risk'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card card-sm">
+                            <div class="card-body text-center">
+                                <div class="text-${severityColor} h3 mb-1">${severity}</div>
+                                <div class="text-muted small">Severity</div>
+                                <div class="text-muted small mt-1">CVSS Based</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Find all assets affected by this CVE
+                const affectedAssets = this.vulnerabilities.filter(v => v.cve === vulnerability.cve);
+                document.getElementById('affectedAssetsCount').textContent = `${affectedAssets.length} assets`;
+
+                // Initialize affected assets grid
+                const assetsGridDiv = document.getElementById('vulnerabilityAssetsGrid');
+                assetsGridDiv.innerHTML = '';
+
+                const assetsColumnDefs = [
+                    { 
+                        headerName: 'Hostname', 
+                        field: 'hostname', 
+                        width: 200,
+                        cellRenderer: (params) => {
+                            const hostname = params.value;
+                            return `<a href="#" class="text-primary text-decoration-none fw-bold" onclick="vulnManager.viewDeviceDetails('${hostname}')">${hostname}</a>`;
+                        }
+                    },
+                    { 
+                        headerName: 'Port', 
+                        field: 'port', 
+                        width: 100,
+                        cellRenderer: (params) => {
+                            return `<span class="badge bg-secondary">${params.value || 'N/A'}</span>`;
+                        }
+                    },
+                    { 
+                        headerName: 'First Seen', 
+                        field: 'first_seen', 
+                        width: 150,
+                        cellRenderer: (params) => {
+                            return params.value ? new Date(params.value).toLocaleDateString() : 'N/A';
+                        }
+                    },
+                    { 
+                        headerName: 'Last Seen', 
+                        field: 'last_seen', 
+                        width: 150,
+                        cellRenderer: (params) => {
+                            return params.value ? new Date(params.value).toLocaleDateString() : 'N/A';
+                        }
+                    },
+                    { headerName: 'Plugin Output', field: 'plugin_output', flex: 1 }
+                ];
+
+                const assetsGridOptions = {
+                    columnDefs: assetsColumnDefs,
+                    rowData: affectedAssets,
+                    defaultColDef: {
+                        resizable: true,
+                        sortable: true,
+                        filter: true
+                    },
+                    pagination: true,
+                    paginationPageSize: 15,
+                    animateRows: true
+                };
+
+                new agGrid.Grid(assetsGridDiv, assetsGridOptions);
+
+                // Show enhanced vulnerability modal
+                const modal = new bootstrap.Modal(document.getElementById('vulnerabilityModal'));
                 modal.show();
             }
 
@@ -2264,6 +2624,75 @@
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
                 this.showToast('Vulnerability data refreshed!', 'success');
+            }
+
+            // Enhanced Export Functions for Phase 2
+            exportDeviceReport(hostname) {
+                const device = this.devices.find(d => d.hostname === hostname);
+                if (!device) return;
+
+                const csvData = device.vulnerabilities.map(vuln => ({
+                    'Device': hostname,
+                    'CVE': vuln.cve || 'N/A',
+                    'VPR Score': vuln.vpr_score || 0,
+                    'Severity': vuln.severity,
+                    'Plugin Name': vuln.plugin_name,
+                    'Port': vuln.port || 'N/A',
+                    'First Seen': vuln.first_seen ? new Date(vuln.first_seen).toLocaleDateString() : 'N/A',
+                    'Last Seen': vuln.last_seen ? new Date(vuln.last_seen).toLocaleDateString() : 'N/A'
+                }));
+
+                const csv = Papa.unparse(csvData);
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `device_${hostname}_vulnerabilities_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                this.showToast(`Device report exported for ${hostname}`, 'success');
+            }
+
+            exportVulnerabilityReport() {
+                // Get the currently displayed vulnerability in the modal
+                const modal = document.getElementById('vulnerabilityModal');
+                if (!modal.classList.contains('show')) return;
+
+                // Extract vulnerability info from the modal
+                const vulnTitle = modal.querySelector('.modal-title').textContent;
+                const vulnInfo = modal.querySelector('#vulnerabilityInfo').innerHTML;
+                
+                // Create a simple report
+                const reportContent = `
+                    ${vulnTitle}\n
+                    Generated: ${new Date().toLocaleString()}\n
+                    ${vulnInfo.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ')}\n
+                `;
+
+                const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `vulnerability_report_${new Date().toISOString().split('T')[0]}.txt`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                this.showToast('Vulnerability report exported', 'success');
+            }
+
+            generateDevicePDF(hostname) {
+                // Placeholder for PDF generation - would integrate with jsPDF
+                this.showToast('PDF generation feature coming soon!', 'info');
+            }
+
+            generateVulnerabilityPDF() {
+                // Placeholder for vulnerability PDF generation
+                this.showToast('PDF generation feature coming soon!', 'info');
             }
         }
 
