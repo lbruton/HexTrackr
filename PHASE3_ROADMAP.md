@@ -10,7 +10,21 @@ Based on user testing findings, the following critical UX improvements have been
    - Multiple CVEs in table view showing blank popups
    - CVE links need proper URL construction and popup handling
 
-2. **Missing Vulnerability Details Modal**
+2. **Missing Vulnerability Det### **Resource Requirements**
+
+### **Development Time**
+- **Phase 3.1-3.4 (Core UX)**: 8-12 development days
+- **Phase 3.5 (Design & Security)**: 2-3 development days
+- **Total Estimated Time**: 10-15 development days
+- **Sprint Distribution**: 5 sprints @ 2-3 days each
+- **Testing Time**: 3-4 additional days
+- **Documentation**: 1-2 days
+
+### **Infrastructure Needs**
+- No additional infrastructure required for Phases 3.1-3.4
+- Authentication system may require session storage consideration
+- Current Docker setup sufficient for all planned features
+- Testing environment recommended for security features
    - Clicking vulnerability description should open comprehensive modal
    - Need device list showing all affected systems for that vulnerability
 
@@ -38,7 +52,16 @@ Based on user testing findings, the following critical UX improvements have been
 
 ### **Sprint 3.1: Core Functionality Fixes** (Priority: CRITICAL)
 
-#### 3.1.1 CVE Link System Overhaul
+#### 3.1.1 Header & Navigation Cleanup
+- **Scope**: Remove deprecated UI elements and streamline navigation
+- **Tasks**:
+  - [ ] Remove non-working "Import CSV Data" button from header
+  - [ ] Remove standalone "Settings" button (now in user dropdown)
+  - [ ] Clean up header layout for better visual balance
+  - [ ] Ensure user dropdown contains all necessary actions
+  - [ ] Update navigation accessibility and keyboard support
+
+#### 3.1.2 CVE Link System Overhaul
 - **Scope**: Fix all CVE popup functionality across the application
 - **Tasks**:
   - [ ] Audit all CVE link implementations
@@ -73,8 +96,37 @@ Based on user testing findings, the following critical UX improvements have been
 
 ### **Sprint 3.2: Advanced Filtering & State Management** (Priority: HIGH)
 
-#### 3.2.1 Enhanced State Management
-- **Scope**: Improve state visualization and filtering
+#### 3.2.1 Enhanced Statistics Cards & Vendor Filtering
+- **Scope**: Upgrade dashboard cards with interactive vendor filtering and historical trends
+- **Tasks**:
+  - [ ] Redesign statistics cards to be larger and more prominent
+  - [ ] Add historical trend mini-charts below each stat card
+  - [ ] Implement clickable cards that flip between views:
+    - Default: TOTAL values (all vulnerabilities)
+    - Cisco View: Only vulnerabilities from Cisco products 
+    - Palo Alto View: Only vulnerabilities from Palo Alto products
+    - Other Vendors: Additional vendor-specific views
+  - [ ] Extract vendor information from plugin_name/vendor database column
+  - [ ] Create vendor detection logic for data categorization
+  - [ ] Add smooth card flip animations with CSS transforms
+
+#### 3.2.2 Interactive Historical Trends Enhancement
+- **Scope**: Enhanced trend visualization with vendor filtering and line toggles
+- **Tasks**:
+  - [ ] Sync Historical VPR Trends chart with stat card filters
+  - [ ] Add vendor-specific trend line filtering
+  - [ ] Implement clickable trend line legend:
+    - Combined view: All trends overlaid
+    - Individual toggles: Click legend items to show/hide specific lines
+    - Vendor-specific views: Filter trends by selected vendor
+  - [ ] Add chart interaction controls:
+    - Zoom functionality for date ranges
+    - Hover tooltips with detailed data points
+    - Export chart as PNG/SVG functionality
+  - [ ] Create trend comparison mode (side-by-side vendor charts)
+
+#### 3.2.3 Enhanced State Management & Traditional Filtering
+- **Scope**: Improve state visualization and filtering (existing planned items)
 - **Tasks**:
   - [ ] Design new state color scheme:
     - `Open` → Red badge with warning icon
@@ -85,15 +137,7 @@ Based on user testing findings, the following critical UX improvements have been
   - [ ] Add state quick-filter buttons in header
   - [ ] Create state statistics in dashboard
 
-#### 3.2.2 Vendor Filtering System
-- **Scope**: Add comprehensive vendor-based filtering
-- **Tasks**:
-  - [ ] Extract vendor information from vulnerability data
-  - [ ] Create vendor dropdown filter in table view
-  - [ ] Implement vendor-based grouping options
-  - [ ] Add vendor statistics and insights
-
-#### 3.2.3 Universal Card Filtering
+#### 3.2.4 Universal Card Filtering
 - **Scope**: Add filtering capabilities to all card views
 - **Tasks**:
   - [ ] Implement real-time search for device cards
@@ -102,7 +146,7 @@ Based on user testing findings, the following critical UX improvements have been
   - [ ] Add date range filtering for discovery timeline
   - [ ] Implement combined filter logic (AND/OR operations)
 
-**Estimated Completion**: 2-3 development days
+**Estimated Completion**: 3-4 development days
 
 ---
 
@@ -166,11 +210,107 @@ Based on user testing findings, the following critical UX improvements have been
 
 ---
 
+### **Sprint 3.5: Design Unification & Security** (Priority: MEDIUM-HIGH)
+
+#### 3.5.1 Tickets Page Redesign
+- **Scope**: Unify design aesthetic between vulnerability and tickets applications
+- **Tasks**:
+  - [ ] Audit current tickets.html design and functionality
+  - [ ] Apply Tabler.io framework to tickets page
+  - [ ] Implement consistent header and navigation design
+  - [ ] Update ticket cards to match vulnerability card styling
+  - [ ] Add VPR-style mini-cards for ticket priorities/statuses
+  - [ ] Ensure responsive design consistency
+  - [ ] Implement dark mode preparation for tickets page
+  - [ ] Add enhanced modal system for ticket details
+  - [ ] Update PDF generation to match new design
+
+#### 3.5.2 Authentication & Data Protection
+- **Scope**: Add basic authentication to protect sensitive vulnerability data
+- **Tasks**:
+  - [ ] Implement simple login system with default credentials
+  - [ ] Add session management and timeout functionality
+  - [ ] Create user profile management interface
+  - [ ] Add password change functionality
+  - [ ] Implement logout and session cleanup
+  - [ ] Add authentication bypass for development mode
+  - [ ] Create data access logging for security auditing
+  - [ ] Default credentials: `admin` / `hextrackr2025` (changeable)
+
+**Estimated Completion**: 2-3 development days
+
+---
+
+## 🌙 **Long-term Roadmap Extensions**
+
+### **Phase 4: Advanced UI/UX (Future Implementation)**
+
+#### 4.1 Dark Mode Implementation
+- **Scope**: Complete dark mode skin for professional nighttime usage
+- **Priority**: LOW (after core functionality complete)
+- **Tasks**:
+  - [ ] Design dark mode color palette for Tabler.io integration
+  - [ ] Implement CSS custom properties for theme switching
+  - [ ] Add dark mode toggle in user dropdown
+  - [ ] Update all charts and graphs for dark mode compatibility
+  - [ ] Ensure accessibility compliance in dark mode
+  - [ ] Add user preference persistence
+  - [ ] Test dark mode across all browsers and devices
+  - [ ] Create automatic dark/light mode based on system preference
+
+#### 4.2 Advanced Dashboard Customization
+- **Scope**: User-customizable dashboard layouts and widgets
+- **Tasks**:
+  - [ ] Implement drag-and-drop dashboard builder
+  - [ ] Add widget library (charts, tables, statistics)
+  - [ ] Create dashboard templates for different roles
+  - [ ] Add dashboard sharing and collaboration features
+
+#### 4.3 Enhanced Vendor Intelligence
+- **Scope**: Advanced vendor-specific features and integrations
+- **Tasks**:
+  - [ ] Add vendor logos and branding to cards
+  - [ ] Implement vendor-specific vulnerability scoring
+  - [ ] Create vendor comparison analytics
+  - [ ] Add vendor security posture tracking
+
+---
+
 ## 🔧 **Technical Implementation Strategy**
 
 ### **Architecture Decisions**
 
-#### 1. Centralized Modal System
+#### 1. Interactive Statistics Cards System
+```javascript
+class InteractiveStatsManager {
+  constructor() {
+    this.currentView = 'total'; // 'total', 'cisco', 'palo-alto', 'other'
+    this.vendors = ['cisco', 'palo-alto', 'fortinet', 'juniper'];
+  }
+  
+  flipCard(vendor) // Animate card flip and update data
+  updateHistoricalTrends(vendor) // Sync chart with card selection
+  detectVendor(pluginName) // Extract vendor from vulnerability data
+  calculateVendorStats(vendor) // Get vendor-specific statistics
+}
+```
+
+#### 2. Enhanced Historical Trends Controller
+```javascript
+class HistoricalTrendsManager {
+  constructor() {
+    this.activeLines = new Set(['critical', 'high', 'medium', 'low']);
+    this.currentVendor = 'all';
+  }
+  
+  toggleTrendLine(severity) // Show/hide individual trend lines
+  filterByVendor(vendor) // Apply vendor filtering to trends
+  updateChartLegend() // Make legend interactive
+  exportChart(format) // Export chart as PNG/SVG
+}
+```
+
+#### 3. Centralized Modal System
 ```javascript
 class ModalManager {
   showVulnerabilityDetails(vulnerability)
@@ -180,7 +320,7 @@ class ModalManager {
 }
 ```
 
-#### 2. Enhanced Filtering Engine
+#### 4. Enhanced Filtering Engine
 ```javascript
 class FilterEngine {
   addFilter(type, value)
@@ -188,6 +328,17 @@ class FilterEngine {
   combineFilters(operator='AND')
   applyFilters(dataset)
   saveFilterPreset(name)
+  applyVendorFilter(vendor) // New vendor filtering capability
+}
+```
+
+#### 5. Authentication System
+```javascript
+class AuthManager {
+  login(username, password) // Simple credential check
+  logout() // Clear session and redirect
+  checkSession() // Validate active session
+  requireAuth() // Middleware for protected pages
 }
 ```
 
@@ -203,15 +354,50 @@ class PaginationController {
 
 ### **Database Schema Updates**
 
-#### Vulnerability State Enhancement
+#### Vulnerability Enhancement
 ```javascript
 // Add to vulnerability schema
 {
   state: 'open|in_progress|resolved|false_positive',
   state_changed_date: Date,
   state_changed_by: String,
-  vendor: String, // Extracted from plugin_name
-  assigned_to: String
+  vendor: String, // Extracted from plugin_name or manual classification
+  vendor_confidence: Number, // Confidence level of vendor detection
+  assigned_to: String,
+  vendor_product: String, // Specific product (e.g., 'ASA', 'Panorama')
+  vendor_category: String // Product category (e.g., 'firewall', 'router')
+}
+```
+
+#### Statistics Tracking
+```javascript
+// New vendor statistics schema
+{
+  vendor: String,
+  date: Date,
+  critical_count: Number,
+  high_count: Number,
+  medium_count: Number,
+  low_count: Number,
+  total_vpr: Number,
+  critical_vpr: Number,
+  high_vpr: Number,
+  medium_vpr: Number,
+  low_vpr: Number
+}
+```
+
+#### Authentication Schema
+```javascript
+// Simple user authentication
+{
+  id: String,
+  username: String,
+  password_hash: String, // bcrypt hashed
+  last_login: Date,
+  session_token: String,
+  created_date: Date,
+  is_active: Boolean
 }
 ```
 
@@ -301,14 +487,27 @@ class PaginationController {
 
 ## 📝 **Next Steps**
 
-1. **Review & Approval**: Get stakeholder approval for this roadmap
+1. **Review & Approval**: Get stakeholder approval for this enhanced roadmap
 2. **Git Backup**: Create development branch for Phase 3
 3. **Sprint Planning**: Break down tasks into detailed tickets
 4. **Development Start**: Begin with Sprint 3.1 critical fixes
-5. **Continuous Testing**: Test each sprint before moving to next
+5. **Iterative Development**: Complete each sprint with testing before proceeding
+6. **Security Implementation**: Implement authentication in Sprint 3.5
+7. **Design Unification**: Apply consistent styling across both applications
 
 ---
 
-*Roadmap Created: August 24, 2025*  
-*Estimated Completion: September 15, 2025*  
-*Priority: HIGH - Critical UX improvements needed*
+*Roadmap Updated: August 24, 2025*  
+*Estimated Completion: September 30, 2025*  
+*Priority: HIGH - Critical UX improvements + Design Unification*
+
+## 🎯 **Enhanced Features Summary**
+
+### **New Additions to Roadmap:**
+✅ **Header Cleanup** - Remove deprecated buttons, streamline navigation  
+✅ **Interactive Statistics Cards** - Vendor filtering with flip animations  
+✅ **Enhanced Historical Trends** - Interactive legend, vendor filtering  
+✅ **Tickets Page Redesign** - Unified Tabler.io aesthetic  
+✅ **Authentication System** - Data protection with default credentials  
+✅ **Dark Mode Planning** - Long-term UI enhancement  
+✅ **Advanced Vendor Intelligence** - Product categorization and analytics
