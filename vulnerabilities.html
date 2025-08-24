@@ -1065,10 +1065,27 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script>
+        const db = localforage.createInstance({ name: 'hextrackr' });
+
+        async function dbGet(key) {
+            return await db.getItem(key);
+        }
+        async function dbSet(key, value) {
+            return await db.setItem(key, value);
+        }
+        async function dbRemove(key) {
+            return await db.removeItem(key);
+        }
+
         // Global variables
         let vulnData = [];
-        let historyData = JSON.parse(localStorage.getItem('vulnHistory') || '[]');
+        let historyData = [];
+
+        async function saveVulnData() {
+            await dbSet('hextrackr_vuln_data', vulnData);
+        }
         
         // Pagination variables
         let currentAssetPage = 1;
@@ -1086,10 +1103,10 @@
         let severityFilter = '';
 
         // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             setupEventListeners();
             initializeSortable();
-            loadExistingData();
+            await loadExistingData();
             
             // PRODUCTION MODE: Sample data loading disabled
             if (vulnData.length === 0) {
@@ -1178,8 +1195,8 @@
                 Papa.parse(file, {
                     header: true,
                     skipEmptyLines: true,
-                    complete: function(results) {
-                        processVulnData(results.data, file);
+                    complete: async function(results) {
+                        await processVulnData(results.data, file);
                     },
                     error: function(error) {
                         console.error('Error parsing CSV:', error);
@@ -1189,7 +1206,7 @@
             });
         }
 
-        function processVulnData(data, file) {
+        async function processVulnData(data, file) {
             console.log('Processing vulnerability data from file:', file.name);
             console.log('Raw CSV data sample:', data.slice(0, 3));
             console.log('CSV Headers found:', Object.keys(data[0] || {}));
@@ -1201,7 +1218,7 @@
 
             // Check if this is a very large file that needs batch processing
             if (data.length > 5000) {
-                processBatchVulnData(data, file);
+                await processBatchVulnData(data, file);
                 return;
             }
 
@@ -1291,11 +1308,11 @@
             updateCardViews();
             updateLastUploadInfo(file.name, fileDate, processedData.length);
             
-            // Save to localStorage
-            localStorage.setItem('hextrackr_vuln_data', JSON.stringify(vulnData));
-            
+            // Save to IndexedDB
+            await saveVulnData();
+
             // Save to history
-            saveToHistory(file.name, fileDate, stats);
+            await saveToHistory(file.name, fileDate, stats);
             
             // Show trend chart section if we have data
             if (vulnData.length > 0) {
@@ -1308,7 +1325,7 @@
             alert(`Successfully processed ${processedData.length} vulnerability records!`);
         }
 
-        function processBatchVulnData(data, file) {
+        async function processBatchVulnData(data, file) {
             console.log(`Processing large CSV file with ${data.length} rows in batches...`);
             
             // SAFEGUARD 1: Maximum record limit (100K records for browser stability)
@@ -1324,16 +1341,7 @@
             // SAFEGUARD 2: Check available storage space
             function checkStorageQuota() {
                 try {
-                    // Estimate storage needed (rough calculation: ~500 bytes per record after optimization)
-                    const estimatedSize = data.length * 500;
-                    const currentUsage = JSON.stringify(localStorage).length;
-                    const availableSpace = 5 * 1024 * 1024 - currentUsage; // 5MB typical localStorage limit
-                    
-                    if (estimatedSize > availableSpace) {
-                        console.warn(`Estimated storage needed: ${(estimatedSize/1024/1024).toFixed(1)}MB, Available: ${(availableSpace/1024/1024).toFixed(1)}MB`);
-                        return false;
-                    }
-                    return true;
+                    return true; // IndexedDB typically has ample space
                 } catch (e) {
                     console.warn('Could not check storage quota:', e);
                     return true; // Proceed anyway
@@ -1382,7 +1390,7 @@
             const totalBatches = Math.ceil(data.length / batchSize);
             let allProcessedData = [];
 
-            function processBatch() {
+            async function processBatch() {
                 const startIndex = currentBatch * batchSize;
                 const endIndex = Math.min(startIndex + batchSize, data.length);
                 const batchData = data.slice(startIndex, endIndex);
@@ -1459,11 +1467,11 @@
                     setTimeout(processBatch, 10);
                 } else {
                     // All batches processed
-                    finalizeBatchProcessing();
+                    await finalizeBatchProcessing();
                 }
             }
 
-            function finalizeBatchProcessing() {
+            async function finalizeBatchProcessing() {
                 document.getElementById('progressStatus').textContent = 'Finalizing data...';
                 document.getElementById('progressBar').style.width = '100%';
 
@@ -1498,43 +1506,20 @@
                     filterAndDisplayData(); // Use filterAndDisplayData instead of updateCardViews
                     updateLastUploadInfo(file.name, fileDate, allProcessedData.length);
                     
-                    // SAFEGUARD 3: Try to save to localStorage with quota error handling
+                    // SAFEGUARD 3: Save to IndexedDB
                     document.getElementById('progressStatus').textContent = 'Saving data...';
                     try {
-                        localStorage.setItem('hextrackr_vuln_data', JSON.stringify(vulnData));
-                        console.log('Data saved successfully to localStorage');
+                        await saveVulnData();
+                        console.log('Data saved successfully to IndexedDB');
                     } catch (storageError) {
-                        console.error('Storage quota exceeded:', storageError);
-                        
-                        // Try to free up space by removing old data
-                        try {
-                            localStorage.removeItem('hextrackr_vuln_history');
-                            localStorage.setItem('hextrackr_vuln_data', JSON.stringify(vulnData));
-                            console.log('Saved after clearing history data');
-                        } catch (secondError) {
-                            console.error('Still unable to save:', secondError);
-                            
-                            // Last resort: Save only the most critical/recent data
-                            try {
-                                const reducedData = vulnData
-                                    .filter(item => item.severity === 'Critical' || item.severity === 'High')
-                                    .slice(0, 50000); // Limit to 50K most critical vulnerabilities
-                                
-                                localStorage.setItem('hextrackr_vuln_data', JSON.stringify(reducedData));
-                                
-                                alert(`Storage quota exceeded! Saved only ${reducedData.length} Critical/High severity vulnerabilities out of ${vulnData.length} total records. Consider exporting data or using a smaller dataset.`);
-                                vulnData = reducedData; // Update in-memory data to match saved data
-                            } catch (finalError) {
-                                console.error('Unable to save any data:', finalError);
-                                alert('Storage quota exceeded and unable to save data. Please clear browser storage or use a smaller dataset.');
-                                throw finalError;
-                            }
-                        }
+                        console.error('Storage error:', storageError);
+                        alert('Unable to save data. Please clear browser storage or use a smaller dataset.');
+                        throw storageError;
                     }
-                    
+
                     // Save to history (skip if storage issues)
                     try {
-                        saveToHistory(file.name, fileDate, stats);
+                        await saveToHistory(file.name, fileDate, stats);
                     } catch (historyError) {
                         console.warn('Could not save to history:', historyError);
                     }
@@ -2344,21 +2329,21 @@
             `;
         }
 
-        function saveToHistory(filename, date, stats) {
+        async function saveToHistory(filename, date, stats) {
             const historyEntry = {
                 date: date.toISOString(),
                 filename: filename,
                 stats: stats
             };
-            
+
             historyData.push(historyEntry);
-            
+
             // Keep only last 30 entries
             if (historyData.length > 30) {
                 historyData = historyData.slice(-30);
             }
-            
-            localStorage.setItem('vulnHistory', JSON.stringify(historyData));
+
+            await dbSet('vulnHistory', historyData);
         }
 
         function initializeSortable() {
@@ -2376,27 +2361,22 @@
             }
         }
 
-        function loadExistingData() {
-            const savedData = localStorage.getItem('hextrackr_vuln_data');
-            const savedHistory = localStorage.getItem('vulnHistory');
-            
+        async function loadExistingData() {
+            const savedData = await dbGet('hextrackr_vuln_data');
+            const savedHistory = await dbGet('vulnHistory');
+
             if (savedHistory) {
-                try {
-                    historyData = JSON.parse(savedHistory);
-                } catch (error) {
-                    console.error('Error loading history data:', error);
-                    historyData = [];
-                }
+                historyData = savedHistory;
             }
-            
+
             if (savedData) {
                 try {
-                    vulnData = JSON.parse(savedData);
+                    vulnData = savedData;
                     if (vulnData.length > 0) {
                         const stats = calculateStatistics(vulnData);
                         updateStatCards(stats);
                         updateCardViews();
-                        
+
                         // Show trend chart instead of upload area if data exists
                         document.getElementById('uploadArea').style.display = 'none';
                         document.getElementById('trendChartSection').style.display = 'block';
@@ -2410,7 +2390,7 @@
             }
         }
 
-        function loadSampleData() {
+        async function loadSampleData() {
             // Sample data to demonstrate the interface
             const sampleData = [
                 {
@@ -2463,16 +2443,16 @@
                 });
             }
             
-            localStorage.setItem('vulnHistory', JSON.stringify(historyData));
-            localStorage.setItem('hextrackr_vuln_data', JSON.stringify(vulnData));
+            await dbSet('vulnHistory', historyData);
+            await saveVulnData();
         }
 
-        function clearVulnData() {
+        async function clearVulnData() {
             if (confirm('Are you sure you want to clear all vulnerability data?')) {
                 vulnData = [];
                 historyData = [];
-                localStorage.removeItem('vulnHistory');
-                localStorage.removeItem('hextrackr_vuln_data');
+                await dbRemove('vulnHistory');
+                await dbRemove('hextrackr_vuln_data');
                 
                 // Clear displays
                 updateStatCards({
@@ -2496,7 +2476,7 @@
         }
 
         // Edit and Delete Functions
-        function editAsset(hostname) {
+        async function editAsset(hostname) {
             const asset = vulnData.find(item => item.hostname === hostname);
             if (!asset) return;
 
@@ -2537,8 +2517,8 @@
                 }
             });
 
-            // Save to localStorage
-            saveVulnData();
+            // Save to IndexedDB
+            await saveVulnData();
 
             // Refresh the display
             updateCardViews();
@@ -2549,7 +2529,7 @@
             alert('Asset updated successfully');
         }
 
-        function deleteAsset(hostname) {
+        async function deleteAsset(hostname) {
             const asset = vulnData.filter(item => item.hostname === hostname);
             if (!asset.length) return;
 
@@ -2558,8 +2538,8 @@
                 // Remove all vulnerabilities for this asset
                 vulnData = vulnData.filter(item => item.hostname !== hostname);
 
-                // Save to localStorage
-                saveVulnData();
+                // Save to IndexedDB
+                await saveVulnData();
 
                 // Refresh the display
                 updateCardViews();
@@ -2585,7 +2565,7 @@
             modal.show();
         }
 
-        function saveVulnChanges() {
+        async function saveVulnChanges() {
             const vulnId = document.getElementById('editVulnOriginalId').value;
             const newName = document.getElementById('editVulnName').value;
             const newCVE = document.getElementById('editVulnCVE').value;
@@ -2607,8 +2587,8 @@
                 vulnData[vulnIndex].vprScore = parseFloat(newVPR) || 0;
                 vulnData[vulnIndex].vendor = newVendor;
 
-                // Save to localStorage
-                saveVulnData();
+                // Save to IndexedDB
+                await saveVulnData();
 
                 // Refresh the display
                 updateCardViews();
@@ -2620,7 +2600,7 @@
             }
         }
 
-        function deleteVulnerability(vulnId) {
+        async function deleteVulnerability(vulnId) {
             const vuln = vulnData.find(item => item.vulnId === vulnId);
             if (!vuln) return;
 
@@ -2628,8 +2608,8 @@
                 // Remove the vulnerability
                 vulnData = vulnData.filter(item => item.vulnId !== vulnId);
 
-                // Save to localStorage
-                saveVulnData();
+                // Save to IndexedDB
+                await saveVulnData();
 
                 // Refresh the display
                 updateCardViews();
@@ -2811,24 +2791,24 @@
         }
 
         // UTILITY: Storage management functions
-        function clearStorageData() {
+        async function clearStorageData() {
             if (confirm('This will clear all stored vulnerability data. Are you sure?')) {
-                localStorage.removeItem('hextrackr_vuln_data');
-                localStorage.removeItem('hextrackr_vuln_history');
+                await dbRemove('hextrackr_vuln_data');
+                await dbRemove('vulnHistory');
                 alert('Storage cleared successfully. You can now upload a new large CSV file.');
                 location.reload();
             }
         }
 
-        function getStorageInfo() {
+        async function getStorageInfo() {
             try {
-                const vulnData = localStorage.getItem('hextrackr_vuln_data');
-                const historyData = localStorage.getItem('hextrackr_vuln_history');
-                const totalUsage = JSON.stringify(localStorage).length;
-                
+                const vulnData = await dbGet('hextrackr_vuln_data');
+                const historyData = await dbGet('vulnHistory');
+                const totalUsage = JSON.stringify({ vulnData, historyData }).length;
+
                 console.log('Storage Usage:');
-                console.log(`- Vulnerability Data: ${vulnData ? (vulnData.length / 1024 / 1024).toFixed(2) : 0}MB`);
-                console.log(`- History Data: ${historyData ? (historyData.length / 1024 / 1024).toFixed(2) : 0}MB`);
+                console.log(`- Vulnerability Data: ${vulnData ? (JSON.stringify(vulnData).length / 1024 / 1024).toFixed(2) : 0}MB`);
+                console.log(`- History Data: ${historyData ? (JSON.stringify(historyData).length / 1024 / 1024).toFixed(2) : 0}MB`);
                 console.log(`- Total Storage: ${(totalUsage / 1024 / 1024).toFixed(2)}MB`);
                 console.log('Run clearStorageData() to free up space');
             } catch (e) {
@@ -2844,21 +2824,21 @@
         // ================================
 
         // Generate a device-specific encryption key (stays in browser only)
-        function getEncryptionKey() {
-            let key = localStorage.getItem('hextrackr_encryption_key');
+        async function getEncryptionKey() {
+            let key = await dbGet('hextrackr_encryption_key');
             if (!key) {
                 // Generate a new key based on device characteristics
                 const deviceData = navigator.userAgent + navigator.language + screen.width + screen.height;
                 key = CryptoJS.SHA256(deviceData + Date.now()).toString();
-                localStorage.setItem('hextrackr_encryption_key', key);
+                await dbSet('hextrackr_encryption_key', key);
             }
             return key;
         }
 
         // Encrypt sensitive data
-        function encryptData(data) {
+        async function encryptData(data) {
             try {
-                const key = getEncryptionKey();
+                const key = await getEncryptionKey();
                 return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
             } catch (e) {
                 console.error('Encryption failed:', e);
@@ -2867,9 +2847,9 @@
         }
 
         // Decrypt sensitive data
-        function decryptData(encryptedData) {
+        async function decryptData(encryptedData) {
             try {
-                const key = getEncryptionKey();
+                const key = await getEncryptionKey();
                 const bytes = CryptoJS.AES.decrypt(encryptedData, key);
                 return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
             } catch (e) {
@@ -2879,14 +2859,14 @@
         }
 
         // Show API Configuration Modal
-        function showAPIModal() {
+        async function showAPIModal() {
             const modal = new bootstrap.Modal(document.getElementById('apiModal'));
-            loadCiscoCredentials(); // Load existing credentials
+            await loadCiscoCredentials(); // Load existing credentials
             modal.show();
         }
 
         // Save Cisco credentials with encryption
-        function saveCiscoCredentials() {
+        async function saveCiscoCredentials() {
             const clientId = document.getElementById('ciscoClientId').value.trim();
             const clientSecret = document.getElementById('ciscoClientSecret').value.trim();
 
@@ -2901,9 +2881,9 @@
                 savedAt: new Date().toISOString()
             };
 
-            const encrypted = encryptData(credentials);
+            const encrypted = await encryptData(credentials);
             if (encrypted) {
-                localStorage.setItem('hextrackr_cisco_credentials', encrypted);
+                await dbSet('hextrackr_cisco_credentials', encrypted);
                 document.getElementById('ciscoStatus').textContent = 'Configured';
                 document.getElementById('ciscoStatus').className = 'badge bg-success ms-2';
                 
@@ -2918,10 +2898,10 @@
         }
 
         // Load Cisco credentials (decrypt and populate form)
-        function loadCiscoCredentials() {
-            const encrypted = localStorage.getItem('hextrackr_cisco_credentials');
+        async function loadCiscoCredentials() {
+            const encrypted = await dbGet('hextrackr_cisco_credentials');
             if (encrypted) {
-                const credentials = decryptData(encrypted);
+                const credentials = await decryptData(encrypted);
                 if (credentials) {
                     document.getElementById('ciscoClientId').value = credentials.clientId;
                     document.getElementById('ciscoClientSecret').value = credentials.clientSecret;
@@ -2989,13 +2969,13 @@
 
         // Sync Cisco vulnerabilities using API
         async function syncCiscoVulnerabilities() {
-            const encrypted = localStorage.getItem('hextrackr_cisco_credentials');
+            const encrypted = await dbGet('hextrackr_cisco_credentials');
             if (!encrypted) {
                 alert('Please configure Cisco API credentials first');
                 return;
             }
 
-            const credentials = decryptData(encrypted);
+            const credentials = await decryptData(encrypted);
             if (!credentials) {
                 alert('Failed to decrypt credentials. Please reconfigure.');
                 return;
@@ -3069,7 +3049,7 @@
                 statusDiv.textContent = 'Updating local database...';
 
                 // Step 4: Merge with existing data
-                const existingData = JSON.parse(localStorage.getItem('hextrackr_vuln_data') || '[]');
+                const existingData = (await dbGet('hextrackr_vuln_data')) || [];
                 const mergedData = [...existingData, ...transformedData];
                 
                 // Remove duplicates
@@ -3077,8 +3057,8 @@
                     array.findIndex(other => other.cve === item.cve && other.hostname === item.hostname) === index
                 );
 
-                // Save to localStorage
-                localStorage.setItem('hextrackr_vuln_data', JSON.stringify(uniqueData));
+                // Save to IndexedDB
+                await dbSet('hextrackr_vuln_data', uniqueData);
                 window.vulnData = uniqueData;
 
                 progressBar.style.width = '100%';
@@ -3132,10 +3112,10 @@
         }
 
         // Clear all encrypted API credentials
-        function clearAPICredentials() {
+        async function clearAPICredentials() {
             if (confirm('⚠️ Are you sure you want to clear all API credentials? This cannot be undone.')) {
-                localStorage.removeItem('hextrackr_cisco_credentials');
-                localStorage.removeItem('hextrackr_encryption_key');
+                await dbRemove('hextrackr_cisco_credentials');
+                await dbRemove('hextrackr_encryption_key');
                 document.getElementById('ciscoClientId').value = '';
                 document.getElementById('ciscoClientSecret').value = '';
                 document.getElementById('ciscoStatus').textContent = 'Not Configured';
@@ -3145,11 +3125,11 @@
         }
 
         // Check API configuration on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             // Check if Cisco credentials are configured
-            const encrypted = localStorage.getItem('hextrackr_cisco_credentials');
+            const encrypted = await dbGet('hextrackr_cisco_credentials');
             if (encrypted) {
-                const credentials = decryptData(encrypted);
+                const credentials = await decryptData(encrypted);
                 if (credentials) {
                     document.getElementById('ciscoStatus').textContent = 'Configured';
                     document.getElementById('ciscoStatus').className = 'badge bg-success ms-2';
