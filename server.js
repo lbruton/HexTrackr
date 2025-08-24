@@ -204,7 +204,7 @@ app.post('/api/vulnerabilities/import', upload.single('csvFile'), (req, res) => 
         
         let processed = 0;
         
-        rows.forEach(row => {
+        rows.forEach(async (row) => {
           // Map Cisco CSV columns to database fields
           const hostname = row['asset.name'] || row['hostname'] || row['Host'] || '';
           const ipAddress = row['asset.display_ipv4_address'] || row['asset.ipv4_addresses'] || row['ip_address'] || row['IP Address'] || '';
@@ -216,32 +216,65 @@ app.post('/api/vulnerabilities/import', upload.single('csvFile'), (req, res) => 
           const description = row['definition.name'] || row['plugin_name'] || row['description'] || row['Description'] || '';
           const pluginPublished = row['definition.plugin_published'] || row['vulnerability_date'] || row['plugin_published'] || '';
           const state = row['state'] || row['State'] || 'open';
-
-          stmt.run([
-            importId,
-            hostname,
-            ipAddress,
-            cve,
-            severity,
-            vprScore || null,
-            cvssScore || null,
-            row['first_seen'] || row['First Seen'] || '',
-            row['last_seen'] || row['Last Seen'] || '',
-            row['plugin_id'] || row['Plugin ID'] || '',
-            description,
-            row['description'] || row['Description'] || '',
-            row['solution'] || row['Solution'] || '',
-            vendor,
-            pluginPublished,
-            state,
-            new Date().toISOString().split('T')[0]
-          ], (err) => {
-            if (err) console.error('Row insert error:', err);
+          const currentDate = new Date().toISOString().split('T')[0];
+          
+          // Check if vulnerability already exists (based on hostname + CVE + plugin_id)
+          const uniqueKey = `${hostname}-${cve}-${row['plugin_id'] || row['Plugin ID'] || ''}`;
+          
+          db.get(`
+            SELECT rowid, vpr_score, last_seen FROM vulnerabilities 
+            WHERE hostname = ? AND cve = ? AND plugin_id = ?
+          `, [hostname, cve, row['plugin_id'] || row['Plugin ID'] || ''], (err, existingVuln) => {
+            
+            if (existingVuln) {
+              // UPSERT: Update existing vulnerability
+              // Keep historical VPR data by creating a history record if VPR changed significantly
+              const oldVpr = parseFloat(existingVuln.vpr_score) || 0;
+              const vprChange = Math.abs(vprScore - oldVpr);
+              
+              if (vprChange > 0.1) { // Track significant VPR changes
+                // Insert historical record
+                db.run(`
+                  INSERT INTO vulnerability_history 
+                  (vulnerability_id, vpr_score_old, vpr_score_new, change_date, import_id)
+                  VALUES (?, ?, ?, ?, ?)
+                `, [existingVuln.rowid, oldVpr, vprScore, currentDate, importId]);
+              }
+              
+              // Update the current vulnerability record
+              db.run(`
+                UPDATE vulnerabilities SET
+                  ip_address = ?, severity = ?, vpr_score = ?, cvss_score = ?,
+                  last_seen = ?, state = ?, import_date = ?, vendor = ?,
+                  description = ?, solution = ?
+                WHERE rowid = ?
+              `, [
+                ipAddress, severity, vprScore, cvssScore,
+                currentDate, state, currentDate, vendor,
+                row['description'] || row['Description'] || '',
+                row['solution'] || row['Solution'] || '',
+                existingVuln.rowid
+              ]);
+            } else {
+              // INSERT: New vulnerability
+              db.run(`
+                INSERT INTO vulnerabilities 
+                (import_id, hostname, ip_address, cve, severity, vpr_score, cvss_score, 
+                 first_seen, last_seen, plugin_id, plugin_name, description, solution, 
+                 vendor, vulnerability_date, state, import_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              `, [
+                importId, hostname, ipAddress, cve, severity, vprScore, cvssScore,
+                currentDate, currentDate, row['plugin_id'] || row['Plugin ID'] || '',
+                description, row['description'] || row['Description'] || '',
+                row['solution'] || row['Solution'] || '', vendor, pluginPublished,
+                state, currentDate
+              ]);
+            }
+            
             processed++;
             
             if (processed === rows.length) {
-              stmt.finalize();
-              
               // Clean up uploaded file
               fs.unlinkSync(req.file.path);
               
@@ -260,6 +293,117 @@ app.post('/api/vulnerabilities/import', upload.single('csvFile'), (req, res) => 
     error: (error) => {
       res.status(400).json({ error: 'CSV parsing failed: ' + error.message });
     }
+  });
+});
+
+// Update a specific vulnerability
+app.put('/api/vulnerabilities/:id', (req, res) => {
+  const { id } = req.params;
+  const { hostname, ip_address, severity, state, notes } = req.body;
+  
+  const query = `
+    UPDATE vulnerabilities 
+    SET hostname = ?, ip_address = ?, severity = ?, state = ?, notes = ?
+    WHERE rowid = ?
+  `;
+  
+  db.run(query, [hostname, ip_address, severity, state, notes, id], function(err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    if (this.changes === 0) {
+      res.status(404).json({ error: 'Vulnerability not found' });
+      return;
+    }
+    
+    res.json({ success: true, message: 'Vulnerability updated successfully' });
+  });
+});
+
+// Delete a specific vulnerability
+app.delete('/api/vulnerabilities/:id', (req, res) => {
+  const { id } = req.params;
+  
+  db.run('DELETE FROM vulnerabilities WHERE rowid = ?', [id], function(err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    if (this.changes === 0) {
+      res.status(404).json({ error: 'Vulnerability not found' });
+      return;
+    }
+    
+    res.json({ success: true, message: 'Vulnerability deleted successfully' });
+  });
+});
+
+// Tenable API integration for historical VPR data
+app.get('/api/tenable/historical-vpr', async (req, res) => {
+  const tenableApiKey = req.headers['x-tenable-api-key'];
+  const tenableSecretKey = req.headers['x-tenable-secret-key'];
+  
+  if (!tenableApiKey || !tenableSecretKey) {
+    return res.status(400).json({ error: 'Tenable API credentials required' });
+  }
+  
+  try {
+    // Get historical VPR data from Tenable
+    const response = await fetch('https://cloud.tenable.com/workbenches/vulnerabilities', {
+      headers: {
+        'X-ApiKeys': `accessKey=${tenableApiKey}; secretKey=${tenableSecretKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      
+      // Process and store historical VPR data
+      const historicalData = data.vulnerabilities.map(vuln => ({
+        cve: vuln.plugin_id,
+        vpr_score: vuln.vpr_score,
+        last_seen: vuln.last_seen,
+        severity: vuln.severity
+      }));
+      
+      res.json({
+        success: true,
+        count: historicalData.length,
+        data: historicalData
+      });
+    } else {
+      res.status(response.status).json({ error: 'Failed to fetch from Tenable API' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Error connecting to Tenable API: ' + error.message });
+  }
+});
+
+// Get VPR trend data for charts
+app.get('/api/vulnerabilities/vpr-trends', (req, res) => {
+  const query = `
+    SELECT 
+      vh.change_date as date,
+      AVG(vh.vpr_score_new) as avg_vpr,
+      COUNT(*) as change_count,
+      v.severity
+    FROM vulnerability_history vh
+    JOIN vulnerabilities v ON vh.vulnerability_id = v.rowid
+    WHERE vh.change_date >= date('now', '-30 days')
+    GROUP BY vh.change_date, v.severity
+    ORDER BY vh.change_date DESC
+  `;
+  
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
   });
 });
 
@@ -342,6 +486,29 @@ const initDb = () => {
     db.run(`ALTER TABLE vulnerabilities ADD COLUMN import_date TEXT DEFAULT ''`, (err) => {
       if (err && !err.message.includes('duplicate column')) {
         console.error('Error adding import_date column:', err.message);
+      }
+    });
+    
+    db.run(`ALTER TABLE vulnerabilities ADD COLUMN notes TEXT DEFAULT ''`, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding notes column:', err.message);
+      }
+    });
+    
+    // Create vulnerability history table for VPR tracking
+    db.run(`CREATE TABLE IF NOT EXISTS vulnerability_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      vulnerability_id INTEGER,
+      vpr_score_old REAL,
+      vpr_score_new REAL,
+      change_date TEXT,
+      import_id INTEGER,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities(rowid),
+      FOREIGN KEY (import_id) REFERENCES vulnerability_imports(id)
+    )`, (err) => {
+      if (err) {
+        console.error('Error creating vulnerability_history table:', err.message);
       }
     });
   });
