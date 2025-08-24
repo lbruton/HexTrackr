@@ -94,12 +94,23 @@ git add . && git commit -m "🔄 Pre-work backup: [what you're about to do]"
 When starting a new chat session or continuing development, AI assistants must follow this workflow:
 
 #### **1. Essential MCP Server Setup**
-- **✅ REQUIRED**: Verify these MCP Servers are available and functional:
+- **✅ CORE REQUIRED**: Verify these MCP Servers are available and functional:
   - **Playwright Browser** - For testing and UI validation
-  - **Context7** - For enhanced context management
   - **Memory** - For session state persistence ✅ **CONFIGURED AND WORKING**
   - **Sequential Thinking** - For complex problem solving
-- **⚠️ ACTION**: If any MCP server is unavailable, inform user immediately
+  - **GitHub** - Repository management and issue tracking
+
+- **✅ CYBERSECURITY ENHANCED**: Additional MCP tools for HexTrackr:
+  - **Codacy** ⭐ - Code quality and security vulnerability scanning (CRITICAL)
+  - **Firecrawl** ⭐ - Web scraping for vulnerability data collection
+  - **Hugging Face** - AI/ML models for enhanced risk scoring
+  - **DeepWiki** - GitHub repository documentation analysis
+  - **MarkItDown** - Document conversion for security reports
+  - **Microsoft Docs** - Security guidance and best practices
+  - **ImageSorcery** - Image processing for vulnerability reports
+  - **Apify** - Web automation for scanner integration
+
+- **⚠️ ACTION**: If any CORE MCP server is unavailable, inform user immediately
 - **✅ MEMORY SERVER**: Successfully configured at `/Volumes/DATA/GitHub/server-memory/memory.db`
 
 #### **2. Mandatory Git Backup Protocol**
