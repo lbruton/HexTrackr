@@ -326,8 +326,11 @@
                         </h1>
                     </div>
                     <div>
-                        <button class="btn btn-outline-success me-2" onclick="showAPIModal()">
+                        <button class="btn btn-outline-success me-2" onclick="console.log('Button clicked'); showAPIModal(); console.log('showAPIModal returned');">
                             <i class="fas fa-plug me-2"></i>Connect to APIs
+                        </button>
+                        <button class="btn btn-outline-warning me-2" onclick="testShowAPIModal()">
+                            <i class="fas fa-bug me-2"></i>Test Modal
                         </button>
                         <a href="tickets.html" class="btn btn-outline-primary">
                             <i class="fas fa-ticket-alt me-2"></i>Ticket Management
@@ -373,6 +376,47 @@
                                     <label class="form-check-label text-light" for="sevInfo">Info</label>
                                 </div>
                             </div>
+                            
+                            <!-- Large File Optimization Options -->
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label fw-semibold text-light">
+                                        <i class="fas fa-cogs me-1"></i>Large File Options
+                                    </label>
+                                    <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="collapse" data-bs-target="#largeFileOptions">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                </div>
+                                <div class="collapse" id="largeFileOptions">
+                                    <div class="border rounded p-3 bg-dark bg-opacity-50">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="enableColumnFilter">
+                                            <label class="form-check-label text-light" for="enableColumnFilter">
+                                                Filter columns (reduces memory usage for large files)
+                                            </label>
+                                        </div>
+                                        <div id="columnFilterOptions" class="mt-2" style="display: none;">
+                                            <small class="text-muted mb-2 d-block">Select essential columns only (others will be ignored):</small>
+                                            <div class="row g-2" id="columnCheckboxes">
+                                                <!-- Column checkboxes will be populated dynamically after file analysis -->
+                                            </div>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="enableStreamingMode" checked>
+                                            <label class="form-check-label text-light" for="enableStreamingMode">
+                                                Streaming mode (processes large files in chunks)
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="showProgress" checked>
+                                            <label class="form-check-label text-light" for="showProgress">
+                                                Show detailed progress for large imports
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="mt-3">
                                 <small class="text-light">
                                     <i class="fas fa-info-circle me-1"></i>
@@ -763,97 +807,7 @@
         </div>
     </div>
 
-    <!-- API Connection Modal -->
-    <div class="modal fade" id="apiModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Connect to Vendor APIs</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6><i class="fas fa-shield-alt me-2"></i>Cisco Security</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="ciscoApiKey" class="form-label">API Key</label>
-                                        <input type="password" class="form-control" id="ciscoApiKey" placeholder="Enter Cisco API key">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="ciscoSecret" class="form-label">API Secret</label>
-                                        <input type="password" class="form-control" id="ciscoSecret" placeholder="Enter API secret">
-                                    </div>
-                                    <button class="btn btn-primary btn-sm" onclick="testCiscoAPI()">Test Connection</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6><i class="fas fa-fire me-2"></i>Palo Alto Networks</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="paloApiKey" class="form-label">API Key</label>
-                                        <input type="password" class="form-control" id="paloApiKey" placeholder="Enter Palo Alto API key">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="paloHost" class="form-label">Host</label>
-                                        <input type="text" class="form-control" id="paloHost" placeholder="firewall.company.com">
-                                    </div>
-                                    <button class="btn btn-primary btn-sm" onclick="testPaloAPI()">Test Connection</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6><i class="fas fa-bug me-2"></i>Tenable</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="tenableApiKey" class="form-label">Access Key</label>
-                                        <input type="password" class="form-control" id="tenableApiKey" placeholder="Enter Tenable access key">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="tenableSecret" class="form-label">Secret Key</label>
-                                        <input type="password" class="form-control" id="tenableSecret" placeholder="Enter secret key">
-                                    </div>
-                                    <button class="btn btn-primary btn-sm" onclick="testTenableAPI()">Test Connection</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6><i class="fas fa-search me-2"></i>Qualys</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="qualysUsername" class="form-label">Username</label>
-                                        <input type="text" class="form-control" id="qualysUsername" placeholder="Enter Qualys username">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="qualysPassword" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="qualysPassword" placeholder="Enter password">
-                                    </div>
-                                    <button class="btn btn-primary btn-sm" onclick="testQualysAPI()">Test Connection</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" onclick="syncFromAPIs()">Sync Data from APIs</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Legacy API Modal (Deprecated - kept for compatibility) -->
 
     <!-- API Configuration Modal -->
     <div class="modal fade" id="apiModal" tabindex="-1" aria-labelledby="apiModalLabel" aria-hidden="true">
@@ -1213,94 +1167,312 @@
                 currentTablePage = 1;
                 updateTableView();
             });
+
+            // Setup large file optimization listeners
+            setupLargeFileListeners();
+        }
+
+        // Large file optimization functions
+        function setupLargeFileListeners() {
+            // Column filter toggle
+            document.getElementById('enableColumnFilter').addEventListener('change', function() {
+                const optionsDiv = document.getElementById('columnFilterOptions');
+                optionsDiv.style.display = this.checked ? 'block' : 'none';
+            });
+        }
+
+        async function analyzeFileHeaders(file) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(file, {
+                    header: true,
+                    preview: 1, // Only read first row to get headers
+                    complete: function(results) {
+                        if (results.meta.fields) {
+                            resolve(results.meta.fields);
+                        } else {
+                            reject(new Error('Could not read file headers'));
+                        }
+                    },
+                    error: function(error) {
+                        reject(error);
+                    }
+                });
+            });
+        }
+
+        function createColumnFilterUI(headers) {
+            const checkboxContainer = document.getElementById('columnCheckboxes');
+            checkboxContainer.innerHTML = '';
+
+            // Essential columns that should be checked by default
+            const essentialColumns = [
+                'hostname', 'host', 'asset', 'ip', 'netbios',
+                'plugin_id', 'plugin', 'cve', 'definition_id', 'qid',
+                'severity', 'risk', 'criticality',
+                'plugin_name', 'title', 'name', 'description',
+                'solution', 'synopsis', 'see_also',
+                'first_seen', 'last_seen', 'scan_date'
+            ];
+
+            headers.forEach((header, index) => {
+                const isEssential = essentialColumns.some(essential => 
+                    header.toLowerCase().includes(essential.toLowerCase()) ||
+                    essential.toLowerCase().includes(header.toLowerCase())
+                );
+
+                const colDiv = document.createElement('div');
+                colDiv.className = 'col-6 col-md-4 col-lg-3';
+                colDiv.innerHTML = `
+                    <div class="form-check">
+                        <input class="form-check-input column-filter" type="checkbox" 
+                               id="col_${index}" value="${header}" ${isEssential ? 'checked' : ''}>
+                        <label class="form-check-label text-light small" for="col_${index}" title="${header}">
+                            ${header.length > 20 ? header.substring(0, 17) + '...' : header}
+                        </label>
+                    </div>
+                `;
+                checkboxContainer.appendChild(colDiv);
+            });
+
+            // Add select all/none buttons
+            const buttonDiv = document.createElement('div');
+            buttonDiv.className = 'col-12 mt-2';
+            buttonDiv.innerHTML = `
+                <button type="button" class="btn btn-outline-light btn-sm me-2" onclick="selectAllColumns(true)">
+                    Select All
+                </button>
+                <button type="button" class="btn btn-outline-light btn-sm me-2" onclick="selectAllColumns(false)">
+                    Select None
+                </button>
+                <button type="button" class="btn btn-outline-warning btn-sm" onclick="selectEssentialColumns()">
+                    Essential Only
+                </button>
+            `;
+            checkboxContainer.appendChild(buttonDiv);
+        }
+
+        function selectAllColumns(select) {
+            document.querySelectorAll('.column-filter').forEach(checkbox => {
+                checkbox.checked = select;
+            });
+        }
+
+        function selectEssentialColumns() {
+            document.querySelectorAll('.column-filter').forEach(checkbox => {
+                const header = checkbox.value.toLowerCase();
+                const essentialColumns = [
+                    'hostname', 'host', 'asset', 'ip', 'netbios',
+                    'plugin_id', 'plugin', 'cve', 'definition_id', 'qid',
+                    'severity', 'risk', 'criticality',
+                    'plugin_name', 'title', 'name', 'description',
+                    'solution', 'synopsis', 'see_also',
+                    'first_seen', 'last_seen', 'scan_date'
+                ];
+                
+                checkbox.checked = essentialColumns.some(essential => 
+                    header.includes(essential) || essential.includes(header)
+                );
+            });
+        }
+
+        function getSelectedColumns() {
+            const selectedColumns = [];
+            document.querySelectorAll('.column-filter:checked').forEach(checkbox => {
+                selectedColumns.push(checkbox.value);
+            });
+            return selectedColumns;
+        }
+
+        function filterRowData(rowData, selectedColumns) {
+            if (!document.getElementById('enableColumnFilter').checked) {
+                return rowData; // No filtering
+            }
+            
+            const filteredData = {};
+            selectedColumns.forEach(column => {
+                if (rowData.hasOwnProperty(column)) {
+                    filteredData[column] = rowData[column];
+                }
+            });
+            return filteredData;
         }
 
         async function handleFileUpload(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
-            Array.from(files).forEach(file => {
-                let fileDate = file.lastModified ? new Date(file.lastModified) : new Date();
-                const dateMatch = file.name.match(/(\d{4}[-_]\d{2}[-_]\d{2})/);
-                if (dateMatch) {
-                    fileDate = new Date(dateMatch[1].replace(/_/g, '-'));
-                }
+            // Process each file
+            for (const file of files) {
+                await processFile(file);
+            }
+        }
 
-                const progressModal = document.createElement('div');
-                progressModal.innerHTML = `
-                    <div class="modal fade" id="progressModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
+        async function processFile(file) {
+            let fileDate = file.lastModified ? new Date(file.lastModified) : new Date();
+            const dateMatch = file.name.match(/(\d{4}[-_]\d{2}[-_]\d{2})/);
+            if (dateMatch) {
+                fileDate = new Date(dateMatch[1].replace(/_/g, '-'));
+            }
+
+            // Check if column filtering is enabled and show UI if needed
+            if (document.getElementById('enableColumnFilter').checked) {
+                try {
+                    document.getElementById('progressStatus')?.textContent = 'Analyzing file headers...';
+                    const headers = await analyzeFileHeaders(file);
+                    createColumnFilterUI(headers);
+                    
+                    // Show the column filter options
+                    document.getElementById('columnFilterOptions').style.display = 'block';
+                    
+                    // Create a confirmation modal for user to proceed
+                    const confirmModal = await showColumnFilterModal(file.name, headers.length);
+                    if (!confirmModal) {
+                        return; // User cancelled
+                    }
+                } catch (error) {
+                    console.warn('Could not analyze headers, proceeding without filtering:', error);
+                }
+            }
+
+            // Proceed with file processing
+            await processCSVFile(file, fileDate);
+        }
+
+        function showColumnFilterModal(fileName, totalColumns) {
+            return new Promise((resolve) => {
+                const modalHtml = `
+                    <div class="modal fade" id="columnFilterModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title">Processing CSV File</h5>
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-filter me-2"></i>Column Filter - ${fileName}
+                                    </h5>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Processing ${file.name}...</p>
-                                    <div class="progress mb-3">
-                                        <div class="progress-bar" role="progressbar" style="width: 0%" id="progressBar"></div>
+                                    <p class="mb-3">
+                                        Found <strong>${totalColumns}</strong> columns in the CSV file. 
+                                        Select which columns to import to reduce memory usage:
+                                    </p>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-lightbulb me-2"></i>
+                                        <strong>Tip:</strong> Only selected columns will be processed and stored. 
+                                        This can significantly reduce memory usage for large files.
                                     </div>
-                                    <div id="progressStatus">Initializing...</div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" id="cancelColumnFilter">
+                                        Cancel Import
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="proceedWithFiltering">
+                                        <i class="fas fa-play me-2"></i>Process File
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </div>`;
-                document.body.appendChild(progressModal);
-                const modal = new bootstrap.Modal(document.getElementById('progressModal'));
+                    </div>
+                `;
+
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                const modal = new bootstrap.Modal(document.getElementById('columnFilterModal'));
                 modal.show();
 
-                const uniqueData = new Map();
-                vulnData.forEach(item => {
-                    const key = `${item.hostname}-${item.definitionId}`;
-                    uniqueData.set(key, item);
+                document.getElementById('cancelColumnFilter').addEventListener('click', () => {
+                    modal.hide();
+                    document.getElementById('columnFilterModal').remove();
+                    resolve(false);
                 });
 
-                let importedRows = 0;
-                const selectedSeverities = getSelectedSeverities();
-
-                Papa.parse(file, {
-                    header: true,
-                    skipEmptyLines: true,
-                    chunkSize: 1000,
-                    chunk: function(results, parser) {
-                        importedRows += processBatchVulnData(results.data, fileDate, selectedSeverities, uniqueData);
-
-                        const progress = Math.min(100, Math.round((results.meta.cursor / file.size) * 100));
-                        document.getElementById('progressBar').style.width = progress + '%';
-                        document.getElementById('progressStatus').textContent = `Imported ${importedRows.toLocaleString()} records`;
-                    },
-                    complete: async function() {
-                        vulnData = Array.from(uniqueData.values());
-                        const stats = calculateStatistics(vulnData, fileDate);
-                        updateStatCards(stats);
-                        filterAndDisplayData();
-                        updateLastUploadInfo(file.name, fileDate, importedRows);
-
-                        try {
-                            await saveVulnData();
-                            await saveToHistory(file.name, fileDate, stats);
-                        } catch (e) {
-                            console.warn('Could not save data:', e);
-                        }
-
-                        document.getElementById('progressBar').style.width = '100%';
-                        document.getElementById('progressStatus').textContent = 'Completed';
-                        setTimeout(() => {
-                            modal.hide();
-                            document.body.removeChild(progressModal);
-                            alert(`Successfully imported ${importedRows} vulnerability records!`);
-                        }, 300);
-                    },
-                    error: function(error) {
-                        console.error('Error parsing CSV:', error);
-                        modal.hide();
-                        document.body.removeChild(progressModal);
-                        alert('Error parsing CSV file: ' + error.message);
-                    }
+                document.getElementById('proceedWithFiltering').addEventListener('click', () => {
+                    modal.hide();
+                    document.getElementById('columnFilterModal').remove();
+                    resolve(true);
                 });
             });
         }
 
-        function mapCsvRow(row, fileDate) {
+        async function processCSVFile(file, fileDate) {
+            const progressModal = document.createElement('div');
+            progressModal.innerHTML = `
+                <div class="modal fade" id="progressModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Processing CSV File</h5>
+                            </div>
+                            <div class="modal-body">
+                                <p>Processing ${file.name}...</p>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" role="progressbar" style="width: 0%" id="progressBar"></div>
+                                </div>
+                                <div id="progressStatus">Initializing...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            document.body.appendChild(progressModal);
+            const modal = new bootstrap.Modal(document.getElementById('progressModal'));
+            modal.show();
+
+            const uniqueData = new Map();
+            vulnData.forEach(item => {
+                const key = `${item.hostname}-${item.definitionId}`;
+                uniqueData.set(key, item);
+            });
+
+            let importedRows = 0;
+            const selectedSeverities = getSelectedSeverities();
+            const selectedColumns = getSelectedColumns();
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                chunkSize: document.getElementById('enableStreamingMode').checked ? 1000 : undefined,
+                chunk: function(results, parser) {
+                    // Filter column data if filtering is enabled
+                    const processedData = results.data.map(row => {
+                        return filterRowData(row, selectedColumns);
+                    });
+                    
+                    importedRows += processBatchVulnData(processedData, fileDate, selectedSeverities, uniqueData);
+
+                    if (document.getElementById('showProgress').checked) {
+                        const progress = Math.min(100, Math.round((results.meta.cursor / file.size) * 100));
+                        document.getElementById('progressBar').style.width = progress + '%';
+                        document.getElementById('progressStatus').textContent = 
+                            `Imported ${importedRows.toLocaleString()} records (${progress}%)`;
+                    }
+                },
+                complete: async function() {
+                    vulnData = Array.from(uniqueData.values());
+                    const stats = calculateStatistics(vulnData, fileDate);
+                    updateStatCards(stats);
+                    filterAndDisplayData();
+                    updateLastUploadInfo(file.name, fileDate, importedRows);
+
+                    try {
+                        await saveVulnData();
+                        await saveToHistory(file.name, fileDate, stats);
+                    } catch (e) {
+                        console.warn('Could not save data:', e);
+                    }
+
+                    document.getElementById('progressBar').style.width = '100%';
+                    document.getElementById('progressStatus').textContent = 'Completed';
+                    setTimeout(() => {
+                        modal.hide();
+                        document.body.removeChild(progressModal);
+                        alert(`Successfully imported ${importedRows} vulnerability records!`);
+                    }, 300);
+                },
+                error: function(error) {
+                    console.error('Error parsing CSV:', error);
+                    modal.hide();
+                    document.body.removeChild(progressModal);
+                    alert('Error parsing CSV file: ' + error.message);
+                }
+            });
+        }        function mapCsvRow(row, fileDate) {
             const mappedRow = {};
 
             mappedRow.hostname = row['asset.name'] || row.hostname || row.asset_name || row.host || row.target || '';
@@ -2276,7 +2448,7 @@
             modal.show();
         }
 
-        function saveAssetChanges() {
+        async function saveAssetChanges() {
             const originalHostname = document.getElementById('editAssetOriginalHostname').value;
             const newHostname = document.getElementById('editAssetHostname').value;
             const newIP = document.getElementById('editAssetIP').value;
@@ -2404,67 +2576,8 @@
         }
 
         // API Integration Functions
-        function testCiscoAPI() {
-            const apiKey = document.getElementById('ciscoApiKey').value;
-            const secret = document.getElementById('ciscoSecret').value;
-
-            if (!apiKey || !secret) {
-                alert('Please enter both API key and secret');
-                return;
-            }
-
-            // TODO: Implement actual Cisco API test
-            alert('Cisco API test functionality will be implemented in a future version');
-        }
-
-        function testPaloAPI() {
-            const apiKey = document.getElementById('paloApiKey').value;
-            const host = document.getElementById('paloHost').value;
-
-            if (!apiKey || !host) {
-                alert('Please enter both API key and host');
-                return;
-            }
-
-            // TODO: Implement actual Palo Alto API test
-            alert('Palo Alto API test functionality will be implemented in a future version');
-        }
-
-        function testTenableAPI() {
-            const accessKey = document.getElementById('tenableApiKey').value;
-            const secretKey = document.getElementById('tenableSecret').value;
-
-            if (!accessKey || !secretKey) {
-                alert('Please enter both access key and secret key');
-                return;
-            }
-
-            // TODO: Implement actual Tenable API test
-            alert('Tenable API test functionality will be implemented in a future version');
-        }
-
-        function testQualysAPI() {
-            const username = document.getElementById('qualysUsername').value;
-            const password = document.getElementById('qualysPassword').value;
-
-            if (!username || !password) {
-                alert('Please enter both username and password');
-                return;
-            }
-
-            // TODO: Implement actual Qualys API test
-            alert('Qualys API test functionality will be implemented in a future version');
-        }
-
-        function syncFromAPIs() {
-            alert('API synchronization functionality will be implemented in a future version');
-        }
-
-        // Add Connect to APIs button functionality
-        function showAPIModal() {
-            const modal = new bootstrap.Modal(document.getElementById('apiModal'));
-            modal.show();
-        }
+        // API Test Functions (Legacy - replaced by newer implementations below)
+        // These are kept for the legacy modal but are mostly stubbed out
 
         function toggleUploadArea() {
             const uploadArea = document.getElementById('uploadArea');
@@ -2643,11 +2756,64 @@
             }
         }
 
+        // Simplified test function for debugging
+        function testShowAPIModal() {
+            console.log('testShowAPIModal called');
+            alert('Test function called - button is responsive!');
+            
+            if (typeof bootstrap === 'undefined') {
+                alert('Bootstrap not loaded');
+                return;
+            }
+            
+            const modalElement = document.getElementById('apiModal');
+            if (!modalElement) {
+                alert('Modal element not found');
+                return;
+            }
+            
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+
         // Show API Configuration Modal
         async function showAPIModal() {
-            const modal = new bootstrap.Modal(document.getElementById('apiModal'));
-            await loadCiscoCredentials(); // Load existing credentials
-            modal.show();
+            console.log('showAPIModal function called');
+            
+            try {
+                // Check if Bootstrap is loaded
+                if (typeof bootstrap === 'undefined') {
+                    console.error('Bootstrap is not loaded');
+                    alert('Bootstrap library is not loaded. Please refresh the page.');
+                    return;
+                }
+                
+                // Check if modal element exists
+                const modalElement = document.getElementById('apiModal');
+                if (!modalElement) {
+                    console.error('Modal element with id "apiModal" not found');
+                    alert('Modal element not found. Please check the page structure.');
+                    return;
+                }
+                
+                console.log('Modal element found:', modalElement);
+                
+                // Create modal instance
+                const modal = new bootstrap.Modal(modalElement);
+                console.log('Modal instance created:', modal);
+                
+                // Load credentials first
+                await loadCiscoCredentials(); // Load existing credentials
+                console.log('Credentials loaded');
+                
+                // Show the modal
+                modal.show();
+                console.log('Modal show() called');
+                
+            } catch (error) {
+                console.error('Error in showAPIModal:', error);
+                alert('Error opening modal: ' + error.message);
+            }
         }
 
         // Save Cisco credentials with encryption
