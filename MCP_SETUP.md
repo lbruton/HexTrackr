@@ -1,5 +1,9 @@
 # MCP Server Configuration Guide for HexTrackr
 
+## ✅ **STATUS: CONFIGURED AND WORKING**
+
+The Memory MCP server is now successfully configured and tested with centralized storage.
+
 ## 🔧 **VS Code MCP Server Setup**
 
 ### **Required MCP Servers**
@@ -15,26 +19,33 @@
 - **Purpose**: Shared memory across all projects and sessions
 - **Benefits**: Persistent context, cross-project learning
 
-#### **VS Code Settings (settings.json)**
+#### **VS Code Settings (mcp.json) - CONFIRMED WORKING**
 ```json
 {
-  "mcp.servers": {
+  "servers": {
     "memory": {
-      "command": "mcp-memory-server",
-      "args": ["--storage-path", "/Volumes/DATA/GitHub/server-memory/"],
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
       "env": {
-        "MEMORY_STORAGE_PATH": "/Volumes/DATA/GitHub/server-memory/"
-      }
+        "MEMORY_FILE_PATH": "/Volumes/DATA/GitHub/server-memory/memory.db"
+      },
+      "type": "stdio"
     },
     "playwright": {
-      "command": "mcp-playwright-server"
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+      "type": "stdio"
     },
-    "sequential-thinking": {
-      "command": "mcp-sequential-thinking-server"
+    "sequentialthinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "type": "stdio"
     }
   }
 }
 ```
+
+**✅ VERIFIED**: Memory server successfully stores HexTrackr project context
 
 ### **Setup Commands**
 ```bash
