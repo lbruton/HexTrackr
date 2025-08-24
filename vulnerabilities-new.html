@@ -1871,8 +1871,8 @@
                                 <div class="vulnerability-meta">
                                     <div>
                                         ${cve && cve.startsWith('CVE-') ? `
-                                            <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}" 
-                                               target="_blank" class="vulnerability-cve" onclick="event.stopPropagation();">
+                                            <a href="#" class="vulnerability-cve" 
+                                               onclick="event.stopPropagation(); vulnManager.lookupCVE('${cve}');">
                                                 ${cve}
                                             </a>
                                         ` : `
@@ -2055,7 +2055,7 @@
                         cellRenderer: (params) => {
                             const cve = params.value;
                             if (cve && cve.startsWith('CVE-')) {
-                                return `<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}" target="_blank" class="text-primary text-decoration-none">${cve}</a>`;
+                                return `<a href="#" class="text-primary text-decoration-none" onclick="vulnManager.lookupCVE('${cve}')">${cve}</a>`;
                             }
                             return cve || 'N/A';
                         }
@@ -2255,64 +2255,111 @@
             }
 
             async lookupCVE(cveId) {
-                // Check if we have Cisco API credentials
+                // Handle multiple CVEs separated by commas or spaces
+                const cveIds = cveId.includes(',') ? cveId.split(',').map(id => id.trim()) 
+                                                   : cveId.includes(' ') ? cveId.split(' ').filter(id => id.startsWith('CVE-'))
+                                                   : [cveId.trim()];
+
+                // Check if we have Cisco API credentials for comprehensive lookup
                 const ciscoClientId = localStorage.getItem('cisco_client_id');
                 const ciscoClientSecret = localStorage.getItem('cisco_client_secret');
 
-                if (ciscoClientId && ciscoClientSecret) {
-                    try {
-                        this.showLoading(`Looking up ${cveId}...`);
+                if (ciscoClientId && ciscoClientSecret && cveIds.length === 1) {
+                    // Use Cisco API for single CVE comprehensive lookup
+                    await this.lookupCVEWithCiscoAPI(cveIds[0], ciscoClientId, ciscoClientSecret);
+                } else {
+                    // Use external CVE database in popup windows (supports multiple CVEs)
+                    this.openCVEPopups(cveIds);
+                }
+            }
+
+            async lookupCVEWithCiscoAPI(cveId, clientId, clientSecret) {
+                try {
+                    this.showLoading(`Looking up ${cveId} via Cisco PSIRT...`);
+                    
+                    // Get Cisco access token
+                    const tokenResponse = await fetch('https://id.cisco.com/oauth2/default/v1/token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Authorization': 'Basic ' + btoa(`${clientId}:${clientSecret}`)
+                        },
+                        body: 'grant_type=client_credentials'
+                    });
+
+                    if (tokenResponse.ok) {
+                        const tokenData = await tokenResponse.json();
                         
-                        // Get Cisco access token
-                        const tokenResponse = await fetch('https://id.cisco.com/oauth2/default/v1/token', {
-                            method: 'POST',
+                        // Query Cisco PSIRT API
+                        const psirtResponse = await fetch(`https://api.cisco.com/security/advisories/cve/${cveId}`, {
                             headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                                'Authorization': 'Basic ' + btoa(`${ciscoClientId}:${ciscoClientSecret}`)
-                            },
-                            body: 'grant_type=client_credentials'
+                                'Authorization': `Bearer ${tokenData.access_token}`,
+                                'Accept': 'application/json'
+                            }
                         });
 
-                        if (tokenResponse.ok) {
-                            const tokenData = await tokenResponse.json();
-                            
-                            // Query Cisco PSIRT API
-                            const psirtResponse = await fetch(`https://api.cisco.com/security/advisories/cve/${cveId}`, {
-                                headers: {
-                                    'Authorization': `Bearer ${tokenData.access_token}`,
-                                    'Accept': 'application/json'
-                                }
-                            });
-
-                            this.hideLoading();
-
-                            if (psirtResponse.ok) {
-                                const data = await psirtResponse.json();
-                                this.displayCVEInfo(cveId, data);
-                            } else {
-                                this.showToast(`No Cisco advisory found for ${cveId}`, 'warning');
-                            }
-                        } else {
-                            this.hideLoading();
-                            this.showToast('Failed to authenticate with Cisco API', 'danger');
-                        }
-                    } catch (error) {
                         this.hideLoading();
-                        this.showToast('Error looking up CVE: ' + error.message, 'danger');
-                    }
-                } else {
-                    // Fallback to external CVE database in smaller popup window
-                    const popup = window.open(
-                        `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cveId}`, 
-                        'CVE_Lookup',
-                        'width=1200,height=800,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=yes,status=yes'
-                    );
-                    if (popup) {
-                        popup.focus();
+
+                        if (psirtResponse.ok) {
+                            const data = await psirtResponse.json();
+                            this.displayCVEInfo(cveId, data);
+                        } else {
+                            this.showToast(`No Cisco advisory found for ${cveId}. Opening external lookup...`, 'warning');
+                            this.openCVEPopups([cveId]);
+                        }
                     } else {
-                        this.showToast('Popup blocked. Please allow popups for CVE lookups.', 'warning');
+                        this.hideLoading();
+                        this.showToast('Failed to authenticate with Cisco API. Using external lookup...', 'warning');
+                        this.openCVEPopups([cveId]);
                     }
+                } catch (error) {
+                    this.hideLoading();
+                    this.showToast('Error with Cisco API. Using external lookup...', 'warning');
+                    this.openCVEPopups([cveId]);
                 }
+            }
+
+            openCVEPopups(cveIds) {
+                if (!Array.isArray(cveIds) || cveIds.length === 0) {
+                    this.showToast('No valid CVE IDs found', 'warning');
+                    return;
+                }
+
+                let successCount = 0;
+                let blockedCount = 0;
+
+                cveIds.forEach((cveId, index) => {
+                    if (!cveId.startsWith('CVE-')) {
+                        return; // Skip invalid CVE format
+                    }
+
+                    // Stagger popup opening to avoid browser blocking
+                    setTimeout(() => {
+                        const popup = window.open(
+                            `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cveId.trim()}`, 
+                            `CVE_Lookup_${cveId.replace(/[^a-zA-Z0-9]/g, '_')}`,
+                            'width=1200,height=800,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=yes,status=yes,top=50,left=' + (100 + index * 50)
+                        );
+                        
+                        if (popup) {
+                            popup.focus();
+                            successCount++;
+                        } else {
+                            blockedCount++;
+                        }
+
+                        // Show summary message after last popup attempt
+                        if (index === cveIds.length - 1) {
+                            setTimeout(() => {
+                                if (blockedCount > 0) {
+                                    this.showToast(`${successCount} CVE lookup(s) opened. ${blockedCount} popup(s) blocked. Please allow popups for full CVE lookups.`, 'warning');
+                                } else if (successCount > 0) {
+                                    this.showToast(`${successCount} CVE lookup(s) opened successfully`, 'success');
+                                }
+                            }, 100);
+                        }
+                    }, index * 200); // 200ms delay between popups
+                });
             }
 
             displayCVEInfo(cveId, data) {
