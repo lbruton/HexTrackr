@@ -350,6 +350,29 @@
                             <button class="btn btn-light btn-lg" onclick="document.getElementById('fileInput').click()">
                                 <i class="fas fa-file-upload me-2"></i>Choose Files
                             </button>
+                            <div class="mt-3 text-start">
+                                <label class="form-label fw-semibold text-light">Import Severities:</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input import-severity" type="checkbox" id="sevCritical" value="critical" checked>
+                                    <label class="form-check-label text-light" for="sevCritical">Critical</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input import-severity" type="checkbox" id="sevHigh" value="high" checked>
+                                    <label class="form-check-label text-light" for="sevHigh">High</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input import-severity" type="checkbox" id="sevMedium" value="medium" checked>
+                                    <label class="form-check-label text-light" for="sevMedium">Medium</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input import-severity" type="checkbox" id="sevLow" value="low" checked>
+                                    <label class="form-check-label text-light" for="sevLow">Low</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input import-severity" type="checkbox" id="sevInfo" value="info" checked>
+                                    <label class="form-check-label text-light" for="sevInfo">Info</label>
+                                </div>
+                            </div>
                             <div class="mt-3">
                                 <small class="text-light">
                                     <i class="fas fa-info-circle me-1"></i>
@@ -1102,6 +1125,11 @@
         let searchTerm = '';
         let severityFilter = '';
 
+        function getSelectedSeverities() {
+            return Array.from(document.querySelectorAll('.import-severity:checked'))
+                .map(cb => cb.value);
+        }
+
         // Initialize the application
         document.addEventListener('DOMContentLoaded', async function() {
             setupEventListeners();
@@ -1226,37 +1254,26 @@
                     uniqueData.set(key, item);
                 });
 
-                let processedRows = 0;
-                const currentSeverityFilter = severityFilter;
+                let importedRows = 0;
+                const selectedSeverities = getSelectedSeverities();
 
                 Papa.parse(file, {
                     header: true,
                     skipEmptyLines: true,
                     chunkSize: 1000,
                     chunk: function(results, parser) {
-                        results.data.forEach(row => {
-                            const mapped = mapCsvRow(row, fileDate);
-                            if (!mapped) return;
-                            if (currentSeverityFilter && mapped.severity !== currentSeverityFilter) return;
+                        importedRows += processBatchVulnData(results.data, fileDate, selectedSeverities, uniqueData);
 
-                            const key = `${mapped.hostname}-${mapped.definitionId}`;
-                            const existing = uniqueData.get(key);
-                            if (!existing || new Date(existing.date) < new Date(mapped.date)) {
-                                uniqueData.set(key, mapped);
-                            }
-                        });
-
-                        processedRows += results.data.length;
                         const progress = Math.min(100, Math.round((results.meta.cursor / file.size) * 100));
                         document.getElementById('progressBar').style.width = progress + '%';
-                        document.getElementById('progressStatus').textContent = `Processed ${processedRows.toLocaleString()} rows`;
+                        document.getElementById('progressStatus').textContent = `Imported ${importedRows.toLocaleString()} records`;
                     },
                     complete: async function() {
                         vulnData = Array.from(uniqueData.values());
                         const stats = calculateStatistics(vulnData, fileDate);
                         updateStatCards(stats);
                         filterAndDisplayData();
-                        updateLastUploadInfo(file.name, fileDate, processedRows);
+                        updateLastUploadInfo(file.name, fileDate, importedRows);
 
                         try {
                             await saveVulnData();
@@ -1270,7 +1287,7 @@
                         setTimeout(() => {
                             modal.hide();
                             document.body.removeChild(progressModal);
-                            alert(`Successfully processed ${processedRows} vulnerability records!`);
+                            alert(`Successfully imported ${importedRows} vulnerability records!`);
                         }, 300);
                     },
                     error: function(error) {
@@ -1311,6 +1328,28 @@
             mappedRow.date = fileDate.toLocaleDateString();
 
             return mappedRow;
+        }
+
+        function processVulnData(row, fileDate, allowedSeverities) {
+            const mapped = mapCsvRow(row, fileDate);
+            if (!mapped) return null;
+            if (allowedSeverities.length && !allowedSeverities.includes(mapped.severity)) return null;
+            return mapped;
+        }
+
+        function processBatchVulnData(rows, fileDate, allowedSeverities, uniqueData) {
+            let count = 0;
+            rows.forEach(row => {
+                const mapped = processVulnData(row, fileDate, allowedSeverities);
+                if (!mapped) return;
+                const key = `${mapped.hostname}-${mapped.definitionId}`;
+                const existing = uniqueData.get(key);
+                if (!existing || new Date(existing.date) < new Date(mapped.date)) {
+                    uniqueData.set(key, mapped);
+                    count++;
+                }
+            });
+            return count;
         }
 
         function calculateStatistics(data, date) {
