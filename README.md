@@ -71,6 +71,25 @@ http://localhost:8080/tickets.html
 
 ## 🤖 **AI Assistant Workflow Instructions**
 
+### **🚨 CRITICAL: MANDATORY PROTOCOLS - NO EXCEPTIONS**
+
+#### **RULE #1: ALWAYS BACKUP BEFORE CHANGES**
+```bash
+# NEVER SKIP THIS STEP - Execute before ANY code modification:
+git add . && git commit -m "🔄 Pre-work backup: [what you're about to do]"
+```
+
+#### **RULE #2: ROADMAP FIRST, CODE SECOND**
+- **❌ NEVER**: Start coding without updating roadmap documentation
+- **✅ ALWAYS**: Plan changes in PHASE3_ROADMAP.md BEFORE implementation
+- **✅ PROCESS**: Update roadmap → Get approval → Create backup → Implement → Test → Commit
+
+#### **RULE #3: FOLLOW ESTABLISHED STRUCTURE**
+- **Primary Roadmap**: `PHASE3_ROADMAP.md` (detailed sprint planning)
+- **High-level Planning**: `ROADMAP.md` (long-term strategy)
+- **Quick Reference**: `.ai-quickref.md` (startup checklist)
+- **Configuration**: `MCP_SETUP.md` (MCP server setup)
+
 ### **CRITICAL: Always Read These Instructions First**
 When starting a new chat session or continuing development, AI assistants must follow this workflow:
 
@@ -140,6 +159,23 @@ For the Memory MCP server to work properly, ensure your VS Code settings include
 }
 ```
 **Note**: User should verify MCP server configuration in VS Code settings.
+
+#### **8. Workflow Enforcement Checklist**
+**Before making ANY changes, AI assistants must verify:**
+- [ ] Git backup completed successfully
+- [ ] Roadmap updated with planned changes
+- [ ] User approval obtained for significant modifications
+- [ ] All MCP servers functional (especially Memory for context)
+- [ ] Current sprint/phase understood from PHASE3_ROADMAP.md
+- [ ] Docker environment verified running on localhost:8080
+
+**After making changes:**
+- [ ] Changes tested in browser
+- [ ] Descriptive commit with appropriate emoji category
+- [ ] Roadmap progress updated if milestone completed
+- [ ] Documentation updated if new features added
+
+---
 
 ### **Current Project State**
 - **Active Branch**: `main`
