@@ -257,12 +257,12 @@
         .workspace-container {
             background: white;
             border-radius: 12px;
-            box-shadow: var(--card-shadow);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
         .workspace-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, var(--hextrackr-primary) 0%, #3b82f6 100%);
             color: white;
             padding: 1.5rem;
             border: none;
@@ -286,34 +286,34 @@
             padding: 0.5rem 1rem;
             border-radius: 6px;
             transition: all 0.2s ease;
-            color: var(--secondary-color);
+            color: var(--hextrackr-secondary);
         }
 
         .view-btn.active {
-            background: var(--primary-color);
+            background: var(--hextrackr-primary);
             color: white;
-            box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 1px 3px rgba(32, 107, 196, 0.3);
         }
 
         .ag-theme-alpine {
-            --ag-alpine-active-color: var(--primary-color);
+            --ag-alpine-active-color: var(--hextrackr-primary);
             --ag-header-background-color: #f8fafc;
-            --ag-header-foreground-color: var(--dark-color);
+            --ag-header-foreground-color: #1f2937;
             --ag-border-color: #e2e8f0;
         }
 
         .device-card, .vuln-card {
             background: white;
             border-radius: 8px;
-            box-shadow: var(--card-shadow);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
             margin-bottom: 1rem;
             transition: all 0.2s ease;
             border: 1px solid #e2e8f0;
         }
 
         .device-card:hover, .vuln-card:hover {
-            box-shadow: var(--card-shadow-lg);
-            border-color: var(--primary-color);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: var(--hextrackr-primary);
         }
 
         .severity-badge {
@@ -326,25 +326,25 @@
 
         .severity-critical {
             background-color: #fef2f2;
-            color: var(--danger-color);
+            color: var(--hextrackr-danger);
             border: 1px solid #fecaca;
         }
 
         .severity-high {
             background-color: #fffbeb;
-            color: var(--warning-color);
+            color: var(--hextrackr-warning);
             border: 1px solid #fed7aa;
         }
 
         .severity-medium {
             background-color: #eff6ff;
-            color: var(--info-color);
+            color: var(--hextrackr-info);
             border: 1px solid #bfdbfe;
         }
 
         .severity-low {
             background-color: #f0fdf4;
-            color: var(--success-color);
+            color: var(--hextrackr-success);
             border: 1px solid #bbf7d0;
         }
 
@@ -363,7 +363,7 @@
         }
 
         .progress-modern .progress-bar {
-            background: linear-gradient(90deg, var(--primary-color) 0%, #3b82f6 100%);
+            background: linear-gradient(90deg, var(--hextrackr-primary) 0%, #3b82f6 100%);
             border-radius: 4px;
             transition: width 0.3s ease;
         }
