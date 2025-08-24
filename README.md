@@ -81,6 +81,10 @@ When starting a new chat session or continuing development, AI assistants must f
   - **Memory** - For session state persistence
   - **Sequential Thinking** - For complex problem solving
 - **⚠️ ACTION**: If any MCP server is unavailable, inform user immediately
+- **🔧 MEMORY SERVER SETUP**: Ensure Memory MCP server points to centralized location:
+  - **Path**: `/Volumes/DATA/GitHub/server-memory/`
+  - **Config**: VS Code MCP settings should use this centralized path
+  - **Create if missing**: `mkdir -p /Volumes/DATA/GitHub/server-memory`
 
 #### **2. Mandatory Git Backup Protocol**
 - **✅ BEFORE ANY CODE CHANGES**: Always create git backup
@@ -117,7 +121,25 @@ ls -la                             # Verify project structure
 - **If Docker Issues**: `docker-compose down && docker-compose up -d`
 - **If Git Issues**: Create backup branch before any fixes
 - **If File Corruption**: Restore from `deprecated/` folder if needed
+- **If MCP Memory Issues**: 
+  - Check VS Code MCP settings point to `/Volumes/DATA/GitHub/server-memory/`
+  - Recreate directory: `mkdir -p /Volumes/DATA/GitHub/server-memory`
+  - Restart VS Code MCP servers if needed
 - **Always**: Communicate issues to user before attempting fixes
+
+#### **7. VS Code MCP Configuration**
+For the Memory MCP server to work properly, ensure your VS Code settings include:
+```json
+{
+  "mcp.servers": {
+    "memory": {
+      "command": "mcp-memory-server",
+      "args": ["--storage-path", "/Volumes/DATA/GitHub/server-memory/"]
+    }
+  }
+}
+```
+**Note**: User should verify MCP server configuration in VS Code settings.
 
 ### **Current Project State**
 - **Active Branch**: `main`
