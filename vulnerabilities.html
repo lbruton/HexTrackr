@@ -1187,384 +1187,130 @@
             });
         }
 
-        function handleFileUpload(event) {
+        async function handleFileUpload(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
             Array.from(files).forEach(file => {
+                let fileDate = file.lastModified ? new Date(file.lastModified) : new Date();
+                const dateMatch = file.name.match(/(\d{4}[-_]\d{2}[-_]\d{2})/);
+                if (dateMatch) {
+                    fileDate = new Date(dateMatch[1].replace(/_/g, '-'));
+                }
+
+                const progressModal = document.createElement('div');
+                progressModal.innerHTML = `
+                    <div class="modal fade" id="progressModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Processing CSV File</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Processing ${file.name}...</p>
+                                    <div class="progress mb-3">
+                                        <div class="progress-bar" role="progressbar" style="width: 0%" id="progressBar"></div>
+                                    </div>
+                                    <div id="progressStatus">Initializing...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                document.body.appendChild(progressModal);
+                const modal = new bootstrap.Modal(document.getElementById('progressModal'));
+                modal.show();
+
+                const uniqueData = new Map();
+                vulnData.forEach(item => {
+                    const key = `${item.hostname}-${item.definitionId}`;
+                    uniqueData.set(key, item);
+                });
+
+                let processedRows = 0;
+                const currentSeverityFilter = severityFilter;
+
                 Papa.parse(file, {
                     header: true,
                     skipEmptyLines: true,
-                    complete: async function(results) {
-                        await processVulnData(results.data, file);
+                    chunkSize: 1000,
+                    chunk: function(results, parser) {
+                        results.data.forEach(row => {
+                            const mapped = mapCsvRow(row, fileDate);
+                            if (!mapped) return;
+                            if (currentSeverityFilter && mapped.severity !== currentSeverityFilter) return;
+
+                            const key = `${mapped.hostname}-${mapped.definitionId}`;
+                            const existing = uniqueData.get(key);
+                            if (!existing || new Date(existing.date) < new Date(mapped.date)) {
+                                uniqueData.set(key, mapped);
+                            }
+                        });
+
+                        processedRows += results.data.length;
+                        const progress = Math.min(100, Math.round((results.meta.cursor / file.size) * 100));
+                        document.getElementById('progressBar').style.width = progress + '%';
+                        document.getElementById('progressStatus').textContent = `Processed ${processedRows.toLocaleString()} rows`;
+                    },
+                    complete: async function() {
+                        vulnData = Array.from(uniqueData.values());
+                        const stats = calculateStatistics(vulnData, fileDate);
+                        updateStatCards(stats);
+                        filterAndDisplayData();
+                        updateLastUploadInfo(file.name, fileDate, processedRows);
+
+                        try {
+                            await saveVulnData();
+                            await saveToHistory(file.name, fileDate, stats);
+                        } catch (e) {
+                            console.warn('Could not save data:', e);
+                        }
+
+                        document.getElementById('progressBar').style.width = '100%';
+                        document.getElementById('progressStatus').textContent = 'Completed';
+                        setTimeout(() => {
+                            modal.hide();
+                            document.body.removeChild(progressModal);
+                            alert(`Successfully processed ${processedRows} vulnerability records!`);
+                        }, 300);
                     },
                     error: function(error) {
                         console.error('Error parsing CSV:', error);
+                        modal.hide();
+                        document.body.removeChild(progressModal);
                         alert('Error parsing CSV file: ' + error.message);
                     }
                 });
             });
         }
 
-        async function processVulnData(data, file) {
-            console.log('Processing vulnerability data from file:', file.name);
-            console.log('Raw CSV data sample:', data.slice(0, 3));
-            console.log('CSV Headers found:', Object.keys(data[0] || {}));
-            
-            if (!data || data.length === 0) {
-                alert('No data found in CSV file');
-                return;
-            }
+        function mapCsvRow(row, fileDate) {
+            const mappedRow = {};
 
-            // Check if this is a very large file that needs batch processing
-            if (data.length > 5000) {
-                await processBatchVulnData(data, file);
-                return;
-            }
+            mappedRow.hostname = row['asset.name'] || row.hostname || row.asset_name || row.host || row.target || '';
+            if (!mappedRow.hostname) return null;
 
-            // Extract date from filename or file's last modified timestamp
-            let fileDate = file.lastModified ? new Date(file.lastModified) : new Date();
-            const dateMatch = file.name.match(/(\d{4}[-_]\d{2}[-_]\d{2})/);
-            if (dateMatch) {
-                fileDate = new Date(dateMatch[1].replace(/_/g, '-'));
-            }
+            mappedRow.ipAddress = row['asset.display_ipv4_address'] || row.ip || row.ip_address || row.target_ip || row.asset_ip || '';
+            mappedRow.vendor = row['definition.family'] || row.vendor || row.family || row.plugin_family || row.scanner || 'Unknown';
+            mappedRow.definitionId = row['definition.id'] || row.plugin_id || row.vuln_id || row.id || '';
+            mappedRow.cve = row['definition.cve'] || row.cve || row.cve_id || '';
+            mappedRow.definitionName = row['definition.name'] || row.title || row.name || row.description || row.plugin_name || '';
 
-            // Process each row with flexible column mapping
-            const processedData = data.map((row, index) => {
-                // Map common column variations to our standard format
-                const mappedRow = {};
-                
-                // Hostname mapping - specific to your Cisco CSV format
-                mappedRow.hostname = row['asset.name'] || row.hostname || row.asset_name || row.host || row.target || '';
-                
-                // IP Address mapping - specific to your Cisco CSV format
-                mappedRow.ipAddress = row['asset.display_ipv4_address'] || row.ip || row.ip_address || row.target_ip || row.asset_ip || '';
-                
-                // Vendor mapping - specific to your Cisco CSV format
-                mappedRow.vendor = row['definition.family'] || row.vendor || row.family || row.plugin_family || row.scanner || 'Unknown';
-                
-                // Vulnerability ID mapping - specific to your Cisco CSV format
-                mappedRow.definitionId = row['definition.id'] || row.plugin_id || row.vuln_id || row.id || '';
-                
-                // CVE mapping - specific to your Cisco CSV format
-                mappedRow.cve = row['definition.cve'] || row.cve || row.cve_id || '';
-                
-                // Vulnerability name mapping - specific to your Cisco CSV format
-                mappedRow.definitionName = row['definition.name'] || row.title || row.name || row.description || row.plugin_name || '';
-                
-                // Severity mapping
-                let severity = row.severity || row['severity'] || row.risk || row.threat_level || 'Unknown';
-                severity = severity.toString().toLowerCase();
-                
-                // Normalize severity values
-                if (severity.includes('critical') || severity.includes('4')) severity = 'critical';
-                else if (severity.includes('high') || severity.includes('3')) severity = 'high';
-                else if (severity.includes('medium') || severity.includes('2') || severity.includes('med')) severity = 'medium';
-                else if (severity.includes('low') || severity.includes('1')) severity = 'low';
-                else if (severity.includes('info') || severity.includes('0')) severity = 'info';
-                
-                mappedRow.severity = severity;
-                
-                // VPR Score mapping - specific to your Cisco CSV format
-                let vprScore = row['definition.vpr.score'] || row.vpr_score || row.vpr || row.cvss_score || row.cvss || 0;
-                mappedRow.vprScore = parseFloat(vprScore) || 0;
-                
-                // State mapping
-                mappedRow.state = row.state || row.status || 'ACTIVE';
-                
-                // Date mapping
-                mappedRow.date = fileDate.toLocaleDateString();
-                
-                // Debug log for first few rows
-                if (index < 3) {
-                    console.log(`Row ${index} mapping:`, {
-                        original: row,
-                        mapped: mappedRow
-                    });
-                }
-                
-                return mappedRow;
-            }).filter(row => row.hostname && row.hostname.trim() !== ''); // Filter out rows without hostnames
+            let severity = row.severity || row['severity'] || row.risk || row.threat_level || 'Unknown';
+            severity = severity.toString().toLowerCase();
+            if (severity.includes('critical') || severity.includes('4')) severity = 'critical';
+            else if (severity.includes('high') || severity.includes('3')) severity = 'high';
+            else if (severity.includes('medium') || severity.includes('2') || severity.includes('med')) severity = 'medium';
+            else if (severity.includes('low') || severity.includes('1')) severity = 'low';
+            else if (severity.includes('info') || severity.includes('0')) severity = 'info';
+            mappedRow.severity = severity;
 
-            console.log('Processed data sample:', processedData.slice(0, 3));
-            console.log('Total processed records:', processedData.length);
-            
-            if (processedData.length === 0) {
-                alert('No valid vulnerability data found in CSV. Please check that the file has hostname data in columns like "asset.name", "hostname", or "host".');
-                return;
-            }
+            let vprScore = row['definition.vpr.score'] || row.vpr_score || row.vpr || row.cvss_score || row.cvss || 0;
+            mappedRow.vprScore = parseFloat(vprScore) || 0;
 
-            // Add to existing data
-            vulnData = [...vulnData, ...processedData];
-            
-            // Remove duplicates based on hostname + definitionId
-            vulnData = vulnData.filter((item, index, self) => 
-                index === self.findIndex(t => t.hostname === item.hostname && t.definitionId === item.definitionId)
-            );
+            mappedRow.state = row.state || row.status || 'ACTIVE';
+            mappedRow.date = fileDate.toLocaleDateString();
 
-            // Calculate statistics and update displays
-            const stats = calculateStatistics(vulnData, fileDate);
-            updateStatCards(stats);
-            updateCardViews();
-            updateLastUploadInfo(file.name, fileDate, processedData.length);
-            
-            // Save to IndexedDB
-            await saveVulnData();
-
-            // Save to history
-            await saveToHistory(file.name, fileDate, stats);
-            
-            // Show trend chart section if we have data
-            if (vulnData.length > 0) {
-                document.getElementById('uploadArea').style.display = 'none';
-                document.getElementById('trendChartSection').style.display = 'block';
-                // Update trend chart after a short delay to ensure DOM is ready
-                setTimeout(updateTrendChart, 100);
-            }
-            
-            alert(`Successfully processed ${processedData.length} vulnerability records!`);
-        }
-
-        async function processBatchVulnData(data, file) {
-            console.log(`Processing large CSV file with ${data.length} rows in batches...`);
-            
-            // SAFEGUARD 1: Maximum record limit (100K records for browser stability)
-            const MAX_RECORDS = 100000;
-            if (data.length > MAX_RECORDS) {
-                if (!confirm(`This file contains ${data.length.toLocaleString()} records. For optimal performance, we recommend processing only the first ${MAX_RECORDS.toLocaleString()} records. This will include the most recent vulnerabilities.\n\nProceed with ${MAX_RECORDS.toLocaleString()} records?`)) {
-                    return;
-                }
-                data = data.slice(0, MAX_RECORDS);
-                console.log(`Truncated to ${MAX_RECORDS.toLocaleString()} records for processing`);
-            }
-
-            // SAFEGUARD 2: Check available storage space
-            function checkStorageQuota() {
-                try {
-                    return true; // IndexedDB typically has ample space
-                } catch (e) {
-                    console.warn('Could not check storage quota:', e);
-                    return true; // Proceed anyway
-                }
-            }
-
-            if (!checkStorageQuota()) {
-                alert('Warning: This file may exceed browser storage limits. Consider using a smaller dataset or clearing existing data first.');
-            }
-            
-            // Show progress modal
-            const progressModal = document.createElement('div');
-            progressModal.innerHTML = `
-                <div class="modal fade" id="progressModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Processing Large CSV File</h5>
-                            </div>
-                            <div class="modal-body">
-                                <p>Processing ${data.length.toLocaleString()} vulnerability records...</p>
-                                <div class="progress mb-3">
-                                    <div class="progress-bar" role="progressbar" style="width: 0%" id="progressBar"></div>
-                                </div>
-                                <p class="text-muted small">This may take a few moments for large files.</p>
-                                <div id="progressStatus">Initializing...</div>
-                                <div id="memoryStatus" class="text-muted small mt-2"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(progressModal);
-            const modal = new bootstrap.Modal(document.getElementById('progressModal'));
-            modal.show();
-
-            // Extract date from filename or file's last modified timestamp
-            let fileDate = file.lastModified ? new Date(file.lastModified) : new Date();
-            const dateMatch = file.name.match(/(\d{4}[-_]\d{2}[-_]\d{2})/);
-            if (dateMatch) {
-                fileDate = new Date(dateMatch[1].replace(/_/g, '-'));
-            }
-
-            const batchSize = 1000; // Process 1000 rows at a time
-            let currentBatch = 0;
-            const totalBatches = Math.ceil(data.length / batchSize);
-            let allProcessedData = [];
-
-            async function processBatch() {
-                const startIndex = currentBatch * batchSize;
-                const endIndex = Math.min(startIndex + batchSize, data.length);
-                const batchData = data.slice(startIndex, endIndex);
-
-                // Update progress
-                const progress = Math.round((currentBatch / totalBatches) * 100);
-                document.getElementById('progressBar').style.width = progress + '%';
-                document.getElementById('progressStatus').textContent = `Processing batch ${currentBatch + 1} of ${totalBatches} (rows ${startIndex + 1}-${endIndex})`;
-
-                // SAFEGUARD 4: Memory monitoring
-                if (performance && performance.memory) {
-                    const memUsed = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
-                    const memLimit = (performance.memory.jsHeapSizeLimit / 1024 / 1024).toFixed(1);
-                    document.getElementById('memoryStatus').textContent = `Memory: ${memUsed}MB / ${memLimit}MB`;
-                    
-                    // Warning if memory usage is getting high
-                    if (performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit > 0.8) {
-                        console.warn('High memory usage detected:', memUsed + 'MB');
-                    }
-                }
-
-                // Process this batch
-                const processedBatch = batchData.map((row, index) => {
-                    const mappedRow = {};
-                    
-                    // Essential fields only - filter out verbose descriptions and unnecessary data
-                    mappedRow.hostname = row['asset.name'] || row.hostname || row.asset_name || row.host || row.target || '';
-                    mappedRow.ipAddress = row['asset.display_ipv4_address'] || row.ip || row.ip_address || row.target_ip || row.asset_ip || '';
-                    mappedRow.vendor = row['definition.family'] || row.vendor || row.family || row.plugin_family || row.scanner || 'Unknown';
-                    mappedRow.definitionId = row['definition.id'] || row.plugin_id || row.vuln_id || row.id || '';
-                    mappedRow.cve = row['definition.cve'] || row.cve || row.cve_id || '';
-                    
-                    // Keep vulnerability name short - truncate if too long
-                    let vulnName = row['definition.name'] || row.title || row.name || row.plugin_name || '';
-                    if (vulnName.length > 100) {
-                        vulnName = vulnName.substring(0, 97) + '...';
-                    }
-                    mappedRow.definitionName = vulnName;
-                    
-                    // Severity mapping
-                    let severity = row.severity || row['severity'] || row.risk || row.threat_level || 'Unknown';
-                    severity = severity.toString().toLowerCase();
-                    
-                    if (severity.includes('critical') || severity.includes('4')) severity = 'critical';
-                    else if (severity.includes('high') || severity.includes('3')) severity = 'high';
-                    else if (severity.includes('medium') || severity.includes('2') || severity.includes('med')) severity = 'medium';
-                    else if (severity.includes('low') || severity.includes('1')) severity = 'low';
-                    else if (severity.includes('info') || severity.includes('0')) severity = 'info';
-                    
-                    mappedRow.severity = severity;
-                    
-                    // VPR Score - essential for prioritization
-                    let vprScore = row['definition.vpr.score'] || row.vpr_score || row.vpr || row.cvss_score || row.cvss || 0;
-                    mappedRow.vprScore = parseFloat(vprScore) || 0;
-                    
-                    // State and date - keep minimal
-                    mappedRow.state = row.state || row.status || 'ACTIVE';
-                    mappedRow.date = fileDate.toLocaleDateString();
-                    
-                    // Create unique ID for deduplication
-                    mappedRow.vulnId = `${mappedRow.hostname}-${mappedRow.definitionId}-${Date.now()}-${startIndex + index}`;
-                    
-                    // Skip any verbose description fields, age fields, or other non-essential data
-                    // These can be fetched via API when needed for detailed views
-                    
-                    return mappedRow;
-                }).filter(row => row.hostname && row.hostname.trim() !== '');
-
-                allProcessedData = allProcessedData.concat(processedBatch);
-                currentBatch++;
-
-                if (currentBatch < totalBatches) {
-                    // Process next batch after a small delay to keep UI responsive
-                    setTimeout(processBatch, 10);
-                } else {
-                    // All batches processed
-                    await finalizeBatchProcessing();
-                }
-            }
-
-            async function finalizeBatchProcessing() {
-                document.getElementById('progressStatus').textContent = 'Finalizing data...';
-                document.getElementById('progressBar').style.width = '100%';
-
-                console.log(`Processed ${allProcessedData.length} records from ${data.length} rows`);
-
-                try {
-                    // Use Map for efficient deduplication
-                    const uniqueData = new Map();
-                    
-                    // Add existing data first
-                    vulnData.forEach(item => {
-                        const key = `${item.hostname}-${item.definitionId}`;
-                        uniqueData.set(key, item);
-                    });
-                    
-                    // Add new data, replacing older entries
-                    allProcessedData.forEach(item => {
-                        const key = `${item.hostname}-${item.definitionId}`;
-                        const existing = uniqueData.get(key);
-                        
-                        if (!existing || new Date(existing.date) < new Date(item.date)) {
-                            uniqueData.set(key, item);
-                        }
-                    });
-
-                    vulnData = Array.from(uniqueData.values());
-                    console.log(`Final dataset: ${vulnData.length} unique vulnerabilities`);
-
-                    // Calculate statistics and update displays
-                    const stats = calculateStatistics(vulnData, fileDate);
-                    updateStatCards(stats);
-                    filterAndDisplayData(); // Use filterAndDisplayData instead of updateCardViews
-                    updateLastUploadInfo(file.name, fileDate, allProcessedData.length);
-                    
-                    // SAFEGUARD 3: Save to IndexedDB
-                    document.getElementById('progressStatus').textContent = 'Saving data...';
-                    try {
-                        await saveVulnData();
-                        console.log('Data saved successfully to IndexedDB');
-                    } catch (storageError) {
-                        console.error('Storage error:', storageError);
-                        alert('Unable to save data. Please clear browser storage or use a smaller dataset.');
-                        throw storageError;
-                    }
-
-                    // Save to history (skip if storage issues)
-                    try {
-                        await saveToHistory(file.name, fileDate, stats);
-                    } catch (historyError) {
-                        console.warn('Could not save to history:', historyError);
-                    }
-                    
-                    // Show trend chart section
-                    if (vulnData.length > 0) {
-                        document.getElementById('uploadArea').style.display = 'none';
-                        document.getElementById('trendChartSection').style.display = 'block';
-                        setTimeout(updateTrendChart, 100);
-                    }
-
-                    // Close progress modal
-                    modal.hide();
-                    setTimeout(() => {
-                        try {
-                            document.body.removeChild(progressModal);
-                        } catch (e) {
-                            console.log('Modal already removed');
-                        }
-                    }, 300);
-                    
-                    alert(`Successfully processed ${allProcessedData.length} vulnerability records!\nFinal dataset: ${vulnData.length} unique vulnerabilities`);
-                    
-                } catch (error) {
-                    console.error('Error during finalization:', error);
-                    modal.hide();
-                    setTimeout(() => {
-                        try {
-                            document.body.removeChild(progressModal);
-                        } catch (e) {
-                            console.log('Modal already removed');
-                        }
-                    }, 300);
-                    
-                    // More specific error messages
-                    if (error.message.includes('quota') || error.name === 'QuotaExceededError') {
-                        alert(`Storage quota exceeded! The dataset is too large for browser storage. Try:\n1. Using a smaller CSV file\n2. Clearing existing data first\n3. Processing only Critical/High severity vulnerabilities`);
-                    } else {
-                        alert(`Processing completed but with errors: ${error.message}`);
-                    }
-                }
-            }
-
-            // Start processing
-            setTimeout(processBatch, 100);
+            return mappedRow;
         }
 
         function calculateStatistics(data, date) {
