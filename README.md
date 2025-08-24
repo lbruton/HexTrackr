@@ -69,6 +69,100 @@ http://localhost:8080/tickets.html
 
 ---
 
+## 🤖 **AI Assistant Workflow Instructions**
+
+### **CRITICAL: Always Read These Instructions First**
+When starting a new chat session or continuing development, AI assistants must follow this workflow:
+
+#### **1. Essential MCP Server Setup**
+- **✅ REQUIRED**: Verify these MCP Servers are available and functional:
+  - **Playwright Browser** - For testing and UI validation
+  - **Context7** - For enhanced context management
+  - **Memory** - For session state persistence
+  - **Sequential Thinking** - For complex problem solving
+- **⚠️ ACTION**: If any MCP server is unavailable, inform user immediately
+
+#### **2. Mandatory Git Backup Protocol**
+- **✅ BEFORE ANY CODE CHANGES**: Always create git backup
+- **Command**: `git add . && git commit -m "🔄 Pre-work backup: [brief description]"`
+- **✅ AFTER SIGNIFICANT CHANGES**: Commit with descriptive messages
+- **⚠️ NEVER**: Make multiple edits without intermediate commits
+
+#### **3. Project Context Loading**
+- **✅ READ FIRST**: `PHASE3_ROADMAP.md` - Primary active roadmap
+- **✅ CHECK STATUS**: Current phase completion and next sprint priorities
+- **✅ VERIFY**: Docker environment running on `localhost:8080`
+- **✅ REVIEW**: Any open issues or pending tasks in roadmap
+
+#### **4. Development Standards**
+- **Framework**: Tabler.io (NOT Bootstrap) for all UI components
+- **Backend**: Node.js/Express with SQLite database
+- **Primary File**: `vulnerabilities-new.html` (NOT `vulnerabilities.html`)
+- **Testing**: Always test changes in browser via `localhost:8080`
+- **Documentation**: Update roadmap progress after completing tasks
+
+#### **5. Session Continuity Checklist**
+```bash
+# Verify environment
+docker ps                           # Check containers running
+git status                          # Check for uncommitted changes
+git log --oneline -5               # Review recent commits
+
+# Load project context
+cat PHASE3_ROADMAP.md | head -50   # Review current phase
+ls -la                             # Verify project structure
+```
+
+#### **6. Emergency Recovery**
+- **If Docker Issues**: `docker-compose down && docker-compose up -d`
+- **If Git Issues**: Create backup branch before any fixes
+- **If File Corruption**: Restore from `deprecated/` folder if needed
+- **Always**: Communicate issues to user before attempting fixes
+
+### **Current Project State**
+- **Active Branch**: `main`
+- **Current Phase**: Phase 3 (Sprint 3.1 ready to start)
+- **Primary Focus**: CVE link fixes, enhanced modals, vendor filtering
+- **Critical Files**: 
+  - `vulnerabilities-new.html` - Main application
+  - `PHASE3_ROADMAP.md` - Development planning
+  - `server.js` - Backend API
+
+#### **MCP Server Usage Guidelines**
+- **Playwright Browser**: 
+  - Use for testing UI changes at `localhost:8080`
+  - Verify modal functionality and card interactions
+  - Test CVE popup links and export features
+- **Memory**: 
+  - Store project context and progress between sessions
+  - Track completed tasks and current sprint status
+  - Remember user preferences and design decisions
+- **Sequential Thinking**: 
+  - Use for complex problem solving (debugging, architecture decisions)
+  - Break down large features into manageable steps
+  - Analyze roadmap dependencies and sprint planning
+- **Context7**: 
+  - Maintain awareness of file relationships and dependencies
+  - Track changes across multiple files in single operations
+  - Understand impact of modifications on overall system
+
+#### **Git Commit Message Standards**
+```bash
+# Feature completion
+git commit -m "✅ Sprint 3.1: [Feature] - [Brief description]"
+
+# Bug fixes  
+git commit -m "🐛 Fix: [Issue] - [Solution applied]"
+
+# Roadmap updates
+git commit -m "📋 Roadmap: [Update type] - [Changes made]"
+
+# Backup commits
+git commit -m "🔄 Pre-work backup: [What you're about to work on]"
+```
+
+---
+
 *Last Updated: August 24, 2025*  
 *Current Version: 2.1.0*  
 *Active Roadmap: Phase 3 - Enhanced UX & Advanced Filtering*
