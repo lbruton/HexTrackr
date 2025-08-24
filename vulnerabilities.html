@@ -1205,8 +1205,8 @@
                 return;
             }
 
-            // Extract date from filename or use current date
-            let fileDate = new Date();
+            // Extract date from filename or file's last modified timestamp
+            let fileDate = file.lastModified ? new Date(file.lastModified) : new Date();
             const dateMatch = file.name.match(/(\d{4}[-_]\d{2}[-_]\d{2})/);
             if (dateMatch) {
                 fileDate = new Date(dateMatch[1].replace(/_/g, '-'));
@@ -1370,8 +1370,8 @@
             const modal = new bootstrap.Modal(document.getElementById('progressModal'));
             modal.show();
 
-            // Extract date from filename or use current date
-            let fileDate = new Date();
+            // Extract date from filename or file's last modified timestamp
+            let fileDate = file.lastModified ? new Date(file.lastModified) : new Date();
             const dateMatch = file.name.match(/(\d{4}[-_]\d{2}[-_]\d{2})/);
             if (dateMatch) {
                 fileDate = new Date(dateMatch[1].replace(/_/g, '-'));
