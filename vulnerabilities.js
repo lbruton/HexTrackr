@@ -143,3 +143,89 @@ async function deleteVulnerability(id) {
         showToast('Error deleting vulnerability: ' + error.message, 'danger');
     }
 }
+
+/**
+ * Refresh single vulnerability
+ * Simulates refreshing vulnerability data.
+ * @async
+ * @function refreshVulnerability
+ * @param {string} id - The ID of the vulnerability to refresh.
+ */
+async function refreshVulnerability(id) {
+    const vuln = vulnerabilities[id] || filteredVulnerabilities[id];
+    if (!vuln) {
+        showToast('Vulnerability not found', 'danger');
+        return;
+    }
+
+    showToast('Refreshing vulnerability data...', 'info');
+
+    // Simulate refresh - in production, this would re-scan the specific vulnerability
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    showToast('Vulnerability data refreshed!', 'success');
+}
+
+/**
+ * Export device-specific vulnerabilities as a CSV file.
+ * @function exportDeviceReport
+ * @param {string} hostname - The hostname of the device.
+ */
+function exportDeviceReport(hostname) {
+    const device = devices.find(d => d.hostname === hostname);
+    if (!device) return;
+
+    const csvData = device.vulnerabilities.map(vuln => ({
+        'Device': hostname,
+        'CVE': vuln.cve || 'N/A',
+        'VPR Score': vuln.vpr_score || 0,
+        'Severity': vuln.severity,
+        'Plugin Name': vuln.plugin_name,
+        'Port': vuln.port || 'N/A',
+        'First Seen': vuln.first_seen ? new Date(vuln.first_seen).toLocaleDateString() : 'N/A',
+        'Last Seen': vuln.last_seen ? new Date(vuln.last_seen).toLocaleDateString() : 'N/A'
+    }));
+
+    const csv = Papa.unparse(csvData);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `device_${hostname}_vulnerabilities_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast(`Device report exported for ${hostname}`, 'success');
+}
+
+/**
+ * Export the currently displayed vulnerability as a text file.
+ * @function exportVulnerabilityReport
+ */
+function exportVulnerabilityReport() {
+    const modal = document.getElementById('vulnerabilityModal');
+    if (!modal.classList.contains('show')) return;
+
+    const vulnTitle = modal.querySelector('.modal-title').textContent;
+    const vulnInfo = modal.querySelector('#vulnerabilityInfo').innerHTML;
+
+    const reportContent = `
+        ${vulnTitle}\n
+        Generated: ${new Date().toLocaleString()}\n
+        ${vulnInfo.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ')}\n
+    `;
+
+    const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `vulnerability_report_${new Date().toISOString().split('T')[0]}.txt`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast('Vulnerability report exported', 'success');
+}
