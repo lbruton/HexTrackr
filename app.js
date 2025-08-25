@@ -1,3 +1,22 @@
+/**
+ * HexTrackr - LEGACY TICKETS FILE
+ * 
+ * ⚠️  DEPRECATION NOTICE: This file is now LEGACY
+ * 
+ * As of 2025-08-25, tickets.html has been updated to use tickets.js instead of app.js
+ * This follows the architectural pattern: each HTML page should have its own dedicated JS file
+ * 
+ * New Architecture:
+ * - tickets.html → tickets.js (✅ Current)
+ * - vulnerabilities.html → vulnerabilities.js (if needed)
+ * 
+ * This file is kept for reference but should NOT be loaded by any HTML pages.
+ * All ticket functionality has been moved to tickets.js with proper JSDoc documentation.
+ * 
+ * @deprecated Use tickets.js instead
+ * @see tickets.js - Current implementation with proper documentation
+ */
+
 // HexTrackr - Hexagon Tickets Management System
 class HexagonTicketsManager {
     constructor() {
