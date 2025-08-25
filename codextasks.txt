@@ -1,0 +1,275 @@
+# HexTrackr CodeX Delegation Tasks
+# Created: August 25, 2025
+# Purpose: Non-destructive analysis and preparation tasks for evening work session
+# Instructions: Run these prompts in CodeX throughout the day, save outputs for review
+
+================================================================================
+TASK 1: DATABASE SCHEMA ANALYSIS & DESIGN
+================================================================================
+Priority: HIGHEST IMPACT (saves 2-3 hours tonight)
+Output: Save as `analysis_database_schema.md`
+
+PROMPT:
+"""
+Analyze this HexTrackr vulnerability management system database structure and design a time-series schema migration.
+
+CURRENT PROBLEM: CSV imports create duplicate records instead of tracking changes over time. No trend analysis possible.
+
+CURRENT SCHEMA (from server.js):
+- vulnerabilities table: hostname, ip_address, cve, severity, vpr_score, plugin_name, description, solution, port, protocol, first_seen, last_seen, state, notes, import_id, created_at
+- vulnerability_imports table: filename, vendor, import_date, rowsProcessed
+
+REQUIREMENTS:
+1. Transform into time-series model where same CVE on same hostname tracks VPR changes over time
+2. Unique key should be: hostname + cve + scan_date (no duplicates)
+3. Enable trend tracking: "CVE-2023-1234 on server01 had VPR 8.5 on Aug 20, now 9.2 on Aug 25"
+4. Support queries like "latest vulnerabilities" and "VPR changes over time"
+
+DELIVERABLES NEEDED:
+1. New schema design with proper tables and relationships
+2. Migration SQL scripts (CREATE, INSERT, indexes)
+3. Sample queries for common operations
+4. Rollback procedures
+5. Data integrity constraints
+
+Create a comprehensive database migration plan with all SQL scripts ready to run.
+"""
+
+================================================================================
+TASK 2: LAYOUT & RESPONSIVENESS CSS FIXES
+================================================================================
+Priority: QUICK WIN (saves 1-2 hours tonight)
+Output: Save as `fixes_responsive_layout.css` and `fixes_responsive_layout.html`
+
+PROMPT:
+"""
+Fix responsive layout issues in HexTrackr vulnerabilities dashboard using Tabler.io framework.
+
+CURRENT PROBLEMS:
+1. Body stretches full browser width instead of being centered with proper padding
+2. AG Grid table doesn't auto-adjust when browser resizes (lots of dead space)
+3. Page size selector (50, 100 entries) only enables scroll instead of resizing table
+4. Not mobile-responsive
+
+CURRENT STRUCTURE (vulnerabilities.html uses):
+- Tabler.io CSS Framework
+- AG Grid Community Edition
+- Bootstrap 5 components
+- Custom CSS in <style> section
+
+REQUIREMENTS:
+1. Center content with proper container max-width and padding
+2. Make AG Grid responsive with proper column auto-sizing
+3. Fix pagination behavior to actually resize table
+4. Add mobile breakpoints for smaller screens
+5. Maintain professional Tabler.io appearance
+
+DELIVERABLES NEEDED:
+1. CSS fixes for container centering and responsive design
+2. AG Grid JavaScript configuration for responsive behavior
+3. HTML structure improvements if needed
+4. Mobile-first responsive breakpoints
+5. Comments explaining each fix
+
+Create complete CSS and JavaScript fixes that can be applied directly to vulnerabilities.html.
+"""
+
+================================================================================
+TASK 3: JAVASCRIPT MIGRATION ANALYSIS
+================================================================================
+Priority: PREPARATION (saves 1 hour planning tonight)
+Output: Save as `analysis_javascript_migration.md`
+
+PROMPT:
+"""
+Analyze the embedded JavaScript in HexTrackr vulnerabilities.html and create a migration plan.
+
+CONTEXT:
+- ~1860 lines of JavaScript embedded in HTML <script> section (lines 1098-2958)
+- Contains ModernVulnManager class and all vulnerability management functions
+- Need incremental migration to separate vulnerabilities.js file
+- Migration strategy: move code only when actively working on features
+
+ANALYSIS NEEDED:
+1. Function inventory: List all functions, classes, and their dependencies
+2. Migration priority: Which functions should be moved first (high-change vs stable)
+3. Dependency mapping: Which functions call which other functions
+4. Event listener inventory: All DOM event handlers and their targets
+5. Global variable usage: Variables that need to remain accessible
+6. API endpoint usage: Functions that make server calls
+
+DELIVERABLES NEEDED:
+1. Complete function inventory with descriptions
+2. Dependency diagram (text format)
+3. Migration roadmap with phases (high priority first)
+4. Risk assessment for each function group
+5. Testing checklist for each migration phase
+6. JSDoc template examples for migrated functions
+
+Create a comprehensive migration blueprint that makes the JavaScript extraction systematic and safe.
+"""
+
+================================================================================
+TASK 4: DATABASE SAMPLE DATA ANALYSIS
+================================================================================
+Priority: MEDIUM (saves 30 min analysis)
+Output: Save as `analysis_sample_data.md`
+
+PROMPT:
+"""
+Analyze the existing HexTrackr vulnerability data patterns to inform time-series migration.
+
+CONTEXT: Need to understand current data structure before migrating to time-series model.
+
+ANALYSIS NEEDED:
+1. Data volume: How many total vulnerabilities, unique hostnames, unique CVEs
+2. Duplicate patterns: How many records are actual duplicates vs. legitimate updates
+3. Date patterns: How are dates currently stored and what's the scan frequency
+4. VPR score patterns: Do scores actually change over time for same CVE+hostname
+5. Missing data: What fields are commonly null or empty
+6. Vendor distribution: Which vendors/sources dominate the dataset
+
+SAMPLE QUERIES TO GENERATE:
+1. COUNT(*) total vulnerabilities
+2. COUNT(DISTINCT hostname) unique assets
+3. COUNT(DISTINCT cve) unique vulnerabilities
+4. Duplicates: SELECT hostname, cve, COUNT(*) FROM vulnerabilities GROUP BY hostname, cve HAVING COUNT(*) > 1
+5. VPR changes: Examples where same CVE+hostname has different VPR scores
+6. Date range analysis: earliest vs latest scan dates
+
+DELIVERABLES NEEDED:
+1. Current data statistics summary
+2. Duplicate analysis with examples
+3. VPR change examples that prove time-series value
+4. Recommendations for migration approach
+5. Data quality issues identified
+6. Sample data transformations
+
+Create a data analysis report that validates the time-series migration approach.
+"""
+
+================================================================================
+TASK 5: AG GRID RESPONSIVE CONFIGURATION
+================================================================================
+Priority: QUICK WIN (saves 45 min research)
+Output: Save as `config_aggrid_responsive.js`
+
+PROMPT:
+"""
+Create optimal AG Grid configuration for HexTrackr vulnerabilities table with proper responsive behavior.
+
+CURRENT PROBLEMS:
+1. Table doesn't resize when browser window changes
+2. Pagination size selector doesn't actually resize table
+3. Columns have excessive dead space
+4. Not mobile-friendly
+
+REQUIREMENTS:
+1. Auto-size columns to fit viewport
+2. Responsive column behavior (hide/show columns on smaller screens)
+3. Proper pagination that actually changes table size
+4. Mobile-friendly horizontal scroll or column stacking
+5. Maintain current column definitions and functionality
+
+CURRENT COLUMNS:
+- Date, Hostname, IP Address, Severity, CVE Info, Vendor, Description, VPR Score, State, Actions
+
+DELIVERABLES NEEDED:
+1. Complete gridOptions configuration object
+2. Responsive column definitions with mobile behavior
+3. Proper pagination configuration
+4. Window resize event handlers
+5. Mobile breakpoint handling
+6. Comments explaining each configuration option
+
+Create a complete AG Grid setup that solves all responsive issues and can be dropped into the current code.
+"""
+
+================================================================================
+TASK 6: ERROR HANDLING & VALIDATION UTILITIES
+================================================================================
+Priority: LOW (saves 30 min coding)
+Output: Save as `utilities_validation.js`
+
+PROMPT:
+"""
+Create utility functions for HexTrackr data validation and error handling.
+
+CONTEXT: Need robust validation for CSV imports and database operations in time-series migration.
+
+UTILITIES NEEDED:
+1. CVE format validation (CVE-YYYY-NNNNN pattern)
+2. IP address validation (IPv4/IPv6)
+3. VPR score validation (0-10 range, decimal precision)
+4. Date format validation and normalization
+5. Hostname validation (DNS-safe characters)
+6. Severity level validation (Critical, High, Medium, Low)
+
+ERROR HANDLING:
+1. Graceful error reporting for CSV imports
+2. Database constraint violation handling
+3. API error response formatting
+4. User-friendly error messages
+5. Logging utilities for debugging
+
+DELIVERABLES NEEDED:
+1. Validation function library with JSDoc
+2. Error handling wrapper functions
+3. User-friendly error message templates
+4. CSV import validation pipeline
+5. Database operation error handlers
+6. Unit test examples for each function
+
+Create a comprehensive validation and error handling library ready for integration.
+"""
+
+================================================================================
+TASK 7: DOCUMENTATION IMPROVEMENTS
+================================================================================
+Priority: LOW (saves 20 min writing)
+Output: Save as `documentation_improvements.md`
+
+PROMPT:
+"""
+Improve HexTrackr documentation for better developer onboarding and maintenance.
+
+CURRENT DOCUMENTATION:
+- README.md (basic setup)
+- copilot-instructions.md (AI workflow)
+- Roadmap files (project planning)
+
+IMPROVEMENTS NEEDED:
+1. API endpoint documentation with examples
+2. Database schema documentation
+3. JavaScript architecture explanation
+4. Docker deployment troubleshooting
+5. Development workflow guide
+6. Common issues and solutions
+
+DELIVERABLES NEEDED:
+1. API documentation with curl examples
+2. Database schema diagram (text/markdown format)
+3. Architecture overview with component relationships
+4. Troubleshooting guide for common issues
+5. Development setup checklist
+6. Code style guide for new contributors
+
+Create comprehensive documentation that makes the project easy to understand and contribute to.
+"""
+
+================================================================================
+USAGE INSTRUCTIONS:
+================================================================================
+
+1. Run each prompt in CodeX as separate sessions throughout the day
+2. Save each output with the suggested filename
+3. Don't apply any changes directly to the codebase - just generate analysis/code
+4. When returning tonight, review all outputs before applying any changes
+5. Prioritize TASK 1 (Database) and TASK 2 (Layout) for immediate use
+6. Use other tasks as reference material for future work
+
+================================================================================
+EXPECTED TIME SAVINGS: 4-6 hours of preparation work
+RISK LEVEL: ZERO (no direct code changes, only analysis and preparation)
+REVIEW REQUIRED: Yes, all outputs need human review before implementation
+================================================================================
