@@ -10,8 +10,8 @@ docker-compose up -d
 ```
 
 ## 📁 Key Files
-- `vulnerabilities.html` - Vulnerability dashboard
-- `tickets.html` - Ticket management  
+- `vulnerabilities.html` - Modern vulnerability dashboard (Tabler.io UI)
+- `tickets.html` - Ticket management (Bootstrap 5)
 - `server.js` - Node.js/Express API backend
 - `data/hextrackr.db` - SQLite database
 
@@ -22,7 +22,7 @@ docker-compose up -d
 ## � Development
 **Primary Planning**: See `PHASE3_ROADMAP.md` for detailed sprint planning and implementation roadmap.
 
-**Architecture**: Node.js/Express backend with SQLite database, Bootstrap 5 frontend, Docker deployment ready.
+**Architecture**: Node.js/Express backend with SQLite database, Tabler.io (vulnerabilities) + Bootstrap 5 (tickets) frontend, Docker deployment ready.
 
 ---
 *For detailed AI assistant workflows and development patterns, see `.github/copilot-instructions.md`*

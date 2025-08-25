@@ -520,6 +520,6 @@ app.listen(PORT, () => {
   console.log('📊 Database-powered vulnerability management enabled');
   console.log('Available endpoints:');
   console.log(`  - Tickets: http://localhost:${PORT}/tickets.html`);
-  console.log(`  - Vulnerabilities: http://localhost:${PORT}/vulnerabilities-new.html`);
+  console.log(`  - Vulnerabilities: http://localhost:${PORT}/vulnerabilities.html`);
   console.log(`  - API: http://localhost:${PORT}/api/vulnerabilities`);
 });
