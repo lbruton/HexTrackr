@@ -415,6 +415,52 @@
         footer p {
             margin: 0;
         }
+    
+        /* Enhanced Markdown Styling */
+        .roadmap-section h1, .roadmap-section h2, .roadmap-section h3 {
+            color: var(--pico-primary-500);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .roadmap-section h1:first-child, .roadmap-section h2:first-child, .roadmap-section h3:first-child {
+            margin-top: 0;
+        }
+        
+        .roadmap-section hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--pico-border-color), transparent);
+            margin: 2rem 0;
+        }
+        
+        /* Task Lists */
+        .task-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 1rem 0;
+        }
+        
+        .task-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--pico-border-color);
+            opacity: 0.9;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+            color: var(--pico-muted-color);
+        }
+        
+        /* Update footer */
+        footer p {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -424,6 +470,7 @@
             <p>Cybersecurity Management System • Time-series vulnerability tracking and security ticket management</p>
         </header>
 
+        
         
         
         
@@ -568,12 +615,23 @@
 
 <h3>Advanced Analytics & Intelligence 📋</h3>
 
-<p>#### Threat Intelligence</p>
+<p>#### Threat Intelligence & Priority Enhancement</p>
 <ul class="task-list">
+<li class="task-item">☐ <strong>CISA KEV Integration</strong> 🚨 <strong>HIGH PRIORITY</strong></li>
+<li class="task-item">☐ Non-API CSV download implementation (user-friendly, no API key required)</li>
+<li class="task-item">☐ API-based real-time sync (for users with access)</li>
+<li class="task-item">☐ Automatic KEV flagging in vulnerability tables</li>
+<li class="task-item">☐ KEV priority boost in VPR calculations (auto-assign 10.0 VPR)</li>
+<li class="task-item">☐ Visual KEV indicators in dashboard cards and tables</li>
+<li class="task-item">☐ Historical KEV trend tracking in time-series data</li>
+<li class="task-item">☐ <strong>EPSS Scoring Integration</strong></li>
+<li class="task-item">☐ Daily EPSS CSV download and processing</li>
+<li class="task-item">☐ VPR calculation enhancement with exploit prediction</li>
+<li class="task-item">☐ Non-API implementation for maximum accessibility</li>
 <li class="task-item">☐ <strong>MITRE ATT&CK framework mapping</strong></li>
 <li class="task-item">☐ <strong>CVE enrichment from NVD</strong></li>
 <li class="task-item">☐ <strong>Exploit prediction modeling</strong></li>
-<li class="task-item">☐ <strong>Risk scoring algorithms</strong></li>
+<li class="task-item">☐ <strong>Enhanced risk scoring algorithms</strong> (CVSS + EPSS + KEV + time-series trends)</li>
 </ul>
 
 <p>#### Reporting & Visualization</p>
@@ -607,14 +665,21 @@
 <h2>🚀 IMMEDIATE PRIORITIES (Next Sprint)</h2>
 
 <h3>High Priority</h3>
-<p>1. <strong>Large CSV Import Optimization</strong> </p>
+<p>1. <strong>KEV Integration Implementation</strong> 🚨 <strong>NEW ADDITION</strong></p>
+<ul>
+<li>Target: One-click KEV flagging for existing vulnerabilities</li>
+<li>Non-API CSV download + API option for premium users</li>
+<li>Visual indicators and automatic VPR boosting</li>
+</ul>
+
+<p>2. <strong>Large CSV Import Optimization</strong> </p>
 <ul>
 <li>Target: 50-100MB file handling</li>
 <li>Web Workers + streaming parser</li>
 <li>Column filtering for data reduction</li>
 </ul>
 
-<p>2. <strong>Cisco API Completion</strong></p>
+<p>3. <strong>Cisco API Completion</strong></p>
 <ul>
 <li>Finish Security Advisories sync</li>
 <li>Enhanced error handling</li>
@@ -661,6 +726,123 @@
 <li class="task-item">☐ <strong>Memory leak detection</strong></li>
 <li class="task-item">☐ <strong>Bundle size optimization</strong></li>
 <li class="task-item">☐ <strong>Lighthouse score</strong> improvements</li>
+</ul>
+
+<hr>
+
+<h2>🎯 <strong>CRITICAL PRIORITY: Trend Tracking Implementation</strong></h2>
+<p><strong>Problem</strong>: CSV imports create duplicates instead of tracking changes over time  </p>
+<p><strong>Solution</strong>: Transform into time-series vulnerability management system</p>
+
+<h3>📋 <strong>PHASE 1: Database Schema Migration</strong> </h3>
+<p><em>Risk: HIGH | Impact: CRITICAL | Duration: 2-3 tasks</em></p>
+
+<p>#### 1.1 Analyze Current Data Structure</p>
+<ul class="task-list">
+<li class="task-item">☐ Audit existing vulnerability data patterns</li>
+<li class="task-item">☐ Identify unique vulnerability identifiers (CVE+hostname+date)</li>
+<li class="task-item">☐ Map current columns to time-series requirements</li>
+</ul>
+
+<p>#### 1.2 Design Time-Series Schema</p>
+<ul class="task-list">
+<li class="task-item">☐ Create <code>vulnerability_master</code> table (static CVE data)</li>
+<li class="task-item">☐ Create <code>vulnerability_history</code> table (time-series: device+date+VPR)</li>
+<li class="task-item">☐ Add unique constraints: <code>(hostname, cve, scan_date)</code></li>
+<li class="task-item">☐ Design indexes for latest-value queries</li>
+</ul>
+
+<p>#### 1.3 Create Migration Scripts</p>
+<ul class="task-list">
+<li class="task-item">☐ Backup existing data</li>
+<li class="task-item">☐ Write migration script to reshape current data</li>
+<li class="task-item">☐ Test migration on sample data</li>
+<li class="task-item">☐ Create rollback procedures</li>
+</ul>
+
+<h3>📋 <strong>PHASE 2: Smart CSV Import System</strong></h3>
+<p><em>Risk: MEDIUM | Impact: HIGH | Duration: 2-3 tasks</em></p>
+
+<p>#### 2.1 Redesign Import Logic</p>
+<ul class="task-list">
+<li class="task-item">☐ Use date field as "last_updated" timestamp</li>
+<li class="task-item">☐ Implement UPSERT logic (UPDATE if exists, INSERT if new)</li>
+<li class="task-item">☐ Key on: <code>hostname + cve + scan_date</code></li>
+<li class="task-item">☐ Track VPR changes over time</li>
+</ul>
+
+<p>#### 2.2 Data Validation & Integrity</p>
+<ul class="task-list">
+<li class="task-item">☐ Validate date formats during import</li>
+<li class="task-item">☐ Ensure VPR score changes are logged</li>
+<li class="task-item">☐ Add data quality checks</li>
+<li class="task-item">☐ Handle malformed/duplicate entries gracefully</li>
+</ul>
+
+<p>#### 2.3 Import Analytics</p>
+<ul class="task-list">
+<li class="task-item">☐ Track what changed during each import</li>
+<li class="task-item">☐ Report new/updated/unchanged vulnerabilities</li>
+<li class="task-item">☐ Log VPR trend changes per import</li>
+</ul>
+
+<h3>📋 <strong>PHASE 3: Latest Values Display</strong></h3>
+<p><em>Risk: LOW | Impact: MEDIUM | Duration: 2 tasks</em></p>
+
+<p>#### 3.1 Update API Endpoints</p>
+<ul class="task-list">
+<li class="task-item">☐ Modify <code>/api/vulnerabilities</code> to return latest values only</li>
+<li class="task-item">☐ Create efficient queries for most recent data per device+CVE</li>
+<li class="task-item">☐ Ensure cards/tables show current state</li>
+</ul>
+
+<p>#### 3.2 Frontend Display Updates</p>
+<ul class="task-list">
+<li class="task-item">☐ Update vulnerability cards to show latest VPR</li>
+<li class="task-item">☐ Ensure tables reflect most recent scan data</li>
+<li class="task-item">☐ Add "last updated" timestamps to UI</li>
+</ul>
+
+<h3>📋 <strong>PHASE 4: Trend Visualization</strong></h3>
+<p><em>Risk: LOW | Impact: HIGH | Duration: 3-4 tasks</em></p>
+
+<p>#### 4.1 Historical Data API</p>
+<ul class="task-list">
+<li class="task-item">☐ Create <code>/api/vulnerabilities/trends</code> endpoint</li>
+<li class="task-item">☐ Return VPR changes over time per vulnerability</li>
+<li class="task-item">☐ Support date range filtering</li>
+</ul>
+
+<p>#### 4.2 Chart Implementation</p>
+<ul class="task-list">
+<li class="task-item">☐ Design Chart.js trend visualizations</li>
+<li class="task-item">☐ Show VPR score changes over time</li>
+<li class="task-item">☐ Display severity level migrations</li>
+<li class="task-item">☐ Add device-level trend analysis</li>
+</ul>
+
+<p>#### 4.3 Dashboard Integration</p>
+<ul class="task-list">
+<li class="task-item">☐ Add trend charts to vulnerability dashboard</li>
+<li class="task-item">☐ Create "trending up/down" indicators</li>
+<li class="task-item">☐ Show improvement/degradation analytics</li>
+</ul>
+
+<h3>📋 <strong>PHASE 5: API Integration Framework</strong></h3>
+<p><em>Risk: MEDIUM | Impact: HIGH | Duration: 2-3 tasks</em></p>
+
+<p>#### 5.1 API Supplement System</p>
+<ul class="task-list">
+<li class="task-item">☐ Design hooks for real-time API data</li>
+<li class="task-item">☐ Create 30-day history pull mechanism</li>
+<li class="task-item">☐ Merge API data with CSV historical data</li>
+</ul>
+
+<p>#### 5.2 Data Source Management</p>
+<ul class="task-list">
+<li class="task-item">☐ Support multiple data sources (CSV + API)</li>
+<li class="task-item">☐ Prioritize API data over CSV when available</li>
+<li class="task-item">☐ Maintain data source lineage</li>
 </ul>
 
 <hr>
@@ -1418,6 +1600,40 @@
                     document.getElementById(targetId).classList.add('active');
                 });
             });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all tabs and content
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // Smooth scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+            
+            // Progress tracking
+            const totalTasks = document.querySelectorAll('.task-item').length;
+            const completedTasks = document.querySelectorAll('.task-item.completed').length;
+            
+            if (totalTasks > 0) {
+                const progressPercent = Math.round((completedTasks / totalTasks) * 100);
+                console.log(`📊 Overall Progress: ${completedTasks}/${totalTasks} tasks (${progressPercent}%)`);
+            }
         });
     </script>
 
