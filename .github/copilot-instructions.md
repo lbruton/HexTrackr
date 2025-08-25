@@ -37,15 +37,20 @@ HexTrackr is a dual-purpose cybersecurity management system:
 2. **Update instructions FIRST**: Before any development work, update both:
    - `.github/copilot-instructions.md` (AI workflow & technical details)
    - `README.md` (Human overview & quick start)
-3. **🐳 DOCKER-ONLY DEPLOYMENT**: 
+3. **ROADMAP DISCIPLINE**: Work ONLY from the 3-file structure in `/roadmaps/` folder:
+   - Strategic changes → Update `roadmaps/ROADMAP.md`
+   - Technical tasks → Update `roadmaps/UI_UX_ROADMAP.md`  
+   - Sprint status → Update `roadmaps/CURRENT_STATUS.md`
+   - **NEVER create roadmap files in repository root**
+4. **🐳 DOCKER-ONLY DEPLOYMENT**: 
    - **NEVER run `node server.js` or `npm start` directly**
    - **NEVER install local Node.js servers**
    - **ONLY use Docker Compose**: `docker-compose up -d` for deployment
    - **Access via**: `localhost:8080` (Docker port mapping)
    - **Container management**: Use `docker ps`, `docker-compose logs`, etc.
-4. **Database operations**: Use API endpoints, not direct DB access
-5. **No cross-contamination**: Tickets and vulnerabilities are separate systems
-6. **JavaScript Organization**: **Each HTML page MUST use its own dedicated JS file**
+5. **Database operations**: Use API endpoints, not direct DB access
+6. **No cross-contamination**: Tickets and vulnerabilities are separate systems
+7. **JavaScript Organization**: **Each HTML page MUST use its own dedicated JS file**
    - `tickets.html` → `tickets.js` (✅ CORRECTLY ORGANIZED)
    - `vulnerabilities.html` → `vulnerabilities.js` (if separate JS needed)
    - **NEVER load `app.js` in HTML pages** - Use dedicated files only
@@ -94,3 +99,21 @@ HexTrackr is a dual-purpose cybersecurity management system:
 - **Sprint Status**: `roadmaps/CURRENT_STATUS.md` - Current progress and handoff information
 - **When to update**: EVERY conversation that changes architecture, adds features, or modifies workflows
 - **Prevent framework confusion**: Always check current instructions before starting development work
+
+## Roadmap Structure Enforcement
+**MANDATORY**: Use ONLY the 3-file roadmap structure in `/roadmaps/` folder:
+1. **`roadmaps/ROADMAP.md`** - Strategic project roadmap and long-term planning
+2. **`roadmaps/UI_UX_ROADMAP.md`** - Technical implementation details and tactical tasks
+3. **`roadmaps/CURRENT_STATUS.md`** - Sprint handoff and current progress tracking
+
+**FORBIDDEN**: 
+- ❌ **NEVER create roadmap files in repository root** (e.g., `CURRENT_ROADMAP.md`)
+- ❌ **NEVER create temporary roadmap documents** outside the `/roadmaps/` folder
+- ❌ **NEVER duplicate roadmap content** in multiple files
+- ❌ **Always work from the existing 3-file structure** - if content needs updating, modify the appropriate existing file
+
+**Process**: When roadmap changes are needed:
+1. **Identify correct file**: Strategic (`ROADMAP.md`) vs Tactical (`UI_UX_ROADMAP.md`) vs Status (`CURRENT_STATUS.md`)
+2. **Update in place**: Modify the existing file directly
+3. **No temporary files**: Never create working documents that might get left behind
+4. **Commit immediately**: Update and commit roadmap changes to prevent confusion
