@@ -399,18 +399,24 @@ function generatePortal() {
                 </div>
             </div>
             
-            <ul class="nav nav-tabs" id="roadmapTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="strategic-tab" data-bs-toggle="tab" data-bs-target="#strategic" type="button" role="tab">
-                        🎯 Strategic Roadmap
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tactical-tab" data-bs-toggle="tab" data-bs-target="#tactical" type="button" role="tab">
-                        🚀 Tactical Implementation
-                    </button>
-                </li>
-            </ul>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <ul class="nav nav-tabs" id="roadmapTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="strategic-tab" data-bs-toggle="tab" data-bs-target="#strategic" type="button" role="tab">
+                            🎯 Strategic Roadmap
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tactical-tab" data-bs-toggle="tab" data-bs-target="#tactical" type="button" role="tab">
+                            🚀 Tactical Implementation
+                        </button>
+                    </li>
+                </ul>
+                
+                <a href="CURRENT_STATUS.md" class="btn btn-outline-primary btn-sm" target="_blank" title="View current session status">
+                    📋 Session Status
+                </a>
+            </div>
             
             <div class="tab-content" id="roadmapTabsContent">
                 <div class="tab-pane fade show active" id="strategic" role="tabpanel">

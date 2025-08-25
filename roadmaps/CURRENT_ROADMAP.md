@@ -102,6 +102,126 @@
 
 ---
 
+## 🎨 **PHASE 6: Enhanced User Interactions**
+*Risk: LOW | Impact: MEDIUM | Duration: 2-3 tasks*
+
+### 6.1 Vulnerability Action Buttons Implementation
+- [ ] **Edit Button (Pencil Icon)**: 
+  - Create modal for editing vulnerability information
+  - Allow updates to VPR scores, descriptions, status
+  - Implement save/cancel functionality
+  - Update database via API endpoints
+- [ ] **Refresh Button (Refresh Icon)**:
+  - Implement API data refresh for individual vulnerabilities
+  - Gray out button when no API is configured
+  - Show loading state during refresh
+  - Update UI with fresh data from external sources
+- [ ] **Button State Management**:
+  - Show appropriate tooltips ("Edit vulnerability", "Refresh from API", "API not configured")
+  - Handle error states gracefully
+  - Provide user feedback for successful actions
+
+### 6.2 Modal System Enhancements
+- [ ] Create reusable vulnerability edit modal component
+- [ ] Implement form validation for vulnerability updates
+- [ ] Add confirmation dialogs for destructive actions
+- [ ] Support bulk edit operations
+
+### 6.3 Enhanced Table Interactions & Smart Filtering
+- [ ] **Clickable Description Filtering**:
+  - Make "Vulnerability Description" column clickable
+  - Filter table to show all devices with same vulnerability when clicked
+  - Highlight active filter in UI
+  - Add clear filter option
+- [ ] **Clickable CVE Filtering**:
+  - Make "CVE Info" column clickable  
+  - Filter table to show all instances of same CVE when clicked
+  - Show filtered state clearly in UI
+- [ ] **Clickable Hostname Filtering**:
+  - Make hostname entries clickable
+  - Filter table to show all vulnerabilities for that device when clicked
+  - Provide device-specific view without modal popup
+- [ ] **Smart Info Icons**:
+  - Add info icon next to CVE entries → opens CVE database website (mitre.org, nvd.nist.gov)
+  - Add info icon next to vulnerability descriptions → opens detailed vulnerability modal
+  - Add info icon next to hostnames → opens device details modal
+  - Use appropriate icons (external link, info, device icons)
+- [ ] **Enhanced Filter UI**:
+  - Show active filters as removable chips/badges
+  - Add "Clear All Filters" button
+  - Display filter count (e.g., "Showing 15 of 500 vulnerabilities")
+  - Maintain filter state during pagination
+
+### 6.4 Device Security Modal Improvements
+- [ ] **Remove "First Seen" Column**: 
+  - Clean up modal table layout
+  - Remove redundant "First Seen" column from device modals
+  - Optimize table width and readability
+- [ ] **Clickable Plugin Names**:
+  - Make "Plugin Name" column clickable links
+  - Open individual vulnerability detail modal when clicked
+  - Add hover effects to indicate clickability
+  - Show vulnerability-specific information (description, remediation, etc.)
+### 6.4 Device Security Modal Improvements
+- [ ] **Remove "First Seen" Column**: 
+  - Clean up modal table layout
+  - Remove redundant "First Seen" column from device modals
+  - Optimize table width and readability
+- [ ] **Clickable Plugin Names**:
+  - Make "Plugin Name" column clickable links
+  - Open individual vulnerability detail modal when clicked
+  - Add hover effects to indicate clickability
+  - Show vulnerability-specific information (description, remediation, etc.)
+- [ ] **PDF Report Generation**:
+  - Replace HTML file generation with PDF creation
+  - Implement proper PDF formatting and styling
+  - Include charts and tables in PDF format
+  - Add professional PDF headers/footers with timestamps
+  - Maintain current "Generate Report" button but output PDF instead of HTML
+
+### 6.5 API Integration Status
+- [ ] Add API configuration status indicator to UI
+- [ ] Show API connectivity status in header/footer
+- [ ] Implement API health checks
+- [ ] Graceful degradation when API is unavailable
+
+---
+
+## 🐛 **MAINTENANCE & BUG FIXES**
+*Priority: LOW | Impact: LOW | Duration: 1 task*
+
+### Bug: HTML Report Title Artifacts
+- [ ] **Issue**: Modal-generated HTML reports show character encoding artifacts in titles
+- [ ] **Symptoms**: Strange characters appearing in report headers (e.g., "øÝ┤µ Device Security Report")
+- [ ] **Root Cause**: HTML entity encoding issues in report generation
+- [ ] **Fix Required**: Clean up title rendering in modal report generation
+- [ ] **Files to Check**: Modal report generation functions, HTML template processing
+
+### Bug: Modal Z-Index Layering Issue
+- [ ] **Issue**: Nested modals appear behind parent modals instead of on top
+- [ ] **Symptoms**: Clicking hostnames in "Affected Assets" table opens device modals behind vulnerability detail modal
+- [ ] **Root Cause**: Z-index stacking context problems with nested modal system
+- [ ] **Fix Required**: 
+  - Implement proper modal stacking system
+  - Increase z-index for nested modals dynamically
+  - Add modal backdrop management for multiple layers
+  - Ensure latest modal always appears on top
+- [ ] **Files to Check**: Modal JavaScript, CSS z-index values, Bootstrap modal configurations
+
+### Bug: CVE Link Behavior - Multiple Popups
+- [ ] **Issue**: Clicking any single CVE link opens ALL CVEs instead of just the clicked one
+- [ ] **Symptoms**: User clicks one CVE (e.g., CVE-2024-1234) but browser opens popups for multiple/all CVEs
+- [ ] **Root Cause**: `lookupCVE()` function incorrectly processing single CVE as multiple CVE string
+- [ ] **Expected Behavior**: Clicking a CVE link should open only that specific CVE's lookup popup
+- [ ] **Fix Required**: 
+  - Debug `lookupCVE()` function in lines 2266-2281 of vulnerabilities.html
+  - Check if CVE grouping or string processing is incorrectly splitting single CVE IDs
+  - Ensure `openCVEPopups()` receives only the intended CVE ID
+  - Test CVE links in table view, card view, and modal detail views
+- [ ] **Files to Check**: `vulnerabilities.html` CVE link onclick handlers, `lookupCVE()` function, `openCVEPopups()` function
+
+---
+
 ## 🎯 **IMMEDIATE NEXT STEPS**
 1. **Start with Phase 1.1**: Analyze current data structure
 2. **Keep it simple**: One task at a time
