@@ -36,22 +36,6 @@ HexTrackr is a dual-purpose cybersecurity management system:
 - **Playwright Browser** - Use for testing UI changes at `localhost:8080`
 - **Any other available MCP tools** - Leverage all available capabilities
 
-## CRITICAL: Mandatory MCP Memory Usage
-**ENFORCE THESE RULES AT ALL TIMES:**
-1. **AFTER EVERY TASK COMPLETION** - You MUST write session progress to MCP Memory
-2. **BEFORE ANY DESTRUCTIVE CHANGES** - You MUST verify MCP Memory is accessible
-3. **IF MCP MEMORY FAILS** - You MUST halt immediately and warn the user
-4. **NO DESTRUCTIVE CHANGES WITHOUT MEMORY** - File edits, deletions, moves require working MCP Memory
-5. **SESSION PERSISTENCE** - All task outcomes, decisions, and context MUST be stored in memory
-6. **FAILURE PROTOCOL** - If memory tools are unavailable, inform user and request they restore MCP servers before proceeding
-
-**Memory Storage Requirements:**
-- Task completion status and outcomes
-- File changes and their purposes  
-- Decision rationale and context
-- Error states and recovery actions
-- Project state and next steps
-
 ## Key Patterns
 - **Ticket IDs**: `Date.now().toString()`
 - **Required fields**: Only `location` is mandatory for tickets
@@ -78,6 +62,9 @@ HexTrackr is a dual-purpose cybersecurity management system:
 ## Documentation Maintenance
 **CRITICAL**: Keep these files synchronized across conversations:
 - **AI Instructions**: `.github/copilot-instructions.md` - Technical architecture, MCP requirements, development patterns
-- **Human README**: `README.md` - Project overview, quick start, user-facing information
+- **Human README**: `README.md` - Project overview, quick start, user-facing information  
+- **Strategic Roadmap**: `roadmaps/ROADMAP.md` - Long-term project vision and feature planning
+- **Tactical Roadmap**: `roadmaps/UI_UX_ROADMAP.md` - Current technical implementation tasks and sprints
+- **Sprint Status**: `roadmaps/CURRENT_STATUS.md` - Current progress and handoff information
 - **When to update**: EVERY conversation that changes architecture, adds features, or modifies workflows
 - **Prevent framework confusion**: Always check current instructions before starting development work

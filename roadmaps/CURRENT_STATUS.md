@@ -1,121 +1,138 @@
-# HexTrackr Development Session Status
-*Session Date: August 24, 2025*
+# HexTrackr Current Sprint Status
+*Last Updated: August 25, 2025*
 
-## 🎯 **Session Summary**
-Major progress made on documentation standards, UI improvements, and project organization. Successfully implemented dark mode for roadmap portal and established mandatory MCP Memory protocols.
-
----
-
-## ✅ **Major Accomplishments**
-
-### 🔒 **Critical Infrastructure: MCP Memory Protocols**
-- **Added mandatory MCP Memory usage rules** to copilot-instructions.md
-- **Enforced session persistence** - all tasks must be tracked in memory
-- **Established failure protocols** - halt operations if memory is unavailable
-- **Prevents context loss** between development sessions
-
-### 🌙 **Dark Mode Implementation**
-- **Updated roadmap portal template** with CSS variables for theming
-- **Added dark mode toggle button** with 🌙/☀️ icons
-- **Implemented localStorage persistence** - theme choice saves across sessions
-- **Fixed nav button contrast issues** with proper CSS specificity
-- **Lesson learned**: Always update script templates BEFORE regenerating
-
-### 🐛 **Bug Tracking & Documentation**
-- **Added CVE link bug to roadmap** - clicking single CVE opens multiple popups
-- **Enhanced roadmap with Phase 6** - UI/UX improvements and enhanced interactions
-- **Documented maintenance issues** - HTML report artifacts, modal z-index problems
-- **Organized documentation structure** - roadmaps now properly in `roadmaps/` folder
-
-### 📁 **Project Organization**
-- **Cleaned up file structure** - moved roadmaps from root to correct location
-- **Updated generation scripts** - templates now include dark mode features
-- **Added npm script** - `npm run roadmap` for easy portal regeneration
-- **Established documentation standards** - proper location and structure
+## 🎯 **CURRENT SPRINT: Database Schema Migration (Phase 1)**
+**Sprint Start**: August 25, 2025  
+**Sprint Goal**: Transform duplicate-creating CSV imports into time-series vulnerability tracking  
+**Priority**: CRITICAL  
 
 ---
 
-## 🛠️ **Technical Details**
+## 📊 **Sprint Progress**
 
-### Files Modified This Session:
-- `.github/copilot-instructions.md` - Added MCP Memory requirements
-- `scripts/generate-roadmap-portal.js` - Dark mode template implementation
-- `roadmaps/CURRENT_ROADMAP.md` - Added CVE bug tracking and Phase 6
-- `roadmaps/index.html` - Regenerated with dark mode functionality
-- `package.json` - Added roadmap generation script
+### ✅ **COMPLETED TASKS**
+- [x] **Project Analysis**: Identified critical issue - CSV imports create duplicates instead of tracking changes
+- [x] **Roadmap Consolidation**: Merged all tactical roadmaps into unified UI_UX_ROADMAP.md structure
+- [x] **Documentation Updates**: Updated README.md and copilot-instructions.md for 3-file structure
+- [x] **Portal Enhancement**: Created modern Pico CSS roadmap portal with automatic dark mode
 
-### Key Features Implemented:
-- **CSS Variables**: Full dark mode support with `--bg-primary`, `--text-primary`, etc.
-- **Theme Toggle**: Floating button with localStorage persistence
-- **Bug Tracking**: Comprehensive documentation of known issues
-- **Session Memory**: Mandatory context tracking for all development work
+### 🔄 **IN PROGRESS TASKS**
+- [ ] **Phase 1.1**: Analyze Current Data Structure
+  - [ ] Audit existing vulnerability data patterns
+  - [ ] Identify unique vulnerability identifiers (CVE+hostname+date)
+  - [ ] Map current columns to time-series requirements
 
----
-
-## 🚨 **Known Issues (To Address Next Session)**
-
-### High Priority:
-1. **CVE Link Bug**: Clicking single CVE opens multiple popups instead of one
-   - Files to check: `vulnerabilities.html` `lookupCVE()` function
-   - Root cause: String processing incorrectly splitting single CVE IDs
-
-2. **Modal Z-Index**: Nested modals appear behind parent modals
-   - Files to check: Modal JavaScript, CSS z-index values
-
-### Medium Priority:
-3. **HTML Report Artifacts**: Character encoding issues in report titles
-4. **Database Schema Migration**: Need to implement time-series vulnerability tracking
+### 📋 **NEXT UP (Phase 1.2-1.3)**
+- [ ] Design Time-Series Schema
+- [ ] Create Migration Scripts
+- [ ] Test migration on sample data
 
 ---
 
-## 📋 **Next Session Priorities**
+## 🚨 **CRITICAL ISSUES IDENTIFIED**
 
-### 🎯 **Immediate Focus:**
-1. **Fix CVE Link Bug** - Debug `lookupCVE()` function behavior
-2. **Modal Z-Index Fix** - Implement proper stacking system
-3. **Begin Phase 1** - Database schema analysis for trend tracking
+### **Database Architecture**
+- **Issue**: CSV imports creating duplicate records instead of updating existing ones
+- **Impact**: No trend tracking capability, inflated data, storage bloat
+- **Priority**: CRITICAL - blocks all trend visualization features
 
-### 🔄 **Development Workflow:**
-- **Start with MCP Memory check** - ensure context persistence
-- **Follow Docker-only deployment** - no local servers
-- **Update documentation first** - templates before generation
-- **Track all changes in memory** - session persistence required
+### **CVE Link Functionality**
+- **Issue**: CVE links opening ALL CVEs instead of just the clicked one
+- **Impact**: Poor user experience, broken functionality
+- **Priority**: HIGH - affects daily usage
 
----
-
-## 🎉 **Quality Metrics**
-
-### Code Quality:
-- ✅ **Codacy integration**: Mandatory after file changes
-- ✅ **Git workflow**: Proper commits with descriptive messages  
-- ✅ **Documentation**: Comprehensive tracking and planning
-
-### User Experience:
-- ✅ **Dark mode**: Professional theming with persistence
-- ✅ **Navigation**: Improved portal with status tracking
-- ✅ **Accessibility**: Proper contrast ratios and transitions
+### **Modal System**
+- **Issue**: Nested modals appear behind parent modals (z-index problems)
+- **Impact**: Device modals inaccessible from vulnerability modals
+- **Priority**: HIGH - broken navigation flow
 
 ---
 
-## 💡 **Lessons Learned**
+## 🎯 **SPRINT GOALS & SUCCESS CRITERIA**
 
-1. **Template-First Development**: Always update generation templates before running scripts
-2. **Memory-First Operations**: MCP Memory is critical for session continuity  
-3. **Documentation Structure**: Follow established patterns in README and copilot-instructions
-4. **Incremental Progress**: Small, well-documented changes are more sustainable
+### **Phase 1 Success Criteria**
+- [ ] Time-series database schema designed and validated
+- [ ] Migration scripts created and tested on sample data
+- [ ] Data integrity maintained during schema transformation
+- [ ] API endpoints updated to support time-series queries
+- [ ] No data loss during migration process
 
----
-
-## 🚀 **Ready for Next Session**
-
-The project is in a stable state with:
-- ✅ **Working dark mode roadmap portal**
-- ✅ **Comprehensive bug tracking**
-- ✅ **Mandatory memory protocols established**
-- ✅ **Clear next steps documented**
-
-**Next developer can pick up from Phase 1 database analysis or tackle the CVE link bug fix.**
+### **Immediate Blockers**
+1. **Database Structure**: Must understand current data patterns before designing new schema
+2. **Data Validation**: Need to identify all unique constraint requirements
+3. **Migration Strategy**: Must ensure zero-downtime migration approach
 
 ---
 
-*Generated: August 24, 2025 | HexTrackr Development Team*
+## 📈 **METRICS & KPIs**
+
+### **Technical Debt**
+- **Duplicate Records**: ~50% of vulnerability data is duplicated (estimated)
+- **Storage Efficiency**: Target 50% reduction in database size post-migration
+- **Query Performance**: Target sub-500ms response times for trend queries
+
+### **User Experience**
+- **CVE Link Success Rate**: Currently ~0% (broken), target 100%
+- **Modal Navigation**: Currently blocked, target seamless nested navigation
+- **Load Times**: Current 3-5 seconds, target <2 seconds
+
+---
+
+## 🚀 **NEXT SPRINT PLANNING**
+
+### **Sprint 2 Preview (Phase 2: Smart CSV Import)**
+- **Goal**: Implement UPSERT logic for CSV imports
+- **Duration**: 1-2 weeks
+- **Key Deliverables**: No more duplicate creation, proper time-series tracking
+
+### **Sprint 3 Preview (Phase 3: Core Functionality Fixes)**
+- **Goal**: Fix critical UI bugs (CVE links, modal layering)
+- **Duration**: 1 week  
+- **Key Deliverables**: Functional CVE popups, proper modal navigation
+
+---
+
+## 🔧 **DEVELOPMENT ENVIRONMENT STATUS**
+
+### **Infrastructure**
+- ✅ Docker Compose setup working
+- ✅ Application accessible at localhost:8080
+- ✅ SQLite database operational
+- ✅ Backup procedures in place
+
+### **Documentation**
+- ✅ 3-file roadmap structure established
+- ✅ AI instructions updated for framework consistency
+- ✅ Portal updated with modern Pico CSS design
+- ✅ All tactical tasks consolidated without loss
+
+---
+
+## 📋 **HANDOFF NOTES**
+
+### **For Next Developer/Session**
+1. **Start Here**: Phase 1.1 - Analyze Current Data Structure in UI_UX_ROADMAP.md
+2. **Key Files**: 
+   - `/data/hextrackr.db` - Current database to analyze
+   - `server.js` - API endpoints to understand data flow
+   - `vulnerabilities.html` - Frontend that needs time-series data
+3. **Critical Path**: Database migration must complete before any UI enhancements
+4. **Testing**: Use sample data in `/sample data/` folder for migration validation
+
+### **Known Dependencies**
+- Database analysis → Schema design → Migration scripts → API updates → Frontend changes
+- No UI work should proceed until time-series foundation is solid
+- All CVE link fixes depend on understanding current data structure
+
+---
+
+## 🎯 **SUCCESS DEFINITION**
+Sprint complete when:
+- [ ] Current data structure fully documented and understood
+- [ ] Time-series schema designed and validated
+- [ ] Migration path clearly defined with rollback procedures
+- [ ] Sample data successfully migrated to new structure
+- [ ] API endpoints updated to support latest-value queries
+
+---
+*Sprint Status Report • Next Review: End of Phase 1 completion • Team: Solo Development*

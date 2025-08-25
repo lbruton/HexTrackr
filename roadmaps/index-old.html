@@ -1,0 +1,425 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr Development Roadmap Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/gitbook-style@1.0.0/dist/gitbook.min.css" rel="stylesheet" onerror="this.remove();">
+    <style>
+        /* Enhanced Dark Mode Documentation Theme */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Liberation Sans', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.65;
+            color: #e5e7eb;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .roadmap-portal {
+            min-height: 100vh;
+            padding: 1rem 0;
+        }
+        
+        .documentation-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(31, 41, 55, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            border: 1px solid #374151;
+        }
+        
+        .roadmap-card {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .roadmap-header {
+            background: #111827;
+            border-bottom: 2px solid #374151;
+            color: #f9fafb;
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .roadmap-header h2 {
+            color: #111827;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .roadmap-content {
+            padding: 2rem;
+            max-height: 70vh;
+            overflow-y: auto;
+            background: white;
+        }
+        
+        .emoji {
+            font-size: 1.1em;
+            margin-right: 0.5rem;
+        }
+        
+        .risk-badge, .priority-badge, .duration-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin: 0.25rem 0.5rem 0.25rem 0;
+            border: 1px solid;
+        }
+        
+        .risk-HIGH, .priority-CRITICAL { 
+            background: #fef2f2; 
+            color: #dc2626; 
+            border-color: #fca5a5;
+        }
+        .risk-MEDIUM, .priority-HIGH { 
+            background: #fffbeb; 
+            color: #d97706; 
+            border-color: #fcd34d;
+        }
+        .risk-LOW, .priority-MEDIUM { 
+            background: #eff6ff; 
+            color: #2563eb; 
+            border-color: #93c5fd;
+        }
+        .priority-LOW { 
+            background: #f0fdf4; 
+            color: #16a34a; 
+            border-color: #86efac;
+        }
+        .duration-badge { 
+            background: #f8fafc; 
+            color: #475569; 
+            border-color: #cbd5e1;
+        }
+        
+        .todo-item {
+            list-style: none;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.95rem;
+        }
+        
+        .todo-item.completed {
+            opacity: 0.7;
+            text-decoration: line-through;
+            color: #6b7280;
+        }
+        
+        .todo-item input[type="checkbox"] {
+            margin-right: 0.75rem;
+            transform: scale(1.1);
+        }
+        
+        .nav-tabs {
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 1.5rem;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            padding: 0 1rem;
+        }
+        
+        .nav-link {
+            border: none;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.2s ease;
+            border-radius: 6px 6px 0 0;
+            margin-top: 0.5rem;
+        }
+        
+        .nav-link:hover {
+            color: #374151;
+            background: #f9fafb;
+        }
+        
+        .nav-link.active {
+            background: #2563eb;
+            color: white !important;
+            font-weight: 600;
+        }
+        
+        .last-updated {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: normal;
+        }
+        
+        .progress-overview {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .phase-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+        
+        .phase-status {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid;
+        }
+        
+        .phase-status.completed { 
+            background: #f0fdf4; 
+            color: #16a34a; 
+            border-color: #86efac;
+        }
+        .phase-status.in-progress { 
+            background: #fffbeb; 
+            color: #d97706; 
+            border-color: #fcd34d;
+        }
+        .phase-status.planned { 
+            background: #eff6ff; 
+            color: #2563eb; 
+            border-color: #93c5fd;
+        }
+        
+        h1, h2, h3 { 
+            color: #111827; 
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        h1:first-child, h2:first-child { margin-top: 0; }
+        
+        h1 { font-size: 2rem; }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.25rem; }
+        
+        code {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            border: 1px solid #e2e8f0;
+        }
+        
+        pre {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+        }
+        
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border: 1px solid;
+        }
+        
+        .alert-info {
+            background: #eff6ff;
+            border-color: #93c5fd;
+            color: #1e40af;
+        }
+        
+        .page-header {
+            background: #111827;
+            padding: 2rem 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #374151;
+        }
+        
+        .page-title {
+            color: #f9fafb;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            color: #9ca3af;
+            font-size: 1.125rem;
+            font-weight: 400;
+        }
+        
+        ul, ol {
+            padding-left: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        blockquote {
+            border-left: 4px solid #e5e7eb;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: #6b7280;
+            font-style: italic;
+        }
+        
+        .roadmap-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .roadmap-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        
+        .roadmap-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        .roadmap-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="roadmap-portal">
+        <div class="container-xl">
+            <div class="page-header">
+                <div class="container-xl text-center">
+                    <h1 class="page-title">🛡️ HexTrackr Development Roadmap Portal</h1>
+                    <p class="page-subtitle">Strategic Planning & Tactical Implementation Dashboard</p>
+                </div>
+            </div>
+            
+            <div class="progress-overview">
+                <h3>🎯 Current Development Status</h3>
+                <div class="phase-progress">
+                    <div class="phase-status completed">Phase 1 ✅<br><small>Core UI Complete</small></div>
+                    <div class="phase-status in-progress">Phase 2 🔄<br><small>Filtering & Layout</small></div>
+                    <div class="phase-status planned">Phase 3-7 📋<br><small>Advanced Features</small></div>
+                </div>
+                <div class="alert alert-info">
+                    <strong>Last Updated:</strong> 8/25/2025 | 
+                    <strong>Next Priority:</strong> Fix "Clear Data" button & VPR calculations
+                </div>
+            </div>
+            
+            <ul class="nav nav-tabs" id="roadmapTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="strategic-tab" data-bs-toggle="tab" data-bs-target="#strategic" type="button" role="tab">
+                        🎯 Strategic Roadmap
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tactical-tab" data-bs-toggle="tab" data-bs-target="#tactical" type="button" role="tab">
+                        🚀 Tactical Implementation
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="status-tab" data-bs-toggle="tab" data-bs-target="#status" type="button" role="tab">
+                        📋 Session Status
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="roadmapTabsContent">
+                <div class="tab-pane fade show active" id="strategic" role="tabpanel">
+                    <div class="roadmap-card">
+                        <div class="roadmap-header">
+                            <h2 class="mb-0">Strategic Project Roadmap</h2>
+                            <div class="last-updated">Long-term Vision & Architecture</div>
+                        </div>
+                        <div class="roadmap-content">
+                            <h1>HexTrackr Project Roadmap & Task List</h1></p><p><h2><span class="emoji">🎯</span> Project Overview</h2><br>HexTrackr is a dual-purpose cybersecurity management system providing:<br><li><strong>Ticket Management</strong>: Hexagon security workflow management</li><br><li><strong>Vulnerability Management</strong>: Multi-vendor vulnerability data analysis</li></p><p>---</p><p><h2>🟢 COMPLETED FEATURES</h2></p><p><h3>Core Infrastructure <span class="emoji success">✅</span></h3><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>Dual-app architecture</strong> (tickets.html + vulnerabilities.html)</li><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>Storage systems</strong> (localStorage for tickets, IndexedDB for vulnerabilities)</li><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>Bootstrap 5 UI</strong> with responsive design</li><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>PDF generation</strong> with jsPDF + auto-bundling capabilities</li><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>Device management</strong> with smart auto-increment naming</li><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>CSV import/export</strong> basic functionality</li><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>Pagination & filtering</strong> across all views</li><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>Sample data system</strong> for development/testing</li></p><p><h3>Cisco API Integration <span class="emoji success">✅</span></h3><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>OAuth2 authentication</strong> with real Cisco endpoints</li><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>AES-256 credential encryption</strong> for secure local storage</li><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>Live API testing</strong> with connection validation</li><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>Vulnerability synchronization</strong> from Cisco PSIRT API</li><br><li class="todo-item completed"><input type="checkbox" checked disabled> <strong>Error handling & progress tracking</strong></li></p><p>---</p><p><h2>🟡 IN PROGRESS</h2></p><p><h3>Performance Optimization <span class="emoji warning">🔄</span></h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>Large CSV file handling</strong> (50-100MB files)</li><br>  - [ ] Implement streaming CSV parser for memory efficiency<br>  - [ ] Add column filtering to ignore unnecessary data<br>  - [ ] Progress indicators for large file processing<br>  - [ ] Web Workers for non-blocking file processing<br>  - [ ] Chunk-based processing with IndexedDB batching</p><p>---</p><p><h2>🔴 PLANNED FEATURES</h2></p><p><h3>API Integrations Roadmap <span class="emoji info">📋</span></h3></p><p>#### Cisco Extensions<br><li class="todo-item"><input type="checkbox" disabled> <strong>Security Advisories Sync</strong> (partially stubbed)</li><br>  - [ ] Complete <code>syncCiscoAdvisories()</code> implementation<br>  - [ ] Advisory correlation with existing vulnerabilities<br>  - [ ] Risk scoring integration</p><p>#### Palo Alto Networks Integration<br><li class="todo-item"><input type="checkbox" disabled> <strong>Prisma Cloud API</strong> integration</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Cortex API</strong> for threat intelligence</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>PAN-OS API</strong> for firewall management</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>WildFire API</strong> for malware analysis</li><br><li class="todo-item"><input type="checkbox" disabled> OAuth2 authentication framework</li><br><li class="todo-item"><input type="checkbox" disabled> Multi-product configuration management</li></p><p>#### Additional Vendor APIs<br><li class="todo-item"><input type="checkbox" disabled> <strong>Tenable.io</strong> vulnerability scanner integration</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Qualys</strong> VMDR API connectivity</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Rapid7</strong> InsightVM integration</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>CrowdStrike</strong> Falcon endpoint data</li></p><p><h3>Network Infrastructure Features <span class="emoji info">📋</span></h3></p><p>#### SNMP Network Polling<br><li class="todo-item"><input type="checkbox" disabled> <strong>SNMPv2/v3 implementation</strong></li><br>  - [ ] Real-time device status monitoring<br>  - [ ] Hardware health monitoring  <br>  - [ ] Firmware version detection<br>  - [ ] Network interface analysis<br>  - [ ] Vulnerability correlation by device type<br><li class="todo-item"><input type="checkbox" disabled> <strong>Docker containerization</strong></li><br>  - [ ] Node.js backend with net-snmp library<br>  - [ ] RESTful API for browser integration<br>  - [ ] Scalable multi-network support</p><p>#### Network Discovery & Mapping<br><li class="todo-item"><input type="checkbox" disabled> <strong>Automated asset discovery</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Network topology visualization</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Device fingerprinting</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Service enumeration</strong></li></p><p><h3>Automation & Orchestration <span class="emoji info">📋</span></h3></p><p>#### Ansible Integration<br><li class="todo-item"><input type="checkbox" disabled> <strong>AWX/Tower API connectivity</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Automated patch deployment</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Configuration compliance enforcement</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Vulnerability remediation playbooks</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Bulk system updates and hardening</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Secure credential vault management</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Playbook execution monitoring</strong></li></p><p>#### Docker Implementation<br><li class="todo-item"><input type="checkbox" disabled> <strong>Container architecture</strong></li><br>  - [ ] SNMP polling service containerization<br>  - [ ] API gateway container<br>  - [ ] Database container (if moving from browser storage)<br>  - [ ] Docker Compose orchestration</p><p><h3>Advanced Analytics & Intelligence <span class="emoji info">📋</span></h3></p><p>#### Threat Intelligence<br><li class="todo-item"><input type="checkbox" disabled> <strong>MITRE ATT&CK framework mapping</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>CVE enrichment from NVD</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Exploit prediction modeling</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Risk scoring algorithms</strong></li></p><p>#### Reporting & Visualization<br><li class="todo-item"><input type="checkbox" disabled> <strong>Executive dashboards</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Compliance reporting</strong> (SOC2, ISO27001, NIST)</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Trend analysis</strong> with ApexCharts expansion</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Custom report builder</strong></li></p><p><h3>Enterprise Features <span class="emoji info">📋</span></h3></p><p>#### Multi-tenancy & Access Control<br><li class="todo-item"><input type="checkbox" disabled> <strong>User authentication system</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Role-based access control (RBAC)</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Organization/site isolation</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Audit logging</strong></li></p><p>#### Data Management<br><li class="todo-item"><input type="checkbox" disabled> <strong>Backend database</strong> option (PostgreSQL/MongoDB)</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Data retention policies</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Backup & restore functionality</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Data encryption at rest</strong></li></p><p>---</p><p><h2><span class="emoji primary">🚀</span> IMMEDIATE PRIORITIES (Next Sprint)</h2></p><p><h3>High Priority</h3><br>1. <strong>Large CSV Import Optimization</strong> <br>   - Target: 50-100MB file handling<br>   - Web Workers + streaming parser<br>   - Column filtering for data reduction</p><p>2. <strong>Cisco API Completion</strong><br>   - Finish Security Advisories sync<br>   - Enhanced error handling</p><p><h3>Medium Priority  </h3><br>3. <strong>Performance Improvements</strong><br>   - IndexedDB query optimization<br>   - UI responsiveness during large operations<br>   - Memory usage optimization</p><p>4. <strong>User Experience</strong><br>   - Better progress indicators<br>   - Improved error messages<br>   - Mobile responsiveness testing</p><p>---</p><p><h2>📊 TECHNICAL DEBT</h2></p><p><h3>Code Quality</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>ESLint configuration</strong> for JavaScript standardization</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Unit testing framework</strong> setup (Jest)</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>End-to-end testing</strong> with Playwright</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Documentation improvements</strong></li></p><p><h3>Security Hardening</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>Content Security Policy (CSP)</strong> implementation</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>API key rotation</strong> mechanisms</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Input validation</strong> strengthening</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>XSS prevention</strong> auditing</li></p><p><h3>Performance Monitoring</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>Performance metrics</strong> collection</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Memory leak detection</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Bundle size optimization</strong></li><br><li class="todo-item"><input type="checkbox" disabled> <strong>Lighthouse score</strong> improvements</li></p><p>---</p><p><h2>🔧 DEVELOPMENT WORKFLOW</h2></p><p><h3>Current Stack</h3><br><li><strong>Frontend</strong>: Vanilla JavaScript, Bootstrap 5, ApexCharts</li><br><li><strong>Storage</strong>: localStorage, IndexedDB via LocalForage</li><br><li><strong>Build</strong>: No build process (direct file serving)</li><br><li><strong>Dependencies</strong>: CDN-based (Bootstrap, jQuery-less)</li></p><p><h3>Proposed Enhancements</h3><br><li><strong>Build System</strong>: Webpack/Vite for optimization</li><br><li><strong>Package Management</strong>: npm/yarn for dependency management</li><br><li><strong>Testing</strong>: Jest + Playwright test suite</li><br><li><strong>CI/CD</strong>: GitHub Actions for automated testing</li></p><p>---</p><p><h2><span class="emoji info">📋</span> MAINTENANCE SCHEDULE</h2></p><p><h3>Regular Tasks</h3><br><li><strong>Weekly</strong>: Dependency security updates</li><br><li><strong>Monthly</strong>: Performance monitoring review</li><br><li><strong>Quarterly</strong>: Feature roadmap review and prioritization</li><br><li><strong>Annually</strong>: Security audit and penetration testing</li></p><p>---</p><p><em>Last Updated: August 24, 2025</em><br><em>Maintainer: HexTrackr Development Team</em><br>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="tactical" role="tabpanel">
+                    <div class="roadmap-card">
+                        <div class="roadmap-header">
+                            <h2 class="mb-0">UI/UX Implementation Roadmap</h2>
+                            <div class="last-updated">Current Sprint Priorities</div>
+                        </div>
+                        <div class="roadmap-content">
+                            <h1>HexTrackr UI/UX Enhancement Roadmap</h1><br><em>Updated: December 19, 2024</em></p><p><h2><span class="emoji">🎯</span> <strong>CURRENT STATUS: ANALYSIS COMPLETE</strong></h2><br><strong><span class="emoji success">✅</span> CONFIRMED WORKING:</strong><br><li>CVE links intelligently split multiple CVEs into individual tabs <span class="emoji success">✅</span></li><br><li>Modern Tabler.io vulnerability dashboard with real data <span class="emoji success">✅</span></li><br><li>Statistics cards (109 Critical, 4,843 High, etc.) <span class="emoji success">✅</span></li><br><li>AG Grid table with pagination (Page 1 of 200) <span class="emoji success">✅</span></li></p><p>---</p><p><h2><span class="emoji info">📋</span> <strong>PHASE 1: Enhanced Modal System</strong> </h2><br><em>Risk: LOW | Impact: HIGH | Duration: 3-4 tasks</em></p><p><h3>1.1 Vulnerability Description Modal</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>NEW FEATURE</strong>: Click vulnerability description → modal</li><br><li class="todo-item"><input type="checkbox" disabled> Show vulnerability details, totals, affected devices table</li><br><li class="todo-item"><input type="checkbox" disabled> Mirror hostname modal but "flipped" perspective</li><br><li class="todo-item"><input type="checkbox" disabled> Use 1200px width like device modal</li></p><p><h3>1.2 Device Modal Enhancements  </h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>FIX</strong>: CVE links in Active Vulnerabilities sub-table should open 1200px popup</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>IMPLEMENT</strong>: Generate Report → PDF/HTML export of Device Overview</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>IMPLEMENT</strong>: Export button → CSV export of Active Vulnerabilities table</li></p><p>---</p><p><h2><span class="emoji info">📋</span> <strong>PHASE 2: Enhanced Filtering & Display</strong></h2><br><em>Risk: LOW | Impact: MEDIUM | Duration: 3-4 tasks</em></p><p><h3>2.1 State Column Improvements & Default Filtering</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>DEFAULT</strong>: Hide FIXED state by default in all filters (table, charts, totals)</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>STYLE</strong>: Use different color scheme for STATE column (currently showing FIXED/Open)</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>FILTER</strong>: Add State filter dropdown to table controls</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>CONSISTENCY</strong>: Ensure state colors match across cards and table</li></p><p><h3>2.2 Layout & Navigation Improvements</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>REPOSITION</strong>: Move search bar below charts and above table</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>CRITICAL FIX</strong>: Fix non-functional "Clear Data" button in settings</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>UI</strong>: Optimize layout flow for better user experience</li></p><p><h3>2.3 Vendor Filtering & View Synchronization</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>FILTER</strong>: Add Vendor filter dropdown (CISCO, Tenable, etc.)</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>UI</strong>: Integrate with existing severity filter in clean layout</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>EXTEND</strong>: Apply all table filters to card views (Devices/Vulnerabilities)</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>SYNC</strong>: Keep filter state synchronized across view modes</li></p><p><h3>2.4 Unified Header Design</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>HEADER UNIFICATION</strong>: Remove purple bar from vulnerability dashboard</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>DARK HEADER</strong>: Replace vuln dashboard top bar with tickets page dark header</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>TOGGLE INTEGRATION</strong>: Move dark/light mode toggle into both page toolbars</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>MENU CONSISTENCY</strong>: Add hamburger menu to both pages with same styling</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>BRANDING</strong>: Ensure consistent HexTrackr branding across both dashboards</li></p><p>---</p><p><h2><span class="emoji info">📋</span> <strong>PHASE 3: Performance & Navigation</strong></h2><br><em>Risk: LOW | Impact: HIGH | Duration: 2-3 tasks</em></p><p><h3>3.1 Pagination Enhancement</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>OPTIMIZE</strong>: Add pagination to card views (currently only table has it)</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>PERFORMANCE</strong>: Reduce initial load by limiting cards per page</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>UX</strong>: Consistent pagination controls across all views</li></p><p><h3>3.2 Memory & Load Optimization  </h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>ANALYZE</strong>: Current system loads 10,000+ records (Page 1 of 200)</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>OPTIMIZE</strong>: Implement virtual scrolling or smaller page sizes</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>CACHE</strong>: Better client-side data management</li></p><p>---</p><p><h2><span class="emoji info">📋</span> <strong>PHASE 4: Time-Series Data Model</strong> </h2><br><em>Risk: HIGH | Impact: CRITICAL | Duration: 5-6 tasks</em><br><em>Note: This is the fundamental architecture change for trend tracking</em></p><p><h3>4.1 Database Schema Migration</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>ANALYZE</strong>: Current duplicate-creating CSV import logic</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>DESIGN</strong>: Time-series schema with trend tracking</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>MIGRATE</strong>: Transform existing data to new model</li></p><p><h3>4.2 Import Logic Redesign</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>IMPLEMENT</strong>: UPSERT based on hostname + CVE + scan_date</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>TRACK</strong>: VPR changes over time instead of duplicating</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>VALIDATE</strong>: Date field as last_updated timestamp</li></p><p>---</p><p><h2><span class="emoji info">📋</span> <strong>PHASE 5: Cross-Dashboard Integration</strong></h2><br><em>Risk: MEDIUM | Impact: HIGH | Duration: 4-5 tasks</em></p><p><h3>5.1 Ticket ↔ Vulnerability Cross-Reference</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>HOSTNAME LINKS</strong>: Click hostname in tickets dashboard → opens vulnerability modal</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>DEVICE INTEGRATION</strong>: Add "Open Ticket" button on vulnerability device cards</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>MODAL SHARING</strong>: Share device modal component between dashboards</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>DATA INDEPENDENCE</strong>: Maintain separate data storage for each dashboard</li></p><p><h3>5.2 Cross-Dashboard Modal System</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>SHARED COMPONENTS</strong>: Extract device modal for reuse across pages</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>TICKET CREATION</strong>: Open add ticket modal from vulnerability dashboard</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>CONTEXT PASSING</strong>: Pass hostname/device context between systems</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>STATE MANAGEMENT</strong>: Maintain independent operation of each dashboard</li></p><p>---</p><p><h2><span class="emoji info">📋</span> <strong>PHASE 7: Enhanced Statistics Cards</strong> </h2><br><em>Risk: LOW | Impact: LOW | Duration: 2-3 tasks | Priority: VERY LOW</em></p><p><h3>7.1 VPR Calculation Improvements</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>CRITICAL LOGIC</strong>: Exclude FIXED state from VPR total calculations  </li><br><li class="todo-item"><input type="checkbox" disabled> <strong>ACCURACY</strong>: Ensure cards only count active vulnerabilities</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>CONSISTENCY</strong>: Match card totals with filtered table data</li></p><p><h3>7.2 Enhanced Card Design & Micro-Charts</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>SIZING</strong>: Make statistics cards larger for better visibility</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>MICRO-GRAPHS</strong>: Add small historical trend graphs within cards</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>SPARKLINES</strong>: Show 7-day or 30-day trend indicators</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>VISUAL</strong>: Enhanced card styling with embedded chart.js mini-graphs</li></p><p>---</p><p><h2><span class="emoji info">📋</span> <strong>PHASE 6: User Authentication & Security</strong></h2><br><em>Risk: HIGH | Impact: CRITICAL | Duration: 5-6 tasks</em></p><p><h3>6.1 Authentication System</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>LOGIN PAGE</strong>: Create secure login interface</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>SESSION MANAGEMENT</strong>: Implement secure session handling</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>ROUTE PROTECTION</strong>: Wrap both dashboards behind authentication</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>DATA SECURITY</strong>: Protect all data endpoints with auth middleware</li></p><p><h3>6.2 User Management</h3><br><li class="todo-item"><input type="checkbox" disabled> <strong>USER ACCOUNTS</strong>: Basic user account system</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>PERMISSIONS</strong>: Role-based access if needed</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>LOGOUT</strong>: Secure logout and session cleanup</li><br><li class="todo-item"><input type="checkbox" disabled> <strong>SESSION TIMEOUT</strong>: Automatic logout after inactivity</li></p><p>---</p><p><h2><span class="emoji">🎯</span> <strong>IMMEDIATE PRIORITIES</strong></h2><br>1. <strong>Phase 2.2</strong> - Fix critical "Clear Data" button issue (urgent bug fix)<br>2. <strong>Phase 7.1</strong> - Fix VPR calculations to exclude FIXED state (data accuracy)<br>3. <strong>Phase 2.4</strong> - Unified header design (visual consistency)<br>4. <strong>Phase 2.1</strong> - Default hide FIXED state (immediate UX improvement)<br>5. <strong>Phase 1.1</strong> - Vulnerability Description Modal (high impact feature)<br>6. <strong>Phase 2.2</strong> - Search bar repositioning (layout improvement)</p><p><strong>Which phase should we tackle first? I recommend starting with Phase 1.1 for immediate user value! <span class="emoji primary">🚀</span></strong><br>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="status" role="tabpanel">
+                    <div class="roadmap-card">
+                        <div class="roadmap-header">
+                            <h2 class="mb-0">Session Status & Handoff</h2>
+                            <div class="last-updated">Current Development Session</div>
+                        </div>
+                        <div class="roadmap-content">
+                            <h1>HexTrackr Development Session Status</h1><br><em>Session Date: August 24, 2025</em></p><p><h2><span class="emoji">🎯</span> <strong>Session Summary</strong></h2><br>Major progress made on documentation standards, UI improvements, and project organization. Successfully implemented dark mode for roadmap portal and established mandatory MCP Memory protocols.</p><p>---</p><p><h2><span class="emoji success">✅</span> <strong>Major Accomplishments</strong></h2></p><p><h3>🔒 <strong>Critical Infrastructure: MCP Memory Protocols</strong></h3><br><li><strong>Added mandatory MCP Memory usage rules</strong> to copilot-instructions.md</li><br><li><strong>Enforced session persistence</strong> - all tasks must be tracked in memory</li><br><li><strong>Established failure protocols</strong> - halt operations if memory is unavailable</li><br><li><strong>Prevents context loss</strong> between development sessions</li></p><p><h3>🌙 <strong>Dark Mode Implementation</strong></h3><br><li><strong>Updated roadmap portal template</strong> with CSS variables for theming</li><br><li><strong>Added dark mode toggle button</strong> with 🌙/☀️ icons</li><br><li><strong>Implemented localStorage persistence</strong> - theme choice saves across sessions</li><br><li><strong>Fixed nav button contrast issues</strong> with proper CSS specificity</li><br><li><strong>Lesson learned</strong>: Always update script templates BEFORE regenerating</li></p><p><h3>🐛 <strong>Bug Tracking & Documentation</strong></h3><br><li><strong>Added CVE link bug to roadmap</strong> - clicking single CVE opens multiple popups</li><br><li><strong>Enhanced roadmap with Phase 6</strong> - UI/UX improvements and enhanced interactions</li><br><li><strong>Documented maintenance issues</strong> - HTML report artifacts, modal z-index problems</li><br><li><strong>Organized documentation structure</strong> - roadmaps now properly in <code>roadmaps/</code> folder</li></p><p><h3>📁 <strong>Project Organization</strong></h3><br><li><strong>Cleaned up file structure</strong> - moved roadmaps from root to correct location</li><br><li><strong>Updated generation scripts</strong> - templates now include dark mode features</li><br><li><strong>Added npm script</strong> - <code>npm run roadmap</code> for easy portal regeneration</li><br><li><strong>Established documentation standards</strong> - proper location and structure</li></p><p>---</p><p><h2>🛠️ <strong>Technical Details</strong></h2></p><p><h3>Files Modified This Session:</h3><br><li><code>.github/copilot-instructions.md</code> - Added MCP Memory requirements</li><br><li><code>scripts/generate-roadmap-portal.js</code> - Dark mode template implementation</li><br><li><code>roadmaps/CURRENT_ROADMAP.md</code> - Added CVE bug tracking and Phase 6</li><br><li><code>roadmaps/index.html</code> - Regenerated with dark mode functionality</li><br><li><code>package.json</code> - Added roadmap generation script</li></p><p><h3>Key Features Implemented:</h3><br><li><strong>CSS Variables</strong>: Full dark mode support with <code>--bg-primary</code>, <code>--text-primary</code>, etc.</li><br><li><strong>Theme Toggle</strong>: Floating button with localStorage persistence</li><br><li><strong>Bug Tracking</strong>: Comprehensive documentation of known issues</li><br><li><strong>Session Memory</strong>: Mandatory context tracking for all development work</li></p><p>---</p><p><h2><span class="emoji danger">🚨</span> <strong>Known Issues (To Address Next Session)</strong></h2></p><p><h3>High Priority:</h3><br>1. <strong>CVE Link Bug</strong>: Clicking single CVE opens multiple popups instead of one<br>   - Files to check: <code>vulnerabilities.html</code> <code>lookupCVE()</code> function<br>   - Root cause: String processing incorrectly splitting single CVE IDs</p><p>2. <strong>Modal Z-Index</strong>: Nested modals appear behind parent modals<br>   - Files to check: Modal JavaScript, CSS z-index values</p><p><h3>Medium Priority:</h3><br>3. <strong>HTML Report Artifacts</strong>: Character encoding issues in report titles<br>4. <strong>Database Schema Migration</strong>: Need to implement time-series vulnerability tracking</p><p>---</p><p><h2><span class="emoji info">📋</span> <strong>Next Session Priorities</strong></h2></p><p><h3><span class="emoji">🎯</span> <strong>Immediate Focus:</strong></h3><br>1. <strong>Fix CVE Link Bug</strong> - Debug <code>lookupCVE()</code> function behavior<br>2. <strong>Modal Z-Index Fix</strong> - Implement proper stacking system<br>3. <strong>Begin Phase 1</strong> - Database schema analysis for trend tracking</p><p><h3><span class="emoji warning">🔄</span> <strong>Development Workflow:</strong></h3><br><li><strong>Start with MCP Memory check</strong> - ensure context persistence</li><br><li><strong>Follow Docker-only deployment</strong> - no local servers</li><br><li><strong>Update documentation first</strong> - templates before generation</li><br><li><strong>Track all changes in memory</strong> - session persistence required</li></p><p>---</p><p><h2>🎉 <strong>Quality Metrics</strong></h2></p><p><h3>Code Quality:</h3><br><li><span class="emoji success">✅</span> <strong>Codacy integration</strong>: Mandatory after file changes</li><br><li><span class="emoji success">✅</span> <strong>Git workflow</strong>: Proper commits with descriptive messages  </li><br><li><span class="emoji success">✅</span> <strong>Documentation</strong>: Comprehensive tracking and planning</li></p><p><h3>User Experience:</h3><br><li><span class="emoji success">✅</span> <strong>Dark mode</strong>: Professional theming with persistence</li><br><li><span class="emoji success">✅</span> <strong>Navigation</strong>: Improved portal with status tracking</li><br><li><span class="emoji success">✅</span> <strong>Accessibility</strong>: Proper contrast ratios and transitions</li></p><p>---</p><p><h2>💡 <strong>Lessons Learned</strong></h2></p><p>1. <strong>Template-First Development</strong>: Always update generation templates before running scripts<br>2. <strong>Memory-First Operations</strong>: MCP Memory is critical for session continuity  <br>3. <strong>Documentation Structure</strong>: Follow established patterns in README and copilot-instructions<br>4. <strong>Incremental Progress</strong>: Small, well-documented changes are more sustainable</p><p>---</p><p><h2><span class="emoji primary">🚀</span> <strong>Ready for Next Session</strong></h2></p><p>The project is in a stable state with:<br><li><span class="emoji success">✅</span> <strong>Working dark mode roadmap portal</strong></li><br><li><span class="emoji success">✅</span> <strong>Comprehensive bug tracking</strong></li><br><li><span class="emoji success">✅</span> <strong>Mandatory memory protocols established</strong></li><br><li><span class="emoji success">✅</span> <strong>Clear next steps documented</strong></li></p><p><strong>Next developer can pick up from Phase 1 database analysis or tackle the CVE link bug fix.</strong></p><p>---</p><p><em>Generated: August 24, 2025 | HexTrackr Development Team</em><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p class="text-muted">
+                    <small>🔄 Auto-generated from markdown files | Run <code>npm run roadmap</code> to update</small>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
+    <script>
+        // Auto-refresh functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling for internal links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+            
+            // Progress tracking
+            const checkboxes = document.querySelectorAll('.todo-item input[type="checkbox"]');
+            const totalTasks = checkboxes.length;
+            const completedTasks = document.querySelectorAll('.todo-item.completed').length;
+            
+            if (totalTasks > 0) {
+                const progressPercent = Math.round((completedTasks / totalTasks) * 100);
+                console.log(`📊 Overall Progress: ${completedTasks}/${totalTasks} tasks (${progressPercent}%)`);
+            }
+        });
+    </script>
+</body>
+</html>

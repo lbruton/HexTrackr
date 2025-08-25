@@ -61,12 +61,13 @@ function generatePortal() {
     // Read roadmap files
     const strategicRoadmap = fs.readFileSync(path.join(roadmapsDir, 'ROADMAP.md'), 'utf8');
     const tacticalRoadmap = fs.readFileSync(path.join(roadmapsDir, 'UI_UX_ROADMAP.md'), 'utf8');
+    const statusContent = fs.readFileSync(path.join(roadmapsDir, 'CURRENT_STATUS.md'), 'utf8');
     
     // Convert to HTML
+    // Convert markdown to HTML
     const strategicHtml = markdownToHtml(strategicRoadmap);
     const tacticalHtml = markdownToHtml(tacticalRoadmap);
-    
-    // Generate complete HTML page
+    const statusHtml = markdownToHtml(statusContent);    // Generate complete HTML page
     const htmlTemplate = `
 <!DOCTYPE html>
 <html lang="en">
@@ -78,12 +79,12 @@ function generatePortal() {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/gitbook-style@1.0.0/dist/gitbook.min.css" rel="stylesheet" onerror="this.remove();">
     <style>
-        /* Enhanced Documentation Theme with GitBook/VuePress inspiration */
+        /* Enhanced Dark Mode Documentation Theme */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Liberation Sans', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.65;
-            color: #2c3e50;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #e5e7eb;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
             margin: 0;
             padding: 0;
         }
@@ -96,32 +97,33 @@ function generatePortal() {
         .documentation-container {
             max-width: 1400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(31, 41, 55, 0.95);
             border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
             overflow: hidden;
+            border: 1px solid #374151;
         }
         
         .roadmap-card {
-            background: white;
-            border: 1px solid #e5e7eb;
+            background: #1f2937;
+            border: 1px solid #374151;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             margin-bottom: 1.5rem;
             overflow: hidden;
         }
         
         .roadmap-header {
-            background: #ffffff;
-            border-bottom: 2px solid #e5e7eb;
-            color: #1f2937;
+            background: #111827;
+            border-bottom: 2px solid #374151;
+            color: #f9fafb;
             padding: 1.5rem;
             position: relative;
         }
         
         .roadmap-header h2 {
-            color: #111827;
+            color: #f9fafb;
             margin: 0;
             font-weight: 600;
         }
@@ -130,7 +132,8 @@ function generatePortal() {
             padding: 2rem;
             max-height: 70vh;
             overflow-y: auto;
-            background: white;
+            background: #1f2937;
+            color: #e5e7eb;
         }
         
         .emoji {
@@ -322,21 +325,21 @@ function generatePortal() {
         }
         
         .page-header {
-            background: white;
+            background: #111827;
             padding: 2rem 0;
             margin-bottom: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #374151;
         }
         
         .page-title {
-            color: #111827;
+            color: #f9fafb;
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
         
         .page-subtitle {
-            color: #6b7280;
+            color: #9ca3af;
             font-size: 1.125rem;
             font-weight: 400;
         }
@@ -399,24 +402,23 @@ function generatePortal() {
                 </div>
             </div>
             
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <ul class="nav nav-tabs" id="roadmapTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="strategic-tab" data-bs-toggle="tab" data-bs-target="#strategic" type="button" role="tab">
-                            🎯 Strategic Roadmap
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="tactical-tab" data-bs-toggle="tab" data-bs-target="#tactical" type="button" role="tab">
-                            🚀 Tactical Implementation
-                        </button>
-                    </li>
-                </ul>
-                
-                <a href="CURRENT_STATUS.md" class="btn btn-outline-primary btn-sm" target="_blank" title="View current session status">
-                    📋 Session Status
-                </a>
-            </div>
+            <ul class="nav nav-tabs" id="roadmapTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="strategic-tab" data-bs-toggle="tab" data-bs-target="#strategic" type="button" role="tab">
+                        🎯 Strategic Roadmap
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tactical-tab" data-bs-toggle="tab" data-bs-target="#tactical" type="button" role="tab">
+                        🚀 Tactical Implementation
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="status-tab" data-bs-toggle="tab" data-bs-target="#status" type="button" role="tab">
+                        📋 Session Status
+                    </button>
+                </li>
+            </ul>
             
             <div class="tab-content" id="roadmapTabsContent">
                 <div class="tab-pane fade show active" id="strategic" role="tabpanel">
@@ -439,6 +441,18 @@ function generatePortal() {
                         </div>
                         <div class="roadmap-content">
                             ${tacticalHtml}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="status" role="tabpanel">
+                    <div class="roadmap-card">
+                        <div class="roadmap-header">
+                            <h2 class="mb-0">Session Status & Handoff</h2>
+                            <div class="last-updated">Current Development Session</div>
+                        </div>
+                        <div class="roadmap-content">
+                            ${statusHtml}
                         </div>
                     </div>
                 </div>

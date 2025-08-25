@@ -1,22 +1,9 @@
-# HexTrackr - Cyb## 🎯 Curre## 📋 Development
-**Current Planning**: 
-- **Strategic**: See `roadmaps/ROADMAP.md` for long-term project vision
-- **Tactical**: See `roadmaps/UI_UX_ROADMAP.md` for immediate UI/UX implementation plan
-- **🌐 Portal**: View at http://localhost:8080/roadmaps/ or run `npm run roadmap` to regenerate
-
-**Architecture**: Node.js/Express backend with SQLite database, Tabler.io (vulnerabilities) + Bootstrap 5 (tickets) frontend, Docker deployment ready.tatus
-- ✅ Modern UI unified
-- 🔄 **CRITICAL**: Implementing trend tracking (see `CURRENT_ROADMAP.md`)
-
-## 📋 Development
-**Current Focus**: Time-series data model - CSV imports should update existing records, not duplicate them.
-
-**Architecture**: Node.js/Express + SQLite with time-series vulnerability tracking, modern Tabler.io UI.ty Management System
+# HexTrackr - Cybersecurity Management System
 
 ## 🛡️ Overview
 **Time-series vulnerability tracking** and security ticket management system. Tracks VPR changes over time rather than creating duplicates.
 
-## � Quick Start
+## 🚀 Quick Start
 ```bash
 docker-compose up -d
 # Access: http://localhost:8080
@@ -28,14 +15,31 @@ docker-compose up -d
 - `server.js` - Node.js/Express API backend
 - `data/hextrackr.db` - SQLite database
 
-## � Current Status
-- ✅ Phase 1-2: Core functionality complete
-- 🔄 Phase 3: Advanced UX improvements (see `PHASE3_ROADMAP.md`)
+## 🎯 Current Status
+- ✅ Modern UI unified with Tabler.io framework
+- 🔄 **CRITICAL**: Implementing time-series data model for trend tracking
+- � **Current Sprint**: Database schema migration (Phase 1)
 
-## � Development
-**Primary Planning**: See `PHASE3_ROADMAP.md` for detailed sprint planning and implementation roadmap.
+## 📋 Development Planning
+**Strategic Roadmap**: See `roadmaps/ROADMAP.md` for long-term project vision and feature roadmap  
+**Current Technical Work**: See `roadmaps/UI_UX_ROADMAP.md` for immediate implementation tasks and sprints  
+**Sprint Status**: See `roadmaps/CURRENT_STATUS.md` for current progress and handoff information  
+**🌐 Portal**: View all roadmaps at http://localhost:8080/roadmaps/
 
-**Architecture**: Node.js/Express backend with SQLite database, Tabler.io (vulnerabilities) + Bootstrap 5 (tickets) frontend, Docker deployment ready.
+## 🏗️ Architecture
+**Deployment**: Docker-only containerized system  
+**Backend**: Node.js/Express + SQLite with time-series vulnerability tracking  
+**Frontend**: Tabler.io (vulnerabilities) + Bootstrap 5 (tickets)  
+**Data Model**: Time-series tracking - CSV imports update existing records, not duplicate them  
+**Port**: Application runs on `localhost:8080` via Docker port mapping
+
+## 🔧 Development Focus
+**Primary Issue**: CSV imports create duplicates instead of tracking changes over time  
+**Solution**: Transform into time-series vulnerability management system  
+**Current Phase**: Database schema migration and UPSERT implementation  
+
+---
+*For detailed AI assistant workflows and development patterns, see `.github/copilot-instructions.md`*
 
 ---
 *For detailed AI assistant workflows and development patterns, see `.github/copilot-instructions.md`*

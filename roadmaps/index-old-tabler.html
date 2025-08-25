@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr Development Roadmap Portal</title>
+    <link rel="stylesheet" href="pico.min.css">
+    <style>
+        /* HexTrackr Customizations for Pico CSS */
+        :root {
+            /* Custom colors for cybersecurity theme */
+            --pico-primary-500: #0ea5e9; /* Sky blue for primary actions */
+            --pico-primary-600: #0284c7;
+            --pico-primary-700: #0369a1;
+            --pico-secondary-500: #10b981; /* Emerald for success/security */
+            --pico-secondary-600: #059669;
+            --pico-accent-500: #f59e0b; /* Amber for warnings */
+            --pico-accent-600: #d97706;
+        }
+
+        /* Header styling */
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--pico-border-color);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--pico-primary-500), var(--pico-secondary-500));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            color: var(--pico-muted-color);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* Navigation tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding: 0;
+            list-style: none;
+            border-bottom: 1px solid var(--pico-border-color);
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-radius: var(--pico-border-radius) var(--pico-border-radius) 0 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--pico-muted-color);
+            text-decoration: none;
+            display: block;
+        }
+
+        .nav-tab:hover {
+            background-color: var(--pico-card-background-color);
+            color: var(--pico-color);
+        }
+
+        .nav-tab.active {
+            background-color: var(--pico-primary-background);
+            color: var(--pico-primary);
+            border-bottom: 2px solid var(--pico-primary);
+        }
+
+        /* Content panels */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Roadmap specific styling */
+        .roadmap-section {
+            margin-bottom: 2rem;
+        }
+
+        .phase {
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--pico-primary);
+            background-color: var(--pico-card-background-color);
+            border-radius: 0 var(--pico-border-radius) var(--pico-border-radius) 0;
+        }
+
+        .phase.completed {
+            border-left-color: var(--pico-secondary-500);
+        }
+
+        .phase.in-progress {
+            border-left-color: var(--pico-accent-500);
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 1rem;
+        }
+
+        .phase-title {
+            margin: 0;
+            color: var(--pico-color);
+        }
+
+        .phase-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--pico-border-radius);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-completed {
+            background-color: var(--pico-secondary-background);
+            color: var(--pico-secondary);
+        }
+
+        .status-in-progress {
+            background-color: var(--pico-accent-background);
+            color: var(--pico-accent-500);
+        }
+
+        .status-planned {
+            background-color: var(--pico-muted-background-color);
+            color: var(--pico-muted-color);
+        }
+
+        /* Code blocks and technical content */
+        pre {
+            background-color: var(--pico-code-background-color);
+            border: 1px solid var(--pico-border-color);
+        }
+
+        code {
+            background-color: var(--pico-code-background-color);
+            padding: 0.125rem 0.25rem;
+            border-radius: calc(var(--pico-border-radius) / 2);
+        }
+
+        /* Links and buttons */
+        a {
+            color: var(--pico-primary);
+            text-decoration-color: var(--pico-primary-background);
+        }
+
+        a:hover {
+            text-decoration-color: var(--pico-primary);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 4rem;
+            padding: 2rem 0;
+            border-top: 1px solid var(--pico-border-color);
+            text-align: center;
+            color: var(--pico-muted-color);
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1 class="logo">🛡️ HexTrackr</h1>
+            <p class="tagline">Cybersecurity Management System - Development Roadmap</p>
+        </header>
+
+        <nav>
+            <ul class="nav-tabs" role="tablist">
+                <li><a href="#current" class="nav-tab active" data-tab="current">Current Roadmap</a></li>
+                <li><a href="#phase3" class="nav-tab" data-tab="phase3">Phase 3</a></li>
+                <li><a href="#ui-ux" class="nav-tab" data-tab="ui-ux">UI/UX</a></li>
+            </ul>
+        </nav>
+
+        <div id="current" class="tab-content active">
+            <article class="roadmap-section">
+                <header>
+                    <h2>�️ HexTrackr Trend Tracking Roadmap</h2>
+                    <p><em>Updated: August 24, 2025</em></p>
+                    <div style="background-color: var(--pico-accent-background); color: var(--pico-accent-500); padding: 1rem; border-radius: var(--pico-border-radius); margin: 1rem 0;">
+                        <strong>🎯 CRITICAL ISSUE IDENTIFIED: No Trend Tracking</strong><br>
+                        <strong>Problem:</strong> CSV imports create duplicates instead of tracking changes over time<br>
+                        <strong>Solution:</strong> Transform into time-series vulnerability management system
+                    </div>
+                </header>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">📋 PHASE 1: Database Schema Migration</h3>
+                        <span class="phase-status status-planned">Risk: HIGH | Impact: CRITICAL</span>
+                    </div>
+                    <h4>1.1 Analyze Current Data Structure</h4>
+                    <ul>
+                        <li>Audit existing vulnerability data patterns</li>
+                        <li>Identify unique vulnerability identifiers (CVE+hostname+date)</li>
+                        <li>Map current columns to time-series requirements</li>
+                    </ul>
+                    <h4>1.2 Design Time-Series Schema</h4>
+                    <ul>
+                        <li>Create <code>vulnerability_master</code> table (static CVE data)</li>
+                        <li>Create <code>vulnerability_history</code> table (time-series: device+date+VPR)</li>
+                        <li>Add unique constraints: <code>(hostname, cve, scan_date)</code></li>
+                        <li>Design indexes for latest-value queries</li>
+                    </ul>
+                </section>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">📊 PHASE 2: Smart CSV Import System</h3>
+                        <span class="phase-status status-planned">Risk: MEDIUM | Impact: HIGH</span>
+                    </div>
+                    <h4>2.1 Redesign Import Logic</h4>
+                    <ul>
+                        <li>Use date field as "last_updated" timestamp</li>
+                        <li>Implement UPSERT logic (UPDATE if exists, INSERT if new)</li>
+                        <li>Key on: <code>hostname + cve + scan_date</code></li>
+                        <li>Track VPR changes over time</li>
+                    </ul>
+                    <h4>2.2 Data Validation & Integrity</h4>
+                    <ul>
+                        <li>Validate date formats during import</li>
+                        <li>Ensure VPR score changes are logged</li>
+                        <li>Add data quality checks</li>
+                        <li>Handle malformed/duplicate entries gracefully</li>
+                    </ul>
+                </section>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">� PHASE 3: Latest Values Display</h3>
+                        <span class="phase-status status-planned">Risk: LOW | Impact: MEDIUM</span>
+                    </div>
+                    <h4>3.1 Update API Endpoints</h4>
+                    <ul>
+                        <li>Modify <code>/api/vulnerabilities</code> to return latest values only</li>
+                        <li>Create efficient queries for most recent data per device+CVE</li>
+                        <li>Ensure cards/tables show current state</li>
+                    </ul>
+                </section>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">📊 PHASE 4: Trend Visualization</h3>
+                        <span class="phase-status status-planned">Risk: LOW | Impact: HIGH</span>
+                    </div>
+                    <h4>4.1 Historical Data API</h4>
+                    <ul>
+                        <li>Create <code>/api/vulnerabilities/trends</code> endpoint</li>
+                        <li>Return VPR changes over time per vulnerability</li>
+                        <li>Support date range filtering</li>
+                    </ul>
+                    <h4>4.2 Chart Implementation</h4>
+                    <ul>
+                        <li>Design Chart.js trend visualizations</li>
+                        <li>Show VPR score changes over time</li>
+                        <li>Display severity level migrations</li>
+                        <li>Add device-level trend analysis</li>
+                    </ul>
+                </section>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">🔌 PHASE 5: API Integration Framework</h3>
+                        <span class="phase-status status-planned">Risk: MEDIUM | Impact: HIGH</span>
+                    </div>
+                    <ul>
+                        <li>Design hooks for real-time API data</li>
+                        <li>Create 30-day history pull mechanism</li>
+                        <li>Merge API data with CSV historical data</li>
+                        <li>Support multiple data sources (CSV + API)</li>
+                    </ul>
+                </section>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">🎨 PHASE 6: Enhanced User Interactions</h3>
+                        <span class="phase-status status-planned">Risk: LOW | Impact: MEDIUM</span>
+                    </div>
+                    <h4>6.1 Vulnerability Action Buttons</h4>
+                    <ul>
+                        <li><strong>Edit Button (Pencil Icon):</strong> Modal for editing vulnerability information</li>
+                        <li><strong>Refresh Button:</strong> API data refresh for individual vulnerabilities</li>
+                        <li>Button state management with tooltips and error handling</li>
+                    </ul>
+                    <h4>6.2 Smart Filtering & Table Interactions</h4>
+                    <ul>
+                        <li>Clickable description, CVE, and hostname filtering</li>
+                        <li>Smart info icons for external CVE database links</li>
+                        <li>Enhanced filter UI with removable chips/badges</li>
+                    </ul>
+                </section>
+
+                <div style="background-color: var(--pico-secondary-background); color: var(--pico-secondary); padding: 1rem; border-radius: var(--pico-border-radius); margin: 2rem 0;">
+                    <h4>🎯 IMMEDIATE NEXT STEPS</h4>
+                    <ol>
+                        <li><strong>Start with Phase 1.1:</strong> Analyze current data structure</li>
+                        <li><strong>Keep it simple:</strong> One task at a time</li>
+                        <li><strong>Test thoroughly:</strong> Each phase must be working before moving on</li>
+                    </ol>
+                </div>
+            </article>
+        </div>
+
+        <div id="phase3" class="tab-content">
+            <article class="roadmap-section">
+                <header>
+                    <h2>� Phase 3: Enhanced UX & Advanced Filtering System</h2>
+                    <p>Critical UX improvements identified for immediate implementation based on user testing findings.</p>
+                </header>
+
+                <div style="background-color: var(--pico-accent-background); color: var(--pico-accent-500); padding: 1rem; border-radius: var(--pico-border-radius); margin: 1rem 0;">
+                    <h4>🐛 Critical Issues Found:</h4>
+                    <ul style="margin: 0.5rem 0;">
+                        <li><strong>CVE Link Functionality Broken</strong> - Multiple CVEs showing blank popups</li>
+                        <li><strong>Missing Vulnerability Details Modal</strong> - Need comprehensive device lists</li>
+                        <li><strong>State Management Issues</strong> - Better color coding and filtering needed</li>
+                        <li><strong>Limited Filtering Options</strong> - No vendor-based filtering in table view</li>
+                        <li><strong>Performance Issues</strong> - No pagination causing memory problems</li>
+                        <li><strong>Device Modal Export Issues</strong> - Non-functional report generation</li>
+                    </ul>
+                </div>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">🎯 Sprint 3.1: Core Functionality Fixes</h3>
+                        <span class="phase-status status-in-progress">Priority: CRITICAL</span>
+                    </div>
+                    <h4>3.1.1 Header & Navigation Cleanup</h4>
+                    <ul>
+                        <li>Remove non-working "Import CSV Data" button from header</li>
+                        <li>Remove standalone "Settings" button (now in user dropdown)</li>
+                        <li>Clean up header layout for better visual balance</li>
+                        <li>Update navigation accessibility and keyboard support</li>
+                    </ul>
+                    <h4>3.1.2 CVE Link System Overhaul</h4>
+                    <ul>
+                        <li>Audit all CVE link implementations</li>
+                        <li>Create centralized CVE popup handler function</li>
+                        <li>Fix popup URL construction for multiple CVEs</li>
+                        <li>Implement 1200px wide popup standard</li>
+                        <li>Add error handling for blocked popups</li>
+                    </ul>
+                    <h4>3.1.3 Enhanced Vulnerability Details Modal</h4>
+                    <ul>
+                        <li>Design vulnerability details modal (mirror of device modal)</li>
+                        <li>Implement affected devices grid with sorting/filtering</li>
+                        <li>Add vulnerability metadata display (CVSS, VPR, timeline)</li>
+                        <li>Create vulnerability export functionality</li>
+                    </ul>
+                    <p><em>Estimated Completion: 2-3 development days</em></p>
+                </section>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">� Sprint 3.2: Advanced Filtering & State Management</h3>
+                        <span class="phase-status status-planned">Priority: HIGH</span>
+                    </div>
+                    <h4>3.2.1 Enhanced Statistics Cards & Vendor Filtering</h4>
+                    <ul>
+                        <li>Redesign statistics cards to be larger and more prominent</li>
+                        <li>Add historical trend mini-charts below each stat card</li>
+                        <li>Implement clickable cards that flip between vendor views</li>
+                        <li>Extract vendor information from plugin_name/vendor database</li>
+                        <li>Add smooth card flip animations with CSS transforms</li>
+                    </ul>
+                    <h4>3.2.2 Interactive Historical Trends Enhancement</h4>
+                    <ul>
+                        <li>Sync Historical VPR Trends chart with stat card filters</li>
+                        <li>Add vendor-specific trend line filtering</li>
+                        <li>Implement clickable trend line legend</li>
+                        <li>Add chart interaction controls (zoom, tooltips, export)</li>
+                    </ul>
+                    <h4>3.2.3 Enhanced State Management</h4>
+                    <ul>
+                        <li><code>Open</code> → Red badge with warning icon</li>
+                        <li><code>In Progress</code> → Yellow badge with clock icon</li>
+                        <li><code>Resolved</code> → Green badge with check icon</li>
+                        <li><code>False Positive</code> → Gray badge with X icon</li>
+                    </ul>
+                    <p><em>Estimated Completion: 3-4 development days</em></p>
+                </section>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">⚡ Sprint 3.3: Performance & Pagination</h3>
+                        <span class="phase-status status-planned">Priority: HIGH</span>
+                    </div>
+                    <h4>3.3.1 Universal Pagination System</h4>
+                    <ul>
+                        <li>Device cards: 12 per page</li>
+                        <li>Vulnerability cards: 9 per page</li>
+                        <li>Asset cards: 15 per page</li>
+                        <li>Add page size selection options (12/24/48)</li>
+                        <li>Implement virtual scrolling for large datasets</li>
+                    </ul>
+                    <h4>3.3.2 Performance Optimization</h4>
+                    <ul>
+                        <li>Implement lazy loading for card images/charts</li>
+                        <li>Add data virtualization for large tables</li>
+                        <li>Create loading skeletons for better UX</li>
+                        <li>Add performance monitoring and metrics</li>
+                    </ul>
+                    <p><em>Estimated Completion: 2-3 development days</em></p>
+                </section>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">🔍 Sprint 3.4: Advanced Features & Polish</h3>
+                        <span class="phase-status status-planned">Priority: MEDIUM</span>
+                    </div>
+                    <h4>3.4.1 Enhanced Search & Discovery</h4>
+                    <ul>
+                        <li>Implement global search across all data types</li>
+                        <li>Add search suggestions and autocomplete</li>
+                        <li>Create saved filter presets</li>
+                        <li>Implement boolean search operators</li>
+                    </ul>
+                    <h4>3.4.2 Data Export & Reporting Enhancements</h4>
+                    <ul>
+                        <li>Create executive summary reports</li>
+                        <li>Add custom report builder interface</li>
+                        <li>Implement scheduled report generation</li>
+                        <li>Create report templates library</li>
+                    </ul>
+                </section>
+
+                <div style="background-color: var(--pico-primary-background); color: var(--pico-primary); padding: 1rem; border-radius: var(--pico-border-radius); margin: 2rem 0;">
+                    <h4>📋 Resource Requirements</h4>
+                    <ul style="margin: 0.5rem 0;">
+                        <li><strong>Phase 3.1-3.4 (Core UX):</strong> 8-12 development days</li>
+                        <li><strong>Sprint Distribution:</strong> 5 sprints @ 2-3 days each</li>
+                        <li><strong>Testing Time:</strong> 3-4 additional days</li>
+                        <li><strong>Total Estimated Time:</strong> 10-15 development days</li>
+                    </ul>
+                </div>
+            </article>
+        </div>
+
+        <div id="ui-ux" class="tab-content">
+            <article class="roadmap-section">
+                <header>
+                    <h2>🎨 UI/UX Enhancement Roadmap</h2>
+                    <p><em>Updated: December 19, 2024</em></p>
+                </header>
+                
+                <div style="background-color: var(--pico-primary-background); color: var(--pico-primary-500); padding: 1rem; border-radius: var(--pico-border-radius); margin: 1rem 0;">
+                    <h4>🎯 Current Status: Analysis Complete</h4>
+                    <p><strong>✅ CONFIRMED WORKING:</strong></p>
+                    <ul style="margin: 0.5rem 0;">
+                        <li>CVE links intelligently split multiple CVEs into individual tabs ✅</li>
+                        <li>Modern Tabler.io vulnerability dashboard with real data ✅</li>
+                        <li>Statistics cards (109 Critical, 4,843 High, etc.) ✅</li>
+                        <li>AG Grid table with pagination (Page 1 of 200) ✅</li>
+                    </ul>
+                </div>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">📋 Phase 1: Enhanced Modal System</h3>
+                        <span class="phase-status status-planned">Risk: LOW | Impact: HIGH | Duration: 3-4 tasks</span>
+                    </div>
+                    
+                    <h4>1.1 Vulnerability Description Modal</h4>
+                    <ul>
+                        <li>🔲 <strong>NEW FEATURE</strong>: Click vulnerability description → modal</li>
+                        <li>🔲 Show vulnerability details, totals, affected devices table</li>
+                        <li>🔲 Mirror hostname modal but "flipped" perspective</li>
+                        <li>🔲 Use 1200px width like device modal</li>
+                    </ul>
+
+                    <h4>1.2 Device Modal Enhancements</h4>
+                    <ul>
+                        <li>🔲 <strong>FIX</strong>: CVE links in Active Vulnerabilities sub-table should open 1200px popup</li>
+                        <li>🔲 <strong>IMPLEMENT</strong>: Generate Report → PDF/HTML export of Device Overview</li>
+                        <li>🔲 <strong>IMPLEMENT</strong>: Export button → CSV export of Active Vulnerabilities table</li>
+                    </ul>
+                </section>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">📋 Phase 2: Enhanced Filtering & Display</h3>
+                        <span class="phase-status status-planned">Risk: LOW | Impact: MEDIUM | Duration: 3-4 tasks</span>
+                    </div>
+                    
+                    <h4>2.1 State Column Improvements & Default Filtering</h4>
+                    <ul>
+                        <li>🔲 <strong>DEFAULT</strong>: Hide FIXED state by default in all filters (table, charts, totals)</li>
+                        <li>🔲 <strong>STYLE</strong>: Use different color scheme for STATE column (currently showing FIXED/Open)</li>
+                        <li>🔲 <strong>FILTER</strong>: Add State filter dropdown to table controls</li>
+                        <li>🔲 <strong>CONSISTENCY</strong>: Ensure state colors match across cards and table</li>
+                    </ul>
+
+                    <h4>2.2 Layout & Navigation Improvements</h4>
+                    <ul>
+                        <li>🔲 <strong>REPOSITION</strong>: Move search bar below charts and above table</li>
+                        <li>🔲 <strong>CRITICAL FIX</strong>: Fix non-functional "Clear Data" button in settings</li>
+                        <li>🔲 <strong>UI</strong>: Optimize layout flow for better user experience</li>
+                    </ul>
+
+                    <h4>2.3 Vendor Filtering & View Synchronization</h4>
+                    <ul>
+                        <li>� <strong>FILTER</strong>: Add Vendor filter dropdown (CISCO, Tenable, etc.)</li>
+                        <li>🔲 <strong>UI</strong>: Integrate with existing severity filter in clean layout</li>
+                        <li>🔲 <strong>EXTEND</strong>: Apply all table filters to card views (Devices/Vulnerabilities)</li>
+                        <li>🔲 <strong>SYNC</strong>: Keep filter state synchronized across view modes</li>
+                    </ul>
+
+                    <h4>2.4 Unified Header Design</h4>
+                    <ul>
+                        <li>🔲 <strong>HEADER UNIFICATION</strong>: Remove purple bar from vulnerability dashboard</li>
+                        <li>🔲 <strong>DARK HEADER</strong>: Replace vuln dashboard top bar with tickets page dark header</li>
+                        <li>🔲 <strong>TOGGLE INTEGRATION</strong>: Move dark/light mode toggle into both page toolbars</li>
+                        <li>🔲 <strong>MENU CONSISTENCY</strong>: Add hamburger menu to both pages with same styling</li>
+                        <li>🔲 <strong>BRANDING</strong>: Ensure consistent HexTrackr branding across both dashboards</li>
+                    </ul>
+                </section>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">� Phase 3: Performance & Navigation</h3>
+                        <span class="phase-status status-planned">Risk: LOW | Impact: HIGH | Duration: 2-3 tasks</span>
+                    </div>
+                    
+                    <h4>3.1 Pagination Enhancement</h4>
+                    <ul>
+                        <li>🔲 <strong>OPTIMIZE</strong>: Add pagination to card views (currently only table has it)</li>
+                        <li>🔲 <strong>PERFORMANCE</strong>: Reduce initial load by limiting cards per page</li>
+                        <li>🔲 <strong>UX</strong>: Consistent pagination controls across all views</li>
+                    </ul>
+
+                    <h4>3.2 Memory & Load Optimization</h4>
+                    <ul>
+                        <li>🔲 <strong>ANALYZE</strong>: Current system loads 10,000+ records (Page 1 of 200)</li>
+                        <li>🔲 <strong>OPTIMIZE</strong>: Implement virtual scrolling or smaller page sizes</li>
+                        <li>🔲 <strong>CACHE</strong>: Better client-side data management</li>
+                    </ul>
+                </section>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">� Phase 4: Time-Series Data Model</h3>
+                        <span class="phase-status status-planned">Risk: HIGH | Impact: CRITICAL | Duration: 5-6 tasks</span>
+                    </div>
+                    
+                    <blockquote>
+                        <em>Note: This is the fundamental architecture change for trend tracking</em>
+                    </blockquote>
+                    
+                    <h4>4.1 Database Schema Migration</h4>
+                    <ul>
+                        <li>🔲 <strong>ANALYZE</strong>: Current duplicate-creating CSV import logic</li>
+                        <li>🔲 <strong>DESIGN</strong>: Time-series schema with trend tracking</li>
+                        <li>🔲 <strong>MIGRATE</strong>: Transform existing data to new model</li>
+                    </ul>
+
+                    <h4>4.2 Import Logic Redesign</h4>
+                    <ul>
+                        <li>🔲 <strong>IMPLEMENT</strong>: UPSERT based on hostname + CVE + scan_date</li>
+                        <li>🔲 <strong>TRACK</strong>: VPR changes over time instead of duplicating</li>
+                        <li>🔲 <strong>VALIDATE</strong>: Date field as last_updated timestamp</li>
+                    </ul>
+                </section>
+
+                <section class="phase">
+                    <div class="phase-header">
+                        <h3 class="phase-title">📋 Phase 5: Cross-Dashboard Integration</h3>
+                        <span class="phase-status status-planned">Risk: MEDIUM | Impact: HIGH | Duration: 4-5 tasks</span>
+                    </div>
+                    
+                    <h4>5.1 Ticket ↔ Vulnerability Cross-Reference</h4>
+                    <ul>
+                        <li>🔲 <strong>HOSTNAME LINKS</strong>: Click hostname in tickets dashboard → opens vulnerability modal</li>
+                        <li>🔲 <strong>DEVICE INTEGRATION</strong>: Add "Open Ticket" button on vulnerability device cards</li>
+                        <li>🔲 <strong>MODAL SHARING</strong>: Share device modal component between dashboards</li>
+                        <li>🔲 <strong>DATA INDEPENDENCE</strong>: Maintain separate data storage for each dashboard</li>
+                    </ul>
+
+                    <h4>5.2 Cross-Dashboard Modal System</h4>
+                    <ul>
+                        <li>🔲 <strong>SHARED COMPONENTS</strong>: Extract device modal for reuse across pages</li>
+                        <li>🔲 <strong>TICKET CREATION</strong>: Open add ticket modal from vulnerability dashboard</li>
+                    </ul>
+                </section>
+            </article>
+        </div>
+
+        <footer>
+            <p><strong>HexTrackr</strong> • Cybersecurity Management Platform • <em>Built with 🛡️ for Security Teams</em></p>
+            <p><small>Last updated: August 25, 2025 • <a href="https://github.com/Lonnie-Bruton/HexTrackr">View on GitHub</a></small></p>
+        </footer>
+    </main>
+
+    <script>
+        // Simple tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.nav-tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    const targetId = this.getAttribute('data-tab');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
