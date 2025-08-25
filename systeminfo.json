@@ -1,0 +1,155 @@
+{
+  "project": {
+    "name": "HexTrackr",
+    "version": "2.0.0",
+    "description": "Dual-purpose cybersecurity management system with ticket management and vulnerability analysis",
+    "repository": "https://github.com/lbruton/HexTrackr",
+    "license": "MIT",
+    "created": "2024",
+    "lastUpdated": "2025-08-24"
+  },
+  "architecture": {
+    "type": "Client-Side + API Hybrid",
+    "deployment": "Docker Container",
+    "database": "SQLite3 (server-side) + localStorage + IndexedDB",
+    "frontend": "Vanilla JavaScript + Bootstrap/Tabler.io",
+    "backend": "Node.js Express Server",
+    "port": 8080
+  },
+  "applications": {
+    "tickets": {
+      "file": "tickets.html",
+      "purpose": "Hexagon security ticket workflow management",
+      "storage": "localStorage",
+      "storageKey": "hexagonTickets",
+      "dependencies": [
+        "Bootstrap 5.3.0",
+        "Font Awesome 6.4.0",
+        "XLSX (SheetJS)",
+        "jsPDF + AutoTable",
+        "JSZip",
+        "PapaParse"
+      ],
+      "jsFile": "app.js",
+      "mainClass": "HexagonTicketsManager",
+      "features": [
+        "CSV import/export",
+        "PDF generation with bundling",
+        "Device smart naming",
+        "Drag-and-drop reordering",
+        "Local storage persistence"
+      ],
+      "apiDependency": false
+    },
+    "vulnerabilities": {
+      "file": "vulnerabilities-new.html",
+      "purpose": "Multi-vendor vulnerability data analysis and management",
+      "storage": "SQLite3 database via API",
+      "database": "hextrackr.db",
+      "dependencies": [
+        "Tabler.io CSS/JS",
+        "Chart.js",
+        "SortableJS",
+        "AG-Grid Community",
+        "ApexCharts",
+        "PapaParse"
+      ],
+      "jsFile": "vulnerabilities.js",
+      "mainClass": "ModernVulnManager",
+      "features": [
+        "CSV upload processing",
+        "VPR scoring integration",
+        "Device/vulnerability card views",
+        "Advanced filtering and search",
+        "Statistics dashboard",
+        "API-based data persistence"
+      ],
+      "apiDependency": true,
+      "apiEndpoints": [
+        "/api/vulnerabilities/upload",
+        "/api/vulnerabilities/stats",
+        "/api/vulnerabilities/devices",
+        "/api/vulnerabilities/search"
+      ]
+    }
+  },
+  "dataFlow": {
+    "tickets": {
+      "storage": "Client-side localStorage",
+      "persistence": "Browser local storage only",
+      "export": "CSV, Excel, JSON, PDF, HTML",
+      "import": "CSV via Papa.parse"
+    },
+    "vulnerabilities": {
+      "storage": "Server-side SQLite3 database",
+      "persistence": "Database file at /app/data/hextrackr.db",
+      "api": "RESTful Express.js endpoints",
+      "upload": "Multipart form data processing",
+      "processing": "Server-side CSV parsing and VPR calculations"
+    }
+  },
+  "development": {
+    "environment": "Docker containerized",
+    "volumes": [
+      ".:/app (source code mounting)",
+      "/app/node_modules (dependency isolation)",
+      "./data:/app/data (database persistence)"
+    ],
+    "devServer": "Express.js with live reload via volume mounting",
+    "buildProcess": "Docker build with Alpine Linux + Node.js 18",
+    "dependencies": {
+      "native": ["sqlite3", "python3", "make", "g++"],
+      "security": "npm audit, Codacy integration"
+    }
+  },
+  "fileStructure": {
+    "entryPoints": {
+      "tickets.html": "Ticket management interface",
+      "vulnerabilities-new.html": "Vulnerability analysis interface"
+    },
+    "scripts": {
+      "app.js": "Ticket management logic (HexagonTicketsManager)",
+      "vulnerabilities.js": "Vulnerability management logic (ModernVulnManager) - TO BE EXTRACTED",
+      "modal-solutions.js": "Shared modal utilities",
+      "server.js": "Express.js API server"
+    },
+    "styles": {
+      "styles.css": "Shared custom styles",
+      "bootstrap": "Used by tickets.html",
+      "tabler": "Used by vulnerabilities-new.html"
+    },
+    "data": {
+      "hextrackr.db": "SQLite database for vulnerabilities",
+      "uploads/": "Temporary CSV upload directory"
+    }
+  },
+  "criticalSeparation": {
+    "warning": "NEVER mix ticket and vulnerability JavaScript logic",
+    "tickets": {
+      "scope": "tickets.html + app.js only",
+      "storage": "localStorage with key 'hexagonTickets'",
+      "framework": "Bootstrap 5",
+      "offline": true
+    },
+    "vulnerabilities": {
+      "scope": "vulnerabilities-new.html + vulnerabilities.js only",
+      "storage": "API calls to /api/vulnerabilities/*",
+      "framework": "Tabler.io",
+      "offline": false,
+      "serverRequired": true
+    }
+  },
+  "nextSteps": {
+    "immediate": [
+      "Extract inline JavaScript from vulnerabilities-new.html to vulnerabilities.js",
+      "Ensure complete separation of ticket and vulnerability logic",
+      "Add JSDoc documentation to both JavaScript files"
+    ],
+    "planned": [
+      "API authentication with CryptoJS",
+      "Cisco PSIRT integration",
+      "SNMP polling capabilities",
+      "Ansible automation integration"
+    ]
+  }
+}

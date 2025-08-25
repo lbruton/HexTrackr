@@ -6,8 +6,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
+      # Mount source files for development but exclude node_modules
       - .:/app
-      - ./data:/app/data
       - /app/node_modules
     environment:
       - NODE_ENV=development
