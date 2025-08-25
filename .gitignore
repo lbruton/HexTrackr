@@ -49,6 +49,10 @@ Thumbs.db
 *.backup
 *.bak
 
+# Markdown files (except README)
+*.md
+!README.md
+
 
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
