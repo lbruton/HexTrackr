@@ -1,5 +1,24 @@
-# HexTrackr Copilot Instructions
+# HexTrackr Copilot Instruct## JavaScript Organization**: **Each HTML page MUST use its own dedicated JS file**
+   - `tickets.html` → `tickets.js` (✅ CORRECTLY ORGANIZED)
+   - `vulnerabilities.html` → `vulnerabilities.js` (📋 INCREMENTAL MIGRATION STRATEGY)
+   - **NEVER load `app.js` in HTML pages** - Use dedicated files only
+   - **JSDoc Documentation**: All JS files should have proper headers like `tickets.js`
 
+### Vulnerabilities JavaScript Migration Strategy
+**Discovery (2025-08-25)**: All vulnerabilities JavaScript (~1860 lines) is embedded in `vulnerabilities.html`, NOT in `app.js`
+- **Current State**: ModernVulnManager class and all functions are in HTML `<script>` section (lines 1098-2958)
+- **Migration Approach**: **INCREMENTAL** - Too much code to move at once
+- **New Development**: All NEW vulnerabilities JavaScript goes directly in `vulnerabilities.js`
+- **Modifications**: When modifying existing embedded JS, comment out in HTML and move to `vulnerabilities.js`
+- **Timeline**: Migrate code organically as we work through features over time
+- **No Rush**: System works perfectly with embedded JS - migrate only when touching code
+
+### Migration Process
+1. **New Features**: Write directly in `vulnerabilities.js`
+2. **Modifying Existing**: Comment out in HTML, move to `vulnerabilities.js`, test thoroughly
+3. **Documentation**: Add proper JSDoc headers for all migrated functions
+4. **Testing**: Ensure functionality works after each migration step
+5. **Gradual**: Only migrate code when actively working on that feature
 ## Project Overview
 HexTrackr is a dual-purpose cybersecurity management system:
 1. **Ticket Management** (`tickets.html` + `tickets.js`) - Security ticket workflow 
@@ -53,7 +72,8 @@ HexTrackr is a dual-purpose cybersecurity management system:
 - `server.js` - Express API server (runs in Docker container)
 - `tickets.html` + `tickets.js` - Ticket management (Bootstrap 5) ✅ **CORRECTLY ORGANIZED**
 - `app.js` - **LEGACY FILE** - Tickets functionality moved to `tickets.js`
-- `vulnerabilities.html` - Vulnerability dashboard (Tabler.io modern UI)
+- `vulnerabilities.html` - Vulnerability dashboard (Tabler.io modern UI) with **embedded JavaScript**
+- `vulnerabilities.js` - **TARGET FILE** for incremental migration of vulnerabilities JS
 - `data/hextrackr.db` - SQLite database (Docker volume mount)
 - `styles/` - CSS files
 - `scripts/` - JavaScript modules
