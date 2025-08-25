@@ -49,8 +49,24 @@
 // This file is ready to receive migrated JavaScript from vulnerabilities.html
 // All new vulnerabilities features should be added directly to this file
 
-// Global vulnerability manager instance (will be migrated)
-let vulnManager;
+/* global document, fetch, showToast, loadData, bootstrap, confirm, Papa, Blob, URL, setTimeout, window, console */
+
+// Define apiBase and other global variables if not already defined
+const apiBase = typeof window !== 'undefined' ? window.apiBase || '' : ''; // Replace with actual API base URL if needed
+const vulnerabilities = typeof window !== 'undefined' ? window.vulnerabilities || {} : {}; // Replace with actual vulnerabilities data if needed
+const filteredVulnerabilities = typeof window !== 'undefined' ? window.filteredVulnerabilities || {} : {}; // Replace with actual filtered vulnerabilities data if needed
+const devices = typeof window !== 'undefined' ? window.devices || [] : []; // Replace with actual devices data if needed
+
+// Ensure all browser-specific objects are accounted for
+if (typeof Blob === 'undefined') {
+    throw new Error('Blob is not supported in this environment.');
+}
+if (typeof URL === 'undefined') {
+    throw new Error('URL is not supported in this environment.');
+}
+if (typeof setTimeout === 'undefined') {
+    throw new Error('setTimeout is not supported in this environment.');
+}
 
 // 📋 MIGRATION CHECKLIST:
 // □ ModernVulnManager class (~1860 lines)
