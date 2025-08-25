@@ -3,12 +3,13 @@
 ## Project Overview
 HexTrackr is a dual-purpose cybersecurity management system:
 1. **Ticket Management** (`tickets.html` + `app.js`) - Security ticket workflow 
-2. **Vulnerability Management** (`vulnerabilities.html`) - Multi-vendor vulnerability analysis with modern Tabler.io UI
+2. **Vulnerability Management** (`vulnerabilities.html`) - **Time-series trend tracking** with modern Tabler.io UI
 
 ## Architecture
 - **Backend**: Node.js/Express + SQLite (`data/hextrackr.db`)
 - **Frontend**: Tabler.io + vanilla JavaScript (vulnerabilities), Bootstrap 5 (tickets)
 - **Storage**: Database-first with localStorage fallback
+- **Data Model**: **Time-series vulnerability tracking** (CSV imports track changes over time, not duplicates)
 
 ## Development Rules
 1. **Always backup first**: `git add . && git commit -m "🔄 Pre-work backup"`
@@ -33,6 +34,8 @@ HexTrackr is a dual-purpose cybersecurity management system:
 - **Required fields**: Only `location` is mandatory for tickets
 - **Device naming**: Smart auto-increment (e.g., `host01` → `host02`)
 - **Data persistence**: API-first with localStorage fallback
+- **Vulnerability Tracking**: Time-series model - CSV date field = last_updated, track VPR changes over time
+- **Import Logic**: UPSERT based on `hostname + cve + scan_date` (no duplicates)
 
 ## File Structure
 - `server.js` - Express API server

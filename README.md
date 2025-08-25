@@ -1,7 +1,14 @@
-# HexTrackr - Cybersecurity Management System
+# HexTrackr - Cyb## 🎯 Current Status
+- ✅ Modern UI unified
+- 🔄 **CRITICAL**: Implementing trend tracking (see `CURRENT_ROADMAP.md`)
+
+## 📋 Development
+**Current Focus**: Time-series data model - CSV imports should update existing records, not duplicate them.
+
+**Architecture**: Node.js/Express + SQLite with time-series vulnerability tracking, modern Tabler.io UI.ty Management System
 
 ## 🛡️ Overview
-Dual-purpose cybersecurity management system for vulnerability tracking and security ticket workflows.
+**Time-series vulnerability tracking** and security ticket management system. Tracks VPR changes over time rather than creating duplicates.
 
 ## � Quick Start
 ```bash
@@ -10,7 +17,7 @@ docker-compose up -d
 ```
 
 ## 📁 Key Files
-- `vulnerabilities.html` - Modern vulnerability dashboard (Tabler.io UI)
+- `vulnerabilities.html` - Time-series vulnerability dashboard (Tabler.io UI)
 - `tickets.html` - Ticket management (Bootstrap 5)
 - `server.js` - Node.js/Express API backend
 - `data/hextrackr.db` - SQLite database
