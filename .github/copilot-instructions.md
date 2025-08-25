@@ -6,17 +6,24 @@ HexTrackr is a dual-purpose cybersecurity management system:
 2. **Vulnerability Management** (`vulnerabilities.html`) - **Time-series trend tracking** with modern Tabler.io UI
 
 ## Architecture
-- **Backend**: Node.js/Express + SQLite (`data/hextrackr.db`)
+- **Deployment**: **DOCKER-ONLY** - Uses Docker Compose for containerized deployment
+- **Backend**: Node.js/Express + SQLite (`data/hextrackr.db`) running in Docker container
 - **Frontend**: Tabler.io + vanilla JavaScript (vulnerabilities), Bootstrap 5 (tickets)
 - **Storage**: Database-first with localStorage fallback
 - **Data Model**: **Time-series vulnerability tracking** (CSV imports track changes over time, not duplicates)
+- **Port**: Application runs on `localhost:8080` via Docker port mapping (8080:8080)
 
 ## Development Rules
 1. **Always backup first**: `git add . && git commit -m "🔄 Pre-work backup"`
 2. **Update instructions FIRST**: Before any development work, update both:
    - `.github/copilot-instructions.md` (AI workflow & technical details)
    - `README.md` (Human overview & quick start)
-3. **Test locally**: Use `localhost:8080` via Docker
+3. **🐳 DOCKER-ONLY DEPLOYMENT**: 
+   - **NEVER run `node server.js` or `npm start` directly**
+   - **NEVER install local Node.js servers**
+   - **ONLY use Docker Compose**: `docker-compose up -d` for deployment
+   - **Access via**: `localhost:8080` (Docker port mapping)
+   - **Container management**: Use `docker ps`, `docker-compose logs`, etc.
 4. **Database operations**: Use API endpoints, not direct DB access
 5. **No cross-contamination**: Tickets and vulnerabilities are separate systems
 
@@ -38,12 +45,14 @@ HexTrackr is a dual-purpose cybersecurity management system:
 - **Import Logic**: UPSERT based on `hostname + cve + scan_date` (no duplicates)
 
 ## File Structure
-- `server.js` - Express API server
+- `server.js` - Express API server (runs in Docker container)
 - `tickets.html` + `app.js` - Ticket management (Bootstrap 5)
 - `vulnerabilities.html` - Vulnerability dashboard (Tabler.io modern UI)
-- `data/hextrackr.db` - SQLite database
+- `data/hextrackr.db` - SQLite database (Docker volume mount)
 - `styles/` - CSS files
 - `scripts/` - JavaScript modules
+- `docker-compose.yml` - Container orchestration
+- `Dockerfile` - Node.js container configuration
 
 ## Common Tasks
 - **Add ticket fields**: Update HTML → `saveTicket()` → `renderTickets()` → PDF generation

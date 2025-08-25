@@ -1,4 +1,10 @@
-# HexTrackr - Cyb## 🎯 Current Status
+# HexTrackr - Cyb## 🎯 Curre## 📋 Development
+**Current Planning**: 
+- **Strategic**: See `roadmaps/ROADMAP.md` for long-term project vision
+- **Tactical**: See `roadmaps/UI_UX_ROADMAP.md` for immediate UI/UX implementation plan
+- **🌐 Portal**: View at http://localhost:8080/roadmaps/ or run `npm run roadmap` to regenerate
+
+**Architecture**: Node.js/Express backend with SQLite database, Tabler.io (vulnerabilities) + Bootstrap 5 (tickets) frontend, Docker deployment ready.tatus
 - ✅ Modern UI unified
 - 🔄 **CRITICAL**: Implementing trend tracking (see `CURRENT_ROADMAP.md`)
 
