@@ -185,6 +185,98 @@
         footer a:hover {
             text-decoration: underline;
         }
+    
+        /* Enhanced Markdown Styling */
+        .roadmap-section h1, .roadmap-section h2, .roadmap-section h3 {
+            color: var(--pico-primary-500);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .roadmap-section h1:first-child, .roadmap-section h2:first-child, .roadmap-section h3:first-child {
+            margin-top: 0;
+        }
+        
+        .roadmap-section hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--pico-border-color), transparent);
+            margin: 2rem 0;
+        }
+        
+        /* Task Lists */
+        .task-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 1rem 0;
+        }
+        
+        .task-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--pico-border-color);
+            opacity: 0.9;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+            color: var(--pico-muted-color);
+        }
+        
+        /* Update footer */
+        footer p {
+            margin: 0;
+        }
+    
+        /* Enhanced Markdown Styling */
+        .roadmap-section h1, .roadmap-section h2, .roadmap-section h3 {
+            color: var(--pico-primary-500);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .roadmap-section h1:first-child, .roadmap-section h2:first-child, .roadmap-section h3:first-child {
+            margin-top: 0;
+        }
+        
+        .roadmap-section hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--pico-border-color), transparent);
+            margin: 2rem 0;
+        }
+        
+        /* Task Lists */
+        .task-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 1rem 0;
+        }
+        
+        .task-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--pico-border-color);
+            opacity: 0.9;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+            color: var(--pico-muted-color);
+        }
+        
+        /* Update footer */
+        footer p {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -194,427 +286,891 @@
             <p>Cybersecurity Management System • Time-series vulnerability tracking and security ticket management</p>
         </header>
 
+        
+        
         <nav class="nav-container">
             <ul class="nav-tabs">
-                <li><a href="#strategic" class="nav-tab active" data-tab="strategic">Strategic Roadmap</a></li>
-                <li><a href="#technical" class="nav-tab" data-tab="technical">Technical Implementation</a></li>
-                <li><a href="#status" class="nav-tab" data-tab="status">Current Status</a></li>
+                <li><a href="#strategic" class="nav-tab active" data-tab="strategic">🎯 Strategic Roadmap</a></li>
+                <li><a href="#tactical" class="nav-tab" data-tab="tactical">🚀 Tactical Implementation</a></li>
+                <li><a href="#status" class="nav-tab" data-tab="status">📊 Current Status</a></li>
             </ul>
         </nav>
 
-        <div id="strategic" class="tab-content active">
-            <article class="roadmap-section">
-                <header>
-                    <h2>📋 Strategic Project Roadmap</h2>
-                    <p>Long-term project vision and feature planning for HexTrackr cybersecurity platform</p>
-                </header>
 
-                <div style="background-color: var(--pico-primary-background); color: var(--pico-primary-500); padding: 1rem; border-radius: var(--pico-border-radius); margin: 1rem 0;">
-                    <h4>🎯 Project Overview</h4>
-                    <p>HexTrackr is a dual-purpose cybersecurity management system providing:</p>
-                    <ul style="margin: 0.5rem 0;">
-                        <li><strong>Ticket Management</strong>: Hexagon security workflow management</li>
-                        <li><strong>Vulnerability Management</strong>: Multi-vendor vulnerability data analysis with time-series tracking</li>
-                    </ul>
-                </div>
+        <section id="strategic" class="tab-content active">
+            <div class="roadmap-section">
+                <h1>HexTrackr Project Roadmap & Task List</h1>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">🟢 COMPLETED FEATURES</h3>
-                        <span class="phase-status status-complete">Status: COMPLETE</span>
-                    </div>
-                    
-                    <h4>Core Infrastructure ✅</h4>
-                    <ul>
-                        <li><strong>✅ Dual-app architecture</strong> (tickets.html + vulnerabilities.html)</li>
-                        <li><strong>✅ Storage systems</strong> (localStorage for tickets, IndexedDB for vulnerabilities)</li>
-                        <li><strong>✅ Modern Tabler.io UI</strong> with responsive design</li>
-                        <li><strong>✅ PDF generation</strong> with jsPDF + auto-bundling capabilities</li>
-                        <li><strong>✅ Device management</strong> with smart auto-increment naming</li>
-                        <li><strong>✅ CSV import/export</strong> basic functionality</li>
-                        <li><strong>✅ Pagination & filtering</strong> across all views</li>
-                        <li><strong>✅ Sample data system</strong> for development/testing</li>
-                    </ul>
+<h2>🎯 Project Overview</h2>
+<p>HexTrackr is a dual-purpose cybersecurity management system providing:</p>
+<ul>
+<li><strong>Ticket Management</strong>: Hexagon security workflow management</li>
+<li><strong>Vulnerability Management</strong>: Multi-vendor vulnerability data analysis</li>
+</ul>
 
-                    <h4>Cisco API Integration ✅</h4>
-                    <ul>
-                        <li><strong>✅ OAuth2 authentication</strong> with real Cisco endpoints</li>
-                        <li><strong>✅ AES-256 credential encryption</strong> for secure local storage</li>
-                        <li><strong>✅ Live API testing</strong> with connection validation</li>
-                        <li><strong>✅ Vulnerability synchronization</strong> from Cisco PSIRT API</li>
-                        <li><strong>✅ Error handling & progress tracking</strong></li>
-                    </ul>
-                </section>
+<hr>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">🟡 IN PROGRESS</h3>
-                        <span class="phase-status status-in-progress">Status: ACTIVE DEVELOPMENT</span>
-                    </div>
-                    
-                    <h4>Time-Series Data Model 🔄</h4>
-                    <ul>
-                        <li><strong>Database Schema Migration</strong> - Transform duplicate-creating imports to time-series tracking</li>
-                        <li><strong>Smart CSV Import</strong> - UPSERT logic for tracking VPR changes over time</li>
-                        <li><strong>Trend Visualization</strong> - Historical charts and improvement analytics</li>
-                        <li><strong>Performance Optimization</strong> - Large dataset handling (50-100MB files)</li>
-                    </ul>
-                </section>
+<h2>🟢 COMPLETED FEATURES</h2>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">🔴 PLANNED FEATURES</h3>
-                        <span class="phase-status status-planned">Status: FUTURE ROADMAP</span>
-                    </div>
-                    
-                    <h4>API Integrations Roadmap 📋</h4>
-                    
-                    <h5>Additional Vendor APIs</h5>
-                    <ul>
-                        <li><strong>Palo Alto Networks API</strong> - Prisma Cloud vulnerability feeds, firewall threat intelligence</li>
-                        <li><strong>Tenable.io API</strong> - Nessus scan result imports, asset discovery integration</li>
-                        <li><strong>Microsoft Security APIs</strong> - Defender for Endpoint, Azure Security Center</li>
-                        <li><strong>Qualys API</strong> - VMDR vulnerability data, compliance scanning</li>
-                    </ul>
+<h3>Core Infrastructure ✅</h3>
+<ul class="task-list">
+<li class="task-item completed">✅ <strong>Dual-app architecture</strong> (tickets.html + vulnerabilities.html)</li>
+<li class="task-item completed">✅ <strong>Storage systems</strong> (localStorage for tickets, IndexedDB for vulnerabilities)</li>
+<li class="task-item completed">✅ <strong>Bootstrap 5 UI</strong> with responsive design</li>
+<li class="task-item completed">✅ <strong>PDF generation</strong> with jsPDF + auto-bundling capabilities</li>
+<li class="task-item completed">✅ <strong>Device management</strong> with smart auto-increment naming</li>
+<li class="task-item completed">✅ <strong>CSV import/export</strong> basic functionality</li>
+<li class="task-item completed">✅ <strong>Pagination & filtering</strong> across all views</li>
+<li class="task-item completed">✅ <strong>Sample data system</strong> for development/testing</li>
+</ul>
 
-                    <h5>Threat Intelligence Feeds</h5>
-                    <ul>
-                        <li><strong>MITRE ATT&CK</strong> technique mapping and threat correlation</li>
-                        <li><strong>CISA KEV</strong> catalog integration for priority vulnerabilities</li>
-                        <li><strong>NVD API</strong> for enhanced CVE data and CVSS scoring</li>
-                        <li><strong>Exploit databases</strong> for real-world threat intelligence</li>
-                    </ul>
+<h3>Cisco API Integration ✅</h3>
+<ul class="task-list">
+<li class="task-item completed">✅ <strong>OAuth2 authentication</strong> with real Cisco endpoints</li>
+<li class="task-item completed">✅ <strong>AES-256 credential encryption</strong> for secure local storage</li>
+<li class="task-item completed">✅ <strong>Live API testing</strong> with connection validation</li>
+<li class="task-item completed">✅ <strong>Vulnerability synchronization</strong> from Cisco PSIRT API</li>
+<li class="task-item completed">✅ <strong>Error handling & progress tracking</strong></li>
+</ul>
 
-                    <h4>Advanced Analytics</h4>
-                    <ul>
-                        <li><strong>Machine Learning</strong> for vulnerability prioritization and risk scoring</li>
-                        <li><strong>Predictive Analytics</strong> for breach risk assessment and trend forecasting</li>
-                        <li><strong>Automated Remediation</strong> recommendations based on environment context</li>
-                        <li><strong>Risk Dashboard</strong> with executive-level metrics and KPIs</li>
-                    </ul>
+<hr>
 
-                    <h4>Enterprise Features</h4>
-                    <ul>
-                        <li><strong>Multi-tenant</strong> organization support with data isolation</li>
-                        <li><strong>Role-based Access Control</strong> (RBAC) with granular permissions</li>
-                        <li><strong>SAML/LDAP</strong> authentication integration for enterprise SSO</li>
-                        <li><strong>Compliance Reporting</strong> (SOC 2, NIST, ISO 27001, PCI DSS)</li>
-                        <li><strong>Audit Logging</strong> with tamper-proof security event tracking</li>
-                    </ul>
+<h2>🟡 IN PROGRESS</h2>
 
-                    <h4>Integration Ecosystem</h4>
-                    <ul>
-                        <li><strong>SIEM/SOAR</strong> platform connectors (Splunk, QRadar, Phantom)</li>
-                        <li><strong>Ticketing Systems</strong> integration (Jira, ServiceNow, Remedy)</li>
-                        <li><strong>Communication</strong> channels (Slack, Teams, email notifications)</li>
-                        <li><strong>REST API</strong> for third-party integrations and automation</li>
-                        <li><strong>Webhook Support</strong> for real-time event streaming</li>
-                    </ul>
-                </section>
+<h3>Performance Optimization 🔄</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Large CSV file handling</strong> (50-100MB files)</li>
+<li class="task-item">☐ Implement streaming CSV parser for memory efficiency</li>
+<li class="task-item">☐ Add column filtering to ignore unnecessary data</li>
+<li class="task-item">☐ Progress indicators for large file processing</li>
+<li class="task-item">☐ Web Workers for non-blocking file processing</li>
+<li class="task-item">☐ Chunk-based processing with IndexedDB batching</li>
+</ul>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">🚀 FUTURE ENHANCEMENTS</h3>
-                        <span class="phase-status status-planned">Status: LONG-TERM VISION</span>
-                    </div>
-                    
-                    <h4>Cloud-Native Architecture</h4>
-                    <ul>
-                        <li><strong>Kubernetes</strong> deployment with auto-scaling and high availability</li>
-                        <li><strong>Microservices</strong> architecture for scalability and maintainability</li>
-                        <li><strong>Cloud Storage</strong> integration (AWS S3, Azure Blob, GCP Cloud Storage)</li>
-                        <li><strong>Container Registry</strong> for secure image distribution</li>
-                    </ul>
+<hr>
 
-                    <h4>AI/ML Capabilities</h4>
-                    <ul>
-                        <li><strong>Natural Language</strong> processing for vulnerability descriptions</li>
-                        <li><strong>Anomaly Detection</strong> for unusual vulnerability patterns</li>
-                        <li><strong>Intelligent Clustering</strong> of related vulnerabilities and assets</li>
-                        <li><strong>Automated Reporting</strong> with AI-generated insights and recommendations</li>
-                    </ul>
+<h2>🔴 PLANNED FEATURES</h2>
 
-                    <h4>Mobile & Modern Interfaces</h4>
-                    <ul>
-                        <li><strong>Progressive Web App</strong> (PWA) for mobile access</li>
-                        <li><strong>Mobile Applications</strong> (iOS/Android) for on-the-go management</li>
-                        <li><strong>Voice Interface</strong> for hands-free security operations</li>
-                        <li><strong>AR/VR</strong> visualization for complex network security landscapes</li>
-                    </ul>
-                </section>
-            </article>
-        </div>
+<h3>API Integrations Roadmap 📋</h3>
 
-        <div id="technical" class="tab-content">
-            <article class="roadmap-section">
-                <header>
-                    <h2>🔧 Technical Implementation Roadmap</h2>
-                    <p>Current technical work, sprints, and immediate implementation tasks</p>
-                </header>
-                
-                <div style="background-color: var(--pico-accent-background); color: var(--pico-accent-500); padding: 1rem; border-radius: var(--pico-border-radius); margin: 1rem 0;">
-                    <h4>🚨 CRITICAL ISSUE: CSV Imports Create Duplicates</h4>
-                    <p><strong>Problem</strong>: CSV imports create duplicate records instead of tracking changes over time</p>
-                    <p><strong>Solution</strong>: Transform into time-series vulnerability management system</p>
-                    <p><strong>Impact</strong>: Enables trend tracking, reduces storage bloat, improves data integrity</p>
-                </div>
+<p>#### Cisco Extensions</p>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Security Advisories Sync</strong> (partially stubbed)</li>
+<li class="task-item">☐ Complete <code>syncCiscoAdvisories()</code> implementation</li>
+<li class="task-item">☐ Advisory correlation with existing vulnerabilities</li>
+<li class="task-item">☐ Risk scoring integration</li>
+</ul>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">📋 PHASE 1: Database Schema Migration</h3>
-                        <span class="phase-status status-in-progress">Risk: HIGH | Impact: CRITICAL</span>
-                    </div>
-                    
-                    <h4>1.1 Analyze Current Data Structure</h4>
-                    <ul>
-                        <li>🔄 Audit existing vulnerability data patterns</li>
-                        <li>🔄 Identify unique vulnerability identifiers (CVE+hostname+date)</li>
-                        <li>🔄 Map current columns to time-series requirements</li>
-                    </ul>
+<p>#### Palo Alto Networks Integration</p>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Prisma Cloud API</strong> integration</li>
+<li class="task-item">☐ <strong>Cortex API</strong> for threat intelligence</li>
+<li class="task-item">☐ <strong>PAN-OS API</strong> for firewall management</li>
+<li class="task-item">☐ <strong>WildFire API</strong> for malware analysis</li>
+<li class="task-item">☐ OAuth2 authentication framework</li>
+<li class="task-item">☐ Multi-product configuration management</li>
+</ul>
 
-                    <h4>1.2 Design Time-Series Schema</h4>
-                    <ul>
-                        <li>📋 Create <code>vulnerability_master</code> table (static CVE data)</li>
-                        <li>📋 Create <code>vulnerability_history</code> table (time-series: device+date+VPR)</li>
-                        <li>📋 Add unique constraints: <code>(hostname, cve, scan_date)</code></li>
-                        <li>📋 Design indexes for latest-value queries</li>
-                    </ul>
+<p>#### Additional Vendor APIs</p>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Tenable.io</strong> vulnerability scanner integration</li>
+<li class="task-item">☐ <strong>Qualys</strong> VMDR API connectivity</li>
+<li class="task-item">☐ <strong>Rapid7</strong> InsightVM integration</li>
+<li class="task-item">☐ <strong>CrowdStrike</strong> Falcon endpoint data</li>
+</ul>
 
-                    <h4>1.3 Create Migration Scripts</h4>
-                    <ul>
-                        <li>📋 Backup existing data</li>
-                        <li>📋 Write migration script to reshape current data</li>
-                        <li>📋 Test migration on sample data</li>
-                        <li>📋 Create rollback procedures</li>
-                    </ul>
-                </section>
+<h3>Network Infrastructure Features 📋</h3>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">📋 PHASE 2: Smart CSV Import System</h3>
-                        <span class="phase-status status-planned">Risk: MEDIUM | Impact: HIGH</span>
-                    </div>
-                    
-                    <h4>2.1 Redesign Import Logic</h4>
-                    <ul>
-                        <li>📋 Use date field as "last_updated" timestamp</li>
-                        <li>📋 Implement UPSERT logic (UPDATE if exists, INSERT if new)</li>
-                        <li>📋 Key on: <code>hostname + cve + scan_date</code></li>
-                        <li>📋 Track VPR changes over time</li>
-                    </ul>
+<p>#### SNMP Network Polling</p>
+<ul class="task-list">
+<li class="task-item">☐ <strong>SNMPv2/v3 implementation</strong></li>
+<li class="task-item">☐ Real-time device status monitoring</li>
+<li class="task-item">☐ Hardware health monitoring  </li>
+<li class="task-item">☐ Firmware version detection</li>
+<li class="task-item">☐ Network interface analysis</li>
+<li class="task-item">☐ Vulnerability correlation by device type</li>
+<li class="task-item">☐ <strong>Docker containerization</strong></li>
+<li class="task-item">☐ Node.js backend with net-snmp library</li>
+<li class="task-item">☐ RESTful API for browser integration</li>
+<li class="task-item">☐ Scalable multi-network support</li>
+</ul>
 
-                    <h4>2.2 Data Validation & Integrity</h4>
-                    <ul>
-                        <li>📋 Validate date formats during import</li>
-                        <li>📋 Ensure VPR score changes are logged</li>
-                        <li>📋 Add data quality checks</li>
-                        <li>📋 Handle malformed/duplicate entries gracefully</li>
-                    </ul>
-                </section>
+<p>#### Network Discovery & Mapping</p>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Automated asset discovery</strong></li>
+<li class="task-item">☐ <strong>Network topology visualization</strong></li>
+<li class="task-item">☐ <strong>Device fingerprinting</strong></li>
+<li class="task-item">☐ <strong>Service enumeration</strong></li>
+</ul>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">📋 PHASE 3: Core Functionality Fixes</h3>
-                        <span class="phase-status status-planned">Risk: MEDIUM | Impact: CRITICAL</span>
-                    </div>
-                    
-                    <h4>3.1 CVE Link System Overhaul</h4>
-                    <ul>
-                        <li>🚨 <strong>CRITICAL BUG</strong>: Fix CVE links opening ALL CVEs instead of clicked one</li>
-                        <li>📋 Audit all CVE link implementations</li>
-                        <li>📋 Create centralized CVE popup handler function</li>
-                        <li>📋 Implement 1200px wide popup standard</li>
-                    </ul>
+<h3>Automation & Orchestration 📋</h3>
 
-                    <h4>3.2 Enhanced Modal System</h4>
-                    <ul>
-                        <li>📋 Fix modal z-index layering issues</li>
-                        <li>📋 Create vulnerability description modal</li>
-                        <li>📋 Implement device modal export functionality</li>
-                        <li>📋 Add PDF generation for reports</li>
-                    </ul>
-                </section>
+<p>#### Ansible Integration</p>
+<ul class="task-list">
+<li class="task-item">☐ <strong>AWX/Tower API connectivity</strong></li>
+<li class="task-item">☐ <strong>Automated patch deployment</strong></li>
+<li class="task-item">☐ <strong>Configuration compliance enforcement</strong></li>
+<li class="task-item">☐ <strong>Vulnerability remediation playbooks</strong></li>
+<li class="task-item">☐ <strong>Bulk system updates and hardening</strong></li>
+<li class="task-item">☐ <strong>Secure credential vault management</strong></li>
+<li class="task-item">☐ <strong>Playbook execution monitoring</strong></li>
+</ul>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">📋 PHASE 4-10: Advanced Features</h3>
-                        <span class="phase-status status-planned">Risk: LOW-MEDIUM | Impact: HIGH</span>
-                    </div>
-                    
-                    <h4>Enhanced Filtering & Display</h4>
-                    <ul>
-                        <li>📋 State column improvements with default filtering</li>
-                        <li>📋 Advanced vendor filtering system</li>
-                        <li>📋 Interactive statistics cards</li>
-                        <li>📋 Unified header design</li>
-                    </ul>
+<p>#### Docker Implementation</p>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Container architecture</strong></li>
+<li class="task-item">☐ SNMP polling service containerization</li>
+<li class="task-item">☐ API gateway container</li>
+<li class="task-item">☐ Database container (if moving from browser storage)</li>
+<li class="task-item">☐ Docker Compose orchestration</li>
+</ul>
 
-                    <h4>Performance & Visualization</h4>
-                    <ul>
-                        <li>📋 Latest values display optimization</li>
-                        <li>📋 Pagination enhancement for large datasets</li>
-                        <li>📋 Historical trend visualization with Chart.js</li>
-                        <li>📋 Dashboard integration with analytics</li>
-                    </ul>
+<h3>Advanced Analytics & Intelligence 📋</h3>
 
-                    <h4>Integration & Polish</h4>
-                    <ul>
-                        <li>📋 API integration framework</li>
-                        <li>📋 Cross-dashboard integration</li>
-                        <li>📋 Authentication & data protection</li>
-                        <li>📋 Dark mode implementation</li>
-                        <li>📋 Advanced UI/UX features</li>
-                    </ul>
-                </section>
+<p>#### Threat Intelligence</p>
+<ul class="task-list">
+<li class="task-item">☐ <strong>MITRE ATT&CK framework mapping</strong></li>
+<li class="task-item">☐ <strong>CVE enrichment from NVD</strong></li>
+<li class="task-item">☐ <strong>Exploit prediction modeling</strong></li>
+<li class="task-item">☐ <strong>Risk scoring algorithms</strong></li>
+</ul>
 
-                <div style="background-color: var(--pico-primary-background); color: var(--pico-primary-500); padding: 1rem; border-radius: var(--pico-border-radius); margin: 2rem 0;">
-                    <h4>🎯 IMMEDIATE NEXT STEPS</h4>
-                    <ol>
-                        <li><strong>Start with Phase 1.1</strong>: Analyze current data structure</li>
-                        <li><strong>Fix Critical Bugs</strong>: Address CVE link and modal issues</li>
-                        <li><strong>Test Thoroughly</strong>: Each phase must be working before moving on</li>
-                        <li><strong>Implement Time-Series</strong>: Core architecture change for trend tracking</li>
-                    </ol>
-                    <p><strong>Estimated Timeline</strong>: 6-10 weeks total • Current Phase: 1-2 weeks</p>
-                </div>
-            </article>
-        </div>
+<p>#### Reporting & Visualization</p>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Executive dashboards</strong></li>
+<li class="task-item">☐ <strong>Compliance reporting</strong> (SOC2, ISO27001, NIST)</li>
+<li class="task-item">☐ <strong>Trend analysis</strong> with ApexCharts expansion</li>
+<li class="task-item">☐ <strong>Custom report builder</strong></li>
+</ul>
 
-        <div id="status" class="tab-content">
-            <article class="roadmap-section">
-                <header>
-                    <h2>📊 Current Sprint Status</h2>
-                    <p><em>Last Updated: August 25, 2025</em></p>
-                </header>
-                
-                <div style="background-color: var(--pico-accent-background); color: var(--pico-accent-500); padding: 1rem; border-radius: var(--pico-border-radius); margin: 1rem 0;">
-                    <h4>🎯 CURRENT SPRINT: Database Schema Migration (Phase 1)</h4>
-                    <p><strong>Sprint Start</strong>: August 25, 2025</p>
-                    <p><strong>Sprint Goal</strong>: Transform duplicate-creating CSV imports into time-series vulnerability tracking</p>
-                    <p><strong>Priority</strong>: CRITICAL</p>
-                </div>
+<h3>Enterprise Features 📋</h3>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">✅ COMPLETED TASKS</h3>
-                        <span class="phase-status status-complete">Status: COMPLETE</span>
-                    </div>
-                    <ul>
-                        <li><strong>✅ Project Analysis</strong>: Identified critical issue - CSV imports create duplicates instead of tracking changes</li>
-                        <li><strong>✅ Roadmap Consolidation</strong>: Merged all tactical roadmaps into unified 3-file structure</li>
-                        <li><strong>✅ Documentation Updates</strong>: Updated README.md and copilot-instructions.md</li>
-                        <li><strong>✅ Portal Enhancement</strong>: Created modern Pico CSS roadmap portal with automatic dark mode</li>
-                    </ul>
-                </section>
+<p>#### Multi-tenancy & Access Control</p>
+<ul class="task-list">
+<li class="task-item">☐ <strong>User authentication system</strong></li>
+<li class="task-item">☐ <strong>Role-based access control (RBAC)</strong></li>
+<li class="task-item">☐ <strong>Organization/site isolation</strong></li>
+<li class="task-item">☐ <strong>Audit logging</strong></li>
+</ul>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">🔄 IN PROGRESS TASKS</h3>
-                        <span class="phase-status status-in-progress">Status: ACTIVE</span>
-                    </div>
-                    <ul>
-                        <li><strong>Phase 1.1</strong>: Analyze Current Data Structure
-                            <ul>
-                                <li>📋 Audit existing vulnerability data patterns</li>
-                                <li>📋 Identify unique vulnerability identifiers (CVE+hostname+date)</li>
-                                <li>📋 Map current columns to time-series requirements</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
+<p>#### Data Management</p>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Backend database</strong> option (PostgreSQL/MongoDB)</li>
+<li class="task-item">☐ <strong>Data retention policies</strong></li>
+<li class="task-item">☐ <strong>Backup & restore functionality</strong></li>
+<li class="task-item">☐ <strong>Data encryption at rest</strong></li>
+</ul>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">📋 NEXT UP (Phase 1.2-1.3)</h3>
-                        <span class="phase-status status-planned">Status: QUEUED</span>
-                    </div>
-                    <ul>
-                        <li>📋 Design Time-Series Schema</li>
-                        <li>📋 Create Migration Scripts</li>
-                        <li>📋 Test migration on sample data</li>
-                    </ul>
-                </section>
+<hr>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">🚨 CRITICAL ISSUES IDENTIFIED</h3>
-                        <span class="phase-status status-critical">Status: BLOCKING</span>
-                    </div>
-                    
-                    <h4>Database Architecture</h4>
-                    <ul>
-                        <li><strong>Issue</strong>: CSV imports creating duplicate records instead of updating existing ones</li>
-                        <li><strong>Impact</strong>: No trend tracking capability, inflated data, storage bloat</li>
-                        <li><strong>Priority</strong>: CRITICAL - blocks all trend visualization features</li>
-                    </ul>
+<h2>🚀 IMMEDIATE PRIORITIES (Next Sprint)</h2>
 
-                    <h4>CVE Link Functionality</h4>
-                    <ul>
-                        <li><strong>Issue</strong>: CVE links opening ALL CVEs instead of just the clicked one</li>
-                        <li><strong>Impact</strong>: Poor user experience, broken functionality</li>
-                        <li><strong>Priority</strong>: HIGH - affects daily usage</li>
-                    </ul>
+<h3>High Priority</h3>
+<p>1. <strong>Large CSV Import Optimization</strong> </p>
+<ul>
+<li>Target: 50-100MB file handling</li>
+<li>Web Workers + streaming parser</li>
+<li>Column filtering for data reduction</li>
+</ul>
 
-                    <h4>Modal System</h4>
-                    <ul>
-                        <li><strong>Issue</strong>: Nested modals appear behind parent modals (z-index problems)</li>
-                        <li><strong>Impact</strong>: Device modals inaccessible from vulnerability modals</li>
-                        <li><strong>Priority</strong>: HIGH - broken navigation flow</li>
-                    </ul>
-                </section>
+<p>2. <strong>Cisco API Completion</strong></p>
+<ul>
+<li>Finish Security Advisories sync</li>
+<li>Enhanced error handling</li>
+</ul>
 
-                <section class="phase">
-                    <div class="phase-header">
-                        <h3 class="phase-title">📈 METRICS & KPIs</h3>
-                        <span class="phase-status status-in-progress">Status: TRACKING</span>
-                    </div>
-                    
-                    <h4>Technical Debt</h4>
-                    <ul>
-                        <li><strong>Duplicate Records</strong>: ~50% of vulnerability data is duplicated (estimated)</li>
-                        <li><strong>Storage Efficiency</strong>: Target 50% reduction in database size post-migration</li>
-                        <li><strong>Query Performance</strong>: Target sub-500ms response times for trend queries</li>
-                    </ul>
+<h3>Medium Priority  </h3>
+<p>3. <strong>Performance Improvements</strong></p>
+<ul>
+<li>IndexedDB query optimization</li>
+<li>UI responsiveness during large operations</li>
+<li>Memory usage optimization</li>
+</ul>
 
-                    <h4>User Experience</h4>
-                    <ul>
-                        <li><strong>CVE Link Success Rate</strong>: Currently ~0% (broken), target 100%</li>
-                        <li><strong>Modal Navigation</strong>: Currently blocked, target seamless nested navigation</li>
-                        <li><strong>Load Times</strong>: Current 3-5 seconds, target <2 seconds</li>
-                    </ul>
-                </section>
+<p>4. <strong>User Experience</strong></p>
+<ul>
+<li>Better progress indicators</li>
+<li>Improved error messages</li>
+<li>Mobile responsiveness testing</li>
+</ul>
 
-                <div style="background-color: var(--pico-primary-background); color: var(--pico-primary-500); padding: 1rem; border-radius: var(--pico-border-radius); margin: 2rem 0;">
-                    <h4>🔧 HANDOFF NOTES FOR NEXT SESSION</h4>
-                    <ol>
-                        <li><strong>Start Here</strong>: Phase 1.1 - Analyze Current Data Structure in UI_UX_ROADMAP.md</li>
-                        <li><strong>Key Files</strong>: 
-                            <ul>
-                                <li><code>/data/hextrackr.db</code> - Current database to analyze</li>
-                                <li><code>server.js</code> - API endpoints to understand data flow</li>
-                                <li><code>vulnerabilities.html</code> - Frontend that needs time-series data</li>
-                            </ul>
-                        </li>
-                        <li><strong>Critical Path</strong>: Database migration must complete before any UI enhancements</li>
-                        <li><strong>Testing</strong>: Use sample data in <code>/sample data/</code> folder for validation</li>
-                    </ol>
-                    
-                    <h4>✅ SUCCESS DEFINITION</h4>
-                    <p>Sprint complete when:</p>
-                    <ul>
-                        <li>📋 Current data structure fully documented and understood</li>
-                        <li>📋 Time-series schema designed and validated</li>
-                        <li>📋 Migration path clearly defined with rollback procedures</li>
-                        <li>📋 Sample data successfully migrated to new structure</li>
-                        <li>📋 API endpoints updated to support latest-value queries</li>
-                    </ul>
-                </div>
-            </article>
-        </div>
+<hr>
 
+<h2>📊 TECHNICAL DEBT</h2>
+
+<h3>Code Quality</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>ESLint configuration</strong> for JavaScript standardization</li>
+<li class="task-item">☐ <strong>Unit testing framework</strong> setup (Jest)</li>
+<li class="task-item">☐ <strong>End-to-end testing</strong> with Playwright</li>
+<li class="task-item">☐ <strong>Documentation improvements</strong></li>
+</ul>
+
+<h3>Security Hardening</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Content Security Policy (CSP)</strong> implementation</li>
+<li class="task-item">☐ <strong>API key rotation</strong> mechanisms</li>
+<li class="task-item">☐ <strong>Input validation</strong> strengthening</li>
+<li class="task-item">☐ <strong>XSS prevention</strong> auditing</li>
+</ul>
+
+<h3>Performance Monitoring</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Performance metrics</strong> collection</li>
+<li class="task-item">☐ <strong>Memory leak detection</strong></li>
+<li class="task-item">☐ <strong>Bundle size optimization</strong></li>
+<li class="task-item">☐ <strong>Lighthouse score</strong> improvements</li>
+</ul>
+
+<hr>
+
+<h2>🔧 DEVELOPMENT WORKFLOW</h2>
+
+<h3>Current Stack</h3>
+<ul>
+<li><strong>Frontend</strong>: Vanilla JavaScript, Bootstrap 5, ApexCharts</li>
+<li><strong>Storage</strong>: localStorage, IndexedDB via LocalForage</li>
+<li><strong>Build</strong>: No build process (direct file serving)</li>
+<li><strong>Dependencies</strong>: CDN-based (Bootstrap, jQuery-less)</li>
+</ul>
+
+<h3>Proposed Enhancements</h3>
+<ul>
+<li><strong>Build System</strong>: Webpack/Vite for optimization</li>
+<li><strong>Package Management</strong>: npm/yarn for dependency management</li>
+<li><strong>Testing</strong>: Jest + Playwright test suite</li>
+<li><strong>CI/CD</strong>: GitHub Actions for automated testing</li>
+</ul>
+
+<hr>
+
+<h2>📋 MAINTENANCE SCHEDULE</h2>
+
+<h3>Regular Tasks</h3>
+<ul>
+<li><strong>Weekly</strong>: Dependency security updates</li>
+<li><strong>Monthly</strong>: Performance monitoring review</li>
+<li><strong>Quarterly</strong>: Feature roadmap review and prioritization</li>
+<li><strong>Annually</strong>: Security audit and penetration testing</li>
+</ul>
+
+<hr>
+
+<p><em>Last Updated: August 24, 2025</em></p>
+<p><em>Maintainer: HexTrackr Development Team</em></p>
+
+            </div>
+        </section>
+
+        <section id="tactical" class="tab-content">
+            <div class="roadmap-section">
+                <h1>HexTrackr UI/UX Technical Roadmap</h1>
+<p><em>Updated: August 25, 2025</em></p>
+
+<h2>🎯 <strong>CURRENT STATUS: TREND TRACKING IMPLEMENTATION PHASE</strong></h2>
+<p><strong>✅ CONFIRMED WORKING:</strong></p>
+<ul>
+<li>Modern Tabler.io vulnerability dashboard with real data ✅</li>
+<li>Statistics cards (109 Critical, 4,843 High, etc.) ✅</li>
+<li>AG Grid table with pagination (Page 1 of 200) ✅</li>
+</ul>
+
+<p><strong>🔄 CRITICAL ISSUE IDENTIFIED:</strong></p>
+<ul>
+<li><strong>Problem</strong>: CSV imports create duplicates instead of tracking changes over time</li>
+<li><strong>Solution</strong>: Transform into time-series vulnerability management system</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>PHASE 1: Database Schema Migration</strong> </h2>
+<p><em>Risk: HIGH | Impact: CRITICAL | Duration: 2-3 tasks</em></p>
+
+<h3>1.1 Analyze Current Data Structure</h3>
+<ul class="task-list">
+<li class="task-item">☐ Audit existing vulnerability data patterns</li>
+<li class="task-item">☐ Identify unique vulnerability identifiers (CVE+hostname+date)</li>
+<li class="task-item">☐ Map current columns to time-series requirements</li>
+</ul>
+
+<h3>1.2 Design Time-Series Schema</h3>
+<ul class="task-list">
+<li class="task-item">☐ Create <code>vulnerability_master</code> table (static CVE data)</li>
+<li class="task-item">☐ Create <code>vulnerability_history</code> table (time-series: device+date+VPR)</li>
+<li class="task-item">☐ Add unique constraints: <code>(hostname, cve, scan_date)</code></li>
+<li class="task-item">☐ Design indexes for latest-value queries</li>
+</ul>
+
+<h3>1.3 Create Migration Scripts</h3>
+<ul class="task-list">
+<li class="task-item">☐ Backup existing data</li>
+<li class="task-item">☐ Write migration script to reshape current data</li>
+<li class="task-item">☐ Test migration on sample data</li>
+<li class="task-item">☐ Create rollback procedures</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>PHASE 2: Smart CSV Import System</strong></h2>
+<p><em>Risk: MEDIUM | Impact: HIGH | Duration: 2-3 tasks</em></p>
+
+<h3>2.1 Redesign Import Logic</h3>
+<ul class="task-list">
+<li class="task-item">☐ Use date field as "last_updated" timestamp</li>
+<li class="task-item">☐ Implement UPSERT logic (UPDATE if exists, INSERT if new)</li>
+<li class="task-item">☐ Key on: <code>hostname + cve + scan_date</code></li>
+<li class="task-item">☐ Track VPR changes over time</li>
+</ul>
+
+<h3>2.2 Data Validation & Integrity</h3>
+<ul class="task-list">
+<li class="task-item">☐ Validate date formats during import</li>
+<li class="task-item">☐ Ensure VPR score changes are logged</li>
+<li class="task-item">☐ Add data quality checks</li>
+<li class="task-item">☐ Handle malformed/duplicate entries gracefully</li>
+</ul>
+
+<h3>2.3 Import Analytics</h3>
+<ul class="task-list">
+<li class="task-item">☐ Track what changed during each import</li>
+<li class="task-item">☐ Report new/updated/unchanged vulnerabilities</li>
+<li class="task-item">☐ Log VPR trend changes per import</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>PHASE 3: Core Functionality Fixes</strong> </h2>
+<p><em>Risk: MEDIUM | Impact: CRITICAL | Duration: 3-4 tasks</em></p>
+
+<h3>3.1 Header & Navigation Cleanup</h3>
+<ul class="task-list">
+<li class="task-item">☐ Remove non-working "Import CSV Data" button from header</li>
+<li class="task-item">☐ Remove standalone "Settings" button (now in user dropdown)</li>
+<li class="task-item">☐ Clean up header layout for better visual balance</li>
+<li class="task-item">☐ Update navigation accessibility and keyboard support</li>
+</ul>
+
+<h3>3.2 CVE Link System Overhaul</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>CRITICAL BUG</strong>: Fix CVE links opening ALL CVEs instead of clicked one</li>
+<li class="task-item">☐ Audit all CVE link implementations</li>
+<li class="task-item">☐ Create centralized CVE popup handler function</li>
+<li class="task-item">☐ Fix popup URL construction for multiple CVEs</li>
+<li class="task-item">☐ Implement 1200px wide popup standard</li>
+<li class="task-item">☐ Add error handling for blocked popups</li>
+</ul>
+
+<h3>3.3 Enhanced Vulnerability Details Modal</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>NEW FEATURE</strong>: Click vulnerability description → modal</li>
+<li class="task-item">☐ Design vulnerability details modal (mirror of device modal)</li>
+<li class="task-item">☐ Show vulnerability details, totals, affected devices table</li>
+<li class="task-item">☐ Use 1200px width like device modal</li>
+<li class="task-item">☐ Add vulnerability metadata display (CVSS, VPR, timeline)</li>
+<li class="task-item">☐ Create vulnerability export functionality</li>
+</ul>
+
+<h3>3.4 Device Modal Export System</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>FIX</strong>: CVE links in Active Vulnerabilities sub-table should open 1200px popup</li>
+<li class="task-item">☐ <strong>IMPLEMENT</strong>: Generate Report → PDF/HTML export of Device Overview</li>
+<li class="task-item">☐ <strong>IMPLEMENT</strong>: Export button → CSV export of Active Vulnerabilities table</li>
+<li class="task-item">☐ Replace HTML file generation with PDF creation</li>
+<li class="task-item">☐ Add professional PDF headers/footers with timestamps</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>PHASE 4: Enhanced Filtering & Display</strong></h2>
+<p><em>Risk: LOW | Impact: HIGH | Duration: 3-4 tasks</em></p>
+
+<h3>4.1 State Column Improvements & Default Filtering</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>DEFAULT</strong>: Hide FIXED state by default in all filters (table, charts, totals)</li>
+<li class="task-item">☐ <strong>STYLE</strong>: Use different color scheme for STATE column (currently showing FIXED/Open)</li>
+<li class="task-item">☐ <strong>FILTER</strong>: Add State filter dropdown to table controls</li>
+<li class="task-item">☐ <strong>CONSISTENCY</strong>: Ensure state colors match across cards and table</li>
+</ul>
+
+<h3>4.2 Advanced Vendor Filtering System</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>FILTER</strong>: Add Vendor filter dropdown (CISCO, Tenable, etc.)</li>
+<li class="task-item">☐ <strong>UI</strong>: Integrate with existing severity filter in clean layout</li>
+<li class="task-item">☐ <strong>EXTEND</strong>: Apply all table filters to card views (Devices/Vulnerabilities)</li>
+<li class="task-item">☐ <strong>SYNC</strong>: Keep filter state synchronized across view modes</li>
+<li class="task-item">☐ Extract vendor from plugin_name automatically</li>
+<li class="task-item">☐ Add vendor-specific vulnerability scoring</li>
+</ul>
+
+<h3>4.3 Interactive Statistics Cards</h3>
+<ul class="task-list">
+<li class="task-item">☐ Implement vendor filtering with flip animations</li>
+<li class="task-item">☐ Add historical trend integration</li>
+<li class="task-item">☐ Calculate vendor-specific statistics</li>
+<li class="task-item">☐ Show vendor comparison analytics</li>
+</ul>
+
+<h3>4.4 Layout & Navigation Improvements</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>REPOSITION</strong>: Move search bar below charts and above table</li>
+<li class="task-item">☐ <strong>CRITICAL FIX</strong>: Fix non-functional "Clear Data" button in settings</li>
+<li class="task-item">☐ <strong>UI</strong>: Optimize layout flow for better user experience</li>
+</ul>
+
+<h3>4.5 Unified Header Design</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>HEADER UNIFICATION</strong>: Remove purple bar from vulnerability dashboard</li>
+<li class="task-item">☐ <strong>DARK HEADER</strong>: Replace vuln dashboard top bar with tickets page dark header</li>
+<li class="task-item">☐ <strong>TOGGLE INTEGRATION</strong>: Move dark/light mode toggle into both page toolbars</li>
+<li class="task-item">☐ <strong>MENU CONSISTENCY</strong>: Add hamburger menu to both pages with same styling</li>
+<li class="task-item">☐ <strong>BRANDING</strong>: Ensure consistent HexTrackr branding across both dashboards</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>PHASE 5: Performance & Navigation</strong></h2>
+<p><em>Risk: LOW | Impact: HIGH | Duration: 2-3 tasks</em></p>
+
+<h3>5.1 Latest Values Display</h3>
+<ul class="task-list">
+<li class="task-item">☐ Modify <code>/api/vulnerabilities</code> to return latest values only</li>
+<li class="task-item">☐ Create efficient queries for most recent data per device+CVE</li>
+<li class="task-item">☐ Update vulnerability cards to show latest VPR</li>
+<li class="task-item">☐ Ensure tables reflect most recent scan data</li>
+<li class="task-item">☐ Add "last updated" timestamps to UI</li>
+</ul>
+
+<h3>5.2 Pagination Enhancement</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>OPTIMIZE</strong>: Add pagination to card views (currently only table has it)</li>
+<li class="task-item">☐ <strong>PERFORMANCE</strong>: Reduce initial load by limiting cards per page</li>
+<li class="task-item">☐ <strong>UX</strong>: Consistent pagination controls across all views</li>
+</ul>
+
+<h3>5.3 Memory & Load Optimization</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>ANALYZE</strong>: Current system loads 10,000+ records (Page 1 of 200)</li>
+<li class="task-item">☐ <strong>OPTIMIZE</strong>: Implement virtual scrolling or smaller page sizes</li>
+<li class="task-item">☐ <strong>CACHE</strong>: Better client-side data management</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>PHASE 6: Trend Visualization</strong></h2>
+<p><em>Risk: LOW | Impact: HIGH | Duration: 3-4 tasks</em></p>
+
+<h3>6.1 Historical Data API</h3>
+<ul class="task-list">
+<li class="task-item">☐ Create <code>/api/vulnerabilities/trends</code> endpoint</li>
+<li class="task-item">☐ Return VPR changes over time per vulnerability</li>
+<li class="task-item">☐ Support date range filtering</li>
+</ul>
+
+<h3>6.2 Chart Implementation</h3>
+<ul class="task-list">
+<li class="task-item">☐ Design Chart.js trend visualizations</li>
+<li class="task-item">☐ Show VPR score changes over time</li>
+<li class="task-item">☐ Display severity level migrations</li>
+<li class="task-item">☐ Add device-level trend analysis</li>
+<li class="task-item">☐ Implement interactive legend with line toggling</li>
+</ul>
+
+<h3>6.3 Dashboard Integration</h3>
+<ul class="task-list">
+<li class="task-item">☐ Add trend charts to vulnerability dashboard</li>
+<li class="task-item">☐ Create "trending up/down" indicators</li>
+<li class="task-item">☐ Show improvement/degradation analytics</li>
+<li class="task-item">☐ Add vendor filtering to historical trends</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>PHASE 7: Enhanced User Interactions</strong></h2>
+<p><em>Risk: LOW | Impact: MEDIUM | Duration: 3-4 tasks</em></p>
+
+<h3>7.1 Vulnerability Action Buttons</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Edit Button (Pencil Icon)</strong>: Create modal for editing vulnerability information</li>
+<li class="task-item">☐ <strong>Refresh Button (Refresh Icon)</strong>: Implement API data refresh for individual vulnerabilities</li>
+<li class="task-item">☐ <strong>Button State Management</strong>: Show appropriate tooltips and handle error states</li>
+</ul>
+
+<h3>7.2 Enhanced Table Interactions & Smart Filtering</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Clickable Description Filtering</strong>: Make vulnerability description column clickable to filter</li>
+<li class="task-item">☐ <strong>Clickable CVE Filtering</strong>: Make CVE Info column clickable to filter</li>
+<li class="task-item">☐ <strong>Clickable Hostname Filtering</strong>: Make hostname entries clickable to filter</li>
+<li class="task-item">☐ <strong>Smart Info Icons</strong>: Add info icons next to CVE entries, descriptions, hostnames</li>
+<li class="task-item">☐ <strong>Enhanced Filter UI</strong>: Show active filters as removable chips/badges</li>
+</ul>
+
+<h3>7.3 Device Security Modal Improvements</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Remove "First Seen" Column</strong>: Clean up modal table layout</li>
+<li class="task-item">☐ <strong>Clickable Plugin Names</strong>: Make Plugin Name column clickable links</li>
+<li class="task-item">☐ <strong>Modal System Enhancements</strong>: Create reusable vulnerability edit modal component</li>
+</ul>
+
+<h3>7.4 Modal Z-Index & CVE Bug Fixes</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Fix Modal Layering</strong>: Implement proper modal stacking system for nested modals</li>
+<li class="task-item">☐ <strong>Fix CVE Link Behavior</strong>: Ensure single CVE clicks open only that CVE popup</li>
+<li class="task-item">☐ <strong>Fix HTML Report Artifacts</strong>: Clean up character encoding issues in report titles</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>PHASE 8: API Integration Framework</strong></h2>
+<p><em>Risk: MEDIUM | Impact: HIGH | Duration: 2-3 tasks</em></p>
+
+<h3>8.1 API Supplement System</h3>
+<ul class="task-list">
+<li class="task-item">☐ Design hooks for real-time API data</li>
+<li class="task-item">☐ Create 30-day history pull mechanism</li>
+<li class="task-item">☐ Merge API data with CSV historical data</li>
+</ul>
+
+<h3>8.2 Data Source Management</h3>
+<ul class="task-list">
+<li class="task-item">☐ Support multiple data sources (CSV + API)</li>
+<li class="task-item">☐ Prioritize API data over CSV when available</li>
+<li class="task-item">☐ Maintain data source lineage</li>
+<li class="task-item">☐ Add API configuration status indicator to UI</li>
+<li class="task-item">☐ Implement API health checks</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>PHASE 9: Cross-Dashboard Integration</strong></h2>
+<p><em>Risk: MEDIUM | Impact: HIGH | Duration: 4-5 tasks</em></p>
+
+<h3>9.1 Tickets Page Redesign</h3>
+<ul class="task-list">
+<li class="task-item">☐ Audit current tickets.html design and functionality</li>
+<li class="task-item">☐ Apply Tabler.io framework to tickets page</li>
+<li class="task-item">☐ Implement consistent header and navigation design</li>
+<li class="task-item">☐ Update ticket cards to match vulnerability card styling</li>
+<li class="task-item">☐ Add VPR-style mini-cards for ticket priorities/statuses</li>
+<li class="task-item">☐ Update PDF generation to match new design</li>
+</ul>
+
+<h3>9.2 Ticket ↔ Vulnerability Cross-Reference</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>HOSTNAME LINKS</strong>: Click hostname in tickets dashboard → opens vulnerability modal</li>
+<li class="task-item">☐ <strong>DEVICE INTEGRATION</strong>: Add "Open Ticket" button on vulnerability device cards</li>
+<li class="task-item">☐ <strong>MODAL SHARING</strong>: Share device modal component between dashboards</li>
+<li class="task-item">☐ <strong>DATA INDEPENDENCE</strong>: Maintain separate data storage for each dashboard</li>
+</ul>
+
+<h3>9.3 Authentication & Data Protection</h3>
+<ul class="task-list">
+<li class="task-item">☐ Implement simple login system with default credentials</li>
+<li class="task-item">☐ Add session management and timeout functionality</li>
+<li class="task-item">☐ Create user profile management interface</li>
+<li class="task-item">☐ Default credentials: <code>admin</code> / <code>hextrackr2025</code> (changeable)</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>PHASE 10: Advanced UI/UX Features</strong></h2>
+<p><em>Risk: LOW | Impact: MEDIUM | Duration: 3-4 tasks</em></p>
+
+<h3>10.1 Dark Mode Implementation</h3>
+<ul class="task-list">
+<li class="task-item">☐ Design dark mode color palette for Tabler.io integration</li>
+<li class="task-item">☐ Implement CSS custom properties for theme switching</li>
+<li class="task-item">☐ Add dark mode toggle in user dropdown</li>
+<li class="task-item">☐ Update all charts and graphs for dark mode compatibility</li>
+<li class="task-item">☐ Create automatic dark/light mode based on system preference</li>
+</ul>
+
+<h3>10.2 User Experience Refinements</h3>
+<ul class="task-list">
+<li class="task-item">☐ Add keyboard shortcuts for power users</li>
+<li class="task-item">☐ Implement context menus for quick actions</li>
+<li class="task-item">☐ Add drag-and-drop for bulk operations</li>
+<li class="task-item">☐ Create onboarding tour for new users</li>
+<li class="task-item">☐ Add accessibility improvements (ARIA labels, keyboard nav)</li>
+</ul>
+
+<h3>10.3 Advanced Dashboard Customization</h3>
+<ul class="task-list">
+<li class="task-item">☐ Implement drag-and-drop dashboard builder</li>
+<li class="task-item">☐ Add widget library (charts, tables, statistics)</li>
+<li class="task-item">☐ Create dashboard templates for different roles</li>
+<li class="task-item">☐ Add dashboard sharing and collaboration features</li>
+</ul>
+
+<hr>
+
+<h2>🎯 <strong>IMMEDIATE NEXT STEPS</strong></h2>
+<p>1. <strong>Start with Phase 1.1</strong>: Analyze current data structure</p>
+<p>2. <strong>Fix Critical Issues</strong>: Address CVE link bugs and modal layering</p>
+<p>3. <strong>Test thoroughly</strong>: Each phase must be working before moving on</p>
+<p>4. <strong>Implement time-series</strong>: Core architecture change for trend tracking</p>
+
+<h2>📊 <strong>Success Criteria</strong></h2>
+<ul>
+<li>✅ Time-series data model implemented with no duplicates</li>
+<li>✅ All CVE links open properly in 1200px popups</li>
+<li>✅ Vulnerability modal shows comprehensive device list</li>
+<li>✅ State filtering works with proper color coding</li>
+<li>✅ Vendor filtering implemented across all views</li>
+<li>✅ Page load time reduced by 50%</li>
+<li>✅ Memory usage optimized for large datasets</li>
+</ul>
+
+<h2>🚀 <strong>Estimated Timeline</strong></h2>
+<ul>
+<li><strong>Phase 1-2 (Database)</strong>: 1-2 weeks</li>
+<li><strong>Phase 3-5 (Core UX)</strong>: 2-3 weeks</li>
+<li><strong>Phase 6-8 (Advanced Features)</strong>: 2-3 weeks</li>
+<li><strong>Phase 9-10 (Integration & Polish)</strong>: 1-2 weeks</li>
+<li><strong>Total Duration</strong>: 6-10 weeks</li>
+</ul>
+
+<hr>
+<p><em>Last Updated: August 25, 2025 • Priority: HIGH - Critical trend tracking + UX improvements</em></p>
+<ul class="task-list">
+<li class="task-item">☐ <strong>CONTEXT PASSING</strong>: Pass hostname/device context between systems</li>
+<li class="task-item">☐ <strong>STATE MANAGEMENT</strong>: Maintain independent operation of each dashboard</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>PHASE 7: Enhanced Statistics Cards</strong> </h2>
+<p><em>Risk: LOW | Impact: LOW | Duration: 2-3 tasks | Priority: VERY LOW</em></p>
+
+<h3>7.1 VPR Calculation Improvements</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>CRITICAL LOGIC</strong>: Exclude FIXED state from VPR total calculations  </li>
+<li class="task-item">☐ <strong>ACCURACY</strong>: Ensure cards only count active vulnerabilities</li>
+<li class="task-item">☐ <strong>CONSISTENCY</strong>: Match card totals with filtered table data</li>
+</ul>
+
+<h3>7.2 Enhanced Card Design & Micro-Charts</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>SIZING</strong>: Make statistics cards larger for better visibility</li>
+<li class="task-item">☐ <strong>MICRO-GRAPHS</strong>: Add small historical trend graphs within cards</li>
+<li class="task-item">☐ <strong>SPARKLINES</strong>: Show 7-day or 30-day trend indicators</li>
+<li class="task-item">☐ <strong>VISUAL</strong>: Enhanced card styling with embedded chart.js mini-graphs</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>PHASE 6: User Authentication & Security</strong></h2>
+<p><em>Risk: HIGH | Impact: CRITICAL | Duration: 5-6 tasks</em></p>
+
+<h3>6.1 Authentication System</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>LOGIN PAGE</strong>: Create secure login interface</li>
+<li class="task-item">☐ <strong>SESSION MANAGEMENT</strong>: Implement secure session handling</li>
+<li class="task-item">☐ <strong>ROUTE PROTECTION</strong>: Wrap both dashboards behind authentication</li>
+<li class="task-item">☐ <strong>DATA SECURITY</strong>: Protect all data endpoints with auth middleware</li>
+</ul>
+
+<h3>6.2 User Management</h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>USER ACCOUNTS</strong>: Basic user account system</li>
+<li class="task-item">☐ <strong>PERMISSIONS</strong>: Role-based access if needed</li>
+<li class="task-item">☐ <strong>LOGOUT</strong>: Secure logout and session cleanup</li>
+<li class="task-item">☐ <strong>SESSION TIMEOUT</strong>: Automatic logout after inactivity</li>
+</ul>
+
+<hr>
+
+<h2>🎯 <strong>IMMEDIATE PRIORITIES</strong></h2>
+<p>1. <strong>Phase 2.2</strong> - Fix critical "Clear Data" button issue (urgent bug fix)</p>
+<p>2. <strong>Phase 7.1</strong> - Fix VPR calculations to exclude FIXED state (data accuracy)</p>
+<p>3. <strong>Phase 2.4</strong> - Unified header design (visual consistency)</p>
+<p>4. <strong>Phase 2.1</strong> - Default hide FIXED state (immediate UX improvement)</p>
+<p>5. <strong>Phase 1.1</strong> - Vulnerability Description Modal (high impact feature)</p>
+<p>6. <strong>Phase 2.2</strong> - Search bar repositioning (layout improvement)</p>
+
+<p><strong>Which phase should we tackle first? I recommend starting with Phase 1.1 for immediate user value! 🚀</strong></p>
+
+            </div>
+        </section>
+
+        <section id="status" class="tab-content">
+            <div class="roadmap-section">
+                <h1>HexTrackr Current Sprint Status</h1>
+<p><em>Last Updated: August 25, 2025</em></p>
+
+<h2>🎯 <strong>CURRENT SPRINT: Database Schema Migration (Phase 1)</strong></h2>
+<p><strong>Sprint Start</strong>: August 25, 2025  </p>
+<p><strong>Sprint Goal</strong>: Transform duplicate-creating CSV imports into time-series vulnerability tracking  </p>
+<p><strong>Priority</strong>: CRITICAL  </p>
+
+<hr>
+
+<h2>📊 <strong>Sprint Progress</strong></h2>
+
+<h3>✅ <strong>COMPLETED TASKS</strong></h3>
+<ul class="task-list">
+<li class="task-item completed">✅ <strong>Project Analysis</strong>: Identified critical issue - CSV imports create duplicates instead of tracking changes</li>
+<li class="task-item completed">✅ <strong>Roadmap Consolidation</strong>: Merged all tactical roadmaps into unified UI_UX_ROADMAP.md structure</li>
+<li class="task-item completed">✅ <strong>Documentation Updates</strong>: Updated README.md and copilot-instructions.md for 3-file structure</li>
+<li class="task-item completed">✅ <strong>Portal Enhancement</strong>: Created modern Pico CSS roadmap portal with automatic dark mode</li>
+</ul>
+
+<h3>🔄 <strong>IN PROGRESS TASKS</strong></h3>
+<ul class="task-list">
+<li class="task-item">☐ <strong>Phase 1.1</strong>: Analyze Current Data Structure</li>
+<li class="task-item">☐ Audit existing vulnerability data patterns</li>
+<li class="task-item">☐ Identify unique vulnerability identifiers (CVE+hostname+date)</li>
+<li class="task-item">☐ Map current columns to time-series requirements</li>
+</ul>
+
+<h3>📋 <strong>NEXT UP (Phase 1.2-1.3)</strong></h3>
+<ul class="task-list">
+<li class="task-item">☐ Design Time-Series Schema</li>
+<li class="task-item">☐ Create Migration Scripts</li>
+<li class="task-item">☐ Test migration on sample data</li>
+</ul>
+
+<hr>
+
+<h2>🚨 <strong>CRITICAL ISSUES IDENTIFIED</strong></h2>
+
+<h3><strong>Database Architecture</strong></h3>
+<ul>
+<li><strong>Issue</strong>: CSV imports creating duplicate records instead of updating existing ones</li>
+<li><strong>Impact</strong>: No trend tracking capability, inflated data, storage bloat</li>
+<li><strong>Priority</strong>: CRITICAL - blocks all trend visualization features</li>
+</ul>
+
+<h3><strong>CVE Link Functionality</strong></h3>
+<ul>
+<li><strong>Issue</strong>: CVE links opening ALL CVEs instead of just the clicked one</li>
+<li><strong>Impact</strong>: Poor user experience, broken functionality</li>
+<li><strong>Priority</strong>: HIGH - affects daily usage</li>
+</ul>
+
+<h3><strong>Modal System</strong></h3>
+<ul>
+<li><strong>Issue</strong>: Nested modals appear behind parent modals (z-index problems)</li>
+<li><strong>Impact</strong>: Device modals inaccessible from vulnerability modals</li>
+<li><strong>Priority</strong>: HIGH - broken navigation flow</li>
+</ul>
+
+<hr>
+
+<h2>🎯 <strong>SPRINT GOALS & SUCCESS CRITERIA</strong></h2>
+
+<h3><strong>Phase 1 Success Criteria</strong></h3>
+<ul class="task-list">
+<li class="task-item">☐ Time-series database schema designed and validated</li>
+<li class="task-item">☐ Migration scripts created and tested on sample data</li>
+<li class="task-item">☐ Data integrity maintained during schema transformation</li>
+<li class="task-item">☐ API endpoints updated to support time-series queries</li>
+<li class="task-item">☐ No data loss during migration process</li>
+</ul>
+
+<h3><strong>Immediate Blockers</strong></h3>
+<p>1. <strong>Database Structure</strong>: Must understand current data patterns before designing new schema</p>
+<p>2. <strong>Data Validation</strong>: Need to identify all unique constraint requirements</p>
+<p>3. <strong>Migration Strategy</strong>: Must ensure zero-downtime migration approach</p>
+
+<hr>
+
+<h2>📈 <strong>METRICS & KPIs</strong></h2>
+
+<h3><strong>Technical Debt</strong></h3>
+<ul>
+<li><strong>Duplicate Records</strong>: ~50% of vulnerability data is duplicated (estimated)</li>
+<li><strong>Storage Efficiency</strong>: Target 50% reduction in database size post-migration</li>
+<li><strong>Query Performance</strong>: Target sub-500ms response times for trend queries</li>
+</ul>
+
+<h3><strong>User Experience</strong></h3>
+<ul>
+<li><strong>CVE Link Success Rate</strong>: Currently ~0% (broken), target 100%</li>
+<li><strong>Modal Navigation</strong>: Currently blocked, target seamless nested navigation</li>
+<li><strong>Load Times</strong>: Current 3-5 seconds, target <2 seconds</li>
+</ul>
+
+<hr>
+
+<h2>🚀 <strong>NEXT SPRINT PLANNING</strong></h2>
+
+<h3><strong>Sprint 2 Preview (Phase 2: Smart CSV Import)</strong></h3>
+<ul>
+<li><strong>Goal</strong>: Implement UPSERT logic for CSV imports</li>
+<li><strong>Duration</strong>: 1-2 weeks</li>
+<li><strong>Key Deliverables</strong>: No more duplicate creation, proper time-series tracking</li>
+</ul>
+
+<h3><strong>Sprint 3 Preview (Phase 3: Core Functionality Fixes)</strong></h3>
+<ul>
+<li><strong>Goal</strong>: Fix critical UI bugs (CVE links, modal layering)</li>
+<li><strong>Duration</strong>: 1 week  </li>
+<li><strong>Key Deliverables</strong>: Functional CVE popups, proper modal navigation</li>
+</ul>
+
+<hr>
+
+<h2>🔧 <strong>DEVELOPMENT ENVIRONMENT STATUS</strong></h2>
+
+<h3><strong>Infrastructure</strong></h3>
+<ul>
+<li>✅ Docker Compose setup working</li>
+<li>✅ Application accessible at localhost:8080</li>
+<li>✅ SQLite database operational</li>
+<li>✅ Backup procedures in place</li>
+</ul>
+
+<h3><strong>Documentation</strong></h3>
+<ul>
+<li>✅ 3-file roadmap structure established</li>
+<li>✅ AI instructions updated for framework consistency</li>
+<li>✅ Portal updated with modern Pico CSS design</li>
+<li>✅ All tactical tasks consolidated without loss</li>
+</ul>
+
+<hr>
+
+<h2>📋 <strong>HANDOFF NOTES</strong></h2>
+
+<h3><strong>For Next Developer/Session</strong></h3>
+<p>1. <strong>Start Here</strong>: Phase 1.1 - Analyze Current Data Structure in UI_UX_ROADMAP.md</p>
+<p>2. <strong>Key Files</strong>: </p>
+<ul>
+<li><code>/data/hextrackr.db</code> - Current database to analyze</li>
+<li><code>server.js</code> - API endpoints to understand data flow</li>
+<li><code>vulnerabilities.html</code> - Frontend that needs time-series data</li>
+</ul>
+<p>3. <strong>Critical Path</strong>: Database migration must complete before any UI enhancements</p>
+<p>4. <strong>Testing</strong>: Use sample data in <code>/sample data/</code> folder for migration validation</p>
+
+<h3><strong>Known Dependencies</strong></h3>
+<ul>
+<li>Database analysis → Schema design → Migration scripts → API updates → Frontend changes</li>
+<li>No UI work should proceed until time-series foundation is solid</li>
+<li>All CVE link fixes depend on understanding current data structure</li>
+</ul>
+
+<hr>
+
+<h2>🎯 <strong>SUCCESS DEFINITION</strong></h2>
+<p>Sprint complete when:</p>
+<ul class="task-list">
+<li class="task-item">☐ Current data structure fully documented and understood</li>
+<li class="task-item">☐ Time-series schema designed and validated</li>
+<li class="task-item">☐ Migration path clearly defined with rollback procedures</li>
+<li class="task-item">☐ Sample data successfully migrated to new structure</li>
+<li class="task-item">☐ API endpoints updated to support latest-value queries</li>
+</ul>
+
+<hr>
+<p><em>Sprint Status Report • Next Review: End of Phase 1 completion • Team: Solo Development</em></p>
+            </div>
+        </section>
+
+        
         <footer>
-            <p><strong>HexTrackr</strong> • Cybersecurity Management Platform • <em>Built with 🛡️ for Security Teams</em></p>
-            <p><small>Last updated: August 25, 2025 • <a href="https://github.com/Lonnie-Bruton/HexTrackr">View on GitHub</a></small></p>
+            <p>🔄 Auto-generated from markdown files | Last updated: 8/25/2025 | 
+            <a href="javascript:location.reload()">Refresh</a></p>
         </footer>
     </main>
 
@@ -640,6 +1196,74 @@
                     document.getElementById(targetId).classList.add('active');
                 });
             });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all tabs and content
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // Smooth scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+            
+            // Progress tracking
+            const totalTasks = document.querySelectorAll('.task-item').length;
+            const completedTasks = document.querySelectorAll('.task-item.completed').length;
+            
+            if (totalTasks > 0) {
+                const progressPercent = Math.round((completedTasks / totalTasks) * 100);
+                console.log(`📊 Overall Progress: ${completedTasks}/${totalTasks} tasks (${progressPercent}%)`);
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all tabs and content
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // Smooth scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+            
+            // Progress tracking
+            const totalTasks = document.querySelectorAll('.task-item').length;
+            const completedTasks = document.querySelectorAll('.task-item.completed').length;
+            
+            if (totalTasks > 0) {
+                const progressPercent = Math.round((completedTasks / totalTasks) * 100);
+                console.log(`📊 Overall Progress: ${completedTasks}/${totalTasks} tasks (${progressPercent}%)`);
+            }
         });
     </script>
 </body>

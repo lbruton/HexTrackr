@@ -2,501 +2,312 @@
 
 /**
  * HexTrackr Roadmap Portal Generator
- * Automatically converts markdown roadmaps to a beautiful HTML portal page
+ * Uses existing Pico CSS template and populates with real markdown content
  * Run: node scripts/generate-roadmap-portal.js
  */
 
 const fs = require('fs');
 const path = require('path');
 
-// Simple markdown to HTML converter
+// Enhanced markdown to HTML converter
 function markdownToHtml(markdown) {
-    return markdown
+    // Handle code blocks first to prevent interference
+    const codeBlocks = [];
+    markdown = markdown.replace(/```([\s\S]*?)```/g, (match, code) => {
+        codeBlocks.push(code);
+        return `__CODEBLOCK_${codeBlocks.length - 1}__`;
+    });
+
+    // Process line by line for better structure
+    const lines = markdown.split('\n');
+    const htmlLines = [];
+    let inList = false;
+    let listType = '';
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        const nextLine = lines[i + 1] || '';
+
         // Headers
-        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        
+        if (line.match(/^### /)) {
+            if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
+            htmlLines.push(line.replace(/^### (.*)$/, '<h3>$1</h3>'));
+        } else if (line.match(/^## /)) {
+            if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
+            htmlLines.push(line.replace(/^## (.*)$/, '<h2>$1</h2>'));
+        } else if (line.match(/^# /)) {
+            if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
+            htmlLines.push(line.replace(/^# (.*)$/, '<h1>$1</h1>'));
+        }
+        // Horizontal rules
+        else if (line.match(/^---+$/)) {
+            if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
+            htmlLines.push('<hr>');
+        }
+        // Task lists (checkboxes)
+        else if (line.match(/^\s*- \[ \]/)) {
+            if (!inList || listType !== 'ul') {
+                if (inList) htmlLines.push(`</${listType}>`);
+                htmlLines.push('<ul class="task-list">');
+                inList = true;
+                listType = 'ul';
+            }
+            htmlLines.push(line.replace(/^\s*- \[ \] (.*)$/, '<li class="task-item">☐ $1</li>'));
+        } else if (line.match(/^\s*- \[x\]/)) {
+            if (!inList || listType !== 'ul') {
+                if (inList) htmlLines.push(`</${listType}>`);
+                htmlLines.push('<ul class="task-list">');
+                inList = true;
+                listType = 'ul';
+            }
+            htmlLines.push(line.replace(/^\s*- \[x\] (.*)$/, '<li class="task-item completed">✅ $1</li>'));
+        }
+        // Regular lists
+        else if (line.match(/^\s*- /)) {
+            if (!inList || listType !== 'ul') {
+                if (inList) htmlLines.push(`</${listType}>`);
+                htmlLines.push('<ul>');
+                inList = true;
+                listType = 'ul';
+            }
+            htmlLines.push(line.replace(/^\s*- (.*)$/, '<li>$1</li>'));
+        }
+        // Empty line - close lists
+        else if (line.trim() === '') {
+            if (inList) {
+                htmlLines.push(`</${listType}>`);
+                inList = false;
+            }
+            htmlLines.push('');
+        }
+        // Regular paragraphs
+        else {
+            if (inList && !nextLine.match(/^\s*-/)) {
+                htmlLines.push(`</${listType}>`);
+                inList = false;
+            }
+            if (line.trim() !== '') {
+                htmlLines.push(`<p>${line}</p>`);
+            }
+        }
+    }
+
+    // Close any remaining lists
+    if (inList) {
+        htmlLines.push(`</${listType}>`);
+    }
+
+    let html = htmlLines.join('\n');
+
+    // Apply inline formatting
+    html = html
         // Bold and italic
         .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         
-        // Code blocks and inline code
-        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+        // Inline code
         .replace(/`([^`]+)`/g, '<code>$1</code>')
         
-        // Lists
-        .replace(/^\- \[ \] (.*$)/gim, '<li class="todo-item"><input type="checkbox" disabled> $1</li>')
-        .replace(/^\- \[x\] (.*$)/gim, '<li class="todo-item completed"><input type="checkbox" checked disabled> $1</li>')
-        .replace(/^\- (.*$)/gim, '<li>$1</li>')
+        // Status badges
+        .replace(/\*Risk: (HIGH|MEDIUM|LOW)\*/g, '<span class="phase-status status-critical">Risk: $1</span>')
+        .replace(/\*Priority: (CRITICAL|HIGH|MEDIUM|LOW)\*/g, '<span class="phase-status status-in-progress">Priority: $1</span>')
+        .replace(/\*Duration: ([^*]+)\*/g, '<span class="phase-status status-planned">Duration: $1</span>')
+        .replace(/\*Updated: ([^*]+)\*/g, '<span class="phase-status status-complete">Updated: $1</span>')
         
-        // Emojis and special formatting
-        .replace(/🎯/g, '<span class="emoji">🎯</span>')
-        .replace(/✅/g, '<span class="emoji success">✅</span>')
-        .replace(/🔄/g, '<span class="emoji warning">🔄</span>')
-        .replace(/🚀/g, '<span class="emoji primary">🚀</span>')
-        .replace(/📋/g, '<span class="emoji info">📋</span>')
-        .replace(/🚨/g, '<span class="emoji danger">🚨</span>')
-        
-        // Priority tags
-        .replace(/\*Risk: (HIGH|MEDIUM|LOW)\*/g, '<span class="risk-badge risk-$1">Risk: $1</span>')
-        .replace(/\*Priority: (CRITICAL|HIGH|MEDIUM|LOW)\*/g, '<span class="priority-badge priority-$1">Priority: $1</span>')
-        .replace(/\*Duration: ([^*]+)\*/g, '<span class="duration-badge">Duration: $1</span>')
-        
-        // Line breaks
-        .replace(/\n\n/g, '</p><p>')
-        .replace(/\n/g, '<br>')
-        
-        // Wrap in paragraphs
-        .replace(/^(?!<[h|ul|ol|li|div|pre])/gim, '<p>')
-        .replace(/(?<!>)$/gim, '</p>');
+        // Blockquotes
+        .replace(/^> (.*)$/gm, '<blockquote>$1</blockquote>');
+
+    // Restore code blocks
+    codeBlocks.forEach((code, index) => {
+        html = html.replace(`__CODEBLOCK_${index}__`, `<pre><code>${code}</code></pre>`);
+    });
+
+    return html;
 }
 
-// Generate the complete HTML portal
+// Generate the roadmap portal using existing template
 function generatePortal() {
     const roadmapsDir = path.join(__dirname, '../roadmaps');
-    const outputPath = path.join(__dirname, '../roadmaps/index.html');
+    const templatePath = path.join(roadmapsDir, 'index.html');
+    const outputPath = templatePath; // Overwrite the existing file
+    
+    console.log('🔍 Reading roadmap files...');
     
     // Read roadmap files
     const strategicRoadmap = fs.readFileSync(path.join(roadmapsDir, 'ROADMAP.md'), 'utf8');
     const tacticalRoadmap = fs.readFileSync(path.join(roadmapsDir, 'UI_UX_ROADMAP.md'), 'utf8');
-    const statusContent = fs.readFileSync(path.join(roadmapsDir, 'CURRENT_STATUS.md'), 'utf8');
+    const currentStatus = fs.readFileSync(path.join(roadmapsDir, 'CURRENT_STATUS.md'), 'utf8');
+    
+    console.log('🔄 Converting markdown to HTML...');
     
     // Convert to HTML
-    // Convert markdown to HTML
     const strategicHtml = markdownToHtml(strategicRoadmap);
     const tacticalHtml = markdownToHtml(tacticalRoadmap);
-    const statusHtml = markdownToHtml(statusContent);    // Generate complete HTML page
-    const htmlTemplate = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HexTrackr Development Roadmap Portal</title>
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/gitbook-style@1.0.0/dist/gitbook.min.css" rel="stylesheet" onerror="this.remove();">
-    <style>
-        /* Enhanced Dark Mode Documentation Theme */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Liberation Sans', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.65;
-            color: #e5e7eb;
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            margin: 0;
-            padding: 0;
-        }
-        
-        .roadmap-portal {
-            min-height: 100vh;
-            padding: 1rem 0;
-        }
-        
-        .documentation-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: rgba(31, 41, 55, 0.95);
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-            border: 1px solid #374151;
-        }
-        
-        .roadmap-card {
-            background: #1f2937;
-            border: 1px solid #374151;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-        
-        .roadmap-header {
-            background: #111827;
-            border-bottom: 2px solid #374151;
-            color: #f9fafb;
-            padding: 1.5rem;
-            position: relative;
-        }
-        
-        .roadmap-header h2 {
-            color: #f9fafb;
-            margin: 0;
-            font-weight: 600;
-        }
-        
-        .roadmap-content {
-            padding: 2rem;
-            max-height: 70vh;
-            overflow-y: auto;
-            background: #1f2937;
-            color: #e5e7eb;
-        }
-        
-        .emoji {
-            font-size: 1.1em;
-            margin-right: 0.5rem;
-        }
-        
-        .risk-badge, .priority-badge, .duration-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin: 0.25rem 0.5rem 0.25rem 0;
-            border: 1px solid;
-        }
-        
-        .risk-HIGH, .priority-CRITICAL { 
-            background: #fef2f2; 
-            color: #dc2626; 
-            border-color: #fca5a5;
-        }
-        .risk-MEDIUM, .priority-HIGH { 
-            background: #fffbeb; 
-            color: #d97706; 
-            border-color: #fcd34d;
-        }
-        .risk-LOW, .priority-MEDIUM { 
-            background: #eff6ff; 
-            color: #2563eb; 
-            border-color: #93c5fd;
-        }
-        .priority-LOW { 
-            background: #f0fdf4; 
-            color: #16a34a; 
-            border-color: #86efac;
-        }
-        .duration-badge { 
-            background: #f8fafc; 
-            color: #475569; 
-            border-color: #cbd5e1;
-        }
-        
-        .todo-item {
-            list-style: none;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #f3f4f6;
-            font-size: 0.95rem;
-        }
-        
-        .todo-item.completed {
-            opacity: 0.7;
-            text-decoration: line-through;
-            color: #6b7280;
-        }
-        
-        .todo-item input[type="checkbox"] {
-            margin-right: 0.75rem;
-            transform: scale(1.1);
-        }
-        
-        .nav-tabs {
-            border-bottom: 2px solid #e5e7eb;
-            margin-bottom: 1.5rem;
-            background: white;
-            border-radius: 8px 8px 0 0;
-            padding: 0 1rem;
-        }
-        
-        .nav-link {
-            border: none;
-            padding: 1rem 1.5rem;
-            font-weight: 500;
-            color: #6b7280;
-            transition: all 0.2s ease;
-            border-radius: 6px 6px 0 0;
-            margin-top: 0.5rem;
-        }
-        
-        .nav-link:hover {
-            color: #374151;
-            background: #f9fafb;
-        }
-        
-        .nav-link.active {
-            background: #2563eb;
-            color: white !important;
-            font-weight: 600;
-        }
-        
-        .last-updated {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            font-size: 0.875rem;
-            color: #6b7280;
-            font-weight: normal;
-        }
-        
-        .progress-overview {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .phase-progress {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            gap: 1rem;
-        }
-        
-        .phase-status {
-            flex: 1;
-            text-align: center;
-            padding: 1rem;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            border: 1px solid;
-        }
-        
-        .phase-status.completed { 
-            background: #f0fdf4; 
-            color: #16a34a; 
-            border-color: #86efac;
-        }
-        .phase-status.in-progress { 
-            background: #fffbeb; 
-            color: #d97706; 
-            border-color: #fcd34d;
-        }
-        .phase-status.planned { 
-            background: #eff6ff; 
-            color: #2563eb; 
-            border-color: #93c5fd;
-        }
-        
-        h1, h2, h3 { 
-            color: #111827; 
+    const statusHtml = markdownToHtml(currentStatus);
+    
+    console.log('📝 Reading existing template...');
+    
+    // Read the current template
+    let template = fs.readFileSync(templatePath, 'utf8');
+    
+    // Update the navigation to include current status tab
+    const updatedNav = `
+        <nav class="nav-container">
+            <ul class="nav-tabs">
+                <li><a href="#strategic" class="nav-tab active" data-tab="strategic">🎯 Strategic Roadmap</a></li>
+                <li><a href="#tactical" class="nav-tab" data-tab="tactical">🚀 Tactical Implementation</a></li>
+                <li><a href="#status" class="nav-tab" data-tab="status">📊 Current Status</a></li>
+            </ul>
+        </nav>`;
+    
+    // Replace navigation
+    template = template.replace(
+        /<nav class="nav-container">[\s\S]*?<\/nav>/,
+        updatedNav
+    );
+    
+    // Create the tab content sections
+    const tabContent = `
+        <section id="strategic" class="tab-content active">
+            <div class="roadmap-section">
+                ${strategicHtml}
+            </div>
+        </section>
+
+        <section id="tactical" class="tab-content">
+            <div class="roadmap-section">
+                ${tacticalHtml}
+            </div>
+        </section>
+
+        <section id="status" class="tab-content">
+            <div class="roadmap-section">
+                ${statusHtml}
+            </div>
+        </section>`;
+    
+    // Find where to insert content (after nav, before footer)
+    const navEndIndex = template.indexOf('</nav>') + 6;
+    const footerStartIndex = template.indexOf('<footer');
+    
+    if (navEndIndex > 5 && footerStartIndex > navEndIndex) {
+        // Replace content between nav and footer
+        template = template.substring(0, navEndIndex) + 
+                  '\n\n' + tabContent + '\n\n        ' + 
+                  template.substring(footerStartIndex);
+    } else {
+        // Fallback: insert before closing main tag
+        template = template.replace(
+            '</main>',
+            tabContent + '\n    </main>'
+        );
+    }
+    
+    // Add enhanced CSS for task lists and markdown content
+    const enhancedCSS = `
+        /* Enhanced Markdown Styling */
+        .roadmap-section h1, .roadmap-section h2, .roadmap-section h3 {
+            color: var(--pico-primary-500);
             margin-top: 2rem;
             margin-bottom: 1rem;
-            font-weight: 600;
         }
         
-        h1:first-child, h2:first-child { margin-top: 0; }
-        
-        h1 { font-size: 2rem; }
-        h2 { font-size: 1.5rem; }
-        h3 { font-size: 1.25rem; }
-        
-        code {
-            background: #f1f5f9;
-            color: #475569;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.875rem;
-            border: 1px solid #e2e8f0;
+        .roadmap-section h1:first-child, .roadmap-section h2:first-child, .roadmap-section h3:first-child {
+            margin-top: 0;
         }
         
-        pre {
-            background: #f8fafc;
-            padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-            border: 1px solid #e2e8f0;
-        }
-        
-        pre code {
-            background: none;
+        .roadmap-section hr {
             border: none;
-            padding: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--pico-border-color), transparent);
+            margin: 2rem 0;
         }
         
-        .alert {
-            padding: 1rem;
-            border-radius: 6px;
+        /* Task Lists */
+        .task-list {
+            list-style: none;
+            padding-left: 0;
             margin: 1rem 0;
-            border: 1px solid;
         }
         
-        .alert-info {
-            background: #eff6ff;
-            border-color: #93c5fd;
-            color: #1e40af;
+        .task-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--pico-border-color);
+            opacity: 0.9;
         }
         
-        .page-header {
-            background: #111827;
-            padding: 2rem 0;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #374151;
+        .task-item:last-child {
+            border-bottom: none;
         }
         
-        .page-title {
-            color: #f9fafb;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        .task-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+            color: var(--pico-muted-color);
         }
         
-        .page-subtitle {
-            color: #9ca3af;
-            font-size: 1.125rem;
-            font-weight: 400;
-        }
-        
-        ul, ol {
-            padding-left: 1.5rem;
-        }
-        
-        li {
-            margin-bottom: 0.5rem;
-        }
-        
-        blockquote {
-            border-left: 4px solid #e5e7eb;
-            padding-left: 1rem;
-            margin: 1rem 0;
-            color: #6b7280;
-            font-style: italic;
-        }
-        
-        .roadmap-content::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .roadmap-content::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
-        }
-        
-        .roadmap-content::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        
-        .roadmap-content::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-    </style>
-</head>
-<body>
-    <div class="roadmap-portal">
-        <div class="container-xl">
-            <div class="page-header">
-                <div class="container-xl text-center">
-                    <h1 class="page-title">🛡️ HexTrackr Development Roadmap Portal</h1>
-                    <p class="page-subtitle">Strategic Planning & Tactical Implementation Dashboard</p>
-                </div>
-            </div>
-            
-            <div class="progress-overview">
-                <h3>🎯 Current Development Status</h3>
-                <div class="phase-progress">
-                    <div class="phase-status completed">Phase 1 ✅<br><small>Core UI Complete</small></div>
-                    <div class="phase-status in-progress">Phase 2 🔄<br><small>Filtering & Layout</small></div>
-                    <div class="phase-status planned">Phase 3-7 📋<br><small>Advanced Features</small></div>
-                </div>
-                <div class="alert alert-info">
-                    <strong>Last Updated:</strong> ${new Date().toLocaleDateString()} | 
-                    <strong>Next Priority:</strong> Fix "Clear Data" button & VPR calculations
-                </div>
-            </div>
-            
-            <ul class="nav nav-tabs" id="roadmapTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="strategic-tab" data-bs-toggle="tab" data-bs-target="#strategic" type="button" role="tab">
-                        🎯 Strategic Roadmap
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tactical-tab" data-bs-toggle="tab" data-bs-target="#tactical" type="button" role="tab">
-                        🚀 Tactical Implementation
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="status-tab" data-bs-toggle="tab" data-bs-target="#status" type="button" role="tab">
-                        📋 Session Status
-                    </button>
-                </li>
-            </ul>
-            
-            <div class="tab-content" id="roadmapTabsContent">
-                <div class="tab-pane fade show active" id="strategic" role="tabpanel">
-                    <div class="roadmap-card">
-                        <div class="roadmap-header">
-                            <h2 class="mb-0">Strategic Project Roadmap</h2>
-                            <div class="last-updated">Long-term Vision & Architecture</div>
-                        </div>
-                        <div class="roadmap-content">
-                            ${strategicHtml}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tab-pane fade" id="tactical" role="tabpanel">
-                    <div class="roadmap-card">
-                        <div class="roadmap-header">
-                            <h2 class="mb-0">UI/UX Implementation Roadmap</h2>
-                            <div class="last-updated">Current Sprint Priorities</div>
-                        </div>
-                        <div class="roadmap-content">
-                            ${tacticalHtml}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tab-pane fade" id="status" role="tabpanel">
-                    <div class="roadmap-card">
-                        <div class="roadmap-header">
-                            <h2 class="mb-0">Session Status & Handoff</h2>
-                            <div class="last-updated">Current Development Session</div>
-                        </div>
-                        <div class="roadmap-content">
-                            ${statusHtml}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center mt-4">
-                <p class="text-muted">
-                    <small>🔄 Auto-generated from markdown files | Run <code>npm run roadmap</code> to update</small>
-                </p>
-            </div>
-        </div>
-    </div>
+        /* Update footer */
+        footer p {
+            margin: 0;
+        }`;
     
-    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
+    // Insert enhanced CSS before closing </style>
+    template = template.replace('</style>', enhancedCSS + '\n    </style>');
+    
+    // Update footer with generation info
+    const footerContent = `
+        <footer>
+            <p>🔄 Auto-generated from markdown files | Last updated: ${new Date().toLocaleDateString()} | 
+            <a href="javascript:location.reload()">Refresh</a></p>
+        </footer>`;
+    
+    template = template.replace(/<footer>[\s\S]*?<\/footer>/, footerContent);
+    
+    // Add JavaScript for tab functionality
+    const jsScript = `
     <script>
-        // Auto-refresh functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Smooth scrolling for internal links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
+            // Tab switching functionality
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({ behavior: 'smooth' });
-                    }
+                    
+                    // Remove active class from all tabs and content
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // Smooth scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
             });
             
             // Progress tracking
-            const checkboxes = document.querySelectorAll('.todo-item input[type="checkbox"]');
-            const totalTasks = checkboxes.length;
-            const completedTasks = document.querySelectorAll('.todo-item.completed').length;
+            const totalTasks = document.querySelectorAll('.task-item').length;
+            const completedTasks = document.querySelectorAll('.task-item.completed').length;
             
             if (totalTasks > 0) {
                 const progressPercent = Math.round((completedTasks / totalTasks) * 100);
                 console.log(\`📊 Overall Progress: \${completedTasks}/\${totalTasks} tasks (\${progressPercent}%)\`);
             }
         });
-    </script>
-</body>
-</html>`;
+    </script>`;
     
-    // Write the HTML file
-    fs.writeFileSync(outputPath, htmlTemplate);
+    // Insert JavaScript before closing body tag
+    template = template.replace('</body>', jsScript + '\n</body>');
+    
+    console.log('💾 Writing updated portal...');
+    
+    // Write the updated HTML file
+    fs.writeFileSync(outputPath, template);
+    
     console.log('🚀 Roadmap portal generated successfully!');
     console.log(`📂 Open: file://${outputPath}`);
     console.log('🌐 Or access via: http://localhost:8080/roadmaps/');
@@ -513,13 +324,21 @@ function updatePackageJson() {
             packageJson.scripts = {};
         }
         
-        packageJson.scripts.roadmap = 'node scripts/generate-roadmap-portal.js';
-        
-        fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-        console.log('✅ Added "npm run roadmap" script to package.json');
+        if (!packageJson.scripts.roadmap) {
+            packageJson.scripts.roadmap = 'node scripts/generate-roadmap-portal.js';
+            fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+            console.log('✅ Added "npm run roadmap" script to package.json');
+        }
     } catch (error) {
         console.log('⚠️  Could not update package.json:', error.message);
     }
+}
+
+// Count tasks for progress tracking
+function countTasks(html) {
+    const taskMatches = html.match(/class="task-item"/g) || [];
+    const completedMatches = html.match(/class="task-item completed"/g) || [];
+    return { total: taskMatches.length, completed: completedMatches.length };
 }
 
 // Run the generator
