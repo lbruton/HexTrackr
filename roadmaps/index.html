@@ -192,29 +192,32 @@
             padding: 0 1rem;
         }
         
-        .nav-link {
-            border: none;
-            padding: 1rem 1.5rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            transition: all 0.2s ease;
-            border-radius: 6px 6px 0 0;
-            margin-top: 0.5rem;
-            background: transparent;
-            cursor: pointer;
+        .nav-tabs .nav-link {
+            border: 2px solid var(--border-color) !important;
+            padding: 1rem 1.5rem !important;
+            font-weight: 600 !important;
+            color: var(--text-heading) !important;
+            background: var(--bg-primary) !important;
+            transition: all 0.3s ease !important;
+            border-radius: 6px 6px 0 0 !important;
+            margin-top: 0.5rem !important;
+            cursor: pointer !important;
+            text-decoration: none !important;
         }
         
-        .nav-link:hover {
-            color: var(--text-heading);
-            background: var(--bg-secondary);
-            transform: translateY(-1px);
+        .nav-tabs .nav-link:hover {
+            color: var(--text-heading) !important;
+            background: var(--bg-secondary) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px var(--shadow-color) !important;
         }
         
-        .nav-link.active {
-            background: #2563eb;
+        .nav-tabs .nav-link.active {
+            background: #2563eb !important;
             color: #ffffff !important;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            font-weight: 700 !important;
+            border-color: #2563eb !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4) !important;
         }
         
         .last-updated {
@@ -515,8 +518,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
     <script>
-        // Auto-refresh functionality
-        <script>
         // Dark mode toggle functionality
         function toggleTheme() {
             const body = document.body;
