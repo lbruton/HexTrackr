@@ -1,0 +1,29 @@
+/* CSS Fixes for HexTrackr Vulnerabilities Dashboard */
+
+/* Center content with proper max-width and padding */
+body {
+    margin: 0 auto;
+    max-width: 1200px;
+    padding: 0 1rem;
+}
+
+/* Responsive breakpoints for smaller screens */
+@media (max-width: 768px) {
+    .vpr-mini-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .vulnerability-card, .device-card {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .vpr-mini-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .vulnerability-card, .device-card {
+        padding: 0.5rem;
+    }
+}
