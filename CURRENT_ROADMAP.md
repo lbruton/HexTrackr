@@ -208,6 +208,18 @@
   - Ensure latest modal always appears on top
 - [ ] **Files to Check**: Modal JavaScript, CSS z-index values, Bootstrap modal configurations
 
+### Bug: CVE Link Behavior - Multiple Popups
+- [ ] **Issue**: Clicking any single CVE link opens ALL CVEs instead of just the clicked one
+- [ ] **Symptoms**: User clicks one CVE (e.g., CVE-2024-1234) but browser opens popups for multiple/all CVEs
+- [ ] **Root Cause**: `lookupCVE()` function incorrectly processing single CVE as multiple CVE string
+- [ ] **Expected Behavior**: Clicking a CVE link should open only that specific CVE's lookup popup
+- [ ] **Fix Required**: 
+  - Debug `lookupCVE()` function in lines 2266-2281 of vulnerabilities.html
+  - Check if CVE grouping or string processing is incorrectly splitting single CVE IDs
+  - Ensure `openCVEPopups()` receives only the intended CVE ID
+  - Test CVE links in table view, card view, and modal detail views
+- [ ] **Files to Check**: `vulnerabilities.html` CVE link onclick handlers, `lookupCVE()` function, `openCVEPopups()` function
+
 ---
 
 ## 🎯 **IMMEDIATE NEXT STEPS**
