@@ -2602,58 +2602,10 @@
             }
 
             // Save vulnerability changes
-            async saveVulnerabilityChanges() {
-                const id = document.getElementById('editVulnId').value;
-                const formData = {
-                    hostname: document.getElementById('editHostname').value,
-                    ip_address: document.getElementById('editIpAddress').value,
-                    severity: document.getElementById('editSeverity').value,
-                    state: document.getElementById('editState').value,
-                    notes: document.getElementById('editNotes').value
-                };
-
-                try {
-                    const response = await fetch(`${this.apiBase}/vulnerabilities/${id}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(formData)
-                    });
-
-                    if (response.ok) {
-                        this.showToast('Vulnerability updated successfully!', 'success');
-                        await this.loadData(); // Refresh the data
-                        bootstrap.Modal.getInstance(document.getElementById('editVulnModal')).hide();
-                    } else {
-                        this.showToast('Failed to update vulnerability', 'danger');
-                    }
-                } catch (error) {
-                    this.showToast('Error updating vulnerability: ' + error.message, 'danger');
-                }
-            }
+            /* Moved to vulnerabilities.js */
 
             // Delete vulnerability
-            async deleteVulnerability(id) {
-                if (!confirm('Are you sure you want to delete this vulnerability? This action cannot be undone.')) {
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`${this.apiBase}/vulnerabilities/${id}`, {
-                        method: 'DELETE'
-                    });
-
-                    if (response.ok) {
-                        this.showToast('Vulnerability deleted successfully!', 'success');
-                        await this.loadData(); // Refresh the data
-                    } else {
-                        this.showToast('Failed to delete vulnerability', 'danger');
-                    }
-                } catch (error) {
-                    this.showToast('Error deleting vulnerability: ' + error.message, 'danger');
-                }
-            }
+            /* Moved to vulnerabilities.js */
 
             // Refresh single vulnerability
             async refreshVulnerability(id) {

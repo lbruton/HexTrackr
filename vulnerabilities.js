@@ -78,3 +78,68 @@ function showToastExample(message, type) {
 }
 
 // 🎯 Ready for incremental migration as we work through vulnerabilities features
+
+/**
+ * Save vulnerability changes
+ * Updates vulnerability details via a PUT request.
+ * @async
+ * @function saveVulnerabilityChanges
+ */
+async function saveVulnerabilityChanges() {
+    const id = document.getElementById('editVulnId').value;
+    const formData = {
+        hostname: document.getElementById('editHostname').value,
+        ip_address: document.getElementById('editIpAddress').value,
+        severity: document.getElementById('editSeverity').value,
+        state: document.getElementById('editState').value,
+        notes: document.getElementById('editNotes').value
+    };
+
+    try {
+        const response = await fetch(`${apiBase}/vulnerabilities/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            showToast('Vulnerability updated successfully!', 'success');
+            await loadData(); // Refresh the data
+            bootstrap.Modal.getInstance(document.getElementById('editVulnModal')).hide();
+        } else {
+            showToast('Failed to update vulnerability', 'danger');
+        }
+    } catch (error) {
+        showToast('Error updating vulnerability: ' + error.message, 'danger');
+    }
+}
+
+/**
+ * Delete vulnerability
+ * Deletes a vulnerability via a DELETE request.
+ * @async
+ * @function deleteVulnerability
+ * @param {string} id - The ID of the vulnerability to delete.
+ */
+async function deleteVulnerability(id) {
+    if (!confirm('Are you sure you want to delete this vulnerability? This action cannot be undone.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${apiBase}/vulnerabilities/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            showToast('Vulnerability deleted successfully!', 'success');
+            await loadData(); // Refresh the data
+        } else {
+            showToast('Failed to delete vulnerability', 'danger');
+        }
+    } catch (error) {
+        showToast('Error deleting vulnerability: ' + error.message, 'danger');
+    }
+}
