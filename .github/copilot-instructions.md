@@ -57,13 +57,22 @@ HexTrackr is a dual-purpose cybersecurity management system:
    - **JSDoc Documentation**: All JS files should have proper headers like `tickets.js`
 
 ## MCP Server Requirements
+**DEVELOPMENT TOOLS ONLY** - These are for AI development assistance, NOT app features to implement:
+
 **ALWAYS verify these MCP servers are available and use them when appropriate:**
 - **Memory Server** - CRITICAL for session persistence and context tracking
 - **Sequential Thinking** - REQUIRED for complex problem solving and planning
+- **Context7** - MANDATORY for real-time library documentation and code examples (React, Node.js, etc.)
 - **GitHub Tools** - Use for repository management and issue tracking
 - **Codacy Tools** - MANDATORY after any code changes for quality analysis
-- **Playwright Browser** - Use for testing UI changes at `localhost:8080`
-- **Any other available MCP tools** - Leverage all available capabilities
+- **Playwright Browser** - Available for testing UI changes at `localhost:8080` (may need manual activation)
+- **Microsoft Docs** - Use for Azure/Microsoft technology documentation
+- **Firecrawl Tools** - Use for researching security best practices, gathering documentation
+- **Knowledge Graph Tools** - Use for organizing development context and technical relationships
+- **MarkItDown** - Use for converting documentation formats during development
+- **Image Processing Tools** - Use for processing development assets, mockups, diagrams
+- **Codacy Security Management** - Use for enhanced security analysis of our codebase
+- **Any other available MCP tools** - Leverage all available capabilities for development
 
 ## Key Patterns
 - **Ticket IDs**: `Date.now().toString()`
