@@ -12,9 +12,12 @@ HexTrackr is a dual-purpose cybersecurity management system:
 
 ## Development Rules
 1. **Always backup first**: `git add . && git commit -m "🔄 Pre-work backup"`
-2. **Test locally**: Use `localhost:8080` via Docker
-3. **Database operations**: Use API endpoints, not direct DB access
-4. **No cross-contamination**: Tickets and vulnerabilities are separate systems
+2. **Update instructions FIRST**: Before any development work, update both:
+   - `.github/copilot-instructions.md` (AI workflow & technical details)
+   - `README.md` (Human overview & quick start)
+3. **Test locally**: Use `localhost:8080` via Docker
+4. **Database operations**: Use API endpoints, not direct DB access
+5. **No cross-contamination**: Tickets and vulnerabilities are separate systems
 
 ## MCP Server Requirements
 **ALWAYS verify these MCP servers are available and use them when appropriate:**
@@ -43,3 +46,10 @@ HexTrackr is a dual-purpose cybersecurity management system:
 - **Add ticket fields**: Update HTML → `saveTicket()` → `renderTickets()` → PDF generation
 - **CSV import/export**: Follow `sample-data.js` structure
 - **Modal management**: Use Bootstrap 5 with `data-ticket-id` attributes
+
+## Documentation Maintenance
+**CRITICAL**: Keep these files synchronized across conversations:
+- **AI Instructions**: `.github/copilot-instructions.md` - Technical architecture, MCP requirements, development patterns
+- **Human README**: `README.md` - Project overview, quick start, user-facing information
+- **When to update**: EVERY conversation that changes architecture, adds features, or modifies workflows
+- **Prevent framework confusion**: Always check current instructions before starting development work
