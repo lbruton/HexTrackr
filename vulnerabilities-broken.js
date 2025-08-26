@@ -79,3 +79,30 @@ console.log('✅ vulnerabilities.js loaded successfully - ready for incremental 
 // 🎯 READY FOR INCREMENTAL MIGRATION
 // This file is now properly loaded by vulnerabilities.html
 // All JavaScript code from HTML will be migrated here incrementally as we work on features
+
+            const trendsResponse = await fetch(`${this.apiBase}/trends`);
+            this.historicalData = await trendsResponse.json();
+        } catch (error) {
+            console.error('Error loading data:', error);
+            this.vulnerabilities = [];
+            this.historicalData = [];
+        }
+
+        this.loadStatistics(); // Load statistics from API
+    }
+
+    async loadStatistics() {
+        // Placeholder for loadStatistics method to avoid undefined reference
+        console.log('Loading statistics...');
+    }
+
+    updateDevices(deviceMap) {
+        this.devices = Array.from(deviceMap.values());
+    }
+}
+
+// Initialize the application
+let vulnManager;
+document.addEventListener('DOMContentLoaded', () => {
+    vulnManager = new ModernVulnManager();
+});
