@@ -87,6 +87,12 @@
 - **Impact**: Device modals inaccessible from vulnerability modals
 - **Priority**: HIGH - broken navigation flow
 
+### **CSV Export Functionality**
+- **Issue**: CSV export headers contain extra characters/corruption in device security reports
+- **Impact**: Exported reports are malformed, headers unreadable
+- **Priority**: HIGH - affects report generation and data sharing
+- **Status**: Newly identified
+
 ---
 
 ## 🎯 **SPRINT GOALS & SUCCESS CRITERIA**
