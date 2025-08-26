@@ -146,6 +146,13 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 - [ ] **Compliance reporting** (SOC2, ISO27001, NIST)
 - [ ] **Trend analysis** with ApexCharts expansion
 - [ ] **Custom report builder**
+- [ ] **HTML-based reports with PDF export** 🎯 **MID-TERM GOAL**
+  - [ ] Beautiful HTML report templates
+  - [ ] PDF export capabilities (jsPDF or Puppeteer)
+  - [ ] Support for both Live Tracking Mode (scan date reports) and Scheduled Snapshots Mode (aggregate trend reports)
+  - [ ] Executive summary reports with charts and metrics
+  - [ ] Customizable report branding and styling
+  - [ ] Automated report scheduling and delivery
 
 ### Enterprise Features 📋
 
