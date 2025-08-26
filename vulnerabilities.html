@@ -2691,12 +2691,6 @@
                     
                     this.hideLoading();
                     
-                    // Close settings modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
-                    if (modal) {
-                        modal.hide();
-                    }
-                    
                     this.showToast('All vulnerability data cleared successfully!', 'success');
                 } catch (error) {
                     this.hideLoading();
