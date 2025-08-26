@@ -140,6 +140,40 @@
 - [ ] Replace HTML file generation with PDF creation
 - [ ] Add professional PDF headers/footers with timestamps
 
+### 3.5 Advanced Trends Chart Analytics 🚨 **CRITICAL - FUNDAMENTAL FLAW IDENTIFIED**
+*Risk: CRITICAL | Impact: HIGHEST | Duration: 2-4 hours total*
+
+**🚨 CRITICAL ISSUE**: Historical VPR Trends chart shows vulnerability COUNTS instead of VPR SCORE SUMS - defeats the purpose of VPR trend analysis!
+
+#### 3.5.1 Count vs VPR Sum Toggle ⚡ **PHASE 1 - CURRENT SPRINT** (30 min)
+- [ ] **BACKEND FIX**: Modify `/api/vulnerabilities/trends` to return both count AND total_vpr data (currently ignores total_vpr)
+- [ ] **FRONTEND TOGGLE**: Add button group to Historical VPR Trends card header similar to Data Workspace switcher
+- [ ] **CHART LOGIC**: Update ApexCharts to switch between count vs VPR sum based on user selection
+- [ ] **DEFAULT**: Set to VPR Sum (the correct behavior) instead of count
+- [ ] **TESTING**: Verify VPR sum calculations are accurate and meaningful
+
+#### 3.5.2 Multi-Vendor Analytics 🎯 **PHASE 2** (45 min)  
+- [ ] **VENDOR FILTERING**: Add Cisco | Palo Alto | Other | All vendor filter buttons
+- [ ] **API ENHANCEMENT**: JOIN time-series with vulnerabilities table for vendor-specific trends
+- [ ] **UI DESIGN**: 3-row button groups (Vendor, Metric, Aggregation) with clean spacing
+- [ ] **BACKEND QUERY**: Support vendor parameter in trends API endpoint
+- [ ] **TESTING**: Verify filtering works correctly (currently all data is Cisco)
+
+#### 3.5.3 CVSS Support & Aggregation Methods 📊 **PHASE 3** (30 min)
+- [ ] **CVSS INTEGRATION**: Add CVSS Sum option (infrastructure ready, awaiting real CVSS data)
+- [ ] **AGGREGATION TOGGLE**: Add Sum | Average toggle for both VPR and CVSS metrics  
+- [ ] **API EXPANSION**: Support metric type (VPR/CVSS) and aggregation (sum/avg) parameters
+- [ ] **CHART UPDATES**: Update tooltips and labels based on selected metric and aggregation
+- [ ] **DEFAULT STATE**: All vendors, VPR Sum, Sum aggregation
+
+#### 3.5.4 UI Polish & Performance 🎨 **PHASE 4** (15 min)
+- [ ] **RESPONSIVE DESIGN**: Ensure button groups work on mobile devices
+- [ ] **LOADING STATES**: Add loading indicators during metric switching
+- [ ] **PERFORMANCE**: Optimize API queries for vendor filtering
+- [ ] **ACCESSIBILITY**: Add proper ARIA labels and keyboard navigation
+
+**Vision**: Transform trends chart into comprehensive analytics dashboard with vendor-specific, multi-metric trend analysis using elegant button-based UI (no ugly dropdowns).
+
 ---
 
 ## 📋 **PHASE 4: Enhanced Filtering & Display**
