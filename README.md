@@ -5,10 +5,11 @@ A modern cybersecurity management system that combines **vulnerability tracking*
 ## ✨ Key Features
 
 ### 🔍 Vulnerability Management
-- **Time-series tracking** - Monitor how vulnerabilities change over time
-- **Multi-vendor support** - Import data from various security tools
-- **Trend analysis** - Track VPR (Vulnerability Priority Rating) improvements
-- **Modern dashboard** - Clean, responsive Tabler.io interface
+- **Time-series tracking** - Monitor vulnerability changes with historical trends
+- **Chart toggle functionality** - Switch between vulnerability counts and VPR sum visualization
+- **Multi-vendor support** - Import data from various security tools (Cisco tested)
+- **Real-time analytics** - ApexCharts with responsive design for all screen sizes
+- **Modern dashboard** - Clean Tabler.io interface with 6K+ real vulnerability records
 
 ### 🎫 Security Ticket Management  
 - **Hexagon workflow** - Specialized for cybersecurity teams

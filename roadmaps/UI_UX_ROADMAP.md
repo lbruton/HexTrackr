@@ -1,19 +1,22 @@
 # HexTrackr UI/UX Technical Roadmap
 *Updated: August 25, 2025*
 
-## 🎯 **CURRENT STATUS: TREND TRACKING IMPLEMENTATION PHASE**
-**✅ CONFIRMED WORKING:**
-- Modern Tabler.io vulnerability dashboard with real data ✅
-- Statistics cards (109 Critical, 4,843 High, etc.) ✅
-- AG Grid table with pagination (Page 1 of 200) ✅
+# HexTrackr UI/UX Technical Roadmap
+*Updated: August 25, 2025*
 
-**🔄 CRITICAL ISSUE IDENTIFIED:**
-- **Problem**: CSV imports create duplicates instead of tracking changes over time
-- **Solution**: Transform into time-series vulnerability management system
+## 🎯 **CURRENT STATUS: CHART ENHANCEMENT PHASE**
+**✅ CURRENT ACHIEVEMENTS:**
+- ✅ **VPR Toggle Bug Fix**: Fixed critical JavaScript bug in chart metric switching
+- ✅ Modern Tabler.io vulnerability dashboard with real 6K records
+- ✅ Time-series database migration complete (97% data reduction)
+- ✅ Chart metric toggle working perfectly (Count ↔ VPR Sum modes)
+
+**🎯 NEXT PRIORITY:**
+- **Chart Timeline Extension**: Extend chart to current date (Aug 25, 2025) with flat lines for data continuity
 
 ---
 
-## 📋 **PHASE 0: JavaScript Architecture & Code Organization** ✅ **MOSTLY COMPLETE**
+## 📋 **PHASE 0: JavaScript Architecture & Code Organization** ✅ **COMPLETE**
 *Risk: LOW | Impact: HIGH | Duration: Ongoing*
 
 ### 0.1 JavaScript File Organization ✅ **COMPLETED**
@@ -174,6 +177,15 @@
 - [ ] **ACCESSIBILITY**: Add proper ARIA labels and keyboard navigation
 
 **Vision**: Transform trends chart into comprehensive analytics dashboard with vendor-specific, multi-metric trend analysis using elegant button-based UI (no ugly dropdowns).
+
+#### 3.5.5 Timeline Extension & Data Continuity 📈 **PHASE 4** (45 min) 🎯 **NEXT PRIORITY**
+- [ ] **TIMELINE EXTENSION**: Extend chart from last data point to current date (August 25, 2025)
+- [ ] **FLAT LINE CONTINUATION**: Show flat lines when no new data exists between last scan and current date
+- [ ] **DATE CALCULATION**: Calculate gap between max(date_discovered) and current date
+- [ ] **DATA PADDING**: Add synthetic data points with same values to extend timeline
+- [ ] **UX IMPROVEMENT**: Users see system is current and data is up-to-date visually
+- [ ] **API ENHANCEMENT**: Support date range extension in trends endpoint
+- [ ] **CHART CONFIG**: Update ApexCharts to handle extended timeline properly
 
 ---
 

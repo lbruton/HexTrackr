@@ -66,43 +66,65 @@ app.get('/api/vulnerabilities/stats', (req, res) => {
 
 // Get historical trending data (last 180 days based on time-series data)
 app.get('/api/vulnerabilities/trends', (req, res) => {
-  const query = `
-    SELECT 
-      f.scan_date as date,
-      f.severity,
-      COUNT(*) as count,
-      SUM(f.vpr_score) as total_vpr
-    FROM fact_vulnerability_timeseries f
-    WHERE f.scan_date >= DATE('now', '-180 days')
-    GROUP BY f.scan_date, f.severity
-    ORDER BY f.scan_date DESC, f.severity
+  // First get all distinct dates in descending order
+  const datesQuery = `
+    SELECT DISTINCT scan_date as date
+    FROM fact_vulnerability_timeseries 
+    WHERE scan_date >= DATE('now', '-180 days')
+    ORDER BY scan_date DESC
   `;
   
-  db.all(query, [], (err, rows) => {
+  db.all(datesQuery, [], (err, dates) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
     }
     
-    // Format data for chart consumption - include BOTH count and total_vpr
-    const trends = {};
-    rows.forEach(row => {
-      if (!trends[row.date]) {
-        trends[row.date] = { 
-          date: row.date, 
-          Critical: { count: 0, total_vpr: 0 }, 
-          High: { count: 0, total_vpr: 0 }, 
-          Medium: { count: 0, total_vpr: 0 }, 
-          Low: { count: 0, total_vpr: 0 } 
-        };
-      }
-      trends[row.date][row.severity] = {
-        count: row.count,
-        total_vpr: row.total_vpr || 0
-      };
+    // For each date, calculate cumulative totals up to that date
+    const cumulativeQuery = `
+      SELECT 
+        ? as date,
+        f.severity,
+        COUNT(*) as count,
+        SUM(f.vpr_score) as total_vpr
+      FROM fact_vulnerability_timeseries f
+      WHERE f.scan_date <= ? AND f.scan_date >= DATE('now', '-180 days')
+      GROUP BY f.severity
+    `;
+    
+    const promises = dates.map(dateRow => {
+      return new Promise((resolve, reject) => {
+        db.all(cumulativeQuery, [dateRow.date, dateRow.date], (err, rows) => {
+          if (err) reject(err);
+          else {
+            const dateData = { 
+              date: dateRow.date, 
+              Critical: { count: 0, total_vpr: 0 }, 
+              High: { count: 0, total_vpr: 0 }, 
+              Medium: { count: 0, total_vpr: 0 }, 
+              Low: { count: 0, total_vpr: 0 } 
+            };
+            
+            rows.forEach(row => {
+              dateData[row.severity] = {
+                count: row.count,
+                total_vpr: Math.round((row.total_vpr || 0) * 100) / 100 // Round to 2 decimal places
+              };
+            });
+            
+            resolve(dateData);
+          }
+        });
+      });
     });
     
-    res.json(Object.values(trends));
+    Promise.all(promises)
+      .then(results => {
+        res.json(results);
+      })
+      .catch(err => {
+        res.status(500).json({ error: err.message });
+      });
   });
 });
 

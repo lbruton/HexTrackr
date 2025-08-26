@@ -1840,8 +1840,10 @@
             updateChart() {
                 if (!this.chart || this.historicalData.length === 0) return;
 
-                // Get current metric selection (count or vpr)
-                const metricType = document.querySelector('input[name="chart-metric"]:checked')?.dataset?.metric || 'vpr';
+                // Get current metric selection (count or vpr) 
+                const checkedInput = document.querySelector('input[name="chart-metric"]:checked');
+                const associatedLabel = checkedInput ? document.querySelector(`label[for="${checkedInput.id}"]`) : null;
+                const metricType = associatedLabel?.dataset?.metric || 'vpr';
                 
                 const series = ['Critical', 'High', 'Medium', 'Low'].map((severity, index) => ({
                     name: severity,
@@ -1869,10 +1871,20 @@
                 const chartTitle = metricType === 'vpr' ? 
                     'Vulnerability VPR Score Trends Over Time' : 
                     'Vulnerability Count Trends Over Time';
+                
+                const yAxisTitle = metricType === 'vpr' ? 
+                    'Cumulative VPR Score Total' : 
+                    'Cumulative Vulnerability Count';
                     
                 this.chart.updateOptions({
                     title: {
                         text: chartTitle
+                    },
+                    yaxis: {
+                        title: {
+                            text: yAxisTitle
+                        },
+                        min: 0
                     },
                     tooltip: {
                         shared: true,
@@ -1880,7 +1892,7 @@
                         y: {
                             formatter: function (val) {
                                 if (metricType === 'vpr') {
-                                    return val.toFixed(1) + " VPR points";
+                                    return val.toFixed(2) + " VPR points";
                                 } else {
                                     return val + " vulnerabilities";
                                 }
