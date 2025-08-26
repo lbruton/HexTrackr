@@ -1485,11 +1485,11 @@
                             enabled: true,
                             type: 'x'
                         },
-                        selection: {
-                            enabled: true
-                        },
                         toolbar: {
-                            show: true
+                            show: true,
+                            tools: {
+                                selection: false  // Disable selection tool - will re-enable when table filtering is implemented
+                            }
                         },
                         animations: {
                             enabled: true,
