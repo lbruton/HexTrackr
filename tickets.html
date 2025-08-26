@@ -43,26 +43,51 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="navbar navbar-expand-md d-print-none">
+    <!-- Tabler.io Unified Header -->
+    <header class="navbar navbar-expand-md d-print-none" data-bs-theme="dark">
         <div class="container-xl">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
                 <a href="tickets.html">
-                    <i class="fas fa-hexagon me-2"></i>HexTrackr
+                    <i class="fas fa-shield-alt me-2 text-primary"></i>
+                    HexTrackr
                 </a>
             </h1>
             <div class="navbar-nav flex-row order-md-last">
-                <div class="nav-item d-none d-md-flex me-3">
-                    <div class="btn-list">
-                        <!-- Navigation links as buttons -->
+                <div class="d-none d-md-flex">
+                    <a href="#" class="nav-link px-0 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                        <i class="fas fa-moon"></i>
+                    </a>
+                    <a href="#" class="nav-link px-0 hide-theme-light" title="Enable light mode" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                        <i class="fas fa-sun"></i>
+                    </a>
+                </div>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
+                        <span class="avatar avatar-sm" style="background-image: url(https://ui-avatars.com/api/?name=HT&background=206bc4&color=fff)"></span>
+                        <div class="d-none d-xl-block ps-2">
+                            <div>HexTrackr User</div>
+                            <div class="mt-1 small text-muted">Ticket Manager</div>
+                        </div>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#backupModal">
+                            <i class="fas fa-cog me-2"></i>Settings
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item" id="importCsvBtnHeader">
+                            <i class="fas fa-upload me-2"></i>Import CSV Data
+                        </a>
                     </div>
                 </div>
             </div>
             <div class="collapse navbar-collapse" id="navbar-menu">
                 <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
                     <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="tickets.html">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="tickets.html">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">
                                     <i class="fas fa-ticket-alt"></i>
                                 </span>
@@ -83,73 +108,59 @@
         </div>
     </header>
 
-    <!-- Page wrapper -->
-    <div class="page-wrapper">
-        <!-- Page body -->
-        <div class="page-body">
-            <div class="container-xl">
-                <!-- Header -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="page-header d-print-none">
-                            <div class="container-xl">
-                                <div class="row g-2 align-items-center">
-                                    <div class="col">
-                                        <h2 class="page-title">
-                                            <i class="fas fa-ticket-alt me-2"></i>Tickets Management
-                                        </h2>
-                                    </div>
-                                </div>
+    <!-- Tabler.io Page Wrapper -->
+    <div class="page">
+        <div class="page-wrapper">
+            <!-- Page header -->
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <h2 class="page-title">
+                                <i class="fas fa-ticket-alt me-2 text-primary"></i>
+                                Tickets Management
+                            </h2>
+                            <div class="page-pretitle">
+                                Modern cybersecurity ticket tracking and management
                             </div>
                         </div>
                     </div>
                 </div>
-
-        <!-- External Links Section -->
-        <div class="row mb-3">
-            <div class="col-12">
-                <a href="#" class="btn btn-outline-info btn-lg me-2" id="hexagonLink" target="_blank">
-                    <i class="fas fa-external-link-alt me-2"></i>Hexagon
-                </a>
-                <a href="#" class="btn btn-outline-warning btn-lg" id="serviceNowLink" target="_blank">
-                    <i class="fas fa-external-link-alt me-2"></i>ServiceNow
-                </a>
             </div>
-        </div>
-
-        <!-- Controls Section -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#ticketModal">
-                    <i class="fas fa-plus me-2"></i>Add New Ticket
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-lg ms-2" id="attachDocsBtn">
-                    <i class="fas fa-paperclip me-2"></i>Attach Documentation
-                </button>
-                <button type="button" class="btn btn-outline-info btn-lg ms-2" id="importCsvBtn">
-                    <i class="fas fa-upload me-2"></i>Import CSV
-                </button>
-            </div>
-            <div class="col-md-6 text-end">
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-primary" onclick="exportData('csv')">
-                        <i class="fas fa-file-csv me-1"></i>CSV
-                    </button>
-                    <button type="button" class="btn btn-outline-success" onclick="exportData('excel')">
-                        <i class="fas fa-file-excel me-1"></i>Excel
-                    </button>
-                    <button type="button" class="btn btn-outline-info" onclick="exportData('json')">
-                        <i class="fas fa-file-code me-1"></i>JSON
-                    </button>
-                    <button type="button" class="btn btn-outline-danger" onclick="exportData('pdf')">
-                        <i class="fas fa-file-pdf me-1"></i>PDF
-                    </button>
-                    <button type="button" class="btn btn-outline-warning" onclick="exportData('html')">
-                        <i class="fas fa-file-alt me-1"></i>HTML
-                    </button>
-                </div>
-            </div>
-        </div>
+            
+            <!-- Page body -->
+            <div class="page-body">
+                <div class="container-xl">
+                    <!-- Controls Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#ticketModal">
+                                <i class="fas fa-plus me-2"></i>Add New Ticket
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-lg ms-2" id="attachDocsBtn">
+                                <i class="fas fa-paperclip me-2"></i>Attach Documentation
+                            </button>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-primary" onclick="exportData('csv')">
+                                    <i class="fas fa-file-csv me-1"></i>CSV
+                                </button>
+                                <button type="button" class="btn btn-outline-success" onclick="exportData('excel')">
+                                    <i class="fas fa-file-excel me-1"></i>Excel
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="exportData('json')">
+                                    <i class="fas fa-file-code me-1"></i>JSON
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" onclick="exportData('pdf')">
+                                    <i class="fas fa-file-pdf me-1"></i>PDF
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" onclick="exportData('html')">
+                                    <i class="fas fa-file-alt me-1"></i>HTML
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
         <!-- Hidden file input for shared documentation -->
         <input type="file" id="sharedDocsInput" style="display: none;" multiple accept=".pdf,.doc,.docx,.txt,.md">
@@ -475,6 +486,103 @@
         </div>
     </div>
 
+    <!-- Backup/Settings Modal -->
+    <div class="modal fade" id="backupModal" tabindex="-1" aria-labelledby="backupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="backupModalLabel">
+                        <i class="fas fa-cog me-2"></i>Backup & Data Management
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Backup Statistics -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Database Statistics</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row" id="backupStats">
+                                <div class="col-md-4 text-center">
+                                    <div class="text-muted">Tickets</div>
+                                    <div class="h4 mb-0" id="ticketCount">-</div>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <div class="text-muted">Vulnerabilities</div>
+                                    <div class="h4 mb-0" id="vulnCount">-</div>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <div class="text-muted">Total Records</div>
+                                    <div class="h4 mb-0" id="totalCount">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Export Options -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0"><i class="fas fa-download me-2"></i>Export Data</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <button type="button" class="btn btn-outline-primary w-100" onclick="exportBackup('tickets')">
+                                        <i class="fas fa-ticket-alt me-2"></i>Export Tickets
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="button" class="btn btn-outline-info w-100" onclick="exportBackup('vulnerabilities')">
+                                        <i class="fas fa-shield-virus me-2"></i>Export Vulnerabilities
+                                    </button>
+                                </div>
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-success w-100" onclick="exportBackup('all')">
+                                        <i class="fas fa-database me-2"></i>Export All Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clear Data Options -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-warning">
+                            <h6 class="card-title mb-0 text-dark">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Clear Data (Dangerous)
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning">
+                                <strong>Warning:</strong> These actions cannot be undone. Please backup your data first.
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <button type="button" class="btn btn-outline-danger w-100" onclick="clearData('tickets')">
+                                        <i class="fas fa-trash me-2"></i>Clear Tickets
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="button" class="btn btn-outline-danger w-100" onclick="clearData('vulnerabilities')">
+                                        <i class="fas fa-trash me-2"></i>Clear Vulnerabilities
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="refreshBackupStats()">
+                        <i class="fas fa-sync me-2"></i>Refresh Stats
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                </div>
             </div>
         </div>
     </div>

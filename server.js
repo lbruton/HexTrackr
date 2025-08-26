@@ -542,6 +542,419 @@ app.get('/api/imports', (req, res) => {
   });
 });
 
+// ==================== TICKETS API ====================
+
+// Get all tickets
+app.get('/api/tickets', (req, res) => {
+  const query = `
+    SELECT * FROM tickets 
+    ORDER BY date_submitted DESC
+  `;
+  
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    // Parse JSON fields and map snake_case to camelCase
+    const tickets = rows.map(row => ({
+      id: row.id,
+      dateSubmitted: row.date_submitted,
+      dateDue: row.date_due,
+      hexagonTicket: row.hexagon_ticket,
+      serviceNowTicket: row.service_now_ticket,
+      location: row.location,
+      devices: JSON.parse(row.devices || '[]'),
+      supervisor: row.supervisor,
+      tech: row.tech,
+      status: row.status,
+      notes: row.notes,
+      attachments: JSON.parse(row.attachments || '[]'),
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    }));
+    
+    res.json(tickets);
+  });
+});
+
+// Get single ticket by ID
+app.get('/api/tickets/:id', (req, res) => {
+  const { id } = req.params;
+  
+  db.get('SELECT * FROM tickets WHERE id = ?', [id], (err, row) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    if (!row) {
+      res.status(404).json({ error: 'Ticket not found' });
+      return;
+    }
+    
+    // Parse JSON fields and map snake_case to camelCase
+    const ticket = {
+      id: row.id,
+      dateSubmitted: row.date_submitted,
+      dateDue: row.date_due,
+      hexagonTicket: row.hexagon_ticket,
+      serviceNowTicket: row.service_now_ticket,
+      location: row.location,
+      devices: JSON.parse(row.devices || '[]'),
+      supervisor: row.supervisor,
+      tech: row.tech,
+      status: row.status,
+      notes: row.notes,
+      attachments: JSON.parse(row.attachments || '[]'),
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    };
+    
+    res.json(ticket);
+  });
+});
+
+// Create new ticket
+app.post('/api/tickets', (req, res) => {
+  const {
+    id,
+    dateSubmitted,
+    dateDue,
+    hexagonTicket,
+    serviceNowTicket,
+    location,
+    devices,
+    supervisor,
+    tech,
+    status,
+    notes,
+    attachments,
+    createdAt,
+    updatedAt
+  } = req.body;
+
+  // Validate required fields
+  if (!location) {
+    res.status(400).json({ error: 'Location is required' });
+    return;
+  }
+
+  const query = `
+    INSERT INTO tickets (
+      id, date_submitted, date_due, hexagon_ticket, service_now_ticket,
+      location, devices, supervisor, tech, status, notes, attachments,
+      created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  const params = [
+    id || Date.now().toString(),
+    dateSubmitted,
+    dateDue,
+    hexagonTicket || '',
+    serviceNowTicket || '',
+    location,
+    JSON.stringify(devices || []),
+    supervisor || '',
+    tech || '',
+    status || 'Open',
+    notes || '',
+    JSON.stringify(attachments || []),
+    createdAt || new Date().toISOString(),
+    updatedAt || new Date().toISOString()
+  ];
+
+  db.run(query, params, function(err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    res.json({ 
+      success: true, 
+      id: params[0],
+      message: 'Ticket created successfully' 
+    });
+  });
+});
+
+// Update existing ticket
+app.put('/api/tickets/:id', (req, res) => {
+  const { id } = req.params;
+  const {
+    dateSubmitted,
+    dateDue,
+    hexagonTicket,
+    serviceNowTicket,
+    location,
+    devices,
+    supervisor,
+    tech,
+    status,
+    notes,
+    attachments
+  } = req.body;
+
+  // Validate required fields
+  if (!location) {
+    res.status(400).json({ error: 'Location is required' });
+    return;
+  }
+
+  const query = `
+    UPDATE tickets SET
+      date_submitted = ?, date_due = ?, hexagon_ticket = ?, service_now_ticket = ?,
+      location = ?, devices = ?, supervisor = ?, tech = ?, status = ?, 
+      notes = ?, attachments = ?, updated_at = ?
+    WHERE id = ?
+  `;
+
+  const params = [
+    dateSubmitted,
+    dateDue,
+    hexagonTicket || '',
+    serviceNowTicket || '',
+    location,
+    JSON.stringify(devices || []),
+    supervisor || '',
+    tech || '',
+    status || 'Open',
+    notes || '',
+    JSON.stringify(attachments || []),
+    new Date().toISOString(),
+    id
+  ];
+
+  db.run(query, params, function(err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    if (this.changes === 0) {
+      res.status(404).json({ error: 'Ticket not found' });
+      return;
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Ticket updated successfully' 
+    });
+  });
+});
+
+// Delete ticket
+app.delete('/api/tickets/:id', (req, res) => {
+  const { id } = req.params;
+  
+  db.run('DELETE FROM tickets WHERE id = ?', [id], function(err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    if (this.changes === 0) {
+      res.status(404).json({ error: 'Ticket not found' });
+      return;
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Ticket deleted successfully' 
+    });
+  });
+});
+
+// Migrate localStorage data to database
+app.post('/api/tickets/migrate', (req, res) => {
+  const { tickets, mode = 'check' } = req.body;
+  
+  if (!Array.isArray(tickets)) {
+    res.status(400).json({ error: 'Invalid tickets data' });
+    return;
+  }
+
+  // First, check if we already have tickets in the database
+  db.get('SELECT COUNT(*) as count FROM tickets', [], (err, row) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    // Handle different import modes
+    if (row.count > 0 && mode === 'check') {
+      res.status(409).json({ 
+        error: 'Database already contains tickets. Clear existing data first or use replace/append mode.',
+        currentCount: row.count
+      });
+      return;
+    }
+    
+    // If replace mode, clear existing data first
+    if (mode === 'replace' && row.count > 0) {
+      db.run('DELETE FROM tickets', [], (err) => {
+        if (err) {
+          res.status(500).json({ error: `Failed to clear existing data: ${err.message}` });
+          return;
+        }
+        // Continue with insert after clearing
+        insertTickets();
+      });
+      return;
+    }
+    
+    // For append mode or empty database, proceed directly
+    insertTickets();
+    
+    function insertTickets() {
+      // Begin transaction
+      db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+        
+        let completed = 0;
+        let errors = [];
+        
+        const insertQuery = `
+          INSERT INTO tickets (
+            id, date_submitted, date_due, hexagon_ticket, service_now_ticket,
+            location, devices, supervisor, tech, status, notes, attachments,
+            created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        
+        for (const ticket of tickets) {
+          const params = [
+            ticket.id,
+            ticket.dateSubmitted,
+            ticket.dateDue,
+            ticket.hexagonTicket || '',
+            ticket.serviceNowTicket || '',
+            ticket.location,
+            JSON.stringify(ticket.devices || []),
+            ticket.supervisor || '',
+            ticket.tech || '',
+            ticket.status || 'Open',
+            ticket.notes || '',
+            JSON.stringify(ticket.attachments || []),
+            ticket.createdAt || new Date().toISOString(),
+            ticket.updatedAt || new Date().toISOString()
+          ];
+          
+          db.run(insertQuery, params, function(err) {
+            if (err) {
+              errors.push(`Error inserting ticket ${ticket.id}: ${err.message}`);
+            }
+          
+          completed++;
+          
+          if (completed === tickets.length) {
+            if (errors.length > 0) {
+              db.run('ROLLBACK');
+              res.status(500).json({ 
+                error: 'Migration failed', 
+                details: errors 
+              });
+            } else {
+              db.run('COMMIT');
+              res.json({ 
+                success: true, 
+                message: `Successfully migrated ${tickets.length} tickets` 
+              });
+            }
+          }
+        });
+      }
+      
+      if (tickets.length === 0) {
+        db.run('COMMIT');
+        res.json({ 
+          success: true, 
+          message: 'No tickets to migrate' 
+        });
+      }
+    });
+    }
+  });
+});
+
+// Backup and Restore Endpoints
+
+// Export all tickets as JSON backup
+app.get('/api/backup/tickets', (req, res) => {
+  db.all('SELECT * FROM tickets ORDER BY created_at', [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    // Convert snake_case fields back to camelCase for consistency
+    const tickets = rows.map(row => ({
+      id: row.id,
+      dateSubmitted: row.date_submitted,
+      dateDue: row.date_due,
+      hexagonTicket: row.hexagon_ticket,
+      serviceNowTicket: row.service_now_ticket,
+      location: row.location,
+      devices: JSON.parse(row.devices || '[]'),
+      supervisor: row.supervisor,
+      tech: row.tech,
+      status: row.status,
+      notes: row.notes,
+      attachments: JSON.parse(row.attachments || '[]'),
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    }));
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="hextrackr-tickets-backup-${new Date().toISOString().split('T')[0]}.json"`);
+    res.json({
+      exportDate: new Date().toISOString(),
+      dataType: 'tickets',
+      count: tickets.length,
+      data: tickets
+    });
+  });
+});
+
+// Clear all tickets
+app.delete('/api/clear/tickets', (req, res) => {
+  db.run('DELETE FROM tickets', [], function(err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ 
+      success: true, 
+      message: `Cleared ${this.changes} tickets` 
+    });
+  });
+});
+
+// Get backup statistics
+app.get('/api/backup/stats', (req, res) => {
+  db.get('SELECT COUNT(*) as ticketCount FROM tickets', [], (err, ticketRow) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    db.get('SELECT COUNT(*) as vulnCount FROM vulnerabilities', [], (err, vulnRow) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      
+      res.json({
+        tickets: ticketRow.ticketCount,
+        vulnerabilities: vulnRow.vulnCount,
+        total: ticketRow.ticketCount + vulnRow.vulnCount
+      });
+    });
+  });
+});
+
 // Serve static files from current directory
 app.use(express.static(__dirname, {
   maxAge: '1m', // Short cache for development
