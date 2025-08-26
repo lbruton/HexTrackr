@@ -140,19 +140,20 @@
 - [ ] Replace HTML file generation with PDF creation
 - [ ] Add professional PDF headers/footers with timestamps
 
-### 3.5 Advanced Trends Chart Analytics 🚨 **CRITICAL - FUNDAMENTAL FLAW IDENTIFIED**
+### 3.5 Advanced Trends Chart Analytics ✅ **CRITICAL ISSUE RESOLVED**
 *Risk: CRITICAL | Impact: HIGHEST | Duration: 2-4 hours total*
 
-**🚨 CRITICAL ISSUE**: Historical VPR Trends chart shows vulnerability COUNTS instead of VPR SCORE SUMS - defeats the purpose of VPR trend analysis!
+**✅ RESOLVED**: Historical VPR Trends chart now correctly shows VPR SCORE SUMS with toggle functionality!
 
-#### 3.5.1 Count vs VPR Sum Toggle ⚡ **PHASE 1 - CURRENT SPRINT** (30 min)
-- [ ] **BACKEND FIX**: Modify `/api/vulnerabilities/trends` to return both count AND total_vpr data (currently ignores total_vpr)
-- [ ] **FRONTEND TOGGLE**: Add button group to Historical VPR Trends card header similar to Data Workspace switcher
-- [ ] **CHART LOGIC**: Update ApexCharts to switch between count vs VPR sum based on user selection
-- [ ] **DEFAULT**: Set to VPR Sum (the correct behavior) instead of count
-- [ ] **TESTING**: Verify VPR sum calculations are accurate and meaningful
+#### 3.5.1 Count vs VPR Sum Toggle ✅ **PHASE 1 - COMPLETE** (2025-01-28)
+- ✅ **BACKEND FIX**: Modified `/api/vulnerabilities/trends` to return both count AND total_vpr data (API working correctly)
+- ✅ **FRONTEND TOGGLE**: Added button group to Historical VPR Trends card header similar to Data Workspace switcher
+- ✅ **CHART LOGIC**: Updated ApexCharts to switch between count vs VPR sum based on user selection
+- ✅ **DEFAULT**: Set to VPR Sum (the correct behavior) instead of count
+- ✅ **TESTING**: Verified toggle works both ways, VPR sum calculations accurate and meaningful
+- ✅ **QUALITY**: Added ESLint config, Playwright testing confirms functionality
 
-#### 3.5.2 Multi-Vendor Analytics 🎯 **PHASE 2** (45 min)  
+#### 3.5.2 Multi-Vendor Analytics 🎯 **PHASE 2 - READY FOR IMPLEMENTATION** (45 min estimated)  
 - [ ] **VENDOR FILTERING**: Add Cisco | Palo Alto | Other | All vendor filter buttons
 - [ ] **API ENHANCEMENT**: JOIN time-series with vulnerabilities table for vendor-specific trends
 - [ ] **UI DESIGN**: 3-row button groups (Vendor, Metric, Aggregation) with clean spacing
