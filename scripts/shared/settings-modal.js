@@ -52,7 +52,6 @@ console.log('✅ HexTrackr Settings Modal (shared) loaded successfully');
       try {
         await this.loadModalHtml();
         this.setupEventListeners();
-        this.loadAllSettings();
         this.initServiceNowSettings();
         console.log('Settings modal initialized');
       } catch (error) {
@@ -80,6 +79,9 @@ console.log('✅ HexTrackr Settings Modal (shared) loaded successfully');
         
         // Inject the modal HTML
         modalContainer.innerHTML = modalHtml;
+        
+        // Get reference to the modal element for Bootstrap
+        this.modal = document.getElementById('settingsModal');
         
         console.log('✅ HexTrackr Settings Modal (shared) loaded successfully');
         
