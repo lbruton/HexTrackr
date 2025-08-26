@@ -59,17 +59,17 @@ app.get('/api/vulnerabilities/stats', (req, res) => {
   });
 });
 
-// Get historical trending data (last 14 days)
+// Get historical trending data (last 180 days based on vulnerability dates)
 app.get('/api/vulnerabilities/trends', (req, res) => {
   const query = `
     SELECT 
-      DATE(created_at) as date,
+      DATE(last_seen) as date,
       severity,
       COUNT(*) as count,
       SUM(vpr_score) as total_vpr
     FROM vulnerabilities 
-    WHERE created_at >= DATE('now', '-14 days')
-    GROUP BY DATE(created_at), severity
+    WHERE last_seen >= DATE('now', '-180 days')
+    GROUP BY DATE(last_seen), severity
     ORDER BY date DESC, severity
   `;
   
@@ -216,7 +216,45 @@ app.post('/api/vulnerabilities/import', upload.single('csvFile'), (req, res) => 
           const description = row['definition.name'] || row['plugin_name'] || row['description'] || row['Description'] || '';
           const pluginPublished = row['definition.plugin_published'] || row['vulnerability_date'] || row['plugin_published'] || '';
           const state = row['state'] || row['State'] || 'open';
+          
+          // Parse dates from CSV - try multiple date fields and formats
+          const parseDate = (dateStr) => {
+            if (!dateStr) return null;
+            try {
+              const date = new Date(dateStr);
+              return date.toISOString().split('T')[0];
+            } catch (e) {
+              return null;
+            }
+          };
+          
+          // Priority order: vulnerability_published -> plugin_updated -> resurfaced_date
+          const vulnerabilityDate = parseDate(
+            row['definition.vulnerability_published'] || 
+            row['definition.plugin_updated'] || 
+            row['resurfaced_date'] || 
+            row['vulnerability_date'] || 
+            row['first_seen'] || 
+            row['last_seen']
+          );
+          
+          const firstSeenDate = parseDate(
+            row['first_seen'] || 
+            row['definition.vulnerability_published'] || 
+            vulnerabilityDate
+          );
+          
+          const lastSeenDate = parseDate(
+            row['last_seen'] || 
+            row['resurfaced_date'] || 
+            vulnerabilityDate
+          );
+          
+          // Fallback to current date ONLY if no valid dates found anywhere
           const currentDate = new Date().toISOString().split('T')[0];
+          const finalFirstSeen = firstSeenDate || vulnerabilityDate || currentDate;
+          const finalLastSeen = lastSeenDate || vulnerabilityDate || currentDate;
+          const finalVulnDate = vulnerabilityDate || currentDate;
           
           // Check if vulnerability already exists (based on hostname + CVE + plugin_id)
           const uniqueKey = `${hostname}-${cve}-${row['plugin_id'] || row['Plugin ID'] || ''}`;
@@ -250,7 +288,7 @@ app.post('/api/vulnerabilities/import', upload.single('csvFile'), (req, res) => 
                 WHERE rowid = ?
               `, [
                 ipAddress, severity, vprScore, cvssScore,
-                currentDate, state, currentDate, vendor,
+                finalLastSeen, state, currentDate, vendor,
                 row['description'] || row['Description'] || '',
                 row['solution'] || row['Solution'] || '',
                 existingVuln.rowid
@@ -265,9 +303,9 @@ app.post('/api/vulnerabilities/import', upload.single('csvFile'), (req, res) => 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               `, [
                 importId, hostname, ipAddress, cve, severity, vprScore, cvssScore,
-                currentDate, currentDate, row['plugin_id'] || row['Plugin ID'] || '',
+                finalFirstSeen, finalLastSeen, row['plugin_id'] || row['Plugin ID'] || '',
                 description, row['description'] || row['Description'] || '',
-                row['solution'] || row['Solution'] || '', vendor, pluginPublished,
+                row['solution'] || row['Solution'] || '', vendor, finalVulnDate,
                 state, currentDate
               ]);
             }
@@ -319,6 +357,21 @@ app.put('/api/vulnerabilities/:id', (req, res) => {
     }
     
     res.json({ success: true, message: 'Vulnerability updated successfully' });
+  });
+});
+
+// Clear all vulnerability data - MUST come before /:id route
+app.delete('/api/vulnerabilities/clear', (req, res) => {
+  db.serialize(() => {
+    db.run('DELETE FROM ticket_vulnerabilities');
+    db.run('DELETE FROM vulnerabilities');
+    db.run('DELETE FROM vulnerability_imports', (err) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({ success: true, message: 'All vulnerability data cleared' });
+    });
   });
 });
 
@@ -404,21 +457,6 @@ app.get('/api/vulnerabilities/vpr-trends', (req, res) => {
       return;
     }
     res.json(rows);
-  });
-});
-
-// Clear all vulnerability data
-app.delete('/api/vulnerabilities/clear', (req, res) => {
-  db.serialize(() => {
-    db.run('DELETE FROM ticket_vulnerabilities');
-    db.run('DELETE FROM vulnerabilities');
-    db.run('DELETE FROM vulnerability_imports', (err) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({ success: true, message: 'All vulnerability data cleared' });
-    });
   });
 });
 

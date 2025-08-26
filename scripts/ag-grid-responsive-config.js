@@ -41,8 +41,8 @@ function createVulnerabilityGridOptions(componentContext) {
     // =================================================================================================
     const columnDefs = [
         {
-            headerName: 'Date',
-            field: 'import_date',
+            headerName: 'Last Seen',
+            field: 'last_seen',
             sortable: true,
             filter: 'agDateColumnFilter',
             width: 120,
@@ -226,7 +226,7 @@ function createVulnerabilityGridOptions(componentContext) {
             allColumns.forEach(column => {
                 const colId = column.getColId();
                 switch (colId) {
-                    case 'import_date':
+                    case 'last_seen':
                         gridWidth < breakpoints.small ? columnsToHide.push(colId) : columnsToShow.push(colId);
                         break;
                     case 'ip_address':

@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-alpine.css">
     
-    <!-- Chart.js for mini-charts -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css">
+    <!-- Chart.js for mini-charts - using local files -->
+    <!-- Chart.js CSS is embedded in the library -->
     
     <style>
         /* Enhanced HexTrackr Styles for Tabler.io Integration */
@@ -1080,8 +1080,8 @@
     <!-- Tabler.io JS -->
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
     
-    <!-- Chart.js for mini-charts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <!-- Chart.js for mini-charts - using local file -->
+    <script src="scripts/chart.min.js"></script>
     
     <!-- SortableJS for drag and drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -1094,6 +1094,9 @@
     
     <!-- PapaParse for CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <!-- AG Grid Responsive Configuration -->
+    <script src="scripts/ag-grid-responsive-config.js"></script>
 
     <script>
         // Modern Vulnerability Management System
@@ -1181,163 +1184,18 @@
             }
 
             initializeGrid() {
-                const columnDefs = [
-                    { 
-                        headerName: 'Date', 
-                        field: 'import_date',
-                        sortable: true,
-                        filter: 'agDateColumnFilter',
-                        width: 100,
-                        cellRenderer: (params) => {
-                            if (params.value) {
-                                return new Date(params.value).toLocaleDateString();
-                            }
-                            return '-';
-                        }
-                    },
-                    { 
-                        headerName: 'Hostname', 
-                        field: 'hostname',
-                        sortable: true,
-                        filter: true,
-                        width: 150,
-                        cellRenderer: (params) => {
-                            const hostname = params.value || '-';
-                            return `<a href="#" class="fw-bold text-primary text-decoration-none" onclick="vulnManager.viewDeviceDetails('${hostname}')">${hostname}</a>`;
-                        }
-                    },
-                    { 
-                        headerName: 'IP Address', 
-                        field: 'ip_address',
-                        sortable: true,
-                        filter: true,
-                        width: 130,
-                        cellRenderer: (params) => {
-                            return params.value || '-';
-                        }
-                    },
-                    { 
-                        headerName: 'Severity', 
-                        field: 'severity',
-                        sortable: true,
-                        filter: true,
-                        width: 100,
-                        cellRenderer: (params) => {
-                            const severity = params.value || 'Low';
-                            const className = `severity-${severity.toLowerCase()}`;
-                            return `<span class="severity-badge ${className}">${severity}</span>`;
-                        }
-                    },
-                    { 
-                        headerName: 'CVE Info', 
-                        field: 'cve',
-                        sortable: true,
-                        filter: true,
-                        width: 120,
-                        cellRenderer: (params) => {
-                            if (params.value && params.value.startsWith('CVE-')) {
-                                return `<a href="#" class="text-decoration-none" onclick="vulnManager.lookupCVE('${params.value}')">${params.value}</a>`;
-                            }
-                            return params.value || '-';
-                        }
-                    },
-                    { 
-                        headerName: 'Vendor', 
-                        field: 'vendor',
-                        sortable: true,
-                        filter: true,
-                        width: 120,
-                        cellRenderer: (params) => {
-                            return params.value || '-';
-                        }
-                    },
-                    { 
-                        headerName: 'Vulnerability Description', 
-                        field: 'plugin_name',
-                        sortable: true,
-                        filter: true,
-                        flex: 1,
-                        minWidth: 250,
-                        cellRenderer: (params) => {
-                            const text = params.value || '-';
-                            if (text.length > 80) {
-                                return `<span title="${text}">${text.substring(0, 80)}...</span>`;
-                            }
-                            return text;
-                        }
-                    },
-                    { 
-                        headerName: 'VPR Score', 
-                        field: 'vpr_score',
-                        sortable: true,
-                        filter: 'agNumberColumnFilter',
-                        width: 100,
-                        cellRenderer: (params) => {
-                            const score = parseFloat(params.value) || 0;
-                            let className = 'severity-low';
-                            if (score >= 9.0) className = 'severity-critical';
-                            else if (score >= 7.0) className = 'severity-high';
-                            else if (score >= 4.0) className = 'severity-medium';
-                            
-                            return `<span class="severity-badge ${className}">${score.toFixed(1)}</span>`;
-                        }
-                    },
-                    { 
-                        headerName: 'State', 
-                        field: 'state',
-                        sortable: true,
-                        filter: true,
-                        width: 90,
-                        cellRenderer: (params) => {
-                            const state = params.value || 'open';
-                            const className = state === 'open' ? 'badge bg-warning' : 'badge bg-success';
-                            return `<span class="${className}">${state}</span>`;
-                        }
-                    },
-                    {
-                        headerName: 'Actions',
-                        field: 'actions',
-                        width: 120,
-                        cellRenderer: (params) => {
-                            const id = params.data.id || params.node.rowIndex;
-                            return `
-                                <div class="btn-group" role="group">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="vulnManager.editVulnerability(${id})" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="vulnManager.deleteVulnerability(${id})" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-success" onclick="vulnManager.refreshVulnerability(${id})" title="Refresh">
-                                        <i class="fas fa-sync"></i>
-                                    </button>
-                                </div>
-                            `;
-                        }
-                    }
-                ];
-
-                const gridOptions = {
-                    columnDefs: columnDefs,
-                    rowData: [],
-                    defaultColDef: {
-                        resizable: true,
-                        sortable: true,
-                        filter: true
-                    },
-                    pagination: true,
-                    paginationPageSize: 50,
-                    animateRows: true,
-                    rowSelection: 'multiple',
-                    suppressRowClickSelection: true,
-                    enableRangeSelection: true,
-                    onGridReady: (params) => {
-                        this.gridApi = params.api;
-                        params.api.sizeColumnsToFit();
-                    }
-                };
+                // Create the grid options using the new responsive configuration function
+                // We pass `this` so the config can access `this.gridApi`
+                const gridOptions = createVulnerabilityGridOptions(this);
 
                 const gridDiv = document.getElementById('vulnGrid');
+                
+                // Clean up any previous grid instance to prevent memory leaks
+                if (this.gridApi) {
+                    this.gridApi.destroy();
+                }
+
+                // Create the new grid
                 new agGrid.Grid(gridDiv, gridOptions);
             }
 
@@ -1701,8 +1559,8 @@
             updateChart() {
                 if (!this.chart || this.historicalData.length === 0) return;
 
-                const series = ['critical', 'high', 'medium', 'low'].map((severity, index) => ({
-                    name: severity.charAt(0).toUpperCase() + severity.slice(1),
+                const series = ['Critical', 'High', 'Medium', 'Low'].map((severity, index) => ({
+                    name: severity,
                     data: this.historicalData.map(point => ({
                         x: new Date(point.date).getTime(),
                         y: point[severity]
