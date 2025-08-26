@@ -731,6 +731,19 @@
                                 <i class="fas fa-chart-line me-2 text-primary"></i>
                                 Historical VPR Trends (Last 14 Days)
                             </h3>
+                            <div class="card-actions">
+                                <div class="btn-group" role="group" aria-label="Chart metric switcher">
+                                    <input type="radio" class="btn-check" name="chart-metric" id="chart-count" autocomplete="off">
+                                    <label class="btn btn-outline-primary" for="chart-count" data-metric="count">
+                                        <i class="fas fa-hashtag me-1"></i>Vulnerability Count
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="chart-metric" id="chart-vpr" autocomplete="off" checked>
+                                    <label class="btn btn-outline-primary" for="chart-vpr" data-metric="vpr">
+                                        <i class="fas fa-chart-bar me-1"></i>VPR Score Sum
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div id="historicalChart" style="height: 300px;"></div>
@@ -1827,15 +1840,54 @@
             updateChart() {
                 if (!this.chart || this.historicalData.length === 0) return;
 
+                // Get current metric selection (count or vpr)
+                const metricType = document.querySelector('input[name="chart-metric"]:checked')?.dataset?.metric || 'vpr';
+                
                 const series = ['Critical', 'High', 'Medium', 'Low'].map((severity, index) => ({
                     name: severity,
-                    data: this.historicalData.map(point => ({
-                        x: new Date(point.date).getTime(),
-                        y: point[severity]
-                    }))
+                    data: this.historicalData.map(point => {
+                        // Handle both old format (numbers) and new format (objects)
+                        let value;
+                        if (typeof point[severity] === 'object' && point[severity] !== null) {
+                            // New format: {count: X, total_vpr: Y}
+                            value = metricType === 'vpr' ? point[severity].total_vpr : point[severity].count;
+                        } else {
+                            // Old format: just numbers (fallback)
+                            value = point[severity] || 0;
+                        }
+                        
+                        return {
+                            x: new Date(point.date).getTime(),
+                            y: value || 0
+                        };
+                    })
                 }));
 
                 this.chart.updateSeries(series);
+
+                // Update chart title and tooltip based on metric
+                const chartTitle = metricType === 'vpr' ? 
+                    'Vulnerability VPR Score Trends Over Time' : 
+                    'Vulnerability Count Trends Over Time';
+                    
+                this.chart.updateOptions({
+                    title: {
+                        text: chartTitle
+                    },
+                    tooltip: {
+                        shared: true,
+                        intersect: false,
+                        y: {
+                            formatter: function (val) {
+                                if (metricType === 'vpr') {
+                                    return val.toFixed(1) + " VPR points";
+                                } else {
+                                    return val + " vulnerabilities";
+                                }
+                            }
+                        }
+                    }
+                });
 
                 // Set default zoom to last 14 days
                 if (this.historicalData.length > 0) {
@@ -3073,6 +3125,15 @@
         let vulnManager;
         document.addEventListener('DOMContentLoaded', () => {
             vulnManager = new ModernVulnManager();
+            
+            // Add event listener for chart metric toggle
+            document.querySelectorAll('input[name="chart-metric"]').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (vulnManager && vulnManager.updateChart) {
+                        vulnManager.updateChart();
+                    }
+                });
+            });
             
             // Load saved settings
             const savedSettings = {

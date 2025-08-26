@@ -84,13 +84,22 @@ app.get('/api/vulnerabilities/trends', (req, res) => {
       return;
     }
     
-    // Format data for chart consumption
+    // Format data for chart consumption - include BOTH count and total_vpr
     const trends = {};
     rows.forEach(row => {
       if (!trends[row.date]) {
-        trends[row.date] = { date: row.date, Critical: 0, High: 0, Medium: 0, Low: 0 };
+        trends[row.date] = { 
+          date: row.date, 
+          Critical: { count: 0, total_vpr: 0 }, 
+          High: { count: 0, total_vpr: 0 }, 
+          Medium: { count: 0, total_vpr: 0 }, 
+          Low: { count: 0, total_vpr: 0 } 
+        };
       }
-      trends[row.date][row.severity] = row.count;
+      trends[row.date][row.severity] = {
+        count: row.count,
+        total_vpr: row.total_vpr || 0
+      };
     });
     
     res.json(Object.values(trends));
