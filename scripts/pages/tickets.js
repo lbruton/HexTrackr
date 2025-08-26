@@ -9,14 +9,20 @@
  * CSV import/export, PDF generation, and drag-and-drop device management.
  * 
  * Used by: tickets.html
- * Dependencies: Bootstrap 5, jsPDF, JSZip, XLSX (SheetJS)
+ * Dependencies: 
+ * - Bootstrap 5, jsPDF, JSZip, XLSX (SheetJS)
+ * - scripts/shared/settings-modal.js (shared Settings modal component)
  * 
- * Architecture: Each HTML page should have its own dedicated JS file
- * Following the pattern: page.html + page.js
+ * Architecture: Modular JavaScript following CSS pattern
+ * scripts/
+ * ├── shared/           # Shared components (Settings modal, navigation, etc.)
+ * ├── pages/           # Page-specific functionality
+ * └── utils/           # Utility functions
  * 
  * @author HexTrackr Development Team
  * @version 2.0.0
  * @since 2025-08-24
+ * @updated 2025-08-26 - Refactored to use shared Settings modal component
  */
 
 // HexTrackr - Hexagon Tickets Management System
@@ -1471,7 +1477,16 @@ class HexagonTicketsManager {
 
     // Download bundle from view modal
     downloadBundleFromView() {
-        this.bundleTicketFiles(this.currentViewingId);
+        // Get the ticket ID from the modal's data attribute
+        const modal = document.getElementById('viewTicketModal');
+        const ticketId = modal?.dataset.ticketId;
+        
+        if (!ticketId) {
+            this.showToast('No ticket selected for download', 'error');
+            return;
+        }
+        
+        this.bundleTicketFiles(ticketId);
     }
 
     // Handle CSV import
@@ -1794,190 +1809,22 @@ function sortTable(column) {
     ticketManager.sortTable(column);
 }
 
-// Backup Management Functions
-async function refreshBackupStats() {
-    try {
-        const response = await fetch('/api/backup/stats');
-        const stats = await response.json();
-        
-        document.getElementById('ticketCount').textContent = stats.tickets || 0;
-        document.getElementById('vulnCount').textContent = stats.vulnerabilities || 0;
-        document.getElementById('totalCount').textContent = stats.total || 0;
-    } catch (error) {
-        console.error('Error fetching backup stats:', error);
-        ticketManager.showToast('Error loading statistics', 'error');
+// Page-specific refresh function for Settings modal integration
+window.refreshPageData = function(type) {
+    if (type === 'tickets' && window.ticketManager) {
+        ticketManager.loadTicketsFromDB();
+        ticketManager.renderTickets();
+        ticketManager.updateStatistics();
+        ticketManager.populateLocationFilter();
     }
-}
+};
 
-async function exportBackup(type) {
-    try {
-        let url;
-        let filename;
-        
-        switch (type) {
-            case 'tickets':
-                url = '/api/backup/tickets';
-                filename = `hextrackr-tickets-backup-${new Date().toISOString().split('T')[0]}.json`;
-                break;
-            case 'vulnerabilities':
-                // TODO: Implement vulnerabilities backup endpoint
-                ticketManager.showToast('Vulnerabilities backup not yet implemented', 'warning');
-                return;
-            case 'all':
-                // TODO: Implement full backup endpoint
-                ticketManager.showToast('Full backup not yet implemented', 'warning');
-                return;
-            default:
-                ticketManager.showToast('Invalid backup type', 'error');
-                return;
-        }
-        
-        const response = await fetch(url);
-        if (response.ok) {
-            const blob = await response.blob();
-            const downloadUrl = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = downloadUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(downloadUrl);
-            
-            ticketManager.showToast(`${type} backup downloaded successfully!`, 'success');
-        } else {
-            throw new Error('Failed to create backup');
-        }
-    } catch (error) {
-        console.error('Error creating backup:', error);
-        ticketManager.showToast('Error creating backup: ' + error.message, 'error');
+// Page-specific toast integration for Settings modal
+window.showToast = function(message, type) {
+    if (window.ticketManager) {
+        ticketManager.showToast(message, type);
     }
-}
-
-async function clearData(type) {
-    const confirmText = type === 'tickets' ? 'CLEAR TICKETS' : 'CLEAR VULNERABILITIES';
-    
-    const confirmation = await showClearConfirmationModal(type, confirmText);
-    if (!confirmation) return;
-    
-    try {
-        let url;
-        switch (type) {
-            case 'tickets':
-                url = '/api/clear/tickets';
-                break;
-            case 'vulnerabilities':
-                // TODO: Implement vulnerabilities clear endpoint
-                ticketManager.showToast('Vulnerabilities clear not yet implemented', 'warning');
-                return;
-            default:
-                ticketManager.showToast('Invalid clear type', 'error');
-                return;
-        }
-        
-        const response = await fetch(url, { method: 'DELETE' });
-        if (response.ok) {
-            const result = await response.json();
-            ticketManager.showToast(result.message, 'success');
-            
-            // Refresh the page data if clearing tickets
-            if (type === 'tickets') {
-                await ticketManager.loadTicketsFromDB();
-                ticketManager.renderTickets();
-                ticketManager.updateStatistics();
-                ticketManager.populateLocationFilter();
-            }
-            
-            // Refresh backup stats
-            await refreshBackupStats();
-        } else {
-            const error = await response.json();
-            throw new Error(error.error || 'Failed to clear data');
-        }
-    } catch (error) {
-        console.error('Error clearing data:', error);
-        ticketManager.showToast('Error clearing data: ' + error.message, 'error');
-    }
-}
-
-function showClearConfirmationModal(type, confirmText) {
-    return new Promise((resolve) => {
-        const modal = document.createElement('div');
-        modal.className = 'modal fade';
-        modal.innerHTML = `
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Confirm Clear ${type.charAt(0).toUpperCase() + type.slice(1)}
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="alert alert-danger">
-                            <strong>WARNING:</strong> This action cannot be undone!
-                        </div>
-                        <p>You are about to permanently delete all ${type} from the database.</p>
-                        <p>To confirm this action, please type <strong>${confirmText}</strong> in the field below:</p>
-                        <input type="text" class="form-control" id="confirmInput" placeholder="Type ${confirmText} to confirm">
-                        <div class="form-text text-danger" id="confirmError" style="display: none;">
-                            Text does not match. Please type exactly: ${confirmText}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" id="confirmClearBtn" disabled>
-                            <i class="fas fa-trash me-2"></i>Clear ${type.charAt(0).toUpperCase() + type.slice(1)}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        const bsModal = new bootstrap.Modal(modal);
-        
-        const confirmInput = modal.querySelector('#confirmInput');
-        const confirmBtn = modal.querySelector('#confirmClearBtn');
-        const confirmError = modal.querySelector('#confirmError');
-        
-        confirmInput.addEventListener('input', () => {
-            if (confirmInput.value === confirmText) {
-                confirmBtn.disabled = false;
-                confirmError.style.display = 'none';
-            } else {
-                confirmBtn.disabled = true;
-                if (confirmInput.value.length > 0) {
-                    confirmError.style.display = 'block';
-                }
-            }
-        });
-        
-        confirmBtn.addEventListener('click', () => {
-            if (confirmInput.value === confirmText) {
-                bsModal.hide();
-                resolve(true);
-            }
-        });
-        
-        modal.addEventListener('hidden.bs.modal', () => {
-            document.body.removeChild(modal);
-            resolve(false);
-        });
-        
-        bsModal.show();
-        confirmInput.focus();
-    });
-}
-
-// Initialize backup stats when modal is opened
-document.addEventListener('DOMContentLoaded', function() {
-    const backupModal = document.getElementById('backupModal');
-    if (backupModal) {
-        backupModal.addEventListener('shown.bs.modal', refreshBackupStats);
-    }
-});
+};
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {

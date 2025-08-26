@@ -3,9 +3,13 @@
  * 
  * 🎯 INCREMENTAL MIGRATION TARGET
  * 
- * This file is the target for migrating vulnerabilities JavaScript from the embedded 
- * HTML script section in vulnerabilities.html to follow our architectural pattern:
- * "Each HTML page MUST use its own dedicated JS file"
+ * This file contains vulnerabilities-specific JavaScript functionality.
+ * Following the modular architecture pattern established for CSS:
+ * 
+ * scripts/
+ * ├── shared/           # Shared components (Settings modal, navigation, etc.)
+ * ├── pages/           # Page-specific functionality  
+ * └── utils/           # Utility functions
  * 
  * MIGRATION STRATEGY:
  * - All NEW vulnerabilities JavaScript goes directly in this file
@@ -16,14 +20,14 @@
  * Current State (2025-08-26):
  * - ~1788 lines of JavaScript embedded in vulnerabilities.html (lines 1380-3166)
  * - ModernVulnManager class and all functions currently in HTML <script> section
- * - This file is now properly loaded by HTML and ready for incremental migration
+ * - This file now uses shared Settings modal component
  * 
  * @file vulnerabilities.js
- * @description Modern vulnerability management system JavaScript (incremental migration target)
+ * @description Vulnerabilities page-specific functionality (incremental migration target)
  * @version 2.0.0
  * @author HexTrackr Development Team
  * @since 2025-08-25
- * @updated 2025-08-26 - Cleaned for proper HTML loading
+ * @updated 2025-08-26 - Refactored to use shared Settings modal component
  * 
  * Dependencies (loaded via HTML):
  * - Tabler.io CSS Framework
@@ -32,6 +36,7 @@
  * - PapaParse for CSV processing
  * - SortableJS for drag-and-drop
  * - Bootstrap 5 for modals and components
+ * - scripts/shared/settings-modal.js (shared Settings modal component)
  * 
  * @example
  * // This file will incrementally receive migrated code:
@@ -63,19 +68,35 @@ console.log('✅ vulnerabilities.js loaded successfully - ready for incremental 
 // □ API communication functions
 // □ Utility functions
 
-// 🎯 MIGRATION TARGET FUNCTIONS
-// As we migrate functions from HTML, they will be properly documented here
+// 🎯 PAGE-SPECIFIC INTEGRATION FOR SHARED SETTINGS MODAL
 
 /**
- * Example function showing documentation pattern for migrated code
- * @param {string} message - The message to display
- * @param {string} type - Toast type ('success', 'warning', 'danger', 'info')
- * @returns {void}
- * @example
- * showToast('Import completed!', 'success');
+ * Page-specific refresh function for Settings modal integration
+ * Called by shared Settings modal when data operations complete
+ * @param {string} type - Type of data refreshed ('vulnerabilities', 'tickets', 'all')
  */
-// Migrated functions will replace this example as we move code from HTML
+window.refreshPageData = function(type) {
+    if (type === 'vulnerabilities' && window.gridApi) {
+        // Refresh AG Grid when vulnerability data changes
+        console.log('Refreshing vulnerabilities grid after data operation');
+        // TODO: Implement proper grid refresh when migration is complete
+        // window.gridApi.refreshServerSideStore();
+    }
+};
+
+/**
+ * Page-specific toast integration for Settings modal
+ * @param {string} message - Message to display
+ * @param {string} type - Toast type ('success', 'warning', 'danger', 'info')
+ */
+window.showToast = function(message, type) {
+    // This will use the existing toast system from embedded HTML for now
+    // TODO: Implement proper toast system during migration
+    console.log(`Toast (${type}): ${message}`);
+    alert(`${type.toUpperCase()}: ${message}`);
+};
 
 // 🎯 READY FOR INCREMENTAL MIGRATION
-// This file is now properly loaded by vulnerabilities.html
+// This file is now properly loaded by vulnerabilities.html with Settings modal support
+// New vulnerabilities functionality should be added here as we migrate from embedded HTML
 // All JavaScript code from HTML will be migrated here incrementally as we work on features

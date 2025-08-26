@@ -1,33 +1,56 @@
-# HexTrackr Copilot Instructions (v2.0)
+# HexTrackr Copilot Instructions (v2.1)
 
-## JavaScript Organization
-- **Dedicated JS per page**:  
-  - `tickets.html` → `tickets.js` (✅ CORRECT)  
-  - `vulnerabilities.html` → `vulnerabilities.js` (📋 incremental migration)  
-- **NEVER** load `app.js` in HTML pages.  
-- **Documentation**: All JS files require JSDoc headers (see `tickets.js` template).  
+## JavaScript Architecture (MODULAR PATTERN - 2025-08-26)
+Following CSS modular pattern for maximum reusability and maintainability:
 
-### Vulnerabilities Migration Strategy
-- **Discovery (2025-08-25)**: ~1860 lines embedded JS in `vulnerabilities.html` (`<script>` lines 1098–2958).  
-- **Migration Approach**: Incremental, not bulk.  
-  - **New development** → goes in `vulnerabilities.js` only.  
-  - **Modifications** → comment out in HTML, migrate to `vulnerabilities.js`, test.  
-  - **Timeline** → organic migration while working on features.  
-- **Rule**: Do not rush migration; system works fine with embedded JS.  
+### Directory Structure
+```
+scripts/
+├── shared/                 # Shared components across pages
+│   ├── settings-modal.js   # ✅ Unified Settings modal (implemented)
+│   ├── navigation.js       # � Shared header/nav (future)
+│   └── toast-notifications.js # 🔄 Notification system (future)
+├── pages/                  # Page-specific functionality
+│   ├── tickets.js         # ✅ Tickets page code (refactored)
+│   └── vulnerabilities.js # ✅ Vuln page code (migration target)
+└── utils/                  # 🔄 Utility functions (future)
+    ├── api-client.js      # 🔄 API utilities
+    └── data-formatters.js # 🔄 Formatting helpers
+```
 
-### Migration Process
-1. New features → `vulnerabilities.js`  
-2. Modifications → comment in HTML, move to `vulnerabilities.js`, test  
-3. Add JSDoc headers  
-4. Test after each migration step  
-5. Migrate gradually  
+### HTML Loading Pattern
+```html
+<!-- Shared components FIRST -->
+<script src="scripts/shared/settings-modal.js"></script>
+<!-- Page-specific code SECOND -->
+<script src="scripts/pages/tickets.js"></script>
+```
+
+### Integration Rules
+- **Shared components** expose global functions and auto-initialize
+- **Page files** provide integration hooks: `window.refreshPageData(type)`, `window.showToast(msg, type)`
+- **Settings modal** works consistently across all pages via shared component
+- **NEVER** duplicate Settings modal code in page files
+
+### Development Rules
+- **New shared functionality** → create in `scripts/shared/`
+- **Page-specific code** → goes in `scripts/pages/`
+- **Settings modal changes** → edit `scripts/shared/settings-modal.js` only
+- **New pages** → follow modular pattern from day one
+
+### Migration Strategy (Vulnerabilities)
+- **Current**: ~1788 lines embedded in HTML
+- **Approach**: Incremental migration to `scripts/pages/vulnerabilities.js`
+- **Priority**: New features go in JS file, migrate existing as needed
+- **Settings modal**: Already unified across both pages
 
 ---
 
 ## Project Overview
 HexTrackr = dual-purpose cybersecurity management system:  
-1. **Ticket Management** (`tickets.html` + `tickets.js`)  
-2. **Vulnerability Management** (`vulnerabilities.html` / `vulnerabilities.js`) — time-series trend tracking w/ Tabler.io UI  
+1. **Ticket Management** (`tickets.html` + `scripts/pages/tickets.js`)  
+2. **Vulnerability Management** (`vulnerabilities.html` + `scripts/pages/vulnerabilities.js`)
+3. **Shared Components** (`scripts/shared/` - Settings modal, future navigation, etc.)  
 
 ---
 
@@ -156,5 +179,30 @@ Use this table format in responses:
 - **Strategic Roadmap** → `/roadmaps/ROADMAP.md`  
 - **Tactical Roadmap** → `/roadmaps/UI_UX_ROADMAP.md`  
 - **Sprint Status** → `/roadmaps/CURRENT_STATUS.md`  
+- **Project Presentation** → `presentation.html` (internal peer documentation)
 
-**Update all of the above after ANY architectural or workflow change.**  
+**Update all of the above after ANY architectural or workflow change.**
+
+---
+
+## Presentation Maintenance (`presentation.html`)
+**Purpose**: Internal documentation for peer review of HexTrackr capabilities and features.
+
+**Update Requirements**:
+- **Version Dating**: Update date stamp in header for each significant update
+- **Feature Additions**: Add new functionality with screenshots as implemented
+- **Metric Updates**: Refresh live data metrics and screenshots periodically
+- **Tone**: Keep technical/informational for internal audience (avoid marketing language)
+
+**Update Triggers**:
+- Major feature completions (like Smart Timeline Extension)
+- Significant architectural changes
+- New module additions
+- Quarterly metric refreshes
+
+**Content Guidelines**:
+- Use "Project Overview" not "Executive Summary"
+- Use "Technical Impact" not "Business Impact" 
+- Focus on capabilities and technical achievements
+- Include version numbers and completion dates
+- Maintain screenshot currency for visual features  
