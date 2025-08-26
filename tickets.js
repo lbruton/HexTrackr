@@ -1292,23 +1292,6 @@ class HexagonTicketsManager {
     }
 
     // View ticket in markdown format
-    viewTicket(id) {
-        const ticket = this.getTicketById(id);
-        if (!ticket) {
-            this.showToast('Ticket not found', 'error');
-            return;
-        }
-
-        const markdown = this.generateMarkdown(ticket);
-        document.getElementById('markdownContent').textContent = markdown;
-        
-        // Store current ticket ID for potential editing
-        this.currentViewingId = id;
-        
-        const modal = new bootstrap.Modal(document.getElementById('viewTicketModal'));
-        modal.show();
-    }
-
     // Generate markdown format for ticket
     generateMarkdown(ticket) {
         let markdown = `# Hexagon Work Request\n\n`;
@@ -1361,16 +1344,6 @@ class HexagonTicketsManager {
             console.error('Failed to copy markdown:', err);
             this.showToast('Failed to copy markdown', 'error');
         });
-    }
-
-    // Edit ticket from view modal
-    editTicketFromView() {
-        const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewTicketModal'));
-        viewModal.hide();
-        
-        setTimeout(() => {
-            this.editTicket(this.currentViewingId);
-        }, 300);
     }
 
     // Download bundle from view modal

@@ -59,9 +59,10 @@ import ApexCharts from 'apexcharts';
 
 // Define apiBase and other global variables if not already defined
 const apiBase = typeof window !== 'undefined' ? window.apiBase || '' : ''; // Replace with actual API base URL if needed
-const vulnerabilities = typeof window !== 'undefined' ? window.vulnerabilities || {} : {}; // Replace with actual vulnerabilities data if needed
+let vulnerabilities = typeof window !== 'undefined' ? window.vulnerabilities || {} : {}; // Replace with actual vulnerabilities data if needed
 const filteredVulnerabilities = typeof window !== 'undefined' ? window.filteredVulnerabilities || {} : {}; // Replace with actual filtered vulnerabilities data if needed
-const devices = typeof window !== 'undefined' ? window.devices || [] : []; // Replace with actual devices data if needed
+let devices = typeof window !== 'undefined' ? window.devices || [] : []; // Replace with actual devices data if needed
+let historicalData = typeof window !== 'undefined' ? window.historicalData || [] : []; // Historical trend data
 
 // Ensure all browser-specific objects are accounted for
 if (typeof Blob === 'undefined') {
@@ -485,6 +486,24 @@ function processDevices() {
     });
 
     devices = Array.from(deviceMap.values());
+}
+
+/**
+ * Loads vulnerability statistics from the API.
+ */
+async function loadStatistics() {
+    try {
+        const response = await fetch(`${apiBase}/vulnerabilities/stats`);
+        if (response.ok) {
+            const stats = await response.json();
+            // Update the statistics cards in the UI
+            if (typeof updateStatisticsCards === 'function') {
+                updateStatisticsCards(stats);
+            }
+        }
+    } catch (error) {
+        console.error('Error loading statistics:', error);
+    }
 }
 
 /**
