@@ -36,18 +36,23 @@ app.use((req, res, next) => {
 
 // API Routes
 
-// Get vulnerability statistics with VPR totals
+// Get vulnerability statistics with VPR totals (using time-series schema)
 app.get('/api/vulnerabilities/stats', (req, res) => {
   const query = `
     SELECT 
-      severity,
+      f.severity,
       COUNT(*) as count,
-      SUM(vpr_score) as total_vpr,
-      AVG(vpr_score) as avg_vpr,
-      MIN(first_seen) as earliest,
-      MAX(last_seen) as latest
-    FROM vulnerabilities 
-    GROUP BY severity
+      SUM(f.vpr_score) as total_vpr,
+      AVG(f.vpr_score) as avg_vpr,
+      MIN(f.first_seen) as earliest,
+      MAX(f.last_seen) as latest
+    FROM fact_vulnerability_timeseries f
+    JOIN dim_vulnerabilities dv ON f.vulnerability_id = dv.id
+    WHERE f.scan_date = (
+      SELECT MAX(scan_date) FROM fact_vulnerability_timeseries f2 
+      WHERE f2.vulnerability_id = f.vulnerability_id
+    )
+    GROUP BY f.severity
   `;
   
   db.all(query, [], (err, rows) => {
@@ -59,18 +64,18 @@ app.get('/api/vulnerabilities/stats', (req, res) => {
   });
 });
 
-// Get historical trending data (last 180 days based on vulnerability dates)
+// Get historical trending data (last 180 days based on time-series data)
 app.get('/api/vulnerabilities/trends', (req, res) => {
   const query = `
     SELECT 
-      DATE(last_seen) as date,
-      severity,
+      f.scan_date as date,
+      f.severity,
       COUNT(*) as count,
-      SUM(vpr_score) as total_vpr
-    FROM vulnerabilities 
-    WHERE last_seen >= DATE('now', '-180 days')
-    GROUP BY DATE(last_seen), severity
-    ORDER BY date DESC, severity
+      SUM(f.vpr_score) as total_vpr
+    FROM fact_vulnerability_timeseries f
+    WHERE f.scan_date >= DATE('now', '-180 days')
+    GROUP BY f.scan_date, f.severity
+    ORDER BY f.scan_date DESC, f.severity
   `;
   
   db.all(query, [], (err, rows) => {
@@ -92,7 +97,7 @@ app.get('/api/vulnerabilities/trends', (req, res) => {
   });
 });
 
-// Get vulnerabilities with pagination
+// Get vulnerabilities with pagination (using time-series schema)
 app.get('/api/vulnerabilities', (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 50;
@@ -106,20 +111,39 @@ app.get('/api/vulnerabilities', (req, res) => {
   if (search || severity) {
     let conditions = [];
     if (search) {
-      conditions.push('(hostname LIKE ? OR cve LIKE ? OR plugin_name LIKE ?)');
+      conditions.push('(a.hostname LIKE ? OR dv.cve LIKE ? OR dv.name LIKE ?)');
       params.push(`%${search}%`, `%${search}%`, `%${search}%`);
     }
     if (severity) {
-      conditions.push('severity = ?');
+      conditions.push('f.severity = ?');
       params.push(severity);
     }
-    whereClause = 'WHERE ' + conditions.join(' AND ');
+    whereClause = 'WHERE ' + conditions.join(' AND ') + ' AND';
+  } else {
+    whereClause = 'WHERE';
   }
   
   const query = `
-    SELECT * FROM vulnerabilities 
-    ${whereClause}
-    ORDER BY vpr_score DESC, last_seen DESC 
+    SELECT 
+      a.hostname,
+      a.ip_address,
+      dv.cve,
+      dv.name as plugin_name,
+      dv.plugin_id,
+      f.severity,
+      f.vpr_score,
+      f.state,
+      f.first_seen,
+      f.last_seen,
+      f.scan_date
+    FROM fact_vulnerability_timeseries f
+    JOIN dim_vulnerabilities dv ON f.vulnerability_id = dv.id
+    JOIN assets a ON dv.asset_id = a.id
+    ${whereClause} f.scan_date = (
+      SELECT MAX(scan_date) FROM fact_vulnerability_timeseries f2 
+      WHERE f2.vulnerability_id = f.vulnerability_id
+    )
+    ORDER BY f.vpr_score DESC, f.last_seen DESC 
     LIMIT ? OFFSET ?
   `;
   
@@ -132,7 +156,24 @@ app.get('/api/vulnerabilities', (req, res) => {
     }
     
     // Get total count for pagination
-    const countQuery = `SELECT COUNT(*) as total FROM vulnerabilities ${whereClause}`;
+    let countConditions = whereClause.replace('WHERE', '').replace(' AND', '');
+    if (countConditions) {
+      countConditions = 'WHERE ' + countConditions + ' AND';
+    } else {
+      countConditions = 'WHERE';
+    }
+    
+    const countQuery = `
+      SELECT COUNT(*) as total 
+      FROM fact_vulnerability_timeseries f
+      JOIN dim_vulnerabilities dv ON f.vulnerability_id = dv.id
+      JOIN assets a ON dv.asset_id = a.id
+      ${countConditions} f.scan_date = (
+        SELECT MAX(scan_date) FROM fact_vulnerability_timeseries f2 
+        WHERE f2.vulnerability_id = f.vulnerability_id
+      )
+    `;
+    
     db.get(countQuery, params.slice(0, -2), (err, countResult) => {
       if (err) {
         res.status(500).json({ error: err.message });
