@@ -98,5 +98,7 @@ window.showToast = function(message, type) {
 
 // 🎯 READY FOR INCREMENTAL MIGRATION
 // This file is now properly loaded by vulnerabilities.html with Settings modal support
+
+console.log('✅ vulnerabilities.js loaded successfully');
 // New vulnerabilities functionality should be added here as we migrate from embedded HTML
 // All JavaScript code from HTML will be migrated here incrementally as we work on features

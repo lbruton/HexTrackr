@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>HexTrackr - New Page Template</title>
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons-sprite.svg" rel="stylesheet"/>
+    <style>
+      @import url("https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css");
+      .page-wrapper {
+        margin-top: 1rem;
+      }
+    </style>
+</head>
+<body>
+    <!-- Header component auto-injected here -->
+    <div id="headerContainer"></div>
+    
+    <!-- Page-specific content -->
+    <main class="page-wrapper">
+        <div class="container-xl">
+            <div class="page-header d-print-none">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <h2 class="page-title">
+                            New Page Template
+                        </h2>
+                        <div class="text-muted mt-1">Example of shared component architecture</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row row-deck row-cards">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Shared Component Demo</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>This page demonstrates the HexTrackr shared component architecture:</p>
+                            <ul>
+                                <li>✅ <strong>Shared Header</strong> - Navigation loaded from <code>scripts/shared/header.html</code></li>
+                                <li>✅ <strong>Shared Settings Modal</strong> - Modal loaded from <code>scripts/shared/settings-modal.html</code></li>
+                                <li>✅ <strong>Import CSV Data link</strong> - Opens settings modal to Data Management tab</li>
+                                <li>✅ <strong>ServiceNow Integration</strong> - Available in Ticket Systems tab</li>
+                                <li>✅ <strong>Consistent UI</strong> - Same look and feel across all pages</li>
+                            </ul>
+                            
+                            <div class="alert alert-info mt-3">
+                                <h4>Architecture Benefits:</h4>
+                                <ul class="mb-0">
+                                    <li>One place to update navigation across all pages</li>
+                                    <li>Consistent settings modal across all pages</li>
+                                    <li>Easy to add new pages with shared components</li>
+                                    <li>No duplicate HTML or JavaScript code</li>
+                                    <li>Clear separation of shared vs page-specific code</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Settings modal auto-injected here -->
+    <div id="settingsModalContainer"></div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Load shared components FIRST -->
+    <script src="scripts/shared/header-loader.js"></script>
+    <script src="scripts/shared/settings-modal.js"></script>
+    
+    <!-- Page-specific code LAST -->
+    <script>
+        // Page-specific JavaScript goes here
+        console.log('New page template loaded');
+        
+        // Integration hook for settings modal
+        window.refreshPageData = function(type) {
+            console.log('Page data refresh requested:', type);
+            // Add page-specific refresh logic here
+        };
+    </script>
+</body>
+</html>

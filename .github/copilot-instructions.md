@@ -7,6 +7,59 @@ Following CSS modular pattern for maximum reusability and maintainability:
 ```
 scripts/
 ├── shared/                 # Shared components across pages
+│   ├── header.html         # 🔄 Shared navigation header (future)
+│   ├── settings-modal.html # 🔄 Shared settings modal HTML (future)
+│   ├── settings-modal.js   # ✅ Unified Settings modal (implemented)
+│   ├── navigation.js       # 📋 Shared header/nav (future)
+│   └── toast-notifications.js # 🔄 Notification system (future)
+├── pages/                  # Page-specific functionality
+│   ├── tickets.js         # ✅ Tickets page code (refactored)
+│   └── vulnerabilities.js # ✅ Vuln page code (migration target)
+└── utils/                  # 🔄 Utility functions (future)
+    ├── api-client.js      # 🔄 API utilities
+    └── data-formatters.js # 🔄 Formatting helpers
+```
+
+### HTML Loading Pattern
+```html
+<!-- Shared components loaded via JavaScript -->
+<script src="scripts/shared/header-loader.js"></script>
+<script src="scripts/shared/settings-modal.js"></script>
+<!-- Page-specific code LAST -->
+<script src="scripts/pages/tickets.js"></script>
+```
+
+### New Page Template
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HexTrackr - New Page</title>
+    <!-- Bootstrap/CSS includes -->
+</head>
+<body>
+    <!-- Header component auto-injected here -->
+    <div id="headerContainer"></div>
+    
+    <!-- Page-specific content -->
+    <main class="page-wrapper">
+        <!-- Your page content here -->
+    </main>
+    
+    <!-- Settings modal auto-injected here -->
+    <div id="settingsModalContainer"></div>
+    
+    <!-- Load shared components -->
+    <script src="scripts/shared/header-loader.js"></script>
+    <script src="scripts/shared/settings-modal.js"></script>
+    <!-- Page-specific code -->
+    <script src="scripts/pages/your-page.js"></script>
+</body>
+</html>
+```
+```
+scripts/
+├── shared/                 # Shared components across pages
 │   ├── settings-modal.js   # ✅ Unified Settings modal (implemented)
 │   ├── navigation.js       # � Shared header/nav (future)
 │   └── toast-notifications.js # 🔄 Notification system (future)
@@ -37,6 +90,18 @@ scripts/
 - **Page-specific code** → goes in `scripts/pages/`
 - **Settings modal changes** → edit `scripts/shared/settings-modal.js` only
 - **New pages** → follow modular pattern from day one
+
+### ⚠️ ARCHITECTURE VIOLATION CHECKLIST (Pre-commit)
+Before ANY commit involving shared components:
+- [ ] Settings modal HTML exists ONLY in shared HTML file, NEVER embedded in pages
+- [ ] Header/navigation HTML exists ONLY in shared header.html, NEVER duplicated in pages
+- [ ] No duplicate component code across pages
+- [ ] Import/Export actions use shared settings modal (Data Management tab)
+- [ ] All dropdown links correctly target shared modals with proper tab selection
+- [ ] New pages use shared components (header.html + settings-modal.html + page content)
+- [ ] Check ALL pages (tickets.html, vulnerabilities.html, future pages) for consistency
+- [ ] Verify shared JavaScript components auto-initialize across all pages
+- [ ] Test navigation and settings functionality on EVERY page after changes
 
 ### Migration Strategy (Vulnerabilities)
 - **Current**: ~1788 lines embedded in HTML

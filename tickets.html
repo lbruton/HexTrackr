@@ -74,6 +74,128 @@
         .terminal-content::-webkit-scrollbar-thumb:hover {
             background: #484f58;
         }
+
+        /* Supervisor chips styling */
+        .supervisor-chip {
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 15px;
+            padding: 0.25rem 0.75rem;
+        }
+        
+        .supervisor-chip:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .supervisor-chip.active {
+            background-color: var(--tblr-primary) !important;
+            border-color: var(--tblr-primary) !important;
+            color: white !important;
+        }
+
+        /* Table chips styling for location, site, supervisor, and devices - small and consistent */
+        .location-chip, .site-chip, .supervisor-chip, .device-tag {
+            display: inline-block;
+            padding: 0.15rem 0.4rem;
+            margin: 0.05rem;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border: none;
+        }
+
+        /* Enhanced device chip styling - more visually appealing colors */
+        .device-tag.enhanced {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+
+        .device-tag.enhanced:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        /* Alternative device chip colors for variety */
+        .device-tag.enhanced:nth-child(2n) {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .device-tag.enhanced:nth-child(3n) {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .device-tag.enhanced:nth-child(4n) {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333 !important;
+        }
+
+        .device-tag.enhanced:nth-child(5n) {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333 !important;
+        }
+
+        .supervisor-chips, .devices-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.1rem;
+            justify-content: center;
+        }
+
+        /* Center all table cell content */
+        .table td, .table th {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        /* Optimize date column widths to fit content properly */
+        .table th[data-column="dateSubmitted"],
+        .table th[data-column="dateDue"],
+        .table td:nth-child(2),
+        .table td:nth-child(3) {
+            width: 110px;
+            min-width: 110px;
+            white-space: nowrap;
+        }
+
+        /* Bootstrap color classes for chips */
+        .bg-primary { background-color: #0066cc !important; }
+        .bg-success { background-color: #198754 !important; }
+        .bg-info { background-color: #0dcaf0 !important; }
+        .bg-warning { background-color: #ffc107 !important; color: #000 !important; }
+        .bg-danger { background-color: #dc3545 !important; }
+        .bg-secondary { background-color: #6c757d !important; }
+
+        /* Red highlighting for overdue items */
+        .table-danger {
+            background-color: rgba(220, 53, 69, 0.1) !important;
+        }
+        
+        .table-danger td {
+            border-color: rgba(220, 53, 69, 0.2) !important;
+        }
+
+        /* ServiceNow link styling */
+        .service-now-link {
+            color: #0d6efd !important;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .service-now-link:hover {
+            color: #0b5ed7 !important;
+            text-decoration: underline !important;
+        }
+        
+        .service-now-link i {
+            font-size: 0.875em;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
@@ -107,12 +229,18 @@
                         </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#settingsModal">
-                            <i class="fas fa-cog me-2"></i>Settings
+                        <h6 class="dropdown-header">User Management</h6>
+                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#settingsModal" data-settings-tab="api-config">
+                            <i class="fas fa-plug me-2"></i>API Configuration
                         </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item" id="importCsvBtnHeader">
-                            <i class="fas fa-upload me-2"></i>Import CSV Data
+                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#settingsModal" data-settings-tab="data-management">
+                            <i class="fas fa-database me-2"></i>Data Management
+                        </a>
+                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#settingsModal" data-settings-tab="ticket-systems">
+                            <i class="fas fa-ticket-alt me-2"></i>Ticket Systems
+                        </a>
+                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#settingsModal" data-settings-tab="system-config">
+                            <i class="fas fa-cogs me-2"></i>System Configuration
                         </a>
                     </div>
                 </div>
@@ -333,21 +461,23 @@
                             </select>
                         </div>
                     </div>
-                    <div class="card-body">
+                    
+                    <div class="card-body pt-0">
                         <div class="table-responsive">
                             <table class="table table-hover table-striped" id="ticketsTable">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th class="sortable-header" data-column="dateSubmitted" onclick="sortTable('dateSubmitted')">Date Submitted</th>
-                                        <th class="sortable-header" data-column="dateDue" onclick="sortTable('dateDue')">Date Due</th>
-                                        <th class="sortable-header" data-column="hexagonTicket" onclick="sortTable('hexagonTicket')">Hexagon Ticket #</th>
-                                        <th class="sortable-header" data-column="serviceNowTicket" onclick="sortTable('serviceNowTicket')">Service Now #</th>
-                                        <th class="sortable-header" data-column="location" onclick="sortTable('location')">Location</th>
-                                        <th class="sortable-header" data-column="devices" onclick="sortTable('devices')">Devices</th>
-                                        <th class="sortable-header" data-column="supervisor" onclick="sortTable('supervisor')">Supervisor</th>
-                                        <th class="sortable-header" data-column="tech" onclick="sortTable('tech')">Tech</th>
-                                        <th class="sortable-header" data-column="status" onclick="sortTable('status')">Status</th>
-                                        <th>Actions</th>
+                                        <th class="sortable-header text-center" data-column="xtNumber" onclick="sortTable('xtNumber')">XT #</th>
+                                        <th class="sortable-header text-center" data-column="dateSubmitted" onclick="sortTable('dateSubmitted')">Submitted</th>
+                                        <th class="sortable-header text-center" data-column="dateDue" onclick="sortTable('dateDue')">Due</th>
+                                        <th class="sortable-header text-center" data-column="hexagonTicket" onclick="sortTable('hexagonTicket')">Hexagon #</th>
+                                        <th class="sortable-header text-center" data-column="serviceNowTicket" onclick="sortTable('serviceNowTicket')">Service Now #</th>
+                                        <th class="sortable-header text-center" data-column="location" onclick="sortTable('location')">Location</th>
+                                        <th class="sortable-header text-center d-none" data-column="site" onclick="sortTable('site')">Site</th>
+                                        <th class="sortable-header text-center" data-column="devices" onclick="sortTable('devices')">Devices</th>
+                                        <th class="sortable-header text-center" data-column="supervisor" onclick="sortTable('supervisor')">Supervisor</th>
+                                        <th class="sortable-header text-center" data-column="status" onclick="sortTable('status')">Status</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="ticketsTableBody">
@@ -544,6 +674,11 @@
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="data-tab" data-bs-toggle="tab" data-bs-target="#data-management" type="button" role="tab">
                                         <i class="fas fa-database me-2"></i>Data Management
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="ticket-systems-tab" data-bs-toggle="tab" data-bs-target="#ticket-systems" type="button" role="tab">
+                                        <i class="fas fa-external-link-alt me-2"></i>Ticket Systems
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
@@ -784,6 +919,127 @@
                                                             <button type="button" class="btn btn-danger w-100" onclick="clearData('all')">
                                                                 <i class="fas fa-exclamation-triangle me-2"></i>Clear All Data
                                                             </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Ticket Systems Tab -->
+                                <div class="tab-pane fade" id="ticket-systems" role="tabpanel">
+                                    <div class="row">
+                                        <!-- ServiceNow Integration -->
+                                        <div class="col-lg-8 mb-4">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h6 class="card-title mb-0">
+                                                        <i class="fas fa-snowflake me-2 text-primary"></i>
+                                                        ServiceNow Integration
+                                                    </h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="mb-3">
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input" type="checkbox" id="serviceNowEnabled">
+                                                            <label class="form-check-label" for="serviceNowEnabled">
+                                                                <strong>Enable ServiceNow Integration</strong>
+                                                            </label>
+                                                        </div>
+                                                        <small class="text-muted">When enabled, Service Now ticket numbers become clickable links</small>
+                                                    </div>
+                                                    
+                                                    <div class="mb-3" id="serviceNowConfig">
+                                                        <label for="serviceNowInstance" class="form-label">ServiceNow Instance URL</label>
+                                                        <input type="url" class="form-control" id="serviceNowInstance" 
+                                                               placeholder="https://yourorg.service-now.com" 
+                                                               pattern="https://.*\.service-now\.com">
+                                                        <div class="form-text">
+                                                            Enter your organization's ServiceNow instance URL (e.g., https://yourorg.service-now.com)
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="mb-3">
+                                                        <label class="form-label">URL Pattern Preview</label>
+                                                        <div class="p-2 bg-light rounded">
+                                                            <code id="urlPatternPreview">
+                                                                Configure your instance URL to see the link pattern
+                                                            </code>
+                                                        </div>
+                                                        <small class="text-muted">
+                                                            Clicking INC/CHG numbers will open ServiceNow with this pattern
+                                                        </small>
+                                                    </div>
+                                                    
+                                                    <div class="d-flex gap-2">
+                                                        <button type="button" class="btn btn-outline-primary" id="testServiceNowLink">
+                                                            <i class="fas fa-external-link-alt me-2"></i>Test Link
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-success" id="saveServiceNowSettings">
+                                                            <i class="fas fa-save me-2"></i>Save Configuration
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Integration Status & Help -->
+                                        <div class="col-lg-4 mb-4">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h6 class="card-title mb-0">
+                                                        <i class="fas fa-info-circle me-2 text-info"></i>
+                                                        Integration Status
+                                                    </h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="mb-3">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <i class="fas fa-circle text-secondary me-2"></i>
+                                                            <span>ServiceNow</span>
+                                                            <span class="badge bg-secondary ms-auto" id="serviceNowStatus">Disabled</span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <hr>
+                                                    
+                                                    <h6 class="mb-2">
+                                                        <i class="fas fa-question-circle me-2"></i>How it works
+                                                    </h6>
+                                                    <ul class="small text-muted mb-0">
+                                                        <li>Configure your ServiceNow instance URL</li>
+                                                        <li>INC/CHG numbers become clickable links</li>
+                                                        <li>Links open ServiceNow incidents directly</li>
+                                                        <li>Works with standard ServiceNow URL patterns</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Future Integrations -->
+                                            <div class="card mt-3">
+                                                <div class="card-header">
+                                                    <h6 class="card-title mb-0">
+                                                        <i class="fas fa-plus-circle me-2 text-muted"></i>
+                                                        Future Integrations
+                                                    </h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="text-muted small">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <i class="fas fa-circle text-muted me-2"></i>
+                                                            <span>Jira Integration</span>
+                                                            <span class="badge bg-secondary ms-auto">Coming Soon</span>
+                                                        </div>
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <i class="fas fa-circle text-muted me-2"></i>
+                                                            <span>Remedy Integration</span>
+                                                            <span class="badge bg-secondary ms-auto">Coming Soon</span>
+                                                        </div>
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fas fa-circle text-muted me-2"></i>
+                                                            <span>Custom ITSM</span>
+                                                            <span class="badge bg-secondary ms-auto">Coming Soon</span>
                                                         </div>
                                                     </div>
                                                 </div>

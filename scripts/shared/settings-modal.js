@@ -42,29 +42,66 @@ console.log('✅ HexTrackr Settings Modal (shared) loaded successfully');
 /**
  * Settings Modal State Management
  */
-const SettingsModal = {
-    modal: null,
-    initialized: false,
-    
-    /**
-     * Initialize the Settings modal
-     */
-    init() {
-        if (this.initialized) return;
-        
-        const settingsModal = document.getElementById('settingsModal');
-        if (settingsModal) {
-            this.modal = settingsModal;
-            this.setupEventListeners();
-            this.initialized = true;
-            console.log('Settings modal initialized');
+// HexTrackr Shared Settings Modal Component
+(function() {
+  'use strict';
+  
+  const SettingsModal = {
+    // Initialize the settings modal
+    async init() {
+      try {
+        await this.loadModalHtml();
+        this.setupEventListeners();
+        this.loadAllSettings();
+        this.initServiceNowSettings();
+        console.log('Settings modal initialized');
+      } catch (error) {
+        console.error('Failed to initialize settings modal:', error);
+      }
+    },
+
+    // Load the modal HTML from shared file
+    async loadModalHtml() {
+      try {
+        const response = await fetch('scripts/shared/settings-modal.html');
+        if (!response.ok) {
+          throw new Error(`Failed to load settings modal: ${response.status}`);
         }
+        
+        const modalHtml = await response.text();
+        
+        // Find the modal container or create one if it doesn't exist
+        let modalContainer = document.getElementById('settingsModalContainer');
+        if (!modalContainer) {
+          modalContainer = document.createElement('div');
+          modalContainer.id = 'settingsModalContainer';
+          document.body.appendChild(modalContainer);
+        }
+        
+        // Inject the modal HTML
+        modalContainer.innerHTML = modalHtml;
+        
+        console.log('✅ HexTrackr Settings Modal (shared) loaded successfully');
+        
+      } catch (error) {
+        console.error('❌ Failed to load shared settings modal:', error);
+        throw error;
+      }
     },
     
     /**
      * Setup all event listeners for the Settings modal
      */
     setupEventListeners() {
+        // Handle tab switching from dropdown links
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('[data-settings-tab]');
+            if (target) {
+                const tabId = target.getAttribute('data-settings-tab');
+                this.switchToTab(tabId);
+            }
+        });
+        
         // Refresh stats when modal is shown
         this.modal.addEventListener('shown.bs.modal', refreshStats);
         
@@ -79,7 +116,39 @@ const SettingsModal = {
         // Settings save button
         document.getElementById('saveSettings')?.addEventListener('click', saveSettings);
         
+        // Initialize ServiceNow settings when modal is shown
+        this.modal.addEventListener('shown.bs.modal', initServiceNowSettings);
+        
         console.log('Settings modal event listeners configured');
+    },
+    
+    /**
+     * Switch to a specific tab in the settings modal
+     * @param {string} tabId - The ID of the tab to switch to
+     */
+    switchToTab(tabId) {
+        // Deactivate all tabs
+        document.querySelectorAll('#settingsModal .nav-link').forEach(tab => {
+            tab.classList.remove('active');
+            tab.setAttribute('aria-selected', 'false');
+        });
+        
+        document.querySelectorAll('#settingsModal .tab-pane').forEach(pane => {
+            pane.classList.remove('show', 'active');
+        });
+        
+        // Activate the target tab
+        const targetTab = document.getElementById(tabId + '-tab');
+        const targetPane = document.getElementById(tabId);
+        
+        if (targetTab && targetPane) {
+            targetTab.classList.add('active');
+            targetTab.setAttribute('aria-selected', 'true');
+            targetPane.classList.add('show', 'active');
+            console.log(`✅ Switched to ${tabId} tab`);
+        } else {
+            console.warn(`❌ Tab ${tabId} not found`);
+        }
     }
 };
 
@@ -381,10 +450,66 @@ async function fetchTenableData() {
  * @returns {Promise<void>}
  */
 async function saveSettings() {
-    // TODO: Implement settings save functionality
-    showNotification('Settings saved successfully', 'success');
-    const settingsModal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
-    settingsModal.hide();
+    try {
+        // Collect all settings from the modal
+        const settings = {
+            // API Configuration
+            apiEndpoint: document.getElementById('apiEndpoint')?.value || '',
+            refreshInterval: parseInt(document.getElementById('refreshInterval')?.value) || 30,
+            apiKey: document.getElementById('apiKey')?.value || '',
+            enableApiAuth: document.getElementById('enableApiAuth')?.checked || false,
+            
+            // ServiceNow Configuration
+            enableServiceNow: document.getElementById('enableServiceNow')?.checked || false,
+            serviceNowUrl: document.getElementById('serviceNowUrl')?.value || '',
+            
+            // Save timestamp
+            lastSaved: new Date().toISOString()
+        };
+
+        // Save to localStorage
+        localStorage.setItem('hextrackr-settings', JSON.stringify(settings));
+        
+        // Try to save to server as well (if API is available)
+        try {
+            const response = await fetch('/api/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(settings)
+            });
+            
+            if (response.ok) {
+                console.log('✅ Settings saved to server successfully');
+            } else {
+                console.log('⚠️ Server save failed, using localStorage only');
+            }
+        } catch (apiError) {
+            console.log('⚠️ Server not available, using localStorage only');
+        }
+        
+        // Update ServiceNow integration status
+        updateServiceNowStatus();
+        
+        // Show success notification
+        showNotification('Settings saved successfully!', 'success');
+        
+        // Close the modal
+        const settingsModal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
+        if (settingsModal) {
+            settingsModal.hide();
+        }
+        
+        // Refresh page data if there are any refresh hooks
+        if (window.refreshPageData) {
+            window.refreshPageData('settings');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error saving settings:', error);
+        showNotification('Error saving settings. Please try again.', 'danger');
+    }
 }
 
 /**
@@ -408,6 +533,209 @@ function showNotification(message, type) {
     }
 }
 
+// ServiceNow Integration Functions
+function initServiceNowSettings() {
+    const enabledToggle = document.getElementById('serviceNowEnabled');
+    const instanceInput = document.getElementById('serviceNowInstance');
+    const configDiv = document.getElementById('serviceNowConfig');
+    const urlPreview = document.getElementById('urlPatternPreview');
+    const statusBadge = document.getElementById('serviceNowStatus');
+    const testButton = document.getElementById('testServiceNowLink');
+    const saveButton = document.getElementById('saveServiceNowSettings');
+
+    if (!enabledToggle || !instanceInput) return;
+
+    // Load saved settings
+    loadServiceNowSettings();
+
+    // Toggle configuration visibility
+    enabledToggle.addEventListener('change', function() {
+        configDiv.style.display = this.checked ? 'block' : 'none';
+        updateServiceNowStatus();
+        updateUrlPreview();
+    });
+
+    // Update URL preview as user types
+    instanceInput.addEventListener('input', updateUrlPreview);
+
+    // Test link functionality
+    testButton.addEventListener('click', testServiceNowConnection);
+
+    // Save settings
+    saveButton.addEventListener('click', saveServiceNowSettings);
+
+    // Initial state
+    updateServiceNowStatus();
+    updateUrlPreview();
+}
+
+function loadServiceNowSettings() {
+    try {
+        const settings = JSON.parse(localStorage.getItem('serviceNowSettings') || '{}');
+        const enabledToggle = document.getElementById('serviceNowEnabled');
+        const instanceInput = document.getElementById('serviceNowInstance');
+        const configDiv = document.getElementById('serviceNowConfig');
+
+        if (enabledToggle) {
+            enabledToggle.checked = settings.enabled || false;
+        }
+        if (instanceInput) {
+            instanceInput.value = settings.instanceUrl || '';
+        }
+        if (configDiv) {
+            configDiv.style.display = settings.enabled ? 'block' : 'none';
+        }
+    } catch (error) {
+        console.error('Error loading ServiceNow settings:', error);
+    }
+}
+
+function saveServiceNowSettings() {
+    try {
+        const enabledToggle = document.getElementById('serviceNowEnabled');
+        const instanceInput = document.getElementById('serviceNowInstance');
+
+        if (!enabledToggle || !instanceInput) {
+            showToast('Settings elements not found', 'error');
+            return;
+        }
+
+        // Validate URL if enabled
+        if (enabledToggle.checked && instanceInput.value) {
+            const url = instanceInput.value.trim();
+            if (!url.match(/^https:\/\/.*\.service-now\.com\/?$/)) {
+                showToast('Please enter a valid ServiceNow URL (https://yourorg.service-now.com)', 'error');
+                instanceInput.focus();
+                return;
+            }
+        }
+
+        const settings = {
+            enabled: enabledToggle.checked,
+            instanceUrl: instanceInput.value.trim()
+        };
+
+        localStorage.setItem('serviceNowSettings', JSON.stringify(settings));
+        updateServiceNowStatus();
+        showToast('ServiceNow settings saved successfully', 'success');
+
+        // Trigger page refresh if available
+        if (window.refreshPageData) {
+            window.refreshPageData('serviceNow');
+        }
+    } catch (error) {
+        console.error('Error saving ServiceNow settings:', error);
+        showToast('Failed to save ServiceNow settings', 'error');
+    }
+}
+
+function updateServiceNowStatus() {
+    const statusBadge = document.getElementById('serviceNowStatus');
+    const enabledToggle = document.getElementById('serviceNowEnabled');
+    const instanceInput = document.getElementById('serviceNowInstance');
+
+    if (!statusBadge || !enabledToggle) return;
+
+    const isEnabled = enabledToggle.checked;
+    const hasValidUrl = instanceInput && instanceInput.value.trim().match(/^https:\/\/.*\.service-now\.com\/?$/);
+
+    if (isEnabled && hasValidUrl) {
+        statusBadge.textContent = 'Enabled';
+        statusBadge.className = 'badge bg-success ms-auto';
+    } else if (isEnabled) {
+        statusBadge.textContent = 'Configuration Needed';
+        statusBadge.className = 'badge bg-warning ms-auto';
+    } else {
+        statusBadge.textContent = 'Disabled';
+        statusBadge.className = 'badge bg-secondary ms-auto';
+    }
+}
+
+function updateUrlPreview() {
+    const urlPreview = document.getElementById('urlPatternPreview');
+    const instanceInput = document.getElementById('serviceNowInstance');
+    const enabledToggle = document.getElementById('serviceNowEnabled');
+
+    if (!urlPreview || !instanceInput || !enabledToggle) return;
+
+    if (!enabledToggle.checked) {
+        urlPreview.textContent = 'ServiceNow integration is disabled';
+        return;
+    }
+
+    const instanceUrl = instanceInput.value.trim();
+    if (!instanceUrl) {
+        urlPreview.textContent = 'Enter your ServiceNow instance URL to see the pattern';
+        return;
+    }
+
+    const baseUrl = instanceUrl.replace(/\/$/, ''); // Remove trailing slash
+    const pattern = `${baseUrl}/nav_to.do?uri=incident_list.do?sysparm_query=number={TICKET_NUMBER}`;
+    urlPreview.textContent = pattern;
+}
+
+function testServiceNowConnection() {
+    const instanceInput = document.getElementById('serviceNowInstance');
+    const enabledToggle = document.getElementById('serviceNowEnabled');
+
+    if (!instanceInput || !enabledToggle) {
+        showToast('Settings elements not found', 'error');
+        return;
+    }
+
+    if (!enabledToggle.checked) {
+        showToast('Please enable ServiceNow integration first', 'warning');
+        return;
+    }
+
+    const instanceUrl = instanceInput.value.trim();
+    if (!instanceUrl) {
+        showToast('Please enter your ServiceNow instance URL', 'warning');
+        instanceInput.focus();
+        return;
+    }
+
+    if (!instanceUrl.match(/^https:\/\/.*\.service-now\.com\/?$/)) {
+        showToast('Please enter a valid ServiceNow URL format', 'error');
+        instanceInput.focus();
+        return;
+    }
+
+    // Generate test URL
+    const baseUrl = instanceUrl.replace(/\/$/, '');
+    const testUrl = `${baseUrl}/nav_to.do?uri=incident_list.do?sysparm_query=number=INC0000001`;
+
+    // Open test link
+    window.open(testUrl, '_blank');
+    showToast('Test link opened in new tab', 'info');
+}
+
+function generateServiceNowUrl(ticketNumber) {
+    try {
+        const settings = JSON.parse(localStorage.getItem('serviceNowSettings') || '{}');
+        
+        if (!settings.enabled || !settings.instanceUrl) {
+            return null;
+        }
+
+        const baseUrl = settings.instanceUrl.replace(/\/$/, '');
+        return `${baseUrl}/nav_to.do?uri=incident_list.do?sysparm_query=number=${ticketNumber}`;
+    } catch (error) {
+        console.error('Error generating ServiceNow URL:', error);
+        return null;
+    }
+}
+
+function isServiceNowEnabled() {
+    try {
+        const settings = JSON.parse(localStorage.getItem('serviceNowSettings') || '{}');
+        return settings.enabled && settings.instanceUrl;
+    } catch (error) {
+        console.error('Error checking ServiceNow status:', error);
+        return false;
+    }
+};
+
 // Auto-initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
     SettingsModal.init();
@@ -426,6 +754,17 @@ if (typeof module !== 'undefined' && module.exports) {
         testTenableConnection,
         fetchCiscoData,
         fetchTenableData,
-        saveSettings
+        saveSettings,
+        initServiceNowSettings,
+        loadServiceNowSettings,
+        saveServiceNowSettings,
+        generateServiceNowUrl,
+        isServiceNowEnabled
     };
 }
+
+// Export for testing and page integration
+window.SettingsModal = SettingsModal;
+window.refreshPageData = window.refreshPageData || function() {};
+
+})();

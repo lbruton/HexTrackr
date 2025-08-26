@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Function Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+</head>
+<body>
+    <h1>Function Test</h1>
+    <input type="file" id="fileInput" accept=".csv">
+    
+    <script>
+        // Test minimal function definitions
+        async function processFileSimple(file) {
+            console.log('processFileSimple called with:', file.name);
+            return true;
+        }
+        
+        function handleFileUpload(event) {
+            console.log('handleFileUpload called');
+            const files = event.target.files;
+            if (files && files.length > 0) {
+                processFileSimple(files[0]);
+            }
+        }
+        
+        function updateDataStatus(message) {
+            console.log('updateDataStatus:', message);
+        }
+        
+        function showToast(message) {
+            console.log('showToast:', message);
+        }
+        
+        // Test the functions
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Testing functions:');
+            console.log('processFileSimple:', typeof processFileSimple);
+            console.log('handleFileUpload:', typeof handleFileUpload);
+            console.log('updateDataStatus:', typeof updateDataStatus);
+            console.log('showToast:', typeof showToast);
+            console.log('Papa:', typeof Papa);
+            
+            // Add event listener
+            const fileInput = document.getElementById('fileInput');
+            fileInput.addEventListener('change', handleFileUpload);
+        });
+    </script>
+</body>
+</html>

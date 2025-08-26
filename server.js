@@ -1,1037 +1,798 @@
 const express = require('express');
-const path = require('path');
+const { Pool } = require('pg');
 const cors = require('cors');
-const compression = require('compression');
-const sqlite3 = require('sqlite3').verbose();
-const multer = require('multer');
-const Papa = require('papaparse');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
+const csv = require('csv-parser');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3040;
+const JWT_SECRET = process.env.JWT_SECRET || 'hextrackr-secret-key-change-in-production';
 
-// Database setup
-const dbPath = path.join(__dirname, 'data', 'hextrackr.db');
-const db = new sqlite3.Database(dbPath);
+// PostgreSQL Database setup
+const pool = new Pool({
+    host: process.env.PGHOST || 'localhost',
+    port: process.env.PGPORT || 5432,
+    database: process.env.PGDATABASE || 'hextrackr',
+    user: process.env.PGUSER || 'hextrackr',
+    password: process.env.PGPASSWORD || 'hextrackr123',
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+});
+
+// Test database connection
+pool.connect((err, client, release) => {
+    if (err) {
+        console.error('Error connecting to PostgreSQL database:', err.message);
+    } else {
+        console.log('Connected to PostgreSQL database');
+        release();
+    }
+});
 
 // Middleware
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://cdn.tailwindcss.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://cdn.tailwindcss.com"],
+            imgSrc: ["'self'", "data:", "https:"],
+            fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
+            connectSrc: ["'self'", "https://cloudsso.cisco.com", "https://api.cisco.com"]
+        }
+    }
+}));
+
 app.use(cors());
-app.use(compression());
-app.use(express.json({ limit: '100mb' }));
-app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 1000, // limit each IP to 1000 requests per windowMs
+    message: 'Too many requests from this IP'
+});
+app.use(limiter);
+
+// Import database service
+const databaseService = require('./database-service.js');
 
 // File upload configuration
 const upload = multer({
-  dest: 'uploads/',
-  limits: { fileSize: 100 * 1024 * 1024 } // 100MB limit
+    dest: 'uploads/',
+    limits: {
+        fileSize: 100 * 1024 * 1024 // 100MB limit for large CSV files
+    }
 });
 
-// Security headers
-app.use((req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  next();
+// Block access to deprecated files
+app.use('/deprecated', (req, res) => {
+    res.status(404).json({ error: 'File not found - deprecated services have been moved' });
 });
 
-// API Routes
-
-// Get vulnerability statistics with VPR totals (using time-series schema)
-app.get('/api/vulnerabilities/stats', (req, res) => {
-  const query = `
-    SELECT 
-      f.severity,
-      COUNT(*) as count,
-      SUM(f.vpr_score) as total_vpr,
-      AVG(f.vpr_score) as avg_vpr,
-      MIN(f.first_seen) as earliest,
-      MAX(f.last_seen) as latest
-    FROM fact_vulnerability_timeseries f
-    JOIN dim_vulnerabilities dv ON f.vulnerability_id = dv.id
-    WHERE f.scan_date = (
-      SELECT MAX(scan_date) FROM fact_vulnerability_timeseries f2 
-      WHERE f2.vulnerability_id = f.vulnerability_id
-    )
-    GROUP BY f.severity
-  `;
-  
-  db.all(query, [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(rows);
-  });
+// Block specific deprecated file requests
+app.use(/\/(sqlite-service\.js|turso-service\.js|turso-config\.js|turso-demo\.js)$/, (req, res) => {
+    res.status(404).json({ error: 'Service deprecated - please use PostgreSQL backend' });
 });
 
-// Get historical trending data (last 180 days based on time-series data)
-app.get('/api/vulnerabilities/trends', (req, res) => {
-  // First get all distinct dates in descending order
-  const datesQuery = `
-    SELECT DISTINCT scan_date as date
-    FROM fact_vulnerability_timeseries 
-    WHERE scan_date >= DATE('now', '-180 days')
-    ORDER BY scan_date DESC
-  `;
-  
-  db.all(datesQuery, [], (err, dates) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    // For each date, calculate cumulative totals up to that date
-    const cumulativeQuery = `
-      SELECT 
-        ? as date,
-        f.severity,
-        COUNT(*) as count,
-        SUM(f.vpr_score) as total_vpr
-      FROM fact_vulnerability_timeseries f
-      WHERE f.scan_date <= ? AND f.scan_date >= DATE('now', '-180 days')
-      GROUP BY f.severity
-    `;
-    
-    const promises = dates.map(dateRow => {
-      return new Promise((resolve, reject) => {
-        db.all(cumulativeQuery, [dateRow.date, dateRow.date], (err, rows) => {
-          if (err) reject(err);
-          else {
-            const dateData = { 
-              date: dateRow.date, 
-              Critical: { count: 0, total_vpr: 0 }, 
-              High: { count: 0, total_vpr: 0 }, 
-              Medium: { count: 0, total_vpr: 0 }, 
-              Low: { count: 0, total_vpr: 0 } 
-            };
-            
-            rows.forEach(row => {
-              dateData[row.severity] = {
-                count: row.count,
-                total_vpr: Math.round((row.total_vpr || 0) * 100) / 100 // Round to 2 decimal places
-              };
-            });
-            
-            resolve(dateData);
-          }
-        });
-      });
-    });
-    
-    Promise.all(promises)
-      .then(results => {
-        res.json(results);
-      })
-      .catch(err => {
-        res.status(500).json({ error: err.message });
-      });
-  });
-});
-
-// Get vulnerabilities with pagination (using time-series schema)
-app.get('/api/vulnerabilities', (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 50;
-  const offset = (page - 1) * limit;
-  const search = req.query.search || '';
-  const severity = req.query.severity || '';
-  
-  let whereClause = '';
-  let params = [];
-  
-  if (search || severity) {
-    let conditions = [];
-    if (search) {
-      conditions.push('(a.hostname LIKE ? OR dv.cve LIKE ? OR dv.name LIKE ?)');
-      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
-    }
-    if (severity) {
-      conditions.push('f.severity = ?');
-      params.push(severity);
-    }
-    whereClause = 'WHERE ' + conditions.join(' AND ') + ' AND';
-  } else {
-    whereClause = 'WHERE';
-  }
-  
-  const query = `
-    SELECT 
-      a.hostname,
-      a.ip_address,
-      dv.cve,
-      dv.name as plugin_name,
-      dv.description,
-      dv.solution,
-      dv.plugin_id,
-      dv.vendor_family as vendor,
-      f.severity,
-      f.vpr_score,
-      f.state,
-      f.first_seen,
-      f.last_seen,
-      f.scan_date
-    FROM fact_vulnerability_timeseries f
-    JOIN dim_vulnerabilities dv ON f.vulnerability_id = dv.id
-    JOIN assets a ON dv.asset_id = a.id
-    ${whereClause} f.scan_date = (
-      SELECT MAX(scan_date) FROM fact_vulnerability_timeseries f2 
-      WHERE f2.vulnerability_id = f.vulnerability_id
-    )
-    ORDER BY f.vpr_score DESC, f.last_seen DESC 
-    LIMIT ? OFFSET ?
-  `;
-  
-  params.push(limit, offset);
-  
-  db.all(query, params, (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    // Get total count for pagination
-    let countConditions = whereClause.replace('WHERE', '').replace(' AND', '');
-    if (countConditions) {
-      countConditions = 'WHERE ' + countConditions + ' AND';
-    } else {
-      countConditions = 'WHERE';
-    }
-    
-    const countQuery = `
-      SELECT COUNT(*) as total 
-      FROM fact_vulnerability_timeseries f
-      JOIN dim_vulnerabilities dv ON f.vulnerability_id = dv.id
-      JOIN assets a ON dv.asset_id = a.id
-      ${countConditions} f.scan_date = (
-        SELECT MAX(scan_date) FROM fact_vulnerability_timeseries f2 
-        WHERE f2.vulnerability_id = f.vulnerability_id
-      )
-    `;
-    
-    db.get(countQuery, params.slice(0, -2), (err, countResult) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      
-      res.json({
-        data: rows,
-        pagination: {
-          page,
-          limit,
-          total: countResult.total,
-          pages: Math.ceil(countResult.total / limit)
-        }
-      });
-    });
-  });
-});
-
-// Import CSV vulnerabilities - TIME-SERIES SCHEMA
-app.post('/api/vulnerabilities/import', upload.single('csvFile'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded' });
-  }
-  
-  const startTime = Date.now();
-  const filename = req.file.originalname;
-  const vendor = req.body.vendor || 'unknown';
-  const currentDate = new Date().toISOString().split('T')[0];
-  
-  // Read and parse CSV
-  const csvData = fs.readFileSync(req.file.path, 'utf8');
-  
-  Papa.parse(csvData, {
-    header: true,
-    complete: (results) => {
-      const rows = results.data.filter(row => Object.values(row).some(val => val && val.trim()));
-      
-      // Insert import record (keep for logging)
-      const importQuery = `
-        INSERT INTO vulnerability_imports 
-        (filename, import_date, row_count, vendor, file_size, processing_time, raw_headers)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `;
-      
-      db.run(importQuery, [
-        filename,
-        new Date().toISOString(),
-        rows.length,
-        vendor,
-        req.file.size,
-        Date.now() - startTime,
-        JSON.stringify(results.meta.fields)
-      ], function(err) {
-        if (err) {
-          res.status(500).json({ error: err.message });
-          return;
+// Serve static files with proper MIME types and security
+app.use(express.static(path.join(__dirname), {
+    setHeaders: (res, filePath) => {
+        // Block access to deprecated files
+        if (filePath.includes('deprecated/') || filePath.includes('deprecated\\')) {
+            res.status(404).end();
+            return;
         }
         
-        const importId = this.lastID;
-        let processed = 0;
-        
-        // Process rows using time-series schema: assets -> dim_vulnerabilities -> fact_vulnerability_timeseries
-        rows.forEach((row, index) => {
-          // Map CSV columns to database fields
-          const hostname = row['asset.name'] || row['hostname'] || row['Host'] || '';
-          const ipAddress = row['asset.display_ipv4_address'] || row['asset.ipv4_addresses'] || row['ip_address'] || row['IP Address'] || '';
-          const cve = row['definition.cve'] || row['cve'] || row['CVE'] || '';
-          const severity = row['severity'] || row['Severity'] || '';
-          const vprScore = parseFloat(row['definition.vpr.score'] || row['vpr_score'] || row['VPR Score'] || 0);
-          const cvssScore = parseFloat(row['cvss_score'] || row['CVSS Score'] || 0);
-          const vendorFamily = row['definition.family'] || row['vendor'] || row['Vendor'] || '';
-          const pluginName = row['definition.name'] || row['plugin_name'] || row['description'] || row['Description'] || '';
-          const pluginId = row['plugin_id'] || row['Plugin ID'] || '';
-          const state = row['state'] || row['State'] || 'open';
-          
-          // Parse dates
-          const parseDate = (dateStr) => {
-            if (!dateStr) return null;
-            try {
-              const date = new Date(dateStr);
-              return date.toISOString().split('T')[0];
-            } catch (e) {
-              return null;
-            }
-          };
-          
-          const firstSeenDate = parseDate(
-            row['first_seen'] || 
-            row['definition.vulnerability_published'] || 
-            row['vulnerability_date']
-          ) || currentDate;
-          
-          const lastSeenDate = parseDate(
-            row['last_seen'] || 
-            row['resurfaced_date'] || 
-            row['vulnerability_date']
-          ) || currentDate;
-          
-          // Create vulnerability key (CVE preferred, fallback to plugin_id)
-          const vulnKey = cve || pluginId || `name_${pluginName.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50)}`;
-          
-          // Step 1: Ensure asset exists
-          db.run(`
-            INSERT OR IGNORE INTO assets (hostname, ip_address) 
-            VALUES (?, ?)
-          `, [hostname, ipAddress], function(assetErr) {
-            if (assetErr) {
-              console.error('Asset insert error:', assetErr);
-              return;
-            }
-            
-            // Get asset ID
-            db.get(`SELECT id FROM assets WHERE hostname = ?`, [hostname], (assetGetErr, asset) => {
-              if (assetGetErr || !asset) {
-                console.error('Asset lookup error:', assetGetErr);
-                return;
-              }
-              
-              // Step 2: Ensure vulnerability dimension exists
-              db.run(`
-                INSERT OR IGNORE INTO dim_vulnerabilities 
-                (asset_id, vuln_key, cve, plugin_id, name, vendor_family) 
-                VALUES (?, ?, ?, ?, ?, ?)
-              `, [asset.id, vulnKey, cve, pluginId, pluginName, vendorFamily], function(vulnErr) {
-                if (vulnErr) {
-                  console.error('Vulnerability dimension insert error:', vulnErr);
-                  return;
-                }
-                
-                // Get vulnerability dimension ID
-                db.get(`
-                  SELECT id FROM dim_vulnerabilities 
-                  WHERE asset_id = ? AND vuln_key = ?
-                `, [asset.id, vulnKey], (vulnGetErr, vuln) => {
-                  if (vulnGetErr || !vuln) {
-                    console.error('Vulnerability lookup error:', vulnGetErr);
-                    return;
-                  }
-                  
-                  // Step 3: Insert time-series fact (UPSERT for same scan_date)
-                  db.run(`
-                    INSERT OR REPLACE INTO fact_vulnerability_timeseries 
-                    (vulnerability_id, scan_date, severity, vpr_score, state, import_id, first_seen, last_seen)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                  `, [vuln.id, currentDate, severity, vprScore, state, importId, firstSeenDate, lastSeenDate], function(factErr) {
-                    if (factErr) {
-                      console.error('Time-series fact insert error:', factErr);
-                      return;
-                    }
-                    
-                    processed++;
-                    
-                    if (processed === rows.length) {
-                      // Clean up uploaded file
-                      fs.unlinkSync(req.file.path);
-                      
-                      res.json({
-                        success: true,
-                        importId,
-                        rowsProcessed: processed,
-                        filename,
-                        processingTime: Date.now() - startTime,
-                        message: 'Data imported to time-series database'
-                      });
-                    }
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
-    },
-    error: (error) => {
-      res.status(400).json({ error: 'CSV parsing failed: ' + error.message });
-    }
-  });
-});
-
-// Update a specific vulnerability
-app.put('/api/vulnerabilities/:id', (req, res) => {
-  const { id } = req.params;
-  const { hostname, ip_address, severity, state, notes } = req.body;
-  
-  const query = `
-    UPDATE vulnerabilities 
-    SET hostname = ?, ip_address = ?, severity = ?, state = ?, notes = ?
-    WHERE rowid = ?
-  `;
-  
-  db.run(query, [hostname, ip_address, severity, state, notes, id], function(err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    if (this.changes === 0) {
-      res.status(404).json({ error: 'Vulnerability not found' });
-      return;
-    }
-    
-    res.json({ success: true, message: 'Vulnerability updated successfully' });
-  });
-});
-
-// Clear all vulnerability data - MUST come before /:id route
-app.delete('/api/vulnerabilities/clear', (req, res) => {
-  db.serialize(() => {
-    // Clear new time-series tables (where actual data is)
-    db.run('DELETE FROM fact_vulnerability_timeseries');
-    db.run('DELETE FROM dim_vulnerabilities');
-    db.run('DELETE FROM assets');
-    db.run('DELETE FROM vulnerability_history');
-    
-    // Clear old tables (for completeness, though they're empty)
-    db.run('DELETE FROM ticket_vulnerabilities');
-    db.run('DELETE FROM vulnerabilities');
-    db.run('DELETE FROM vulnerability_imports', (err) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({ success: true, message: 'All vulnerability data cleared from time-series database' });
-    });
-  });
-});
-
-// Delete a specific vulnerability
-app.delete('/api/vulnerabilities/:id', (req, res) => {
-  const { id } = req.params;
-  
-  db.run('DELETE FROM vulnerabilities WHERE rowid = ?', [id], function(err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    if (this.changes === 0) {
-      res.status(404).json({ error: 'Vulnerability not found' });
-      return;
-    }
-    
-    res.json({ success: true, message: 'Vulnerability deleted successfully' });
-  });
-});
-
-// Tenable API integration for historical VPR data
-app.get('/api/tenable/historical-vpr', async (req, res) => {
-  const tenableApiKey = req.headers['x-tenable-api-key'];
-  const tenableSecretKey = req.headers['x-tenable-secret-key'];
-  
-  if (!tenableApiKey || !tenableSecretKey) {
-    return res.status(400).json({ error: 'Tenable API credentials required' });
-  }
-  
-  try {
-    // Get historical VPR data from Tenable
-    const response = await fetch('https://cloud.tenable.com/workbenches/vulnerabilities', {
-      headers: {
-        'X-ApiKeys': `accessKey=${tenableApiKey}; secretKey=${tenableSecretKey}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      
-      // Process and store historical VPR data
-      const historicalData = data.vulnerabilities.map(vuln => ({
-        cve: vuln.plugin_id,
-        vpr_score: vuln.vpr_score,
-        last_seen: vuln.last_seen,
-        severity: vuln.severity
-      }));
-      
-      res.json({
-        success: true,
-        count: historicalData.length,
-        data: historicalData
-      });
-    } else {
-      res.status(response.status).json({ error: 'Failed to fetch from Tenable API' });
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'Error connecting to Tenable API: ' + error.message });
-  }
-});
-
-// Get VPR trend data for charts
-app.get('/api/vulnerabilities/vpr-trends', (req, res) => {
-  const query = `
-    SELECT 
-      vh.change_date as date,
-      AVG(vh.vpr_score_new) as avg_vpr,
-      COUNT(*) as change_count,
-      v.severity
-    FROM vulnerability_history vh
-    JOIN vulnerabilities v ON vh.vulnerability_id = v.rowid
-    WHERE vh.change_date >= date('now', '-30 days')
-    GROUP BY vh.change_date, v.severity
-    ORDER BY vh.change_date DESC
-  `;
-  
-  db.all(query, [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(rows);
-  });
-});
-
-// Get import history
-app.get('/api/imports', (req, res) => {
-  const query = `
-    SELECT 
-      vi.*,
-      COUNT(v.id) as vulnerability_count
-    FROM vulnerability_imports vi
-    LEFT JOIN vulnerabilities v ON vi.id = v.import_id
-    GROUP BY vi.id
-    ORDER BY vi.created_at DESC
-  `;
-  
-  db.all(query, [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(rows);
-  });
-});
-
-// ==================== TICKETS API ====================
-
-// Get all tickets
-app.get('/api/tickets', (req, res) => {
-  const query = `
-    SELECT * FROM tickets 
-    ORDER BY date_submitted DESC
-  `;
-  
-  db.all(query, [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    // Parse JSON fields and map snake_case to camelCase
-    const tickets = rows.map(row => ({
-      id: row.id,
-      dateSubmitted: row.date_submitted,
-      dateDue: row.date_due,
-      hexagonTicket: row.hexagon_ticket,
-      serviceNowTicket: row.service_now_ticket,
-      location: row.location,
-      devices: JSON.parse(row.devices || '[]'),
-      supervisor: row.supervisor,
-      tech: row.tech,
-      status: row.status,
-      notes: row.notes,
-      attachments: JSON.parse(row.attachments || '[]'),
-      createdAt: row.created_at,
-      updatedAt: row.updated_at
-    }));
-    
-    res.json(tickets);
-  });
-});
-
-// Get single ticket by ID
-app.get('/api/tickets/:id', (req, res) => {
-  const { id } = req.params;
-  
-  db.get('SELECT * FROM tickets WHERE id = ?', [id], (err, row) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    if (!row) {
-      res.status(404).json({ error: 'Ticket not found' });
-      return;
-    }
-    
-    // Parse JSON fields and map snake_case to camelCase
-    const ticket = {
-      id: row.id,
-      dateSubmitted: row.date_submitted,
-      dateDue: row.date_due,
-      hexagonTicket: row.hexagon_ticket,
-      serviceNowTicket: row.service_now_ticket,
-      location: row.location,
-      devices: JSON.parse(row.devices || '[]'),
-      supervisor: row.supervisor,
-      tech: row.tech,
-      status: row.status,
-      notes: row.notes,
-      attachments: JSON.parse(row.attachments || '[]'),
-      createdAt: row.created_at,
-      updatedAt: row.updated_at
-    };
-    
-    res.json(ticket);
-  });
-});
-
-// Create new ticket
-app.post('/api/tickets', (req, res) => {
-  const {
-    id,
-    dateSubmitted,
-    dateDue,
-    hexagonTicket,
-    serviceNowTicket,
-    location,
-    devices,
-    supervisor,
-    tech,
-    status,
-    notes,
-    attachments,
-    createdAt,
-    updatedAt
-  } = req.body;
-
-  // Validate required fields
-  if (!location) {
-    res.status(400).json({ error: 'Location is required' });
-    return;
-  }
-
-  const query = `
-    INSERT INTO tickets (
-      id, date_submitted, date_due, hexagon_ticket, service_now_ticket,
-      location, devices, supervisor, tech, status, notes, attachments,
-      created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  const params = [
-    id || Date.now().toString(),
-    dateSubmitted,
-    dateDue,
-    hexagonTicket || '',
-    serviceNowTicket || '',
-    location,
-    JSON.stringify(devices || []),
-    supervisor || '',
-    tech || '',
-    status || 'Open',
-    notes || '',
-    JSON.stringify(attachments || []),
-    createdAt || new Date().toISOString(),
-    updatedAt || new Date().toISOString()
-  ];
-
-  db.run(query, params, function(err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    res.json({ 
-      success: true, 
-      id: params[0],
-      message: 'Ticket created successfully' 
-    });
-  });
-});
-
-// Update existing ticket
-app.put('/api/tickets/:id', (req, res) => {
-  const { id } = req.params;
-  const {
-    dateSubmitted,
-    dateDue,
-    hexagonTicket,
-    serviceNowTicket,
-    location,
-    devices,
-    supervisor,
-    tech,
-    status,
-    notes,
-    attachments
-  } = req.body;
-
-  // Validate required fields
-  if (!location) {
-    res.status(400).json({ error: 'Location is required' });
-    return;
-  }
-
-  const query = `
-    UPDATE tickets SET
-      date_submitted = ?, date_due = ?, hexagon_ticket = ?, service_now_ticket = ?,
-      location = ?, devices = ?, supervisor = ?, tech = ?, status = ?, 
-      notes = ?, attachments = ?, updated_at = ?
-    WHERE id = ?
-  `;
-
-  const params = [
-    dateSubmitted,
-    dateDue,
-    hexagonTicket || '',
-    serviceNowTicket || '',
-    location,
-    JSON.stringify(devices || []),
-    supervisor || '',
-    tech || '',
-    status || 'Open',
-    notes || '',
-    JSON.stringify(attachments || []),
-    new Date().toISOString(),
-    id
-  ];
-
-  db.run(query, params, function(err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    if (this.changes === 0) {
-      res.status(404).json({ error: 'Ticket not found' });
-      return;
-    }
-    
-    res.json({ 
-      success: true, 
-      message: 'Ticket updated successfully' 
-    });
-  });
-});
-
-// Delete ticket
-app.delete('/api/tickets/:id', (req, res) => {
-  const { id } = req.params;
-  
-  db.run('DELETE FROM tickets WHERE id = ?', [id], function(err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    if (this.changes === 0) {
-      res.status(404).json({ error: 'Ticket not found' });
-      return;
-    }
-    
-    res.json({ 
-      success: true, 
-      message: 'Ticket deleted successfully' 
-    });
-  });
-});
-
-// Migrate localStorage data to database
-app.post('/api/tickets/migrate', (req, res) => {
-  const { tickets, mode = 'check' } = req.body;
-  
-  if (!Array.isArray(tickets)) {
-    res.status(400).json({ error: 'Invalid tickets data' });
-    return;
-  }
-
-  // First, check if we already have tickets in the database
-  db.get('SELECT COUNT(*) as count FROM tickets', [], (err, row) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    // Handle different import modes
-    if (row.count > 0 && mode === 'check') {
-      res.status(409).json({ 
-        error: 'Database already contains tickets. Clear existing data first or use replace/append mode.',
-        currentCount: row.count
-      });
-      return;
-    }
-    
-    // If replace mode, clear existing data first
-    if (mode === 'replace' && row.count > 0) {
-      db.run('DELETE FROM tickets', [], (err) => {
-        if (err) {
-          res.status(500).json({ error: `Failed to clear existing data: ${err.message}` });
-          return;
+        if (filePath.endsWith('.css')) {
+            res.set('Content-Type', 'text/css');
+            res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.set('Pragma', 'no-cache');
+            res.set('Expires', '0');
         }
-        // Continue with insert after clearing
-        insertTickets();
-      });
-      return;
+        if (filePath.endsWith('.js')) {
+            res.set('Content-Type', 'application/javascript');
+            res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.set('Pragma', 'no-cache');
+            res.set('Expires', '0');
+        }
+        if (filePath.endsWith('.html')) {
+            res.set('Content-Type', 'text/html');
+            res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.set('Pragma', 'no-cache');
+            res.set('Expires', '0');
+        }
     }
-    
-    // For append mode or empty database, proceed directly
-    insertTickets();
-    
-    function insertTickets() {
-      // Begin transaction
-      db.serialize(() => {
-        db.run('BEGIN TRANSACTION');
-        
-        let completed = 0;
-        let errors = [];
-        
-        const insertQuery = `
-          INSERT INTO tickets (
-            id, date_submitted, date_due, hexagon_ticket, service_now_ticket,
-            location, devices, supervisor, tech, status, notes, attachments,
-            created_at, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-        
-        for (const ticket of tickets) {
-          const params = [
-            ticket.id,
-            ticket.dateSubmitted,
-            ticket.dateDue,
-            ticket.hexagonTicket || '',
-            ticket.serviceNowTicket || '',
-            ticket.location,
-            JSON.stringify(ticket.devices || []),
-            ticket.supervisor || '',
-            ticket.tech || '',
-            ticket.status || 'Open',
-            ticket.notes || '',
-            JSON.stringify(ticket.attachments || []),
-            ticket.createdAt || new Date().toISOString(),
-            ticket.updatedAt || new Date().toISOString()
-          ];
-          
-          db.run(insertQuery, params, function(err) {
-            if (err) {
-              errors.push(`Error inserting ticket ${ticket.id}: ${err.message}`);
-            }
-          
-          completed++;
-          
-          if (completed === tickets.length) {
-            if (errors.length > 0) {
-              db.run('ROLLBACK');
-              res.status(500).json({ 
-                error: 'Migration failed', 
-                details: errors 
-              });
-            } else {
-              db.run('COMMIT');
-              res.json({ 
-                success: true, 
-                message: `Successfully migrated ${tickets.length} tickets` 
-              });
-            }
-          }
-        });
-      }
-      
-      if (tickets.length === 0) {
-        db.run('COMMIT');
-        res.json({ 
-          success: true, 
-          message: 'No tickets to migrate' 
-        });
-      }
-    });
-    }
-  });
-});
-
-// Backup and Restore Endpoints
-
-// Export all tickets as JSON backup
-app.get('/api/backup/tickets', (req, res) => {
-  db.all('SELECT * FROM tickets ORDER BY created_at', [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    // Convert snake_case fields back to camelCase for consistency
-    const tickets = rows.map(row => ({
-      id: row.id,
-      dateSubmitted: row.date_submitted,
-      dateDue: row.date_due,
-      hexagonTicket: row.hexagon_ticket,
-      serviceNowTicket: row.service_now_ticket,
-      location: row.location,
-      devices: JSON.parse(row.devices || '[]'),
-      supervisor: row.supervisor,
-      tech: row.tech,
-      status: row.status,
-      notes: row.notes,
-      attachments: JSON.parse(row.attachments || '[]'),
-      createdAt: row.created_at,
-      updatedAt: row.updated_at
-    }));
-    
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename="hextrackr-tickets-backup-${new Date().toISOString().split('T')[0]}.json"`);
-    res.json({
-      exportDate: new Date().toISOString(),
-      dataType: 'tickets',
-      count: tickets.length,
-      data: tickets
-    });
-  });
-});
-
-// Clear all tickets
-app.delete('/api/clear/tickets', (req, res) => {
-  db.run('DELETE FROM tickets', [], function(err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({ 
-      success: true, 
-      message: `Cleared ${this.changes} tickets` 
-    });
-  });
-});
-
-// Get backup statistics
-app.get('/api/backup/stats', (req, res) => {
-  db.get('SELECT COUNT(*) as ticketCount FROM tickets', [], (err, ticketRow) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    db.get('SELECT COUNT(*) as vulnCount FROM vulnerabilities', [], (err, vulnRow) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      
-      res.json({
-        tickets: ticketRow.ticketCount,
-        vulnerabilities: vulnRow.vulnCount,
-        total: ticketRow.ticketCount + vulnRow.vulnCount
-      });
-    });
-  });
-});
-
-// Serve static files from current directory
-app.use(express.static(__dirname, {
-  maxAge: '1m', // Short cache for development
-  etag: true,
-  lastModified: true
 }));
 
-// Fallback to tickets.html for root
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tickets.html'));
-});
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-// Initialize database on startup
-const initDb = () => {
-  const fs = require('fs');
-  if (!fs.existsSync(dbPath)) {
-    console.log('Initializing database...');
-    require('./scripts/init-database.js');
-  }
-  
-  // Add new columns if they don't exist (for existing databases)
-  db.serialize(() => {
-    db.run(`ALTER TABLE vulnerabilities ADD COLUMN vendor TEXT DEFAULT ''`, (err) => {
-      if (err && !err.message.includes('duplicate column')) {
-        console.error('Error adding vendor column:', err.message);
-      }
+    if (!token) {
+        return res.sendStatus(401);
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
     });
-    
-    db.run(`ALTER TABLE vulnerabilities ADD COLUMN vulnerability_date TEXT DEFAULT ''`, (err) => {
-      if (err && !err.message.includes('duplicate column')) {
-        console.error('Error adding vulnerability_date column:', err.message);
-      }
-    });
-    
-    db.run(`ALTER TABLE vulnerabilities ADD COLUMN state TEXT DEFAULT 'open'`, (err) => {
-      if (err && !err.message.includes('duplicate column')) {
-        console.error('Error adding state column:', err.message);
-      }
-    });
-    
-    db.run(`ALTER TABLE vulnerabilities ADD COLUMN import_date TEXT DEFAULT ''`, (err) => {
-      if (err && !err.message.includes('duplicate column')) {
-        console.error('Error adding import_date column:', err.message);
-      }
-    });
-    
-    db.run(`ALTER TABLE vulnerabilities ADD COLUMN notes TEXT DEFAULT ''`, (err) => {
-      if (err && !err.message.includes('duplicate column')) {
-        console.error('Error adding notes column:', err.message);
-      }
-    });
-    
-    // Create vulnerability history table for VPR tracking
-    db.run(`CREATE TABLE IF NOT EXISTS vulnerability_history (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      vulnerability_id INTEGER,
-      vpr_score_old REAL,
-      vpr_score_new REAL,
-      change_date TEXT,
-      import_id INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities(rowid),
-      FOREIGN KEY (import_id) REFERENCES vulnerability_imports(id)
-    )`, (err) => {
-      if (err) {
-        console.error('Error creating vulnerability_history table:', err.message);
-      }
-    });
-  });
 };
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
+// Large CSV Import Endpoints
+
+// Import the large 64MB Cisco vulnerabilities CSV
+app.post('/api/import/cisco-csv', async (req, res) => {
+    try {
+        console.log('🚀 Starting large Cisco CSV import...');
+        
+        // Check if the large CSV file exists
+        const largeCsvPath = path.join(__dirname, 'cisco-vulnerabilities-08_19_2025_-09_02_16-cdt.csv');
+        
+        if (!fs.existsSync(largeCsvPath)) {
+            return res.status(404).json({
+                success: false,
+                error: 'Large CSV file not found',
+                path: largeCsvPath
+            });
+        }
+
+        // Get file stats
+        const stats = fs.statSync(largeCsvPath);
+        console.log(`📊 File size: ${(stats.size / 1024 / 1024).toFixed(2)} MB`);
+
+        // Start streaming import
+        const result = await databaseService.importCsvFile(largeCsvPath, 'vulnerabilities');
+        
+        res.json({
+            success: true,
+            message: 'CSV import completed successfully',
+            ...result,
+            fileSize: `${(stats.size / 1024 / 1024).toFixed(2)} MB`
+        });
+
+    } catch (error) {
+        console.error('❌ CSV import error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message,
+            details: 'Failed to import large CSV file'
+        });
+    }
+});
+
+// Upload and import CSV files
+app.post('/api/import/upload-csv', upload.single('csvFile'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                error: 'No file uploaded'
+            });
+        }
+
+        const csvType = req.body.csvType || 'vulnerabilities';
+        console.log(`🚀 Importing uploaded CSV: ${req.file.originalname} (${csvType})`);
+
+        // Import the uploaded file
+        const result = await databaseService.importCsvFile(req.file.path, csvType);
+
+        // Clean up uploaded file
+        fs.unlinkSync(req.file.path);
+
+        res.json({
+            success: true,
+            message: 'CSV file imported successfully',
+            filename: req.file.originalname,
+            ...result
+        });
+
+    } catch (error) {
+        console.error('❌ Upload CSV import error:', error);
+        
+        // Clean up file on error
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
+
+        res.status(500).json({
+            success: false,
+            error: error.message,
+            details: 'Failed to import uploaded CSV file'
+        });
+    }
+});
+
+// Get vulnerability statistics
+app.get('/api/vulnerabilities/stats', async (req, res) => {
+    try {
+        const stats = await databaseService.getVulnerabilityStats();
+        res.json({
+            success: true,
+            data: stats
+        });
+    } catch (error) {
+        console.error('❌ Stats error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Search vulnerabilities with filters
+app.get('/api/vulnerabilities/search', async (req, res) => {
+    try {
+        const filters = {
+            search: req.query.search,
+            severity: req.query.severity,
+            status: req.query.status,
+            limit: parseInt(req.query.limit) || 100
+        };
+
+        const vulnerabilities = await databaseService.searchVulnerabilities(filters);
+        
+        res.json({
+            success: true,
+            data: vulnerabilities,
+            count: vulnerabilities.length
+        });
+    } catch (error) {
+        console.error('❌ Search error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Get import progress (for real-time updates)
+app.get('/api/import/status', (req, res) => {
+    // This could be enhanced with real-time progress tracking
+    res.json({
+        success: true,
+        message: 'Import status endpoint - enhance with real-time progress tracking'
+    });
+});
+
+// Debug: List available files
+app.get('/debug/files', (req, res) => {
+    const fs = require('fs');
+    const files = fs.readdirSync(__dirname).filter(file => 
+        file.endsWith('.html') || file.endsWith('.css') || file.endsWith('.js')
+    );
+    res.json({ availableFiles: files, directory: __dirname });
+});
+
+// Serve main application
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Serve tickets page
+app.get('/tickets.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'tickets.html'));
+});
+
+// Serve any other HTML files
+app.get('/*.html', (req, res) => {
+    const fileName = req.params[0] + '.html';
+    const filePath = path.join(__dirname, fileName);
+    
+    // Check if file exists
+    if (require('fs').existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send('Page not found');
+    }
+});
+
+// Authentication endpoints
+app.post('/api/auth/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+        const user = result.rows[0];
+
+        if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const token = jwt.sign(
+            { id: user.id, username: user.username, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({ 
+            token, 
+            user: { 
+                id: user.id, 
+                username: user.username, 
+                email: user.email, 
+                role: user.role 
+            } 
+        });
+    } catch (err) {
+        console.error('Login error:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Assets endpoints - adapted to work with Cisco vulnerability data
+app.get('/api/assets', (req, res) => {
+    const query = `
+        SELECT 
+            unnest(affected_products) as hostname,
+            '0.0.0.0' as ip_address,
+            'Cisco' as vendor,
+            'Unknown' as operating_system,
+            COUNT(*) as vulnerability_count,
+            SUM(CASE WHEN severity = 'critical' THEN 1 ELSE 0 END) as critical_count,
+            SUM(CASE WHEN severity = 'high' THEN 1 ELSE 0 END) as high_count,
+            SUM(CASE WHEN severity = 'medium' THEN 1 ELSE 0 END) as medium_count,
+            SUM(CASE WHEN severity = 'low' THEN 1 ELSE 0 END) as low_count,
+            AVG(cvss_score) as avg_vpr_score
+        FROM vulnerabilities 
+        WHERE status = 'open' AND affected_products IS NOT NULL
+        GROUP BY unnest(affected_products)
+        HAVING COUNT(*) > 0
+        ORDER BY critical_count DESC, high_count DESC, avg_vpr_score DESC
+        LIMIT 50
+    `;
+
+    pool.query(query)
+        .then(result => {
+            res.json(result.rows);
+        })
+        .catch(err => {
+            console.error('Error querying assets:', err);
+            res.status(500).json({ error: 'Failed to fetch assets' });
+        });
+});
+
+app.post('/api/assets', authenticateToken, async (req, res) => {
+    const { hostname, ip_address, vendor, operating_system, risk_level, business_criticality, notes } = req.body;
+
+    const query = `
+        INSERT INTO assets (hostname, ip_address, vendor, operating_system, risk_level, business_criticality, notes)
+        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id
+    `;
+
+    try {
+        const result = await pool.query(query, [hostname, ip_address, vendor, operating_system, risk_level, business_criticality, notes]);
+        res.json({ id: result.rows[0].id });
+    } catch (err) {
+        console.error('Asset creation error:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/assets/:id', authenticateToken, async (req, res) => {
+    const { hostname, ip_address, vendor, operating_system, risk_level, business_criticality, notes } = req.body;
+    const { id } = req.params;
+
+    const query = `
+        UPDATE assets 
+        SET hostname = $1, ip_address = $2, vendor = $3, operating_system = $4, 
+            risk_level = $5, business_criticality = $6, notes = $7, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $8
+    `;
+
+    try {
+        const result = await pool.query(query, [hostname, ip_address, vendor, operating_system, risk_level, business_criticality, notes, id]);
+        res.json({ changes: result.rowCount });
+    } catch (err) {
+        console.error('Asset update error:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Vulnerabilities endpoints - adapted for Cisco vulnerability data
+app.get('/api/vulnerabilities', (req, res) => {
+    const { severity, status } = req.query;
+    let query = `
+        SELECT 
+            id,
+            advisory_id,
+            title,
+            summary,
+            description,
+            severity,
+            vpr_score,
+            cvss_score,
+            publication_date,
+            status,
+            affected_products,
+            cve_ids,
+            asset_ip,
+            asset_name as hostname,
+            vendor
+        FROM vulnerabilities
+        WHERE 1=1
+    `;
+    const params = [];
+    let paramCount = 0;
+
+    if (severity) {
+        paramCount++;
+        query += ` AND severity = $${paramCount}`;
+        params.push(severity);
+    }
+    if (status) {
+        paramCount++;
+        query += ` AND status = $${paramCount}`;
+        params.push(status);
+    } else {
+        // Default to open vulnerabilities only
+        paramCount++;
+        query += ` AND status = $${paramCount}`;
+        params.push('open');
+    }
+
+    query += ' ORDER BY vpr_score DESC NULLS LAST, severity DESC LIMIT 1000';
+
+    pool.query(query, params)
+        .then(result => {
+            // Transform data to match frontend expectations
+            const transformedData = result.rows.map(row => ({
+                ...row,
+                hostname: row.hostname || (row.affected_products && row.affected_products[0]) || 'Unknown',
+                ip_address: row.asset_ip || '192.168.1.1',
+                vulnerability_id: row.advisory_id,
+                cve: row.cve_ids && row.cve_ids[0] || '',
+                // Keep VPR score properly mapped
+                vpr_score: row.vpr_score
+            }));
+            
+            res.json(transformedData);
+        })
+        .catch(err => {
+            console.error('Error querying vulnerabilities:', err);
+            res.status(500).json({ error: 'Failed to fetch vulnerabilities' });
+        });
+});
+
+// Tickets endpoints
+app.get('/api/tickets', authenticateToken, async (req, res) => {
+    const query = `
+        SELECT t.*, a.hostname, a.ip_address,
+               COUNT(tv.vulnerability_id) as vulnerability_count
+        FROM tickets t
+        LEFT JOIN assets a ON t.asset_id = a.id
+        LEFT JOIN ticket_vulnerabilities tv ON t.id = tv.ticket_id
+        GROUP BY t.id
+        ORDER BY 
+            CASE t.priority 
+                WHEN 'critical' THEN 1 
+                WHEN 'high' THEN 2 
+                WHEN 'medium' THEN 3 
+                ELSE 4 
+            END,
+            t.created_at DESC
+    `;
+
+    try {
+        const result = await pool.query(query);
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Tickets query error:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/tickets', authenticateToken, async (req, res) => {
+    const { ticket_number, title, description, priority, status, assignee, asset_id, snow_number } = req.body;
+
+    const query = `
+        INSERT INTO tickets (ticket_number, title, description, priority, status, assignee, asset_id, snow_number)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id
+    `;
+
+    try {
+        const result = await pool.query(query, [ticket_number, title, description, priority, status, assignee, asset_id, snow_number]);
+        res.json({ id: result.rows[0].id });
+    } catch (err) {
+        console.error('Ticket creation error:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// CSV upload endpoint
+app.post('/api/upload/csv', authenticateToken, upload.single('csvFile'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const results = [];
+    const filePath = req.file.path;
+
+    fs.createReadStream(filePath)
+        .pipe(csv())
+        .on('data', (data) => results.push(data))
+        .on('end', async () => {
+            try {
+                // Process and insert data in batches
+                const batchSize = 100;
+                let processed = 0;
+
+                for (let i = 0; i < results.length; i += batchSize) {
+                    const batch = results.slice(i, i + batchSize);
+                    await processBatch(batch);
+                    processed += batch.length;
+                    
+                    // Send progress update
+                    if (processed % 1000 === 0) {
+                        console.log(`Processed ${processed}/${results.length} records`);
+                    }
+                }
+
+                // Clean up uploaded file
+                fs.unlinkSync(filePath);
+
+                res.json({ 
+                    message: 'CSV processed successfully', 
+                    recordsProcessed: processed 
+                });
+            } catch (error) {
+                console.error('CSV processing error:', error);
+                res.status(500).json({ error: 'Failed to process CSV' });
+            }
+        })
+        .on('error', (error) => {
+            console.error('CSV parsing error:', error);
+            res.status(500).json({ error: 'Failed to parse CSV' });
+        });
+});
+
+// Process batch of CSV records
+async function processBatch(batch) {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        for (const record of batch) {
+            // Insert or update asset using PostgreSQL UPSERT
+            const assetQuery = `
+                INSERT INTO assets (hostname, ip_address, vendor, operating_system)
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (hostname) DO UPDATE SET
+                    ip_address = EXCLUDED.ip_address,
+                    vendor = EXCLUDED.vendor,
+                    operating_system = EXCLUDED.operating_system
+            `;
+            await client.query(assetQuery, [record.hostname, record.ipAddress, record.vendor, record.operatingSystem]);
+
+            // Insert vulnerability
+            const vulnQuery = `
+                INSERT INTO vulnerabilities 
+                (asset_id, cve_id, definition_name, severity, vpr_score, cvss_score, description)
+                VALUES (
+                    (SELECT id FROM assets WHERE hostname = $1),
+                    $2, $3, $4, $5, $6, $7
+                )
+            `;
+            await client.query(vulnQuery, [
+                record.hostname,
+                record.cve || record.definitionId,
+                record.definitionName,
+                record.severity,
+                parseFloat(record.vprScore) || 0,
+                parseFloat(record.cvssScore) || 0,
+                record.description
+            ]);
+        }
+
+        await client.query('COMMIT');
+    } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+    } finally {
+        client.release();
+    }
+}
+
+// ServiceNow integration endpoints
+app.get('/api/servicenow/ticket/:snow_number', authenticateToken, async (req, res) => {
+    const { snow_number } = req.params;
+    
+    // This is a placeholder for ServiceNow integration
+    // In a real implementation, you would make API calls to ServiceNow
+    res.json({
+        snow_number,
+        status: 'open',
+        assigned_to: 'IT Team',
+        short_description: `ServiceNow ticket ${snow_number}`,
+        description: 'Placeholder for ServiceNow integration',
+        priority: 'high',
+        created_on: new Date().toISOString()
+    });
+});
+
+// Free Tenable VPR API integration
+app.get('/api/tenable/vpr/:cve', authenticateToken, async (req, res) => {
+    const { cve } = req.params;
+    
+    try {
+        // This uses Tenable's free VPR API (no key required for basic CVE lookups)
+        const response = await fetch(`https://www.tenable.com/plugins/vpr/${cve}`);
+        
+        if (response.ok) {
+            const data = await response.text(); // Returns HTML, would need parsing
+            res.json({
+                cve,
+                vpr_score: 'Available via web scraping',
+                message: 'Free Tenable VPR data available'
+            });
+        } else {
+            res.status(404).json({ error: 'CVE not found in Tenable database' });
+        }
+    } catch (error) {
+        console.error('Tenable VPR API error:', error);
+        res.status(500).json({ error: 'Failed to fetch VPR data' });
+    }
+});
+
+// Cisco PSIRT API proxy to handle CORS
+app.post('/api/cisco/oauth/token', authenticateToken, async (req, res) => {
+    const { client_id, client_secret } = req.body;
+    
+    if (!client_id || !client_secret) {
+        return res.status(400).json({ error: 'Client ID and Client Secret are required' });
+    }
+    
+    try {
+        console.log('🔧 Proxying Cisco OAuth request...');
+        
+        const response = await fetch('https://cloudsso.cisco.com/as/token.oauth2', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
+            },
+            body: new URLSearchParams({
+                grant_type: 'client_credentials',
+                client_id: client_id,
+                client_secret: client_secret
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            console.log('✅ Cisco OAuth token obtained successfully');
+            res.json(data);
+        } else {
+            console.error('❌ Cisco OAuth error:', data);
+            res.status(response.status).json(data);
+        }
+    } catch (error) {
+        console.error('🔥 Cisco API proxy error:', error);
+        res.status(500).json({ 
+            error: 'Failed to connect to Cisco API',
+            details: error.message 
+        });
+    }
+});
+
+// Cisco PSIRT advisories proxy
+app.get('/api/cisco/advisories', authenticateToken, async (req, res) => {
+    const { access_token } = req.query;
+    
+    if (!access_token) {
+        return res.status(400).json({ error: 'Access token is required' });
+    }
+    
+    try {
+        console.log('📡 Fetching Cisco security advisories...');
+        
+        const response = await fetch('https://api.cisco.com/security/advisories/v2/advisories', {
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+                'Accept': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            console.log(`✅ Retrieved ${data.advisories?.length || 0} Cisco advisories`);
+            res.json(data);
+        } else {
+            console.error('❌ Cisco advisories error:', data);
+            res.status(response.status).json(data);
+        }
+    } catch (error) {
+        console.error('🔥 Cisco advisories proxy error:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch Cisco advisories',
+            details: error.message 
+        });
+    }
+});
+
+// Dashboard stats endpoint
+app.get('/api/dashboard/stats', async (req, res) => {
+    try {
+        const queries = {
+            totalAssets: 'SELECT COUNT(*) as count FROM assets',
+            totalVulnerabilities: 'SELECT COUNT(*) as count FROM vulnerabilities WHERE status = \'open\'',
+            criticalVulns: 'SELECT COUNT(*) as count FROM vulnerabilities WHERE severity = \'critical\' AND status = \'open\'',
+            openTickets: 'SELECT COUNT(*) as count FROM tickets WHERE status IN (\'open\', \'in_progress\')',
+            severityBreakdown: `
+                SELECT severity, COUNT(*) as count 
+                FROM vulnerabilities 
+                WHERE status = 'open' 
+                GROUP BY severity
+            `,
+            topRiskyAssets: `
+                SELECT a.hostname, a.ip_address, COUNT(v.id) as vuln_count,
+                       SUM(CASE WHEN v.severity = 'critical' THEN 1 ELSE 0 END) as critical_count
+                FROM assets a
+                JOIN vulnerabilities v ON a.id = v.asset_id
+                WHERE v.status = 'open'
+                GROUP BY a.id
+                ORDER BY critical_count DESC, vuln_count DESC
+                LIMIT 5
+            `
+        };
+
+        const results = {};
+        
+        for (const [key, query] of Object.entries(queries)) {
+            try {
+                const result = await pool.query(query);
+                results[key] = result.rows;
+            } catch (err) {
+                console.error(`Error in ${key} query:`, err);
+                results[key] = [];
+            }
+        }
+        
+        res.json(results);
+    } catch (error) {
+        console.error('Dashboard stats error:', error);
+        res.status(500).json({ error: 'Failed to fetch dashboard stats' });
+    }
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// Start server
 app.listen(PORT, () => {
-  initDb();
-  console.log(`🚀 HexTrackr server running on http://localhost:${PORT}`);
-  console.log('📊 Database-powered vulnerability management enabled');
-  console.log('Available endpoints:');
-  console.log(`  - Tickets: http://localhost:${PORT}/tickets.html`);
-  console.log(`  - Vulnerabilities: http://localhost:${PORT}/vulnerabilities.html`);
-  console.log(`  - API: http://localhost:${PORT}/api/vulnerabilities`);
+    console.log(`🚀 HexTrackr server running on port ${PORT}`);
+    console.log(`📊 Dashboard: http://localhost:${PORT}`);
+    console.log(`🔒 API: http://localhost:${PORT}/api`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+    console.log('\n🛑 Shutting down gracefully...');
+    try {
+        await pool.end();
+        console.log('Database connection pool closed.');
+    } catch (err) {
+        console.error('Error closing database pool:', err);
+    }
+    process.exit(0);
 });

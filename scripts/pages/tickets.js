@@ -69,6 +69,7 @@ class HexagonTicketsManager {
             if (response.ok) {
                 this.tickets = await response.json();
                 console.log('Loaded', this.tickets.length, 'tickets from database');
+                // No longer need to setup supervisor chips since they're in the table
             } else {
                 console.error('Failed to load tickets:', response.statusText);
                 this.showToast('Failed to load tickets from database', 'error');
@@ -221,17 +222,16 @@ class HexagonTicketsManager {
             this.handleSharedDocumentation(e.target.files);
         });
 
-        // CSV import from header dropdown
-        const importCsvBtnHeader = document.getElementById('importCsvBtnHeader');
-        if (importCsvBtnHeader) {
-            importCsvBtnHeader.addEventListener('click', () => {
-                document.getElementById('csvImportInput').click();
-            });
-        }
-
+        // CSV import handler - now integrated with Data Management tab in Settings modal
         document.getElementById('csvImportInput').addEventListener('change', (e) => {
             this.handleCsvImport(e.target.files[0]);
         });
+
+        // Supervisor filter clear button
+        // Remove this event listener since we no longer have supervisor filter
+        // document.getElementById('clearSupervisorFilter').addEventListener('click', () => {
+        //     this.clearSupervisorFilter();
+        // });
     }
 
     setupDeviceManagement() {
@@ -599,7 +599,7 @@ class HexagonTicketsManager {
         if (filteredTickets.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="10" class="text-center py-4">
+                    <td colspan="11" class="text-center py-4">
                         <div class="empty-state">
                             <i class="fas fa-inbox"></i>
                             <h5>No tickets found</h5>
@@ -630,24 +630,33 @@ class HexagonTicketsManager {
         const paginatedTickets = filteredTickets.slice(startIndex, endIndex);
 
         tbody.innerHTML = paginatedTickets.map(ticket => {
-            const isOverdue = new Date(ticket.dateDue) < new Date() && ticket.status !== 'Completed' && ticket.status !== 'Closed';
+            // Use server-calculated overdue status
+            const isOverdue = ticket.isOverdue || ticket.status === 'Overdue';
+            
+            // Format XT# to show only last 4 digits
+            const displayXtNumber = ticket.xtNumber ? ticket.xtNumber.slice(-4) : 'N/A';
             
             return `
-                <tr class="${isOverdue ? 'overdue' : ''}" data-ticket-id="${ticket.id}">
-                    <td>${this.formatDate(ticket.dateSubmitted)}</td>
-                    <td>${this.formatDate(ticket.dateDue)} ${isOverdue ? '<span class="badge bg-danger">OVERDUE</span>' : ''}</td>
-                    <td><strong>${this.highlightSearch(ticket.hexagonTicket)}</strong></td>
-                    <td>${this.highlightSearch(ticket.serviceNowTicket || 'N/A')}</td>
-                    <td>${this.highlightSearch(ticket.location)}</td>
-                    <td>
+                <tr class="${isOverdue ? 'table-danger' : ''}" data-ticket-id="${ticket.id}">
+                    <td class="text-center"><strong>${displayXtNumber}</strong></td>
+                    <td class="text-center">${this.formatDate(ticket.dateSubmitted)}</td>
+                    <td class="text-center">${this.formatDate(ticket.dateDue)}</td>
+                    <td class="text-center"><strong>${this.highlightSearch(ticket.hexagonTicket)}</strong></td>
+                    <td class="text-center">${this.createServiceNowDisplay(ticket.serviceNowTicket)}</td>
+                    <td class="text-center">${this.createLocationChip(ticket.location)}</td>
+                    <td class="text-center d-none">${this.createSiteChip(ticket.site || ticket.location)}</td>
+                    <td class="text-center">
                         <div class="devices-list">
-                            ${ticket.devices.map(device => `<span class="device-tag">${this.highlightSearch(device)}</span>`).join('')}
+                            ${ticket.devices.map(device => `<span class="device-tag enhanced">${this.highlightSearch(device)}</span>`).join('')}
                         </div>
                     </td>
-                    <td>${this.highlightSearch(ticket.supervisor)}</td>
-                    <td>${this.highlightSearch(ticket.tech)}</td>
-                    <td><span class="status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}">${ticket.status}</span></td>
-                    <td>
+                    <td class="text-center">
+                        <div class="supervisor-chips">
+                            ${this.createSupervisorChips(ticket.supervisor)}
+                        </div>
+                    </td>
+                    <td class="text-center"><span class="status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}">${ticket.status}</span></td>
+                    <td class="text-center">
                         <div class="btn-group btn-group-sm" role="group">
                             <button class="btn btn-outline-primary action-btn" onclick="ticketManager.viewTicket('${ticket.id}')" title="View">
                                 <i class="fas fa-eye"></i>
@@ -760,6 +769,82 @@ class HexagonTicketsManager {
         this.renderTickets();
     }
 
+    // Helper function to create location chips
+    createLocationChip(location) {
+        if (!location) return 'N/A';
+        const colorClass = this.getLocationColor(location);
+        return `<span class="location-chip ${colorClass}">${this.highlightSearch(location)}</span>`;
+    }
+
+    // Helper function to create site chips  
+    createSiteChip(site) {
+        if (!site) return 'N/A';
+        const colorClass = this.getSiteColor(site);
+        return `<span class="site-chip ${colorClass}">${this.highlightSearch(site)}</span>`;
+    }
+
+    // Helper function to create supervisor chips
+    createSupervisorChips(supervisorText) {
+        if (!supervisorText) return 'N/A';
+        
+        // Parse supervisors (semicolon separated only - names are "LAST, FIRST" format)
+        const supervisors = supervisorText.split(';').map(s => s.trim()).filter(s => s);
+        
+        return supervisors.map(supervisor => {
+            const colorClass = this.getSupervisorColor(supervisor);
+            return `<span class="supervisor-chip ${colorClass}">${this.highlightSearch(supervisor)}</span>`;
+        }).join('');
+    }
+
+    // Color assignment functions for consistent chip styling
+    getLocationColor(location) {
+        const colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-secondary'];
+        const hash = this.hashString(location);
+        return colors[hash % colors.length];
+    }
+
+    getSiteColor(site) {
+        const colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-secondary'];
+        const hash = this.hashString(site);
+        return colors[hash % colors.length];
+    }
+
+    getSupervisorColor(supervisor) {
+        const colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-secondary'];
+        const hash = this.hashString(supervisor);
+        return colors[hash % colors.length];
+    }
+
+    // Helper function to create ServiceNow ticket display (clickable if enabled)
+    createServiceNowDisplay(serviceNowTicket) {
+        if (!serviceNowTicket) return this.highlightSearch('N/A');
+        
+        // Check if ServiceNow integration is enabled (from shared settings modal)
+        const isEnabled = window.isServiceNowEnabled && window.isServiceNowEnabled();
+        const serviceNowUrl = window.generateServiceNowUrl && window.generateServiceNowUrl(serviceNowTicket);
+        
+        // If enabled and we have a valid URL, make it clickable
+        if (isEnabled && serviceNowUrl) {
+            return `<a href="${serviceNowUrl}" target="_blank" class="text-decoration-none service-now-link" title="Open in ServiceNow">
+                        <i class="fas fa-external-link-alt me-1 text-primary"></i>${this.highlightSearch(serviceNowTicket)}
+                    </a>`;
+        }
+        
+        // Otherwise, just show the ticket number
+        return this.highlightSearch(serviceNowTicket);
+    }
+
+    // Simple hash function for consistent color assignment
+    hashString(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        return Math.abs(hash);
+    }
+
     getFilteredTickets() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         const statusFilter = document.getElementById('statusFilter').value;
@@ -767,16 +852,19 @@ class HexagonTicketsManager {
 
         return this.tickets.filter(ticket => {
             const matchesSearch = !searchTerm || 
+                (ticket.xtNumber && ticket.xtNumber.toLowerCase().includes(searchTerm)) ||
                 ticket.hexagonTicket.toLowerCase().includes(searchTerm) ||
                 ticket.serviceNowTicket.toLowerCase().includes(searchTerm) ||
                 ticket.location.toLowerCase().includes(searchTerm) ||
+                (ticket.site && ticket.site.toLowerCase().includes(searchTerm)) ||
                 ticket.supervisor.toLowerCase().includes(searchTerm) ||
                 ticket.tech.toLowerCase().includes(searchTerm) ||
                 ticket.devices.some(device => device.toLowerCase().includes(searchTerm));
 
             const matchesStatus = !statusFilter || ticket.status === statusFilter;
             const matchesLocation = !locationFilter || ticket.location === locationFilter;
-
+            
+            // No longer need supervisor filtering since chips are in table
             return matchesSearch && matchesStatus && matchesLocation;
         });
     }
@@ -1816,6 +1904,9 @@ window.refreshPageData = function(type) {
         ticketManager.renderTickets();
         ticketManager.updateStatistics();
         ticketManager.populateLocationFilter();
+    } else if (type === 'serviceNow' && window.ticketManager) {
+        // Refresh ticket display to apply ServiceNow link changes
+        ticketManager.renderTickets();
     }
 };
 

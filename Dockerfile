@@ -1,13 +1,30 @@
-# Lightweight nginx for serving static files
-FROM nginx:alpine
+# Use Node.js with Alpine for smaller image size
+FROM node:18-alpine
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+# Set working directory
+WORKDIR /app
 
-# Copy static files (optional - can be volume mounted instead)
-# COPY . /usr/share/nginx/html
+# Install PostgreSQL client and other necessary packages (removed SQLite)
+RUN apk add --no-cache postgresql-client python3 make g++ curl
 
-# Expose port 80
-EXPOSE 80
+# Copy package files
+COPY package*.json ./
 
-CMD ["nginx", "-g", "daemon off;"]
+# Install dependencies and rebuild native modules for the container architecture
+RUN npm ci --only=production && npm rebuild
+
+# Copy application files (excluding node_modules from host)
+COPY . .
+
+# Create data directory for file uploads
+RUN mkdir -p /app/data
+
+# Expose correct port for HexTrackr
+EXPOSE 3040
+
+# Health check for correct port
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3040/health || exit 1
+
+# Start the application
+CMD ["npm", "start"]
