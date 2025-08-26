@@ -438,6 +438,13 @@ app.put('/api/vulnerabilities/:id', (req, res) => {
 // Clear all vulnerability data - MUST come before /:id route
 app.delete('/api/vulnerabilities/clear', (req, res) => {
   db.serialize(() => {
+    // Clear new time-series tables (where actual data is)
+    db.run('DELETE FROM fact_vulnerability_timeseries');
+    db.run('DELETE FROM dim_vulnerabilities');
+    db.run('DELETE FROM assets');
+    db.run('DELETE FROM vulnerability_history');
+    
+    // Clear old tables (for completeness, though they're empty)
     db.run('DELETE FROM ticket_vulnerabilities');
     db.run('DELETE FROM vulnerabilities');
     db.run('DELETE FROM vulnerability_imports', (err) => {
@@ -445,7 +452,7 @@ app.delete('/api/vulnerabilities/clear', (req, res) => {
         res.status(500).json({ error: err.message });
         return;
       }
-      res.json({ success: true, message: 'All vulnerability data cleared' });
+      res.json({ success: true, message: 'All vulnerability data cleared from time-series database' });
     });
   });
 });
