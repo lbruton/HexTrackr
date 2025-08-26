@@ -227,7 +227,7 @@ app.get('/api/vulnerabilities', (req, res) => {
   });
 });
 
-// Import CSV vulnerabilities
+// Import CSV vulnerabilities - TIME-SERIES SCHEMA
 app.post('/api/vulnerabilities/import', upload.single('csvFile'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
@@ -236,6 +236,7 @@ app.post('/api/vulnerabilities/import', upload.single('csvFile'), (req, res) => 
   const startTime = Date.now();
   const filename = req.file.originalname;
   const vendor = req.body.vendor || 'unknown';
+  const currentDate = new Date().toISOString().split('T')[0];
   
   // Read and parse CSV
   const csvData = fs.readFileSync(req.file.path, 'utf8');
@@ -245,7 +246,7 @@ app.post('/api/vulnerabilities/import', upload.single('csvFile'), (req, res) => 
     complete: (results) => {
       const rows = results.data.filter(row => Object.values(row).some(val => val && val.trim()));
       
-      // Insert import record
+      // Insert import record (keep for logging)
       const importQuery = `
         INSERT INTO vulnerability_imports 
         (filename, import_date, row_count, vendor, file_size, processing_time, raw_headers)
@@ -267,32 +268,23 @@ app.post('/api/vulnerabilities/import', upload.single('csvFile'), (req, res) => 
         }
         
         const importId = this.lastID;
-        
-        // Process rows and insert vulnerabilities
-        const stmt = db.prepare(`
-          INSERT INTO vulnerabilities 
-          (import_id, hostname, ip_address, cve, severity, vpr_score, cvss_score, 
-           first_seen, last_seen, plugin_id, plugin_name, description, solution, 
-           vendor, vulnerability_date, state, import_date)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
-        
         let processed = 0;
         
-        rows.forEach(async (row) => {
-          // Map Cisco CSV columns to database fields
+        // Process rows using time-series schema: assets -> dim_vulnerabilities -> fact_vulnerability_timeseries
+        rows.forEach((row, index) => {
+          // Map CSV columns to database fields
           const hostname = row['asset.name'] || row['hostname'] || row['Host'] || '';
           const ipAddress = row['asset.display_ipv4_address'] || row['asset.ipv4_addresses'] || row['ip_address'] || row['IP Address'] || '';
           const cve = row['definition.cve'] || row['cve'] || row['CVE'] || '';
           const severity = row['severity'] || row['Severity'] || '';
           const vprScore = parseFloat(row['definition.vpr.score'] || row['vpr_score'] || row['VPR Score'] || 0);
           const cvssScore = parseFloat(row['cvss_score'] || row['CVSS Score'] || 0);
-          const vendor = row['definition.family'] || row['vendor'] || row['Vendor'] || '';
-          const description = row['definition.name'] || row['plugin_name'] || row['description'] || row['Description'] || '';
-          const pluginPublished = row['definition.plugin_published'] || row['vulnerability_date'] || row['plugin_published'] || '';
+          const vendorFamily = row['definition.family'] || row['vendor'] || row['Vendor'] || '';
+          const pluginName = row['definition.name'] || row['plugin_name'] || row['description'] || row['Description'] || '';
+          const pluginId = row['plugin_id'] || row['Plugin ID'] || '';
           const state = row['state'] || row['State'] || 'open';
           
-          // Parse dates from CSV - try multiple date fields and formats
+          // Parse dates
           const parseDate = (dateStr) => {
             if (!dateStr) return null;
             try {
@@ -303,102 +295,89 @@ app.post('/api/vulnerabilities/import', upload.single('csvFile'), (req, res) => 
             }
           };
           
-          // Priority order: vulnerability_published -> plugin_updated -> resurfaced_date
-          const vulnerabilityDate = parseDate(
-            row['definition.vulnerability_published'] || 
-            row['definition.plugin_updated'] || 
-            row['resurfaced_date'] || 
-            row['vulnerability_date'] || 
-            row['first_seen'] || 
-            row['last_seen']
-          );
-          
           const firstSeenDate = parseDate(
             row['first_seen'] || 
             row['definition.vulnerability_published'] || 
-            vulnerabilityDate
-          );
+            row['vulnerability_date']
+          ) || currentDate;
           
           const lastSeenDate = parseDate(
             row['last_seen'] || 
             row['resurfaced_date'] || 
-            vulnerabilityDate
-          );
+            row['vulnerability_date']
+          ) || currentDate;
           
-          // Fallback to current date ONLY if no valid dates found anywhere
-          const currentDate = new Date().toISOString().split('T')[0];
-          const finalFirstSeen = firstSeenDate || vulnerabilityDate || currentDate;
-          const finalLastSeen = lastSeenDate || vulnerabilityDate || currentDate;
-          const finalVulnDate = vulnerabilityDate || currentDate;
+          // Create vulnerability key (CVE preferred, fallback to plugin_id)
+          const vulnKey = cve || pluginId || `name_${pluginName.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50)}`;
           
-          // Check if vulnerability already exists (based on hostname + CVE + plugin_id)
-          const uniqueKey = `${hostname}-${cve}-${row['plugin_id'] || row['Plugin ID'] || ''}`;
-          
-          db.get(`
-            SELECT rowid, vpr_score, last_seen FROM vulnerabilities 
-            WHERE hostname = ? AND cve = ? AND plugin_id = ?
-          `, [hostname, cve, row['plugin_id'] || row['Plugin ID'] || ''], (err, existingVuln) => {
+          // Step 1: Ensure asset exists
+          db.run(`
+            INSERT OR IGNORE INTO assets (hostname, ip_address) 
+            VALUES (?, ?)
+          `, [hostname, ipAddress], function(assetErr) {
+            if (assetErr) {
+              console.error('Asset insert error:', assetErr);
+              return;
+            }
             
-            if (existingVuln) {
-              // UPSERT: Update existing vulnerability
-              // Keep historical VPR data by creating a history record if VPR changed significantly
-              const oldVpr = parseFloat(existingVuln.vpr_score) || 0;
-              const vprChange = Math.abs(vprScore - oldVpr);
-              
-              if (vprChange > 0.1) { // Track significant VPR changes
-                // Insert historical record
-                db.run(`
-                  INSERT INTO vulnerability_history 
-                  (vulnerability_id, vpr_score_old, vpr_score_new, change_date, import_id)
-                  VALUES (?, ?, ?, ?, ?)
-                `, [existingVuln.rowid, oldVpr, vprScore, currentDate, importId]);
+            // Get asset ID
+            db.get(`SELECT id FROM assets WHERE hostname = ?`, [hostname], (assetGetErr, asset) => {
+              if (assetGetErr || !asset) {
+                console.error('Asset lookup error:', assetGetErr);
+                return;
               }
               
-              // Update the current vulnerability record
+              // Step 2: Ensure vulnerability dimension exists
               db.run(`
-                UPDATE vulnerabilities SET
-                  ip_address = ?, severity = ?, vpr_score = ?, cvss_score = ?,
-                  last_seen = ?, state = ?, import_date = ?, vendor = ?,
-                  description = ?, solution = ?
-                WHERE rowid = ?
-              `, [
-                ipAddress, severity, vprScore, cvssScore,
-                finalLastSeen, state, currentDate, vendor,
-                row['description'] || row['Description'] || '',
-                row['solution'] || row['Solution'] || '',
-                existingVuln.rowid
-              ]);
-            } else {
-              // INSERT: New vulnerability
-              db.run(`
-                INSERT INTO vulnerabilities 
-                (import_id, hostname, ip_address, cve, severity, vpr_score, cvss_score, 
-                 first_seen, last_seen, plugin_id, plugin_name, description, solution, 
-                 vendor, vulnerability_date, state, import_date)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-              `, [
-                importId, hostname, ipAddress, cve, severity, vprScore, cvssScore,
-                finalFirstSeen, finalLastSeen, row['plugin_id'] || row['Plugin ID'] || '',
-                description, row['description'] || row['Description'] || '',
-                row['solution'] || row['Solution'] || '', vendor, finalVulnDate,
-                state, currentDate
-              ]);
-            }
-            
-            processed++;
-            
-            if (processed === rows.length) {
-              // Clean up uploaded file
-              fs.unlinkSync(req.file.path);
-              
-              res.json({
-                success: true,
-                importId,
-                rowsProcessed: processed,
-                filename,
-                processingTime: Date.now() - startTime
+                INSERT OR IGNORE INTO dim_vulnerabilities 
+                (asset_id, vuln_key, cve, plugin_id, name, vendor_family) 
+                VALUES (?, ?, ?, ?, ?, ?)
+              `, [asset.id, vulnKey, cve, pluginId, pluginName, vendorFamily], function(vulnErr) {
+                if (vulnErr) {
+                  console.error('Vulnerability dimension insert error:', vulnErr);
+                  return;
+                }
+                
+                // Get vulnerability dimension ID
+                db.get(`
+                  SELECT id FROM dim_vulnerabilities 
+                  WHERE asset_id = ? AND vuln_key = ?
+                `, [asset.id, vulnKey], (vulnGetErr, vuln) => {
+                  if (vulnGetErr || !vuln) {
+                    console.error('Vulnerability lookup error:', vulnGetErr);
+                    return;
+                  }
+                  
+                  // Step 3: Insert time-series fact (UPSERT for same scan_date)
+                  db.run(`
+                    INSERT OR REPLACE INTO fact_vulnerability_timeseries 
+                    (vulnerability_id, scan_date, severity, vpr_score, state, import_id, first_seen, last_seen)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                  `, [vuln.id, currentDate, severity, vprScore, state, importId, firstSeenDate, lastSeenDate], function(factErr) {
+                    if (factErr) {
+                      console.error('Time-series fact insert error:', factErr);
+                      return;
+                    }
+                    
+                    processed++;
+                    
+                    if (processed === rows.length) {
+                      // Clean up uploaded file
+                      fs.unlinkSync(req.file.path);
+                      
+                      res.json({
+                        success: true,
+                        importId,
+                        rowsProcessed: processed,
+                        filename,
+                        processingTime: Date.now() - startTime,
+                        message: 'Data imported to time-series database'
+                      });
+                    }
+                  });
+                });
               });
-            }
+            });
           });
         });
       });

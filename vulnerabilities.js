@@ -511,11 +511,17 @@ async function loadStatistics() {
  */
 async function loadData() {
     try {
-        // Load vulnerabilities from database API
-        const response = await fetch(`${apiBase}/vulnerabilities?limit=10000`);
+        // Load vulnerabilities from database API with pagination for better performance
+        const response = await fetch(`${apiBase}/vulnerabilities?limit=1000&page=1`);
         if (response.ok) {
             const result = await response.json();
             vulnerabilities = result.data || [];
+            
+            // Log pagination info for debugging
+            if (result.pagination) {
+                console.log(`Loaded ${vulnerabilities.length} of ${result.pagination.total} vulnerabilities`);
+                console.log(`Page 1 of ${result.pagination.pages} total pages`);
+            }
         } else {
             vulnerabilities = [];
         }
