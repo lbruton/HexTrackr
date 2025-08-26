@@ -1,3 +1,5 @@
+/* eslint-env browser */
+/* global jsPDF */
 /**
  * HexTrackr - Tickets Management System
  * 
