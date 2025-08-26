@@ -1095,8 +1095,191 @@
     <!-- PapaParse for CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
-    <!-- AG Grid Responsive Configuration -->
-    <script src="scripts/ag-grid-responsive-config.js"></script>
+    <!-- AG Grid Responsive Configuration - Embedded -->
+    <script>
+        /**
+         * Debounce function to limit the rate at which a function gets called.
+         * This is crucial for performance on events that fire rapidly, like window resize.
+         * @param {Function} func - The function to debounce.
+         * @param {number} delay - The debounce delay in milliseconds.
+         * @returns {Function} The debounced function.
+         */
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        }
+
+        /**
+         * Creates and returns the complete AG Grid configuration object.
+         * @param {object} componentContext - The 'this' context of the calling component (e.g., ModernVulnManager)
+         *                                    to access its methods and properties like `gridApi`.
+         * @returns {GridOptions} A complete AG Grid `gridOptions` object.
+         */
+        function createVulnerabilityGridOptions(componentContext) {
+            // Column definitions with responsive behavior
+            const columnDefs = [
+                {
+                    headerName: 'Last Seen',
+                    field: 'last_seen',
+                    sortable: true,
+                    filter: 'agDateColumnFilter',
+                    width: 120,
+                    cellRenderer: (params) => params.value ? new Date(params.value).toLocaleDateString() : '-',
+                    hide: window.innerWidth < 576,
+                },
+                {
+                    headerName: 'Hostname',
+                    field: 'hostname',
+                    sortable: true,
+                    filter: true,
+                    width: 180,
+                    cellRenderer: (params) => {
+                        const hostname = params.value || '-';
+                        return `<a href="#" class="fw-bold text-primary text-decoration-none" onclick="vulnManager.viewDeviceDetails('${hostname}')">${hostname}</a>`;
+                    }
+                },
+                {
+                    headerName: 'IP Address',
+                    field: 'ip_address',
+                    sortable: true,
+                    filter: true,
+                    width: 140,
+                    hide: window.innerWidth < 992,
+                },
+                {
+                    headerName: 'Severity',
+                    field: 'severity',
+                    sortable: true,
+                    filter: true,
+                    width: 110,
+                    cellRenderer: (params) => {
+                        const severity = params.value || 'Low';
+                        const className = `severity-${severity.toLowerCase()}`;
+                        return `<span class="severity-badge ${className}">${severity}</span>`;
+                    }
+                },
+                {
+                    headerName: 'CVE Info',
+                    field: 'cve',
+                    sortable: true,
+                    filter: true,
+                    width: 150,
+                    cellRenderer: (params) => {
+                        if (params.value && params.value.startsWith('CVE-')) {
+                            return `<a href="#" class="text-decoration-none" onclick="vulnManager.lookupCVE('${params.value}')">${params.value}</a>`;
+                        }
+                        return params.value || '-';
+                    }
+                },
+                {
+                    headerName: 'Vendor',
+                    field: 'vendor',
+                    sortable: true,
+                    filter: true,
+                    width: 120,
+                    hide: window.innerWidth < 992,
+                },
+                {
+                    headerName: 'Vulnerability Description',
+                    field: 'plugin_name',
+                    sortable: true,
+                    filter: true,
+                    flex: 1,
+                    minWidth: 250,
+                    wrapText: true,
+                    autoHeight: true,
+                    cellRenderer: (params) => params.value || '-',
+                },
+                {
+                    headerName: 'VPR',
+                    field: 'vpr_score',
+                    sortable: true,
+                    filter: 'agNumberColumnFilter',
+                    width: 90,
+                    cellRenderer: (params) => {
+                        const score = parseFloat(params.value) || 0;
+                        let className = 'severity-low';
+                        if (score >= 9.0) className = 'severity-critical';
+                        else if (score >= 7.0) className = 'severity-high';
+                        else if (score >= 4.0) className = 'severity-medium';
+                        return `<span class="severity-badge ${className}">${score.toFixed(1)}</span>`;
+                    }
+                }
+            ];
+
+            const gridOptions = {
+                columnDefs: columnDefs,
+                rowData: [],
+                defaultColDef: {
+                    resizable: true,
+                    sortable: true,
+                    filter: true,
+                },
+                animateRows: true,
+                rowSelection: 'multiple',
+                suppressRowClickSelection: true,
+                pagination: true,
+                paginationPageSize: 50,
+                paginationPageSizeSelector: [25, 50, 100, 200],
+                
+                onGridReady: (params) => {
+                    // Grid API is now set directly in initializeGrid()
+                    window.addEventListener('resize', debounce(() => {
+                        if (componentContext.gridApi) {
+                            componentContext.gridApi.sizeColumnsToFit();
+                        }
+                    }, 200));
+                },
+
+                onFirstDataRendered: (params) => {
+                    if (componentContext.gridApi) {
+                        componentContext.gridApi.sizeColumnsToFit();
+                    }
+                },
+
+                onGridSizeChanged: (params) => {
+                    const gridWidth = document.getElementById('vulnGrid').offsetWidth;
+                    const api = params.api;
+                    
+                    const breakpoints = { small: 576, medium: 768, large: 992 };
+                    const allColumns = api.getColumns();
+                    if (!allColumns) return;
+
+                    const columnsToShow = [];
+                    const columnsToHide = [];
+
+                    allColumns.forEach(column => {
+                        const colId = column.getColId();
+                        switch (colId) {
+                            case 'last_seen':
+                                gridWidth < breakpoints.small ? columnsToHide.push(colId) : columnsToShow.push(colId);
+                                break;
+                            case 'ip_address':
+                            case 'vendor':
+                                gridWidth < breakpoints.large ? columnsToHide.push(colId) : columnsToShow.push(colId);
+                                break;
+                            default:
+                                columnsToShow.push(colId);
+                                break;
+                        }
+                    });
+
+                    api.setColumnsVisible(columnsToShow, true);
+                    api.setColumnsVisible(columnsToHide, false);
+                    
+                    if (componentContext.gridApi) {
+                        componentContext.gridApi.sizeColumnsToFit();
+                    }
+                }
+            };
+
+            return gridOptions;
+        }
+    </script>
 
     <script>
         // Modern Vulnerability Management System
@@ -1195,8 +1378,8 @@
                     this.gridApi.destroy();
                 }
 
-                // Create the new grid
-                new agGrid.Grid(gridDiv, gridOptions);
+                // Create the new grid using the modern AG Grid API
+                this.gridApi = agGrid.createGrid(gridDiv, gridOptions);
             }
 
             initializeChart() {
@@ -1586,7 +1769,8 @@
                 });
 
                 if (this.gridApi) {
-                    this.gridApi.setRowData(this.filteredVulnerabilities);
+                    // Use the new AG Grid v31+ API
+                    this.gridApi.setGridOption('rowData', this.filteredVulnerabilities);
                 }
 
                 this.updateCurrentView();
