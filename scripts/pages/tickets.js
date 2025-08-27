@@ -50,6 +50,11 @@ class HexagonTicketsManager {
         this.loadSharedDocumentation();
         this.setupEventListeners();
         this.populateLocationFilter();
+        
+        // Populate Sites and Locations dropdowns from API
+        await this.populateSitesDropdown();
+        await this.populateLocationsDropdown();
+        
         this.updateStatistics();
         this.renderTickets();
         
@@ -569,8 +574,16 @@ class HexagonTicketsManager {
     }
 
     async saveTicket() {
-        // Only validate that location is required
+        // Validate that both site and location are required
+        const site = document.getElementById('site').value.trim();
         const location = document.getElementById('location').value.trim();
+        
+        if (!site) {
+            alert('Site is required.');
+            document.getElementById('site').focus();
+            return;
+        }
+        
         if (!location) {
             alert('Location is required.');
             document.getElementById('location').focus();
@@ -586,6 +599,7 @@ class HexagonTicketsManager {
             dateDue: document.getElementById('dateDue').value,
             hexagonTicket: document.getElementById('hexagonTicket').value,
             serviceNowTicket: document.getElementById('serviceNowTicket').value,
+            site: document.getElementById('site').value,
             location: document.getElementById('location').value,
             devices: this.getDevices(),
             supervisor: document.getElementById('supervisor').value,
@@ -627,6 +641,7 @@ class HexagonTicketsManager {
         document.getElementById('dateDue').value = ticket.dateDue;
         document.getElementById('hexagonTicket').value = ticket.hexagonTicket;
         document.getElementById('serviceNowTicket').value = ticket.serviceNowTicket;
+        document.getElementById('site').value = ticket.site || '';
         document.getElementById('location').value = ticket.location;
         document.getElementById('supervisor').value = ticket.supervisor;
         document.getElementById('tech').value = ticket.tech;
@@ -1021,6 +1036,52 @@ class HexagonTicketsManager {
         });
         
         filter.value = currentValue;
+    }
+
+    // Populate Sites dropdown from API
+    async populateSitesDropdown() {
+        try {
+            const response = await fetch('/api/sites');
+            const sites = await response.json();
+            
+            const siteDropdown = document.getElementById('site');
+            if (siteDropdown) {
+                siteDropdown.innerHTML = '<option value="">Select Site</option>';
+                sites.forEach(site => {
+                    const option = document.createElement('option');
+                    option.value = site.id;
+                    option.textContent = `${site.code} - ${site.name}`;
+                    option.dataset.code = site.code;
+                    option.dataset.name = site.name;
+                    siteDropdown.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading sites:', error);
+        }
+    }
+
+    // Populate Locations dropdown from API
+    async populateLocationsDropdown() {
+        try {
+            const response = await fetch('/api/locations');
+            const locations = await response.json();
+            
+            const locationDropdown = document.getElementById('location');
+            if (locationDropdown) {
+                locationDropdown.innerHTML = '<option value="">Select Location</option>';
+                locations.forEach(location => {
+                    const option = document.createElement('option');
+                    option.value = location.id;
+                    option.textContent = `${location.code} - ${location.name}`;
+                    option.dataset.code = location.code;
+                    option.dataset.name = location.name;
+                    locationDropdown.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading locations:', error);
+        }
     }
 
     resetForm() {

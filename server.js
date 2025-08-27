@@ -462,6 +462,29 @@ app.get('/api/tickets', (req, res) => {
     });
 });
 
+// Sites and Locations API endpoints
+app.get('/api/sites', (req, res) => {
+    db.all('SELECT * FROM sites ORDER BY name ASC', (err, rows) => {
+        if (err) {
+            console.error('Error fetching sites:', err);
+            res.status(500).json({ error: 'Failed to fetch sites' });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
+app.get('/api/locations', (req, res) => {
+    db.all('SELECT * FROM locations ORDER BY name ASC', (err, rows) => {
+        if (err) {
+            console.error('Error fetching locations:', err);
+            res.status(500).json({ error: 'Failed to fetch locations' });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
 app.post('/api/tickets', (req, res) => {
     const ticket = req.body;
     
