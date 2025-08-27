@@ -1,0 +1,35 @@
+{
+  "source": {
+    "include": [
+      "./scripts/",
+      "./server.js",
+      "./README.md"
+    ],
+    "includePattern": "\\.(js|jsx)$",
+    "exclude": [
+      "node_modules/",
+      "uploads/",
+      "data/"
+    ]
+  },
+  "opts": {
+    "destination": "./docs/jsdoc/",
+    "recurse": true,
+    "readme": "./README.md"
+  },
+  "plugins": [
+    "plugins/markdown"
+  ],
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false
+  },
+  "metadata": {
+    "title": "HexTrackr API Documentation",
+    "description": "Complete technical documentation for HexTrackr cybersecurity management system"
+  },
+  "markdown": {
+    "parser": "gfm",
+    "hardwrap": true
+  }
+}
