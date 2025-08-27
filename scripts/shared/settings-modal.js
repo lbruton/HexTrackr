@@ -604,8 +604,8 @@ async function saveSettings() {
             enableApiAuth: document.getElementById('enableApiAuth')?.checked || false,
             
             // ServiceNow Configuration
-            enableServiceNow: document.getElementById('enableServiceNow')?.checked || false,
-            serviceNowUrl: document.getElementById('serviceNowUrl')?.value || '',
+            enableServiceNow: document.getElementById('serviceNowEnabled')?.checked || false,
+            serviceNowUrl: document.getElementById('serviceNowInstance')?.value || '',
             
             // Save timestamp
             lastSaved: new Date().toISOString()
@@ -1259,5 +1259,9 @@ async function restoreData(type) {
         showNotification(`Restore setup failed: ${error.message}`, 'danger');
     }
 }
+
+// Expose ServiceNow functions globally for use by other pages
+window.generateServiceNowUrl = generateServiceNowUrl;
+window.isServiceNowEnabled = isServiceNowEnabled;
 
 })();
