@@ -264,6 +264,14 @@ class HexagonTicketsManager {
             this.handleLocationToDeviceAutofill(e.target.value);
         });
 
+        // Track manual edits to device fields to disable autofill for manually edited fields
+        document.getElementById('devicesContainer').addEventListener('input', (e) => {
+            if (e.target.classList.contains('device-input')) {
+                // Remove autofill tracking when user manually edits a device field
+                delete e.target.dataset.autofilled;
+            }
+        });
+
         // Shared documentation handling
         document.getElementById('attachDocsBtn').addEventListener('click', () => {
             document.getElementById('sharedDocsInput').click();
@@ -415,9 +423,18 @@ class HexagonTicketsManager {
         // Get the first device input field
         const firstDeviceInput = document.querySelector('#devicesContainer .device-input');
         if (firstDeviceInput) {
-            // Only autofill if the device field is empty (don't override existing content)
-            if (!firstDeviceInput.value.trim()) {
+            // Autofill if field is empty OR was previously autofilled (not manually edited)
+            const isEmpty = !firstDeviceInput.value.trim();
+            const wasAutofilled = firstDeviceInput.dataset.autofilled === 'true';
+            
+            if (isEmpty || wasAutofilled) {
                 firstDeviceInput.value = locationValue.trim();
+                // Mark as autofilled if there's content, remove if empty
+                if (locationValue.trim()) {
+                    firstDeviceInput.dataset.autofilled = 'true';
+                } else {
+                    delete firstDeviceInput.dataset.autofilled;
+                }
             }
         }
     }
