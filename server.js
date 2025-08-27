@@ -306,6 +306,49 @@ app.use(express.static(__dirname, {
   lastModified: true
 }));
 
+// Clear data endpoint
+app.delete('/api/backup/clear/:type', (req, res) => {
+    const { type } = req.params;
+    let query = '';
+    
+    if (type === 'vulnerabilities') {
+        query = 'DELETE FROM vulnerabilities';
+    } else if (type === 'tickets') {
+        query = 'DELETE FROM tickets';
+    } else if (type === 'all') {
+        // For 'all', we'll run multiple queries
+        db.run('DELETE FROM vulnerabilities', (vulnErr) => {
+            if (vulnErr) {
+                res.status(500).json({ error: 'Failed to clear vulnerabilities' });
+                return;
+            }
+            
+            db.run('DELETE FROM tickets', (ticketErr) => {
+                if (ticketErr) {
+                    res.status(500).json({ error: 'Failed to clear tickets' });
+                    return;
+                }
+                
+                res.json({ message: 'All data cleared successfully' });
+            });
+        });
+        return; // Exit early since we're handling the response in the nested callbacks
+    } else {
+        res.status(400).json({ error: 'Invalid data type' });
+        return;
+    }
+    
+    // Run the query for single table clear
+    db.run(query, (err) => {
+        if (err) {
+            res.status(500).json({ error: `Failed to clear ${type}` });
+            return;
+        }
+        
+        res.json({ message: `${type} cleared successfully` });
+    });
+});
+
 // Fallback to tickets.html for root
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'tickets.html'));
@@ -709,49 +752,6 @@ app.get('/api/backup/all', (req, res) => {
                 exported_at: new Date().toISOString()
             });
         });
-    });
-});
-
-// Clear data endpoint
-app.delete('/api/backup/clear/:type', (req, res) => {
-    const { type } = req.params;
-    let query = '';
-    
-    if (type === 'vulnerabilities') {
-        query = 'DELETE FROM vulnerabilities';
-    } else if (type === 'tickets') {
-        query = 'DELETE FROM tickets';
-    } else if (type === 'all') {
-        // For 'all', we'll run multiple queries
-        db.run('DELETE FROM vulnerabilities', (vulnErr) => {
-            if (vulnErr) {
-                res.status(500).json({ error: 'Failed to clear vulnerabilities' });
-                return;
-            }
-            
-            db.run('DELETE FROM tickets', (ticketErr) => {
-                if (ticketErr) {
-                    res.status(500).json({ error: 'Failed to clear tickets' });
-                    return;
-                }
-                
-                res.json({ message: 'All data cleared successfully' });
-            });
-        });
-        return; // Exit early since we're handling the response in the nested callbacks
-    } else {
-        res.status(400).json({ error: 'Invalid data type' });
-        return;
-    }
-    
-    // Run the query for single table clear
-    db.run(query, (err) => {
-        if (err) {
-            res.status(500).json({ error: `Failed to clear ${type}` });
-            return;
-        }
-        
-        res.json({ message: `${type} cleared successfully` });
     });
 });
 
