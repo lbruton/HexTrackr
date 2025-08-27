@@ -188,8 +188,8 @@ async function refreshStats() {
 }
 
 /**
- * Export data backup for specified type
- * @param {string} type - Type of data to backup ('tickets', 'vulnerabilities', 'all')
+ * Export data as CSV for specified type
+ * @param {string} type - Type of data to export ('tickets', 'vulnerabilities', 'all')
  * @returns {Promise<void>}
  */
 async function exportData(type) {
@@ -203,8 +203,9 @@ async function exportData(type) {
                 endpoint += 'vulnerabilities';
                 break;
             case 'all':
-                endpoint += 'all';
-                break;
+                // For 'all', we'll create separate CSV files in a ZIP
+                await exportAllDataAsCSV();
+                return;
             default:
                 throw new Error('Invalid export type');
         }
@@ -213,11 +214,19 @@ async function exportData(type) {
         if (response.ok) {
             const data = await response.json();
             
-            // Create download
-            const timestamp = new Date().toISOString().split('T')[0];
-            const filename = `hextrackr_backup_${type}_${timestamp}.json`;
+            // Convert JSON data to CSV format
+            let csvData;
+            if (type === 'tickets') {
+                csvData = convertTicketsToCSV(data.data || []);
+            } else if (type === 'vulnerabilities') {
+                csvData = convertVulnerabilitiesToCSV(data.data || []);
+            }
             
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            // Create CSV download
+            const timestamp = new Date().toISOString().split('T')[0];
+            const filename = `hextrackr_${type}_export_${timestamp}.csv`;
+            
+            const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             
             const a = document.createElement('a');
@@ -228,23 +237,96 @@ async function exportData(type) {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showNotification(`Export created: ${filename}`, 'success');
+            showNotification(`CSV export created: ${filename}`, 'success');
         } else {
             throw new Error('Export failed');
         }
     } catch (error) {
-        console.error('Error creating export:', error);
-        showNotification(`Export failed: ${error.message}`, 'danger');
+        console.error('Error creating CSV export:', error);
+        showNotification(`CSV export failed: ${error.message}`, 'danger');
     }
 }
 
 /**
- * Create backup of specified data type (alias for exportData)
+ * Create ZIP backup of specified data type with JSON content
  * @param {string} type - Type of data to backup
  * @returns {Promise<void>}
  */
 async function backupData(type) {
-    return exportData(type);
+    try {
+        const zip = new JSZip();
+        const timestamp = new Date().toISOString().split('T')[0];
+        
+        // Create metadata
+        const metadata = {
+            backup_type: type,
+            created_at: new Date().toISOString(),
+            schema_version: "1.0",
+            application: "HexTrackr",
+            version: "2.3"
+        };
+        
+        if (type === 'all') {
+            // Fetch all data types
+            const [ticketsRes, vulnsRes, statsRes] = await Promise.all([
+                fetch('/api/backup/tickets'),
+                fetch('/api/backup/vulnerabilities'),
+                fetch('/api/backup/stats')
+            ]);
+            
+            if (ticketsRes.ok && vulnsRes.ok && statsRes.ok) {
+                const ticketsData = await ticketsRes.json();
+                const vulnsData = await vulnsRes.json();
+                const statsData = await statsRes.json();
+                
+                // Add files to ZIP
+                zip.file('tickets.json', JSON.stringify(ticketsData, null, 2));
+                zip.file('vulnerabilities.json', JSON.stringify(vulnsData, null, 2));
+                zip.file('statistics.json', JSON.stringify(statsData, null, 2));
+                zip.file('metadata.json', JSON.stringify(metadata, null, 2));
+                
+                metadata.contents = {
+                    tickets: ticketsData.count || 0,
+                    vulnerabilities: vulnsData.count || 0,
+                    total_records: (ticketsData.count || 0) + (vulnsData.count || 0)
+                };
+            }
+        } else {
+            // Single data type backup
+            const response = await fetch(`/api/backup/${type}`);
+            if (response.ok) {
+                const data = await response.json();
+                zip.file(`${type}.json`, JSON.stringify(data, null, 2));
+                metadata.contents = { [type]: data.count || 0 };
+            } else {
+                throw new Error(`Failed to fetch ${type} data`);
+            }
+        }
+        
+        // Update metadata and add to ZIP
+        zip.file('metadata.json', JSON.stringify(metadata, null, 2));
+        
+        // Generate ZIP file
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        
+        // Create download
+        const filename = `hextrackr_backup_${type}_${timestamp}.zip`;
+        const url = URL.createObjectURL(zipBlob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showNotification(`ZIP backup created: ${filename}`, 'success');
+        
+    } catch (error) {
+        console.error('Error creating ZIP backup:', error);
+        showNotification(`ZIP backup failed: ${error.message}`, 'danger');
+    }
 }
 
 /**
@@ -738,6 +820,124 @@ function isServiceNowEnabled() {
     }
 };
 
+/**
+ * Convert tickets data to CSV format
+ * @param {Array} tickets - Array of ticket objects
+ * @returns {string} CSV data
+ */
+function convertTicketsToCSV(tickets) {
+    if (!tickets || tickets.length === 0) {
+        return 'id,xt_number,title,description,priority,status,created_at,site_code,location_code\n';
+    }
+    
+    // Transform tickets for CSV
+    const csvData = tickets.map(ticket => ({
+        id: ticket.id || '',
+        xt_number: ticket.xt_number || '',
+        title: ticket.title || '',
+        description: ticket.description || '',
+        priority: ticket.priority || '',
+        status: ticket.status || '',
+        created_at: ticket.created_at || '',
+        site_code: ticket.site_code || '',
+        location_code: ticket.location_code || ''
+    }));
+    
+    return Papa.unparse(csvData);
+}
+
+/**
+ * Convert vulnerabilities data to CSV format
+ * @param {Array} vulnerabilities - Array of vulnerability objects
+ * @returns {string} CSV data
+ */
+function convertVulnerabilitiesToCSV(vulnerabilities) {
+    if (!vulnerabilities || vulnerabilities.length === 0) {
+        return 'id,hostname,ip_address,cve,severity,vpr_score,cvss_score,first_seen,last_seen,plugin_name,description,solution\n';
+    }
+    
+    // Transform vulnerabilities for CSV
+    const csvData = vulnerabilities.map(vuln => ({
+        id: vuln.id || '',
+        hostname: vuln.hostname || '',
+        ip_address: vuln.ip_address || '',
+        cve: vuln.cve || '',
+        severity: vuln.severity || '',
+        vpr_score: vuln.vpr_score || 0,
+        cvss_score: vuln.cvss_score || 0,
+        first_seen: vuln.first_seen || '',
+        last_seen: vuln.last_seen || '',
+        plugin_name: vuln.plugin_name || '',
+        description: vuln.description || '',
+        solution: vuln.solution || ''
+    }));
+    
+    return Papa.unparse(csvData);
+}
+
+/**
+ * Export all data as separate CSV files in a ZIP
+ * @returns {Promise<void>}
+ */
+async function exportAllDataAsCSV() {
+    try {
+        const zip = new JSZip();
+        const timestamp = new Date().toISOString().split('T')[0];
+        
+        // Fetch all data
+        const [ticketsRes, vulnsRes] = await Promise.all([
+            fetch('/api/backup/tickets'),
+            fetch('/api/backup/vulnerabilities')
+        ]);
+        
+        if (ticketsRes.ok && vulnsRes.ok) {
+            const ticketsData = await ticketsRes.json();
+            const vulnsData = await vulnsRes.json();
+            
+            // Convert to CSV
+            const ticketsCSV = convertTicketsToCSV(ticketsData.data || []);
+            const vulnsCSV = convertVulnerabilitiesToCSV(vulnsData.data || []);
+            
+            // Add CSV files to ZIP
+            zip.file('tickets.csv', ticketsCSV);
+            zip.file('vulnerabilities.csv', vulnsCSV);
+            
+            // Add metadata
+            const metadata = {
+                export_type: 'all_csv',
+                created_at: new Date().toISOString(),
+                application: 'HexTrackr',
+                version: '2.3',
+                contents: {
+                    tickets: ticketsData.count || 0,
+                    vulnerabilities: vulnsData.count || 0
+                }
+            };
+            zip.file('export_info.json', JSON.stringify(metadata, null, 2));
+            
+            // Generate and download ZIP
+            const zipBlob = await zip.generateAsync({ type: 'blob' });
+            const filename = `hextrackr_all_data_export_${timestamp}.zip`;
+            
+            const url = URL.createObjectURL(zipBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification(`All data CSV export created: ${filename}`, 'success');
+        } else {
+            throw new Error('Failed to fetch data for export');
+        }
+    } catch (error) {
+        console.error('Error creating all data CSV export:', error);
+        showNotification(`All data CSV export failed: ${error.message}`, 'danger');
+    }
+}
+
 // Auto-initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
     SettingsModal.init();
@@ -774,5 +974,6 @@ window.exportData = exportData;
 window.backupData = backupData;
 window.importData = importData;
 window.clearData = clearData;
+window.exportAllDataAsCSV = exportAllDataAsCSV;
 
 })();

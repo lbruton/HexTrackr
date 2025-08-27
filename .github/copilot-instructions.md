@@ -1,4 +1,4 @@
-# HexTrackr Copilot Instructions (v2.2)
+# HexTrackr Copilot Instructions (v2.3)
 
 
 
@@ -31,6 +31,8 @@ HexTrackr = dual-purpose cybersecurity management system:
    - `.github/copilot-instructions.md` (AI workflow + tech details)  
    - `README.md` (human quick start)  
 3. **Roadmap discipline**: use `/roadmaps/` files only (`ROADMAP.md`, `UI_UX_ROADMAP.md`, `CURRENT_STATUS.md`).  
+   - ❌ Never create new roadmap files or duplicates.  
+   - ✅ Update in place + commit immediately.  
 4. **Docker-only**:  
    - ❌ Never run `node server.js` or `npm start` directly.  
    - ✅ Use only `docker-compose up -d`.  
@@ -43,11 +45,10 @@ HexTrackr = dual-purpose cybersecurity management system:
 
 ## MCP Server Compliance (Development Tools)
 **Mandatory tools for every turn** (development assistance only):  
-- **Memory MCP** → CRITICAL. Persist before every action.  
 - **Server Memory** → Mirror plans, summaries, snapshots.  
 - **Sequential Thinking** → REQUIRED for complex planning (multi-step tasks).  
-- **Context7 Map Server** → MANDATORY for library docs, real-time examples, and project knowledge graph updates.  
-- **Playwright** → Run on any UI-affecting changes.  
+- **Context7 Map Server** → MANDATORY for library docs  
+- **Playwright** → Run on any UI-affecting changes, do not use headless. 
 - **Codacy** → Run after every code change (quality/security analysis).  
 - **GitHub Tools** → Repo + issue mgmt.  
 - **Firecrawl** → Security best-practice research.  
@@ -113,14 +114,8 @@ Use this table format in responses:
 
 ---
 
-## Roadmap Enforcement
-- Use only `/roadmaps/ROADMAP.md`, `/roadmaps/UI_UX_ROADMAP.md`, `/roadmaps/CURRENT_STATUS.md`.  
-- ❌ Never create new roadmap files or duplicates.  
-- ✅ Update in place + commit immediately.  
-
----
-
 ## File Structure (Enforced)
+
 ## JavaScript Architecture (MODULAR PATTERN - 2025-08-26)
 Following CSS modular pattern for maximum reusability and maintainability:
 
@@ -212,17 +207,6 @@ scripts/
 - **Settings modal changes** → edit `scripts/shared/settings-modal.js` only
 - **New pages** → follow modular pattern from day one
 
-### ⚠️ ARCHITECTURE VIOLATION CHECKLIST (Pre-commit)
-Before ANY commit involving shared components:
-- [ ] Settings modal HTML exists ONLY in shared HTML file, NEVER embedded in pages
-- [ ] Header/navigation HTML exists ONLY in shared header.html, NEVER duplicated in pages
-- [ ] No duplicate component code across pages
-- [ ] Import/Export actions use shared settings modal (Data Management tab)
-- [ ] All dropdown links correctly target shared modals with proper tab selection
-- [ ] New pages use shared components (header.html + settings-modal.html + page content)
-- [ ] Check ALL pages (tickets.html, vulnerabilities.html, future pages) for consistency
-- [ ] Verify shared JavaScript components auto-initialize across all pages
-- [ ] Test navigation and settings functionality on EVERY page after changes
 
 ### Migration Strategy (Vulnerabilities)
 - **Current**: ~1788 lines embedded in HTML

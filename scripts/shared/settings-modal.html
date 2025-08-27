@@ -249,7 +249,7 @@
                                                 </div>
                                                 <div class="row g-2">
                                                     <div class="col-md-3">
-                                                        <button type="button" class="btn btn-success w-100" onclick="exportData('all')">
+                                                        <button type="button" class="btn btn-success w-100" onclick="exportAllDataAsCSV()">
                                                             <i class="fas fa-download me-2"></i>Export All Data
                                                         </button>
                                                     </div>
@@ -453,3 +453,7 @@
         </div>
     </div>
 </div>
+
+<!-- Required Libraries for Export/Import -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
