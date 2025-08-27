@@ -52,7 +52,7 @@ console.log('✅ HexTrackr Settings Modal (shared) loaded successfully');
       try {
         await this.loadModalHtml();
         this.setupEventListeners();
-        this.initServiceNowSettings();
+        initServiceNowSettings(); // Call as standalone function instead of method
         console.log('Settings modal initialized');
       } catch (error) {
         console.error('Failed to initialize settings modal:', error);
