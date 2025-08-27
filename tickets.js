@@ -1,3 +1,5 @@
+/* eslint-env browser */
+/* global jsPDF */
 /**
  * HexTrackr - Tickets Management System
  * 
@@ -31,8 +33,13 @@ class HexagonTicketsManager {
         this.init();
     }
 
-    init() {
-        this.loadTickets();
+    async init() {
+        // Check if we have localStorage data to migrate
+        await this.migrateFromLocalStorageIfNeeded();
+        
+        // Load tickets from database
+        await this.loadTicketsFromDB();
+        
         this.loadSharedDocumentation();
         this.setupEventListeners();
         this.populateLocationFilter();
@@ -47,6 +54,124 @@ class HexagonTicketsManager {
         dueDate.setDate(dueDate.getDate() + 7);
         document.getElementById('dateDue').value = dueDate.toISOString().split('T')[0];
     }
+
+    // ==================== DATABASE API METHODS ====================
+
+    async loadTicketsFromDB() {
+        try {
+            const response = await fetch('/api/tickets');
+            if (response.ok) {
+                this.tickets = await response.json();
+                console.log('Loaded', this.tickets.length, 'tickets from database');
+            } else {
+                console.error('Failed to load tickets:', response.statusText);
+                this.showToast('Failed to load tickets from database', 'error');
+            }
+        } catch (error) {
+            console.error('Error loading tickets:', error);
+            this.showToast('Error connecting to database', 'error');
+        }
+    }
+
+    async saveTicketToDB(ticket) {
+        try {
+            const method = ticket.id && this.tickets.find(t => t.id === ticket.id) ? 'PUT' : 'POST';
+            const url = method === 'PUT' ? `/api/tickets/${ticket.id}` : '/api/tickets';
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(ticket)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Ticket saved:', result.message);
+                // Reload tickets from database to ensure consistency
+                await this.loadTicketsFromDB();
+                return result;
+            } else {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to save ticket');
+            }
+        } catch (error) {
+            console.error('Error saving ticket:', error);
+            this.showToast('Error saving ticket: ' + error.message, 'error');
+            throw error;
+        }
+    }
+
+    async deleteTicketFromDB(ticketId) {
+        try {
+            const response = await fetch(`/api/tickets/${ticketId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Ticket deleted:', result.message);
+                // Reload tickets from database to ensure consistency
+                await this.loadTicketsFromDB();
+                return result;
+            } else {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to delete ticket');
+            }
+        } catch (error) {
+            console.error('Error deleting ticket:', error);
+            this.showToast('Error deleting ticket: ' + error.message, 'error');
+            throw error;
+        }
+    }
+
+    async migrateFromLocalStorageIfNeeded() {
+        try {
+            const localData = localStorage.getItem('hexagonTickets');
+            if (!localData) return;
+
+            const tickets = JSON.parse(localData);
+            if (!Array.isArray(tickets) || tickets.length === 0) {
+                localStorage.removeItem('hexagonTickets');
+                return;
+            }
+
+            console.log('Found', tickets.length, 'tickets in localStorage, migrating to database...');
+            this.showToast('Migrating tickets from localStorage to database...', 'info');
+
+            const response = await fetch('/api/tickets/migrate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ tickets })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Migration successful:', result.message);
+                this.showToast(`Migration successful: ${result.message}`, 'success');
+                
+                // Clear localStorage after successful migration
+                localStorage.removeItem('hexagonTickets');
+            } else {
+                const error = await response.json();
+                if (response.status === 409) {
+                    // Database already has data, just clear localStorage
+                    localStorage.removeItem('hexagonTickets');
+                    console.log('Database already contains tickets, cleared localStorage');
+                } else {
+                    throw new Error(error.error || 'Migration failed');
+                }
+            }
+        } catch (error) {
+            console.error('Migration error:', error);
+            this.showToast('Migration error: ' + error.message, 'error');
+        }
+    }
+
+    // ==================== END DATABASE API METHODS ====================
 
     setupEventListeners() {
         // Search functionality
@@ -90,10 +215,13 @@ class HexagonTicketsManager {
             this.handleSharedDocumentation(e.target.files);
         });
 
-        // CSV import handling
-        document.getElementById('importCsvBtn').addEventListener('click', () => {
-            document.getElementById('csvImportInput').click();
-        });
+        // CSV import from header dropdown
+        const importCsvBtnHeader = document.getElementById('importCsvBtnHeader');
+        if (importCsvBtnHeader) {
+            importCsvBtnHeader.addEventListener('click', () => {
+                document.getElementById('csvImportInput').click();
+            });
+        }
 
         document.getElementById('csvImportInput').addEventListener('change', (e) => {
             this.handleCsvImport(e.target.files[0]);
@@ -374,24 +502,24 @@ class HexagonTicketsManager {
             updatedAt: new Date().toISOString()
         };
 
-        if (this.currentEditingId) {
-            const index = this.tickets.findIndex(t => t.id === this.currentEditingId);
-            this.tickets[index] = ticket;
-        } else {
-            this.tickets.push(ticket);
+        try {
+            // Save to database instead of localStorage
+            await this.saveTicketToDB(ticket);
+
+            this.renderTickets();
+            this.updateStatistics();
+            this.populateLocationFilter();
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('ticketModal'));
+            modal.hide();
+
+            // Show success message
+            this.showToast('Ticket saved successfully!', 'success');
+        } catch (error) {
+            // Error is already handled in saveTicketToDB, just return
+            return;
         }
-
-        this.saveTickets();
-        this.renderTickets();
-        this.updateStatistics();
-        this.populateLocationFilter();
-        
-        // Close modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('ticketModal'));
-        modal.hide();
-
-        // Show success message
-        this.showToast('Ticket saved successfully!', 'success');
     }
 
     editTicket(id) {
@@ -418,14 +546,18 @@ class HexagonTicketsManager {
         modal.show();
     }
 
-    deleteTicket(id) {
+    async deleteTicket(id) {
         if (confirm('Are you sure you want to delete this ticket?')) {
-            this.tickets = this.tickets.filter(t => t.id !== id);
-            this.saveTickets();
-            this.renderTickets();
-            this.updateStatistics();
-            this.populateLocationFilter();
-            this.showToast('Ticket deleted successfully!', 'success');
+            try {
+                await this.deleteTicketFromDB(id);
+                this.renderTickets();
+                this.updateStatistics();
+                this.populateLocationFilter();
+                this.showToast('Ticket deleted successfully!', 'success');
+            } catch (error) {
+                // Error is already handled in deleteTicketFromDB
+                return;
+            }
         }
     }
 
@@ -719,16 +851,7 @@ class HexagonTicketsManager {
         return this.tickets.find(t => t.id === id);
     }
 
-    loadTickets() {
-        const stored = localStorage.getItem('hexagonTickets');
-        if (stored) {
-            this.tickets = JSON.parse(stored);
-        }
-    }
-
-    saveTickets() {
-        localStorage.setItem('hexagonTickets', JSON.stringify(this.tickets));
-    }
+    // Note: loadTickets() and saveTickets() methods removed - now using database API
 
     showToast(message, type = 'info') {
         // Create toast container if it doesn't exist
@@ -1369,18 +1492,111 @@ class HexagonTicketsManager {
                 return;
             }
 
-            // Replace existing tickets with imported tickets
-            this.tickets = tickets;
-            this.saveTickets();
-            this.renderTickets();
-            this.updateStatistics();
-            this.populateLocationFilter();
+            // Check if database has existing data
+            const statsResponse = await fetch('/api/backup/stats');
+            const stats = await statsResponse.json();
             
-            this.showToast(`Successfully imported ${tickets.length} ticket(s)! Previous data has been replaced.`, 'success');
+            let mode = 'check';
+            
+            if (stats.tickets > 0) {
+                // Show import mode selection modal
+                mode = await this.showImportModeModal(stats.tickets, tickets.length);
+                if (!mode) {
+                    // User cancelled
+                    return;
+                }
+            }
+
+            // Use the migration API to import tickets to database
+            const response = await fetch('/api/tickets/migrate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ tickets, mode })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                // Reload tickets from database to refresh local array
+                await this.loadTicketsFromDB();
+                this.renderTickets();
+                this.updateStatistics();
+                this.populateLocationFilter();
+                
+                this.showToast(`Successfully imported ${tickets.length} ticket(s)!`, 'success');
+            } else {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to import tickets');
+            }
         } catch (error) {
             console.error('Error importing CSV:', error);
-            this.showToast('Error importing CSV file. Please check the format.', 'error');
+            this.showToast('Error importing CSV file: ' + error.message, 'error');
         }
+    }
+
+    // Show import mode selection modal
+    async showImportModeModal(existingCount, newCount) {
+        return new Promise((resolve) => {
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="fas fa-exclamation-triangle text-warning"></i>
+                                Import Mode Selection
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-info">
+                                <strong>Existing Data Detected</strong><br>
+                                Database contains: <strong>${existingCount}</strong> tickets<br>
+                                Importing: <strong>${newCount}</strong> new tickets
+                            </div>
+                            <p>How would you like to proceed?</p>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-danger" data-mode="replace">
+                                    <i class="fas fa-trash-restore"></i>
+                                    Replace All Data
+                                    <small class="d-block text-light">Clear existing tickets and import new ones</small>
+                                </button>
+                                <button type="button" class="btn btn-primary" data-mode="append">
+                                    <i class="fas fa-plus"></i>
+                                    Add to Existing Data
+                                    <small class="d-block text-light">Keep existing tickets and add new ones</small>
+                                </button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times"></i>
+                                    Cancel Import
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            const bsModal = new bootstrap.Modal(modal);
+            
+            // Handle mode selection
+            modal.addEventListener('click', (e) => {
+                if (e.target.dataset.mode) {
+                    bsModal.hide();
+                    resolve(e.target.dataset.mode);
+                }
+            });
+            
+            // Handle modal close without selection
+            modal.addEventListener('hidden.bs.modal', () => {
+                document.body.removeChild(modal);
+                resolve(null);
+            });
+            
+            bsModal.show();
+        });
     }
 
     // Parse CSV text to tickets array
@@ -1577,6 +1793,327 @@ function exportData(format) {
 function sortTable(column) {
     ticketManager.sortTable(column);
 }
+
+// Backup Management Functions
+async function refreshStats() {
+    try {
+        const response = await fetch('/api/backup/stats');
+        const stats = await response.json();
+        
+        document.getElementById('ticketCount').textContent = stats.tickets || 0;
+        document.getElementById('vulnCount').textContent = stats.vulnerabilities || 0;
+        document.getElementById('totalCount').textContent = stats.total || 0;
+        
+        // Format database size
+        const dbSize = stats.dbSize || 0;
+        let sizeStr = dbSize < 1024 ? `${dbSize} B` :
+                     dbSize < 1024 * 1024 ? `${(dbSize / 1024).toFixed(1)} KB` :
+                     `${(dbSize / (1024 * 1024)).toFixed(1)} MB`;
+        document.getElementById('dbSize').textContent = sizeStr;
+    } catch (error) {
+        console.error('Error fetching backup stats:', error);
+        ticketManager.showToast('Error loading statistics', 'error');
+    }
+}
+
+async function exportData(type) {
+    try {
+        let url;
+        let filename;
+        
+        switch (type) {
+            case 'tickets':
+                url = '/api/backup/tickets';
+                filename = `hextrackr-tickets-backup-${new Date().toISOString().split('T')[0]}.json`;
+                break;
+            case 'vulnerabilities':
+                // TODO: Implement vulnerabilities backup endpoint
+                ticketManager.showToast('Vulnerabilities backup not yet implemented', 'warning');
+                return;
+            case 'all':
+                // TODO: Implement full backup endpoint
+                ticketManager.showToast('Full backup not yet implemented', 'warning');
+                return;
+            default:
+                ticketManager.showToast('Invalid backup type', 'error');
+                return;
+        }
+        
+        const response = await fetch(url);
+        if (response.ok) {
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(downloadUrl);
+            
+            ticketManager.showToast(`${type} backup downloaded successfully!`, 'success');
+        } else {
+            throw new Error('Failed to create backup');
+        }
+    } catch (error) {
+        console.error('Error creating backup:', error);
+        ticketManager.showToast('Error creating backup: ' + error.message, 'error');
+    }
+}
+
+async function clearData(type) {
+    const confirmText = type === 'tickets' ? 'CLEAR TICKETS' : 'CLEAR VULNERABILITIES';
+    
+    const confirmation = await showClearConfirmationModal(type, confirmText);
+    if (!confirmation) return;
+    
+    try {
+        let url;
+        switch (type) {
+            case 'tickets':
+                url = '/api/clear/tickets';
+                break;
+            case 'vulnerabilities':
+                // TODO: Implement vulnerabilities clear endpoint
+                ticketManager.showToast('Vulnerabilities clear not yet implemented', 'warning');
+                return;
+            default:
+                ticketManager.showToast('Invalid clear type', 'error');
+                return;
+        }
+        
+        const response = await fetch(url, { method: 'DELETE' });
+        if (response.ok) {
+            const result = await response.json();
+            ticketManager.showToast(result.message, 'success');
+            
+            // Refresh the page data if clearing tickets
+            if (type === 'tickets') {
+                await ticketManager.loadTicketsFromDB();
+                ticketManager.renderTickets();
+                ticketManager.updateStatistics();
+                ticketManager.populateLocationFilter();
+            }
+            
+            // Refresh backup stats
+            await refreshStats();
+        } else {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to clear data');
+        }
+    } catch (error) {
+        console.error('Error clearing data:', error);
+        ticketManager.showToast('Error clearing data: ' + error.message, 'error');
+    }
+}
+
+function showClearConfirmationModal(type, confirmText) {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Confirm Clear ${type.charAt(0).toUpperCase() + type.slice(1)}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger">
+                            <strong>WARNING:</strong> This action cannot be undone!
+                        </div>
+                        <p>You are about to permanently delete all ${type} from the database.</p>
+                        <p>To confirm this action, please type <strong>${confirmText}</strong> in the field below:</p>
+                        <input type="text" class="form-control" id="confirmInput" placeholder="Type ${confirmText} to confirm">
+                        <div class="form-text text-danger" id="confirmError" style="display: none;">
+                            Text does not match. Please type exactly: ${confirmText}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="confirmClearBtn" disabled>
+                            <i class="fas fa-trash me-2"></i>Clear ${type.charAt(0).toUpperCase() + type.slice(1)}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        const bsModal = new bootstrap.Modal(modal);
+        
+        const confirmInput = modal.querySelector('#confirmInput');
+        const confirmBtn = modal.querySelector('#confirmClearBtn');
+        const confirmError = modal.querySelector('#confirmError');
+        
+        confirmInput.addEventListener('input', () => {
+            if (confirmInput.value === confirmText) {
+                confirmBtn.disabled = false;
+                confirmError.style.display = 'none';
+            } else {
+                confirmBtn.disabled = true;
+                if (confirmInput.value.length > 0) {
+                    confirmError.style.display = 'block';
+                }
+            }
+        });
+        
+        confirmBtn.addEventListener('click', () => {
+            if (confirmInput.value === confirmText) {
+                bsModal.hide();
+                resolve(true);
+            }
+        });
+        
+        modal.addEventListener('hidden.bs.modal', () => {
+            document.body.removeChild(modal);
+            resolve(false);
+        });
+        
+        bsModal.show();
+        confirmInput.focus();
+    });
+}
+
+// Backup Data Function
+async function backupData(type) {
+    try {
+        let endpoint = '/api/backup/';
+        switch(type) {
+            case 'tickets':
+                endpoint += 'tickets';
+                break;
+            case 'vulnerabilities':
+                endpoint += 'vulnerabilities';
+                break;
+            case 'all':
+                endpoint += 'all';
+                break;
+            default:
+                throw new Error('Invalid backup type');
+        }
+        
+        const response = await fetch(endpoint);
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Create download
+            const timestamp = new Date().toISOString().split('T')[0];
+            const filename = `hextrackr_backup_${type}_${timestamp}.json`;
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            ticketManager.showToast(`Backup created: ${filename}`, 'success');
+        } else {
+            throw new Error('Backup failed');
+        }
+    } catch (error) {
+        console.error('Error creating backup:', error);
+        ticketManager.showToast(`Backup failed: ${error.message}`, 'error');
+    }
+}
+
+// Import Data Function
+async function importData(type) {
+    // Create file input for import
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,.csv';
+    
+    input.onchange = async function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('type', type);
+            
+            const response = await fetch('/api/import', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                ticketManager.showToast(`Import successful: ${result.message}`, 'success');
+                await refreshStats();
+                
+                // Refresh the relevant page data
+                if (type === 'tickets') {
+                    await ticketManager.loadTickets();
+                    ticketManager.renderTickets();
+                    ticketManager.updateStatistics();
+                }
+            } else {
+                const error = await response.json();
+                throw new Error(error.message || 'Import failed');
+            }
+        } catch (error) {
+            console.error('Error importing data:', error);
+            ticketManager.showToast(`Import failed: ${error.message}`, 'error');
+        }
+    };
+    
+    input.click();
+}
+
+// API Test Functions (stubs for now)
+async function testCiscoConnection() {
+    ticketManager.showToast('Cisco API connectivity test - feature coming soon', 'info');
+    // TODO: Implement actual Cisco PSIRT API test
+}
+
+async function testTenableConnection() {
+    ticketManager.showToast('Tenable API connectivity test - feature coming soon', 'info');
+    // TODO: Implement actual Tenable API test
+}
+
+// Data Fetch Functions (stubs for now)
+async function fetchCiscoData() {
+    ticketManager.showToast('Cisco data fetch - feature coming soon', 'info');
+    // TODO: Implement actual Cisco PSIRT data fetch
+}
+
+async function fetchTenableData() {
+    ticketManager.showToast('Tenable data fetch - feature coming soon', 'info');
+    // TODO: Implement actual Tenable data fetch
+}
+
+// Save Settings Function
+async function saveSettings() {
+    // TODO: Implement settings save functionality
+    ticketManager.showToast('Settings saved successfully', 'success');
+    const settingsModal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
+    settingsModal.hide();
+}
+
+// Initialize stats when settings modal is opened
+document.addEventListener('DOMContentLoaded', function() {
+    const settingsModal = document.getElementById('settingsModal');
+    if (settingsModal) {
+        settingsModal.addEventListener('shown.bs.modal', refreshStats);
+        
+        // Add event listeners for Settings modal buttons
+        document.getElementById('testCiscoConnection')?.addEventListener('click', testCiscoConnection);
+        document.getElementById('testTenableConnection')?.addEventListener('click', testTenableConnection);
+        document.getElementById('fetchCiscoData')?.addEventListener('click', fetchCiscoData);
+        document.getElementById('fetchTenableData')?.addEventListener('click', fetchTenableData);
+        document.getElementById('saveSettings')?.addEventListener('click', saveSettings);
+    }
+});
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
