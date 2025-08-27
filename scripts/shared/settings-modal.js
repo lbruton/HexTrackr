@@ -1113,7 +1113,86 @@ window.backupData = backupData;
 window.importData = importData;
 window.clearData = clearData;
 window.exportAllDataAsCSV = exportAllDataAsCSV;
-window.restoreData = restoreData; // Add missing function export
+window.restoreData = restoreData;
+window.restoreFullSystemBackup = restoreFullSystemBackup;
+
+/**
+ * Restore full system backup (all data types)
+ * This is a specialized version of restoreData that handles the 'all' type
+ * @returns {Promise<void>}
+ */
+async function restoreFullSystemBackup() {
+    try {
+        // Show confirmation dialog first
+        const confirmed = await showRestoreConfirmationModal();
+        if (!confirmed) return;
+        
+        // Call restoreData with 'all' type
+        await restoreData('all');
+    } catch (error) {
+        console.error('Error with full system restore:', error);
+        showNotification(`System restore failed: ${error.message}`, 'danger');
+    }
+}
+
+/**
+ * Show confirmation modal for system restore
+ * @returns {Promise<boolean>} True if confirmed, false otherwise
+ */
+function showRestoreConfirmationModal() {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Confirm Full System Restore
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <strong>Warning:</strong> This will restore all data from a backup file.
+                            Existing data may be overwritten or duplicated.
+                        </div>
+                        <p>Would you like to clear existing data before restore?</p>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="clearBeforeRestore">
+                            <label class="form-check-label" for="clearBeforeRestore">
+                                Clear existing data before restore
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="confirmRestoreBtn">Proceed with Restore</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        const bsModal = new bootstrap.Modal(modal);
+        const confirmBtn = modal.querySelector('#confirmRestoreBtn');
+        const clearCheckbox = modal.querySelector('#clearBeforeRestore');
+        
+        confirmBtn.addEventListener('click', () => {
+            const shouldClear = clearCheckbox.checked;
+            bsModal.hide();
+            resolve(true);
+        });
+        
+        modal.addEventListener('hidden.bs.modal', () => {
+            document.body.removeChild(modal);
+            resolve(false);
+        });
+        
+        bsModal.show();
+    });
+}
 
 /**
  * Restore data from a ZIP backup file
