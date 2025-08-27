@@ -3,8 +3,14 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-cog me-2"></i>
+                <h5 class="modal-titl                                                        <button type="button" class="btn btn-success w-100" onclick="exportData('all')">
+                                                            <i class="fas fa-file-csv me-2"></i>Export All Data CSV
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <button type="button" class="btn btn-info w-100" onclick="backupData('all')">
+                                                            <i class="fas fa-file-archive me-2"></i>Full System Backup ZIP
+                                                        </button>                <i class="fas fa-cog me-2"></i>
                     HexTrackr Settings
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -190,13 +196,13 @@
                                             <div class="card-body">
                                                 <div class="d-grid gap-2">
                                                     <button type="button" class="btn btn-outline-primary" onclick="exportData('tickets')">
-                                                        <i class="fas fa-download me-2"></i>Export Tickets
+                                                        <i class="fas fa-file-csv me-2"></i>Export Tickets CSV
                                                     </button>
                                                     <button type="button" class="btn btn-outline-info" onclick="importData('tickets')">
-                                                        <i class="fas fa-upload me-2"></i>Import Tickets
+                                                        <i class="fas fa-upload me-2"></i>Import Tickets CSV
                                                     </button>
                                                     <button type="button" class="btn btn-outline-warning" onclick="backupData('tickets')">
-                                                        <i class="fas fa-save me-2"></i>Backup Tickets
+                                                        <i class="fas fa-file-archive me-2"></i>Backup Tickets ZIP
                                                     </button>
                                                     <button type="button" class="btn btn-outline-danger" onclick="clearData('tickets')">
                                                         <i class="fas fa-trash me-2"></i>Clear Tickets
@@ -217,13 +223,13 @@
                                             <div class="card-body">
                                                 <div class="d-grid gap-2">
                                                     <button type="button" class="btn btn-outline-primary" onclick="exportData('vulnerabilities')">
-                                                        <i class="fas fa-download me-2"></i>Export Vulnerabilities
+                                                        <i class="fas fa-file-csv me-2"></i>Export Vulnerabilities CSV
                                                     </button>
                                                     <button type="button" class="btn btn-outline-info" onclick="importData('vulnerabilities')">
-                                                        <i class="fas fa-upload me-2"></i>Import Vulnerabilities
+                                                        <i class="fas fa-upload me-2"></i>Import Vulnerabilities CSV
                                                     </button>
                                                     <button type="button" class="btn btn-outline-warning" onclick="backupData('vulnerabilities')">
-                                                        <i class="fas fa-save me-2"></i>Backup Vulnerabilities
+                                                        <i class="fas fa-file-archive me-2"></i>Backup Vulnerabilities ZIP
                                                     </button>
                                                     <button type="button" class="btn btn-outline-danger" onclick="clearData('vulnerabilities')">
                                                         <i class="fas fa-trash me-2"></i>Clear Vulnerabilities
@@ -454,6 +460,7 @@
     </div>
 </div>
 
-<!-- Required Libraries for Export/Import -->
+<!-- External Libraries for Settings Modal -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>

@@ -203,9 +203,8 @@ async function exportData(type) {
                 endpoint += 'vulnerabilities';
                 break;
             case 'all':
-                // For 'all', we'll create separate CSV files in a ZIP
-                await exportAllDataAsCSV();
-                return;
+                endpoint += 'all';
+                break;
             default:
                 throw new Error('Invalid export type');
         }
@@ -214,37 +213,94 @@ async function exportData(type) {
         if (response.ok) {
             const data = await response.json();
             
-            // Convert JSON data to CSV format
-            let csvData;
-            if (type === 'tickets') {
-                csvData = convertTicketsToCSV(data.data || []);
-            } else if (type === 'vulnerabilities') {
-                csvData = convertVulnerabilitiesToCSV(data.data || []);
+            // Create CSV export based on type
+            const timestamp = new Date().toISOString().split('T')[0];
+            
+            if (type === 'all') {
+                // Export combined CSV for all data
+                await exportCombinedCSV(data, timestamp);
+            } else {
+                // Export single CSV file
+                await exportSingleCSV(data, type, timestamp);
             }
             
-            // Create CSV download
-            const timestamp = new Date().toISOString().split('T')[0];
-            const filename = `hextrackr_${type}_export_${timestamp}.csv`;
-            
-            const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showNotification(`CSV export created: ${filename}`, 'success');
         } else {
             throw new Error('Export failed');
         }
     } catch (error) {
-        console.error('Error creating CSV export:', error);
-        showNotification(`CSV export failed: ${error.message}`, 'danger');
+        console.error('Error creating export:', error);
+        showNotification(`Export failed: ${error.message}`, 'danger');
     }
+}
+
+/**
+ * Export single data type as CSV
+ */
+async function exportSingleCSV(data, type, timestamp) {
+    if (!data.data || data.data.length === 0) {
+        showNotification(`No ${type} data to export`, 'warning');
+        return;
+    }
+    
+    // Convert to CSV using Papa Parse
+    const csv = Papa.unparse(data.data);
+    const filename = `hextrackr_${type}_${timestamp}.csv`;
+    
+    // Download CSV file
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    downloadFile(blob, filename);
+    
+    showNotification(`CSV export created: ${filename}`, 'success');
+}
+
+/**
+ * Export all data as combined CSV
+ */
+async function exportCombinedCSV(data, timestamp) {
+    let combinedData = [];
+    
+    // Add vulnerabilities with type indicator
+    if (data.vulnerabilities && data.vulnerabilities.data) {
+        data.vulnerabilities.data.forEach(item => {
+            combinedData.push({ data_type: 'vulnerability', ...item });
+        });
+    }
+    
+    // Add tickets with type indicator
+    if (data.tickets && data.tickets.data) {
+        data.tickets.data.forEach(item => {
+            combinedData.push({ data_type: 'ticket', ...item });
+        });
+    }
+    
+    if (combinedData.length === 0) {
+        showNotification('No data to export', 'warning');
+        return;
+    }
+    
+    const csv = Papa.unparse(combinedData);
+    const filename = `hextrackr_all_data_${timestamp}.csv`;
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    downloadFile(blob, filename);
+    
+    showNotification(`Combined CSV export created: ${filename}`, 'success');
+}
+
+/**
+ * Utility function to download a file
+ * @param {Blob} blob - File blob to download
+ * @param {string} filename - Name of the file
+ */
+function downloadFile(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 /**
