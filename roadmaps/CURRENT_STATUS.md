@@ -86,6 +86,8 @@
 - **Performance Optimization**: Further optimize queries and UI responsiveness
 
 ### 📋 **IMMEDIATE NEXT PRIORITIES**
+- [ ] **Auto-Refresh Implementation**: Add auto-refresh when settings modal is closed
+- [ ] **Background Data Refresh**: Add background refresh during import/export operations
 - [ ] **CVE Link Fix**: Update CVE popup functionality to show only clicked CVE
 - [ ] **Modal Z-Index Fix**: Resolve nested modal display issues
 - [ ] **Chart Filtering**: Connect chart selections to table filtering

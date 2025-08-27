@@ -60,6 +60,14 @@
 - [x] **Desktop Layout Validation**: Confirmed all 8 columns display properly on desktop (1024x768)
 - [x] **Responsive Script Integration**: Successfully integrated ag-grid-responsive-config.js into vulnerabilities.html
 
+### 0.6 Modal Behavior Improvements 📋 **IN PROGRESS**
+- [x] **Settings Modal Fixed**: Fixed initialization and restore functionality
+- [x] **JSZip Integration**: Added proper dependency for backup/restore operations
+- [ ] **Auto-Refresh After Modal**: Implement auto-refresh when settings modal is closed
+- [ ] **Background Refresh**: Add background refresh during import/export operations
+- [ ] **Toast Notifications**: Add toast notifications for all operations
+- [ ] **Confirmation Feedback**: Improve visual feedback for successful operations
+
 ---
 
 ## 📋 **PHASE 1: Database Schema Migration** 
