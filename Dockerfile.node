@@ -19,3 +19,15 @@ COPY *.js ./
 COPY *.css ./
 COPY *.json ./
 COPY eslint.config.mjs ./
+
+# Copy scripts directory
+COPY scripts/ ./scripts/
+
+# Create necessary directories
+RUN mkdir -p ./data/ ./roadmaps/ ./uploads/ ./docs/ ./audit/
+
+# Expose port for the application
+EXPOSE 8080
+
+# Start the application
+CMD ["node", "server.js"]
