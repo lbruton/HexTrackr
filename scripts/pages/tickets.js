@@ -285,6 +285,7 @@ class HexagonTicketsManager {
         document.getElementById('ticketModal').addEventListener('show.bs.modal', () => {
             if (!this.currentEditingId) { // Only for new tickets
                 this.updateXtNumberDisplay();
+                this.updateDeviceNumbers(); // Fix: Ensure device numbering is correct on modal open
             }
         });
 
