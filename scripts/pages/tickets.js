@@ -37,6 +37,7 @@ class HexagonTicketsManager {
         // Pagination properties
         this.currentPage = 1;
         this.rowsPerPage = 25;
+        this.isDeviceOrderReversed = false; // Track reverse state
         this.init();
     }
 
@@ -593,7 +594,7 @@ class HexagonTicketsManager {
     }
 
     /**
-     * Reverse the order of all device entries in the container
+     * Reverse the order of all device entries in the container (with toggle support)
      */
     reverseDeviceOrder() {
         const container = document.getElementById('devicesContainer');
@@ -613,6 +614,12 @@ class HexagonTicketsManager {
             container.appendChild(entry);
         });
         
+        // Toggle the reverse state
+        this.isDeviceOrderReversed = !this.isDeviceOrderReversed;
+        
+        // Update the reverse button to reflect current state
+        this.updateReverseButton();
+        
         // Update the numbering and button states
         this.updateDeviceNumbers();
         this.updateDeviceButtons();
@@ -622,22 +629,46 @@ class HexagonTicketsManager {
     }
 
     /**
+     * Update the reverse button appearance and text based on current state
+     */
+    updateReverseButton() {
+        const reverseBtn = document.getElementById('reverseDevicesBtn');
+        if (reverseBtn) {
+            if (this.isDeviceOrderReversed) {
+                reverseBtn.innerHTML = '<i class="fas fa-sort-amount-up"></i> Restore';
+                reverseBtn.title = 'Restore original device order';
+                reverseBtn.classList.remove('btn-outline-primary');
+                reverseBtn.classList.add('btn-outline-warning');
+            } else {
+                reverseBtn.innerHTML = '<i class="fas fa-sort-amount-down-alt"></i> Reverse';
+                reverseBtn.title = 'Reverse device order';
+                reverseBtn.classList.remove('btn-outline-warning');
+                reverseBtn.classList.add('btn-outline-primary');
+            }
+        }
+    }
+
+    /**
      * Show visual feedback when reversing device order
      */
     showReverseOrderFeedback() {
         const container = document.getElementById('devicesContainer');
-        const label = container.previousElementSibling;
+        const headerDiv = container.previousElementSibling;
+        const label = headerDiv.querySelector('label');
         
-        // Create feedback message
-        const originalText = label.innerHTML;
-        label.innerHTML = `<i class="fas fa-arrows-alt-v text-primary me-2"></i>Device order reversed!`;
-        label.style.color = '#0d6efd';
-        
-        // Reset after a short delay
-        setTimeout(() => {
-            label.innerHTML = originalText;
-            label.style.color = '';
-        }, 2000);
+        if (label) {
+            // Create feedback message based on current state
+            const originalText = label.innerHTML;
+            const actionText = this.isDeviceOrderReversed ? 'reversed' : 'restored';
+            label.innerHTML = `Devices <small class="text-primary fw-bold">(Order ${actionText}! ✓ Use arrows or drag to reorder boot sequence)</small>`;
+            label.style.color = '#0d6efd';
+            
+            // Reset after a short delay
+            setTimeout(() => {
+                label.innerHTML = originalText;
+                label.style.color = '';
+            }, 2000);
+        }
     }
 
     /**
@@ -646,20 +677,23 @@ class HexagonTicketsManager {
      */
     showMoveArrowFeedback(direction) {
         const container = document.getElementById('devicesContainer');
-        const label = container.previousElementSibling;
+        const headerDiv = container.previousElementSibling;
+        const label = headerDiv.querySelector('label');
         
-        // Create a more prominent feedback message
-        const originalText = label.innerHTML;
-        label.style.color = '#28a745';
-        label.style.fontWeight = 'bold';
-        label.style.transition = 'all 0.3s ease';
-        label.innerHTML = `Devices <small class="text-success fw-bold">(Moved ${direction}! ✓ Use arrows or drag to reorder boot sequence)</small>`;
-        
-        setTimeout(() => {
-            label.style.color = '';
-            label.style.fontWeight = '';
-            label.innerHTML = 'Devices <small class="text-muted">(Use arrows or drag to reorder boot sequence)</small>';
-        }, 2000);
+        if (label) {
+            // Create a more prominent feedback message
+            const originalText = label.innerHTML;
+            label.style.color = '#28a745';
+            label.style.fontWeight = 'bold';
+            label.style.transition = 'all 0.3s ease';
+            label.innerHTML = `Devices <small class="text-success fw-bold">(Moved ${direction}! ✓ Use arrows or drag to reorder boot sequence)</small>`;
+            
+            setTimeout(() => {
+                label.style.color = '';
+                label.style.fontWeight = '';
+                label.innerHTML = originalText;
+            }, 2000);
+        }
     }
 
     getDevices() {
@@ -794,7 +828,14 @@ class HexagonTicketsManager {
             const draggedIndex = allEntries.indexOf(this.draggedElement);
             const dropIndex = allEntries.indexOf(dropTarget);
             
-            if (draggedIndex < dropIndex) {
+            // Remove the dragged element from its current position
+            this.draggedElement.remove();
+            
+            // Insert the dragged element at the correct position
+            if (dropIndex === 0) {
+                // Dropping at the top - insert as first child
+                container.insertBefore(this.draggedElement, container.firstChild);
+            } else if (draggedIndex < dropIndex) {
                 // Moving down - insert after the drop target
                 dropTarget.parentNode.insertBefore(this.draggedElement, dropTarget.nextSibling);
             } else {
@@ -818,16 +859,20 @@ class HexagonTicketsManager {
 
     showReorderFeedback() {
         const container = document.getElementById('devicesContainer');
-        const label = container.previousElementSibling;
+        const headerDiv = container.previousElementSibling;
+        const label = headerDiv.querySelector('label');
         
-        // Temporarily highlight the label to show reordering happened
-        label.style.color = '#28a745';
-        label.innerHTML = 'Devices <small class="text-muted">(Reordered! Use arrows or drag to reorder boot sequence)</small>';
-        
-        setTimeout(() => {
-            label.style.color = '';
-            label.innerHTML = 'Devices <small class="text-muted">(Use arrows or drag to reorder boot sequence)</small>';
-        }, 2000);
+        if (label) {
+            // Temporarily highlight the label to show reordering happened
+            const originalText = label.innerHTML;
+            label.style.color = '#28a745';
+            label.innerHTML = 'Devices <small class="text-success">(Reordered! ✓ Use arrows or drag to reorder boot sequence)</small>';
+            
+            setTimeout(() => {
+                label.style.color = '';
+                label.innerHTML = originalText;
+            }, 2000);
+        }
     }
 
     async saveTicket() {
