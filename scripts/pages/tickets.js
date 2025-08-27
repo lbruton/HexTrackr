@@ -1,5 +1,6 @@
 /* eslint-env browser */
-/* global jsPDF */
+/* global fetch, console, localStorage, FileReader, JSZip, URL, XLSX, Blob, navigator, bootstrap */
+
 /**
  * HexTrackr - Tickets Management System
  * 
