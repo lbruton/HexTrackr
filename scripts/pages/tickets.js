@@ -251,6 +251,13 @@ class HexagonTicketsManager {
             this.resetForm();
         });
 
+        // Update XT# when modal is shown for new tickets
+        document.getElementById('ticketModal').addEventListener('show.bs.modal', () => {
+            if (!this.currentEditingId) { // Only for new tickets
+                this.updateXtNumberDisplay();
+            }
+        });
+
         // Shared documentation handling
         document.getElementById('attachDocsBtn').addEventListener('click', () => {
             document.getElementById('sharedDocsInput').click();
@@ -344,6 +351,48 @@ class HexagonTicketsManager {
         
         // If no numeric pattern found, return empty to let user type
         return '';
+    }
+
+    /**
+     * Generate the next XT number for new tickets
+     * @returns {string} Next XT number (e.g., "XT018")
+     */
+    generateNextXtNumber() {
+        // Get all existing XT numbers
+        const xtNumbers = this.tickets
+            .map(ticket => ticket.xtNumber || ticket.xt_number)
+            .filter(xt => xt && xt.startsWith('XT'))
+            .map(xt => {
+                // Extract the numeric part
+                const match = xt.match(/XT(\d+)/);
+                return match ? parseInt(match[1], 10) : 0;
+            })
+            .filter(num => !isNaN(num));
+
+        // Find the highest number
+        const maxNumber = xtNumbers.length > 0 ? Math.max(...xtNumbers) : 0;
+        
+        // Generate next number with zero padding (3 digits)
+        const nextNumber = maxNumber + 1;
+        return `XT${nextNumber.toString().padStart(3, '0')}`;
+    }
+
+    /**
+     * Update the XT number display in the modal
+     */
+    updateXtNumberDisplay() {
+        const xtDisplayElement = document.getElementById('xtNumberDisplay');
+        if (xtDisplayElement) {
+            if (this.currentEditingId) {
+                // Show current ticket's XT number when editing
+                const ticket = this.getTicketById(this.currentEditingId);
+                xtDisplayElement.textContent = ticket?.xtNumber || ticket?.xt_number || 'N/A';
+            } else {
+                // Show next available XT number for new tickets
+                const nextXt = this.generateNextXtNumber();
+                xtDisplayElement.textContent = nextXt;
+            }
+        }
     }
 
     removeDeviceField(deviceEntry) {
@@ -530,6 +579,9 @@ class HexagonTicketsManager {
 
         const ticket = {
             id: this.currentEditingId || Date.now().toString(),
+            xtNumber: this.currentEditingId ? 
+                this.getTicketById(this.currentEditingId).xtNumber || this.getTicketById(this.currentEditingId).xt_number :
+                this.generateNextXtNumber(),
             dateSubmitted: document.getElementById('dateSubmitted').value,
             dateDue: document.getElementById('dateDue').value,
             hexagonTicket: document.getElementById('hexagonTicket').value,
@@ -582,6 +634,9 @@ class HexagonTicketsManager {
         document.getElementById('notes').value = ticket.notes || '';
         
         this.setDevices(ticket.devices || []);
+        
+        // Update XT# display for editing
+        this.updateXtNumberDisplay();
         
         document.getElementById('ticketModalLabel').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Ticket';
         
