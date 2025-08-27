@@ -529,7 +529,12 @@
 
                         <!-- Devices Section -->
                         <div class="mb-3">
-                            <label class="form-label">Devices <small class="text-muted">(Drag to reorder boot sequence)</small></label>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label mb-0">Devices <small class="text-muted">(Use arrows or drag to reorder boot sequence)</small></label>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="reverseDevicesBtn" title="Reverse device order">
+                                    <i class="fas fa-sort-amount-down-alt"></i> Reverse
+                                </button>
+                            </div>
                             <div id="devicesContainer" class="sortable-container">
                                 <div class="device-entry mb-2" draggable="true">
                                     <div class="input-group">

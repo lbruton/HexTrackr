@@ -315,6 +315,11 @@ class HexagonTicketsManager {
             this.handleCsvImport(e.target.files[0]);
         });
 
+        // Reverse devices button handler
+        document.getElementById('reverseDevicesBtn').addEventListener('click', () => {
+            this.reverseDeviceOrder();
+        });
+
         // Supervisor filter clear button
         // Remove this event listener since we no longer have supervisor filter
         // document.getElementById('clearSupervisorFilter').addEventListener('click', () => {
@@ -354,17 +359,17 @@ class HexagonTicketsManager {
         deviceEntry.innerHTML = `
             <div class="input-group">
                 <span class="input-group-text device-number-indicator" style="min-width: 40px; font-weight: bold; color: #6c757d;">
-                    #1
+                    #0
                 </span>
                 <span class="input-group-text drag-handle" style="cursor: grab; border-left: 0;">
                     <i class="fas fa-grip-vertical"></i>
                 </span>
-                <div class="input-group-text border-0 p-0" style="flex-direction: column;">
-                    <button type="button" class="btn btn-sm btn-outline-secondary move-up-btn" style="border: none; padding: 1px 6px; line-height: 1;" title="Move Up">
-                        <i class="fas fa-chevron-up" style="font-size: 10px;"></i>
+                <div class="input-group-text border-0 p-1" style="flex-direction: column; background: #f8f9fa;">
+                    <button type="button" class="btn btn-primary btn-sm move-up-btn" style="padding: 2px 8px; margin-bottom: 1px; border-radius: 3px; font-size: 11px;" title="Move Up">
+                        <i class="fas fa-chevron-up"></i>
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary move-down-btn" style="border: none; padding: 1px 6px; line-height: 1;" title="Move Down">
-                        <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+                    <button type="button" class="btn btn-primary btn-sm move-down-btn" style="padding: 2px 8px; border-radius: 3px; font-size: 11px;" title="Move Down">
+                        <i class="fas fa-chevron-down"></i>
                     </button>
                 </div>
                 <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${suggestedValue}">
@@ -541,11 +546,29 @@ class HexagonTicketsManager {
      * Update the numbered indicators for all device entries
      */
     updateDeviceNumbers() {
-        const deviceEntries = document.querySelectorAll('.device-entry');
+        const container = document.getElementById('devicesContainer');
+        const deviceEntries = container.querySelectorAll('.device-entry');
+        
+        console.log(`Updating ${deviceEntries.length} device numbers`); // Debug log
+        
         deviceEntries.forEach((entry, index) => {
             const numberIndicator = entry.querySelector('.device-number-indicator');
             if (numberIndicator) {
-                numberIndicator.textContent = `#${index + 1}`;
+                const newNumber = `#${index + 1}`;
+                console.log(`Setting device ${index} to ${newNumber}`); // Debug log
+                numberIndicator.textContent = newNumber;
+                
+                // Add a subtle highlight effect to show the number updated
+                numberIndicator.style.backgroundColor = '#007bff';
+                numberIndicator.style.color = 'white';
+                numberIndicator.style.transition = 'all 0.3s ease';
+                
+                setTimeout(() => {
+                    numberIndicator.style.backgroundColor = '';
+                    numberIndicator.style.color = '#6c757d';
+                }, 800);
+            } else {
+                console.warn(`No number indicator found for device ${index}`); // Debug log
             }
             
             // Update up/down button states
@@ -572,12 +595,16 @@ class HexagonTicketsManager {
         const container = document.getElementById('devicesContainer');
         const label = container.previousElementSibling;
         
-        // Temporarily highlight the label to show reordering happened
+        // Create a more prominent feedback message
+        const originalText = label.innerHTML;
         label.style.color = '#28a745';
-        label.innerHTML = `Devices <small class="text-muted">(Moved ${direction}! Use arrows or drag to reorder boot sequence)</small>`;
+        label.style.fontWeight = 'bold';
+        label.style.transition = 'all 0.3s ease';
+        label.innerHTML = `Devices <small class="text-success fw-bold">(Moved ${direction}! ✓ Use arrows or drag to reorder boot sequence)</small>`;
         
         setTimeout(() => {
             label.style.color = '';
+            label.style.fontWeight = '';
             label.innerHTML = 'Devices <small class="text-muted">(Use arrows or drag to reorder boot sequence)</small>';
         }, 2000);
     }
@@ -609,17 +636,17 @@ class HexagonTicketsManager {
             deviceEntry.innerHTML = `
                 <div class="input-group">
                     <span class="input-group-text device-number-indicator" style="min-width: 40px; font-weight: bold; color: #6c757d;">
-                        #1
+                        #0
                     </span>
                     <span class="input-group-text drag-handle" style="cursor: grab; border-left: 0;">
                         <i class="fas fa-grip-vertical"></i>
                     </span>
-                    <div class="input-group-text border-0 p-0" style="flex-direction: column;">
-                        <button type="button" class="btn btn-sm btn-outline-secondary move-up-btn" style="border: none; padding: 1px 6px; line-height: 1;" title="Move Up">
-                            <i class="fas fa-chevron-up" style="font-size: 10px;"></i>
+                    <div class="input-group-text border-0 p-1" style="flex-direction: column; background: #f8f9fa;">
+                        <button type="button" class="btn btn-primary btn-sm move-up-btn" style="padding: 2px 8px; margin-bottom: 1px; border-radius: 3px; font-size: 11px;" title="Move Up">
+                            <i class="fas fa-chevron-up"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary move-down-btn" style="border: none; padding: 1px 6px; line-height: 1;" title="Move Down">
-                            <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+                        <button type="button" class="btn btn-primary btn-sm move-down-btn" style="padding: 2px 8px; border-radius: 3px; font-size: 11px;" title="Move Down">
+                            <i class="fas fa-chevron-down"></i>
                         </button>
                     </div>
                     <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${device}">
