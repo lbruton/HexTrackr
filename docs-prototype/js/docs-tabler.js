@@ -66,9 +66,11 @@ class DocumentationPortal {
                     'functions-tickets': 'content/architecture/functions.html',
                     'bugs-found': 'content/code-review/bugs-found.html',
                     'handoff-template': 'content/code-review/handoff-template.html',
-                    // Legacy sections for backward compatibility
-                    'javascript': 'content/architecture/functions.html',
-                    'symbols': 'content/architecture/functions.html'
+                    // Distinct content sections (no more duplicates)
+                    'javascript': 'content/architecture/javascript-reference.html',
+                    'javascript-reference': 'content/architecture/javascript-reference.html',
+                    'symbols': 'content/architecture/symbols-index.html',
+                    'symbols-index': 'content/architecture/symbols-index.html'
                 };
                 
                 const filePath = fileMap[section];
