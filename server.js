@@ -355,11 +355,20 @@ app.get('/api/backup/stats', (req, res) => {
             return;
         }
         
-        // Since tickets are localStorage-based, we'll return 0 for now
-        res.json({
-            vulnerabilities: vulnRow.vulnerabilities,
-            tickets: 0,
-            total: vulnRow.vulnerabilities
+        db.get('SELECT COUNT(*) as tickets FROM tickets', (ticketErr, ticketRow) => {
+            if (ticketErr) {
+                res.status(500).json({ error: 'Database error - tickets' });
+                return;
+            }
+            
+            const vulnCount = vulnRow.vulnerabilities;
+            const ticketCount = ticketRow.tickets;
+            
+            res.json({
+                vulnerabilities: vulnCount,
+                tickets: ticketCount,
+                total: vulnCount + ticketCount
+            });
         });
     });
 });
@@ -379,36 +388,145 @@ app.get('/api/backup/vulnerabilities', (req, res) => {
     });
 });
 
+// Tickets CRUD endpoints (restored after PostgreSQL corruption incident)
+app.get('/api/tickets', (req, res) => {
+    db.all('SELECT * FROM tickets ORDER BY created_at DESC', (err, rows) => {
+        if (err) {
+            console.error('Error fetching tickets:', err);
+            res.status(500).json({ error: 'Failed to fetch tickets' });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
+app.post('/api/tickets', (req, res) => {
+    const ticket = req.body;
+    
+    const sql = `INSERT INTO tickets (
+        id, start_date, end_date, primary_number, incident_number, site_code,
+        affected_devices, assignee, notes, status, priority, linked_cves,
+        created_at, updated_at, display_site_code, ticket_number, site_id, location_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    
+    const params = [
+        ticket.id, ticket.start_date, ticket.end_date, ticket.primary_number,
+        ticket.incident_number, ticket.site_code, JSON.stringify(ticket.affected_devices),
+        ticket.assignee, ticket.notes, ticket.status, ticket.priority,
+        JSON.stringify(ticket.linked_cves), ticket.created_at, ticket.updated_at,
+        ticket.display_site_code, ticket.ticket_number, ticket.site_id, ticket.location_id
+    ];
+    
+    db.run(sql, params, function(err) {
+        if (err) {
+            console.error('Error saving ticket:', err);
+            res.status(500).json({ error: 'Failed to save ticket' });
+            return;
+        }
+        res.json({ success: true, id: ticket.id });
+    });
+});
+
+app.delete('/api/tickets/:id', (req, res) => {
+    const ticketId = req.params.id;
+    
+    db.run('DELETE FROM tickets WHERE id = ?', [ticketId], function(err) {
+        if (err) {
+            console.error('Error deleting ticket:', err);
+            res.status(500).json({ error: 'Failed to delete ticket' });
+            return;
+        }
+        res.json({ success: true, deleted: this.changes });
+    });
+});
+
+app.post('/api/tickets/migrate', (req, res) => {
+    const tickets = req.body.tickets || [];
+    
+    if (!Array.isArray(tickets) || tickets.length === 0) {
+        return res.json({ success: true, message: 'No tickets to migrate' });
+    }
+    
+    const sql = `INSERT OR REPLACE INTO tickets (
+        id, start_date, end_date, primary_number, incident_number, site_code,
+        affected_devices, assignee, notes, status, priority, linked_cves,
+        created_at, updated_at, display_site_code, ticket_number, site_id, location_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    
+    let successCount = 0;
+    let errorCount = 0;
+    
+    tickets.forEach(ticket => {
+        const params = [
+            ticket.id, ticket.start_date, ticket.end_date, ticket.primary_number,
+            ticket.incident_number, ticket.site_code, JSON.stringify(ticket.affected_devices || []),
+            ticket.assignee, ticket.notes, ticket.status, ticket.priority,
+            JSON.stringify(ticket.linked_cves || []), ticket.created_at, ticket.updated_at,
+            ticket.display_site_code, ticket.ticket_number, ticket.site_id, ticket.location_id
+        ];
+        
+        db.run(sql, params, function(err) {
+            if (err) {
+                console.error('Error migrating ticket:', err);
+                errorCount++;
+            } else {
+                successCount++;
+            }
+        });
+    });
+    
+    // Give the database operations time to complete
+    setTimeout(() => {
+        res.json({ 
+            success: true, 
+            message: `Migration completed: ${successCount} tickets migrated, ${errorCount} errors`
+        });
+    }, 1000);
+});
+
 app.get('/api/backup/tickets', (req, res) => {
-    // Tickets are localStorage-based, so return empty data
-    res.json({
-        type: 'tickets',
-        count: 0,
-        data: [],
-        exported_at: new Date().toISOString(),
-        note: 'Tickets are stored in browser localStorage. Use browser export functionality.'
+    db.all('SELECT * FROM tickets ORDER BY created_at DESC', (err, rows) => {
+        if (err) {
+            console.error('Error fetching tickets for backup:', err);
+            res.status(500).json({ error: 'Failed to fetch tickets' });
+            return;
+        }
+        
+        res.json({
+            type: 'tickets',
+            count: rows.length,
+            data: rows,
+            exported_at: new Date().toISOString()
+        });
     });
 });
 
 app.get('/api/backup/all', (req, res) => {
+    // Get vulnerabilities and tickets from database
     db.all('SELECT * FROM vulnerabilities LIMIT 10000', (err, vulnRows) => {
         if (err) {
             res.status(500).json({ error: 'Export failed' });
             return;
         }
         
-        res.json({
-            type: 'complete_backup',
-            vulnerabilities: {
-                count: vulnRows.length,
-                data: vulnRows
-            },
-            tickets: {
-                count: 0,
-                data: [],
-                note: 'Tickets are stored in browser localStorage. Use browser export functionality.'
-            },
-            exported_at: new Date().toISOString()
+        db.all('SELECT * FROM tickets ORDER BY created_at DESC', (ticketErr, ticketRows) => {
+            if (ticketErr) {
+                res.status(500).json({ error: 'Export failed - tickets error' });
+                return;
+            }
+            
+            res.json({
+                type: 'complete_backup',
+                vulnerabilities: {
+                    count: vulnRows.length,
+                    data: vulnRows
+                },
+                tickets: {
+                    count: ticketRows.length,
+                    data: ticketRows
+                },
+                exported_at: new Date().toISOString()
+            });
         });
     });
 });
