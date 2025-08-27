@@ -73,7 +73,9 @@ class DocumentationPortal {
                     'javascript': 'content/architecture/javascript-reference.html',
                     'javascript-reference': 'content/architecture/javascript-reference.html',
                     'symbols': 'content/architecture/symbols-index.html',
-                    'symbols-index': 'content/architecture/symbols-index.html'
+                    'symbols-index': 'content/architecture/symbols-index.html',
+                    'docs-system': 'content/architecture/docs-system.html',
+                    'roadmap': 'content/roadmap.html'
                 };
                 
                 const filePath = fileMap[section];
