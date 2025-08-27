@@ -285,7 +285,11 @@ class HexagonTicketsManager {
         document.getElementById('ticketModal').addEventListener('show.bs.modal', () => {
             if (!this.currentEditingId) { // Only for new tickets
                 this.updateXtNumberDisplay();
-                this.updateDeviceNumbers(); // Fix: Ensure device numbering is correct on modal open
+                // Use setTimeout to ensure DOM is fully rendered before updating device numbers
+                setTimeout(() => {
+                    this.updateDeviceNumbers();
+                    console.log('Device numbers updated after modal show');
+                }, 100);
             }
         });
 
@@ -586,6 +590,54 @@ class HexagonTicketsManager {
                 moveDownBtn.style.opacity = (index === deviceEntries.length - 1) ? '0.5' : '1';
             }
         });
+    }
+
+    /**
+     * Reverse the order of all device entries in the container
+     */
+    reverseDeviceOrder() {
+        const container = document.getElementById('devicesContainer');
+        const deviceEntries = Array.from(container.querySelectorAll('.device-entry'));
+        
+        if (deviceEntries.length <= 1) {
+            return; // Nothing to reverse
+        }
+        
+        console.log('Reversing device order'); // Debug log
+        
+        // Clear the container
+        container.innerHTML = '';
+        
+        // Add devices back in reverse order
+        deviceEntries.reverse().forEach(entry => {
+            container.appendChild(entry);
+        });
+        
+        // Update the numbering and button states
+        this.updateDeviceNumbers();
+        this.updateDeviceButtons();
+        
+        // Show visual feedback
+        this.showReverseOrderFeedback();
+    }
+
+    /**
+     * Show visual feedback when reversing device order
+     */
+    showReverseOrderFeedback() {
+        const container = document.getElementById('devicesContainer');
+        const label = container.previousElementSibling;
+        
+        // Create feedback message
+        const originalText = label.innerHTML;
+        label.innerHTML = `<i class="fas fa-arrows-alt-v text-primary me-2"></i>Device order reversed!`;
+        label.style.color = '#0d6efd';
+        
+        // Reset after a short delay
+        setTimeout(() => {
+            label.innerHTML = originalText;
+            label.style.color = '';
+        }, 2000);
     }
 
     /**
@@ -1254,6 +1306,8 @@ class HexagonTicketsManager {
         
         // Reset devices
         this.setDevices(['']);
+        // Update device numbers to show proper numbering (fixes #0 display issue)
+        setTimeout(() => this.updateDeviceNumbers(), 50);
     }
 
     formatDate(dateString) {
