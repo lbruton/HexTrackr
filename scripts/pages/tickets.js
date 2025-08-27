@@ -259,6 +259,11 @@ class HexagonTicketsManager {
             }
         });
 
+        // Location-to-device autofill functionality for new tickets only
+        document.getElementById('location').addEventListener('input', (e) => {
+            this.handleLocationToDeviceAutofill(e.target.value);
+        });
+
         // Shared documentation handling
         document.getElementById('attachDocsBtn').addEventListener('click', () => {
             document.getElementById('sharedDocsInput').click();
@@ -392,6 +397,27 @@ class HexagonTicketsManager {
                 // Show next available XT number for new tickets
                 const nextXt = this.generateNextXtNumber();
                 xtDisplayElement.textContent = nextXt;
+            }
+        }
+    }
+
+    /**
+     * Handle location-to-device autofill functionality
+     * Only autofills the first device field when in ADD mode (not EDIT mode)
+     * @param {string} locationValue - The value entered in the location field
+     */
+    handleLocationToDeviceAutofill(locationValue) {
+        // Only autofill for new tickets (not when editing existing tickets)
+        if (this.currentEditingId) {
+            return;
+        }
+
+        // Get the first device input field
+        const firstDeviceInput = document.querySelector('#devicesContainer .device-input');
+        if (firstDeviceInput) {
+            // Only autofill if the device field is empty (don't override existing content)
+            if (!firstDeviceInput.value.trim()) {
+                firstDeviceInput.value = locationValue.trim();
             }
         }
     }
