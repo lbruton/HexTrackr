@@ -66,6 +66,14 @@ class HexagonTicketsManager {
 
     // Helper function to transform raw ticket data
     transformTicketData(rawTicket) {
+        // Calculate if the ticket is overdue based on due date
+        const dueDate = rawTicket.date_due || rawTicket.dateDue;
+        const isOverdue = dueDate ? new Date(dueDate) < new Date() : false;
+        const status = rawTicket.status || '';
+        
+        // Don't mark completed or closed tickets as overdue
+        const isActiveOverdue = isOverdue && status !== 'Completed' && status !== 'Closed';
+        
         return {
             ...rawTicket,
             devices: typeof rawTicket.devices === 'string' ? JSON.parse(rawTicket.devices) : rawTicket.devices || [],
@@ -74,7 +82,8 @@ class HexagonTicketsManager {
             dateSubmitted: rawTicket.date_submitted || rawTicket.dateSubmitted,
             dateDue: rawTicket.date_due || rawTicket.dateDue,
             hexagonTicket: rawTicket.hexagon_ticket || rawTicket.hexagonTicket,
-            serviceNowTicket: rawTicket.service_now_ticket || rawTicket.serviceNowTicket
+            serviceNowTicket: rawTicket.service_now_ticket || rawTicket.serviceNowTicket,
+            isOverdue: isActiveOverdue // Add the isOverdue flag
         };
     }
 
@@ -83,8 +92,22 @@ class HexagonTicketsManager {
             const response = await fetch('/api/tickets');
             if (response.ok) {
                 const rawTickets = await response.json();
-                this.tickets = rawTickets.map(this.transformTicketData);
+                console.log('Raw tickets from DB:', rawTickets);
+                console.log('First raw ticket:', rawTickets[0]);
+                
+                // Changed from using map with this.transformTicketData to using an arrow function
+                // to ensure 'this' context is preserved
+                this.tickets = rawTickets.map(ticket => this.transformTicketData(ticket));
+                
                 console.log('Loaded', this.tickets.length, 'tickets from database');
+                // Debug: Check first ticket to ensure it has an id
+                if (this.tickets.length > 0) {
+                    console.log('First transformed ticket:', this.tickets[0]);
+                    console.log('First ticket ID:', this.tickets[0].id);
+                    
+                    // Debug: Check all ticket IDs
+                    console.log('All ticket IDs:', this.tickets.map(t => t.id));
+                }
             } else {
                 console.error('Failed to load tickets:', response.statusText);
                 this.showToast('Failed to load tickets from database', 'error');

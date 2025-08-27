@@ -443,7 +443,22 @@ app.get('/api/tickets', (req, res) => {
             res.status(500).json({ error: 'Failed to fetch tickets' });
             return;
         }
-        res.json(rows);
+        
+        // Log the structure of the first row for debugging
+        if (rows.length > 0) {
+            console.log('Sample ticket row:', Object.keys(rows[0]));
+        }
+        
+        // Transform the rows to ensure each ticket has an id (use xt_number if id is null)
+        const transformedRows = rows.map(row => {
+            // If id is null, use xt_number as the id
+            if (row.id === null || row.id === undefined) {
+                row.id = row.xt_number;
+            }
+            return row;
+        });
+        
+        res.json(transformedRows);
     });
 });
 
