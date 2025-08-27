@@ -51,10 +51,6 @@ class HexagonTicketsManager {
         this.setupEventListeners();
         this.populateLocationFilter();
         
-        // Populate Sites and Locations dropdowns from API
-        await this.populateSitesDropdown();
-        await this.populateLocationsDropdown();
-        
         this.updateStatistics();
         this.renderTickets();
         
@@ -730,7 +726,7 @@ class HexagonTicketsManager {
         if (filteredTickets.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="11" class="text-center py-4">
+                    <td colspan="12" class="text-center py-4">
                         <div class="empty-state">
                             <i class="fas fa-inbox"></i>
                             <h5>No tickets found</h5>
@@ -774,8 +770,8 @@ class HexagonTicketsManager {
                     <td class="text-center">${this.formatDate(ticket.dateDue)}</td>
                     <td class="text-center"><strong>${this.highlightSearch(ticket.hexagonTicket)}</strong></td>
                     <td class="text-center">${this.createServiceNowDisplay(ticket.serviceNowTicket)}</td>
-                    <td class="text-center">${this.createLocationChip(ticket.location)}</td>
-                    <td class="text-center d-none">${this.createSiteChip(ticket.site || ticket.location)}</td>
+                    <td class="text-center">${this.createSiteChip(ticket.site || '')}</td>
+                    <td class="text-center">${this.createLocationChip(ticket.location || '')}</td>
                     <td class="text-center">
                         <div class="devices-list">
                             ${ticket.devices.map(device => `<span class="device-tag enhanced">${this.highlightSearch(device)}</span>`).join('')}
@@ -1036,52 +1032,6 @@ class HexagonTicketsManager {
         });
         
         filter.value = currentValue;
-    }
-
-    // Populate Sites dropdown from API
-    async populateSitesDropdown() {
-        try {
-            const response = await fetch('/api/sites');
-            const sites = await response.json();
-            
-            const siteDropdown = document.getElementById('site');
-            if (siteDropdown) {
-                siteDropdown.innerHTML = '<option value="">Select Site</option>';
-                sites.forEach(site => {
-                    const option = document.createElement('option');
-                    option.value = site.id;
-                    option.textContent = `${site.code} - ${site.name}`;
-                    option.dataset.code = site.code;
-                    option.dataset.name = site.name;
-                    siteDropdown.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error('Error loading sites:', error);
-        }
-    }
-
-    // Populate Locations dropdown from API
-    async populateLocationsDropdown() {
-        try {
-            const response = await fetch('/api/locations');
-            const locations = await response.json();
-            
-            const locationDropdown = document.getElementById('location');
-            if (locationDropdown) {
-                locationDropdown.innerHTML = '<option value="">Select Location</option>';
-                locations.forEach(location => {
-                    const option = document.createElement('option');
-                    option.value = location.id;
-                    option.textContent = `${location.code} - ${location.name}`;
-                    option.dataset.code = location.code;
-                    option.dataset.name = location.name;
-                    locationDropdown.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error('Error loading locations:', error);
-        }
     }
 
     resetForm() {

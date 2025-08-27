@@ -63,16 +63,56 @@ Comprehensive enhancement of the HexTrackr ticket modal system to fix critical s
 ---
 
 ### ✅ STEP 3: Separate Site and Location Fields
-**Status**: 🟡 Pending  
-**Description**: Add distinct Site and Location dropdown fields
-- **Current Issue**: Only location field exists, causing confusion
-- **Solution**: Add separate Site dropdown connected to sites table
-- **Data Source**: Pull from existing sites/locations tables via API
-- **Validation**: Ensure proper data separation (site ≠ location)
-- **Git Backup**: Required before changes
-- **Acceptance Criteria**: Both fields populated with correct data sources
+**Status**: ✅ **COMPLETED** - Aug 27, 2025
 
-### ✅ STEP 4: Update Status Options
+**Description**: Convert to simple text input fields for direct site/location entry
+
+**Solution Implemented:**
+- ✅ Converted dropdown selects to simple text input fields
+- ✅ Implemented direct database field mapping (no foreign key complexity)
+- ✅ Successfully migrated existing data from location to site column
+- ✅ Updated table display to show both Site and Location columns properly
+- ✅ Simplified approach: "What you type is what it shows"
+
+**Testing Results:**
+- ✅ Modal opens with text input fields for Site and Location
+- ✅ Can enter values like "GRIM" for site and "Building A" for location
+- ✅ Table displays both columns correctly with proper data
+- ✅ Database migration successful - all site codes preserved
+- ✅ No JavaScript errors or display issues
+
+**Files Modified:**
+- `tickets.html` - Converted dropdowns to text inputs (lines 502-513 area)
+- `scripts/pages/tickets.js` - Updated table rendering for dual columns
+- `server.js` - Database migration query execution
+
+---
+
+### ✅ STEP 3A: Optimize Modal Layout (NEW)
+**Status**: 🟡 Pending  
+**Description**: Improve modal field layout for better space utilization
+- **Change**: Move Hexagon Ticket #, Service Now #, and Status dropdown to same row
+- **Rationale**: Plenty of room available for horizontal layout
+- **Benefit**: Better utilization of modal space and improved UX
+- **Impact**: HTML layout restructuring in tickets.html
+- **Git Backup**: Required before changes
+- **Acceptance Criteria**: Three fields on one row with proper spacing and responsiveness
+
+### ✅ STEP 3B: Location-to-Device Autofill (NEW)
+**Status**: 🟡 Pending  
+**Description**: Auto-populate first device name from location field input
+- **Feature**: Location field input autofills first device name field
+- **Example**: User types "wtulsa" in location → first device autofills "wtulsa"
+- **Workflow**: User completes device name (e.g., "wtulsanswan01") and hits plus button
+- **Implementation**: JavaScript event handler on location field change
+- **Edit Mode Logic**: Only autofill if no devices exist (don't override existing devices)
+- **Future**: Device drag/drop and sort functionality to be enhanced later
+- **Git Backup**: Required before changes
+- **Acceptance Criteria**: Location input immediately populates first device field in ADD mode only
+
+---
+
+### ✅ STEP 4: Modernize Status Workflow
 **Status**: 🟡 Pending  
 **Description**: Modernize status workflow for better work order management
 - **Remove**: "In-Progress"

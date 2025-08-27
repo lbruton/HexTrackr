@@ -408,8 +408,8 @@
                                         <th class="sortable-header text-center" data-column="dateDue" onclick="sortTable('dateDue')">Due</th>
                                         <th class="sortable-header text-center" data-column="hexagonTicket" onclick="sortTable('hexagonTicket')">Hexagon #</th>
                                         <th class="sortable-header text-center" data-column="serviceNowTicket" onclick="sortTable('serviceNowTicket')">Service Now #</th>
+                                        <th class="sortable-header text-center" data-column="site" onclick="sortTable('site')">Site</th>
                                         <th class="sortable-header text-center" data-column="location" onclick="sortTable('location')">Location</th>
-                                        <th class="sortable-header text-center d-none" data-column="site" onclick="sortTable('site')">Site</th>
                                         <th class="sortable-header text-center" data-column="devices" onclick="sortTable('devices')">Devices</th>
                                         <th class="sortable-header text-center" data-column="supervisor" onclick="sortTable('supervisor')">Supervisor</th>
                                         <th class="sortable-header text-center" data-column="status" onclick="sortTable('status')">Status</th>
@@ -499,17 +499,13 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="site" class="form-label">Site</label>
-                                    <select class="form-select" id="site" required>
-                                        <option value="">Select Site</option>
-                                    </select>
+                                    <input type="text" class="form-control" id="site" placeholder="Enter site code (e.g., GRIM)">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="location" class="form-label">Location</label>
-                                    <select class="form-select" id="location" required>
-                                        <option value="">Select Location</option>
-                                    </select>
+                                    <input type="text" class="form-control" id="location" placeholder="Enter location (e.g., Building A)">
                                 </div>
                             </div>
                         </div>
