@@ -199,76 +199,8 @@
     </style>
 </head>
 <body>
-    <!-- Tabler.io Unified Header -->
-    <header class="navbar navbar-expand-md d-print-none" data-bs-theme="dark">
-        <div class="container-xl">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-                <a href="tickets.html">
-                    <i class="fas fa-shield-alt me-2 text-primary"></i>
-                    HexTrackr
-                </a>
-            </h1>
-            <div class="navbar-nav flex-row order-md-last">
-                <div class="d-none d-md-flex">
-                    <a href="#" class="nav-link px-0 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip" data-bs-placement="bottom">
-                        <i class="fas fa-moon"></i>
-                    </a>
-                    <a href="#" class="nav-link px-0 hide-theme-light" title="Enable light mode" data-bs-toggle="tooltip" data-bs-placement="bottom">
-                        <i class="fas fa-sun"></i>
-                    </a>
-                </div>
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
-                        <span class="avatar avatar-sm" style="background-image: url(https://ui-avatars.com/api/?name=HT&background=206bc4&color=fff)"></span>
-                        <div class="d-none d-xl-block ps-2">
-                            <div>HexTrackr User</div>
-                            <div class="mt-1 small text-muted">Ticket Manager</div>
-                        </div>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                        <h6 class="dropdown-header">User Management</h6>
-                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#settingsModal" data-settings-tab="api-config">
-                            <i class="fas fa-plug me-2"></i>API Configuration
-                        </a>
-                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#settingsModal" data-settings-tab="data-management">
-                            <i class="fas fa-database me-2"></i>Data Management
-                        </a>
-                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#settingsModal" data-settings-tab="ticket-systems">
-                            <i class="fas fa-ticket-alt me-2"></i>Ticket Systems
-                        </a>
-                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#settingsModal" data-settings-tab="system-config">
-                            <i class="fas fa-cogs me-2"></i>System Configuration
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="collapse navbar-collapse" id="navbar-menu">
-                <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
-                    <ul class="navbar-nav">
-                        <li class="nav-item active">
-                            <a class="nav-link" href="tickets.html">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <i class="fas fa-ticket-alt"></i>
-                                </span>
-                                <span class="nav-link-title">Tickets</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="vulnerabilities.html">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <i class="fas fa-bug"></i>
-                                </span>
-                                <span class="nav-link-title">Vulnerabilities</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </header>
+    <!-- Header component auto-injected here -->
+    <div id="headerContainer"></div>
 
     <!-- Tabler.io Page Wrapper -->
     <div class="page">
@@ -661,6 +593,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <!-- HexTrackr Modular JavaScript Architecture -->
+    <script src="scripts/shared/header-loader.js"></script>
     <script src="scripts/shared/settings-modal.js"></script>
     <script src="scripts/pages/tickets.js"></script>
 </body>
