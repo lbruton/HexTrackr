@@ -330,6 +330,10 @@ class HexagonTicketsManager {
                 this.addDeviceField();
             } else if (e.target.classList.contains('remove-device-btn') || e.target.parentElement.classList.contains('remove-device-btn')) {
                 this.removeDeviceField(e.target.closest('.device-entry'));
+            } else if (e.target.classList.contains('move-up-btn') || e.target.parentElement.classList.contains('move-up-btn')) {
+                this.moveDeviceUp(e.target.closest('.device-entry'));
+            } else if (e.target.classList.contains('move-down-btn') || e.target.parentElement.classList.contains('move-down-btn')) {
+                this.moveDeviceDown(e.target.closest('.device-entry'));
             }
         });
 
@@ -349,9 +353,20 @@ class HexagonTicketsManager {
         
         deviceEntry.innerHTML = `
             <div class="input-group">
-                <span class="input-group-text drag-handle" style="cursor: grab;">
+                <span class="input-group-text device-number-indicator" style="min-width: 40px; font-weight: bold; color: #6c757d;">
+                    #1
+                </span>
+                <span class="input-group-text drag-handle" style="cursor: grab; border-left: 0;">
                     <i class="fas fa-grip-vertical"></i>
                 </span>
+                <div class="input-group-text border-0 p-0" style="flex-direction: column;">
+                    <button type="button" class="btn btn-sm btn-outline-secondary move-up-btn" style="border: none; padding: 1px 6px; line-height: 1;" title="Move Up">
+                        <i class="fas fa-chevron-up" style="font-size: 10px;"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary move-down-btn" style="border: none; padding: 1px 6px; line-height: 1;" title="Move Down">
+                        <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+                    </button>
+                </div>
                 <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${suggestedValue}">
                 <button type="button" class="btn btn-outline-success add-device-btn">
                     <i class="fas fa-plus"></i>
@@ -364,6 +379,7 @@ class HexagonTicketsManager {
         
         container.appendChild(deviceEntry);
         this.updateDeviceButtons();
+        this.updateDeviceNumbers();
         this.setupDragAndDrop(deviceEntry);
         
         // Focus and select the new input for easy editing
@@ -473,6 +489,7 @@ class HexagonTicketsManager {
         if (container.children.length > 1) {
             deviceEntry.remove();
             this.updateDeviceButtons();
+            this.updateDeviceNumbers();
         }
     }
 
@@ -486,6 +503,83 @@ class HexagonTicketsManager {
                 removeBtn.style.display = 'block';
             }
         });
+    }
+
+    /**
+     * Move a device entry up in the list
+     * @param {HTMLElement} deviceEntry - The device entry to move up
+     */
+    moveDeviceUp(deviceEntry) {
+        const previousSibling = deviceEntry.previousElementSibling;
+        if (previousSibling) {
+            deviceEntry.parentNode.insertBefore(deviceEntry, previousSibling);
+            this.updateDeviceNumbers();
+            this.showMoveArrowFeedback('up');
+            
+            // Re-initialize drag and drop after DOM change
+            this.initializeDragAndDrop();
+        }
+    }
+
+    /**
+     * Move a device entry down in the list
+     * @param {HTMLElement} deviceEntry - The device entry to move down
+     */
+    moveDeviceDown(deviceEntry) {
+        const nextSibling = deviceEntry.nextElementSibling;
+        if (nextSibling) {
+            deviceEntry.parentNode.insertBefore(nextSibling, deviceEntry);
+            this.updateDeviceNumbers();
+            this.showMoveArrowFeedback('down');
+            
+            // Re-initialize drag and drop after DOM change
+            this.initializeDragAndDrop();
+        }
+    }
+
+    /**
+     * Update the numbered indicators for all device entries
+     */
+    updateDeviceNumbers() {
+        const deviceEntries = document.querySelectorAll('.device-entry');
+        deviceEntries.forEach((entry, index) => {
+            const numberIndicator = entry.querySelector('.device-number-indicator');
+            if (numberIndicator) {
+                numberIndicator.textContent = `#${index + 1}`;
+            }
+            
+            // Update up/down button states
+            const moveUpBtn = entry.querySelector('.move-up-btn');
+            const moveDownBtn = entry.querySelector('.move-down-btn');
+            
+            if (moveUpBtn && moveDownBtn) {
+                // Disable up button for first item
+                moveUpBtn.disabled = (index === 0);
+                moveUpBtn.style.opacity = (index === 0) ? '0.5' : '1';
+                
+                // Disable down button for last item
+                moveDownBtn.disabled = (index === deviceEntries.length - 1);
+                moveDownBtn.style.opacity = (index === deviceEntries.length - 1) ? '0.5' : '1';
+            }
+        });
+    }
+
+    /**
+     * Show visual feedback when using arrow controls
+     * @param {string} direction - 'up' or 'down'
+     */
+    showMoveArrowFeedback(direction) {
+        const container = document.getElementById('devicesContainer');
+        const label = container.previousElementSibling;
+        
+        // Temporarily highlight the label to show reordering happened
+        label.style.color = '#28a745';
+        label.innerHTML = `Devices <small class="text-muted">(Moved ${direction}! Use arrows or drag to reorder boot sequence)</small>`;
+        
+        setTimeout(() => {
+            label.style.color = '';
+            label.innerHTML = 'Devices <small class="text-muted">(Use arrows or drag to reorder boot sequence)</small>';
+        }, 2000);
     }
 
     getDevices() {
@@ -514,9 +608,20 @@ class HexagonTicketsManager {
 
             deviceEntry.innerHTML = `
                 <div class="input-group">
-                    <span class="input-group-text drag-handle" style="cursor: grab;">
+                    <span class="input-group-text device-number-indicator" style="min-width: 40px; font-weight: bold; color: #6c757d;">
+                        #1
+                    </span>
+                    <span class="input-group-text drag-handle" style="cursor: grab; border-left: 0;">
                         <i class="fas fa-grip-vertical"></i>
                     </span>
+                    <div class="input-group-text border-0 p-0" style="flex-direction: column;">
+                        <button type="button" class="btn btn-sm btn-outline-secondary move-up-btn" style="border: none; padding: 1px 6px; line-height: 1;" title="Move Up">
+                            <i class="fas fa-chevron-up" style="font-size: 10px;"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary move-down-btn" style="border: none; padding: 1px 6px; line-height: 1;" title="Move Down">
+                            <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+                        </button>
+                    </div>
                     <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${device}">
                     <button type="button" class="btn btn-outline-success add-device-btn">
                         <i class="fas fa-plus"></i>
@@ -531,6 +636,7 @@ class HexagonTicketsManager {
         });
         
         this.updateDeviceButtons();
+        this.updateDeviceNumbers();
     }
 
     // Drag and Drop functionality
@@ -616,6 +722,9 @@ class HexagonTicketsManager {
                 dropTarget.parentNode.insertBefore(this.draggedElement, dropTarget);
             }
             
+            // Update device numbers after reordering
+            this.updateDeviceNumbers();
+            
             // Re-initialize drag and drop for all entries
             this.initializeDragAndDrop();
             
@@ -633,11 +742,11 @@ class HexagonTicketsManager {
         
         // Temporarily highlight the label to show reordering happened
         label.style.color = '#28a745';
-        label.innerHTML = 'Devices <small class="text-muted">(Reordered! Drag to reorder boot sequence)</small>';
+        label.innerHTML = 'Devices <small class="text-muted">(Reordered! Use arrows or drag to reorder boot sequence)</small>';
         
         setTimeout(() => {
             label.style.color = '';
-            label.innerHTML = 'Devices <small class="text-muted">(Drag to reorder boot sequence)</small>';
+            label.innerHTML = 'Devices <small class="text-muted">(Use arrows or drag to reorder boot sequence)</small>';
         }, 2000);
     }
 
