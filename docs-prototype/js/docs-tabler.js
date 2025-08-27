@@ -64,6 +64,7 @@ class DocumentationPortal {
                     'frameworks-aggrid': 'content/frameworks/aggrid.html',
                     'functions-overview': 'content/architecture/overview.html',
                     'functions-tickets': 'content/architecture/functions.html',
+                    'database-schema': 'content/architecture/database-schema.html',
                     'bugs-found': 'content/code-review/bugs-found.html',
                     'handoff-template': 'content/code-review/handoff-template.html',
                     // Distinct content sections (no more duplicates)
