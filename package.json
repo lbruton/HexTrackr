@@ -17,6 +17,7 @@
     "jszip": "^3.10.1",
     "multer": "^2.0.2",
     "papaparse": "^5.4.1",
+    "playwright": "^1.55.0",
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {

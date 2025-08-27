@@ -98,6 +98,13 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 - [ ] **Rapid7** InsightVM integration
 - [ ] **CrowdStrike** Falcon endpoint data
 
+### UI/UX Modernization & Standardization 🎨
+- [ ] **Unify Application Framework** - Migrate `tickets.html` from Bootstrap 5 to Tabler.io to create a single, consistent user experience. (See also: `UI_UX_ROADMAP.md`, Phase 9.1)
+- [ ] **Standardize Data Tables** - Replace the custom HTML table on `tickets.html` with AG Grid, aligning it with the `vulnerabilities.html` implementation.
+- [ ] **Implement Dark Mode-Aware Charting** - Refactor ApexCharts initialization to use Tabler.io CSS variables, enabling seamless theme switching (Light/Dark mode). (See also: `UI_UX_ROADMAP.md`, Phase 10.1)
+- [ ] **Formalize Component Strategy** - Officially document and enforce the use of Tabler.io for layout, AG Grid for tables, and ApexCharts for all data visualizations.
+
+
 ### Network Infrastructure Features 📋
 
 #### SNMP Network Polling

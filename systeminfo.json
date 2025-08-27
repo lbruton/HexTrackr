@@ -1,20 +1,43 @@
 {
   "project": {
     "name": "HexTrackr",
-    "version": "2.0.0",
+    "version": "1.0.1",
     "description": "Dual-purpose cybersecurity management system with ticket management and vulnerability analysis",
     "repository": "https://github.com/lbruton/HexTrackr",
     "license": "MIT",
     "created": "2024",
-    "lastUpdated": "2025-08-24"
+    "lastUpdated": "2025-08-27"
   },
   "architecture": {
     "type": "Client-Side + API Hybrid",
     "deployment": "Docker Container",
     "database": "SQLite3 (server-side) + localStorage + IndexedDB",
-    "frontend": "Vanilla JavaScript + Bootstrap/Tabler.io",
+    "frontend": "Vanilla JavaScript + Tabler.io (primary) + Bootstrap (legacy)",
     "backend": "Node.js Express Server",
     "port": 8080
+  },
+  "documentation": {
+    "system": "Automated generation with docs-prototype portal",
+    "location": "docs-prototype/",
+    "generator": "docs-prototype/generate-docs.js",
+    "automation": "docs-prototype/AUTOMATION_INSTRUCTIONS.md",
+    "features": [
+      "API endpoint auto-discovery (22 endpoints found)",
+      "Function reference auto-generation (353 functions)",
+      "Framework usage detection (4 frameworks)",
+      "Unified navigation with shared header/footer",
+      "GPT/Gemini overnight automation support",
+      "UI-API interaction mapping",
+      "Database schema visualization",
+      "Page flow diagrams"
+    ],
+    "standards": {
+      "apiDocumentation": "Auto-scanned from server.js route definitions",
+      "functionDocumentation": "Pattern-based extraction from all .js files",
+      "frameworkDocumentation": "Usage detection across HTML/CSS/JS files",
+      "architectureDocumentation": "System analysis and visual diagrams"
+    },
+    "integration": "Seamless with HexTrackr UI using shared components"
   },
   "applications": {
     "tickets": {
@@ -23,7 +46,7 @@
       "storage": "localStorage",
       "storageKey": "hexagonTickets",
       "dependencies": [
-        "Bootstrap 5.3.0",
+        "Tabler.io v1.0.0-beta17 (primary UI framework)",
         "Font Awesome 6.4.0",
         "XLSX (SheetJS)",
         "jsPDF + AutoTable",
@@ -47,7 +70,7 @@
       "storage": "SQLite3 database via API",
       "database": "hextrackr.db",
       "dependencies": [
-        "Tabler.io CSS/JS",
+        "Tabler.io v1.0.0-beta17",
         "Chart.js",
         "SortableJS",
         "AG-Grid Community",
@@ -105,18 +128,26 @@
   "fileStructure": {
     "entryPoints": {
       "tickets.html": "Ticket management interface",
-      "vulnerabilities-new.html": "Vulnerability analysis interface"
+      "vulnerabilities.html": "Vulnerability analysis interface",
+      "docs-prototype/index.html": "Comprehensive documentation portal"
     },
     "scripts": {
-      "app.js": "Ticket management logic (HexagonTicketsManager)",
-      "vulnerabilities.js": "Vulnerability management logic (ModernVulnManager) - TO BE EXTRACTED",
-      "modal-solutions.js": "Shared modal utilities",
-      "server.js": "Express.js API server"
+      "scripts/pages/tickets.js": "Ticket management logic (HexagonTicketsManager)",
+      "scripts/pages/vulnerabilities.js": "Vulnerability management logic (ModernVulnManager)",
+      "scripts/shared/header-loader.js": "Shared header component system",
+      "scripts/shared/footer-loader.js": "Shared footer component system",
+      "scripts/shared/settings-modal.js": "Unified settings modal",
+      "docs-prototype/generate-docs.js": "Documentation auto-generation system",
+      "docs-prototype/js/docs-tabler.js": "Documentation portal logic",
+      "server.js": "Express.js API server with 22 documented endpoints"
     },
     "styles": {
-      "styles.css": "Shared custom styles",
-      "bootstrap": "Used by tickets.html",
-      "tabler": "Used by vulnerabilities-new.html"
+      "styles/shared/base.css": "Global HexTrackr styling",
+      "styles/shared/header.css": "Shared header component styles",
+      "styles/pages/tickets.css": "Ticket-specific styling",
+      "styles/pages/vulnerabilities.css": "Vulnerability-specific styling",
+      "docs-prototype/css/docs-tabler.css": "Documentation portal styling",
+      "framework": "Tabler.io v1.0.0-beta17 (primary), Bootstrap components (legacy support)"
     },
     "data": {
       "hextrackr.db": "SQLite database for vulnerabilities",
@@ -139,17 +170,50 @@
       "serverRequired": true
     }
   },
+  "uiApiInteractions": {
+    "tickets": {
+      "interface": "tickets.html",
+      "dataFlow": "UI → localStorage (no API calls)",
+      "interactions": {
+        "saveTicket()": "Saves to localStorage['hexagonTickets']",
+        "loadTickets()": "Reads from localStorage['hexagonTickets']",
+        "exportData()": "Client-side file generation (CSV/PDF/Excel)",
+        "importCSV()": "Client-side CSV parsing with PapaParse"
+      }
+    },
+    "vulnerabilities": {
+      "interface": "vulnerabilities.html",
+      "dataFlow": "UI → API → SQLite Database",
+      "interactions": {
+        "uploadVulnerabilities()": "POST /api/vulnerabilities/upload",
+        "loadDevices()": "GET /api/vulnerabilities/devices",
+        "getStats()": "GET /api/vulnerabilities/stats",
+        "searchVulnerabilities()": "GET /api/vulnerabilities/search"
+      }
+    },
+    "documentation": {
+      "interface": "docs-prototype/index.html",
+      "dataFlow": "Static HTML content → Generated documentation files",
+      "interactions": {
+        "loadSection()": "Fetches content/[section]/[file].html",
+        "generateDocs()": "node generate-docs.js scans codebase",
+        "searchDocs()": "Client-side search through generated content"
+      }
+    }
+  },
   "nextSteps": {
     "immediate": [
-      "Extract inline JavaScript from vulnerabilities-new.html to vulnerabilities.js",
-      "Ensure complete separation of ticket and vulnerability logic",
-      "Add JSDoc documentation to both JavaScript files"
+      "Complete UI-API interaction mapping documentation",
+      "Add database schema visualization to docs portal",
+      "Create page flow diagrams showing system architecture",
+      "Integrate roadmap into documentation portal"
     ],
     "planned": [
       "API authentication with CryptoJS",
       "Cisco PSIRT integration",
       "SNMP polling capabilities",
-      "Ansible automation integration"
+      "Ansible automation integration",
+      "Advanced documentation automation with AI"
     ]
   }
 }
