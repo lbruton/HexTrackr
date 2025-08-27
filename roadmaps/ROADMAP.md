@@ -46,6 +46,17 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 
 ## 🟡 IN PROGRESS
 
+### Ticket Modal Enhancement Suite 🔄 **CURRENT FOCUS**
+- [ ] **Comprehensive Ticket Modal Improvements** - See [TICKET_MODAL_ENHANCEMENTS_20250827.md](./TICKET_MODAL_ENHANCEMENTS_20250827.md) for detailed implementation plan
+  - [ ] Fix backend/frontend field mapping (critical save bug)
+  - [ ] Add XT# read-only display field
+  - [ ] Implement site/location separation in UI
+  - [ ] Update status workflow (remove In-Progress, add Staged/Failed/Overdue)
+  - [ ] Enhance drag-drop UX with accessibility features
+  - [ ] Add reverse sort toggle functionality
+  - [ ] Implement auto-status updates for overdue items
+  - [ ] Comprehensive testing and validation
+
 ### Chart Timeline Enhancement 🔄 **NEXT PRIORITY**
 - [ ] **Timeline Extension Feature** - Extend chart to current date with flat lines for data continuity
   - [ ] Calculate gap between last data point and current date (August 25, 2025)
