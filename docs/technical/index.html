@@ -678,7 +678,7 @@
                             'architecture': 'architecture-overview.md'
                         };
                         
-                        filePath = `/docs/technical/${fileMap[section]}`;
+                        filePath = `${fileMap[section]}`;
                         
                         if (!filePath) {
                             throw new Error(`Unknown section: ${section}`);
