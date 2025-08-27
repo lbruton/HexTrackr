@@ -1,0 +1,593 @@
+<!-- UI-API Interaction Flowcharts -->
+<div class="container-fluid">
+    <h2>🔄 UI-API Interaction Flowcharts</h2>
+    <p>Complete documentation of data flow patterns between HexTrackr's frontend JavaScript and backend APIs.</p>
+    
+    <!-- Architecture Overview -->
+    <div class="mb-4">
+        <strong>Architecture:</strong> Dual-pattern system with localStorage-based tickets and API-based vulnerabilities<br>
+        <strong>Frontend:</strong> Modular JavaScript in <code>scripts/pages/</code><br>
+        <strong>Backend:</strong> Node.js/Express with SQLite database<br>
+        <strong>Migration:</strong> Tickets transitioning from localStorage to API pattern
+    </div>
+
+    <!-- Visual Architecture Overview -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3>🏗️ Architecture Overview</h3>
+            <div class="architecture-diagram">
+                <div class="arch-layer frontend">
+                    <h4>Frontend Layer</h4>
+                    <div class="arch-components">
+                        <div class="component tickets">tickets.html<br><small>localStorage + Migration</small></div>
+                        <div class="component vulnerabilities">vulnerabilities.html<br><small>API-based</small></div>
+                    </div>
+                </div>
+                <div class="arch-layer backend">
+                    <h4>Backend Layer</h4>
+                    <div class="arch-components">
+                        <div class="component api">server.js<br><small>Express API</small></div>
+                        <div class="component database">SQLite<br><small>data/hextrackr.db</small></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tickets Data Flow (localStorage Pattern) -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3>🎫 Tickets Data Flow (localStorage → Database Migration)</h3>
+            <div class="data-flow-diagram">
+                <div class="flow-step frontend-step">
+                    <h4>Frontend: scripts/pages/tickets.js</h4>
+                    <div class="functions-list">
+                        <div class="function-item">
+                            <code>loadTicketsFromDB()</code>
+                            <span class="arrow">→</span>
+                            <code>GET /api/tickets</code>
+                        </div>
+                        <div class="function-item">
+                            <code>saveTicket()</code>
+                            <span class="arrow">→</span>
+                            <code>POST /api/tickets</code>
+                        </div>
+                        <div class="function-item">
+                            <code>updateTicket()</code>
+                            <span class="arrow">→</span>
+                            <code>PUT /api/tickets/:id</code>
+                        </div>
+                        <div class="function-item">
+                            <code>deleteTicket()</code>
+                            <span class="arrow">→</span>
+                            <code>DELETE /api/tickets/:id</code>
+                        </div>
+                        <div class="function-item migration">
+                            <code>migrateFromLocalStorageIfNeeded()</code>
+                            <span class="arrow">→</span>
+                            <code>POST /api/tickets/migrate</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="flow-step backend-step">
+                    <h4>Backend: server.js API Endpoints</h4>
+                    <div class="endpoints-list">
+                        <div class="endpoint-item">
+                            <code>GET /api/tickets</code>
+                            <div class="description">Retrieve all tickets with filtering</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <code>POST /api/tickets</code>
+                            <div class="description">Create new ticket</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <code>PUT /api/tickets/:id</code>
+                            <div class="description">Update existing ticket</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <code>DELETE /api/tickets/:id</code>
+                            <div class="description">Remove ticket</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <code>GET /api/sites</code>
+                            <div class="description">Get location/site data</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <code>GET /api/locations</code>
+                            <div class="description">Get location options</div>
+                        </div>
+                        <div class="endpoint-item migration">
+                            <code>POST /api/tickets/migrate</code>
+                            <div class="description">Migrate localStorage to database</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vulnerabilities Data Flow (API Pattern) -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3>🛡️ Vulnerabilities Data Flow (Full API Integration)</h3>
+            <div class="data-flow-diagram">
+                <div class="flow-step frontend-step">
+                    <h4>Frontend: vulnerabilities.html (Embedded JS)</h4>
+                    <div class="functions-list">
+                        <div class="function-item">
+                            <code>importCSV()</code>
+                            <span class="arrow">→</span>
+                            <code>POST /api/vulnerabilities/import</code>
+                        </div>
+                        <div class="function-item">
+                            <code>loadVulnerabilities()</code>
+                            <span class="arrow">→</span>
+                            <code>GET /api/vulnerabilities</code>
+                        </div>
+                        <div class="function-item">
+                            <code>loadTrends()</code>
+                            <span class="arrow">→</span>
+                            <code>GET /api/vulnerabilities/trends</code>
+                        </div>
+                        <div class="function-item">
+                            <code>getVulnerabilityStats()</code>
+                            <span class="arrow">→</span>
+                            <code>GET /api/vulnerabilities/stats</code>
+                        </div>
+                        <div class="function-item">
+                            <code>clearAllData()</code>
+                            <span class="arrow">→</span>
+                            <code>DELETE /api/vulnerabilities/clear</code>
+                        </div>
+                        <div class="function-item">
+                            <code>getImportHistory()</code>
+                            <span class="arrow">→</span>
+                            <code>GET /api/imports</code>
+                        </div>
+                        <div class="function-item">
+                            <code>fetchTenableHistoricalData()</code>
+                            <span class="arrow">→</span>
+                            <code>GET /api/tenable/historical-vpr</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="flow-step backend-step">
+                    <h4>Backend: server.js Vulnerability API</h4>
+                    <div class="endpoints-list">
+                        <div class="endpoint-item">
+                            <code>GET /api/vulnerabilities</code>
+                            <div class="description">List vulnerabilities with pagination & filters</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <code>POST /api/vulnerabilities/import</code>
+                            <div class="description">CSV upload with UPSERT logic</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <code>GET /api/vulnerabilities/stats</code>
+                            <div class="description">Dashboard statistics</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <code>GET /api/vulnerabilities/trends</code>
+                            <div class="description">Time-series trend data</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <code>DELETE /api/vulnerabilities/clear</code>
+                            <div class="description">Clear all vulnerability data</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <code>GET /api/imports</code>
+                            <div class="description">Import history with metadata</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <code>GET /api/tenable/historical-vpr</code>
+                            <div class="description">Fetch Tenable historical VPR data</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete API Reference -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3>📋 Complete Server.js API Reference</h3>
+            <div class="api-reference">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Frontend Consumer</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Vulnerability Endpoints -->
+                        <tr class="vulnerability-api">
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/vulnerabilities</code></td>
+                            <td>vulnerabilities.html</td>
+                            <td>List all vulnerabilities with filters</td>
+                        </tr>
+                        <tr class="vulnerability-api">
+                            <td><span class="method post">POST</span></td>
+                            <td><code>/api/vulnerabilities/import</code></td>
+                            <td>vulnerabilities.html</td>
+                            <td>CSV upload and processing</td>
+                        </tr>
+                        <tr class="vulnerability-api">
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/vulnerabilities/stats</code></td>
+                            <td>vulnerabilities.html</td>
+                            <td>Dashboard statistics</td>
+                        </tr>
+                        <tr class="vulnerability-api">
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/vulnerabilities/trends</code></td>
+                            <td>vulnerabilities.html</td>
+                            <td>Time-series data for charts</td>
+                        </tr>
+                        <tr class="vulnerability-api">
+                            <td><span class="method delete">DELETE</span></td>
+                            <td><code>/api/vulnerabilities/clear</code></td>
+                            <td>vulnerabilities.html</td>
+                            <td>Clear all vulnerability data</td>
+                        </tr>
+                        
+                        <!-- Ticket Endpoints -->
+                        <tr class="ticket-api">
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/tickets</code></td>
+                            <td>tickets.js</td>
+                            <td>Retrieve all tickets</td>
+                        </tr>
+                        <tr class="ticket-api">
+                            <td><span class="method post">POST</span></td>
+                            <td><code>/api/tickets</code></td>
+                            <td>tickets.js</td>
+                            <td>Create new ticket</td>
+                        </tr>
+                        <tr class="ticket-api">
+                            <td><span class="method put">PUT</span></td>
+                            <td><code>/api/tickets/:id</code></td>
+                            <td>tickets.js</td>
+                            <td>Update existing ticket</td>
+                        </tr>
+                        <tr class="ticket-api">
+                            <td><span class="method delete">DELETE</span></td>
+                            <td><code>/api/tickets/:id</code></td>
+                            <td>tickets.js</td>
+                            <td>Remove ticket</td>
+                        </tr>
+                        <tr class="ticket-api">
+                            <td><span class="method post">POST</span></td>
+                            <td><code>/api/tickets/migrate</code></td>
+                            <td>tickets.js</td>
+                            <td>Migrate localStorage to database</td>
+                        </tr>
+                        
+                        <!-- Utility Endpoints -->
+                        <tr class="utility-api">
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/imports</code></td>
+                            <td>vulnerabilities.html</td>
+                            <td>Import history metadata</td>
+                        </tr>
+                        <tr class="utility-api">
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/sites</code></td>
+                            <td>tickets.js</td>
+                            <td>Location/site data</td>
+                        </tr>
+                        <tr class="utility-api">
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/locations</code></td>
+                            <td>tickets.js</td>
+                            <td>Location dropdown options</td>
+                        </tr>
+                        
+                        <!-- Backup Endpoints -->
+                        <tr class="backup-api">
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/backup/stats</code></td>
+                            <td>Potential future use</td>
+                            <td>Database statistics</td>
+                        </tr>
+                        <tr class="backup-api">
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/backup/vulnerabilities</code></td>
+                            <td>Potential future use</td>
+                            <td>Export vulnerabilities</td>
+                        </tr>
+                        <tr class="backup-api">
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/backup/tickets</code></td>
+                            <td>Potential future use</td>
+                            <td>Export tickets</td>
+                        </tr>
+                        <tr class="backup-api">
+                            <td><span class="method get">GET</span></td>
+                            <td><code>/api/backup/all</code></td>
+                            <td>Potential future use</td>
+                            <td>Complete data export</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Flow Patterns -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3>🔄 Current Data Flow Patterns</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="pattern-card localStorage-pattern">
+                        <h4>📦 Tickets: localStorage → Database Migration</h4>
+                        <div class="pattern-steps">
+                            <div class="step">1. Check for localStorage data</div>
+                            <div class="step">2. Migrate to database if found</div>
+                            <div class="step">3. Use API for all new operations</div>
+                            <div class="step">4. Clear localStorage after migration</div>
+                        </div>
+                        <div class="pattern-status transition">
+                            <strong>Status:</strong> Transition complete - now API-based
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="pattern-card api-pattern">
+                        <h4>🛡️ Vulnerabilities: Full API Integration</h4>
+                        <div class="pattern-steps">
+                            <div class="step">1. CSV upload via multipart/form-data</div>
+                            <div class="step">2. Server processing with UPSERT logic</div>
+                            <div class="step">3. Time-series data storage</div>
+                            <div class="step">4. Real-time dashboard updates</div>
+                        </div>
+                        <div class="pattern-status complete">
+                            <strong>Status:</strong> Complete API-based architecture
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Future Architecture -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3>🚀 Future Architecture Considerations</h3>
+            <div class="future-considerations">
+                <div class="consideration">
+                    <h4>Authentication Integration</h4>
+                    <p>Add JWT token authentication to all API endpoints for secure multi-user access.</p>
+                </div>
+                <div class="consideration">
+                    <h4>Real-time Updates</h4>
+                    <p>Implement WebSocket connections for live data updates across multiple browser sessions.</p>
+                </div>
+                <div class="consideration">
+                    <h4>API Versioning</h4>
+                    <p>Version API endpoints (e.g., <code>/api/v1/</code>) to support backward compatibility during updates.</p>
+                </div>
+                <div class="consideration">
+                    <h4>Ticket-Vulnerability Cross-Reference</h4>
+                    <p>Implement API endpoints for the <code>ticket_vulnerabilities</code> junction table.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* UI-API Flowcharts Styling */
+.architecture-diagram {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.arch-layer {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.arch-layer.frontend {
+    background: linear-gradient(90deg, #e3f2fd 0%, #bbdefb 100%);
+    border-left: 4px solid #2196f3;
+}
+
+.arch-layer.backend {
+    background: linear-gradient(90deg, #f3e5f5 0%, #e1bee7 100%);
+    border-left: 4px solid #9c27b0;
+}
+
+.arch-components {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.component {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    flex: 1;
+    min-width: 200px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.data-flow-diagram {
+    display: flex;
+    gap: 30px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.flow-step {
+    flex: 1;
+    min-width: 300px;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.flow-step.frontend-step {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    border-left: 4px solid #4caf50;
+}
+
+.flow-step.backend-step {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%);
+    border-left: 4px solid #ff9800;
+}
+
+.functions-list, .endpoints-list {
+    margin-top: 15px;
+}
+
+.function-item, .endpoint-item {
+    background: white;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.function-item.migration, .endpoint-item.migration {
+    border-left: 4px solid #ff5722;
+    background: linear-gradient(90deg, #fff8f7 0%, #ffebee 100%);
+}
+
+.arrow {
+    margin: 0 10px;
+    color: #666;
+    font-weight: bold;
+}
+
+.method {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: white;
+    min-width: 45px;
+    text-align: center;
+    display: inline-block;
+}
+
+.method.get { background: #4caf50; }
+.method.post { background: #2196f3; }
+.method.put { background: #ff9800; }
+.method.delete { background: #f44336; }
+
+.api-reference {
+    margin: 20px 0;
+}
+
+.vulnerability-api { background: rgba(76, 175, 80, 0.1); }
+.ticket-api { background: rgba(33, 150, 243, 0.1); }
+.utility-api { background: rgba(255, 152, 0, 0.1); }
+.backup-api { background: rgba(96, 125, 139, 0.1); }
+
+.pattern-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 10px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.localStorage-pattern {
+    border-left: 4px solid #ff9800;
+}
+
+.api-pattern {
+    border-left: 4px solid #4caf50;
+}
+
+.pattern-steps {
+    margin: 15px 0;
+}
+
+.step {
+    padding: 5px 0;
+    padding-left: 20px;
+    position: relative;
+}
+
+.step::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: #666;
+}
+
+.pattern-status {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.pattern-status.transition {
+    background: linear-gradient(90deg, #fff8e1 0%, #ffecb3 100%);
+    border: 1px solid #ffc107;
+}
+
+.pattern-status.complete {
+    background: linear-gradient(90deg, #e8f5e8 0%, #c8e6c9 100%);
+    border: 1px solid #4caf50;
+}
+
+.future-considerations {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.consideration {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    border-left: 4px solid #673ab7;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.consideration h4 {
+    color: #673ab7;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .data-flow-diagram {
+        flex-direction: column;
+    }
+    
+    .arch-components {
+        flex-direction: column;
+    }
+    
+    .function-item, .endpoint-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .arrow {
+        margin: 5px 0;
+        transform: rotate(90deg);
+    }
+}
+</style>
