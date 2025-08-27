@@ -466,17 +466,17 @@ app.post('/api/tickets', (req, res) => {
     const ticket = req.body;
     
     const sql = `INSERT INTO tickets (
-        id, start_date, end_date, primary_number, incident_number, site_code,
-        affected_devices, assignee, notes, status, priority, linked_cves,
-        created_at, updated_at, display_site_code, ticket_number, site_id, location_id
+        id, date_submitted, date_due, hexagon_ticket, service_now_ticket, location,
+        devices, supervisor, tech, status, notes, attachments,
+        created_at, updated_at, site, xt_number, site_id, location_id
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     
     const params = [
-        ticket.id, ticket.start_date, ticket.end_date, ticket.primary_number,
-        ticket.incident_number, ticket.site_code, JSON.stringify(ticket.affected_devices),
-        ticket.assignee, ticket.notes, ticket.status, ticket.priority,
-        JSON.stringify(ticket.linked_cves), ticket.created_at, ticket.updated_at,
-        ticket.display_site_code, ticket.ticket_number, ticket.site_id, ticket.location_id
+        ticket.id, ticket.dateSubmitted, ticket.dateDue, ticket.hexagonTicket,
+        ticket.serviceNowTicket, ticket.location, JSON.stringify(ticket.devices),
+        ticket.supervisor, ticket.tech, ticket.status, ticket.notes,
+        JSON.stringify(ticket.attachments || []), ticket.createdAt, ticket.updatedAt,
+        ticket.site, ticket.xt_number, ticket.site_id, ticket.location_id
     ];
     
     db.run(sql, params, function(err) {
@@ -485,7 +485,35 @@ app.post('/api/tickets', (req, res) => {
             res.status(500).json({ error: 'Failed to save ticket' });
             return;
         }
-        res.json({ success: true, id: ticket.id });
+        res.json({ success: true, id: ticket.id, message: 'Ticket saved successfully' });
+    });
+});
+
+app.put('/api/tickets/:id', (req, res) => {
+    const ticketId = req.params.id;
+    const ticket = req.body;
+    
+    const sql = `UPDATE tickets SET 
+        date_submitted = ?, date_due = ?, hexagon_ticket = ?, service_now_ticket = ?, 
+        location = ?, devices = ?, supervisor = ?, tech = ?, status = ?, notes = ?, 
+        attachments = ?, updated_at = ?, site = ?, xt_number = ?, site_id = ?, location_id = ?
+        WHERE id = ?`;
+    
+    const params = [
+        ticket.dateSubmitted, ticket.dateDue, ticket.hexagonTicket,
+        ticket.serviceNowTicket, ticket.location, JSON.stringify(ticket.devices),
+        ticket.supervisor, ticket.tech, ticket.status, ticket.notes,
+        JSON.stringify(ticket.attachments || []), ticket.updatedAt,
+        ticket.site, ticket.xt_number, ticket.site_id, ticket.location_id, ticketId
+    ];
+    
+    db.run(sql, params, function(err) {
+        if (err) {
+            console.error('Error updating ticket:', err);
+            res.status(500).json({ error: 'Failed to update ticket' });
+            return;
+        }
+        res.json({ success: true, id: ticketId, message: 'Ticket updated successfully' });
     });
 });
 
