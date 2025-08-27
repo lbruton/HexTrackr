@@ -70,13 +70,21 @@ class HexagonTicketsManager {
         // Calculate if the ticket is overdue based on due date
         const dueDate = rawTicket.date_due || rawTicket.dateDue;
         const isOverdue = dueDate ? new Date(dueDate) < new Date() : false;
-        const status = rawTicket.status || '';
+        let status = rawTicket.status || '';
+        
+        // Auto-update status to "Overdue" if conditions are met
+        if (isOverdue && status !== 'Completed' && status !== 'Closed' && status !== 'Overdue') {
+            status = 'Overdue';
+            // Update the status in the database asynchronously
+            this.updateTicketStatusToOverdue(rawTicket.id);
+        }
         
         // Don't mark completed or closed tickets as overdue
         const isActiveOverdue = isOverdue && status !== 'Completed' && status !== 'Closed';
         
         return {
             ...rawTicket,
+            status: status, // Use the potentially updated status
             devices: typeof rawTicket.devices === 'string' ? JSON.parse(rawTicket.devices) : rawTicket.devices || [],
             attachments: typeof rawTicket.attachments === 'string' ? JSON.parse(rawTicket.attachments) : rawTicket.attachments || [],
             xtNumber: rawTicket.xt_number || rawTicket.xtNumber,
@@ -146,6 +154,27 @@ class HexagonTicketsManager {
             console.error('Error saving ticket:', error);
             this.showToast('Error saving ticket: ' + error.message, 'error');
             throw error;
+        }
+    }
+
+    // Method to update ticket status to "Overdue" in the database
+    async updateTicketStatusToOverdue(ticketId) {
+        try {
+            const response = await fetch(`/api/tickets/${ticketId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: 'Overdue' })
+            });
+
+            if (response.ok) {
+                console.log(`Ticket ${ticketId} status updated to Overdue`);
+            } else {
+                console.error(`Failed to update ticket ${ticketId} status to Overdue`);
+            }
+        } catch (error) {
+            console.error(`Error updating ticket ${ticketId} to overdue:`, error);
         }
     }
 
@@ -1051,9 +1080,7 @@ class HexagonTicketsManager {
         const total = this.tickets.length;
         const open = this.tickets.filter(t => t.status === 'Open' || t.status === 'In Progress').length;
         const completed = this.tickets.filter(t => t.status === 'Completed' || t.status === 'Closed').length;
-        const overdue = this.tickets.filter(t => {
-            return new Date(t.dateDue) < new Date() && t.status !== 'Completed' && t.status !== 'Closed';
-        }).length;
+        const overdue = this.tickets.filter(t => t.status === 'Overdue').length;
 
         document.getElementById('totalTickets').textContent = total;
         document.getElementById('openTickets').textContent = open;

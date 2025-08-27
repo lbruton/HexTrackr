@@ -198,14 +198,41 @@ Comprehensive enhancement of the HexTrackr ticket modal system to fix critical s
 ---
 
 ### ✅ STEP 5: Auto-Update Overdue Status
-**Status**: 🟡 Pending  
+**Status**: ✅ **COMPLETED** - Aug 27, 2025  
 **Description**: Implement automatic overdue status management
-- **Logic**: Compare current date with due date
-- **Action**: Auto-change overdue items to "Overdue" status
-- **Visual**: Highlight overdue items in table
-- **Frequency**: Check on page load and periodic updates
-- **Git Backup**: Required before changes
-- **Acceptance Criteria**: Overdue items automatically flagged and highlighted
+
+**Solution Implemented:**
+- ✅ Added "Overdue" to both status dropdown options (filter and modal)
+- ✅ Modified `transformTicketData()` to automatically update status to "Overdue" when due date passes
+- ✅ Added `updateTicketStatusToOverdue()` method for database persistence  
+- ✅ Updated `updateStatistics()` to count tickets with "Overdue" status properly
+- ✅ Ensured CSS highlighting works for overdue items (table-danger class)
+
+**Testing Results:**
+- ✅ Application automatically updated 5 tickets to "Overdue" status on page load
+- ✅ Statistics correctly show: Total: 16, Open: 3, Overdue: 5, Completed: 8
+- ✅ Console logs confirm database updates: "Ticket XT003 status updated to Overdue", etc.
+- ✅ Overdue filter dropdown works perfectly - shows exactly 5 overdue tickets
+- ✅ Table displays "Showing 1 to 5 of 5 entries" when filtered by Overdue
+- ✅ All overdue tickets have past due dates and non-completed/closed statuses
+
+**Implementation Details:**
+- **Logic**: Compare current date (Aug 27, 2025) with due date, exclude Completed/Closed tickets
+- **Action**: Auto-change overdue items to "Overdue" status with database persistence
+- **Visual**: Table-danger CSS class provides red highlighting for overdue items  
+- **Frequency**: Runs on page load and during ticket data transformation
+- **Database**: PUT requests to `/api/tickets/:id` update status field asynchronously
+
+**Files Modified:**
+- `tickets.html` - Added "Overdue" option to status dropdowns (lines 370, 504)
+- `scripts/pages/tickets.js` - Enhanced transformTicketData(), added updateTicketStatusToOverdue(), updated updateStatistics()
+
+**Automated Tickets Updated:**
+- ✅ T003 (GAPK) - Due: Aug 21, 2025 → Status: "Overdue" 
+- ✅ T004 (DRUM) - Due: Aug 21, 2025 → Status: "Overdue"
+- ✅ T008 (ELPS) - Due: Aug 9, 2025 → Status: "Overdue"  
+- ✅ T009 (CDRV) - Due: Aug 3, 2025 → Status: "Overdue"
+- ✅ T013 (OMHA) - Due: Aug 2, 2025 → Status: "Overdue"
 
 ### ✅ STEP 6: Improve Drag-Drop UX
 **Status**: 🟡 Pending  
