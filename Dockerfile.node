@@ -10,7 +10,7 @@ RUN apk add --no-cache python3 make g++
 COPY package*.json ./
 
 # Install dependencies and rebuild native modules
-RUN npm install --only=production
+RUN npm install
 RUN npm rebuild
 
 # Copy application files (but not node_modules)
@@ -18,12 +18,4 @@ COPY *.html ./
 COPY *.js ./
 COPY *.css ./
 COPY *.json ./
-COPY data/ ./data/
-COPY help/ ./help/
-COPY uploads/ ./uploads/
-
-# Expose port
-EXPOSE 8080
-
-# Start the server
-CMD ["npm", "start"]
+COPY eslint.config.mjs ./

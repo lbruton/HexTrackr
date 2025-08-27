@@ -64,26 +64,26 @@ class HexagonTicketsManager {
 
     // ==================== DATABASE API METHODS ====================
 
+    // Helper function to transform raw ticket data
+    transformTicketData(rawTicket) {
+        return {
+            ...rawTicket,
+            devices: typeof rawTicket.devices === 'string' ? JSON.parse(rawTicket.devices) : rawTicket.devices || [],
+            attachments: typeof rawTicket.attachments === 'string' ? JSON.parse(rawTicket.attachments) : rawTicket.attachments || [],
+            xtNumber: rawTicket.xt_number || rawTicket.xtNumber,
+            dateSubmitted: rawTicket.date_submitted || rawTicket.dateSubmitted,
+            dateDue: rawTicket.date_due || rawTicket.dateDue,
+            hexagonTicket: rawTicket.hexagon_ticket || rawTicket.hexagonTicket,
+            serviceNowTicket: rawTicket.service_now_ticket || rawTicket.serviceNowTicket
+        };
+    }
+
     async loadTicketsFromDB() {
         try {
             const response = await fetch('/api/tickets');
             if (response.ok) {
                 const rawTickets = await response.json();
-                
-                // Convert data types for frontend compatibility
-                this.tickets = rawTickets.map(ticket => ({
-                    ...ticket,
-                    // Convert JSON string fields to arrays
-                    devices: typeof ticket.devices === 'string' ? JSON.parse(ticket.devices) : ticket.devices || [],
-                    attachments: typeof ticket.attachments === 'string' ? JSON.parse(ticket.attachments) : ticket.attachments || [],
-                    // Ensure consistent property names
-                    xtNumber: ticket.xt_number || ticket.xtNumber,
-                    dateSubmitted: ticket.date_submitted || ticket.dateSubmitted,
-                    dateDue: ticket.date_due || ticket.dateDue,
-                    hexagonTicket: ticket.hexagon_ticket || ticket.hexagonTicket,
-                    serviceNowTicket: ticket.service_now_ticket || ticket.serviceNowTicket
-                }));
-                
+                this.tickets = rawTickets.map(this.transformTicketData);
                 console.log('Loaded', this.tickets.length, 'tickets from database');
             } else {
                 console.error('Failed to load tickets:', response.statusText);
@@ -333,7 +333,7 @@ class HexagonTicketsManager {
 
     updateDeviceButtons() {
         const deviceEntries = document.querySelectorAll('.device-entry');
-        deviceEntries.forEach((entry, index) => {
+        deviceEntries.forEach((entry) => {
             const removeBtn = entry.querySelector('.remove-device-btn');
             if (deviceEntries.length === 1) {
                 removeBtn.style.display = 'none';
@@ -362,11 +362,11 @@ class HexagonTicketsManager {
             devices = [''];
         }
         
-        devices.forEach((device, index) => {
+        devices.forEach((device) => {
             const deviceEntry = document.createElement('div');
             deviceEntry.className = 'device-entry mb-2';
             deviceEntry.draggable = true;
-            
+
             deviceEntry.innerHTML = `
                 <div class="input-group">
                     <span class="input-group-text drag-handle" style="cursor: grab;">
@@ -381,7 +381,6 @@ class HexagonTicketsManager {
                     </button>
                 </div>
             `;
-            
             container.appendChild(deviceEntry);
             this.setupDragAndDrop(deviceEntry);
         });
@@ -537,7 +536,7 @@ class HexagonTicketsManager {
 
             // Show success message
             this.showToast('Ticket saved successfully!', 'success');
-        } catch (error) {
+        } catch {
             // Error is already handled in saveTicketToDB, just return
             return;
         }
@@ -623,7 +622,7 @@ class HexagonTicketsManager {
                     </td>
                 </tr>
             `;
-            this.updatePaginationInfo(0, 0, 0, 0);
+            this.updatePaginationInfo(0, 0, 0);
             this.renderPaginationControls(0);
             return;
         }
@@ -692,11 +691,11 @@ class HexagonTicketsManager {
         }).join('');
 
         // Update pagination info and controls
-        this.updatePaginationInfo(startIndex + 1, endIndex, totalItems, totalPages);
+        this.updatePaginationInfo(startIndex + 1, endIndex, totalItems);
         this.renderPaginationControls(totalPages);
     }
 
-    updatePaginationInfo(start, end, total, totalPages) {
+    updatePaginationInfo(start, end, total) {
         const paginationInfo = document.getElementById('paginationInfo');
         if (total === 0) {
             paginationInfo.textContent = 'Showing 0 to 0 of 0 entries';
@@ -1256,7 +1255,7 @@ class HexagonTicketsManager {
 
             // Add shared documentation files (uploaded via "Attach Documentation")
             if (this.sharedDocumentation && this.sharedDocumentation.length > 0) {
-                this.sharedDocumentation.forEach((doc_file, index) => {
+                this.sharedDocumentation.forEach((doc_file) => {
                     // Convert base64 back to blob
                     const base64Data = doc_file.content.split(',')[1];
                     const binaryString = atob(base64Data);

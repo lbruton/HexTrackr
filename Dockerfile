@@ -13,8 +13,14 @@ COPY package*.json ./
 # Install dependencies and rebuild native modules for the container architecture
 RUN npm ci --only=production && npm rebuild
 
+# Install ESLint globally for linting support
+RUN npm install -g eslint
+
 # Copy application files (excluding node_modules from host)
 COPY . .
+
+# Copy ESLint configuration file to /app directory
+COPY eslint.config.js /app/
 
 # Create data directory for file uploads
 RUN mkdir -p /app/data
