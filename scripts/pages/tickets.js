@@ -1304,103 +1304,130 @@ class HexagonTicketsManager {
         try {
             const zip = new JSZip();
 
-            // Generate the PDF content
+            // Generate the PDF content using the same structure as markdown
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
 
+            // Set up margins and formatting constants
+            const margin = 20;
+            const pageWidth = 170; // A4 width minus margins
+            let yPosition = 25;
+            const lineHeight = 7;
+            const sectionSpacing = 10;
+
             // Title
-            doc.setFontSize(16);
+            doc.setFontSize(18);
             doc.setTextColor(0, 102, 204);
-            doc.text(`Hexagon Ticket [${ticket.hexagonTicket}]`, 20, 25);
+            doc.text('Hexagon Work Request', margin, yPosition);
+            yPosition += 15;
 
-            // Content styling
+            // Ticket Information Section
+            doc.setFontSize(14);
             doc.setTextColor(0, 0, 0);
-            doc.setFontSize(12);
-
-            let yPosition = 45;
-            const lineHeight = 8;
-            const sectionSpacing = 12;
-
-            // Site/Group
             doc.setFont('helvetica', 'bold');
-            doc.text('Site/Group:', 20, yPosition);
+            doc.text('Ticket Information:', margin, yPosition);
+            yPosition += lineHeight + 3;
+
+            doc.setFontSize(11);
             doc.setFont('helvetica', 'normal');
-            doc.text(`${ticket.location}`, 20, yPosition + lineHeight);
-            yPosition += sectionSpacing;
-
-            // Subject
-            doc.setFont('helvetica', 'bold');
-            doc.text('Subject:', 20, yPosition);
-            doc.setFont('helvetica', 'normal');
-            doc.text(`NETOPS: Software Upgrades [${ticket.location}]`, 20, yPosition + lineHeight);
-            yPosition += sectionSpacing;
-
-            // Start Date
-            doc.setFont('helvetica', 'bold');
-            doc.text('Start Date:', 20, yPosition);
-            doc.setFont('helvetica', 'normal');
-            doc.text(this.formatDate(ticket.dateSubmitted), 20, yPosition + lineHeight);
-            yPosition += sectionSpacing;
-
-            // Required Completion Date
-            doc.setFont('helvetica', 'bold');
-            doc.text('Required Completion Date:', 20, yPosition);
-            doc.setFont('helvetica', 'normal');
-            doc.text(this.formatDate(ticket.dateDue), 20, yPosition + lineHeight);
-            yPosition += sectionSpacing;
-
-            // Task Instruction
-            doc.setFont('helvetica', 'bold');
-            doc.text('Task Instruction:', 20, yPosition);
+            doc.text(`• Hexagon Ticket #: ${ticket.hexagonTicket || 'N/A'}`, margin + 5, yPosition);
             yPosition += lineHeight;
-            doc.setFont('helvetica', 'normal');
-            
-            const taskText = `There are critical security patches that must be applied within 30 days at the [${ticket.location}] site.`;
-            const splitTaskText = doc.splitTextToSize(taskText, 170);
-            doc.text(splitTaskText, 20, yPosition);
-            yPosition += splitTaskText.length * 6 + 8;
+            doc.text(`• ServiceNow Ticket #: ${ticket.serviceNowTicket || 'N/A'}`, margin + 5, yPosition);
+            yPosition += lineHeight;
+            doc.text(`• Site: ${ticket.site || 'N/A'}`, margin + 5, yPosition);
+            yPosition += lineHeight;
+            doc.text(`• Location: ${ticket.location || 'N/A'}`, margin + 5, yPosition);
+            yPosition += lineHeight;
+            doc.text(`• Status: ${ticket.status || 'N/A'}`, margin + 5, yPosition);
+            yPosition += sectionSpacing + 5;
 
-            // Instructions with Service Now info
-            const instructionText = `Please schedule a maintenance outage of at least two hours and contact the ITCC @ 918-732-4822 with service now ticket number [${ticket.serviceNowTicket || 'TBD'}] to coordinate Netops to apply security updates and reboot the equipment.`;
-            const splitInstructionText = doc.splitTextToSize(instructionText, 170);
-            doc.text(splitInstructionText, 20, yPosition);
-            yPosition += splitInstructionText.length * 6 + 15;
+            // Timeline Section
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Timeline:', margin, yPosition);
+            yPosition += lineHeight + 3;
+
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`• Date Submitted: ${this.formatDate(ticket.dateSubmitted)}`, margin + 5, yPosition);
+            yPosition += lineHeight;
+            doc.text(`• Required Completion Date: ${this.formatDate(ticket.dateDue)}`, margin + 5, yPosition);
+            yPosition += sectionSpacing + 5;
+
+            // Task Instruction Section
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Task Instruction:', margin, yPosition);
+            yPosition += lineHeight + 3;
+            
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            const taskText = `There are critical security patches that must be applied within 30 days at the [${ticket.site || 'SITE NAME'}] site.`;
+            const splitTaskText = doc.splitTextToSize(taskText, pageWidth);
+            doc.text(splitTaskText, margin, yPosition);
+            yPosition += splitTaskText.length * lineHeight + 5;
+
+            const instructionText = `Please schedule a maintenance outage of at least two hours and contact the ITCC @ 918-732-4822 with service now ticket number [${ticket.serviceNowTicket || 'SERVICE NOW TICKET'}] to coordinate Netops to apply security updates and reboot the equipment.`;
+            const splitInstructionText = doc.splitTextToSize(instructionText, pageWidth);
+            doc.text(splitInstructionText, margin, yPosition);
+            yPosition += splitInstructionText.length * lineHeight + sectionSpacing;
 
             // Devices section
-            doc.setFont('helvetica', 'bold');
-            doc.text('The devices will be updated and rebooted in the following order:', 20, yPosition);
-            yPosition += lineHeight + 5;
-
-            doc.setFont('helvetica', 'normal');
-            ticket.devices.forEach((device, index) => {
-                doc.text(`${index + 1}. ${device}`, 30, yPosition);
-                yPosition += lineHeight;
-            });
-
-            // Footer with additional details
-            yPosition += 20;
-            doc.setFontSize(10);
-            doc.setTextColor(100, 100, 100);
-            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, yPosition);
-            doc.text(`Supervisor: ${ticket.supervisor}`, 20, yPosition + 6);
-            doc.text(`Tech: ${ticket.tech}`, 20, yPosition + 12);
-            doc.text(`Status: ${ticket.status}`, 20, yPosition + 18);
-
-            if (ticket.notes) {
-                yPosition += 30;
+            if (ticket.devices && ticket.devices.length > 0) {
+                doc.setFontSize(14);
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(12);
-                doc.setTextColor(0, 0, 0);
-                doc.text('Notes:', 20, yPosition);
-                yPosition += 8;
+                doc.text('Devices to be Updated:', margin, yPosition);
+                yPosition += lineHeight + 3;
+
+                doc.setFontSize(11);
                 doc.setFont('helvetica', 'normal');
-                doc.setFontSize(10);
-                const splitNotes = doc.splitTextToSize(ticket.notes, 170);
-                doc.text(splitNotes, 20, yPosition);
+                doc.text('The following devices will be updated and rebooted:', margin, yPosition);
+                yPosition += lineHeight + 3;
+
+                ticket.devices.forEach((device, index) => {
+                    doc.text(`${index + 1}. ${device}`, margin + 5, yPosition);
+                    yPosition += lineHeight;
+                });
+                yPosition += sectionSpacing;
             }
 
+            // Personnel section
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Personnel:', margin, yPosition);
+            yPosition += lineHeight + 3;
+
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`• Supervisor: ${ticket.supervisor || 'N/A'}`, margin + 5, yPosition);
+            yPosition += lineHeight;
+            doc.text(`• Technician: ${ticket.tech || 'N/A'}`, margin + 5, yPosition);
+            yPosition += sectionSpacing + 5;
+
+            // Additional Notes section
+            if (ticket.notes && ticket.notes.trim()) {
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Additional Notes:', margin, yPosition);
+                yPosition += lineHeight + 3;
+
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'normal');
+                const splitNotes = doc.splitTextToSize(ticket.notes, pageWidth);
+                doc.text(splitNotes, margin, yPosition);
+                yPosition += splitNotes.length * lineHeight + sectionSpacing;
+            }
+
+            // Footer with generation info
+            yPosition += 10;
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            doc.text('---', margin, yPosition);
+            yPosition += 5;
+            doc.text(`Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, margin, yPosition);
+
             // Generate base filename
-            const siteName = ticket.location.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '');
+            const siteName = (ticket.site || ticket.location || 'UNKNOWN').replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '');
             const dateStr = ticket.dateSubmitted.replace(/-/g, '');
             const ticketNum = ticket.hexagonTicket.replace(/[^a-zA-Z0-9]/g, '');
             const baseFilename = `${siteName}_${dateStr}_${ticketNum}`;
@@ -1408,6 +1435,11 @@ class HexagonTicketsManager {
             // Add PDF to zip
             const pdfBlob = doc.output('blob');
             zip.file(`${baseFilename}.pdf`, pdfBlob);
+
+            // Generate and add markdown file to zip
+            const markdownContent = this.generateMarkdown(ticket);
+            const markdownBlob = new Blob([markdownContent], { type: 'text/markdown' });
+            zip.file(`${baseFilename}.md`, markdownBlob);
 
             // Add shared documentation files (uploaded via "Attach Documentation")
             if (this.sharedDocumentation && this.sharedDocumentation.length > 0) {
@@ -1686,6 +1718,7 @@ class HexagonTicketsManager {
         markdown += `**Ticket Information:**\n`;
         markdown += `- Hexagon Ticket #: ${ticket.hexagonTicket || 'N/A'}\n`;
         markdown += `- ServiceNow Ticket #: ${ticket.serviceNowTicket || 'N/A'}\n`;
+        markdown += `- Site: ${ticket.site || 'N/A'}\n`;
         markdown += `- Location: ${ticket.location || 'N/A'}\n`;
         markdown += `- Status: ${ticket.status || 'N/A'}\n\n`;
         
@@ -1694,7 +1727,7 @@ class HexagonTicketsManager {
         markdown += `- Required Completion Date: ${this.formatDate(ticket.dateDue)}\n\n`;
         
         markdown += `**Task Instruction:**\n`;
-        markdown += `There are critical security patches that must be applied within 30 days at the [${ticket.location || 'SITE NAME'}] site.\n`;
+        markdown += `There are critical security patches that must be applied within 30 days at the [${ticket.site || 'SITE NAME'}] site.\n`;
         markdown += `Please schedule a maintenance outage of at least two hours and contact the ITCC @\n`;
         markdown += `918-732-4822 with service now ticket number [${ticket.serviceNowTicket || 'SERVICE NOW TICKET'}] to coordinate Netops to apply security\n`;
         markdown += `updates and reboot the equipment.\n\n`;

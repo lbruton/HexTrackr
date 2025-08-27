@@ -156,7 +156,48 @@ Comprehensive enhancement of the HexTrackr ticket modal system to fix critical s
 - ✅ Modal status dropdown displays all new options correctly
 - ✅ Filter status dropdown shows complete new workflow  
 - ✅ T009 ticket successfully migrated from "In Progress" → "Open"
-- ✅ Page loads without errors, statistics update correctly### ✅ STEP 5: Auto-Update Overdue Status
+- ✅ Page loads without errors, statistics update correctly
+
+---
+
+### ✅ STEP 4.5: Fix PDF/Markdown Generation for Site/Location Fields
+**Status**: ✅ **COMPLETED** - Aug 27, 2025
+
+**Description**: Update PDF and markdown generation to properly display site and location fields
+
+**Problems Identified:**
+- ❌ Markdown generation only showed location field, missing site field
+- ❌ Task instruction body used location instead of site name
+- ❌ PDF generation missing comprehensive markdown content  
+- ❌ PDF formatting could be improved for better readability
+
+**Solution Implemented:**
+- ✅ Updated `generateMarkdown()` function to include both Site and Location fields separately
+- ✅ Modified task instruction to use site name instead of location in body text
+- ✅ Enhanced PDF generation in `bundleTicketFiles()` with complete markdown structure
+- ✅ Improved PDF formatting with better margins, font sizes, and section organization
+- ✅ Added markdown file (.md) to download bundle alongside PDF
+- ✅ Updated filename generation to prioritize site over location for consistency
+
+**Implementation Details:**
+- ✅ **Markdown Template**: Now shows "Site: [site]" and "Location: [location]" as separate fields
+- ✅ **Task Instruction**: Uses `ticket.site` instead of `ticket.location` for site reference
+- ✅ **PDF Content**: Matches markdown structure with all sections (Timeline, Personnel, Notes)
+- ✅ **Bundle Contents**: PDF + Markdown + attachments + documentation files
+- ✅ **Enhanced PDF Styling**: Professional layout with proper typography and spacing
+
+**Files Modified:**
+- `scripts/pages/tickets.js` - Updated `generateMarkdown()` and `bundleTicketFiles()` functions
+
+**Testing Requirements:**
+- 🟡 Test markdown generation with tickets containing both site and location data
+- 🟡 Verify PDF includes all markdown content and displays properly  
+- 🟡 Confirm bundle download includes both PDF and markdown files
+- 🟡 Validate task instruction shows correct site name in body text
+
+---
+
+### ✅ STEP 5: Auto-Update Overdue Status
 **Status**: 🟡 Pending  
 **Description**: Implement automatic overdue status management
 - **Logic**: Compare current date with due date
