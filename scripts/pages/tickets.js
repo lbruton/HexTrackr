@@ -67,9 +67,23 @@ class HexagonTicketsManager {
         try {
             const response = await fetch('/api/tickets');
             if (response.ok) {
-                this.tickets = await response.json();
+                const rawTickets = await response.json();
+                
+                // Convert data types for frontend compatibility
+                this.tickets = rawTickets.map(ticket => ({
+                    ...ticket,
+                    // Convert JSON string fields to arrays
+                    devices: typeof ticket.devices === 'string' ? JSON.parse(ticket.devices) : ticket.devices || [],
+                    attachments: typeof ticket.attachments === 'string' ? JSON.parse(ticket.attachments) : ticket.attachments || [],
+                    // Ensure consistent property names
+                    xtNumber: ticket.xt_number || ticket.xtNumber,
+                    dateSubmitted: ticket.date_submitted || ticket.dateSubmitted,
+                    dateDue: ticket.date_due || ticket.dateDue,
+                    hexagonTicket: ticket.hexagon_ticket || ticket.hexagonTicket,
+                    serviceNowTicket: ticket.service_now_ticket || ticket.serviceNowTicket
+                }));
+                
                 console.log('Loaded', this.tickets.length, 'tickets from database');
-                // No longer need to setup supervisor chips since they're in the table
             } else {
                 console.error('Failed to load tickets:', response.statusText);
                 this.showToast('Failed to load tickets from database', 'error');

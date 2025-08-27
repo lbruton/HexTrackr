@@ -118,6 +118,10 @@ console.log('✅ HexTrackr Settings Modal (shared) loaded successfully');
         // Settings save button
         document.getElementById('saveSettings')?.addEventListener('click', saveSettings);
         
+        // CSV Import buttons
+        document.getElementById('importTicketsCSV')?.addEventListener('click', () => importCSV('tickets'));
+        document.getElementById('importVulnerabilitiesCSV')?.addEventListener('click', () => importCSV('vulnerabilities'));
+        
         // Initialize ServiceNow settings when modal is shown
         this.modal.addEventListener('shown.bs.modal', initServiceNowSettings);
         
@@ -883,20 +887,25 @@ function isServiceNowEnabled() {
  */
 function convertTicketsToCSV(tickets) {
     if (!tickets || tickets.length === 0) {
-        return 'id,xt_number,title,description,priority,status,created_at,site_code,location_code\n';
+        return 'id,xt_number,date_submitted,date_due,hexagon_ticket,service_now_ticket,location,devices,supervisor,tech,status,notes,created_at,updated_at\n';
     }
     
-    // Transform tickets for CSV
+    // Transform tickets for CSV with proper field mapping
     const csvData = tickets.map(ticket => ({
         id: ticket.id || '',
         xt_number: ticket.xt_number || '',
-        title: ticket.title || '',
-        description: ticket.description || '',
-        priority: ticket.priority || '',
+        date_submitted: ticket.date_submitted || '',
+        date_due: ticket.date_due || '',
+        hexagon_ticket: ticket.hexagon_ticket || '',
+        service_now_ticket: ticket.service_now_ticket || '',
+        location: ticket.location || '',
+        devices: ticket.devices || '',
+        supervisor: ticket.supervisor || '',
+        tech: ticket.tech || '',
         status: ticket.status || '',
+        notes: ticket.notes || '',
         created_at: ticket.created_at || '',
-        site_code: ticket.site_code || '',
-        location_code: ticket.location_code || ''
+        updated_at: ticket.updated_at || ''
     }));
     
     return Papa.unparse(csvData);
@@ -991,6 +1000,79 @@ async function exportAllDataAsCSV() {
     } catch (error) {
         console.error('Error creating all data CSV export:', error);
         showNotification(`All data CSV export failed: ${error.message}`, 'danger');
+    }
+}
+
+/**
+ * Import CSV data
+ * @param {string} type - Type of data to import ('tickets' or 'vulnerabilities')
+ */
+async function importCSV(type) {
+    try {
+        // Create a file input element
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.csv';
+        fileInput.style.display = 'none';
+        
+        fileInput.addEventListener('change', async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            try {
+                // Read the CSV file
+                const text = await file.text();
+                const data = Papa.parse(text, { 
+                    header: true, 
+                    skipEmptyLines: true 
+                });
+                
+                if (data.errors.length > 0) {
+                    throw new Error(`CSV parsing errors: ${data.errors.map(e => e.message).join(', ')}`);
+                }
+                
+                // Send to backend for import
+                const response = await fetch(`/api/import/${type}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        data: data.data
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showNotification(`${type} import successful: ${result.imported || data.data.length} records imported`, 'success');
+                    
+                    // Refresh page data if available
+                    if (window.refreshPageData) {
+                        window.refreshPageData(type);
+                    }
+                    if (window.loadTickets) {
+                        window.loadTickets();
+                    }
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Import failed');
+                }
+            } catch (error) {
+                console.error('Import error:', error);
+                showNotification(`Import failed: ${error.message}`, 'danger');
+            } finally {
+                // Clean up
+                document.body.removeChild(fileInput);
+            }
+        });
+        
+        // Trigger file selection
+        document.body.appendChild(fileInput);
+        fileInput.click();
+        
+    } catch (error) {
+        console.error('Error setting up import:', error);
+        showNotification(`Import setup failed: ${error.message}`, 'danger');
     }
 }
 

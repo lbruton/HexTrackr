@@ -3,14 +3,8 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-titl                                                        <button type="button" class="btn btn-success w-100" onclick="exportData('all')">
-                                                            <i class="fas fa-file-csv me-2"></i>Export All Data CSV
-                                                        </button>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <button type="button" class="btn btn-info w-100" onclick="backupData('all')">
-                                                            <i class="fas fa-file-archive me-2"></i>Full System Backup ZIP
-                                                        </button>                <i class="fas fa-cog me-2"></i>
+                <h5 class="modal-title">
+                    <i class="fas fa-cog me-2"></i>
                     HexTrackr Settings
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -204,6 +198,9 @@
                                                     <button type="button" class="btn btn-outline-warning" onclick="backupData('tickets')">
                                                         <i class="fas fa-file-archive me-2"></i>Backup Tickets ZIP
                                                     </button>
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="restoreData('tickets')">
+                                                        <i class="fas fa-file-import me-2"></i>Restore Tickets ZIP
+                                                    </button>
                                                     <button type="button" class="btn btn-outline-danger" onclick="clearData('tickets')">
                                                         <i class="fas fa-trash me-2"></i>Clear Tickets
                                                     </button>
@@ -230,6 +227,9 @@
                                                     </button>
                                                     <button type="button" class="btn btn-outline-warning" onclick="backupData('vulnerabilities')">
                                                         <i class="fas fa-file-archive me-2"></i>Backup Vulnerabilities ZIP
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="restoreData('vulnerabilities')">
+                                                        <i class="fas fa-file-import me-2"></i>Restore Vulnerabilities ZIP
                                                     </button>
                                                     <button type="button" class="btn btn-outline-danger" onclick="clearData('vulnerabilities')">
                                                         <i class="fas fa-trash me-2"></i>Clear Vulnerabilities
@@ -260,8 +260,8 @@
                                                         </button>
                                                     </div>
                                                     <div class="col-md-3">
-                                                        <button type="button" class="btn btn-info w-100" onclick="backupData('all')">
-                                                            <i class="fas fa-save me-2"></i>Full System Backup
+                                                        <button type="button" class="btn btn-primary w-100" onclick="restoreFullSystemBackup()">
+                                                            <i class="fas fa-upload me-2"></i>Restore Full System Backup
                                                         </button>
                                                     </div>
                                                     <div class="col-md-3">

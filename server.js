@@ -484,6 +484,183 @@ app.post('/api/tickets/migrate', (req, res) => {
     }, 1000);
 });
 
+// JSON-based CSV import endpoints for frontend upload
+app.post('/api/import/tickets', (req, res) => {
+    const csvData = req.body.data || [];
+    
+    if (!Array.isArray(csvData) || csvData.length === 0) {
+        return res.status(400).json({ error: 'No data provided' });
+    }
+    
+    let imported = 0;
+    let errors = [];
+    
+    // Prepare insert statement with UPSERT (INSERT OR REPLACE)
+    const stmt = db.prepare(`
+        INSERT OR REPLACE INTO tickets (
+            id, xt_number, date_submitted, date_due, hexagon_ticket, 
+            service_now_ticket, location, devices, supervisor, tech,
+            status, notes, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    
+    csvData.forEach((row, index) => {
+        try {
+            // Use existing XT number from CSV or generate one
+            const xtNumber = row.xt_number || row['XT Number'] || `XT${String(index + 1).padStart(3, '0')}`;
+            const now = new Date().toISOString();
+            
+            // Use existing ID from CSV or generate one
+            const ticketId = row.id || `ticket_${Date.now()}_${index}`;
+            
+            stmt.run([
+                ticketId,
+                xtNumber,
+                row.date_submitted || row['Date Submitted'] || '',
+                row.date_due || row['Date Due'] || '',
+                row.hexagon_ticket || row['Hexagon Ticket'] || '',
+                row.service_now_ticket || row['ServiceNow Ticket'] || '',
+                row.location || row['Location'] || '',
+                row.devices || row['Devices'] || '',
+                row.supervisor || row['Supervisor'] || '',
+                row.tech || row['Tech'] || '',
+                row.status || row['Status'] || 'Open',
+                row.notes || row['Notes'] || '',
+                row.created_at || now,
+                now
+            ], (err) => {
+                if (err) {
+                    console.error(`Error importing ticket row ${index + 1}:`, err);
+                    errors.push(`Row ${index + 1}: ${err.message}`);
+                } else {
+                    imported++;
+                }
+            });
+        } catch (error) {
+            errors.push(`Row ${index + 1}: ${error.message}`);
+        }
+    });
+    
+    stmt.finalize((err) => {
+        if (err) {
+            console.error('Error finalizing ticket import:', err);
+            return res.status(500).json({ error: 'Import failed' });
+        }
+        
+        res.json({
+            success: true,
+            imported: imported,
+            total: csvData.length,
+            errors: errors.length > 0 ? errors : undefined
+        });
+    });
+});
+
+app.post('/api/import/vulnerabilities', (req, res) => {
+    const csvData = req.body.data || [];
+    
+    if (!Array.isArray(csvData) || csvData.length === 0) {
+        return res.status(400).json({ error: 'No data provided' });
+    }
+    
+    const importDate = new Date().toISOString();
+    let imported = 0;
+    let errors = [];
+    
+    // Create import record
+    const importQuery = `
+        INSERT INTO vulnerability_imports 
+        (filename, import_date, row_count, vendor, file_size, processing_time, raw_headers)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    
+    db.run(importQuery, [
+        'web-upload.csv',
+        importDate,
+        csvData.length,
+        'web-import',
+        0,
+        0,
+        JSON.stringify(Object.keys(csvData[0] || {}))
+    ], function(err) {
+        if (err) {
+            console.error('Error creating import record:', err);
+            return res.status(500).json({ error: 'Failed to create import record' });
+        }
+        
+        const importId = this.lastID;
+        
+        // Prepare insert statement
+        const stmt = db.prepare(`
+            INSERT INTO vulnerabilities 
+            (import_id, hostname, ip_address, cve, severity, vpr_score, cvss_score, 
+             first_seen, last_seen, plugin_id, plugin_name, description, solution, 
+             vendor, vulnerability_date, state, import_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+        
+        csvData.forEach((row, index) => {
+            try {
+                // Map CSV columns to database fields
+                const hostname = row['asset.name'] || row['hostname'] || row['Host'] || '';
+                const ipAddress = row['asset.display_ipv4_address'] || row['asset.ipv4_addresses'] || row['ip_address'] || row['IP Address'] || '';
+                const cve = row['definition.cve'] || row['cve'] || row['CVE'] || '';
+                const severity = row['severity'] || row['Severity'] || '';
+                const vprScore = parseFloat(row['definition.vpr.score'] || row['vpr_score'] || row['VPR Score'] || 0);
+                const cvssScore = parseFloat(row['cvss_score'] || row['CVSS Score'] || 0);
+                const vendor = row['definition.family'] || row['vendor'] || row['Vendor'] || '';
+                const description = row['definition.name'] || row['plugin_name'] || row['description'] || row['Description'] || '';
+                const pluginPublished = row['definition.plugin_published'] || row['vulnerability_date'] || row['plugin_published'] || '';
+                const state = row['state'] || row['State'] || 'open';
+
+                stmt.run([
+                    importId,
+                    hostname,
+                    ipAddress,
+                    cve,
+                    severity,
+                    vprScore || null,
+                    cvssScore || null,
+                    row['first_seen'] || row['First Seen'] || '',
+                    row['last_seen'] || row['Last Seen'] || '',
+                    row['plugin_id'] || row['Plugin ID'] || '',
+                    description,
+                    row['description'] || row['Description'] || '',
+                    row['solution'] || row['Solution'] || '',
+                    vendor,
+                    pluginPublished,
+                    state,
+                    importDate.split('T')[0]
+                ], (err) => {
+                    if (err) {
+                        console.error(`Error importing vulnerability row ${index + 1}:`, err);
+                        errors.push(`Row ${index + 1}: ${err.message}`);
+                    } else {
+                        imported++;
+                    }
+                });
+            } catch (error) {
+                errors.push(`Row ${index + 1}: ${error.message}`);
+            }
+        });
+        
+        stmt.finalize((err) => {
+            if (err) {
+                console.error('Error finalizing vulnerability import:', err);
+                return res.status(500).json({ error: 'Import failed' });
+            }
+            
+            res.json({
+                success: true,
+                imported: imported,
+                total: csvData.length,
+                importId: importId,
+                errors: errors.length > 0 ? errors : undefined
+            });
+        });
+    });
+});
+
 app.get('/api/backup/tickets', (req, res) => {
     db.all('SELECT * FROM tickets ORDER BY created_at DESC', (err, rows) => {
         if (err) {
