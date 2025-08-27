@@ -1113,5 +1113,72 @@ window.backupData = backupData;
 window.importData = importData;
 window.clearData = clearData;
 window.exportAllDataAsCSV = exportAllDataAsCSV;
+window.restoreData = restoreData; // Add missing function export
+
+/**
+ * Restore data from a ZIP backup file
+ * @param {string} type - Type of data to restore ('tickets', 'vulnerabilities', 'all')
+ * @returns {Promise<void>}
+ */
+async function restoreData(type) {
+    try {
+        // Create a file input element for selecting the backup file
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.zip';
+        input.style.display = 'none';
+        
+        input.onchange = async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Show loading notification
+            showNotification(`Restoring ${type} data from backup...`, 'info');
+            
+            try {
+                // Create form data with the file and type
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('type', type);
+                
+                // Send to backend for processing
+                const response = await fetch('/api/restore', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showNotification(`Restore successful: ${result.message}`, 'success');
+                    
+                    // Refresh statistics
+                    await refreshStats();
+                    
+                    // Trigger page-specific refresh if available
+                    if (window.refreshPageData) {
+                        window.refreshPageData(type);
+                    }
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Restore failed');
+                }
+            } catch (error) {
+                console.error('Error restoring data:', error);
+                showNotification(`Restore failed: ${error.message}`, 'danger');
+            } finally {
+                // Clean up
+                document.body.removeChild(input);
+            }
+        };
+        
+        // Trigger file selection
+        document.body.appendChild(input);
+        input.click();
+        
+    } catch (error) {
+        console.error('Error setting up restore:', error);
+        showNotification(`Restore setup failed: ${error.message}`, 'danger');
+    }
+}
 
 })();

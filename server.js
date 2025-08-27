@@ -364,10 +364,14 @@ app.get('/api/backup/stats', (req, res) => {
             const vulnCount = vulnRow.vulnerabilities;
             const ticketCount = ticketRow.tickets;
             
+            // Get database file size
+            const dbSize = fs.statSync(dbPath).size;
+            
             res.json({
                 vulnerabilities: vulnCount,
                 tickets: ticketCount,
-                total: vulnCount + ticketCount
+                total: vulnCount + ticketCount,
+                dbSize: dbSize
             });
         });
     });
@@ -706,6 +710,192 @@ app.get('/api/backup/all', (req, res) => {
             });
         });
     });
+});
+
+// Clear data endpoint
+app.delete('/api/backup/clear/:type', (req, res) => {
+    const { type } = req.params;
+    let query = '';
+    
+    if (type === 'vulnerabilities') {
+        query = 'DELETE FROM vulnerabilities';
+    } else if (type === 'tickets') {
+        query = 'DELETE FROM tickets';
+    } else if (type === 'all') {
+        // For 'all', we'll run multiple queries
+        db.run('DELETE FROM vulnerabilities', (vulnErr) => {
+            if (vulnErr) {
+                res.status(500).json({ error: 'Failed to clear vulnerabilities' });
+                return;
+            }
+            
+            db.run('DELETE FROM tickets', (ticketErr) => {
+                if (ticketErr) {
+                    res.status(500).json({ error: 'Failed to clear tickets' });
+                    return;
+                }
+                
+                res.json({ message: 'All data cleared successfully' });
+            });
+        });
+        return; // Exit early since we're handling the response in the nested callbacks
+    } else {
+        res.status(400).json({ error: 'Invalid data type' });
+        return;
+    }
+    
+    // Run the query for single table clear
+    db.run(query, (err) => {
+        if (err) {
+            res.status(500).json({ error: `Failed to clear ${type}` });
+            return;
+        }
+        
+        res.json({ message: `${type} cleared successfully` });
+    });
+});
+
+// Restore data from backup
+app.post('/api/restore', upload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+        
+        const type = req.body.type;
+        if (!['tickets', 'vulnerabilities', 'all'].includes(type)) {
+            return res.status(400).json({ error: 'Invalid data type' });
+        }
+        
+        const filePath = req.file.path;
+        const fileData = fs.readFileSync(filePath);
+        
+        // Use JSZip to extract the backup
+        const zip = new (require('jszip'))();
+        const zipContent = await zip.loadAsync(fileData);
+        
+        let restoredCount = 0;
+        
+        // Process based on data type
+        if (type === 'tickets' || type === 'all') {
+            // Extract tickets.json if it exists
+            if (zipContent.files['tickets.json']) {
+                const ticketsJson = await zipContent.files['tickets.json'].async('string');
+                const ticketsData = JSON.parse(ticketsJson);
+                
+                if (ticketsData && ticketsData.data && Array.isArray(ticketsData.data)) {
+                    // Clear existing tickets if requested
+                    if (req.body.clearExisting === 'true') {
+                        await new Promise((resolve, reject) => {
+                            db.run('DELETE FROM tickets', (err) => {
+                                if (err) reject(err);
+                                else resolve();
+                            });
+                        });
+                    }
+                    
+                    // Insert tickets data
+                    const ticketValues = ticketsData.data.map(ticket => {
+                        return [
+                            ticket.xt_number || '',
+                            ticket.date_submitted || '',
+                            ticket.date_due || '',
+                            ticket.hexagon_ticket || '',
+                            ticket.service_now_ticket || '',
+                            ticket.location || '',
+                            ticket.devices || '',
+                            ticket.supervisor || '',
+                            ticket.tech || '',
+                            ticket.status || '',
+                            ticket.notes || '',
+                            ticket.created_at || new Date().toISOString(),
+                            ticket.updated_at || new Date().toISOString()
+                        ];
+                    });
+                    
+                    for (const values of ticketValues) {
+                        await new Promise((resolve, reject) => {
+                            db.run(`
+                                INSERT INTO tickets 
+                                (xt_number, date_submitted, date_due, hexagon_ticket, service_now_ticket, 
+                                location, devices, supervisor, tech, status, notes, created_at, updated_at)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            `, values, function(err) {
+                                if (err) reject(err);
+                                else resolve();
+                            });
+                        });
+                        restoredCount++;
+                    }
+                }
+            }
+        }
+        
+        if (type === 'vulnerabilities' || type === 'all') {
+            // Extract vulnerabilities.json if it exists
+            if (zipContent.files['vulnerabilities.json']) {
+                const vulnJson = await zipContent.files['vulnerabilities.json'].async('string');
+                const vulnData = JSON.parse(vulnJson);
+                
+                if (vulnData && vulnData.data && Array.isArray(vulnData.data)) {
+                    // Clear existing vulnerabilities if requested
+                    if (req.body.clearExisting === 'true') {
+                        await new Promise((resolve, reject) => {
+                            db.run('DELETE FROM vulnerabilities', (err) => {
+                                if (err) reject(err);
+                                else resolve();
+                            });
+                        });
+                    }
+                    
+                    // Insert vulnerability data
+                    const vulnValues = vulnData.data.map(vuln => {
+                        return [
+                            vuln.hostname || '',
+                            vuln.ip_address || '',
+                            vuln.cve || '',
+                            vuln.severity || '',
+                            vuln.vpr_score || 0,
+                            vuln.cvss_score || 0,
+                            vuln.first_seen || '',
+                            vuln.last_seen || '',
+                            vuln.plugin_name || '',
+                            vuln.description || '',
+                            vuln.solution || ''
+                        ];
+                    });
+                    
+                    for (const values of vulnValues) {
+                        await new Promise((resolve, reject) => {
+                            db.run(`
+                                INSERT INTO vulnerabilities 
+                                (hostname, ip_address, cve, severity, vpr_score, cvss_score, 
+                                first_seen, last_seen, plugin_name, description, solution)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            `, values, function(err) {
+                                if (err) reject(err);
+                                else resolve();
+                            });
+                        });
+                        restoredCount++;
+                    }
+                }
+            }
+        }
+        
+        // Clean up the uploaded file
+        fs.unlinkSync(filePath);
+        
+        res.json({
+            success: true,
+            message: `Successfully restored ${restoredCount} records`,
+            count: restoredCount
+        });
+        
+    } catch (error) {
+        console.error('Error restoring backup:', error);
+        res.status(500).json({ error: 'Failed to restore data: ' + error.message });
+    }
 });
 
 app.listen(PORT, () => {
