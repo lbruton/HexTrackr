@@ -88,26 +88,47 @@ Comprehensive enhancement of the HexTrackr ticket modal system to fix critical s
 
 ---
 
-### ✅ STEP 3A: Optimize Modal Layout (NEW)
-**Status**: 🟡 Pending  
+### ❌ STEP 3A: Optimize Modal Layout (FAILED ATTEMPT)
+**Status**: ❌ **FAILED** - Aug 27, 2025  
 **Description**: Improve modal field layout for better space utilization
+
+**FAILED ATTEMPT ANALYSIS:**
+- ❌ **Root Cause**: Framework misidentification (assumed Bootstrap, actually Tabler.io)
+- ❌ **Symptom**: Modal became unusable with transparency overlays throughout interface
+- ❌ **Error**: Applied Bootstrap CSS patterns to Tabler.io framework causing style conflicts
+- ❌ **Impact**: Complete modal UI breakdown requiring emergency rollback
+- ❌ **Resolution**: `git restore` rollback to backup commit + Docker restart
+- ❌ **Lesson**: Must verify framework before making CSS/layout changes
+- ❌ **Files Affected**: tickets.html (modal footer), scripts/pages/tickets.js (autofill logic)
+
+**RESET STATUS**: 🟡 **PENDING** - Ready for fresh approach
 - **Change**: Move Hexagon Ticket #, Service Now #, and Status dropdown to same row
 - **Rationale**: Plenty of room available for horizontal layout
 - **Benefit**: Better utilization of modal space and improved UX
 - **Impact**: HTML layout restructuring in tickets.html
-- **Git Backup**: Required before changes
+- **Git Backup**: ✅ REQUIRED before changes
+- **Framework Check**: ✅ REQUIRED - Verify Tabler.io vs Bootstrap patterns
 - **Acceptance Criteria**: Three fields on one row with proper spacing and responsiveness
 
-### ✅ STEP 3B: Location-to-Device Autofill (NEW)
-**Status**: 🟡 Pending  
+### ❌ STEP 3B: Location-to-Device Autofill (FAILED ATTEMPT)
+**Status**: ❌ **FAILED** - Aug 27, 2025  
 **Description**: Auto-populate first device name from location field input
+
+**FAILED ATTEMPT ANALYSIS:**
+- ❌ **Implementation Issue**: Autofill logic was correctly implemented but lost during rollback
+- ❌ **Side Effect**: Broke during Step 3A modal layout failure
+- ❌ **Code Quality**: JavaScript logic was sound (handleLocationToDeviceAutofill method)
+- ❌ **Testing**: Functionality worked but was overshadowed by UI breakage
+- ❌ **Resolution**: Rolled back with Step 3A
+
+**RESET STATUS**: 🟡 **PENDING** - Ready for fresh approach  
 - **Feature**: Location field input autofills first device name field
 - **Example**: User types "wtulsa" in location → first device autofills "wtulsa"
 - **Workflow**: User completes device name (e.g., "wtulsanswan01") and hits plus button
 - **Implementation**: JavaScript event handler on location field change
 - **Edit Mode Logic**: Only autofill if no devices exist (don't override existing devices)
 - **Future**: Device drag/drop and sort functionality to be enhanced later
-- **Git Backup**: Required before changes
+- **Git Backup**: ✅ REQUIRED before changes
 - **Acceptance Criteria**: Location input immediately populates first device field in ADD mode only
 
 ---
