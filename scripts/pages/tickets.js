@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* global fetch, console, localStorage, FileReader, JSZip, URL, XLSX, Blob, navigator, bootstrap */
+/* global fetch, console, localStorage, FileReader, JSZip, URL, XLSX, Blob, navigator, bootstrap, window, document */
 
 /**
  * HexTrackr - Tickets Management System
@@ -582,8 +582,12 @@ class HexagonTicketsManager {
     }
 
     viewTicket(id) {
+        console.log('viewTicket called with id:', id);
         const ticket = this.getTicketById(id);
-        if (!ticket) return;
+        if (!ticket) {
+            console.error('Ticket not found with id:', id);
+            return;
+        }
 
         // Generate markdown content for the ticket
         const markdownContent = this.generateMarkdown(ticket);
@@ -592,8 +596,28 @@ class HexagonTicketsManager {
         document.getElementById('markdownContent').textContent = markdownContent;
         document.getElementById('viewTicketModal').setAttribute('data-ticket-id', id);
         
-        const modal = new bootstrap.Modal(document.getElementById('viewTicketModal'));
-        modal.show();
+        // Check if we're using Bootstrap or Tabler
+        const viewTicketModal = document.getElementById('viewTicketModal');
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            console.log('Using Bootstrap Modal');
+            const modal = new bootstrap.Modal(viewTicketModal);
+            modal.show();
+        } else if (typeof Tabler !== 'undefined' && Tabler.Modal) {
+            console.log('Using Tabler Modal');
+            const modal = new Tabler.Modal(viewTicketModal);
+            modal.show();
+        } else {
+            console.log('Manually showing modal with jQuery or native methods');
+            // Fallback to manually adding the classes
+            viewTicketModal.classList.add('show');
+            viewTicketModal.style.display = 'block';
+            document.body.classList.add('modal-open');
+            
+            // Add backdrop
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            document.body.appendChild(backdrop);
+        }
     }
 
     editTicketFromView() {
@@ -672,16 +696,16 @@ class HexagonTicketsManager {
                     <td class="text-center"><span class="status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}">${ticket.status}</span></td>
                     <td class="text-center">
                         <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-primary action-btn" onclick="ticketManager.viewTicket('${ticket.id}')" title="View">
+                            <button class="btn btn-outline-primary action-btn" onclick="window.ticketManager.viewTicket('${ticket.id}')" title="View">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn btn-outline-warning action-btn" onclick="ticketManager.editTicket('${ticket.id}')" title="Edit">
+                            <button class="btn btn-outline-warning action-btn" onclick="window.ticketManager.editTicket('${ticket.id}')" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-outline-success action-btn" onclick="ticketManager.bundleTicketFiles('${ticket.id}')" title="Download Bundle">
+                            <button class="btn btn-outline-success action-btn" onclick="window.ticketManager.bundleTicketFiles('${ticket.id}')" title="Download Bundle">
                                 <i class="fas fa-download"></i>
                             </button>
-                            <button class="btn btn-outline-danger action-btn" onclick="ticketManager.deleteTicket('${ticket.id}')" title="Delete">
+                            <button class="btn btn-outline-danger action-btn" onclick="window.ticketManager.deleteTicket('${ticket.id}')" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -1885,53 +1909,55 @@ class HexagonTicketsManager {
 }
 
 // Global functions for button onclick events
-let ticketManager;
+// Explicitly assign to window object to ensure global scope
+window.ticketManager = null; // Will be initialized on DOMContentLoaded
 
-function saveTicket() {
-    ticketManager.saveTicket();
-}
+window.saveTicket = function() {
+    if (window.ticketManager) window.ticketManager.saveTicket();
+};
 
-function editTicketFromView() {
-    ticketManager.editTicketFromView();
-}
+window.editTicketFromView = function() {
+    if (window.ticketManager) window.ticketManager.editTicketFromView();
+};
 
-function copyMarkdownToClipboard() {
-    ticketManager.copyMarkdownToClipboard();
-}
+window.copyMarkdownToClipboard = function() {
+    if (window.ticketManager) window.ticketManager.copyMarkdownToClipboard();
+};
 
-function downloadBundleFromView() {
-    ticketManager.downloadBundleFromView();
-}
+window.downloadBundleFromView = function() {
+    if (window.ticketManager) window.ticketManager.downloadBundleFromView();
+};
 
-function exportData(format) {
-    ticketManager.exportData(format);
-}
+window.exportData = function(format) {
+    if (window.ticketManager) window.ticketManager.exportData(format);
+};
 
-function sortTable(column) {
-    ticketManager.sortTable(column);
-}
+window.sortTable = function(column) {
+    if (window.ticketManager) window.ticketManager.sortTable(column);
+};
 
 // Page-specific refresh function for Settings modal integration
 window.refreshPageData = function(type) {
     if (type === 'tickets' && window.ticketManager) {
-        ticketManager.loadTicketsFromDB();
-        ticketManager.renderTickets();
-        ticketManager.updateStatistics();
-        ticketManager.populateLocationFilter();
+        window.ticketManager.loadTicketsFromDB();
+        window.ticketManager.renderTickets();
+        window.ticketManager.updateStatistics();
+        window.ticketManager.populateLocationFilter();
     } else if (type === 'serviceNow' && window.ticketManager) {
         // Refresh ticket display to apply ServiceNow link changes
-        ticketManager.renderTickets();
+        window.ticketManager.renderTickets();
     }
 };
 
 // Page-specific toast integration for Settings modal
 window.showToast = function(message, type) {
     if (window.ticketManager) {
-        ticketManager.showToast(message, type);
+        window.ticketManager.showToast(message, type);
     }
 };
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    ticketManager = new HexagonTicketsManager();
+    // Initialize the ticket manager and explicitly set it as a global variable
+    window.ticketManager = new HexagonTicketsManager();
 });
