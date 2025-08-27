@@ -379,11 +379,11 @@ class HexagonTicketsManager {
                     </button>
                 </div>
                 <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${suggestedValue}">
-                <button type="button" class="btn btn-outline-success add-device-btn">
-                    <i class="fas fa-plus"></i>
-                </button>
                 <button type="button" class="btn btn-outline-danger remove-device-btn">
                     <i class="fas fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-outline-success add-device-btn">
+                    <i class="fas fa-plus"></i>
                 </button>
             </div>
         `;
