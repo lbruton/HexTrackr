@@ -46,7 +46,19 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 
 ## 🟡 IN PROGRESS
 
-### Ticket Modal Enhancement Suite 🔄 **CURRENT FOCUS**
+### Documentation Portal Completion 🔄 **CRITICAL PRIORITY** 
+- [ ] **Complete Documentation Portal System** - Final phase of comprehensive project documentation
+  - [ ] Fix duplicate content mapping in documentation generator
+  - [ ] Create database schema visualization with table relationships
+  - [ ] Generate UI-API interaction flowcharts for data flow understanding
+  - [ ] Add page navigation flow diagrams
+  - [ ] Integrate roadmap status into documentation portal
+  - [ ] Document the documentation system itself (meta-documentation)
+  - [ ] Remove Docusaurus dependencies and finalize portal as primary docs
+  - **Timeline**: 6 focused sessions (~2.5 hours total)
+  - **Goal**: Complete project handoff-ready documentation system
+
+### Ticket Modal Enhancement Suite 🔄 **HIGH PRIORITY**
 - [ ] **Comprehensive Ticket Modal Improvements** - See [TICKET_MODAL_ENHANCEMENTS_20250827.md](./TICKET_MODAL_ENHANCEMENTS_20250827.md) for detailed implementation plan
   - [x] Fix backend/frontend field mapping (critical save bug) ✅ **COMPLETED**
   - [x] Add XT# read-only display field ✅ **COMPLETED Aug 27, 2025**
@@ -75,6 +87,30 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 ---
 
 ## 🔴 PLANNED FEATURES
+
+### AI-Powered Documentation Automation 🤖 **POST-AUTH FEATURE**
+- [ ] **Automated Documentation Generation System** - AI-powered self-updating docs
+  - [ ] Settings panel integration for API key management
+    - [ ] Gemini API key configuration
+    - [ ] OpenAI API key configuration
+    - [ ] Secure encrypted storage of API credentials
+  - [ ] AI Documentation Automation Engine
+    - [ ] Automated codebase scanning and analysis
+    - [ ] AI-powered documentation content generation
+    - [ ] Integration with existing `generate-docs.js` workflow
+    - [ ] Real-time documentation updates via AI APIs
+  - [ ] Documentation Revision Management
+    - [ ] Automatic backup system before AI updates
+    - [ ] Version control for documentation changes
+    - [ ] Rollback capability for problematic AI generations
+    - [ ] Change tracking and diff visualization
+  - [ ] User Experience Features
+    - [ ] One-click documentation refresh button
+    - [ ] Progress indicators for AI generation process
+    - [ ] Quality validation and human review prompts
+    - [ ] Scheduled automatic documentation updates
+  - **Prerequisites**: Authentication system, settings modal enhancements
+  - **Goal**: Self-maintaining documentation platform with AI assistance
 
 ### API Integrations Roadmap 📋
 
