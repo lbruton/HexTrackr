@@ -1,0 +1,119 @@
+/* Tickets Page Specific Styles */
+
+/* Sortable table headers */
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 25px !important;
+}
+
+.sortable-header:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sortable-header::after {
+    content: '\f0dc';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+}
+
+.sortable-header.sort-asc::after {
+    content: '\f0de';
+    opacity: 1;
+}
+
+.sortable-header.sort-desc::after {
+    content: '\f0dd';
+    opacity: 1;
+}
+
+/* Terminal-style markdown viewer */
+.terminal-content {
+    background-color: #0d1117 !important;
+    color: #00ff00 !important;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin: 0.5rem 0 !important;
+    border: 1px solid #30363d !important;
+    overflow-x: auto !important;
+}
+
+/* Table styling for tickets */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+    min-width: 800px; /* Force minimum width for proper scrolling */
+}
+
+.table-responsive {
+    overflow-x: auto;
+    border-radius: 8px;
+}
+
+.table thead th {
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Status badges */
+.badge {
+    font-size: 0.75em;
+    padding: 0.5em 0.75em;
+    border-radius: 20px;
+}
+
+/* Action buttons in table */
+.btn-group .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8em;
+    border-radius: 4px;
+}
+
+/* Ticket form styles */
+.form-control:focus {
+    border-color: var(--hextrackr-primary);
+    box-shadow: 0 0 0 0.2rem rgba(32, 107, 196, 0.25);
+}
+
+.form-select:focus {
+    border-color: var(--hextrackr-primary);
+    box-shadow: 0 0 0 0.2rem rgba(32, 107, 196, 0.25);
+}
+
+/* Pagination */
+.pagination .page-link {
+    color: var(--hextrackr-primary);
+    border-color: #dee2e6;
+}
+
+.pagination .page-link:hover {
+    color: var(--hextrackr-primary);
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--hextrackr-primary);
+    border-color: var(--hextrackr-primary);
+}
