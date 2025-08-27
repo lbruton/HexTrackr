@@ -66,6 +66,7 @@ class DocumentationPortal {
                     'functions-tickets': 'content/architecture/functions.html',
                     'database-schema': 'content/architecture/database-schema.html',
                     'ui-api-flowcharts': 'content/architecture/ui-api-flowcharts.html',
+                    'page-flow-navigation': 'content/architecture/page-flow-navigation.html',
                     'bugs-found': 'content/code-review/bugs-found.html',
                     'handoff-template': 'content/code-review/handoff-template.html',
                     // Distinct content sections (no more duplicates)
