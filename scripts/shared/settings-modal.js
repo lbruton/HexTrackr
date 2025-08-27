@@ -769,4 +769,10 @@ if (typeof module !== 'undefined' && module.exports) {
 window.SettingsModal = SettingsModal;
 window.refreshPageData = window.refreshPageData || function() {};
 
+// Export individual functions for onclick handlers
+window.exportData = exportData;
+window.backupData = backupData;
+window.importData = importData;
+window.clearData = clearData;
+
 })();
