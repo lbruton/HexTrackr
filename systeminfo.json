@@ -17,7 +17,7 @@
     "port": 8080
   },
   "documentation": {
-    "system": "Automated generation with docs-prototype portal",
+    "system": "Static portal with comprehensive technical documentation",
     "location": "docs-prototype/",
     "generator": "docs-prototype/generate-docs.js",
     "automation": "docs-prototype/AUTOMATION_INSTRUCTIONS.md",
@@ -25,11 +25,12 @@
       "API endpoint auto-discovery (22 endpoints found)",
       "Function reference auto-generation (353 functions)",
       "Framework usage detection (4 frameworks)",
-      "Unified navigation with shared header/footer",
-      "GPT/Gemini overnight automation support",
+      "Unified navigation with hash-based routing",
+      "Documentation system self-documentation",
+      "Project roadmap integration with sprint tracking",
       "UI-API interaction mapping",
-      "Database schema visualization",
-      "Page flow diagrams"
+      "Database schema visualization", 
+      "Page flow navigation diagrams"
     ],
     "standards": {
       "apiDocumentation": "Auto-scanned from server.js route definitions",
