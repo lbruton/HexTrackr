@@ -1,7 +1,7 @@
 {
   "project": {
     "name": "HexTrackr",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Dual-purpose cybersecurity management system with ticket management and vulnerability analysis",
     "repository": "https://github.com/lbruton/HexTrackr",
     "license": "MIT",
