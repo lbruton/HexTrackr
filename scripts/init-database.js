@@ -1,15 +1,15 @@
-const sqlite3 = require("sqlite3").verbose();
-const path = require("path");
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 
-const dbPath = path.join(__dirname, "..", "data", "hextrackr.db");
+const dbPath = path.join(__dirname, '..', 'data', 'hextrackr.db');
 
 // Create database and tables
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error("Error opening database:", err.message);
+    console.error('Error opening database:', err.message);
     return;
   }
-  console.log("Connected to SQLite database");
+  console.log('Connected to SQLite database');
 });
 
 // Create tables
@@ -76,22 +76,22 @@ db.serialize(() => {
   )`);
 
   // Indexes for performance
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_hostname ON vulnerabilities (hostname)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_severity ON vulnerabilities (severity)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_cve ON vulnerabilities (cve)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_import ON vulnerabilities (import_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_vulns_ticket ON ticket_vulnerabilities (ticket_id)");
+  db.run(`CREATE INDEX IF NOT EXISTS idx_vulnerabilities_hostname ON vulnerabilities (hostname)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_vulnerabilities_severity ON vulnerabilities (severity)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_vulnerabilities_cve ON vulnerabilities (cve)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_vulnerabilities_import ON vulnerabilities (import_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_ticket_vulns_ticket ON ticket_vulnerabilities (ticket_id)`);
 });
 
 db.close((err) => {
   if (err) {
-    console.error("Error closing database:", err.message);
+    console.error('Error closing database:', err.message);
   } else {
-    console.log("Database initialized successfully!");
-    console.log("Tables created:");
-    console.log("  - tickets (ready for future localStorage sync)");
-    console.log("  - vulnerability_imports (CSV import tracking)");
-    console.log("  - vulnerabilities (normalized data)");
-    console.log("  - ticket_vulnerabilities (cross-referencing)");
+    console.log('Database initialized successfully!');
+    console.log('Tables created:');
+    console.log('  - tickets (ready for future localStorage sync)');
+    console.log('  - vulnerability_imports (CSV import tracking)');
+    console.log('  - vulnerabilities (normalized data)');
+    console.log('  - ticket_vulnerabilities (cross-referencing)');
   }
 });

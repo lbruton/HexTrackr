@@ -37,14 +37,14 @@
  */
 
 // 🚀 HEXTRACKR SETTINGS MODAL - SHARED COMPONENT
-console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
+console.log('✅ HexTrackr Settings Modal (shared) loaded successfully');
 
 /**
  * Settings Modal State Management
  */
 // HexTrackr Shared Settings Modal Component
 (function() {
-  "use strict";
+  'use strict';
   
   const SettingsModal = {
     // Initialize the settings modal
@@ -53,16 +53,16 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
         await this.loadModalHtml();
         this.setupEventListeners();
         initServiceNowSettings(); // Call as standalone function instead of method
-        console.log("Settings modal initialized");
+        console.log('Settings modal initialized');
       } catch (error) {
-        console.error("Failed to initialize settings modal:", error);
+        console.error('Failed to initialize settings modal:', error);
       }
     },
 
     // Load the modal HTML from shared file
     async loadModalHtml() {
       try {
-        const response = await fetch("scripts/shared/settings-modal.html");
+        const response = await fetch('scripts/shared/settings-modal.html');
         if (!response.ok) {
           throw new Error(`Failed to load settings modal: ${response.status}`);
         }
@@ -70,10 +70,10 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
         const modalHtml = await response.text();
         
         // Find the modal container or create one if it doesn't exist
-        let modalContainer = document.getElementById("settingsModalContainer");
+        let modalContainer = document.getElementById('settingsModalContainer');
         if (!modalContainer) {
-          modalContainer = document.createElement("div");
-          modalContainer.id = "settingsModalContainer";
+          modalContainer = document.createElement('div');
+          modalContainer.id = 'settingsModalContainer';
           document.body.appendChild(modalContainer);
         }
         
@@ -81,12 +81,12 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
         modalContainer.innerHTML = modalHtml;
         
         // Get reference to the modal element for Bootstrap
-        this.modal = document.getElementById("settingsModal");
+        this.modal = document.getElementById('settingsModal');
         
-        console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
+        console.log('✅ HexTrackr Settings Modal (shared) loaded successfully');
         
       } catch (error) {
-        console.error("❌ Failed to load shared settings modal:", error);
+        console.error('❌ Failed to load shared settings modal:', error);
         throw error;
       }
     },
@@ -96,36 +96,36 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
      */
     setupEventListeners() {
         // Handle tab switching from dropdown links
-        document.addEventListener("click", (e) => {
-            const target = e.target.closest("[data-settings-tab]");
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('[data-settings-tab]');
             if (target) {
-                const tabId = target.getAttribute("data-settings-tab");
+                const tabId = target.getAttribute('data-settings-tab');
                 this.switchToTab(tabId);
             }
         });
         
         // Refresh stats when modal is shown
-        this.modal.addEventListener("shown.bs.modal", refreshStats);
+        this.modal.addEventListener('shown.bs.modal', refreshStats);
         
         // API test buttons
-        document.getElementById("testCiscoConnection")?.addEventListener("click", testCiscoConnection);
-        document.getElementById("testTenableConnection")?.addEventListener("click", testTenableConnection);
+        document.getElementById('testCiscoConnection')?.addEventListener('click', testCiscoConnection);
+        document.getElementById('testTenableConnection')?.addEventListener('click', testTenableConnection);
         
         // Data fetch buttons
-        document.getElementById("fetchCiscoData")?.addEventListener("click", fetchCiscoData);
-        document.getElementById("fetchTenableData")?.addEventListener("click", fetchTenableData);
+        document.getElementById('fetchCiscoData')?.addEventListener('click', fetchCiscoData);
+        document.getElementById('fetchTenableData')?.addEventListener('click', fetchTenableData);
         
         // Settings save button
-        document.getElementById("saveSettings")?.addEventListener("click", saveSettings);
+        document.getElementById('saveSettings')?.addEventListener('click', saveSettings);
         
         // CSV Import buttons
-        document.getElementById("importTicketsCSV")?.addEventListener("click", () => importCSV("tickets"));
-        document.getElementById("importVulnerabilitiesCSV")?.addEventListener("click", () => importCSV("vulnerabilities"));
+        document.getElementById('importTicketsCSV')?.addEventListener('click', () => importCSV('tickets'));
+        document.getElementById('importVulnerabilitiesCSV')?.addEventListener('click', () => importCSV('vulnerabilities'));
         
         // Initialize ServiceNow settings when modal is shown
-        this.modal.addEventListener("shown.bs.modal", initServiceNowSettings);
+        this.modal.addEventListener('shown.bs.modal', initServiceNowSettings);
         
-        console.log("Settings modal event listeners configured");
+        console.log('Settings modal event listeners configured');
     },
     
     /**
@@ -134,23 +134,23 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
      */
     switchToTab(tabId) {
         // Deactivate all tabs
-        document.querySelectorAll("#settingsModal .nav-link").forEach(tab => {
-            tab.classList.remove("active");
-            tab.setAttribute("aria-selected", "false");
+        document.querySelectorAll('#settingsModal .nav-link').forEach(tab => {
+            tab.classList.remove('active');
+            tab.setAttribute('aria-selected', 'false');
         });
         
-        document.querySelectorAll("#settingsModal .tab-pane").forEach(pane => {
-            pane.classList.remove("show", "active");
+        document.querySelectorAll('#settingsModal .tab-pane').forEach(pane => {
+            pane.classList.remove('show', 'active');
         });
         
         // Activate the target tab
-        const targetTab = document.getElementById(tabId + "-tab");
+        const targetTab = document.getElementById(tabId + '-tab');
         const targetPane = document.getElementById(tabId);
         
         if (targetTab && targetPane) {
-            targetTab.classList.add("active");
-            targetTab.setAttribute("aria-selected", "true");
-            targetPane.classList.add("show", "active");
+            targetTab.classList.add('active');
+            targetTab.setAttribute('aria-selected', 'true');
+            targetPane.classList.add('show', 'active');
             console.log(`✅ Switched to ${tabId} tab`);
         } else {
             console.warn(`❌ Tab ${tabId} not found`);
@@ -164,14 +164,14 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
  */
 async function refreshStats() {
     try {
-        const response = await fetch("/api/backup/stats");
+        const response = await fetch('/api/backup/stats');
         const stats = await response.json();
         
         // Update counters
-        const ticketCountEl = document.getElementById("ticketCount");
-        const vulnCountEl = document.getElementById("vulnCount");
-        const totalCountEl = document.getElementById("totalCount");
-        const dbSizeEl = document.getElementById("dbSize");
+        const ticketCountEl = document.getElementById('ticketCount');
+        const vulnCountEl = document.getElementById('vulnCount');
+        const totalCountEl = document.getElementById('totalCount');
+        const dbSizeEl = document.getElementById('dbSize');
         
         if (ticketCountEl) ticketCountEl.textContent = stats.tickets || 0;
         if (vulnCountEl) vulnCountEl.textContent = stats.vulnerabilities || 0;
@@ -186,8 +186,8 @@ async function refreshStats() {
             dbSizeEl.textContent = sizeStr;
         }
     } catch (error) {
-        console.error("Error fetching stats:", error);
-        showNotification("Error loading statistics", "danger");
+        console.error('Error fetching stats:', error);
+        showNotification('Error loading statistics', 'danger');
     }
 }
 
@@ -198,19 +198,19 @@ async function refreshStats() {
  */
 async function exportData(type) {
     try {
-        let endpoint = "/api/backup/";
+        let endpoint = '/api/backup/';
         switch(type) {
-            case "tickets":
-                endpoint += "tickets";
+            case 'tickets':
+                endpoint += 'tickets';
                 break;
-            case "vulnerabilities":
-                endpoint += "vulnerabilities";
+            case 'vulnerabilities':
+                endpoint += 'vulnerabilities';
                 break;
-            case "all":
-                endpoint += "all";
+            case 'all':
+                endpoint += 'all';
                 break;
             default:
-                throw new Error("Invalid export type");
+                throw new Error('Invalid export type');
         }
         
         const response = await fetch(endpoint);
@@ -218,9 +218,9 @@ async function exportData(type) {
             const data = await response.json();
             
             // Create CSV export based on type
-            const timestamp = new Date().toISOString().split("T")[0];
+            const timestamp = new Date().toISOString().split('T')[0];
             
-            if (type === "all") {
+            if (type === 'all') {
                 // Export combined CSV for all data
                 await exportCombinedCSV(data, timestamp);
             } else {
@@ -229,11 +229,11 @@ async function exportData(type) {
             }
             
         } else {
-            throw new Error("Export failed");
+            throw new Error('Export failed');
         }
     } catch (error) {
-        console.error("Error creating export:", error);
-        showNotification(`Export failed: ${error.message}`, "danger");
+        console.error('Error creating export:', error);
+        showNotification(`Export failed: ${error.message}`, 'danger');
     }
 }
 
@@ -242,7 +242,7 @@ async function exportData(type) {
  */
 async function exportSingleCSV(data, type, timestamp) {
     if (!data.data || data.data.length === 0) {
-        showNotification(`No ${type} data to export`, "warning");
+        showNotification(`No ${type} data to export`, 'warning');
         return;
     }
     
@@ -251,10 +251,10 @@ async function exportSingleCSV(data, type, timestamp) {
     const filename = `hextrackr_${type}_${timestamp}.csv`;
     
     // Download CSV file
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     downloadFile(blob, filename);
     
-    showNotification(`CSV export created: ${filename}`, "success");
+    showNotification(`CSV export created: ${filename}`, 'success');
 }
 
 /**
@@ -266,29 +266,29 @@ async function exportCombinedCSV(data, timestamp) {
     // Add vulnerabilities with type indicator
     if (data.vulnerabilities && data.vulnerabilities.data) {
         data.vulnerabilities.data.forEach(item => {
-            combinedData.push({ data_type: "vulnerability", ...item });
+            combinedData.push({ data_type: 'vulnerability', ...item });
         });
     }
     
     // Add tickets with type indicator
     if (data.tickets && data.tickets.data) {
         data.tickets.data.forEach(item => {
-            combinedData.push({ data_type: "ticket", ...item });
+            combinedData.push({ data_type: 'ticket', ...item });
         });
     }
     
     if (combinedData.length === 0) {
-        showNotification("No data to export", "warning");
+        showNotification('No data to export', 'warning');
         return;
     }
     
     const csv = Papa.unparse(combinedData);
     const filename = `hextrackr_all_data_${timestamp}.csv`;
     
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     downloadFile(blob, filename);
     
-    showNotification(`Combined CSV export created: ${filename}`, "success");
+    showNotification(`Combined CSV export created: ${filename}`, 'success');
 }
 
 /**
@@ -298,7 +298,7 @@ async function exportCombinedCSV(data, timestamp) {
  */
 function downloadFile(blob, filename) {
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
@@ -315,7 +315,7 @@ function downloadFile(blob, filename) {
 async function backupData(type) {
     try {
         const zip = new JSZip();
-        const timestamp = new Date().toISOString().split("T")[0];
+        const timestamp = new Date().toISOString().split('T')[0];
         
         // Create metadata
         const metadata = {
@@ -326,12 +326,12 @@ async function backupData(type) {
             version: "2.3"
         };
         
-        if (type === "all") {
+        if (type === 'all') {
             // Fetch all data types
             const [ticketsRes, vulnsRes, statsRes] = await Promise.all([
-                fetch("/api/backup/tickets"),
-                fetch("/api/backup/vulnerabilities"),
-                fetch("/api/backup/stats")
+                fetch('/api/backup/tickets'),
+                fetch('/api/backup/vulnerabilities'),
+                fetch('/api/backup/stats')
             ]);
             
             if (ticketsRes.ok && vulnsRes.ok && statsRes.ok) {
@@ -340,10 +340,10 @@ async function backupData(type) {
                 const statsData = await statsRes.json();
                 
                 // Add files to ZIP
-                zip.file("tickets.json", JSON.stringify(ticketsData, null, 2));
-                zip.file("vulnerabilities.json", JSON.stringify(vulnsData, null, 2));
-                zip.file("statistics.json", JSON.stringify(statsData, null, 2));
-                zip.file("metadata.json", JSON.stringify(metadata, null, 2));
+                zip.file('tickets.json', JSON.stringify(ticketsData, null, 2));
+                zip.file('vulnerabilities.json', JSON.stringify(vulnsData, null, 2));
+                zip.file('statistics.json', JSON.stringify(statsData, null, 2));
+                zip.file('metadata.json', JSON.stringify(metadata, null, 2));
                 
                 metadata.contents = {
                     tickets: ticketsData.count || 0,
@@ -364,16 +364,16 @@ async function backupData(type) {
         }
         
         // Update metadata and add to ZIP
-        zip.file("metadata.json", JSON.stringify(metadata, null, 2));
+        zip.file('metadata.json', JSON.stringify(metadata, null, 2));
         
         // Generate ZIP file
-        const zipBlob = await zip.generateAsync({ type: "blob" });
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
         
         // Create download
         const filename = `hextrackr_backup_${type}_${timestamp}.zip`;
         const url = URL.createObjectURL(zipBlob);
         
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
@@ -381,11 +381,11 @@ async function backupData(type) {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        showNotification(`ZIP backup created: ${filename}`, "success");
+        showNotification(`ZIP backup created: ${filename}`, 'success');
         
     } catch (error) {
-        console.error("Error creating ZIP backup:", error);
-        showNotification(`ZIP backup failed: ${error.message}`, "danger");
+        console.error('Error creating ZIP backup:', error);
+        showNotification(`ZIP backup failed: ${error.message}`, 'danger');
     }
 }
 
@@ -395,9 +395,9 @@ async function backupData(type) {
  * @returns {Promise<void>}
  */
 async function importData(type) {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json,.csv";
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,.csv';
     
     input.onchange = async function(event) {
         const file = event.target.files[0];
@@ -405,17 +405,17 @@ async function importData(type) {
         
         try {
             const formData = new FormData();
-            formData.append("file", file);
-            formData.append("type", type);
+            formData.append('file', file);
+            formData.append('type', type);
             
-            const response = await fetch("/api/import", {
-                method: "POST",
+            const response = await fetch('/api/import', {
+                method: 'POST',
                 body: formData
             });
             
             if (response.ok) {
                 const result = await response.json();
-                showNotification(`Import successful: ${result.message}`, "success");
+                showNotification(`Import successful: ${result.message}`, 'success');
                 await refreshStats();
                 
                 // Trigger page-specific refresh if available
@@ -424,11 +424,11 @@ async function importData(type) {
                 }
             } else {
                 const error = await response.json();
-                throw new Error(error.message || "Import failed");
+                throw new Error(error.message || 'Import failed');
             }
         } catch (error) {
-            console.error("Error importing data:", error);
-            showNotification(`Import failed: ${error.message}`, "danger");
+            console.error('Error importing data:', error);
+            showNotification(`Import failed: ${error.message}`, 'danger');
         }
     };
     
@@ -448,12 +448,12 @@ async function clearData(type) {
     
     try {
         const response = await fetch(`/api/backup/clear/${type}`, {
-            method: "DELETE"
+            method: 'DELETE'
         });
         
         if (response.ok) {
             const result = await response.json();
-            showNotification(result.message, "success");
+            showNotification(result.message, 'success');
             
             // Refresh statistics
             await refreshStats();
@@ -463,11 +463,11 @@ async function clearData(type) {
                 window.refreshPageData(type);
             }
         } else {
-            throw new Error("Clear operation failed");
+            throw new Error('Clear operation failed');
         }
     } catch (error) {
-        console.error("Error clearing data:", error);
-        showNotification(`Error clearing data: ${error.message}`, "danger");
+        console.error('Error clearing data:', error);
+        showNotification(`Error clearing data: ${error.message}`, 'danger');
     }
 }
 
@@ -479,8 +479,8 @@ async function clearData(type) {
  */
 function showClearConfirmationModal(type, confirmText) {
     return new Promise((resolve) => {
-        const modal = document.createElement("div");
-        modal.className = "modal fade";
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
         modal.innerHTML = `
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -508,27 +508,27 @@ function showClearConfirmationModal(type, confirmText) {
         
         document.body.appendChild(modal);
         const bsModal = new bootstrap.Modal(modal);
-        const confirmInput = modal.querySelector("#confirmInput");
-        const confirmBtn = modal.querySelector("#confirmBtn");
+        const confirmInput = modal.querySelector('#confirmInput');
+        const confirmBtn = modal.querySelector('#confirmBtn');
         
-        confirmInput.addEventListener("input", () => {
+        confirmInput.addEventListener('input', () => {
             if (confirmInput.value === confirmText) {
                 confirmBtn.disabled = false;
-                confirmBtn.classList.remove("disabled");
+                confirmBtn.classList.remove('disabled');
             } else {
                 confirmBtn.disabled = true;
-                confirmBtn.classList.add("disabled");
+                confirmBtn.classList.add('disabled');
             }
         });
         
-        confirmBtn.addEventListener("click", () => {
+        confirmBtn.addEventListener('click', () => {
             if (confirmInput.value === confirmText) {
                 bsModal.hide();
                 resolve(true);
             }
         });
         
-        modal.addEventListener("hidden.bs.modal", () => {
+        modal.addEventListener('hidden.bs.modal', () => {
             document.body.removeChild(modal);
             resolve(false);
         });
@@ -544,14 +544,14 @@ function showClearConfirmationModal(type, confirmText) {
  * @returns {Promise<void>}
  */
 async function testCiscoConnection() {
-    showNotification("Cisco API connectivity test - feature coming soon", "info");
+    showNotification('Cisco API connectivity test - feature coming soon', 'info');
     // TODO: Implement actual Cisco PSIRT API test
-    document.getElementById("ciscoStatus").textContent = "Testing...";
-    document.getElementById("ciscoStatus").className = "badge bg-warning";
+    document.getElementById('ciscoStatus').textContent = 'Testing...';
+    document.getElementById('ciscoStatus').className = 'badge bg-warning';
     
     setTimeout(() => {
-        document.getElementById("ciscoStatus").textContent = "Not Configured";
-        document.getElementById("ciscoStatus").className = "badge bg-secondary";
+        document.getElementById('ciscoStatus').textContent = 'Not Configured';
+        document.getElementById('ciscoStatus').className = 'badge bg-secondary';
     }, 2000);
 }
 
@@ -560,14 +560,14 @@ async function testCiscoConnection() {
  * @returns {Promise<void>}
  */
 async function testTenableConnection() {
-    showNotification("Tenable API connectivity test - feature coming soon", "info");
+    showNotification('Tenable API connectivity test - feature coming soon', 'info');
     // TODO: Implement actual Tenable API test
-    document.getElementById("tenableStatus").textContent = "Testing...";
-    document.getElementById("tenableStatus").className = "badge bg-warning";
+    document.getElementById('tenableStatus').textContent = 'Testing...';
+    document.getElementById('tenableStatus').className = 'badge bg-warning';
     
     setTimeout(() => {
-        document.getElementById("tenableStatus").textContent = "Not Configured";
-        document.getElementById("tenableStatus").className = "badge bg-secondary";
+        document.getElementById('tenableStatus').textContent = 'Not Configured';
+        document.getElementById('tenableStatus').className = 'badge bg-secondary';
     }, 2000);
 }
 
@@ -576,7 +576,7 @@ async function testTenableConnection() {
  * @returns {Promise<void>}
  */
 async function fetchCiscoData() {
-    showNotification("Cisco data fetch - feature coming soon", "info");
+    showNotification('Cisco data fetch - feature coming soon', 'info');
     // TODO: Implement actual Cisco PSIRT data fetch
 }
 
@@ -585,7 +585,7 @@ async function fetchCiscoData() {
  * @returns {Promise<void>}
  */
 async function fetchTenableData() {
-    showNotification("Tenable data fetch - feature coming soon", "info");
+    showNotification('Tenable data fetch - feature coming soon', 'info');
     // TODO: Implement actual Tenable data fetch
 }
 
@@ -598,61 +598,61 @@ async function saveSettings() {
         // Collect all settings from the modal
         const settings = {
             // API Configuration
-            apiEndpoint: document.getElementById("apiEndpoint")?.value || "",
-            refreshInterval: parseInt(document.getElementById("refreshInterval")?.value) || 30,
-            apiKey: document.getElementById("apiKey")?.value || "",
-            enableApiAuth: document.getElementById("enableApiAuth")?.checked || false,
+            apiEndpoint: document.getElementById('apiEndpoint')?.value || '',
+            refreshInterval: parseInt(document.getElementById('refreshInterval')?.value) || 30,
+            apiKey: document.getElementById('apiKey')?.value || '',
+            enableApiAuth: document.getElementById('enableApiAuth')?.checked || false,
             
             // ServiceNow Configuration
-            enableServiceNow: document.getElementById("serviceNowEnabled")?.checked || false,
-            serviceNowUrl: document.getElementById("serviceNowInstance")?.value || "",
+            enableServiceNow: document.getElementById('serviceNowEnabled')?.checked || false,
+            serviceNowUrl: document.getElementById('serviceNowInstance')?.value || '',
             
             // Save timestamp
             lastSaved: new Date().toISOString()
         };
 
         // Save to localStorage
-        localStorage.setItem("hextrackr-settings", JSON.stringify(settings));
+        localStorage.setItem('hextrackr-settings', JSON.stringify(settings));
         
         // Try to save to server as well (if API is available)
         try {
-            const response = await fetch("/api/settings", {
-                method: "POST",
+            const response = await fetch('/api/settings', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(settings)
             });
             
             if (response.ok) {
-                console.log("✅ Settings saved to server successfully");
+                console.log('✅ Settings saved to server successfully');
             } else {
-                console.log("⚠️ Server save failed, using localStorage only");
+                console.log('⚠️ Server save failed, using localStorage only');
             }
         } catch (apiError) {
-            console.log("⚠️ Server not available, using localStorage only");
+            console.log('⚠️ Server not available, using localStorage only');
         }
         
         // Update ServiceNow integration status
         updateServiceNowStatus();
         
         // Show success notification
-        showNotification("Settings saved successfully!", "success");
+        showNotification('Settings saved successfully!', 'success');
         
         // Close the modal
-        const settingsModal = bootstrap.Modal.getInstance(document.getElementById("settingsModal"));
+        const settingsModal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
         if (settingsModal) {
             settingsModal.hide();
         }
         
         // Refresh page data if there are any refresh hooks
         if (window.refreshPageData) {
-            window.refreshPageData("settings");
+            window.refreshPageData('settings');
         }
         
     } catch (error) {
-        console.error("❌ Error saving settings:", error);
-        showNotification("Error saving settings. Please try again.", "danger");
+        console.error('❌ Error saving settings:', error);
+        showNotification('Error saving settings. Please try again.', 'danger');
     }
 }
 
@@ -679,13 +679,13 @@ function showNotification(message, type) {
 
 // ServiceNow Integration Functions
 function initServiceNowSettings() {
-    const enabledToggle = document.getElementById("serviceNowEnabled");
-    const instanceInput = document.getElementById("serviceNowInstance");
-    const configDiv = document.getElementById("serviceNowConfig");
-    const urlPreview = document.getElementById("urlPatternPreview");
-    const statusBadge = document.getElementById("serviceNowStatus");
-    const testButton = document.getElementById("testServiceNowLink");
-    const saveButton = document.getElementById("saveServiceNowSettings");
+    const enabledToggle = document.getElementById('serviceNowEnabled');
+    const instanceInput = document.getElementById('serviceNowInstance');
+    const configDiv = document.getElementById('serviceNowConfig');
+    const urlPreview = document.getElementById('urlPatternPreview');
+    const statusBadge = document.getElementById('serviceNowStatus');
+    const testButton = document.getElementById('testServiceNowLink');
+    const saveButton = document.getElementById('saveServiceNowSettings');
 
     if (!enabledToggle || !instanceInput) return;
 
@@ -693,20 +693,20 @@ function initServiceNowSettings() {
     loadServiceNowSettings();
 
     // Toggle configuration visibility
-    enabledToggle.addEventListener("change", function() {
-        configDiv.style.display = this.checked ? "block" : "none";
+    enabledToggle.addEventListener('change', function() {
+        configDiv.style.display = this.checked ? 'block' : 'none';
         updateServiceNowStatus();
         updateUrlPreview();
     });
 
     // Update URL preview as user types
-    instanceInput.addEventListener("input", updateUrlPreview);
+    instanceInput.addEventListener('input', updateUrlPreview);
 
     // Test link functionality
-    testButton.addEventListener("click", testServiceNowConnection);
+    testButton.addEventListener('click', testServiceNowConnection);
 
     // Save settings
-    saveButton.addEventListener("click", saveServiceNowSettings);
+    saveButton.addEventListener('click', saveServiceNowSettings);
 
     // Initial state
     updateServiceNowStatus();
@@ -715,32 +715,32 @@ function initServiceNowSettings() {
 
 function loadServiceNowSettings() {
     try {
-        const settings = JSON.parse(localStorage.getItem("serviceNowSettings") || "{}");
-        const enabledToggle = document.getElementById("serviceNowEnabled");
-        const instanceInput = document.getElementById("serviceNowInstance");
-        const configDiv = document.getElementById("serviceNowConfig");
+        const settings = JSON.parse(localStorage.getItem('serviceNowSettings') || '{}');
+        const enabledToggle = document.getElementById('serviceNowEnabled');
+        const instanceInput = document.getElementById('serviceNowInstance');
+        const configDiv = document.getElementById('serviceNowConfig');
 
         if (enabledToggle) {
             enabledToggle.checked = settings.enabled || false;
         }
         if (instanceInput) {
-            instanceInput.value = settings.instanceUrl || "";
+            instanceInput.value = settings.instanceUrl || '';
         }
         if (configDiv) {
-            configDiv.style.display = settings.enabled ? "block" : "none";
+            configDiv.style.display = settings.enabled ? 'block' : 'none';
         }
     } catch (error) {
-        console.error("Error loading ServiceNow settings:", error);
+        console.error('Error loading ServiceNow settings:', error);
     }
 }
 
 function saveServiceNowSettings() {
     try {
-        const enabledToggle = document.getElementById("serviceNowEnabled");
-        const instanceInput = document.getElementById("serviceNowInstance");
+        const enabledToggle = document.getElementById('serviceNowEnabled');
+        const instanceInput = document.getElementById('serviceNowInstance');
 
         if (!enabledToggle || !instanceInput) {
-            showNotification("Settings elements not found", "error");
+            showNotification('Settings elements not found', 'error');
             return;
         }
 
@@ -748,7 +748,7 @@ function saveServiceNowSettings() {
         if (enabledToggle.checked && instanceInput.value) {
             const url = instanceInput.value.trim();
             if (!url.match(/^https:\/\/.*\.service-now\.com\/?$/)) {
-                showNotification("Please enter a valid ServiceNow URL (https://yourorg.service-now.com)", "error");
+                showNotification('Please enter a valid ServiceNow URL (https://yourorg.service-now.com)', 'error');
                 instanceInput.focus();
                 return;
             }
@@ -759,24 +759,24 @@ function saveServiceNowSettings() {
             instanceUrl: instanceInput.value.trim()
         };
 
-        localStorage.setItem("serviceNowSettings", JSON.stringify(settings));
+        localStorage.setItem('serviceNowSettings', JSON.stringify(settings));
         updateServiceNowStatus();
-        showNotification("ServiceNow settings saved successfully", "success");
+        showNotification('ServiceNow settings saved successfully', 'success');
 
         // Trigger page refresh if available
         if (window.refreshPageData) {
-            window.refreshPageData("serviceNow");
+            window.refreshPageData('serviceNow');
         }
     } catch (error) {
-        console.error("Error saving ServiceNow settings:", error);
-        showNotification("Failed to save ServiceNow settings", "error");
+        console.error('Error saving ServiceNow settings:', error);
+        showNotification('Failed to save ServiceNow settings', 'error');
     }
 }
 
 function updateServiceNowStatus() {
-    const statusBadge = document.getElementById("serviceNowStatus");
-    const enabledToggle = document.getElementById("serviceNowEnabled");
-    const instanceInput = document.getElementById("serviceNowInstance");
+    const statusBadge = document.getElementById('serviceNowStatus');
+    const enabledToggle = document.getElementById('serviceNowEnabled');
+    const instanceInput = document.getElementById('serviceNowInstance');
 
     if (!statusBadge || !enabledToggle) return;
 
@@ -784,98 +784,98 @@ function updateServiceNowStatus() {
     const hasValidUrl = instanceInput && instanceInput.value.trim().match(/^https:\/\/.*\.service-now\.com\/?$/);
 
     if (isEnabled && hasValidUrl) {
-        statusBadge.textContent = "Enabled";
-        statusBadge.className = "badge bg-success ms-auto";
+        statusBadge.textContent = 'Enabled';
+        statusBadge.className = 'badge bg-success ms-auto';
     } else if (isEnabled) {
-        statusBadge.textContent = "Configuration Needed";
-        statusBadge.className = "badge bg-warning ms-auto";
+        statusBadge.textContent = 'Configuration Needed';
+        statusBadge.className = 'badge bg-warning ms-auto';
     } else {
-        statusBadge.textContent = "Disabled";
-        statusBadge.className = "badge bg-secondary ms-auto";
+        statusBadge.textContent = 'Disabled';
+        statusBadge.className = 'badge bg-secondary ms-auto';
     }
 }
 
 function updateUrlPreview() {
-    const urlPreview = document.getElementById("urlPatternPreview");
-    const instanceInput = document.getElementById("serviceNowInstance");
-    const enabledToggle = document.getElementById("serviceNowEnabled");
+    const urlPreview = document.getElementById('urlPatternPreview');
+    const instanceInput = document.getElementById('serviceNowInstance');
+    const enabledToggle = document.getElementById('serviceNowEnabled');
 
     if (!urlPreview || !instanceInput || !enabledToggle) return;
 
     if (!enabledToggle.checked) {
-        urlPreview.textContent = "ServiceNow integration is disabled";
+        urlPreview.textContent = 'ServiceNow integration is disabled';
         return;
     }
 
     const instanceUrl = instanceInput.value.trim();
     if (!instanceUrl) {
-        urlPreview.textContent = "Enter your ServiceNow instance URL to see the pattern";
+        urlPreview.textContent = 'Enter your ServiceNow instance URL to see the pattern';
         return;
     }
 
-    const baseUrl = instanceUrl.replace(/\/$/, ""); // Remove trailing slash
+    const baseUrl = instanceUrl.replace(/\/$/, ''); // Remove trailing slash
     const pattern = `${baseUrl}/nav_to.do?uri=incident_list.do?sysparm_query=number={TICKET_NUMBER}`;
     urlPreview.textContent = pattern;
 }
 
 function testServiceNowConnection() {
-    const instanceInput = document.getElementById("serviceNowInstance");
-    const enabledToggle = document.getElementById("serviceNowEnabled");
+    const instanceInput = document.getElementById('serviceNowInstance');
+    const enabledToggle = document.getElementById('serviceNowEnabled');
 
     if (!instanceInput || !enabledToggle) {
-        showNotification("Settings elements not found", "error");
+        showNotification('Settings elements not found', 'error');
         return;
     }
 
     if (!enabledToggle.checked) {
-        showNotification("Please enable ServiceNow integration first", "warning");
+        showNotification('Please enable ServiceNow integration first', 'warning');
         return;
     }
 
     const instanceUrl = instanceInput.value.trim();
     if (!instanceUrl) {
-        showNotification("Please enter your ServiceNow instance URL", "warning");
+        showNotification('Please enter your ServiceNow instance URL', 'warning');
         instanceInput.focus();
         return;
     }
 
     if (!instanceUrl.match(/^https:\/\/.*\.service-now\.com\/?$/)) {
-        showNotification("Please enter a valid ServiceNow URL format", "error");
+        showNotification('Please enter a valid ServiceNow URL format', 'error');
         instanceInput.focus();
         return;
     }
 
     // Generate test URL
-    const baseUrl = instanceUrl.replace(/\/$/, "");
+    const baseUrl = instanceUrl.replace(/\/$/, '');
     const testUrl = `${baseUrl}/nav_to.do?uri=incident_list.do?sysparm_query=number=INC0000001`;
 
     // Open test link
-    window.open(testUrl, "_blank");
-    showNotification("Test link opened in new tab", "info");
+    window.open(testUrl, '_blank');
+    showNotification('Test link opened in new tab', 'info');
 }
 
 function generateServiceNowUrl(ticketNumber) {
     try {
-        const settings = JSON.parse(localStorage.getItem("serviceNowSettings") || "{}");
+        const settings = JSON.parse(localStorage.getItem('serviceNowSettings') || '{}');
         
         if (!settings.enabled || !settings.instanceUrl) {
             return null;
         }
 
-        const baseUrl = settings.instanceUrl.replace(/\/$/, "");
+        const baseUrl = settings.instanceUrl.replace(/\/$/, '');
         return `${baseUrl}/nav_to.do?uri=incident_list.do?sysparm_query=number=${ticketNumber}`;
     } catch (error) {
-        console.error("Error generating ServiceNow URL:", error);
+        console.error('Error generating ServiceNow URL:', error);
         return null;
     }
 }
 
 function isServiceNowEnabled() {
     try {
-        const settings = JSON.parse(localStorage.getItem("serviceNowSettings") || "{}");
+        const settings = JSON.parse(localStorage.getItem('serviceNowSettings') || '{}');
         return settings.enabled && settings.instanceUrl;
     } catch (error) {
-        console.error("Error checking ServiceNow status:", error);
+        console.error('Error checking ServiceNow status:', error);
         return false;
     }
 };
@@ -887,25 +887,25 @@ function isServiceNowEnabled() {
  */
 function convertTicketsToCSV(tickets) {
     if (!tickets || tickets.length === 0) {
-        return "id,xt_number,date_submitted,date_due,hexagon_ticket,service_now_ticket,location,devices,supervisor,tech,status,notes,created_at,updated_at\n";
+        return 'id,xt_number,date_submitted,date_due,hexagon_ticket,service_now_ticket,location,devices,supervisor,tech,status,notes,created_at,updated_at\n';
     }
     
     // Transform tickets for CSV with proper field mapping
     const csvData = tickets.map(ticket => ({
-        id: ticket.id || "",
-        xt_number: ticket.xt_number || "",
-        date_submitted: ticket.date_submitted || "",
-        date_due: ticket.date_due || "",
-        hexagon_ticket: ticket.hexagon_ticket || "",
-        service_now_ticket: ticket.service_now_ticket || "",
-        location: ticket.location || "",
-        devices: ticket.devices || "",
-        supervisor: ticket.supervisor || "",
-        tech: ticket.tech || "",
-        status: ticket.status || "",
-        notes: ticket.notes || "",
-        created_at: ticket.created_at || "",
-        updated_at: ticket.updated_at || ""
+        id: ticket.id || '',
+        xt_number: ticket.xt_number || '',
+        date_submitted: ticket.date_submitted || '',
+        date_due: ticket.date_due || '',
+        hexagon_ticket: ticket.hexagon_ticket || '',
+        service_now_ticket: ticket.service_now_ticket || '',
+        location: ticket.location || '',
+        devices: ticket.devices || '',
+        supervisor: ticket.supervisor || '',
+        tech: ticket.tech || '',
+        status: ticket.status || '',
+        notes: ticket.notes || '',
+        created_at: ticket.created_at || '',
+        updated_at: ticket.updated_at || ''
     }));
     
     return Papa.unparse(csvData);
@@ -918,23 +918,23 @@ function convertTicketsToCSV(tickets) {
  */
 function convertVulnerabilitiesToCSV(vulnerabilities) {
     if (!vulnerabilities || vulnerabilities.length === 0) {
-        return "id,hostname,ip_address,cve,severity,vpr_score,cvss_score,first_seen,last_seen,plugin_name,description,solution\n";
+        return 'id,hostname,ip_address,cve,severity,vpr_score,cvss_score,first_seen,last_seen,plugin_name,description,solution\n';
     }
     
     // Transform vulnerabilities for CSV
     const csvData = vulnerabilities.map(vuln => ({
-        id: vuln.id || "",
-        hostname: vuln.hostname || "",
-        ip_address: vuln.ip_address || "",
-        cve: vuln.cve || "",
-        severity: vuln.severity || "",
+        id: vuln.id || '',
+        hostname: vuln.hostname || '',
+        ip_address: vuln.ip_address || '',
+        cve: vuln.cve || '',
+        severity: vuln.severity || '',
         vpr_score: vuln.vpr_score || 0,
         cvss_score: vuln.cvss_score || 0,
-        first_seen: vuln.first_seen || "",
-        last_seen: vuln.last_seen || "",
-        plugin_name: vuln.plugin_name || "",
-        description: vuln.description || "",
-        solution: vuln.solution || ""
+        first_seen: vuln.first_seen || '',
+        last_seen: vuln.last_seen || '',
+        plugin_name: vuln.plugin_name || '',
+        description: vuln.description || '',
+        solution: vuln.solution || ''
     }));
     
     return Papa.unparse(csvData);
@@ -947,12 +947,12 @@ function convertVulnerabilitiesToCSV(vulnerabilities) {
 async function exportAllDataAsCSV() {
     try {
         const zip = new JSZip();
-        const timestamp = new Date().toISOString().split("T")[0];
+        const timestamp = new Date().toISOString().split('T')[0];
         
         // Fetch all data
         const [ticketsRes, vulnsRes] = await Promise.all([
-            fetch("/api/backup/tickets"),
-            fetch("/api/backup/vulnerabilities")
+            fetch('/api/backup/tickets'),
+            fetch('/api/backup/vulnerabilities')
         ]);
         
         if (ticketsRes.ok && vulnsRes.ok) {
@@ -964,28 +964,28 @@ async function exportAllDataAsCSV() {
             const vulnsCSV = convertVulnerabilitiesToCSV(vulnsData.data || []);
             
             // Add CSV files to ZIP
-            zip.file("tickets.csv", ticketsCSV);
-            zip.file("vulnerabilities.csv", vulnsCSV);
+            zip.file('tickets.csv', ticketsCSV);
+            zip.file('vulnerabilities.csv', vulnsCSV);
             
             // Add metadata
             const metadata = {
-                export_type: "all_csv",
+                export_type: 'all_csv',
                 created_at: new Date().toISOString(),
-                application: "HexTrackr",
-                version: "2.3",
+                application: 'HexTrackr',
+                version: '2.3',
                 contents: {
                     tickets: ticketsData.count || 0,
                     vulnerabilities: vulnsData.count || 0
                 }
             };
-            zip.file("export_info.json", JSON.stringify(metadata, null, 2));
+            zip.file('export_info.json', JSON.stringify(metadata, null, 2));
             
             // Generate and download ZIP
-            const zipBlob = await zip.generateAsync({ type: "blob" });
+            const zipBlob = await zip.generateAsync({ type: 'blob' });
             const filename = `hextrackr_all_data_export_${timestamp}.zip`;
             
             const url = URL.createObjectURL(zipBlob);
-            const a = document.createElement("a");
+            const a = document.createElement('a');
             a.href = url;
             a.download = filename;
             document.body.appendChild(a);
@@ -993,13 +993,13 @@ async function exportAllDataAsCSV() {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showNotification(`All data CSV export created: ${filename}`, "success");
+            showNotification(`All data CSV export created: ${filename}`, 'success');
         } else {
-            throw new Error("Failed to fetch data for export");
+            throw new Error('Failed to fetch data for export');
         }
     } catch (error) {
-        console.error("Error creating all data CSV export:", error);
-        showNotification(`All data CSV export failed: ${error.message}`, "danger");
+        console.error('Error creating all data CSV export:', error);
+        showNotification(`All data CSV export failed: ${error.message}`, 'danger');
     }
 }
 
@@ -1010,12 +1010,12 @@ async function exportAllDataAsCSV() {
 async function importCSV(type) {
     try {
         // Create a file input element
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept = ".csv";
-        fileInput.style.display = "none";
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.csv';
+        fileInput.style.display = 'none';
         
-        fileInput.addEventListener("change", async function(event) {
+        fileInput.addEventListener('change', async function(event) {
             const file = event.target.files[0];
             if (!file) return;
             
@@ -1028,14 +1028,14 @@ async function importCSV(type) {
                 });
                 
                 if (data.errors.length > 0) {
-                    throw new Error(`CSV parsing errors: ${data.errors.map(e => e.message).join(", ")}`);
+                    throw new Error(`CSV parsing errors: ${data.errors.map(e => e.message).join(', ')}`);
                 }
                 
                 // Send to backend for import
                 const response = await fetch(`/api/import/${type}`, {
-                    method: "POST",
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json"
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         data: data.data
@@ -1044,7 +1044,7 @@ async function importCSV(type) {
                 
                 if (response.ok) {
                     const result = await response.json();
-                    showNotification(`${type} import successful: ${result.imported || data.data.length} records imported`, "success");
+                    showNotification(`${type} import successful: ${result.imported || data.data.length} records imported`, 'success');
                     
                     // Refresh page data if available
                     if (window.refreshPageData) {
@@ -1055,11 +1055,11 @@ async function importCSV(type) {
                     }
                 } else {
                     const error = await response.json();
-                    throw new Error(error.message || "Import failed");
+                    throw new Error(error.message || 'Import failed');
                 }
             } catch (error) {
-                console.error("Import error:", error);
-                showNotification(`Import failed: ${error.message}`, "danger");
+                console.error('Import error:', error);
+                showNotification(`Import failed: ${error.message}`, 'danger');
             } finally {
                 // Clean up
                 document.body.removeChild(fileInput);
@@ -1071,18 +1071,18 @@ async function importCSV(type) {
         fileInput.click();
         
     } catch (error) {
-        console.error("Error setting up import:", error);
-        showNotification(`Import setup failed: ${error.message}`, "danger");
+        console.error('Error setting up import:', error);
+        showNotification(`Import setup failed: ${error.message}`, 'danger');
     }
 }
 
 // Auto-initialize when DOM is ready
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener('DOMContentLoaded', function() {
     SettingsModal.init();
 });
 
 // Export for use in other modules
-if (typeof module !== "undefined" && module.exports) {
+if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         SettingsModal,
         refreshStats,
@@ -1128,10 +1128,10 @@ async function restoreFullSystemBackup() {
         if (!confirmed) return;
         
         // Call restoreData with 'all' type
-        await restoreData("all");
+        await restoreData('all');
     } catch (error) {
-        console.error("Error with full system restore:", error);
-        showNotification(`System restore failed: ${error.message}`, "danger");
+        console.error('Error with full system restore:', error);
+        showNotification(`System restore failed: ${error.message}`, 'danger');
     }
 }
 
@@ -1141,8 +1141,8 @@ async function restoreFullSystemBackup() {
  */
 function showRestoreConfirmationModal() {
     return new Promise((resolve) => {
-        const modal = document.createElement("div");
-        modal.className = "modal fade";
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
         modal.innerHTML = `
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -1176,16 +1176,16 @@ function showRestoreConfirmationModal() {
         
         document.body.appendChild(modal);
         const bsModal = new bootstrap.Modal(modal);
-        const confirmBtn = modal.querySelector("#confirmRestoreBtn");
-        const clearCheckbox = modal.querySelector("#clearBeforeRestore");
+        const confirmBtn = modal.querySelector('#confirmRestoreBtn');
+        const clearCheckbox = modal.querySelector('#clearBeforeRestore');
         
-        confirmBtn.addEventListener("click", () => {
+        confirmBtn.addEventListener('click', () => {
             const shouldClear = clearCheckbox.checked;
             bsModal.hide();
             resolve(true);
         });
         
-        modal.addEventListener("hidden.bs.modal", () => {
+        modal.addEventListener('hidden.bs.modal', () => {
             document.body.removeChild(modal);
             resolve(false);
         });
@@ -1202,33 +1202,33 @@ function showRestoreConfirmationModal() {
 async function restoreData(type) {
     try {
         // Create a file input element for selecting the backup file
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = ".zip";
-        input.style.display = "none";
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.zip';
+        input.style.display = 'none';
         
         input.onchange = async function(event) {
             const file = event.target.files[0];
             if (!file) return;
             
             // Show loading notification
-            showNotification(`Restoring ${type} data from backup...`, "info");
+            showNotification(`Restoring ${type} data from backup...`, 'info');
             
             try {
                 // Create form data with the file and type
                 const formData = new FormData();
-                formData.append("file", file);
-                formData.append("type", type);
+                formData.append('file', file);
+                formData.append('type', type);
                 
                 // Send to backend for processing
-                const response = await fetch("/api/restore", {
-                    method: "POST",
+                const response = await fetch('/api/restore', {
+                    method: 'POST',
                     body: formData
                 });
                 
                 if (response.ok) {
                     const result = await response.json();
-                    showNotification(`Restore successful: ${result.message}`, "success");
+                    showNotification(`Restore successful: ${result.message}`, 'success');
                     
                     // Refresh statistics
                     await refreshStats();
@@ -1239,11 +1239,11 @@ async function restoreData(type) {
                     }
                 } else {
                     const error = await response.json();
-                    throw new Error(error.message || "Restore failed");
+                    throw new Error(error.message || 'Restore failed');
                 }
             } catch (error) {
-                console.error("Error restoring data:", error);
-                showNotification(`Restore failed: ${error.message}`, "danger");
+                console.error('Error restoring data:', error);
+                showNotification(`Restore failed: ${error.message}`, 'danger');
             } finally {
                 // Clean up
                 document.body.removeChild(input);
@@ -1255,8 +1255,8 @@ async function restoreData(type) {
         input.click();
         
     } catch (error) {
-        console.error("Error setting up restore:", error);
-        showNotification(`Restore setup failed: ${error.message}`, "danger");
+        console.error('Error setting up restore:', error);
+        showNotification(`Restore setup failed: ${error.message}`, 'danger');
     }
 }
 

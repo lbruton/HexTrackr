@@ -1,11 +1,11 @@
 // HexTrackr Shared Header Loader
 (function() {
-  "use strict";
+  'use strict';
   
   async function loadHeader() {
     try {
       // Fetch the header HTML
-      const response = await fetch("scripts/shared/header.html");
+      const response = await fetch('scripts/shared/header.html');
       if (!response.ok) {
         throw new Error(`Failed to load header: ${response.status}`);
       }
@@ -13,10 +13,10 @@
       const headerHtml = await response.text();
       
       // Find the header container or create one if it doesn't exist
-      let headerContainer = document.getElementById("headerContainer");
+      let headerContainer = document.getElementById('headerContainer');
       if (!headerContainer) {
-        headerContainer = document.createElement("div");
-        headerContainer.id = "headerContainer";
+        headerContainer = document.createElement('div');
+        headerContainer.id = 'headerContainer';
         document.body.insertBefore(headerContainer, document.body.firstChild);
       }
       
@@ -26,10 +26,10 @@
       // Initialize header functionality
       initHeaderFunctionality();
       
-      console.log("✅ HexTrackr Header (shared) loaded successfully");
+      console.log('✅ HexTrackr Header (shared) loaded successfully');
       
     } catch (error) {
-      console.error("❌ Failed to load shared header:", error);
+      console.error('❌ Failed to load shared header:', error);
       // Fallback: show basic navigation if loading fails
       showFallbackHeader();
     }
@@ -37,27 +37,27 @@
   
   function initHeaderFunctionality() {
     // Set active navigation item based on current page
-    const currentPage = window.location.pathname.split("/").pop();
-    const navLinks = document.querySelectorAll(".navbar-nav .nav-link");
+    const currentPage = window.location.pathname.split('/').pop();
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
     
     navLinks.forEach(link => {
-      const href = link.getAttribute("href");
+      const href = link.getAttribute('href');
       if (href === currentPage) {
-        link.classList.add("active");
+        link.classList.add('active');
       } else {
-        link.classList.remove("active");
+        link.classList.remove('active');
       }
     });
     
     // Handle Import CSV Data link to open settings modal with specific tab
-    const importCsvLink = document.querySelector("a[data-settings-tab=\"data-management\"]");
+    const importCsvLink = document.querySelector('a[data-settings-tab="data-management"]');
     if (importCsvLink) {
-      importCsvLink.addEventListener("click", function(e) {
+      importCsvLink.addEventListener('click', function(e) {
         e.preventDefault();
         
         // Wait for settings modal to be loaded, then open specific tab
         setTimeout(() => {
-          const dataManagementTab = document.getElementById("data-management-tab");
+          const dataManagementTab = document.getElementById('data-management-tab');
           if (dataManagementTab) {
             dataManagementTab.click();
           }
@@ -66,9 +66,9 @@
     }
     
     // Initialize Bootstrap components if needed
-    if (typeof bootstrap !== "undefined") {
+    if (typeof bootstrap !== 'undefined') {
       // Initialize any Bootstrap tooltips in the header
-      const tooltipTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle=\"tooltip\"]"));
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
       tooltipTriggerList.map(function(tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
       });
@@ -76,10 +76,10 @@
   }
   
   function showFallbackHeader() {
-    let headerContainer = document.getElementById("headerContainer");
+    let headerContainer = document.getElementById('headerContainer');
     if (!headerContainer) {
-      headerContainer = document.createElement("div");
-      headerContainer.id = "headerContainer";
+      headerContainer = document.createElement('div');
+      headerContainer.id = 'headerContainer';
       document.body.insertBefore(headerContainer, document.body.firstChild);
     }
     
@@ -97,12 +97,12 @@
       </header>
     `;
     
-    console.log("⚠️ HexTrackr Header fallback loaded");
+    console.log('⚠️ HexTrackr Header fallback loaded');
   }
   
   // Load header when DOM is ready
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadHeader);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadHeader);
   } else {
     loadHeader();
   }
