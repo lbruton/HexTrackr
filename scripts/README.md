@@ -2,11 +2,13 @@
 
 ## Overview
 
-HexTrackr follows a modular JavaScript architecture pattern that mirrors our CSS organization structure. This approach promotes reusability, maintainability, and scalability across the application.
+HexTrackr follows a modular JavaScript architecture pattern that mirrors our CSS organization
+structure. This approach promotes reusability, maintainability, and scalability across the
+application.
 
 ## Directory Structure
 
-```
+```text
 scripts/
 ├── shared/                 # Shared components used across multiple pages
 │   ├── settings-modal.js   # Unified Settings modal functionality
@@ -36,6 +38,7 @@ Each page includes:
 2. **Page-specific code second** (e.g., tickets.js)
 
 Example in HTML:
+
 ```html
 <!-- HexTrackr Modular JavaScript Architecture -->
 <script src="scripts/shared/settings-modal.js"></script>
@@ -53,7 +56,7 @@ Example in HTML:
 ### Shared Settings Modal (`scripts/shared/settings-modal.js`)
 
 - **Purpose**: Unified Settings modal functionality across all pages
-- **Features**: 
+- **Features**:
   - API configuration (Cisco PSIRT, Tenable)
   - Data management (export, import, backup, clear)
   - System configuration placeholders

@@ -1,6 +1,8 @@
 # Codacy Compliance Tracking
 
-*Last Updated: August 27, 2025*
+<!-- markdownlint-disable MD013 MD009 -->
+
+Last updated: August 27, 2025
 
 ## 🎯 **Compliance Initiative Overview**
 

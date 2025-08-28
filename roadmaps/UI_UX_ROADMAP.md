@@ -1,29 +1,27 @@
 # HexTrackr UI/UX Technical Roadmap
 
-*Updated: August 25, 2025*
+<!-- markdownlint-disable MD013 MD009 -->
 
-# HexTrackr UI/UX Technical Roadmap (2)
+Updated: August 25, 2025
 
-*Updated: August 25, 2025*
+## 🎯 CURRENT STATUS: CHART ENHANCEMENT PHASE
 
-## 🎯 **CURRENT STATUS: CHART ENHANCEMENT PHASE**
-
-## ✅ CURRENT ACHIEVEMENTS:
+## ✅ CURRENT ACHIEVEMENTS
 
 - ✅ **VPR Toggle Bug Fix**: Fixed critical JavaScript bug in chart metric switching
 - ✅ Modern Tabler.io vulnerability dashboard with real 6K records
 - ✅ Time-series database migration complete (97% data reduction)
 - ✅ Chart metric toggle working perfectly (Count ↔ VPR Sum modes)
 
-## 🎯 NEXT PRIORITY:
+## 🎯 NEXT PRIORITY
 
 - **Chart Timeline Extension**: Extend chart to current date (Aug 25, 2025) with flat lines for data continuity
 
 ---
 
-## 📋 **PHASE 0: JavaScript Architecture & Code Organization** ✅ **COMPLETE Aug 26, 2025**
+## 📋 PHASE 0: JavaScript Architecture & Code Organization ✅ COMPLETE Aug 26, 2025
 
-*Risk: LOW | Impact: HIGH | Duration: Ongoing*
+Risk: LOW | Impact: HIGH | Duration: Ongoing
 
 ### 0.1 JavaScript File Organization ✅ **COMPLETED**
 
@@ -83,9 +81,9 @@
 
 ---
 
-## 📋 **PHASE 1: Database Schema Migration** 
+## 📋 PHASE 1: Database Schema Migration 
 
-*Risk: HIGH | Impact: CRITICAL | Duration: 2-3 tasks*
+Risk: HIGH | Impact: CRITICAL | Duration: 2-3 tasks
 
 ### 1.1 Analyze Current Data Structure
 
@@ -109,9 +107,9 @@
 
 ---
 
-## 📋 **PHASE 2: Smart CSV Import System**
+## 📋 PHASE 2: Smart CSV Import System
 
-*Risk: MEDIUM | Impact: HIGH | Duration: 2-3 tasks*
+Risk: MEDIUM | Impact: HIGH | Duration: 2-3 tasks
 
 ### 2.1 Redesign Import Logic
 
@@ -135,9 +133,9 @@
 
 ---
 
-## 📋 **PHASE 3: Core UX Improvements**
+## 📋 PHASE 3: Core UX Improvements
 
-*Risk: MEDIUM | Impact: HIGH | Duration: 4-5 tasks*
+Risk: MEDIUM | Impact: HIGH | Duration: 4-5 tasks
 
 ### 3.0 Layout & Table Responsiveness 🚨 **HIGH PRIORITY**
 
@@ -188,9 +186,9 @@
 - [ ] Replace HTML file generation with PDF creation
 - [ ] Add professional PDF headers/footers with timestamps
 
-### 3.5 Advanced Trends Chart Analytics ✅ **CRITICAL ISSUE RESOLVED**
+### 3.5 Advanced Trends Chart Analytics ✅ CRITICAL ISSUE RESOLVED
 
-*Risk: CRITICAL | Impact: HIGHEST | Duration: 2-4 hours total*
+Risk: CRITICAL | Impact: HIGHEST | Duration: 2-4 hours total
 
 **✅ RESOLVED**: Historical VPR Trends chart now correctly shows VPR SCORE SUMS with toggle functionality!
 
@@ -203,7 +201,7 @@
 - ✅ **TESTING**: Verified toggle works both ways, VPR sum calculations accurate and meaningful
 - ✅ **QUALITY**: Added ESLint config, Playwright testing confirms functionality
 
-#### 3.5.2 Multi-Vendor Analytics 🎯 **PHASE 2 - READY FOR IMPLEMENTATION** (45 min estimated)  
+#### 3.5.2 Multi-Vendor Analytics 🎯 PHASE 2 - READY FOR IMPLEMENTATION (45 min estimated)  
 
 - [ ] **VENDOR FILTERING**: Add Cisco | Palo Alto | Other | All vendor filter buttons
 - [ ] **API ENHANCEMENT**: JOIN time-series with vulnerabilities table for vendor-specific trends
@@ -211,7 +209,7 @@
 - [ ] **BACKEND QUERY**: Support vendor parameter in trends API endpoint
 - [ ] **TESTING**: Verify filtering works correctly (currently all data is Cisco)
 
-#### 3.5.3 CVSS Support & Aggregation Methods 📊 **PHASE 3** (30 min)
+#### 3.5.3 CVSS Support & Aggregation Methods 📊 PHASE 3 (30 min)
 
 - [ ] **CVSS INTEGRATION**: Add CVSS Sum option (infrastructure ready, awaiting real CVSS data)
 - [ ] **AGGREGATION TOGGLE**: Add Sum | Average toggle for both VPR and CVSS metrics  
@@ -219,7 +217,7 @@
 - [ ] **CHART UPDATES**: Update tooltips and labels based on selected metric and aggregation
 - [ ] **DEFAULT STATE**: All vendors, VPR Sum, Sum aggregation
 
-#### 3.5.4 UI Polish & Performance 🎨 **PHASE 4** (15 min)
+#### 3.5.4 UI Polish & Performance 🎨 PHASE 4 (15 min)
 
 - [ ] **RESPONSIVE DESIGN**: Ensure button groups work on mobile devices
 - [ ] **LOADING STATES**: Add loading indicators during metric switching
@@ -228,7 +226,7 @@
 
 **Vision**: Transform trends chart into comprehensive analytics dashboard with vendor-specific, multi-metric trend analysis using elegant button-based UI (no ugly dropdowns).
 
-#### 3.5.5 Timeline Extension & Data Continuity 📈 **PHASE 4** (45 min) 🎯 **NEXT PRIORITY**
+#### 3.5.5 Timeline Extension & Data Continuity 📈 PHASE 4 (45 min) 🎯 NEXT PRIORITY
 
 - [ ] **TIMELINE EXTENSION**: Extend chart from last data point to current date (August 25, 2025)
 - [ ] **FLAT LINE CONTINUATION**: Show flat lines when no new data exists between last scan and current date
@@ -240,9 +238,9 @@
 
 ---
 
-## 📋 **PHASE 4: Enhanced Filtering & Display**
+## 📋 PHASE 4: Enhanced Filtering & Display
 
-*Risk: LOW | Impact: HIGH | Duration: 3-4 tasks*
+Risk: LOW | Impact: HIGH | Duration: 3-4 tasks
 
 ### 4.1 State Column Improvements & Default Filtering
 
@@ -283,9 +281,9 @@
 
 ---
 
-## 📋 **PHASE 5: Performance & Navigation**
+## 📋 PHASE 5: Performance & Navigation
 
-*Risk: LOW | Impact: HIGH | Duration: 2-3 tasks*
+Risk: LOW | Impact: HIGH | Duration: 2-3 tasks
 
 ### 5.1 Latest Values Display
 
@@ -311,7 +309,7 @@
 
 ## 📋 **PHASE 6: Trend Visualization**
 
-*Risk: LOW | Impact: HIGH | Duration: 3-4 tasks*
+Risk: LOW | Impact: HIGH | Duration: 3-4 tasks
 
 ### 6.1 Historical Data API
 
@@ -358,7 +356,7 @@
 
 ## 📋 **PHASE 7: Enhanced User Interactions**
 
-*Risk: LOW | Impact: MEDIUM | Duration: 3-4 tasks*
+Risk: LOW | Impact: MEDIUM | Duration: 3-4 tasks
 
 ### 7.1 Vulnerability Action Buttons
 
@@ -390,7 +388,7 @@
 
 ## 📋 **PHASE 8: API Integration Framework**
 
-*Risk: MEDIUM | Impact: HIGH | Duration: 2-3 tasks*
+Risk: MEDIUM | Impact: HIGH | Duration: 2-3 tasks
 
 ### 8.1 API Supplement System
 
@@ -410,7 +408,7 @@
 
 ## 📋 **PHASE 9: Cross-Dashboard Integration**
 
-*Risk: MEDIUM | Impact: HIGH | Duration: 4-5 tasks*
+Risk: MEDIUM | Impact: HIGH | Duration: 4-5 tasks
 
 ### 9.1 Tickets Page Redesign
 
@@ -444,7 +442,7 @@
 
 ## 📋 **PHASE 10: Advanced UI/UX Features**
 
-*Risk: LOW | Impact: MEDIUM | Duration: 3-4 tasks*
+Risk: LOW | Impact: MEDIUM | Duration: 3-4 tasks
 
 ### 10.1 Dark Mode Implementation
 
@@ -497,7 +495,7 @@
 - **Total Duration**: 6-10 weeks
 
 ---
-*Last Updated: August 25, 2025 • Priority: HIGH - Critical trend tracking + UX improvements*
+Last Updated: August 25, 2025 • Priority: HIGH - Critical trend tracking + UX improvements
 
 - [ ] **CONTEXT PASSING**: Pass hostname/device context between systems
 - [ ] **STATE MANAGEMENT**: Maintain independent operation of each dashboard
@@ -506,7 +504,7 @@
 
 ## 📋 **PHASE 7: Enhanced Statistics Cards** 
 
-*Risk: LOW | Impact: LOW | Duration: 2-3 tasks | Priority: VERY LOW*
+Risk: LOW | Impact: LOW | Duration: 2-3 tasks | Priority: VERY LOW
 
 ### 7.1 VPR Calculation Improvements
 
@@ -525,7 +523,7 @@
 
 ## 📋 **PHASE 6: User Authentication & Security**
 
-*Risk: HIGH | Impact: CRITICAL | Duration: 5-6 tasks*
+Risk: HIGH | Impact: CRITICAL | Duration: 5-6 tasks
 
 ### 6.1 Authentication System
 
@@ -562,7 +560,7 @@
 
 ## 📋 **PHASE 7: Future Enhancements & Nice-to-Have Features**
 
-*Risk: LOW | Impact: MEDIUM | Duration: Various | Priority: LOW*
+Risk: LOW | Impact: MEDIUM | Duration: Various | Priority: LOW
 
 ### 7.1 Interactive Chart Selection & Table Filtering
 
@@ -596,4 +594,4 @@
 5. **Phase 1.1** - Vulnerability Description Modal (high impact feature)
 6. **Phase 2.2** - Search bar repositioning (layout improvement)
 
-**Which phase should we tackle first? I recommend starting with Phase 1.1 for immediate user value! 🚀**
+Which phase should we tackle first? I recommend starting with Phase 1.1 for immediate user value! 🚀
