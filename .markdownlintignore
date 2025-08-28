@@ -1,0 +1,5 @@
+# Vendor and generated content
+node_modules/
+uploads/
+data/
+docs-prototype/content/

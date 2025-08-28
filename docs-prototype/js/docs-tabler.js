@@ -48,7 +48,8 @@ class DocumentationPortal {
                     "backend.html",
                     "database.html",
                     "deployment.html",
-                    "frontend.html"
+                    "frontend.html",
+                    "frameworks.html"
                 ],
                 "Development": [
                     "index.html",

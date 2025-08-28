@@ -1,3 +1,6 @@
+/* eslint-env browser */
+/* eslint-disable no-undef */
+/* global console, document, window, fetch, setTimeout, localStorage, Blob, URL, FormData, Papa, JSZip, bootstrap, module, alert */
 /**
  * HexTrackr - Shared Settings Modal Component
  * 
@@ -62,7 +65,8 @@ console.log('✅ HexTrackr Settings Modal (shared) loaded successfully');
     // Load the modal HTML from shared file
     async loadModalHtml() {
       try {
-        const response = await fetch('scripts/shared/settings-modal.html');
+    // Use absolute path to work from any page (including nested docs routes)
+    const response = await fetch('/scripts/shared/settings-modal.html');
         if (!response.ok) {
           throw new Error(`Failed to load settings modal: ${response.status}`);
         }
