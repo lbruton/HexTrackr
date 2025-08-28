@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>🎫 Ticket Management User Guide - HexTrackr Documentation</title>
+    <!-- Tabler.io CSS Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons-sprite.svg" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    
+    <style>
+        /* Documentation Section Styling */
+        .documentation-section {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+        }
+        
+        .documentation-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .documentation-section h3 {
+            color: #34495e;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .documentation-section h4 {
+            color: #5a6c7d;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .documentation-section .text-muted {
+            color: #6c757d !important;
+        }
+        
+        .documentation-section code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875em;
+            border: 1px solid #e9ecef;
+        }
+        
+        .documentation-section pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .documentation-section pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .documentation-section .alert {
+            border-radius: 8px;
+            border: none;
+            margin: 1rem 0;
+        }
+        
+        .documentation-section .card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .documentation-section .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 1rem 1.25rem;
+        }
+        
+        .documentation-section .card-body {
+            padding: 1.25rem;
+        }
+        
+        .documentation-section .badge {
+            font-size: 0.75em;
+            padding: 0.35em 0.65em;
+        }
+        
+        .documentation-section table {
+            margin: 1rem 0;
+        }
+        
+        .documentation-section .table th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .documentation-section .table td {
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .documentation-section .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f8f9fa;
+        }
+        
+        /* Custom component styling for documentation */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .documentation-section {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="documentation-section">
+        <h1>🎫 Ticket Management User Guide</h1>
+<h2>Overview</h2>
+<p>The HexTrackr Ticket Management system provides a structured approach to handling security incidents using a hexagon-based workflow. This guide covers all aspects of creating, managing, and tracking security tickets from initial creation to resolution.</p>
+<h2>Getting Started</h2>
+<h3>Accessing Ticket Management</h3>
+<ol>
+<li>Navigate to HexTrackr web interface at <code>http://localhost:8080</code></li>
+<li>Click <strong>&quot;Tickets&quot;</strong> in the main navigation</li>
+<li>The ticket dashboard displays all current tickets with status overview</li>
+</ol>
+<h3>Interface Overview</h3>
+<h4>Main Dashboard</h4>
+<ul>
+<li><strong>Active Tickets Count:</strong> Real-time display of open tickets</li>
+<li><strong>Status Distribution:</strong> Visual breakdown of ticket states</li>
+<li><strong>Recent Activity:</strong> Latest ticket updates and changes</li>
+<li><strong>Quick Actions:</strong> Create new ticket, bulk operations, filters</li>
+</ul>
+<h4>Ticket Grid</h4>
+<ul>
+<li><strong>Sortable Columns:</strong> ID, Title, Priority, Status, Assigned Device, Created Date</li>
+<li><strong>Search Functionality:</strong> Global search across all ticket fields</li>
+<li><strong>Filter Options:</strong> Status, priority, device, date ranges</li>
+<li><strong>Pagination:</strong> Configurable page size with navigation controls</li>
+</ul>
+<h2>Creating Tickets</h2>
+<h3>Basic Ticket Creation</h3>
+<h4>Step 1: Open New Ticket Form</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Step 2: Enter Ticket Information</h4>
+<ul>
+<li><strong>Title:</strong> Clear, descriptive incident title</li>
+<li><strong>Description:</strong> Detailed incident description and context</li>
+<li><strong>Priority:</strong> Critical, High, Medium, Low</li>
+<li><strong>Device Assignment:</strong> Select from available devices</li>
+<li><strong>Initial Status:</strong> Usually starts as &quot;New&quot; or &quot;Open&quot;</li>
+</ul>
+<h4>Step 3: Device Selection</h4>
+<p>The system provides device management with:</p>
+<ul>
+<li><strong>Device List:</strong> All registered devices with metadata</li>
+<li><strong>Device Details:</strong> IP addresses, hostnames, device types</li>
+<li><strong>Assignment History:</strong> Previous assignments and relationships</li>
+<li><strong>Device Status:</strong> Current availability and assignment status</li>
+</ul>
+<h3>Advanced Ticket Options</h3>
+<h4>Metadata Fields</h4>
+<ul>
+<li><strong>Reporter:</strong> Person reporting the incident</li>
+<li><strong>Category:</strong> Incident type classification</li>
+<li><strong>Tags:</strong> Custom labels for organization</li>
+<li><strong>Due Date:</strong> Expected resolution timeframe</li>
+<li><strong>External References:</strong> Links to related systems or tickets</li>
+</ul>
+<h4>File Attachments</h4>
+<ul>
+<li><strong>Screenshots:</strong> Visual evidence of issues</li>
+<li><strong>Log Files:</strong> System logs and error messages  </li>
+<li><strong>Documentation:</strong> Related policies or procedures</li>
+<li><strong>Evidence:</strong> Security-related artifacts</li>
+</ul>
+<h2>Ticket Workflow</h2>
+<h3>Hexagon Workflow States</h3>
+<p>HexTrackr uses a hexagon-based workflow with six primary states:</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>State Descriptions</h4>
+<p><strong>New</strong></p>
+<ul>
+<li>Initial state for all tickets</li>
+<li>Awaiting triage and assignment</li>
+<li>Automated notifications sent to team</li>
+</ul>
+<p><strong>Assigned</strong>  </p>
+<ul>
+<li>Ticket assigned to specific team member</li>
+<li>Device association completed</li>
+<li>Work planning and resource allocation</li>
+</ul>
+<p><strong>In Progress</strong></p>
+<ul>
+<li>Active investigation and remediation</li>
+<li>Status updates and progress tracking</li>
+<li>Collaboration tools and comments</li>
+</ul>
+<p><strong>Review</strong></p>
+<ul>
+<li>Work completed, awaiting verification</li>
+<li>Quality assurance and testing</li>
+<li>Documentation review and approval</li>
+</ul>
+<p><strong>Resolved</strong></p>
+<ul>
+<li>Issue addressed and verified</li>
+<li>Solution documented and tested</li>
+<li>Awaiting closure approval</li>
+</ul>
+<p><strong>Closed</strong></p>
+<ul>
+<li>Incident fully resolved and documented</li>
+<li>Lessons learned captured</li>
+<li>Metrics and reporting updated</li>
+</ul>
+<h3>Status Transitions</h3>
+<h4>Manual Transitions</h4>
+<p>Users can manually change ticket status with:</p>
+<ul>
+<li><strong>Status Dropdown:</strong> Available next states based on current status</li>
+<li><strong>Transition Comments:</strong> Required explanations for status changes</li>
+<li><strong>Automatic Notifications:</strong> Team updates on status changes</li>
+<li><strong>Audit Trail:</strong> Complete history of all status changes</li>
+</ul>
+<h4>Automatic Transitions</h4>
+<p>System can automatically transition tickets based on:</p>
+<ul>
+<li><strong>Time-based Rules:</strong> Auto-close after resolution period</li>
+<li><strong>Integration Events:</strong> External system updates</li>
+<li><strong>Bulk Operations:</strong> Mass status updates</li>
+<li><strong>Workflow Rules:</strong> Custom business logic</li>
+</ul>
+<h2>Device Management</h2>
+<h3>Device Assignment</h3>
+<h4>Selecting Devices</h4>
+<ul>
+<li><strong>Device Grid:</strong> Searchable list of all registered devices</li>
+<li><strong>Filter Options:</strong> By type, location, availability, status</li>
+<li><strong>Device Details:</strong> IP, hostname, OS, last seen, assignments</li>
+<li><strong>Assignment History:</strong> Previous tickets and relationships</li>
+</ul>
+<h4>Device Information</h4>
+<p>Each device record includes:</p>
+<ul>
+<li><strong>Basic Info:</strong> Name, IP address, hostname, device type</li>
+<li><strong>Network Info:</strong> Subnet, VLAN, network segment</li>
+<li><strong>System Info:</strong> Operating system, version, patch level</li>
+<li><strong>Security Info:</strong> Security tools, agents, compliance status</li>
+</ul>
+<h3>Multi-Device Tickets</h3>
+<p>For incidents affecting multiple devices:</p>
+<ul>
+<li><strong>Primary Device:</strong> Main affected system</li>
+<li><strong>Related Devices:</strong> Additional systems involved</li>
+<li><strong>Device Groups:</strong> Logical groupings for mass operations</li>
+<li><strong>Impact Assessment:</strong> Scope and severity calculation</li>
+</ul>
+<h2>Ticket Operations</h2>
+<h3>Editing Tickets</h3>
+<h4>Inline Editing</h4>
+<ul>
+<li><strong>Quick Edit:</strong> Double-click fields for immediate changes</li>
+<li><strong>Bulk Edit:</strong> Select multiple tickets for mass updates</li>
+<li><strong>Field Validation:</strong> Real-time validation and error checking</li>
+<li><strong>Auto-save:</strong> Automatic saving of changes</li>
+</ul>
+<h4>Full Edit Mode</h4>
+<ul>
+<li><strong>Complete Form:</strong> Access to all ticket fields and metadata</li>
+<li><strong>File Management:</strong> Upload, download, delete attachments</li>
+<li><strong>Comment System:</strong> Add notes and collaboration comments</li>
+<li><strong>History View:</strong> Complete audit trail and change history</li>
+</ul>
+<h3>Comments and Collaboration</h3>
+<h4>Comment System</h4>
+<ul>
+<li><strong>Threaded Comments:</strong> Organized discussion threads</li>
+<li><strong>User Attribution:</strong> Clear identification of comment authors</li>
+<li><strong>Timestamp Tracking:</strong> Precise timing of all comments</li>
+<li><strong>Rich Text:</strong> Formatting options for clear communication</li>
+</ul>
+<h4>Notifications</h4>
+<ul>
+<li><strong>Email Alerts:</strong> Configurable email notifications</li>
+<li><strong>In-app Notifications:</strong> Real-time updates within interface</li>
+<li><strong>Assignment Alerts:</strong> Notifications for new assignments</li>
+<li><strong>Status Change Alerts:</strong> Updates on workflow transitions</li>
+</ul>
+<h3>Search and Filtering</h3>
+<h4>Global Search</h4>
+<p>Search across all ticket fields:</p>
+<ul>
+<li><strong>Title and Description:</strong> Full-text search</li>
+<li><strong>Device Information:</strong> Search by device names, IPs</li>
+<li><strong>Comments:</strong> Search within all comments and notes</li>
+<li><strong>Metadata:</strong> Search tags, categories, custom fields</li>
+</ul>
+<h4>Advanced Filters</h4>
+<ul>
+<li><strong>Status Filters:</strong> Filter by current workflow state</li>
+<li><strong>Priority Filters:</strong> Critical, High, Medium, Low</li>
+<li><strong>Date Ranges:</strong> Created, modified, due date filters</li>
+<li><strong>Assignment Filters:</strong> By user, team, device</li>
+<li><strong>Custom Field Filters:</strong> Based on metadata and tags</li>
+</ul>
+<h3>Reporting and Export</h3>
+<h4>PDF Reports</h4>
+<p>Generate comprehensive PDF reports including:</p>
+<ul>
+<li><strong>Ticket Details:</strong> Complete ticket information and metadata</li>
+<li><strong>Device Information:</strong> Associated device details and history</li>
+<li><strong>Comment History:</strong> All comments and collaboration notes</li>
+<li><strong>Attachments:</strong> Embedded files and screenshots</li>
+<li><strong>Audit Trail:</strong> Complete history of changes and updates</li>
+</ul>
+<h4>Data Export</h4>
+<ul>
+<li><strong>CSV Export:</strong> Spreadsheet-compatible data export</li>
+<li><strong>Filtered Exports:</strong> Export based on current filters</li>
+<li><strong>Custom Fields:</strong> Include/exclude specific data fields</li>
+<li><strong>Bulk Operations:</strong> Export multiple tickets simultaneously</li>
+</ul>
+<h2>Best Practices</h2>
+<h3>Ticket Creation</h3>
+<ul>
+<li><strong>Clear Titles:</strong> Use descriptive, specific titles</li>
+<li><strong>Complete Descriptions:</strong> Include all relevant context and details</li>
+<li><strong>Appropriate Priority:</strong> Set priority based on business impact</li>
+<li><strong>Device Assignment:</strong> Assign to most relevant affected device</li>
+<li><strong>Tag Consistently:</strong> Use standardized tags for organization</li>
+</ul>
+<h3>Workflow Management</h3>
+<ul>
+<li><strong>Regular Updates:</strong> Keep status current and accurate</li>
+<li><strong>Meaningful Comments:</strong> Add context and progress notes</li>
+<li><strong>Timely Transitions:</strong> Move through workflow states promptly</li>
+<li><strong>Documentation:</strong> Document solutions and lessons learned</li>
+<li><strong>Closure Process:</strong> Ensure complete resolution before closing</li>
+</ul>
+<h3>Collaboration</h3>
+<ul>
+<li><strong>Clear Communication:</strong> Use comments for team coordination</li>
+<li><strong>File Organization:</strong> Keep attachments organized and relevant</li>
+<li><strong>Assignment Clarity:</strong> Ensure clear ownership and responsibility</li>
+<li><strong>Knowledge Sharing:</strong> Document solutions for future reference</li>
+</ul>
+<h2>Troubleshooting</h2>
+<h3>Common Issues</h3>
+<h4>Ticket Creation Problems</h4>
+<ul>
+<li><strong>Device Not Available:</strong> Check device registration and status</li>
+<li><strong>Validation Errors:</strong> Ensure all required fields are completed</li>
+<li><strong>Permission Issues:</strong> Verify user access and permissions</li>
+<li><strong>Upload Failures:</strong> Check file size limits and formats</li>
+</ul>
+<h4>Workflow Issues</h4>
+<ul>
+<li><strong>Status Stuck:</strong> Check for required fields or approvals</li>
+<li><strong>Assignment Problems:</strong> Verify user availability and permissions</li>
+<li><strong>Notification Failures:</strong> Check email settings and preferences</li>
+<li><strong>Performance Issues:</strong> Clear browser cache, check network</li>
+</ul>
+<h3>Performance Tips</h3>
+<ul>
+<li><strong>Filter Early:</strong> Use filters to reduce dataset size</li>
+<li><strong>Limit Attachments:</strong> Keep file sizes reasonable</li>
+<li><strong>Regular Cleanup:</strong> Archive or close completed tickets</li>
+<li><strong>Browser Updates:</strong> Keep browser current for best performance</li>
+</ul>
+<h2>Integration</h2>
+<h3>API Access</h3>
+<p>For external system integration:</p>
+<ul>
+<li><strong>REST API:</strong> Standard HTTP endpoints for ticket operations</li>
+<li><strong>Authentication:</strong> Token-based API authentication</li>
+<li><strong>Webhooks:</strong> Real-time notifications for external systems</li>
+<li><strong>Bulk Operations:</strong> API support for mass ticket operations</li>
+</ul>
+<h3>Data Import/Export</h3>
+<ul>
+<li><strong>CSV Import:</strong> Bulk ticket creation from spreadsheets</li>
+<li><strong>System Integration:</strong> Connect with existing ticketing systems</li>
+<li><strong>Reporting Tools:</strong> Export data for external reporting</li>
+<li><strong>Backup Procedures:</strong> Regular data backup and recovery</li>
+</ul>
+<hr>
+<p><strong>Target Audience:</strong> End users, security analysts, IT support staff<br><strong>Difficulty Level:</strong> Beginner to Intermediate<br><strong>Prerequisites:</strong> Basic understanding of incident management processes</p>
+
+    </div>
+</body>
+</html>

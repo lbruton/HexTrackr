@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>🔌 REST API Reference - HexTrackr Documentation</title>
+    <!-- Tabler.io CSS Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons-sprite.svg" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    
+    <style>
+        /* Documentation Section Styling */
+        .documentation-section {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+        }
+        
+        .documentation-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .documentation-section h3 {
+            color: #34495e;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .documentation-section h4 {
+            color: #5a6c7d;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .documentation-section .text-muted {
+            color: #6c757d !important;
+        }
+        
+        .documentation-section code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875em;
+            border: 1px solid #e9ecef;
+        }
+        
+        .documentation-section pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .documentation-section pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .documentation-section .alert {
+            border-radius: 8px;
+            border: none;
+            margin: 1rem 0;
+        }
+        
+        .documentation-section .card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .documentation-section .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 1rem 1.25rem;
+        }
+        
+        .documentation-section .card-body {
+            padding: 1.25rem;
+        }
+        
+        .documentation-section .badge {
+            font-size: 0.75em;
+            padding: 0.35em 0.65em;
+        }
+        
+        .documentation-section table {
+            margin: 1rem 0;
+        }
+        
+        .documentation-section .table th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .documentation-section .table td {
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .documentation-section .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f8f9fa;
+        }
+        
+        /* Custom component styling for documentation */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .documentation-section {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="documentation-section">
+        <h1>🔌 REST API Reference</h1>
+<h2>Overview</h2>
+<p>HexTrackr provides a comprehensive REST API for programmatic access to all ticket and vulnerability management functions. The API follows REST conventions with JSON request/response formats and HTTP status codes for operation results.</p>
+<h2>Base Configuration</h2>
+<h3>Base URL</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Authentication</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Response Format</h3>
+<p>All API responses follow a consistent format:</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Error Format</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h2>Ticket Management API</h2>
+<h3>List Tickets</h3>
+<p>Retrieve all tickets with optional filtering and pagination.</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Query Parameters</h4>
+<ul>
+<li><code>status</code> (string): Filter by ticket status</li>
+<li><code>priority</code> (string): Filter by priority level  </li>
+<li><code>device_id</code> (integer): Filter by assigned device</li>
+<li><code>page</code> (integer): Page number (default: 1)</li>
+<li><code>limit</code> (integer): Results per page (default: 50, max: 100)</li>
+<li><code>sort</code> (string): Sort field (id, title, created_at, status)</li>
+<li><code>order</code> (string): Sort direction (asc, desc)</li>
+</ul>
+<h4>Example Request</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Example Response</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Get Ticket</h3>
+<p>Retrieve a specific ticket by ID.</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Example Request</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Example Response</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Create Ticket</h3>
+<p>Create a new security ticket.</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Request Body</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Required Fields</h4>
+<ul>
+<li><code>title</code> (string): Ticket title</li>
+<li><code>description</code> (string): Detailed description</li>
+<li><code>priority</code> (string): One of: critical, high, medium, low</li>
+</ul>
+<h4>Optional Fields</h4>
+<ul>
+<li><code>device_id</code> (integer): Associated device ID</li>
+<li><code>assigned_to</code> (string): User email for assignment</li>
+<li><code>tags</code> (array): Array of tag strings</li>
+<li><code>metadata</code> (object): Additional key-value data</li>
+</ul>
+<h4>Example Response</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Update Ticket</h3>
+<p>Update an existing ticket.</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Request Body</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Response</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Delete Ticket</h3>
+<p>Delete a ticket (soft delete - archived).</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Response</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h2>Vulnerability Management API</h2>
+<h3>List Vulnerabilities</h3>
+<p>Retrieve vulnerability data with filtering and analytics.</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Query Parameters</h4>
+<ul>
+<li><code>severity</code> (string): Filter by severity level</li>
+<li><code>vendor</code> (string): Filter by vendor name</li>
+<li><code>status</code> (string): Filter by remediation status</li>
+<li><code>date_from</code> (string): Start date (ISO 8601)</li>
+<li><code>date_to</code> (string): End date (ISO 8601)</li>
+<li><code>page</code> (integer): Page number</li>
+<li><code>limit</code> (integer): Results per page</li>
+</ul>
+<h4>Example Request</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Example Response</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Import Vulnerabilities</h3>
+<p>Bulk import vulnerability data from CSV.</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Form Data</h4>
+<ul>
+<li><code>file</code> (file): CSV file with vulnerability data</li>
+<li><code>vendor</code> (string): Vendor name for imported data</li>
+<li><code>source</code> (string): Data source identifier</li>
+</ul>
+<h4>CSV Format</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Response</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Vulnerability Trends</h3>
+<p>Get trend analysis and statistics.</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Query Parameters</h4>
+<ul>
+<li><code>period</code> (string): Time period (week, month, quarter, year)</li>
+<li><code>group_by</code> (string): Grouping field (severity, vendor, status)</li>
+</ul>
+<h4>Example Response</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h2>Device Management API</h2>
+<h3>List Devices</h3>
+<p>Retrieve all registered devices.</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Response</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Create Device</h3>
+<p>Register a new device.</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Request Body</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h2>Error Handling</h2>
+<h3>HTTP Status Codes</h3>
+<ul>
+<li><code>200</code> - Success</li>
+<li><code>201</code> - Created</li>
+<li><code>400</code> - Bad Request (validation error)</li>
+<li><code>401</code> - Unauthorized</li>
+<li><code>403</code> - Forbidden</li>
+<li><code>404</code> - Not Found</li>
+<li><code>429</code> - Rate Limited</li>
+<li><code>500</code> - Internal Server Error</li>
+</ul>
+<h3>Error Response Examples</h3>
+<h4>Validation Error (400)</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Not Found (404)</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Rate Limited (429)</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h2>Rate Limiting</h2>
+<p>API requests are limited to prevent abuse:</p>
+<ul>
+<li><strong>General Endpoints:</strong> 100 requests per minute</li>
+<li><strong>Import Endpoints:</strong> 10 requests per minute</li>
+<li><strong>Authentication:</strong> 20 requests per minute</li>
+</ul>
+<p>Rate limit headers are included in responses:</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h2>SDK and Examples</h2>
+<h3>JavaScript/Node.js Example</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Python Example</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><hr>
+<p><strong>Target Audience:</strong> Developers, system integrators, automation engineers<br><strong>API Version:</strong> 1.0<br><strong>Authentication:</strong> Session-based with API key support planned</p>
+
+    </div>
+</body>
+</html>

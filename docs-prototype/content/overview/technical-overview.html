@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>🔧 Technical Overview - HexTrackr Documentation</title>
+    <!-- Tabler.io CSS Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons-sprite.svg" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    
+    <style>
+        /* Documentation Section Styling */
+        .documentation-section {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+        }
+        
+        .documentation-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .documentation-section h3 {
+            color: #34495e;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .documentation-section h4 {
+            color: #5a6c7d;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .documentation-section .text-muted {
+            color: #6c757d !important;
+        }
+        
+        .documentation-section code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875em;
+            border: 1px solid #e9ecef;
+        }
+        
+        .documentation-section pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .documentation-section pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .documentation-section .alert {
+            border-radius: 8px;
+            border: none;
+            margin: 1rem 0;
+        }
+        
+        .documentation-section .card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .documentation-section .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 1rem 1.25rem;
+        }
+        
+        .documentation-section .card-body {
+            padding: 1.25rem;
+        }
+        
+        .documentation-section .badge {
+            font-size: 0.75em;
+            padding: 0.35em 0.65em;
+        }
+        
+        .documentation-section table {
+            margin: 1rem 0;
+        }
+        
+        .documentation-section .table th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .documentation-section .table td {
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .documentation-section .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f8f9fa;
+        }
+        
+        /* Custom component styling for documentation */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .documentation-section {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="documentation-section">
+        <h1>🔧 Technical Overview</h1>
+<h2>System Architecture</h2>
+<p>HexTrackr employs a modern, containerized architecture designed for reliability, scalability, and maintainability.</p>
+<h3>High-Level Architecture</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h2>Technology Stack</h2>
+<h3>Backend Infrastructure</h3>
+<ul>
+<li><strong>Runtime:</strong> Node.js 18+ with Express.js framework</li>
+<li><strong>Database:</strong> SQLite with WAL mode for concurrent access</li>
+<li><strong>API Design:</strong> RESTful architecture with JSON responses</li>
+<li><strong>File Processing:</strong> Native CSV parsing with validation</li>
+<li><strong>Security:</strong> Session-based authentication with middleware protection</li>
+</ul>
+<h3>Frontend Technologies</h3>
+<ul>
+<li><strong>UI Framework:</strong> Tabler.io for modern, responsive interface design</li>
+<li><strong>CSS Framework:</strong> Bootstrap 5 for responsive grid and components  </li>
+<li><strong>JavaScript:</strong> Modular ES6+ with shared component architecture</li>
+<li><strong>Data Visualization:</strong> ApexCharts for real-time analytics</li>
+<li><strong>Data Grids:</strong> AG-Grid for advanced table management</li>
+</ul>
+<h3>Development &amp; Deployment</h3>
+<ul>
+<li><strong>Containerization:</strong> Docker with multi-stage builds</li>
+<li><strong>Process Management:</strong> PM2 for production process management</li>
+<li><strong>Web Server:</strong> Nginx for static assets and reverse proxy</li>
+<li><strong>Version Control:</strong> Git with semantic versioning</li>
+<li><strong>Code Quality:</strong> ESLint with comprehensive rule sets</li>
+</ul>
+<h2>Database Design</h2>
+<h3>Core Tables</h3>
+<p><strong>Tickets Table</strong></p>
+<ul>
+<li>Primary incident tracking with hexagon workflow states</li>
+<li>Device association with metadata and assignment tracking</li>
+<li>Status progression with timestamp auditing</li>
+</ul>
+<p><strong>Vulnerabilities Table</strong>  </p>
+<ul>
+<li>Time-series vulnerability data with vendor attribution</li>
+<li>UPSERT operations for data deduplication</li>
+<li>Severity categorization with risk scoring</li>
+</ul>
+<p><strong>Indexes and Performance</strong></p>
+<ul>
+<li>Composite indexes for common query patterns</li>
+<li>Foreign key constraints for data integrity</li>
+<li>Query optimization for large datasets</li>
+</ul>
+<h2>Security Model</h2>
+<h3>Authentication &amp; Authorization</h3>
+<ul>
+<li>Session-based authentication with secure cookies</li>
+<li>Role-based access control for different user types</li>
+<li>CSRF protection for state-changing operations</li>
+</ul>
+<h3>Data Protection</h3>
+<ul>
+<li>Input validation and sanitization on all endpoints</li>
+<li>SQL injection prevention through parameterized queries</li>
+<li>File upload restrictions and validation</li>
+</ul>
+<h3>Deployment Security</h3>
+<ul>
+<li>Non-root user execution in containers</li>
+<li>Minimal attack surface with Alpine Linux base</li>
+<li>Environment variable configuration for secrets</li>
+</ul>
+<h2>API Architecture</h2>
+<h3>RESTful Endpoints</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Response Format</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h2>Performance Characteristics</h2>
+<h3>Database Performance</h3>
+<ul>
+<li><strong>Query Optimization:</strong> Indexed searches with &lt;100ms response times</li>
+<li><strong>Concurrent Access:</strong> WAL mode supporting multiple readers</li>
+<li><strong>Data Growth:</strong> Designed for 100K+ records with maintained performance</li>
+</ul>
+<h3>Frontend Performance</h3>
+<ul>
+<li><strong>Bundle Size:</strong> Optimized JavaScript modules with lazy loading</li>
+<li><strong>Responsive Design:</strong> Mobile-first approach with progressive enhancement</li>
+<li><strong>Real-time Updates:</strong> WebSocket connections for live data updates</li>
+</ul>
+<h3>Scalability Considerations</h3>
+<ul>
+<li><strong>Horizontal Scaling:</strong> Stateless design enables load balancing</li>
+<li><strong>Database Migration:</strong> SQLite to PostgreSQL migration path available</li>
+<li><strong>Caching Strategy:</strong> Application-level caching for frequent queries</li>
+</ul>
+<h2>Development Workflow</h2>
+<h3>Code Organization</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Quality Assurance</h3>
+<ul>
+<li><strong>Code Standards:</strong> ESLint configuration with comprehensive rules</li>
+<li><strong>Testing Strategy:</strong> Unit tests with integration test coverage</li>
+<li><strong>Performance Monitoring:</strong> Application metrics and logging</li>
+<li><strong>Documentation:</strong> Comprehensive API and user documentation</li>
+</ul>
+<h2>Integration Capabilities</h2>
+<h3>Data Import/Export</h3>
+<ul>
+<li><strong>CSV Import:</strong> Automated parsing with validation and error handling</li>
+<li><strong>PDF Export:</strong> Dynamic report generation with custom templates</li>
+<li><strong>API Integration:</strong> RESTful endpoints for external system integration</li>
+</ul>
+<h3>Future Extension Points</h3>
+<ul>
+<li><strong>Plugin Architecture:</strong> Modular design supporting additional security tools</li>
+<li><strong>Webhook Support:</strong> Event-driven integration with external systems</li>
+<li><strong>SSO Integration:</strong> SAML/OAuth support for enterprise authentication</li>
+</ul>
+<hr>
+<p><strong>Target Audience:</strong> Technical stakeholders, system administrators, developers<br><strong>Complexity Level:</strong> Intermediate to Advanced<br><strong>Prerequisites:</strong> Basic understanding of web applications and databases</p>
+
+    </div>
+</body>
+</html>

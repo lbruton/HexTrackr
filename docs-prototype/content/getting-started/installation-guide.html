@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>🚀 Installation Guide - HexTrackr Documentation</title>
+    <!-- Tabler.io CSS Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons-sprite.svg" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    
+    <style>
+        /* Documentation Section Styling */
+        .documentation-section {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+        }
+        
+        .documentation-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .documentation-section h3 {
+            color: #34495e;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .documentation-section h4 {
+            color: #5a6c7d;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .documentation-section .text-muted {
+            color: #6c757d !important;
+        }
+        
+        .documentation-section code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875em;
+            border: 1px solid #e9ecef;
+        }
+        
+        .documentation-section pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .documentation-section pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .documentation-section .alert {
+            border-radius: 8px;
+            border: none;
+            margin: 1rem 0;
+        }
+        
+        .documentation-section .card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .documentation-section .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 1rem 1.25rem;
+        }
+        
+        .documentation-section .card-body {
+            padding: 1.25rem;
+        }
+        
+        .documentation-section .badge {
+            font-size: 0.75em;
+            padding: 0.35em 0.65em;
+        }
+        
+        .documentation-section table {
+            margin: 1rem 0;
+        }
+        
+        .documentation-section .table th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .documentation-section .table td {
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .documentation-section .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f8f9fa;
+        }
+        
+        /* Custom component styling for documentation */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .documentation-section {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="documentation-section">
+        <h1>🚀 Installation Guide</h1>
+<h2>Prerequisites</h2>
+<p>Before installing HexTrackr, ensure your system meets the following requirements:</p>
+<h3>System Requirements</h3>
+<ul>
+<li><strong>Operating System:</strong> macOS, Linux, or Windows with WSL2</li>
+<li><strong>Docker:</strong> Version 20.0+ with Docker Compose</li>
+<li><strong>Memory:</strong> Minimum 2GB RAM available for containers</li>
+<li><strong>Storage:</strong> 1GB free disk space for application and data</li>
+<li><strong>Network:</strong> Internet access for initial image downloads</li>
+</ul>
+<h3>Required Software</h3>
+<ul>
+<li><strong>Docker Desktop</strong> (recommended) or Docker Engine + Docker Compose</li>
+<li><strong>Git</strong> for repository management</li>
+<li><strong>Text Editor</strong> (VS Code, nano, vim) for configuration</li>
+</ul>
+<h2>Installation Methods</h2>
+<h3>Method 1: Docker Compose (Recommended)</h3>
+<p>This is the simplest and most reliable installation method.</p>
+<h4>Step 1: Clone Repository</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Step 2: Verify Docker Installation</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Step 3: Start HexTrackr Services</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Step 4: Verify Installation</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Method 2: Development Setup</h3>
+<p>For development or customization purposes.</p>
+<h4>Step 1: Clone and Setup</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Step 2: Install Dependencies</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Step 3: Development Start</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h2>Configuration</h2>
+<h3>Environment Variables</h3>
+<p>Create a <code>.env</code> file in the project root:</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Docker Configuration</h3>
+<h4>Default Configuration</h4>
+<p>The default <code>docker-compose.yml</code> provides:</p>
+<ul>
+<li><strong>Port Mapping:</strong> 8080:8080</li>
+<li><strong>Volume Mounts:</strong> Data persistence in <code>./data</code></li>
+<li><strong>Network:</strong> Isolated Docker network</li>
+<li><strong>Health Checks:</strong> Automatic service monitoring</li>
+</ul>
+<h4>Custom Configuration</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h2>Database Setup</h2>
+<h3>Automatic Initialization</h3>
+<p>HexTrackr automatically creates the database on first startup:</p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Manual Database Setup</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Database Migration</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h2>Verification &amp; Testing</h2>
+<h3>Service Health Check</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Functional Testing</h3>
+<ol>
+<li><p><strong>Web Interface Access</strong></p>
+<ul>
+<li>Navigate to <code>http://localhost:8080</code></li>
+<li>Verify homepage loads correctly</li>
+<li>Check navigation between Tickets and Vulnerabilities</li>
+</ul>
+</li>
+<li><p><strong>Database Operations</strong></p>
+<ul>
+<li>Create a test ticket</li>
+<li>Upload a test CSV file (vulnerabilities)</li>
+<li>Verify data persistence after container restart</li>
+</ul>
+</li>
+<li><p><strong>File Operations</strong></p>
+<ul>
+<li>Test PDF export functionality</li>
+<li>Verify file upload restrictions</li>
+<li>Check data directory permissions</li>
+</ul>
+</li>
+</ol>
+<h2>Troubleshooting</h2>
+<h3>Common Issues</h3>
+<h4>Port Already in Use</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Permission Issues</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Database Connection Issues</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Memory Issues</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Performance Optimization</h3>
+<h4>Docker Optimization</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h4>Database Optimization</h4>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h2>Next Steps</h2>
+<p>After successful installation:</p>
+<ol>
+<li><strong>Read the <a href="../getting-started/quick-start.md">Quick Start Guide</a></strong> for your first usage</li>
+<li><strong>Review <a href="../reference/configuration-reference.md">Configuration Reference</a></strong> for advanced settings</li>
+<li><strong>Check <a href="../user-guides/">User Guides</a></strong> for feature-specific documentation</li>
+<li><strong>Set up <a href="../deployment/backup-and-recovery.md">Backup Procedures</a></strong> for production use</li>
+</ol>
+<h2>Support</h2>
+<ul>
+<li><strong>Documentation:</strong> <a href="../index.md">Complete documentation portal</a></li>
+<li><strong>Issues:</strong> GitHub Issues for bug reports and feature requests</li>
+<li><strong>Development:</strong> <a href="../development/contributing-guide.md">Contributing Guide</a> for development setup</li>
+</ul>
+<hr>
+<p><strong>Installation Time:</strong> ~10 minutes for Docker method<br><strong>Difficulty Level:</strong> Beginner to Intermediate<br><strong>Support:</strong> Community-supported with comprehensive documentation</p>
+
+    </div>
+</body>
+</html>
