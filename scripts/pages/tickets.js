@@ -671,7 +671,11 @@ class HexagonTicketsManager {
             // Create feedback message based on current state
             const originalText = label.textContent; // Use textContent to avoid HTML
             const actionText = this.isDeviceOrderReversed ? "reversed" : "restored";
-            label.innerHTML = `Devices <small class="text-primary fw-bold">(Order ${escapeHtml(actionText)}! ✓ Use arrows or drag to reorder boot sequence)</small>`;
+            label.textContent = "Devices (Order " + escapeHtml(actionText) + "! ✓ Use arrows or drag to reorder";
+            const small = document.createElement("small");
+            small.className = "text-primary fw-bold";
+            small.textContent = "Order " + escapeHtml(actionText) + "! ✓ Use arrows or drag to reorder boot sequence";
+            label.appendChild(small);
             label.style.color = "#0d6efd";
             
             // Reset after a short delay
@@ -697,7 +701,13 @@ class HexagonTicketsManager {
             label.style.color = "#28a745";
             label.style.fontWeight = "bold";
             label.style.transition = "all 0.3s ease";
-            label.innerHTML = `Devices <small class="text-success fw-bold">(Moved ${escapeHtml(direction)}! ✓ Use arrows or drag to reorder boot sequence)</small>`;
+            
+            // Safe DOM manipulation instead of innerHTML
+            label.textContent = "Devices ";
+            const small = document.createElement("small");
+            small.className = "text-success fw-bold";
+            small.textContent = `(Moved ${escapeHtml(direction)}! ✓ Use arrows or drag to reorder boot sequence)`;
+            label.appendChild(small);
             
             setTimeout(() => {
                 label.style.color = "";
@@ -1317,7 +1327,8 @@ class HexagonTicketsManager {
         const searchTerm = document.getElementById("searchInput").value.toLowerCase();
         if (!searchTerm || !text) return text;
 
-        const regex = new RegExp(`(${searchTerm})`, "gi");
+        const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const regex = new RegExp(`(${escapedSearchTerm})`, "gi");
         return text.replace(regex, "<span class=\"highlight\">$1</span>");
     }
 

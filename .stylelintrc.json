@@ -11,6 +11,10 @@
     "declaration-block-single-line-max-declarations": 3,
     "comment-empty-line-before": null,
     "media-feature-name-no-vendor-prefix": null,
-    "media-feature-range-notation": "prefix"
+    "media-feature-range-notation": "prefix",
+    "scss/declaration-property-value-no-unknown": null,
+    "no-display-none": null,
+    "no-outline-none": null,
+    "scss/property-no-unknown": null
   }
 }
