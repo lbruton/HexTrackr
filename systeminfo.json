@@ -114,6 +114,41 @@
   },
   "development": {
     "environment": "Docker containerized",
+    "qualityTools": {
+      "markdownlint": {
+        "version": "0.41.0",
+        "integration": "Official CLI with --fix capabilities",
+        "disabledRules": ["MD013", "MD046"],
+        "purpose": "Markdown formatting and style enforcement"
+      },
+      "eslint": {
+        "version": "8.57.0",
+        "config": "eslint.config.mjs",
+        "autoFix": "suggestion,layout types only",
+        "purpose": "JavaScript code quality and style enforcement"
+      },
+      "stylelint": {
+        "integration": "CSS/SCSS linting with auto-fix",
+        "purpose": "Style sheet quality enforcement"
+      },
+      "codacy": {
+        "integration": "MCP Server for continuous quality analysis",
+        "tools": ["ESLint", "PMD", "Semgrep OSS", "Trivy"],
+        "purpose": "Comprehensive code quality and security scanning"
+      }
+    },
+    "preCommitHooks": {
+      "location": ".githooks/pre-commit",
+      "documentation": "docs-source/development/pre-commit-hooks.md",
+      "features": [
+        "Automatic markdown fixing with official markdownlint --fix",
+        "CSS/SCSS auto-fixing with Stylelint",
+        "Safe JavaScript auto-fixing with ESLint",
+        "Selective rule disabling for MD013/MD046 compatibility",
+        "Comprehensive validation with immediate feedback"
+      ],
+      "optimization": "Replaced custom fix-markdown.js with official markdownlint CLI"
+    },
     "volumes": [
       ".:/app (source code mounting)",
       "/app/node_modules (dependency isolation)",
