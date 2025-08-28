@@ -269,7 +269,7 @@ class HexagonTicketsManager {
 
         // Pagination controls
         document.getElementById('rowsPerPage').addEventListener('change', (e) => {
-            this.rowsPerPage = parseInt(e.target.value);
+            this.rowsPerPage = parseInt(e.target.value, 10);
             this.currentPage = 1; // Reset to first page
             this.renderTickets();
         });

@@ -334,13 +334,6 @@ function updatePackageJson() {
     }
 }
 
-// Count tasks for progress tracking
-function countTasks(html) {
-    const taskMatches = html.match(/class="task-item"/g) || [];
-    const completedMatches = html.match(/class="task-item completed"/g) || [];
-    return { total: taskMatches.length, completed: completedMatches.length };
-}
-
 // Run the generator
 if (require.main === module) {
     try {

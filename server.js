@@ -97,8 +97,8 @@ app.get('/api/vulnerabilities/trends', (req, res) => {
 
 // Get vulnerabilities with pagination
 app.get('/api/vulnerabilities', (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 50;
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 50;
   const offset = (page - 1) * limit;
   const search = req.query.search || '';
   const severity = req.query.severity || '';
