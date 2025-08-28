@@ -26,46 +26,40 @@ class DocumentationPortal {
             // For this prototype, we'll simulate it.
             this.fileStructure = {
                 "Getting Started": [
-                    "installation-guide.html",
-                    "quick-start.html",
-                    "configuration.html",
-                    "first-run.html"
+                    "index.html",
+                    "installation.html"
                 ],
                 "User Guides": [
+                    "index.html",
                     "ticket-management.html",
-                    "vulnerability-management.html",
-                    "csv-import-export.html",
-                    "settings.html",
-                    "backup-restore.html"
+                    "vulnerability-management.html"
                 ],
                 "API Reference": [
-                    "rest-api-reference.html",
-                    "tickets.html",
-                    "vulnerabilities.html"
+                    "index.html",
+                    "tickets-api.html",
+                    "vulnerabilities-api.html"
                 ],
                 "Architecture": [
-                    "overview.html",
-                    "database-schema.html",
-                    "page-flow-navigation.html",
-                    "docs-system.html",
-                    "functions.html",
-                    "javascript-reference.html",
-                    "symbols-index.html"
+                    "index.html",
+                    "backend.html",
+                    "database.html",
+                    "deployment.html",
+                    "frontend.html"
                 ],
                 "Development": [
-                    "development-setup.html",
+                    "index.html",
                     "coding-standards.html",
-                    "coding-style-guide.html",
-                    "testing-guide.html",
-                    "versioning.html"
-                ],
-                "Frameworks": [
-                    "bootstrap.html",
-                    "nodejs-express.html",
-                    "tabler-io.html"
+                    "contributing.html",
+                    "development-setup.html"
                 ],
                 "Project Management": [
+                    "index.html",
                     "roadmap.html"
+                ],
+                "Security": [
+                    "index.html",
+                    "overview.html",
+                    "vulnerability-disclosure.html"
                 ]
             };
             console.log("File structure loaded.");
@@ -94,9 +88,21 @@ class DocumentationPortal {
             html += `<div class="list-group-item bg-light fw-bold">${category}</div>`;
             for (const file of files) {
                 const sectionName = file.replace('.html', '');
-                const displayName = sectionName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                const dataSection = `${category.toLowerCase().replace(/ /g, '-')}/${sectionName}`;
-                html += `<a href="#${dataSection}" class="list-group-item list-group-item-action" data-section="${dataSection}">• ${displayName}</a>`;
+                // Handle index files to just display the category name
+                const displayName = sectionName === 'index' 
+                    ? category
+                    : sectionName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                
+                const dataSection = sectionName === 'index' 
+                    ? `${category.toLowerCase().replace(/ /g, '-')}/index`
+                    : `${category.toLowerCase().replace(/ /g, '-')}/${sectionName}`;
+
+                // Special handling for the main index to avoid prefix
+                const linkSection = sectionName === 'index' && category === 'Getting Started'
+                    ? 'index'
+                    : dataSection;
+
+                html += `<a href="#${linkSection}" class="list-group-item list-group-item-action" data-section="${linkSection}">• ${displayName}</a>`;
             }
         }
 
@@ -141,7 +147,8 @@ class DocumentationPortal {
         this.showLoading();
         
         try {
-            const filePath = `content/${section}.html`;
+            // Adjust the file path to correctly point to the content directory
+            const filePath = `/docs-prototype/content/${section}.html`;
             const response = await fetch(filePath);
             
             if (!response.ok) {
