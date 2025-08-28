@@ -14,7 +14,7 @@
 
 .sortable-header::after {
     content: '\f0dc';
-    font-family: 'Font Awesome 6 Free';
+    font-family: "Font Awesome 6 Free";
     font-weight: 900;
     position: absolute;
     right: 8px;
@@ -37,7 +37,7 @@
 .terminal-content {
     background-color: #0d1117 !important;
     color: #00ff00 !important;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+    font-family: "Consolas", "Monaco", "Courier New", monospace !important;
     font-size: 13px !important;
     line-height: 1.4 !important;
     border-radius: 8px !important;

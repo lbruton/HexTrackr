@@ -5,15 +5,19 @@
 <h2>Endpoints</h2>
 <h3>GET /api/vulnerabilities</h3>
 <ul>
-<li>Description: List vulnerabilities with pagination, optional search and severity filter.</li>
-<li>Query params:<ul>
+<li><p>Description: List vulnerabilities with pagination, optional search and severity filter.</p>
+</li>
+<li><p>Query params:</p>
+<ul>
 <li>page: number (default 1)</li>
 <li>limit: number (default 50)</li>
 <li>search: string (matches hostname, cve, plugin_name)</li>
 <li>severity: string (Critical|High|Medium|Low)</li>
 </ul>
 </li>
-<li>Response: 200 OK<pre><code class="language-json">{
+<li><p>Response: 200 OK</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">{
   &quot;data&quot;: [
     {
       &quot;id&quot;: 10,
@@ -40,45 +44,61 @@
   &quot;pagination&quot;: { &quot;page&quot;: 1, &quot;limit&quot;: 50, &quot;total&quot;: 1234, &quot;pages&quot;: 25 }
 }
 </code></pre>
-</li>
+<!-- markdownlint-enable MD013 --></li>
 </ul>
 <h3>GET /api/vulnerabilities/stats</h3>
 <ul>
-<li>Description: Aggregated statistics by severity with VPR totals/averages and date range.</li>
-<li>Response: 200 OK Array<pre><code class="language-json">[
+<li><p>Description: Aggregated statistics by severity with VPR totals/averages and date range.</p>
+</li>
+<li><p>Response: 200 OK Array</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">[
   { &quot;severity&quot;: &quot;Critical&quot;, &quot;count&quot;: 12, &quot;total_vpr&quot;: 100.1, &quot;avg_vpr&quot;: 8.34, &quot;earliest&quot;: &quot;2025-08-01&quot;, &quot;latest&quot;: &quot;2025-08-20&quot; }
 ]
 </code></pre>
-</li>
+<!-- markdownlint-enable MD013 --></li>
 </ul>
 <h3>GET /api/vulnerabilities/trends</h3>
 <ul>
-<li>Description: Historical counts by day and severity for the last 14 days.</li>
-<li>Response: 200 OK Array (one object per date)<pre><code class="language-json">[ { &quot;date&quot;: &quot;2025-08-20&quot;, &quot;Critical&quot;: 1, &quot;High&quot;: 5, &quot;Medium&quot;: 3, &quot;Low&quot;: 0 } ]
-</code></pre>
+<li><p>Description: Historical counts by day and severity for the last 14 days.</p>
 </li>
+<li><p>Response: 200 OK Array (one object per date)</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">[ { &quot;date&quot;: &quot;2025-08-20&quot;, &quot;Critical&quot;: 1, &quot;High&quot;: 5, &quot;Medium&quot;: 3, &quot;Low&quot;: 0 } ]
+</code></pre>
+<!-- markdownlint-enable MD013 --></li>
 </ul>
 <h3>POST /api/vulnerabilities/import</h3>
 <ul>
-<li>Description: Upload a CSV file and import rows. Creates a record in vulnerability_imports and inserts normalized rows.</li>
-<li>Body: multipart/form-data<ul>
+<li><p>Description: Upload a CSV file and import rows. Creates a record in vulnerability_imports and inserts normalized rows.</p>
+</li>
+<li><p>Body: multipart/form-data</p>
+<ul>
 <li>csvFile: file (required)</li>
 <li>vendor: string (optional)</li>
 </ul>
 </li>
-<li>Response: 200 OK<pre><code class="language-json">{ &quot;success&quot;: true, &quot;importId&quot;: 7, &quot;rowsProcessed&quot;: 250, &quot;filename&quot;: &quot;export.csv&quot;, &quot;processingTime&quot;: 5234 }
+<li><p>Response: 200 OK</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">{ &quot;success&quot;: true, &quot;importId&quot;: 7, &quot;rowsProcessed&quot;: 250, &quot;filename&quot;: &quot;export.csv&quot;, &quot;processingTime&quot;: 5234 }
 </code></pre>
-</li>
+<!-- markdownlint-enable MD013 --></li>
 </ul>
 <h3>POST /api/import/vulnerabilities</h3>
 <ul>
-<li>Description: Import vulnerabilities from a JSON array (frontend CSV to JSON). Also records an import in vulnerability_imports.</li>
-<li>Body: application/json<pre><code class="language-json">{ &quot;data&quot;: [ { &quot;hostname&quot;: &quot;host-1&quot;, &quot;cve&quot;: &quot;CVE-2024-0001&quot;, &quot;severity&quot;: &quot;High&quot; } ] }
-</code></pre>
+<li><p>Description: Import vulnerabilities from a JSON array (frontend CSV to JSON). Also records an import in vulnerability_imports.</p>
 </li>
-<li>Response: 200 OK<pre><code class="language-json">{ &quot;success&quot;: true, &quot;imported&quot;: 1, &quot;total&quot;: 1, &quot;importId&quot;: 8 }
+<li><p>Body: application/json</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">{ &quot;data&quot;: [ { &quot;hostname&quot;: &quot;host-1&quot;, &quot;cve&quot;: &quot;CVE-2024-0001&quot;, &quot;severity&quot;: &quot;High&quot; } ] }
 </code></pre>
+<!-- markdownlint-enable MD013 -->
 </li>
+<li><p>Response: 200 OK</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">{ &quot;success&quot;: true, &quot;imported&quot;: 1, &quot;total&quot;: 1, &quot;importId&quot;: 8 }
+</code></pre>
+<!-- markdownlint-enable MD013 --></li>
 </ul>
 <h3>GET /api/imports</h3>
 <ul>
@@ -87,10 +107,13 @@
 </ul>
 <h3>DELETE /api/vulnerabilities/clear</h3>
 <ul>
-<li>Description: Clears ticket_vulnerabilities, vulnerabilities, and vulnerability_imports.</li>
-<li>Response: 200 OK<pre><code class="language-json">{ &quot;success&quot;: true, &quot;message&quot;: &quot;All vulnerability data cleared&quot; }
-</code></pre>
+<li><p>Description: Clears ticket_vulnerabilities, vulnerabilities, and vulnerability_imports.</p>
 </li>
+<li><p>Response: 200 OK</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">{ &quot;success&quot;: true, &quot;message&quot;: &quot;All vulnerability data cleared&quot; }
+</code></pre>
+<!-- markdownlint-enable MD013 --></li>
 </ul>
 <h2>Error responses</h2>
 <ul>

@@ -1,6 +1,7 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Database Architecture</h1>
+<!-- markdownlint-disable-next-line MD013 -->
 <p>HexTrackr uses SQLite as its primary storage at <code>data/hextrackr.db</code>, initialized by <code>scripts/init-database.js</code> with runtime schema evolution in <code>server.js</code>.</p>
 <h2>Engine</h2>
 <ul>
@@ -97,6 +98,7 @@
 <li>idx_ticket_vulns_ticket (ticket_vulnerabilities.ticket_id)</li>
 </ul>
 <h2>Entity Relationships</h2>
+<!-- markdownlint-disable MD013 MD010 -->
 <pre><code class="language-mermaid">erDiagram
 	vulnerability_imports ||--o{ vulnerabilities : contains
 	tickets ||--o{ ticket_vulnerabilities : has
@@ -164,8 +166,11 @@
 		datetime created_at
 	}
 </code></pre>
+<!-- markdownlint-enable MD013 MD010 -->
+
 <h2>Data flows</h2>
 <h3>CSV import (multipart)</h3>
+<!-- markdownlint-disable MD013 MD010 -->
 <pre><code class="language-mermaid">sequenceDiagram
 	participant UI as vulnerabilities.html
 	participant API as POST /api/vulnerabilities/import
@@ -175,7 +180,10 @@
 	API-&gt;&gt;DB: INSERT vulnerabilities (mapped rows)
 	API--&gt;&gt;UI: { success, importId, rowsProcessed }
 </code></pre>
+<!-- markdownlint-enable MD013 MD010 -->
+
 <h3>JSON import (CSV parsed client-side)</h3>
+<!-- markdownlint-disable MD013 MD010 -->
 <pre><code class="language-mermaid">sequenceDiagram
 	participant UI
 	participant API as POST /api/import/vulnerabilities
@@ -185,6 +193,8 @@
 	API-&gt;&gt;DB: INSERT vulnerabilities
 	API--&gt;&gt;UI: { success, imported, total, importId }
 </code></pre>
+<!-- markdownlint-enable MD013 MD010 -->
+
 <h2>Notes and caveats</h2>
 <ul>
 <li>Tickets schema drift: server endpoints expect additional columns not present in the initial table. Migrations will align these over time. Client code handles absent fields gracefully.</li>

@@ -1,7 +1,7 @@
 /* HexTrackr Responsive Utilities - Mobile First */
 
 /* Mobile Responsive Styles */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     /* Grid adjustments */
     #vulnGrid {
         height: 500px;
@@ -60,7 +60,7 @@
     }
 }
 
-@media (max-width: 576px) {
+@media (width <= 576px) {
     /* Further grid optimizations */
     #vulnGrid {
         height: 400px;

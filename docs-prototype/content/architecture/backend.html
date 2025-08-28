@@ -1,6 +1,7 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Backend Architecture</h1>
+<!-- markdownlint-disable-next-line MD013 -->
 <p>The backend is a Node.js/Express app providing REST endpoints, CSV processing, and SQLite persistence. It also serves static frontend assets.</p>
 <h2>Modules</h2>
 <ul>
@@ -23,11 +24,15 @@
 <li>initDb() runs on boot: calls init script when DB file missing and adds new columns to vulnerabilities table (idempotent ALTERs).</li>
 </ul>
 <h2>API surface</h2>
+<!-- markdownlint-disable MD013 -->
+
 <ul>
 <li>Tickets: GET/POST/PUT/DELETE /api/tickets, POST /api/tickets/migrate, GET /api/sites, GET /api/locations, POST /api/import/tickets</li>
 <li>Vulnerabilities: GET /api/vulnerabilities, GET /api/vulnerabilities/stats, GET /api/vulnerabilities/trends, POST /api/vulnerabilities/import (multipart), POST /api/import/vulnerabilities, DELETE /api/vulnerabilities/clear, GET /api/imports</li>
 <li>Backup/Restore: GET /api/backup/stats, GET /api/backup/{tickets|vulnerabilities|all}, DELETE /api/backup/clear/:type, POST /api/restore (zip)</li>
 </ul>
+<!-- markdownlint-enable MD013 -->
+
 <p>Full details in API Reference.</p>
 <h2>Symbol analysis (server.js)</h2>
 <ul>
