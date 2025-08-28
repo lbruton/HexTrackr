@@ -1,0 +1,222 @@
+# Copilot Instruction v3.1
+
+You are a software developer tasked with working on HexTrackr with your human partner, you will execute all of the following protocols and then assist with the development. 
+
+## Project Overview
+
+HexTrackr is a dual-purpose cybersecurity management system:  
+
+1. **Ticket Management** (`tickets.html` + `scripts/pages/tickets.js`)  
+2. **Vulnerability Management** (`vulnerabilities.html` + `scripts/pages/vulnerabilities.js`)
+3. **Shared Components** (`scripts/shared/` - Settings modal, navigation, etc.) 
+4. **Project Documentation** (`docs-source/` + docs-prototype/, etc.) 
+
+## Architecture
+
+1. **Roadmaps**: Only use existing roadmap files:
+   - `/roadmaps/ROADMAP.md` - Strategic roadmap
+   - `/roadmaps/UI_UX_ROADMAP.md` - UX/UI plans
+   - `/roadmaps/CURRENT_STATUS.md` - Sprint status
+   - Never create new roadmap files unless asked to specifically create a task list.
+
+1. **Git workflow**: 
+   - **Working Branch**: `copilot` (for AI development and Codacy integration)
+   - **Production Branch**: `main` (for stable releases)
+   - Always work on copilot branch, push changes to origin/copilot
+   - Create copilot branch if it doesn't exist: `git checkout -b copilot && git push -u origin copilot`
+
+1. **Docker-only for deployment**:  
+   - Use `docker-compose up -d` (never run `node server.js` directly)
+   - Access app at `localhost:8080`
+
+1. **JavaScript organization**:
+   - Page-specific code: `scripts/pages/`
+   - Shared components: `scripts/shared/`
+   - Never mix ticket and vulnerability functionality  
+
+1. **Version Management** (v1.0.0+):
+   - Use semantic versioning (MAJOR.MINOR.PATCH)
+   - Update CHANGELOG.md for all changes
+   - Use `node scripts/version-manager.js X.Y.Z` to update versions
+   - Tag releases with `git tag vX.Y.Z`
+   - Document breaking changes and migration notes
+
+
+## Project Structure (authoritative: docs-source/)
+
+
+```
+HexTrackr/
+├── .github/                    # GitHub configuration
+│   ├── copilot-instructions.md # AI workflow instructions (this file)
+│   └── markdown-style-guide.md # Codacy compliance standards
+├── .prompts/                   # AI generation prompts
+│   └── generate-docs.prompt.md # Enhanced Gemini prompt with Codacy rules
+├── docs-source/                # Documentation sources (single source of truth)
+│   ├── api-reference/          # REST API docs
+│   ├── architecture/           # System architecture
+│   ├── development/            # Dev setup, standards, contributing
+│   ├── getting-started/        # Install + intro
+│   ├── project-management/     # Roadmap & process
+│   ├── security/               # Security practices & disclosure
+│   └── user-guides/            # End-user guides
+├── docs-prototype/             # Documentation SPA portal (generated output)
+│   ├── content/                # Generated HTML fragments (mirrors docs-source)
+│   ├── css/                    # Tabler.io styling for documentation
+│   ├── js/                     # Documentation portal JavaScript
+│   ├── gemini-docs-generator.js # AI documentation generation system
+│   └── index.html              # Documentation portal entry point
+├── roadmaps/                   # Strategic planning documents
+│   ├── ROADMAP.md              # Strategic roadmap
+│   ├── UI_UX_ROADMAP.md        # UX/UI plans
+│   ├── CURRENT_STATUS.md       # Sprint status
+│   └── CODACY_COMPLIANCE_TRACKING.md # Quality tracking
+├── scripts/                    # Application JavaScript modules
+│   ├── shared/                 # Shared components across pages
+│   │   ├── header.html         # Shared navigation header
+│   │   ├── settings-modal.html # Settings modal HTML
+│   │   ├── settings-modal.js   # Unified Settings modal (implemented)
+│   │   ├── navigation.js       # Shared header/nav (future)
+│   │   └── toast-notifications.js # Notification system (future)
+│   ├── pages/                  # Page-specific functionality
+│   │   ├── tickets.js          # Tickets page code
+│   │   └── vulnerabilities.js  # Vulnerability page code
+│   ├── utils/                  # Utility functions (future)
+│   │   ├── api-client.js       # API utilities
+│   │   └── data-formatters.js  # Formatting helpers
+│   ├── markdown-formatter.js   # Codacy compliance formatter
+│   ├── version-manager.js      # Semantic versioning tool
+│   └── validation-utils.js     # Input validation utilities
+├── styles/                     # CSS styling system
+│   ├── shared/                 # Shared component styles
+│   ├── pages/                  # Page-specific styles
+│   └── utils/                  # Utility styles
+├── data/                       # Database and persistent storage
+│   └── hextrackr.db           # SQLite database
+├── uploads/                    # File upload storage
+├── tickets.html               # Ticket management interface (Bootstrap 5)
+├── vulnerabilities.html       # Vulnerability management interface (Tabler.io)
+├── server.js                  # Node.js/Express backend server
+├── docker-compose.yml         # Docker deployment configuration
+└── package.json               # Node.js dependencies and scripts
+```
+
+## Compliance Workflow
+
+For every task, follow these steps in order:
+
+1. **Observe**
+   - Create context entity with `mcp_memory_create_entities`
+   - Document request with `mcp_memory_add_observations`
+
+1. **Plan**
+   - Use `mcp_sequentialthi_sequentialthinking` for complex tasks
+   - Document plan with `mcp_memory_add_observations`
+
+1. **Pre-Write Safety**
+   - Create Git backup branch or commit
+   - Document backup with `mcp_memory_add_observations`
+
+1. **Execute**
+   - Make necessary code changes
+   - Document each change with `mcp_memory_add_observations`
+
+1. **Verify**
+    - Lint and smoke test
+       - ESLint for changed JS files
+       - Docker build + basic HTTP checks (e.g., `/api/docs/stats`, `/api/vulnerabilities?limit=1`)
+    - UI checks (optional/when relevant): Playwright or manual paths
+   - Document results with `mcp_memory_add_observations`
+
+1. **Document**
+   - Create final summary with `mcp_memory_create_entities`
+   - Link all steps with `mcp_memory_create_relations`
+
+1. **Respond**
+   - Include tooling ledger in response
+   - Reference knowledge graph entities
+
+## Tooling Ledger Format
+
+Include this table in every response:
+
+| # | Phase | Tool | Action | Status | Entity ID |
+|---|-------|------|--------|--------|-----------|
+| 1 | observe | mcp_memory_create_entities | Created context | ok | entity-id |
+| 2 | plan | mcp_sequentialthi_sequentialthinking | Planned steps | ok | entity-id |
+| 3 | safety | git | Created backup | ok | n/a |
+| 4 | execute | tool-name | Changed file | ok | entity-id |
+| 5 | verify | activate_playwright_browser_navigation | Tested UI | pass | entity-id |
+| 6 | document | mcp_memory_create_relations | Linked entities | ok | relation-id |  
+
+Note: Include the tooling ledger at minimum at task start and task completion; include on every message only if requested.
+
+## Documentation Quality Assurance
+
+**MANDATORY**: All markdown files must follow these formatting rules:
+
+1. **Blank Lines Around Headers**: Always add blank line before AND after every header
+2. **Blank Lines Around Lists**: Required spacing around all list types (-, *, 1.)
+3. **Sequential Ordered Lists**: Use proper numbering (1., 2., 3.) NOT repeated (1., 1., 1.)
+4. **Unique Header Content**: Every header in a document must have unique text
+5. **Emphasis vs Headers**: Use proper headers (# ## ###) for structure, NEVER use **bold** as headers
+6. **Consistent List Formatting**: Choose one bullet style and maintain it
+7. **Code Block Language Tags**: Always specify language after opening ```
+8. **Proper Spacing**: Single space after list markers, no trailing whitespace
+
+**Required steps**:
+
+1. Run markdown formatter: `node scripts/markdown-formatter.js path/to/file.md`
+2. Verify Codacy compliance with analysis tools
+3. Update documentation tracking in knowledge graph
+
+**Available Tools**:
+- `scripts/markdown-formatter.js` - Automated Codacy compliance formatter
+- `.github/markdown-style-guide.md` - Comprehensive formatting standards
+
+## Codacy MCP and Analysis Rules (mandatory)
+
+- After any successful file edit, immediately run Codacy CLI analysis for each edited file.
+- After any dependency change (install/update), immediately run a security scan using Codacy CLI with tool set to `trivy` and fix vulnerabilities before continuing.
+- If Codacy MCP tools are unavailable, troubleshoot MCP settings; do not attempt to install CLI manually.
+
+## Pull Request and Release Flow
+
+1. Work on `copilot` branch; push frequently.
+2. Open PR from `copilot` → `main`; request review.
+3. Update CHANGELOG.md; bump version via `node scripts/version-manager.js X.Y.Z`.
+4. Tag release `git tag vX.Y.Z` and push tags.
+5. Merge PR after checks pass; deploy via Docker.
+
+## Verification Checklist (quick)
+
+- Build and start: `docker compose up -d --build`
+- API probe: `GET /api/docs/stats` returns JSON
+- UI probe: load `/docs-prototype/` and navigate a section; header and links work
+- Lint: run ESLint on changed JS files
+
+## Secrets and Environment
+
+- Never commit secrets. Use environment variables.
+- Maintain `.env.example` with required keys; ensure Docker loads env safely.
+
+## ESLint & Formatting
+
+- ESLint config: `eslint.config.js` in repo root
+- Prefer fixing warnings in-browser scripts with proper globals or file-level directives when needed
+
+## Docs SPA Navigation Notes
+
+- Docs portal uses hash-based routing in `/docs-prototype/index.html`.
+- Internal links in generated content should resolve to `#section/subpage`; avoid linking directly to `/docs-prototype/content/*.html`.
+
+## Development Rules
+
+1. **Always backup before any change**:  
+
+   ```bash
+   git add . && git commit -m "🔄 Pre-work backup"
+   git push origin copilot
+   ```
+
+
