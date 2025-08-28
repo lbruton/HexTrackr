@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>🗑️ Deprecation & Code Cleanup - HexTrackr Documentation</title>
+    <!-- Tabler.io CSS Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons-sprite.svg" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    
+    <style>
+        /* Documentation Section Styling */
+        .documentation-section {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+        }
+        
+        .documentation-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .documentation-section h3 {
+            color: #34495e;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .documentation-section h4 {
+            color: #5a6c7d;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .documentation-section .text-muted {
+            color: #6c757d !important;
+        }
+        
+        .documentation-section code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875em;
+            border: 1px solid #e9ecef;
+        }
+        
+        .documentation-section pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .documentation-section pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .documentation-section .alert {
+            border-radius: 8px;
+            border: none;
+            margin: 1rem 0;
+        }
+        
+        .documentation-section .card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .documentation-section .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 1rem 1.25rem;
+        }
+        
+        .documentation-section .card-body {
+            padding: 1.25rem;
+        }
+        
+        .documentation-section .badge {
+            font-size: 0.75em;
+            padding: 0.35em 0.65em;
+        }
+        
+        .documentation-section table {
+            margin: 1rem 0;
+        }
+        
+        .documentation-section .table th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .documentation-section .table td {
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .documentation-section .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f8f9fa;
+        }
+        
+        /* Custom component styling for documentation */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .documentation-section {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="documentation-section">
+        <h1>🗑️ Deprecation &amp; Code Cleanup</h1>
+<p>Code cleanup tracking and orphaned functionality identification for HexTrackr.</p>
+<h2>📋 Overview</h2>
+<p>This document tracks deprecated features, orphaned code, and cleanup opportunities identified through codebase analysis.</p>
+<h2>🔍 Deprecated/Orphaned Code</h2>
+<h3>localStorage Migration System</h3>
+<p><strong>Status:</strong> 🔴 Deprecated (Legacy from v0.x)<br><strong>Location:</strong> <code>scripts/pages/tickets.js</code><br><strong>Risk:</strong> Low (graceful fallback)<br><strong>Action Required:</strong> Remove in next major version</p>
+<p><strong>Details:</strong></p>
+<ul>
+<li><strong>Functions:</strong> <code>migrateFromLocalStorageIfNeeded()</code>, <code>loadTicketsFromLocalStorage()</code></li>
+<li><strong>Context:</strong> Historical transition code from early development</li>
+<li><strong>Current State:</strong> Tickets have been API-based since day 2 of development</li>
+<li><strong>Impact:</strong> Creates confusion in documentation and codebase reviews</li>
+<li><strong>References Found:</strong> 18 localStorage mentions in tickets.js</li>
+</ul>
+<p><strong>Cleanup Plan:</strong></p>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>Vulnerability localStorage References</h3>
+<p><strong>Status:</strong> 🟡 Investigation Needed<br><strong>Location:</strong> <code>scripts/pages/vulnerabilities.js</code><br><strong>Risk:</strong> Unknown<br><strong>Action Required:</strong> Audit for orphaned localStorage usage</p>
+<h2>🧹 Cleanup Opportunities</h2>
+<h3>1. Remove Migration Code</h3>
+<ul>
+<li><strong>Priority:</strong> Medium</li>
+<li><strong>Effort:</strong> 2-3 hours</li>
+<li><strong>Blocker:</strong> None</li>
+<li><strong>Benefits:</strong> Simplified codebase, clearer documentation</li>
+</ul>
+<h3>2. Consolidate API Patterns</h3>
+<ul>
+<li><strong>Priority:</strong> Low</li>
+<li><strong>Effort:</strong> 4-6 hours</li>
+<li><strong>Blocker:</strong> None</li>
+<li><strong>Benefits:</strong> Consistent error handling, improved maintainability</li>
+</ul>
+<h3>3. CSS File Organization</h3>
+<ul>
+<li><strong>Priority:</strong> Low</li>
+<li><strong>Effort:</strong> 1-2 hours</li>
+<li><strong>Blocker:</strong> None</li>
+<li><strong>Benefits:</strong> Better asset management</li>
+</ul>
+<h2>📊 Analysis Metrics</h2>
+<h3>Code Debt Score</h3>
+<ul>
+<li><strong>localStorage Migration:</strong> 18 references (High debt)</li>
+<li><strong>Unused CSS:</strong> Unknown (Audit needed)</li>
+<li><strong>Dead Routes:</strong> 0 identified</li>
+<li><strong>Redundant Functions:</strong> 3-4 identified</li>
+</ul>
+<h3>Cleanup Impact</h3>
+<ul>
+<li><strong>Code Reduction:</strong> ~200-300 lines estimated</li>
+<li><strong>Complexity Reduction:</strong> Medium</li>
+<li><strong>Performance Impact:</strong> Minimal</li>
+<li><strong>Security Impact:</strong> Positive (reduced attack surface)</li>
+</ul>
+<h2>🎯 Gemini Automation Guidelines</h2>
+<p>When scanning the codebase, flag these patterns for deprecation review:</p>
+<h3>🔍 Detection Patterns</h3>
+<div class="code-block mb-3">
+                <pre class="bg-light border rounded p-3"><code>[object Object]</code></pre>
+            </div><h3>📝 Documentation Rules</h3>
+<ul>
+<li><strong>Document Current State Only:</strong> Focus on actual user workflows</li>
+<li><strong>Mark Legacy Clearly:</strong> Use deprecation warnings for old patterns</li>
+<li><strong>Provide Migration Paths:</strong> When removing features, document alternatives</li>
+<li><strong>Track Technical Debt:</strong> Maintain this cleanup list</li>
+</ul>
+<h2>🚨 Critical Notes</h2>
+<ul>
+<li><strong>Do NOT document localStorage migration as a current feature</strong></li>
+<li><strong>Focus documentation on API-based workflows only</strong></li>
+<li><strong>Clearly separate &quot;current&quot; vs &quot;historical&quot; context</strong></li>
+<li><strong>Use this document to track what Gemini should ignore vs. flag for cleanup</strong></li>
+</ul>
+<h2>📅 Cleanup Schedule</h2>
+<h3>Phase 1: Documentation Accuracy (Current)</h3>
+<ul>
+<li>Remove localStorage migration from flowcharts</li>
+<li>Update architecture docs to reflect API-only reality</li>
+<li>Clear separation of current vs. legacy features</li>
+</ul>
+<h3>Phase 2: Code Cleanup (v1.1.0)</h3>
+<ul>
+<li>Remove localStorage migration functions</li>
+<li>Audit vulnerabilities.js for similar patterns</li>
+<li>Consolidate API error handling</li>
+</ul>
+<h3>Phase 3: Architecture Cleanup (v1.2.0)</h3>
+<ul>
+<li>CSS consolidation</li>
+<li>Unused function removal</li>
+<li>Performance optimization</li>
+</ul>
+<hr>
+<p><em>This document serves as the source of truth for Gemini automation to distinguish between active code requiring documentation and legacy code requiring cleanup.</em></p>
+
+    </div>
+</body>
+</html>
