@@ -11,6 +11,20 @@ const path = require("path");
 
 // Enhanced markdown to HTML converter
 function markdownToHtml(markdown) {
+    /**
+     * Node.js compatible HTML escaping to prevent XSS attacks
+     * @param {string} text - Text to escape
+     * @returns {string} - Escaped HTML-safe text
+     */
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+    
     // Handle code blocks first to prevent interference
     const codeBlocks = [];
     markdown = markdown.replace(/```([\s\S]*?)```/g, (match, code) => {
@@ -28,16 +42,19 @@ function markdownToHtml(markdown) {
         let line = lines[i];
         const nextLine = lines[i + 1] || "";
 
-        // Headers
+        // Headers (with HTML escaping for security)
         if (line.match(/^### /)) {
             if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
-            htmlLines.push(line.replace(/^### (.*)$/, "<h3>$1</h3>"));
+            const headerText = line.replace(/^### /, "");
+            htmlLines.push(`<h3>${escapeHtml(headerText)}</h3>`);
         } else if (line.match(/^## /)) {
             if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
-            htmlLines.push(line.replace(/^## (.*)$/, "<h2>$1</h2>"));
+            const headerText = line.replace(/^## /, "");
+            htmlLines.push(`<h2>${escapeHtml(headerText)}</h2>`);
         } else if (line.match(/^# /)) {
             if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
-            htmlLines.push(line.replace(/^# (.*)$/, "<h1>$1</h1>"));
+            const headerText = line.replace(/^# /, "");
+            htmlLines.push(`<h1>${escapeHtml(headerText)}</h1>`);
         }
         // Horizontal rules
         else if (line.match(/^---+$/)) {
@@ -52,7 +69,8 @@ function markdownToHtml(markdown) {
                 inList = true;
                 listType = "ul";
             }
-            htmlLines.push(line.replace(/^\s*- \[ \] (.*)$/, "<li class=\"task-item\">☐ $1</li>"));
+            const taskText = line.replace(/^\s*- \[ \] /, "");
+            htmlLines.push(`<li class="task-item">☐ ${escapeHtml(taskText)}</li>`);
         } else if (line.match(/^\s*- \[x\]/)) {
             if (!inList || listType !== "ul") {
                 if (inList) htmlLines.push(`</${listType}>`);
@@ -60,7 +78,8 @@ function markdownToHtml(markdown) {
                 inList = true;
                 listType = "ul";
             }
-            htmlLines.push(line.replace(/^\s*- \[x\] (.*)$/, "<li class=\"task-item completed\">✅ $1</li>"));
+            const taskText = line.replace(/^\s*- \[x\] /, "");
+            htmlLines.push(`<li class="task-item completed">✅ ${escapeHtml(taskText)}</li>`);
         }
         // Regular lists
         else if (line.match(/^\s*- /)) {
@@ -70,7 +89,8 @@ function markdownToHtml(markdown) {
                 inList = true;
                 listType = "ul";
             }
-            htmlLines.push(line.replace(/^\s*- (.*)$/, "<li>$1</li>"));
+            const listText = line.replace(/^\s*- /, "");
+            htmlLines.push(`<li>${escapeHtml(listText)}</li>`);
         }
         // Empty line - close lists
         else if (line.trim() === "") {
@@ -99,30 +119,59 @@ function markdownToHtml(markdown) {
 
     let html = htmlLines.join("\n");
 
-    // Apply inline formatting
-    html = html
-        // Bold and italic
-        .replace(/\*\*\*(.*?)\*\*\*/g, "<strong><em>$1</em></strong>")
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/\*(.*?)\*/g, "<em>$1</em>")
-        
-        // Inline code
-        .replace(/`([^`]+)`/g, "<code>$1</code>")
-        
-        // Status badges
-        .replace(/\*Risk: (HIGH|MEDIUM|LOW)\*/g, "<span class=\"phase-status status-critical\">Risk: $1</span>")
-        .replace(/\*Priority: (CRITICAL|HIGH|MEDIUM|LOW)\*/g, "<span class=\"phase-status status-in-progress\">Priority: $1</span>")
-        .replace(/\*Duration: ([^*]+)\*/g, "<span class=\"phase-status status-planned\">Duration: $1</span>")
-        .replace(/\*Updated: ([^*]+)\*/g, "<span class=\"phase-status status-complete\">Updated: $1</span>")
-        
-        // Blockquotes
-        .replace(/^> (.*)$/gm, "<blockquote>$1</blockquote>");
+    // Apply inline formatting with XSS protection
+    html = applyInlineFormatting(html, escapeHtml);
 
     // Restore code blocks
     codeBlocks.forEach((code, index) => {
-        html = html.replace(`__CODEBLOCK_${index}__`, `<pre><code>${code}</code></pre>`);
+        html = html.replace(`__CODEBLOCK_${index}__`, `<pre><code>${escapeHtml(code)}</code></pre>`);
     });
 
+    return html;
+}
+
+/**
+ * Applies inline formatting while preventing XSS attacks
+ * @param {string} html - HTML content to format
+ * @param {function} escapeHtml - HTML escaping function
+ * @returns {string} - Safely formatted HTML
+ */
+function applyInlineFormatting(html, escapeHtml) {
+    // Bold and italic (safer with explicit capture and escape)
+    html = html.replace(/\*\*\*(.*?)\*\*\*/g, (match, content) => {
+        return `<strong><em>${escapeHtml(content)}</em></strong>`;
+    });
+    html = html.replace(/\*\*(.*?)\*\*/g, (match, content) => {
+        return `<strong>${escapeHtml(content)}</strong>`;
+    });
+    html = html.replace(/\*(.*?)\*/g, (match, content) => {
+        return `<em>${escapeHtml(content)}</em>`;
+    });
+    
+    // Inline code (safer escape)
+    html = html.replace(/`([^`]+)`/g, (match, content) => {
+        return `<code>${escapeHtml(content)}</code>`;
+    });
+    
+    // Status badges (these are controlled content, but still escape)
+    html = html.replace(/\*Risk: (HIGH|MEDIUM|LOW)\*/g, (match, content) => {
+        return `<span class="phase-status status-critical">Risk: ${escapeHtml(content)}</span>`;
+    });
+    html = html.replace(/\*Priority: (CRITICAL|HIGH|MEDIUM|LOW)\*/g, (match, content) => {
+        return `<span class="phase-status status-in-progress">Priority: ${escapeHtml(content)}</span>`;
+    });
+    html = html.replace(/\*Duration: ([^*]+)\*/g, (match, content) => {
+        return `<span class="phase-status status-planned">Duration: ${escapeHtml(content)}</span>`;
+    });
+    html = html.replace(/\*Updated: ([^*]+)\*/g, (match, content) => {
+        return `<span class="phase-status status-complete">Updated: ${escapeHtml(content)}</span>`;
+    });
+    
+    // Blockquotes (safer escape)
+    html = html.replace(/^> (.*)$/gm, (match, content) => {
+        return `<blockquote>${escapeHtml(content)}</blockquote>`;
+    });
+    
     return html;
 }
 
