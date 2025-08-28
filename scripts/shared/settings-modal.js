@@ -1,6 +1,23 @@
 /* eslint-env browser */
  
 /* global console, document, window, fetch, setTimeout, localStorage, Blob, URL, FormData, Papa, JSZip, bootstrap, module, alert */
+
+/**
+ * Escape HTML characters to prevent XSS attacks
+ * @param {string} text - Text to escape
+ * @returns {string} Escaped text
+ */
+function escapeHtml(text) {
+    const map = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
 /**
  * HexTrackr - Shared Settings Modal Component
  * 
@@ -485,22 +502,27 @@ function showClearConfirmationModal(type, confirmText) {
     return new Promise((resolve) => {
         const modal = document.createElement("div");
         modal.className = "modal fade";
+        
+        // Escape potentially unsafe input parameters
+        const safeType = escapeHtml(type);
+        const safeConfirmText = escapeHtml(confirmText);
+        
         modal.innerHTML = `
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header bg-danger text-white">
                         <h5 class="modal-title">
                             <i class="fas fa-exclamation-triangle me-2"></i>
-                            Confirm Clear ${type.charAt(0).toUpperCase() + type.slice(1)}
+                            Confirm Clear ${safeType.charAt(0).toUpperCase() + safeType.slice(1)}
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="alert alert-danger">
-                            <strong>Warning:</strong> This action cannot be undone. All ${type} data will be permanently deleted.
+                            <strong>Warning:</strong> This action cannot be undone. All ${safeType} data will be permanently deleted.
                         </div>
-                        <p>To confirm, type <strong>${confirmText}</strong> in the field below:</p>
-                        <input type="text" class="form-control" id="confirmInput" placeholder="Type ${confirmText} to confirm">
+                        <p>To confirm, type <strong>${safeConfirmText}</strong> in the field below:</p>
+                        <input type="text" class="form-control" id="confirmInput" placeholder="Type ${safeConfirmText} to confirm">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

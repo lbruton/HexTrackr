@@ -2,6 +2,17 @@
 /* global fetch, window, document, console, CSS, Prism, bootstrap */
  
 
+/**
+ * Escape HTML entities to prevent XSS attacks
+ * @param {string} text - The text to escape
+ * @returns {string} - The escaped text
+ */
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Documentation Portal JavaScript (Tabler.io version)
 class DocumentationPortal {
     constructor() {
@@ -242,7 +253,7 @@ class DocumentationPortal {
         container.innerHTML = `
             <div class="alert alert-danger" role="alert">
                 <h4 class="alert-title">Error Loading Documentation</h4>
-                <div class="text-muted">${message}</div>
+                <div class="text-muted">${escapeHtml(message)}</div>
             </div>
         `;
     }

@@ -1,17 +1,32 @@
-# HexTrackr Project Roadmap & Task List
+# HexTrackr Unified Project Roadmap
 
 <!-- markdownlint-disable MD013 MD009 -->
 
-## 🎯 Project Overview
+Last updated: January 29, 2025
 
-HexTrackr is a dual-purpose cybersecurity management system providing:
+## 🎯 **CURRENT SPRINT - ISSUE-DRIVEN WORKFLOW**
 
-- **Ticket Management**: Hexagon security workflow management
-- **Vulnerability Management**: Multi-vendor vulnerability data analysis
+**Working Mode**: Issue-driven Codacy compliance workflow  
+**Process**: User selects specific Codacy issue → AI implements targeted fix → Immediate compliance verification  
+**Current Focus**: Security fixes for v1.0.3 release preparation  
+
+### 📊 **Codacy Compliance Status**
+
+- **Total Issues**: 83 (down from 370+ after ESLint improvements)
+- **Security Issues**: 4 critical vulnerabilities (release blocking)
+- **Status**: 🔴 Not compliant - awaiting specific issue selection
+- **Quality Gate**: Zero critical/high security issues, <50 total issues before v1.0.3
+
+#### 🚨 **Security Issues Available for Selection**
+
+1. **Generic Object Injection Sink** - High severity in `docs-prototype/generate-docs.js`
+2. **fs.writeFileSync non-literal arguments** - File system security risk
+3. **fs.existsSync non-literal arguments** - File system security risk  
+4. **Unsafe innerHTML assignments** - DOM security vulnerability across multiple files
 
 ---
 
-## 🟢 COMPLETED FEATURES
+## 🟢 **COMPLETED FEATURES**
 
 ### Core Infrastructure ✅
 
@@ -19,92 +34,35 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 - [x] **Time-series database** with dimensional schema migration (97% data reduction)
 - [x] **Modern AG Grid** with responsive configuration
 - [x] **Bootstrap 5 + Tabler.io UI** with responsive design
-- [x] **PDF generation** with jsPDF + auto-bundling capabilities
-- [x] **Device management** with smart auto-increment naming
-- [x] **CSV import/export** with UPSERT logic for time-series
-- [x] **Pagination & filtering** across all views
-- [x] **JavaScript architecture** with modular pattern (shared components + page-specific files) ✅ **COMPLETE Aug 26, 2025**
+- [x] **JavaScript architecture** with modular pattern ✅ **Aug 26, 2025**
+- [x] **Chart & Visualization System** with ApexCharts and VPR toggle functionality
+- [x] **Cisco API Integration** with OAuth2 authentication and vulnerability sync
+- [x] **Documentation Portal** - Comprehensive markdown-first documentation system ✅ **Aug 27, 2025**
+- [x] **Ticket Modal Enhancement Suite** - Complete CRUD operations with modern workflow ✅ **Aug 27, 2025**
 
-### Chart & Visualization System ✅
+### Recent Critical Achievements ✅
 
-- [x] **ApexCharts integration** with historical VPR trends
-- [x] **Metric toggle functionality** (Count ↔ VPR Sum modes)
-- [x] **Multi-severity visualization** (Critical, High, Medium, Low)
-- [x] **Real-time chart updates** based on user selections
-- [x] **Responsive chart configuration** for mobile/desktop
-
-### Recent Critical Fixes ✅
-
-- [x] **VPR Toggle Bug Fix** - Fixed JavaScript DOM selector issue in chart metric switching
-- [x] **Database Schema Migration** - Complete time-series implementation with optimized queries
-- [x] **Data Quality Improvement** - Eliminated 97% duplicates, maintained historical accuracy
-- [x] **Modular JavaScript Architecture** - Implemented shared components pattern with settings modal ✅ **Aug 26, 2025**
-- [x] **JavaScript Console Error Fix** - Resolved TypeError in vulnerabilities.html setupEventListeners() ✅ **Aug 26, 2025**
-- [x] **Playwright Testing Integration** - Comprehensive browser automation testing deployed ✅ **Aug 26, 2025**
-
-### Cisco API Integration ✅
-
-- [x] **OAuth2 authentication** with real Cisco endpoints
-- [x] **AES-256 credential encryption** for secure local storage
-- [x] **Live API testing** with connection validation
-- [x] **Vulnerability synchronization** from Cisco PSIRT API
-- [x] **Error handling & progress tracking**
+- [x] **Playwright Testing Integration** - Comprehensive browser automation testing ✅ **Aug 26, 2025**
+- [x] **Production Data Management** - Web-based import/export with ZIP backup/restore ✅ **Aug 26, 2025**
+- [x] **Database Recovery** - 100% recovery from PostgreSQL corruption (16/16 tickets restored) ✅ **Aug 26, 2025**
+- [x] **Modular JavaScript Architecture** - Complete separation with shared components ✅ **Aug 26, 2025**
+- [x] **ESLint Configuration Improvements** - Reduced Codacy issues from 370+ → 83 ✅ **Aug 27, 2025**
 
 ---
 
-## 🟡 IN PROGRESS
+## 🟡 **IN PROGRESS**
 
-### Code Quality & Security Compliance 🔄 **CRITICAL - RELEASE BLOCKER**
+### Code Quality & Security Compliance 🔄 **CRITICAL PRIORITY**
 
-- [ ] **Codacy Compliance for v1.0.3 Release** - 83 issues identified, security fixes prioritized
-  - Current Progress (Aug 28, 2025): ESLint configuration improved; markdownlint configured; initial roadmaps cleanup completed; security fixes in progress
-  - [ ] **Security Fixes** (Release Blocking - HIGH Priority)
-    - [ ] Fix Generic Object Injection Sink vulnerability
-    - [ ] Secure fs.writeFileSync operations with literal arguments
-    - [ ] Secure fs.existsSync operations with literal arguments  
-    - [ ] Replace unsafe innerHTML assignments with secure alternatives
-  - [ ] **Code Quality Improvements** (Medium Priority)
-    - [ ] Address remaining ESLint violations (ESLint rules updated Aug 27, 2025)
-    - [ ] Fix code style and consistency issues
-    - [ ] Resolve complexity and maintainability warnings
-  - [ ] **Quality Gate Establishment**
-    - [x] ESLint configuration improvements implemented ✅ **Aug 27, 2025**
-    - [x] Markdownlint configured and applied to roadmaps ✅ **Aug 28, 2025**
-    - [ ] Security issue resolution
-    - [ ] Codacy compliance verification before v1.0.3 release
-  - **Goal**: Zero critical/high security issues, <50 total Codacy issues before any patch release
-  - **Timeline**: Complete before v1.0.3 release
+**Status**: Awaiting user selection of specific Codacy issue  
+**Process**: User reviews Codacy dashboard → Selects priority issue → AI implements targeted fix  
+**Timeline**: Complete security fixes before v1.0.3 release  
 
-### Documentation Portal Completion ✅ **COMPLETED** - *August 27, 2025*
-
-- [x] **Complete Documentation Portal System** - Comprehensive project documentation system
-  - [x] Fixed duplicate content mapping in documentation generator
-  - [x] Created database schema visualization with complete table relationships
-  - [x] Generated UI-API interaction flowcharts for complete data flow understanding
-  - [x] Added comprehensive page navigation flow diagrams with user journeys
-  - [x] Implemented markdown-first documentation workflow with beautiful Tabler.io templates
-  - [x] Established maintainable documentation system with living markdown sources
-  - [x] Remove Docusaurus dependencies and finalize portal cleanup (final task) ✅ COMPLETED Aug 27, 2025
-  - **Timeline**: 6/6 tasks complete - COMPLETE
-  - **Achievement**: ✅ Markdown-First Documentation Workflow COMPLETE!
-
-### Ticket Modal Enhancement Suite ✅ COMPLETED - *August 27, 2025*
-
-- [x] **Comprehensive Ticket Modal Improvements** - See [TICKET_MODAL_ENHANCEMENTS_20250827.md](./TICKET_MODAL_ENHANCEMENTS_20250827.md) for detailed implementation plan ✅ COMPLETED Aug 27, 2025
-  - [x] Fix backend/frontend field mapping (critical save bug) ✅ COMPLETED Aug 27, 2025
-  - [x] Add XT# read-only display field ✅ COMPLETED Aug 27, 2025
-  - [x] Implement site/location separation in UI ✅ COMPLETED Aug 27, 2025
-  - [x] Update status workflow (remove In-Progress, add Staged/Failed/Overdue) ✅ COMPLETED Aug 27, 2025
-  - [x] Enhance drag-drop UX with accessibility features ✅ COMPLETED Aug 27, 2025
-  - [x] Add reverse sort toggle functionality ✅ COMPLETED Aug 27, 2025
-  - [x] Implement auto-status updates for overdue items ✅ COMPLETED Aug 27, 2025
-  - [x] Comprehensive testing and validation ✅ COMPLETED Aug 27, 2025
-
-### Chart Timeline Enhancement 🔄 **NEXT PRIORITY**
+### Chart Timeline Enhancement 🔄 **NEXT TECHNICAL PRIORITY**
 
 - [ ] **Timeline Extension Feature** - Extend chart to current date with flat lines for data continuity
-  - [ ] Calculate gap between last data point and current date (August 25, 2025)
-  - [ ] Add synthetic data points to extend timeline with flat lines
+  - [ ] Calculate gap between last data point and current date
+  - [ ] Add synthetic data points to extend timeline
   - [ ] Update API to support date range extension
   - [ ] Improve UX to show system is current and up-to-date
 
@@ -115,17 +73,74 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
   - [ ] Add column filtering to ignore unnecessary data
   - [ ] Progress indicators for large file processing
   - [ ] Web Workers for non-blocking file processing
-  - [ ] Chunk-based processing with IndexedDB batching
 
 ---
 
-## 📦 Release Planning & Version Control
+## 🔴 **PLANNED FEATURES**
+
+### High Priority Planned Features
+
+#### KEV Integration Implementation 🚨 **HIGH PRIORITY**
+
+- [ ] **CISA KEV Integration** - Known Exploited Vulnerabilities flagging
+  - [ ] Non-API CSV download implementation (user-friendly)
+  - [ ] API-based real-time sync option
+  - [ ] Automatic KEV flagging in vulnerability tables
+  - [ ] KEV priority boost in VPR calculations (auto-assign 10.0)
+  - [ ] Visual KEV indicators and historical tracking
+
+#### UI/UX Modernization & Critical Fixes
+
+- [ ] **CVE Link System Overhaul** - Fix critical bug where CVE links open ALL CVEs instead of clicked one
+- [ ] **Modal System Enhancement** - Resolve z-index issues with nested modals
+- [ ] **Responsive Layout Completion** - Fix container layout and AG Grid responsiveness issues
+- [ ] **Unified Application Framework** - Migrate tickets.html to Tabler.io for consistency
+- [ ] **Dark Mode Implementation** - Complete theme switching with chart compatibility
+
+#### Network Infrastructure Features
+
+- [ ] **SNMP Network Polling** - Real-time device status monitoring with SNMPv2/v3
+- [ ] **Network Discovery & Mapping** - Automated asset discovery and topology visualization
+- [ ] **Docker Implementation** - Container architecture for SNMP services
+
+### Enterprise & Security Features
+
+#### Authentication & Access Control 🛡️ **CRITICAL FOR PRODUCTION**
+
+- [ ] **User Authentication System** - Secure login with session management
+- [ ] **Role-based Access Control** - Admin, User, Read-only roles with feature permissions
+- [ ] **API Security Enhancement** - Authentication middleware for all endpoints
+- [ ] **Content Security Policy** - Comprehensive CSP implementation
+- [ ] **Audit Logging** - User action tracking for compliance
+
+#### Advanced Analytics & Intelligence
+
+- [ ] **EPSS Scoring Integration** - Daily exploit prediction scoring
+- [ ] **MITRE ATT&CK Mapping** - Framework-based vulnerability classification
+- [ ] **Executive Dashboards** - C-level reporting with trend analysis
+- [ ] **Compliance Reporting** - SOC2, ISO27001, NIST report generation
+
+#### API Integrations Roadmap
+
+- [ ] **Palo Alto Networks Integration** - Prisma Cloud, Cortex, PAN-OS, WildFire APIs
+- [ ] **Additional Vendor APIs** - Tenable.io, Qualys, Rapid7, CrowdStrike integrations
+- [ ] **Cisco Extensions** - Complete Security Advisories sync implementation
+
+### Automation & Advanced Features
+
+- [ ] **Ansible Integration** - AWX/Tower connectivity for automated patch deployment
+- [ ] **AI-Powered Documentation** - Automated documentation generation with Gemini/OpenAI
+- [ ] **Multi-tenancy Support** - Organization/site isolation for enterprise deployment
+- [ ] **Advanced Reporting System** - HTML-based reports with PDF export capabilities
+
+---
+
+## 📦 **VERSION PLANNING**
 
 ### Version 1.0.3 (Next Patch Release) 🚀
 
 **Release Blockers**:
 
-- [x] ESLint configuration improvements ✅ **Aug 27, 2025**
 - [ ] **Security fixes from Codacy scan** (4 critical security issues)
 - [ ] **Code quality compliance** (<50 total Codacy issues)
 - [ ] **Comprehensive testing** of all security fixes
@@ -134,16 +149,16 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 
 - Zero critical/high security vulnerabilities
 - Codacy compliance established as ongoing quality gate
-- All security-related fs operations properly secured
-- DOM manipulation using secure methods only
+- All security-related operations properly secured
 
 ### Version 1.1.0 (Next Minor Release)
 
 **Features**:
 
-- Ticket Modal Enhancement Suite completion
-- Chart Timeline Enhancement
+- Chart Timeline Enhancement completion
 - Performance optimization for large CSV files
+- KEV Integration implementation
+- Critical UI/UX fixes (CVE links, modal system)
 
 **Quality Gates**:
 
@@ -153,415 +168,209 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 
 ---
 
-## 🔴 Planned Features
+## 🚨 **CRITICAL ISSUES TRACKING**
 
-### AI-Powered Documentation Automation 🤖 **POST-AUTH FEATURE**
+### Security & Compliance Issues
 
-- [ ] **Automated Documentation Generation System** - AI-powered self-updating docs
-  - [ ] Settings panel integration for API key management
-    - [ ] Gemini API key configuration
-    - [ ] OpenAI API key configuration
-    - [ ] Secure encrypted storage of API credentials
-  - [ ] AI Documentation Automation Engine
-    - [ ] Automated codebase scanning and analysis
-    - [ ] AI-powered documentation content generation
-    - [ ] Integration with existing `generate-docs.js` workflow
-    - [ ] Real-time documentation updates via AI APIs
-  - [ ] Documentation Revision Management
-    - [ ] Automatic backup system before AI updates
-    - [ ] Version control for documentation changes
-    - [ ] Rollback capability for problematic AI generations
-    - [ ] Change tracking and diff visualization
-  - [ ] User Experience Features
-    - [ ] One-click documentation refresh button
-    - [ ] Progress indicators for AI generation process
-    - [ ] Quality validation and human review prompts
-    - [ ] Scheduled automatic documentation updates
-  - **Prerequisites**: Authentication system, settings modal enhancements
-  - **Goal**: Self-maintaining documentation platform with AI assistance
+- **Codacy Security Vulnerabilities**: 4 critical issues blocking v1.0.3 release
+- **Authentication Gap**: No authentication protects API endpoints or data access
+- **File System Security**: Dynamic file paths in fs operations pose security risks
+- **DOM Security**: innerHTML assignments create XSS vulnerability potential
 
-### API Integrations Roadmap 📋
+### User Experience Issues
 
-#### Cisco Extensions
+- **CVE Link Functionality**: CVE links open ALL CVEs instead of individual ones
+- **Modal System**: Nested modals appear behind parent modals (z-index problems)
+- **Layout Responsiveness**: Full-width layout with excessive dead space on desktop
+- **AG Grid Issues**: Table cells don't auto-adjust on browser resize
 
-- [ ] **Security Advisories Sync** (partially stubbed)
-  - [ ] Complete `syncCiscoAdvisories()` implementation
-  - [ ] Advisory correlation with existing vulnerabilities
-  - [ ] Risk scoring integration
+### Data Management Issues
 
-#### Palo Alto Networks Integration
-
-- [ ] **Prisma Cloud API** integration
-- [ ] **Cortex API** for threat intelligence
-- [ ] **PAN-OS API** for firewall management
-- [ ] **WildFire API** for malware analysis
-- [ ] OAuth2 authentication framework
-- [ ] Multi-product configuration management
-
-#### Additional Vendor APIs
-
-- [ ] **Tenable.io** vulnerability scanner integration
-- [ ] **Qualys** VMDR API connectivity
-- [ ] **Rapid7** InsightVM integration
-- [ ] **CrowdStrike** Falcon endpoint data
-
-### UI/UX Modernization & Standardization 🎨
-
-- [ ] **Unify Application Framework** - Migrate `tickets.html` from Bootstrap 5 to Tabler.io to create a single, consistent user experience. (See also: `UI_UX_ROADMAP.md`, Phase 9.1)
-- [ ] **Standardize Data Tables** - Replace the custom HTML table on `tickets.html` with AG Grid, aligning it with the `vulnerabilities.html` implementation.
-- [ ] **Implement Dark Mode-Aware Charting** - Refactor ApexCharts initialization to use Tabler.io CSS variables, enabling seamless theme switching (Light/Dark mode). (See also: `UI_UX_ROADMAP.md`, Phase 10.1)
-- [ ] **Formalize Component Strategy** - Officially document and enforce the use of Tabler.io for layout, AG Grid for tables, and ApexCharts for all data visualizations.
-
-### Network Infrastructure Features 📋
-
-#### SNMP Network Polling
-
-- [ ] **SNMPv2/v3 implementation**
-  - [ ] Real-time device status monitoring
-  - [ ] Hardware health monitoring  
-  - [ ] Firmware version detection
-  - [ ] Network interface analysis
-  - [ ] Vulnerability correlation by device type
-- [ ] **Docker containerization**
-  - [ ] Node.js backend with net-snmp library
-  - [ ] RESTful API for browser integration
-  - [ ] Scalable multi-network support
-
-#### Network Discovery & Mapping
-
-- [ ] **Automated asset discovery**
-- [ ] **Network topology visualization**
-- [ ] **Device fingerprinting**
-- [ ] **Service enumeration**
-
-### Automation & Orchestration 📋
-
-#### Ansible Integration
-
-- [ ] **AWX/Tower API connectivity**
-- [ ] **Automated patch deployment**
-- [ ] **Configuration compliance enforcement**
-- [ ] **Vulnerability remediation playbooks**
-- [ ] **Bulk system updates and hardening**
-- [ ] **Secure credential vault management**
-- [ ] **Playbook execution monitoring**
-
-#### Docker Implementation
-
-- [ ] **Container architecture**
-  - [ ] SNMP polling service containerization
-  - [ ] API gateway container
-  - [ ] Database container (if moving from browser storage)
-  - [ ] Docker Compose orchestration
-
-### Advanced Analytics & Intelligence 📋
-
-#### Threat Intelligence & Priority Enhancement
-
-- [ ] **CISA KEV Integration** 🚨 **HIGH PRIORITY**
-  - [ ] Non-API CSV download implementation (user-friendly, no API key required)
-  - [ ] API-based real-time sync (for users with access)
-  - [ ] Automatic KEV flagging in vulnerability tables
-  - [ ] KEV priority boost in VPR calculations (auto-assign 10.0 VPR)
-  - [ ] Visual KEV indicators in dashboard cards and tables
-  - [ ] Historical KEV trend tracking in time-series data
-- [ ] **EPSS Scoring Integration**
-  - [ ] Daily EPSS CSV download and processing
-  - [ ] VPR calculation enhancement with exploit prediction
-  - [ ] Non-API implementation for maximum accessibility
-- [ ] **MITRE ATT&CK framework mapping**
-- [ ] **CVE enrichment from NVD**
-- [ ] **Exploit prediction modeling**
-- [ ] **Enhanced risk scoring algorithms** (CVSS + EPSS + KEV + time-series trends)
-
-#### Reporting & Visualization
-
-- [ ] **Executive dashboards**
-- [ ] **Compliance reporting** (SOC2, ISO27001, NIST)
-- [ ] **Trend analysis** with ApexCharts expansion
-- [ ] **Custom report builder**
-- [ ] **HTML-based reports with PDF export** 🎯 **MID-TERM GOAL**
-  - [ ] Beautiful HTML report templates
-  - [ ] PDF export capabilities (jsPDF or Puppeteer)
-  - [ ] Support for both Live Tracking Mode (scan date reports) and Scheduled Snapshots Mode (aggregate trend reports)
-  - [ ] Executive summary reports with charts and metrics
-  - [ ] Customizable report branding and styling
-  - [ ] Automated report scheduling and delivery
-
-### Enterprise Features 📋
-
-#### Multi-tenancy & Access Control
-
-- [ ] **User authentication system**
-  - [ ] Login page with secure credential handling
-  - [ ] Session management and token-based authentication
-  - [ ] Password hashing and security best practices
-  - [ ] Account recovery mechanisms
-  - [ ] Secure password reset workflow
-  - [ ] Multi-factor authentication support
-- [ ] **Role-based access control (RBAC)**
-  - [ ] Admin, User, and Read-only roles
-  - [ ] Feature access based on role permissions
-  - [ ] UI adaptation based on user role
-  - [ ] Granular permission system for specific features
-  - [ ] Team-based access groups
-- [ ] **API security and authentication**
-  - [ ] All API endpoints protected by authentication middleware
-  - [ ] Token validation for all data access requests
-  - [ ] Rate limiting to prevent brute force attacks
-  - [ ] API key management for system integrations
-  - [ ] JWT-based authentication with proper expiration
-  - [ ] API request logging and monitoring
-  - [ ] Secure API documentation with authentication examples
-- [ ] **Organization/site isolation**
-  - [ ] Multi-tenant data partitioning
-  - [ ] Cross-tenant access controls
-- [ ] **Audit logging**
-  - [ ] User action tracking for compliance
-  - [ ] Login/logout event recording
-  - [ ] Data access and modification logging
-  - [ ] Failed authentication attempt tracking
-  - [ ] Security event alerting system
-
-#### Data Management
-
-- [ ] **Backend database** option (PostgreSQL/MongoDB)
-- [ ] **Data retention policies**
-- [ ] **Backup & restore functionality**
-- [ ] **Data encryption at rest**
+- **CSV Export Headers**: Export headers contain extra characters/corruption
+- **Large File Performance**: 50-100MB CSV files cause memory issues
+- **API Rate Limiting**: No protection against abuse or brute force attacks
 
 ---
 
-## 🚀 IMMEDIATE PRIORITIES (Next Sprint)
+## � **DEVELOPMENT WORKFLOW & STANDARDS**
 
-### High Priority
+### Git Management Standards
 
-1. **KEV Integration Implementation** 🚨 **NEW ADDITION**
-   - Target: One-click KEV flagging for existing vulnerabilities
-   - Non-API CSV download + API option for premium users
-   - Visual indicators and automatic VPR boosting
+- **Branch Protection**: Never commit directly to `main` branch
+- **Feature Branches**: Use `feature/description` or `fix/issue-name` pattern
+- **Git Checkpoints**: Make commits every 2-3 file changes with descriptive messages
+- **Context Preservation**: Include sufficient context in commit messages
 
-1. **Large CSV Import Optimization** 
-   - Target: 50-100MB file handling
-   - Web Workers + streaming parser
-   - Column filtering for data reduction
+### Code Quality Standards
 
-1. **Cisco API Completion**
-   - Finish Security Advisories sync
-   - Enhanced error handling
+#### Codacy Compliance (MANDATORY)
 
-### Medium Priority  
+- **After ANY File Edit**: Run `codacy_cli_analyze` for each edited file immediately
+- **After ANY Dependency Changes**: Run `codacy_cli_analyze` with tool "trivy" 
+- **Fix All Issues**: Resolve issues immediately before proceeding
+- **Quality Gate**: Maintain <50 total issues, zero critical/high security issues
 
-1. **Performance Improvements**
-   - IndexedDB query optimization
-   - UI responsiveness during large operations
-   - Memory usage optimization
+#### Documentation Maintenance (MANDATORY)
 
-1. **User Experience**
-   - Better progress indicators
-   - Improved error messages
-   - Mobile responsiveness testing
+Update these files with EVERY change:
 
----
+- `systeminfo.json` - Project state and dependencies
+- `roadmaps/roadmap.md` - Feature progress (this file)
+- `docs-source/project-management/codacy-compliance.md` - Quality metrics
+- `docs-source/api/endpoints.md` - When adding/modifying APIs
+- `docs-source/security/README.md` - When implementing security features
 
-## 📊 TECHNICAL DEBT
+#### Markdown Standards (ENFORCED)
 
-### Code Quality
+- Run markdown formatter before and after editing: `node scripts/fix-markdown.js --file=path/to/file.md`
+- Follow markdownlint rules: MD022, MD032, MD036, MD029, MD024, MD013
 
-- [ ] **ESLint configuration** for JavaScript standardization
-- [ ] **Unit testing framework** setup (Jest)
-- [ ] **End-to-end testing** with Playwright
-- [ ] **Documentation improvements**
+### Sprint Management
 
-### Security Hardening
+#### Sprint File Template
 
-- [ ] **Content Security Policy (CSP)** implementation
-  - [ ] Strict CSP headers to prevent XSS attacks
-  - [ ] Frame-ancestors restrictions
-  - [ ] Inline script protection
-  - [ ] Nonce-based script execution
-  - [ ] Reporting and monitoring for CSP violations
-- [ ] **API security enhancements**
-  - [ ] API key rotation mechanisms
-  - [ ] Authentication for all API endpoints
-  - [ ] Request validation and sanitization
-  - [ ] Rate limiting implementation
-  - [ ] Secure secret storage (no hardcoded secrets)
-  - [ ] OAuth2 integration for third-party access
-  - [ ] IP-based access restrictions for sensitive endpoints
-- [ ] **Input validation** strengthening
-  - [ ] Server-side validation of all user inputs
-  - [ ] Parameterized queries to prevent SQL injection
-  - [ ] Data sanitization before storage
-  - [ ] Schema-based validation for all API requests
-  - [ ] Content-type verification for uploads
-  - [ ] File upload scanning and validation
-- [ ] **XSS prevention** auditing
-  - [ ] Output encoding for all dynamic content
-  - [ ] Safe HTML rendering practices
-  - [ ] Script injection vulnerability scanning
-  - [ ] DOM-based XSS protection
-  - [ ] Security headers (X-XSS-Protection, etc.)
-- [ ] **HTTPS enforcement** for all connections
-  - [ ] Proper TLS configuration
-  - [ ] HSTS implementation
-  - [ ] Secure cookie attributes
-  - [ ] Certificate monitoring and auto-renewal
-  - [ ] Mixed content prevention
-- [ ] **Data leakage prevention**
-  - [ ] API response filtering based on user role
-  - [ ] Error message sanitization (no sensitive data in errors)
-  - [ ] Sensitive data masking in logs
-  - [ ] Secure data deletion processes
-  - [ ] Regular security scanning for exposed endpoints
+Every sprint file (`roadmaps/sprint-YYYY-MM-DD-HHMM.md`) must include:
 
-### Performance Monitoring
+```markdown
 
-- [ ] **Performance metrics** collection
-- [ ] **Memory leak detection**
-- [ ] **Bundle size optimization**
-- [ ] **Lighthouse score** improvements
+# Sprint: [Description] - [YYYY-MM-DD-HHMM]
 
----
+## Context for Resume
 
-## 🎯 **CRITICAL PRIORITY: Trend Tracking Implementation**
+- **Current Branch**: feature/name
+- **Last Completed**: [description]
+- **Next Steps**: [what to do next]
+- **Files Modified**: [list]
+- **Codacy Status**: [current state]
 
-**Problem**: CSV imports create duplicates instead of tracking changes over time  
-**Solution**: Transform into time-series vulnerability management system
+## Checklist
 
-### 📋 PHASE 1: Database Schema Migration
+- [ ] Task 1: [description with context]
+- [ ] **CODACY**: Run analysis after each task
+- [ ] Git checkpoint after task 2
+- [ ] Update documentation for tasks 1-2
 
-Risk: HIGH | Impact: CRITICAL | Duration: 2-3 tasks
+## Documentation Updates Required
 
-#### 1.1 Analyze Current Data Structure
+- [ ] systeminfo.json: [what to update]
+- [ ] roadmap.md: [progress to mark]
 
-- [ ] Audit existing vulnerability data patterns
-- [ ] Identify unique vulnerability identifiers (CVE+hostname+date)
-- [ ] Map current columns to time-series requirements
+## Git Strategy
 
-#### 1.2 Design Time-Series Schema
+- Branch: feature/[name]
+- Checkpoints after: [specific points]
+- Final merge: [when ready]
 
-- [ ] Create `vulnerability_master` table (static CVE data)
-- [ ] Create `vulnerability_history` table (time-series: device+date+VPR)
-- [ ] Add unique constraints: `(hostname, cve, scan_date)`
-- [ ] Design indexes for latest-value queries
+## Codacy Impact
 
-#### 1.3 Create Migration Scripts
+- Expected new issues: [estimate]
+- Files to analyze: [list]
+- Critical fixes needed: [priority items]
 
-- [ ] Backup existing data
-- [ ] Write migration script to reshape current data
-- [ ] Test migration on sample data
-- [ ] Create rollback procedures
+```
 
-### 📋 PHASE 2: Smart CSV Import System
+#### Context Management
 
-Risk: MEDIUM | Impact: HIGH | Duration: 2-3 tasks
+**When to Start New Chat**:
 
-#### 2.1 Redesign Import Logic
+- After every 3-5 completed tasks
+- When context becomes too long
+- Before tackling complex features
+- After major git checkpoints
 
-- [ ] Use date field as "last_updated" timestamp
-- [ ] Implement UPSERT logic (UPDATE if exists, INSERT if new)
-- [ ] Key on: `hostname + cve + scan_date`
-- [ ] Track VPR changes over time
+**Context Handoff Protocol**:
 
-#### 2.2 Data Validation & Integrity
-
-- [ ] Validate date formats during import
-- [ ] Ensure VPR score changes are logged
-- [ ] Add data quality checks
-- [ ] Handle malformed/duplicate entries gracefully
-
-#### 2.3 Import Analytics
-
-- [ ] Track what changed during each import
-- [ ] Report new/updated/unchanged vulnerabilities
-- [ ] Log VPR trend changes per import
-
-### 📋 PHASE 3: Latest Values Display
-
-Risk: LOW | Impact: MEDIUM | Duration: 2 tasks
-
-#### 3.1 Update API Endpoints
-
-- [ ] Modify `/api/vulnerabilities` to return latest values only
-- [ ] Create efficient queries for most recent data per device+CVE
-- [ ] Ensure cards/tables show current state
-
-#### 3.2 Frontend Display Updates
-
-- [ ] Update vulnerability cards to show latest VPR
-- [ ] Ensure tables reflect most recent scan data
-- [ ] Add "last updated" timestamps to UI
-
-### 📋 PHASE 4: Trend Visualization
-
-Risk: LOW | Impact: HIGH | Duration: 3-4 tasks
-
-#### 4.1 Historical Data API
-
-- [ ] Create `/api/vulnerabilities/trends` endpoint
-- [ ] Return VPR changes over time per vulnerability
-- [ ] Support date range filtering
-
-#### 4.2 Chart Implementation
-
-- [ ] Design Chart.js trend visualizations
-- [ ] Show VPR score changes over time
-- [ ] Display severity level migrations
-- [ ] Add device-level trend analysis
-
-#### 4.3 Dashboard Integration
-
-- [ ] Add trend charts to vulnerability dashboard
-- [ ] Create "trending up/down" indicators
-- [ ] Show improvement/degradation analytics
-
-### 📋 PHASE 5: API Integration Framework
-
-Risk: MEDIUM | Impact: HIGH | Duration: 2-3 tasks
-
-#### 5.1 API Supplement System
-
-- [ ] Design hooks for real-time API data
-- [ ] Create 30-day history pull mechanism
-- [ ] Merge API data with CSV historical data
-
-#### 5.2 Data Source Management
-
-- [ ] Support multiple data sources (CSV + API)
-- [ ] Prioritize API data over CSV when available
-- [ ] Maintain data source lineage
+1. Update current sprint file with progress
+2. Commit all changes to git
+3. Summarize next steps clearly
+4. Save current state to memory
+5. Provide user with resume instructions
 
 ---
 
-## 🔧 DEVELOPMENT WORKFLOW
+## � **PROJECT METRICS & ACHIEVEMENTS**
 
-### Current Stack
+### Technical Achievements
 
-- **Frontend**: Vanilla JavaScript, Bootstrap 5, ApexCharts
-- **Storage**: localStorage, IndexedDB via LocalForage
-- **Build**: No build process (direct file serving)
-- **Dependencies**: CDN-based (Bootstrap, jQuery-less)
+- ✅ **Database Optimization**: 97% storage reduction (193K → 6K records)
+- ✅ **Production Data Recovery**: 100% recovery rate from corruption (16/16 tickets)
+- ✅ **Code Quality**: Reduced Codacy issues from 370+ → 83 (-77% improvement)
+- ✅ **API Completeness**: All CRUD endpoints implemented and tested
+- ✅ **Zero-dependency Import/Export**: 100% web-based operation
 
-### Proposed Enhancements
+### User Experience Achievements
 
-- **Build System**: Webpack/Vite for optimization
-- **Package Management**: npm/yarn for dependency management
-- **Testing**: Jest + Playwright test suite
-- **CI/CD**: GitHub Actions for automated testing
+- ✅ **Chart Performance**: 14-day default view with proper historical data
+- ✅ **Data Management UX**: Complete import/export/backup/restore through web interface
+- ✅ **Settings Modal**: Clean, organized interface with logical button groupings
+- ✅ **Production Ready**: Zero technical knowledge required for data operations
+- ✅ **Browser Testing**: Comprehensive Playwright automation validates functionality
+
+### Current State
+
+- **Version**: 1.0.2
+- **Total Records**: 100,570 (17 tickets + 100,553 vulnerabilities)
+- **Database Status**: Optimized time-series schema operational
+- **Testing Coverage**: Browser automation with Playwright
+- **Documentation**: Complete markdown-first portal system
 
 ---
 
-## 📋 MAINTENANCE SCHEDULE
+## 🎯 **SUCCESS CRITERIA & QUALITY GATES**
+
+### Release Criteria (All Patch Versions)
+
+- ✅ **Security**: Zero critical/high security vulnerabilities
+- ✅ **Quality**: <50 total Codacy issues
+- ✅ **Testing**: All security fixes tested and verified
+- ✅ **Documentation**: Security changes documented
+
+### Feature Completion Standards
+
+- All Codacy issues resolved for modified files
+- Documentation updated to reflect changes
+- Git checkpoints created for rollback capability
+- systeminfo.json reflects current state
+- Markdown files formatted correctly
+- No broken functionality introduced
+
+### Project Success Definition
+
+**Current Sprint READY** when user selects specific Codacy issue for implementation  
+**v1.0.3 Release READY** when all 4 security vulnerabilities resolved and compliance verified  
+**Long-term SUCCESS** when authentication system implemented and enterprise features operational  
+
+---
+
+## 📋 **MAINTENANCE SCHEDULE**
 
 ### Regular Tasks
 
-- **Weekly**: Dependency security updates
-- **Monthly**: Performance monitoring review
+- **Weekly**: Dependency security updates and Codacy compliance verification
+- **Monthly**: Performance monitoring review and documentation updates
 - **Quarterly**: Feature roadmap review and prioritization
-- **Annually**: Security audit and penetration testing
+- **Per Release**: Comprehensive security audit and compliance verification
+
+### Quality Assurance
+
+- **Pre-commit**: ESLint validation and basic testing
+- **Pull Request**: Codacy analysis required for all changes
+- **Release**: Full compliance verification mandatory
+- **Post-deployment**: Monitoring and issue tracking
 
 ---
 
-*Last Updated: August 24, 2025*
-*Maintainer: HexTrackr Development Team*
+## � **RELATED DOCUMENTATION**
+
+- **Sprint Files**: Individual dated sprint files in `/roadmaps/`
+- **API Documentation**: `/docs-source/api/endpoints.md`
+- **Security Guidelines**: `/docs-source/security/README.md`
+- **Development Setup**: `/docs-source/development/development-setup.md`
+- **Architecture Overview**: `/docs-source/architecture/index.md`
+- **Project Management**: `/docs-source/project-management/index.md`
+
+---
+
+## Documentation Updates
+
+This unified roadmap consolidates all project planning, progress tracking, and strategic direction for HexTrackr development. Last major update: January 29, 2025

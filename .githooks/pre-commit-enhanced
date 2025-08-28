@@ -78,13 +78,13 @@ if [ -n "$STAGED_JS_FILES" ]; then
   
   # Run auto-fix for safe issues only
   echo "${YELLOW}[pre-commit]${NC} Auto-fixing safe JavaScript issues..."
-  ./node_modules/.bin/eslint --fix --fix-type suggestion,layout --config eslint.config.mjs $STAGED_JS_FILES
+  ./node_modules/.bin/eslint --fix --fix-type suggestion,layout $STAGED_JS_FILES
   
   # Re-stage auto-fixed files
   git add $STAGED_JS_FILES
   
   # Run full validation
-  ./node_modules/.bin/eslint --config eslint.config.mjs $STAGED_JS_FILES
+  ./node_modules/.bin/eslint $STAGED_JS_FILES
   JS_STATUS=$?
   
   if [ $JS_STATUS -ne 0 ]; then
