@@ -1,0 +1,212 @@
+# 📚 HexTrackr Documentation Portal
+
+Welcome to the comprehensive HexTrackr documentation. This portal provides complete information for users, developers, and administrators working with the HexTrackr cybersecurity management system.
+
+## 🎯 Quick Navigation
+
+### For New Users
+
+- 🚀 **[Quick Start Guide](getting-started/quick-start.md)** - Get running in 10 minutes
+- 📖 **[Installation Guide](getting-started/installation-guide.md)** - Complete setup instructions
+- 🎫 **[Ticket Management](user-guides/ticket-management.md)** - Security incident workflows
+
+### For Supervisors & Stakeholders
+
+- 🏢 **[Project Summary](overview/project-summary.md)** - Executive overview and value proposition
+- 🔧 **[Technical Overview](overview/technical-overview.md)** - Architecture and implementation details
+- 📊 **[Current Roadmap](planning/current-roadmap.md)** - Development status and future plans
+
+### For Developers
+
+- 💻 **[Development Setup](development/development-setup.md)** - Local development environment
+- 🔌 **[API Reference](api/rest-api-reference.md)** - Complete REST API documentation
+- 🏗️ **[System Architecture](architecture/system-architecture.md)** - Technical deep dive
+
+## 📖 Documentation Sections
+
+### 🎯 Overview
+
+Essential project information and high-level understanding.
+
+| Document | Description | Audience |
+|----------|-------------|----------|
+| [Project Summary](overview/project-summary.md) | Executive overview, problems solved, value delivered | Stakeholders, managers |
+| [Technical Overview](overview/technical-overview.md) | Architecture, technology stack, implementation | Technical stakeholders |
+| [Value Proposition](overview/value-proposition.md) | Benefits, efficiency gains, capabilities | Decision makers |
+| [System Requirements](overview/system-requirements.md) | Infrastructure needs and dependencies | IT administrators |
+
+### 🚀 Getting Started
+
+Everything needed to get HexTrackr running quickly.
+
+| Document | Description | Time Required |
+|----------|-------------|---------------|
+| [Installation Guide](getting-started/installation-guide.md) | Complete setup instructions | 10-15 minutes |
+| [Quick Start Guide](getting-started/quick-start.md) | Essential features in 10 minutes | 10 minutes |
+| [Configuration](getting-started/configuration.md) | Initial setup and customization | 15-30 minutes |
+| [Troubleshooting Setup](getting-started/troubleshooting-setup.md) | Common installation issues | As needed |
+
+### 📋 User Guides
+
+Comprehensive feature documentation for end users.
+
+| Feature | Description | User Type |
+|---------|-------------|-----------|
+| [Ticket Management](user-guides/ticket-management.md) | Security incident tracking and workflow | Security analysts |
+| [Vulnerability Tracking](user-guides/vulnerability-tracking.md) | Vulnerability data analysis and trends | Vulnerability analysts |
+| [Data Import/Export](user-guides/data-import-export.md) | CSV imports and PDF report generation | Data managers |
+| [Search and Filtering](user-guides/search-and-filtering.md) | Finding and organizing information | All users |
+| [Reporting Dashboards](user-guides/reporting-dashboards.md) | Analytics and visual insights | Managers, analysts |
+
+### 🔌 API Documentation
+
+Technical interface documentation for integration and automation.
+
+| Document | Description | Use Case |
+|----------|-------------|----------|
+| [REST API Reference](api/rest-api-reference.md) | Complete endpoint documentation | Integration, automation |
+| [Authentication](api/authentication.md) | Security and access control | Secure integrations |
+| [Data Models](api/data-models.md) | Request/response schemas | Development |
+| [Integration Examples](api/integration-examples.md) | Code samples and patterns | Implementation |
+
+### 🏗️ Architecture
+
+Technical deep dives into system design and implementation.
+
+| Document | Description | Audience |
+|----------|-------------|----------|
+| [System Architecture](architecture/system-architecture.md) | Overall design and component interaction | Architects, developers |
+| [Database Design](architecture/database-design.md) | Schema, relationships, performance | Database developers |
+| [Frontend Architecture](architecture/frontend-architecture.md) | UI components and patterns | Frontend developers |
+| [Backend Architecture](architecture/backend-architecture.md) | Server design and API structure | Backend developers |
+| [Security Model](architecture/security-model.md) | Authentication, authorization, protection | Security engineers |
+| [Performance Optimization](architecture/performance-optimization.md) | Scaling and optimization strategies | Performance engineers |
+
+### 💻 Development
+
+Guides for developers working on HexTrackr code.
+
+| Document | Description | Developer Type |
+|----------|-------------|----------------|
+| [Development Setup](development/development-setup.md) | Local environment configuration | All developers |
+| [Coding Standards](development/coding-standards.md) | Style guides and best practices | Contributors |
+| [Testing Strategy](development/testing-strategy.md) | Unit, integration, and E2E testing | QA engineers |
+| [Code Organization](development/code-organization.md) | File structure and module patterns | New contributors |
+| [Contributing Guide](development/contributing-guide.md) | How to contribute to the project | Open source contributors |
+| [Debugging Guide](development/debugging-guide.md) | Common issues and troubleshooting | All developers |
+
+### 🚀 Deployment
+
+Operations and production deployment information.
+
+| Document | Description | Audience |
+|----------|-------------|----------|
+| [Docker Deployment](deployment/docker-deployment.md) | Container setup and management | DevOps engineers |
+| [Production Deployment](deployment/production-deployment.md) | Live environment configuration | System administrators |
+| [Backup and Recovery](deployment/backup-and-recovery.md) | Data protection procedures | Operations teams |
+| [Monitoring and Logging](deployment/monitoring-and-logging.md) | System health and diagnostics | Site reliability engineers |
+| [Security Hardening](deployment/security-hardening.md) | Production security measures | Security administrators |
+| [Maintenance Procedures](deployment/maintenance-procedures.md) | Updates, patches, routine tasks | Operations teams |
+
+### 🔧 Frameworks
+
+Technical references for frameworks and libraries used.
+
+| Framework | Description | Use Case |
+|-----------|-------------|----------|
+| [Tabler UI Framework](frameworks/tabler-ui-framework.md) | Modern UI components and styling | Frontend development |
+| [Bootstrap Integration](frameworks/bootstrap-integration.md) | Bootstrap patterns and customization | UI development |
+| [AG-Grid Configuration](frameworks/ag-grid-configuration.md) | Advanced data grid setup | Data presentation |
+| [Chart Visualization](frameworks/chart-visualization.md) | ApexCharts implementation | Analytics and reporting |
+| [JavaScript Patterns](frameworks/javascript-patterns.md) | Code patterns and module organization | Frontend architecture |
+
+### 📅 Planning
+
+Project management, roadmaps, and development planning.
+
+| Document | Description | Audience |
+|----------|-------------|----------|
+| [Current Roadmap](planning/current-roadmap.md) | Active development plans and milestones | All stakeholders |
+| [Sprint Planning](planning/sprint-planning.md) | Development cycles and task management | Development teams |
+| [Feature Backlog](planning/feature-backlog.md) | Planned enhancements and new features | Product managers |
+| [Technical Debt](planning/technical-debt.md) | Known issues and improvement opportunities | Development teams |
+| [Version History](planning/version-history.md) | Release notes and changelog | All users |
+
+### 📖 Reference
+
+Quick lookup guides and troubleshooting resources.
+
+| Document | Description | Use Case |
+|----------|-------------|----------|
+| [Glossary](reference/glossary.md) | Technical terms and definitions | Learning, clarification |
+| [Command Reference](reference/command-reference.md) | Common commands and scripts | Quick reference |
+| [Configuration Reference](reference/configuration-reference.md) | All configuration options | System setup |
+| [Troubleshooting Index](reference/troubleshooting-index.md) | Problem → solution mapping | Issue resolution |
+| [External Resources](reference/external-resources.md) | Links to related documentation | Extended learning |
+
+## 🎯 Learning Paths
+
+### Path 1: New User Onboarding
+
+1. [Project Summary](overview/project-summary.md) - Understand what HexTrackr does
+2. [Installation Guide](getting-started/installation-guide.md) - Get it running
+3. [Quick Start Guide](getting-started/quick-start.md) - Try key features
+4. [Ticket Management](user-guides/ticket-management.md) - Learn core workflows
+
+### Path 2: Developer Onboarding
+
+1. [Technical Overview](overview/technical-overview.md) - Understand the architecture
+2. [Development Setup](development/development-setup.md) - Configure environment
+3. [System Architecture](architecture/system-architecture.md) - Deep dive technical
+4. [API Reference](api/rest-api-reference.md) - Integration capabilities
+
+### Path 3: Administrator Setup
+
+1. [System Requirements](overview/system-requirements.md) - Infrastructure planning
+2. [Installation Guide](getting-started/installation-guide.md) - Deploy the system
+3. [Production Deployment](deployment/production-deployment.md) - Secure deployment
+4. [Backup and Recovery](deployment/backup-and-recovery.md) - Data protection
+
+### Path 4: Supervisor Review
+
+1. [Project Summary](overview/project-summary.md) - Executive overview
+2. [Technical Overview](overview/technical-overview.md) - Implementation approach
+3. [Current Roadmap](planning/current-roadmap.md) - Development status
+4. [Security Model](architecture/security-model.md) - Security approach
+
+## 📊 Documentation Statistics
+
+- **Total Documents:** 44 comprehensive guides
+- **Coverage Areas:** 10 major topic areas
+- **Target Audiences:** 8 distinct user types
+- **Learning Paths:** 4 structured progressions
+- **Estimated Reading Time:** 15+ hours of content
+- **Code Examples:** 100+ working examples
+- **API Endpoints:** Complete REST API coverage
+
+## 🆘 Getting Help
+
+### Documentation Issues
+
+- **Missing Information:** [Request documentation updates](https://github.com/Lonnie-Bruton/HexTrackr/issues)
+- **Unclear Instructions:** [Report clarity issues](https://github.com/Lonnie-Bruton/HexTrackr/issues)
+- **Outdated Content:** [Flag outdated information](https://github.com/Lonnie-Bruton/HexTrackr/issues)
+
+### Technical Support
+
+- **Bug Reports:** [GitHub Issues](https://github.com/Lonnie-Bruton/HexTrackr/issues)
+- **Feature Requests:** [GitHub Discussions](https://github.com/Lonnie-Bruton/HexTrackr/discussions)
+- **General Questions:** [Community Forum](https://github.com/Lonnie-Bruton/HexTrackr/discussions)
+
+### Contributing
+
+- **Documentation:** [Contributing Guide](development/contributing-guide.md)
+- **Code Contributions:** [Development Setup](development/development-setup.md)
+- **Testing:** [Testing Strategy](development/testing-strategy.md)
+
+---
+
+**Documentation Version:** 1.0  
+**Last Updated:** August 27, 2025  
+**HexTrackr Version:** 1.0.2  
+**Coverage:** Complete system documentation

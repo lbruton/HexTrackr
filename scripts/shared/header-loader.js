@@ -5,7 +5,7 @@
   async function loadHeader() {
     try {
       // Fetch the header HTML
-      const response = await fetch('scripts/shared/header.html');
+      const response = await fetch('/scripts/shared/header.html');
       if (!response.ok) {
         throw new Error(`Failed to load header: ${response.status}`);
       }

@@ -1,0 +1,2173 @@
+<div class="documentation-section">
+    <h2><i class="fas fa-code me-2"></i>Function Reference</h2>
+    <p class="text-muted mb-4">Complete reference of all JavaScript functions in the codebase.</p>
+    
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Function</th>
+                    <th>File</th>
+                    <th>Line</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>main()</code></td>
+                    <td>docs-prototype/gemini-docs-generator.js</td>
+                    <td>289</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>scanDirectory()</code></td>
+                    <td>docs-source/generate-docs.js</td>
+                    <td>175</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>scanDirectory()</code></td>
+                    <td>docs-source/generate-docs.js</td>
+                    <td>411</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>highlight()</code></td>
+                    <td>docs-source/generate-docs.js</td>
+                    <td>42</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>debounce()</code></td>
+                    <td>scripts/ag-grid-responsive-config.js</td>
+                    <td>18</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>createVulnerabilityGridOptions()</code></td>
+                    <td>scripts/ag-grid-responsive-config.js</td>
+                    <td>33</td>
+                    <td>Data creation/saving</td>
+                </tr>
+                <tr>
+                    <td><code>e()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>s()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>n()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>o()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>a()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>r()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>l()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>d()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>u()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>f()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>g()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>p()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>m()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>b()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>x()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>_()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>v()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>M()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>w()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>D()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>V()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>B()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>W()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>N()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>H()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>j()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>$()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Y()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>U()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>X()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>q()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>K()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>G()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Z()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>J()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Q()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>tt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>et()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>nt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>at()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>rt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>lt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ct()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>dt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>pt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>mt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>_t()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>vt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Mt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>wt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>kt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>At()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Lt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Et()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Rt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>It()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>zt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ft()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Vt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Bt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>jt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Xt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>qt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Kt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Gt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Jt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Qt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>te()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ne()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>he()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ce()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>fe()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ge()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>pe()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>be()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>_e()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ve()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>we()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ke()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Pe()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>De()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ce()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Oe()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ae()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Te()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Le()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ee()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Re()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ie()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ze()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Fe()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ve()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Be()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>We()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ne()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>He()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>je()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>$e()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ye()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>qe()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ke()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ze()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Je()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Qe()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ti()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ei()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ii()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ai()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ri()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>li()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>hi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>gi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>pi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>mi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>_i()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>vi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Mi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>wi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ki()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Si()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Pi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Di()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ci()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Oi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ai()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ti()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Li()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ei()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ri()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ii()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>zi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Fi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>f()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Vi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Bi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ni()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Hi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ji()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>$i()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Yi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ui()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ki()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Gi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Zi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ji()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Qi()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ts()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>es()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>is()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>s()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ss()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ns()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>os()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>i()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>fs()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>gs()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ps()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ms()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>_s()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ys()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>vs()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ms()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ks()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>As()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ts()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ls()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Es()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Rs()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Is()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>zs()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Fs()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Vs()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>g()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>js()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>$s()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Xs()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>qs()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ks()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Gs()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Zs()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>nn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>on()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>an()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>rn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ln()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>hn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>cn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>dn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>un()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>pn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>xn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>vn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Mn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>wn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>kn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Sn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Cn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>On()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Tn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ln()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>In()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>zn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Fn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Vn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Bn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Wn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Nn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Hn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Un()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Xn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>qn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Kn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Gn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Zn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Jn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Qn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>to()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>eo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>so()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>oo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ao()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ro()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>lo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ho()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>co()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>uo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>go()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>po()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>mo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>vo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Mo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>wo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>So()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Po()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Do()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Co()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Oo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ao()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>To()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Lo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>zo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Fo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Vo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Bo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Wo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>l()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ho()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Uo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Xo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>qo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ko()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Zo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Jo()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ta()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ea()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ia()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>sa()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>na()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>oa()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>aa()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ra()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>la()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ca()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>da()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ua()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>fa()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ga()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>pa()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>_a()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Pa()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Da()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ca()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Oa()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Aa()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ta()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>La()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ea()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ra()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ia()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Fa()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>i()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>h()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>it()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>7</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>yt()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ye()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ue()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ge()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>y()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>a()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>Ys()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>a()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>mn()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>a()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>l()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>ba()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>_deprecated()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>fontString()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>get()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Data retrieval</td>
+                </tr>
+                <tr>
+                    <td><code>set()</code></td>
+                    <td>scripts/chart.min.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>main()</code></td>
+                    <td>scripts/fix-markdown.js</td>
+                    <td>309</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>scanDirectory()</code></td>
+                    <td>scripts/fix-markdown.js</td>
+                    <td>260</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>markdownToHtml()</code></td>
+                    <td>scripts/generate-roadmap-portal.js</td>
+                    <td>13</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>generatePortal()</code></td>
+                    <td>scripts/generate-roadmap-portal.js</td>
+                    <td>130</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>updatePackageJson()</code></td>
+                    <td>scripts/generate-roadmap-portal.js</td>
+                    <td>317</td>
+                    <td>Data modification</td>
+                </tr>
+                <tr>
+                    <td><code>countTasks()</code></td>
+                    <td>scripts/generate-roadmap-portal.js</td>
+                    <td>338</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>loadHeader()</code></td>
+                    <td>scripts/shared/header-loader.js</td>
+                    <td>5</td>
+                    <td>Data retrieval</td>
+                </tr>
+                <tr>
+                    <td><code>initHeaderFunctionality()</code></td>
+                    <td>scripts/shared/header-loader.js</td>
+                    <td>38</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>showFallbackHeader()</code></td>
+                    <td>scripts/shared/header-loader.js</td>
+                    <td>78</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>refreshStats()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>165</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>exportData()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>199</td>
+                    <td>Data export</td>
+                </tr>
+                <tr>
+                    <td><code>exportSingleCSV()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>243</td>
+                    <td>Data export</td>
+                </tr>
+                <tr>
+                    <td><code>exportCombinedCSV()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>263</td>
+                    <td>Data export</td>
+                </tr>
+                <tr>
+                    <td><code>downloadFile()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>299</td>
+                    <td>Data retrieval</td>
+                </tr>
+                <tr>
+                    <td><code>backupData()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>315</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>importData()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>397</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>clearData()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>443</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>showClearConfirmationModal()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>480</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>testCiscoConnection()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>546</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>testTenableConnection()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>562</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>fetchCiscoData()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>578</td>
+                    <td>Data retrieval</td>
+                </tr>
+                <tr>
+                    <td><code>fetchTenableData()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>587</td>
+                    <td>Data retrieval</td>
+                </tr>
+                <tr>
+                    <td><code>saveSettings()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>596</td>
+                    <td>Data creation/saving</td>
+                </tr>
+                <tr>
+                    <td><code>showNotification()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>664</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>initServiceNowSettings()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>681</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>loadServiceNowSettings()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>716</td>
+                    <td>Data retrieval</td>
+                </tr>
+                <tr>
+                    <td><code>saveServiceNowSettings()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>737</td>
+                    <td>Data creation/saving</td>
+                </tr>
+                <tr>
+                    <td><code>updateServiceNowStatus()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>776</td>
+                    <td>Data modification</td>
+                </tr>
+                <tr>
+                    <td><code>updateUrlPreview()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>798</td>
+                    <td>Data modification</td>
+                </tr>
+                <tr>
+                    <td><code>testServiceNowConnection()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>821</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>generateServiceNowUrl()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>857</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>isServiceNowEnabled()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>873</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>convertTicketsToCSV()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>888</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>convertVulnerabilitiesToCSV()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>919</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>exportAllDataAsCSV()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>947</td>
+                    <td>Data export</td>
+                </tr>
+                <tr>
+                    <td><code>importCSV()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>1010</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>restoreFullSystemBackup()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>1124</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>showRestoreConfirmationModal()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>1142</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>restoreData()</code></td>
+                    <td>scripts/shared/settings-modal.js</td>
+                    <td>1202</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>isValidCVE()</code></td>
+                    <td>scripts/validation-utils.js</td>
+                    <td>26</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>isValidIP()</code></td>
+                    <td>scripts/validation-utils.js</td>
+                    <td>42</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>isValidVPR()</code></td>
+                    <td>scripts/validation-utils.js</td>
+                    <td>61</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>normalizeDate()</code></td>
+                    <td>scripts/validation-utils.js</td>
+                    <td>76</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>isValidHostname()</code></td>
+                    <td>scripts/validation-utils.js</td>
+                    <td>98</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>isValidSeverity()</code></td>
+                    <td>scripts/validation-utils.js</td>
+                    <td>116</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>formatApiError()</code></td>
+                    <td>scripts/validation-utils.js</td>
+                    <td>145</td>
+                    <td>Data formatting</td>
+                </tr>
+                <tr>
+                    <td><code>log()</code></td>
+                    <td>scripts/validation-utils.js</td>
+                    <td>169</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>validateCsvRow()</code></td>
+                    <td>scripts/validation-utils.js</td>
+                    <td>210</td>
+                    <td>Data validation</td>
+                </tr>
+                <tr>
+                    <td><code>myDbQuery()</code></td>
+                    <td>scripts/validation-utils.js</td>
+                    <td>247</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>handleDbOperation()</code></td>
+                    <td>scripts/validation-utils.js</td>
+                    <td>257</td>
+                    <td>Application logic</td>
+                </tr>
+                <tr>
+                    <td><code>getCurrentVersion()</code></td>
+                    <td>scripts/version-manager.js</td>
+                    <td>16</td>
+                    <td>Data retrieval</td>
+                </tr>
+                <tr>
+                    <td><code>updateVersion()</code></td>
+                    <td>scripts/version-manager.js</td>
+                    <td>22</td>
+                    <td>Data modification</td>
+                </tr>
+                <tr>
+                    <td><code>validateVersion()</code></td>
+                    <td>scripts/version-manager.js</td>
+                    <td>48</td>
+                    <td>Data validation</td>
+                </tr>
+                <tr>
+                    <td><code>initDb()</code></td>
+                    <td>server.js</td>
+                    <td>358</td>
+                    <td>Application logic</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

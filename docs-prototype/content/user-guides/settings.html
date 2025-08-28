@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr - Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="../../styles/shared/base.css" rel="stylesheet">
+    <link href="../../styles/shared/header.css" rel="stylesheet">
+    <link href="../css/docs-tabler.css" rel="stylesheet">
+</head>
+<body>
+    <div class="page">
+        <!-- Shared Header -->
+        <div id="headerContainer"></div>
+        
+        <div class="page-wrapper">
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h1>User Guide: Shared Settings Modal</h1>
+<p>The HexTrackr application features a unified settings modal that is shared across both the Ticket Management and Vulnerability Management pages. This provides a consistent and centralized location for all application-level configurations.</p>
+<h2>Accessing the Settings Modal</h2>
+<ol>
+<li>Click the <strong>gear icon</strong> (<code>&lt;i class=&quot;fa-solid fa-cog&quot;&gt;&lt;/i&gt;</code>) located in the main header of either the tickets or vulnerabilities page.</li>
+<li>The settings modal will appear as an overlay.</li>
+</ol>
+<h2>How It Works</h2>
+<p>The settings modal is a &quot;shared component,&quot; meaning the same HTML and JavaScript code is used on all pages.</p>
+<ul>
+<li><strong><code>scripts/shared/settings-modal.js</code></strong>: This script contains all the logic for the modal, including fetching its HTML content, handling user interactions, and communicating with the backend API.</li>
+<li><strong><code>scripts/shared/settings-modal.html</code></strong>: This file contains the HTML structure of the modal itself.</li>
+<li><strong>Dynamic Injection</strong>: When a page loads, the <code>settings-modal.js</code> script automatically fetches the <code>settings-modal.html</code> content and injects it into the page. This ensures that any page can use the modal simply by including the script.</li>
+</ul>
+<h2>Features of the Settings Modal</h2>
+<p>The modal is organized into several tabs, each handling a different aspect of the application&#39;s configuration.</p>
+<h3>1. General Settings</h3>
+<ul>
+<li><strong>Theme Customization</strong>: Allows you to switch between light and dark modes for the user interface.</li>
+<li><strong>API Configuration</strong>: Provides fields to enter API keys or other credentials needed for integrations (e.g., ServiceNow).</li>
+</ul>
+<h3>2. Data Management</h3>
+<ul>
+<li><strong>Import Data</strong>: Provides a unified interface for importing CSV files for both tickets and vulnerabilities. This is the same functionality accessed via the &quot;Import&quot; buttons on the main pages.</li>
+<li><strong>Export Data</strong>: Allows you to export all tickets to a CSV file.</li>
+<li><strong>Clear Data</strong>:<ul>
+<li><strong>Clear Tickets</strong>: Permanently deletes all records from the <code>tickets</code> table.</li>
+<li><strong>Clear Vulnerabilities</strong>: Permanently deletes all records from the <code>vulnerabilities</code> and <code>vulnerability_imports</code> tables.</li>
+<li>A confirmation prompt is shown before any data is deleted to prevent accidental loss.</li>
+</ul>
+</li>
+</ul>
+<h3>3. ServiceNow Integration</h3>
+<ul>
+<li><strong>Configuration</strong>: Contains fields to set up the connection to a ServiceNow instance, including the instance URL, username, and password.</li>
+<li><strong>Test Connection</strong>: A button to verify that the provided credentials are correct and that the application can successfully connect to the ServiceNow API.</li>
+<li><strong>Ticket Creation</strong>: Once configured, this integration allows for the creation of ServiceNow tickets directly from vulnerabilities within HexTrackr.</li>
+</ul>
+<h3>4. About</h3>
+<ul>
+<li><strong>Version Information</strong>: Displays the current version of the HexTrackr application.</li>
+<li><strong>Links</strong>: Provides links to project documentation, the Git repository, and other relevant resources.</li>
+</ul>
+<h2>Saving Settings</h2>
+<ul>
+<li>Most settings are saved automatically when changed.</li>
+<li>For settings that require explicit confirmation (like API keys), a <strong>&quot;Save&quot;</strong> button is provided within the relevant tab.</li>
+<li>All settings are stored in the backend database, ensuring they persist across sessions and are applied consistently throughout the application.</li>
+</ul>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Footer -->
+    <div id="footerContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <!-- Load shared header and footer -->
+    <script src="../../scripts/shared/header-loader.js"></script>
+    <script src="../../scripts/shared/footer-loader.js"></script>
+</body>
+</html>

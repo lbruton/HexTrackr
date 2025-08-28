@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr - Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="../../styles/shared/base.css" rel="stylesheet">
+    <link href="../../styles/shared/header.css" rel="stylesheet">
+    <link href="../css/docs-tabler.css" rel="stylesheet">
+</head>
+<body>
+    <div class="page">
+        <!-- Shared Header -->
+        <div id="headerContainer"></div>
+        
+        <div class="page-wrapper">
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h1>Tabler.io Framework</h1>
+<p>The HexTrackr application uses the Tabler.io UI kit for the <strong>Vulnerability Management</strong> page (<code>vulnerabilities.html</code>). Tabler.io is a premium and open-source dashboard template built on Bootstrap, providing a clean, modern, and responsive interface for data-rich applications.</p>
+<h2>Integration</h2>
+<p>Tabler.io is integrated into the project via a CDN link in the <code>&lt;head&gt;</code> section of <code>vulnerabilities.html</code>.</p>
+<pre><code class="language-html">&lt;link href=&quot;https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+</code></pre>
+<p>This single line imports the core Tabler CSS, which includes styles for layout, components, and typography.</p>
+<h2>Key Components Used</h2>
+<p>The <code>vulnerabilities.html</code> page is built almost entirely with Tabler.io components, creating a sophisticated and consistent user experience.</p>
+<h3>1. Page Layout</h3>
+<ul>
+<li><strong><code>&lt;div class=&quot;page&quot;&gt;</code> and <code>&lt;div class=&quot;page-wrapper&quot;&gt;</code></strong>: These are the main containers that structure the entire page, providing the foundational layout for the dashboard.</li>
+<li><strong><code>&lt;header class=&quot;navbar&quot;&gt;</code></strong>: The shared application header is built using Tabler&#39;s navbar component, ensuring a consistent look and feel with the rest of the UI.</li>
+<li><strong><code>&lt;div class=&quot;page-body&quot;&gt;</code></strong>: This container holds the main content of the page, including statistics cards and the data grid.</li>
+</ul>
+<h3>2. Cards (<code>&lt;div class=&quot;card&quot;&gt;</code>)</h3>
+<ul>
+<li><strong>Stats Cards</strong>: The key statistics at the top of the page (e.g., &quot;Critical Vulnerabilities,&quot; &quot;High Severity VPR&quot;) are displayed in Tabler cards. These cards use a combination of icons, titles, and metric values to present information clearly.</li>
+<li><strong>Main Content Card</strong>: The AG Grid for vulnerabilities is enclosed within a large card that provides a clear visual boundary for the main interactive element of the page.</li>
+</ul>
+<h3>3. Data Visualization</h3>
+<ul>
+<li><strong>Charts</strong>: The page is designed to include charts (e.g., for vulnerability trends). While Chart.js is used for the charting library itself, the charts are embedded within Tabler cards to seamlessly integrate with the dashboard&#39;s aesthetic.</li>
+</ul>
+<h3>4. Forms and Controls</h3>
+<ul>
+<li><strong>Buttons (<code>&lt;a href=&quot;#&quot; class=&quot;btn btn-primary&quot;&gt;</code>)</strong>: Action buttons like &quot;Import CSV&quot; are styled using Tabler&#39;s button classes.</li>
+<li><strong>Input Groups</strong>: The search and filter controls for the data grid are styled using Tabler&#39;s form components for a cohesive look.</li>
+</ul>
+<h3>5. Icons</h3>
+<ul>
+<li><strong>Font Awesome</strong>: Tabler.io is designed to work well with icon libraries. HexTrackr uses Font Awesome, and the icons are integrated into Tabler components like buttons and stat cards to provide visual cues.</li>
+</ul>
+<h2>Customization and Responsiveness</h2>
+<ul>
+<li><strong>Responsive Design</strong>: Tabler.io is inherently responsive. The layout, cards, and other components automatically adjust to different screen sizes, from large desktops to mobile devices.</li>
+<li><strong>Custom Styles</strong>: While Tabler provides a comprehensive set of styles, custom CSS in <code>styles/pages/vulnerabilities.css</code> is used to fine-tune the appearance. For example, custom styles are applied to constrain the maximum width of the page on ultrawide monitors, ensuring the content remains centered and readable.</li>
+<li><strong>AG Grid Integration</strong>: The AG Grid component is styled with the <code>ag-theme-alpine</code> theme, but it is embedded within Tabler cards and layouts, making it a central part of the Tabler-based dashboard.</li>
+</ul>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Footer -->
+    <div id="footerContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <!-- Load shared header and footer -->
+    <script src="../../scripts/shared/header-loader.js"></script>
+    <script src="../../scripts/shared/footer-loader.js"></script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+# 🔧 Technical Overview
+
+## System Architecture
+
+HexTrackr employs a modern, containerized architecture designed for reliability, scalability, and maintainability.
+
+### High-Level Architecture
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend UI   │    │   Backend API   │    │   Database      │
+│                 │    │                 │    │                 │
+│ • Tabler.io     │◄──►│ • Node.js       │◄──►│ • SQLite        │
+│ • Bootstrap     │    │ • Express       │    │ • Optimized     │
+│ • JavaScript    │    │ • REST API      │    │   Schemas       │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │              ┌─────────────────┐              │
+         └──────────────►│ Docker Container│◄─────────────┘
+                        │                 │
+                        │ • Nginx Proxy   │
+                        │ • Process Mgmt  │
+                        │ • File Storage  │
+                        └─────────────────┘
+```
+
+## Technology Stack
+
+### Backend Infrastructure
+
+- **Runtime:** Node.js 18+ with Express.js framework
+- **Database:** SQLite with WAL mode for concurrent access
+- **API Design:** RESTful architecture with JSON responses
+- **File Processing:** Native CSV parsing with validation
+- **Security:** Session-based authentication with middleware protection
+
+### Frontend Technologies
+
+- **UI Framework:** Tabler.io for modern, responsive interface design
+- **CSS Framework:** Bootstrap 5 for responsive grid and components  
+- **JavaScript:** Modular ES6+ with shared component architecture
+- **Data Visualization:** ApexCharts for real-time analytics
+- **Data Grids:** AG-Grid for advanced table management
+
+### Development & Deployment
+
+- **Containerization:** Docker with multi-stage builds
+- **Process Management:** PM2 for production process management
+- **Web Server:** Nginx for static assets and reverse proxy
+- **Version Control:** Git with semantic versioning
+- **Code Quality:** ESLint with comprehensive rule sets
+
+## Database Design
+
+### Core Tables
+
+## Tickets Table
+
+- Primary incident tracking with hexagon workflow states
+- Device association with metadata and assignment tracking
+- Status progression with timestamp auditing
+
+## Vulnerabilities Table
+
+- Time-series vulnerability data with vendor attribution
+- UPSERT operations for data deduplication
+- Severity categorization with risk scoring
+
+## Indexes and Performance
+
+- Composite indexes for common query patterns
+- Foreign key constraints for data integrity
+- Query optimization for large datasets
+
+## Security Model
+
+### Authentication & Authorization
+
+- Session-based authentication with secure cookies
+- Role-based access control for different user types
+- CSRF protection for state-changing operations
+
+### Data Protection
+
+- Input validation and sanitization on all endpoints
+- SQL injection prevention through parameterized queries
+- File upload restrictions and validation
+
+### Deployment Security
+
+- Non-root user execution in containers
+- Minimal attack surface with Alpine Linux base
+- Environment variable configuration for secrets
+
+## API Architecture
+
+### RESTful Endpoints
+
+```
+GET    /api/tickets          # List all tickets
+POST   /api/tickets          # Create new ticket
+PUT    /api/tickets/:id      # Update ticket
+DELETE /api/tickets/:id      # Delete ticket
+
+GET    /api/vulnerabilities  # List vulnerabilities
+POST   /api/vulnerabilities  # Import vulnerability data
+GET    /api/vulnerabilities/trends # Analytics data
+```
+
+### Response Format
+
+```json
+{
+  "success": true,
+  "data": { /* result data */ },
+  "message": "Operation completed",
+  "timestamp": "2025-08-27T10:30:00Z"
+}
+```
+
+## Performance Characteristics
+
+### Database Performance
+
+- **Query Optimization:** Indexed searches with <100ms response times
+- **Concurrent Access:** WAL mode supporting multiple readers
+- **Data Growth:** Designed for 100K+ records with maintained performance
+
+### Frontend Performance
+
+- **Bundle Size:** Optimized JavaScript modules with lazy loading
+- **Responsive Design:** Mobile-first approach with progressive enhancement
+- **Real-time Updates:** WebSocket connections for live data updates
+
+### Scalability Considerations
+
+- **Horizontal Scaling:** Stateless design enables load balancing
+- **Database Migration:** SQLite to PostgreSQL migration path available
+- **Caching Strategy:** Application-level caching for frequent queries
+
+## Development Workflow
+
+### Code Organization
+
+```
+├── server.js              # Main application entry point
+├── scripts/
+│   ├── pages/             # Page-specific JavaScript modules
+│   ├── shared/            # Shared components and utilities
+│   └── utils/             # Utility functions and helpers
+├── styles/
+│   ├── pages/             # Page-specific styles
+│   ├── shared/            # Shared styling components
+│   └── utils/             # Utility classes and mixins
+└── data/                  # Database and uploads storage
+```
+
+### Quality Assurance
+
+- **Code Standards:** ESLint configuration with comprehensive rules
+- **Testing Strategy:** Unit tests with integration test coverage
+- **Performance Monitoring:** Application metrics and logging
+- **Documentation:** Comprehensive API and user documentation
+
+## Integration Capabilities
+
+### Data Import/Export
+
+- **CSV Import:** Automated parsing with validation and error handling
+- **PDF Export:** Dynamic report generation with custom templates
+- **API Integration:** RESTful endpoints for external system integration
+
+### Future Extension Points
+
+- **Plugin Architecture:** Modular design supporting additional security tools
+- **Webhook Support:** Event-driven integration with external systems
+- **SSO Integration:** SAML/OAuth support for enterprise authentication
+
+---
+
+**Target Audience:** Technical stakeholders, system administrators, developers  
+**Complexity Level:** Intermediate to Advanced  
+**Prerequisites:** Basic understanding of web applications and databases

@@ -1,0 +1,620 @@
+# 🔌 REST API Reference
+
+## Overview
+
+HexTrackr provides a comprehensive REST API for programmatic access to all ticket and vulnerability management functions. The API follows REST conventions with JSON request/response formats and HTTP status codes for operation results.
+
+## Base Configuration
+
+### Base URL
+
+```
+http://localhost:8080/api
+```
+
+### Authentication
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "your_username",
+  "password": "your_password"
+}
+```
+
+### Response Format
+
+All API responses follow a consistent format:
+```json
+{
+  "success": true,
+  "data": { /* response data */ },
+  "message": "Operation completed successfully",
+  "timestamp": "2025-08-27T10:30:00.000Z",
+  "version": "1.0.2"
+}
+```
+
+### Error Format
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid input parameters",
+    "details": ["Field 'title' is required"]
+  },
+  "timestamp": "2025-08-27T10:30:00.000Z"
+}
+```
+
+## Ticket Management API
+
+### List Tickets
+
+Retrieve all tickets with optional filtering and pagination.
+
+```http
+GET /api/tickets
+```
+
+#### Query Parameters
+
+- `status` (string): Filter by ticket status
+- `priority` (string): Filter by priority level  
+- `device_id` (integer): Filter by assigned device
+- `page` (integer): Page number (default: 1)
+- `limit` (integer): Results per page (default: 50, max: 100)
+- `sort` (string): Sort field (id, title, created_at, status)
+- `order` (string): Sort direction (asc, desc)
+
+#### Example Request
+
+```http
+GET /api/tickets?status=open&priority=high&page=1&limit=25
+```
+
+#### Example Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "tickets": [
+      {
+        "id": 1,
+        "title": "Security Alert - Unauthorized Access",
+        "description": "Detected suspicious login attempt from unusual location",
+        "status": "open",
+        "priority": "high",
+        "device_id": 42,
+        "device_name": "web-server-01",
+        "assigned_to": "analyst@company.com",
+        "created_at": "2025-08-27T09:15:00.000Z",
+        "updated_at": "2025-08-27T10:30:00.000Z",
+        "tags": ["security", "authentication", "alert"]
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 25,
+      "total": 156,
+      "pages": 7
+    }
+  }
+}
+```
+
+### Get Ticket
+
+Retrieve a specific ticket by ID.
+
+```http
+GET /api/tickets/:id
+```
+
+#### Example Request (2)
+
+```http
+GET /api/tickets/1
+```
+
+#### Example Response (2)
+
+```json
+{
+  "success": true,
+  "data": {
+    "ticket": {
+      "id": 1,
+      "title": "Security Alert - Unauthorized Access",
+      "description": "Detected suspicious login attempt from unusual location",
+      "status": "open",
+      "priority": "high",
+      "device_id": 42,
+      "device": {
+        "id": 42,
+        "name": "web-server-01",
+        "ip_address": "192.168.1.100",
+        "hostname": "web01.company.local",
+        "device_type": "server"
+      },
+      "assigned_to": "analyst@company.com",
+      "created_at": "2025-08-27T09:15:00.000Z",
+      "updated_at": "2025-08-27T10:30:00.000Z",
+      "tags": ["security", "authentication", "alert"],
+      "comments": [
+        {
+          "id": 1,
+          "author": "analyst@company.com",
+          "content": "Initial investigation started",
+          "created_at": "2025-08-27T09:20:00.000Z"
+        }
+      ],
+      "attachments": [
+        {
+          "id": 1,
+          "filename": "login_logs.txt",
+          "size": 2048,
+          "content_type": "text/plain",
+          "uploaded_at": "2025-08-27T09:25:00.000Z"
+        }
+      ]
+    }
+  }
+}
+```
+
+### Create Ticket
+
+Create a new security ticket.
+
+```http
+POST /api/tickets
+Content-Type: application/json
+```
+
+#### Request Body
+
+```json
+{
+  "title": "Security Alert - Unauthorized Access",
+  "description": "Detected suspicious login attempt from unusual location",
+  "priority": "high",
+  "device_id": 42,
+  "assigned_to": "analyst@company.com",
+  "tags": ["security", "authentication", "alert"],
+  "metadata": {
+    "source_system": "SIEM",
+    "alert_id": "ALT-2025-001234"
+  }
+}
+```
+
+#### Required Fields
+
+- `title` (string): Ticket title
+- `description` (string): Detailed description
+- `priority` (string): One of: critical, high, medium, low
+
+#### Optional Fields
+
+- `device_id` (integer): Associated device ID
+- `assigned_to` (string): User email for assignment
+- `tags` (array): Array of tag strings
+- `metadata` (object): Additional key-value data
+
+#### Example Response (3)
+
+```json
+{
+  "success": true,
+  "data": {
+    "ticket": {
+      "id": 157,
+      "title": "Security Alert - Unauthorized Access",
+      "status": "new",
+      "created_at": "2025-08-27T10:45:00.000Z"
+    }
+  },
+  "message": "Ticket created successfully"
+}
+```
+
+### Update Ticket
+
+Update an existing ticket.
+
+```http
+PUT /api/tickets/:id
+Content-Type: application/json
+```
+
+#### Request Body (2)
+
+```json
+{
+  "status": "in_progress",
+  "assigned_to": "senior_analyst@company.com",
+  "tags": ["security", "authentication", "alert", "investigation"]
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "ticket": {
+      "id": 157,
+      "status": "in_progress",
+      "updated_at": "2025-08-27T11:00:00.000Z"
+    }
+  },
+  "message": "Ticket updated successfully"
+}
+```
+
+### Delete Ticket
+
+Delete a ticket (soft delete - archived).
+
+```http
+DELETE /api/tickets/:id
+```
+
+#### Response (2)
+
+```json
+{
+  "success": true,
+  "message": "Ticket deleted successfully"
+}
+```
+
+## Vulnerability Management API
+
+### List Vulnerabilities
+
+Retrieve vulnerability data with filtering and analytics.
+
+```http
+GET /api/vulnerabilities
+```
+
+#### Query Parameters (2)
+
+- `severity` (string): Filter by severity level
+- `vendor` (string): Filter by vendor name
+- `status` (string): Filter by remediation status
+- `date_from` (string): Start date (ISO 8601)
+- `date_to` (string): End date (ISO 8601)
+- `page` (integer): Page number
+- `limit` (integer): Results per page
+
+#### Example Request (3)
+
+```http
+GET /api/vulnerabilities?severity=critical&date_from=2025-08-01
+```
+
+#### Example Response (4)
+
+```json
+{
+  "success": true,
+  "data": {
+    "vulnerabilities": [
+      {
+        "id": 1,
+        "cve_id": "CVE-2025-12345",
+        "title": "Remote Code Execution in Web Framework",
+        "description": "Critical vulnerability allowing remote code execution",
+        "severity": "critical",
+        "cvss_score": 9.8,
+        "vendor": "TechCorp",
+        "affected_products": ["WebFramework v2.1", "WebFramework v2.2"],
+        "discovered_date": "2025-08-15T00:00:00.000Z",
+        "published_date": "2025-08-20T00:00:00.000Z",
+        "status": "open",
+        "remediation": {
+          "available": true,
+          "patch_version": "2.3.1",
+          "workaround": "Disable remote access until patched"
+        }
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 50,
+      "total": 23,
+      "pages": 1
+    }
+  }
+}
+```
+
+### Import Vulnerabilities
+
+Bulk import vulnerability data from CSV.
+
+```http
+POST /api/vulnerabilities/import
+Content-Type: multipart/form-data
+```
+
+#### Form Data
+
+- `file` (file): CSV file with vulnerability data
+- `vendor` (string): Vendor name for imported data
+- `source` (string): Data source identifier
+
+#### CSV Format
+
+```csv
+cve_id,title,severity,cvss_score,affected_products,status
+CVE-2025-12345,"Remote Code Execution",critical,9.8,"Product v1.0",open
+CVE-2025-12346,"SQL Injection",high,8.1,"Product v2.0",patched
+```
+
+#### Response (3)
+
+```json
+{
+  "success": true,
+  "data": {
+    "imported": 245,
+    "updated": 12,
+    "skipped": 3,
+    "errors": []
+  },
+  "message": "Vulnerability data imported successfully"
+}
+```
+
+### Vulnerability Trends
+
+Get trend analysis and statistics.
+
+```http
+GET /api/vulnerabilities/trends
+```
+
+#### Query Parameters (3)
+
+- `period` (string): Time period (week, month, quarter, year)
+- `group_by` (string): Grouping field (severity, vendor, status)
+
+#### Example Response (5)
+
+```json
+{
+  "success": true,
+  "data": {
+    "trends": {
+      "period": "month",
+      "data": [
+        {
+          "date": "2025-08-01",
+          "critical": 12,
+          "high": 45,
+          "medium": 123,
+          "low": 67
+        }
+      ]
+    },
+    "summary": {
+      "total_vulnerabilities": 247,
+      "new_this_period": 23,
+      "patched_this_period": 45,
+      "critical_open": 8
+    }
+  }
+}
+```
+
+## Device Management API
+
+### List Devices
+
+Retrieve all registered devices.
+
+```http
+GET /api/devices
+```
+
+#### Response (4)
+
+```json
+{
+  "success": true,
+  "data": {
+    "devices": [
+      {
+        "id": 42,
+        "name": "web-server-01",
+        "ip_address": "192.168.1.100",
+        "hostname": "web01.company.local",
+        "device_type": "server",
+        "operating_system": "Ubuntu 22.04",
+        "last_seen": "2025-08-27T10:30:00.000Z",
+        "status": "active",
+        "open_tickets": 2
+      }
+    ]
+  }
+}
+```
+
+### Create Device
+
+Register a new device.
+
+```http
+POST /api/devices
+Content-Type: application/json
+```
+
+#### Request Body (3)
+
+```json
+{
+  "name": "web-server-02",
+  "ip_address": "192.168.1.101",
+  "hostname": "web02.company.local",
+  "device_type": "server",
+  "operating_system": "Ubuntu 22.04"
+}
+```
+
+## Error Handling
+
+### HTTP Status Codes
+
+- `200` - Success
+- `201` - Created
+- `400` - Bad Request (validation error)
+- `401` - Unauthorized
+- `403` - Forbidden
+- `404` - Not Found
+- `429` - Rate Limited
+- `500` - Internal Server Error
+
+### Error Response Examples
+
+#### Validation Error (400)
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid input parameters",
+    "details": [
+      "Field 'title' is required",
+      "Field 'priority' must be one of: critical, high, medium, low"
+    ]
+  }
+}
+```
+
+#### Not Found (404)
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Ticket with ID 999 not found"
+  }
+}
+```
+
+#### Rate Limited (429)
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "RATE_LIMITED",
+    "message": "Too many requests. Try again in 60 seconds.",
+    "retry_after": 60
+  }
+}
+```
+
+## Rate Limiting
+
+API requests are limited to prevent abuse:
+
+- **General Endpoints:** 100 requests per minute
+- **Import Endpoints:** 10 requests per minute
+- **Authentication:** 20 requests per minute
+
+Rate limit headers are included in responses:
+```http
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1693123200
+```
+
+## SDK and Examples
+
+### JavaScript/Node.js Example
+
+```javascript
+const axios = require('axios');
+
+const hextrackr = axios.create({
+  baseURL: 'http://localhost:8080/api',
+  timeout: 10000
+});
+
+// Create a new ticket
+async function createTicket(ticketData) {
+  try {
+    const response = await hextrackr.post('/tickets', ticketData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating ticket:', error.response.data);
+    throw error;
+  }
+}
+
+// Usage
+const newTicket = {
+  title: 'Security Alert - Malware Detected',
+  description: 'Antivirus detected malware on user workstation',
+  priority: 'high',
+  device_id: 123
+};
+
+createTicket(newTicket)
+  .then(result => console.log('Ticket created:', result))
+  .catch(error => console.error('Failed:', error));
+```
+
+### Python Example
+
+```python
+import requests
+import json
+
+class HexTrackrAPI:
+    def __init__(self, base_url):
+        self.base_url = base_url
+        self.session = requests.Session()
+    
+    def create_ticket(self, ticket_data):
+        url = f"{self.base_url}/tickets"
+        response = self.session.post(url, json=ticket_data)
+        return response.json()
+    
+    def get_vulnerabilities(self, **filters):
+        url = f"{self.base_url}/vulnerabilities"
+        response = self.session.get(url, params=filters)
+        return response.json()
+
+# Usage
+
+api = HexTrackrAPI('http://localhost:8080/api')
+
+ticket = {
+    'title': 'Network Intrusion Detected',
+    'description': 'IDS detected suspicious network activity',
+    'priority': 'critical'
+}
+
+result = api.create_ticket(ticket)
+print(f"Created ticket: {result['data']['ticket']['id']}")
+```
+
+---
+
+**Target Audience:** Developers, system integrators, automation engineers  
+**API Version:** 1.0  
+**Authentication:** Session-based with API key support planned

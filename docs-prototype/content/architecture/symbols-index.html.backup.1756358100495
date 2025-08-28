@@ -1,0 +1,253 @@
+<div class="documentation-section">
+    <h2><i class="fas fa-list me-2"></i>Symbols Index</h2>
+    <p class="text-muted mb-4">Comprehensive lookup table of all JavaScript symbols and functions in the codebase.</p>
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" id="symbolsSearch" placeholder="Search symbols...">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">All JavaScript Symbols</h3>
+            <div class="card-actions">
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Filter by Type
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" data-filter="all">All</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="function">Functions</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="variable">Variables</a></li>
+                        <li><a class="dropdown-item" href="#" data-filter="class">Classes</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0" id="symbolsTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Type</th>
+                            <th>File</th>
+                            <th>Line</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Core Application Functions -->
+                        <tr data-type="function" data-category="core">
+                            <td><code>debounce</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>scripts/ag-grid-responsive-config.js</td>
+                            <td>18</td>
+                            <td>Utility</td>
+                        </tr>
+                        <tr data-type="function" data-category="core">
+                            <td><code>createVulnerabilityGridOptions</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>scripts/ag-grid-responsive-config.js</td>
+                            <td>33</td>
+                            <td>Grid Configuration</td>
+                        </tr>
+                        <tr data-type="function" data-category="validation">
+                            <td><code>validateAndPrepareDeviceData</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>scripts/validation-utils.js</td>
+                            <td>15</td>
+                            <td>Data Validation</td>
+                        </tr>
+                        
+                        <!-- Ticket Management -->
+                        <tr data-type="function" data-category="tickets">
+                            <td><code>refreshPageData</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>scripts/pages/tickets.js</td>
+                            <td>45</td>
+                            <td>Data Management</td>
+                        </tr>
+                        <tr data-type="function" data-category="tickets">
+                            <td><code>showToast</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>scripts/pages/tickets.js</td>
+                            <td>120</td>
+                            <td>UI Feedback</td>
+                        </tr>
+                        <tr data-type="function" data-category="tickets">
+                            <td><code>openModal</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>scripts/pages/tickets.js</td>
+                            <td>200</td>
+                            <td>Modal Management</td>
+                        </tr>
+                        <tr data-type="function" data-category="tickets">
+                            <td><code>populateModal</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>scripts/pages/tickets.js</td>
+                            <td>245</td>
+                            <td>Modal Management</td>
+                        </tr>
+                        <tr data-type="function" data-category="tickets">
+                            <td><code>saveTicket</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>scripts/pages/tickets.js</td>
+                            <td>350</td>
+                            <td>Data Management</td>
+                        </tr>
+
+                        <!-- Shared Components -->
+                        <tr data-type="function" data-category="shared">
+                            <td><code>initializeSettingsModal</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>scripts/shared/settings-modal.js</td>
+                            <td>25</td>
+                            <td>Settings Management</td>
+                        </tr>
+                        <tr data-type="function" data-category="shared">
+                            <td><code>saveSettingsData</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>scripts/shared/settings-modal.js</td>
+                            <td>180</td>
+                            <td>Settings Management</td>
+                        </tr>
+                        <tr data-type="function" data-category="shared">
+                            <td><code>loadSettingsData</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>scripts/shared/settings-modal.js</td>
+                            <td>220</td>
+                            <td>Settings Management</td>
+                        </tr>
+
+                        <!-- Vulnerabilities Page -->
+                        <tr data-type="function" data-category="vulnerabilities">
+                            <td><code>loadVulnerabilityData</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>vulnerabilities.html</td>
+                            <td>850</td>
+                            <td>Data Loading</td>
+                        </tr>
+                        <tr data-type="function" data-category="vulnerabilities">
+                            <td><code>updateChart</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>vulnerabilities.html</td>
+                            <td>1200</td>
+                            <td>Chart Management</td>
+                        </tr>
+                        <tr data-type="function" data-category="vulnerabilities">
+                            <td><code>toggleMetric</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>vulnerabilities.html</td>
+                            <td>1350</td>
+                            <td>Chart Controls</td>
+                        </tr>
+
+                        <!-- Documentation Portal -->
+                        <tr data-type="class" data-category="docs">
+                            <td><code>DocumentationPortal</code></td>
+                            <td><span class="badge bg-success">Class</span></td>
+                            <td>docs-prototype/js/docs-tabler.js</td>
+                            <td>4</td>
+                            <td>Documentation System</td>
+                        </tr>
+                        <tr data-type="function" data-category="docs">
+                            <td><code>loadSection</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>docs-prototype/js/docs-tabler.js</td>
+                            <td>50</td>
+                            <td>Navigation</td>
+                        </tr>
+                        <tr data-type="function" data-category="docs">
+                            <td><code>performSearch</code></td>
+                            <td><span class="badge bg-primary">Function</span></td>
+                            <td>docs-prototype/js/docs-tabler.js</td>
+                            <td>180</td>
+                            <td>Search</td>
+                        </tr>
+
+                        <!-- Server-side Functions -->
+                        <tr data-type="function" data-category="server">
+                            <td><code>handleVulnerabilityUpload</code></td>
+                            <td><span class="badge bg-warning">Server</span></td>
+                            <td>server.js</td>
+                            <td>150</td>
+                            <td>File Processing</td>
+                        </tr>
+                        <tr data-type="function" data-category="server">
+                            <td><code>validateCsvData</code></td>
+                            <td><span class="badge bg-warning">Server</span></td>
+                            <td>server.js</td>
+                            <td>280</td>
+                            <td>Data Validation</td>
+                        </tr>
+                        <tr data-type="function" data-category="server">
+                            <td><code>insertVulnerabilityData</code></td>
+                            <td><span class="badge bg-warning">Server</span></td>
+                            <td>server.js</td>
+                            <td>350</td>
+                            <td>Database Operations</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h4>Total Functions</h4>
+                    <div class="h1 text-primary" id="functionCount">18</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h4>Files Scanned</h4>
+                    <div class="h1 text-success" id="fileCount">8</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-4">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Usage:</strong> Use the search box to quickly find specific symbols, or use the filter dropdown to view symbols by type. 
+        Click on any symbol name to jump to its detailed documentation in the 
+        <a href="#javascript" data-section="javascript">JavaScript Reference</a>.
+    </div>
+</div>
+
+<script>
+// Simple search functionality for symbols table
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('symbolsSearch');
+    const table = document.getElementById('symbolsTable');
+    
+    if (searchInput && table) {
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            
+            for (let row of rows) {
+                const symbol = row.cells[0].textContent.toLowerCase();
+                const file = row.cells[2].textContent.toLowerCase();
+                const category = row.cells[4].textContent.toLowerCase();
+                
+                if (symbol.includes(searchTerm) || file.includes(searchTerm) || category.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    }
+});
+</script>
