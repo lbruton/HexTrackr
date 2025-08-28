@@ -18,7 +18,7 @@ class HtmlFileGenerator {
     /**
      * Generate HTML content from markdown file
      */
-    async generateHtmlFromMd(mdPath, htmlPath) {
+    async generateHtmlFromMd(mdPath) {
         try {
             // Read the markdown content
             const mdContent = await fs.readFile(mdPath, 'utf8');
@@ -120,7 +120,7 @@ class HtmlFileGenerator {
                 await fs.mkdir(path.dirname(htmlPath), { recursive: true });
 
                 // Generate HTML content
-                const htmlContent = await this.generateHtmlFromMd(mdPath, htmlPath);
+                const htmlContent = await this.generateHtmlFromMd(mdPath);
 
                 // Write HTML file
                 await fs.writeFile(htmlPath, htmlContent);

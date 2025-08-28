@@ -686,7 +686,6 @@ function initServiceNowSettings() {
     const enabledToggle = document.getElementById('serviceNowEnabled');
     const instanceInput = document.getElementById('serviceNowInstance');
     const configDiv = document.getElementById('serviceNowConfig');
-    const urlPreview = document.getElementById('urlPatternPreview');
     const statusBadge = document.getElementById('serviceNowStatus');
     const testButton = document.getElementById('testServiceNowLink');
     const saveButton = document.getElementById('saveServiceNowSettings');
