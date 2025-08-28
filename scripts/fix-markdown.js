@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+/* eslint-env node */
+/* eslint-disable no-console */
+/* global require, module, process, console */
+/* eslint no-undef: "off" */
+
 /**
  * HexTrackr Markdown Formatter
  * Fixes all Codacy markdown violations automatically

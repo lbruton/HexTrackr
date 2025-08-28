@@ -1,10 +1,14 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Frontend Architecture</h1>
+<!-- markdownlint-disable-next-line MD013 -->
 <p>The UI is split into Tickets (Bootstrap/Tabler) and Vulnerabilities (Tabler + AG Grid + ApexCharts). Shared components are loaded first, then page scripts.</p>
 <h2>Pages and frameworks</h2>
 <ul>
 <li>tickets.html: Bootstrap + Tabler styles; JS: scripts/shared/settings-modal.js, scripts/pages/tickets.js</li>
+</ul>
+<!-- markdownlint-disable-next-line MD013 -->
+<ul>
 <li>vulnerabilities.html: Tabler + AG Grid + ApexCharts; JS embedded (ModernVulnManager) with migration target scripts/pages/vulnerabilities.js</li>
 </ul>
 <h2>JavaScript layout</h2>
@@ -16,7 +20,7 @@
 </li>
 <li>scripts/pages/<ul>
 <li>tickets.js: HexagonTicketsManager class handles CRUD, rendering, device list interactions, filtering, and CSV/PDF exports.</li>
-<li>vulnerabilities.js: Placeholder exposing window.refreshPageData and window.showToast for shared modal integration; main logic remains embedded in vulnerabilities.html.</li>
+<li>vulnerabilities.js: Placeholder exposing window.refreshPageData and window.showToast for shared modal integration; main logic remains<br>  embedded in vulnerabilities.html.</li>
 </ul>
 </li>
 </ul>
@@ -63,6 +67,7 @@
 </ul>
 <h2>Symbol tables</h2>
 <h3>scripts/pages/tickets.js (HexagonTicketsManager)</h3>
+<!-- markdownlint-disable MD013 -->
 <table>
 <thead>
 <tr>
@@ -139,7 +144,10 @@
 <td>Displays a toast/snackbar.</td>
 </tr>
 </tbody></table>
+<!-- markdownlint-enable MD013 -->
+
 <h3>vulnerabilities.html (ModernVulnManager - embedded)</h3>
+<!-- markdownlint-disable MD013 -->
 <table>
 <thead>
 <tr>
@@ -186,7 +194,10 @@
 <td>Loads aggregated stats; updates dashboard.</td>
 </tr>
 </tbody></table>
+<!-- markdownlint-enable MD013 -->
+
 <h3>scripts/shared/settings-modal.js (IIFE)</h3>
+<!-- markdownlint-disable MD013 -->
 <table>
 <thead>
 <tr>
@@ -245,6 +256,8 @@
 <td>Build instance-specific ServiceNow link.</td>
 </tr>
 </tbody></table>
+<!-- markdownlint-enable MD013 -->
+
 <h3>scripts/pages/vulnerabilities.js (migration placeholder)</h3>
 <table>
 <thead>

@@ -603,7 +603,7 @@ async function saveSettings() {
         const settings = {
             // API Configuration
             apiEndpoint: document.getElementById('apiEndpoint')?.value || '',
-            refreshInterval: parseInt(document.getElementById('refreshInterval')?.value) || 30,
+            refreshInterval: parseInt(document.getElementById('refreshInterval')?.value, 10) || 30,
             apiKey: document.getElementById('apiKey')?.value || '',
             enableApiAuth: document.getElementById('enableApiAuth')?.checked || false,
             

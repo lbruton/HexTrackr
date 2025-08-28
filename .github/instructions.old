@@ -23,7 +23,7 @@ HexTrackr is a dual-purpose cybersecurity management system:
    - **Working Branch**: `copilot` (for AI development and Codacy integration)
    - **Production Branch**: `main` (for stable releases)
    - Always work on copilot branch, push changes to origin/copilot
-   - Create copilot branch if it doesn't exist: `git checkout -b copilot && git push -u origin copilot`
+   - Create copilot branch if it doesnt exist: `git checkout -b copilot && git push -u origin copilot`
 
 1. **Docker-only for deployment**:  
    - Use `docker-compose up -d` (never run `node server.js` directly)
