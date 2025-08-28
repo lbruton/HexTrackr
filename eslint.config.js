@@ -1,65 +1,109 @@
 export default [
   {
+    // Global configuration for all JavaScript files
     languageOptions: {
-      ecmaVersion: 12,
+      ecmaVersion: 2022,
       sourceType: "module",
       globals: {
+        // Module globals (for Node.js files)
         require: "readonly",
-        process: "readonly",
+        module: "readonly",
+        exports: "readonly",
         __dirname: "readonly",
-        module: "readonly",
+        __filename: "readonly",
+        process: "readonly",
+        Buffer: "readonly",
+        global: "readonly",
         console: "readonly",
-        setTimeout: "readonly"
-      }
-    },
-    rules: {
-      "no-unused-vars": "warn",
-      "no-console": "off",
-      "semi": ["error", "always"],
-      "quotes": ["warn", "single", { "allowTemplateLiterals": true }]
-    }
-  },
-  {
-    files: ["**/scripts/shared/*.js", "**/scripts/pages/*.js", "**/scripts/ag-grid-*.js", "**/scripts/validation-utils.js"],
-    languageOptions: {
-      ecmaVersion: 12,
-      sourceType: "module",
-      globals: {
-        bootstrap: "readonly",
-        Papa: "readonly",
-        JSZip: "readonly",
-        Tabler: "readonly",
-        fetch: "readonly",
-        document: "readonly",
+        // Browser globals (for client-side files)
         window: "readonly",
-        console: "readonly",
-        localStorage: "readonly",
-        URL: "readonly",
-        FormData: "readonly",
-        module: "readonly",
-        FileReader: "readonly",
-        Blob: "readonly",
+        document: "readonly",
         navigator: "readonly",
-        XLSX: "readonly",
-        showNotification: "readonly",
+        localStorage: "readonly",
+        sessionStorage: "readonly",
+        XMLHttpRequest: "readonly",
+        fetch: "readonly",
+        bootstrap: "readonly",
+        // Additional globals for docs and utilities
+        Prism: "readonly",
+        define: "readonly",
+        self: "readonly",
+        clearTimeout: "readonly",
         setTimeout: "readonly",
-        alert: "readonly"
+        Intl: "readonly"
       }
     },
     rules: {
-      "no-unused-vars": "warn",
-      "no-console": "off",
-      "semi": ["error", "always"],
-      "quotes": ["warn", "single", { "allowTemplateLiterals": true }]
+      // Enforce consistent quote style
+      "quotes": ["error", "double"],
+      // Enforce semicolons
+      "semi": ["error", "always"]
     }
   },
   {
+    // Configuration for Node.js scripts
+    files: ["docs-prototype/generate-docs.js", "docs-source/generate-docs.js", "scripts/**/*.js"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: {
+        // Node.js environment globals
+        require: "readonly",
+        module: "readonly",
+        exports: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        process: "readonly",
+        Buffer: "readonly",
+        global: "readonly",
+        console: "readonly"
+      }
+    }
+  },
+  {
+    // Configuration for browser documentation files
+    files: ["docs-prototype/js/*.js"],
+    languageOptions: {
+      globals: {
+        // Browser environment globals for docs
+        window: "readonly",
+        document: "readonly",
+        fetch: "readonly",
+        console: "readonly",
+        bootstrap: "readonly",
+        Prism: "readonly"
+      }
+    }
+  },
+  {
+    // Configuration for shared JavaScript files (enhanced browser globals)
+    files: ["scripts/shared/*.js"],
+    languageOptions: {
+      globals: {
+        // Additional browser-specific globals for shared components
+        alert: "readonly",
+        confirm: "readonly",
+        prompt: "readonly"
+      }
+    }
+  },
+  {
+    // Configuration for page-specific JavaScript files
+    files: ["scripts/pages/*.js"],
+    languageOptions: {
+      globals: {
+        // Page-specific globals can be added here if needed
+      }
+    }
+  },
+  {
+    // Files to ignore
     ignores: [
       "node_modules/**",
-      "docs-prototype/js/docs-tabler.js",
-      "scripts/chart.min.js",
-      "scripts/ag-grid-responsive-config.js",
-      "uploads/**"
+      "dist/**",
+      "build/**",
+      "coverage/**",
+      "*.min.js",
+      "scripts/chart.min.js"
     ]
   }
 ];

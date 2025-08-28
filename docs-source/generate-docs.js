@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const { marked } = require('marked');
+const fs = require("fs");
+const path = require("path");
+const { marked } = require("marked");
 
 /**
  * HexTrackr Documentation Generator - Markdown to Beautiful HTML
@@ -9,9 +9,9 @@ const { marked } = require('marked');
 class MarkdownDocumentationGenerator {
     constructor() {
         this.baseDir = path.dirname(__dirname);
-        this.sourceDir = path.join(this.baseDir, 'docs-source');
-        this.outputDir = path.join(this.baseDir, 'docs-prototype', 'content');
-        this.templatesDir = path.join(this.sourceDir, 'templates');
+        this.sourceDir = path.join(this.baseDir, "docs-source");
+        this.outputDir = path.join(this.baseDir, "docs-prototype", "content");
+        this.templatesDir = path.join(this.sourceDir, "templates");
         
         // Configure marked for beautiful HTML output
         this.configureMarkdown();
@@ -52,15 +52,15 @@ class MarkdownDocumentationGenerator {
         const originalHeading = renderer.heading;
         renderer.heading = function(text, level, raw) {
             const iconMap = {
-                1: 'fas fa-book-open',
-                2: 'fas fa-layer-group', 
-                3: 'fas fa-list-ul',
-                4: 'fas fa-dot-circle',
-                5: 'fas fa-chevron-right',
-                6: 'fas fa-chevron-right'
+                1: "fas fa-book-open",
+                2: "fas fa-layer-group", 
+                3: "fas fa-list-ul",
+                4: "fas fa-dot-circle",
+                5: "fas fa-chevron-right",
+                6: "fas fa-chevron-right"
             };
             
-            const icon = iconMap[level] || 'fas fa-chevron-right';
+            const icon = iconMap[level] || "fas fa-chevron-right";
             const styledText = level <= 2 ? 
                 `<i class="${icon} me-2"></i>${text}` : text;
             
@@ -80,10 +80,10 @@ class MarkdownDocumentationGenerator {
         // Enhanced code blocks
         renderer.code = function(code, language) {
             const validLang = language && language.match(/\S*/)[0];
-            const langClass = validLang ? ` language-${validLang}` : '';
+            const langClass = validLang ? ` language-${validLang}` : "";
             
             return `<div class="code-block mb-3">
-                <pre class="bg-light border rounded p-3${langClass}"><code${langClass ? ` class="${langClass}"` : ''}>${code}</code></pre>
+                <pre class="bg-light border rounded p-3${langClass}"><code${langClass ? ` class="${langClass}"` : ""}>${code}</code></pre>
             </div>`;
         };
 
@@ -105,13 +105,13 @@ class MarkdownDocumentationGenerator {
         
         try {
             templates.base = fs.readFileSync(
-                path.join(this.templatesDir, 'base.html'), 'utf8'
+                path.join(this.templatesDir, "base.html"), "utf8"
             );
             templates.section = fs.readFileSync(
-                path.join(this.templatesDir, 'section.html'), 'utf8'
+                path.join(this.templatesDir, "section.html"), "utf8"
             );
         } catch (error) {
-            console.error('❌ Error loading templates:', error.message);
+            console.error("❌ Error loading templates:", error.message);
             throw error;
         }
 
@@ -122,8 +122,8 @@ class MarkdownDocumentationGenerator {
      * Main generation method - convert all markdown to HTML
      */
     async generateAll() {
-        console.log('🎨 Starting Beautiful Documentation Generation...\n');
-        console.log('📝 Converting Markdown → Styled HTML with Tabler.io\n');
+        console.log("🎨 Starting Beautiful Documentation Generation...\n");
+        console.log("📝 Converting Markdown → Styled HTML with Tabler.io\n");
 
         // Ensure output directories exist
         this.ensureDirectories();
@@ -145,7 +145,7 @@ class MarkdownDocumentationGenerator {
      * Ensure all output directories exist
      */
     ensureDirectories() {
-        const dirs = ['api', 'architecture', 'frameworks', 'code-review'];
+        const dirs = ["api", "architecture", "frameworks", "code-review"];
         dirs.forEach(dir => {
             const fullPath = path.join(this.outputDir, dir);
             if (!fs.existsSync(fullPath)) {
@@ -172,20 +172,20 @@ class MarkdownDocumentationGenerator {
     findMarkdownFiles() {
         const files = [];
         
-        const scanDirectory = (dir, relativePath = '') => {
+        const scanDirectory = (dir, relativePath = "") => {
             const entries = fs.readdirSync(dir);
             
             for (const entry of entries) {
                 const fullPath = path.join(dir, entry);
                 const entryRelativePath = path.join(relativePath, entry);
                 
-                if (fs.statSync(fullPath).isDirectory() && entry !== 'templates') {
+                if (fs.statSync(fullPath).isDirectory() && entry !== "templates") {
                     scanDirectory(fullPath, entryRelativePath);
-                } else if (entry.endsWith('.md')) {
+                } else if (entry.endsWith(".md")) {
                     files.push({
                         fullPath,
                         relativePath: entryRelativePath,
-                        outputPath: entryRelativePath.replace('.md', '.html')
+                        outputPath: entryRelativePath.replace(".md", ".html")
                     });
                 }
             }
@@ -203,7 +203,7 @@ class MarkdownDocumentationGenerator {
         
         try {
             // Read markdown content
-            const markdownContent = fs.readFileSync(fullPath, 'utf8');
+            const markdownContent = fs.readFileSync(fullPath, "utf8");
             
             // Extract metadata if present
             const { content, metadata } = this.extractMetadata(markdownContent);
@@ -212,7 +212,7 @@ class MarkdownDocumentationGenerator {
             const htmlContent = marked(content);
             
             // Apply section template
-            const styledContent = this.applyTemplate('section', {
+            const styledContent = this.applyTemplate("section", {
                 content: htmlContent,
                 custom_styles: this.getCustomStyles(outputPath)
             });
@@ -249,12 +249,12 @@ class MarkdownDocumentationGenerator {
      */
     parseFrontmatter(frontmatter) {
         const metadata = {};
-        const lines = frontmatter.split('\n');
+        const lines = frontmatter.split("\n");
         
         for (const line of lines) {
-            const [key, ...valueParts] = line.split(':');
+            const [key, ...valueParts] = line.split(":");
             if (key && valueParts.length > 0) {
-                metadata[key.trim()] = valueParts.join(':').trim();
+                metadata[key.trim()] = valueParts.join(":").trim();
             }
         }
         
@@ -270,7 +270,7 @@ class MarkdownDocumentationGenerator {
         // Substitute variables
         for (const [key, value] of Object.entries(variables)) {
             const placeholder = `{{${key}}}`;
-            template = template.replace(new RegExp(placeholder, 'g'), value || '');
+            template = template.replace(new RegExp(placeholder, "g"), value || "");
         }
         
         return template;
@@ -281,7 +281,7 @@ class MarkdownDocumentationGenerator {
      */
     getCustomStyles(outputPath) {
         const styleMap = {
-            'architecture/database-schema.html': `
+            "architecture/database-schema.html": `
                 .schema-diagram {
                     display: grid;
                     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -323,7 +323,7 @@ class MarkdownDocumentationGenerator {
                     color: #f57c00;
                 }
             `,
-            'roadmap.html': `
+            "roadmap.html": `
                 .roadmap-status {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     color: white;
@@ -349,32 +349,32 @@ class MarkdownDocumentationGenerator {
             `
         };
         
-        return styleMap[outputPath] || '';
+        return styleMap[outputPath] || "";
     }
 
     /**
      * Generate enhanced components for special sections
      */
     async generateEnhancedComponents() {
-        console.log('\n🎨 Generating Enhanced Components...');
+        console.log("\n🎨 Generating Enhanced Components...");
         
         // Add any special component generation here
-        console.log('   ✓ Enhanced components ready');
+        console.log("   ✓ Enhanced components ready");
     }
 
     /**
      * Update navigation system with new sections
      */
     async updateNavigation() {
-        console.log('\n🧭 Updating Navigation System...');
+        console.log("\n🧭 Updating Navigation System...");
         
         // This would update the docs-tabler.js fileMap
         // For now, we'll just log what sections were created
         const htmlFiles = this.findGeneratedFiles();
         
-        console.log('   ✓ Navigation sections available:');
+        console.log("   ✓ Navigation sections available:");
         htmlFiles.forEach(file => {
-            console.log(`     • ${file.replace('.html', '')}`);
+            console.log(`     • ${file.replace(".html", "")}`);
         });
     }
 
@@ -384,7 +384,7 @@ class MarkdownDocumentationGenerator {
     findGeneratedFiles() {
         const files = [];
         
-        const scanDirectory = (dir, relativePath = '') => {
+        const scanDirectory = (dir, relativePath = "") => {
             const entries = fs.readdirSync(dir);
             
             for (const entry of entries) {
@@ -393,7 +393,7 @@ class MarkdownDocumentationGenerator {
                 
                 if (fs.statSync(fullPath).isDirectory()) {
                     scanDirectory(fullPath, entryRelativePath);
-                } else if (entry.endsWith('.html')) {
+                } else if (entry.endsWith(".html")) {
                     files.push(entryRelativePath);
                 }
             }
@@ -407,13 +407,13 @@ class MarkdownDocumentationGenerator {
      * Show completion statistics
      */
     showCompletionStats() {
-        console.log('\n✅ Beautiful Documentation Generation Complete!');
-        console.log(`📊 Generated documentation:`);
+        console.log("\n✅ Beautiful Documentation Generation Complete!");
+        console.log("📊 Generated documentation:");
         console.log(`   • ${this.stats.markdownFiles} markdown files processed`);
         console.log(`   • ${this.stats.htmlGenerated} HTML files generated`);
-        console.log(`   • Tabler.io styling applied throughout`);
-        console.log(`   • Templates preserved visual consistency`);
-        console.log('\n🎯 Ready for portal integration!\n');
+        console.log("   • Tabler.io styling applied throughout");
+        console.log("   • Templates preserved visual consistency");
+        console.log("\n🎯 Ready for portal integration!\n");
     }
 }
 

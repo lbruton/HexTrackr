@@ -8,13 +8,13 @@
  * Usage: node generate-docs.js [--scan-api] [--scan-functions] [--scan-frameworks] [--all]
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 class HexTrackrDocsGenerator {
     constructor() {
         this.baseDir = path.dirname(__dirname);
-        this.contentDir = path.join(__dirname, 'content');
+        this.contentDir = path.join(__dirname, "content");
         this.standards = this.loadDocumentationStandards();
         this.stats = {
             apiEndpoints: 0,
@@ -38,9 +38,9 @@ class HexTrackrDocsGenerator {
                     /router\.(get|post|put|delete|patch)\s*\(\s*['"`]([^'"`]+)['"`]/g
                 ],
                 // Required sections for each endpoint
-                sections: ['Method', 'Endpoint', 'Parameters', 'Response', 'Example', 'Location'],
+                sections: ["Method", "Endpoint", "Parameters", "Response", "Example", "Location"],
                 // Files to scan for API endpoints
-                scanFiles: ['server.js', 'routes/*.js', 'api/*.js']
+                scanFiles: ["server.js", "routes/*.js", "api/*.js"]
             },
             
             // Function Documentation Standards  
@@ -52,9 +52,9 @@ class HexTrackrDocsGenerator {
                     /([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:\s*function\s*\([^)]*\)/g
                 ],
                 // Required sections for each function
-                sections: ['Purpose', 'Parameters', 'Returns', 'Usage', 'Location'],
+                sections: ["Purpose", "Parameters", "Returns", "Usage", "Location"],
                 // Files to scan for functions
-                scanFiles: ['scripts/**/*.js', 'server.js']
+                scanFiles: ["scripts/**/*.js", "server.js"]
             },
 
             // Framework Documentation Standards
@@ -81,7 +81,7 @@ class HexTrackrDocsGenerator {
                     ]
                 },
                 // Files to scan for framework usage
-                scanFiles: ['**/*.html', '**/*.js', '**/*.css']
+                scanFiles: ["**/*.html", "**/*.js", "**/*.css"]
             }
         };
     }
@@ -90,7 +90,7 @@ class HexTrackrDocsGenerator {
      * Main documentation generation method
      */
     async generateAll() {
-        console.log('🚀 Starting HexTrackr Documentation Generation...\n');
+        console.log("🚀 Starting HexTrackr Documentation Generation...\n");
         
         // Ensure content directories exist
         this.ensureDirectories();
@@ -104,8 +104,8 @@ class HexTrackrDocsGenerator {
         // Update stats and create overview
         await this.updateOverviewStats();
         
-        console.log('\n✅ Documentation generation complete!');
-        console.log(`📊 Generated documentation for:`);
+        console.log("\n✅ Documentation generation complete!");
+        console.log("📊 Generated documentation for:");
         console.log(`   • ${this.stats.apiEndpoints} API endpoints`);
         console.log(`   • ${this.stats.functions} functions`);
         console.log(`   • ${this.stats.frameworks} framework integrations`);
@@ -116,7 +116,7 @@ class HexTrackrDocsGenerator {
      * Ensure all content directories exist
      */
     ensureDirectories() {
-        const dirs = ['api', 'frameworks', 'architecture', 'code-review'];
+        const dirs = ["api", "frameworks", "architecture", "code-review"];
         dirs.forEach(dir => {
             const fullPath = path.join(this.contentDir, dir);
             if (!fs.existsSync(fullPath)) {
@@ -129,13 +129,13 @@ class HexTrackrDocsGenerator {
      * Generate API Documentation by scanning server.js and related files
      */
     async generateAPIDocumentation() {
-        console.log('📋 Generating API Documentation...');
+        console.log("📋 Generating API Documentation...");
         
         const endpoints = [];
-        const serverPath = path.join(this.baseDir, 'server.js');
+        const serverPath = path.join(this.baseDir, "server.js");
         
         if (fs.existsSync(serverPath)) {
-            const serverContent = fs.readFileSync(serverPath, 'utf8');
+            const serverContent = fs.readFileSync(serverPath, "utf8");
             
             // Scan for API endpoints using patterns
             this.standards.api.patterns.forEach(pattern => {
@@ -145,19 +145,19 @@ class HexTrackrDocsGenerator {
                         method: match[1].toUpperCase(),
                         path: match[2],
                         line: this.getLineNumber(serverContent, match.index),
-                        file: 'server.js'
+                        file: "server.js"
                     });
                 }
             });
         }
         
         // Generate ticket management API docs
-        const ticketApiContent = this.generateAPIContent('Ticket Management', endpoints.filter(e => 
-            e.path.includes('ticket') || e.path.includes('/api/')
+        const ticketApiContent = this.generateAPIContent("Ticket Management", endpoints.filter(e => 
+            e.path.includes("ticket") || e.path.includes("/api/")
         ));
         
         fs.writeFileSync(
-            path.join(this.contentDir, 'api', 'tickets.html'),
+            path.join(this.contentDir, "api", "tickets.html"),
             ticketApiContent
         );
         
@@ -169,16 +169,16 @@ class HexTrackrDocsGenerator {
      * Generate comprehensive function documentation
      */
     async generateFunctionDocumentation() {
-        console.log('🔧 Generating Function Documentation...');
+        console.log("🔧 Generating Function Documentation...");
         
         const functions = [];
-        const jsFiles = this.findFiles('**/*.js', [
-            'node_modules',
-            'docs-prototype/generate-docs.js'
+        const jsFiles = this.findFiles("**/*.js", [
+            "node_modules",
+            "docs-prototype/generate-docs.js"
         ]);
         
         jsFiles.forEach(filePath => {
-            const content = fs.readFileSync(filePath, 'utf8');
+            const content = fs.readFileSync(filePath, "utf8");
             const relativePath = path.relative(this.baseDir, filePath);
             
             // Scan for functions using patterns
@@ -199,7 +199,7 @@ class HexTrackrDocsGenerator {
         const functionsContent = this.generateFunctionsContent(functions);
         
         fs.writeFileSync(
-            path.join(this.contentDir, 'architecture', 'functions.html'),
+            path.join(this.contentDir, "architecture", "functions.html"),
             functionsContent
         );
         
@@ -212,13 +212,13 @@ class HexTrackrDocsGenerator {
      * Generate framework usage documentation
      */
     async generateFrameworkDocumentation() {
-        console.log('🎨 Generating Framework Documentation...');
+        console.log("🎨 Generating Framework Documentation...");
         
         const frameworkUsage = {};
-        const webFiles = this.findFiles('**/*.{html,js,css}', ['node_modules', 'docs-prototype']);
+        const webFiles = this.findFiles("**/*.{html,js,css}", ["node_modules", "docs-prototype"]);
         
         webFiles.forEach(filePath => {
-            const content = fs.readFileSync(filePath, 'utf8');
+            const content = fs.readFileSync(filePath, "utf8");
             const relativePath = path.relative(this.baseDir, filePath);
             
             // Check each framework
@@ -229,7 +229,7 @@ class HexTrackrDocsGenerator {
                     if (pattern.test(content)) {
                         frameworkUsage[framework].push({
                             file: relativePath,
-                            usage: 'Detected usage patterns'
+                            usage: "Detected usage patterns"
                         });
                     }
                 });
@@ -241,7 +241,7 @@ class HexTrackrDocsGenerator {
             if (usage.length > 0) {
                 const frameworkContent = this.generateFrameworkContent(framework, usage);
                 fs.writeFileSync(
-                    path.join(this.contentDir, 'frameworks', `${framework}.html`),
+                    path.join(this.contentDir, "frameworks", `${framework}.html`),
                     frameworkContent
                 );
             }
@@ -255,7 +255,7 @@ class HexTrackrDocsGenerator {
      * Generate architecture overview
      */
     async generateArchitectureOverview() {
-        console.log('🏗️ Generating Architecture Overview...');
+        console.log("🏗️ Generating Architecture Overview...");
         
         const overview = {
             structure: this.analyzeProjectStructure(),
@@ -266,11 +266,11 @@ class HexTrackrDocsGenerator {
         const overviewContent = this.generateArchitectureContent(overview);
         
         fs.writeFileSync(
-            path.join(this.contentDir, 'architecture', 'overview.html'),
+            path.join(this.contentDir, "architecture", "overview.html"),
             overviewContent
         );
         
-        console.log('   ✓ Architecture overview generated');
+        console.log("   ✓ Architecture overview generated");
     }
 
     /**
@@ -278,18 +278,18 @@ class HexTrackrDocsGenerator {
      */
     async updateOverviewStats() {
         // This would update the main docs-prototype/index.html with current stats
-        console.log('📊 Updating overview statistics...');
-        console.log('   ✓ Statistics updated');
+        console.log("📊 Updating overview statistics...");
+        console.log("   ✓ Statistics updated");
     }
 
     // Helper Methods
 
     getLineNumber(content, index) {
-        return content.substring(0, index).split('\n').length;
+        return content.substring(0, index).split("\n").length;
     }
 
     findFiles(pattern, exclude = []) {
-        const glob = require('glob');
+        const glob = require("glob");
         const files = glob.sync(pattern, { 
             cwd: this.baseDir,
             ignore: exclude.map(e => `**/${e}/**`)
@@ -299,17 +299,17 @@ class HexTrackrDocsGenerator {
 
     analyzeProjectStructure() {
         return {
-            backend: 'Node.js/Express',
-            database: 'SQLite',
-            frontend: 'Vanilla JS + Tabler.io',
-            deployment: 'Docker'
+            backend: "Node.js/Express",
+            database: "SQLite",
+            frontend: "Vanilla JS + Tabler.io",
+            deployment: "Docker"
         };
     }
 
     analyzeDependencies() {
-        const packagePath = path.join(this.baseDir, 'package.json');
+        const packagePath = path.join(this.baseDir, "package.json");
         if (fs.existsSync(packagePath)) {
-            const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+            const pkg = JSON.parse(fs.readFileSync(packagePath, "utf8"));
             return {
                 dependencies: Object.keys(pkg.dependencies || {}),
                 devDependencies: Object.keys(pkg.devDependencies || {})
@@ -320,9 +320,9 @@ class HexTrackrDocsGenerator {
 
     analyzeDataFlow() {
         return {
-            'Frontend → API': 'JavaScript functions call REST endpoints',
-            'API → Database': 'Express routes query SQLite database',
-            'Database → Frontend': 'JSON responses rendered in UI'
+            "Frontend → API": "JavaScript functions call REST endpoints",
+            "API → Database": "Express routes query SQLite database",
+            "Database → Frontend": "JSON responses rendered in UI"
         };
     }
 
@@ -398,13 +398,13 @@ class HexTrackrDocsGenerator {
 
     generateFrameworkContent(framework, usage) {
         const frameworkInfo = {
-            tabler: { name: 'Tabler.io', description: 'Modern Bootstrap-based UI framework' },
-            bootstrap: { name: 'Bootstrap', description: 'Frontend component framework' },
-            apexcharts: { name: 'ApexCharts', description: 'Interactive chart library' },
-            aggrid: { name: 'AG Grid', description: 'Advanced data grid component' }
+            tabler: { name: "Tabler.io", description: "Modern Bootstrap-based UI framework" },
+            bootstrap: { name: "Bootstrap", description: "Frontend component framework" },
+            apexcharts: { name: "ApexCharts", description: "Interactive chart library" },
+            aggrid: { name: "AG Grid", description: "Advanced data grid component" }
         };
 
-        const info = frameworkInfo[framework] || { name: framework, description: 'Framework integration' };
+        const info = frameworkInfo[framework] || { name: framework, description: "Framework integration" };
 
         let html = `<div class="documentation-section">
     <h2><i class="fas fa-puzzle-piece me-2"></i>${info.name} Integration</h2>
@@ -461,7 +461,7 @@ class HexTrackrDocsGenerator {
                     <ul>
                         ${Object.entries(overview.dataFlow).map(([key, value]) => 
                             `<li><strong>${key}:</strong> ${value}</li>`
-                        ).join('')}
+                        ).join("")}
                     </ul>
                 </div>
             </div>
@@ -474,31 +474,31 @@ class HexTrackrDocsGenerator {
 
     getMethodColor(method) {
         const colors = {
-            'GET': 'success',
-            'POST': 'primary', 
-            'PUT': 'warning',
-            'DELETE': 'danger',
-            'PATCH': 'info'
+            "GET": "success",
+            "POST": "primary", 
+            "PUT": "warning",
+            "DELETE": "danger",
+            "PATCH": "info"
         };
-        return colors[method] || 'secondary';
+        return colors[method] || "secondary";
     }
 
     guessEndpointPurpose(path) {
-        if (path.includes('ticket')) return 'Ticket management operations';
-        if (path.includes('api')) return 'API endpoint for data operations';
-        if (path.includes('export')) return 'Data export functionality';
-        return 'Application endpoint';
+        if (path.includes("ticket")) return "Ticket management operations";
+        if (path.includes("api")) return "API endpoint for data operations";
+        if (path.includes("export")) return "Data export functionality";
+        return "Application endpoint";
     }
 
     guessFunctionPurpose(name) {
-        if (name.includes('save') || name.includes('create')) return 'Data creation/saving';
-        if (name.includes('load') || name.includes('get') || name.includes('fetch')) return 'Data retrieval';
-        if (name.includes('update') || name.includes('edit')) return 'Data modification';
-        if (name.includes('delete') || name.includes('remove')) return 'Data deletion';
-        if (name.includes('export')) return 'Data export';
-        if (name.includes('validate')) return 'Data validation';
-        if (name.includes('format')) return 'Data formatting';
-        return 'Application logic';
+        if (name.includes("save") || name.includes("create")) return "Data creation/saving";
+        if (name.includes("load") || name.includes("get") || name.includes("fetch")) return "Data retrieval";
+        if (name.includes("update") || name.includes("edit")) return "Data modification";
+        if (name.includes("delete") || name.includes("remove")) return "Data deletion";
+        if (name.includes("export")) return "Data export";
+        if (name.includes("validate")) return "Data validation";
+        if (name.includes("format")) return "Data formatting";
+        return "Application logic";
     }
 }
 
@@ -508,12 +508,12 @@ if (require.main === module) {
     
     const args = process.argv.slice(2);
     
-    if (args.length === 0 || args.includes('--all')) {
+    if (args.length === 0 || args.includes("--all")) {
         generator.generateAll();
     } else {
-        if (args.includes('--scan-api')) generator.generateAPIDocumentation();
-        if (args.includes('--scan-functions')) generator.generateFunctionDocumentation();  
-        if (args.includes('--scan-frameworks')) generator.generateFrameworkDocumentation();
+        if (args.includes("--scan-api")) generator.generateAPIDocumentation();
+        if (args.includes("--scan-functions")) generator.generateFunctionDocumentation();  
+        if (args.includes("--scan-frameworks")) generator.generateFrameworkDocumentation();
     }
 }
 
