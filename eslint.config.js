@@ -30,14 +30,14 @@ export default [
         self: "readonly",
         clearTimeout: "readonly",
         setTimeout: "readonly",
-        Intl: "readonly"
+        Intl: "readonly",
       }
     },
     rules: {
       // Enforce consistent quote style
-      "quotes": ["error", "double"],
+      quotes: ["error", "double"],
       // Enforce semicolons
-      "semi": ["error", "always"]
+      semi: ["error", "always"],
     }
   },
   {

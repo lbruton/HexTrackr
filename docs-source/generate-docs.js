@@ -249,8 +249,8 @@ class MarkdownDocumentationGenerator {
         }
         
         // Fall back to filename
-        const filename = path.basename(outputPath, '.html');
-        return filename.charAt(0).toUpperCase() + filename.slice(1).replace(/-/g, ' ');
+        const filename = path.basename(outputPath, ".html");
+        return filename.charAt(0).toUpperCase() + filename.slice(1).replace(/-/g, " ");
     }
 
     /**
