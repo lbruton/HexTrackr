@@ -1,30 +1,89 @@
-<div class="documentation-section">
-    <h2><i class="fas fa-sitemap me-2"></i>Architecture Overview</h2>
-    <p class="text-muted mb-4">Complete system architecture and technology stack.</p>
-    
-    <div class="row g-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header"><h3 class="card-title">Technology Stack</h3></div>
-                <div class="card-body">
-                    <ul>
-                        <li><strong>Backend:</strong> Node.js/Express</li>
-                        <li><strong>Database:</strong> SQLite</li>
-                        <li><strong>Frontend:</strong> Vanilla JS + Tabler.io</li>
-                        <li><strong>Deployment:</strong> Docker</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header"><h3 class="card-title">Data Flow</h3></div>
-                <div class="card-body">
-                    <ul>
-                        <li><strong>Frontend → API:</strong> JavaScript functions call REST endpoints</li><li><strong>API → Database:</strong> Express routes query SQLite database</li><li><strong>Database → Frontend:</strong> JSON responses rendered in UI</li>
-                    </ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr - Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="../../styles/shared/base.css" rel="stylesheet">
+    <link href="../../styles/shared/header.css" rel="stylesheet">
+    <link href="../css/docs-tabler.css" rel="stylesheet">
+</head>
+<body>
+    <div class="page">
+        <!-- Shared Header -->
+        <div id="headerContainer"></div>
+        
+        <div class="page-wrapper">
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h1>HexTrackr System Architecture</h1>
+<h2>1. Overview</h2>
+<p>HexTrackr is a web-based application designed for managing cybersecurity tickets and vulnerabilities. It is built with a Node.js backend, an Express.js framework, and a SQLite database. The application is containerized using Docker for consistent deployment and scalability.</p>
+<h2>2. Core Components</h2>
+<h3>2.1. Backend</h3>
+<ul>
+<li><strong>Framework</strong>: Express.js</li>
+<li><strong>Language</strong>: Node.js</li>
+<li><strong>Database</strong>: SQLite 3</li>
+<li><strong>API</strong>: RESTful API for all data operations.</li>
+</ul>
+<h3>2.2. Frontend</h3>
+<ul>
+<li><strong>Tickets Interface</strong>: <code>tickets.html</code> (Built with Bootstrap 5)</li>
+<li><strong>Vulnerabilities Interface</strong>: <code>vulnerabilities.html</code> (Built with Tabler.io)</li>
+<li><strong>JavaScript</strong>: Modular, with shared components and page-specific scripts.</li>
+</ul>
+<h3>2.3. Data Storage</h3>
+<ul>
+<li><strong>Primary Database</strong>: A single SQLite database file (<code>data/hextrackr.db</code>) stores all application data.</li>
+<li><strong>File Uploads</strong>: Temporary storage in the <code>uploads/</code> directory for processing.</li>
+</ul>
+<h2>3. Deployment</h2>
+<ul>
+<li><strong>Containerization</strong>: The application is designed to run exclusively within a Docker container.</li>
+<li><strong>Orchestration</strong>: <code>docker-compose.yml</code> defines the service, network, and volume configurations.</li>
+<li><strong>Service</strong>: A single <code>hextrackr</code> service runs the Node.js application.</li>
+<li><strong>Port</strong>: The application is accessible on port <code>8080</code>.</li>
+</ul>
+<h2>4. Application Flow</h2>
+<ol>
+<li>The user accesses the application through <code>tickets.html</code> or <code>vulnerabilities.html</code>.</li>
+<li>The frontend makes API calls to the Node.js/Express backend.</li>
+<li>The backend processes requests, interacts with the SQLite database, and returns data in JSON format.</li>
+<li>Data is dynamically rendered on the frontend.</li>
+</ol>
+<h2>5. Key Architectural Patterns</h2>
+<ul>
+<li><strong>Database-First</strong>: The application relies on the SQLite database as the single source of truth.</li>
+<li><strong>Modular JavaScript</strong>: Code is organized into <code>shared/</code> and <code>pages/</code> directories to promote reusability and separation of concerns.</li>
+<li><strong>RESTful API</strong>: A comprehensive set of API endpoints provides CRUD (Create, Read, Update, Delete) functionality for all data entities.</li>
+<li><strong>Stateless Backend</strong>: The backend is largely stateless, with all persistent data stored in the database.</li>
+</ul>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Shared Footer -->
+    <div id="footerContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <!-- Load shared header and footer -->
+    <script src="../../scripts/shared/header-loader.js"></script>
+    <script src="../../scripts/shared/footer-loader.js"></script>
+</body>
+</html>

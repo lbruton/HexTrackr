@@ -1,269 +1,310 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Database Schema - HexTrackr Documentation</title>
-    <!-- Tabler.io CSS Framework -->
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet"/>
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons-sprite.svg" rel="stylesheet"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-    
-    <style>
-        /* Documentation Section Styling */
-        .documentation-section {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            line-height: 1.6;
-        }
-        
-        .documentation-section h2 {
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-        
-        .documentation-section h3 {
-            color: #34495e;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-        
-        .documentation-section h4 {
-            color: #5a6c7d;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            font-weight: 500;
-        }
-        
-        .documentation-section .text-muted {
-            color: #6c757d !important;
-        }
-        
-        .documentation-section code {
-            background: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 0.875em;
-            border: 1px solid #e9ecef;
-        }
-        
-        .documentation-section pre {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            padding: 1rem;
-            overflow-x: auto;
-            margin: 1rem 0;
-        }
-        
-        .documentation-section pre code {
-            background: none;
-            border: none;
-            padding: 0;
-        }
-        
-        .documentation-section .alert {
-            border-radius: 8px;
-            border: none;
-            margin: 1rem 0;
-        }
-        
-        .documentation-section .card {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .documentation-section .card-header {
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-            padding: 1rem 1.25rem;
-        }
-        
-        .documentation-section .card-body {
-            padding: 1.25rem;
-        }
-        
-        .documentation-section .badge {
-            font-size: 0.75em;
-            padding: 0.35em 0.65em;
-        }
-        
-        .documentation-section table {
-            margin: 1rem 0;
-        }
-        
-        .documentation-section .table th {
-            background: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-            font-weight: 600;
-            color: #495057;
-        }
-        
-        .documentation-section .table td {
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .documentation-section .table-striped tbody tr:nth-of-type(odd) {
-            background-color: #f8f9fa;
-        }
-        
-        /* Custom component styling for documentation */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        
-        .stat-card {
-            text-align: center;
-            padding: 1.5rem;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-label {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-        
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .documentation-section {
-                padding: 1rem;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
-            }
-            
-            .stat-card {
-                padding: 1rem;
-            }
-            
-            .stat-number {
-                font-size: 2rem;
-            }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr - Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="../../styles/shared/base.css" rel="stylesheet">
+    <link href="../../styles/shared/header.css" rel="stylesheet">
+    <link href="../css/docs-tabler.css" rel="stylesheet">
 </head>
 <body>
-    <div class="documentation-section">
-        <h1>Database Schema</h1>
-<p>Complete database schema documentation for HexTrackr&#39;s SQLite database architecture.</p>
-<h2>Overview</h2>
-<p><strong>Database:</strong> SQLite3 located at <code>data/hextrackr.db</code><br><strong>Initialization:</strong> <code>scripts/init-database.js</code><br><strong>Architecture:</strong> Time-series vulnerability tracking with normalized data structure</p>
-<h2>Database Statistics</h2>
+    <div class="page">
+        <!-- Shared Header -->
+        <div id="headerContainer"></div>
+        
+        <div class="page-wrapper">
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h1>HexTrackr Database Schema</h1>
+<p>This document outlines the schema of the SQLite database used by HexTrackr.</p>
+<h2>1. <code>tickets</code></h2>
+<p>Stores information about cybersecurity tickets.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Column</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left"><strong>Primary Key</strong>. A unique identifier for the ticket.</td>
+</tr>
+<tr>
+<td align="left"><code>location</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The location associated with the ticket.</td>
+</tr>
+<tr>
+<td align="left"><code>devices</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">A JSON array of devices related to the ticket.</td>
+</tr>
+<tr>
+<td align="left"><code>description</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">A description of the ticket.</td>
+</tr>
+<tr>
+<td align="left"><code>urgency</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The urgency level of the ticket.</td>
+</tr>
+<tr>
+<td align="left"><code>category</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The category of the ticket.</td>
+</tr>
+<tr>
+<td align="left"><code>status</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The current status of the ticket (e.g., &#39;Open&#39;). Defaults to &#39;Open&#39;.</td>
+</tr>
+<tr>
+<td align="left"><code>assigned_to</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The user to whom the ticket is assigned.</td>
+</tr>
+<tr>
+<td align="left"><code>created_date</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The date the ticket was created.</td>
+</tr>
+<tr>
+<td align="left"><code>updated_date</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The date the ticket was last updated.</td>
+</tr>
+<tr>
+<td align="left"><code>notes</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Additional notes for the ticket.</td>
+</tr>
+</tbody></table>
+<h2>2. <code>vulnerability_imports</code></h2>
+<p>Tracks metadata for each imported CSV file of vulnerabilities.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Column</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>id</code></td>
+<td align="left"><code>INTEGER</code></td>
+<td align="left"><strong>Primary Key</strong>. Auto-incrementing identifier.</td>
+</tr>
+<tr>
+<td align="left"><code>filename</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The name of the imported CSV file.</td>
+</tr>
+<tr>
+<td align="left"><code>import_date</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The date of the import.</td>
+</tr>
+<tr>
+<td align="left"><code>row_count</code></td>
+<td align="left"><code>INTEGER</code></td>
+<td align="left">The number of rows in the imported file.</td>
+</tr>
+<tr>
+<td align="left"><code>vendor</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The vendor of the vulnerability data (e.g., &#39;cisco&#39;, &#39;tenable&#39;).</td>
+</tr>
+<tr>
+<td align="left"><code>file_size</code></td>
+<td align="left"><code>INTEGER</code></td>
+<td align="left">The size of the file in bytes.</td>
+</tr>
+<tr>
+<td align="left"><code>processing_time</code></td>
+<td align="left"><code>INTEGER</code></td>
+<td align="left">The time taken to process the file in milliseconds.</td>
+</tr>
+<tr>
+<td align="left"><code>raw_headers</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">A JSON array of the original column headers from the CSV.</td>
+</tr>
+<tr>
+<td align="left"><code>created_at</code></td>
+<td align="left"><code>DATETIME</code></td>
+<td align="left">The timestamp of the import record creation. Defaults to <code>CURRENT_TIMESTAMP</code>.</td>
+</tr>
+</tbody></table>
+<h2>3. <code>vulnerabilities</code></h2>
+<p>Contains normalized vulnerability data from imported files.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Column</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>id</code></td>
+<td align="left"><code>INTEGER</code></td>
+<td align="left"><strong>Primary Key</strong>. Auto-incrementing identifier.</td>
+</tr>
+<tr>
+<td align="left"><code>import_id</code></td>
+<td align="left"><code>INTEGER</code></td>
+<td align="left"><strong>Foreign Key</strong> to <code>vulnerability_imports.id</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>hostname</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The hostname of the affected asset.</td>
+</tr>
+<tr>
+<td align="left"><code>ip_address</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The IP address of the affected asset.</td>
+</tr>
+<tr>
+<td align="left"><code>cve</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The CVE identifier of the vulnerability.</td>
+</tr>
+<tr>
+<td align="left"><code>severity</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The severity level (e.g., &#39;Critical&#39;, &#39;High&#39;).</td>
+</tr>
+<tr>
+<td align="left"><code>vpr_score</code></td>
+<td align="left"><code>REAL</code></td>
+<td align="left">The Vulnerability Priority Rating score.</td>
+</tr>
+<tr>
+<td align="left"><code>cvss_score</code></td>
+<td align="left"><code>REAL</code></td>
+<td align="left">The Common Vulnerability Scoring System score.</td>
+</tr>
+<tr>
+<td align="left"><code>first_seen</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The date the vulnerability was first observed.</td>
+</tr>
+<tr>
+<td align="left"><code>last_seen</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The date the vulnerability was last observed.</td>
+</tr>
+<tr>
+<td align="left"><code>plugin_id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The ID of the scanner plugin that detected the vulnerability.</td>
+</tr>
+<tr>
+<td align="left"><code>plugin_name</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The name of the scanner plugin.</td>
+</tr>
+<tr>
+<td align="left"><code>description</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">A description of the vulnerability.</td>
+</tr>
+<tr>
+<td align="left"><code>solution</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The recommended solution for the vulnerability.</td>
+</tr>
+<tr>
+<td align="left"><code>vendor_reference</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">A reference to the vendor&#39;s advisory.</td>
+</tr>
+<tr>
+<td align="left"><code>created_at</code></td>
+<td align="left"><code>DATETIME</code></td>
+<td align="left">The timestamp of the record creation. Defaults to <code>CURRENT_TIMESTAMP</code>.</td>
+</tr>
+</tbody></table>
+<h2>4. <code>ticket_vulnerabilities</code></h2>
+<p>A junction table to link tickets and vulnerabilities.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Column</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>id</code></td>
+<td align="left"><code>INTEGER</code></td>
+<td align="left"><strong>Primary Key</strong>. Auto-incrementing identifier.</td>
+</tr>
+<tr>
+<td align="left"><code>ticket_id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left"><strong>Foreign Key</strong> to <code>tickets.id</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>vulnerability_id</code></td>
+<td align="left"><code>INTEGER</code></td>
+<td align="left"><strong>Foreign Key</strong> to <code>vulnerabilities.id</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>relationship_type</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The nature of the link (e.g., &#39;remediation&#39;). Defaults to &#39;remediation&#39;.</td>
+</tr>
+<tr>
+<td align="left"><code>notes</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Notes about the relationship.</td>
+</tr>
+<tr>
+<td align="left"><code>created_at</code></td>
+<td align="left"><code>DATETIME</code></td>
+<td align="left">The timestamp of the link creation. Defaults to <code>CURRENT_TIMESTAMP</code>.</td>
+</tr>
+</tbody></table>
+<h2>5. Indexes</h2>
 <ul>
-<li><strong>Main Tables:</strong> 4</li>
-<li><strong>Indexes:</strong> 5  </li>
-<li><strong>Foreign Keys:</strong> 2</li>
-<li><strong>Junction Tables:</strong> 1</li>
+<li><code>idx_vulnerabilities_hostname</code> on <code>vulnerabilities(hostname)</code></li>
+<li><code>idx_vulnerabilities_severity</code> on <code>vulnerabilities(severity)</code></li>
+<li><code>idx_vulnerabilities_cve</code> on <code>vulnerabilities(cve)</code></li>
+<li><code>idx_vulnerabilities_import</code> on <code>vulnerabilities(import_id)</code></li>
+<li><code>idx_ticket_vulns_ticket</code> on <code>ticket_vulnerabilities(ticket_id)</code></li>
 </ul>
-<h2>Schema Relationships</h2>
-<h3>tickets</h3>
-<p>Main table for security ticket management and tracking.</p>
-<div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">[object Object]</thead>
-                    <tbody>undefined</tbody>
-                </table>
-            </div><h3>vulnerability_imports</h3>
-<p>Tracks CSV import operations and metadata for vulnerability data.</p>
-<div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">[object Object]</thead>
-                    <tbody>undefined</tbody>
-                </table>
-            </div><h3>vulnerabilities</h3>
-<p>Individual vulnerability records from scanned systems.</p>
-<div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">[object Object]</thead>
-                    <tbody>undefined</tbody>
-                </table>
-            </div><h3>ticket_vulnerabilities</h3>
-<p>Junction table linking tickets to vulnerabilities for relationship tracking.</p>
-<div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">[object Object]</thead>
-                    <tbody>undefined</tbody>
-                </table>
-            </div><h2>Indexes</h2>
-<ol>
-<li><strong>idx_vulnerabilities_import_id</strong> - Optimizes import-based queries</li>
-<li><strong>idx_vulnerabilities_hostname</strong> - Speeds up hostname searches  </li>
-<li><strong>idx_vulnerabilities_cve</strong> - Accelerates CVE lookups</li>
-<li><strong>idx_tickets_status</strong> - Improves status-based filtering</li>
-<li><strong>idx_ticket_vulnerabilities_ticket</strong> - Junction table optimization</li>
-</ol>
-<h2>Foreign Key Constraints</h2>
-<ol>
-<li><p><strong>vulnerabilities.import_id → vulnerability_imports.id</strong></p>
-<ul>
-<li>Maintains referential integrity for import tracking</li>
-<li>Cascade delete removes vulnerabilities when import is deleted</li>
-</ul>
-</li>
-<li><p><strong>ticket_vulnerabilities.ticket_id → tickets.id</strong>  </p>
-<ul>
-<li>Links vulnerabilities to tickets</li>
-<li>Cascade delete removes relationships when ticket is deleted</li>
-</ul>
-</li>
-</ol>
-<h2>Data Flow</h2>
-<h3>Import Process</h3>
-<ol>
-<li>CSV files uploaded to <code>uploads/</code> directory</li>
-<li>Import metadata recorded in <code>vulnerability_imports</code></li>
-<li>Individual records parsed and stored in <code>vulnerabilities</code></li>
-<li>UPSERT operations prevent duplicates based on hostname+CVE+import</li>
-</ol>
-<h3>Ticket Workflow</h3>
-<ol>
-<li>New tickets created in <code>tickets</code> table</li>
-<li>Vulnerabilities linked via <code>ticket_vulnerabilities</code> junction</li>
-<li>Status updates tracked with timestamps</li>
-<li>Device information stored as JSON arrays</li>
-</ol>
-<h3>Query Patterns</h3>
-<p><strong>Common Queries:</strong></p>
-<ul>
-<li>Vulnerabilities by severity: <code>SELECT * FROM vulnerabilities WHERE severity = &#39;Critical&#39;</code></li>
-<li>Tickets by status: <code>SELECT * FROM tickets WHERE status = &#39;Open&#39;</code></li>
-<li>Import history: <code>SELECT * FROM vulnerability_imports ORDER BY import_date DESC</code></li>
-<li>Ticket relationships: Join through <code>ticket_vulnerabilities</code> junction table</li>
-</ul>
-<p><strong>Performance Optimizations:</strong></p>
-<ul>
-<li>Indexed columns for frequent WHERE clauses</li>
-<li>JSON storage for flexible device arrays</li>
-<li>Time-series approach for historical tracking</li>
-<li>Normalized structure reduces data redundancy</li>
-</ul>
-<h2>Schema Evolution</h2>
-<p>The database schema supports:</p>
-<ul>
-<li><strong>Backward compatibility</strong> - New columns added with defaults</li>
-<li><strong>Migration scripts</strong> - Schema updates through versioned migrations  </li>
-<li><strong>Data integrity</strong> - Foreign key constraints and validation</li>
-<li><strong>Performance</strong> - Strategic indexing for common access patterns</li>
-</ul>
-<p>This architecture enables efficient vulnerability tracking while maintaining flexibility for ticket management workflows.</p>
 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Shared Footer -->
+    <div id="footerContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <!-- Load shared header and footer -->
+    <script src="../../scripts/shared/header-loader.js"></script>
+    <script src="../../scripts/shared/footer-loader.js"></script>
 </body>
 </html>

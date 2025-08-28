@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr - Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="../../styles/shared/base.css" rel="stylesheet">
+    <link href="../../styles/shared/header.css" rel="stylesheet">
+    <link href="../css/docs-tabler.css" rel="stylesheet">
+</head>
+<body>
+    <div class="page">
+        <!-- Shared Header -->
+        <div id="headerContainer"></div>
+        
+        <div class="page-wrapper">
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h1>Installation Guide</h1>
+<p>This guide provides instructions for installing and configuring the HexTrackr application. The entire application is containerized using Docker, which ensures a consistent and reliable setup process.</p>
+<h2>System Requirements</h2>
+<ul>
+<li><strong>Docker</strong>: You must have Docker and Docker Compose installed on your server or local machine.<ul>
+<li>For server environments, follow the official Docker Engine installation guide for your Linux distribution.</li>
+<li>For local setup, install <a href="httpss://www.docker.com/products/docker-desktop">Docker Desktop</a>.</li>
+</ul>
+</li>
+<li><strong>Git</strong>: A Git client is required to clone the application repository.</li>
+</ul>
+<h2>1. Clone the Repository</h2>
+<p>First, clone the HexTrackr repository to your desired location on the server or your local machine.</p>
+<pre><code class="language-bash">git clone &lt;repository-url&gt;
+cd HexTrackr
+</code></pre>
+<p>Replace <code>&lt;repository-url&gt;</code> with the actual URL of the Git repository.</p>
+<h2>2. Configuration</h2>
+<p>The application is configured to run out-of-the-box with sensible defaults. No mandatory environment variables are required for the initial setup.</p>
+<h3>Port Configuration</h3>
+<ul>
+<li>By default, the application runs on port <code>8080</code>.</li>
+<li>If you need to run the application on a different port, you can modify the <code>docker-compose.yml</code> file. Change the <code>ports</code> mapping from <code>&quot;8080:8080&quot;</code> to <code>&quot;&lt;your-port&gt;:8080&quot;</code>.</li>
+</ul>
+<p>Example for running on port <code>8888</code>:</p>
+<pre><code class="language-yaml">services:
+  app:
+    # ...
+    ports:
+      - &quot;8888:8080&quot;
+    # ...
+</code></pre>
+<h2>3. Build and Launch the Application</h2>
+<p>The application stack is managed by Docker Compose. This single command will build the Docker image and start the application container.</p>
+<p>From the root directory of the project, run:</p>
+<pre><code class="language-bash">docker-compose up -d --build
+</code></pre>
+<p><strong>What this command does:</strong></p>
+<ul>
+<li><strong><code>--build</code></strong>: Forces Docker to build the <code>hextrackr</code> image from the <code>Dockerfile.node</code> before starting the container. This is recommended for the first-time setup to ensure all dependencies are correctly installed.</li>
+<li><strong><code>-d</code></strong>: Runs the container in detached mode, so it continues to run in the background.</li>
+</ul>
+<h2>4. Database and Storage</h2>
+<ul>
+<li><strong>Database</strong>: The application uses a SQLite database. The database file (<code>hextrackr.db</code>) is stored in the <code>data/</code> directory.</li>
+<li><strong>Persistent Storage</strong>: The <code>docker-compose.yml</code> file defines a volume that maps the <code>data/</code> directory on the host machine to the container. This ensures that all database information is preserved even if the container is stopped, removed, or updated.</li>
+<li><strong>Automatic Initialization</strong>: On the first launch, the application will automatically create the <code>hextrackr.db</code> file and set up the necessary tables.</li>
+</ul>
+<h2>5. Verify the Installation</h2>
+<p>To confirm that the application is running correctly, you can check the status of the Docker containers:</p>
+<pre><code class="language-bash">docker-compose ps
+</code></pre>
+<p>The output should show the <code>hextrackr</code> service with a state of <code>Up</code>.</p>
+<p>You can now access the application by navigating to <code>http://localhost:8080/tickets.html</code> or <code>http://localhost:8080/vulnerabilities.html</code> in your web browser (or the custom port you configured).</p>
+<h2>6. Updating the Application</h2>
+<p>To update to a newer version of the application:</p>
+<ol>
+<li>Pull the latest changes from the Git repository: <code>git pull</code></li>
+<li>Re-build and restart the container: <code>docker-compose up -d --build</code></li>
+</ol>
+<p>Docker will pull the latest base image, rebuild the application container with the new code, and restart it. Your data in the <code>data/</code> directory will be preserved.</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Footer -->
+    <div id="footerContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <!-- Load shared header and footer -->
+    <script src="../../scripts/shared/header-loader.js"></script>
+    <script src="../../scripts/shared/footer-loader.js"></script>
+</body>
+</html>
