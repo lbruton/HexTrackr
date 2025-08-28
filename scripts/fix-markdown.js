@@ -8,6 +8,7 @@
  *   node scripts/fix-markdown.js --file=path/to/file.md
  *   node scripts/fix-markdown.js --all
  *   node scripts/fix-markdown.js --dry-run --all
+ *   node scripts/fix-markdown.js --all --dir=docs-source
  */
 
 const fs = require('fs');
@@ -312,13 +313,27 @@ function main() {
         dryRun: args.includes('--dry-run'),
         verbose: args.includes('--verbose') || args.includes('-v'),
         all: args.includes('--all'),
-        file: args.find(arg => arg.startsWith('--file='))?.split('=')[1]
+    file: args.find(arg => arg.startsWith('--file='))?.split('=')[1],
+    dir: args.find(arg => arg.startsWith('--dir='))?.split('=')[1]
     };
 
     console.log('🔧 HexTrackr Markdown Formatter');
     console.log('Fixing Codacy markdown violations...\n');
 
     const formatter = new MarkdownFormatter(options);
+
+    // If a target directory is provided, change into it so relative paths work as expected
+    if (options.dir) {
+        const targetDir = path.resolve(process.cwd(), options.dir);
+        if (!fs.existsSync(targetDir) || !fs.statSync(targetDir).isDirectory()) {
+            console.error(`❌ Directory not found or not a directory: ${options.dir}`);
+            process.exit(1);
+        }
+        if (options.verbose) {
+            console.log(`[${new Date().toISOString()}] Changing working directory to: ${targetDir}`);
+        }
+        process.chdir(targetDir);
+    }
 
     if (options.file) {
         // Format single file
@@ -339,6 +354,7 @@ function main() {
         console.log('  node scripts/fix-markdown.js --all');
         console.log('  node scripts/fix-markdown.js --dry-run --all');
         console.log('  node scripts/fix-markdown.js --verbose --all');
+        console.log('  node scripts/fix-markdown.js --all --dir=docs-source');
         process.exit(1);
     }
 
