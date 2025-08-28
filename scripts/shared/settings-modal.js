@@ -740,7 +740,7 @@ function saveServiceNowSettings() {
         const instanceInput = document.getElementById('serviceNowInstance');
 
         if (!enabledToggle || !instanceInput) {
-            showToast('Settings elements not found', 'error');
+            showNotification('Settings elements not found', 'error');
             return;
         }
 
@@ -748,7 +748,7 @@ function saveServiceNowSettings() {
         if (enabledToggle.checked && instanceInput.value) {
             const url = instanceInput.value.trim();
             if (!url.match(/^https:\/\/.*\.service-now\.com\/?$/)) {
-                showToast('Please enter a valid ServiceNow URL (https://yourorg.service-now.com)', 'error');
+                showNotification('Please enter a valid ServiceNow URL (https://yourorg.service-now.com)', 'error');
                 instanceInput.focus();
                 return;
             }
@@ -761,7 +761,7 @@ function saveServiceNowSettings() {
 
         localStorage.setItem('serviceNowSettings', JSON.stringify(settings));
         updateServiceNowStatus();
-        showToast('ServiceNow settings saved successfully', 'success');
+        showNotification('ServiceNow settings saved successfully', 'success');
 
         // Trigger page refresh if available
         if (window.refreshPageData) {
@@ -769,7 +769,7 @@ function saveServiceNowSettings() {
         }
     } catch (error) {
         console.error('Error saving ServiceNow settings:', error);
-        showToast('Failed to save ServiceNow settings', 'error');
+        showNotification('Failed to save ServiceNow settings', 'error');
     }
 }
 
@@ -823,24 +823,24 @@ function testServiceNowConnection() {
     const enabledToggle = document.getElementById('serviceNowEnabled');
 
     if (!instanceInput || !enabledToggle) {
-        showToast('Settings elements not found', 'error');
+        showNotification('Settings elements not found', 'error');
         return;
     }
 
     if (!enabledToggle.checked) {
-        showToast('Please enable ServiceNow integration first', 'warning');
+        showNotification('Please enable ServiceNow integration first', 'warning');
         return;
     }
 
     const instanceUrl = instanceInput.value.trim();
     if (!instanceUrl) {
-        showToast('Please enter your ServiceNow instance URL', 'warning');
+        showNotification('Please enter your ServiceNow instance URL', 'warning');
         instanceInput.focus();
         return;
     }
 
     if (!instanceUrl.match(/^https:\/\/.*\.service-now\.com\/?$/)) {
-        showToast('Please enter a valid ServiceNow URL format', 'error');
+        showNotification('Please enter a valid ServiceNow URL format', 'error');
         instanceInput.focus();
         return;
     }
@@ -851,7 +851,7 @@ function testServiceNowConnection() {
 
     // Open test link
     window.open(testUrl, '_blank');
-    showToast('Test link opened in new tab', 'info');
+    showNotification('Test link opened in new tab', 'info');
 }
 
 function generateServiceNowUrl(ticketNumber) {

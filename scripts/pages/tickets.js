@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* global fetch, console, localStorage, FileReader, JSZip, URL, XLSX, Blob, navigator, bootstrap, window, document */
+/* global console, localStorage, FileReader, JSZip, URL, XLSX, Blob, navigator, bootstrap, window, document, Tabler */
 
 /**
  * HexTrackr - Tickets Management System
@@ -2086,7 +2086,7 @@ class HexagonTicketsManager {
             });
 
             if (response.ok) {
-                const result = await response.json();
+                await response.json(); // Parse response (not used)
                 // Reload tickets from database to refresh local array
                 await this.loadTicketsFromDB();
                 this.renderTickets();
