@@ -54,7 +54,8 @@ class DocumentationPortal {
                 ],
                 "Project Management": [
                     "index.html",
-                    "roadmap.html"
+                    "roadmap.html",
+                    "codacy-compliance.html"
                 ],
                 "Security": [
                     "index.html",

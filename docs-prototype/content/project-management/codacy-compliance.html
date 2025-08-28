@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr - Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="/styles/shared/base.css" rel="stylesheet">
+    <link href="/styles/shared/header.css" rel="stylesheet">
+    <link href="/docs-prototype/css/docs-tabler.css" rel="stylesheet">
+</head>
+<body>
+    <div class="page">
+        <!-- Shared Header -->
+        <div id="headerContainer"></div>
+        
+        <div class="page-wrapper">
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h1>Codacy Compliance Tracking</h1>
+<p>This page tracks our progress toward resolving all Codacy violations to ensure the codebase meets quality standards before merging to the <code>main</code> branch.</p>
+<h2>Current Violations Checklist</h2>
+<h3><code>server.js</code></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Error Prone: Avoid using console</strong> (2 issues)</li>
+<li><input disabled="" type="checkbox"> <strong>Code Style: Missing semicolon</strong> (Multiple instances)</li>
+<li><input disabled="" type="checkbox"> <strong>Code Style: Use single quotes</strong> (Multiple instances)</li>
+</ul>
+<h3><code>scripts/pages/tickets.js</code></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Error Prone: Unused variable &#39;apiUrl&#39;</strong></li>
+<li><input disabled="" type="checkbox"> <strong>Complexity: Function <code>loadTickets</code> has a high complexity score</strong></li>
+</ul>
+<h3><code>scripts/pages/vulnerabilities.js</code></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Error Prone: Avoid using console</strong> (Multiple issues)</li>
+<li><input disabled="" type="checkbox"> <strong>Code Style: Inconsistent use of tabs and spaces</strong></li>
+</ul>
+<h3><code>docs-prototype/js/docs-tabler.js</code></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Error Prone: &#39;console&#39; is not defined</strong> (Linter environment issue, can be configured)</li>
+<li><input disabled="" type="checkbox"> <strong>Error Prone: &#39;document&#39; is not defined</strong> (Linter environment issue, can be configured)</li>
+<li><input disabled="" type="checkbox"> <strong>Error Prone: &#39;fetch&#39; is not defined</strong> (Linter environment issue, can be configured)</li>
+</ul>
+<h2>Action Plan</h2>
+<ol>
+<li>Address all &quot;Code Style&quot; issues first, as they are typically the quickest to fix.</li>
+<li>Refactor complex functions identified by Codacy to improve maintainability.</li>
+<li>Resolve all &quot;Error Prone&quot; issues, ensuring no unused variables or direct <code>console</code> logs remain in production code.</li>
+<li>Configure the linter to correctly recognize the browser environment for <code>docs-tabler.js</code>.</li>
+</ol>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Footer -->
+    <div id="footerContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <!-- Load shared header and footer -->
+    <script src="/scripts/shared/header-loader.js"></script>
+    <script src="/scripts/shared/footer-loader.js"></script>
+    <script src="/docs-prototype/js/docs-tabler.js"></script>
+</body>
+</html>
