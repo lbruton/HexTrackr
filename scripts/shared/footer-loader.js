@@ -7,7 +7,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const footerContainer = document.getElementById("footerContainer");
     
     if (footerContainer) {
-        fetch("/scripts/shared/footer.html")
+        fetch(
+            (window.HexTrackrConfig && window.HexTrackrConfig.basePath
+                ? window.HexTrackrConfig.basePath.replace(/\/$/, "") + "/scripts/shared/footer.html"
+                : "./scripts/shared/footer.html"
+            )
+        )
             .then(response => response.text())
             .then(footerHTML => {
                 // Create a safe DOM parser to prevent XSS
