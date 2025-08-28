@@ -1,69 +1,151 @@
+<!--
+MARKDOWNLINT COMPLIANCE REQUIRED
+This file MUST pass markdownlint validation before commit.
+Run: node scripts/fix-markdown.js --file=THIS_FILE.md
+Automated validation via pre-commit hooks - DO NOT BYPASS
+-->
+
 # Pre-commit Hooks Documentation
 
 ## Overview
 
-HexTrackr implements an enhanced pre-commit hook system that automatically enforces code quality standards
-before commits reach the repository. This system uses a "graduated approach" that combines safe auto-fixing
-with validation-only checks for critical issues.
+HexTrackr implements an enhanced pre-commit hook system that automatically enforces code quality standards before commits reach the repository. The system uses a pragmatic approach that combines automated fixing with intelligent validation, ensuring code quality while maintaining development velocity.
 
-## Archit### Auto-fix Loop Issuecture
+## System Architecture
 
-### Hook Components
-
-The enhanced pre-commit hook system consists of
-
-- **Markdown Linting**: Auto-fixes formatting issues, validates compliance
-- **ESLint (JavaScript)**: Selective auto-fixing for safe issues, validation for logic/security
-- **Stylelint (CSS)**: Auto-fixes formatting, property order, and style consistency
-- **Codacy Integration**: Supports project goal of <50 total issues for v1.0.3
-
-### File Structure
+### Hook Location and Structure
 
 ```text
 .githooks/
-├── pre-commit              # Active enhanced hook
-├── pre-commit-backup       # Original hook backup
-└── pre-commit-enhanced     # Enhanced hook template
+└── pre-commit              # Enhanced pre-commit hook (executable)
 
-package.json                # Enhanced npm scripts
-eslint.config.mjs          # ESLint configuration (ES modules)
-.stylelintrc.json          # Stylelint configuration
-.markdownlint.json         # Markdownlint configuration
+Configuration Files:
+├── .markdownlint.json       # Markdown rules (MD013, MD046 disabled)
+├── eslint.config.mjs        # ESLint configuration (ES module)
+├── .stylelintrc.json        # Stylelint configuration
+└── scripts/
+    └── fix-markdown.js      # Custom Codacy-compliant markdown fixer
 ```
 
-## Configuration
+### Quality Tools Integration
 
-### ESLint Configuration
+The pre-commit hook integrates three quality tools:
 
-Located in `eslint.config.mjs` (ES module format)
+1. **Custom Markdown Fixer** (`scripts/fix-markdown.js`)
+   - Handles Codacy-specific violations
+   - Fixes MD022, MD032, MD036, MD029, MD024 violations
+   - Compatible with MD013/MD046 disabled rules
 
-```javascript
-export default [
-  {
-    ignores: [
-      "node_modules/**",
-      "**/node_modules/**", 
-      "dist/**",
-      "build/**",
-      "coverage/**",
-      "scripts/chart.min.js"
-    ]
-  },
-  // ... additional configuration
-];
+1. **Stylelint** (CSS/SCSS)
+   - Auto-fixes formatting and property order
+   - Validates CSS standards compliance
+   - Full validation after auto-fix
+
+1. **ESLint** (JavaScript)
+   - Selective auto-fix for safe issues only
+   - Full validation including security and logic checks
+   - Excludes minified files (*.min.js)
+
+## Pre-commit Hook Process
+
+### Execution Flow
+
+The hook executes in this sequence for each staged file type:
+
+1. **File Detection**: Identifies staged files by extension
+2. **Auto-fix Phase**: Applies safe automatic fixes
+3. **Re-staging**: Automatically stages fixed files
+4. **Validation Phase**: Runs full quality checks
+5. **Result Reporting**: Provides detailed feedback
+6. **Commit Decision**: Blocks commit if critical issues remain
+
+### Markdown Processing
+
+```bash
+
+# For each staged *.md file:
+
+node scripts/fix-markdown.js --file="$file"
+
+# Auto-fix Applied:
+
+- Heading spacing (MD022)
+- List spacing (MD032) 
+- Emphasis to heading conversion (MD036)
+- Ordered list numbering (MD029)
+- Duplicate heading detection (MD024)
+
+# Validation: Delegated to Codacy
+
+# (markdownlint CLI --disable flags have compatibility issues)
+
 ```
 
-## Key Features
+### CSS/SCSS Processing
 
-- ES module format (`.mjs` extension)
-- Node.js and browser environment support
-- Comprehensive rule set for code quality
-- Quote style enforcement (double quotes)
-- Security-focused linting rules
+```bash
 
-### Stylelint Issues
+# Auto-fix formatting issues:
 
-Located in `.stylelintrc.json`
+./node_modules/.bin/stylelint --fix $STAGED_CSS_FILES
+
+# Re-stage fixed files:
+
+git add $STAGED_CSS_FILES
+
+# Full validation:
+
+./node_modules/.bin/stylelint $STAGED_CSS_FILES
+```
+
+### JavaScript Processing
+
+```bash
+
+# Safe auto-fix only (suggestion, layout):
+
+./node_modules/.bin/eslint --fix --fix-type suggestion,layout --config eslint.config.mjs $STAGED_JS_FILES
+
+# Re-stage fixed files: (2)
+
+git add $STAGED_JS_FILES
+
+# Full validation (including security, logic):
+
+./node_modules/.bin/eslint --config eslint.config.mjs $STAGED_JS_FILES
+```
+
+## Configuration Details
+
+### Markdown Configuration (.markdownlint.json)
+
+```json
+{
+  "default": true,
+  "MD013": false,  // Line length (disabled - not auto-fixable)
+  "MD033": false,  // HTML tags allowed
+  "MD041": false,  // First line heading requirement disabled
+  "MD046": false   // Code block style (disabled - project preference)
+}
+```
+
+**Note**: MD013 and MD046 are disabled because:
+
+- MD013 (line length) cannot be automatically fixed safely
+- MD046 (code block style) conflicts with project documentation standards
+- Both rules don't affect Codacy quality scores
+- markdownlint CLI `--disable` flags have compatibility issues
+
+### ESLint Configuration (eslint.config.mjs)
+
+Key features:
+
+- ES module format for modern Node.js compatibility
+- Selective auto-fixing with `--fix-type suggestion,layout`
+- Security and logic rules validation-only
+- Excludes minified files and dependencies
+
+### Stylelint Configuration (.stylelintrc.json)
 
 ```json
 {
@@ -77,88 +159,123 @@ Located in `.stylelintrc.json`
 }
 ```
 
-## Key Features: (2)
-
-- Standard CSS linting rules
-- Property validation
-- Color and unit validation
-- Duplicate property detection
-
-### Markdownlint Configuration
-
-Uses existing `.markdownlint.json` with custom HexTrackr formatter in `scripts/fix-markdown.js`.
-
-## Graduated Approach Strategy
-
-### ✅ Safe Auto-fixes (Automatic)
-
-Issues that are automatically fixed and re-staged
-
-## Markdown
-
-- Line wrapping and spacing
-- List formatting consistency
-- Heading spacing requirements
-- Ordered list numbering
-
-## CSS
-
-- Property order standardization
-- Missing semicolons
-- Spacing and indentation
-- Color format consistency
-
-## JavaScript
-
-- Quote style consistency (double quotes)
-- Spacing and indentation
-- Layout formatting
-- Semicolon insertion
-
-### ⚠️ Validation-Only (Manual Review Required)
-
-Issues that block commits and require manual attention
-
-## Security Issues
-
-- XSS vulnerabilities
-- SQL injection patterns
-- Unsafe DOM manipulation
-
-## Logic Issues
-
-- Unused variables
-- Unreachable code
-- Type-related problems
-
-## Breaking Changes
-
-- Function signature modifications
-- Variable scope changes
-- API modifications
-
 ## Installation & Setup
 
 ### Initial Setup
 
 ```bash
 
-# Install git hooks path
+# Install git hooks path (if not already set)
 
-npm run hooks:install
+git config core.hooksPath .githooks
 
-# Verify hook is executable
+# Ensure hook is executable
 
 chmod +x .githooks/pre-commit
 
-# Test hook functionality
+# Install dependencies
+
+npm install
+
+# Test hook manually
 
 ./.githooks/pre-commit
 ```
 
+### Verify Installation
+
+```bash
+
+# Check git hooks configuration
+
+git config core.hooksPath
+
+# Should output: .githooks
+
+# Check hook permissions
+
+ls -la .githooks/pre-commit
+
+# Should show: -rwxr-xr-x (executable)
+
+```
+
+## Usage and Workflow
+
+### Normal Development Workflow
+
+```bash
+
+# 1. Make changes to files
+
+vim some-file.js
+
+# 2. Stage changes
+
+git add .
+
+# 3. Commit (pre-commit hook runs automatically)
+
+git commit -m "your commit message"
+
+# Hook output example:
+
+[pre-commit] Running code quality checks...
+[pre-commit] Checking Markdown files...
+[pre-commit] Auto-fixing Markdown issues...
+📊 Markdown Formatting Results:
+Files processed: 2
+Total fixes applied: 5
+[pre-commit] Markdown auto-fix complete (validation delegated to Codacy)
+[pre-commit] All code quality checks passed! ✅
+```
+
+### When Pre-commit Hook Fails
+
+```bash
+
+# Example failure output:
+
+[pre-commit] ESLint validation failed
+[pre-commit] Run 'npm run eslint' to see details
+[pre-commit] Code quality checks failed. Please fix issues before committing.
+[pre-commit] Tip: Some issues were auto-fixed and staged. Review changes with 'git diff --cached'
+
+# Steps to resolve:
+
+1. Review what was auto-fixed: git diff --cached
+2. Check specific issues: npm run eslint
+3. Fix remaining issues manually
+4. Stage fixes: git add .
+5. Retry commit: git commit -m "your message"
+
+```
+
+## Manual Quality Control Commands
+
+### Individual Tool Commands
+
+```bash
+
+# Markdown fixing
+
+node scripts/fix-markdown.js --file=docs/example.md
+node scripts/fix-markdown.js --all
+
+# ESLint
+
+npm run eslint                    # Check only
+npm run eslint:fix               # Safe auto-fix
+
+# Stylelint  
+
+npm run stylelint                # Check only
+npm run stylelint:fix            # Auto-fix
+```
+
 ### Package.json Scripts
 
-Enhanced npm scripts for manual quality control
+The following npm scripts are available for manual quality control:
 
 ```json
 {
@@ -169,301 +286,226 @@ Enhanced npm scripts for manual quality control
     "eslint:fix": "eslint '**/*.js' --ignore-pattern '**/*.min.js' --config eslint.config.mjs --fix",
     "stylelint": "stylelint '**/*.css'",
     "stylelint:fix": "stylelint '**/*.css' --fix",
-    "lint:md": "markdownlint --config .markdownlint.json --ignore-path .markdownlintignore '**/*.md'",
-    "lint:md:fix": "node scripts/fix-markdown.js"
+    "lint:md:fix": "node scripts/fix-markdown.js --all"
   }
 }
 ```
 
-## Hook Workflow
+## Codacy Integration
 
-### Execution Flow
+### Quality Workflow
 
-1. **Stage Detection**: Identifies staged files by type (.md, .css, .js)
-2. **Auto-fixing Phase**: Runs safe auto-fixes for each file type
-3. **Re-staging**: Automatically stages auto-fixed files
-4. **Validation Phase**: Runs full validation on all files
-5. **Result Reporting**: Provides detailed feedback with line numbers
-6. **Commit Decision**: Allows commit only if all validations pass
+The pre-commit hooks support the established Codacy compliance workflow:
 
-### Sample Output
+1. **Pre-commit**: Automatically fixes formatting issues before they reach Codacy
+2. **Codacy Analysis**: Focuses on logic, security, and complex issues
+3. **Developer Focus**: Manual attention only needed for critical issues
+4. **Target Goal**: Maintain <50 total Codacy issues for production releases
 
-```bash
-[pre-commit] Running code quality checks...
+### Issue Categories
 
-[pre-commit] Checking Markdown files...
-[pre-commit] Auto-fixing Markdown issues...
-📊 Markdown Formatting Results
-Files processed: 2
-Total fixes applied: 15
-✅ [pre-commit] Markdown validation passed
+## Auto-fixed by Pre-commit:
 
-[pre-commit] Checking CSS/SCSS files...
-[pre-commit] Auto-fixing CSS issues...
-✅ [pre-commit] CSS validation passed
+- Markdown formatting (heading spacing, list formatting)
+- CSS property order and formatting
+- JavaScript quote style and indentation
+- Basic syntax and layout issues
 
-[pre-commit] Checking JavaScript files...
-[pre-commit] Auto-fixing safe JavaScript issues...
-✅ [pre-commit] JavaScript validation passed
+## Requires Manual Attention (Codacy alerts):
 
-✅ [pre-commit] All code quality checks passed! ✅
-```
-
-### Error Handling
-
-When validation fails
-
-```bash
-❌ [pre-commit] ESLint validation failed
-[pre-commit] Run 'npm run eslint' to see details
-
-[pre-commit] Code quality checks failed. Please fix issues before committing.
-[pre-commit] Tip: Some issues were auto-fixed and staged. Review changes with 'git diff --cached'
-```
-
-## Manual Commands
-
-### Diagnostic Commands
-
-```bash
-
-# Check all file types
-
-npm run lint:all
-
-# Check specific file types
-
-npm run eslint
-npm run stylelint
-npm run lint:md
-
-# Auto-fix all safe issues
-
-npm run fix:all
-
-# Auto-fix specific file types
-
-npm run eslint:fix
-npm run stylelint:fix
-npm run lint:md:fix
-```
-
-### Testing Hook Functionality
-
-```bash
-
-# Test the hook manually
-
-./.githooks/pre-commit
-
-# Test with specific files
-
-git add specific-file.js
-./.githooks/pre-commit
-
-# Bypass hook for emergency commits (NOT RECOMMENDED)
-
-git commit --no-verify -m "Emergency commit"
-```
-
-## Integration with Codacy
-
-### Workflow Enhancement
-
-The pre-commit hooks support the established Codacy workflow
-
-1. **Pre-commit**: Catches and fixes formatting issues automatically
-2. **Codacy Dashboard**: User focuses on logic and security issues
-3. **Manual Selection**: Reduced workload due to fewer formatting issues
-4. **Systematic Fixes**: AI handles implementation of user-selected patterns
-
-### Impact on Issue Count
-
-## Before Enhanced Hooks
-
-- 83 total Codacy issues
-- Manual selection required for all issues
-- High ratio of formatting issues
-
-## After Enhanced Hooks
-
-- Formatting issues auto-fixed before commit
-- Focus on critical logic/security issues
-- Target: <50 issues for v1.0.3 release
+- Security vulnerabilities
+- Logic errors and unused variables
+- Complex code quality issues
+- Performance optimizations
 
 ## Troubleshooting
 
-### Common Issues
+### Common Issues and Solutions
 
-## ESLint Configuration Error
-
-```bash
-
-# Error: Unexpected token 'export'
-
-# Solution: Ensure package.json has correct config reference
-
-"eslint": "eslint '**/*.js' --config eslint.config.mjs"
-```
-
-## Permission Issues
+#### Permission Denied
 
 ```bash
 
-# Make hook executable
+# Problem: ./githooks/pre-commit: Permission denied
+
+# Solution:
 
 chmod +x .githooks/pre-commit
+```
 
-# Verify git hooks path
+#### Hook Not Running
+
+```bash
+
+# Problem: Hook doesn't execute during commit
+
+# Check git hooks path:
+
+git config core.hooksPath
+
+# If empty, set it:
 
 git config core.hooksPath .githooks
 ```
 
-## Markdown Formatting Loop
+#### ESLint Configuration Error
 
 ```bash
 
-# If markdown auto-fixer runs repeatedly
+# Problem: Unexpected token 'export' in eslint.config.mjs
 
-# Check for complex formatting issues that need manual attention
+# Solution: Ensure Node.js 16+ and proper config reference
 
-# Use git diff --cached to see what changes are being made
-
+node --version  # Should be 16+
 ```
 
-```text
+#### Markdownlint Issues
 
-**Markdown Formatting Loop:**
 ```bash
 
-# If markdown auto-fixer runs repeatedly (2)
+# Problem: Markdownlint CLI --disable flags not working
 
-# Check for complex formatting issues that need manual attention (2)
+# Current Solution: Custom script handles Codacy violations
 
-# Use git diff --cached to see what changes are being made (2)
+# Validation delegated to Codacy for reliability
 
 ```
-
-### Performance Considerations
-
-## Large Codebase Optimization
-
-- Hook only processes staged files
-- Ignores patterns defined in each linter's configuration
-- Uses selective auto-fixing to minimize processing time
-
-## File Type Filtering
-
-- `.min.js` files excluded from JavaScript linting
-- `node_modules/` directories ignored
-- Binary files automatically skipped
-
-## Best Practices
-
-### Commit Workflow
-
-1. **Stage Changes**: `git add .`
-2. **Let Hook Run**: Automatic during `git commit`
-3. **Review Auto-fixes**: `git diff --cached` if needed
-4. **Address Failures**: Fix validation issues manually
-5. **Commit Success**: Proceed when all checks pass
-
-### Development Guidelines
-
-## Safe Auto-fix Categories
-
-- Formatting and style consistency
-- Whitespace and indentation
-- Quote style standardization
-- Property order in CSS
-
-## Manual Review Categories
-
-- Logic modifications
-- Security vulnerabilities
-- Variable scope changes
-- API modifications
 
 ### Emergency Procedures
 
-## Bypass Hook (Emergency Only)
+#### Bypass Hook (Emergency Only)
 
 ```bash
-git commit --no-verify -m "Emergency: brief description"
+
+# ONLY for critical hotfixes - use sparingly
+
+git commit --no-verify -m "Emergency fix: brief description"
+
+# Follow up immediately with quality fixes:
+
+npm run fix:all
+git add .
+git commit -m "fix: resolve quality issues from emergency commit"
 ```
 
-## Restore Previous Hook
+#### Restore Functionality
 
 ```bash
-cp .githooks/pre-commit-backup .githooks/pre-commit
+
+# If hook becomes corrupted, restore from git:
+
+git checkout HEAD -- .githooks/pre-commit
+chmod +x .githooks/pre-commit
 ```
 
-## Maintenance
+## Technical Implementation Details
 
-### Regular Updates
+### File Processing Logic
 
-## Monthly Review
+The hook uses git's staging area efficiently:
 
-- Check for new ESLint/Stylelint rules
-- Update configuration based on Codacy dashboard patterns
-- Review auto-fix effectiveness
+```bash
 
-## Configuration Updates
+# Detect staged files by type
 
-- Update rule severity based on project needs
-- Add new file patterns to ignore lists
-- Adjust auto-fix scope based on safety assessment
+STAGED_MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.md$' || true)
+STAGED_CSS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(css|scss)$' || true)
+STAGED_JS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.js$' | grep -v '\.min\.js$' || true)
 
-### Version Compatibility
+# Process only if files exist
 
-## Dependencies
+if [ -n "$STAGED_MD_FILES" ]; then
 
-- ESLint 9.34.0+
-- Stylelint 16.23.1+
-- markdownlint-cli 0.41.0+
+    # Process markdown files
 
-## Node.js Compatibility
-
-- Requires Node.js 16+ for ES module support
-- Compatible with npm 8+ and yarn 1.22+
-
-## Security Considerations
+fi
+```
 
 ### Auto-fix Safety
 
-The graduated approach ensures
+The system ensures safe automatic fixes by:
 
-- **No logic changes** in auto-fixes
-- **No variable renaming** or scope modifications
-- **No API changes** or function signature modifications
-- **Format-only changes** that don't affect behavior
+- **Markdown**: Only formatting changes (spacing, numbering)
+- **CSS**: Property order and syntax fixes
+- **JavaScript**: `--fix-type suggestion,layout` only (no logic changes)
+
+### Performance Optimization
+
+- Processes only staged files (not entire codebase)
+- Skips processing when no relevant files are staged
+- Uses efficient file filtering with grep patterns
+- Excludes minified files and dependencies
+
+## Maintenance and Updates
+
+### Regular Maintenance Tasks
+
+#### Monthly Review
+
+- Check Codacy dashboard for new patterns
+- Review auto-fix effectiveness
+- Update configurations based on project needs
+
+#### Dependency Updates
+
+```bash
+
+# Update linting tools
+
+npm update eslint stylelint
+
+# Verify configuration compatibility
+
+npm run lint:all
+```
+
+### Configuration Updates
+
+When modifying linting rules:
+
+1. Test with `npm run lint:all`
+2. Verify pre-commit hook functionality
+3. Update this documentation
+4. Communicate changes to team
+
+### Version Compatibility
+
+## Current Tool Versions:
+
+- Node.js: 16+ (required for ES modules)
+- ESLint: 8.57.0+
+- Stylelint: 16.23.1+
+- markdownlint-cli: 0.41.0+ (for future official integration)
+
+## Security Considerations
+
+### Safe Auto-fix Boundaries
+
+The pre-commit hook only auto-fixes:
+
+- **Format and style**: No logic changes
+- **Syntax fixes**: Semicolons, quotes, spacing
+- **Property order**: CSS property organization
+- **Markdown structure**: Heading and list formatting
+
+### Manual Review Required
+
+Critical issues that block commits:
+
+- Security vulnerabilities (XSS, injection)
+- Logic errors and unused variables
+- Function signature changes
+- API modifications
 
 ### Validation Boundaries
 
-Security-related issues require manual review
+The hook maintains strict separation:
 
-- XSS vulnerability patterns
-- SQL injection detection
-- Unsafe DOM manipulation
-- Dependency vulnerabilities
-
-## Future Enhancements
-
-### Planned Improvements
-
-1. **Performance Optimization**: Parallel linting for large changesets
-2. **Custom Rules**: HexTrackr-specific linting rules
-3. **Integration Testing**: Automated testing of hook functionality
-4. **Metrics Dashboard**: Track fix success rates and patterns
-
-### Consideration Items
-
-1. **IDE Integration**: Pre-commit validation in VS Code
-2. **CI/CD Pipeline**: Mirror pre-commit checks in GitHub Actions
-3. **Team Onboarding**: Automated setup for new developers
-4. **Configuration Management**: Centralized rule management
+- **Auto-fix**: Safe, formatting-only changes
+- **Validation**: Security, logic, and quality checks
+- **Delegation**: Complex validation handled by Codacy
 
 ---
 
-*This documentation is maintained as part of the HexTrackr project and should be updated
-whenever the pre-commit hook system is modified.*
+*This documentation reflects the current implementation as of August 28, 2025. 
+Update this file whenever the pre-commit hook system is modified.*
