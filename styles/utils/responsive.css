@@ -1,7 +1,7 @@
 /* HexTrackr Responsive Utilities - Mobile First */
 
 /* Mobile Responsive Styles */
-@media (width <= 768px) {
+@media (max-width: 768px) {
     /* Grid adjustments */
     #vulnGrid {
         height: 500px;
@@ -60,7 +60,7 @@
     }
 }
 
-@media (width <= 576px) {
+@media (max-width: 576px) {
     /* Further grid optimizations */
     #vulnGrid {
         height: 400px;
@@ -115,7 +115,7 @@
 /* Table responsive wrapper */
 .table-responsive {
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Print styles */
@@ -125,7 +125,7 @@
     }
 
     .card {
-        border: 1px solid #ddd !important;
+        border: 1px solid #dddddd !important;
         box-shadow: none !important;
     }
 
