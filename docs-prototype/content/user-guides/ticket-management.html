@@ -24,25 +24,44 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h1>Ticket Management Guide</h1>
-<p>The Ticket Management interface, available at <code>tickets.html</code>, allows users to track support requests and other operational tasks.</p>
-<h2>Creating a Ticket</h2>
+<p>The Tickets page (<code>/tickets.html</code>) lets you create, edit, filter, and export tickets. Devices can be added per ticket and reordered.</p>
+<h2>Create a ticket</h2>
 <ol>
-<li>Navigate to the <strong>Tickets</strong> page.</li>
-<li>Click the <strong>&quot;New Ticket&quot;</strong> button.</li>
-<li>Fill in the required fields in the modal:<ul>
-<li><strong>Title</strong>: A brief summary of the ticket.</li>
-<li><strong>Description</strong>: Detailed information about the issue or task.</li>
-<li><strong>Status</strong>: The current state of the ticket (e.g., Open, In Progress, Closed).</li>
-<li><strong>Priority</strong>: The urgency of the ticket (e.g., Low, Medium, High).</li>
+<li>Open the Tickets page.</li>
+<li>Click Add Ticket.</li>
+<li>In the modal, fill:<ul>
+<li>XT Number (optional)</li>
+<li>Date Submitted, Date Due</li>
+<li>Hexagon Ticket, ServiceNow Ticket</li>
+<li>Site, Location</li>
+<li>Devices: Add Device to insert rows; drag to reorder; Reverse Order to flip numbering</li>
+<li>Supervisor, Tech, Status, Notes</li>
 </ul>
 </li>
-<li>Click <strong>&quot;Save&quot;</strong> to create the ticket.</li>
+<li>Save to persist.</li>
 </ol>
-<h2>Viewing and Editing Tickets</h2>
+<h2>Edit or delete</h2>
 <ul>
-<li>All tickets are displayed in a table on the main page.</li>
-<li>Click the <strong>&quot;Edit&quot;</strong> button next to a ticket to open the editing modal and update its details.</li>
-<li>Click the <strong>&quot;Delete&quot;</strong> button to remove a ticket.</li>
+<li>Click Edit on a row to modify and save.</li>
+<li>Click Delete to remove; confirm when prompted.</li>
+</ul>
+<h2>Search, filters, pagination</h2>
+<ul>
+<li>Use top search and dropdowns for Site, Location, Status. Results update instantly.</li>
+<li>Pagination controls at the bottom; adjust rows per page to change density.</li>
+</ul>
+<h2>Export and backup</h2>
+<ul>
+<li>Open Settings (gear icon):<ul>
+<li>Export Tickets/Vulnerabilities/All (CSV or JSON)</li>
+<li>Backup data and Restore from zip</li>
+<li>Clear datasets (tickets/vulns/all)</li>
+</ul>
+</li>
+</ul>
+<h2>ServiceNow links</h2>
+<ul>
+<li>Configure your instance in Settings. When enabled, ServiceNow ticket IDs link to your instance.</li>
 </ul>
 
                                 </div>
