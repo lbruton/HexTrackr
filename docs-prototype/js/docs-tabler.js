@@ -284,7 +284,11 @@ class DocumentationPortal {
     }
 
     highlight(text, query) {
-        return text.replace(new RegExp(query, "gi"), (match) => `<span class="bg-yellow-lt">${match}</span>`);
+        return text.replace(new RegExp(this.escapeRegExp(query), "gi"), (match) => `<span class="bg-yellow-lt">${match}</span>`);
+    }
+
+    escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // Escape special characters
     }
 
     // Map a content href to a section path used by the router. Returns

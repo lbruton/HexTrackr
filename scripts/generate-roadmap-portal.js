@@ -184,8 +184,11 @@ function generatePortal() {
     console.log("🔍 Reading roadmap files...");
     
     // Read roadmap files
+    const allowedFiles = ["ROADMAP.md", "UI_UX_ROADMAP.md", "CURRENT_STATUS.md"]; if (!allowedFiles.includes("ROADMAP.md")) throw new Error("Invalid file access");
     const strategicRoadmap = fs.readFileSync(path.join(roadmapsDir, "ROADMAP.md"), "utf8");
+    if (!allowedFiles.includes("UI_UX_ROADMAP.md")) throw new Error("Invalid file access");
     const tacticalRoadmap = fs.readFileSync(path.join(roadmapsDir, "UI_UX_ROADMAP.md"), "utf8");
+    if (!allowedFiles.includes("CURRENT_STATUS.md")) throw new Error("Invalid file access");
     const currentStatus = fs.readFileSync(path.join(roadmapsDir, "CURRENT_STATUS.md"), "utf8");
     
     console.log("🔄 Converting markdown to HTML...");
@@ -364,10 +367,10 @@ function generatePortal() {
 
 // Add npm script integration
 function updatePackageJson() {
-    const packageJsonPath = path.join(__dirname, "../package.json");
+    const packageJsonPath = "../package.json";
     
     try {
-        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+        const packageJson = JSON.parse(fs.readFileSync(path.resolve(packageJsonPath), "utf8"));
         
         if (!packageJson.scripts) {
             packageJson.scripts = {};

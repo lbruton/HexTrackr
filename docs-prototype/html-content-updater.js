@@ -43,7 +43,7 @@ class PathValidator {
 
         // Resolve the path to get absolute path
         const resolvedPath = path.resolve(filePath);
-        const resolvedBase = path.resolve(allowedBaseDir);
+        const resolvedBase = path.resolve(process.cwd(), allowedBaseDir);
 
         // Check if the resolved path is within the allowed base directory
         if (!resolvedPath.startsWith(resolvedBase)) {
@@ -117,9 +117,15 @@ class HtmlContentUpdater {
             for (const item of items) {
                 // Validate item before using in path operations
                 const validatedItem = PathValidator.validatePathComponent(item);
-                const fullPath = path.join(dir, validatedItem);
+                const fullPath = path.resolve(dir, validatedItem);
+                if (!fullPath.startsWith(path.resolve(dir))) {
+                    throw new Error("Attempted directory traversal detected");
+                }
                 const stat = await PathValidator.safeStat(fullPath);
-                const currentRelativePath = path.join(relativePath, validatedItem);
+                const currentRelativePath = path.resolve(relativePath, validatedItem);
+                if (!currentRelativePath.startsWith(path.resolve(relativePath))) {
+                    throw new Error("Attempted directory traversal detected in relative path");
+                }
                 
                 if (stat.isDirectory()) {
                     await findMdFiles(fullPath, currentRelativePath);

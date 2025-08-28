@@ -21,7 +21,7 @@ class PathValidator {
         }
 
         // Resolve the path to get absolute path
-        const resolvedPath = path.resolve(filePath);
+        const resolvedPath = path.resolve(path.normalize(filePath));
         const resolvedBase = path.resolve(allowedBaseDir);
 
         // Check if the resolved path is within the allowed base directory
@@ -34,6 +34,7 @@ class PathValidator {
 
     static safeReadFileSync(filePath, options = "utf8") {
         const validatedPath = PathValidator.validatePath(filePath);
+        if (!fs.existsSync(validatedPath)) throw new Error(`File not found: ${validatedPath}`);
         return fs.readFileSync(validatedPath, options);
     }
 

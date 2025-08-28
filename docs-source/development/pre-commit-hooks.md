@@ -304,14 +304,14 @@ The pre-commit hooks support the established Codacy compliance workflow:
 
 ### Issue Categories
 
-## Auto-fixed by Pre-commit:
+## Auto-fixed by Pre-commit
 
 - Markdown formatting (heading spacing, list formatting)
 - CSS property order and formatting
 - JavaScript quote style and indentation
 - Basic syntax and layout issues
 
-## Requires Manual Attention (Codacy alerts):
+## Requires Manual Attention (Codacy alerts)
 
 - Security vulnerabilities
 - Logic errors and unused variables
@@ -470,7 +470,7 @@ When modifying linting rules:
 
 ### Version Compatibility
 
-## Current Tool Versions:
+## Current Tool Versions
 
 - Node.js: 16+ (required for ES modules)
 - ESLint: 8.57.0+
@@ -507,5 +507,5 @@ The hook maintains strict separation:
 
 ---
 
-*This documentation reflects the current implementation as of August 28, 2025. 
+*This documentation reflects the current implementation as of August 28, 2025.
 Update this file whenever the pre-commit hook system is modified.*
