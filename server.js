@@ -27,7 +27,7 @@ class PathValidator {
         // Validate path components
         const pathComponents = normalizedPath.split(path.sep);
         for (const component of pathComponents) {
-            if (component === ".." || component === "." && pathComponents.length > 1) {
+            if (component === ".." || (component === "." && pathComponents.length > 1)) {
                 throw new Error("Invalid path component");
             }
         }
