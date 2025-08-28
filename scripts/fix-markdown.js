@@ -19,6 +19,99 @@
 const fs = require("fs");
 const path = require("path");
 
+/**
+ * Secure path validation utility to prevent path traversal attacks
+ */
+class PathValidator {
+    static validatePathComponent(component) {
+        if (!component || typeof component !== "string") {
+            throw new Error("Invalid path component: must be a non-empty string");
+        }
+
+        // Check for dangerous characters
+        const dangerousChars = /[<>"|?*\0]/;
+        if (dangerousChars.test(component)) {
+            throw new Error(`Invalid characters in path component: ${component}`);
+        }
+
+        // Check for path traversal attempts
+        if (component.includes("..") || component.startsWith("/") || component.includes("\\")) {
+            throw new Error(`Path traversal attempt detected in component: ${component}`);
+        }
+
+        return component;
+    }
+
+    static safePathJoin(...components) {
+        // Validate each component before joining
+        const validatedComponents = components.map(comp => PathValidator.validatePathComponent(comp));
+        return path.join(...validatedComponents);
+    }
+
+    static validatePath(filePath, allowedBaseDir = process.cwd()) {
+        if (!filePath || typeof filePath !== "string") {
+            throw new Error("Invalid file path: path must be a non-empty string");
+        }
+
+        // Resolve the path to get absolute path
+        const resolvedPath = path.resolve(filePath);
+        const resolvedBase = path.resolve(allowedBaseDir);
+
+        // Check if the resolved path is within the allowed base directory
+        if (!resolvedPath.startsWith(resolvedBase)) {
+            throw new Error(`Path traversal detected: ${filePath} is outside allowed directory ${allowedBaseDir}`);
+        }
+
+        // Additional security checks
+        const normalized = path.normalize(filePath);
+        
+        // Check for dangerous path components
+        const dangerousPatterns = [
+            /\.\./,      // Parent directory traversal
+            /^\//,       // Absolute path (if not intended)
+            /[<>"|?*]/,  // Invalid filename characters
+            /\0/         // Null bytes
+        ];
+
+        for (const pattern of dangerousPatterns) {
+            if (pattern.test(normalized)) {
+                throw new Error(`Potentially dangerous path pattern detected: ${filePath}`);
+            }
+        }
+
+        return resolvedPath;
+    }
+
+    static safeReadFileSync(filePath, options = "utf8") {
+        const validatedPath = PathValidator.validatePath(filePath);
+        return fs.readFileSync(validatedPath, options);
+    }
+
+    static safeWriteFileSync(filePath, data, options = "utf8") {
+        const validatedPath = PathValidator.validatePath(filePath);
+        return fs.writeFileSync(validatedPath, data, options);
+    }
+
+    static safeReaddirSync(dirPath, options = {}) {
+        const validatedPath = PathValidator.validatePath(dirPath);
+        return fs.readdirSync(validatedPath, options);
+    }
+
+    static safeStatSync(filePath) {
+        const validatedPath = PathValidator.validatePath(filePath);
+        return fs.statSync(validatedPath);
+    }
+
+    static safeExistsSync(filePath) {
+        try {
+            const validatedPath = PathValidator.validatePath(filePath);
+            return fs.existsSync(validatedPath);
+        } catch {
+            return false; // If path validation fails, treat as non-existent
+        }
+    }
+}
+
 class MarkdownFormatter {
     constructor(options = {}) {
         this.dryRun = options.dryRun || false;
@@ -229,7 +322,7 @@ class MarkdownFormatter {
         this.log(`Processing: ${filePath}`);
         
         try {
-            let content = fs.readFileSync(filePath, "utf8");
+            let content = PathValidator.safeReadFileSync(filePath, "utf8");
             
             // Apply all fixes in sequence
             content = this.fixHeadingSpacing(content);
@@ -243,12 +336,10 @@ class MarkdownFormatter {
             
             // Ensure file ends with single newline
             content = content.replace(/\n*$/, "\n");
-            
+
             if (!this.dryRun) {
-                fs.writeFileSync(filePath, content);
-            }
-            
-            this.stats.filesProcessed++;
+                PathValidator.safeWriteFileSync(filePath, content);
+            }            this.stats.filesProcessed++;
             this.log(`✅ Formatted: ${filePath}`);
             
         } catch (error) {
@@ -265,11 +356,15 @@ class MarkdownFormatter {
         
         const scanDirectory = (currentDir) => {
             try {
-                const items = fs.readdirSync(currentDir);
+                const items = PathValidator.safeReaddirSync(currentDir);
                 
                 for (const item of items) {
-                    const fullPath = path.join(currentDir, item);
-                    const stat = fs.statSync(fullPath);
+                    // Validate the item name before using in path.join
+                    if (!item || typeof item !== "string") continue;
+                    
+                    // Use safe path joining to prevent path traversal
+                    const fullPath = path.join(currentDir, PathValidator.validatePathComponent(item));
+                    const stat = PathValidator.safeStatSync(fullPath);
                     
                     if (stat.isDirectory()) {
                         // Skip excluded directories
@@ -330,7 +425,7 @@ function main() {
     // If a target directory is provided, change into it so relative paths work as expected
     if (options.dir) {
         const targetDir = path.resolve(process.cwd(), options.dir);
-        if (!fs.existsSync(targetDir) || !fs.statSync(targetDir).isDirectory()) {
+        if (!PathValidator.safeExistsSync(targetDir) || !PathValidator.safeStatSync(targetDir).isDirectory()) {
             console.error(`❌ Directory not found or not a directory: ${options.dir}`);
             process.exit(1);
         }
@@ -342,7 +437,7 @@ function main() {
 
     if (options.file) {
         // Format single file
-        if (!fs.existsSync(options.file)) {
+        if (!PathValidator.safeExistsSync(options.file)) {
             console.error(`❌ File not found: ${options.file}`);
             process.exit(1);
         }

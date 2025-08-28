@@ -1,5 +1,7 @@
 #!/usr/bin/env node
- 
+
+/* eslint-env node */
+/* global require, process, console, module, setTimeout */
 
 /**
  * HTML Content Updater
@@ -10,6 +12,72 @@ require("dotenv").config();
 const fs = require("fs").promises;
 const path = require("path");
 const { marked } = require("marked");
+
+/**
+ * Secure path validation utility to prevent path traversal attacks
+ */
+class PathValidator {
+    static validatePathComponent(component) {
+        if (!component || typeof component !== "string") {
+            throw new Error("Invalid path component: must be a non-empty string");
+        }
+
+        // Check for dangerous characters
+        const dangerousChars = /[<>"|?*\0]/;
+        if (dangerousChars.test(component)) {
+            throw new Error(`Invalid characters in path component: ${component}`);
+        }
+
+        // Check for path traversal attempts
+        if (component.includes("..") || component.startsWith("/") || component.includes("\\")) {
+            throw new Error(`Path traversal attempt detected in component: ${component}`);
+        }
+
+        return component;
+    }
+
+    static validatePath(filePath, allowedBaseDir = process.cwd()) {
+        if (!filePath || typeof filePath !== "string") {
+            throw new Error("Invalid file path: path must be a non-empty string");
+        }
+
+        // Resolve the path to get absolute path
+        const resolvedPath = path.resolve(filePath);
+        const resolvedBase = path.resolve(allowedBaseDir);
+
+        // Check if the resolved path is within the allowed base directory
+        if (!resolvedPath.startsWith(resolvedBase)) {
+            throw new Error(`Path traversal detected: ${filePath} is outside allowed directory ${allowedBaseDir}`);
+        }
+
+        return resolvedPath;
+    }
+
+    static async safeReadFile(filePath, options = "utf8") {
+        const validatedPath = PathValidator.validatePath(filePath);
+        return await fs.readFile(validatedPath, options);
+    }
+
+    static async safeReaddir(dirPath, options = {}) {
+        const validatedPath = PathValidator.validatePath(dirPath);
+        return await fs.readdir(validatedPath, options);
+    }
+
+    static async safeStat(filePath) {
+        const validatedPath = PathValidator.validatePath(filePath);
+        return await fs.stat(validatedPath);
+    }
+
+    static async safeWriteFile(filePath, data, options = "utf8") {
+        const validatedPath = PathValidator.validatePath(filePath);
+        return await fs.writeFile(validatedPath, data, options);
+    }
+
+    static async safeMkdir(dirPath, options = { recursive: true }) {
+        const validatedPath = PathValidator.validatePath(dirPath);
+        return await fs.mkdir(validatedPath, options);
+    }
+}
 
 class HtmlContentUpdater {
     constructor() {
@@ -27,7 +95,7 @@ class HtmlContentUpdater {
     async loadTemplate() {
         try {
             const templatePath = path.join(process.cwd(), "docs-prototype", "template.html");
-            this.templateContent = await fs.readFile(templatePath, "utf8");
+            this.templateContent = await PathValidator.safeReadFile(templatePath, "utf8");
             console.log("📄 Master HTML template loaded.");
         } catch (error) {
             console.error("❌ Fatal Error: Could not load template.html.", error);
@@ -44,16 +112,18 @@ class HtmlContentUpdater {
         const docsProtoDir = path.join(process.cwd(), "docs-prototype/content");
 
         const findMdFiles = async (dir, relativePath = "") => {
-            const items = await fs.readdir(dir);
+            const items = await PathValidator.safeReaddir(dir);
             
             for (const item of items) {
-                const fullPath = path.join(dir, item);
-                const stat = await fs.stat(fullPath);
-                const currentRelativePath = path.join(relativePath, item);
+                // Validate item before using in path operations
+                const validatedItem = PathValidator.validatePathComponent(item);
+                const fullPath = path.join(dir, validatedItem);
+                const stat = await PathValidator.safeStat(fullPath);
+                const currentRelativePath = path.join(relativePath, validatedItem);
                 
                 if (stat.isDirectory()) {
                     await findMdFiles(fullPath, currentRelativePath);
-                } else if (item.endsWith(".md")) {
+                } else if (validatedItem.endsWith(".md")) {
                     const htmlPath = path.join(docsProtoDir, currentRelativePath.replace(".md", ".html"));
                     sources.push({
                         mdPath: fullPath,
@@ -91,7 +161,7 @@ class HtmlContentUpdater {
     async generateHtmlFile(source) {
         try {
             // Read markdown content
-            const markdownContent = await fs.readFile(source.mdPath, "utf8");
+            const markdownContent = await PathValidator.safeReadFile(source.mdPath, "utf8");
             
             // Convert markdown to HTML
             const newHtmlContent = this.markdownToHtml(markdownContent);
@@ -103,10 +173,10 @@ class HtmlContentUpdater {
             );
 
             // Ensure the destination directory exists
-            await fs.mkdir(path.dirname(source.htmlPath), { recursive: true });
+            await PathValidator.safeMkdir(path.dirname(source.htmlPath), { recursive: true });
             
             // Write the final HTML file
-            await fs.writeFile(source.htmlPath, finalHtml);
+            await PathValidator.safeWriteFile(source.htmlPath, finalHtml);
             
             console.log(`✅ Generated HTML: ${source.relativePath.replace(".md", ".html")}`);
             this.stats.filesGenerated++;
@@ -141,7 +211,7 @@ ${generatedFiles.map(file => `- ${file}`).join("\n")}
 The HTML generator successfully created ${this.stats.filesGenerated} HTML files from their corresponding markdown sources using the master template.
 `;
 
-        await fs.writeFile("docs-source/html-update-report.md", report);
+        await PathValidator.safeWriteFile("docs-source/html-update-report.md", report);
         console.log("📋 HTML generation report saved: html-update-report.md");
     }
 
