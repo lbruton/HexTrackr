@@ -23,32 +23,53 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h1>Development Setup</h1>
-<p>Follow these instructions to set up a local development environment for HexTrackr.</p>
-<h2>Environment</h2>
+                                    <h1>Tickets API</h1>
+<p>The Tickets API provides endpoints for creating, reading, updating, and deleting tickets.</p>
+<h2>Endpoints</h2>
+<h3><code>GET /api/tickets</code></h3>
 <ul>
-<li><strong>Runtime</strong>: Node.js</li>
-<li><strong>Database</strong>: SQLite</li>
-<li><strong>Deployment</strong>: Docker</li>
+<li><strong>Description</strong>: Retrieves a list of all tickets.</li>
+<li><strong>Response</strong>: <code>200 OK</code><pre><code class="language-json">[
+  {
+    &quot;id&quot;: 1,
+    &quot;title&quot;: &quot;Example Ticket&quot;,
+    &quot;description&quot;: &quot;This is a test ticket.&quot;,
+    &quot;status&quot;: &quot;Open&quot;,
+    &quot;priority&quot;: &quot;Medium&quot;,
+    &quot;created_at&quot;: &quot;2023-10-27T10:00:00Z&quot;
+  }
+]
+</code></pre>
+</li>
 </ul>
-<h2>Local Setup (without Docker)</h2>
-<p>While Docker is recommended, you can run the application locally for development:</p>
-<ol>
-<li><p><strong>Install Dependencies:</strong></p>
-<pre><code class="language-bash">npm install
+<h3><code>POST /api/tickets</code></h3>
+<ul>
+<li><strong>Description</strong>: Creates a new ticket.</li>
+<li><strong>Request Body</strong>:<pre><code class="language-json">{
+  &quot;title&quot;: &quot;New Ticket Title&quot;,
+  &quot;description&quot;: &quot;Description of the new ticket.&quot;,
+  &quot;status&quot;: &quot;Open&quot;,
+  &quot;priority&quot;: &quot;High&quot;
+}
 </code></pre>
 </li>
-<li><p><strong>Initialize the Database:</strong></p>
-<p>Create the SQLite database and schema.</p>
-<pre><code class="language-bash">node scripts/init-database.js
+<li><strong>Response</strong>: <code>201 Created</code></li>
+</ul>
+<h3><code>PUT /api/tickets/:id</code></h3>
+<ul>
+<li><strong>Description</strong>: Updates an existing ticket.</li>
+<li><strong>Request Body</strong>:<pre><code class="language-json">{
+  &quot;status&quot;: &quot;In Progress&quot;
+}
 </code></pre>
 </li>
-<li><p><strong>Run the Server:</strong></p>
-<pre><code class="language-bash">node server.js
-</code></pre>
-<p>The server will start on <code>http://localhost:8080</code>.</p>
-</li>
-</ol>
+<li><strong>Response</strong>: <code>200 OK</code></li>
+</ul>
+<h3><code>DELETE /api/tickets/:id</code></h3>
+<ul>
+<li><strong>Description</strong>: Deletes a ticket.</li>
+<li><strong>Response</strong>: <code>204 No Content</code></li>
+</ul>
 
                                 </div>
                             </div>

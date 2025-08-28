@@ -23,32 +23,20 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h1>Development Setup</h1>
-<p>Follow these instructions to set up a local development environment for HexTrackr.</p>
-<h2>Environment</h2>
+                                    <h1>Security Overview</h1>
+<p>HexTrackr is designed with security in mind. This document provides an overview of the security measures in place.</p>
+<h2>Data Security</h2>
 <ul>
-<li><strong>Runtime</strong>: Node.js</li>
-<li><strong>Database</strong>: SQLite</li>
-<li><strong>Deployment</strong>: Docker</li>
+<li><strong>Database</strong>: The SQLite database is stored locally on the server. Access is restricted to the backend application.</li>
+<li><strong>File Uploads</strong>: Uploaded CSV files are stored temporarily and processed securely. They are deleted after processing.</li>
+<li><strong>Input Validation</strong>: All user input is validated on the backend to prevent common vulnerabilities such as Cross-Site Scripting (XSS) and SQL Injection.</li>
 </ul>
-<h2>Local Setup (without Docker)</h2>
-<p>While Docker is recommended, you can run the application locally for development:</p>
-<ol>
-<li><p><strong>Install Dependencies:</strong></p>
-<pre><code class="language-bash">npm install
-</code></pre>
-</li>
-<li><p><strong>Initialize the Database:</strong></p>
-<p>Create the SQLite database and schema.</p>
-<pre><code class="language-bash">node scripts/init-database.js
-</code></pre>
-</li>
-<li><p><strong>Run the Server:</strong></p>
-<pre><code class="language-bash">node server.js
-</code></pre>
-<p>The server will start on <code>http://localhost:8080</code>.</p>
-</li>
-</ol>
+<h2>Secure Development</h2>
+<ul>
+<li><strong>Dependencies</strong>: We use <code>npm audit</code> to regularly check for vulnerabilities in our dependencies.</li>
+<li><strong>Docker</strong>: The application is containerized using Docker, which provides process isolation and a controlled environment.</li>
+<li><strong>Code Analysis</strong>: We use static analysis tools like ESLint and Codacy to identify potential security issues in the codebase.</li>
+</ul>
 
                                 </div>
                             </div>
