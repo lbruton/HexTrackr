@@ -211,9 +211,13 @@ class MarkdownDocumentationGenerator {
             // Convert markdown to HTML
             const htmlContent = marked(content);
             
-            // Apply section template
-            const styledContent = this.applyTemplate("section", {
+            // Extract title from content or metadata
+            const title = this.extractTitle(content, metadata, outputPath);
+            
+            // Apply base template (not section!) for complete page
+            const styledContent = this.applyTemplate("base", {
                 content: htmlContent,
+                title: title,
                 custom_styles: this.getCustomStyles(outputPath)
             });
             
@@ -227,6 +231,26 @@ class MarkdownDocumentationGenerator {
         } catch (error) {
             console.error(`❌ Error converting ${fullPath}:`, error.message);
         }
+    }
+
+    /**
+     * Extract title from markdown content or metadata
+     */
+    extractTitle(content, metadata, outputPath) {
+        // First try metadata title
+        if (metadata.title) {
+            return metadata.title;
+        }
+        
+        // Then try first H1 in content
+        const h1Match = content.match(/^#\s+(.+)$/m);
+        if (h1Match) {
+            return h1Match[1].trim();
+        }
+        
+        // Fall back to filename
+        const filename = path.basename(outputPath, '.html');
+        return filename.charAt(0).toUpperCase() + filename.slice(1).replace(/-/g, ' ');
     }
 
     /**
