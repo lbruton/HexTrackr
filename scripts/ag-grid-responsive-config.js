@@ -41,29 +41,29 @@ function createVulnerabilityGridOptions(componentContext) {
     // =================================================================================================
     const columnDefs = [
         {
-            headerName: 'Last Seen',
-            field: 'last_seen',
+            headerName: "Last Seen",
+            field: "last_seen",
             sortable: true,
-            filter: 'agDateColumnFilter',
+            filter: "agDateColumnFilter",
             width: 120,
-            cellRenderer: (params) => params.value ? new Date(params.value).toLocaleDateString() : '-',
+            cellRenderer: (params) => params.value ? new Date(params.value).toLocaleDateString() : "-",
             // Responsive setting for small screens
             hide: window.innerWidth < 576,
         },
         {
-            headerName: 'Hostname',
-            field: 'hostname',
+            headerName: "Hostname",
+            field: "hostname",
             sortable: true,
             filter: true,
             width: 180,
             cellRenderer: (params) => {
-                const hostname = params.value || '-';
+                const hostname = params.value || "-";
                 return `<a href="#" class="fw-bold text-primary text-decoration-none" onclick="vulnManager.viewDeviceDetails('${hostname}')">${hostname}</a>`;
             }
         },
         {
-            headerName: 'IP Address',
-            field: 'ip_address',
+            headerName: "IP Address",
+            field: "ip_address",
             sortable: true,
             filter: true,
             width: 140,
@@ -71,33 +71,33 @@ function createVulnerabilityGridOptions(componentContext) {
             hide: window.innerWidth < 992,
         },
         {
-            headerName: 'Severity',
-            field: 'severity',
+            headerName: "Severity",
+            field: "severity",
             sortable: true,
             filter: true,
             width: 110,
             cellRenderer: (params) => {
-                const severity = params.value || 'Low';
+                const severity = params.value || "Low";
                 const className = `severity-${severity.toLowerCase()}`;
                 return `<span class="severity-badge ${className}">${severity}</span>`;
             }
         },
         {
-            headerName: 'CVE Info',
-            field: 'cve',
+            headerName: "CVE Info",
+            field: "cve",
             sortable: true,
             filter: true,
             width: 150,
             cellRenderer: (params) => {
-                if (params.value && params.value.startsWith('CVE-')) {
+                if (params.value && params.value.startsWith("CVE-")) {
                     return `<a href="#" class="text-decoration-none" onclick="vulnManager.lookupCVE('${params.value}')">${params.value}</a>`;
                 }
-                return params.value || '-';
+                return params.value || "-";
             }
         },
         {
-            headerName: 'Vendor',
-            field: 'vendor',
+            headerName: "Vendor",
+            field: "vendor",
             sortable: true,
             filter: true,
             width: 120,
@@ -105,48 +105,48 @@ function createVulnerabilityGridOptions(componentContext) {
             hide: window.innerWidth < 992,
         },
         {
-            headerName: 'Vulnerability Description',
-            field: 'plugin_name',
+            headerName: "Vulnerability Description",
+            field: "plugin_name",
             sortable: true,
             filter: true,
             flex: 1, // This column will take up the remaining available space
             minWidth: 250,
             wrapText: true,
             autoHeight: true,
-            cellRenderer: (params) => params.value || '-',
+            cellRenderer: (params) => params.value || "-",
         },
         {
-            headerName: 'VPR',
-            field: 'vpr_score',
+            headerName: "VPR",
+            field: "vpr_score",
             sortable: true,
-            filter: 'agNumberColumnFilter',
+            filter: "agNumberColumnFilter",
             width: 90,
             cellRenderer: (params) => {
                 const score = parseFloat(params.value) || 0;
-                let className = 'severity-low';
-                if (score >= 9.0) className = 'severity-critical';
-                else if (score >= 7.0) className = 'severity-high';
-                else if (score >= 4.0) className = 'severity-medium';
+                let className = "severity-low";
+                if (score >= 9.0) className = "severity-critical";
+                else if (score >= 7.0) className = "severity-high";
+                else if (score >= 4.0) className = "severity-medium";
                 return `<span class="severity-badge ${className}">${score.toFixed(1)}</span>`;
             }
         },
         {
-            headerName: 'State',
-            field: 'state',
+            headerName: "State",
+            field: "state",
             sortable: true,
             filter: true,
             width: 100,
             // Responsive setting for small screens
             hide: window.innerWidth < 768,
             cellRenderer: (params) => {
-                const state = params.value || 'open';
-                const className = state === 'open' ? 'badge bg-warning' : 'badge bg-success';
+                const state = params.value || "open";
+                const className = state === "open" ? "badge bg-warning" : "badge bg-success";
                 return `<span class="${className}">${state}</span>`;
             }
         },
         {
-            headerName: 'Actions',
-            field: 'actions',
+            headerName: "Actions",
+            field: "actions",
             width: 120,
             cellRenderer: (params) => {
                 const id = params.data.id || params.node.rowIndex;
@@ -174,7 +174,7 @@ function createVulnerabilityGridOptions(componentContext) {
             filter: true,
         },
         animateRows: true,
-        rowSelection: 'multiple',
+        rowSelection: "multiple",
         suppressRowClickSelection: true,
 
         // --- PAGINATION CONFIGURATION ---
@@ -188,7 +188,7 @@ function createVulnerabilityGridOptions(componentContext) {
         onGridReady: (params) => {
             componentContext.gridApi = params.api;
             // Attach the responsive resize listener using a debounced function
-            window.addEventListener('resize', debounce(() => {
+            window.addEventListener("resize", debounce(() => {
                 if (params.api) {
                     params.api.sizeColumnsToFit();
                 }
@@ -206,7 +206,7 @@ function createVulnerabilityGridOptions(componentContext) {
          * Dynamically updates column visibility based on the grid's width.
          */
         onGridSizeChanged: (params) => {
-            const gridWidth = document.getElementById('vulnGrid').offsetWidth;
+            const gridWidth = document.getElementById("vulnGrid").offsetWidth;
             const columnApi = params.columnApi;
             
             // Define breakpoints for showing/hiding columns
@@ -226,14 +226,14 @@ function createVulnerabilityGridOptions(componentContext) {
             allColumns.forEach(column => {
                 const colId = column.getColId();
                 switch (colId) {
-                    case 'last_seen':
+                    case "last_seen":
                         gridWidth < breakpoints.small ? columnsToHide.push(colId) : columnsToShow.push(colId);
                         break;
-                    case 'ip_address':
-                    case 'vendor':
+                    case "ip_address":
+                    case "vendor":
                         gridWidth < breakpoints.large ? columnsToHide.push(colId) : columnsToShow.push(colId);
                         break;
-                    case 'state':
+                    case "state":
                         gridWidth < breakpoints.medium ? columnsToHide.push(colId) : columnsToShow.push(colId);
                         break;
                     default:
@@ -252,50 +252,3 @@ function createVulnerabilityGridOptions(componentContext) {
 
     return gridOptions;
 }
-
-/**
- * HOW TO INTEGRATE THIS CONFIGURATION:
- * 
- * 1.  **Save this file** as `ag-grid-responsive-config.js` in your `scripts/` directory.
- * 
- * 2.  **Load the script** in `vulnerabilities.html` BEFORE your main script block:
- *     ```html
- *     <!-- Just before the closing </body> tag -->
- *     <script src="scripts/ag-grid-responsive-config.js"></script>
- *     <script>
- *         // The ModernVulnManager class and its initialization
- *         class ModernVulnManager { ... }
- *         document.addEventListener('DOMContentLoaded', () => {
- *             vulnManager = new ModernVulnManager();
- *         });
- *     </script>
- *     ```
- * 
- * 3.  **Modify `ModernVulnManager.initializeGrid()`** in `vulnerabilities.html`:
- *     Replace the entire existing `initializeGrid` method with this:
- *     ```javascript
- *     initializeGrid() {
- *         // Create the grid options using the new configuration function
- *         // We pass `this` so the config can access `this.gridApi`
- *         const gridOptions = createVulnerabilityGridOptions(this);
- * 
- *         const gridDiv = document.getElementById('vulnGrid');
- *         
- *         // Clean up any previous grid instance to prevent memory leaks
- *         if (this.gridApi) {
- *             this.gridApi.destroy();
- *         }
- * 
- *         // Create the new grid
- *         new agGrid.Grid(gridDiv, gridOptions);
- *     }
- *     ```
- *
- * 4. **Ensure the grid container has a defined size**:
- *    In your CSS, make sure the #vulnGrid container can flex and has a height.
- *    For example, in styles.css:
- *    #vulnGrid {
- *        width: 100%;
- *        height: 600px; /* Or a percentage-based height relative to a parent */
- *    }
- */

@@ -3,23 +3,23 @@
  * Loads the shared footer component into any page
  */
 
-document.addEventListener('DOMContentLoaded', function() {
-    const footerContainer = document.getElementById('footerContainer');
+document.addEventListener("DOMContentLoaded", function() {
+    const footerContainer = document.getElementById("footerContainer");
     
     if (footerContainer) {
-        fetch('/scripts/shared/footer.html')
+        fetch("/scripts/shared/footer.html")
             .then(response => response.text())
             .then(footerHTML => {
                 footerContainer.innerHTML = footerHTML;
                 
                 // Update version number if available
-                const versionSpan = document.getElementById('app-version');
+                const versionSpan = document.getElementById("app-version");
                 if (versionSpan && window.HexTrackrConfig && window.HexTrackrConfig.version) {
                     versionSpan.textContent = window.HexTrackrConfig.version;
                 }
             })
             .catch(error => {
-                console.warn('Failed to load shared footer:', error);
+                console.warn("Failed to load shared footer:", error);
                 // Fallback footer
                 footerContainer.innerHTML = `
                     <footer class="footer footer-transparent d-print-none mt-5">

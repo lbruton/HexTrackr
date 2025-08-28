@@ -5,14 +5,14 @@
  * Analyzes the current state of HTML and MD files to create a 1:1 mapping plan
  */
 
-const fs = require('fs').promises;
-const path = require('path');
+const fs = require("fs").promises;
+const path = require("path");
 
 class DocumentationMapper {
     constructor() {
         this.baseDir = process.cwd();
-        this.docsSourceDir = path.join(this.baseDir, 'docs-source');
-        this.htmlContentDir = path.join(this.baseDir, 'docs-prototype', 'content');
+        this.docsSourceDir = path.join(this.baseDir, "docs-source");
+        this.htmlContentDir = path.join(this.baseDir, "docs-prototype", "content");
         
         this.mapping = {
             matched: [],
@@ -28,7 +28,7 @@ class DocumentationMapper {
     async getMdFiles() {
         const mdFiles = [];
         
-        async function scanDirectory(dir, relativePath = '') {
+        async function scanDirectory(dir, relativePath = "") {
             try {
                 const entries = await fs.readdir(dir);
                 
@@ -39,7 +39,7 @@ class DocumentationMapper {
                     
                     if (stat.isDirectory()) {
                         await scanDirectory(fullPath, relativeFilePath);
-                    } else if (entry.endsWith('.md') && !entry.includes('.backup.')) {
+                    } else if (entry.endsWith(".md") && !entry.includes(".backup.")) {
                         mdFiles.push({
                             name: entry,
                             relativePath: relativeFilePath,
@@ -63,7 +63,7 @@ class DocumentationMapper {
     async getHtmlFiles() {
         const htmlFiles = [];
         
-        async function scanDirectory(dir, relativePath = '') {
+        async function scanDirectory(dir, relativePath = "") {
             try {
                 const entries = await fs.readdir(dir);
                 
@@ -74,7 +74,7 @@ class DocumentationMapper {
                     
                     if (stat.isDirectory()) {
                         await scanDirectory(fullPath, relativeFilePath);
-                    } else if (entry.endsWith('.html') && !entry.includes('.backup.')) {
+                    } else if (entry.endsWith(".html") && !entry.includes(".backup.")) {
                         htmlFiles.push({
                             name: entry,
                             relativePath: relativeFilePath,
@@ -108,7 +108,7 @@ class DocumentationMapper {
                     
                     if (stat.isDirectory()) {
                         await scanDirectory(fullPath);
-                    } else if (entry.includes('.backup.')) {
+                    } else if (entry.includes(".backup.")) {
                         backupFiles.push({
                             name: entry,
                             fullPath: fullPath
@@ -128,7 +128,7 @@ class DocumentationMapper {
      * Create mapping between HTML and MD files
      */
     async createMapping() {
-        console.log('🔍 Analyzing documentation file structure...');
+        console.log("🔍 Analyzing documentation file structure...");
         
         const mdFiles = await this.getMdFiles();
         const htmlFiles = await this.getHtmlFiles();
@@ -143,7 +143,7 @@ class DocumentationMapper {
             const expectedMdPath = this.htmlToMdPath(htmlFile.relativePath);
             const matchingMd = mdFiles.find(md => 
                 md.relativePath === expectedMdPath || 
-                md.relativePath === expectedMdPath.replace('.html', '.md')
+                md.relativePath === expectedMdPath.replace(".html", ".md")
             );
             
             if (matchingMd) {
@@ -183,14 +183,14 @@ class DocumentationMapper {
      * Convert HTML file path to expected MD path
      */
     htmlToMdPath(htmlPath) {
-        return htmlPath.replace('.html', '.md');
+        return htmlPath.replace(".html", ".md");
     }
 
     /**
      * Convert MD file path to expected HTML path
      */
     mdToHtmlPath(mdPath) {
-        return mdPath.replace('.md', '.html');
+        return mdPath.replace(".md", ".html");
     }
 
     /**
@@ -207,16 +207,16 @@ class DocumentationMapper {
 - **Backup files to clean**: ${this.mapping.backupFiles.length}
 
 ## Matched Pairs (${this.mapping.matched.length})
-${this.mapping.matched.map(pair => `- ✅ ${pair.html.relativePath} ↔ ${pair.md.relativePath}`).join('\n')}
+${this.mapping.matched.map(pair => `- ✅ ${pair.html.relativePath} ↔ ${pair.md.relativePath}`).join("\n")}
 
 ## Missing .md Files (${this.mapping.missingMd.length})
-${this.mapping.missingMd.map(item => `- ❌ **${item.html.relativePath}** needs **${item.expectedMdPath}**`).join('\n')}
+${this.mapping.missingMd.map(item => `- ❌ **${item.html.relativePath}** needs **${item.expectedMdPath}**`).join("\n")}
 
 ## Missing .html Files (${this.mapping.missingHtml.length})
-${this.mapping.missingHtml.map(item => `- ❌ **${item.md.relativePath}** needs **${item.expectedHtmlPath}**`).join('\n')}
+${this.mapping.missingHtml.map(item => `- ❌ **${item.md.relativePath}** needs **${item.expectedHtmlPath}**`).join("\n")}
 
 ## Backup Files to Clean (${this.mapping.backupFiles.length})
-${this.mapping.backupFiles.map(file => `- 🗑️  ${path.basename(file.fullPath)}`).join('\n')}
+${this.mapping.backupFiles.map(file => `- 🗑️  ${path.basename(file.fullPath)}`).join("\n")}
 
 ## Repair Plan
 1. Create ${this.mapping.missingMd.length} missing .md files
@@ -233,7 +233,7 @@ ${this.mapping.backupFiles.map(file => `- 🗑️  ${path.basename(file.fullPath
      */
     async saveReport() {
         const report = this.generateReport();
-        const reportPath = path.join(this.baseDir, 'docs-mapping-analysis.md');
+        const reportPath = path.join(this.baseDir, "docs-mapping-analysis.md");
         await fs.writeFile(reportPath, report);
         console.log(`📋 Mapping analysis saved: ${reportPath}`);
         return reportPath;
@@ -246,7 +246,7 @@ async function main() {
         const mapper = new DocumentationMapper();
         const mapping = await mapper.createMapping();
         
-        console.log('\n📊 Analysis Results:');
+        console.log("\n📊 Analysis Results:");
         console.log(`✅ Matched pairs: ${mapping.matched.length}`);
         console.log(`❌ Missing .md files: ${mapping.missingMd.length}`);
         console.log(`❌ Missing .html files: ${mapping.missingHtml.length}`);
@@ -257,7 +257,7 @@ async function main() {
         return mapping;
         
     } catch (error) {
-        console.error('💥 Analysis failed:', error.message);
+        console.error("💥 Analysis failed:", error.message);
         process.exit(1);
     }
 }
