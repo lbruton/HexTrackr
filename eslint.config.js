@@ -1,5 +1,14 @@
 export default [
   {
+    // Files to ignore
+    ignores: [
+      "node_modules/**",
+      "**/node_modules/**",
+      "scripts/chart.min.js",  // Third-party minified chart library
+      "**/*.min.js"           // All minified files
+    ]
+  },
+  {
     // Global configuration for all JavaScript files
     languageOptions: {
       ecmaVersion: 2022,
@@ -30,7 +39,12 @@ export default [
         self: "readonly",
         clearTimeout: "readonly",
         setTimeout: "readonly",
-        Intl: "readonly"
+        Intl: "readonly",
+        // Browser API globals
+        MutationObserver: "readonly",
+        ResizeObserver: "readonly",
+        OffscreenCanvas: "readonly",
+        Path2D: "readonly"
       }
     },
     rules: {
@@ -55,7 +69,9 @@ export default [
         process: "readonly",
         Buffer: "readonly",
         global: "readonly",
-        console: "readonly"
+        console: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly"
       }
     }
   },

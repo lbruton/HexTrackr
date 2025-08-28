@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-/* eslint-disable no-undef */
+ 
 
 /**
  * HTML Content Updater
  * Generates HTML files from markdown sources using a master template.
  */
 
-require('dotenv').config();
-const fs = require('fs').promises;
-const path = require('path');
-const { marked } = require('marked');
+require("dotenv").config();
+const fs = require("fs").promises;
+const path = require("path");
+const { marked } = require("marked");
 
 class HtmlContentUpdater {
     constructor() {
@@ -26,12 +26,12 @@ class HtmlContentUpdater {
      */
     async loadTemplate() {
         try {
-            const templatePath = path.join(process.cwd(), 'docs-prototype', 'template.html');
-            this.templateContent = await fs.readFile(templatePath, 'utf8');
-            console.log('📄 Master HTML template loaded.');
+            const templatePath = path.join(process.cwd(), "docs-prototype", "template.html");
+            this.templateContent = await fs.readFile(templatePath, "utf8");
+            console.log("📄 Master HTML template loaded.");
         } catch (error) {
-            console.error('❌ Fatal Error: Could not load template.html.', error);
-            throw new Error('template.html not found in docs-prototype directory.');
+            console.error("❌ Fatal Error: Could not load template.html.", error);
+            throw new Error("template.html not found in docs-prototype directory.");
         }
     }
 
@@ -40,10 +40,10 @@ class HtmlContentUpdater {
      */
     async findAllMarkdownSources() {
         const sources = [];
-        const docsSourceDir = path.join(process.cwd(), 'docs-source');
-        const docsProtoDir = path.join(process.cwd(), 'docs-prototype/content');
+        const docsSourceDir = path.join(process.cwd(), "docs-source");
+        const docsProtoDir = path.join(process.cwd(), "docs-prototype/content");
 
-        const findMdFiles = async (dir, relativePath = '') => {
+        const findMdFiles = async (dir, relativePath = "") => {
             const items = await fs.readdir(dir);
             
             for (const item of items) {
@@ -53,8 +53,8 @@ class HtmlContentUpdater {
                 
                 if (stat.isDirectory()) {
                     await findMdFiles(fullPath, currentRelativePath);
-                } else if (item.endsWith('.md')) {
-                    const htmlPath = path.join(docsProtoDir, currentRelativePath.replace('.md', '.html'));
+                } else if (item.endsWith(".md")) {
+                    const htmlPath = path.join(docsProtoDir, currentRelativePath.replace(".md", ".html"));
                     sources.push({
                         mdPath: fullPath,
                         htmlPath: htmlPath,
@@ -77,8 +77,8 @@ class HtmlContentUpdater {
             gfm: true,
             sanitize: false,
             highlight: function(code, lang) {
-                const hljs = require('highlight.js');
-                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                const hljs = require("highlight.js");
+                const language = hljs.getLanguage(lang) ? lang : "plaintext";
                 return hljs.highlight(code, { language }).value;
             }
         });
@@ -91,14 +91,14 @@ class HtmlContentUpdater {
     async generateHtmlFile(source) {
         try {
             // Read markdown content
-            const markdownContent = await fs.readFile(source.mdPath, 'utf8');
+            const markdownContent = await fs.readFile(source.mdPath, "utf8");
             
             // Convert markdown to HTML
             const newHtmlContent = this.markdownToHtml(markdownContent);
             
             // Inject content into the template
             const finalHtml = this.templateContent.replace(
-                '<!-- CONTENT WILL BE INJECTED HERE -->',
+                "<!-- CONTENT WILL BE INJECTED HERE -->",
                 newHtmlContent
             );
 
@@ -108,7 +108,7 @@ class HtmlContentUpdater {
             // Write the final HTML file
             await fs.writeFile(source.htmlPath, finalHtml);
             
-            console.log(`✅ Generated HTML: ${source.relativePath.replace('.md', '.html')}`);
+            console.log(`✅ Generated HTML: ${source.relativePath.replace(".md", ".html")}`);
             this.stats.filesGenerated++;
             return true;
             
@@ -134,22 +134,22 @@ Errors: ${this.stats.errors}
 
 ## Generated Files
 
-${generatedFiles.map(file => `- ${file}`).join('\n')}
+${generatedFiles.map(file => `- ${file}`).join("\n")}
 
 ## Summary
 
 The HTML generator successfully created ${this.stats.filesGenerated} HTML files from their corresponding markdown sources using the master template.
 `;
 
-        await fs.writeFile('docs-source/html-update-report.md', report);
-        console.log('📋 HTML generation report saved: html-update-report.md');
+        await fs.writeFile("docs-source/html-update-report.md", report);
+        console.log("📋 HTML generation report saved: html-update-report.md");
     }
 
     /**
      * Main execution function.
      */
     async run() {
-        console.log('🚀 Starting HTML generation from markdown sources...');
+        console.log("🚀 Starting HTML generation from markdown sources...");
         
         try {
             // Load the template first
@@ -160,7 +160,7 @@ The HTML generator successfully created ${this.stats.filesGenerated} HTML files 
             console.log(`📊 Found ${sources.length} markdown source files to convert.`);
             
             if (sources.length === 0) {
-                console.log('ℹ️ No markdown files found in docs-source. Nothing to generate.');
+                console.log("ℹ️ No markdown files found in docs-source. Nothing to generate.");
                 return;
             }
 
@@ -170,7 +170,7 @@ The HTML generator successfully created ${this.stats.filesGenerated} HTML files 
             for (const source of sources) {
                 const success = await this.generateHtmlFile(source);
                 if (success) {
-                    generatedFiles.push(source.relativePath.replace('.md', '.html'));
+                    generatedFiles.push(source.relativePath.replace(".md", ".html"));
                 }
                 // Small delay to prevent overwhelming the system
                 await new Promise(resolve => setTimeout(resolve, 50));
@@ -189,7 +189,7 @@ The HTML generator successfully created ${this.stats.filesGenerated} HTML files 
             }
             
         } catch (error) {
-            console.error('❌ HTML generation process failed:', error);
+            console.error("❌ HTML generation process failed:", error);
             process.exit(1);
         }
     }

@@ -1,6 +1,6 @@
 /* eslint-env browser */
 /* global fetch, window, document, console, CSS, Prism, bootstrap */
-/* eslint-disable no-undef */
+ 
 
 // Documentation Portal JavaScript (Tabler.io version)
 class DocumentationPortal {
@@ -93,26 +93,26 @@ class DocumentationPortal {
         for (const [category, files] of Object.entries(this.fileStructure)) {
             html += `<div class="list-group-item bg-light fw-bold">${category}</div>`;
             for (const file of files) {
-                const sectionName = file.replace('.html', '');
+                const sectionName = file.replace(".html", "");
                 // Handle index files to just display the category name
-                const displayName = sectionName === 'index' 
+                const displayName = sectionName === "index" 
                     ? category
-                    : sectionName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    : sectionName.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
                 
-                const dataSection = sectionName === 'index' 
-                    ? `${category.toLowerCase().replace(/ /g, '-')}/index`
-                    : `${category.toLowerCase().replace(/ /g, '-')}/${sectionName}`;
+                const dataSection = sectionName === "index" 
+                    ? `${category.toLowerCase().replace(/ /g, "-")}/index`
+                    : `${category.toLowerCase().replace(/ /g, "-")}/${sectionName}`;
 
                 // Special handling for the main index to avoid prefix
-                const linkSection = sectionName === 'index' && category === 'Getting Started'
-                    ? 'index'
+                const linkSection = sectionName === "index" && category === "Getting Started"
+                    ? "index"
                     : dataSection;
 
                 html += `<a href="#${linkSection}" class="list-group-item list-group-item-action" data-section="${linkSection}">• ${displayName}</a>`;
             }
         }
 
-        html += '</div>';
+        html += "</div>";
         sidebarContainer.innerHTML = html;
     }
 
@@ -187,7 +187,7 @@ class DocumentationPortal {
         if (!sectionEl) {
             sectionEl = document.createElement("section");
             sectionEl.id = `${section}-content`;
-            container.innerHTML = ''; // Clear previous content
+            container.innerHTML = ""; // Clear previous content
             container.appendChild(sectionEl);
         }
         
@@ -214,7 +214,7 @@ class DocumentationPortal {
     }
 
     updatePageTitle(section) {
-        const displayName = section.split('/').pop().replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const displayName = section.split("/").pop().replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
         document.getElementById("page-title").textContent = displayName;
         document.getElementById("page-description").textContent = `HexTrackr Documentation | ${displayName}`;
     }
@@ -288,7 +288,7 @@ class DocumentationPortal {
         }
 
         // In-page anchor within the current content
-        if (trimmed.startsWith('#')) {
+        if (trimmed.startsWith("#")) {
             return { section: this.currentSection, fragment: trimmed.slice(1) };
         }
 
@@ -311,12 +311,12 @@ class DocumentationPortal {
 
         // Relative HTML file link (e.g., "backend.html")
         if (/^[a-z0-9\-_/]+\.html(?:#(.*))?$/i.test(trimmed)) {
-            const rel = trimmed.replace(/^\.\//, '');
-            const noHtml = rel.replace(/\.html(?:#.*)?$/i, '');
+            const rel = trimmed.replace(/^\.\//, "");
+            const noHtml = rel.replace(/\.html(?:#.*)?$/i, "");
             // Resolve relative to current section directory
-            const parts = this.currentSection.split('/');
+            const parts = this.currentSection.split("/");
             parts.pop(); // remove current page
-            const base = parts.join('/');
+            const base = parts.join("/");
             const section = base ? `${base}/${noHtml}` : noHtml;
             const fragMatch = trimmed.match(/\.html#(.*)$/i);
             const fragment = fragMatch ? fragMatch[1] : undefined;
@@ -330,32 +330,32 @@ class DocumentationPortal {
     // delegate navigation through loadSection. Keeps external links intact.
     rewriteInternalLinks(rootEl) {
         if (!rootEl) return;
-        const anchors = rootEl.querySelectorAll('a[href]');
+        const anchors = rootEl.querySelectorAll("a[href]");
         anchors.forEach((a) => {
-            const href = a.getAttribute('href');
+            const href = a.getAttribute("href");
             const mapped = this.mapContentHrefToSection(href);
             if (!mapped) return; // external
 
             // If it's an in-page anchor, just handle smooth scroll
-            if (href.startsWith('#')) {
-                a.addEventListener('click', (e) => {
+            if (href.startsWith("#")) {
+                a.addEventListener("click", (e) => {
                     e.preventDefault();
                     const id = href.slice(1);
                     const target = rootEl.querySelector(`[id="${CSS.escape(id)}"]`);
-                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
                 });
                 return;
             }
 
             // Regular internal doc link: rewrite href and handle via router
             const newHash = `#${mapped.section}`;
-            a.setAttribute('href', newHash);
-            a.addEventListener('click', (e) => {
+            a.setAttribute("href", newHash);
+            a.addEventListener("click", (e) => {
                 e.preventDefault();
                 this.loadSection(mapped.section).then(() => {
                     if (mapped.fragment) {
                         const target = document.getElementById(mapped.fragment) || rootEl.querySelector(`[id="${CSS.escape(mapped.fragment)}"]`);
-                        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
                     }
                 });
             });
@@ -365,27 +365,27 @@ class DocumentationPortal {
     // Fetch dynamic statistics for the overview cards
     async refreshOverviewStats() {
         try {
-            const res = await fetch('/api/docs/stats');
+            const res = await fetch("/api/docs/stats");
             if (!res.ok) return; // leave defaults
             const data = await res.json();
             // Update cards if present
-            const endpointEl = document.querySelector('#overview-content .card-body .h1');
+            const endpointEl = document.querySelector("#overview-content .card-body .h1");
             // The overview has 3 cards; query them explicitly
-            const cards = document.querySelectorAll('#overview-content .card.card-sm .card-body .h1');
+            const cards = document.querySelectorAll("#overview-content .card.card-sm .card-body .h1");
             if (cards.length >= 3) {
                 // 0: endpoints, 1: js functions, 2: frameworks
-                if (typeof data.apiEndpoints === 'number') cards[0].textContent = data.apiEndpoints;
-                if (typeof data.jsFunctions === 'number') cards[1].textContent = data.jsFunctions;
-                if (typeof data.frameworks === 'number') cards[2].textContent = data.frameworks;
+                if (typeof data.apiEndpoints === "number") cards[0].textContent = data.apiEndpoints;
+                if (typeof data.jsFunctions === "number") cards[1].textContent = data.jsFunctions;
+                if (typeof data.frameworks === "number") cards[2].textContent = data.frameworks;
             }
 
             // Also update badge counts if present
-            const apiBadges = Array.from(document.querySelectorAll('#overview-content .badge.bg-blue-lt'));
-            const jsBadges = Array.from(document.querySelectorAll('#overview-content .badge.bg-green-lt'));
+            const apiBadges = Array.from(document.querySelectorAll("#overview-content .badge.bg-blue-lt"));
+            const jsBadges = Array.from(document.querySelectorAll("#overview-content .badge.bg-green-lt"));
             const apiBadge = apiBadges.find(b => /Endpoints/i.test(b.textContent));
             const jsBadge = jsBadges.find(b => /Functions/i.test(b.textContent));
-            if (apiBadge && typeof data.apiEndpoints === 'number') apiBadge.textContent = `${data.apiEndpoints} Endpoints`;
-            if (jsBadge && typeof data.jsFunctions === 'number') jsBadge.textContent = `${data.jsFunctions} Functions`;
+            if (apiBadge && typeof data.apiEndpoints === "number") apiBadge.textContent = `${data.apiEndpoints} Endpoints`;
+            if (jsBadge && typeof data.jsFunctions === "number") jsBadge.textContent = `${data.jsFunctions} Functions`;
         } catch (_) {
             // ignore; leave defaults
         }

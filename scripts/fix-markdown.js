@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /* eslint-env node */
-/* eslint-disable no-console */
+ 
 /* global require, module, process, console */
 /* eslint no-undef: "off" */
 
@@ -16,8 +16,8 @@
  *   node scripts/fix-markdown.js --all --dir=docs-source
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 class MarkdownFormatter {
     constructor(options = {}) {
@@ -47,7 +47,7 @@ class MarkdownFormatter {
         let fixes = 0;
         
         // Split into lines for processing
-        const lines = content.split('\n');
+        const lines = content.split("\n");
         const result = [];
         
         for (let i = 0; i < lines.length; i++) {
@@ -56,16 +56,16 @@ class MarkdownFormatter {
             
             if (isHeading) {
                 // Check if previous line needs blank line
-                if (i > 0 && lines[i - 1].trim() !== '') {
-                    result.push('');
+                if (i > 0 && lines[i - 1].trim() !== "") {
+                    result.push("");
                     fixes++;
                 }
                 
                 result.push(line);
                 
                 // Check if next line needs blank line
-                if (i < lines.length - 1 && lines[i + 1].trim() !== '') {
-                    result.push('');
+                if (i < lines.length - 1 && lines[i + 1].trim() !== "") {
+                    result.push("");
                     fixes++;
                 }
             } else {
@@ -74,7 +74,7 @@ class MarkdownFormatter {
         }
         
         this.stats.headingSpacingFixed += fixes;
-        return result.join('\n');
+        return result.join("\n");
     }
 
     /**
@@ -83,14 +83,14 @@ class MarkdownFormatter {
      */
     fixListSpacing(content) {
         let fixes = 0;
-        const lines = content.split('\n');
+        const lines = content.split("\n");
         const result = [];
         
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             const isListItem = /^[\s]*[-*+]\s/.test(line) || /^[\s]*\d+\.\s/.test(line);
-            const prevLine = i > 0 ? lines[i - 1] : '';
-            const nextLine = i < lines.length - 1 ? lines[i + 1] : '';
+            const prevLine = i > 0 ? lines[i - 1] : "";
+            const nextLine = i < lines.length - 1 ? lines[i + 1] : "";
             
             // Check if this is the start of a list
             const isListStart = isListItem && !(/^[\s]*[-*+]\s/.test(prevLine) || /^[\s]*\d+\.\s/.test(prevLine));
@@ -98,21 +98,21 @@ class MarkdownFormatter {
             // Check if this is the end of a list
             const isListEnd = isListItem && !(/^[\s]*[-*+]\s/.test(nextLine) || /^[\s]*\d+\.\s/.test(nextLine));
             
-            if (isListStart && prevLine.trim() !== '') {
-                result.push('');
+            if (isListStart && prevLine.trim() !== "") {
+                result.push("");
                 fixes++;
             }
             
             result.push(line);
             
-            if (isListEnd && nextLine.trim() !== '') {
-                result.push('');
+            if (isListEnd && nextLine.trim() !== "") {
+                result.push("");
                 fixes++;
             }
         }
         
         this.stats.listSpacingFixed += fixes;
-        return result.join('\n');
+        return result.join("\n");
     }
 
     /**
@@ -122,7 +122,7 @@ class MarkdownFormatter {
     fixEmphasisAsHeading(content) {
         let fixes = 0;
         
-        const lines = content.split('\n');
+        const lines = content.split("\n");
         const result = [];
         
         for (let i = 0; i < lines.length; i++) {
@@ -132,10 +132,10 @@ class MarkdownFormatter {
             const boldMatch = line.match(/^\*\*(.*?)\*\*\s*$/);
             if (boldMatch && line.trim().length < 60) { // Likely a heading if short
                 const headingText = boldMatch[1];
-                const nextLine = i < lines.length - 1 ? lines[i + 1] : '';
+                const nextLine = i < lines.length - 1 ? lines[i + 1] : "";
                 
                 // Convert to heading based on context
-                if (nextLine.trim() === '' || i === lines.length - 1) {
+                if (nextLine.trim() === "" || i === lines.length - 1) {
                     line = `## ${headingText}`;
                     fixes++;
                 }
@@ -145,7 +145,7 @@ class MarkdownFormatter {
         }
         
         this.stats.emphasisToHeadingFixed += fixes;
-        return result.join('\n');
+        return result.join("\n");
     }
 
     /**
@@ -154,7 +154,7 @@ class MarkdownFormatter {
      */
     fixOrderedLists(content) {
         let fixes = 0;
-        const lines = content.split('\n');
+        const lines = content.split("\n");
         const result = [];
         
         let listNumber = 1;
@@ -184,7 +184,7 @@ class MarkdownFormatter {
         }
         
         this.stats.orderedListFixed += fixes;
-        return result.join('\n');
+        return result.join("\n");
     }
 
     /**
@@ -193,7 +193,7 @@ class MarkdownFormatter {
      */
     fixDuplicateHeadings(content) {
         let fixes = 0;
-        const lines = content.split('\n');
+        const lines = content.split("\n");
         const headingSeen = new Map();
         const result = [];
         
@@ -219,7 +219,7 @@ class MarkdownFormatter {
         }
         
         this.stats.duplicateHeadingsFixed += fixes;
-        return result.join('\n');
+        return result.join("\n");
     }
 
     /**
@@ -229,7 +229,7 @@ class MarkdownFormatter {
         this.log(`Processing: ${filePath}`);
         
         try {
-            let content = fs.readFileSync(filePath, 'utf8');
+            let content = fs.readFileSync(filePath, "utf8");
             
             // Apply all fixes in sequence
             content = this.fixHeadingSpacing(content);
@@ -239,10 +239,10 @@ class MarkdownFormatter {
             content = this.fixDuplicateHeadings(content);
             
             // Clean up multiple consecutive blank lines
-            content = content.replace(/\n{3,}/g, '\n\n');
+            content = content.replace(/\n{3,}/g, "\n\n");
             
             // Ensure file ends with single newline
-            content = content.replace(/\n*$/, '\n');
+            content = content.replace(/\n*$/, "\n");
             
             if (!this.dryRun) {
                 fs.writeFileSync(filePath, content);
@@ -261,7 +261,7 @@ class MarkdownFormatter {
      */
     findMarkdownFiles(dir = process.cwd()) {
         const markdownFiles = [];
-        const excludeDirs = ['node_modules', '.git', 'data', 'docs-prototype'];
+        const excludeDirs = ["node_modules", ".git", "data", "docs-prototype"];
         
         const scanDirectory = (currentDir) => {
             try {
@@ -276,7 +276,7 @@ class MarkdownFormatter {
                         if (!excludeDirs.includes(item)) {
                             scanDirectory(fullPath);
                         }
-                    } else if (stat.isFile() && item.endsWith('.md')) {
+                    } else if (stat.isFile() && item.endsWith(".md")) {
                         markdownFiles.push(path.relative(process.cwd(), fullPath));
                     }
                 }
@@ -293,7 +293,7 @@ class MarkdownFormatter {
      * Print formatting statistics
      */
     printStats() {
-        console.log('\n📊 Markdown Formatting Results:');
+        console.log("\n📊 Markdown Formatting Results:");
         console.log(`Files processed: ${this.stats.filesProcessed}`);
         console.log(`Heading spacing fixes: ${this.stats.headingSpacingFixed}`);
         console.log(`List spacing fixes: ${this.stats.listSpacingFixed}`);
@@ -302,11 +302,11 @@ class MarkdownFormatter {
         console.log(`Duplicate heading fixes: ${this.stats.duplicateHeadingsFixed}`);
         
         const totalFixes = Object.values(this.stats).reduce((sum, val) => 
-            typeof val === 'number' && val !== this.stats.filesProcessed ? sum + val : sum, 0);
+            typeof val === "number" && val !== this.stats.filesProcessed ? sum + val : sum, 0);
         console.log(`Total fixes applied: ${totalFixes}`);
         
         if (this.dryRun) {
-            console.log('\n⚠️  DRY RUN MODE - No files were modified');
+            console.log("\n⚠️  DRY RUN MODE - No files were modified");
         }
     }
 }
@@ -315,15 +315,15 @@ class MarkdownFormatter {
 function main() {
     const args = process.argv.slice(2);
     const options = {
-        dryRun: args.includes('--dry-run'),
-        verbose: args.includes('--verbose') || args.includes('-v'),
-        all: args.includes('--all'),
-    file: args.find(arg => arg.startsWith('--file='))?.split('=')[1],
-    dir: args.find(arg => arg.startsWith('--dir='))?.split('=')[1]
+        dryRun: args.includes("--dry-run"),
+        verbose: args.includes("--verbose") || args.includes("-v"),
+        all: args.includes("--all"),
+    file: args.find(arg => arg.startsWith("--file="))?.split("=")[1],
+    dir: args.find(arg => arg.startsWith("--dir="))?.split("=")[1]
     };
 
-    console.log('🔧 HexTrackr Markdown Formatter');
-    console.log('Fixing Codacy markdown violations...\n');
+    console.log("🔧 HexTrackr Markdown Formatter");
+    console.log("Fixing Codacy markdown violations...\n");
 
     const formatter = new MarkdownFormatter(options);
 
@@ -354,12 +354,12 @@ function main() {
         
         markdownFiles.forEach(file => formatter.formatFile(file));
     } else {
-        console.log('Usage:');
-        console.log('  node scripts/fix-markdown.js --file=path/to/file.md');
-        console.log('  node scripts/fix-markdown.js --all');
-        console.log('  node scripts/fix-markdown.js --dry-run --all');
-        console.log('  node scripts/fix-markdown.js --verbose --all');
-        console.log('  node scripts/fix-markdown.js --all --dir=docs-source');
+        console.log("Usage:");
+        console.log("  node scripts/fix-markdown.js --file=path/to/file.md");
+        console.log("  node scripts/fix-markdown.js --all");
+        console.log("  node scripts/fix-markdown.js --dry-run --all");
+        console.log("  node scripts/fix-markdown.js --verbose --all");
+        console.log("  node scripts/fix-markdown.js --all --dir=docs-source");
         process.exit(1);
     }
 

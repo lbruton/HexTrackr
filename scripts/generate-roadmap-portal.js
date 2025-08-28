@@ -6,8 +6,8 @@
  * Run: node scripts/generate-roadmap-portal.js
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 // Enhanced markdown to HTML converter
 function markdownToHtml(markdown) {
@@ -19,66 +19,66 @@ function markdownToHtml(markdown) {
     });
 
     // Process line by line for better structure
-    const lines = markdown.split('\n');
+    const lines = markdown.split("\n");
     const htmlLines = [];
     let inList = false;
-    let listType = '';
+    let listType = "";
 
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
-        const nextLine = lines[i + 1] || '';
+        const nextLine = lines[i + 1] || "";
 
         // Headers
         if (line.match(/^### /)) {
             if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
-            htmlLines.push(line.replace(/^### (.*)$/, '<h3>$1</h3>'));
+            htmlLines.push(line.replace(/^### (.*)$/, "<h3>$1</h3>"));
         } else if (line.match(/^## /)) {
             if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
-            htmlLines.push(line.replace(/^## (.*)$/, '<h2>$1</h2>'));
+            htmlLines.push(line.replace(/^## (.*)$/, "<h2>$1</h2>"));
         } else if (line.match(/^# /)) {
             if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
-            htmlLines.push(line.replace(/^# (.*)$/, '<h1>$1</h1>'));
+            htmlLines.push(line.replace(/^# (.*)$/, "<h1>$1</h1>"));
         }
         // Horizontal rules
         else if (line.match(/^---+$/)) {
             if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
-            htmlLines.push('<hr>');
+            htmlLines.push("<hr>");
         }
         // Task lists (checkboxes)
         else if (line.match(/^\s*- \[ \]/)) {
-            if (!inList || listType !== 'ul') {
+            if (!inList || listType !== "ul") {
                 if (inList) htmlLines.push(`</${listType}>`);
-                htmlLines.push('<ul class="task-list">');
+                htmlLines.push("<ul class=\"task-list\">");
                 inList = true;
-                listType = 'ul';
+                listType = "ul";
             }
-            htmlLines.push(line.replace(/^\s*- \[ \] (.*)$/, '<li class="task-item">☐ $1</li>'));
+            htmlLines.push(line.replace(/^\s*- \[ \] (.*)$/, "<li class=\"task-item\">☐ $1</li>"));
         } else if (line.match(/^\s*- \[x\]/)) {
-            if (!inList || listType !== 'ul') {
+            if (!inList || listType !== "ul") {
                 if (inList) htmlLines.push(`</${listType}>`);
-                htmlLines.push('<ul class="task-list">');
+                htmlLines.push("<ul class=\"task-list\">");
                 inList = true;
-                listType = 'ul';
+                listType = "ul";
             }
-            htmlLines.push(line.replace(/^\s*- \[x\] (.*)$/, '<li class="task-item completed">✅ $1</li>'));
+            htmlLines.push(line.replace(/^\s*- \[x\] (.*)$/, "<li class=\"task-item completed\">✅ $1</li>"));
         }
         // Regular lists
         else if (line.match(/^\s*- /)) {
-            if (!inList || listType !== 'ul') {
+            if (!inList || listType !== "ul") {
                 if (inList) htmlLines.push(`</${listType}>`);
-                htmlLines.push('<ul>');
+                htmlLines.push("<ul>");
                 inList = true;
-                listType = 'ul';
+                listType = "ul";
             }
-            htmlLines.push(line.replace(/^\s*- (.*)$/, '<li>$1</li>'));
+            htmlLines.push(line.replace(/^\s*- (.*)$/, "<li>$1</li>"));
         }
         // Empty line - close lists
-        else if (line.trim() === '') {
+        else if (line.trim() === "") {
             if (inList) {
                 htmlLines.push(`</${listType}>`);
                 inList = false;
             }
-            htmlLines.push('');
+            htmlLines.push("");
         }
         // Regular paragraphs
         else {
@@ -86,7 +86,7 @@ function markdownToHtml(markdown) {
                 htmlLines.push(`</${listType}>`);
                 inList = false;
             }
-            if (line.trim() !== '') {
+            if (line.trim() !== "") {
                 htmlLines.push(`<p>${line}</p>`);
             }
         }
@@ -97,26 +97,26 @@ function markdownToHtml(markdown) {
         htmlLines.push(`</${listType}>`);
     }
 
-    let html = htmlLines.join('\n');
+    let html = htmlLines.join("\n");
 
     // Apply inline formatting
     html = html
         // Bold and italic
-        .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\*\*\*(.*?)\*\*\*/g, "<strong><em>$1</em></strong>")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.*?)\*/g, "<em>$1</em>")
         
         // Inline code
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/`([^`]+)`/g, "<code>$1</code>")
         
         // Status badges
-        .replace(/\*Risk: (HIGH|MEDIUM|LOW)\*/g, '<span class="phase-status status-critical">Risk: $1</span>')
-        .replace(/\*Priority: (CRITICAL|HIGH|MEDIUM|LOW)\*/g, '<span class="phase-status status-in-progress">Priority: $1</span>')
-        .replace(/\*Duration: ([^*]+)\*/g, '<span class="phase-status status-planned">Duration: $1</span>')
-        .replace(/\*Updated: ([^*]+)\*/g, '<span class="phase-status status-complete">Updated: $1</span>')
+        .replace(/\*Risk: (HIGH|MEDIUM|LOW)\*/g, "<span class=\"phase-status status-critical\">Risk: $1</span>")
+        .replace(/\*Priority: (CRITICAL|HIGH|MEDIUM|LOW)\*/g, "<span class=\"phase-status status-in-progress\">Priority: $1</span>")
+        .replace(/\*Duration: ([^*]+)\*/g, "<span class=\"phase-status status-planned\">Duration: $1</span>")
+        .replace(/\*Updated: ([^*]+)\*/g, "<span class=\"phase-status status-complete\">Updated: $1</span>")
         
         // Blockquotes
-        .replace(/^> (.*)$/gm, '<blockquote>$1</blockquote>');
+        .replace(/^> (.*)$/gm, "<blockquote>$1</blockquote>");
 
     // Restore code blocks
     codeBlocks.forEach((code, index) => {
@@ -128,28 +128,28 @@ function markdownToHtml(markdown) {
 
 // Generate the roadmap portal using existing template
 function generatePortal() {
-    const roadmapsDir = path.join(__dirname, '../roadmaps');
-    const templatePath = path.join(roadmapsDir, 'index.html');
+    const roadmapsDir = path.join(__dirname, "../roadmaps");
+    const templatePath = path.join(roadmapsDir, "index.html");
     const outputPath = templatePath; // Overwrite the existing file
     
-    console.log('🔍 Reading roadmap files...');
+    console.log("🔍 Reading roadmap files...");
     
     // Read roadmap files
-    const strategicRoadmap = fs.readFileSync(path.join(roadmapsDir, 'ROADMAP.md'), 'utf8');
-    const tacticalRoadmap = fs.readFileSync(path.join(roadmapsDir, 'UI_UX_ROADMAP.md'), 'utf8');
-    const currentStatus = fs.readFileSync(path.join(roadmapsDir, 'CURRENT_STATUS.md'), 'utf8');
+    const strategicRoadmap = fs.readFileSync(path.join(roadmapsDir, "ROADMAP.md"), "utf8");
+    const tacticalRoadmap = fs.readFileSync(path.join(roadmapsDir, "UI_UX_ROADMAP.md"), "utf8");
+    const currentStatus = fs.readFileSync(path.join(roadmapsDir, "CURRENT_STATUS.md"), "utf8");
     
-    console.log('🔄 Converting markdown to HTML...');
+    console.log("🔄 Converting markdown to HTML...");
     
     // Convert to HTML
     const strategicHtml = markdownToHtml(strategicRoadmap);
     const tacticalHtml = markdownToHtml(tacticalRoadmap);
     const statusHtml = markdownToHtml(currentStatus);
     
-    console.log('📝 Reading existing template...');
+    console.log("📝 Reading existing template...");
     
     // Read the current template
-    let template = fs.readFileSync(templatePath, 'utf8');
+    let template = fs.readFileSync(templatePath, "utf8");
     
     // Update the navigation to include current status tab
     const updatedNav = `
@@ -188,19 +188,19 @@ function generatePortal() {
         </section>`;
     
     // Find where to insert content (after nav, before footer)
-    const navEndIndex = template.indexOf('</nav>') + 6;
-    const footerStartIndex = template.indexOf('<footer');
+    const navEndIndex = template.indexOf("</nav>") + 6;
+    const footerStartIndex = template.indexOf("<footer");
     
     if (navEndIndex > 5 && footerStartIndex > navEndIndex) {
         // Replace content between nav and footer
         template = template.substring(0, navEndIndex) + 
-                  '\n\n' + tabContent + '\n\n        ' + 
+                  "\n\n" + tabContent + "\n\n        " + 
                   template.substring(footerStartIndex);
     } else {
         // Fallback: insert before closing main tag
         template = template.replace(
-            '</main>',
-            tabContent + '\n    </main>'
+            "</main>",
+            tabContent + "\n    </main>"
         );
     }
     
@@ -253,7 +253,7 @@ function generatePortal() {
         }`;
     
     // Insert enhanced CSS before closing </style>
-    template = template.replace('</style>', enhancedCSS + '\n    </style>');
+    template = template.replace("</style>", enhancedCSS + "\n    </style>");
     
     // Update footer with generation info
     const footerContent = `
@@ -301,36 +301,36 @@ function generatePortal() {
     </script>`;
     
     // Insert JavaScript before closing body tag
-    template = template.replace('</body>', jsScript + '\n</body>');
+    template = template.replace("</body>", jsScript + "\n</body>");
     
-    console.log('💾 Writing updated portal...');
+    console.log("💾 Writing updated portal...");
     
     // Write the updated HTML file
     fs.writeFileSync(outputPath, template);
     
-    console.log('🚀 Roadmap portal generated successfully!');
+    console.log("🚀 Roadmap portal generated successfully!");
     console.log(`📂 Open: file://${outputPath}`);
-    console.log('🌐 Or access via: http://localhost:8080/roadmaps/');
+    console.log("🌐 Or access via: http://localhost:8080/roadmaps/");
 }
 
 // Add npm script integration
 function updatePackageJson() {
-    const packageJsonPath = path.join(__dirname, '../package.json');
+    const packageJsonPath = path.join(__dirname, "../package.json");
     
     try {
-        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
         
         if (!packageJson.scripts) {
             packageJson.scripts = {};
         }
         
         if (!packageJson.scripts.roadmap) {
-            packageJson.scripts.roadmap = 'node scripts/generate-roadmap-portal.js';
+            packageJson.scripts.roadmap = "node scripts/generate-roadmap-portal.js";
             fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-            console.log('✅ Added "npm run roadmap" script to package.json');
+            console.log("✅ Added \"npm run roadmap\" script to package.json");
         }
     } catch (error) {
-        console.log('⚠️  Could not update package.json:', error.message);
+        console.log("⚠️  Could not update package.json:", error.message);
     }
 }
 
@@ -340,7 +340,7 @@ if (require.main === module) {
         generatePortal();
         updatePackageJson();
     } catch (error) {
-        console.error('❌ Error generating roadmap portal:', error.message);
+        console.error("❌ Error generating roadmap portal:", error.message);
         process.exit(1);
     }
 }
