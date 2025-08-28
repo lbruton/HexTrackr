@@ -339,7 +339,8 @@ class MarkdownFormatter {
 
             if (!this.dryRun) {
                 PathValidator.safeWriteFileSync(filePath, content);
-            }            this.stats.filesProcessed++;
+            }
+            this.stats.filesProcessed++;
             this.log(`✅ Formatted: ${filePath}`);
             
         } catch (error) {
