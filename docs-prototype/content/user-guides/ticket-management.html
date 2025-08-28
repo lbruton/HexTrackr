@@ -23,72 +23,26 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h1>User Guide: Ticket Management</h1>
-<p>The Ticket Management page (<code>tickets.html</code>) is the central hub for creating, tracking, and managing remediation tasks within HexTrackr.</p>
-<h2>Interface Overview</h2>
-<p>The interface is designed for clarity and efficiency, providing all necessary tools on a single screen.</p>
+                                    <h1>Ticket Management Guide</h1>
+<p>The Ticket Management interface, available at <code>tickets.html</code>, allows users to track support requests and other operational tasks.</p>
+<h2>Creating a Ticket</h2>
 <ol>
-<li><strong>Header</strong>: Contains the main navigation, a link to the Vulnerabilities page, and the settings icon.</li>
-<li><strong>Action Buttons</strong>:<ul>
-<li><strong>Add New Ticket</strong>: Opens a modal to create a new ticket.</li>
-<li><strong>Attach Documentation</strong>: Allows for attaching relevant documents to a ticket.</li>
-<li><strong>Export Buttons</strong>: A group of buttons to export the ticket data in various formats (CSV, Excel, JSON, PDF, HTML).</li>
+<li>Navigate to the <strong>Tickets</strong> page.</li>
+<li>Click the <strong>&quot;New Ticket&quot;</strong> button.</li>
+<li>Fill in the required fields in the modal:<ul>
+<li><strong>Title</strong>: A brief summary of the ticket.</li>
+<li><strong>Description</strong>: Detailed information about the issue or task.</li>
+<li><strong>Status</strong>: The current state of the ticket (e.g., Open, In Progress, Closed).</li>
+<li><strong>Priority</strong>: The urgency of the ticket (e.g., Low, Medium, High).</li>
 </ul>
 </li>
-<li><strong>Statistics Cards</strong>: Display a high-level overview of ticket status: Total, Open, Overdue, and Completed.</li>
-<li><strong>Search and Filters</strong>:<ul>
-<li>A search bar allows for free-text searching across all ticket fields.</li>
-<li>Dropdown filters for <code>Status</code> and <code>Location</code> allow for quick filtering of the ticket list.</li>
-</ul>
-</li>
-<li><strong>Tickets Table</strong>: The main component, displaying a list of all tickets. It is sortable by clicking on the column headers.</li>
-<li><strong>Pagination</strong>: Controls at the bottom of the table allow for navigating through pages of tickets and changing the number of rows displayed per page.</li>
+<li>Click <strong>&quot;Save&quot;</strong> to create the ticket.</li>
 </ol>
-<h2>Creating and Editing Tickets</h2>
-<h3>Adding a New Ticket</h3>
-<ol>
-<li>Click the <strong>&quot;Add New Ticket&quot;</strong> button.</li>
-<li>The &quot;Add New Ticket&quot; modal will appear.</li>
-<li>Fill in the required fields:<ul>
-<li><strong>Dates</strong>: <code>Date Submitted</code> and <code>Date Due</code>.</li>
-<li><strong>Ticket Numbers</strong>: <code>Hexagon Ticket #</code> and <code>Service Now #</code> (if applicable).</li>
-<li><strong>Details</strong>: <code>Site</code>, <code>Location</code>, <code>Supervisor</code>, and <code>Tech</code>.</li>
-<li><strong>Status</strong>: Select the current status from the dropdown (e.g., Open, In Progress).</li>
-<li><strong>Devices</strong>: Add one or more device names. You can add, remove, and reorder devices to specify a boot sequence.</li>
-<li><strong>Notes</strong>: Add any additional details in Markdown format.</li>
-</ul>
-</li>
-<li>Click <strong>&quot;Save Ticket&quot;</strong>. The new ticket will be assigned a unique <code>XT#</code> and will appear in the table.</li>
-</ol>
-<h3>Editing an Existing Ticket</h3>
-<ol>
-<li>In the tickets table, find the ticket you wish to edit.</li>
-<li>Click the <strong>pencil icon</strong> (<code>&lt;i class=&quot;fas fa-edit&quot;&gt;&lt;/i&gt;</code>) in the &quot;Actions&quot; column for that row.</li>
-<li>The same modal used for adding tickets will appear, pre-filled with the existing ticket&#39;s data.</li>
-<li>Make your changes and click <strong>&quot;Save Ticket&quot;</strong>.</li>
-</ol>
-<h2>Viewing Ticket Details</h2>
-<ol>
-<li>Click the <strong>eye icon</strong> (<code>&lt;i class=&quot;fas fa-eye&quot;&gt;&lt;/i&gt;</code>) in the &quot;Actions&quot; column of any ticket.</li>
-<li>The &quot;View Ticket&quot; modal will appear, displaying a formatted summary of the ticket in a terminal-style view. This content is generated from the ticket&#39;s data and is presented in Markdown.</li>
-<li>From this view, you can:<ul>
-<li><strong>Copy Markdown</strong>: Copies the full Markdown content to your clipboard.</li>
-<li><strong>Download Bundle</strong>: Downloads a <code>.zip</code> file containing the ticket details in a Markdown file along with any attached documentation.</li>
-<li><strong>Edit Ticket</strong>: Closes the view modal and opens the edit modal for that ticket.</li>
-</ul>
-</li>
-</ol>
-<h2>Deleting a Ticket</h2>
-<ol>
-<li>Click the <strong>trash can icon</strong> (<code>&lt;i class=&quot;fas fa-trash&quot;&gt;&lt;/i&gt;</code>) in the &quot;Actions&quot; column for the ticket you want to delete.</li>
-<li>A confirmation prompt will appear to prevent accidental deletion.</li>
-<li>Confirm the action to permanently remove the ticket from the database.</li>
-</ol>
-<h2>Sorting and Filtering</h2>
+<h2>Viewing and Editing Tickets</h2>
 <ul>
-<li><strong>Sorting</strong>: Click on any column header (e.g., <code>XT#</code>, <code>Date Due</code>, <code>Status</code>) to sort the table by that column. Clicking again will reverse the sort order.</li>
-<li><strong>Filtering</strong>: Use the <code>Status</code> and <code>Location</code> dropdowns to narrow down the list of tickets. The table will update in real-time as you select filter options.</li>
-<li><strong>Searching</strong>: Type a keyword into the search bar to filter the table to only show rows containing that keyword.</li>
+<li>All tickets are displayed in a table on the main page.</li>
+<li>Click the <strong>&quot;Edit&quot;</strong> button next to a ticket to open the editing modal and update its details.</li>
+<li>Click the <strong>&quot;Delete&quot;</strong> button to remove a ticket.</li>
 </ul>
 
                                 </div>

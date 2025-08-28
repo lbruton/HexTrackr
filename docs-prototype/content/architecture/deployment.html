@@ -23,32 +23,31 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h1>Development Setup</h1>
-<p>Follow these instructions to set up a local development environment for HexTrackr.</p>
-<h2>Environment</h2>
+                                    <h1>Deployment Architecture</h1>
+<p>HexTrackr is designed for a streamlined, Docker-only deployment.</p>
+<h2>Docker Compose</h2>
 <ul>
-<li><strong>Runtime</strong>: Node.js</li>
-<li><strong>Database</strong>: SQLite</li>
-<li><strong>Deployment</strong>: Docker</li>
+<li><strong><code>docker-compose.yml</code></strong>: This file orchestrates the multi-container Docker application.</li>
+<li><strong>Services</strong>:<ul>
+<li><code>app</code>: The Node.js/Express backend application.</li>
+<li><code>nginx</code>: (Optional but recommended for production) An Nginx reverse proxy to handle incoming traffic, serve static files, and route API requests to the Node.js service.</li>
 </ul>
-<h2>Local Setup (without Docker)</h2>
-<p>While Docker is recommended, you can run the application locally for development:</p>
-<ol>
-<li><p><strong>Install Dependencies:</strong></p>
-<pre><code class="language-bash">npm install
-</code></pre>
 </li>
-<li><p><strong>Initialize the Database:</strong></p>
-<p>Create the SQLite database and schema.</p>
-<pre><code class="language-bash">node scripts/init-database.js
-</code></pre>
+</ul>
+<h2>Build Process</h2>
+<ul>
+<li><strong><code>Dockerfile</code></strong>: Defines the Docker image for the Node.js application. It handles:<ul>
+<li>Installing Node.js.</li>
+<li>Copying the application source code.</li>
+<li>Installing npm dependencies.</li>
+<li>Exposing the application port.</li>
+</ul>
 </li>
-<li><p><strong>Run the Server:</strong></p>
-<pre><code class="language-bash">node server.js
-</code></pre>
-<p>The server will start on <code>http://localhost:8080</code>.</p>
-</li>
-</ol>
+</ul>
+<h2>Port Mapping</h2>
+<ul>
+<li>The application is exposed on <code>localhost:8080</code> by default.</li>
+</ul>
 
                                 </div>
                             </div>

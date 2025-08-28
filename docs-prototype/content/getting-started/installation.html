@@ -24,66 +24,28 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h1>Installation Guide</h1>
-<p>This guide provides instructions for installing and configuring the HexTrackr application. The entire application is containerized using Docker, which ensures a consistent and reliable setup process.</p>
-<h2>System Requirements</h2>
+<p>HexTrackr is designed for Docker-only deployment to ensure a consistent and reliable environment.</p>
+<h2>Prerequisites</h2>
 <ul>
-<li><strong>Docker</strong>: You must have Docker and Docker Compose installed on your server or local machine.<ul>
-<li>For server environments, follow the official Docker Engine installation guide for your Linux distribution.</li>
-<li>For local setup, install <a href="httpss://www.docker.com/products/docker-desktop">Docker Desktop</a>.</li>
+<li><a href="https://docs.docker.com/get-docker/">Docker</a></li>
+<li><a href="https://docs.docker.com/compose/install/">Docker Compose</a></li>
 </ul>
-</li>
-<li><strong>Git</strong>: A Git client is required to clone the application repository.</li>
-</ul>
-<h2>1. Clone the Repository</h2>
-<p>First, clone the HexTrackr repository to your desired location on the server or your local machine.</p>
-<pre><code class="language-bash">git clone &lt;repository-url&gt;
+<h2>Running the Application</h2>
+<ol>
+<li><p><strong>Clone the repository:</strong></p>
+<pre><code class="language-bash">git clone https://github.com/your-username/HexTrackr.git
 cd HexTrackr
 </code></pre>
-<p>Replace <code>&lt;repository-url&gt;</code> with the actual URL of the Git repository.</p>
-<h2>2. Configuration</h2>
-<p>The application is configured to run out-of-the-box with sensible defaults. No mandatory environment variables are required for the initial setup.</p>
-<h3>Port Configuration</h3>
-<ul>
-<li>By default, the application runs on port <code>8080</code>.</li>
-<li>If you need to run the application on a different port, you can modify the <code>docker-compose.yml</code> file. Change the <code>ports</code> mapping from <code>&quot;8080:8080&quot;</code> to <code>&quot;&lt;your-port&gt;:8080&quot;</code>.</li>
-</ul>
-<p>Example for running on port <code>8888</code>:</p>
-<pre><code class="language-yaml">services:
-  app:
-    # ...
-    ports:
-      - &quot;8888:8080&quot;
-    # ...
-</code></pre>
-<h2>3. Build and Launch the Application</h2>
-<p>The application stack is managed by Docker Compose. This single command will build the Docker image and start the application container.</p>
-<p>From the root directory of the project, run:</p>
+</li>
+<li><p><strong>Start the services:</strong></p>
+<p>Use Docker Compose to build and run the application in detached mode.</p>
 <pre><code class="language-bash">docker-compose up -d --build
 </code></pre>
-<p><strong>What this command does:</strong></p>
-<ul>
-<li><strong><code>--build</code></strong>: Forces Docker to build the <code>hextrackr</code> image from the <code>Dockerfile.node</code> before starting the container. This is recommended for the first-time setup to ensure all dependencies are correctly installed.</li>
-<li><strong><code>-d</code></strong>: Runs the container in detached mode, so it continues to run in the background.</li>
-</ul>
-<h2>4. Database and Storage</h2>
-<ul>
-<li><strong>Database</strong>: The application uses a SQLite database. The database file (<code>hextrackr.db</code>) is stored in the <code>data/</code> directory.</li>
-<li><strong>Persistent Storage</strong>: The <code>docker-compose.yml</code> file defines a volume that maps the <code>data/</code> directory on the host machine to the container. This ensures that all database information is preserved even if the container is stopped, removed, or updated.</li>
-<li><strong>Automatic Initialization</strong>: On the first launch, the application will automatically create the <code>hextrackr.db</code> file and set up the necessary tables.</li>
-</ul>
-<h2>5. Verify the Installation</h2>
-<p>To confirm that the application is running correctly, you can check the status of the Docker containers:</p>
-<pre><code class="language-bash">docker-compose ps
-</code></pre>
-<p>The output should show the <code>hextrackr</code> service with a state of <code>Up</code>.</p>
-<p>You can now access the application by navigating to <code>http://localhost:8080/tickets.html</code> or <code>http://localhost:8080/vulnerabilities.html</code> in your web browser (or the custom port you configured).</p>
-<h2>6. Updating the Application</h2>
-<p>To update to a newer version of the application:</p>
-<ol>
-<li>Pull the latest changes from the Git repository: <code>git pull</code></li>
-<li>Re-build and restart the container: <code>docker-compose up -d --build</code></li>
+</li>
+<li><p><strong>Access HexTrackr:</strong></p>
+<p>The application will be available at <code>http://localhost:8080</code>.</p>
+</li>
 </ol>
-<p>Docker will pull the latest base image, rebuild the application container with the new code, and restart it. Your data in the <code>data/</code> directory will be preserved.</p>
 
                                 </div>
                             </div>

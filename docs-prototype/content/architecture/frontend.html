@@ -23,32 +23,26 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h1>Development Setup</h1>
-<p>Follow these instructions to set up a local development environment for HexTrackr.</p>
-<h2>Environment</h2>
+                                    <h1>Frontend Architecture</h1>
+<p>The HexTrackr frontend is built with a mix of technologies to support its dual-purpose nature.</p>
+<h2>Frameworks</h2>
 <ul>
-<li><strong>Runtime</strong>: Node.js</li>
-<li><strong>Database</strong>: SQLite</li>
-<li><strong>Deployment</strong>: Docker</li>
+<li><strong>Ticket Management (<code>tickets.html</code>)</strong>: Built with <strong>Bootstrap 5</strong> for a clean, standard interface.</li>
+<li><strong>Vulnerability Management (<code>vulnerabilities.html</code>)</strong>: Built with <strong>Tabler.io</strong> for its rich set of data visualization components and a modern dashboard aesthetic.</li>
 </ul>
-<h2>Local Setup (without Docker)</h2>
-<p>While Docker is recommended, you can run the application locally for development:</p>
-<ol>
-<li><p><strong>Install Dependencies:</strong></p>
-<pre><code class="language-bash">npm install
-</code></pre>
+<h2>JavaScript Structure</h2>
+<ul>
+<li><strong><code>scripts/pages/</code></strong>: Contains page-specific JavaScript files.<ul>
+<li><code>tickets.js</code>: Logic for the ticketing system.</li>
+<li><code>vulnerabilities.js</code>: Logic for the vulnerability dashboard.</li>
+</ul>
 </li>
-<li><p><strong>Initialize the Database:</strong></p>
-<p>Create the SQLite database and schema.</p>
-<pre><code class="language-bash">node scripts/init-database.js
-</code></pre>
+<li><strong><code>scripts/shared/</code></strong>: Contains JavaScript modules shared across pages.<ul>
+<li><code>settings-modal.js</code>: A unified settings modal used on all pages.</li>
+</ul>
 </li>
-<li><p><strong>Run the Server:</strong></p>
-<pre><code class="language-bash">node server.js
-</code></pre>
-<p>The server will start on <code>http://localhost:8080</code>.</p>
-</li>
-</ol>
+<li><strong><code>scripts/utils/</code></strong>: Contains utility functions for common tasks like API calls and data formatting.</li>
+</ul>
 
                                 </div>
                             </div>

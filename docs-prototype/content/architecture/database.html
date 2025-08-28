@@ -23,32 +23,23 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h1>Development Setup</h1>
-<p>Follow these instructions to set up a local development environment for HexTrackr.</p>
-<h2>Environment</h2>
+                                    <h1>Database Architecture</h1>
+<p>HexTrackr uses a database-first approach with a fallback to localStorage.</p>
+<h2>Primary Storage</h2>
 <ul>
-<li><strong>Runtime</strong>: Node.js</li>
-<li><strong>Database</strong>: SQLite</li>
-<li><strong>Deployment</strong>: Docker</li>
+<li><strong>Database</strong>: SQLite (<code>data/hextrackr.db</code>)</li>
+<li><strong>Rationale</strong>: SQLite provides a simple, file-based, and self-contained database solution that is perfect for a lightweight application like HexTrackr. It requires no separate server process.</li>
 </ul>
-<h2>Local Setup (without Docker)</h2>
-<p>While Docker is recommended, you can run the application locally for development:</p>
-<ol>
-<li><p><strong>Install Dependencies:</strong></p>
-<pre><code class="language-bash">npm install
-</code></pre>
-</li>
-<li><p><strong>Initialize the Database:</strong></p>
-<p>Create the SQLite database and schema.</p>
-<pre><code class="language-bash">node scripts/init-database.js
-</code></pre>
-</li>
-<li><p><strong>Run the Server:</strong></p>
-<pre><code class="language-bash">node server.js
-</code></pre>
-<p>The server will start on <code>http://localhost:8080</code>.</p>
-</li>
-</ol>
+<h2>Data Model</h2>
+<ul>
+<li><strong>Tickets</strong>: Stores information about support tickets.</li>
+<li><strong>Vulnerabilities</strong>: Stores vulnerability data imported from CSVs. The data model is designed for time-series tracking, allowing for analysis of trends.</li>
+<li><strong>UPSERT Logic</strong>: When importing vulnerability data, the system performs an UPSERT (update or insert) to avoid creating duplicate entries.</li>
+</ul>
+<h2>Fallback Storage</h2>
+<ul>
+<li><strong>localStorage</strong>: If the backend database is unavailable, the application can fall back to using the browser&#39;s localStorage for basic functionality. This is not a primary feature but provides resilience.</li>
+</ul>
 
                                 </div>
                             </div>

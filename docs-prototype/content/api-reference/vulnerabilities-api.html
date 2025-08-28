@@ -23,32 +23,37 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h1>Development Setup</h1>
-<p>Follow these instructions to set up a local development environment for HexTrackr.</p>
-<h2>Environment</h2>
+                                    <h1>Vulnerabilities API</h1>
+<p>The Vulnerabilities API provides endpoints for retrieving and importing vulnerability data.</p>
+<h2>Endpoints</h2>
+<h3><code>GET /api/vulnerabilities</code></h3>
 <ul>
-<li><strong>Runtime</strong>: Node.js</li>
-<li><strong>Database</strong>: SQLite</li>
-<li><strong>Deployment</strong>: Docker</li>
+<li><strong>Description</strong>: Retrieves a list of all vulnerabilities.</li>
+<li><strong>Response</strong>: <code>200 OK</code><pre><code class="language-json">[
+  {
+    &quot;id&quot;: 1,
+    &quot;vulnerability_id&quot;: &quot;CVE-2023-12345&quot;,
+    &quot;severity&quot;: &quot;High&quot;,
+    &quot;status&quot;: &quot;Open&quot;,
+    &quot;first_seen&quot;: &quot;2023-10-01T12:00:00Z&quot;,
+    &quot;last_seen&quot;: &quot;2023-10-27T14:00:00Z&quot;
+  }
+]
+</code></pre>
+</li>
 </ul>
-<h2>Local Setup (without Docker)</h2>
-<p>While Docker is recommended, you can run the application locally for development:</p>
-<ol>
-<li><p><strong>Install Dependencies:</strong></p>
-<pre><code class="language-bash">npm install
+<h3><code>POST /api/vulnerabilities/import</code></h3>
+<ul>
+<li><strong>Description</strong>: Imports vulnerabilities from a CSV file.</li>
+<li><strong>Request Body</strong>: <code>multipart/form-data</code> with a single file field named <code>csvfile</code>.</li>
+<li><strong>Response</strong>: <code>200 OK</code><pre><code class="language-json">{
+  &quot;message&quot;: &quot;Import successful&quot;,
+  &quot;new_vulnerabilities&quot;: 10,
+  &quot;updated_vulnerabilities&quot;: 5
+}
 </code></pre>
 </li>
-<li><p><strong>Initialize the Database:</strong></p>
-<p>Create the SQLite database and schema.</p>
-<pre><code class="language-bash">node scripts/init-database.js
-</code></pre>
-</li>
-<li><p><strong>Run the Server:</strong></p>
-<pre><code class="language-bash">node server.js
-</code></pre>
-<p>The server will start on <code>http://localhost:8080</code>.</p>
-</li>
-</ol>
+</ul>
 
                                 </div>
                             </div>
