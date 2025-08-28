@@ -1,328 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>🗺️ HexTrackr Roadmap & Current Status - HexTrackr Documentation</title>
-    <!-- Tabler.io CSS Framework -->
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet"/>
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons-sprite.svg" rel="stylesheet"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-    
-    <style>
-        /* Documentation Section Styling */
-        .documentation-section {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            line-height: 1.6;
-        }
-        
-        .documentation-section h2 {
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-        
-        .documentation-section h3 {
-            color: #34495e;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-        
-        .documentation-section h4 {
-            color: #5a6c7d;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            font-weight: 500;
-        }
-        
-        .documentation-section .text-muted {
-            color: #6c757d !important;
-        }
-        
-        .documentation-section code {
-            background: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 0.875em;
-            border: 1px solid #e9ecef;
-        }
-        
-        .documentation-section pre {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            padding: 1rem;
-            overflow-x: auto;
-            margin: 1rem 0;
-        }
-        
-        .documentation-section pre code {
-            background: none;
-            border: none;
-            padding: 0;
-        }
-        
-        .documentation-section .alert {
-            border-radius: 8px;
-            border: none;
-            margin: 1rem 0;
-        }
-        
-        .documentation-section .card {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .documentation-section .card-header {
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-            padding: 1rem 1.25rem;
-        }
-        
-        .documentation-section .card-body {
-            padding: 1.25rem;
-        }
-        
-        .documentation-section .badge {
-            font-size: 0.75em;
-            padding: 0.35em 0.65em;
-        }
-        
-        .documentation-section table {
-            margin: 1rem 0;
-        }
-        
-        .documentation-section .table th {
-            background: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-            font-weight: 600;
-            color: #495057;
-        }
-        
-        .documentation-section .table td {
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .documentation-section .table-striped tbody tr:nth-of-type(odd) {
-            background-color: #f8f9fa;
-        }
-        
-        /* Custom component styling for documentation */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        
-        .stat-card {
-            text-align: center;
-            padding: 1.5rem;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-label {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-        
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .documentation-section {
-                padding: 1rem;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
-            }
-            
-            .stat-card {
-                padding: 1rem;
-            }
-            
-            .stat-number {
-                font-size: 2rem;
-            }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr - Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="../../styles/shared/base.css" rel="stylesheet">
+    <link href="../../styles/shared/header.css" rel="stylesheet">
+    <link href="../css/docs-tabler.css" rel="stylesheet">
 </head>
 <body>
-    <div class="documentation-section">
-        <h1>🗺️ HexTrackr Roadmap &amp; Current Status</h1>
-<p>Strategic project roadmap with real-time sprint progress and tactical task tracking.</p>
-<div class="alert alert-info border-start border-4 border-info">
-                <div class="alert-body">[object Object]</div>
-            </div><h2>🎯 Project Overview</h2>
-<p>HexTrackr is a dual-purpose cybersecurity management system providing:</p>
-<h3>🎫 Ticket Management</h3>
-<p>Hexagon security workflow management with advanced device tracking and PDF generation</p>
-<h3>🛡️ Vulnerability Management</h3>
-<p>Multi-vendor vulnerability data analysis with time-series tracking and trend visualization</p>
-<h2>🚀 Current Sprint: Documentation Portal Completion</h2>
-<p><strong>Sprint Tasks (6 Sessions • ~2.5 Hours Total)</strong></p>
+    <div class="page">
+        <!-- Shared Header -->
+        <div id="headerContainer"></div>
+        
+        <div class="page-wrapper">
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h1>Project Roadmap</h1>
+<p>This document provides a high-level overview of the HexTrackr project&#39;s strategic roadmap, current status, and future plans. It consolidates information from several planning documents to provide a single source of truth for the project&#39;s direction.</p>
+<h2>1. Strategic Roadmap (<code>ROADMAP.md</code>)</h2>
+<p>This is the primary document outlining the long-term vision and major feature releases for HexTrackr.</p>
+<h3>Completed Features</h3>
 <ul>
-<li>✅ 4 Completed</li>
-<li>⏳ 2 Remaining  </li>
-<li>⏱️ 40min Left</li>
+<li><strong>Core Infrastructure</strong>: Dual-app architecture, time-series database, modern UI with AG Grid, and a modular JavaScript pattern.</li>
+<li><strong>Chart &amp; Visualization System</strong>: ApexCharts integration with real-time updates and responsive design.</li>
+<li><strong>Cisco API Integration</strong>: Secure OAuth2 authentication and vulnerability synchronization.</li>
 </ul>
-<h3>Task Progress</h3>
-<p><strong>✅ Task 1: Fix Duplicate Content Mapping</strong></p>
+<h3>In Progress</h3>
 <ul>
-<li>Created distinct content sections, eliminated navigation conflicts</li>
-<li>⏱️ 20 minutes • 🔧 JavaScript &amp; Navigation</li>
+<li><strong>Code Quality &amp; Security Compliance</strong>: A critical, release-blocking initiative to resolve all security vulnerabilities identified by Codacy and reduce the total number of issues.</li>
+<li><strong>Ticket Modal Enhancement Suite</strong>: A series of high-priority improvements to the ticket creation and management modal.</li>
+<li><strong>Chart Timeline Enhancement</strong>: Extending the vulnerability trend chart to provide a more comprehensive timeline.</li>
 </ul>
-<p><strong>✅ Task 2: Database Schema Documentation</strong>  </p>
+<h2>2. UI/UX Roadmap (<code>UI_UX_ROADMAP.md</code>)</h2>
+<p>This document focuses on the technical implementation details of the user interface and user experience enhancements.</p>
+<h3>Current Focus</h3>
 <ul>
-<li>Comprehensive schema visualization with table relationships and performance indexes</li>
-<li>⏱️ 25 minutes • 📊 Database Architecture</li>
+<li><strong>Chart Timeline Extension</strong>: The immediate priority is to extend the vulnerability chart&#39;s timeline to the current date, providing a more continuous and informative visualization.</li>
 </ul>
-<p><strong>✅ Task 3: UI-API Interaction Flowcharts</strong></p>
+<h3>Completed UI/UX Achievements</h3>
 <ul>
-<li>Complete data flow documentation with visual diagrams and API mapping</li>
-<li>⏱️ 30 minutes • 🔄 Data Flow Architecture</li>
+<li><strong>Modular JavaScript Architecture</strong>: Successfully refactored the frontend code into a modular pattern with shared components and page-specific scripts.</li>
+<li><strong>Responsive Layout</strong>: Implemented a comprehensive responsive design for the AG Grid and other UI components, ensuring the application is usable on both desktop and mobile devices.</li>
+<li><strong>Settings Modal Unification</strong>: Created a single, unified settings modal that functions consistently across both the tickets and vulnerabilities pages.</li>
 </ul>
-<p><strong>✅ Task 4: Page Flow &amp; Navigation Diagram</strong></p>
+<h2>3. Current Sprint Status (<code>CURRENT_STATUS.md</code>)</h2>
+<p>This document provides a snapshot of the current sprint&#39;s focus, priorities, and recent accomplishments.</p>
+<h3>Current Focus</h3>
 <ul>
-<li>Navigation architecture with user journeys and responsive design patterns</li>
-<li>⏱️ 20 minutes • 🧭 Navigation Architecture</li>
+<li><strong>Code Quality &amp; Security Compliance</strong>: The team is actively working on fixing four critical security vulnerabilities identified by Codacy, which is a blocker for the next release (v1.0.3).</li>
+<li><strong>Ticket Modal Enhancements</strong>: In parallel, work is proceeding on improving the ticket modal, with the current task being the implementation of a reverse sort toggle.</li>
 </ul>
-<p><strong>🔄 Task 5: Markdown-First Documentation Workflow</strong> ✅ <strong>COMPLETED</strong></p>
+<h3>Recent Accomplishments</h3>
 <ul>
-<li>✅ Created <code>docs-source/</code> directory structure for living documents</li>
-<li>✅ Built beautiful Tabler.io templates preserving all styling  </li>
-<li>✅ Implemented advanced markdown-to-HTML generator with enhanced features</li>
-<li>✅ Extracted all content to maintainable markdown source files</li>
-<li>✅ Established sustainable documentation workflow</li>
-<li>⏱️ 25 minutes • 📋 Meta-Documentation</li>
+<li><strong>AI Documentation Generation System</strong>: A comprehensive, automated documentation generation system has been successfully implemented, creating a live documentation portal with professional styling and content derived directly from the codebase.</li>
 </ul>
-<p><strong>⏳ Task 6: Docusaurus Removal &amp; Final Cleanup</strong></p>
+<h2>4. Codacy Compliance Tracking (<code>CODACY_COMPLIANCE_TRACKING.md</code>)</h2>
+<p>This document tracks the project&#39;s progress toward meeting its code quality and security goals.</p>
+<h3>Current Status</h3>
 <ul>
-<li>Remove Docusaurus dependencies, update systeminfo.json, version bump to 1.0.2</li>
-<li>⏱️ 15 minutes • 🧹 Final Cleanup</li>
+<li><strong>83 Total Issues</strong>: Down from over 370 after recent ESLint configuration improvements.</li>
+<li><strong>4 Critical Security Issues</strong>: These are release-blocking and are the highest priority for the development team. The issues include a generic object injection sink and unsafe file system operations.</li>
 </ul>
-<h2>🟡 Parallel Focus: Ticket Modal Enhancements</h2>
-<p><strong>Priority:</strong> HIGH (User workflow optimization and production functionality)<br><strong>Current Task:</strong> Task 7 - Add Reverse Sort Toggle</p>
-<h3>Progress Overview</h3>
+<h3>Release Criteria</h3>
 <ul>
-<li>✅ 6 Tasks Completed</li>
-<li>🔄 1 In Progress  </li>
-<li>⏳ 1 Remaining</li>
+<li><strong>Zero Critical/High Security Vulnerabilities</strong>.</li>
+<li><strong>Fewer than 50 total Codacy issues</strong>.</li>
+<li>All security fixes must be tested and verified.</li>
 </ul>
-<p><strong>✅ Recently Completed: Enhanced Drag-Drop UX</strong>
-Added numbered device indicators (#1, #2, #3) for clear position awareness and improved button styling to match application theme (Bootstrap primary blue).</p>
-<h2>🟢 Completed Features</h2>
-<h3>🏗️ Core Infrastructure</h3>
+<h3>Codacy Scan Results (August 28, 2025)</h3>
+<p>A full repository scan was conducted to establish a baseline for the compliance initiative.</p>
 <ul>
-<li>✅ Dual-app architecture (tickets.html + vulnerabilities.html)</li>
-<li>✅ Time-series database with dimensional schema migration (97% data reduction)</li>
-<li>✅ Modern AG Grid with responsive configuration</li>
-<li>✅ Bootstrap 5 + Tabler.io UI with responsive design</li>
-<li>✅ PDF generation with jsPDF + auto-bundling capabilities</li>
-<li>✅ Device management with smart auto-increment naming</li>
-<li>✅ CSV import/export with UPSERT logic for time-series</li>
-<li>✅ Pagination &amp; filtering across all views</li>
-<li>✅ JavaScript architecture with modular pattern <em>(Aug 26, 2025)</em></li>
+<li><strong>Total Issues Identified</strong>: 311</li>
+<li><strong>Highest Issue Count Files</strong>:<ul>
+<li><code>roadmaps/ROADMAP.md</code>: 50 issues</li>
+<li><code>roadmaps/CURRENT_STATUS.md</code>: 50 issues</li>
+<li><code>roadmaps/UI_UX_ROADMAP.md</code>: 50 issues</li>
+<li><code>roadmaps/TICKET_MODAL_ENHANCEMENTS_20250827.md</code>: 39 issues</li>
+<li><code>scripts/README.md</code>: 27 issues</li>
+<li><code>scripts/shared/settings-modal.js</code>: 21 issues</li>
+<li><code>server.js</code>: 11 issues</li>
+<li><code>scripts/pages/tickets.js</code>: 10 issues</li>
 </ul>
-<h3>📊 Chart &amp; Visualization System</h3>
+</li>
+</ul>
+<p>The majority of these issues are related to markdown formatting. The immediate priority is to resolve the security vulnerabilities, followed by cleaning up the markdown files and then addressing the remaining code quality issues.</p>
+<h3>Codacy Compliance Checklist</h3>
 <ul>
-<li>✅ ApexCharts integration with historical VPR trends</li>
-<li>✅ Metric toggle functionality (Count ↔ VPR Sum modes)</li>
-<li>✅ Multi-severity visualization (Critical, High, Medium, Low)</li>
-<li>✅ Real-time chart updates based on user selections</li>
-<li>✅ Responsive chart configuration for mobile/desktop</li>
+<li><input disabled="" type="checkbox"> <strong>Phase 1: Security Vulnerabilities (Critical)</strong><ul>
+<li><input disabled="" type="checkbox"> Fix Generic Object Injection Sink in <code>docs-prototype/generate-docs.js</code>.</li>
+<li><input disabled="" type="checkbox"> Secure <code>fs.writeFileSync</code> calls in <code>docs-prototype/generate-docs.js</code>.</li>
+<li><input disabled="" type="checkbox"> Secure <code>fs.existsSync</code> calls in <code>docs-prototype/generate-docs.js</code>.</li>
+<li><input disabled="" type="checkbox"> Replace unsafe <code>innerHTML</code> assignments.</li>
 </ul>
-<h3>🔧 Recent Critical Fixes</h3>
-<ul>
-<li>✅ VPR Toggle Bug Fix - Fixed JavaScript DOM selector issue</li>
-<li>✅ Database Schema Migration - Complete time-series implementation</li>
-<li>✅ Data Quality Improvement - Eliminated 97% duplicates</li>
-<li>✅ Modular JavaScript Architecture <em>(Aug 26, 2025)</em></li>
-<li>✅ JavaScript Console Error Fix <em>(Aug 26, 2025)</em></li>
-<li>✅ Playwright Testing Integration <em>(Aug 26, 2025)</em></li>
+</li>
+<li><input disabled="" type="checkbox"> <strong>Phase 2: Markdown Formatting Cleanup (High)</strong><ul>
+<li><input disabled="" type="checkbox"> <code>roadmaps/ROADMAP.md</code> (50 issues)</li>
+<li><input disabled="" type="checkbox"> <code>roadmaps/CURRENT_STATUS.md</code> (50 issues)</li>
+<li><input disabled="" type="checkbox"> <code>roadmaps/UI_UX_ROADMAP.md</code> (50 issues)</li>
+<li><input disabled="" type="checkbox"> <code>roadmaps/TICKET_MODAL_ENHANCEMENTS_20250827.md</code> (39 issues)</li>
+<li><input disabled="" type="checkbox"> <code>scripts/README.md</code> (27 issues)</li>
 </ul>
-<h3>🔐 Cisco API Integration</h3>
-<ul>
-<li>✅ OAuth2 authentication with real Cisco endpoints</li>
-<li>✅ AES-256 credential encryption for secure local storage</li>
-<li>✅ Live API testing with connection validation</li>
-<li>✅ Vulnerability synchronization from Cisco PSIRT API</li>
-<li>✅ Error handling &amp; progress tracking</li>
+</li>
+<li><input disabled="" type="checkbox"> <strong>Phase 3: Code Quality Improvements (Medium)</strong><ul>
+<li><input disabled="" type="checkbox"> <code>scripts/shared/settings-modal.js</code> (21 issues)</li>
+<li><input disabled="" type="checkbox"> <code>server.js</code> (11 issues)</li>
+<li><input disabled="" type="checkbox"> <code>scripts/pages/tickets.js</code> (10 issues)</li>
+<li><input disabled="" type="checkbox"> Address all remaining issues.</li>
 </ul>
-<h2>🟡 In Progress</h2>
-<h3>🔄 Documentation Portal Completion</h3>
-<p><strong>Priority:</strong> CRITICAL<br><strong>Progress:</strong> 4/6 Tasks Complete (67%)<br><strong>Timeline:</strong> 6 focused sessions (~2.5 hours total) • <strong>Remaining:</strong> 40 minutes</p>
-<p>Final phase of comprehensive project documentation for handoff readiness.</p>
-<h3>🔄 Ticket Modal Enhancement Suite</h3>
-<p><strong>Priority:</strong> HIGH<br><strong>Progress:</strong> 6/8 Tasks Complete (75%)<br><strong>Recent:</strong> Enhanced Drag-Drop UX with numbered device indicators</p>
-<p>Comprehensive ticket modal improvements for enhanced user workflow optimization.</p>
-<h3>🔄 Chart Timeline Enhancement</h3>
-<p><strong>Priority:</strong> NEXT<br><strong>Goal:</strong> Extend charts to current date (August 25, 2025) with flat lines</p>
-<p>Timeline extension feature to show current status with data continuity lines.</p>
-<h2>🔴 Planned Features</h2>
-<h3>🤖 AI-Powered Documentation Automation</h3>
-<p><strong>Type:</strong> POST-AUTH FEATURE</p>
-<p>Automated documentation generation system with AI-powered self-updating docs.</p>
-<h4>🔧 Settings Panel Integration</h4>
-<ul>
-<li>Gemini API key configuration</li>
-<li>OpenAI API key configuration  </li>
-<li>Secure encrypted storage of API credentials</li>
+</li>
 </ul>
-<h4>🤖 AI Documentation Engine</h4>
-<ul>
-<li>Automated codebase scanning and analysis</li>
-<li>AI-powered documentation content generation</li>
-<li>Integration with existing generate-docs.js workflow</li>
-<li>Backup and revision system for AI-generated changes</li>
-</ul>
-<p><strong>Vision:</strong> One-click documentation refresh that automatically detects code changes, updates roadmap status, and maintains comprehensive technical documentation without manual intervention.</p>
-<h3>⚡ Performance Optimization</h3>
-<p><strong>Type:</strong> PERFORMANCE</p>
-<p>Large CSV file handling optimization for 50-100MB files.</p>
-<ul>
-<li>Streaming CSV parser for memory efficiency</li>
-<li>Column filtering to ignore unnecessary data</li>
-<li>Progress indicators for large file processing</li>
-<li>Web Workers for non-blocking file processing</li>
-<li>Chunk-based processing with IndexedDB batching</li>
-</ul>
-<h2>📊 Success Metrics &amp; Milestones</h2>
-<h3>🎯 Current Sprint Success Criteria</h3>
-<ul>
-<li>✅ Complete documentation portal without duplicates</li>
-<li>✅ Database schema visualized</li>
-<li>✅ UI-API interactions mapped</li>
-<li>🔄 Roadmap integrated</li>
-<li>⏳ Docusaurus removed</li>
-<li>⏳ systeminfo.json updated</li>
-<li>⏳ Version 1.0.2 released</li>
-</ul>
-<h3>🏆 Project Completion Milestones</h3>
-<p><strong>✅ Core System Complete</strong>
-Full-featured ticket and vulnerability management system</p>
-<p><strong>🔄 Documentation Complete</strong>
-Comprehensive technical documentation portal for handoff</p>
-<p><strong>⏳ Authentication System</strong>
-User management and role-based access control</p>
-<p><strong>🔮 AI Automation Complete</strong>
-Fully automated documentation maintenance system</p>
-<hr>
-<p><strong>Last Updated:</strong> August 27, 2025 • <strong>Next Review:</strong> End of current sprint • <strong>Team:</strong> Solo Development</p>
-<p><em>This roadmap represents a static snapshot. Future AI automation will enable real-time updates and live progress tracking.</em></p>
 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Shared Footer -->
+    <div id="footerContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <!-- Load shared header and footer -->
+    <script src="../../scripts/shared/header-loader.js"></script>
+    <script src="../../scripts/shared/footer-loader.js"></script>
 </body>
 </html>

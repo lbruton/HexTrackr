@@ -1,304 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>🧭 Page Flow & Navigation Diagram - HexTrackr Documentation</title>
-    <!-- Tabler.io CSS Framework -->
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet"/>
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons-sprite.svg" rel="stylesheet"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-    
-    <style>
-        /* Documentation Section Styling */
-        .documentation-section {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            line-height: 1.6;
-        }
-        
-        .documentation-section h2 {
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-        
-        .documentation-section h3 {
-            color: #34495e;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-        
-        .documentation-section h4 {
-            color: #5a6c7d;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            font-weight: 500;
-        }
-        
-        .documentation-section .text-muted {
-            color: #6c757d !important;
-        }
-        
-        .documentation-section code {
-            background: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 0.875em;
-            border: 1px solid #e9ecef;
-        }
-        
-        .documentation-section pre {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            padding: 1rem;
-            overflow-x: auto;
-            margin: 1rem 0;
-        }
-        
-        .documentation-section pre code {
-            background: none;
-            border: none;
-            padding: 0;
-        }
-        
-        .documentation-section .alert {
-            border-radius: 8px;
-            border: none;
-            margin: 1rem 0;
-        }
-        
-        .documentation-section .card {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .documentation-section .card-header {
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-            padding: 1rem 1.25rem;
-        }
-        
-        .documentation-section .card-body {
-            padding: 1.25rem;
-        }
-        
-        .documentation-section .badge {
-            font-size: 0.75em;
-            padding: 0.35em 0.65em;
-        }
-        
-        .documentation-section table {
-            margin: 1rem 0;
-        }
-        
-        .documentation-section .table th {
-            background: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-            font-weight: 600;
-            color: #495057;
-        }
-        
-        .documentation-section .table td {
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .documentation-section .table-striped tbody tr:nth-of-type(odd) {
-            background-color: #f8f9fa;
-        }
-        
-        /* Custom component styling for documentation */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        
-        .stat-card {
-            text-align: center;
-            padding: 1.5rem;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-label {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-        
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .documentation-section {
-                padding: 1rem;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
-            }
-            
-            .stat-card {
-                padding: 1rem;
-            }
-            
-            .stat-number {
-                font-size: 2rem;
-            }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr - Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="../../styles/shared/base.css" rel="stylesheet">
+    <link href="../../styles/shared/header.css" rel="stylesheet">
+    <link href="../css/docs-tabler.css" rel="stylesheet">
 </head>
 <body>
-    <div class="documentation-section">
-        <h1>🧭 Page Flow &amp; Navigation Diagram</h1>
-<p>Complete navigation architecture and user journey mapping for HexTrackr&#39;s page flow patterns.</p>
-<p><strong>Navigation System:</strong> Shared header component with consistent navigation across all pages<br><strong>Main Pages:</strong> Tickets (home), Vulnerabilities, Documentation Portal<br><strong>Architecture:</strong> Component-based navigation with responsive design<br><strong>User Flow:</strong> Task-oriented workflows with cross-page integration</p>
-<h2>🗺️ Site Map &amp; Page Hierarchy</h2>
-<h3>🏠 HexTrackr Application</h3>
-<p><strong>URL:</strong> localhost:8080</p>
-<h4>Main Pages:</h4>
-<p><strong>🎫 Tickets</strong></p>
+    <div class="page">
+        <!-- Shared Header -->
+        <div id="headerContainer"></div>
+        
+        <div class="page-wrapper">
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h1>HexTrackr Page Flow and Navigation</h1>
+<p>This document describes the user navigation and page flow within the HexTrackr application.</p>
+<h2>1. Main Pages</h2>
+<p>The application consists of two primary pages:</p>
 <ul>
-<li><strong>URL:</strong> tickets.html</li>
-<li><strong>Purpose:</strong> Primary workflow management</li>
-<li><strong>Features:</strong> CRUD Operations, CSV Import/Export, Filtering &amp; Search, PDF Generation</li>
+<li><strong>Ticket Management</strong>: <code>tickets.html</code></li>
+<li><strong>Vulnerability Management</strong>: <code>vulnerabilities.html</code></li>
 </ul>
-<p><strong>🛡️ Vulnerabilities</strong></p>
+<p>A shared header provides consistent navigation between these two pages.</p>
+<h2>2. Ticket Management (<code>tickets.html</code>)</h2>
+<h3>2.1. Initial View</h3>
 <ul>
-<li><strong>URL:</strong> vulnerabilities.html</li>
-<li><strong>Purpose:</strong> Security data analysis  </li>
-<li><strong>Features:</strong> CSV Imports, Dashboard Analytics, Trend Charts, Data Export</li>
+<li>The page loads with a table displaying all existing tickets.</li>
+<li>Statistics cards show a summary of ticket statuses (Total, Open, Overdue, Completed).</li>
+<li>Users can search, filter, and sort the ticket data.</li>
 </ul>
-<p><strong>📚 Documentation</strong></p>
+<h3>2.2. User Actions</h3>
 <ul>
-<li><strong>URL:</strong> docs-prototype/</li>
-<li><strong>Purpose:</strong> Technical reference portal</li>
-<li><strong>Features:</strong> API Reference, Architecture Docs, Code Examples, Search Functions</li>
+<li><strong>Add New Ticket</strong>: Opens a modal (<code>#ticketModal</code>) to create a new ticket.</li>
+<li><strong>View Ticket</strong>: Opens a modal (<code>#viewTicketModal</code>) with a detailed, read-only view of the selected ticket.</li>
+<li><strong>Edit Ticket</strong>: From the view modal, users can open the edit modal, which is the same as the &quot;Add New Ticket&quot; modal but pre-filled with the ticket&#39;s data.</li>
+<li><strong>Delete Ticket</strong>: A button in the actions column of the ticket table allows for the deletion of a ticket.</li>
+<li><strong>Export Data</strong>: Users can export the ticket data in various formats (CSV, Excel, JSON, PDF, HTML).</li>
+<li><strong>Attach Documentation</strong>: Allows users to attach files to a ticket.</li>
 </ul>
-<h2>🧩 Navigation Components</h2>
-<h3>Shared Header Navigation</h3>
-<p><strong>HexTrackr Brand</strong></p>
+<h2>3. Vulnerability Management (<code>vulnerabilities.html</code>)</h2>
+<h3>3.1. Initial View</h3>
 <ul>
-<li>Action: → tickets.html (home)</li>
+<li>The page loads with a dashboard view, including:<ul>
+<li>Statistics cards for vulnerabilities by severity.</li>
+<li>A historical trend chart.</li>
+<li>A data workspace with three views: Table, Devices, and Vulnerabilities.</li>
 </ul>
-<p><strong>Main Navigation Links:</strong></p>
+</li>
+<li>The default view is the <strong>Table View</strong>, which uses AG Grid to display all vulnerabilities.</li>
+</ul>
+<h3>3.2. User Actions</h3>
 <ul>
-<li>🎫 Tickets → tickets.html</li>
-<li>🛡️ Vulnerabilities → vulnerabilities.html  </li>
-<li>📚 Documentation → docs-prototype/</li>
+<li><strong>Switch Views</strong>: Users can switch between the Table, Devices, and Vulnerabilities views.</li>
+<li><strong>Search and Filter</strong>: Users can search for specific vulnerabilities and filter by severity.</li>
+<li><strong>View Device Details</strong>: In the <strong>Devices View</strong>, clicking on a device card opens a modal (<code>#deviceModal</code>) with a detailed security overview for that device.</li>
+<li><strong>View Vulnerability Details</strong>: In the <strong>Vulnerabilities View</strong>, clicking on a vulnerability card opens a modal (<code>#vulnerabilityModal</code>) with detailed information about that vulnerability.</li>
+<li><strong>Import Data</strong>: Users can import vulnerability data from a CSV file through the settings modal.</li>
+<li><strong>Export Data</strong>: Users can export data from the AG Grid or from the device/vulnerability detail modals.</li>
 </ul>
-<p><strong>User Dropdown Menu:</strong></p>
+<h2>4. Shared Components</h2>
+<h3>4.1. Header</h3>
 <ul>
-<li>⚙️ Settings Modal</li>
-<li>👤 User Management</li>
-<li>🔌 API Configuration</li>
-<li>💾 Data Management</li>
-<li>🎫 Ticket Systems</li>
-<li>📚 Documentation Portal</li>
+<li>Provides navigation links to the &quot;Tickets&quot; and &quot;Vulnerabilities&quot; pages.</li>
+<li>Includes a &quot;Settings&quot; button that opens the settings modal.</li>
 </ul>
-<h3>Documentation Portal Navigation</h3>
-<p><strong>API Documentation</strong></p>
+<h3>4.2. Settings Modal (<code>#settingsModal</code>)</h3>
 <ul>
-<li>• Ticket Management</li>
-<li>• Vulnerability Management</li>
+<li>Accessible from both main pages.</li>
+<li>Provides functionality for:<ul>
+<li>Importing CSV data (tickets or vulnerabilities).</li>
+<li>Backing up data (tickets, vulnerabilities, or all).</li>
+<li>Restoring data from a backup.</li>
+<li>Clearing application data.</li>
 </ul>
-<p><strong>Framework Reference</strong></p>
-<ul>
-<li>• Tabler.io Integration</li>
-<li>• Bootstrap Usage</li>
-<li>• ApexCharts</li>
-<li>• AG Grid</li>
+</li>
 </ul>
-<p><strong>Architecture</strong></p>
-<ul>
-<li>• Function Reference</li>
-<li>• Database Schema</li>
-<li>• UI-API Flowcharts</li>
-<li>• Page Flow Navigation</li>
-</ul>
-<h2>👤 User Journey &amp; Workflow Patterns</h2>
-<h3>🔄 Daily Admin Workflow</h3>
-<ol>
-<li><strong>🏁 Start</strong> - Open HexTrackr</li>
-<li><strong>🎫 Tickets</strong> - Review daily tickets (Check status, assign tasks)</li>
-<li><strong>🛡️ Vulnerabilities</strong> - Analyze security data (Review trends, import CSV)</li>
-<li><strong>🎫 Create Tickets</strong> - Generate remediation tasks (Link vulnerabilities to tickets)</li>
-</ol>
-<h3>👋 New User Onboarding</h3>
-<ol>
-<li><strong>🆕 First Visit</strong> - Access HexTrackr</li>
-<li><strong>📚 Documentation</strong> - Read getting started (API reference, examples)</li>
-<li><strong>🎫 Explore Tickets</strong> - Learn ticket management (Interface tour, features)</li>
-<li><strong>🛡️ Discover Vulnerabilities</strong> - Understand security module (CSV imports, analytics)</li>
-</ol>
-<h3>🔍 Technical Research Workflow</h3>
-<ol>
-<li><strong>❓ Question</strong> - Technical issue</li>
-<li><strong>📚 Documentation</strong> - Search knowledge base (API reference, code examples)</li>
-<li><strong>🔧 Implementation</strong> - Apply solution (Tickets or vulnerabilities)</li>
-<li><strong>✅ Validation</strong> - Test &amp; verify (Confirm resolution)</li>
-</ol>
-<h2>🔗 URL Structure &amp; Routing Patterns</h2>
-<div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">[object Object]</thead>
-                    <tbody>undefined</tbody>
-                </table>
-            </div><h2>📱 Responsive Navigation Behavior</h2>
-<h3>🖥️ Desktop Navigation (&gt;= 768px)</h3>
-<ul>
-<li>✅ Full horizontal navigation bar</li>
-<li>✅ All navigation items visible</li>
-<li>✅ User dropdown with full menu</li>
-<li>✅ Theme toggle buttons visible</li>
-<li>✅ Icon + text labels for nav items</li>
-</ul>
-<h3>📱 Mobile Navigation (&lt; 768px)</h3>
-<ul>
-<li>✅ Collapsible hamburger menu</li>
-<li>✅ Vertical navigation layout</li>
-<li>✅ Touch-friendly button sizes</li>
-<li>✅ Simplified user menu</li>
-<li>✅ Priority navigation items only</li>
-</ul>
-<h2>💡 Navigation Best Practices &amp; Patterns</h2>
-<h3>🎯 User Experience Patterns</h3>
-<ul>
-<li><strong>Consistent Navigation:</strong> Same header across all pages ensures familiarity</li>
-<li><strong>Clear Hierarchy:</strong> Primary → Secondary navigation levels clearly defined</li>
-<li><strong>Visual Feedback:</strong> Active states and hover effects guide user interactions</li>
-<li><strong>Mobile-First:</strong> Responsive design ensures usability across all devices</li>
-</ul>
-<h3>🏗️ Technical Implementation</h3>
-<ul>
-<li><strong>Component-Based:</strong> Shared header component reduces code duplication</li>
-<li><strong>Hash Routing:</strong> Documentation portal uses #section for SPA-like navigation</li>
-<li><strong>Progressive Enhancement:</strong> Basic navigation works without JavaScript</li>
-<li><strong>Accessibility Ready:</strong> ARIA labels and semantic HTML structure</li>
-</ul>
-<h2>🚀 Future Navigation Enhancements</h2>
-<h3>🔐 Authentication-Aware Navigation</h3>
-<p>Role-based navigation items that show/hide based on user permissions and authentication status.</p>
-<h3>🔍 Global Search</h3>
-<p>Search functionality accessible from any page to find tickets, vulnerabilities, or documentation.</p>
-<h3>📍 Breadcrumb Navigation</h3>
-<p>Hierarchical breadcrumbs for complex workflows and deep documentation sections.</p>
-<h3>⌨️ Keyboard Navigation</h3>
-<p>Full keyboard accessibility with shortcuts for power users (Ctrl+K for search, etc.).</p>
-<h3>📱 Progressive Web App</h3>
-<p>PWA navigation patterns with offline support and app-like navigation behaviors.</p>
 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Shared Footer -->
+    <div id="footerContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <!-- Load shared header and footer -->
+    <script src="../../scripts/shared/header-loader.js"></script>
+    <script src="../../scripts/shared/footer-loader.js"></script>
 </body>
 </html>

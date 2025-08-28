@@ -18,7 +18,7 @@ COPY *.html ./
 COPY *.js ./
 COPY *.css ./
 COPY *.json ./
-COPY eslint.config.mjs ./
+COPY eslint.config.js ./
 
 # Copy scripts directory
 COPY scripts/ ./scripts/
