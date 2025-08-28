@@ -24,21 +24,194 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h1>Database Architecture</h1>
-<p>HexTrackr uses a database-first approach with a fallback to localStorage.</p>
-<h2>Primary Storage</h2>
+<p>HexTrackr uses SQLite as its primary storage at <code>data/hextrackr.db</code>, initialized by <code>scripts/init-database.js</code> with runtime schema evolution in <code>server.js</code>.</p>
+<h2>Engine</h2>
 <ul>
-<li><strong>Database</strong>: SQLite (<code>data/hextrackr.db</code>)</li>
-<li><strong>Rationale</strong>: SQLite provides a simple, file-based, and self-contained database solution that is perfect for a lightweight application like HexTrackr. It requires no separate server process.</li>
+<li>SQLite 3 (file-backed). Chosen for simplicity and zero-ops embedded deployment.</li>
 </ul>
-<h2>Data Model</h2>
+<h2>Tables</h2>
+<h3>tickets</h3>
+<p>Created initially to mirror earlier localStorage fields; the server currently reads/writes additional columns. Expect schema evolution.</p>
+<p>Initial columns (init-database.js):</p>
 <ul>
-<li><strong>Tickets</strong>: Stores information about support tickets.</li>
-<li><strong>Vulnerabilities</strong>: Stores vulnerability data imported from CSVs. The data model is designed for time-series tracking, allowing for analysis of trends.</li>
-<li><strong>UPSERT Logic</strong>: When importing vulnerability data, the system performs an UPSERT (update or insert) to avoid creating duplicate entries.</li>
+<li>id TEXT PRIMARY KEY</li>
+<li>location TEXT NOT NULL</li>
+<li>devices TEXT (JSON array as string)</li>
+<li>description TEXT</li>
+<li>urgency TEXT</li>
+<li>category TEXT</li>
+<li>status TEXT DEFAULT &#39;Open&#39;</li>
+<li>assigned_to TEXT</li>
+<li>created_date TEXT</li>
+<li>updated_date TEXT</li>
+<li>notes TEXT</li>
 </ul>
-<h2>Fallback Storage</h2>
+<p>Observed fields used by API (server.js):</p>
 <ul>
-<li><strong>localStorage</strong>: If the backend database is unavailable, the application can fall back to using the browser&#39;s localStorage for basic functionality. This is not a primary feature but provides resilience.</li>
+<li>xt_number TEXT</li>
+<li>date_submitted TEXT</li>
+<li>date_due TEXT</li>
+<li>hexagon_ticket TEXT</li>
+<li>service_now_ticket TEXT</li>
+<li>supervisor TEXT</li>
+<li>tech TEXT</li>
+<li>attachments TEXT (JSON string)</li>
+<li>created_at TEXT</li>
+<li>updated_at TEXT</li>
+<li>site TEXT</li>
+<li>site_id INTEGER</li>
+<li>location_id INTEGER</li>
+</ul>
+<p>Note: Some deployments may not yet have all observed columns. API may return nulls; migrations are in progress.</p>
+<h3>vulnerability_imports</h3>
+<ul>
+<li>id INTEGER PRIMARY KEY AUTOINCREMENT</li>
+<li>filename TEXT NOT NULL</li>
+<li>import_date TEXT NOT NULL</li>
+<li>row_count INTEGER NOT NULL</li>
+<li>vendor TEXT</li>
+<li>file_size INTEGER</li>
+<li>processing_time INTEGER</li>
+<li>raw_headers TEXT (JSON array of CSV headers)</li>
+<li>created_at DATETIME DEFAULT CURRENT_TIMESTAMP</li>
+</ul>
+<h3>vulnerabilities</h3>
+<p>Initial columns (init-database.js):</p>
+<ul>
+<li>id INTEGER PRIMARY KEY AUTOINCREMENT</li>
+<li>import_id INTEGER NOT NULL (FK -&gt; vulnerability_imports.id)</li>
+<li>hostname TEXT</li>
+<li>ip_address TEXT</li>
+<li>cve TEXT</li>
+<li>severity TEXT</li>
+<li>vpr_score REAL</li>
+<li>cvss_score REAL</li>
+<li>first_seen TEXT</li>
+<li>last_seen TEXT</li>
+<li>plugin_id TEXT</li>
+<li>plugin_name TEXT</li>
+<li>description TEXT</li>
+<li>solution TEXT</li>
+<li>vendor_reference TEXT</li>
+<li>created_at DATETIME DEFAULT CURRENT_TIMESTAMP</li>
+</ul>
+<p>Runtime ALTERs added by server.js (idempotent):</p>
+<ul>
+<li>vendor TEXT DEFAULT &#39;&#39;</li>
+<li>vulnerability_date TEXT DEFAULT &#39;&#39;</li>
+<li>state TEXT DEFAULT &#39;open&#39;</li>
+<li>import_date TEXT DEFAULT &#39;&#39;</li>
+</ul>
+<h3>ticket_vulnerabilities</h3>
+<ul>
+<li>id INTEGER PRIMARY KEY AUTOINCREMENT</li>
+<li>ticket_id TEXT NOT NULL (FK -&gt; tickets.id)</li>
+<li>vulnerability_id INTEGER NOT NULL (FK -&gt; vulnerabilities.id)</li>
+<li>relationship_type TEXT DEFAULT &#39;remediation&#39;</li>
+<li>notes TEXT</li>
+<li>created_at DATETIME DEFAULT CURRENT_TIMESTAMP</li>
+</ul>
+<h2>Indexes</h2>
+<ul>
+<li>idx_vulnerabilities_hostname (vulnerabilities.hostname)</li>
+<li>idx_vulnerabilities_severity (vulnerabilities.severity)</li>
+<li>idx_vulnerabilities_cve (vulnerabilities.cve)</li>
+<li>idx_vulnerabilities_import (vulnerabilities.import_id)</li>
+<li>idx_ticket_vulns_ticket (ticket_vulnerabilities.ticket_id)</li>
+</ul>
+<h2>Entity Relationships</h2>
+<pre><code class="language-mermaid">erDiagram
+	vulnerability_imports ||--o{ vulnerabilities : contains
+	tickets ||--o{ ticket_vulnerabilities : has
+	vulnerabilities ||--o{ ticket_vulnerabilities : linked_by
+
+	vulnerability_imports {
+		integer id PK
+		text filename
+		text import_date
+		integer row_count
+		text vendor
+		integer file_size
+		integer processing_time
+		text raw_headers
+		datetime created_at
+	}
+	vulnerabilities {
+		integer id PK
+		integer import_id FK
+		text hostname
+		text ip_address
+		text cve
+		text severity
+		real vpr_score
+		real cvss_score
+		text first_seen
+		text last_seen
+		text plugin_id
+		text plugin_name
+		text description
+		text solution
+		text vendor_reference
+		text vendor
+		text vulnerability_date
+		text state
+		text import_date
+		datetime created_at
+	}
+	tickets {
+		text id PK
+		text xt_number
+		text date_submitted
+		text date_due
+		text hexagon_ticket
+		text service_now_ticket
+		text location
+		text devices
+		text supervisor
+		text tech
+		text status
+		text notes
+		text attachments
+		text created_at
+		text updated_at
+		text site
+		integer site_id
+		integer location_id
+	}
+	ticket_vulnerabilities {
+		integer id PK
+		text ticket_id FK
+		integer vulnerability_id FK
+		text relationship_type
+		text notes
+		datetime created_at
+	}
+</code></pre>
+<h2>Data flows</h2>
+<h3>CSV import (multipart)</h3>
+<pre><code class="language-mermaid">sequenceDiagram
+	participant UI as vulnerabilities.html
+	participant API as POST /api/vulnerabilities/import
+	participant DB as SQLite
+	UI-&gt;&gt;API: Upload csvFile (+vendor)
+	API-&gt;&gt;DB: INSERT vulnerability_imports
+	API-&gt;&gt;DB: INSERT vulnerabilities (mapped rows)
+	API--&gt;&gt;UI: { success, importId, rowsProcessed }
+</code></pre>
+<h3>JSON import (CSV parsed client-side)</h3>
+<pre><code class="language-mermaid">sequenceDiagram
+	participant UI
+	participant API as POST /api/import/vulnerabilities
+	participant DB
+	UI-&gt;&gt;API: { data: [...] }
+	API-&gt;&gt;DB: INSERT vulnerability_imports
+	API-&gt;&gt;DB: INSERT vulnerabilities
+	API--&gt;&gt;UI: { success, imported, total, importId }
+</code></pre>
+<h2>Notes and caveats</h2>
+<ul>
+<li>Tickets schema drift: server endpoints expect additional columns not present in the initial table. Migrations will align these over time. Client code handles absent fields gracefully.</li>
+<li>Vulnerabilities table gains extra columns at runtime; re-running server on an existing DB is safe due to duplicate column guards.</li>
 </ul>
 
                                 </div>
