@@ -350,6 +350,87 @@ app.get(/^\/docs-prototype\/(.*)\.html$/, (req, res) => {
     res.redirect(302, `/docs-prototype/#${section}`);
 });
 
+// Documentation statistics endpoint (used by docs portal homepage)
+// Computes:
+//  - apiEndpoints: number of unique Express routes under /api
+//  - jsFunctions: approximate count of JS function definitions in key folders
+app.get('/api/docs/stats', async (req, res) => {
+    try {
+        const readText = (p) => fs.readFileSync(p, 'utf8');
+
+        // 1) Count API endpoints in server.js
+        const serverPath = path.join(__dirname, 'server.js');
+        let apiEndpoints = 0;
+        try {
+            const serverSrc = readText(serverPath);
+            // match app.get('/api/...', ...) capturing path
+            const routeRegex = /app\.(get|post|put|delete|patch|options|head)\s*\(\s*['"`]([^'"`]+)['"`]\s*,/g;
+            const paths = new Set();
+            let m;
+            while ((m = routeRegex.exec(serverSrc)) !== null) {
+                const routePath = m[2];
+                if (routePath.startsWith('/api/')) {
+                    paths.add(routePath);
+                }
+            }
+            apiEndpoints = paths.size;
+        } catch (e) {
+            apiEndpoints = 0;
+        }
+
+        // 2) Approximate JS function count across scripts/ and docs-prototype/js and server.js
+        const scanDirs = [
+            path.join(__dirname, 'scripts'),
+            path.join(__dirname, 'docs-prototype', 'js')
+        ];
+        const filesToScan = [];
+
+        const walk = (dir) => {
+            try {
+                const entries = fs.readdirSync(dir, { withFileTypes: true });
+                for (const e of entries) {
+                    const p = path.join(dir, e.name);
+                    if (e.isDirectory()) walk(p);
+                    else if (e.isFile() && p.endsWith('.js')) filesToScan.push(p);
+                }
+            } catch (_) { /* ignore */ }
+        };
+
+        scanDirs.forEach(walk);
+        // include server.js
+        filesToScan.push(serverPath);
+
+        let jsFunctions = 0;
+        const fnRegexes = [
+            /\bfunction\s+[a-zA-Z0-9_$]+\s*\(/g,                  // named functions
+            /\b(const|let|var)\s+[a-zA-Z0-9_$]+\s*=\s*\([^)]*\)\s*=>/g, // arrow fns
+            /\b[a-zA-Z0-9_$]+\s*:\s*function\s*\(/g              // obj prop functions
+        ];
+
+        for (const f of filesToScan) {
+            try {
+                const src = readText(f);
+                for (const rx of fnRegexes) {
+                    const matches = src.match(rx);
+                    if (matches) jsFunctions += matches.length;
+                }
+            } catch (_) { /* ignore file read errors */ }
+        }
+
+        // 3) Rough framework count (static list of primary frameworks)
+        const frameworks = ['Express', 'Bootstrap', 'Tabler', 'SQLite'];
+
+        res.json({
+            apiEndpoints,
+            jsFunctions,
+            frameworks: frameworks.length,
+            computedAt: new Date().toISOString()
+        });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to compute docs stats' });
+    }
+});
+
 // Clear data endpoint
 app.delete('/api/backup/clear/:type', (req, res) => {
     const { type } = req.params;

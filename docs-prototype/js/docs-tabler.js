@@ -18,6 +18,8 @@ class DocumentationPortal {
         this.setupEventListeners();
         this.loadDocumentationData();
         this.initializeSearch();
+    // Try to update overview statistics dynamically
+    this.refreshOverviewStats();
         this.handleHashChange(); // Handle initial hash on load
     }
 
@@ -357,6 +359,35 @@ class DocumentationPortal {
                 });
             });
         });
+    }
+
+    // Fetch dynamic statistics for the overview cards
+    async refreshOverviewStats() {
+        try {
+            const res = await fetch('/api/docs/stats');
+            if (!res.ok) return; // leave defaults
+            const data = await res.json();
+            // Update cards if present
+            const endpointEl = document.querySelector('#overview-content .card-body .h1');
+            // The overview has 3 cards; query them explicitly
+            const cards = document.querySelectorAll('#overview-content .card.card-sm .card-body .h1');
+            if (cards.length >= 3) {
+                // 0: endpoints, 1: js functions, 2: frameworks
+                if (typeof data.apiEndpoints === 'number') cards[0].textContent = data.apiEndpoints;
+                if (typeof data.jsFunctions === 'number') cards[1].textContent = data.jsFunctions;
+                if (typeof data.frameworks === 'number') cards[2].textContent = data.frameworks;
+            }
+
+            // Also update badge counts if present
+            const apiBadges = Array.from(document.querySelectorAll('#overview-content .badge.bg-blue-lt'));
+            const jsBadges = Array.from(document.querySelectorAll('#overview-content .badge.bg-green-lt'));
+            const apiBadge = apiBadges.find(b => /Endpoints/i.test(b.textContent));
+            const jsBadge = jsBadges.find(b => /Functions/i.test(b.textContent));
+            if (apiBadge && typeof data.apiEndpoints === 'number') apiBadge.textContent = `${data.apiEndpoints} Endpoints`;
+            if (jsBadge && typeof data.jsFunctions === 'number') jsBadge.textContent = `${data.jsFunctions} Functions`;
+        } catch (_) {
+            // ignore; leave defaults
+        }
     }
 }
 
