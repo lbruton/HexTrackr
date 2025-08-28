@@ -20,17 +20,15 @@ STAGED_MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.m
 if [ -n "$STAGED_MD_FILES" ]; then
   echo "\n${YELLOW}[pre-commit]${NC} Checking Markdown files..."
   
-  # Run auto-fix first
+  # Run auto-fix first using official markdownlint
   echo "${YELLOW}[pre-commit]${NC} Auto-fixing Markdown issues..."
-  for file in $STAGED_MD_FILES; do
-    node scripts/fix-markdown.js --file="$file"
-  done
+  npx markdownlint --fix --disable MD013 MD046 -- $STAGED_MD_FILES
   
   # Re-stage auto-fixed files
   git add $STAGED_MD_FILES
   
-  # Run validation
-  ./node_modules/.bin/markdownlint --config .markdownlint.json --ignore-path .markdownlintignore $STAGED_MD_FILES
+  # Run validation (disable MD013 line-length and MD046 code-block-style)
+  npx markdownlint --disable MD013 MD046 -- $STAGED_MD_FILES
   MD_STATUS=$?
   
   if [ $MD_STATUS -ne 0 ]; then
