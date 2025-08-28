@@ -9,7 +9,8 @@
     "init-db": "node scripts/init-database.js",
     "roadmap": "node scripts/generate-roadmap-portal.js",
   "eslint": "eslint scripts/pages/tickets.js --config eslint.config.mjs",
-  "docs:generate": "node docs-prototype/html-content-updater.js"
+  "docs:generate": "node docs-prototype/html-content-updater.js",
+  "lint:md": "markdownlint --config .markdownlint.json '**/*.md'"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -19,14 +20,15 @@
     "express": "^4.18.2",
     "highlight.js": "^11.11.1",
     "jszip": "^3.10.1",
-    "marked": "^16.2.1",
-    "multer": "^2.0.2",
-    "papaparse": "^5.4.1",
-    "playwright": "^1.55.0",
+  "marked": "^16.2.1",
+  "multer": "^2.0.2",
+  "papaparse": "^5.4.1",
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
-    "eslint": "^9.34.0",
-    "nodemon": "^3.0.1"
+  "eslint": "^9.34.0",
+  "nodemon": "^3.0.1",
+  "markdownlint-cli": "^0.41.0",
+  "playwright": "^1.55.0"
   }
 }
