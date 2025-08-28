@@ -1,4 +1,6 @@
 /* eslint-env browser */
+/* global fetch, window, document, console, CSS, Prism, bootstrap */
+/* eslint-disable no-undef */
 
 // Documentation Portal JavaScript (Tabler.io version)
 class DocumentationPortal {
@@ -192,6 +194,9 @@ class DocumentationPortal {
         if (window.Prism) {
             Prism.highlightAllUnder(sectionEl);
         }
+
+    // Rewrite internal links inside the loaded content to use hash routing
+    this.rewriteInternalLinks(sectionEl);
     }
 
     updateActiveNavigation() {
@@ -266,6 +271,92 @@ class DocumentationPortal {
 
     highlight(text, query) {
         return text.replace(new RegExp(query, "gi"), (match) => `<span class="bg-yellow-lt">${match}</span>`);
+    }
+
+    // Map a content href to a section path used by the router. Returns
+    // { section: 'category/page', fragment?: 'anchor' } or null if external.
+    mapContentHrefToSection(href) {
+        if (!href) return null;
+        const trimmed = href.trim();
+
+        // External links or protocols we don't handle
+        if (/^(https?:)?\/\//i.test(trimmed) || /^mailto:/i.test(trimmed) || /^tel:/i.test(trimmed)) {
+            return null;
+        }
+
+        // In-page anchor within the current content
+        if (trimmed.startsWith('#')) {
+            return { section: this.currentSection, fragment: trimmed.slice(1) };
+        }
+
+        // Normalize common path patterns to content path
+        const patterns = [
+            /^\/?docs-prototype\/content\/(.+?)\.html(?:#(.*))?$/i,
+            /^\/?content\/(.+?)\.html(?:#(.*))?$/i,
+            /^\.\.\/content\/(.+?)\.html(?:#(.*))?$/i,
+            /^\.\/content\/(.+?)\.html(?:#(.*))?$/i,
+        ];
+
+        for (const rx of patterns) {
+            const m = trimmed.match(rx);
+            if (m) {
+                const section = m[1];
+                const fragment = m[2];
+                return { section, fragment };
+            }
+        }
+
+        // Relative HTML file link (e.g., "backend.html")
+        if (/^[a-z0-9\-_/]+\.html(?:#(.*))?$/i.test(trimmed)) {
+            const rel = trimmed.replace(/^\.\//, '');
+            const noHtml = rel.replace(/\.html(?:#.*)?$/i, '');
+            // Resolve relative to current section directory
+            const parts = this.currentSection.split('/');
+            parts.pop(); // remove current page
+            const base = parts.join('/');
+            const section = base ? `${base}/${noHtml}` : noHtml;
+            const fragMatch = trimmed.match(/\.html#(.*)$/i);
+            const fragment = fragMatch ? fragMatch[1] : undefined;
+            return { section, fragment };
+        }
+
+        return null;
+    }
+
+    // Rewrite internal links inside a container to hash-based routes and
+    // delegate navigation through loadSection. Keeps external links intact.
+    rewriteInternalLinks(rootEl) {
+        if (!rootEl) return;
+        const anchors = rootEl.querySelectorAll('a[href]');
+        anchors.forEach((a) => {
+            const href = a.getAttribute('href');
+            const mapped = this.mapContentHrefToSection(href);
+            if (!mapped) return; // external
+
+            // If it's an in-page anchor, just handle smooth scroll
+            if (href.startsWith('#')) {
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const id = href.slice(1);
+                    const target = rootEl.querySelector(`[id="${CSS.escape(id)}"]`);
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+                return;
+            }
+
+            // Regular internal doc link: rewrite href and handle via router
+            const newHash = `#${mapped.section}`;
+            a.setAttribute('href', newHash);
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.loadSection(mapped.section).then(() => {
+                    if (mapped.fragment) {
+                        const target = document.getElementById(mapped.fragment) || rootEl.querySelector(`[id="${CSS.escape(mapped.fragment)}"]`);
+                        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        });
     }
 }
 

@@ -1,3 +1,6 @@
+/* eslint-env node */
+/* global __dirname, require, module, console, process, setTimeout */
+/* eslint-disable no-undef */
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -311,8 +314,38 @@ app.get('/docs-prototype', (req, res) => {
     res.sendFile(path.join(__dirname, 'docs-prototype', 'index.html'));
 });
 
+// Helper to find a section path for a given filename by scanning the content folder
+function findDocsSectionForFilename(filename) {
+    try {
+        const contentRoot = path.join(__dirname, 'docs-prototype', 'content');
+        const stack = ['']; // use relative subpaths
+        while (stack.length) {
+            const relDir = stack.pop();
+            const dirPath = path.join(contentRoot, relDir);
+            const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+            for (const entry of entries) {
+                if (entry.isDirectory()) {
+                    stack.push(path.join(relDir, entry.name));
+                } else if (entry.isFile() && entry.name.toLowerCase() === filename.toLowerCase()) {
+                    const relFile = path.join(relDir, entry.name);
+                    // Convert to section path without .html and using forward slashes
+                    return relFile.replace(/\\/g, '/').replace(/\.html$/i, '');
+                }
+            }
+        }
+    } catch (e) {
+        // ignore scan errors and fall back to original behavior
+    }
+    return null;
+}
+
 app.get(/^\/docs-prototype\/(.*)\.html$/, (req, res) => {
-    const section = req.params[0];
+    let section = req.params[0];
+    // If the request is only a filename (no directory), try to resolve the correct section path
+    if (!section.includes('/')) {
+        const resolved = findDocsSectionForFilename(`${section}.html`);
+        if (resolved) section = resolved;
+    }
     // Redirect to hash-based section so the SPA shell loads correctly
     res.redirect(302, `/docs-prototype/#${section}`);
 });

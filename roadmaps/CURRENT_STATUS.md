@@ -139,7 +139,11 @@
 **🎯 Sprint Status**: 5/6 Tasks Complete (83%) - NEARLY COMPLETE!  
 **🎉 Major Milestone**: Markdown-First Documentation Workflow COMPLETE!
 
-### 💭 **WISHLIST ITEM ADDED**: AI Documentation Automation
+### � Additional Fixes (Portal Navigation)
+
+- Rewrote internal links in generated docs to hash-based routes and added delegated click handling. TOC links now navigate within the single-page portal without 404s. Lint updated for browser globals.
+
+### �💭 **WISHLIST ITEM ADDED**: AI Documentation Automation
 
 - **Vision**: Settings panel with Gemini/OpenAI API key integration
 - **Feature**: Automated documentation sweep and updates via AI APIs  
