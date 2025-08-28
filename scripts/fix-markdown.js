@@ -19,6 +19,9 @@
 const fs = require("fs");
 const path = require("path");
 
+// Define the safe root directory for file operations
+const BASE_DIRECTORY = path.resolve(__dirname, "..");
+
 /**
  * Secure path validation utility to prevent path traversal attacks
  */
@@ -55,7 +58,7 @@ class PathValidator {
 
         // Resolve the path to get absolute path
         const resolvedPath = path.resolve(filePath);
-        const resolvedBase = path.resolve(allowedBaseDir);
+        const resolvedBase = path.resolve(allowedBaseDir) && fs.existsSync(allowedBaseDir) ? path.resolve(allowedBaseDir) : (() => { throw new Error("Invalid base directory specified"); })();
 
         // Check if the resolved path is within the allowed base directory
         if (!resolvedPath.startsWith(resolvedBase)) {
@@ -84,6 +87,8 @@ class PathValidator {
 
     static safeReadFileSync(filePath, options = "utf8") {
         const validatedPath = PathValidator.validatePath(filePath);
+        const projectRoot = path.resolve(__dirname, "..");
+        if (!validatedPath.startsWith(projectRoot)) throw new Error("Access to this file path is not allowed.");
         return fs.readFileSync(validatedPath, options);
     }
 
@@ -105,7 +110,7 @@ class PathValidator {
     static safeExistsSync(filePath) {
         try {
             const validatedPath = PathValidator.validatePath(filePath);
-            return fs.existsSync(validatedPath);
+            return fs.existsSync(path.resolve(BASE_DIRECTORY, validatedPath));
         } catch {
             return false; // If path validation fails, treat as non-existent
         }
@@ -364,7 +369,14 @@ class MarkdownFormatter {
                     if (!item || typeof item !== "string") continue;
                     
                     // Use safe path joining to prevent path traversal
-                    const fullPath = path.join(currentDir, PathValidator.validatePathComponent(item));
+                    const fullPath = path.resolve(currentDir, PathValidator.validatePathComponent(item));
+                    
+                    // Ensure the resolved path is still within currentDir bounds
+                    if (!fullPath.startsWith(path.resolve(currentDir))) {
+                        console.warn(`Skipping potential path traversal attempt: ${item}`);
+                        continue;
+                    }
+                    
                     const stat = PathValidator.safeStatSync(fullPath);
                     
                     if (stat.isDirectory()) {
@@ -414,8 +426,8 @@ function main() {
         dryRun: args.includes("--dry-run"),
         verbose: args.includes("--verbose") || args.includes("-v"),
         all: args.includes("--all"),
-    file: args.find(arg => arg.startsWith("--file="))?.split("=")[1],
-    dir: args.find(arg => arg.startsWith("--dir="))?.split("=")[1]
+        file: args.find(arg => arg.startsWith("--file="))?.split("=")[1],
+        dir: args.find(arg => arg.startsWith("--dir="))?.split("=")[1]
     };
 
     console.log("🔧 HexTrackr Markdown Formatter");
