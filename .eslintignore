@@ -1,0 +1,6 @@
+# ESLint ignore patterns
+node_modules/
+docs-prototype/js/docs-tabler.js
+scripts/chart.min.js
+scripts/ag-grid-responsive-config.js
+uploads/
