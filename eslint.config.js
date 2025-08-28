@@ -42,7 +42,7 @@ export default [
   },
   {
     // Configuration for Node.js scripts
-    files: ["docs-prototype/generate-docs.js", "docs-source/generate-docs.js", "scripts/**/*.js"],
+    files: ["docs-prototype/generate-docs.js", "docs-prototype/gemini-docs-generator.js", "docs-source/generate-docs.js", "scripts/**/*.js"],
     languageOptions: {
       sourceType: "commonjs",
       globals: {

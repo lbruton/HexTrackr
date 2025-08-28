@@ -23,12 +23,15 @@ scripts/
 ## Architecture Principles
 
 ### 1. Shared Components Pattern
+
 - **Shared components** in `scripts/shared/` contain functionality used across multiple pages
 - **Page-specific code** in `scripts/pages/` contains functionality unique to each page
 - **Utility functions** in `scripts/utils/` contain helper functions used throughout the app
 
 ### 2. Integration Pattern
+
 Each page includes:
+
 1. **Shared components first** (e.g., settings-modal.js)
 2. **Page-specific code second** (e.g., tickets.js)
 
@@ -40,6 +43,7 @@ Example in HTML:
 ```
 
 ### 3. Communication Pattern
+
 - **Shared components** expose global functions and event handlers
 - **Page-specific code** registers callback functions on the `window` object for shared components to use
 - **Example**: Settings modal calls `window.refreshPageData(type)` when data operations complete
@@ -47,6 +51,7 @@ Example in HTML:
 ## Current Implementation
 
 ### Shared Settings Modal (`scripts/shared/settings-modal.js`)
+
 - **Purpose**: Unified Settings modal functionality across all pages
 - **Features**: 
   - API configuration (Cisco PSIRT, Tenable)
@@ -56,6 +61,7 @@ Example in HTML:
 - **Integration**: Auto-initializes and provides global functions for all data operations
 
 ### Page Integration
+
 Each page provides integration functions:
 
 ```javascript
@@ -73,21 +79,25 @@ window.showToast = function(message, type) {
 ## Benefits
 
 ### 1. Reusability
+
 - Settings modal functionality is written once, used everywhere
 - New pages automatically get Settings modal support by including the shared component
 - Common utilities can be easily shared across pages
 
 ### 2. Maintainability
+
 - Bug fixes in shared components automatically apply to all pages
 - Consistent behavior across the application
 - Clear separation of concerns
 
 ### 3. Scalability
+
 - Adding a new page only requires creating a new file in `scripts/pages/`
 - Shared components can be enhanced without touching page-specific code
 - Easy to add new shared components as the application grows
 
 ### 4. Development Efficiency
+
 - No code duplication for common functionality
 - Faster development of new features
 - Easier testing and debugging
@@ -95,11 +105,13 @@ window.showToast = function(message, type) {
 ## Migration Strategy
 
 ### Vulnerabilities Page
+
 - **Current State**: ~1788 lines of JavaScript embedded in HTML
 - **Strategy**: Incremental migration to `scripts/pages/vulnerabilities.js`
 - **Priority**: New features go directly in the JS file, existing features migrated as needed
 
 ### Future Pages
+
 - Any new page should follow the modular pattern from the start
 - Include shared components as needed
 - Keep page-specific code in dedicated JS files
@@ -107,16 +119,19 @@ window.showToast = function(message, type) {
 ## Usage Examples
 
 ### Adding a New Page
+
 1. Create `scripts/pages/newpage.js`
 2. Include required shared components in the HTML
 3. Implement integration functions (`window.refreshPageData`, `window.showToast`)
 
 ### Adding a New Shared Component
+
 1. Create the component in `scripts/shared/`
 2. Include it in all relevant HTML pages
 3. Update page-specific integration as needed
 
 ### Modifying Settings Modal
+
 - Edit `scripts/shared/settings-modal.js`
 - Changes automatically apply to all pages
 - No need to modify individual page files

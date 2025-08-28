@@ -1,7 +1,9 @@
 # HexTrackr Project Roadmap & Task List
 
 ## 🎯 Project Overview
+
 HexTrackr is a dual-purpose cybersecurity management system providing:
+
 - **Ticket Management**: Hexagon security workflow management
 - **Vulnerability Management**: Multi-vendor vulnerability data analysis
 
@@ -10,6 +12,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 ## 🟢 COMPLETED FEATURES
 
 ### Core Infrastructure ✅
+
 - [x] **Dual-app architecture** (tickets.html + vulnerabilities.html)
 - [x] **Time-series database** with dimensional schema migration (97% data reduction)
 - [x] **Modern AG Grid** with responsive configuration
@@ -21,6 +24,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 - [x] **JavaScript architecture** with modular pattern (shared components + page-specific files) ✅ **COMPLETE Aug 26, 2025**
 
 ### Chart & Visualization System ✅
+
 - [x] **ApexCharts integration** with historical VPR trends
 - [x] **Metric toggle functionality** (Count ↔ VPR Sum modes)
 - [x] **Multi-severity visualization** (Critical, High, Medium, Low)
@@ -28,6 +32,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 - [x] **Responsive chart configuration** for mobile/desktop
 
 ### Recent Critical Fixes ✅
+
 - [x] **VPR Toggle Bug Fix** - Fixed JavaScript DOM selector issue in chart metric switching
 - [x] **Database Schema Migration** - Complete time-series implementation with optimized queries
 - [x] **Data Quality Improvement** - Eliminated 97% duplicates, maintained historical accuracy
@@ -36,6 +41,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 - [x] **Playwright Testing Integration** - Comprehensive browser automation testing deployed ✅ **Aug 26, 2025**
 
 ### Cisco API Integration ✅
+
 - [x] **OAuth2 authentication** with real Cisco endpoints
 - [x] **AES-256 credential encryption** for secure local storage
 - [x] **Live API testing** with connection validation
@@ -46,7 +52,27 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 
 ## 🟡 IN PROGRESS
 
+### Code Quality & Security Compliance 🔄 **CRITICAL - RELEASE BLOCKER**
+
+- [ ] **Codacy Compliance for v1.0.3 Release** - 83 issues identified, security fixes prioritized
+  - [ ] **Security Fixes** (Release Blocking - HIGH Priority)
+    - [ ] Fix Generic Object Injection Sink vulnerability
+    - [ ] Secure fs.writeFileSync operations with literal arguments
+    - [ ] Secure fs.existsSync operations with literal arguments  
+    - [ ] Replace unsafe innerHTML assignments with secure alternatives
+  - [ ] **Code Quality Improvements** (Medium Priority)
+    - [ ] Address remaining ESLint violations
+    - [ ] Fix code style and consistency issues
+    - [ ] Resolve complexity and maintainability warnings
+  - [ ] **Quality Gate Establishment**
+    - [x] ESLint configuration improvements implemented ✅ **Aug 27, 2025**
+    - [ ] Security issue resolution
+    - [ ] Codacy compliance verification before v1.0.3 release
+  - **Goal**: Zero critical/high security issues, <50 total Codacy issues before any patch release
+  - **Timeline**: Complete before v1.0.3 release
+
 ### Documentation Portal Completion ✅ **COMPLETED** - *August 27, 2025*
+
 - [x] **Complete Documentation Portal System** - Comprehensive project documentation system
   - [x] Fixed duplicate content mapping in documentation generator
   - [x] Created database schema visualization with complete table relationships
@@ -59,6 +85,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
   - **Achievement**: ✅ Markdown-First Documentation Workflow COMPLETE!
 
 ### Ticket Modal Enhancement Suite 🔄 **HIGH PRIORITY**
+
 - [ ] **Comprehensive Ticket Modal Improvements** - See [TICKET_MODAL_ENHANCEMENTS_20250827.md](./TICKET_MODAL_ENHANCEMENTS_20250827.md) for detailed implementation plan
   - [x] Fix backend/frontend field mapping (critical save bug) ✅ **COMPLETED**
   - [x] Add XT# read-only display field ✅ **COMPLETED Aug 27, 2025**
@@ -70,6 +97,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
   - [ ] Comprehensive testing and validation
 
 ### Chart Timeline Enhancement 🔄 **NEXT PRIORITY**
+
 - [ ] **Timeline Extension Feature** - Extend chart to current date with flat lines for data continuity
   - [ ] Calculate gap between last data point and current date (August 25, 2025)
   - [ ] Add synthetic data points to extend timeline with flat lines
@@ -77,6 +105,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
   - [ ] Improve UX to show system is current and up-to-date
 
 ### Performance Optimization 🔄
+
 - [ ] **Large CSV file handling** (50-100MB files)
   - [ ] Implement streaming CSV parser for memory efficiency
   - [ ] Add column filtering to ignore unnecessary data
@@ -86,9 +115,44 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 
 ---
 
-## 🔴 PLANNED FEATURES
+## � **RELEASE PLANNING & VERSION CONTROL**
+
+### Version 1.0.3 (Next Patch Release) 🚀
+
+**Release Blockers**:
+
+- [x] ESLint configuration improvements ✅ **Aug 27, 2025**
+- [ ] **Security fixes from Codacy scan** (4 critical security issues)
+- [ ] **Code quality compliance** (<50 total Codacy issues)
+- [ ] **Comprehensive testing** of all security fixes
+
+**Release Goals**:
+
+- Zero critical/high security vulnerabilities
+- Codacy compliance established as ongoing quality gate
+- All security-related fs operations properly secured
+- DOM manipulation using secure methods only
+
+### Version 1.1.0 (Next Minor Release)
+
+**Features**:
+
+- Ticket Modal Enhancement Suite completion
+- Chart Timeline Enhancement
+- Performance optimization for large CSV files
+
+**Quality Gates**:
+
+- [ ] Maintain Codacy compliance (ongoing)
+- [ ] Security audit pass required
+- [ ] Performance benchmarks met
+
+---
+
+## �🔴 PLANNED FEATURES
 
 ### AI-Powered Documentation Automation 🤖 **POST-AUTH FEATURE**
+
 - [ ] **Automated Documentation Generation System** - AI-powered self-updating docs
   - [ ] Settings panel integration for API key management
     - [ ] Gemini API key configuration
@@ -115,12 +179,14 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 ### API Integrations Roadmap 📋
 
 #### Cisco Extensions
+
 - [ ] **Security Advisories Sync** (partially stubbed)
   - [ ] Complete `syncCiscoAdvisories()` implementation
   - [ ] Advisory correlation with existing vulnerabilities
   - [ ] Risk scoring integration
 
 #### Palo Alto Networks Integration
+
 - [ ] **Prisma Cloud API** integration
 - [ ] **Cortex API** for threat intelligence
 - [ ] **PAN-OS API** for firewall management
@@ -129,21 +195,23 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 - [ ] Multi-product configuration management
 
 #### Additional Vendor APIs
+
 - [ ] **Tenable.io** vulnerability scanner integration
 - [ ] **Qualys** VMDR API connectivity
 - [ ] **Rapid7** InsightVM integration
 - [ ] **CrowdStrike** Falcon endpoint data
 
 ### UI/UX Modernization & Standardization 🎨
+
 - [ ] **Unify Application Framework** - Migrate `tickets.html` from Bootstrap 5 to Tabler.io to create a single, consistent user experience. (See also: `UI_UX_ROADMAP.md`, Phase 9.1)
 - [ ] **Standardize Data Tables** - Replace the custom HTML table on `tickets.html` with AG Grid, aligning it with the `vulnerabilities.html` implementation.
 - [ ] **Implement Dark Mode-Aware Charting** - Refactor ApexCharts initialization to use Tabler.io CSS variables, enabling seamless theme switching (Light/Dark mode). (See also: `UI_UX_ROADMAP.md`, Phase 10.1)
 - [ ] **Formalize Component Strategy** - Officially document and enforce the use of Tabler.io for layout, AG Grid for tables, and ApexCharts for all data visualizations.
 
-
 ### Network Infrastructure Features 📋
 
 #### SNMP Network Polling
+
 - [ ] **SNMPv2/v3 implementation**
   - [ ] Real-time device status monitoring
   - [ ] Hardware health monitoring  
@@ -156,6 +224,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
   - [ ] Scalable multi-network support
 
 #### Network Discovery & Mapping
+
 - [ ] **Automated asset discovery**
 - [ ] **Network topology visualization**
 - [ ] **Device fingerprinting**
@@ -164,6 +233,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 ### Automation & Orchestration 📋
 
 #### Ansible Integration
+
 - [ ] **AWX/Tower API connectivity**
 - [ ] **Automated patch deployment**
 - [ ] **Configuration compliance enforcement**
@@ -173,6 +243,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 - [ ] **Playbook execution monitoring**
 
 #### Docker Implementation
+
 - [ ] **Container architecture**
   - [ ] SNMP polling service containerization
   - [ ] API gateway container
@@ -182,6 +253,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 ### Advanced Analytics & Intelligence 📋
 
 #### Threat Intelligence & Priority Enhancement
+
 - [ ] **CISA KEV Integration** 🚨 **HIGH PRIORITY**
   - [ ] Non-API CSV download implementation (user-friendly, no API key required)
   - [ ] API-based real-time sync (for users with access)
@@ -199,6 +271,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 - [ ] **Enhanced risk scoring algorithms** (CVSS + EPSS + KEV + time-series trends)
 
 #### Reporting & Visualization
+
 - [ ] **Executive dashboards**
 - [ ] **Compliance reporting** (SOC2, ISO27001, NIST)
 - [ ] **Trend analysis** with ApexCharts expansion
@@ -214,6 +287,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 ### Enterprise Features 📋
 
 #### Multi-tenancy & Access Control
+
 - [ ] **User authentication system**
   - [ ] Login page with secure credential handling
   - [ ] Session management and token-based authentication
@@ -246,6 +320,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
   - [ ] Security event alerting system
 
 #### Data Management
+
 - [ ] **Backend database** option (PostgreSQL/MongoDB)
 - [ ] **Data retention policies**
 - [ ] **Backup & restore functionality**
@@ -256,27 +331,29 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 ## 🚀 IMMEDIATE PRIORITIES (Next Sprint)
 
 ### High Priority
+
 1. **KEV Integration Implementation** 🚨 **NEW ADDITION**
    - Target: One-click KEV flagging for existing vulnerabilities
    - Non-API CSV download + API option for premium users
    - Visual indicators and automatic VPR boosting
 
-2. **Large CSV Import Optimization** 
+1. **Large CSV Import Optimization** 
    - Target: 50-100MB file handling
    - Web Workers + streaming parser
    - Column filtering for data reduction
 
-3. **Cisco API Completion**
+1. **Cisco API Completion**
    - Finish Security Advisories sync
    - Enhanced error handling
 
 ### Medium Priority  
-3. **Performance Improvements**
+
+1. **Performance Improvements**
    - IndexedDB query optimization
    - UI responsiveness during large operations
    - Memory usage optimization
 
-4. **User Experience**
+1. **User Experience**
    - Better progress indicators
    - Improved error messages
    - Mobile responsiveness testing
@@ -286,12 +363,14 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 ## 📊 TECHNICAL DEBT
 
 ### Code Quality
+
 - [ ] **ESLint configuration** for JavaScript standardization
 - [ ] **Unit testing framework** setup (Jest)
 - [ ] **End-to-end testing** with Playwright
 - [ ] **Documentation improvements**
 
 ### Security Hardening
+
 - [ ] **Content Security Policy (CSP)** implementation
   - [ ] Strict CSP headers to prevent XSS attacks
   - [ ] Frame-ancestors restrictions
@@ -333,6 +412,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
   - [ ] Regular security scanning for exposed endpoints
 
 ### Performance Monitoring
+
 - [ ] **Performance metrics** collection
 - [ ] **Memory leak detection**
 - [ ] **Bundle size optimization**
@@ -341,90 +421,109 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 ---
 
 ## 🎯 **CRITICAL PRIORITY: Trend Tracking Implementation**
+
 **Problem**: CSV imports create duplicates instead of tracking changes over time  
 **Solution**: Transform into time-series vulnerability management system
 
 ### 📋 **PHASE 1: Database Schema Migration** 
+
 *Risk: HIGH | Impact: CRITICAL | Duration: 2-3 tasks*
 
 #### 1.1 Analyze Current Data Structure
+
 - [ ] Audit existing vulnerability data patterns
 - [ ] Identify unique vulnerability identifiers (CVE+hostname+date)
 - [ ] Map current columns to time-series requirements
 
 #### 1.2 Design Time-Series Schema
+
 - [ ] Create `vulnerability_master` table (static CVE data)
 - [ ] Create `vulnerability_history` table (time-series: device+date+VPR)
 - [ ] Add unique constraints: `(hostname, cve, scan_date)`
 - [ ] Design indexes for latest-value queries
 
 #### 1.3 Create Migration Scripts
+
 - [ ] Backup existing data
 - [ ] Write migration script to reshape current data
 - [ ] Test migration on sample data
 - [ ] Create rollback procedures
 
 ### 📋 **PHASE 2: Smart CSV Import System**
+
 *Risk: MEDIUM | Impact: HIGH | Duration: 2-3 tasks*
 
 #### 2.1 Redesign Import Logic
+
 - [ ] Use date field as "last_updated" timestamp
 - [ ] Implement UPSERT logic (UPDATE if exists, INSERT if new)
 - [ ] Key on: `hostname + cve + scan_date`
 - [ ] Track VPR changes over time
 
 #### 2.2 Data Validation & Integrity
+
 - [ ] Validate date formats during import
 - [ ] Ensure VPR score changes are logged
 - [ ] Add data quality checks
 - [ ] Handle malformed/duplicate entries gracefully
 
 #### 2.3 Import Analytics
+
 - [ ] Track what changed during each import
 - [ ] Report new/updated/unchanged vulnerabilities
 - [ ] Log VPR trend changes per import
 
 ### 📋 **PHASE 3: Latest Values Display**
+
 *Risk: LOW | Impact: MEDIUM | Duration: 2 tasks*
 
 #### 3.1 Update API Endpoints
+
 - [ ] Modify `/api/vulnerabilities` to return latest values only
 - [ ] Create efficient queries for most recent data per device+CVE
 - [ ] Ensure cards/tables show current state
 
 #### 3.2 Frontend Display Updates
+
 - [ ] Update vulnerability cards to show latest VPR
 - [ ] Ensure tables reflect most recent scan data
 - [ ] Add "last updated" timestamps to UI
 
 ### 📋 **PHASE 4: Trend Visualization**
+
 *Risk: LOW | Impact: HIGH | Duration: 3-4 tasks*
 
 #### 4.1 Historical Data API
+
 - [ ] Create `/api/vulnerabilities/trends` endpoint
 - [ ] Return VPR changes over time per vulnerability
 - [ ] Support date range filtering
 
 #### 4.2 Chart Implementation
+
 - [ ] Design Chart.js trend visualizations
 - [ ] Show VPR score changes over time
 - [ ] Display severity level migrations
 - [ ] Add device-level trend analysis
 
 #### 4.3 Dashboard Integration
+
 - [ ] Add trend charts to vulnerability dashboard
 - [ ] Create "trending up/down" indicators
 - [ ] Show improvement/degradation analytics
 
 ### 📋 **PHASE 5: API Integration Framework**
+
 *Risk: MEDIUM | Impact: HIGH | Duration: 2-3 tasks*
 
 #### 5.1 API Supplement System
+
 - [ ] Design hooks for real-time API data
 - [ ] Create 30-day history pull mechanism
 - [ ] Merge API data with CSV historical data
 
 #### 5.2 Data Source Management
+
 - [ ] Support multiple data sources (CSV + API)
 - [ ] Prioritize API data over CSV when available
 - [ ] Maintain data source lineage
@@ -434,12 +533,14 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 ## 🔧 DEVELOPMENT WORKFLOW
 
 ### Current Stack
+
 - **Frontend**: Vanilla JavaScript, Bootstrap 5, ApexCharts
 - **Storage**: localStorage, IndexedDB via LocalForage
 - **Build**: No build process (direct file serving)
 - **Dependencies**: CDN-based (Bootstrap, jQuery-less)
 
 ### Proposed Enhancements
+
 - **Build System**: Webpack/Vite for optimization
 - **Package Management**: npm/yarn for dependency management
 - **Testing**: Jest + Playwright test suite
@@ -450,6 +551,7 @@ HexTrackr is a dual-purpose cybersecurity management system providing:
 ## 📋 MAINTENANCE SCHEDULE
 
 ### Regular Tasks
+
 - **Weekly**: Dependency security updates
 - **Monthly**: Performance monitoring review
 - **Quarterly**: Feature roadmap review and prioritization
