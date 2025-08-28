@@ -1,3 +1,6 @@
+/* eslint-env browser */
+/* global fetch, window, document, console, setTimeout, bootstrap */
+/* eslint-disable no-undef */
 // HexTrackr Shared Header Loader
 (function() {
   'use strict';
@@ -36,17 +39,17 @@
   }
   
   function initHeaderFunctionality() {
-    // Set active navigation item based on current page
-    const currentPage = window.location.pathname.split('/').pop();
+    // Set active navigation item based on current path
+    const pathname = window.location.pathname;
     const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-    
     navLinks.forEach(link => {
       const href = link.getAttribute('href');
-      if (href === currentPage) {
-        link.classList.add('active');
-      } else {
-        link.classList.remove('active');
-      }
+      const isDocs = pathname.startsWith('/docs-prototype/');
+      const match =
+        (href === '/tickets.html' && pathname.endsWith('/tickets.html')) ||
+        (href === '/vulnerabilities.html' && pathname.endsWith('/vulnerabilities.html')) ||
+        (href === '/docs-prototype/' && isDocs);
+      link.classList.toggle('active', !!match);
     });
     
     // Handle Import CSV Data link to open settings modal with specific tab
@@ -83,15 +86,16 @@
       document.body.insertBefore(headerContainer, document.body.firstChild);
     }
     
-    headerContainer.innerHTML = `
+  headerContainer.innerHTML = `
       <header class="navbar navbar-expand-md navbar-light d-print-none">
         <div class="container-xl">
           <h1 class="navbar-brand">
-            <a href="tickets.html">HexTrackr</a>
+      <a href="/tickets.html">HexTrackr</a>
           </h1>
           <div class="navbar-nav">
-            <a class="nav-link" href="tickets.html">Tickets</a>
-            <a class="nav-link" href="vulnerabilities.html">Vulnerabilities</a>
+      <a class="nav-link" href="/tickets.html">Tickets</a>
+      <a class="nav-link" href="/vulnerabilities.html">Vulnerabilities</a>
+      <a class="nav-link" href="/docs-prototype/">Documentation</a>
           </div>
         </div>
       </header>

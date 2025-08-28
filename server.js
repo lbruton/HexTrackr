@@ -306,6 +306,17 @@ app.use(express.static(__dirname, {
   lastModified: true
 }));
 
+// Documentation portal routes: serve index for docs root and redirect deep links to hash routing
+app.get('/docs-prototype', (req, res) => {
+    res.sendFile(path.join(__dirname, 'docs-prototype', 'index.html'));
+});
+
+app.get(/^\/docs-prototype\/(.*)\.html$/, (req, res) => {
+    const section = req.params[0];
+    // Redirect to hash-based section so the SPA shell loads correctly
+    res.redirect(302, `/docs-prototype/#${section}`);
+});
+
 // Clear data endpoint
 app.delete('/api/backup/clear/:type', (req, res) => {
     const { type } = req.params;
