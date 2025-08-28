@@ -23,32 +23,32 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h1>Development Setup</h1>
-<p>Follow these instructions to set up a local development environment for HexTrackr.</p>
-<h2>Environment</h2>
-<ul>
-<li><strong>Runtime</strong>: Node.js</li>
-<li><strong>Database</strong>: SQLite</li>
-<li><strong>Deployment</strong>: Docker</li>
-</ul>
-<h2>Local Setup (without Docker)</h2>
-<p>While Docker is recommended, you can run the application locally for development:</p>
+                                    <h1>Contribution Guidelines</h1>
+<p>We welcome contributions to HexTrackr! Please follow these guidelines to ensure a smooth process.</p>
+<h2>Git Workflow</h2>
 <ol>
-<li><p><strong>Install Dependencies:</strong></p>
-<pre><code class="language-bash">npm install
-</code></pre>
+<li><strong>Branching</strong>:<ul>
+<li>Create a new feature branch from <code>main</code>.</li>
+<li>Use a descriptive branch name (e.g., <code>feature/add-ticket-export</code>).</li>
+</ul>
 </li>
-<li><p><strong>Initialize the Database:</strong></p>
-<p>Create the SQLite database and schema.</p>
-<pre><code class="language-bash">node scripts/init-database.js
-</code></pre>
+<li><strong>Commits</strong>:<ul>
+<li>Write clear and concise commit messages.</li>
+<li>Reference any relevant issue numbers.</li>
+</ul>
 </li>
-<li><p><strong>Run the Server:</strong></p>
-<pre><code class="language-bash">node server.js
-</code></pre>
-<p>The server will start on <code>http://localhost:8080</code>.</p>
+<li><strong>Pull Requests</strong>:<ul>
+<li>Submit a pull request to the <code>main</code> branch.</li>
+<li>Provide a detailed description of the changes.</li>
+<li>Ensure all automated checks pass.</li>
+</ul>
 </li>
 </ol>
+<h2>Code Style</h2>
+<ul>
+<li>Follow the rules defined in the <code>.eslintrc.js</code> file.</li>
+<li>Use <code>npm run lint</code> to check for issues.</li>
+</ul>
 
                                 </div>
                             </div>

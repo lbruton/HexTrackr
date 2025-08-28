@@ -23,32 +23,24 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h1>Development Setup</h1>
-<p>Follow these instructions to set up a local development environment for HexTrackr.</p>
-<h2>Environment</h2>
+                                    <h1>Backend Architecture</h1>
+<p>The backend is a Node.js application using the Express framework.</p>
+<h2>Key Components</h2>
 <ul>
-<li><strong>Runtime</strong>: Node.js</li>
-<li><strong>Database</strong>: SQLite</li>
-<li><strong>Deployment</strong>: Docker</li>
+<li><strong><code>server.js</code></strong>: The main entry point for the application. It sets up the Express server, defines middleware, and mounts the API routes.</li>
+<li><strong>API Routes</strong>: The REST API is defined to handle CRUD (Create, Read, Update, Delete) operations for tickets and vulnerabilities.</li>
+<li><strong>Middleware</strong>:<ul>
+<li><code>express.json()</code>: For parsing JSON request bodies.</li>
+<li><code>express.urlencoded()</code>: For parsing URL-encoded request bodies.</li>
+<li>Static file serving for the frontend assets.</li>
 </ul>
-<h2>Local Setup (without Docker)</h2>
-<p>While Docker is recommended, you can run the application locally for development:</p>
-<ol>
-<li><p><strong>Install Dependencies:</strong></p>
-<pre><code class="language-bash">npm install
-</code></pre>
 </li>
-<li><p><strong>Initialize the Database:</strong></p>
-<p>Create the SQLite database and schema.</p>
-<pre><code class="language-bash">node scripts/init-database.js
-</code></pre>
-</li>
-<li><p><strong>Run the Server:</strong></p>
-<pre><code class="language-bash">node server.js
-</code></pre>
-<p>The server will start on <code>http://localhost:8080</code>.</p>
-</li>
-</ol>
+</ul>
+<h2>File Uploads</h2>
+<ul>
+<li>The <code>uploads/</code> directory is used for temporary storage of imported CSV files.</li>
+<li>The backend processes these files and inserts the data into the database.</li>
+</ul>
 
                                 </div>
                             </div>

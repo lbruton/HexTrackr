@@ -23,32 +23,15 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h1>Development Setup</h1>
-<p>Follow these instructions to set up a local development environment for HexTrackr.</p>
-<h2>Environment</h2>
+                                    <h1>System Architecture</h1>
+<p>This section describes the architecture of the HexTrackr system.</p>
+<h2>Components</h2>
 <ul>
-<li><strong>Runtime</strong>: Node.js</li>
-<li><strong>Database</strong>: SQLite</li>
-<li><strong>Deployment</strong>: Docker</li>
+<li><strong><a href="./frontend.html">Frontend</a></strong>: The user interface and client-side logic.</li>
+<li><strong><a href="./backend.html">Backend</a></strong>: The server-side application logic and API.</li>
+<li><strong><a href="./database.html">Database</a></strong>: The data storage layer.</li>
+<li><strong><a href="./deployment.html">Deployment</a></strong>: The deployment and hosting environment.</li>
 </ul>
-<h2>Local Setup (without Docker)</h2>
-<p>While Docker is recommended, you can run the application locally for development:</p>
-<ol>
-<li><p><strong>Install Dependencies:</strong></p>
-<pre><code class="language-bash">npm install
-</code></pre>
-</li>
-<li><p><strong>Initialize the Database:</strong></p>
-<p>Create the SQLite database and schema.</p>
-<pre><code class="language-bash">node scripts/init-database.js
-</code></pre>
-</li>
-<li><p><strong>Run the Server:</strong></p>
-<pre><code class="language-bash">node server.js
-</code></pre>
-<p>The server will start on <code>http://localhost:8080</code>.</p>
-</li>
-</ol>
 
                                 </div>
                             </div>
