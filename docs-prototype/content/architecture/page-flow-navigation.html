@@ -1,817 +1,146 @@
-<!-- Page Flow & Navigation Diagram -->
-<div class="container-fluid">
-    <h2>🧭 Page Flow & Navigation Diagram</h2>
-    <p>Complete navigation architecture and user journey mapping for HexTrackr's page flow patterns.</p>
-    
-    <!-- Navigation Overview -->
-    <div class="mb-4">
-        <strong>Navigation System:</strong> Shared header component with consistent navigation across all pages<br>
-        <strong>Main Pages:</strong> Tickets (home), Vulnerabilities, Documentation Portal<br>
-        <strong>Architecture:</strong> Component-based navigation with responsive design<br>
-        <strong>User Flow:</strong> Task-oriented workflows with cross-page integration
-    </div>
-
-    <!-- Site Map Overview -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h3>🗺️ Site Map & Page Hierarchy</h3>
-            <div class="site-map">
-                <div class="site-level root">
-                    <div class="site-node root-node">
-                        <h4>🏠 HexTrackr Application</h4>
-                        <div class="node-url">localhost:8080</div>
-                    </div>
-                    <div class="site-children">
-                        <div class="site-level main-pages">
-                            <div class="site-node tickets-node">
-                                <h5>🎫 Tickets</h5>
-                                <div class="node-url">tickets.html</div>
-                                <div class="node-description">Primary workflow management</div>
-                                <div class="node-features">
-                                    <span class="feature">CRUD Operations</span>
-                                    <span class="feature">CSV Import/Export</span>
-                                    <span class="feature">Filtering & Search</span>
-                                    <span class="feature">PDF Generation</span>
-                                </div>
-                            </div>
-                            <div class="site-node vulnerabilities-node">
-                                <h5>🛡️ Vulnerabilities</h5>
-                                <div class="node-url">vulnerabilities.html</div>
-                                <div class="node-description">Security data analysis</div>
-                                <div class="node-features">
-                                    <span class="feature">CSV Imports</span>
-                                    <span class="feature">Dashboard Analytics</span>
-                                    <span class="feature">Trend Charts</span>
-                                    <span class="feature">Data Export</span>
-                                </div>
-                            </div>
-                            <div class="site-node docs-node">
-                                <h5>📚 Documentation</h5>
-                                <div class="node-url">docs-prototype/</div>
-                                <div class="node-description">Technical reference portal</div>
-                                <div class="node-features">
-                                    <span class="feature">API Reference</span>
-                                    <span class="feature">Architecture Docs</span>
-                                    <span class="feature">Code Examples</span>
-                                    <span class="feature">Search Functions</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Navigation Components -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h3>🧩 Navigation Components</h3>
-            <div class="nav-components">
-                <div class="component-section">
-                    <h4>Shared Header Navigation</h4>
-                    <div class="nav-component shared-header">
-                        <div class="header-element brand">
-                            <div class="element-name">HexTrackr Brand</div>
-                            <div class="element-action">→ tickets.html (home)</div>
-                        </div>
-                        <div class="header-element nav-links">
-                            <div class="element-name">Main Navigation</div>
-                            <div class="nav-items">
-                                <div class="nav-item">
-                                    <span class="nav-icon">🎫</span>
-                                    <span class="nav-text">Tickets</span>
-                                    <span class="nav-url">→ tickets.html</span>
-                                </div>
-                                <div class="nav-item">
-                                    <span class="nav-icon">🛡️</span>
-                                    <span class="nav-text">Vulnerabilities</span>
-                                    <span class="nav-url">→ vulnerabilities.html</span>
-                                </div>
-                                <div class="nav-item">
-                                    <span class="nav-icon">📚</span>
-                                    <span class="nav-text">Documentation</span>
-                                    <span class="nav-url">→ docs-prototype/</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="header-element user-menu">
-                            <div class="element-name">User Dropdown</div>
-                            <div class="dropdown-items">
-                                <div class="dropdown-item">⚙️ Settings Modal</div>
-                                <div class="dropdown-item">👤 User Management</div>
-                                <div class="dropdown-item">🔌 API Configuration</div>
-                                <div class="dropdown-item">💾 Data Management</div>
-                                <div class="dropdown-item">🎫 Ticket Systems</div>
-                                <div class="dropdown-item">📚 Documentation Portal</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="component-section">
-                    <h4>Documentation Portal Navigation</h4>
-                    <div class="nav-component docs-nav">
-                        <div class="docs-sidebar">
-                            <div class="sidebar-section">
-                                <h5>API Documentation</h5>
-                                <div class="sidebar-items">
-                                    <div class="sidebar-item">• Ticket Management</div>
-                                    <div class="sidebar-item">• Vulnerability Management</div>
-                                </div>
-                            </div>
-                            <div class="sidebar-section">
-                                <h5>Framework Reference</h5>
-                                <div class="sidebar-items">
-                                    <div class="sidebar-item">• Tabler.io Integration</div>
-                                    <div class="sidebar-item">• Bootstrap Usage</div>
-                                    <div class="sidebar-item">• ApexCharts</div>
-                                    <div class="sidebar-item">• AG Grid</div>
-                                </div>
-                            </div>
-                            <div class="sidebar-section">
-                                <h5>Architecture</h5>
-                                <div class="sidebar-items">
-                                    <div class="sidebar-item">• Function Reference</div>
-                                    <div class="sidebar-item">• Database Schema</div>
-                                    <div class="sidebar-item">• UI-API Flowcharts</div>
-                                    <div class="sidebar-item">• Page Flow Navigation</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- User Journey Flows -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h3>👤 User Journey & Workflow Patterns</h3>
-            <div class="user-journeys">
-                
-                <!-- Daily Admin Workflow -->
-                <div class="journey-flow admin-workflow">
-                    <h4>🔄 Daily Admin Workflow</h4>
-                    <div class="flow-path">
-                        <div class="flow-step start">
-                            <div class="step-icon">🏁</div>
-                            <div class="step-title">Start</div>
-                            <div class="step-action">Open HexTrackr</div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <div class="step-icon">🎫</div>
-                            <div class="step-title">Tickets</div>
-                            <div class="step-action">Review daily tickets</div>
-                            <div class="step-details">Check status, assign tasks</div>
-                        </div>
-                        <div class="flow-arrow">↔</div>
-                        <div class="flow-step">
-                            <div class="step-icon">🛡️</div>
-                            <div class="step-title">Vulnerabilities</div>
-                            <div class="step-action">Analyze security data</div>
-                            <div class="step-details">Review trends, import CSV</div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <div class="step-icon">🎫</div>
-                            <div class="step-title">Create Tickets</div>
-                            <div class="step-action">Generate remediation tasks</div>
-                            <div class="step-details">Link vulnerabilities to tickets</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- New User Onboarding -->
-                <div class="journey-flow onboarding-workflow">
-                    <h4>👋 New User Onboarding</h4>
-                    <div class="flow-path">
-                        <div class="flow-step start">
-                            <div class="step-icon">🆕</div>
-                            <div class="step-title">First Visit</div>
-                            <div class="step-action">Access HexTrackr</div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <div class="step-icon">📚</div>
-                            <div class="step-title">Documentation</div>
-                            <div class="step-action">Read getting started</div>
-                            <div class="step-details">API reference, examples</div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <div class="step-icon">🎫</div>
-                            <div class="step-title">Explore Tickets</div>
-                            <div class="step-action">Learn ticket management</div>
-                            <div class="step-details">Interface tour, features</div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <div class="step-icon">🛡️</div>
-                            <div class="step-title">Discover Vulnerabilities</div>
-                            <div class="step-action">Understand security module</div>
-                            <div class="step-details">CSV imports, analytics</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Technical Research Workflow -->
-                <div class="journey-flow research-workflow">
-                    <h4>🔍 Technical Research Workflow</h4>
-                    <div class="flow-path">
-                        <div class="flow-step start">
-                            <div class="step-icon">❓</div>
-                            <div class="step-title">Question</div>
-                            <div class="step-action">Technical issue</div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <div class="step-icon">📚</div>
-                            <div class="step-title">Documentation</div>
-                            <div class="step-action">Search knowledge base</div>
-                            <div class="step-details">API reference, code examples</div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <div class="step-icon">🔧</div>
-                            <div class="step-title">Implementation</div>
-                            <div class="step-action">Apply solution</div>
-                            <div class="step-details">Tickets or vulnerabilities</div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-step">
-                            <div class="step-icon">✅</div>
-                            <div class="step-title">Validation</div>
-                            <div class="step-action">Test & verify</div>
-                            <div class="step-details">Confirm resolution</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- URL Structure & Routing -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h3>🔗 URL Structure & Routing Patterns</h3>
-            <div class="url-structure">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>URL Pattern</th>
-                            <th>Page/Section</th>
-                            <th>Primary Purpose</th>
-                            <th>Navigation Access</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="root-url">
-                            <td><code>localhost:8080/</code></td>
-                            <td>Server Root</td>
-                            <td>Redirects to tickets.html</td>
-                            <td>Direct URL entry</td>
-                        </tr>
-                        <tr class="main-page">
-                            <td><code>localhost:8080/tickets.html</code></td>
-                            <td>Tickets Management</td>
-                            <td>Primary workflow interface</td>
-                            <td>Header nav, brand link (home)</td>
-                        </tr>
-                        <tr class="main-page">
-                            <td><code>localhost:8080/vulnerabilities.html</code></td>
-                            <td>Vulnerability Analysis</td>
-                            <td>Security data dashboard</td>
-                            <td>Header nav, cross-links</td>
-                        </tr>
-                        <tr class="docs-url">
-                            <td><code>localhost:8080/docs-prototype/</code></td>
-                            <td>Documentation Portal</td>
-                            <td>Technical reference hub</td>
-                            <td>Header nav, user dropdown</td>
-                        </tr>
-                        <tr class="docs-section">
-                            <td><code>localhost:8080/docs-prototype/#api-tickets</code></td>
-                            <td>API Reference</td>
-                            <td>Ticket API documentation</td>
-                            <td>Docs sidebar navigation</td>
-                        </tr>
-                        <tr class="docs-section">
-                            <td><code>localhost:8080/docs-prototype/#database-schema</code></td>
-                            <td>Database Schema</td>
-                            <td>Database structure reference</td>
-                            <td>Docs sidebar navigation</td>
-                        </tr>
-                        <tr class="docs-section">
-                            <td><code>localhost:8080/docs-prototype/#ui-api-flowcharts</code></td>
-                            <td>UI-API Flowcharts</td>
-                            <td>Data flow documentation</td>
-                            <td>Docs sidebar navigation</td>
-                        </tr>
-                        <tr class="docs-section">
-                            <td><code>localhost:8080/docs-prototype/#page-flow-navigation</code></td>
-                            <td>Page Flow Navigation</td>
-                            <td>Navigation architecture docs</td>
-                            <td>Docs sidebar navigation</td>
-                        </tr>
-                    </tbody>
+<!-- Section Template for Documentation Portal -->
+<div class="documentation-section">
+    <h1>🧭 Page Flow &amp; Navigation Diagram</h1>
+<p>Complete navigation architecture and user journey mapping for HexTrackr&#39;s page flow patterns.</p>
+<p><strong>Navigation System:</strong> Shared header component with consistent navigation across all pages<br><strong>Main Pages:</strong> Tickets (home), Vulnerabilities, Documentation Portal<br><strong>Architecture:</strong> Component-based navigation with responsive design<br><strong>User Flow:</strong> Task-oriented workflows with cross-page integration</p>
+<h2>🗺️ Site Map &amp; Page Hierarchy</h2>
+<h3>🏠 HexTrackr Application</h3>
+<p><strong>URL:</strong> localhost:8080</p>
+<h4>Main Pages:</h4>
+<p><strong>🎫 Tickets</strong></p>
+<ul>
+<li><strong>URL:</strong> tickets.html</li>
+<li><strong>Purpose:</strong> Primary workflow management</li>
+<li><strong>Features:</strong> CRUD Operations, CSV Import/Export, Filtering &amp; Search, PDF Generation</li>
+</ul>
+<p><strong>🛡️ Vulnerabilities</strong></p>
+<ul>
+<li><strong>URL:</strong> vulnerabilities.html</li>
+<li><strong>Purpose:</strong> Security data analysis  </li>
+<li><strong>Features:</strong> CSV Imports, Dashboard Analytics, Trend Charts, Data Export</li>
+</ul>
+<p><strong>📚 Documentation</strong></p>
+<ul>
+<li><strong>URL:</strong> docs-prototype/</li>
+<li><strong>Purpose:</strong> Technical reference portal</li>
+<li><strong>Features:</strong> API Reference, Architecture Docs, Code Examples, Search Functions</li>
+</ul>
+<h2>🧩 Navigation Components</h2>
+<h3>Shared Header Navigation</h3>
+<p><strong>HexTrackr Brand</strong></p>
+<ul>
+<li>Action: → tickets.html (home)</li>
+</ul>
+<p><strong>Main Navigation Links:</strong></p>
+<ul>
+<li>🎫 Tickets → tickets.html</li>
+<li>🛡️ Vulnerabilities → vulnerabilities.html  </li>
+<li>📚 Documentation → docs-prototype/</li>
+</ul>
+<p><strong>User Dropdown Menu:</strong></p>
+<ul>
+<li>⚙️ Settings Modal</li>
+<li>👤 User Management</li>
+<li>🔌 API Configuration</li>
+<li>💾 Data Management</li>
+<li>🎫 Ticket Systems</li>
+<li>📚 Documentation Portal</li>
+</ul>
+<h3>Documentation Portal Navigation</h3>
+<p><strong>API Documentation</strong></p>
+<ul>
+<li>• Ticket Management</li>
+<li>• Vulnerability Management</li>
+</ul>
+<p><strong>Framework Reference</strong></p>
+<ul>
+<li>• Tabler.io Integration</li>
+<li>• Bootstrap Usage</li>
+<li>• ApexCharts</li>
+<li>• AG Grid</li>
+</ul>
+<p><strong>Architecture</strong></p>
+<ul>
+<li>• Function Reference</li>
+<li>• Database Schema</li>
+<li>• UI-API Flowcharts</li>
+<li>• Page Flow Navigation</li>
+</ul>
+<h2>👤 User Journey &amp; Workflow Patterns</h2>
+<h3>🔄 Daily Admin Workflow</h3>
+<ol>
+<li><strong>🏁 Start</strong> - Open HexTrackr</li>
+<li><strong>🎫 Tickets</strong> - Review daily tickets (Check status, assign tasks)</li>
+<li><strong>🛡️ Vulnerabilities</strong> - Analyze security data (Review trends, import CSV)</li>
+<li><strong>🎫 Create Tickets</strong> - Generate remediation tasks (Link vulnerabilities to tickets)</li>
+</ol>
+<h3>👋 New User Onboarding</h3>
+<ol>
+<li><strong>🆕 First Visit</strong> - Access HexTrackr</li>
+<li><strong>📚 Documentation</strong> - Read getting started (API reference, examples)</li>
+<li><strong>🎫 Explore Tickets</strong> - Learn ticket management (Interface tour, features)</li>
+<li><strong>🛡️ Discover Vulnerabilities</strong> - Understand security module (CSV imports, analytics)</li>
+</ol>
+<h3>🔍 Technical Research Workflow</h3>
+<ol>
+<li><strong>❓ Question</strong> - Technical issue</li>
+<li><strong>📚 Documentation</strong> - Search knowledge base (API reference, code examples)</li>
+<li><strong>🔧 Implementation</strong> - Apply solution (Tickets or vulnerabilities)</li>
+<li><strong>✅ Validation</strong> - Test &amp; verify (Confirm resolution)</li>
+</ol>
+<h2>🔗 URL Structure &amp; Routing Patterns</h2>
+<div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">[object Object]</thead>
+                    <tbody>undefined</tbody>
                 </table>
-            </div>
-        </div>
-    </div>
+            </div><h2>📱 Responsive Navigation Behavior</h2>
+<h3>🖥️ Desktop Navigation (&gt;= 768px)</h3>
+<ul>
+<li>✅ Full horizontal navigation bar</li>
+<li>✅ All navigation items visible</li>
+<li>✅ User dropdown with full menu</li>
+<li>✅ Theme toggle buttons visible</li>
+<li>✅ Icon + text labels for nav items</li>
+</ul>
+<h3>📱 Mobile Navigation (&lt; 768px)</h3>
+<ul>
+<li>✅ Collapsible hamburger menu</li>
+<li>✅ Vertical navigation layout</li>
+<li>✅ Touch-friendly button sizes</li>
+<li>✅ Simplified user menu</li>
+<li>✅ Priority navigation items only</li>
+</ul>
+<h2>💡 Navigation Best Practices &amp; Patterns</h2>
+<h3>🎯 User Experience Patterns</h3>
+<ul>
+<li><strong>Consistent Navigation:</strong> Same header across all pages ensures familiarity</li>
+<li><strong>Clear Hierarchy:</strong> Primary → Secondary navigation levels clearly defined</li>
+<li><strong>Visual Feedback:</strong> Active states and hover effects guide user interactions</li>
+<li><strong>Mobile-First:</strong> Responsive design ensures usability across all devices</li>
+</ul>
+<h3>🏗️ Technical Implementation</h3>
+<ul>
+<li><strong>Component-Based:</strong> Shared header component reduces code duplication</li>
+<li><strong>Hash Routing:</strong> Documentation portal uses #section for SPA-like navigation</li>
+<li><strong>Progressive Enhancement:</strong> Basic navigation works without JavaScript</li>
+<li><strong>Accessibility Ready:</strong> ARIA labels and semantic HTML structure</li>
+</ul>
+<h2>🚀 Future Navigation Enhancements</h2>
+<h3>🔐 Authentication-Aware Navigation</h3>
+<p>Role-based navigation items that show/hide based on user permissions and authentication status.</p>
+<h3>🔍 Global Search</h3>
+<p>Search functionality accessible from any page to find tickets, vulnerabilities, or documentation.</p>
+<h3>📍 Breadcrumb Navigation</h3>
+<p>Hierarchical breadcrumbs for complex workflows and deep documentation sections.</p>
+<h3>⌨️ Keyboard Navigation</h3>
+<p>Full keyboard accessibility with shortcuts for power users (Ctrl+K for search, etc.).</p>
+<h3>📱 Progressive Web App</h3>
+<p>PWA navigation patterns with offline support and app-like navigation behaviors.</p>
 
-    <!-- Responsive Navigation -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h3>📱 Responsive Navigation Behavior</h3>
-            <div class="responsive-nav">
-                <div class="device-nav desktop-nav">
-                    <h4>🖥️ Desktop Navigation (>= 768px)</h4>
-                    <div class="nav-features">
-                        <div class="feature">✅ Full horizontal navigation bar</div>
-                        <div class="feature">✅ All navigation items visible</div>
-                        <div class="feature">✅ User dropdown with full menu</div>
-                        <div class="feature">✅ Theme toggle buttons visible</div>
-                        <div class="feature">✅ Icon + text labels for nav items</div>
-                    </div>
-                </div>
-                
-                <div class="device-nav mobile-nav">
-                    <h4>📱 Mobile Navigation (< 768px)</h4>
-                    <div class="nav-features">
-                        <div class="feature">✅ Collapsible hamburger menu</div>
-                        <div class="feature">✅ Vertical navigation layout</div>
-                        <div class="feature">✅ Touch-friendly button sizes</div>
-                        <div class="feature">✅ Simplified user menu</div>
-                        <div class="feature">✅ Priority navigation items only</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Navigation Best Practices -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h3>💡 Navigation Best Practices & Patterns</h3>
-            <div class="best-practices">
-                <div class="practice-category">
-                    <h4>🎯 User Experience Patterns</h4>
-                    <div class="practice-list">
-                        <div class="practice-item">
-                            <strong>Consistent Navigation:</strong> Same header across all pages ensures familiarity
-                        </div>
-                        <div class="practice-item">
-                            <strong>Clear Hierarchy:</strong> Primary → Secondary navigation levels clearly defined
-                        </div>
-                        <div class="practice-item">
-                            <strong>Visual Feedback:</strong> Active states and hover effects guide user interactions
-                        </div>
-                        <div class="practice-item">
-                            <strong>Mobile-First:</strong> Responsive design ensures usability across all devices
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="practice-category">
-                    <h4>🏗️ Technical Implementation</h4>
-                    <div class="practice-list">
-                        <div class="practice-item">
-                            <strong>Component-Based:</strong> Shared header component reduces code duplication
-                        </div>
-                        <div class="practice-item">
-                            <strong>Hash Routing:</strong> Documentation portal uses #section for SPA-like navigation
-                        </div>
-                        <div class="practice-item">
-                            <strong>Progressive Enhancement:</strong> Basic navigation works without JavaScript
-                        </div>
-                        <div class="practice-item">
-                            <strong>Accessibility Ready:</strong> ARIA labels and semantic HTML structure
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Future Navigation Enhancements -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h3>🚀 Future Navigation Enhancements</h3>
-            <div class="future-nav">
-                <div class="enhancement">
-                    <h4>🔐 Authentication-Aware Navigation</h4>
-                    <p>Role-based navigation items that show/hide based on user permissions and authentication status.</p>
-                </div>
-                <div class="enhancement">
-                    <h4>🔍 Global Search</h4>
-                    <p>Search functionality accessible from any page to find tickets, vulnerabilities, or documentation.</p>
-                </div>
-                <div class="enhancement">
-                    <h4>📍 Breadcrumb Navigation</h4>
-                    <p>Hierarchical breadcrumbs for complex workflows and deep documentation sections.</p>
-                </div>
-                <div class="enhancement">
-                    <h4>⌨️ Keyboard Navigation</h4>
-                    <p>Full keyboard accessibility with shortcuts for power users (Ctrl+K for search, etc.).</p>
-                </div>
-                <div class="enhancement">
-                    <h4>📱 Progressive Web App</h4>
-                    <p>PWA navigation patterns with offline support and app-like navigation behaviors.</p>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
+<!-- Section-specific styling can be added here -->
 <style>
-/* Page Flow & Navigation Styling */
-.site-map {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 30px;
-    margin: 20px 0;
-}
-
-.site-level {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.site-node {
-    background: white;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 10px;
-    text-align: center;
-    min-width: 200px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.2s ease;
-}
-
-.site-node:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-
-.root-node {
-    border-color: #673ab7;
-    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
-}
-
-.tickets-node {
-    border-color: #2196f3;
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-}
-
-.vulnerabilities-node {
-    border-color: #4caf50;
-    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
-}
-
-.docs-node {
-    border-color: #ff9800;
-    background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%);
-}
-
-.site-children {
-    margin-top: 20px;
-}
-
-.main-pages {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.node-url {
-    font-family: 'Courier New', monospace;
-    color: #666;
-    font-size: 0.9em;
-    margin: 5px 0;
-}
-
-.node-description {
-    color: #555;
-    font-style: italic;
-    margin: 10px 0;
-}
-
-.node-features {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.feature {
-    background: rgba(0,0,0,0.1);
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.8em;
-    color: #555;
-}
-
-.nav-components {
-    margin: 20px 0;
-}
-
-.component-section {
-    margin-bottom: 30px;
-}
-
-.nav-component {
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 15px 0;
-}
-
-.shared-header {
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
-    gap: 20px;
-    align-items: start;
-}
-
-.header-element {
-    padding: 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background: #f8f9fa;
-}
-
-.element-name {
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.element-action {
-    color: #666;
-    font-size: 0.9em;
-}
-
-.nav-items, .dropdown-items {
-    margin-top: 10px;
-}
-
-.nav-item, .dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 0;
-    font-size: 0.9em;
-}
-
-.nav-icon {
-    font-size: 1.1em;
-}
-
-.nav-url {
-    color: #666;
-    font-family: 'Courier New', monospace;
-    font-size: 0.85em;
-}
-
-.docs-nav {
-    background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%);
-}
-
-.docs-sidebar {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-}
-
-.sidebar-section {
-    background: white;
-    padding: 15px;
-    border-radius: 6px;
-    border: 1px solid #e0e0e0;
-}
-
-.sidebar-items {
-    margin-top: 10px;
-}
-
-.sidebar-item {
-    padding: 3px 0;
-    color: #555;
-    font-size: 0.9em;
-}
-
-.user-journeys {
-    margin: 20px 0;
-}
-
-.journey-flow {
-    margin: 25px 0;
-    padding: 20px;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    background: white;
-}
-
-.admin-workflow {
-    border-left: 4px solid #2196f3;
-}
-
-.onboarding-workflow {
-    border-left: 4px solid #4caf50;
-}
-
-.research-workflow {
-    border-left: 4px solid #ff9800;
-}
-
-.flow-path {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.flow-step {
-    background: white;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 15px;
-    text-align: center;
-    min-width: 120px;
-    transition: transform 0.2s ease;
-}
-
-.flow-step:hover {
-    transform: scale(1.05);
-    border-color: #2196f3;
-}
-
-.flow-step.start {
-    border-color: #4caf50;
-    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
-}
-
-.step-icon {
-    font-size: 1.5em;
-    margin-bottom: 5px;
-}
-
-.step-title {
-    font-weight: bold;
-    color: #333;
-    margin: 5px 0;
-}
-
-.step-action {
-    color: #666;
-    font-size: 0.9em;
-    margin: 5px 0;
-}
-
-.step-details {
-    color: #888;
-    font-size: 0.8em;
-    font-style: italic;
-}
-
-.flow-arrow {
-    font-size: 1.5em;
-    color: #666;
-    font-weight: bold;
-}
-
-.url-structure {
-    margin: 20px 0;
-}
-
-.root-url { background: rgba(103, 58, 183, 0.1); }
-.main-page { background: rgba(33, 150, 243, 0.1); }
-.docs-url { background: rgba(255, 152, 0, 0.1); }
-.docs-section { background: rgba(255, 193, 7, 0.1); }
-
-.responsive-nav {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin: 20px 0;
-}
-
-.device-nav {
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 20px;
-}
-
-.desktop-nav {
-    border-left: 4px solid #2196f3;
-}
-
-.mobile-nav {
-    border-left: 4px solid #4caf50;
-}
-
-.nav-features {
-    margin-top: 15px;
-}
-
-.nav-features .feature {
-    display: block;
-    padding: 8px 0;
-    border-radius: 0;
-    background: transparent;
-    color: #333;
-    font-size: 0.9em;
-}
-
-.best-practices {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 20px;
-    margin: 20px 0;
-}
-
-.practice-category {
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 20px;
-}
-
-.practice-category:first-child {
-    border-left: 4px solid #673ab7;
-}
-
-.practice-category:last-child {
-    border-left: 4px solid #ff5722;
-}
-
-.practice-list {
-    margin-top: 15px;
-}
-
-.practice-item {
-    padding: 10px 0;
-    border-bottom: 1px solid #f0f0f0;
-    color: #555;
-}
-
-.practice-item:last-child {
-    border-bottom: none;
-}
-
-.future-nav {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin: 20px 0;
-}
-
-.enhancement {
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 20px;
-    border-left: 4px solid #9c27b0;
-}
-
-.enhancement h4 {
-    color: #9c27b0;
-    margin-bottom: 10px;
-}
-
-@media (max-width: 768px) {
-    .main-pages {
-        flex-direction: column;
-        align-items: center;
-    }
     
-    .shared-header {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-    
-    .flow-path {
-        flex-direction: column;
-    }
-    
-    .flow-arrow {
-        transform: rotate(90deg);
-    }
-    
-    .docs-sidebar {
-        grid-template-columns: 1fr;
-    }
-}
 </style>

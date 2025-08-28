@@ -1,400 +1,152 @@
+<!-- Section Template for Documentation Portal -->
 <div class="documentation-section">
-    <h2><i class="fas fa-database me-2"></i>Database Schema</h2>
-    <p class="text-muted mb-4">Complete database schema documentation for HexTrackr's SQLite database architecture.</p>
-    
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i>
-                <strong>Database:</strong> SQLite3 located at <code>data/hextrackr.db</code><br>
-                <strong>Initialization:</strong> <code>scripts/init-database.js</code><br>
-                <strong>Architecture:</strong> Time-series vulnerability tracking with normalized data structure
-            </div>
-        </div>
-    </div>
+    <h1>Database Schema</h1>
+<p>Complete database schema documentation for HexTrackr&#39;s SQLite database architecture.</p>
+<h2>Overview</h2>
+<p><strong>Database:</strong> SQLite3 located at <code>data/hextrackr.db</code><br><strong>Initialization:</strong> <code>scripts/init-database.js</code><br><strong>Architecture:</strong> Time-series vulnerability tracking with normalized data structure</p>
+<h2>Database Statistics</h2>
+<ul>
+<li><strong>Main Tables:</strong> 4</li>
+<li><strong>Indexes:</strong> 5  </li>
+<li><strong>Foreign Keys:</strong> 2</li>
+<li><strong>Junction Tables:</strong> 1</li>
+</ul>
+<h2>Schema Relationships</h2>
+<h3>tickets</h3>
+<p>Main table for security ticket management and tracking.</p>
+<div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">[object Object]</thead>
+                    <tbody>undefined</tbody>
+                </table>
+            </div><h3>vulnerability_imports</h3>
+<p>Tracks CSV import operations and metadata for vulnerability data.</p>
+<div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">[object Object]</thead>
+                    <tbody>undefined</tbody>
+                </table>
+            </div><h3>vulnerabilities</h3>
+<p>Individual vulnerability records from scanned systems.</p>
+<div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">[object Object]</thead>
+                    <tbody>undefined</tbody>
+                </table>
+            </div><h3>ticket_vulnerabilities</h3>
+<p>Junction table linking tickets to vulnerabilities for relationship tracking.</p>
+<div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">[object Object]</thead>
+                    <tbody>undefined</tbody>
+                </table>
+            </div><h2>Indexes</h2>
+<ol>
+<li><strong>idx_vulnerabilities_import_id</strong> - Optimizes import-based queries</li>
+<li><strong>idx_vulnerabilities_hostname</strong> - Speeds up hostname searches  </li>
+<li><strong>idx_vulnerabilities_cve</strong> - Accelerates CVE lookups</li>
+<li><strong>idx_tickets_status</strong> - Improves status-based filtering</li>
+<li><strong>idx_ticket_vulnerabilities_ticket</strong> - Junction table optimization</li>
+</ol>
+<h2>Foreign Key Constraints</h2>
+<ol>
+<li><p><strong>vulnerabilities.import_id → vulnerability_imports.id</strong></p>
+<ul>
+<li>Maintains referential integrity for import tracking</li>
+<li>Cascade delete removes vulnerabilities when import is deleted</li>
+</ul>
+</li>
+<li><p><strong>ticket_vulnerabilities.ticket_id → tickets.id</strong>  </p>
+<ul>
+<li>Links vulnerabilities to tickets</li>
+<li>Cascade delete removes relationships when ticket is deleted</li>
+</ul>
+</li>
+</ol>
+<h2>Data Flow</h2>
+<h3>Import Process</h3>
+<ol>
+<li>CSV files uploaded to <code>uploads/</code> directory</li>
+<li>Import metadata recorded in <code>vulnerability_imports</code></li>
+<li>Individual records parsed and stored in <code>vulnerabilities</code></li>
+<li>UPSERT operations prevent duplicates based on hostname+CVE+import</li>
+</ol>
+<h3>Ticket Workflow</h3>
+<ol>
+<li>New tickets created in <code>tickets</code> table</li>
+<li>Vulnerabilities linked via <code>ticket_vulnerabilities</code> junction</li>
+<li>Status updates tracked with timestamps</li>
+<li>Device information stored as JSON arrays</li>
+</ol>
+<h3>Query Patterns</h3>
+<p><strong>Common Queries:</strong></p>
+<ul>
+<li>Vulnerabilities by severity: <code>SELECT * FROM vulnerabilities WHERE severity = &#39;Critical&#39;</code></li>
+<li>Tickets by status: <code>SELECT * FROM tickets WHERE status = &#39;Open&#39;</code></li>
+<li>Import history: <code>SELECT * FROM vulnerability_imports ORDER BY import_date DESC</code></li>
+<li>Ticket relationships: Join through <code>ticket_vulnerabilities</code> junction table</li>
+</ul>
+<p><strong>Performance Optimizations:</strong></p>
+<ul>
+<li>Indexed columns for frequent WHERE clauses</li>
+<li>JSON storage for flexible device arrays</li>
+<li>Time-series approach for historical tracking</li>
+<li>Normalized structure reduces data redundancy</li>
+</ul>
+<h2>Schema Evolution</h2>
+<p>The database schema supports:</p>
+<ul>
+<li><strong>Backward compatibility</strong> - New columns added with defaults</li>
+<li><strong>Migration scripts</strong> - Schema updates through versioned migrations  </li>
+<li><strong>Data integrity</strong> - Foreign key constraints and validation</li>
+<li><strong>Performance</strong> - Strategic indexing for common access patterns</li>
+</ul>
+<p>This architecture enables efficient vulnerability tracking while maintaining flexibility for ticket management workflows.</p>
 
-    <!-- Database Overview -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3 class="text-primary">4</h3>
-                    <p class="mb-0">Main Tables</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3 class="text-success">5</h3>
-                    <p class="mb-0">Indexes</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3 class="text-warning">2</h3>
-                    <p class="mb-0">Foreign Keys</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3 class="text-info">1</h3>
-                    <p class="mb-0">Junction Table</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Schema Diagram -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3 class="card-title">Schema Relationships</h3>
-        </div>
-        <div class="card-body">
-            <div class="schema-diagram">
-                <div class="table-box tickets">
-                    <h4>tickets</h4>
-                    <div class="fields">
-                        <div class="field primary">id (TEXT PK)</div>
-                        <div class="field">location (TEXT)</div>
-                        <div class="field">devices (TEXT JSON)</div>
-                        <div class="field">description (TEXT)</div>
-                        <div class="field">urgency (TEXT)</div>
-                        <div class="field">category (TEXT)</div>
-                        <div class="field">status (TEXT)</div>
-                        <div class="field">assigned_to (TEXT)</div>
-                        <div class="field">created_date (TEXT)</div>
-                        <div class="field">updated_date (TEXT)</div>
-                        <div class="field">notes (TEXT)</div>
-                    </div>
-                </div>
-
-                <div class="table-box vulnerability-imports">
-                    <h4>vulnerability_imports</h4>
-                    <div class="fields">
-                        <div class="field primary">id (INTEGER PK)</div>
-                        <div class="field">filename (TEXT)</div>
-                        <div class="field">import_date (TEXT)</div>
-                        <div class="field">row_count (INTEGER)</div>
-                        <div class="field">vendor (TEXT)</div>
-                        <div class="field">file_size (INTEGER)</div>
-                        <div class="field">processing_time (INTEGER)</div>
-                        <div class="field">raw_headers (TEXT JSON)</div>
-                        <div class="field">created_at (DATETIME)</div>
-                    </div>
-                </div>
-
-                <div class="table-box vulnerabilities">
-                    <h4>vulnerabilities</h4>
-                    <div class="fields">
-                        <div class="field primary">id (INTEGER PK)</div>
-                        <div class="field foreign">import_id (INTEGER FK)</div>
-                        <div class="field">hostname (TEXT)</div>
-                        <div class="field">ip_address (TEXT)</div>
-                        <div class="field">cve (TEXT)</div>
-                        <div class="field">severity (TEXT)</div>
-                        <div class="field">vpr_score (REAL)</div>
-                        <div class="field">cvss_score (REAL)</div>
-                        <div class="field">first_seen (TEXT)</div>
-                        <div class="field">last_seen (TEXT)</div>
-                        <div class="field">plugin_id (TEXT)</div>
-                        <div class="field">plugin_name (TEXT)</div>
-                        <div class="field">description (TEXT)</div>
-                        <div class="field">solution (TEXT)</div>
-                        <div class="field">vendor_reference (TEXT)</div>
-                        <div class="field">created_at (DATETIME)</div>
-                    </div>
-                </div>
-
-                <div class="table-box ticket-vulnerabilities">
-                    <h4>ticket_vulnerabilities</h4>
-                    <div class="fields">
-                        <div class="field primary">id (INTEGER PK)</div>
-                        <div class="field foreign">ticket_id (TEXT FK)</div>
-                        <div class="field foreign">vulnerability_id (INTEGER FK)</div>
-                        <div class="field">relationship_type (TEXT)</div>
-                        <div class="field">notes (TEXT)</div>
-                        <div class="field">created_at (DATETIME)</div>
-                    </div>
-                </div>
-
-                <!-- Relationship Lines -->
-                <svg class="relationship-lines" width="100%" height="400">
-                    <line x1="250" y1="100" x2="250" y2="200" stroke="#007bff" stroke-width="2"/>
-                    <line x1="500" y1="150" x2="600" y2="150" stroke="#28a745" stroke-width="2"/>
-                    <line x1="150" y1="300" x2="300" y2="350" stroke="#dc3545" stroke-width="2"/>
-                    <line x1="400" y1="300" x2="300" y2="350" stroke="#dc3545" stroke-width="2"/>
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    <!-- Detailed Table Documentation -->
-    <div class="row">
-        <div class="col-lg-6 mb-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">tickets</h4>
-                    <small>Ticket Management System</small>
-                </div>
-                <div class="card-body">
-                    <p><strong>Purpose:</strong> Stores hexagon security workflow tickets with device assignments.</p>
-                    <p><strong>Storage:</strong> Currently localStorage-based, database ready for future sync.</p>
-                    
-                    <table class="table table-sm">
-                        <thead>
-                            <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>id</code></td><td>TEXT PK</td><td>Unique ticket identifier</td></tr>
-                            <tr><td><code>location</code></td><td>TEXT</td><td>Site location (required)</td></tr>
-                            <tr><td><code>devices</code></td><td>TEXT JSON</td><td>Array of assigned devices</td></tr>
-                            <tr><td><code>description</code></td><td>TEXT</td><td>Work description</td></tr>
-                            <tr><td><code>urgency</code></td><td>TEXT</td><td>Priority level</td></tr>
-                            <tr><td><code>category</code></td><td>TEXT</td><td>Work category</td></tr>
-                            <tr><td><code>status</code></td><td>TEXT</td><td>Current status (default: 'Open')</td></tr>
-                            <tr><td><code>assigned_to</code></td><td>TEXT</td><td>Assigned technician</td></tr>
-                            <tr><td><code>created_date</code></td><td>TEXT</td><td>Creation timestamp</td></tr>
-                            <tr><td><code>updated_date</code></td><td>TEXT</td><td>Last modification</td></tr>
-                            <tr><td><code>notes</code></td><td>TEXT</td><td>Additional notes</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6 mb-4">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">vulnerability_imports</h4>
-                    <small>CSV Import Tracking</small>
-                </div>
-                <div class="card-body">
-                    <p><strong>Purpose:</strong> Tracks metadata for each CSV vulnerability import.</p>
-                    <p><strong>Vendors:</strong> Cisco, Tenable, Qualys, etc.</p>
-                    
-                    <table class="table table-sm">
-                        <thead>
-                            <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>id</code></td><td>INTEGER PK</td><td>Auto-increment ID</td></tr>
-                            <tr><td><code>filename</code></td><td>TEXT</td><td>Original CSV filename</td></tr>
-                            <tr><td><code>import_date</code></td><td>TEXT</td><td>Import timestamp</td></tr>
-                            <tr><td><code>row_count</code></td><td>INTEGER</td><td>Number of records processed</td></tr>
-                            <tr><td><code>vendor</code></td><td>TEXT</td><td>Data source vendor</td></tr>
-                            <tr><td><code>file_size</code></td><td>INTEGER</td><td>File size in bytes</td></tr>
-                            <tr><td><code>processing_time</code></td><td>INTEGER</td><td>Processing time (ms)</td></tr>
-                            <tr><td><code>raw_headers</code></td><td>TEXT JSON</td><td>Original column names</td></tr>
-                            <tr><td><code>created_at</code></td><td>DATETIME</td><td>Record creation time</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6 mb-4">
-            <div class="card">
-                <div class="card-header bg-warning text-white">
-                    <h4 class="mb-0">vulnerabilities</h4>
-                    <small>Normalized Vulnerability Data</small>
-                </div>
-                <div class="card-body">
-                    <p><strong>Purpose:</strong> Normalized vulnerability records from CSV imports.</p>
-                    <p><strong>Time-Series:</strong> Tracks vulnerability changes over time with UPSERT logic.</p>
-                    
-                    <table class="table table-sm">
-                        <thead>
-                            <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>id</code></td><td>INTEGER PK</td><td>Auto-increment ID</td></tr>
-                            <tr><td><code>import_id</code></td><td>INTEGER FK</td><td>Links to vulnerability_imports</td></tr>
-                            <tr><td><code>hostname</code></td><td>TEXT</td><td>Target hostname (indexed)</td></tr>
-                            <tr><td><code>ip_address</code></td><td>TEXT</td><td>Target IP address</td></tr>
-                            <tr><td><code>cve</code></td><td>TEXT</td><td>CVE identifier (indexed)</td></tr>
-                            <tr><td><code>severity</code></td><td>TEXT</td><td>Risk severity (indexed)</td></tr>
-                            <tr><td><code>vpr_score</code></td><td>REAL</td><td>Vulnerability Priority Rating</td></tr>
-                            <tr><td><code>cvss_score</code></td><td>REAL</td><td>Common Vulnerability Score</td></tr>
-                            <tr><td><code>first_seen</code></td><td>TEXT</td><td>Initial detection date</td></tr>
-                            <tr><td><code>last_seen</code></td><td>TEXT</td><td>Most recent detection</td></tr>
-                            <tr><td><code>plugin_id</code></td><td>TEXT</td><td>Scanner plugin ID</td></tr>
-                            <tr><td><code>plugin_name</code></td><td>TEXT</td><td>Scanner plugin name</td></tr>
-                            <tr><td><code>description</code></td><td>TEXT</td><td>Vulnerability description</td></tr>
-                            <tr><td><code>solution</code></td><td>TEXT</td><td>Remediation guidance</td></tr>
-                            <tr><td><code>vendor_reference</code></td><td>TEXT</td><td>Vendor-specific reference</td></tr>
-                            <tr><td><code>created_at</code></td><td>DATETIME</td><td>Record creation time</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6 mb-4">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">ticket_vulnerabilities</h4>
-                    <small>Junction Table for Cross-Referencing</small>
-                </div>
-                <div class="card-body">
-                    <p><strong>Purpose:</strong> Links tickets to vulnerabilities for remediation tracking.</p>
-                    <p><strong>Relationship Types:</strong> remediation, investigation, monitoring, etc.</p>
-                    
-                    <table class="table table-sm">
-                        <thead>
-                            <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>id</code></td><td>INTEGER PK</td><td>Auto-increment ID</td></tr>
-                            <tr><td><code>ticket_id</code></td><td>TEXT FK</td><td>Links to tickets.id</td></tr>
-                            <tr><td><code>vulnerability_id</code></td><td>INTEGER FK</td><td>Links to vulnerabilities.id</td></tr>
-                            <tr><td><code>relationship_type</code></td><td>TEXT</td><td>Type of relationship</td></tr>
-                            <tr><td><code>notes</code></td><td>TEXT</td><td>Relationship notes</td></tr>
-                            <tr><td><code>created_at</code></td><td>DATETIME</td><td>Link creation time</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Performance Indexes -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3 class="card-title">Performance Indexes</h3>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Vulnerability Indexes</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <code>idx_vulnerabilities_hostname</code>
-                            <br><small class="text-muted">Optimizes hostname searches</small>
-                        </li>
-                        <li class="list-group-item">
-                            <code>idx_vulnerabilities_severity</code>
-                            <br><small class="text-muted">Enables fast severity filtering</small>
-                        </li>
-                        <li class="list-group-item">
-                            <code>idx_vulnerabilities_cve</code>
-                            <br><small class="text-muted">Accelerates CVE lookups</small>
-                        </li>
-                        <li class="list-group-item">
-                            <code>idx_vulnerabilities_import</code>
-                            <br><small class="text-muted">Links to import metadata</small>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <h5>Junction Table Indexes</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <code>idx_ticket_vulns_ticket</code>
-                            <br><small class="text-muted">Optimizes ticket-vulnerability queries</small>
-                        </li>
-                    </ul>
-                    
-                    <h5 class="mt-4">Future Considerations</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <small class="text-muted">Additional indexes may be added based on query patterns</small>
-                        </li>
-                        <li class="list-group-item">
-                            <small class="text-muted">Composite indexes for complex WHERE clauses</small>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Data Flow Notes -->
-    <div class="alert alert-warning">
-        <h4><i class="fas fa-exclamation-triangle me-2"></i>Current Data Flow</h4>
-        <ul class="mb-0">
-            <li><strong>Tickets:</strong> Currently stored in localStorage, database structure ready for future sync</li>
-            <li><strong>Vulnerabilities:</strong> CSV imports → vulnerability_imports → vulnerabilities (normalized)</li>
-            <li><strong>Time-Series:</strong> UPSERT logic prevents duplicates, tracks changes over time</li>
-            <li><strong>Cross-Reference:</strong> Junction table ready for ticket-vulnerability linking</li>
-        </ul>
-    </div>
 </div>
 
+<!-- Section-specific styling can be added here -->
 <style>
-.schema-diagram {
-    position: relative;
-    min-height: 600px;
-    overflow: hidden;
-}
-
-.table-box {
-    position: absolute;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    background: white;
-    padding: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    min-width: 200px;
-}
-
-.table-box.tickets {
-    top: 20px;
-    left: 20px;
-    border-color: #007bff;
-}
-
-.table-box.vulnerability-imports {
-    top: 20px;
-    right: 20px;
-    border-color: #28a745;
-}
-
-.table-box.vulnerabilities {
-    top: 200px;
-    right: 20px;
-    border-color: #ffc107;
-}
-
-.table-box.ticket-vulnerabilities {
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-color: #dc3545;
-}
-
-.table-box h4 {
-    margin: 0 0 10px 0;
-    font-size: 1rem;
-    font-weight: bold;
-}
-
-.field {
-    padding: 2px 4px;
-    margin: 1px 0;
-    font-size: 0.8rem;
-    border-radius: 3px;
-    background: #f8f9fa;
-}
-
-.field.primary {
-    background: #e3f2fd;
-    font-weight: bold;
-}
-
-.field.foreign {
-    background: #fff3cd;
-}
-
-.relationship-lines {
-    position: absolute;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: -1;
-}
+    
+                .schema-diagram {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 1.5rem;
+                    margin: 2rem 0;
+                }
+                
+                .table-box {
+                    background: white;
+                    border: 2px solid #dee2e6;
+                    border-radius: 8px;
+                    padding: 1rem;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+                
+                .table-box h4 {
+                    background: #007bff;
+                    color: white;
+                    margin: -1rem -1rem 1rem -1rem;
+                    padding: 0.75rem 1rem;
+                    border-radius: 6px 6px 0 0;
+                    font-weight: 600;
+                }
+                
+                .fields .field {
+                    padding: 0.5rem;
+                    border-bottom: 1px solid #f1f3f4;
+                    font-family: 'Monaco', monospace;
+                    font-size: 0.9em;
+                }
+                
+                .field.primary {
+                    background: #e3f2fd;
+                    font-weight: bold;
+                }
+                
+                .field.foreign {
+                    background: #fff3e0;
+                    color: #f57c00;
+                }
+            
 </style>
