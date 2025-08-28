@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+
+/* eslint-env node */
+/* global require, module, process, console */
+
 /**
  * Documentation File Mapping Analyzer
  * 
@@ -7,6 +11,62 @@
 
 const fs = require("fs").promises;
 const path = require("path");
+
+/**
+ * Secure path validation utility to prevent path traversal attacks
+ */
+class PathValidator {
+    static validatePathComponent(component) {
+        if (!component || typeof component !== "string") {
+            throw new Error("Invalid path component: must be a non-empty string");
+        }
+
+        // Check for dangerous characters
+        const dangerousChars = /[<>"|?*\0]/;
+        if (dangerousChars.test(component)) {
+            throw new Error(`Invalid characters in path component: ${component}`);
+        }
+
+        // Check for path traversal attempts
+        if (component.includes("..") || component.startsWith("/") || component.includes("\\")) {
+            throw new Error(`Path traversal attempt detected in component: ${component}`);
+        }
+
+        return component;
+    }
+
+    static validatePath(filePath, allowedBaseDir = process.cwd()) {
+        if (!filePath || typeof filePath !== "string") {
+            throw new Error("Invalid file path: path must be a non-empty string");
+        }
+
+        // Resolve the path to get absolute path
+        const resolvedPath = path.resolve(filePath);
+        const resolvedBase = path.resolve(allowedBaseDir);
+
+        // Check if the resolved path is within the allowed base directory
+        if (!resolvedPath.startsWith(resolvedBase)) {
+            throw new Error(`Path traversal detected: ${filePath} is outside allowed directory ${allowedBaseDir}`);
+        }
+
+        return resolvedPath;
+    }
+
+    static async safeReaddir(dirPath, options = {}) {
+        const validatedPath = PathValidator.validatePath(dirPath);
+        return await fs.readdir(validatedPath, options);
+    }
+
+    static async safeStat(filePath) {
+        const validatedPath = PathValidator.validatePath(filePath);
+        return await fs.stat(validatedPath);
+    }
+
+    static async safeWriteFile(filePath, data, options = "utf8") {
+        const validatedPath = PathValidator.validatePath(filePath);
+        return await fs.writeFile(validatedPath, data, options);
+    }
+}
 
 class DocumentationMapper {
     constructor() {
@@ -30,18 +90,20 @@ class DocumentationMapper {
         
         async function scanDirectory(dir, relativePath = "") {
             try {
-                const entries = await fs.readdir(dir);
+                const entries = await PathValidator.safeReaddir(dir);
                 
                 for (const entry of entries) {
-                    const fullPath = path.join(dir, entry);
-                    const relativeFilePath = path.join(relativePath, entry);
-                    const stat = await fs.stat(fullPath);
+                    // Validate entry before using in path operations
+                    const validatedEntry = PathValidator.validatePathComponent(entry);
+                    const fullPath = path.join(dir, validatedEntry);
+                    const relativeFilePath = path.join(relativePath, validatedEntry);
+                    const stat = await PathValidator.safeStat(fullPath);
                     
                     if (stat.isDirectory()) {
                         await scanDirectory(fullPath, relativeFilePath);
-                    } else if (entry.endsWith(".md") && !entry.includes(".backup.")) {
+                    } else if (validatedEntry.endsWith(".md") && !validatedEntry.includes(".backup.")) {
                         mdFiles.push({
-                            name: entry,
+                            name: validatedEntry,
                             relativePath: relativeFilePath,
                             fullPath: fullPath,
                             directory: relativePath
@@ -65,18 +127,20 @@ class DocumentationMapper {
         
         async function scanDirectory(dir, relativePath = "") {
             try {
-                const entries = await fs.readdir(dir);
+                const entries = await PathValidator.safeReaddir(dir);
                 
                 for (const entry of entries) {
-                    const fullPath = path.join(dir, entry);
-                    const relativeFilePath = path.join(relativePath, entry);
-                    const stat = await fs.stat(fullPath);
+                    // Validate entry before using in path operations
+                    const validatedEntry = PathValidator.validatePathComponent(entry);
+                    const fullPath = path.join(dir, validatedEntry);
+                    const relativeFilePath = path.join(relativePath, validatedEntry);
+                    const stat = await PathValidator.safeStat(fullPath);
                     
                     if (stat.isDirectory()) {
                         await scanDirectory(fullPath, relativeFilePath);
-                    } else if (entry.endsWith(".html") && !entry.includes(".backup.")) {
+                    } else if (validatedEntry.endsWith(".html") && !validatedEntry.includes(".backup.")) {
                         htmlFiles.push({
-                            name: entry,
+                            name: validatedEntry,
                             relativePath: relativeFilePath,
                             fullPath: fullPath,
                             directory: relativePath
@@ -100,17 +164,19 @@ class DocumentationMapper {
         
         async function scanDirectory(dir) {
             try {
-                const entries = await fs.readdir(dir);
+                const entries = await PathValidator.safeReaddir(dir);
                 
                 for (const entry of entries) {
-                    const fullPath = path.join(dir, entry);
-                    const stat = await fs.stat(fullPath);
+                    // Validate entry before using in path operations
+                    const validatedEntry = PathValidator.validatePathComponent(entry);
+                    const fullPath = path.join(dir, validatedEntry);
+                    const stat = await PathValidator.safeStat(fullPath);
                     
                     if (stat.isDirectory()) {
                         await scanDirectory(fullPath);
-                    } else if (entry.includes(".backup.")) {
+                    } else if (validatedEntry.includes(".backup.")) {
                         backupFiles.push({
-                            name: entry,
+                            name: validatedEntry,
                             fullPath: fullPath
                         });
                     }
@@ -234,7 +300,7 @@ ${this.mapping.backupFiles.map(file => `- 🗑️  ${path.basename(file.fullPath
     async saveReport() {
         const report = this.generateReport();
         const reportPath = path.join(this.baseDir, "docs-mapping-analysis.md");
-        await fs.writeFile(reportPath, report);
+        await PathValidator.safeWriteFile(reportPath, report);
         console.log(`📋 Mapping analysis saved: ${reportPath}`);
         return reportPath;
     }

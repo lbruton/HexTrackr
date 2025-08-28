@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+
+/* eslint-env node */
+/* global require, module, process, console */
+
 /**
  * HTML File Generator for Documentation
  * 
@@ -7,6 +11,67 @@
 
 const fs = require("fs").promises;
 const path = require("path");
+
+/**
+ * Secure path validation utility to prevent path traversal attacks
+ */
+class PathValidator {
+    static validatePathComponent(component) {
+        if (!component || typeof component !== "string") {
+            throw new Error("Invalid path component: must be a non-empty string");
+        }
+
+        // Check for dangerous characters
+        const dangerousChars = /[<>"|?*\0]/;
+        if (dangerousChars.test(component)) {
+            throw new Error(`Invalid characters in path component: ${component}`);
+        }
+
+        // Check for path traversal attempts
+        if (component.includes("..") || component.startsWith("/") || component.includes("\\")) {
+            throw new Error(`Path traversal attempt detected in component: ${component}`);
+        }
+
+        return component;
+    }
+
+    static validatePath(filePath, allowedBaseDir = process.cwd()) {
+        if (!filePath || typeof filePath !== "string") {
+            throw new Error("Invalid file path: path must be a non-empty string");
+        }
+
+        // Resolve the path to get absolute path
+        const resolvedPath = path.resolve(filePath);
+        const resolvedBase = path.resolve(allowedBaseDir);
+
+        // Check if the resolved path is within the allowed base directory
+        if (!resolvedPath.startsWith(resolvedBase)) {
+            throw new Error(`Path traversal detected: ${filePath} is outside allowed directory ${allowedBaseDir}`);
+        }
+
+        return resolvedPath;
+    }
+
+    static async safeReadFile(filePath, options = "utf8") {
+        const validatedPath = PathValidator.validatePath(filePath);
+        return await fs.readFile(validatedPath, options);
+    }
+
+    static async safeWriteFile(filePath, data, options = "utf8") {
+        const validatedPath = PathValidator.validatePath(filePath);
+        return await fs.writeFile(validatedPath, data, options);
+    }
+
+    static async safeMkdir(dirPath, options = { recursive: true }) {
+        const validatedPath = PathValidator.validatePath(dirPath);
+        return await fs.mkdir(validatedPath, options);
+    }
+
+    static async safeUnlink(filePath) {
+        const validatedPath = PathValidator.validatePath(filePath);
+        return await fs.unlink(validatedPath);
+    }
+}
 
 class HtmlFileGenerator {
     constructor() {
@@ -21,7 +86,7 @@ class HtmlFileGenerator {
     async generateHtmlFromMd(mdPath) {
         try {
             // Read the markdown content
-            const mdContent = await fs.readFile(mdPath, "utf8");
+            const mdContent = await PathValidator.safeReadFile(mdPath, "utf8");
             
             // Extract title from markdown (first # heading)
             const titleMatch = mdContent.match(/^#\s+(.+)$/m);
@@ -117,13 +182,13 @@ class HtmlFileGenerator {
                 }
 
                 // Ensure directory exists
-                await fs.mkdir(path.dirname(htmlPath), { recursive: true });
+                await PathValidator.safeMkdir(path.dirname(htmlPath), { recursive: true });
 
                 // Generate HTML content
                 const htmlContent = await this.generateHtmlFromMd(mdPath);
 
                 // Write HTML file
-                await fs.writeFile(htmlPath, htmlContent);
+                await PathValidator.safeWriteFile(htmlPath, htmlContent);
                 console.log(`✅ Created: ${htmlFile}`);
                 createdFiles.push(htmlPath);
 
@@ -162,7 +227,7 @@ class HtmlFileGenerator {
             try {
                 const backupPath = path.join(this.baseDir, backupFile);
                 await fs.access(backupPath);
-                await fs.unlink(backupPath);
+                await PathValidator.safeUnlink(backupPath);
                 console.log(`🗑️  Removed: ${backupFile}`);
                 cleanedFiles.push(backupPath);
             } catch (error) {
@@ -201,7 +266,7 @@ All missing HTML files have been created with placeholder content. The Gemini ge
 `;
 
         const reportPath = path.join(this.baseDir, "docs-repair-report.md");
-        await fs.writeFile(reportPath, report);
+        await PathValidator.safeWriteFile(reportPath, report);
         console.log(`📋 Repair report saved: ${reportPath}`);
         return reportPath;
     }

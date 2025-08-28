@@ -10,6 +10,66 @@ const multer = require("multer");
 const Papa = require("papaparse");
 const fs = require("fs");
 
+// Security utility for path validation
+class PathValidator {
+    static validatePath(filePath) {
+        if (!filePath || typeof filePath !== "string") {
+            throw new Error("Invalid file path");
+        }
+        
+        const normalizedPath = path.normalize(filePath);
+        
+        // Check for path traversal attempts
+        if (normalizedPath.includes("../") || normalizedPath.includes("..\\")) {
+            throw new Error("Path traversal detected");
+        }
+        
+        // Validate path components
+        const pathComponents = normalizedPath.split(path.sep);
+        for (const component of pathComponents) {
+            if (component === ".." || component === "." && pathComponents.length > 1) {
+                throw new Error("Invalid path component");
+            }
+        }
+        
+        return normalizedPath;
+    }
+    
+    static safeReadFileSync(filePath, options = "utf8") {
+        const validatedPath = this.validatePath(filePath);
+        return fs.readFileSync(validatedPath, options);
+    }
+    
+    static safeWriteFileSync(filePath, data, options = "utf8") {
+        const validatedPath = this.validatePath(filePath);
+        return fs.writeFileSync(validatedPath, data, options);
+    }
+    
+    static safeReaddirSync(dirPath, options = {}) {
+        const validatedPath = this.validatePath(dirPath);
+        return fs.readdirSync(validatedPath, options);
+    }
+    
+    static safeStatSync(filePath) {
+        const validatedPath = this.validatePath(filePath);
+        return fs.statSync(validatedPath);
+    }
+    
+    static safeExistsSync(filePath) {
+        try {
+            const validatedPath = this.validatePath(filePath);
+            return fs.existsSync(validatedPath);
+        } catch {
+            return false;
+        }
+    }
+    
+    static safeUnlinkSync(filePath) {
+        const validatedPath = this.validatePath(filePath);
+        return fs.unlinkSync(validatedPath);
+    }
+}
+
 const app = express();
 const PORT = process.env.PORT || 8080;
 
@@ -166,7 +226,7 @@ app.post("/api/vulnerabilities/import", upload.single("csvFile"), (req, res) => 
   const vendor = req.body.vendor || "unknown";
   
   // Read and parse CSV
-  const csvData = fs.readFileSync(req.file.path, "utf8");
+  const csvData = PathValidator.safeReadFileSync(req.file.path, "utf8");
   
   Papa.parse(csvData, {
     header: true,
@@ -246,7 +306,7 @@ app.post("/api/vulnerabilities/import", upload.single("csvFile"), (req, res) => 
               stmt.finalize();
               
               // Clean up uploaded file
-              fs.unlinkSync(req.file.path);
+              PathValidator.safeUnlinkSync(req.file.path);
               
               res.json({
                 success: true,
@@ -322,7 +382,7 @@ function findDocsSectionForFilename(filename) {
         while (stack.length) {
             const relDir = stack.pop();
             const dirPath = path.join(contentRoot, relDir);
-            const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+            const entries = PathValidator.safeReaddirSync(dirPath, { withFileTypes: true });
             for (const entry of entries) {
                 if (entry.isDirectory()) {
                     stack.push(path.join(relDir, entry.name));
@@ -356,7 +416,7 @@ app.get(/^\/docs-prototype\/(.*)\.html$/, (req, res) => {
 //  - jsFunctions: approximate count of JS function definitions in key folders
 app.get("/api/docs/stats", async (req, res) => {
     try {
-        const readText = (p) => fs.readFileSync(p, "utf8");
+        const readText = (p) => PathValidator.safeReadFileSync(p, "utf8");
 
         // 1) Count API endpoints in server.js
         const serverPath = path.join(__dirname, "server.js");
@@ -387,7 +447,7 @@ app.get("/api/docs/stats", async (req, res) => {
 
         const walk = (dir) => {
             try {
-                const entries = fs.readdirSync(dir, { withFileTypes: true });
+                const entries = PathValidator.safeReaddirSync(dir, { withFileTypes: true });
                 for (const e of entries) {
                     const p = path.join(dir, e.name);
                     if (e.isDirectory()) walk(p);
@@ -482,7 +542,7 @@ app.get("/", (req, res) => {
 // Initialize database on startup
 const initDb = () => {
   const fs = require("fs");
-  if (!fs.existsSync(dbPath)) {
+  if (!PathValidator.safeExistsSync(dbPath)) {
     console.log("Initializing database...");
     require("./scripts/init-database.js");
   }
@@ -533,7 +593,7 @@ app.get("/api/backup/stats", (req, res) => {
             const ticketCount = ticketRow.tickets;
             
             // Get database file size
-            const dbSize = fs.statSync(dbPath).size;
+            const dbSize = PathValidator.safeStatSync(dbPath).size;
             
             res.json({
                 vulnerabilities: vulnCount,
@@ -959,7 +1019,7 @@ app.post("/api/restore", upload.single("file"), async (req, res) => {
         }
         
         const filePath = req.file.path;
-        const fileData = fs.readFileSync(filePath);
+        const fileData = PathValidator.safeReadFileSync(filePath);
         
         // Use JSZip to extract the backup
         const zip = new (require("jszip"))();
@@ -1075,7 +1135,7 @@ app.post("/api/restore", upload.single("file"), async (req, res) => {
         }
         
         // Clean up the uploaded file
-        fs.unlinkSync(filePath);
+        PathValidator.safeUnlinkSync(filePath);
         
         res.json({
             success: true,
