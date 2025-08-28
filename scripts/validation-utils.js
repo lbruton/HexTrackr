@@ -24,7 +24,7 @@
  * isValidCVE('invalid-cve'); // false
  */
 function isValidCVE(cve) {
-    if (typeof cve !== "string") return false;
+    if (typeof cve !== 'string') return false;
     // Matches 'CVE-' followed by 4 digits (year) and 4 or more digits (sequence). Case-insensitive.
     const cveRegex = /^CVE-\d{4}-\d{4,}$/i;
     return cveRegex.test(cve.trim());
@@ -40,7 +40,7 @@ function isValidCVE(cve) {
  * isValidIP('999.999.999.999'); // false
  */
 function isValidIP(ip) {
-    if (typeof ip !== "string") return false;
+    if (typeof ip !== 'string') return false;
     // This regex is a simplified check and may not cover all edge cases,
     // but is generally sufficient for typical IPv4 and IPv6 formats.
     const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
@@ -81,8 +81,8 @@ function normalizeDate(dateInput) {
     }
     // Pad month and day with a leading zero if necessary
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
 
@@ -96,7 +96,7 @@ function normalizeDate(dateInput) {
  * isValidHostname('invalid_hostname'); // false
  */
 function isValidHostname(hostname) {
-    if (typeof hostname !== "string" || hostname.length > 253) {
+    if (typeof hostname !== 'string' || hostname.length > 253) {
         return false;
     }
     // Matches valid hostnames, allowing for segments separated by dots.
@@ -114,8 +114,8 @@ function isValidHostname(hostname) {
  * isValidSeverity('Urgent'); // false
  */
 function isValidSeverity(severity) {
-    if (typeof severity !== "string") return false;
-    const validSeverities = ["critical", "high", "medium", "low", "info"];
+    if (typeof severity !== 'string') return false;
+    const validSeverities = ['critical', 'high', 'medium', 'low', 'info'];
     return validSeverities.includes(severity.trim().toLowerCase());
 }
 
@@ -132,7 +132,7 @@ class AppError extends Error {
         super(message);
         this.statusCode = statusCode;
         this.isOperational = isOperational; // Operational errors are expected (e.g., user input)
-        this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
+        this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
         Error.captureStackTrace(this, this.constructor);
     }
 }
@@ -143,7 +143,7 @@ class AppError extends Error {
  * @returns {{status: string, message: string, stack?: string}} A formatted error object.
  */
 function formatApiError(err) {
-    const isDevelopment = process.env.NODE_ENV === "development";
+    const isDevelopment = process.env.NODE_ENV === 'development';
     if (err.isOperational) {
         return {
             status: err.status,
@@ -151,10 +151,10 @@ function formatApiError(err) {
         };
     }
     // For non-operational errors, log them and send a generic message
-    console.error("PROGRAMMING_ERROR:", err);
+    console.error('PROGRAMMING_ERROR:', err);
     return {
-        status: "error",
-        message: "Something went very wrong!",
+        status: 'error',
+        message: 'Something went very wrong!',
         // Only expose stack in development
         ...(isDevelopment && { stack: err.stack }),
     };
@@ -168,7 +168,7 @@ function formatApiError(err) {
  */
 function log(level, message, data) {
     const timestamp = new Date().toISOString();
-    console.log(`${timestamp} [${level}] ${message}`, data || "");
+    console.log(`${timestamp} [${level}] ${message}`, data || '');
 }
 
 /**
@@ -178,17 +178,17 @@ const errorMessages = {
     csv: {
         invalidRow: (rowNumber, error) => `Invalid data in CSV row ${rowNumber}: ${error}`,
         missingHeader: (header) => `CSV file is missing required header: "${header}".`,
-        fileReadError: "Could not read the uploaded CSV file.",
+        fileReadError: 'Could not read the uploaded CSV file.',
     },
     db: {
-        connection: "Could not connect to the database.",
-        constraintViolation: "An item with this identifier already exists.",
-        operationFailed: "The database operation failed.",
+        connection: 'Could not connect to the database.',
+        constraintViolation: 'An item with this identifier already exists.',
+        operationFailed: 'The database operation failed.',
     },
     api: {
         notFound: (resource) => `${resource} not found.`,
-        invalidInput: "The data provided is invalid.",
-        unauthorized: "You are not authorized to perform this action.",
+        invalidInput: 'The data provided is invalid.',
+        unauthorized: 'You are not authorized to perform this action.',
     },
 };
 
@@ -213,21 +213,21 @@ function validateCsvRow(row, rowIndex) {
 
     // Example validation for a few fields
     if (!row.Hostname || !isValidHostname(row.Hostname)) {
-        errors.push(errorMessages.csv.invalidRow(rowIndex, "Invalid or missing Hostname"));
+        errors.push(errorMessages.csv.invalidRow(rowIndex, 'Invalid or missing Hostname'));
     } else {
         validatedData.hostname = row.Hostname.trim();
     }
 
     if (!row.CVE || !isValidCVE(row.CVE)) {
-        errors.push(errorMessages.csv.invalidRow(rowIndex, "Invalid or missing CVE ID"));
+        errors.push(errorMessages.csv.invalidRow(rowIndex, 'Invalid or missing CVE ID'));
     } else {
         validatedData.cve = row.CVE.trim().toUpperCase();
     }
 
-    if (row["VPR Score"] && !isValidVPR(row["VPR Score"])) {
-        errors.push(errorMessages.csv.invalidRow(rowIndex, "VPR Score must be between 0.0 and 10.0"));
+    if (row['VPR Score'] && !isValidVPR(row['VPR Score'])) {
+        errors.push(errorMessages.csv.invalidRow(rowIndex, 'VPR Score must be between 0.0 and 10.0'));
     } else {
-        validatedData.vpr_score = row["VPR Score"] ? parseFloat(row["VPR Score"]) : null;
+        validatedData.vpr_score = row['VPR Score'] ? parseFloat(row['VPR Score']) : null;
     }
     
     // Add more validations for other fields...
@@ -259,9 +259,9 @@ async function handleDbOperation(dbOperation) {
         const data = await dbOperation();
         return [data, null];
     } catch (err) {
-        log("ERROR", "Database operation failed", err);
+        log('ERROR', 'Database operation failed', err);
         // Check for specific database error types (e.g., unique constraint)
-        if (err.code === "SQLITE_CONSTRAINT") {
+        if (err.code === 'SQLITE_CONSTRAINT') {
             return [null, new AppError(errorMessages.db.constraintViolation, 409)];
         }
         return [null, new AppError(errorMessages.db.operationFailed, 500)];
@@ -270,7 +270,7 @@ async function handleDbOperation(dbOperation) {
 
 // Export functions for use in other modules if using a module system
 // For browser environment, they are available globally on the window object.
-if (typeof module !== "undefined" && module.exports) {
+if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         isValidCVE,
         isValidIP,
