@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "stylelint-config-standard"
+  ],
+  "rules": {
+    "selector-id-pattern": "^[a-z][a-zA-Z0-9-]*$",
+    "color-function-notation": "legacy",
+    "alpha-value-notation": "number",
+    "font-family-name-quotes": "always-where-recommended",
+    "color-hex-length": "long",
+    "declaration-block-single-line-max-declarations": 3,
+    "comment-empty-line-before": null,
+    "media-feature-name-no-vendor-prefix": null,
+    "media-feature-range-notation": "prefix"
+  }
+}
