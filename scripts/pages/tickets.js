@@ -26,6 +26,17 @@
  * @updated 2025-08-26 - Refactored to use shared Settings modal component
  */
 
+/**
+ * Escape HTML entities to prevent XSS attacks
+ * @param {string} text - The text to escape
+ * @returns {string} - The escaped text
+ */
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // HexTrackr - Hexagon Tickets Management System
 class HexagonTicketsManager {
     constructor() {
@@ -658,14 +669,14 @@ class HexagonTicketsManager {
         
         if (label) {
             // Create feedback message based on current state
-            const originalText = label.innerHTML;
+            const originalText = label.textContent; // Use textContent to avoid HTML
             const actionText = this.isDeviceOrderReversed ? "reversed" : "restored";
-            label.innerHTML = `Devices <small class="text-primary fw-bold">(Order ${actionText}! ✓ Use arrows or drag to reorder boot sequence)</small>`;
+            label.innerHTML = `Devices <small class="text-primary fw-bold">(Order ${escapeHtml(actionText)}! ✓ Use arrows or drag to reorder boot sequence)</small>`;
             label.style.color = "#0d6efd";
             
             // Reset after a short delay
             setTimeout(() => {
-                label.innerHTML = originalText;
+                label.textContent = originalText; // Use textContent for safe restoration
                 label.style.color = "";
             }, 2000);
         }
@@ -682,16 +693,16 @@ class HexagonTicketsManager {
         
         if (label) {
             // Create a more prominent feedback message
-            const originalText = label.innerHTML;
+            const originalText = label.textContent; // Use textContent to avoid HTML
             label.style.color = "#28a745";
             label.style.fontWeight = "bold";
             label.style.transition = "all 0.3s ease";
-            label.innerHTML = `Devices <small class="text-success fw-bold">(Moved ${direction}! ✓ Use arrows or drag to reorder boot sequence)</small>`;
+            label.innerHTML = `Devices <small class="text-success fw-bold">(Moved ${escapeHtml(direction)}! ✓ Use arrows or drag to reorder boot sequence)</small>`;
             
             setTimeout(() => {
                 label.style.color = "";
                 label.style.fontWeight = "";
-                label.innerHTML = originalText;
+                label.textContent = originalText; // Use textContent for safe restoration
             }, 2000);
         }
     }
@@ -864,13 +875,13 @@ class HexagonTicketsManager {
         
         if (label) {
             // Temporarily highlight the label to show reordering happened
-            const originalText = label.innerHTML;
+            const originalText = label.textContent; // Use textContent to avoid HTML
             label.style.color = "#28a745";
             label.innerHTML = "Devices <small class=\"text-success\">(Reordered! ✓ Use arrows or drag to reorder boot sequence)</small>";
             
             setTimeout(() => {
                 label.style.color = "";
-                label.innerHTML = originalText;
+                label.textContent = originalText; // Use textContent for safe restoration
             }, 2000);
         }
     }
@@ -1066,14 +1077,14 @@ class HexagonTicketsManager {
             // Use server-calculated overdue status
             const isOverdue = ticket.isOverdue || ticket.status === "Overdue";
             
-            // Format XT# to show only last 4 digits
-            const displayXtNumber = ticket.xtNumber ? ticket.xtNumber.slice(-4) : "N/A";
+            // Format XT# to show only last 4 digits - escape for safety
+            const displayXtNumber = ticket.xtNumber ? escapeHtml(ticket.xtNumber.slice(-4)) : "N/A";
             
             return `
-                <tr class="${isOverdue ? "table-danger" : ""}" data-ticket-id="${ticket.id}">
+                <tr class="${isOverdue ? "table-danger" : ""}" data-ticket-id="${escapeHtml(ticket.id)}">
                     <td class="text-center"><strong>${displayXtNumber}</strong></td>
-                    <td class="text-center">${this.formatDate(ticket.dateSubmitted)}</td>
-                    <td class="text-center">${this.formatDate(ticket.dateDue)}</td>
+                    <td class="text-center">${escapeHtml(this.formatDate(ticket.dateSubmitted))}</td>
+                    <td class="text-center">${escapeHtml(this.formatDate(ticket.dateDue))}</td>
                     <td class="text-center"><strong>${this.highlightSearch(ticket.hexagonTicket)}</strong></td>
                     <td class="text-center">${this.createServiceNowDisplay(ticket.serviceNowTicket)}</td>
                     <td class="text-center">${this.createSiteChip(ticket.site || "")}</td>
@@ -1088,19 +1099,19 @@ class HexagonTicketsManager {
                             ${this.createSupervisorChips(ticket.supervisor)}
                         </div>
                     </td>
-                    <td class="text-center"><span class="status-badge status-${ticket.status.toLowerCase().replace(" ", "-")}">${ticket.status}</span></td>
+                    <td class="text-center"><span class="status-badge status-${escapeHtml(ticket.status.toLowerCase().replace(" ", "-"))}">${escapeHtml(ticket.status)}</span></td>
                     <td class="text-center">
                         <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-primary action-btn" onclick="window.ticketManager.viewTicket('${ticket.id}')" title="View">
+                            <button class="btn btn-outline-primary action-btn" onclick="window.ticketManager.viewTicket('${escapeHtml(ticket.id)}')" title="View">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn btn-outline-warning action-btn" onclick="window.ticketManager.editTicket('${ticket.id}')" title="Edit">
+                            <button class="btn btn-outline-warning action-btn" onclick="window.ticketManager.editTicket('${escapeHtml(ticket.id)}')" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-outline-success action-btn" onclick="window.ticketManager.bundleTicketFiles('${ticket.id}')" title="Download Bundle">
+                            <button class="btn btn-outline-success action-btn" onclick="window.ticketManager.bundleTicketFiles('${escapeHtml(ticket.id)}')" title="Download Bundle">
                                 <i class="fas fa-download"></i>
                             </button>
-                            <button class="btn btn-outline-danger action-btn" onclick="window.ticketManager.deleteTicket('${ticket.id}')" title="Delete">
+                            <button class="btn btn-outline-danger action-btn" onclick="window.ticketManager.deleteTicket('${escapeHtml(ticket.id)}')" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
