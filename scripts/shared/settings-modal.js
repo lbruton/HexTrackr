@@ -83,7 +83,7 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
     async loadModalHtml() {
       try {
     // Use absolute path to work from any page (including nested docs routes)
-    const response = await fetch("/scripts/shared/settings-modal.html");
+    const response = await fetch("scripts/shared/settings-modal.html");
         if (!response.ok) {
           throw new Error(`Failed to load settings modal: ${response.status}`);
         }
