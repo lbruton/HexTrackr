@@ -4,15 +4,22 @@
 <p>HexTrackr is designed for a streamlined, Docker-only deployment.</p>
 <h2>Docker Compose</h2>
 <ul>
-<li><strong><code>docker-compose.yml</code></strong>: This file orchestrates the single-container Docker<br>application.</li>
-<li><strong>Services</strong>:<ul>
-<li><code>hextrackr</code>: The Node.js/Express backend application serving both API and<br>static files.</li>
+<li><p><strong><code>docker-compose.yml</code></strong>: This file orchestrates the single-container Docker</p>
+<p>application.</p>
+</li>
+<li><p><strong>Services</strong>:</p>
+<ul>
+<li><p><code>hextrackr</code>: The Node.js/Express backend application serving both API and</p>
+<p>static files.</p>
+</li>
 </ul>
 </li>
 </ul>
 <h2>Build Process</h2>
 <ul>
-<li><strong><code>Dockerfile.node</code></strong>: Defines the Docker image for the Node.js application.<br>It handles:<ul>
+<li><p><strong><code>Dockerfile.node</code></strong>: Defines the Docker image for the Node.js application.</p>
+<p>It handles:</p>
+<ul>
 <li>Installing Node.js.</li>
 <li>Copying the application source code.</li>
 <li>Installing npm dependencies.</li>

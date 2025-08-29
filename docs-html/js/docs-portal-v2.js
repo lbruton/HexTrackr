@@ -18,7 +18,7 @@
  */
 
 /* eslint-env browser */
-/* global fetch, window, document, console, Prism, bootstrap */
+/* global fetch, window, document, console, Prism, bootstrap, marked */
 
 /**
  * Escape HTML entities to prevent XSS attacks
@@ -142,19 +142,97 @@ class DocumentationPortalV2 {
         for (const section of sectionsToCheck) {
             try {
                 // Check if the main section file exists
-                const response = await fetch(`/docs-html/content/${section}/index.html`);
+                const response = await fetch(`content/${section}/index.html`);
                 if (response.ok) {
                     structure[section] = {
                         file: `${section}/index`,
                         children: await this.discoverSectionChildren(section)
                     };
                 }
-            } catch (error) {
+            } catch (_error) {
                 console.log(`Section ${section} not found, skipping`);
             }
         }
         
+        // Step 2: Auto-discover roadmaps from /roadmaps/ folder
+        await this.discoverRoadmapsStructure(structure);
+        
         return structure;
+    }
+
+    /**
+     * Auto-discover roadmap files from /roadmaps/ folder and add them to project-management
+     */
+    async discoverRoadmapsStructure(structure) {
+        console.log("📁 Scanning /roadmaps/ folder for additional content...");
+        
+        // Known roadmap files to check
+        const roadmapFiles = [
+            { file: "ROADMAP.md", title: "Strategic Roadmap", key: "strategic-roadmap", path: "../roadmaps/" },
+            { file: "sprint-security-compliance-2025-08-29-1630.md", title: "Current Sprint", key: "current-sprint", path: "../roadmaps/" }
+        ];
+        
+        // Root level files to check
+        const rootFiles = [
+            { file: "CHANGELOG.md", title: "Changelog", key: "changelog", path: "../" }
+        ];
+        
+        try {
+            // If project-management section doesn't exist, create it
+            if (!structure["project-management"]) {
+                structure["project-management"] = {
+                    file: "project-management/index",
+                    children: {}
+                };
+            } else if (!structure["project-management"].children) {
+                structure["project-management"].children = {};
+            }
+            
+            // Test each roadmap file to see if it exists
+            for (const roadmapFile of roadmapFiles) {
+                try {
+                    // Check if file exists by trying to fetch it from roadmaps folder
+                    const response = await fetch(`${roadmapFile.path}${roadmapFile.file}`);
+                    if (response.ok) {
+                        console.log(`✅ Found roadmap file: ${roadmapFile.file}`);
+                        
+                        // Add to project-management children
+                        structure["project-management"].children[roadmapFile.key] = {
+                            title: roadmapFile.title,
+                            file: `${roadmapFile.path}${roadmapFile.file}`, // Direct link to source
+                            isExternal: true // Flag to handle differently
+                        };
+                    }
+                } catch (_error) {
+                    console.log(`Roadmap file ${roadmapFile.file} not accessible, skipping`);
+                }
+            }
+            
+            // Test each root file to see if it exists
+            for (const rootFile of rootFiles) {
+                try {
+                    // Check if file exists by trying to fetch it from root
+                    const response = await fetch(`${rootFile.path}${rootFile.file}`);
+                    if (response.ok) {
+                        console.log(`✅ Found root file: ${rootFile.file}`);
+                        
+                        // Add to project-management children
+                        structure["project-management"].children[rootFile.key] = {
+                            title: rootFile.title,
+                            file: `${rootFile.path}${rootFile.file}`, // Direct link to source
+                            isExternal: true // Flag to handle differently
+                        };
+                    }
+                } catch (_error) {
+                    console.log(`Root file ${rootFile.file} not accessible, skipping`);
+                }
+            }
+            
+            console.log("📁 Roadmaps structure discovery complete");
+            
+        } catch (error) {
+            console.warn("⚠️ Could not discover roadmaps structure:", error);
+        }
     }
 
     /**
@@ -165,13 +243,13 @@ class DocumentationPortalV2 {
         
         // Define section-specific files to avoid showing all pages in every dropdown
         const sectionFiles = {
-            "getting-started": ["installation", "ticket-management", "vulnerability-management"],
-            "user-guides": ["overview"],
+            "getting-started": ["installation"],
+            "user-guides": ["ticket-management", "vulnerability-management"],
             "api-reference": ["tickets-api", "vulnerabilities-api", "backup-api"],
             "architecture": ["backend", "database", "deployment", "frontend", "frameworks"],
             "development": ["coding-standards", "contributing", "development-setup", 
-                          "memory-system", "pre-commit-hooks", "docs-portal-guide", "docs-portal-guide-fixed"],
-            "project-management": ["roadmap", "codacy-compliance"],
+                          "memory-system", "pre-commit-hooks", "docs-portal-guide"],
+            "project-management": ["roadmap", "roadmap-to-sprint-system", "codacy-compliance"],
             "security": ["overview", "vulnerability-disclosure"]
         };
         
@@ -182,14 +260,14 @@ class DocumentationPortalV2 {
             // Test each potential file to see if it exists
             for (const child of filesToTest) {
                 try {
-                    const childResponse = await fetch(`/docs-html/content/${section}/${child}.html`);
+                    const childResponse = await fetch(`content/${section}/${child}.html`);
                     if (childResponse.ok) {
                         children[child] = {
                             title: this.formatTitle(child),
                             file: `${section}/${child}`
                         };
                     }
-                } catch (error) {
+                } catch (_error) {
                     // Child page doesn't exist, skip it
                 }
             }
@@ -297,7 +375,7 @@ class DocumentationPortalV2 {
     }
 
     /**
-     * Render the collapsible navigation
+     * Render the collapsible navigation using Tabler.io list groups
      */
     renderNavigation() {
         const navContainer = document.getElementById("docsNavigation");
@@ -312,35 +390,88 @@ class DocumentationPortalV2 {
             const collapseId = `collapse-${key}`;
 
             html += `
-                <div class="nav-item">
-                    <a class="nav-link${hasChildren ? " collapsed" : ""}" 
-                       href="#${section.file}" 
-                       data-section="${section.file}"
-                       ${hasChildren ? `data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false"` : ""}>
-                        <span>
-                            <i class="${section.icon} me-2"></i>
-                            ${section.title}
+                <a class="list-group-item list-group-item-action d-flex align-items-center${hasChildren ? " collapsed" : ""}" 
+                   href="#${section.file}" 
+                   data-section="${section.file}"
+                   ${hasChildren ? `data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false"` : ""}
+                   style="border-left: 3px solid transparent; transition: all 0.2s ease;">
+                    <div class="d-flex align-items-center w-100">
+                        <span class="avatar avatar-xs bg-primary-lt me-3" style="flex-shrink: 0;">
+                            <i class="${section.icon}"></i>
                         </span>
-                        ${hasChildren ? "<i class=\"fas fa-chevron-down collapse-icon\"></i>" : ""}
-                    </a>
-                    ${hasChildren ? this.renderSubNavigation(section.children, collapseId) : ""}
-                </div>
+                        <span class="flex-fill text-body fw-medium">${section.title}</span>
+                        ${hasChildren ? "<i class=\"fas fa-chevron-down collapse-icon ms-2 text-muted\" style=\"transition: transform 0.2s ease;\"></i>" : ""}
+                    </div>
+                </a>
+                ${hasChildren ? this.renderSubNavigation(section.children, collapseId) : ""}
             `;
         }
 
         navContainer.innerHTML = html;
+        
+        // Add custom styling for active states and hover effects
+        this.addNavigationStyling();
+    }
+
+    /**
+     * Add custom styling for navigation interactions
+     */
+    addNavigationStyling() {
+        const style = document.createElement("style");
+        style.textContent = `
+            .list-group-item-action:hover {
+                border-left-color: var(--tblr-primary) !important;
+                background-color: var(--tblr-bg-surface-secondary);
+                transform: translateX(2px);
+            }
+            
+            .list-group-item-action.active {
+                border-left-color: var(--tblr-primary) !important;
+                background-color: var(--tblr-primary-lt);
+                color: var(--tblr-primary-fg);
+            }
+            
+            .list-group-item-action[aria-expanded="true"] .collapse-icon {
+                transform: rotate(180deg);
+            }
+            
+            .list-group-item-action .avatar {
+                background-color: var(--tblr-primary-lt) !important;
+                color: var(--tblr-primary) !important;
+            }
+            
+            .list-group-item-action:hover .avatar {
+                background-color: var(--tblr-primary) !important;
+                color: white !important;
+            }
+        `;
+        
+        // Remove existing style if present
+        const existingStyle = document.getElementById("nav-custom-style");
+        if (existingStyle) {
+            existingStyle.remove();
+        }
+        
+        style.id = "nav-custom-style";
+        document.head.appendChild(style);
     }
 
     /**
      * Render sub-navigation for collapsible sections
      */
     renderSubNavigation(children, collapseId) {
-        let html = `<div class="collapse docs-subnav" id="${collapseId}">`;
+        let html = `<div class="collapse" id="${collapseId}">`;
         
-        for (const [key, child] of Object.entries(children)) {
+        for (const [_key, child] of Object.entries(children)) {
             html += `
-                <a class="nav-link" href="#${child.file}" data-section="${child.file}">
-                    ${child.title}
+                <a class="list-group-item list-group-item-action d-flex align-items-center ps-5" 
+                   href="#${child.file}" 
+                   data-section="${child.file}"
+                   style="border-left: 3px solid transparent; transition: all 0.2s ease; font-size: 0.9rem;">
+                    <span class="avatar avatar-xs bg-secondary-lt me-3" style="flex-shrink: 0;">
+                        <i class="fas fa-file-alt"></i>
+                    </span>
+                    <span class="text-body">${child.title}</span>
                 </a>
             `;
         }
@@ -406,16 +537,24 @@ class DocumentationPortalV2 {
         this.showLoading();
         
         try {
+            // Check if this is an external roadmap file
+            const isExternalFile = this.isExternalFile(section);
+            
             // Check cache first
             let content = this.contentCache.get(section);
             
             if (!content) {
-                // Load content from server
-                const response = await fetch(`/docs-html/content/${section}.html`);
-                if (!response.ok) {
-                    throw new Error(`Failed to load ${section}: ${response.statusText}`);
+                if (isExternalFile) {
+                    // Load external markdown file and convert to HTML
+                    content = await this.loadExternalMarkdown(section);
+                } else {
+                    // Load processed HTML content
+                    const response = await fetch(`content/${section}.html`);
+                    if (!response.ok) {
+                        throw new Error(`Failed to load ${section}: ${response.statusText}`);
+                    }
+                    content = await response.text();
                 }
-                content = await response.text();
                 this.contentCache.set(section, content);
             }
             
@@ -436,6 +575,118 @@ class DocumentationPortalV2 {
         } catch (error) {
             console.error("❌ Error loading section:", error);
             this.showError(`Failed to load documentation for "${section}"`);
+        }
+    }
+
+    /**
+     * Check if a section refers to an external file
+     */
+    isExternalFile(section) {
+        // Handle direct external file paths
+        if (section.includes("../")) {
+            return true;
+        }
+        
+        // Check if any navigation item has this section marked as external
+        for (const [, sectionData] of Object.entries(this.navigationStructure)) {
+            if (sectionData.children) {
+                for (const [childKey, childData] of Object.entries(sectionData.children)) {
+                    if (childKey === section && childData.isExternal) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Load external markdown file and convert to HTML
+     */
+    async loadExternalMarkdown(section) {
+        console.log(`📄 Loading external markdown for: ${section}`);
+        
+        let filePath = null;
+        
+        // If section contains path characters, it's a direct file path
+        if (section.includes("../")) {
+            filePath = section;
+        } else {
+            // Find the file path from navigation structure
+            for (const [, sectionData] of Object.entries(this.navigationStructure)) {
+                if (sectionData.children) {
+                    for (const [childKey, childData] of Object.entries(sectionData.children)) {
+                        if (childKey === section && childData.isExternal) {
+                            filePath = childData.file;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (!filePath) {
+            throw new Error(`External file path not found for section: ${section}`);
+        }
+        
+        console.log(`📄 Fetching external file: ${filePath}`);
+        
+        // Fetch the raw markdown
+        const response = await fetch(filePath);
+        if (!response.ok) {
+            throw new Error(`Failed to load external file ${filePath}: ${response.statusText}`);
+        }
+        
+        const markdown = await response.text();
+        
+        // Convert markdown to HTML using marked.js (assuming it's loaded)
+        if (typeof marked !== "undefined") {
+            // Configure marked renderer for badges
+            const renderer = new marked.Renderer();
+            
+            // Custom link renderer to handle shields.io badges
+            renderer.link = function(token) {
+                console.log("Link renderer token:", token);
+                
+                let href, text, title;
+                
+                // Handle different token formats
+                if (typeof token === "object") {
+                    href = token.href;
+                    text = token.text;
+                    title = token.title || "";
+                } else {
+                    // Fallback for old API format
+                    href = arguments[0];
+                    title = arguments[1];
+                    text = arguments[2];
+                }
+                
+                console.log("Extracted values:", { href, text, title });
+                
+                // Check if this is a shields.io badge
+                if (href && (href.includes("shields.io") || href.includes("img.shields.io"))) {
+                    return `<a href="${href}" target="_blank" title="${title}"><img src="${href}" alt="${text}" class="badge-img"></a>`;
+                }
+                
+                // Regular link
+                return `<a href="${href || ""}" ${title ? `title="${title}"` : ""}>${text || ""}</a>`;
+            };
+            
+            // Configure marked with our custom renderer
+            marked.setOptions({
+                renderer: renderer,
+                breaks: true,
+                gfm: true
+            });
+            
+            return marked.parse(markdown);
+        } else {
+            // Fallback: just wrap in <pre> tags
+            return `<div class="alert alert-info">
+                <h4>External File: ${section}</h4>
+                <pre class="bg-light p-3 border rounded">${escapeHtml(markdown)}</pre>
+            </div>`;
         }
     }
 
@@ -515,6 +766,11 @@ class DocumentationPortalV2 {
      */
     updateBreadcrumb(section) {
         const breadcrumb = document.getElementById("breadcrumb");
+        if (!breadcrumb) {
+            console.warn("Breadcrumb element not found, skipping breadcrumb update");
+            return;
+        }
+        
         const sectionTitle = this.getSectionTitle(section);
         
         breadcrumb.innerHTML = `

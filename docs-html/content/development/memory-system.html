@@ -39,7 +39,9 @@ npm install -g memento-mcp
 </code></pre>
 </li>
 <li><p><strong>Configure Docker Neo4j</strong>:</p>
-<pre><code class="language-bash"># Start Neo4j container
+<pre><code class="language-bash">
+# Start Neo4j container
+
 docker run -d \
   --name neo4j-dev \
   -p 7474:7474 -p 7687:7687 \
@@ -119,23 +121,31 @@ await memento.createRelation({
 <li>Continue development with full context</li>
 </ol>
 <h3>Knowledge Discovery</h3>
-<pre><code class="language-bash"># Search for security-related knowledge
+<pre><code class="language-bash">
+# Search for security-related knowledge
+
 &quot;Find all entities related to security validation&quot;
 
 # Discover architectural decisions
+
 &quot;Show me technical decisions about database design&quot;
 
 # Find development processes
+
 &quot;What processes do we have for code quality?&quot;
 </code></pre>
 <h3>Development Session Logging</h3>
-<pre><code class="language-bash"># Record new technical decisions
+<pre><code class="language-bash">
+# Record new technical decisions
+
 &quot;Create entity: API Rate Limiting Implementation&quot;
 
 # Link related components
+
 &quot;Connect API Rate Limiting to Security Framework&quot;
 
 # Add observations
+
 &quot;Add observation to ESLint Config: Fixed Node.js environment globals&quot;
 </code></pre>
 <h2>Integration with HexTrackr</h2>
@@ -178,13 +188,17 @@ await memento.createRelation({
 <li>Monitor database query performance</li>
 </ol>
 <h3>Diagnostic Commands</h3>
-<pre><code class="language-bash"># Check Docker containers
+<pre><code class="language-bash">
+# Check Docker containers
+
 docker ps | grep neo4j
 
 # Test Neo4j connectivity
+
 docker exec -it neo4j-dev cypher-shell -u neo4j -p password
 
 # Verify memento installation
+
 npm list -g | grep memento-mcp
 </code></pre>
 <h2>Best Practices</h2>

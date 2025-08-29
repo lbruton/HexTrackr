@@ -1,20 +1,7 @@
 /**
  * HexTrackr Shared Footer Loader
- * Loads the shared footer component     // Version badge
-    const versionLi = document.createElement("li");
-    versionLi.className = "list-inline-item";
-    const versionA = document.createElement("a");
-    versionA.href = "/docs-html/#CHANGELOG";
-    versionA.title = "View Changelog";
-    const versionImg = document.createElement("img");
-    versionImg.src = "https://img.shields.io/badge/HexTrackr-v1.0.1-blue?style=flat&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMSA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDMgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K";
-    versionImg.alt = "HexTrackr Version";
-    versionImg.style.height = "20px";
-    versionImg.className = "img-fluid";
-    versionA.appendChild(versionImg);
-    versionLi.appendChild(versionA);pag    const docsA = document.createElement('a');
-    docsA.href = "/docs-html/";
-    docsA.target = "_blank";*/
+ * Loads the shared footer component
+ */
 
 /* eslint-env browser */
 /* global document, window, fetch, DOMParser, console */
@@ -23,12 +10,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const footerContainer = document.getElementById("footerContainer");
     
     if (footerContainer) {
-        fetch(
-            (window.HexTrackrConfig && window.HexTrackrConfig.basePath
-                ? window.HexTrackrConfig.basePath.replace(/\/$/, "") + "/scripts/shared/footer.html"
-                : "./scripts/shared/footer.html"
-            )
-        )
+        // Determine the correct path based on current location
+        const basePath = window.location.pathname.includes("/docs-html/") ? "../" : "";
+        const footerPath = `${basePath}scripts/shared/footer.html`;
+        
+        fetch(footerPath)
             .then(response => response.text())
             .then(footerHTML => {
                 // Create a safe DOM parser to prevent XSS
@@ -88,18 +74,52 @@ function createFallbackFooter(container) {
     // Version badge
     const versionLi = document.createElement("li");
     versionLi.className = "list-inline-item";
+    const versionA = document.createElement("a");
+    versionA.href = "/docs-html/#CHANGELOG";
+    versionA.title = "View Changelog";
     const versionImg = document.createElement("img");
     versionImg.src = "https://img.shields.io/badge/HexTrackr-v1.0.1-blue?style=flat&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMSA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDMgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K";
     versionImg.alt = "HexTrackr Version";
     versionImg.style.height = "20px";
     versionImg.className = "img-fluid";
-    versionLi.appendChild(versionImg);
+    versionA.appendChild(versionImg);
+    versionLi.appendChild(versionA);
+    
+    // SQLite badge
+    const sqliteLi = document.createElement("li");
+    sqliteLi.className = "list-inline-item";
+    const sqliteImg = document.createElement("img");
+    sqliteImg.src = "https://img.shields.io/badge/Database-SQLite-003B57?style=flat&logo=sqlite&logoColor=white";
+    sqliteImg.alt = "SQLite Database";
+    sqliteImg.style.height = "20px";
+    sqliteImg.className = "img-fluid";
+    sqliteLi.appendChild(sqliteImg);
+    
+    // Express.js badge
+    const expressLi = document.createElement("li");
+    expressLi.className = "list-inline-item";
+    const expressImg = document.createElement("img");
+    expressImg.src = "https://img.shields.io/badge/Backend-Express.js-000000?style=flat&logo=express&logoColor=white";
+    expressImg.alt = "Express.js Backend";
+    expressImg.style.height = "20px";
+    expressImg.className = "img-fluid";
+    expressLi.appendChild(expressImg);
+    
+    // Tabler badge
+    const tablerLi = document.createElement("li");
+    tablerLi.className = "list-inline-item";
+    const tablerImg = document.createElement("img");
+    tablerImg.src = "https://img.shields.io/badge/UI-Tabler-667df6?style=flat&logo=tabler&logoColor=white";
+    tablerImg.alt = "Tabler UI Framework";
+    tablerImg.style.height = "20px";
+    tablerImg.className = "img-fluid";
+    tablerLi.appendChild(tablerImg);
     
     // Documentation badge
     const docsLi = document.createElement("li");
     docsLi.className = "list-inline-item";
     const docsA = document.createElement("a");
-    docsA.href = "/docs-prototype/";
+    docsA.href = "/docs-html/";
     docsA.target = "_blank";
     docsA.title = "Project Documentation";
     const docsImg = document.createElement("img");
@@ -141,6 +161,9 @@ function createFallbackFooter(container) {
     codacyLi.appendChild(codacyA);
     
     ul.appendChild(versionLi);
+    ul.appendChild(sqliteLi);
+    ul.appendChild(expressLi);
+    ul.appendChild(tablerLi);
     ul.appendChild(docsLi);
     ul.appendChild(githubLi);
     ul.appendChild(codacyLi);
