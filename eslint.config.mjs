@@ -89,6 +89,10 @@ export default [
         Event: "readonly",
         EventTarget: "readonly",
         FormData: "readonly",
+        DOMParser: "readonly",
+        atob: "readonly",
+        btoa: "readonly",
+        Intl: "readonly",
         // Third-party library globals
         bootstrap: "readonly",
         agGrid: "readonly"
