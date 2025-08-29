@@ -25,6 +25,9 @@ export default [
       "scripts/fix-markdown.js",
       "scripts/generate-roadmap-portal.js",
       "scripts/init-database.js",
+      "scripts/memory-local.js",
+      "scripts/memento-launcher.js",
+      "scripts/memory-importer.js",
       "scripts/temp-scaffold-docs.js",
       "scripts/validation-utils.js", 
       "scripts/version-manager.js"
