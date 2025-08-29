@@ -70,6 +70,143 @@ class PathValidator {
     }
 }
 
+// Vulnerability processing helper functions
+function mapVulnerabilityRow(row) {
+    return {
+        hostname: row["asset.name"] || row["hostname"] || row["Host"] || "",
+        ipAddress: row["asset.display_ipv4_address"] || row["asset.ipv4_addresses"] || row["ip_address"] || row["IP Address"] || "",
+        cve: row["definition.cve"] || row["cve"] || row["CVE"] || "",
+        severity: row["severity"] || row["Severity"] || "",
+        vprScore: parseFloat(row["definition.vpr.score"] || row["vpr_score"] || row["VPR Score"] || 0) || null,
+        cvssScore: parseFloat(row["cvss_score"] || row["CVSS Score"] || 0) || null,
+        vendor: row["definition.family"] || row["vendor"] || row["Vendor"] || "",
+        description: row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "",
+        pluginPublished: row["definition.plugin_published"] || row["vulnerability_date"] || row["plugin_published"] || "",
+        state: row["state"] || row["State"] || "open",
+        firstSeen: row["first_seen"] || row["First Seen"] || "",
+        lastSeen: row["last_seen"] || row["Last Seen"] || "",
+        pluginId: row["plugin_id"] || row["Plugin ID"] || "",
+        solution: row["solution"] || row["Solution"] || ""
+    };
+}
+
+function processVulnerabilityRows(rows, stmt, importId, filePath, responseData, res) {
+    let processed = 0;
+    const currentDate = new Date().toISOString().split("T")[0];
+    
+    rows.forEach(row => {
+        const mapped = mapVulnerabilityRow(row);
+        
+        stmt.run([
+            importId,
+            mapped.hostname,
+            mapped.ipAddress,
+            mapped.cve,
+            mapped.severity,
+            mapped.vprScore,
+            mapped.cvssScore,
+            mapped.firstSeen,
+            mapped.lastSeen,
+            mapped.pluginId,
+            mapped.description,
+            mapped.solution,
+            mapped.vendor,
+            mapped.pluginPublished,
+            mapped.state,
+            currentDate
+        ], (err) => {
+            if (err) {
+                console.error("Row insert error:", err);
+            }
+            processed++;
+            
+            if (processed === rows.length) {
+                stmt.finalize();
+                PathValidator.safeUnlinkSync(filePath);
+                res.json({
+                    ...responseData,
+                    rowsProcessed: processed
+                });
+            }
+        });
+    });
+}
+
+// Ticket processing helper functions
+function mapTicketRow(row, index) {
+    const now = new Date().toISOString();
+    const xtNumber = row.xt_number || row["XT Number"] || `XT${String(index + 1).padStart(3, "0")}`;
+    const ticketId = row.id || `ticket_${Date.now()}_${index}`;
+    
+    return {
+        id: ticketId,
+        xtNumber,
+        dateSubmitted: row.date_submitted || row["Date Submitted"] || "",
+        dateDue: row.date_due || row["Date Due"] || "",
+        hexagonTicket: row.hexagon_ticket || row["Hexagon Ticket"] || "",
+        serviceNowTicket: row.service_now_ticket || row["ServiceNow Ticket"] || "",
+        location: row.location || row["Location"] || "",
+        devices: row.devices || row["Devices"] || "",
+        supervisor: row.supervisor || row["Supervisor"] || "",
+        tech: row.tech || row["Tech"] || "",
+        status: row.status || row["Status"] || "Open",
+        notes: row.notes || row["Notes"] || "",
+        createdAt: row.created_at || now,
+        updatedAt: now
+    };
+}
+
+function processTicketRows(csvData, stmt, res) {
+    let imported = 0;
+    const errors = [];
+    
+    csvData.forEach((row, index) => {
+        try {
+            const mapped = mapTicketRow(row, index);
+            
+            stmt.run([
+                mapped.id,
+                mapped.xtNumber,
+                mapped.dateSubmitted,
+                mapped.dateDue,
+                mapped.hexagonTicket,
+                mapped.serviceNowTicket,
+                mapped.location,
+                mapped.devices,
+                mapped.supervisor,
+                mapped.tech,
+                mapped.status,
+                mapped.notes,
+                mapped.createdAt,
+                mapped.updatedAt
+            ], (err) => {
+                if (err) {
+                    console.error(`Error importing ticket row ${index + 1}:`, err);
+                    errors.push(`Row ${index + 1}: ${err.message}`);
+                } else {
+                    imported++;
+                }
+            });
+        } catch (error) {
+            errors.push(`Row ${index + 1}: ${error.message}`);
+        }
+    });
+    
+    stmt.finalize((err) => {
+        if (err) {
+            console.error("Error finalizing ticket import:", err);
+            return res.status(500).json({ error: "Import failed" });
+        }
+        
+        res.json({
+            success: true,
+            imported: imported,
+            total: csvData.length,
+            errors: errors.length > 0 ? errors : undefined
+        });
+    });
+}
+
 const app = express();
 const PORT = process.env.PORT || 8080;
 
@@ -276,59 +413,12 @@ app.post("/api/vulnerabilities/import", upload.single("csvFile"), (req, res) => 
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
         
-        let processed = 0;
-        
-        rows.forEach(row => {
-          // Map Cisco CSV columns to database fields
-          const hostname = row["asset.name"] || row["hostname"] || row["Host"] || "";
-          const ipAddress = row["asset.display_ipv4_address"] || row["asset.ipv4_addresses"] || row["ip_address"] || row["IP Address"] || "";
-          const cve = row["definition.cve"] || row["cve"] || row["CVE"] || "";
-          const severity = row["severity"] || row["Severity"] || "";
-          const vprScore = parseFloat(row["definition.vpr.score"] || row["vpr_score"] || row["VPR Score"] || 0);
-          const cvssScore = parseFloat(row["cvss_score"] || row["CVSS Score"] || 0);
-          const vendor = row["definition.family"] || row["vendor"] || row["Vendor"] || "";
-          const description = row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "";
-          const pluginPublished = row["definition.plugin_published"] || row["vulnerability_date"] || row["plugin_published"] || "";
-          const state = row["state"] || row["State"] || "open";
-
-          stmt.run([
-            importId,
-            hostname,
-            ipAddress,
-            cve,
-            severity,
-            vprScore || null,
-            cvssScore || null,
-            row["first_seen"] || row["First Seen"] || "",
-            row["last_seen"] || row["Last Seen"] || "",
-            row["plugin_id"] || row["Plugin ID"] || "",
-            description,
-            row["description"] || row["Description"] || "",
-            row["solution"] || row["Solution"] || "",
-            vendor,
-            pluginPublished,
-            state,
-            new Date().toISOString().split("T")[0]
-          ], (err) => {
-            if (err) {console.error("Row insert error:", err);}
-            processed++;
-            
-            if (processed === rows.length) {
-              stmt.finalize();
-              
-              // Clean up uploaded file
-              PathValidator.safeUnlinkSync(req.file.path);
-              
-              res.json({
-                success: true,
-                importId,
-                rowsProcessed: processed,
-                filename,
-                processingTime: Date.now() - startTime
-              });
-            }
-          });
-        });
+        processVulnerabilityRows(rows, stmt, importId, req.file.path, {
+          success: true,
+          importId,
+          filename,
+          processingTime: Date.now() - startTime
+        }, res);
       });
     },
     error: (error) => {
@@ -381,14 +471,14 @@ app.use(express.static(__dirname, {
 }));
 
 // Documentation portal routes: serve index for docs root and redirect deep links to hash routing
-app.get("/docs-prototype", (req, res) => {
-    res.sendFile(path.join(__dirname, "docs-prototype", "index.html"));
+app.get("/docs-html", (req, res) => {
+    res.sendFile(path.join(__dirname, "docs-html", "index.html"));
 });
 
 // Helper to find a section path for a given filename by scanning the content folder
 function findDocsSectionForFilename(filename) {
     try {
-        const contentRoot = path.join(__dirname, "docs-prototype", "content");
+        const contentRoot = path.join(__dirname, "docs-html", "content");
         const stack = [""]; // use relative subpaths
         while (stack.length) {
             const relDir = stack.pop();
@@ -410,7 +500,7 @@ function findDocsSectionForFilename(filename) {
     return null;
 }
 
-app.get(/^\/docs-prototype\/(.*)\.html$/, (req, res) => {
+app.get(/^\/docs-html\/(.*)\.html$/, (req, res) => {
     let section = req.params[0];
     // If the request is only a filename (no directory), try to resolve the correct section path
     if (!section.includes("/")) {
@@ -418,7 +508,7 @@ app.get(/^\/docs-prototype\/(.*)\.html$/, (req, res) => {
         if (resolved) {section = resolved;}
     }
     // Redirect to hash-based section so the SPA shell loads correctly
-    res.redirect(302, `/docs-prototype/#${section}`);
+    res.redirect(302, `/docs-html/#${section}`);
 });
 
 // Documentation statistics endpoint (used by docs portal homepage)
@@ -449,10 +539,10 @@ app.get("/api/docs/stats", async (req, res) => {
             apiEndpoints = 0;
         }
 
-        // 2) Approximate JS function count across scripts/ and docs-prototype/js and server.js
+        // 2) Approximate JS function count across scripts/ and docs-html/js and server.js
         const scanDirs = [
             path.join(__dirname, "scripts"),
-            path.join(__dirname, "docs-prototype", "js")
+            path.join(__dirname, "docs-html", "js")
         ];
         const filesToScan = [];
 
@@ -800,9 +890,6 @@ app.post("/api/import/tickets", (req, res) => {
         return res.status(400).json({ error: "No data provided" });
     }
     
-    let imported = 0;
-    const errors = [];
-    
     // Prepare insert statement with UPSERT (INSERT OR REPLACE)
     const stmt = db.prepare(`
         INSERT OR REPLACE INTO tickets (
@@ -812,56 +899,7 @@ app.post("/api/import/tickets", (req, res) => {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     
-    csvData.forEach((row, index) => {
-        try {
-            // Use existing XT number from CSV or generate one
-            const xtNumber = row.xt_number || row["XT Number"] || `XT${String(index + 1).padStart(3, "0")}`;
-            const now = new Date().toISOString();
-            
-            // Use existing ID from CSV or generate one
-            const ticketId = row.id || `ticket_${Date.now()}_${index}`;
-            
-            stmt.run([
-                ticketId,
-                xtNumber,
-                row.date_submitted || row["Date Submitted"] || "",
-                row.date_due || row["Date Due"] || "",
-                row.hexagon_ticket || row["Hexagon Ticket"] || "",
-                row.service_now_ticket || row["ServiceNow Ticket"] || "",
-                row.location || row["Location"] || "",
-                row.devices || row["Devices"] || "",
-                row.supervisor || row["Supervisor"] || "",
-                row.tech || row["Tech"] || "",
-                row.status || row["Status"] || "Open",
-                row.notes || row["Notes"] || "",
-                row.created_at || now,
-                now
-            ], (err) => {
-                if (err) {
-                    console.error(`Error importing ticket row ${index + 1}:`, err);
-                    errors.push(`Row ${index + 1}: ${err.message}`);
-                } else {
-                    imported++;
-                }
-            });
-        } catch (error) {
-            errors.push(`Row ${index + 1}: ${error.message}`);
-        }
-    });
-    
-    stmt.finalize((err) => {
-        if (err) {
-            console.error("Error finalizing ticket import:", err);
-            return res.status(500).json({ error: "Import failed" });
-        }
-        
-        res.json({
-            success: true,
-            imported: imported,
-            total: csvData.length,
-            errors: errors.length > 0 ? errors : undefined
-        });
-    });
+    processTicketRows(csvData, stmt, res);
 });
 
 app.post("/api/import/vulnerabilities", (req, res) => {

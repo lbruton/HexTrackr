@@ -1,0 +1,42 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Deployment Architecture</h1>
+<p>HexTrackr is designed for a streamlined, Docker-only deployment.</p>
+<h2>Docker Compose</h2>
+<ul>
+<li><strong><code>docker-compose.yml</code></strong>: This file orchestrates the single-container Docker<br>application.</li>
+<li><strong>Services</strong>:<ul>
+<li><code>hextrackr</code>: The Node.js/Express backend application serving both API and<br>static files.</li>
+</ul>
+</li>
+</ul>
+<h2>Build Process</h2>
+<ul>
+<li><strong><code>Dockerfile.node</code></strong>: Defines the Docker image for the Node.js application.<br>It handles:<ul>
+<li>Installing Node.js.</li>
+<li>Copying the application source code.</li>
+<li>Installing npm dependencies.</li>
+<li>Exposing the application port (8080).</li>
+</ul>
+</li>
+</ul>
+<h2>Port Mapping</h2>
+<ul>
+<li>The application is exposed on <code>localhost:8080</code> by default.</li>
+</ul>
+<h2>Volume Configuration</h2>
+<ul>
+<li>Source code is mounted for development: <code>.:/app</code></li>
+<li>Database persistence: <code>./data:/app/data</code></li>
+<li>Node modules are containerized to avoid conflicts: <code>/app/node_modules</code></li>
+</ul>
+<h2>Environment</h2>
+<ul>
+<li>Configured for development mode: <code>NODE_ENV=development</code></li>
+<li>Auto-restart enabled: <code>restart: unless-stopped</code></li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
