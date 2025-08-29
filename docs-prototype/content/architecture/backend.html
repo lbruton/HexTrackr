@@ -1,0 +1,221 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Backend Architecture</h1>
+<!-- markdownlint-disable-next-line MD013 -->
+<p>The backend is a Node.js/Express app providing REST endpoints, CSV processing, and SQLite persistence. It also serves static frontend assets.</p>
+<h2>Modules</h2>
+<ul>
+<li>server.js: Main entrypoint; initializes Express, SQLite, routes, and security headers.</li>
+<li>scripts/init-database.js: Creates initial tables and indexes.</li>
+</ul>
+<h2>Core middleware</h2>
+<ul>
+<li>cors(): Enables cross-origin requests</li>
+<li>compression(): Gzip responses</li>
+<li>express.json({ limit: &#39;100mb&#39; }): JSON parsing</li>
+<li>express.urlencoded({ extended: true, limit: &#39;100mb&#39; }): form parsing</li>
+<li>multer upload (dest: uploads/, 100MB): multipart CSV uploads</li>
+<li>Security headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection</li>
+<li>express.static(__dirname, { maxAge: &#39;1m&#39; }): serve UI assets</li>
+</ul>
+<h2>Persistence</h2>
+<ul>
+<li>SQLite at data/hextrackr.db. See Database document for schema and ERD.</li>
+<li>initDb() runs on boot: calls init script when DB file missing and adds new columns to vulnerabilities table (idempotent ALTERs).</li>
+</ul>
+<h2>API surface</h2>
+<!-- markdownlint-disable MD013 -->
+
+<ul>
+<li>Tickets: GET/POST/PUT/DELETE /api/tickets, POST /api/tickets/migrate, GET /api/sites, GET /api/locations, POST /api/import/tickets</li>
+<li>Vulnerabilities: GET /api/vulnerabilities, GET /api/vulnerabilities/stats, GET /api/vulnerabilities/trends, POST /api/vulnerabilities/import (multipart), POST /api/import/vulnerabilities, DELETE /api/vulnerabilities/clear, GET /api/imports</li>
+<li>Backup/Restore: GET /api/backup/stats, GET /api/backup/{tickets|vulnerabilities|all}, DELETE /api/backup/clear/:type, POST /api/restore (zip)</li>
+</ul>
+<!-- markdownlint-enable MD013 -->
+
+<p>Full details in API Reference.</p>
+<h2>Symbol analysis (server.js)</h2>
+<ul>
+<li>app (Express): configured with middleware and routes.</li>
+<li>db (sqlite3.Database): shared DB connection.</li>
+<li>upload (multer): single-file handler for csvFile.</li>
+<li>initDb(): Adds columns vendor, vulnerability_date, state, import_date to vulnerabilities; runs init script when DB absent.</li>
+<li>Route handlers (inline functions): Implement business logic per endpoint.</li>
+</ul>
+<h3>Error handling and responses</h3>
+<ul>
+<li>Uses 400 for bad input (missing file/data), 500 for DB/processing errors, otherwise JSON 200 payloads.</li>
+</ul>
+<h2>Flows (Mermaid)</h2>
+<h3>GET /api/vulnerabilities (list)</h3>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant UI as Frontend
+    participant API as server.js
+    participant DB as SQLite
+    UI-&gt;&gt;API: GET /api/vulnerabilities?page=1&amp;limit=50
+    API-&gt;&gt;DB: SELECT ... ORDER BY vpr_score DESC LIMIT ? OFFSET ?
+    DB--&gt;&gt;API: rows
+    API-&gt;&gt;DB: SELECT COUNT(*) as total
+    DB--&gt;&gt;API: total
+    API--&gt;&gt;UI: { data: [...], pagination }
+</code></pre>
+<h3>POST /api/vulnerabilities/import (CSV upload)</h3>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant UI
+    participant API
+    participant FS as uploads/
+    participant DB
+    UI-&gt;&gt;API: multipart/form-data (csvFile, vendor)
+    API-&gt;&gt;FS: store temp file
+    API-&gt;&gt;API: Papa.parse(csv)
+    API-&gt;&gt;DB: INSERT vulnerability_imports
+    API-&gt;&gt;DB: INSERT vulnerabilities (rows)
+    API-&gt;&gt;FS: unlink temp file
+    API--&gt;&gt;UI: { success, importId, rowsProcessed }
+</code></pre>
+<h3>POST /api/tickets (create)</h3>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant UI
+    participant API
+    participant DB
+    UI-&gt;&gt;API: POST /api/tickets { ticket }
+    API-&gt;&gt;DB: INSERT INTO tickets (...)
+    DB--&gt;&gt;API: lastID
+    API--&gt;&gt;UI: { success, id }
+</code></pre>
+<h2>Security notes</h2>
+<ul>
+<li>Security headers applied globally.</li>
+<li>Uploads capped at 100MB, temp files removed post-processing.</li>
+<li>Static assets cached for 1 minute during development.</li>
+</ul>
+<h2>Symbol tables (server.js)</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Type</th>
+<th>Parameters</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>initDb</td>
+<td>function</td>
+<td>none</td>
+<td>void</td>
+<td>Initializes DB on boot and adds columns to vulnerabilities if missing.</td>
+</tr>
+<tr>
+<td>GET /api/vulnerabilities</td>
+<td>route handler</td>
+<td>page, limit, search, severity (query)</td>
+<td>JSON</td>
+<td>Lists vulnerabilities with pagination.</td>
+</tr>
+<tr>
+<td>GET /api/vulnerabilities/stats</td>
+<td>route handler</td>
+<td>none</td>
+<td>JSON[]</td>
+<td>Aggregated stats by severity with VPR totals/avg and date bounds.</td>
+</tr>
+<tr>
+<td>GET /api/vulnerabilities/trends</td>
+<td>route handler</td>
+<td>none</td>
+<td>JSON[]</td>
+<td>14‑day per‑day counts by severity.</td>
+</tr>
+<tr>
+<td>POST /api/vulnerabilities/import</td>
+<td>route handler</td>
+<td>csvFile (multipart), vendor</td>
+<td>JSON</td>
+<td>Parses CSV, records import, inserts vulnerabilities.</td>
+</tr>
+<tr>
+<td>POST /api/import/vulnerabilities</td>
+<td>route handler</td>
+<td>{ data: any[] }</td>
+<td>JSON</td>
+<td>Imports vulnerabilities from JSON array.</td>
+</tr>
+<tr>
+<td>DELETE /api/vulnerabilities/clear</td>
+<td>route handler</td>
+<td>type param</td>
+<td>JSON</td>
+<td>Clears vulnerability-related tables.</td>
+</tr>
+<tr>
+<td>GET /api/tickets</td>
+<td>route handler</td>
+<td>none</td>
+<td>JSON[]</td>
+<td>Lists tickets ordered by created_at. Null id falls back to xt_number.</td>
+</tr>
+<tr>
+<td>POST /api/tickets</td>
+<td>route handler</td>
+<td>ticket body</td>
+<td>JSON</td>
+<td>Inserts a ticket row.</td>
+</tr>
+<tr>
+<td>PUT /api/tickets/:id</td>
+<td>route handler</td>
+<td>id param, ticket body</td>
+<td>JSON</td>
+<td>Updates a ticket row.</td>
+</tr>
+<tr>
+<td>DELETE /api/tickets/:id</td>
+<td>route handler</td>
+<td>id param</td>
+<td>JSON</td>
+<td>Deletes a ticket row.</td>
+</tr>
+<tr>
+<td>POST /api/tickets/migrate</td>
+<td>route handler</td>
+<td>{ tickets: any[] }</td>
+<td>JSON</td>
+<td>Bulk INSERT OR REPLACE from legacy shape.</td>
+</tr>
+<tr>
+<td>POST /api/import/tickets</td>
+<td>route handler</td>
+<td>{ data: any[] }</td>
+<td>JSON</td>
+<td>Imports tickets from JSON array.</td>
+</tr>
+<tr>
+<td>GET /api/backup/*</td>
+<td>route handlers</td>
+<td>none</td>
+<td>JSON</td>
+<td>Backup stats and dataset exports.</td>
+</tr>
+<tr>
+<td>DELETE /api/backup/clear/:type</td>
+<td>route handler</td>
+<td>type param</td>
+<td>JSON</td>
+<td>Clear tickets, vulnerabilities, or all.</td>
+</tr>
+<tr>
+<td>POST /api/restore</td>
+<td>route handler</td>
+<td>file (zip), type, clearExisting</td>
+<td>JSON</td>
+<td>Restores from backup zip.</td>
+</tr>
+</tbody></table>
+<p>For full request/response schemas, see API Reference.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-prototype/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-prototype/js/docs-tabler.js. -->
+</section>
