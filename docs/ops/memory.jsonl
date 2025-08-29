@@ -1,0 +1,1 @@
+{"id":"1756485366178-t6u4mb","timestamp":"2025-08-29T16:36:06.179Z","tags":["project:HexTrackr","adr:memory-backend","setup"],"topic":"memento-mcp","content":"Configured VS Code Chat MCP settings with memento server; npm package not found, using local fallback memory."}
