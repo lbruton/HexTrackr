@@ -198,9 +198,9 @@ async function refreshStats() {
         const totalCountEl = document.getElementById("totalCount");
         const dbSizeEl = document.getElementById("dbSize");
         
-        if (ticketCountEl) ticketCountEl.textContent = stats.tickets || 0;
-        if (vulnCountEl) vulnCountEl.textContent = stats.vulnerabilities || 0;
-        if (totalCountEl) totalCountEl.textContent = stats.total || 0;
+        if (ticketCountEl) {ticketCountEl.textContent = stats.tickets || 0;}
+        if (vulnCountEl) {vulnCountEl.textContent = stats.vulnerabilities || 0;}
+        if (totalCountEl) {totalCountEl.textContent = stats.total || 0;}
         
         // Format database size
         if (dbSizeEl) {
@@ -426,7 +426,7 @@ async function importData(type) {
     
     input.onchange = async function(event) {
         const file = event.target.files[0];
-        if (!file) return;
+        if (!file) {return;}
         
         try {
             const formData = new FormData();
@@ -469,7 +469,7 @@ async function clearData(type) {
     const confirmText = type.toUpperCase();
     const confirmed = await showClearConfirmationModal(type, confirmText);
     
-    if (!confirmed) return;
+    if (!confirmed) {return;}
     
     try {
         const response = await fetch(`/api/backup/clear/${type}`, {
@@ -716,7 +716,7 @@ function initServiceNowSettings() {
     const testButton = document.getElementById("testServiceNowLink");
     const saveButton = document.getElementById("saveServiceNowSettings");
 
-    if (!enabledToggle || !instanceInput) return;
+    if (!enabledToggle || !instanceInput) {return;}
 
     // Load saved settings
     loadServiceNowSettings();
@@ -807,7 +807,7 @@ function updateServiceNowStatus() {
     const enabledToggle = document.getElementById("serviceNowEnabled");
     const instanceInput = document.getElementById("serviceNowInstance");
 
-    if (!statusBadge || !enabledToggle) return;
+    if (!statusBadge || !enabledToggle) {return;}
 
     const isEnabled = enabledToggle.checked;
     const hasValidUrl = instanceInput && instanceInput.value.trim().match(/^https:\/\/.*\.service-now\.com\/?$/);
@@ -829,7 +829,7 @@ function updateUrlPreview() {
     const instanceInput = document.getElementById("serviceNowInstance");
     const enabledToggle = document.getElementById("serviceNowEnabled");
 
-    if (!urlPreview || !instanceInput || !enabledToggle) return;
+    if (!urlPreview || !instanceInput || !enabledToggle) {return;}
 
     if (!enabledToggle.checked) {
         urlPreview.textContent = "ServiceNow integration is disabled";
@@ -1046,7 +1046,7 @@ async function importCSV(type) {
         
         fileInput.addEventListener("change", async function(event) {
             const file = event.target.files[0];
-            if (!file) return;
+            if (!file) {return;}
             
             try {
                 // Read the CSV file
@@ -1154,7 +1154,7 @@ async function restoreFullSystemBackup() {
     try {
         // Show confirmation dialog first
         const confirmed = await showRestoreConfirmationModal();
-        if (!confirmed) return;
+        if (!confirmed) {return;}
         
         // Call restoreData with 'all' type
         await restoreData("all");
@@ -1238,7 +1238,7 @@ async function restoreData(type) {
         
         input.onchange = async function(event) {
             const file = event.target.files[0];
-            if (!file) return;
+            if (!file) {return;}
             
             // Show loading notification
             showNotification(`Restoring ${type} data from backup...`, "info");

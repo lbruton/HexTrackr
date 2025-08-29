@@ -216,7 +216,7 @@ class HexagonTicketsManager {
     async migrateFromLocalStorageIfNeeded() {
         try {
             const localData = localStorage.getItem("hexagonTickets");
-            if (!localData) return;
+            if (!localData) {return;}
 
             const tickets = JSON.parse(localData);
             if (!Array.isArray(tickets) || tickets.length === 0) {
@@ -956,7 +956,7 @@ class HexagonTicketsManager {
 
     editTicket(id) {
         const ticket = this.getTicketById(id);
-        if (!ticket) return;
+        if (!ticket) {return;}
 
         this.currentEditingId = id;
         
@@ -1225,21 +1225,21 @@ class HexagonTicketsManager {
 
     // Helper function to create location chips
     createLocationChip(location) {
-        if (!location) return "N/A";
+        if (!location) {return "N/A";}
         const colorClass = this.getLocationColor(location);
         return `<span class="location-chip ${colorClass}">${this.highlightSearch(location)}</span>`;
     }
 
     // Helper function to create site chips  
     createSiteChip(site) {
-        if (!site) return "N/A";
+        if (!site) {return "N/A";}
         const colorClass = this.getSiteColor(site);
         return `<span class="site-chip ${colorClass}">${this.highlightSearch(site)}</span>`;
     }
 
     // Helper function to create supervisor chips
     createSupervisorChips(supervisorText) {
-        if (!supervisorText) return "N/A";
+        if (!supervisorText) {return "N/A";}
         
         // Parse supervisors (semicolon separated only - names are "LAST, FIRST" format)
         const supervisors = supervisorText.split(";").map(s => s.trim()).filter(s => s);
@@ -1271,7 +1271,7 @@ class HexagonTicketsManager {
 
     // Helper function to create ServiceNow ticket display (clickable if enabled)
     createServiceNowDisplay(serviceNowTicket) {
-        if (!serviceNowTicket) return this.highlightSearch("N/A");
+        if (!serviceNowTicket) {return this.highlightSearch("N/A");}
         
         // Check if ServiceNow integration is enabled (from shared settings modal)
         const isEnabled = window.isServiceNowEnabled && window.isServiceNowEnabled();
@@ -1325,7 +1325,7 @@ class HexagonTicketsManager {
 
     highlightSearch(text) {
         const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-        if (!searchTerm || !text) return text;
+        if (!searchTerm || !text) {return text;}
 
         const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         const regex = new RegExp(`(${escapedSearchTerm})`, "gi");
@@ -1959,7 +1959,7 @@ class HexagonTicketsManager {
 
     // Handle shared documentation upload
     async handleSharedDocumentation(files) {
-        if (files.length === 0) return;
+        if (files.length === 0) {return;}
 
         this.sharedDocumentation = [];
         
@@ -2067,7 +2067,7 @@ class HexagonTicketsManager {
 
     // Handle CSV import
     async handleCsvImport(file) {
-        if (!file) return;
+        if (!file) {return;}
 
         if (!file.name.toLowerCase().endsWith(".csv")) {
             this.showToast("Please select a CSV file", "error");
@@ -2193,7 +2193,7 @@ class HexagonTicketsManager {
     // Parse CSV text to tickets array
     parseCsvToTickets(csvText) {
         const lines = csvText.split("\n").filter(line => line.trim());
-        if (lines.length < 2) return [];
+        if (lines.length < 2) {return [];}
 
         const headers = lines[0].split(",").map(h => h.trim().replace(/"/g, ""));
         const tickets = [];
@@ -2363,27 +2363,27 @@ class HexagonTicketsManager {
 window.ticketManager = null; // Will be initialized on DOMContentLoaded
 
 window.saveTicket = function() {
-    if (window.ticketManager) window.ticketManager.saveTicket();
+    if (window.ticketManager) {window.ticketManager.saveTicket();}
 };
 
 window.editTicketFromView = function() {
-    if (window.ticketManager) window.ticketManager.editTicketFromView();
+    if (window.ticketManager) {window.ticketManager.editTicketFromView();}
 };
 
 window.copyMarkdownToClipboard = function() {
-    if (window.ticketManager) window.ticketManager.copyMarkdownToClipboard();
+    if (window.ticketManager) {window.ticketManager.copyMarkdownToClipboard();}
 };
 
 window.downloadBundleFromView = function() {
-    if (window.ticketManager) window.ticketManager.downloadBundleFromView();
+    if (window.ticketManager) {window.ticketManager.downloadBundleFromView();}
 };
 
 window.exportData = function(format) {
-    if (window.ticketManager) window.ticketManager.exportData(format);
+    if (window.ticketManager) {window.ticketManager.exportData(format);}
 };
 
 window.sortTable = function(column) {
-    if (window.ticketManager) window.ticketManager.sortTable(column);
+    if (window.ticketManager) {window.ticketManager.sortTable(column);}
 };
 
 // Page-specific refresh function for Settings modal integration
