@@ -92,7 +92,7 @@ class DocumentationPortal {
 
     renderSidebar() {
         const sidebarContainer = document.getElementById("sidebar-container");
-        if (!sidebarContainer) return;
+        if (!sidebarContainer) {return;}
 
         let html = `
             <div class="card-header">
@@ -164,7 +164,7 @@ class DocumentationPortal {
     }
 
     async loadSection(section) {
-        if (!section) section = "index";
+        if (!section) {section = "index";}
         this.showLoading();
         
         try {
@@ -307,7 +307,7 @@ class DocumentationPortal {
     // Map a content href to a section path used by the router. Returns
     // { section: 'category/page', fragment?: 'anchor' } or null if external.
     mapContentHrefToSection(href) {
-        if (!href) return null;
+        if (!href) {return null;}
         const trimmed = href.trim();
 
         // External links or protocols we don't handle
@@ -357,12 +357,12 @@ class DocumentationPortal {
     // Rewrite internal links inside a container to hash-based routes and
     // delegate navigation through loadSection. Keeps external links intact.
     rewriteInternalLinks(rootEl) {
-        if (!rootEl) return;
+        if (!rootEl) {return;}
         const anchors = rootEl.querySelectorAll("a[href]");
         anchors.forEach((a) => {
             const href = a.getAttribute("href");
             const mapped = this.mapContentHrefToSection(href);
-            if (!mapped) return; // external
+            if (!mapped) {return;} // external
 
             // If it's an in-page anchor, just handle smooth scroll
             if (href.startsWith("#")) {
@@ -370,7 +370,7 @@ class DocumentationPortal {
                     e.preventDefault();
                     const id = href.slice(1);
                     const target = rootEl.querySelector(`[id="${CSS.escape(id)}"]`);
-                    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+                    if (target) {target.scrollIntoView({ behavior: "smooth", block: "start" });}
                 });
                 return;
             }
@@ -383,7 +383,7 @@ class DocumentationPortal {
                 this.loadSection(mapped.section).then(() => {
                     if (mapped.fragment) {
                         const target = document.getElementById(mapped.fragment) || rootEl.querySelector(`[id="${CSS.escape(mapped.fragment)}"]`);
-                        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+                        if (target) {target.scrollIntoView({ behavior: "smooth", block: "start" });}
                     }
                 });
             });
@@ -394,7 +394,7 @@ class DocumentationPortal {
     async refreshOverviewStats() {
         try {
             const res = await fetch("/api/docs/stats");
-            if (!res.ok) return; // leave defaults
+            if (!res.ok) {return;} // leave defaults
             const data = await res.json();
             // Update cards if present
             const endpointEl = document.querySelector("#overview-content .card-body .h1");
@@ -402,9 +402,9 @@ class DocumentationPortal {
             const cards = document.querySelectorAll("#overview-content .card.card-sm .card-body .h1");
             if (cards.length >= 3) {
                 // 0: endpoints, 1: js functions, 2: frameworks
-                if (typeof data.apiEndpoints === "number") cards[0].textContent = data.apiEndpoints;
-                if (typeof data.jsFunctions === "number") cards[1].textContent = data.jsFunctions;
-                if (typeof data.frameworks === "number") cards[2].textContent = data.frameworks;
+                if (typeof data.apiEndpoints === "number") {cards[0].textContent = data.apiEndpoints;}
+                if (typeof data.jsFunctions === "number") {cards[1].textContent = data.jsFunctions;}
+                if (typeof data.frameworks === "number") {cards[2].textContent = data.frameworks;}
             }
 
             // Also update badge counts if present
@@ -412,8 +412,8 @@ class DocumentationPortal {
             const jsBadges = Array.from(document.querySelectorAll("#overview-content .badge.bg-green-lt"));
             const apiBadge = apiBadges.find(b => /Endpoints/i.test(b.textContent));
             const jsBadge = jsBadges.find(b => /Functions/i.test(b.textContent));
-            if (apiBadge && typeof data.apiEndpoints === "number") apiBadge.textContent = `${data.apiEndpoints} Endpoints`;
-            if (jsBadge && typeof data.jsFunctions === "number") jsBadge.textContent = `${data.jsFunctions} Functions`;
+            if (apiBadge && typeof data.apiEndpoints === "number") {apiBadge.textContent = `${data.apiEndpoints} Endpoints`;}
+            if (jsBadge && typeof data.jsFunctions === "number") {jsBadge.textContent = `${data.jsFunctions} Functions`;}
         } catch (_) {
             // ignore; leave defaults
         }

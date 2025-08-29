@@ -34,7 +34,7 @@ class PathValidator {
 
     static safeReadFileSync(filePath, options = "utf8") {
         const validatedPath = PathValidator.validatePath(filePath);
-        if (!fs.existsSync(validatedPath)) throw new Error(`File not found: ${validatedPath}`);
+        if (!fs.existsSync(validatedPath)) {throw new Error(`File not found: ${validatedPath}`);}
         return fs.readFileSync(validatedPath, options);
     }
 
