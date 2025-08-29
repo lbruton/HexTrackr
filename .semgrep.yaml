@@ -43,10 +43,10 @@ rules:
 
   - id: todo-fixme-comments
     patterns:
-      - pattern-regex: "//.*TODO.*"
-      - pattern-regex: "//.*FIXME.*"
-      - pattern-regex: "/\\*.*TODO.*\\*/"
-      - pattern-regex: "/\\*.*FIXME.*\\*/"
+      - pattern-regex: "(?i)//.*TODO.*"
+      - pattern-regex: "(?i)//.*FIXME.*"
+      - pattern-regex: "(?i)/\\*.*TODO.*\\*/"
+      - pattern-regex: "(?i)/\\*.*FIXME.*\\*/"
     message: TODO/FIXME comments should be tracked in issue system
     languages: [javascript, typescript, python, java]
     severity: INFO
