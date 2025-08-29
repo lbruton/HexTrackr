@@ -1,8 +1,8 @@
 # HTML Generation Report
 
-Generated: 2025-08-29T21:39:02.947Z
-Duration: 1.8s
-Files Generated: 33
+Generated: 2025-08-29T23:21:24.899Z
+Duration: 1.9s
+Files Generated: 34
 Errors: 0
 
 ## Generated Files
@@ -31,7 +31,8 @@ Errors: 0
 - project-management/codacy-compliance.html
 - project-management/index.html
 - project-management/quality-badges.html
-- project-management/roadmap.html
+- project-management/roadmap-to-sprint-system.html
+- project-management/strategic-roadmap.html
 - security/index.html
 - security/overview.html
 - security/vulnerability-disclosure.html
@@ -43,4 +44,4 @@ Errors: 0
 
 ## Summary
 
-The HTML generator successfully created 33 HTML files from their corresponding markdown sources using the master template.
+The HTML generator successfully created 34 HTML files from their corresponding markdown sources using the master template.
