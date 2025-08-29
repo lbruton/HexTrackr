@@ -71,7 +71,7 @@ HexTrackr = dual-purpose cybersecurity management system:
 
 ## Compliance Loop (Non-Negotiable)
 
-## Every task must follow this operating loop:
+## Every task must follow this operating loop
 
 1. **Observe**
    - Record request + context with `memory_mcp.record(phase="observe")`.
