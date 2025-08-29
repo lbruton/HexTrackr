@@ -1,39 +1,41 @@
 # HTML Generation Report
 
-Generated: 2025-08-28T15:50:32.840Z
-Duration: 1.4s
-Files Generated: 26
+Generated: 2025-08-29T02:26:21.580Z
+Duration: 1.7s
+Files Generated: 28
 Errors: 0
 
 ## Generated Files
 
-- api-reference/index.html
-- api-reference/tickets-api.html
-- api-reference/vulnerabilities-api.html
-- architecture/backend.html
-- architecture/database.html
-- architecture/deployment.html
-- architecture/frameworks.html
-- architecture/frontend.html
-- architecture/index.html
-- development/coding-standards.html
-- development/contributing.html
-- development/development-setup.html
-- development/index.html
-- getting-started/index.html
-- getting-started/installation.html
-- html-update-report.html
-- index.html
-- project-management/codacy-compliance.html
-- project-management/index.html
-- project-management/roadmap.html
-- security/index.html
-- security/overview.html
-- security/vulnerability-disclosure.html
-- user-guides/index.html
-- user-guides/ticket-management.html
-- user-guides/vulnerability-management.html
+- /app/api-reference/index.html
+- /app/api-reference/tickets-api.html
+- /app/api-reference/vulnerabilities-api.html
+- /app/architecture/backend.html
+- /app/architecture/database.html
+- /app/architecture/deployment.html
+- /app/architecture/frameworks.html
+- /app/architecture/frontend.html
+- /app/architecture/index.html
+- /app/development/coding-standards.html
+- /app/development/contributing.html
+- /app/development/development-setup.html
+- /app/development/index.html
+- /app/development/pre-commit-hooks.html
+- /app/getting-started/index.html
+- /app/getting-started/installation.html
+- /app/html-update-report.html
+- /app/index.html
+- /app/project-management/codacy-compliance.html
+- /app/project-management/index.html
+- /app/project-management/roadmap.html
+- /app/project-management/roadmaps/sprint-2025-08-28-1530.html
+- /app/security/index.html
+- /app/security/overview.html
+- /app/security/vulnerability-disclosure.html
+- /app/user-guides/index.html
+- /app/user-guides/ticket-management.html
+- /app/user-guides/vulnerability-management.html
 
 ## Summary
 
-The HTML generator successfully created 26 HTML files from their corresponding markdown sources using the master template.
+The HTML generator successfully created 28 HTML files from their corresponding markdown sources using the master template.
