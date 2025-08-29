@@ -198,8 +198,12 @@
 
 <h2>Notes and caveats</h2>
 <ul>
-<li>Tickets schema drift: server endpoints expect additional columns not present in<br>the initial table. Migrations will align these over time. Client code handles<br>absent fields gracefully.</li>
-<li>Vulnerabilities table gains extra columns at runtime; re-running server on an<br>existing DB is safe due to duplicate column guards.</li>
+<li><p>Tickets schema drift: server endpoints expect additional columns not present in</p>
+<p>the initial table. Migrations will align these over time. Client code handles<br>absent fields gracefully.</p>
+</li>
+<li><p>Vulnerabilities table gains extra columns at runtime; re-running server on an</p>
+<p>existing DB is safe due to duplicate column guards.</p>
+</li>
 </ul>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts

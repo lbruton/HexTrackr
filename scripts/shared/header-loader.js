@@ -7,8 +7,11 @@
   
   async function loadHeader() {
     try {
+      // Determine the correct path based on current location
+      const basePath = window.location.pathname.includes("/docs-html/") ? "../" : "";
+      
       // Fetch the header HTML
-      const response = await fetch("/scripts/shared/header.html");
+      const response = await fetch(`${basePath}scripts/shared/header.html`);
       if (!response.ok) {
         throw new Error(`Failed to load header: ${response.status}`);
       }
@@ -44,11 +47,11 @@
     const navLinks = document.querySelectorAll(".navbar-nav .nav-link");
     navLinks.forEach(link => {
       const href = link.getAttribute("href");
-      const isDocs = pathname.startsWith("/docs-prototype/");
+      const isDocs = pathname.startsWith("/docs-html/");
       const match =
         (href === "/tickets.html" && pathname.endsWith("/tickets.html")) ||
         (href === "/vulnerabilities.html" && pathname.endsWith("/vulnerabilities.html")) ||
-        (href === "/docs-prototype/" && isDocs);
+        (href === "/docs-html/" && isDocs);
       link.classList.toggle("active", !!match);
     });
     
@@ -95,7 +98,7 @@
           <div class="navbar-nav">
       <a class="nav-link" href="/tickets.html">Tickets</a>
       <a class="nav-link" href="/vulnerabilities.html">Vulnerabilities</a>
-      <a class="nav-link" href="/docs-prototype/">Documentation</a>
+      <a class="nav-link" href="/docs-html/">Documentation</a>
           </div>
         </div>
       </header>
