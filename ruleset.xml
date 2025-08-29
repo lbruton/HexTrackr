@@ -7,6 +7,11 @@
 
     <description>PMD ruleset for HexTrackr project</description>
 
+    <!-- Exclude third-party dependencies -->
+    <exclude-pattern>.*/node_modules/.*</exclude-pattern>
+    <exclude-pattern>.*/uploads/.*</exclude-pattern>
+    <exclude-pattern>.*/scripts/chart.min.js</exclude-pattern>
+
     <!-- Java Rules -->
     <rule ref="category/java/bestpractices.xml">
         <exclude name="UnusedImports"/>
