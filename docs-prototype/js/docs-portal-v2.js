@@ -101,7 +101,7 @@ class DocumentationPortalV2 {
             
             // Add discovered sections with configuration
             for (const [sectionKey, sectionData] of Object.entries(discoveredStructure)) {
-                if (sectionKey === "index") continue; // Skip index, already added as overview
+                if (sectionKey === "index") {continue;} // Skip index, already added as overview
                 
                 const config = sectionConfig[sectionKey] || {
                     title: this.formatTitle(sectionKey),
@@ -340,7 +340,7 @@ class DocumentationPortalV2 {
      */
     renderNavigation() {
         const navContainer = document.getElementById("docsNavigation");
-        if (!navContainer) return;
+        if (!navContainer) {return;}
 
         let html = "";
 
@@ -569,7 +569,7 @@ class DocumentationPortalV2 {
      * Get section title from navigation structure
      */
     getSectionTitle(section) {
-        if (section === "index") return "Overview";
+        if (section === "index") {return "Overview";}
         
         // Search in main sections
         for (const mainSection of Object.values(this.navigationStructure)) {

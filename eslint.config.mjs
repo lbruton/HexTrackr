@@ -51,7 +51,8 @@ export default [
     },
     rules: {
       "quotes": ["error", "double"],
-      "semi": ["error", "always"]
+      "semi": ["error", "always"],
+      "curly": ["error", "all"]
     }
   },
   {
@@ -100,7 +101,8 @@ export default [
     },
     rules: {
       "quotes": ["error", "double"],
-      "semi": ["error", "always"]
+      "semi": ["error", "always"],
+      "curly": ["error", "all"]
     }
   },
   {
@@ -121,7 +123,8 @@ export default [
     },
     rules: {
       "quotes": ["error", "double"],
-      "semi": ["error", "always"]
+      "semi": ["error", "always"],
+      "curly": ["error", "all"]
     }
   },
   {
@@ -137,7 +140,8 @@ export default [
     },
     rules: {
       "quotes": ["error", "double"],
-      "semi": ["error", "always"]
+      "semi": ["error", "always"],
+      "curly": ["error", "all"]
     }
   }
 ];
