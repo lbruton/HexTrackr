@@ -88,7 +88,7 @@ class PathValidator {
     static safeReadFileSync(filePath, options = "utf8") {
         const validatedPath = PathValidator.validatePath(filePath);
         const projectRoot = path.resolve(__dirname, "..");
-        if (!validatedPath.startsWith(projectRoot)) throw new Error("Access to this file path is not allowed.");
+        if (!validatedPath.startsWith(projectRoot)) {throw new Error("Access to this file path is not allowed.");}
         return fs.readFileSync(validatedPath, options);
     }
 
@@ -366,7 +366,7 @@ class MarkdownFormatter {
                 
                 for (const item of items) {
                     // Validate the item name before using in path.join
-                    if (!item || typeof item !== "string") continue;
+                    if (!item || typeof item !== "string") {continue;}
                     
                     // Use safe path joining to prevent path traversal
                     const fullPath = path.resolve(currentDir, PathValidator.validatePathComponent(item));

@@ -1,0 +1,85 @@
+# Semgrep configuration for HexTrackr
+rules:
+  # Security Rules
+  - id: no-hardcoded-secrets
+    patterns:
+      - pattern: password = "..."
+      - pattern: api_key = "..."
+      - pattern: secret = "..."
+      - pattern: token = "..."
+    message: Potential hardcoded secret detected
+    languages: [javascript, typescript, python, java]
+    severity: ERROR
+
+  - id: sql-injection-risk
+    patterns:
+      - pattern: |
+          db.query($QUERY + $INPUT)
+      - pattern: |
+          db.execute($QUERY + $INPUT)
+    message: Potential SQL injection vulnerability
+    languages: [javascript, typescript, python, java]
+    severity: ERROR
+
+  - id: xss-risk
+    patterns:
+      - pattern: |
+          $EL.innerHTML = $INPUT
+      - pattern: |
+          document.write($INPUT)
+    message: Potential XSS vulnerability
+    languages: [javascript, typescript]
+    severity: ERROR
+
+  # Code Quality Rules
+  - id: console-log-in-production
+    patterns:
+      - pattern: console.log(...)
+      - pattern: console.debug(...)
+      - pattern: console.info(...)
+    message: Console statements should not be in production code
+    languages: [javascript, typescript]
+    severity: WARNING
+
+  - id: todo-fixme-comments
+    patterns:
+      - pattern-regex: "(?i)//.*TODO.*"
+      - pattern-regex: "(?i)//.*FIXME.*"
+      - pattern-regex: "(?i)/\\*.*TODO.*\\*/"
+      - pattern-regex: "(?i)/\\*.*FIXME.*\\*/"
+    message: TODO/FIXME comments should be tracked in issue system
+    languages: [javascript, typescript, python, java]
+    severity: INFO
+
+  - id: empty-catch-block
+    patterns:
+      - pattern: |
+          try {
+            ...
+          } catch ($E) {
+          }
+    message: Empty catch blocks should at least log the error
+    languages: [javascript, typescript, python, java]
+    severity: WARNING
+
+# Include community rules
+include:
+  - p/security-audit
+  - p/javascript
+  - p/typescript
+  - p/python
+  - p/java
+  - p/docker
+  - p/nginx
+  - p/sql
+
+# Exclude patterns
+exclude:
+  - "*.min.js"
+  - "node_modules/"
+  - "dist/"
+  - "build/"
+  - ".git/"
+  - "coverage/"
+  - "*.test.js"
+  - "*.spec.js"

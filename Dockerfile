@@ -24,7 +24,7 @@ RUN npm install -g eslint
 COPY . .
 
 # Copy ESLint configuration file to /app directory
-COPY eslint.config.js /app/
+COPY eslint.config.mjs /app/
 
 # Create data directory for file uploads and set permissions
 RUN mkdir -p /app/data && \

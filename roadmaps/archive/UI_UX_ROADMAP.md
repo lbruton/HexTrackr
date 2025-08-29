@@ -81,7 +81,7 @@ Risk: LOW | Impact: HIGH | Duration: Ongoing
 
 ---
 
-## 📋 PHASE 1: Database Schema Migration 
+## 📋 PHASE 1: Database Schema Migration
 
 Risk: HIGH | Impact: CRITICAL | Duration: 2-3 tasks
 
@@ -201,7 +201,7 @@ Risk: CRITICAL | Impact: HIGHEST | Duration: 2-4 hours total
 - ✅ **TESTING**: Verified toggle works both ways, VPR sum calculations accurate and meaningful
 - ✅ **QUALITY**: Added ESLint config, Playwright testing confirms functionality
 
-#### 3.5.2 Multi-Vendor Analytics 🎯 PHASE 2 - READY FOR IMPLEMENTATION (45 min estimated)  
+#### 3.5.2 Multi-Vendor Analytics 🎯 PHASE 2 - READY FOR IMPLEMENTATION (45 min estimated)
 
 - [ ] **VENDOR FILTERING**: Add Cisco | Palo Alto | Other | All vendor filter buttons
 - [ ] **API ENHANCEMENT**: JOIN time-series with vulnerabilities table for vendor-specific trends
@@ -212,7 +212,7 @@ Risk: CRITICAL | Impact: HIGHEST | Duration: 2-4 hours total
 #### 3.5.3 CVSS Support & Aggregation Methods 📊 PHASE 3 (30 min)
 
 - [ ] **CVSS INTEGRATION**: Add CVSS Sum option (infrastructure ready, awaiting real CVSS data)
-- [ ] **AGGREGATION TOGGLE**: Add Sum | Average toggle for both VPR and CVSS metrics  
+- [ ] **AGGREGATION TOGGLE**: Add Sum | Average toggle for both VPR and CVSS metrics
 - [ ] **API EXPANSION**: Support metric type (VPR/CVSS) and aggregation (sum/avg) parameters
 - [ ] **CHART UPDATES**: Update tooltips and labels based on selected metric and aggregation
 - [ ] **DEFAULT STATE**: All vendors, VPR Sum, Sum aggregation
@@ -502,13 +502,13 @@ Last Updated: August 25, 2025 • Priority: HIGH - Critical trend tracking + UX 
 
 ---
 
-## 📋 **PHASE 7: Enhanced Statistics Cards** 
+## 📋 **PHASE 7: Enhanced Statistics Cards**
 
 Risk: LOW | Impact: LOW | Duration: 2-3 tasks | Priority: VERY LOW
 
 ### 7.1 VPR Calculation Improvements
 
-- [ ] **CRITICAL LOGIC**: Exclude FIXED state from VPR total calculations  
+- [ ] **CRITICAL LOGIC**: Exclude FIXED state from VPR total calculations
 - [ ] **ACCURACY**: Ensure cards only count active vulnerabilities
 - [ ] **CONSISTENCY**: Match card totals with filtered table data
 
