@@ -1,0 +1,81 @@
+[sqlfluff]
+# SQLFluff configuration for HexTrackr
+
+# Core settings
+dialect = sqlite
+templater = raw
+encoding = utf-8
+max_line_length = 120
+
+# Rules configuration
+[sqlfluff:rules]
+# Capitalization rules
+capitalisation.keywords = upper
+capitalisation.identifiers = lower
+capitalisation.functions = upper
+capitalisation.literals = upper
+
+# Layout rules  
+layout.indent = 2
+layout.line_position = leading
+
+# Specific rule configurations
+[sqlfluff:rules:L010]
+# Keywords should be consistently upper case
+capitalisation_policy = upper
+
+[sqlfluff:rules:L014]
+# Unquoted identifiers should be consistently lower case
+capitalisation_policy = lower
+
+[sqlfluff:rules:L030]
+# Function names should be consistently upper case  
+capitalisation_policy = upper
+
+[sqlfluff:rules:L040]
+# Null & Boolean literals should be consistently upper case
+capitalisation_policy = upper
+
+[sqlfluff:rules:L042]
+# Join/Query syntax should be consistent
+preferred_first_table_in_join_clause = earlier
+
+[sqlfluff:rules:L044]
+# Query produces an unknown number of result columns
+select_clause_trailing_comma = forbid
+
+[sqlfluff:rules:L052]
+# Semi-colon formatting approach
+multiline_newline = True
+require_final_semicolon = True
+
+[sqlfluff:rules:L054]
+# GROUP BY/ORDER BY column references
+group_by_and_order_by_style = consistent
+
+# Exclude certain checks that might not apply to our use case
+[sqlfluff:rules:L031]
+# Avoid table aliases in from clauses and join conditions
+force_enable = False
+
+[sqlfluff:rules:L034]
+# Select wildcards then simple targets before calculations and aggregates
+force_enable = False
+
+# File patterns to include/exclude
+[sqlfluff:exclude_rules]
+# Disable some rules that might be too strict for development
+rules = L034, L031
+
+# Template variables (if using templated SQL)
+[sqlfluff:templater:jinja]
+apply_dbt_builtins = False
+
+# Specific file configurations
+[sqlfluff:layout:type:comma]
+line_position = trailing
+spacing_before = touch
+
+[sqlfluff:layout:type:binary_operator]
+line_position = leading
+spacing_within = touch
