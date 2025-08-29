@@ -1,5 +1,5 @@
 /* eslint-env node */
-/* global __dirname, require, module, console, process, setTimeout */
+/* global __dirname, require, console, process, setTimeout */
  
 const express = require("express");
 const path = require("path");
@@ -164,10 +164,10 @@ app.get("/api/vulnerabilities", (req, res) => {
   const severity = req.query.severity || "";
   
   let whereClause = "";
-  let params = [];
+  const params = [];
   
   if (search || severity) {
-    let conditions = [];
+    const conditions = [];
     if (search) {
       conditions.push("(hostname LIKE ? OR cve LIKE ? OR plugin_name LIKE ?)");
       params.push(`%${search}%`, `%${search}%`, `%${search}%`);
@@ -393,7 +393,7 @@ function findDocsSectionForFilename(filename) {
                 }
             }
         }
-    } catch (e) {
+    } catch (_e) {
         // ignore scan errors and fall back to original behavior
     }
     return null;
@@ -434,7 +434,7 @@ app.get("/api/docs/stats", async (req, res) => {
                 }
             }
             apiEndpoints = paths.size;
-        } catch (e) {
+        } catch (_e) {
             apiEndpoints = 0;
         }
 
@@ -486,7 +486,7 @@ app.get("/api/docs/stats", async (req, res) => {
             frameworks: frameworks.length,
             computedAt: new Date().toISOString()
         });
-    } catch (err) {
+    } catch (_err) {
         res.status(500).json({ error: "Failed to compute docs stats" });
     }
 });
@@ -541,7 +541,6 @@ app.get("/", (req, res) => {
 
 // Initialize database on startup
 const initDb = () => {
-  const fs = require("fs");
   if (!PathValidator.safeExistsSync(dbPath)) {
     console.log("Initializing database...");
     require("./scripts/init-database.js");
@@ -791,7 +790,7 @@ app.post("/api/import/tickets", (req, res) => {
     }
     
     let imported = 0;
-    let errors = [];
+    const errors = [];
     
     // Prepare insert statement with UPSERT (INSERT OR REPLACE)
     const stmt = db.prepare(`
@@ -863,7 +862,7 @@ app.post("/api/import/vulnerabilities", (req, res) => {
     
     const importDate = new Date().toISOString();
     let imported = 0;
-    let errors = [];
+    const errors = [];
     
     // Create import record
     const importQuery = `
