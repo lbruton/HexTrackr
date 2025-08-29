@@ -1,0 +1,30 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Installation Guide</h1>
+<p>HexTrackr is designed for Docker-only deployment to ensure a consistent and reliable environment.</p>
+<h2>Prerequisites</h2>
+<ul>
+<li><a href="https://docs.docker.com/get-docker/">Docker</a></li>
+<li><a href="https://docs.docker.com/compose/install/">Docker Compose</a></li>
+</ul>
+<h2>Running the Application</h2>
+<ol>
+<li><p><strong>Clone the repository:</strong></p>
+<pre><code class="language-bash">git clone https://github.com/your-username/HexTrackr.git
+cd HexTrackr
+</code></pre>
+</li>
+<li><p><strong>Start the services:</strong></p>
+<p> Use Docker Compose to build and run the application in detached mode.</p>
+<pre><code class="language-bash">docker-compose up -d --build
+</code></pre>
+</li>
+<li><p><strong>Access HexTrackr:</strong></p>
+<p> The application will be available at <code>http://localhost:8080</code>.</p>
+</li>
+</ol>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

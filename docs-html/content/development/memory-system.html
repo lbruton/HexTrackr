@@ -1,0 +1,247 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Memory System (Memento MCP)</h1>
+<p>This document outlines HexTrackr&#39;s persistent memory system using memento-mcp with Neo4j backend for enhanced development workflows and knowledge retention.</p>
+<h2>Overview</h2>
+<p>HexTrackr uses a memory-first development approach with the memento-mcp (Model Context Protocol) server to maintain persistent knowledge across development sessions. This system provides:</p>
+<ul>
+<li><strong>Persistent Knowledge</strong>: Project context survives VS Code restarts</li>
+<li><strong>Semantic Search</strong>: Find relevant information using natural language</li>
+<li><strong>Relationship Mapping</strong>: Automatic connections between entities</li>
+<li><strong>Archive Separation</strong>: Historical vs current project knowledge</li>
+</ul>
+<h2>Architecture</h2>
+<h3>Components</h3>
+<ul>
+<li><strong>memento-mcp v0.3.9</strong>: Neo4j-backed MCP server for VS Code</li>
+<li><strong>Neo4j Database</strong>: Graph database for storing entities and relationships</li>
+<li><strong>Docker Environment</strong>: Isolated development container</li>
+<li><strong>VS Code Integration</strong>: MCP tools available in Copilot chat</li>
+</ul>
+<h3>Data Model</h3>
+<p>The memory system uses a graph-based approach:</p>
+<pre><code class="language-mermaid">Entity → Properties (name, type, status, confidence, etc.)
+Entity → Relationships → Other Entities
+Entity → Observations → Time-stamped notes
+</code></pre>
+<h2>Setup</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li>Docker Desktop installed and running</li>
+<li>VS Code with GitHub Copilot</li>
+<li>Node.js 18+ for development scripts</li>
+</ul>
+<h3>Installation</h3>
+<ol>
+<li><p><strong>Install memento-mcp</strong>:</p>
+<pre><code class="language-bash">npm install -g @modelcontextprotocol/create-server
+npm install -g memento-mcp
+</code></pre>
+</li>
+<li><p><strong>Configure Docker Neo4j</strong>:</p>
+<pre><code class="language-bash"># Start Neo4j container
+docker run -d \
+  --name neo4j-dev \
+  -p 7474:7474 -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/password \
+  neo4j:latest
+</code></pre>
+</li>
+<li><p><strong>Configure VS Code MCP</strong>:</p>
+<p>Add to your MCP settings in GitHub Copilot:</p>
+<pre><code class="language-json">{
+  &quot;memento&quot;: {
+    &quot;command&quot;: &quot;memento-mcp&quot;,
+    &quot;args&quot;: [&quot;--neo4j-uri&quot;, &quot;bolt://localhost:7687&quot;]
+  }
+}
+</code></pre>
+</li>
+</ol>
+<h2>Memory-First Development Workflow</h2>
+<h3>7-Step Protocol</h3>
+<ol>
+<li><strong>📋 Observe</strong>: Scan current context and identify key information</li>
+<li><strong>🎯 Plan</strong>: Design approach using available knowledge and tools</li>
+<li><strong>🛡️ Safeguards</strong>: Validate inputs, check constraints, ensure security</li>
+<li><strong>⚡ Execute</strong>: Implement solution with proper error handling</li>
+<li><strong>✅ Verify</strong>: Test functionality and validate results</li>
+<li><strong>🧠 Map</strong>: Update memory with new knowledge and relationships</li>
+<li><strong>📝 Log</strong>: Record decisions and outcomes for future reference</li>
+</ol>
+<h3>Entity Types</h3>
+<ul>
+<li><strong><code>project_component</code></strong>: Major system components (frontend, backend, etc.)</li>
+<li><strong><code>development_process</code></strong>: Workflows, procedures, standards</li>
+<li><strong><code>technical_decision</code></strong>: Architecture choices, technology selections</li>
+<li><strong><code>agent_memory</code></strong>: Historical knowledge with <code>status:archived</code></li>
+</ul>
+<h3>Memory Operations</h3>
+<h4>Creating Entities</h4>
+<pre><code class="language-typescript">// Create a new development process entity
+await memento.createEntity({
+  name: &quot;Code Review Process&quot;,
+  type: &quot;development_process&quot;,
+  observations: [&quot;Uses pre-commit hooks&quot;, &quot;Codacy integration required&quot;]
+});
+</code></pre>
+<h4>Searching Knowledge</h4>
+<pre><code class="language-typescript">// Find relevant entities
+const results = await memento.searchEntities(&quot;security validation&quot;);
+</code></pre>
+<h4>Managing Relationships</h4>
+<pre><code class="language-typescript">// Link related concepts
+await memento.createRelation({
+  from: &quot;ESLint Configuration&quot;,
+  to: &quot;Code Quality&quot;,
+  relationType: &quot;enhances&quot;
+});
+</code></pre>
+<h2>Archived vs Current Knowledge</h2>
+<h3>Archived Entities</h3>
+<ul>
+<li>Historical project memories from previous systems</li>
+<li>Tagged with <code>status:archived</code> for reference</li>
+<li>Searchable but distinguished from current project state</li>
+</ul>
+<h3>Current Entities</h3>
+<ul>
+<li>Active project components and processes</li>
+<li>Live development knowledge</li>
+<li>Real-time relationship mapping</li>
+</ul>
+<h2>Practical Usage</h2>
+<h3>Session Continuity</h3>
+<ol>
+<li>Start VS Code and activate memento MCP</li>
+<li>Query previous session context: &quot;What was I working on last?&quot;</li>
+<li>Retrieve relevant technical decisions and progress</li>
+<li>Continue development with full context</li>
+</ol>
+<h3>Knowledge Discovery</h3>
+<pre><code class="language-bash"># Search for security-related knowledge
+&quot;Find all entities related to security validation&quot;
+
+# Discover architectural decisions
+&quot;Show me technical decisions about database design&quot;
+
+# Find development processes
+&quot;What processes do we have for code quality?&quot;
+</code></pre>
+<h3>Development Session Logging</h3>
+<pre><code class="language-bash"># Record new technical decisions
+&quot;Create entity: API Rate Limiting Implementation&quot;
+
+# Link related components
+&quot;Connect API Rate Limiting to Security Framework&quot;
+
+# Add observations
+&quot;Add observation to ESLint Config: Fixed Node.js environment globals&quot;
+</code></pre>
+<h2>Integration with HexTrackr</h2>
+<h3>Pre-commit Hooks</h3>
+<ul>
+<li>Memory system validates against known security patterns</li>
+<li>Automatic logging of code quality improvements</li>
+<li>Cross-reference with existing technical decisions</li>
+</ul>
+<h3>Documentation Generation</h3>
+<ul>
+<li>Memory-informed documentation updates</li>
+<li>Automatic discovery of new components</li>
+<li>Relationship mapping for cross-references</li>
+</ul>
+<h3>Agent Operations</h3>
+<ul>
+<li>All AI interactions logged for future reference</li>
+<li>Decision rationale preserved</li>
+<li>Context continuity across sessions</li>
+</ul>
+<h2>Troubleshooting</h2>
+<h3>Common Issues</h3>
+<p><strong>MCP Server Not Available</strong>:</p>
+<ol>
+<li>Check Docker Neo4j container status</li>
+<li>Verify VS Code MCP configuration</li>
+<li>Restart VS Code to refresh MCP connections</li>
+</ol>
+<p><strong>Memory Persistence Issues</strong>:</p>
+<ol>
+<li>Confirm Neo4j database connectivity</li>
+<li>Check memento-mcp service status</li>
+<li>Validate environment configuration</li>
+</ol>
+<p><strong>Search Performance</strong>:</p>
+<ol>
+<li>Ensure embeddings are generated</li>
+<li>Check Neo4j index status</li>
+<li>Monitor database query performance</li>
+</ol>
+<h3>Diagnostic Commands</h3>
+<pre><code class="language-bash"># Check Docker containers
+docker ps | grep neo4j
+
+# Test Neo4j connectivity
+docker exec -it neo4j-dev cypher-shell -u neo4j -p password
+
+# Verify memento installation
+npm list -g | grep memento-mcp
+</code></pre>
+<h2>Best Practices</h2>
+<h3>Entity Naming</h3>
+<ul>
+<li>Use clear, descriptive names</li>
+<li>Follow consistent naming conventions</li>
+<li>Include context for disambiguation</li>
+</ul>
+<h3>Relationship Types</h3>
+<ul>
+<li>Use meaningful relationship labels</li>
+<li>Create bidirectional connections where appropriate</li>
+<li>Document relationship semantics</li>
+</ul>
+<h3>Observation Quality</h3>
+<ul>
+<li>Include timestamps and context</li>
+<li>Reference specific files or commits</li>
+<li>Note decision rationale</li>
+</ul>
+<h3>Archive Management</h3>
+<ul>
+<li>Regularly review and tag outdated entities</li>
+<li>Maintain clear separation between historical and current knowledge</li>
+<li>Preserve valuable historical context for reference</li>
+</ul>
+<h2>Future Enhancements</h2>
+<h3>Planned Features</h3>
+<ul>
+<li>Automated entity discovery from code changes</li>
+<li>Integration with GitHub commit messages</li>
+<li>Enhanced semantic search with local LLM models</li>
+<li>Automated relationship inference</li>
+</ul>
+<h3>Extension Opportunities</h3>
+<ul>
+<li>Custom entity types for specific domains</li>
+<li>Workflow automation based on memory patterns</li>
+<li>Integration with external knowledge sources</li>
+<li>Advanced analytics and knowledge visualization</li>
+</ul>
+<h2>Related Documentation</h2>
+<ul>
+<li><a href="../agents/AGENTS.md">Agent Operations Guide</a></li>
+<li><a href="dev-environment.md">Development Environment Setup</a></li>
+<li><a href="pre-commit-hooks.md">Pre-commit Hooks</a></li>
+<li><a href="../adr/">Architecture Decision Records</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/modelcontextprotocol/servers/tree/main/src/memento">memento-mcp Documentation</a></li>
+<li><a href="https://neo4j.com/docs/">Neo4j Documentation</a></li>
+<li><a href="https://modelcontextprotocol.io/">Model Context Protocol Specification</a></li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

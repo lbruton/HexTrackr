@@ -1,0 +1,193 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <!-- markdownlint-disable-next-line MD013 -->
+
+<h1>Tickets API</h1>
+<p>The Tickets API provides CRUD operations, basic reference data, and CSV-style JSON imports for tickets. Responses are JSON. Dates are ISO 8601 strings.</p>
+<h2>Endpoints</h2>
+<h3>GET /api/tickets</h3>
+<ul>
+<li><p>Description: List tickets ordered by created_at DESC. If a row has a null id, the backend will use xt_number as id in the response.</p>
+</li>
+<li><p>Query: None</p>
+</li>
+<li><p>Response: 200 OK</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">[
+  {
+    &quot;id&quot;: &quot;TICK-123&quot;,
+    &quot;xt_number&quot;: &quot;XT001&quot;,
+    &quot;date_submitted&quot;: &quot;2025-08-20T12:00:00.000Z&quot;,
+    &quot;date_due&quot;: &quot;2025-08-30T12:00:00.000Z&quot;,
+    &quot;hexagon_ticket&quot;: &quot;HX-456&quot;,
+    &quot;service_now_ticket&quot;: &quot;INC0000123&quot;,
+    &quot;location&quot;: &quot;HQ-1&quot;,
+    &quot;devices&quot;: &quot;[\&quot;Device 1\&quot;,\&quot;Device 2\&quot;]&quot;,
+    &quot;supervisor&quot;: &quot;Jane Doe&quot;,
+    &quot;tech&quot;: &quot;John Smith&quot;,
+    &quot;status&quot;: &quot;Open&quot;,
+    &quot;notes&quot;: &quot;&quot;,
+    &quot;attachments&quot;: &quot;[]&quot;,
+    &quot;created_at&quot;: &quot;2025-08-20T12:00:00.000Z&quot;,
+    &quot;updated_at&quot;: &quot;2025-08-20T12:00:00.000Z&quot;,
+    &quot;site&quot;: &quot;HQ&quot;,
+    &quot;site_id&quot;: null,
+    &quot;location_id&quot;: null
+  }
+]
+</code></pre>
+<!-- markdownlint-enable MD013 --></li>
+</ul>
+<h3>POST /api/tickets</h3>
+<ul>
+<li><p>Description: Create a new ticket.</p>
+</li>
+<li><p>Body: application/json</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">{
+  &quot;id&quot;: &quot;TICK-123&quot;,
+  &quot;dateSubmitted&quot;: &quot;2025-08-20T12:00:00.000Z&quot;,
+  &quot;dateDue&quot;: &quot;2025-08-30T12:00:00.000Z&quot;,
+  &quot;hexagonTicket&quot;: &quot;HX-456&quot;,
+  &quot;serviceNowTicket&quot;: &quot;INC0000123&quot;,
+  &quot;location&quot;: &quot;HQ-1&quot;,
+  &quot;devices&quot;: [&quot;Device 1&quot;, &quot;Device 2&quot;],
+  &quot;supervisor&quot;: &quot;Jane Doe&quot;,
+  &quot;tech&quot;: &quot;John Smith&quot;,
+  &quot;status&quot;: &quot;Open&quot;,
+  &quot;notes&quot;: &quot;&quot;,
+  &quot;attachments&quot;: [],
+  &quot;createdAt&quot;: &quot;2025-08-20T12:00:00.000Z&quot;,
+  &quot;updatedAt&quot;: &quot;2025-08-20T12:00:00.000Z&quot;,
+  &quot;site&quot;: &quot;HQ&quot;,
+  &quot;xt_number&quot;: &quot;XT001&quot;,
+  &quot;site_id&quot;: null,
+  &quot;location_id&quot;: null
+}
+</code></pre>
+<!-- markdownlint-enable MD013 -->
+</li>
+<li><p>Response: 200 OK</p>
+<pre><code class="language-json">{ &quot;success&quot;: true, &quot;id&quot;: &quot;TICK-123&quot;, &quot;message&quot;: &quot;Ticket saved successfully&quot; }
+</code></pre>
+</li>
+</ul>
+<h3>PUT /api/tickets/:id</h3>
+<ul>
+<li><p>Description: Update an existing ticket by id.</p>
+</li>
+<li><p>Body: application/json (same shape as POST, without createdAt)</p>
+</li>
+<li><p>Response: 200 OK</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">{ &quot;success&quot;: true, &quot;id&quot;: &quot;TICK-123&quot;, &quot;message&quot;: &quot;Ticket updated successfully&quot; }
+</code></pre>
+<!-- markdownlint-enable MD013 --></li>
+</ul>
+<h3>DELETE /api/tickets/:id</h3>
+<ul>
+<li><p>Description: Delete a ticket by id.</p>
+</li>
+<li><p>Response: 200 OK</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">{ &quot;success&quot;: true, &quot;deleted&quot;: 1 }
+</code></pre>
+<!-- markdownlint-enable MD013 --></li>
+</ul>
+<h3>POST /api/tickets/migrate</h3>
+<ul>
+<li><p>Description: Bulk migrate tickets from legacy localStorage format. Performs INSERT OR REPLACE.</p>
+</li>
+<li><p>Body: application/json</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">{
+  &quot;tickets&quot;: [
+    {
+      &quot;id&quot;: &quot;legacy-1&quot;,
+      &quot;start_date&quot;: &quot;2025-08-01&quot;,
+      &quot;end_date&quot;: &quot;2025-08-05&quot;,
+      &quot;primary_number&quot;: &quot;PR-1&quot;,
+      &quot;incident_number&quot;: &quot;INC-1&quot;,
+      &quot;site_code&quot;: &quot;HQ&quot;,
+      &quot;affected_devices&quot;: [&quot;DEV-1&quot;],
+      &quot;assignee&quot;: &quot;Tech&quot;,
+      &quot;notes&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;Open&quot;,
+      &quot;priority&quot;: &quot;Medium&quot;,
+      &quot;linked_cves&quot;: [&quot;CVE-2024-0001&quot;],
+      &quot;created_at&quot;: &quot;2025-08-01T12:00:00.000Z&quot;,
+      &quot;updated_at&quot;: &quot;2025-08-01T12:00:00.000Z&quot;,
+      &quot;display_site_code&quot;: &quot;HQ&quot;,
+      &quot;ticket_number&quot;: &quot;XT999&quot;,
+      &quot;site_id&quot;: 1,
+      &quot;location_id&quot;: 2
+    }
+  ]
+}
+</code></pre>
+<!-- markdownlint-enable MD013 -->
+</li>
+<li><p>Response: 200 OK</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">{ &quot;success&quot;: true, &quot;message&quot;: &quot;Migration completed: 1 tickets migrated, 0 errors&quot; }
+</code></pre>
+<!-- markdownlint-enable MD013 --></li>
+</ul>
+<h3>GET /api/sites</h3>
+<ul>
+<li>Description: List sites (if available in DB).</li>
+<li>Response: 200 OK Array of site records.</li>
+</ul>
+<h3>GET /api/locations</h3>
+<ul>
+<li>Description: List locations (if available in DB).</li>
+<li>Response: 200 OK Array of location records.</li>
+</ul>
+<h3>POST /api/import/tickets</h3>
+<ul>
+<li><p>Description: Import tickets using a JSON array derived from CSV (frontend uses PapaParse). Performs INSERT OR REPLACE.</p>
+</li>
+<li><p>Body: application/json</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">{
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: &quot;ticket_1&quot;,
+      &quot;xt_number&quot;: &quot;XT001&quot;,
+      &quot;date_submitted&quot;: &quot;2025-08-20&quot;,
+      &quot;date_due&quot;: &quot;2025-08-30&quot;,
+      &quot;hexagon_ticket&quot;: &quot;HX-456&quot;,
+      &quot;service_now_ticket&quot;: &quot;INC0000123&quot;,
+      &quot;location&quot;: &quot;HQ-1&quot;,
+      &quot;devices&quot;: &quot;[\&quot;Device 1\&quot;]&quot;,
+      &quot;supervisor&quot;: &quot;Jane&quot;,
+      &quot;tech&quot;: &quot;John&quot;,
+      &quot;status&quot;: &quot;Open&quot;,
+      &quot;notes&quot;: &quot;...&quot;,
+      &quot;created_at&quot;: &quot;2025-08-20T12:00:00.000Z&quot;
+    }
+  ]
+}
+</code></pre>
+<!-- markdownlint-enable MD013 -->
+</li>
+<li><p>Response: 200 OK</p>
+<!-- markdownlint-disable MD013 -->
+<pre><code class="language-json">{ &quot;success&quot;: true, &quot;imported&quot;: 1, &quot;total&quot;: 1 }
+</code></pre>
+<!-- markdownlint-enable MD013 --></li>
+</ul>
+<h2>Error responses</h2>
+<ul>
+<li>400 Bad Request: Invalid or missing body.</li>
+<li>500 Internal Server Error: Database errors.</li>
+</ul>
+<h2>Notes</h2>
+<ul>
+<li>The tickets table schema is evolving; some fields may be null depending on import source. The API will include them when present.</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
