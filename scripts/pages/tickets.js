@@ -993,7 +993,7 @@ class HexagonTicketsManager {
                 this.updateStatistics();
                 this.populateLocationFilter();
                 this.showToast("Ticket deleted successfully!", "success");
-            } catch (error) {
+            } catch (_error) {
                 // Error is already handled in deleteTicketFromDB
                 return;
             }
@@ -1169,7 +1169,7 @@ class HexagonTicketsManager {
         // Page numbers with ellipsis logic
         const maxVisiblePages = 5;
         let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
         // Adjust start if we're near the end
         if (endPage - startPage < maxVisiblePages - 1) {
@@ -2207,7 +2207,7 @@ class HexagonTicketsManager {
                 const ticket = {};
                 
                 headers.forEach((header, index) => {
-                    let value = values[index].trim().replace(/"/g, "");
+                    const value = values[index].trim().replace(/"/g, "");
                     
                     // Map CSV headers to ticket properties
                     switch (header.toLowerCase()) {

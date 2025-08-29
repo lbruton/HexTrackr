@@ -1,3 +1,5 @@
+import stylistic from '@stylistic/eslint-plugin';
+
 export default [
   {
     // Files to ignore - placed first for priority
@@ -49,11 +51,19 @@ export default [
         clearImmediate: "readonly"
       }
     },
+    plugins: {
+      '@stylistic': stylistic
+    },
     rules: {
-      "quotes": ["error", "double"],
-      "semi": ["error", "always"],
+      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
-      "no-lone-blocks": "error"
+      "no-lone-blocks": "error",
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-console": "off",
+      "eqeqeq": ["error", "always"],
+      "no-var": "error",
+      "prefer-const": "error"
     }
   },
   {
@@ -100,11 +110,20 @@ export default [
         agGrid: "readonly"
       }
     },
+    plugins: {
+      '@stylistic': stylistic
+    },
     rules: {
-      "quotes": ["error", "double"],
-      "semi": ["error", "always"],
+      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
-      "no-lone-blocks": "error"
+      "no-lone-blocks": "error",
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-console": "off",
+      "eqeqeq": ["error", "always"],
+      "no-var": "error",
+      "prefer-const": "error",
+      "no-undef": "error"
     }
   },
   {
@@ -123,11 +142,19 @@ export default [
         Prism: "readonly"
       }
     },
+    plugins: {
+      '@stylistic': stylistic
+    },
     rules: {
-      "quotes": ["error", "double"],
-      "semi": ["error", "always"],
+      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
-      "no-lone-blocks": "error"
+      "no-lone-blocks": "error",
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-console": "off",
+      "eqeqeq": ["error", "always"],
+      "no-var": "error",
+      "prefer-const": "error"
     }
   },
   {
@@ -141,11 +168,19 @@ export default [
         console: "readonly"
       }
     },
+    plugins: {
+      '@stylistic': stylistic
+    },
     rules: {
-      "quotes": ["error", "double"],
-      "semi": ["error", "always"],
+      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
-      "no-lone-blocks": "error"
+      "no-lone-blocks": "error",
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-console": "off",
+      "eqeqeq": ["error", "always"],
+      "no-var": "error",
+      "prefer-const": "error"
     }
   }
 ];
