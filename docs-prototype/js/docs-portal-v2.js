@@ -206,133 +206,86 @@ class DocumentationPortalV2 {
      * Fallback navigation structure if auto-discovery fails
      */
     loadFallbackStructure(sectionConfig) {
-        this.navigationStructure = {
-            "overview": {
-                title: sectionConfig.index.title,
-                icon: sectionConfig.index.icon,
-                file: "index",
-                children: null
-            },
-            "getting-started": {
-                title: sectionConfig["getting-started"].title,
-                icon: sectionConfig["getting-started"].icon,
-                file: "getting-started/index",
-                children: {
-                    "installation": {
-                        title: "Installation",
-                        file: "getting-started/installation"
-                    }
-                }
-            },
-            "user-guides": {
-                title: sectionConfig["user-guides"].title,
-                icon: sectionConfig["user-guides"].icon,
-                file: "user-guides/index",
-                children: {
-                    "ticket-management": {
-                        title: "Ticket Management",
-                        file: "user-guides/ticket-management"
-                    },
-                    "vulnerability-management": {
-                        title: "Vulnerability Management",
-                        file: "user-guides/vulnerability-management"
-                    }
-                }
-            },
-            "api-reference": {
-                title: sectionConfig["api-reference"].title,
-                icon: sectionConfig["api-reference"].icon,
-                file: "api-reference/index",
-                children: {
-                    "tickets-api": {
-                        title: "Tickets API",
-                        file: "api-reference/tickets-api"
-                    },
-                    "vulnerabilities-api": {
-                        title: "Vulnerabilities API", 
-                        file: "api-reference/vulnerabilities-api"
-                    }
-                }
-            },
-            "architecture": {
-                title: sectionConfig.architecture.title,
-                icon: sectionConfig.architecture.icon,
-                file: "architecture/index",
-                children: {
-                    "backend": {
-                        title: "Backend",
-                        file: "architecture/backend"
-                    },
-                    "database": {
-                        title: "Database",
-                        file: "architecture/database"
-                    },
-                    "deployment": {
-                        title: "Deployment",
-                        file: "architecture/deployment"
-                    },
-                    "frontend": {
-                        title: "Frontend",
-                        file: "architecture/frontend"
-                    },
-                    "frameworks": {
-                        title: "Frameworks",
-                        file: "architecture/frameworks"
-                    }
-                }
-            },
-            "development": {
-                title: sectionConfig.development.title,
-                icon: sectionConfig.development.icon,
-                file: "development/index",
-                children: {
-                    "coding-standards": {
-                        title: "Coding Standards",
-                        file: "development/coding-standards"
-                    },
-                    "contributing": {
-                        title: "Contributing",
-                        file: "development/contributing"
-                    },
-                    "development-setup": {
-                        title: "Development Setup",
-                        file: "development/development-setup"
-                    }
-                }
-            },
-            "project-management": {
-                title: sectionConfig["project-management"].title,
-                icon: sectionConfig["project-management"].icon,
-                file: "project-management/index",
-                children: {
-                    "roadmap": {
-                        title: "Roadmap",
-                        file: "project-management/roadmap"
-                    },
-                    "codacy-compliance": {
-                        title: "Codacy Compliance",
-                        file: "project-management/codacy-compliance"
-                    }
-                }
-            },
-            "security": {
-                title: sectionConfig.security.title,
-                icon: sectionConfig.security.icon,
-                file: "security/index",
-                children: {
-                    "overview": {
-                        title: "Security Overview",
-                        file: "security/overview"
-                    },
-                    "vulnerability-disclosure": {
-                        title: "Vulnerability Disclosure",
-                        file: "security/vulnerability-disclosure"
-                    }
-                }
-            }
-        };
+        this.navigationStructure = {};
+        
+        // Build structure from data-driven approach
+        const sections = this.getFallbackSections();
+        
+        sections.forEach(section => {
+            this.navigationStructure[section.key] = this.buildSection(sectionConfig, section);
+        });
         
         console.log("📁 Using fallback navigation structure");
+    }
+
+    /**
+     * Get fallback section definitions
+     */
+    getFallbackSections() {
+        return [
+            { key: "overview", configKey: "index", file: "index", children: [] },
+            { key: "getting-started", configKey: "getting-started", file: "getting-started/index", 
+              children: [{ key: "installation", title: "Installation" }] },
+            { key: "user-guides", configKey: "user-guides", file: "user-guides/index",
+              children: [
+                  { key: "ticket-management", title: "Ticket Management" },
+                  { key: "vulnerability-management", title: "Vulnerability Management" }
+              ]},
+            { key: "api-reference", configKey: "api-reference", file: "api-reference/index",
+              children: [
+                  { key: "tickets-api", title: "Tickets API" },
+                  { key: "vulnerabilities-api", title: "Vulnerabilities API" }
+              ]},
+            { key: "architecture", configKey: "architecture", file: "architecture/index",
+              children: [
+                  { key: "backend", title: "Backend" },
+                  { key: "database", title: "Database" },
+                  { key: "deployment", title: "Deployment" },
+                  { key: "frontend", title: "Frontend" },
+                  { key: "frameworks", title: "Frameworks" }
+              ]},
+            { key: "development", configKey: "development", file: "development/index",
+              children: [
+                  { key: "coding-standards", title: "Coding Standards" },
+                  { key: "contributing", title: "Contributing" },
+                  { key: "development-setup", title: "Development Setup" }
+              ]},
+            { key: "project-management", configKey: "project-management", file: "project-management/index",
+              children: [
+                  { key: "roadmap", title: "Roadmap" },
+                  { key: "codacy-compliance", title: "Codacy Compliance" }
+              ]},
+            { key: "security", configKey: "security", file: "security/index",
+              children: [
+                  { key: "overview", title: "Security Overview" },
+                  { key: "vulnerability-disclosure", title: "Vulnerability Disclosure" }
+              ]}
+        ];
+    }
+
+    /**
+     * Build a section structure
+     */
+    buildSection(sectionConfig, section) {
+        const config = sectionConfig[section.configKey];
+        const result = {
+            title: config.title,
+            icon: config.icon,
+            file: section.file,
+            children: null
+        };
+
+        if (section.children.length > 0) {
+            result.children = {};
+            section.children.forEach(child => {
+                result.children[child.key] = {
+                    title: child.title,
+                    file: `${section.key}/${child.key}`
+                };
+            });
+        }
+
+        return result;
     }
 
     /**
