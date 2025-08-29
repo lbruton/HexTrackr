@@ -34,6 +34,7 @@
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.2.3",
     "eslint": "^9.34.0",
     "eslint-formatter-compact": "^8.40.0",
     "markdownlint-cli": "^0.41.0",
