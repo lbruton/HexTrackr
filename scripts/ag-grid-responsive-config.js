@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* global window, document, setTimeout, console */
+/* global window, document, setTimeout, clearTimeout, console */
 
 /**
  * @fileoverview This file contains the optimal AG Grid configuration for the HexTrackr vulnerabilities table.
