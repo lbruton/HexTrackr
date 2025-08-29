@@ -340,7 +340,9 @@ class DocumentationPortalV2 {
      */
     renderNavigation() {
         const navContainer = document.getElementById("docsNavigation");
-        if (!navContainer) {return;}
+        if (!navContainer) {
+            return;
+        }
 
         let html = "";
 
