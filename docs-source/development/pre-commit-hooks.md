@@ -63,11 +63,11 @@ The hook executes in this sequence for each staged file type:
 
 ```bash
 
-# For each staged *.md file:
+# For each staged *.md file
 
 node scripts/fix-markdown.js --file="$file"
 
-# Auto-fix Applied:
+# Auto-fix Applied
 
 - Heading spacing (MD022)
 - List spacing (MD032)
@@ -85,15 +85,15 @@ node scripts/fix-markdown.js --file="$file"
 
 ```bash
 
-# Auto-fix formatting issues:
+# Auto-fix formatting issues
 
 ./node_modules/.bin/stylelint --fix $STAGED_CSS_FILES
 
-# Re-stage fixed files:
+# Re-stage fixed files
 
 git add $STAGED_CSS_FILES
 
-# Full validation:
+# Full validation
 
 ./node_modules/.bin/stylelint $STAGED_CSS_FILES
 ```
@@ -102,7 +102,7 @@ git add $STAGED_CSS_FILES
 
 ```bash
 
-# Safe auto-fix only (suggestion, layout):
+# Safe auto-fix only (suggestion, layout)
 
 ./node_modules/.bin/eslint --fix --fix-type suggestion,layout --config eslint.config.mjs $STAGED_JS_FILES
 
@@ -110,7 +110,7 @@ git add $STAGED_CSS_FILES
 
 git add $STAGED_JS_FILES
 
-# Full validation (including security, logic):
+# Full validation (including security, logic)
 
 ./node_modules/.bin/eslint --config eslint.config.mjs $STAGED_JS_FILES
 ```
@@ -218,7 +218,7 @@ git add .
 
 git commit -m "your commit message"
 
-# Hook output example:
+# Hook output example
 
 [pre-commit] Running code quality checks...
 [pre-commit] Checking Markdown files...
@@ -234,14 +234,14 @@ Total fixes applied: 5
 
 ```bash
 
-# Example failure output:
+# Example failure output
 
 [pre-commit] ESLint validation failed
 [pre-commit] Run 'npm run eslint' to see details
 [pre-commit] Code quality checks failed. Please fix issues before committing.
 [pre-commit] Tip: Some issues were auto-fixed and staged. Review changes with 'git diff --cached'
 
-# Steps to resolve:
+# Steps to resolve
 
 1. Review what was auto-fixed: git diff --cached
 2. Check specific issues: npm run eslint
@@ -328,7 +328,7 @@ The pre-commit hooks support the established Codacy compliance workflow:
 
 # Problem: ./githooks/pre-commit: Permission denied
 
-# Solution:
+# Solution
 
 chmod +x .githooks/pre-commit
 ```
@@ -339,11 +339,11 @@ chmod +x .githooks/pre-commit
 
 # Problem: Hook doesn't execute during commit
 
-# Check git hooks path:
+# Check git hooks path
 
 git config core.hooksPath
 
-# If empty, set it:
+# If empty, set it
 
 git config core.hooksPath .githooks
 ```
@@ -381,7 +381,7 @@ node --version  # Should be 16+
 
 git commit --no-verify -m "Emergency fix: brief description"
 
-# Follow up immediately with quality fixes:
+# Follow up immediately with quality fixes
 
 npm run fix:all
 git add .
@@ -392,7 +392,7 @@ git commit -m "fix: resolve quality issues from emergency commit"
 
 ```bash
 
-# If hook becomes corrupted, restore from git:
+# If hook becomes corrupted, restore from git
 
 git checkout HEAD -- .githooks/pre-commit
 chmod +x .githooks/pre-commit
