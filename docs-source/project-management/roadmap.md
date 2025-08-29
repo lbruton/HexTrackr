@@ -4,6 +4,39 @@ This document outlines the strategic roadmap, UI/UX plans, and current sprint st
 
 ---
 
+## 0. Critical Security & Code Quality
+
+### 🚨 CRITICAL XSS Vulnerabilities
+
+- [ ] **Fix XSS in Device Entry Creation** (`scripts/pages/tickets.js:376`): `deviceEntry.innerHTML` with unescaped `suggestedValue` from user input - CRITICAL security risk
+- [ ] **Audit All innerHTML Usage**: Systematically review and sanitize all dynamic HTML injection points
+- [ ] **Implement Content Security Policy (CSP)**: Add CSP headers to prevent XSS execution
+- [ ] **Add Input Sanitization Library**: Integrate DOMPurify or similar for safe HTML rendering
+
+### 📊 Codacy Compliance Efforts
+
+**Code Complexity Issues (Deferred - Requires Major Refactoring):**
+
+- [ ] **server.js Method Refactoring**: `Date.now` method has 348 lines (limit 100) - needs decomposition
+- [ ] **server.js Cyclomatic Complexity**: `Date.now` method complexity 49 (limit 12) - needs conditional logic simplification
+- [ ] **server.js Anonymous Method**: Cyclomatic complexity 42 (limit 12) - needs conditional logic simplification
+- [ ] **ag-grid-responsive-config.js Complexity**:
+  - `Date.toLocaleDateString` method: 171 lines (limit 100) + cyclomatic complexity 23 (limit 12)
+- [ ] **settings-modal.js Method**: `escapeHtml` method has 298 lines (limit 100) - needs decomposition
+- [ ] **Large File Documentation**:
+  - `tickets.js`: 1790 non-comment lines - needs comprehensive commenting
+  - `settings-modal.js`: 1150 non-comment lines - needs comprehensive commenting  
+  - `server.js`: 1023 non-comment lines - needs comprehensive commenting
+  - `package-lock.json`: 4620 non-comment lines (generated file - ignore)
+
+## General Code Quality:
+
+- [ ] **Code Refactoring for Maintainability**: Address complex methods and large file sizes that hinder analysis
+- [ ] **Improve Code Documentation**: Add comprehensive JSDoc comments for better code understanding
+- [ ] **Modularize Large Files**: Break down oversized JS/HTML files into manageable components
+
+---
+
 ## 1. Strategic Roadmap (`ROADMAP.md`)
 
 ### Version 1.1.0: Ticket Enhancements

@@ -1,11 +1,11 @@
-# HexTrackr Copilot Instructions (v2.0)
+# HexTrackr Copilot Instructions
 
 ## JavaScript Organization
 
 - **Dedicated JS per page**:
   - `tickets.html` → `tickets.js` (✅ CORRECT)
   - `vulnerabilities.html` → `vulnerabilities.js` (📋 incremental migration)
-- **NEVER** load `app.js` in HTML pages.
+  
 - **Documentation**: All JS files require JSDoc headers (see `tickets.js` template).
 
 ---
@@ -23,49 +23,25 @@ HexTrackr = dual-purpose cybersecurity management system:
 
 - **Deployment**: Docker-only (Docker Compose).
 - **Backend**: Node.js/Express + SQLite (`data/hextrackr.db`).
-- **Frontend**: Tabler.io (vulnerabilities) + Bootstrap 5 (tickets).
-- **Storage**: Database-first with localStorage fallback.
+- **Frontend**: Tabler.io 
 - **Data Model**: Time-series vulnerability tracking (CSV imports as UPSERTs, no duplicates).
 - **Port**: `localhost:8080`.
 
----
+## File Structure (Enforced)
 
-## Development Rules
-
-1. **Always backup first**:
-
-   ```bash
-   git add . && git commit -m "🔄 Pre-work backup"
-   ```
-
-1. **Update instructions first**:
-   - `.github/copilot-instructions.md` (AI workflow + tech details)
-   - `README.md` (human quick start)
-1. **Roadmap discipline**: use `/roadmaps/` files only (`ROADMAP.md`, `UI_UX_ROADMAP.md`, `CURRENT_STATUS.md`).
-2. **Docker-only**:
-   - ❌ Never run `node server.js` or `npm start` directly.
-   - ✅ Use only `docker-compose up -d`.
-   - Access app at `localhost:8080`.
-1. **Database ops**: API endpoints only.
-2. **No cross-contamination**: tickets & vulnerabilities remain separate.
-3. **JavaScript separation** enforced as above.
-
----
+- `server.js` (Express API)
+- `tickets.html` + `tickets.js` 
+- `vulnerabilities.html` (embedded JS, migration target → `vulnerabilities.js`)
+- `styles/`, `scripts/`
+- `docker-compose.yml`, `Dockerfile`
 
 ## MCP Server Compliance (Development Tools)
 
 **Mandatory tools for every turn** (development assistance only):
-
-- **Memory MCP** → CRITICAL. Persist before every action.
 - **Server Memory** → Mirror plans, summaries, snapshots.
 - **Sequential Thinking** → REQUIRED for complex planning (multi-step tasks).
-- **Context7 Map Server** → MANDATORY for library docs, real-time examples, and project knowledge graph updates.
 - **Playwright** → Run on any UI-affecting changes.
-- **Codacy** → Run after every code change (quality/security analysis).
-- **GitHub Tools** → Repo + issue mgmt.
-- **Firecrawl** → Security best-practice research.
-- **Knowledge Graph Tools** → Organize technical relationships.
-- **Others (MarkItDown, image processing, MS Docs, etc.)** → use as needed.
+- **Codacy** → Run after every code change (quality/security analysis)..
 
 ---
 
@@ -117,43 +93,3 @@ Use this table format in responses:
 | … | execute | <tool> | <action> | ok/err | mem:… |
 | … | verify | playwright.run | smoke/changed-only | pass/fail | report:… |
 | … | map-update | context7.map.update | graph updated | ok | mem:… |
-
----
-
-## Guardrails
-
-- **Tool drift watchdog**: If two turns miss a required tool, declare **COMPLIANCE BREAK**, repair loop, re-run.
-- **Fallbacks**: retry x2, then fallback + record failure.
-- **Never untracked edits**: Always backup branch or stash before file writes.
-- **No secrets**: Redact, alias in memory.
-
----
-
-## Roadmap Enforcement
-
-- Use only `/roadmaps/ROADMAP.md`,
-- ❌ Never create new roadmap files or duplicates.
-- ✅ Update in place + commit immediately.
-
----
-
-## File Structure (Enforced)
-
-- `server.js` (Express API)
-- `tickets.html` + `tickets.js` ✅ organized
-- `vulnerabilities.html` (embedded JS, migration target → `vulnerabilities.js`)
-- `app.js` (legacy)
-- `data/hextrackr.db`
-- `styles/`, `scripts/`
-- `docker-compose.yml`, `Dockerfile`
-
----
-
-## Documentation Discipline
-
-- **AI Instructions** → `.github/copilot-instructions.md`
-- **Human Overview** → `README.md`
-- **Strategic Roadmap** → `/roadmaps/ROADMAP.md`
-- **Sprint Status** → `/roadmaps/sprint-YYYY-MM-DD.md`
-
-**Update all of the above after ANY architectural or workflow change.**
