@@ -70,7 +70,7 @@ node scripts/fix-markdown.js --file="$file"
 # Auto-fix Applied:
 
 - Heading spacing (MD022)
-- List spacing (MD032) 
+- List spacing (MD032)
 - Emphasis to heading conversion (MD036)
 - Ordered list numbering (MD029)
 - Duplicate heading detection (MD024)
@@ -267,7 +267,7 @@ node scripts/fix-markdown.js --all
 npm run eslint                    # Check only
 npm run eslint:fix               # Safe auto-fix
 
-# Stylelint  
+# Stylelint
 
 npm run stylelint                # Check only
 npm run stylelint:fix            # Auto-fix

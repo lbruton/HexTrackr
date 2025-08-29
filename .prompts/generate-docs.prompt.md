@@ -45,7 +45,7 @@ You are an expert technical documentation generator for HexTrackr, a dual-purpos
 HexTrackr consists of:
 
 - **Ticket Management System** (`tickets.html` + `scripts/pages/tickets.js`)
-- **Vulnerability Management System** (`vulnerabilities.html` + `scripts/pages/vulnerabilities.js`) 
+- **Vulnerability Management System** (`vulnerabilities.html` + `scripts/pages/vulnerabilities.js`)
 - **Shared Components** (`scripts/shared/` - settings modal, navigation, etc.)
 - **Backend API** (Node.js/Express + SQLite database)
 - **Documentation Portal** (Tabler.io templates with markdown sources)
@@ -60,7 +60,7 @@ For each API endpoint discovered, generate:
 #### [METHOD] /endpoint-path
 
 **Purpose**: Brief description of endpoint functionality
-**Parameters**: 
+**Parameters**:
 
 - `param1` (type) - Description
 - `param2` (type, optional) - Description
@@ -222,9 +222,9 @@ Document each endpoint using:
 ##### [METHOD] /endpoint-path (2)
 
 **Purpose**: Brief description of endpoint functionality
-**Parameters**: 
+**Parameters**:
 
-- `param1` (type) - Description  
+- `param1` (type) - Description
 - `param2` (type, optional) - Description
 
 **Example Usage**:
@@ -333,7 +333,7 @@ Introduction paragraph here.
 
 Step-by-step installation process.
 
-### Prerequisites  
+### Prerequisites
 
 Before installing, ensure you have:
 
@@ -346,7 +346,7 @@ Before installing, ensure you have:
 Follow these sequential steps:
 
 1. Clone the repository
-2. Install dependencies  
+2. Install dependencies
 3. Configure environment variables
 4. Start the application
 
@@ -381,7 +381,7 @@ Schema information follows.
                 </h1>
             </div>
         </header>
-        
+
         <!-- Main Content -->
         <div class="page-wrapper">
             <div class="container-xl">
