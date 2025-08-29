@@ -1,6 +1,8 @@
 exclude_paths:
     - playwright/**
     - docs-prototype/**
+    - docs-source/**
+    - roadmaps/**
     - scripts/chart.min.js
     - scripts/ag-grid-responsive-config.js
     - node_modules/**
