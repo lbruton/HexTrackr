@@ -14,13 +14,13 @@
 **Line**: 376  
 **Issue**: innerHTML injection vulnerability
 
-#### Pre-Chat Requirements:
+#### Pre-Chat Requirements
 
 - [ ] Agent must read: `/Volumes/DATA/GitHub/HexTrackr/scripts/pages/tickets.js` (around line 376)
 - [ ] Agent must understand: XSS via innerHTML with unescaped user input
 - [ ] Agent must have: Codacy CLI access via MCP tools
 
-#### Chat 1 Deliverables:
+#### Chat 1 Deliverables
 
 - [x] **STEP 1**: Locate vulnerable code pattern in tickets.js:376
 - [x] **STEP 2**: Replace `innerHTML` with safe DOM manipulation OR proper escaping
@@ -28,15 +28,15 @@
 - [x] **STEP 4**: Run Codacy CLI analysis on tickets.js to verify fix
 - [x] **STEP 5**: Commit with message: "SECURITY: Fix XSS vulnerability in device entry creation"
 
-#### Success Criteria for Chat 1:
+#### Success Criteria for Chat 1
 
 - [x] No more XSS vulnerability in Codacy analysis
 - [x] Device entry form still works properly
 - [x] Clear commit showing security fix
 
-#### Handoff to Chat 2:
+#### Handoff to Chat 2
 
-```
+```text
 COMPLETED: XSS vulnerability fixed in scripts/pages/tickets.js
 VERIFIED: Codacy shows XSS issue resolved
 NEXT TASK: Quick-win issue identification (see Chat 2 checklist)
@@ -57,7 +57,7 @@ BRANCH: copilot (clean, committed)
 - [ ] Agent must run: Full Codacy CLI analysis to get current issue list
 - [ ] Agent must ignore: All 9 documented complexity issues (defer to future)
 
-#### Chat 2 Deliverables:
+#### Chat 2 Deliverables
 
 - [x] **STEP 1**: Run comprehensive Codacy analysis of entire project
 - [x] **STEP 2**: Filter out the 9 known complexity issues (already documented)
@@ -69,15 +69,15 @@ BRANCH: copilot (clean, committed)
 - [x] **STEP 4**: Create prioritized list of quick fixes
 - [x] **STEP 5**: Update sprint file with quick-fix task list
 
-#### Success Criteria for Chat 2:
+#### Success Criteria for Chat 2
 
 - [x] Clear list of 5-10 actionable quick fixes
 - [x] Issues separated into "quick fix" vs "architectural work"
 - [x] Priority order established for Chat 3-6
 
-#### Handoff to Chat 3:
+#### Handoff to Chat 3
 
-```
+```text
 COMPLETED: Quick-win analysis complete
 IDENTIFIED: 36 ESLint issues + 200+ PMD warnings eliminated through enhanced configuration
 PRIORITY ORDER: ESLint optimization, code quality improvements, unused variable cleanup
@@ -91,13 +91,13 @@ BRANCH: copilot
 
 ### TASK: Implement Quick Fixes (4 chats, 2-3 fixes per chat)
 
-#### Pre-Chat Requirements for Each Implementation Chat:
+#### Pre-Chat Requirements for Each Implementation Chat
 
 - [x] Agent must have: Quick-fix list from Chat 2
 - [x] Agent must read: Specific files needing fixes
 - [x] Agent must avoid: Touching any complex methods (>50 lines)
 
-#### Chat 3-6 Deliverables (Per Chat):
+#### Chat 3-6 Deliverables (Per Chat)
 
 - [x] **STEP 1**: Pick 2-3 fixes from priority list (CHAT 3: ESLint optimization)
 - [x] **STEP 2**: Read relevant files and locate exact issues
@@ -109,16 +109,16 @@ BRANCH: copilot
 - [x] **STEP 5**: Test that changes don't break functionality
 - [x] **STEP 6**: Commit each fix with descriptive message
 
-#### Success Criteria (Per Implementation Chat):
+#### Success Criteria (Per Implementation Chat)
 
 - [x] 2-3 issues resolved and verified (CHAT 3: Enhanced ESLint + 14 quality fixes)
 - [x] No functional regressions
 - [x] Codacy shows issues as fixed
 - [x] Clean commits with clear messages
 
-#### Handoff Between Implementation Chats:
+#### Handoff Between Implementation Chats
 
-```
+```text
 COMPLETED: Fixed [specific issues] in [files]
 CODACY VERIFIED: [X] issues resolved
 REMAINING: [Updated list of unfixed quick-wins]
@@ -140,7 +140,7 @@ BRANCH: copilot (clean, all changes committed)
 - [ ] Agent must run: Full project Codacy analysis
 - [ ] Agent must test: Basic functionality of modified components
 
-#### Chat 7 Deliverables:
+#### Chat 7 Deliverables
 
 - [ ] **STEP 1**: Run comprehensive Codacy CLI analysis
 - [ ] **STEP 2**: Compare before/after issue counts:
@@ -153,16 +153,16 @@ BRANCH: copilot (clean, all changes committed)
 - [ ] **STEP 4**: Update sprint file with final results
 - [ ] **STEP 5**: Document remaining architectural work for next sprint
 
-#### Success Criteria for Chat 7:
+#### Success Criteria for Chat 7
 
 - [ ] Issue count reduced by at least 10 from baseline
 - [ ] All functionality tests pass
 - [ ] Sprint file shows complete status
 - [ ] Clear plan for next sprint
 
-#### Final Handoff:
+#### Final Handoff
 
-```
+```text
 SPRINT COMPLETED: Codacy Critical Fixes Sprint
 ISSUES RESOLVED: [X] total fixes applied
 SECURITY STATUS: XSS vulnerability eliminated
@@ -174,7 +174,7 @@ BRANCH: copilot (ready for potential merge)
 
 ## 🔧 AGENT SETUP COMMANDS
 
-### Standard Commands for Each Chat:
+### Standard Commands for Each Chat
 
 ```bash
 
@@ -197,14 +197,14 @@ git log --oneline -3
 
 ```
 
-### Files Agents Will Need Access To:
+### Files Agents Will Need Access To
 
 - `/Volumes/DATA/GitHub/HexTrackr/scripts/pages/tickets.js` (Chat 1 - XSS fix)
 - `/Volumes/DATA/GitHub/HexTrackr/server.js` (Chats 3-6 - variable fixes)
 - `/Volumes/DATA/GitHub/HexTrackr/scripts/shared/settings-modal.js` (Chats 3-6 - simple fixes)
 - Other files as identified in Chat 2 analysis
 
-### Emergency Stop Conditions:
+### Emergency Stop Conditions
 
 - **IF** any fix breaks basic functionality → STOP, revert, document issue
 - **IF** Codacy shows new critical issues introduced → STOP, investigate
@@ -214,7 +214,7 @@ git log --oneline -3
 
 ## 📈 PROGRESS TRACKING
 
-### Chat Completion Status:
+### Chat Completion Status
 
 - [ ] **Chat 1**: XSS Security Fix ✅ / ❌
 - [ ] **Chat 2**: Quick-Win Assessment ✅ / ❌  
@@ -224,7 +224,7 @@ git log --oneline -3
 - [ ] **Chat 6**: Implementation Batch 4 ✅ / ❌
 - [ ] **Chat 7**: Final Validation ✅ / ❌
 
-### Issue Resolution Tracking:
+### Issue Resolution Tracking
 
 - [ ] **XSS Vulnerability**: scripts/pages/tickets.js:376 → [Status]
 - [ ] **Quick Fix 1**: [Issue] → [Status]

@@ -93,7 +93,7 @@
 
 ### Sprint Progress Dashboard
 
-```
+```text
 Chat 1: [ ] XSS Security Fix
 Chat 2: [ ] Quick-Win Assessment
 Chat 3: [ ] Implementation Batch 1
@@ -105,7 +105,7 @@ Chat 7: [ ] Final Validation
 
 ### Issue Resolution Counter
 
-```
+```text
 Target: 10-20 issues resolved
 Baseline: 175 total issues
 Security: 1 critical XSS (PRIORITY 1)
