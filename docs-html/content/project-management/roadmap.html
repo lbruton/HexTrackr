@@ -1,0 +1,93 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>HexTrackr Project Roadmap</h1>
+<p>This document outlines the strategic roadmap, UI/UX plans, and current sprint status for HexTrackr.</p>
+<hr>
+<h2>0. Critical Security &amp; Code Quality</h2>
+<h3>🚨 CRITICAL XSS Vulnerabilities</h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Fix XSS in Device Entry Creation</strong> (<code>scripts/pages/tickets.js:376</code>): <code>deviceEntry.innerHTML</code> with unescaped <code>suggestedValue</code> from user input - CRITICAL security risk</li>
+<li><input disabled="" type="checkbox"> <strong>Audit All innerHTML Usage</strong>: Systematically review and sanitize all dynamic HTML injection points</li>
+<li><input disabled="" type="checkbox"> <strong>Implement Content Security Policy (CSP)</strong>: Add CSP headers to prevent XSS execution</li>
+<li><input disabled="" type="checkbox"> <strong>Add Input Sanitization Library</strong>: Integrate DOMPurify or similar for safe HTML rendering</li>
+</ul>
+<h3>📊 Codacy Compliance Efforts</h3>
+<p><strong>Code Complexity Issues (Deferred - Requires Major Refactoring):</strong></p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>server.js Method Refactoring</strong>: <code>Date.now</code> method has 348 lines (limit 100) - needs decomposition</li>
+<li><input disabled="" type="checkbox"> <strong>server.js Cyclomatic Complexity</strong>: <code>Date.now</code> method complexity 49 (limit 12) - needs conditional logic simplification</li>
+<li><input disabled="" type="checkbox"> <strong>server.js Anonymous Method</strong>: Cyclomatic complexity 42 (limit 12) - needs conditional logic simplification</li>
+<li><input disabled="" type="checkbox"> <strong>ag-grid-responsive-config.js Complexity</strong>:<ul>
+<li><code>Date.toLocaleDateString</code> method: 171 lines (limit 100) + cyclomatic complexity 23 (limit 12)</li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"> <strong>settings-modal.js Method</strong>: <code>escapeHtml</code> method has 298 lines (limit 100) - needs decomposition</li>
+<li><input disabled="" type="checkbox"> <strong>Large File Documentation</strong>:<ul>
+<li><code>tickets.js</code>: 1790 non-comment lines - needs comprehensive commenting</li>
+<li><code>settings-modal.js</code>: 1150 non-comment lines - needs comprehensive commenting  </li>
+<li><code>server.js</code>: 1023 non-comment lines - needs comprehensive commenting</li>
+<li><code>package-lock.json</code>: 4620 non-comment lines (generated file - ignore)</li>
+</ul>
+</li>
+</ul>
+<h2>General Code Quality:</h2>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Code Refactoring for Maintainability</strong>: Address complex methods and large file sizes that hinder analysis</li>
+<li><input disabled="" type="checkbox"> <strong>Improve Code Documentation</strong>: Add comprehensive JSDoc comments for better code understanding</li>
+<li><input disabled="" type="checkbox"> <strong>Modularize Large Files</strong>: Break down oversized JS/HTML files into manageable components</li>
+</ul>
+<hr>
+<h2>1. Strategic Roadmap (<code>ROADMAP.md</code>)</h2>
+<h3>Version 1.1.0: Ticket Enhancements</h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Ticket Modal Overhaul</strong>: Redesign the ticket creation and editing modal for better usability.</li>
+<li><input disabled="" type="checkbox"> <strong>Ticket Export</strong>: Add functionality to export tickets to CSV.</li>
+<li><input disabled="" type="checkbox"> <strong>Advanced Filtering</strong>: Implement advanced filtering options for the tickets table.</li>
+</ul>
+<h3>Version 1.2.0: Vulnerability Dashboard v2</h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Customizable Widgets</strong>: Allow users to add, remove, and configure dashboard widgets.</li>
+<li><input disabled="" type="checkbox"> <strong>Historical Trend Analysis</strong>: Add charts to show vulnerability trends over longer periods.</li>
+<li><input disabled="" type="checkbox"> <strong>Integration with External Scanners</strong>: Explore options for direct integration with vulnerability scanners.</li>
+</ul>
+<h3>Future Versions (Post-v1.2.0)</h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>User Authentication</strong>: Implement user accounts and role-based access control.</li>
+<li><input disabled="" type="checkbox"> <strong>Notification System</strong>: Add email or in-app notifications for important events.</li>
+<li><input disabled="" type="checkbox"> <strong>Full API Documentation</strong>: Generate interactive API documentation (e.g., with Swagger/OpenAPI).</li>
+</ul>
+<hr>
+<h2>2. UI/UX Roadmap (<code>UI_UX_ROADMAP.md</code>)</h2>
+<h3>Q4 2024: Consistency and Usability</h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Unified Design Language</strong>: Create a consistent design system across both the Tickets (Bootstrap) and Vulnerabilities (Tabler) pages.</li>
+<li><input disabled="" type="checkbox"> <strong>Accessibility Audit</strong>: Perform a full accessibility audit and implement improvements (WCAG 2.1 AA).</li>
+<li><input disabled="" type="checkbox"> <strong>User Feedback Session</strong>: Conduct sessions with target users to gather feedback on the current UI.</li>
+</ul>
+<h3>Q1 2025: Dashboard Enhancements</h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Interactive Charts</strong>: Make all charts on the vulnerability dashboard more interactive (e.g., drill-down capabilities).</li>
+<li><input disabled="" type="checkbox"> <strong>Dark Mode</strong>: Implement a dark mode theme for the entire application.</li>
+</ul>
+<hr>
+<h2>3. Current Status (<code>CURRENT_STATUS.md</code>)</h2>
+<h3>Current Sprint: Documentation Overhaul (Ends: 2025-08-30)</h3>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> <strong>Setup Documentation Portal</strong>: Create a new, AI-driven documentation portal with a Tabler.io template.</li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Fix Build and Pathing Issues</strong>: Resolve Dockerfile errors and incorrect JavaScript paths.</li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Diagnose and Plan Recovery</strong>: Identify the cause of empty documentation files and create a recovery plan.</li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Rebuild Directory Structure</strong>: Implement the new, approved documentation folder structure.</li>
+<li><input disabled="" type="checkbox"> <strong>Regenerate All Markdown Content</strong>: Systematically populate all source markdown files with fresh, accurate content.</li>
+<li><input disabled="" type="checkbox"> <strong>Generate Final HTML</strong>: Run the build script to create the final HTML documentation pages.</li>
+<li><input disabled="" type="checkbox"> <strong>Final Verification</strong>: Thoroughly test the new documentation portal for completeness and correctness.</li>
+</ul>
+<h3>Recently Completed</h3>
+<ul>
+<li><strong>v1.0.2</strong>: Completed Markdown documentation and fixed initial bugs.</li>
+<li><strong>v1.0.0</strong>: Established stable baseline.</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

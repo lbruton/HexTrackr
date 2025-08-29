@@ -1,0 +1,22 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Security Overview</h1>
+<!-- markdownlint-disable-next-line MD013 -->
+<p>HexTrackr is designed with security in mind. This document provides an overview of the security measures in place.</p>
+<h2>Data Security</h2>
+<ul>
+<li><strong>Database</strong>: The SQLite database is stored locally on the server. Access is restricted to the backend application.</li>
+<li><strong>File Uploads</strong>: Uploaded CSV files are stored temporarily and processed securely. They are deleted after processing.</li>
+<li><strong>Input Validation</strong>: All user input is validated on the backend to prevent common vulnerabilities such as Cross-Site Scripting (XSS) and SQL Injection.</li>
+</ul>
+<h2>Secure Development</h2>
+<ul>
+<li><strong>Dependencies</strong>: We use <code>npm audit</code> to regularly check for vulnerabilities in our dependencies.</li>
+<li><strong>Docker</strong>: The application is containerized using Docker, which provides process isolation and a controlled environment.</li>
+<li><strong>Code Analysis</strong>: We use static analysis tools like ESLint and Codacy to identify potential security issues in the codebase.</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

@@ -1,14 +1,22 @@
 # Backend Architecture
 
-<!-- markdownlint-disable-next-line MD013 -->
-The backend is a Node.js/Express app providing REST endpoints, CSV processing, and SQLite persistence. It also serves static frontend assets.
+The backend is a Node.js/Express monolithic server providing REST endpoints, CSV processing, and SQLite persistence. It also serves static frontend assets and documentation.
+
+## Key Characteristics
+
+- **Monolithic Architecture**: Single server.js file (1,209 lines) handling all backend concerns
+- **Dual Purpose**: Acts as both API server and static file server
+- **Tightly Coupled**: Frontend applications directly depend on this server's API contracts
+- **Database**: Single SQLite database with shared connection pool
+- **Security**: Built-in PathValidator class for secure file operations
 
 ## Modules
 
-- server.js: Main entrypoint; initializes Express, SQLite, routes, and security headers.
-- scripts/init-database.js: Creates initial tables and indexes.
+- **server.js**: Main entrypoint; initializes Express, SQLite, routes, and security headers
+- **scripts/init-database.js**: Creates initial tables and indexes
+- **PathValidator class**: Security utility for safe file system operations
 
-## Core middleware
+## Core Middleware
 
 - cors(): Enables cross-origin requests
 - compression(): Gzip responses

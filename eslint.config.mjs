@@ -19,7 +19,7 @@ export default [
     // Configuration for Node.js scripts - specific patterns first
     files: [
       "server.js",
-      "docs-prototype/html-content-updater.js", 
+      "docs-html/html-content-updater.js", 
       "scripts/docs-mapping-analyzer.js",
       "scripts/docs-repair-generator.js", 
       "scripts/fix-markdown.js",
@@ -131,7 +131,7 @@ export default [
   },
   {
     // Configuration for documentation browser files
-    files: ["docs-prototype/js/*.js"],
+    files: ["docs-html/js/*.js"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "script",
