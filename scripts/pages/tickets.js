@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* global console, localStorage, FileReader, JSZip, URL, XLSX, Blob, navigator, bootstrap, window, document, Tabler */
+/* global console, localStorage, FileReader, JSZip, URL, XLSX, Blob, navigator, bootstrap, window, document, Tabler, fetch, setTimeout, alert, confirm, atob */
 
 /**
  * HexTrackr - Tickets Management System
