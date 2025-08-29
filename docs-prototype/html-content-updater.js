@@ -11,7 +11,6 @@
 require("dotenv").config();
 const fs = require("fs").promises;
 const path = require("path");
-const { marked } = require("marked");
 
 /**
  * Secure path validation utility to prevent path traversal attacks
@@ -87,6 +86,31 @@ class HtmlContentUpdater {
             errors: 0
         };
         this.templateContent = null;
+        this.marked = null;
+    }
+
+    /**
+     * Initialize the marked library
+     */
+    async initializeMarked() {
+        const { marked } = await import("marked");
+        this.marked = marked;
+        
+        // Configure marked options
+        this.marked.setOptions({
+            breaks: true,
+            gfm: true,
+            sanitize: false,
+            highlight: function(code, lang) {
+                try {
+                    const hljs = require("highlight.js");
+                    const language = hljs.getLanguage(lang) ? lang : "plaintext";
+                    return hljs.highlight(code, { language }).value;
+                } catch (e) {
+                    return code; // Fallback to plain text if highlighting fails
+                }
+            }
+        });
     }
 
     /**
@@ -148,17 +172,7 @@ class HtmlContentUpdater {
      * Convert markdown to HTML content.
      */
     markdownToHtml(markdownContent) {
-        marked.setOptions({
-            breaks: true,
-            gfm: true,
-            sanitize: false,
-            highlight: function(code, lang) {
-                const hljs = require("highlight.js");
-                const language = hljs.getLanguage(lang) ? lang : "plaintext";
-                return hljs.highlight(code, { language }).value;
-            }
-        });
-        return marked.parse(markdownContent);
+        return this.marked.parse(markdownContent);
     }
 
     /**
@@ -228,6 +242,9 @@ The HTML generator successfully created ${this.stats.filesGenerated} HTML files 
         console.log("🚀 Starting HTML generation from markdown sources...");
         
         try {
+            // Initialize marked library first
+            await this.initializeMarked();
+            
             // Load the template first
             await this.loadTemplate();
 

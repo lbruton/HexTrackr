@@ -1,3 +1,11 @@
+exclude_paths:
+    - playwright/**
+    - docs-prototype/**
+    - scripts/chart.min.js
+    - scripts/ag-grid-responsive-config.js
+    - node_modules/**
+    - '*.min.js'
+    - uploads/**
 runtimes:
     - java@17.0.10
     - node@22.2.0

@@ -1,3 +1,6 @@
+/* eslint-env browser */
+/* global console, localStorage, document, window, fetch, alert, confirm, setTimeout, bootstrap */
+
 /**
  * HexTrackr - Vulnerabilities Management JavaScript
  * 

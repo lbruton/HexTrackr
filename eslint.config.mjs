@@ -51,7 +51,9 @@ export default [
     },
     rules: {
       "quotes": ["error", "double"],
-      "semi": ["error", "always"]
+      "semi": ["error", "always"],
+      "curly": ["error", "all"],
+      "no-lone-blocks": "error"
     }
   },
   {
@@ -89,6 +91,10 @@ export default [
         Event: "readonly",
         EventTarget: "readonly",
         FormData: "readonly",
+        DOMParser: "readonly",
+        atob: "readonly",
+        btoa: "readonly",
+        Intl: "readonly",
         // Third-party library globals
         bootstrap: "readonly",
         agGrid: "readonly"
@@ -96,7 +102,9 @@ export default [
     },
     rules: {
       "quotes": ["error", "double"],
-      "semi": ["error", "always"]
+      "semi": ["error", "always"],
+      "curly": ["error", "all"],
+      "no-lone-blocks": "error"
     }
   },
   {
@@ -117,7 +125,9 @@ export default [
     },
     rules: {
       "quotes": ["error", "double"],
-      "semi": ["error", "always"]
+      "semi": ["error", "always"],
+      "curly": ["error", "all"],
+      "no-lone-blocks": "error"
     }
   },
   {
@@ -133,7 +143,9 @@ export default [
     },
     rules: {
       "quotes": ["error", "double"],
-      "semi": ["error", "always"]
+      "semi": ["error", "always"],
+      "curly": ["error", "all"],
+      "no-lone-blocks": "error"
     }
   }
 ];

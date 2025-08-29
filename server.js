@@ -299,7 +299,7 @@ app.post("/api/vulnerabilities/import", upload.single("csvFile"), (req, res) => 
             state,
             new Date().toISOString().split("T")[0]
           ], (err) => {
-            if (err) console.error("Row insert error:", err);
+            if (err) {console.error("Row insert error:", err);}
             processed++;
             
             if (processed === rows.length) {
@@ -404,7 +404,7 @@ app.get(/^\/docs-prototype\/(.*)\.html$/, (req, res) => {
     // If the request is only a filename (no directory), try to resolve the correct section path
     if (!section.includes("/")) {
         const resolved = findDocsSectionForFilename(`${section}.html`);
-        if (resolved) section = resolved;
+        if (resolved) {section = resolved;}
     }
     // Redirect to hash-based section so the SPA shell loads correctly
     res.redirect(302, `/docs-prototype/#${section}`);
@@ -450,8 +450,8 @@ app.get("/api/docs/stats", async (req, res) => {
                 const entries = PathValidator.safeReaddirSync(dir, { withFileTypes: true });
                 for (const e of entries) {
                     const p = path.join(dir, e.name);
-                    if (e.isDirectory()) walk(p);
-                    else if (e.isFile() && p.endsWith(".js")) filesToScan.push(p);
+                    if (e.isDirectory()) {walk(p);}
+                    else if (e.isFile() && p.endsWith(".js")) {filesToScan.push(p);}
                 }
             } catch (_) { /* ignore */ }
         };
@@ -472,7 +472,7 @@ app.get("/api/docs/stats", async (req, res) => {
                 const src = readText(f);
                 for (const rx of fnRegexes) {
                     const matches = src.match(rx);
-                    if (matches) jsFunctions += matches.length;
+                    if (matches) {jsFunctions += matches.length;}
                 }
             } catch (_) { /* ignore file read errors */ }
         }
@@ -1039,8 +1039,8 @@ app.post("/api/restore", upload.single("file"), async (req, res) => {
                     if (req.body.clearExisting === "true") {
                         await new Promise((resolve, reject) => {
                             db.run("DELETE FROM tickets", (err) => {
-                                if (err) reject(err);
-                                else resolve();
+                                if (err) {reject(err);}
+                                else {resolve();}
                             });
                         });
                     }
@@ -1072,8 +1072,8 @@ app.post("/api/restore", upload.single("file"), async (req, res) => {
                                 location, devices, supervisor, tech, status, notes, created_at, updated_at)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             `, values, function(err) {
-                                if (err) reject(err);
-                                else resolve();
+                                if (err) {reject(err);}
+                                else {resolve();}
                             });
                         });
                         restoredCount++;
@@ -1093,8 +1093,8 @@ app.post("/api/restore", upload.single("file"), async (req, res) => {
                     if (req.body.clearExisting === "true") {
                         await new Promise((resolve, reject) => {
                             db.run("DELETE FROM vulnerabilities", (err) => {
-                                if (err) reject(err);
-                                else resolve();
+                                if (err) {reject(err);}
+                                else {resolve();}
                             });
                         });
                     }
@@ -1124,8 +1124,8 @@ app.post("/api/restore", upload.single("file"), async (req, res) => {
                                 first_seen, last_seen, plugin_name, description, solution)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             `, values, function(err) {
-                                if (err) reject(err);
-                                else resolve();
+                                if (err) {reject(err);}
+                                else {resolve();}
                             });
                         });
                         restoredCount++;
