@@ -97,6 +97,17 @@ app.use((req, res, next) => {
   next();
 });
 
+// Lightweight health check endpoint for container orchestrators and probes
+app.get("/health", (req, res) => {
+    try {
+        // Simple DB file existence check (non-blocking)
+        const dbExists = PathValidator.safeExistsSync(dbPath);
+        res.json({ status: "ok", version: require("./package.json").version, db: dbExists, uptime: process.uptime() });
+    } catch (_e) {
+        res.json({ status: "ok", version: "unknown", db: false, uptime: process.uptime() });
+    }
+});
+
 // API Routes
 
 // Get vulnerability statistics with VPR totals
@@ -1148,7 +1159,7 @@ app.post("/api/restore", upload.single("file"), async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   initDb();
   console.log(`🚀 HexTrackr server running on http://localhost:${PORT}`);
   console.log("📊 Database-powered vulnerability management enabled");
