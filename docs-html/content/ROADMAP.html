@@ -1,0 +1,341 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>HexTrackr Unified Project Roadmap</h1>
+<!-- markdownlint-disable MD013 MD009 -->
+
+<p>Last updated: January 29, 2025</p>
+<h2>🎯 <strong>CURRENT SPRINT - ISSUE-DRIVEN WORKFLOW</strong></h2>
+<p><strong>Working Mode</strong>: Issue-driven Codacy compliance workflow<br><strong>Process</strong>: User selects specific Codacy issue → AI implements targeted fix → Immediate compliance verification<br><strong>Current Focus</strong>: Security fixes for v1.0.3 release preparation</p>
+<h3>📊 <strong>Codacy Compliance Status</strong></h3>
+<ul>
+<li><strong>Total Issues</strong>: 83 (down from 370+ after ESLint improvements)</li>
+<li><strong>Security Issues</strong>: 4 critical vulnerabilities (release blocking)</li>
+<li><strong>Status</strong>: 🔴 Not compliant - awaiting specific issue selection</li>
+<li><strong>Quality Gate</strong>: Zero critical/high security issues, &lt;50 total issues before v1.0.3</li>
+</ul>
+<h4>🚨 <strong>Security Issues Available for Selection</strong></h4>
+<ol>
+<li><strong>Generic Object Injection Sink</strong> - High severity in <code>docs-prototype/generate-docs.js</code></li>
+<li><strong>fs.writeFileSync non-literal arguments</strong> - File system security risk</li>
+<li><strong>fs.existsSync non-literal arguments</strong> - File system security risk</li>
+<li><strong>Unsafe innerHTML assignments</strong> - DOM security vulnerability across multiple files</li>
+</ol>
+<hr>
+<h2>🟢 <strong>COMPLETED FEATURES</strong></h2>
+<h3>Core Infrastructure ✅</h3>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> <strong>Dual-app architecture</strong> (tickets.html + vulnerabilities.html)</li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Time-series database</strong> with dimensional schema migration (97% data reduction)</li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Modern AG Grid</strong> with responsive configuration</li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Bootstrap 5 + Tabler.io UI</strong> with responsive design</li>
+<li><input checked="" disabled="" type="checkbox"> <strong>JavaScript architecture</strong> with modular pattern ✅ <strong>Aug 26, 2025</strong></li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Chart &amp; Visualization System</strong> with ApexCharts and VPR toggle functionality</li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Cisco API Integration</strong> with OAuth2 authentication and vulnerability sync</li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Documentation Portal</strong> - Comprehensive markdown-first documentation system ✅ <strong>Aug 27, 2025</strong></li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Ticket Modal Enhancement Suite</strong> - Complete CRUD operations with modern workflow ✅ <strong>Aug 27, 2025</strong></li>
+</ul>
+<h3>Recent Critical Achievements ✅</h3>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> <strong>Playwright Testing Integration</strong> - Comprehensive browser automation testing ✅ <strong>Aug 26, 2025</strong></li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Production Data Management</strong> - Web-based import/export with ZIP backup/restore ✅ <strong>Aug 26, 2025</strong></li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Database Recovery</strong> - 100% recovery from PostgreSQL corruption (16/16 tickets restored) ✅ <strong>Aug 26, 2025</strong></li>
+<li><input checked="" disabled="" type="checkbox"> <strong>Modular JavaScript Architecture</strong> - Complete separation with shared components ✅ <strong>Aug 26, 2025</strong></li>
+<li><input checked="" disabled="" type="checkbox"> <strong>ESLint Configuration Improvements</strong> - Reduced Codacy issues from 370+ → 83 ✅ <strong>Aug 27, 2025</strong></li>
+</ul>
+<hr>
+<h2>🟡 <strong>IN PROGRESS</strong></h2>
+<h3>Code Quality &amp; Security Compliance 🔄 <strong>CRITICAL PRIORITY</strong></h3>
+<p><strong>Status</strong>: Awaiting user selection of specific Codacy issue<br><strong>Process</strong>: User reviews Codacy dashboard → Selects priority issue → AI implements targeted fix<br><strong>Timeline</strong>: Complete security fixes before v1.0.3 release</p>
+<h3>Chart Timeline Enhancement 🔄 <strong>NEXT TECHNICAL PRIORITY</strong></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Timeline Extension Feature</strong> - Extend chart to current date with flat lines for data continuity<ul>
+<li><input disabled="" type="checkbox"> Calculate gap between last data point and current date</li>
+<li><input disabled="" type="checkbox"> Add synthetic data points to extend timeline</li>
+<li><input disabled="" type="checkbox"> Update API to support date range extension</li>
+<li><input disabled="" type="checkbox"> Improve UX to show system is current and up-to-date</li>
+</ul>
+</li>
+</ul>
+<h3>Performance Optimization 🔄</h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Large CSV file handling</strong> (50-100MB files)<ul>
+<li><input disabled="" type="checkbox"> Implement streaming CSV parser for memory efficiency</li>
+<li><input disabled="" type="checkbox"> Add column filtering to ignore unnecessary data</li>
+<li><input disabled="" type="checkbox"> Progress indicators for large file processing</li>
+<li><input disabled="" type="checkbox"> Web Workers for non-blocking file processing</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>🔴 <strong>PLANNED FEATURES</strong></h2>
+<h3>High Priority Planned Features</h3>
+<h4>KEV Integration Implementation 🚨 <strong>HIGH PRIORITY</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>CISA KEV Integration</strong> - Known Exploited Vulnerabilities flagging<ul>
+<li><input disabled="" type="checkbox"> Non-API CSV download implementation (user-friendly)</li>
+<li><input disabled="" type="checkbox"> API-based real-time sync option</li>
+<li><input disabled="" type="checkbox"> Automatic KEV flagging in vulnerability tables</li>
+<li><input disabled="" type="checkbox"> KEV priority boost in VPR calculations (auto-assign 10.0)</li>
+<li><input disabled="" type="checkbox"> Visual KEV indicators and historical tracking</li>
+</ul>
+</li>
+</ul>
+<h4>UI/UX Modernization &amp; Critical Fixes</h4>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>CVE Link System Overhaul</strong> - Fix critical bug where CVE links open ALL CVEs instead of clicked one</li>
+<li><input disabled="" type="checkbox"> <strong>Modal System Enhancement</strong> - Resolve z-index issues with nested modals</li>
+<li><input disabled="" type="checkbox"> <strong>Responsive Layout Completion</strong> - Fix container layout and AG Grid responsiveness issues</li>
+<li><input disabled="" type="checkbox"> <strong>Unified Application Framework</strong> - Migrate tickets.html to Tabler.io for consistency</li>
+<li><input disabled="" type="checkbox"> <strong>Dark Mode Implementation</strong> - Complete theme switching with chart compatibility</li>
+</ul>
+<h4>Network Infrastructure Features</h4>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>SNMP Network Polling</strong> - Real-time device status monitoring with SNMPv2/v3</li>
+<li><input disabled="" type="checkbox"> <strong>Network Discovery &amp; Mapping</strong> - Automated asset discovery and topology visualization</li>
+<li><input disabled="" type="checkbox"> <strong>Docker Implementation</strong> - Container architecture for SNMP services</li>
+</ul>
+<h3>Enterprise &amp; Security Features</h3>
+<h4>Authentication &amp; Access Control 🛡️ <strong>CRITICAL FOR PRODUCTION</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>User Authentication System</strong> - Secure login with session management</li>
+<li><input disabled="" type="checkbox"> <strong>Role-based Access Control</strong> - Admin, User, Read-only roles with feature permissions</li>
+<li><input disabled="" type="checkbox"> <strong>API Security Enhancement</strong> - Authentication middleware for all endpoints</li>
+<li><input disabled="" type="checkbox"> <strong>Content Security Policy</strong> - Comprehensive CSP implementation</li>
+<li><input disabled="" type="checkbox"> <strong>Audit Logging</strong> - User action tracking for compliance</li>
+</ul>
+<h4>Advanced Analytics &amp; Intelligence</h4>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>EPSS Scoring Integration</strong> - Daily exploit prediction scoring</li>
+<li><input disabled="" type="checkbox"> <strong>MITRE ATT&amp;CK Mapping</strong> - Framework-based vulnerability classification</li>
+<li><input disabled="" type="checkbox"> <strong>Executive Dashboards</strong> - C-level reporting with trend analysis</li>
+<li><input disabled="" type="checkbox"> <strong>Compliance Reporting</strong> - SOC2, ISO27001, NIST report generation</li>
+</ul>
+<h4>API Integrations Roadmap</h4>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Palo Alto Networks Integration</strong> - Prisma Cloud, Cortex, PAN-OS, WildFire APIs</li>
+<li><input disabled="" type="checkbox"> <strong>Additional Vendor APIs</strong> - Tenable.io, Qualys, Rapid7, CrowdStrike integrations</li>
+<li><input disabled="" type="checkbox"> <strong>Cisco Extensions</strong> - Complete Security Advisories sync implementation</li>
+</ul>
+<h3>Automation &amp; Advanced Features</h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Ansible Integration</strong> - AWX/Tower connectivity for automated patch deployment</li>
+<li><input disabled="" type="checkbox"> <strong>AI-Powered Documentation</strong> - Automated documentation generation with Gemini/OpenAI</li>
+<li><input disabled="" type="checkbox"> <strong>Multi-tenancy Support</strong> - Organization/site isolation for enterprise deployment</li>
+<li><input disabled="" type="checkbox"> <strong>Advanced Reporting System</strong> - HTML-based reports with PDF export capabilities</li>
+</ul>
+<hr>
+<h2>📦 <strong>VERSION PLANNING</strong></h2>
+<h3>Version 1.0.3 (Next Patch Release) 🚀</h3>
+<p><strong>Release Blockers</strong>:</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Security fixes from Codacy scan</strong> (4 critical security issues)</li>
+<li><input disabled="" type="checkbox"> <strong>Code quality compliance</strong> (&lt;50 total Codacy issues)</li>
+<li><input disabled="" type="checkbox"> <strong>Comprehensive testing</strong> of all security fixes</li>
+</ul>
+<p><strong>Release Goals</strong>:</p>
+<ul>
+<li>Zero critical/high security vulnerabilities</li>
+<li>Codacy compliance established as ongoing quality gate</li>
+<li>All security-related operations properly secured</li>
+</ul>
+<h3>Version 1.1.0 (Next Minor Release)</h3>
+<p><strong>Features</strong>:</p>
+<ul>
+<li>Chart Timeline Enhancement completion</li>
+<li>Performance optimization for large CSV files</li>
+<li>KEV Integration implementation</li>
+<li>Critical UI/UX fixes (CVE links, modal system)</li>
+</ul>
+<p><strong>Quality Gates</strong>:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Maintain Codacy compliance (ongoing)</li>
+<li><input disabled="" type="checkbox"> Security audit pass required</li>
+<li><input disabled="" type="checkbox"> Performance benchmarks met</li>
+</ul>
+<hr>
+<h2>🚨 <strong>CRITICAL ISSUES TRACKING</strong></h2>
+<h3>Security &amp; Compliance Issues</h3>
+<ul>
+<li><strong>Codacy Security Vulnerabilities</strong>: 4 critical issues blocking v1.0.3 release</li>
+<li><strong>Authentication Gap</strong>: No authentication protects API endpoints or data access</li>
+<li><strong>File System Security</strong>: Dynamic file paths in fs operations pose security risks</li>
+<li><strong>DOM Security</strong>: innerHTML assignments create XSS vulnerability potential</li>
+</ul>
+<h3>User Experience Issues</h3>
+<ul>
+<li><strong>CVE Link Functionality</strong>: CVE links open ALL CVEs instead of individual ones</li>
+<li><strong>Modal System</strong>: Nested modals appear behind parent modals (z-index problems)</li>
+<li><strong>Layout Responsiveness</strong>: Full-width layout with excessive dead space on desktop</li>
+<li><strong>AG Grid Issues</strong>: Table cells don&#39;t auto-adjust on browser resize</li>
+</ul>
+<h3>Data Management Issues</h3>
+<ul>
+<li><strong>CSV Export Headers</strong>: Export headers contain extra characters/corruption</li>
+<li><strong>Large File Performance</strong>: 50-100MB CSV files cause memory issues</li>
+<li><strong>API Rate Limiting</strong>: No protection against abuse or brute force attacks</li>
+</ul>
+<hr>
+<h2>� <strong>DEVELOPMENT WORKFLOW &amp; STANDARDS</strong></h2>
+<h3>Git Management Standards</h3>
+<ul>
+<li><strong>Branch Protection</strong>: Never commit directly to <code>main</code> branch</li>
+<li><strong>Feature Branches</strong>: Use <code>feature/description</code> or <code>fix/issue-name</code> pattern</li>
+<li><strong>Git Checkpoints</strong>: Make commits every 2-3 file changes with descriptive messages</li>
+<li><strong>Context Preservation</strong>: Include sufficient context in commit messages</li>
+</ul>
+<h3>Code Quality Standards</h3>
+<h4>Codacy Compliance (MANDATORY)</h4>
+<ul>
+<li><strong>After ANY File Edit</strong>: Run <code>codacy_cli_analyze</code> for each edited file immediately</li>
+<li><strong>After ANY Dependency Changes</strong>: Run <code>codacy_cli_analyze</code> with tool &quot;trivy&quot;</li>
+<li><strong>Fix All Issues</strong>: Resolve issues immediately before proceeding</li>
+<li><strong>Quality Gate</strong>: Maintain &lt;50 total issues, zero critical/high security issues</li>
+</ul>
+<h4>Documentation Maintenance (MANDATORY)</h4>
+<p>Update these files with EVERY change:</p>
+<ul>
+<li><code>systeminfo.json</code> - Project state and dependencies</li>
+<li><code>roadmaps/roadmap.md</code> - Feature progress (this file)</li>
+<li><code>docs-source/project-management/codacy-compliance.md</code> - Quality metrics</li>
+<li><code>docs-source/api/endpoints.md</code> - When adding/modifying APIs</li>
+<li><code>docs-source/security/README.md</code> - When implementing security features</li>
+</ul>
+<h4>Markdown Standards (ENFORCED)</h4>
+<ul>
+<li>Run markdown formatter before and after editing: <code>node scripts/fix-markdown.js --file=path/to/file.md</code></li>
+<li>Follow markdownlint rules: MD022, MD032, MD036, MD029, MD024, MD013</li>
+</ul>
+<h3>Sprint Management</h3>
+<h4>Sprint File Template</h4>
+<p>Every sprint file (<code>roadmaps/sprint-YYYY-MM-DD-HHMM.md</code>) must include:</p>
+<pre><code class="language-markdown">
+# Sprint: [Description] - [YYYY-MM-DD-HHMM]
+
+## Context for Resume
+
+- **Current Branch**: feature/name
+- **Last Completed**: [description]
+- **Next Steps**: [what to do next]
+- **Files Modified**: [list]
+- **Codacy Status**: [current state]
+
+## Checklist
+
+- [ ] Task 1: [description with context]
+- [ ] **CODACY**: Run analysis after each task
+- [ ] Git checkpoint after task 2
+- [ ] Update documentation for tasks 1-2
+
+## Documentation Updates Required
+
+- [ ] systeminfo.json: [what to update]
+- [ ] roadmap.md: [progress to mark]
+
+## Git Strategy
+
+- Branch: feature/[name]
+- Checkpoints after: [specific points]
+- Final merge: [when ready]
+
+## Codacy Impact
+
+- Expected new issues: [estimate]
+- Files to analyze: [list]
+- Critical fixes needed: [priority items]
+</code></pre>
+<h4>Context Management</h4>
+<p><strong>When to Start New Chat</strong>:</p>
+<ul>
+<li>After every 3-5 completed tasks</li>
+<li>When context becomes too long</li>
+<li>Before tackling complex features</li>
+<li>After major git checkpoints</li>
+</ul>
+<p><strong>Context Handoff Protocol</strong>:</p>
+<ol>
+<li>Update current sprint file with progress</li>
+<li>Commit all changes to git</li>
+<li>Summarize next steps clearly</li>
+<li>Save current state to memory</li>
+<li>Provide user with resume instructions</li>
+</ol>
+<hr>
+<h2>� <strong>PROJECT METRICS &amp; ACHIEVEMENTS</strong></h2>
+<h3>Technical Achievements</h3>
+<ul>
+<li>✅ <strong>Database Optimization</strong>: 97% storage reduction (193K → 6K records)</li>
+<li>✅ <strong>Production Data Recovery</strong>: 100% recovery rate from corruption (16/16 tickets)</li>
+<li>✅ <strong>Code Quality</strong>: Reduced Codacy issues from 370+ → 83 (-77% improvement)</li>
+<li>✅ <strong>API Completeness</strong>: All CRUD endpoints implemented and tested</li>
+<li>✅ <strong>Zero-dependency Import/Export</strong>: 100% web-based operation</li>
+</ul>
+<h3>User Experience Achievements</h3>
+<ul>
+<li>✅ <strong>Chart Performance</strong>: 14-day default view with proper historical data</li>
+<li>✅ <strong>Data Management UX</strong>: Complete import/export/backup/restore through web interface</li>
+<li>✅ <strong>Settings Modal</strong>: Clean, organized interface with logical button groupings</li>
+<li>✅ <strong>Production Ready</strong>: Zero technical knowledge required for data operations</li>
+<li>✅ <strong>Browser Testing</strong>: Comprehensive Playwright automation validates functionality</li>
+</ul>
+<h3>Current State</h3>
+<ul>
+<li><strong>Version</strong>: 1.0.2</li>
+<li><strong>Total Records</strong>: 100,570 (17 tickets + 100,553 vulnerabilities)</li>
+<li><strong>Database Status</strong>: Optimized time-series schema operational</li>
+<li><strong>Testing Coverage</strong>: Browser automation with Playwright</li>
+<li><strong>Documentation</strong>: Complete markdown-first portal system</li>
+</ul>
+<hr>
+<h2>🎯 <strong>SUCCESS CRITERIA &amp; QUALITY GATES</strong></h2>
+<h3>Release Criteria (All Patch Versions)</h3>
+<ul>
+<li>✅ <strong>Security</strong>: Zero critical/high security vulnerabilities</li>
+<li>✅ <strong>Quality</strong>: &lt;50 total Codacy issues</li>
+<li>✅ <strong>Testing</strong>: All security fixes tested and verified</li>
+<li>✅ <strong>Documentation</strong>: Security changes documented</li>
+</ul>
+<h3>Feature Completion Standards</h3>
+<ul>
+<li>All Codacy issues resolved for modified files</li>
+<li>Documentation updated to reflect changes</li>
+<li>Git checkpoints created for rollback capability</li>
+<li>systeminfo.json reflects current state</li>
+<li>Markdown files formatted correctly</li>
+<li>No broken functionality introduced</li>
+</ul>
+<h3>Project Success Definition</h3>
+<p><strong>Current Sprint READY</strong> when user selects specific Codacy issue for implementation<br><strong>v1.0.3 Release READY</strong> when all 4 security vulnerabilities resolved and compliance verified<br><strong>Long-term SUCCESS</strong> when authentication system implemented and enterprise features operational</p>
+<hr>
+<h2>📋 <strong>MAINTENANCE SCHEDULE</strong></h2>
+<h3>Regular Tasks</h3>
+<ul>
+<li><strong>Weekly</strong>: Dependency security updates and Codacy compliance verification</li>
+<li><strong>Monthly</strong>: Performance monitoring review and documentation updates</li>
+<li><strong>Quarterly</strong>: Feature roadmap review and prioritization</li>
+<li><strong>Per Release</strong>: Comprehensive security audit and compliance verification</li>
+</ul>
+<h3>Quality Assurance</h3>
+<ul>
+<li><strong>Pre-commit</strong>: ESLint validation and basic testing</li>
+<li><strong>Pull Request</strong>: Codacy analysis required for all changes</li>
+<li><strong>Release</strong>: Full compliance verification mandatory</li>
+<li><strong>Post-deployment</strong>: Monitoring and issue tracking</li>
+</ul>
+<hr>
+<h2>� <strong>RELATED DOCUMENTATION</strong></h2>
+<ul>
+<li><strong>Sprint Files</strong>: Individual dated sprint files in <code>/roadmaps/</code></li>
+<li><strong>API Documentation</strong>: <code>/docs-source/api/endpoints.md</code></li>
+<li><strong>Security Guidelines</strong>: <code>/docs-source/security/README.md</code></li>
+<li><strong>Development Setup</strong>: <code>/docs-source/development/development-setup.md</code></li>
+<li><strong>Architecture Overview</strong>: <code>/docs-source/architecture/index.md</code></li>
+<li><strong>Project Management</strong>: <code>/docs-source/project-management/index.md</code></li>
+</ul>
+<hr>
+<h2>Documentation Updates</h2>
+<p>This unified roadmap consolidates all project planning, progress tracking, and strategic direction for HexTrackr development. Last major update: January 29, 2025</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

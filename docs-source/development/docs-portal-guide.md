@@ -191,6 +191,62 @@ docs-prototype/
 
 1. **Create Content Structure**: Follow the same file generation process
 
+## HTML Generation Process
+
+The documentation system uses `html-content-updater.js` to convert markdown files from `docs-source/` into HTML files in `docs-prototype/content/`.
+
+### How HTML Generation Works
+
+1. **Scans Source Directory**: Finds all `.md` files in `docs-source/`
+2. **Loads Template**: Uses the master template from `docs-prototype/template.html`
+3. **Converts Markdown**: Processes markdown content with enhanced parser
+4. **Injects Content**: Replaces `<!-- CONTENT WILL BE INJECTED HERE -->` placeholder
+5. **Writes HTML Files**: Creates corresponding `.html` files with correct relative paths
+6. **Generates Report**: Creates `html-update-report.md` with generation statistics
+
+### Running HTML Generation
+
+```bash
+
+# From project root directory
+
+node docs-prototype/html-content-updater.js
+```
+
+### Output Structure
+
+The generator maintains the exact directory structure:
+
+```text
+docs-source/development/memory-system.md
+↓ (converts to)
+docs-prototype/content/development/memory-system.html
+```
+
+### Generation Features
+
+- **Preserves Directory Structure**: Source folders map directly to content folders
+- **Template Integration**: All HTML files use consistent templating
+- **Error Handling**: Reports files that fail to convert
+- **Performance Tracking**: Shows generation time and file counts
+- **Automatic Directory Creation**: Creates missing directories as needed
+
+### Generation Report
+
+After running, check `docs-source/html-update-report.md` for:
+
+- Total files generated
+- Processing time
+- List of all generated files
+- Error count and details
+
+### Common Generation Issues
+
+- **Permission Errors**: Ensure write access to `docs-prototype/content/`
+- **Invalid Markdown**: Check syntax in source `.md` files
+- **Missing Template**: Verify `docs-prototype/template.html` exists
+- **Path Problems**: Fixed in August 2025 update (absolute path issue resolved)
+
 ## Configuration
 
 ### Navigation Icons
@@ -221,19 +277,61 @@ The auto-discovery system looks for:
 
 - **Check File Paths**: Ensure HTML files exist in `/docs-prototype/content/`
 - **Regenerate Content**: Run `node docs-prototype/html-content-updater.js`
-- **Clear Cache**: Refresh with Ctrl/Cmd+Shift+R
+- **Clear Browser Cache**: Refresh with Ctrl/Cmd+Shift+R
+- **Hard Refresh**: Use Ctrl/Cmd+Shift+R to bypass browser cache completely
 
 ### Content Not Loading
 
 - **Verify HTML**: Check that HTML files are properly generated
 - **Check Network**: Open browser DevTools to see HTTP requests
 - **File Permissions**: Ensure files are readable by web server
+- **Path Issues**: Check browser console for 404 errors on content files
 
 ### Auto-Discovery Issues
 
 - **Missing Index Files**: Each section needs an `index.html` file
-- **Case Sensitivity**: Check filename case matches exactly
+- **Case Sensitivity**: Check filename case matches exactly  
 - **Directory Structure**: Verify proper nesting in content folder
+- **Dynamic Discovery**: The system now automatically discovers all `.html` files in each section
+
+### Recent Fixes (August 2025)
+
+The documentation system has been recently improved with the following fixes:
+
+#### HTML Generation Path Fix
+
+- **Issue**: HTML files were generated with absolute paths instead of relative paths
+- **Fix**: Changed `path.resolve()` to `path.join()` in `html-content-updater.js` line 149
+- **Impact**: HTML files now generate in correct relative directory structure
+
+#### True Dynamic Auto-Discovery
+
+- **Issue**: Navigation used hardcoded file lists instead of dynamic discovery
+- **Fix**: Rewrote `discoverSectionChildren()` method in `docs-portal-v2.js`
+- **Features**:
+  - Attempts nginx directory listing first
+  - Falls back to testing common file patterns
+  - Automatically includes any `.html` files found (except `index.html`)
+  - No longer requires manual updates to navigation lists
+
+#### Auto-Discovery Behavior
+
+The updated auto-discovery system:
+
+1. **Tries directory listing** via HTTP request to section folder
+2. **Parses HTML responses** to extract `.html` file names
+3. **Falls back to pattern testing** if directory listing fails
+4. **Automatically excludes** `index.html` files (handled separately)
+5. **Formats titles** from filenames (e.g., `memory-system.html` → "Memory System")
+
+### Testing Auto-Discovery
+
+To verify auto-discovery is working:
+
+1. **Check Browser Console**: Look for "Auto-discovered navigation structure" log
+2. **Test New Files**: Add a new `.md` file, regenerate HTML, refresh portal
+3. **Verify Navigation**: New pages should appear automatically in sidebar menus
+4. **Check Network Tab**: Ensure no 404 errors when accessing section folders
 
 ## Best Practices
 

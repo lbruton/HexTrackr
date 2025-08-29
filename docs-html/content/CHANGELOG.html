@@ -1,0 +1,158 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Changelog</h1>
+<p>All notable changes to HexTrackr will be documented in this file.</p>
+<p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,<br>and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<h2>[Unreleased]</h2>
+<h3>Planned</h3>
+<h3>Fixed</h3>
+<h3>Added</h3>
+<ul>
+<li><p>Docs: Dynamic overview statistics loaded from new <code>/api/docs/stats</code> endpoint; falls back to existing static counts</p>
+<p>if API unavailable</p>
+</li>
+<li><p>Ticket modal enhancements (v1.1.0)</p>
+<ul>
+<li>XT# read-only field display</li>
+<li>Site/location separation and validation</li>
+<li>Status workflow updates (remove In-Progress, add Staged/Failed/Overdue)</li>
+<li>Drag-drop UX improvements with accessibility features</li>
+<li>Auto-status updates for overdue tickets</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.1] - 2025-08-27</h2>
+<h3>Fixed (2)</h3>
+<ul>
+<li><strong>Device Management UI</strong>: Fixed button order from + - to - + for consistent positioning<ul>
+<li>Resolved button position switching that caused UX friction during rapid clicking</li>
+<li>Updated both initial template (tickets.html) and dynamic generation (tickets.js)</li>
+<li>Enables efficient &quot;tap tap tap&quot; workflow without mouse repositioning</li>
+</ul>
+</li>
+</ul>
+<h3>Improved</h3>
+<ul>
+<li><strong>Drag-and-Drop System</strong>: Comprehensive bug fixes for device reordering<ul>
+<li>Fixed drag-to-top insertion logic to work repeatedly</li>
+<li>Preserved reverse button visibility during drag operations</li>
+<li>Fixed reverse toggle functionality to properly toggle state</li>
+<li>Enhanced feedback system to maintain UI consistency during operations</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.0] - 2025-08-27</h2>
+<h3>Summary</h3>
+<p>Stable baseline release of HexTrackr cybersecurity ticket and vulnerability management system.</p>
+<h3>Features</h3>
+<ul>
+<li><p><strong>Dual-Purpose Management System</strong></p>
+<ul>
+<li>Ticket management with full CRUD operations</li>
+<li>Vulnerability tracking and analysis</li>
+<li>Real-time statistics dashboard</li>
+</ul>
+</li>
+<li><p><strong>Database Management</strong></p>
+<ul>
+<li>SQLite backend with 17 tickets and 100,553+ vulnerabilities</li>
+<li>Comprehensive backup/restore system (ZIP format)</li>
+<li>CSV import/export functionality</li>
+<li>Web-based data management (no technical knowledge required)</li>
+</ul>
+</li>
+<li><p><strong>ServiceNow Integration</strong></p>
+<ul>
+<li>Configurable ServiceNow instance URL</li>
+<li>Clickable ticket number links</li>
+<li>Settings modal configuration</li>
+</ul>
+</li>
+<li><p><strong>User Interface</strong></p>
+<ul>
+<li>Bootstrap 5 (tickets) + Tabler.io (vulnerabilities) frameworks</li>
+<li>Responsive design with modular CSS architecture</li>
+<li>Dark/light theme support</li>
+<li>Settings modal with tabbed interface</li>
+</ul>
+</li>
+<li><p><strong>Development Infrastructure</strong></p>
+<ul>
+<li>Docker-only deployment with Docker Compose</li>
+<li>Modular JavaScript architecture (shared/pages separation)</li>
+<li>Comprehensive documentation system</li>
+<li>Git-based version control with systematic backups</li>
+</ul>
+</li>
+</ul>
+<h3>Technical Stack</h3>
+<ul>
+<li><strong>Backend</strong>: Node.js/Express with SQLite database</li>
+<li><strong>Frontend</strong>: HTML5, JavaScript (ES6+), Bootstrap 5, Tabler.io</li>
+<li><strong>Deployment</strong>: Docker + Docker Compose</li>
+<li><strong>Storage</strong>: SQLite with localStorage fallback</li>
+<li><strong>Port</strong>: localhost:8080</li>
+</ul>
+<h3>Recent Fixes (Leading to v1.0.0)</h3>
+<ul>
+<li>✅ <strong>Field Mapping Fix</strong>: Resolved backend/frontend field mapping preventing ticket saves</li>
+<li>✅ <strong>ServiceNow Integration Restoration</strong>: Fixed ID mismatches and exposed global functions</li>
+<li>✅ <strong>Modular CSS Architecture</strong>: Eliminated font inconsistencies with proper CSS organization</li>
+<li>✅ <strong>Settings Modal Enhancement</strong>: Added Papa Parse 5.4.1 and JSZip 3.10.1 for robust file handling</li>
+</ul>
+<h3>Database Statistics (v1.0.0)</h3>
+<ul>
+<li>Tickets: 17 total (9 open, 5 overdue, 8 completed)</li>
+<li>Vulnerabilities: 100,553 total</li>
+<li>Total Records: 100,570</li>
+</ul>
+<h3>Known Limitations</h3>
+<ul>
+<li>Manual XT# assignment (auto-generation planned for v1.1.0)</li>
+<li>Basic drag-drop interface (accessibility improvements planned)</li>
+<li>Status workflow needs refinement (updates planned for v1.1.0)</li>
+</ul>
+<hr>
+<h2>Version History Notes</h2>
+<h3>Pre-v1.0.0 Development</h3>
+<ul>
+<li>Extensive data recovery and restoration work</li>
+<li>Multiple architecture improvements and bug fixes</li>
+<li>Database corruption recovery with complete data restoration</li>
+<li>Progressive enhancement of import/export functionality</li>
+</ul>
+<h3>Development Methodology</h3>
+<ul>
+<li>Git-based development with systematic backup commits</li>
+<li>Docker-only deployment strategy</li>
+<li>Modular code organization (scripts/shared/, scripts/pages/)</li>
+<li>Comprehensive documentation maintenance</li>
+</ul>
+<hr>
+<h2>Release Process</h2>
+<h3>Version Numbering</h3>
+<ul>
+<li><strong>Major (X.0.0)</strong>: Breaking changes or major architectural updates</li>
+<li><strong>Minor (1.X.0)</strong>: New features and enhancements (backward compatible)</li>
+<li><strong>Patch (1.1.X)</strong>: Bug fixes and minor improvements</li>
+</ul>
+<h3>Release Cycle</h3>
+<ol>
+<li>Feature development on main branch with backup commits</li>
+<li>Version tag creation with comprehensive release notes</li>
+<li>Docker image updates with version tags</li>
+<li>Documentation updates and roadmap adjustments</li>
+<li>GitHub release with change summary</li>
+</ol>
+<h3>Development Workflow</h3>
+<ul>
+<li>All changes documented with descriptive commit messages</li>
+<li>Pre-work backup commits for safety</li>
+<li>Step-by-step implementation with verification</li>
+<li>Comprehensive testing before version tags</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

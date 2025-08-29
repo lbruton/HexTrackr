@@ -3,6 +3,8 @@
 <!-- markdownlint-disable-next-line MD013 -->
 HexTrackr uses SQLite as its primary storage at `data/hextrackr.db`, initialized by `scripts/init-database.js` with runtime schema evolution in `server.js`.
 
+**Note**: The `data/schema.sql` file contains a simplified demo schema for testing purposes. The production schema is defined in `scripts/init-database.js`.
+
 ## Engine
 
 - SQLite 3 (file-backed). Chosen for simplicity and zero-ops embedded deployment.
@@ -209,5 +211,11 @@ sequenceDiagram
 
 ## Notes and caveats
 
-- Tickets schema drift: server endpoints expect additional columns not present in the initial table. Migrations will align these over time. Client code handles absent fields gracefully.
-- Vulnerabilities table gains extra columns at runtime; re-running server on an existing DB is safe due to duplicate column guards.
+- Tickets schema drift: server endpoints expect additional columns not present in
+
+  the initial table. Migrations will align these over time. Client code handles
+  absent fields gracefully.
+
+- Vulnerabilities table gains extra columns at runtime; re-running server on an
+
+  existing DB is safe due to duplicate column guards.
