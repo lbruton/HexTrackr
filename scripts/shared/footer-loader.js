@@ -3,6 +3,9 @@
  * Loads the shared footer component into any page
  */
 
+/* eslint-env browser */
+/* global document, window, fetch, DOMParser, console */
+
 document.addEventListener("DOMContentLoaded", function() {
     const footerContainer = document.getElementById("footerContainer");
     

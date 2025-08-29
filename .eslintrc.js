@@ -5,6 +5,11 @@ module.exports = {
     sourceType: "script"
   },
   
+  // Environment for this config file itself
+  env: {
+    node: true
+  },
+  
   // Global rules that apply to all files
   rules: {
     "quotes": ["error", "double"],
@@ -13,6 +18,7 @@ module.exports = {
   
   // Files to ignore
   ignorePatterns: [
+    ".eslintrc.js",  // Ignore the config file itself
     "node_modules/**",
     "**/node_modules/**", 
     "dist/**",
