@@ -52,7 +52,8 @@ export default [
     rules: {
       "quotes": ["error", "double"],
       "semi": ["error", "always"],
-      "curly": ["error", "all"]
+      "curly": ["error", "all"],
+      "no-lone-blocks": "error"
     }
   },
   {
@@ -102,7 +103,8 @@ export default [
     rules: {
       "quotes": ["error", "double"],
       "semi": ["error", "always"],
-      "curly": ["error", "all"]
+      "curly": ["error", "all"],
+      "no-lone-blocks": "error"
     }
   },
   {
@@ -124,7 +126,8 @@ export default [
     rules: {
       "quotes": ["error", "double"],
       "semi": ["error", "always"],
-      "curly": ["error", "all"]
+      "curly": ["error", "all"],
+      "no-lone-blocks": "error"
     }
   },
   {
@@ -141,7 +144,8 @@ export default [
     rules: {
       "quotes": ["error", "double"],
       "semi": ["error", "always"],
-      "curly": ["error", "all"]
+      "curly": ["error", "all"],
+      "no-lone-blocks": "error"
     }
   }
 ];
