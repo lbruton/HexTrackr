@@ -7,6 +7,10 @@ WORKDIR /app
 # Install PostgreSQL client and other necessary packages (removed SQLite)
 RUN apk add --no-cache postgresql-client python3 make g++ curl
 
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S hextrackr -u 1001
+
 # Copy package files
 COPY package*.json ./
 
@@ -22,8 +26,12 @@ COPY . .
 # Copy ESLint configuration file to /app directory
 COPY eslint.config.js /app/
 
-# Create data directory for file uploads
-RUN mkdir -p /app/data
+# Create data directory for file uploads and set permissions
+RUN mkdir -p /app/data && \
+    chown -R hextrackr:nodejs /app
+
+# Switch to non-root user
+USER hextrackr
 
 # Expose correct port for HexTrackr
 EXPOSE 3040

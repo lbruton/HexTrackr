@@ -366,9 +366,11 @@
                 <select class="form-select" id="statusFilter">
                     <option value="">All Status</option>
                     <option value="Pending">Pending</option>
+                    <option value="Staged">Staged</option>
                     <option value="Open">Open</option>
-                    <option value="In Progress">In Progress</option>
+                    <option value="Overdue">Overdue</option>
                     <option value="Completed">Completed</option>
+                    <option value="Failed">Failed</option>
                     <option value="Closed">Closed</option>
                 </select>
             </div>
@@ -499,9 +501,11 @@
                                     <select class="form-select" id="status">
                                         <option value="">Select Status</option>
                                         <option value="Pending">Pending</option>
+                                        <option value="Staged">Staged</option>
                                         <option value="Open">Open</option>
-                                        <option value="In Progress">In Progress</option>
+                                        <option value="Overdue">Overdue</option>
                                         <option value="Completed">Completed</option>
+                                        <option value="Failed">Failed</option>
                                         <option value="Closed">Closed</option>
                                     </select>
                                 </div>
@@ -525,19 +529,35 @@
 
                         <!-- Devices Section -->
                         <div class="mb-3">
-                            <label class="form-label">Devices <small class="text-muted">(Drag to reorder boot sequence)</small></label>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label mb-0">Devices <small class="text-muted">(Use arrows or drag to reorder boot sequence)</small></label>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="reverseDevicesBtn" title="Reverse device order">
+                                    <i class="fas fa-sort-amount-down-alt"></i> Reverse
+                                </button>
+                            </div>
                             <div id="devicesContainer" class="sortable-container">
                                 <div class="device-entry mb-2" draggable="true">
                                     <div class="input-group">
-                                        <span class="input-group-text drag-handle" style="cursor: grab;">
+                                        <span class="input-group-text device-number-indicator" style="min-width: 40px; font-weight: bold; color: #6c757d;">
+                                            #0
+                                        </span>
+                                        <span class="input-group-text drag-handle" style="cursor: grab; border-left: 0;">
                                             <i class="fas fa-grip-vertical"></i>
                                         </span>
+                                        <div class="input-group-text border-0 p-1" style="flex-direction: column; background: #f8f9fa;">
+                                            <button type="button" class="btn btn-primary btn-sm move-up-btn" style="padding: 2px 8px; margin-bottom: 1px; border-radius: 3px; font-size: 11px;" title="Move Up">
+                                                <i class="fas fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-primary btn-sm move-down-btn" style="padding: 2px 8px; border-radius: 3px; font-size: 11px;" title="Move Down">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </button>
+                                        </div>
                                         <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)">
-                                        <button type="button" class="btn btn-outline-success add-device-btn">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
                                         <button type="button" class="btn btn-outline-danger remove-device-btn" style="display: none;">
                                             <i class="fas fa-minus"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-success add-device-btn">
+                                            <i class="fas fa-plus"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -609,30 +629,8 @@
     <!-- Settings Modal Container - Auto-injected by shared/settings-modal.js -->
     <div id="settingsModalContainer"></div>
 
-    <!-- Version Footer -->
-    <footer class="footer footer-transparent d-print-none mt-5">
-        <div class="container-xl">
-            <div class="row text-center align-items-center flex-row-reverse">
-                <div class="col-12 col-lg-auto mt-3 mt-lg-0">
-                    <ul class="list-inline list-inline-dots mb-0">
-                        <li class="list-inline-item">
-                            <small class="text-muted">HexTrackr v<span id="app-version">1.0.0</span></small>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="/docs/technical/" target="_blank" class="link-secondary text-muted">
-                                <small>Documentation</small>
-                            </a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="https://github.com/Lonnie-Bruton/HexTrackr" target="_blank" class="link-secondary text-muted">
-                                <small>GitHub</small>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <!-- Shared Footer -->
+    <div id="footerContainer"></div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
@@ -644,6 +642,7 @@
     
     <!-- HexTrackr Modular JavaScript Architecture -->
     <script src="scripts/shared/header-loader.js"></script>
+    <script src="scripts/shared/footer-loader.js"></script>
     <script src="scripts/shared/settings-modal.js"></script>
     <script src="scripts/pages/tickets.js"></script>
 </body>

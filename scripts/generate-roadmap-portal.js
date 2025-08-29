@@ -6,11 +6,25 @@
  * Run: node scripts/generate-roadmap-portal.js
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 // Enhanced markdown to HTML converter
 function markdownToHtml(markdown) {
+    /**
+     * Node.js compatible HTML escaping to prevent XSS attacks
+     * @param {string} text - Text to escape
+     * @returns {string} - Escaped HTML-safe text
+     */
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+    
     // Handle code blocks first to prevent interference
     const codeBlocks = [];
     markdown = markdown.replace(/```([\s\S]*?)```/g, (match, code) => {
@@ -19,66 +33,72 @@ function markdownToHtml(markdown) {
     });
 
     // Process line by line for better structure
-    const lines = markdown.split('\n');
+    const lines = markdown.split("\n");
     const htmlLines = [];
     let inList = false;
-    let listType = '';
+    let listType = "";
 
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
-        const nextLine = lines[i + 1] || '';
+        const nextLine = lines[i + 1] || "";
 
-        // Headers
+        // Headers (with HTML escaping for security)
         if (line.match(/^### /)) {
             if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
-            htmlLines.push(line.replace(/^### (.*)$/, '<h3>$1</h3>'));
+            const headerText = line.replace(/^### /, "");
+            htmlLines.push(`<h3>${escapeHtml(headerText)}</h3>`);
         } else if (line.match(/^## /)) {
             if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
-            htmlLines.push(line.replace(/^## (.*)$/, '<h2>$1</h2>'));
+            const headerText = line.replace(/^## /, "");
+            htmlLines.push(`<h2>${escapeHtml(headerText)}</h2>`);
         } else if (line.match(/^# /)) {
             if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
-            htmlLines.push(line.replace(/^# (.*)$/, '<h1>$1</h1>'));
+            const headerText = line.replace(/^# /, "");
+            htmlLines.push(`<h1>${escapeHtml(headerText)}</h1>`);
         }
         // Horizontal rules
         else if (line.match(/^---+$/)) {
             if (inList) { htmlLines.push(`</${listType}>`); inList = false; }
-            htmlLines.push('<hr>');
+            htmlLines.push("<hr>");
         }
         // Task lists (checkboxes)
         else if (line.match(/^\s*- \[ \]/)) {
-            if (!inList || listType !== 'ul') {
+            if (!inList || listType !== "ul") {
                 if (inList) htmlLines.push(`</${listType}>`);
-                htmlLines.push('<ul class="task-list">');
+                htmlLines.push("<ul class=\"task-list\">");
                 inList = true;
-                listType = 'ul';
+                listType = "ul";
             }
-            htmlLines.push(line.replace(/^\s*- \[ \] (.*)$/, '<li class="task-item">☐ $1</li>'));
+            const taskText = line.replace(/^\s*- \[ \] /, "");
+            htmlLines.push(`<li class="task-item">☐ ${escapeHtml(taskText)}</li>`);
         } else if (line.match(/^\s*- \[x\]/)) {
-            if (!inList || listType !== 'ul') {
+            if (!inList || listType !== "ul") {
                 if (inList) htmlLines.push(`</${listType}>`);
-                htmlLines.push('<ul class="task-list">');
+                htmlLines.push("<ul class=\"task-list\">");
                 inList = true;
-                listType = 'ul';
+                listType = "ul";
             }
-            htmlLines.push(line.replace(/^\s*- \[x\] (.*)$/, '<li class="task-item completed">✅ $1</li>'));
+            const taskText = line.replace(/^\s*- \[x\] /, "");
+            htmlLines.push(`<li class="task-item completed">✅ ${escapeHtml(taskText)}</li>`);
         }
         // Regular lists
         else if (line.match(/^\s*- /)) {
-            if (!inList || listType !== 'ul') {
+            if (!inList || listType !== "ul") {
                 if (inList) htmlLines.push(`</${listType}>`);
-                htmlLines.push('<ul>');
+                htmlLines.push("<ul>");
                 inList = true;
-                listType = 'ul';
+                listType = "ul";
             }
-            htmlLines.push(line.replace(/^\s*- (.*)$/, '<li>$1</li>'));
+            const listText = line.replace(/^\s*- /, "");
+            htmlLines.push(`<li>${escapeHtml(listText)}</li>`);
         }
         // Empty line - close lists
-        else if (line.trim() === '') {
+        else if (line.trim() === "") {
             if (inList) {
                 htmlLines.push(`</${listType}>`);
                 inList = false;
             }
-            htmlLines.push('');
+            htmlLines.push("");
         }
         // Regular paragraphs
         else {
@@ -86,7 +106,7 @@ function markdownToHtml(markdown) {
                 htmlLines.push(`</${listType}>`);
                 inList = false;
             }
-            if (line.trim() !== '') {
+            if (line.trim() !== "") {
                 htmlLines.push(`<p>${line}</p>`);
             }
         }
@@ -97,59 +117,91 @@ function markdownToHtml(markdown) {
         htmlLines.push(`</${listType}>`);
     }
 
-    let html = htmlLines.join('\n');
+    let html = htmlLines.join("\n");
 
-    // Apply inline formatting
-    html = html
-        // Bold and italic
-        .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        
-        // Inline code
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        
-        // Status badges
-        .replace(/\*Risk: (HIGH|MEDIUM|LOW)\*/g, '<span class="phase-status status-critical">Risk: $1</span>')
-        .replace(/\*Priority: (CRITICAL|HIGH|MEDIUM|LOW)\*/g, '<span class="phase-status status-in-progress">Priority: $1</span>')
-        .replace(/\*Duration: ([^*]+)\*/g, '<span class="phase-status status-planned">Duration: $1</span>')
-        .replace(/\*Updated: ([^*]+)\*/g, '<span class="phase-status status-complete">Updated: $1</span>')
-        
-        // Blockquotes
-        .replace(/^> (.*)$/gm, '<blockquote>$1</blockquote>');
+    // Apply inline formatting with XSS protection
+    html = applyInlineFormatting(html, escapeHtml);
 
     // Restore code blocks
     codeBlocks.forEach((code, index) => {
-        html = html.replace(`__CODEBLOCK_${index}__`, `<pre><code>${code}</code></pre>`);
+        html = html.replace(`__CODEBLOCK_${index}__`, `<pre><code>${escapeHtml(code)}</code></pre>`);
     });
 
     return html;
 }
 
+/**
+ * Applies inline formatting while preventing XSS attacks
+ * @param {string} html - HTML content to format
+ * @param {function} escapeHtml - HTML escaping function
+ * @returns {string} - Safely formatted HTML
+ */
+function applyInlineFormatting(html, escapeHtml) {
+    // Bold and italic (safer with explicit capture and escape)
+    html = html.replace(/\*\*\*(.*?)\*\*\*/g, (match, content) => {
+        return `<strong><em>${escapeHtml(content)}</em></strong>`;
+    });
+    html = html.replace(/\*\*(.*?)\*\*/g, (match, content) => {
+        return `<strong>${escapeHtml(content)}</strong>`;
+    });
+    html = html.replace(/\*(.*?)\*/g, (match, content) => {
+        return `<em>${escapeHtml(content)}</em>`;
+    });
+    
+    // Inline code (safer escape)
+    html = html.replace(/`([^`]+)`/g, (match, content) => {
+        return `<code>${escapeHtml(content)}</code>`;
+    });
+    
+    // Status badges (these are controlled content, but still escape)
+    html = html.replace(/\*Risk: (HIGH|MEDIUM|LOW)\*/g, (match, content) => {
+        return `<span class="phase-status status-critical">Risk: ${escapeHtml(content)}</span>`;
+    });
+    html = html.replace(/\*Priority: (CRITICAL|HIGH|MEDIUM|LOW)\*/g, (match, content) => {
+        return `<span class="phase-status status-in-progress">Priority: ${escapeHtml(content)}</span>`;
+    });
+    html = html.replace(/\*Duration: ([^*]+)\*/g, (match, content) => {
+        return `<span class="phase-status status-planned">Duration: ${escapeHtml(content)}</span>`;
+    });
+    html = html.replace(/\*Updated: ([^*]+)\*/g, (match, content) => {
+        return `<span class="phase-status status-complete">Updated: ${escapeHtml(content)}</span>`;
+    });
+    
+    // Blockquotes (safer escape)
+    html = html.replace(/^> (.*)$/gm, (match, content) => {
+        return `<blockquote>${escapeHtml(content)}</blockquote>`;
+    });
+    
+    return html;
+}
+
 // Generate the roadmap portal using existing template
 function generatePortal() {
-    const roadmapsDir = path.join(__dirname, '../roadmaps');
-    const templatePath = path.join(roadmapsDir, 'index.html');
+    const roadmapsDir = path.join(__dirname, "../roadmaps");
+    const templatePath = path.join(roadmapsDir, "index.html");
     const outputPath = templatePath; // Overwrite the existing file
     
-    console.log('🔍 Reading roadmap files...');
+    console.log("🔍 Reading roadmap files...");
     
     // Read roadmap files
-    const strategicRoadmap = fs.readFileSync(path.join(roadmapsDir, 'ROADMAP.md'), 'utf8');
-    const tacticalRoadmap = fs.readFileSync(path.join(roadmapsDir, 'UI_UX_ROADMAP.md'), 'utf8');
-    const currentStatus = fs.readFileSync(path.join(roadmapsDir, 'CURRENT_STATUS.md'), 'utf8');
+    const allowedFiles = ["ROADMAP.md", "UI_UX_ROADMAP.md", "CURRENT_STATUS.md"]; if (!allowedFiles.includes("ROADMAP.md")) throw new Error("Invalid file access");
+    const strategicRoadmap = fs.readFileSync(path.join(roadmapsDir, "ROADMAP.md"), "utf8");
+    if (!allowedFiles.includes("UI_UX_ROADMAP.md")) throw new Error("Invalid file access");
+    const tacticalRoadmap = fs.readFileSync(path.join(roadmapsDir, "UI_UX_ROADMAP.md"), "utf8");
+    if (!allowedFiles.includes("CURRENT_STATUS.md")) throw new Error("Invalid file access");
+    const currentStatus = fs.readFileSync(path.join(roadmapsDir, "CURRENT_STATUS.md"), "utf8");
     
-    console.log('🔄 Converting markdown to HTML...');
+    console.log("🔄 Converting markdown to HTML...");
     
     // Convert to HTML
     const strategicHtml = markdownToHtml(strategicRoadmap);
     const tacticalHtml = markdownToHtml(tacticalRoadmap);
     const statusHtml = markdownToHtml(currentStatus);
     
-    console.log('📝 Reading existing template...');
+    console.log("📝 Reading existing template...");
     
     // Read the current template
-    let template = fs.readFileSync(templatePath, 'utf8');
+    let template = fs.readFileSync(templatePath, "utf8");
     
     // Update the navigation to include current status tab
     const updatedNav = `
@@ -188,19 +240,19 @@ function generatePortal() {
         </section>`;
     
     // Find where to insert content (after nav, before footer)
-    const navEndIndex = template.indexOf('</nav>') + 6;
-    const footerStartIndex = template.indexOf('<footer');
+    const navEndIndex = template.indexOf("</nav>") + 6;
+    const footerStartIndex = template.indexOf("<footer");
     
     if (navEndIndex > 5 && footerStartIndex > navEndIndex) {
         // Replace content between nav and footer
         template = template.substring(0, navEndIndex) + 
-                  '\n\n' + tabContent + '\n\n        ' + 
+                  "\n\n" + tabContent + "\n\n        " + 
                   template.substring(footerStartIndex);
     } else {
         // Fallback: insert before closing main tag
         template = template.replace(
-            '</main>',
-            tabContent + '\n    </main>'
+            "</main>",
+            tabContent + "\n    </main>"
         );
     }
     
@@ -253,7 +305,7 @@ function generatePortal() {
         }`;
     
     // Insert enhanced CSS before closing </style>
-    template = template.replace('</style>', enhancedCSS + '\n    </style>');
+    template = template.replace("</style>", enhancedCSS + "\n    </style>");
     
     // Update footer with generation info
     const footerContent = `
@@ -301,44 +353,37 @@ function generatePortal() {
     </script>`;
     
     // Insert JavaScript before closing body tag
-    template = template.replace('</body>', jsScript + '\n</body>');
+    template = template.replace("</body>", jsScript + "\n</body>");
     
-    console.log('💾 Writing updated portal...');
+    console.log("💾 Writing updated portal...");
     
     // Write the updated HTML file
     fs.writeFileSync(outputPath, template);
     
-    console.log('🚀 Roadmap portal generated successfully!');
+    console.log("🚀 Roadmap portal generated successfully!");
     console.log(`📂 Open: file://${outputPath}`);
-    console.log('🌐 Or access via: http://localhost:8080/roadmaps/');
+    console.log("🌐 Or access via: http://localhost:8080/roadmaps/");
 }
 
 // Add npm script integration
 function updatePackageJson() {
-    const packageJsonPath = path.join(__dirname, '../package.json');
+    const packageJsonPath = "../package.json";
     
     try {
-        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+        const packageJson = JSON.parse(fs.readFileSync(path.resolve(packageJsonPath), "utf8"));
         
         if (!packageJson.scripts) {
             packageJson.scripts = {};
         }
         
         if (!packageJson.scripts.roadmap) {
-            packageJson.scripts.roadmap = 'node scripts/generate-roadmap-portal.js';
+            packageJson.scripts.roadmap = "node scripts/generate-roadmap-portal.js";
             fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-            console.log('✅ Added "npm run roadmap" script to package.json');
+            console.log("✅ Added \"npm run roadmap\" script to package.json");
         }
     } catch (error) {
-        console.log('⚠️  Could not update package.json:', error.message);
+        console.log("⚠️  Could not update package.json:", error.message);
     }
-}
-
-// Count tasks for progress tracking
-function countTasks(html) {
-    const taskMatches = html.match(/class="task-item"/g) || [];
-    const completedMatches = html.match(/class="task-item completed"/g) || [];
-    return { total: taskMatches.length, completed: completedMatches.length };
 }
 
 // Run the generator
@@ -347,7 +392,7 @@ if (require.main === module) {
         generatePortal();
         updatePackageJson();
     } catch (error) {
-        console.error('❌ Error generating roadmap portal:', error.message);
+        console.error("❌ Error generating roadmap portal:", error.message);
         process.exit(1);
     }
 }

@@ -1,24 +1,24 @@
 /* Vulnerabilities Page Specific Styles */
 
 /* VPR severity color scheme */
-.severity-critical { 
-    background-color: #dc3545 !important; 
-    color: white !important; 
+.severity-critical {
+    background-color: #dc3545 !important;
+    color: white !important;
 }
 
-.severity-high { 
-    background-color: #fd7e14 !important; 
-    color: white !important; 
+.severity-high {
+    background-color: #fd7e14 !important;
+    color: white !important;
 }
 
-.severity-medium { 
-    background-color: #ffc107 !important; 
-    color: black !important; 
+.severity-medium {
+    background-color: #ffc107 !important;
+    color: black !important;
 }
 
-.severity-low { 
-    background-color: #28a745 !important; 
-    color: white !important; 
+.severity-low {
+    background-color: #28a745 !important;
+    color: white !important;
 }
 
 /* VPR score styling */
@@ -38,7 +38,7 @@
 }
 
 /* Device grid specific styling */
-#deviceVulnGrid {
+#device-vuln-grid {
     height: 500px;
     width: 100%;
 }
