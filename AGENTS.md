@@ -1,95 +1,92 @@
-# HexTrackr Copilot Instructions
+# HexTrackr Agents Playbook (Project-Scoped)
 
-## JavaScript Organization
+This playbook defines how engineering agents operate within the HexTrackr project. It is scoped to this repository and must be followed on every turn.
 
-- **Dedicated JS per page**:
-  - `tickets.html` → `tickets.js` (✅ CORRECT)
-  - `vulnerabilities.html` → `vulnerabilities.js` (📋 incremental migration)
-  
-- **Documentation**: All JS files require JSDoc headers (see `tickets.js` template).
+## 7-Step Turn Loop
 
----
+Always execute these steps in order:
 
-## Project Overview
+1. **observe**
+   - Gather current repo status, open PRs, recent changes, and workspace context.
+   - Read impacted files and constraints (security, quality gates, protocols).
 
-HexTrackr = dual-purpose cybersecurity management system:
+1. **plan**
+   - Produce a short actionable checklist tied to requirements.
+   - Identify files to change and expected outputs.
 
-1. **Ticket Management** (`tickets.html` + `tickets.js`)
-2. **Vulnerability Management** (`vulnerabilities.html` / `vulnerabilities.js`) — time-series trend tracking w/ Tabler.io UI
+1. **safeguards**
+   - Ensure git status is clean OR create a feature branch.
+   - Make a pre-flight commit to snapshot baseline.
+   - Note roll-back strategy.
 
----
+1. **execute**
+   - Apply the smallest changes needed.
+   - After each file edit, run Codacy CLI analysis for the edited file.
+   - Prefer incremental, verifiable steps.
 
-## Architecture
+1. **verify**
+   - Run linters and tests.
+   - Perform a small smoke test where applicable.
+   - Fix issues before proceeding.
 
-- **Deployment**: Docker-only (Docker Compose).
-- **Backend**: Node.js/Express + SQLite (`data/hextrackr.db`).
-- **Frontend**: Tabler.io 
-- **Data Model**: Time-series vulnerability tracking (CSV imports as UPSERTs, no duplicates).
-- **Port**: `localhost:8080`.
+1. **map-update**
+   - Update memory with: decisions, file list, impacts, and follow-ups.
+   - Tag records with `project:${workspaceFolderBasename}`.
+   - Record ADRs for architectural decisions under `docs/adr/`.
 
-## File Structure (Enforced)
+1. **log**
+   - Append a row to `docs/ops/AGENTS_LOG.md` describing the actions, artifacts, and next steps.
 
-- `server.js` (Express API)
-- `tickets.html` + `tickets.js` 
-- `vulnerabilities.html` (embedded JS, migration target → `vulnerabilities.js`)
-- `styles/`, `scripts/`
-- `docker-compose.yml`, `Dockerfile`
+## Project Architecture
+
+**HexTrackr** = dual-purpose cybersecurity management system:
+
+1. **Ticket Management** (`tickets.html` + `scripts/pages/tickets.js`)
+2. **Vulnerability Management** (`vulnerabilities.html` + `scripts/pages/vulnerabilities.js`)
+
+- **Deployment**: Docker-only (Docker Compose)
+- **Backend**: Node.js/Express + SQLite (`data/hextrackr.db`)
+- **Frontend**: Tabler.io CSS framework
+- **Data Model**: Time-series vulnerability tracking (CSV imports as UPSERTs)
+- **Port**: `localhost:8080`
+
+## Protocols
+
+- **One JS per HTML page**
+  - `tickets.html` → `scripts/pages/tickets.js`
+  - `vulnerabilities.html` → `scripts/pages/vulnerabilities.js`
+
+- **ModernVulnManager migration is incremental**
+  - Prefer shims/adapters to avoid big-bang rewrites.
+
+- **Architectural decisions**
+  - Every decision becomes an ADR under `docs/adr/` and a memory record with tag `project:${workspaceFolderBasename}`.
+
+## Memory Backend
+
+- **Primary memory backend**: `memento-mcp` via VS Code Chat MCP
+- **Route aliases**:
+  - `memory.write` → `memento.write`
+  - `memory.search` → `memento.search`
+  - `memory.tag` → `memento.tag`
+
+If the MCP server is unavailable, use a local fallback note in `docs/ops/AGENTS_LOG.md` and open a task to restore MCP.
 
 ## MCP Server Compliance (Development Tools)
 
 **Mandatory tools for every turn** (development assistance only):
-- **Server Memory** → Mirror plans, summaries, snapshots.
-- **Sequential Thinking** → REQUIRED for complex planning (multi-step tasks).
-- **Playwright** → Run on any UI-affecting changes.
-- **Codacy** → Run after every code change (quality/security analysis)..
 
----
+- **Memento Memory** → Persistent project memory and decision tracking
+- **Sequential Thinking** → REQUIRED for complex planning (multi-step tasks)
+- **Playwright** → Run on any UI-affecting changes
+- **Codacy** → Run after every code change (quality/security analysis)
 
-## Compliance Loop (Non-Negotiable)
+## File Structure (Enforced)
 
-## Every task must follow this operating loop
-
-1. **Observe**
-   - Record request + context with `memory_mcp.record(phase="observe")`.
-   - Mirror snapshot with `server_memory.save("observe/<ts>")`.
-
-1. **Plan**
-   - Use `seq.plan` for numbered steps.
-   - Save via `memory_mcp.record(phase="plan")`.
-
-1. **Pre-Write Safety**
-   - Git backup branch or stash patch.
-   - Record via `memory_mcp.record(phase="prewrite")`.
-
-1. **Execute**
-   - Record intent before action.
-   - Execute step.
-   - Record result via `memory_mcp.record(phase="execute")`.
-
-1. **Verify**
-   - Run `playwright.run("smoke"|"changed-only")` after risky edits.
-   - Record outcome (phase="verify").
-
-1. **Map Update**
-   - Update Context7 with changed files & decisions.
-   - Record (phase="map-update").
-
-1. **Finalize**
-   - Save compact summary to `server_memory.save("summary/<ts>")`.
-   - Respond with short summary + Tooling Ledger.
-
-**Compliance Gate:** If any phase is missing (observe, plan, prewrite, verify), STOP and fix before continuing.
-
----
-
-## Tooling Ledger (Every Turn)
-
-Use this table format in responses:
-
-| # | Phase | Tool | What | Status | Memory ID/Note |
-|---|-------|------|------|--------|----------------|
-| 1 | observe | memory_mcp.record | request/context | ok | mem:… |
-| 2 | plan | seq.plan | steps 1–N | ok | mem:… |
-| … | execute | <tool> | <action> | ok/err | mem:… |
-| … | verify | playwright.run | smoke/changed-only | pass/fail | report:… |
-| … | map-update | context7.map.update | graph updated | ok | mem:… |
+- `server.js` (Express API)
+- `tickets.html` + `scripts/pages/tickets.js`
+- `vulnerabilities.html` + `scripts/pages/vulnerabilities.js`
+- `styles/`, `scripts/`
+- `docker-compose.yml`, `Dockerfile`
+- `docs/adr/` (Architecture Decision Records)
+- `docs/ops/AGENTS_LOG.md` (Operations log)
