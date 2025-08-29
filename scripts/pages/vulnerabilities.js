@@ -55,7 +55,7 @@
 // This file is now properly loaded by vulnerabilities.html and ready for incremental migration
 // All new vulnerabilities features should be added directly to this file
 
-console.log('✅ vulnerabilities.js loaded successfully - ready for incremental migration');
+console.log("✅ vulnerabilities.js loaded successfully - ready for incremental migration");
 
 // 📋 INCREMENTAL MIGRATION AREAS:
 // □ ModernVulnManager class (~1788 lines in HTML)
@@ -76,9 +76,9 @@ console.log('✅ vulnerabilities.js loaded successfully - ready for incremental 
  * @param {string} type - Type of data refreshed ('vulnerabilities', 'tickets', 'all')
  */
 window.refreshPageData = function(type) {
-    if (type === 'vulnerabilities' && window.gridApi) {
+    if (type === "vulnerabilities" && window.gridApi) {
         // Refresh AG Grid when vulnerability data changes
-        console.log('Refreshing vulnerabilities grid after data operation');
+        console.log("Refreshing vulnerabilities grid after data operation");
         // TODO: Implement proper grid refresh when migration is complete
         // window.gridApi.refreshServerSideStore();
     }
@@ -99,6 +99,6 @@ window.showToast = function(message, type) {
 // 🎯 READY FOR INCREMENTAL MIGRATION
 // This file is now properly loaded by vulnerabilities.html with Settings modal support
 
-console.log('✅ vulnerabilities.js loaded successfully');
+console.log("✅ vulnerabilities.js loaded successfully");
 // New vulnerabilities functionality should be added here as we migrate from embedded HTML
 // All JavaScript code from HTML will be migrated here incrementally as we work on features

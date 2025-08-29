@@ -804,7 +804,7 @@
                                     </div>
                                 </div>
                                 <div class="card-body p-0">
-                                    <div id="deviceVulnGrid" class="ag-theme-alpine" style="height: 500px; width: 100%;"></div>
+                                    <div id="device-vuln-grid" class="ag-theme-alpine" style="height: 500px; width: 100%;"></div>
                                 </div>
                             </div>
                         </div>
@@ -1010,10 +1010,10 @@
                 <div class="col-12 col-lg-auto mt-3 mt-lg-0">
                     <ul class="list-inline list-inline-dots mb-0">
                         <li class="list-inline-item">
-                            <small class="text-muted">HexTrackr v<span id="app-version">1.0.0</span></small>
+                            <small class="text-muted">HexTrackr v<span id="app-version">1.0.2</span></small>
                         </li>
                         <li class="list-inline-item">
-                            <a href="/docs/technical/" target="_blank" class="link-secondary text-muted">
+                            <a href="/docs-prototype/" class="link-secondary text-muted">
                                 <small>Documentation</small>
                             </a>
                         </li>
@@ -2238,7 +2238,7 @@
                 `;
 
                 // Initialize enhanced device vulnerability grid
-                const deviceGridDiv = document.getElementById('deviceVulnGrid');
+                const deviceGridDiv = document.getElementById('device-vuln-grid');
                 deviceGridDiv.innerHTML = '';
 
                 const deviceColumnDefs = [
