@@ -3,5 +3,12 @@
   "MD013": false,
   "MD033": false,
   "MD041": false,
-  "MD046": false
+  "MD046": false,
+  "MD009": {
+    "br_spaces": 2
+  },
+  "MD026": true,
+  "MD031": true,
+  "MD038": true,
+  "MD040": true
 }
