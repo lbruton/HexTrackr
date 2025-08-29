@@ -37,11 +37,12 @@
 
 **File**: `scripts/pages/tickets.js`  
 **Line**: 376  
-**Issue**: `deviceEntry.innerHTML = ` with unescaped `suggestedValue` from user input  
+**Issue**: `deviceEntry.innerHTML =` with unescaped `suggestedValue` from user input  
 **Risk Level**: CRITICAL - Allows script injection and execution  
 **Attack Vector**: User inputs malicious script → gets processed → injected via innerHTML → executes
 
 **Code Pattern**:
+
 ```javascript
 const suggestedValue = this.generateNextDeviceName(lastInput ? lastInput.value : "");
 deviceEntry.innerHTML = `
@@ -75,8 +76,9 @@ deviceEntry.innerHTML = `
 - [ ] Test device entry functionality still works
 - [ ] Document fix in commit message
 
-**Handoff Documentation**: 
-```
+**Handoff Documentation**:
+
+```text
 CONTEXT: Fixed XSS in scripts/pages/tickets.js line 376
 NEXT AGENT: Please verify fix works and proceed to Phase 2
 FILES MODIFIED: scripts/pages/tickets.js
@@ -106,7 +108,8 @@ BRANCH: copilot
 - [ ] **Document**: In roadmap with effort estimates
 
 **Handoff Documentation**:
-```
+
+```text
 CONTEXT: Assessed remaining issues, separated quick fixes from architectural work
 NEXT AGENT: Focus on quick-win fixes only, defer complexity to future sprints
 BRANCH: copilot
@@ -141,7 +144,8 @@ BRANCH: copilot
 - [ ] **Focus**: Utility functions and short methods
 
 **Handoff Documentation per Fix**:
-```
+
+```text
 CONTEXT: Fixed [specific issue type] in [filename]
 COMPLETED: [list of fixed issues]
 REMAINING: [list of remaining quick fixes]
