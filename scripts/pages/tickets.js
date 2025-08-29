@@ -373,6 +373,9 @@ class HexagonTicketsManager {
         const lastInput = container.querySelector(".device-entry:last-child .device-input");
         const suggestedValue = this.generateNextDeviceName(lastInput ? lastInput.value : "");
         
+        // SECURITY: Escape HTML to prevent XSS injection
+        const escapedValue = escapeHtml(suggestedValue);
+        
         deviceEntry.innerHTML = `
             <div class="input-group">
                 <span class="input-group-text device-number-indicator" style="min-width: 40px; font-weight: bold; color: #6c757d;">
@@ -389,7 +392,7 @@ class HexagonTicketsManager {
                         <i class="fas fa-chevron-down"></i>
                     </button>
                 </div>
-                <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${suggestedValue}">
+                <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${escapedValue}">
                 <button type="button" class="btn btn-outline-danger remove-device-btn">
                     <i class="fas fa-minus"></i>
                 </button>
