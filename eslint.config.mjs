@@ -142,7 +142,8 @@ export default [
         fetch: "readonly",
         console: "readonly",
         bootstrap: "readonly",
-        Prism: "readonly"
+        Prism: "readonly",
+        marked: "readonly"
       }
     },
     plugins: {

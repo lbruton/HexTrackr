@@ -96,7 +96,37 @@ class HtmlContentUpdater {
         const { marked } = await import("marked");
         this.marked = marked;
         
-        // Configure marked options
+        // Create custom renderer
+        const renderer = {
+            link(token) {
+                // Handle both old and new marked.js API formats
+                const href = typeof token === "string" ? token : token.href;
+                const title = arguments.length > 1 ? arguments[1] : token.title;
+                const text = arguments.length > 2 ? arguments[2] : token.text;
+                
+                // Keep a Changelog badge
+                if (href === "https://keepachangelog.com/en/1.0.0/") {
+                    return `<a href="${href}" target="_blank" title="${title || "Keep a Changelog"}" class="me-2">
+                        <img src="https://img.shields.io/badge/changelog-Keep%20a%20Changelog-orange?style=flat&logo=markdown&logoColor=white" 
+                             alt="Keep a Changelog" style="height: 24px;" class="img-fluid"/>
+                    </a>`;
+                }
+                
+                // Semantic Versioning badge
+                if (href === "https://semver.org/spec/v2.0.0.html") {
+                    return `<a href="${href}" target="_blank" title="${title || "Semantic Versioning"}" class="me-2">
+                        <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
+                             alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
+                    </a>`;
+                }
+                
+                // Default link rendering for all other links
+                const titleAttr = title ? ` title="${title}"` : "";
+                return `<a href="${href}"${titleAttr}>${text}</a>`;
+            }
+        };
+        
+        // Configure marked options with custom renderer
         this.marked.setOptions({
             breaks: true,
             gfm: true,
@@ -106,11 +136,14 @@ class HtmlContentUpdater {
                     const hljs = require("highlight.js");
                     const language = hljs.getLanguage(lang) ? lang : "plaintext";
                     return hljs.highlight(code, { language }).value;
-                } catch (e) {
+                } catch (_e) {
                     return code; // Fallback to plain text if highlighting fails
                 }
             }
         });
+
+        // Use marked.use() to set the renderer for newer versions
+        this.marked.use({ renderer });
     }
 
     /**
@@ -122,7 +155,7 @@ class HtmlContentUpdater {
             this.templateContent = await fs.readFile(templatePath, "utf8");
             console.log(`✓ Template loaded successfully from ${templatePath}`);
             return this.templateContent;
-        } catch (error) {
+        } catch (_error) {
             throw new Error("template.html not found in docs-html directory.");
         }
     }
@@ -182,7 +215,7 @@ class HtmlContentUpdater {
                         relativePath: rootFile
                     });
                 }
-            } catch (error) {
+            } catch (_error) {
                 console.log(`ℹ️  ${rootFile} not found in root directory, skipping.`);
             }
         }
@@ -202,7 +235,7 @@ class HtmlContentUpdater {
                         relativePath: roadmapFile
                     });
                 }
-            } catch (error) {
+            } catch (_error) {
                 console.log(`ℹ️  ${roadmapFile} not found in roadmaps directory, skipping.`);
             }
         }

@@ -1,0 +1,154 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Roadmap-to-Sprint Project Management System</h1>
+<p>The HexTrackr project uses a structured roadmap-to-sprint system that links high-level planning with actionable sprint execution, backed by Memento MCP persistent memory.</p>
+<h2>System Overview</h2>
+<h3>Core Components</h3>
+<ol>
+<li><strong>Master Roadmap</strong> (<code>ROADMAP.md</code>) - High-level project direction and milestones</li>
+<li><strong>Active Sprints</strong> (<code>roadmaps/sprint-*.md</code>) - Focused execution documents</li>
+<li><strong>Memento Memory</strong> - Persistent context and decision tracking</li>
+<li><strong>AGENTS.md Playbook</strong> - 7-step turn loop process for consistent execution</li>
+</ol>
+<h3>Integration Flow</h3>
+<pre><code class="language-text">ROADMAP.md 
+    ↓ links to
+Active Sprint Document
+    ↓ tracks with  
+Memento Knowledge Graph
+    ↓ follows
+AGENTS.md Process
+</code></pre>
+<h2>Sprint Structure</h2>
+<h3>Three-Round Methodology</h3>
+<p>Each sprint follows a structured 3-round approach:</p>
+<ul>
+<li><strong>Round 1</strong>: Critical Issues (Security, Blockers)</li>
+<li><strong>Round 2</strong>: Code Quality (Standards, Maintainability) </li>
+<li><strong>Round 3</strong>: Optimization (Performance, Enhancement)</li>
+</ul>
+<h3>Sprint Document Template</h3>
+<p>Active sprints use standardized structure:</p>
+<pre><code class="language-markdown">
+# Sprint: [Name] - [Date-Time]
+
+## 🎯 Sprint Objective
+
+[Clear goal statement]
+
+## 📊 Sprint Progress Overview
+
+[Metrics and targets]
+
+## 🚀 Context for Resume
+
+[Current state and next steps]
+
+## 🎯 ROUND 1: [Focus Area]
+
+### ✅ Phase 1: [Task]
+
+### ⏳ Phase 2: [Next Task]
+</code></pre>
+<h2>Memento Integration</h2>
+<h3>Entity Types</h3>
+<ul>
+<li><strong>roadmap</strong>: Master planning document</li>
+<li><strong>active_sprint</strong>: Current execution sprint</li>
+<li><strong>sprint_checklist</strong>: Real-time progress tracking</li>
+<li><strong>project_management_system</strong>: System metadata</li>
+<li><strong>quality_gate</strong>: Assessment criteria</li>
+</ul>
+<h3>Relationship Tracking</h3>
+<p>The system maintains relationships between:</p>
+<ul>
+<li>Roadmap → Active Sprint (tracking)</li>
+<li>Sprint → Checklist (progress monitoring)</li>
+<li>System → Quality Gates (compliance)</li>
+</ul>
+<h2>Usage Workflow</h2>
+<h3>1. Planning Phase</h3>
+<ol>
+<li>Update master <code>ROADMAP.md</code> with new objectives</li>
+<li>Create sprint document in <code>roadmaps/</code> directory</li>
+<li>Link from roadmap to active sprint</li>
+<li>Initialize Memento entities</li>
+</ol>
+<h3>2. Execution Phase</h3>
+<ol>
+<li><p>Follow AGENTS.md 7-step process:</p>
+<ul>
+<li>Observe current state</li>
+<li>Plan next action</li>
+<li>Check safeguards</li>
+<li>Execute task</li>
+<li>Verify results</li>
+<li>Update memory mapping</li>
+<li>Log decisions</li>
+</ul>
+</li>
+<li><p>Update sprint checklist in real-time</p>
+</li>
+<li><p>Maintain Memento context throughout</p>
+</li>
+</ol>
+<h3>3. Review Phase</h3>
+<ol>
+<li>Complete sprint rounds systematically</li>
+<li>Document outcomes in ADRs</li>
+<li>Update roadmap with progress</li>
+<li>Archive completed sprint</li>
+</ol>
+<h2>File Locations</h2>
+<ul>
+<li><strong>Master Roadmap</strong>: <code>/ROADMAP.md</code></li>
+<li><strong>Sprint Documents</strong>: <code>/roadmaps/sprint-[name]-[YYYY-MM-DD-HHMM].md</code></li>
+<li><strong>Process Guide</strong>: <code>/AGENTS.md</code></li>
+<li><strong>Decision Records</strong>: <code>/docs/adr/</code></li>
+</ul>
+<h2>Benefits</h2>
+<h3>Persistent Context</h3>
+<ul>
+<li>Memento MCP maintains project memory across sessions</li>
+<li>Decisions and context preserved automatically</li>
+<li>AI agents can resume work effectively</li>
+</ul>
+<h3>Structured Progress</h3>
+<ul>
+<li>Clear phases and checkpoints</li>
+<li>Measurable targets and outcomes</li>
+<li>Consistent methodology across sprints</li>
+</ul>
+<h3>Quality Assurance</h3>
+<ul>
+<li>Integration with Codacy analysis</li>
+<li>Automatic compliance checking</li>
+<li>Documentation of all changes</li>
+</ul>
+<h2>Current Implementation</h2>
+<h3>Active Sprint: Security Compliance</h3>
+<ul>
+<li><strong>Document</strong>: <code>roadmaps/sprint-security-compliance-2025-08-29-1630.md</code></li>
+<li><strong>Focus</strong>: Eliminate 4 critical security vulnerabilities</li>
+<li><strong>Target</strong>: 83 → 30 Codacy issues</li>
+<li><strong>Methodology</strong>: Security → Quality → Optimization</li>
+</ul>
+<h3>Memento Status</h3>
+<ul>
+<li>✅ Entities created and linked</li>
+<li>✅ Real-time checklist tracking</li>
+<li>✅ Sprint-to-roadmap relationships established</li>
+</ul>
+<h2>Next Steps</h2>
+<ol>
+<li>Select priority security issue from Codacy dashboard</li>
+<li>Execute Round 1 security fixes using sprint methodology</li>
+<li>Document decisions and maintain Memento context</li>
+<li>Progress through quality and optimization rounds</li>
+</ol>
+<p>This system ensures consistent, traceable project management while maintaining the flexibility needed for agile development.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
