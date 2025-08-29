@@ -84,9 +84,9 @@ rules:
     severity: warn
 
 # Functions for custom validation
-functions:
-  - hextrackr-security-check
-  - hextrackr-naming-convention
+# functions:
+#   - hextrackr-security-check
+#   - hextrackr-naming-convention
 
 # Aliases for reusable patterns
 aliases:
