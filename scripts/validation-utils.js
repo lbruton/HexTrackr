@@ -9,6 +9,8 @@
  * @date 2025-08-25
  */
 
+/* global process, console, module */
+
 // =================================================================================================
 // VALIDATION UTILITIES
 // =================================================================================================
@@ -24,7 +26,7 @@
  * isValidCVE('invalid-cve'); // false
  */
 function isValidCVE(cve) {
-    if (typeof cve !== "string") return false;
+    if (typeof cve !== "string") {return false;}
     // Matches 'CVE-' followed by 4 digits (year) and 4 or more digits (sequence). Case-insensitive.
     const cveRegex = /^CVE-\d{4}-\d{4,}$/i;
     return cveRegex.test(cve.trim());
@@ -40,7 +42,7 @@ function isValidCVE(cve) {
  * isValidIP('999.999.999.999'); // false
  */
 function isValidIP(ip) {
-    if (typeof ip !== "string") return false;
+    if (typeof ip !== "string") {return false;}
     // This regex is a simplified check and may not cover all edge cases,
     // but is generally sufficient for typical IPv4 and IPv6 formats.
     const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
@@ -74,7 +76,7 @@ function isValidVPR(score) {
  * normalizeDate('invalid date'); // null
  */
 function normalizeDate(dateInput) {
-    if (!dateInput) return null;
+    if (!dateInput) {return null;}
     const date = new Date(dateInput);
     if (isNaN(date.getTime())) {
         return null;
@@ -114,7 +116,7 @@ function isValidHostname(hostname) {
  * isValidSeverity('Urgent'); // false
  */
 function isValidSeverity(severity) {
-    if (typeof severity !== "string") return false;
+    if (typeof severity !== "string") {return false;}
     const validSeverities = ["critical", "high", "medium", "low", "info"];
     return validSeverities.includes(severity.trim().toLowerCase());
 }

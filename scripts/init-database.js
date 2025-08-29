@@ -1,3 +1,6 @@
+/* eslint-env node */
+/* global require, console, process, __dirname, module */
+
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 

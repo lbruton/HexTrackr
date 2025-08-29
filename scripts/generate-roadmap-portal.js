@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+/* eslint-env node */
+/* global require, console, process, __dirname, module, Buffer */
+
 /**
  * HexTrackr Roadmap Portal Generator
  * Uses existing Pico CSS template and populates with real markdown content
@@ -64,7 +67,7 @@ function markdownToHtml(markdown) {
         // Task lists (checkboxes)
         else if (line.match(/^\s*- \[ \]/)) {
             if (!inList || listType !== "ul") {
-                if (inList) htmlLines.push(`</${listType}>`);
+                if (inList) {htmlLines.push(`</${listType}>`);}
                 htmlLines.push("<ul class=\"task-list\">");
                 inList = true;
                 listType = "ul";
@@ -73,7 +76,7 @@ function markdownToHtml(markdown) {
             htmlLines.push(`<li class="task-item">☐ ${escapeHtml(taskText)}</li>`);
         } else if (line.match(/^\s*- \[x\]/)) {
             if (!inList || listType !== "ul") {
-                if (inList) htmlLines.push(`</${listType}>`);
+                if (inList) {htmlLines.push(`</${listType}>`);}
                 htmlLines.push("<ul class=\"task-list\">");
                 inList = true;
                 listType = "ul";
@@ -84,7 +87,7 @@ function markdownToHtml(markdown) {
         // Regular lists
         else if (line.match(/^\s*- /)) {
             if (!inList || listType !== "ul") {
-                if (inList) htmlLines.push(`</${listType}>`);
+                if (inList) {htmlLines.push(`</${listType}>`);}
                 htmlLines.push("<ul>");
                 inList = true;
                 listType = "ul";
@@ -184,11 +187,11 @@ function generatePortal() {
     console.log("🔍 Reading roadmap files...");
     
     // Read roadmap files
-    const allowedFiles = ["ROADMAP.md", "UI_UX_ROADMAP.md", "CURRENT_STATUS.md"]; if (!allowedFiles.includes("ROADMAP.md")) throw new Error("Invalid file access");
+    const allowedFiles = ["ROADMAP.md", "UI_UX_ROADMAP.md", "CURRENT_STATUS.md"]; if (!allowedFiles.includes("ROADMAP.md")) {throw new Error("Invalid file access");}
     const strategicRoadmap = fs.readFileSync(path.join(roadmapsDir, "ROADMAP.md"), "utf8");
-    if (!allowedFiles.includes("UI_UX_ROADMAP.md")) throw new Error("Invalid file access");
+    if (!allowedFiles.includes("UI_UX_ROADMAP.md")) {throw new Error("Invalid file access");}
     const tacticalRoadmap = fs.readFileSync(path.join(roadmapsDir, "UI_UX_ROADMAP.md"), "utf8");
-    if (!allowedFiles.includes("CURRENT_STATUS.md")) throw new Error("Invalid file access");
+    if (!allowedFiles.includes("CURRENT_STATUS.md")) {throw new Error("Invalid file access");}
     const currentStatus = fs.readFileSync(path.join(roadmapsDir, "CURRENT_STATUS.md"), "utf8");
     
     console.log("🔄 Converting markdown to HTML...");

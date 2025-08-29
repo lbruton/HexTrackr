@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="HexTrackr PMD Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 
+                             http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+    <description>PMD ruleset for HexTrackr project</description>
+
+    <!-- Java Rules -->
+    <rule ref="category/java/bestpractices.xml">
+        <exclude name="UnusedImports"/>
+        <exclude name="JUnitTestsShouldIncludeAssert"/>
+    </rule>
+    
+    <rule ref="category/java/codestyle.xml">
+        <exclude name="ShortVariable"/>
+        <exclude name="LongVariable"/>
+        <exclude name="OnlyOneReturn"/>
+        <exclude name="AtLeastOneConstructor"/>
+        <exclude name="CallSuperInConstructor"/>
+    </rule>
+    
+    <rule ref="category/java/design.xml">
+        <exclude name="TooManyMethods"/>
+        <exclude name="ExcessiveMethodLength"/>
+        <exclude name="ExcessiveParameterList"/>
+        <exclude name="ExcessiveClassLength"/>
+    </rule>
+    
+    <rule ref="category/java/errorprone.xml">
+        <exclude name="BeanMembersShouldSerialize"/>
+        <exclude name="AvoidDuplicateLiterals"/>
+    </rule>
+    
+    <rule ref="category/java/performance.xml"/>
+    
+    <rule ref="category/java/security.xml"/>
+
+    <!-- JavaScript Rules -->
+    <rule ref="category/ecmascript/bestpractices.xml"/>
+    <rule ref="category/ecmascript/codestyle.xml"/>
+    <rule ref="category/ecmascript/errorprone.xml"/>
+
+    <!-- XML Rules -->
+    <rule ref="category/xml/bestpractices.xml"/>
+    <rule ref="category/xml/errorprone.xml"/>
+
+</ruleset>

@@ -1,3 +1,6 @@
+/* eslint-env browser */
+/* global window, document, setTimeout, clearTimeout, console */
+
 /**
  * @fileoverview This file contains the optimal AG Grid configuration for the HexTrackr vulnerabilities table.
  * It includes responsive behavior, auto-sizing columns, and mobile-friendly features.
@@ -124,9 +127,13 @@ function createVulnerabilityGridOptions(componentContext) {
             cellRenderer: (params) => {
                 const score = parseFloat(params.value) || 0;
                 let className = "severity-low";
-                if (score >= 9.0) className = "severity-critical";
-                else if (score >= 7.0) className = "severity-high";
-                else if (score >= 4.0) className = "severity-medium";
+                if (score >= 9.0) {
+                    className = "severity-critical";
+                } else if (score >= 7.0) {
+                    className = "severity-high";
+                } else if (score >= 4.0) {
+                    className = "severity-medium";
+                }
                 return `<span class="severity-badge ${className}">${score.toFixed(1)}</span>`;
             }
         },
@@ -218,7 +225,7 @@ function createVulnerabilityGridOptions(componentContext) {
 
             // Get all columns and their definitions
             const allColumns = columnApi.getColumns();
-            if (!allColumns) return;
+            if (!allColumns) {return;}
 
             const columnsToShow = [];
             const columnsToHide = [];

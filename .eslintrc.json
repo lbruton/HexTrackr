@@ -1,0 +1,92 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "script"
+  },
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "quotes": ["error", "double"],
+    "semi": ["error", "always"]
+  },
+  "ignorePatterns": [
+    "node_modules/**",
+    "**/node_modules/**", 
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    "scripts/chart.min.js",
+    "**/*.min.js",
+    "**/temp/**",
+    "**/tmp/**"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "server.js",
+        "docs-prototype/html-content-updater.js", 
+        "scripts/docs-mapping-analyzer.js",
+        "scripts/docs-repair-generator.js", 
+        "scripts/fix-markdown.js",
+        "scripts/generate-roadmap-portal.js",
+        "scripts/init-database.js",
+        "scripts/temp-scaffold-docs.js",
+        "scripts/validation-utils.js", 
+        "scripts/version-manager.js"
+      ],
+      "env": {
+        "node": true,
+        "browser": false
+      },
+      "globals": {
+        "require": "readonly",
+        "module": "readonly", 
+        "exports": "readonly",
+        "__dirname": "readonly",
+        "__filename": "readonly",
+        "process": "readonly",
+        "Buffer": "readonly",
+        "global": "readonly",
+        "console": "readonly",
+        "setTimeout": "readonly",
+        "clearTimeout": "readonly",
+        "setInterval": "readonly",
+        "clearInterval": "readonly",
+        "setImmediate": "readonly",
+        "clearImmediate": "readonly"
+      }
+    },
+    {
+      "files": [
+        "scripts/pages/*.js",
+        "scripts/shared/*.js", 
+        "scripts/ag-grid-responsive-config.js"
+      ],
+      "env": {
+        "browser": true,
+        "node": false
+      },
+      "globals": {
+        "window": "readonly",
+        "document": "readonly",
+        "console": "readonly",
+        "setTimeout": "readonly",
+        "clearTimeout": "readonly",
+        "setInterval": "readonly",
+        "clearInterval": "readonly",
+        "fetch": "readonly",
+        "XMLHttpRequest": "readonly",
+        "FormData": "readonly",
+        "localStorage": "readonly",
+        "sessionStorage": "readonly",
+        "location": "readonly",
+        "history": "readonly",
+        "navigator": "readonly",
+        "alert": "readonly",
+        "confirm": "readonly",
+        "prompt": "readonly"
+      }
+    }
+  ]
+}

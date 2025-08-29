@@ -1,0 +1,109 @@
+# Spectral API Linting Configuration for HexTrackr
+extends: ["spectral:oas", "spectral:asyncapi"]
+
+rules:
+  # OpenAPI Specific Rules
+  info-contact: true
+  info-description: true
+  info-license: true
+  info-version: true
+  
+  # Path Rules
+  path-declaration-must-exist: true
+  path-keys-no-trailing-slash: true
+  path-not-include-query: true
+  path-parameters-defined: true
+  
+  # Operation Rules
+  operation-description: true
+  operation-operationId: true
+  operation-operationId-unique: true
+  operation-operationId-valid-in-url: true
+  operation-parameters: true
+  operation-success-response: true
+  operation-tags: true
+  operation-tag-defined: true
+  
+  # Component Rules
+  component-invalid-name: true
+  duplicated-entry-in-enum: true
+  no-$ref-siblings: true
+  oas2-api-host: true
+  oas2-api-schemes: true
+  oas2-host-trailing-slash: true
+  oas2-valid-schema-example: true
+  oas3-api-servers: true
+  oas3-examples-value-or-externalValue: true
+  oas3-operation-security-defined: true
+  oas3-parameter-description: true
+  oas3-schema: true
+  oas3-server-trailing-slash: true
+  oas3-valid-media-example: true
+  oas3-valid-schema-example: true
+  
+  # Security Rules
+  oas2-operation-security-defined: true
+  oas3-operation-security-defined: true
+  
+  # Custom Rules for HexTrackr
+  hextrackr-api-versioning:
+    description: API endpoints should include version information
+    given: "$.paths.*~"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^/api/v[0-9]+/"
+    severity: warn
+    
+  hextrackr-response-format:
+    description: All responses should follow consistent format
+    given: "$.paths.*.*.responses.*.content.application/json.schema"
+    then:
+      - field: properties.success
+        function: truthy
+      - field: properties.data
+        function: truthy
+      - field: properties.message
+        function: truthy
+    severity: warn
+    
+  hextrackr-error-responses:
+    description: All operations should define error responses
+    given: "$.paths.*.*.responses"
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          anyOf:
+            - required: ["400"]
+            - required: ["401"] 
+            - required: ["403"]
+            - required: ["404"]
+            - required: ["500"]
+    severity: warn
+
+# Functions for custom validation
+# functions:
+#   - hextrackr-security-check
+#   - hextrackr-naming-convention
+
+# Aliases for reusable patterns
+aliases:
+  HexTrackrResponse:
+    - field: properties.success
+      function: truthy
+    - field: properties.data
+      function: truthy
+    - field: properties.message
+      function: truthy
+      
+  SecuritySchemes:
+    - field: components.securitySchemes
+      function: truthy
+
+# Exception patterns
+except:
+  - "*.test.json"
+  - "*.example.json"
+  - "node_modules/**"
