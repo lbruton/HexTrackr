@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+/* eslint-env node */
+/* global require, console, process, __dirname, module, Buffer */
+
 /**
  * HexTrackr Roadmap Portal Generator
  * Uses existing Pico CSS template and populates with real markdown content
