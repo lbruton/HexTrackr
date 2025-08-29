@@ -29,9 +29,13 @@ class DocumentationPortal {
         this.setupEventListeners();
         this.loadDocumentationData();
         this.initializeSearch();
-    // Try to update overview statistics dynamically
-    this.refreshOverviewStats();
-        this.handleHashChange(); // Handle initial hash on load
+        // Try to update overview statistics dynamically
+        this.refreshOverviewStats();
+        
+        // Handle initial hash on load, or load index by default
+        const hash = window.location.hash.substring(1);
+        const initialSection = hash || "index";
+        this.loadSection(initialSection);
     }
 
     async loadFileStructure() {
@@ -194,23 +198,23 @@ class DocumentationPortal {
     renderHTML(content, section) {
         const container = document.getElementById("content-container");
         
-        let sectionEl = document.getElementById(`${section}-content`);
-        if (!sectionEl) {
-            sectionEl = document.createElement("section");
-            sectionEl.id = `${section}-content`;
-            container.innerHTML = ""; // Clear previous content
-            container.appendChild(sectionEl);
-        }
+        // Always clear the container first to prevent duplication
+        container.innerHTML = "";
         
+        // Create new section element for the content
+        const sectionEl = document.createElement("section");
+        sectionEl.id = `${section}-content`;
         sectionEl.innerHTML = content;
+        
+        container.appendChild(sectionEl);
 
         // Apply syntax highlighting to any code blocks
         if (window.Prism) {
             Prism.highlightAllUnder(sectionEl);
         }
 
-    // Rewrite internal links inside the loaded content to use hash routing
-    this.rewriteInternalLinks(sectionEl);
+        // Rewrite internal links inside the loaded content to use hash routing
+        this.rewriteInternalLinks(sectionEl);
     }
 
     updateActiveNavigation() {
@@ -226,8 +230,17 @@ class DocumentationPortal {
 
     updatePageTitle(section) {
         const displayName = section.split("/").pop().replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-        document.getElementById("page-title").textContent = displayName;
-        document.getElementById("page-description").textContent = `HexTrackr Documentation | ${displayName}`;
+        
+        // Debug logging
+        console.log("🔧 DEBUG: updatePageTitle called with section:", section);
+        console.log("🔧 DEBUG: displayName:", displayName);
+        
+        // Note: Removed static title elements to prevent duplication
+        // Content files now provide their own headings directly
+        
+        // Update browser tab title only
+        document.title = `HexTrackr - Documentation | ${displayName}`;
+        console.log("🔧 DEBUG: Updated browser tab title to:", `HexTrackr - Documentation | ${displayName}`);
     }
 
     handleHashChange() {
