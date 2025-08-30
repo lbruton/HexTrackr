@@ -23,6 +23,9 @@ COPY eslint.config.mjs ./
 # Copy scripts directory
 COPY scripts/ ./scripts/
 
+# Copy documentation portal
+COPY docs-html/ ./docs-html/
+
 # Create necessary directories
 RUN mkdir -p ./data/ ./roadmaps/ ./uploads/ ./docs/ ./audit/
 
