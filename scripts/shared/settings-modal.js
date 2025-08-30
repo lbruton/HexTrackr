@@ -205,7 +205,7 @@ async function refreshStats() {
         // Format database size
         if (dbSizeEl) {
             const dbSize = stats.dbSize || 0;
-            let sizeStr = dbSize < 1024 ? `${dbSize} B` :
+            const sizeStr = dbSize < 1024 ? `${dbSize} B` :
                          dbSize < 1024 * 1024 ? `${(dbSize / 1024).toFixed(1)} KB` :
                          `${(dbSize / (1024 * 1024)).toFixed(1)} MB`;
             dbSizeEl.textContent = sizeStr;
@@ -286,7 +286,7 @@ async function exportSingleCSV(data, type, timestamp) {
  * Export all data as combined CSV
  */
 async function exportCombinedCSV(data, timestamp) {
-    let combinedData = [];
+    const combinedData = [];
     
     // Add vulnerabilities with type indicator
     if (data.vulnerabilities && data.vulnerabilities.data) {
@@ -659,7 +659,7 @@ async function saveSettings() {
             } else {
                 console.log("⚠️ Server save failed, using localStorage only");
             }
-        } catch (apiError) {
+        } catch (_apiError) {
             console.log("⚠️ Server not available, using localStorage only");
         }
         
@@ -712,7 +712,7 @@ function initServiceNowSettings() {
     const enabledToggle = document.getElementById("serviceNowEnabled");
     const instanceInput = document.getElementById("serviceNowInstance");
     const configDiv = document.getElementById("serviceNowConfig");
-    const statusBadge = document.getElementById("serviceNowStatus");
+    const _statusBadge = document.getElementById("serviceNowStatus");
     const testButton = document.getElementById("testServiceNowLink");
     const saveButton = document.getElementById("saveServiceNowSettings");
 
@@ -1209,7 +1209,7 @@ function showRestoreConfirmationModal() {
         const clearCheckbox = modal.querySelector("#clearBeforeRestore");
         
         confirmBtn.addEventListener("click", () => {
-            const shouldClear = clearCheckbox.checked;
+            const _shouldClear = clearCheckbox.checked;
             bsModal.hide();
             resolve(true);
         });
