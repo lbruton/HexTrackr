@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rEngine Documentation Branding Standards - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-rengine">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">🤖</div>
+            <h1>rEngine Documentation Branding Standards</h1>
+            <div class="subtitle">rEngine Platform</div>
+            <div class="meta">
+                <span>📁 rEngine-Branding-Standards.md</span>
+                <span>📅 2025-08-19</span>
+                <span>📊 5KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rEngine-Branding-Standards.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/rEngine-Branding-Standards.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="rengine-documentation-branding-standards">rEngine Documentation Branding Standards</h1>
+<p><em>Generated from the rScribe Document System • rEngine (v2.1.0) • Last updated: August 19, 2025</em></p>
+<h2 id="overview">Overview</h2>
+<p>This document establishes the unified branding standards for all rEngine documentation across the StackTrackr ecosystem. These standards ensure consistency, professionalism, and brand recognition across all generated documentation.</p>
+<h2 id="brand-identity">Brand Identity</h2>
+<h3 id="primary-colors">Primary Colors</h3>
+<ul>
+<li><strong>rEngine Primary</strong>: <code>#667eea</code> (Soft Blue)</li>
+<li><strong>rEngine Secondary</strong>: <code>#764ba2</code> (Deep Purple)</li>
+<li><strong>rEngine Accent</strong>: <code>#495057</code> (Dark Gray)</li>
+<li><strong>rEngine Accent Light</strong>: <code>#6c757d</code> (Medium Gray)</li>
+</ul>
+<h3 id="status-colors">Status Colors</h3>
+<ul>
+<li><strong>Success</strong>: <code>#28a745</code> (Green)</li>
+<li><strong>Warning</strong>: <code>#ffc107</code> (Yellow)</li>
+<li><strong>Danger</strong>: <code>#dc3545</code> (Red)</li>
+<li><strong>Info</strong>: <code>#007acc</code> (Blue)</li>
+</ul>
+<h3 id="neutral-palette">Neutral Palette</h3>
+<ul>
+<li><strong>Text Primary</strong>: <code>#333</code> (Dark Gray)</li>
+<li><strong>Text Secondary</strong>: <code>#666</code> (Medium Gray)</li>
+<li><strong>Text Muted</strong>: <code>#888</code> (Light Gray)</li>
+<li><strong>Background Primary</strong>: <code>#ffffff</code> (White)</li>
+<li><strong>Background Secondary</strong>: <code>#f8f9fa</code> (Light Gray)</li>
+<li><strong>Border Color</strong>: <code>#e1e4e8</code> (Subtle Gray)</li>
+</ul>
+<h2 id="typography">Typography</h2>
+<h3 id="font-stack">Font Stack</h3>
+<pre><code class="language-css"><pre><code class="language-css">font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;</code></pre>
+</code></pre>
+<h3 id="hierarchy">Hierarchy</h3>
+<ul>
+<li><strong>H1</strong>: 2.5em, weight 300 (Page Titles)</li>
+<li><strong>H2</strong>: 2em, weight 400 (Major Sections)</li>
+<li><strong>H3</strong>: 1.5em, weight 500 (Subsections)</li>
+<li><strong>H4</strong>: 1.25em, weight 500 (Minor Headings)</li>
+<li><strong>Body</strong>: 16px, line-height 1.6</li>
+</ul>
+<h3 id="code-typography">Code Typography</h3>
+<pre><code class="language-css"><pre><code class="language-css">font-family: 'Monaco', 'Consolas', 'Ubuntu Mono', monospace;</code></pre>
+</code></pre>
+<h2 id="visual-design-patterns">Visual Design Patterns</h2>
+<h3 id="gradients">Gradients</h3>
+<pre><code class="language-css"><pre><code class="language-css">/* Primary Background Gradient */
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+/* Header Gradient */
+background: linear-gradient(135deg, #495057 0%, #6c757d 100%);</code></pre>
+</code></pre>
+<h3 id="shadows">Shadows</h3>
+<pre><code class="language-css"><pre><code class="language-css">/* Light Shadow */
+box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+/* Medium Shadow */
+box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+
+/* Heavy Shadow (Cards) */
+box-shadow: 0 20px 40px rgba(0,0,0,0.1);</code></pre>
+</code></pre>
+<h3 id="border-radius">Border Radius</h3>
+<ul>
+<li><strong>Container</strong>: 15px</li>
+<li><strong>Cards</strong>: 8px</li>
+<li><strong>Buttons</strong>: 6px</li>
+<li><strong>Code Blocks</strong>: 5px</li>
+<li><strong>Small Elements</strong>: 3px</li>
+</ul>
+<h2 id="standardized-footer">Standardized Footer</h2>
+<h3 id="required-format">Required Format</h3>
+<pre><code class="language-html"><pre><code class="language-html"><footer class="footer">
+    <div class="branding">
+        <span>Generated from the <span class="system-name">rScribe Document System</span></span>
+        <span class="divider">•</span>
+        <span class="system-name">rEngine</span> <span class="version">(v2.1.0)</span>
+        <span class="divider">•</span>
+        <span>Last updated: [DATE]</span>
+    </div>
+</footer></code></pre>
+</code></pre>
+<h3 id="footer-css">Footer CSS</h3>
+<pre><code class="language-css"><pre><code class="language-css">.footer {
+    background: #f8f9fa;
+    padding: 20px 30px;
+    border-top: 1px solid #e1e4e8;
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+.footer .branding {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.footer .system-name {
+    font-weight: 600;
+    color: #495057;
+}
+
+.footer .version {
+    color: #888;
+    font-style: italic;
+}
+
+.footer .divider {
+    color: #888;
+    opacity: 0.5;
+}</code></pre>
+</code></pre>
+<h2 id="component-standards">Component Standards</h2>
+<h3 id="headers">Headers</h3>
+<ul>
+<li>Must include appropriate emoji/icon</li>
+<li>Title in rEngine brand color</li>
+<li>Subtitle mentioning system context</li>
+<li>Meta information (date, source)</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Consistent nav-bar with standard links</li>
+<li>Blue accent color for links (#007acc)</li>
+<li>Hover effects with slight transform</li>
+</ul>
+<h3 id="content-areas">Content Areas</h3>
+<ul>
+<li>Generous padding (40px)</li>
+<li>Proper spacing between elements</li>
+<li>Code blocks with syntax highlighting</li>
+<li>Tables with hover effects</li>
+</ul>
+<h3 id="status-indicators">Status Indicators</h3>
+<ul>
+<li>Use standard status colors</li>
+<li>Badge-style formatting</li>
+<li>Clear visual hierarchy</li>
+</ul>
+<h2 id="file-organization">File Organization</h2>
+<h3 id="template-location">Template Location</h3>
+<ul>
+<li>Master CSS: <code>/rEngine/templates/branding-theme.css</code></li>
+<li>Generator Template: <code>/rEngine/smart-document-generator.js</code></li>
+</ul>
+<h3 id="documentation-structure">Documentation Structure</h3>
+<pre><code><pre><code class="language-">docs/
+├── generated/
+│   ├── html/
+│   │   ├── patchnotes/
+│   │   ├── rEngine-patchnotes/
+│   │   └── [other-categories]/
+│   └── index.html
+└── branding-standards.md</code></pre>
+</code></pre>
+<h2 id="implementation-guidelines">Implementation Guidelines</h2>
+<h3 id="for-new-documentation">For New Documentation</h3>
+<ol>
+<li>Use the <code>rEngine/smart-document-generator.js</code> for all new docs</li>
+<li>Ensure footer branding is consistent</li>
+<li>Apply the unified color scheme</li>
+<li>Test responsive design on mobile</li>
+</ol>
+<h3 id="for-existing-documentation">For Existing Documentation</h3>
+<ol>
+<li>Update footers to new standard</li>
+<li>Verify color consistency</li>
+<li>Check typography compliance</li>
+<li>Validate responsive behavior</li>
+</ol>
+<h3 id="version-management">Version Management</h3>
+<ul>
+<li>Update version number in footer when rEngine is updated</li>
+<li>Maintain changelog of branding updates</li>
+<li>Document any breaking changes</li>
+</ul>
+<h2 id="quality-assurance">Quality Assurance</h2>
+<h3 id="checklist-for-new-docs">Checklist for New Docs</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Uses rEngine color palette</li>
+<li><input disabled="" type="checkbox"> Has standardized footer</li>
+<li><input disabled="" type="checkbox"> Responsive design tested</li>
+<li><input disabled="" type="checkbox"> Typography hierarchy correct</li>
+<li><input disabled="" type="checkbox"> Navigation links functional</li>
+<li><input disabled="" type="checkbox"> Code blocks properly styled</li>
+<li><input disabled="" type="checkbox"> Status indicators use standard colors</li>
+</ul>
+<h3 id="performance-standards">Performance Standards</h3>
+<ul>
+<li>Page load time &lt; 2 seconds</li>
+<li>Mobile-friendly responsive design</li>
+<li>Accessible color contrast ratios</li>
+<li>Clean, semantic HTML structure</li>
+</ul>
+<h2 id="future-considerations">Future Considerations</h2>
+<h3 id="scalability">Scalability</h3>
+<ul>
+<li>Template system supports multi-theme switching</li>
+<li>Color variables defined for easy updates</li>
+<li>Modular CSS architecture</li>
+</ul>
+<h3 id="brand-evolution">Brand Evolution</h3>
+<ul>
+<li>Quarterly review of branding standards</li>
+<li>User feedback integration</li>
+<li>Technology stack updates</li>
+</ul>
+<hr>
+<p><strong>Generated from the rScribe Document System • rEngine (v2.1.0) • Last updated: August 19, 2025</strong></p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>rEngine-Branding-Standards.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-19</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+# Project Bootstrap Configuration
+name: "{{ project_name }}"
+description: "{{ project_description }}"
+
+# Agent System Configuration
+agent_system:
+  core_memories_source: "rAvents"
+  memory_sync:
+    enabled: true
+    source_repo: "rAvents"
+    branch: "main"
+    paths:
+      - "agents/memory.json"
+      - "agents/github_copilot_memories.json"
+      - "agents/gpt4o_memories.json"
+      - "agents/extendedcontext.json"
+
+  agents:
+    - name: "github_copilot"
+      type: "development"
+      memories: "github_copilot_memories.json"
+      capabilities:
+        - "code_generation"
+        - "documentation"
+        - "testing"
+        
+    - name: "gpt4o"
+      type: "reasoning"
+      memories: "gpt4o_memories.json"
+      capabilities:
+        - "strategic_planning"
+        - "problem_solving"
+        - "architecture_design"
+
+    - name: "context_manager"
+      type: "context"
+      memories: "extendedcontext.json"
+      capabilities:
+        - "context_tracking"
+        - "knowledge_integration"
+        - "memory_management"
+
+# Directory Structure
+structure:
+  - agents/
+    - scripts/
+    - docs/
+    - memory/
+    - templates/
+  - docs/
+    - architecture/
+    - api/
+    - workflows/
+  - src/
+  - tests/
+
+# Required Files
+files:
+  - path: "agents/README.md"
+    template: "agent_readme.md"
+  - path: "agents/memory.json"
+    template: "memory_template.json"
+  - path: "agents/scripts/initialize_memory.py"
+    template: "initialize_memory.py"
+
+# Initialization Hooks
+hooks:
+  pre_init:
+    - "validate_environment"
+    - "check_dependencies"
+  post_init:
+    - "sync_memories"
+    - "initialize_agents"
+    - "validate_setup"

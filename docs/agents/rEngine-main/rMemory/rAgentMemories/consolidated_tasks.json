@@ -1,0 +1,282 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-16",
+    "purpose": "Structured task and workflow management for StackTrackr development",
+    "description": "Machine-readable task tracking with dependencies, assignment, and progress monitoring",
+    "last_updated": "2025-08-16T19:45:00Z"
+  },
+  "active_tasks": {
+    "TASK-001": {
+      "title": "Fix Filter Chip Color Logic",
+      "description": "Resolve multiple filter chip issues including wrong styling on page load, color consistency problems, and inverse dropdown filtering behavior",
+      "category": "bug_fix",
+      "priority": "high",
+      "status": "assigned",
+      "created_date": "2025-08-16",
+      "due_date": "2025-08-20",
+      "estimated_effort": "4h",
+      "actual_effort": "0h",
+      "assigned_to": "github_copilot",
+      "related_bug": "BUG-006",
+      "related_feature": "FEAT-001",
+      "blocking_tasks": [],
+      "blocked_by": [],
+      "subtasks": [
+        {
+          "id": "TASK-001a",
+          "title": "Debug initial styling issues",
+          "status": "pending",
+          "estimated_effort": "1h"
+        },
+        {
+          "id": "TASK-001b", 
+          "title": "Fix color consistency algorithm",
+          "status": "pending",
+          "estimated_effort": "2h"
+        },
+        {
+          "id": "TASK-001c",
+          "title": "Correct dropdown filter logic",
+          "status": "pending",
+          "estimated_effort": "1h"
+        }
+      ],
+      "test_requirements": [
+        "Page load with correct chip styling",
+        "Filter interaction maintains color consistency",
+        "Dropdown filtering works as expected"
+      ]
+    },
+    "TASK-002": {
+      "title": "Fix Table Collect Column Background",
+      "description": "Remove alternating dark backgrounds from Collect column that create visual inconsistency",
+      "category": "bug_fix",
+      "priority": "medium",
+      "status": "pending",
+      "created_date": "2025-08-16",
+      "due_date": "2025-08-23",
+      "estimated_effort": "1h",
+      "actual_effort": "0h",
+      "assigned_to": null,
+      "related_bug": "BUG-007",
+      "related_feature": "FEAT-002",
+      "blocking_tasks": [],
+      "blocked_by": [],
+      "subtasks": [
+        {
+          "id": "TASK-002a",
+          "title": "Identify source of dark backgrounds",
+          "status": "pending",
+          "estimated_effort": "30m"
+        },
+        {
+          "id": "TASK-002b",
+          "title": "Fix CSS styling rules",
+          "status": "pending",
+          "estimated_effort": "30m"
+        }
+      ],
+      "test_requirements": [
+        "Collect column shows consistent styling",
+        "No unwanted background highlights"
+      ]
+    },
+    "TASK-003": {
+      "title": "Plan Virtual Scrolling Architecture",
+      "description": "Research and design virtual scrolling implementation for handling large datasets (10k+ items)",
+      "category": "research",
+      "priority": "medium",
+      "status": "pending",
+      "created_date": "2025-08-16",
+      "due_date": "2025-08-30",
+      "estimated_effort": "3h",
+      "actual_effort": "0h",
+      "assigned_to": null,
+      "related_bug": null,
+      "related_feature": "FEAT-003",
+      "blocking_tasks": ["TASK-004"],
+      "blocked_by": [],
+      "subtasks": [
+        {
+          "id": "TASK-003a",
+          "title": "Research virtual scrolling libraries",
+          "status": "pending",
+          "estimated_effort": "1h"
+        },
+        {
+          "id": "TASK-003b",
+          "title": "Design integration approach",
+          "status": "pending",
+          "estimated_effort": "1h"
+        },
+        {
+          "id": "TASK-003c",
+          "title": "Create implementation plan",
+          "status": "pending",
+          "estimated_effort": "1h"
+        }
+      ],
+      "deliverables": [
+        "Virtual scrolling library recommendation",
+        "Integration architecture document",
+        "Implementation timeline"
+      ]
+    },
+    "TASK-004": {
+      "title": "Implement Virtual Scrolling",
+      "description": "Implement virtual scrolling solution for large collection performance",
+      "category": "feature",
+      "priority": "medium",
+      "status": "blocked",
+      "created_date": "2025-08-16",
+      "due_date": "2025-09-15",
+      "estimated_effort": "12h",
+      "actual_effort": "0h",
+      "assigned_to": null,
+      "related_bug": null,
+      "related_feature": "FEAT-003",
+      "blocking_tasks": [],
+      "blocked_by": ["TASK-003"],
+      "subtasks": [],
+      "test_requirements": [
+        "Smooth scrolling with 10k+ items",
+        "Memory usage remains stable",
+        "Filter/search works with virtual scrolling"
+      ]
+    }
+  },
+  "completed_tasks": {
+    "TASK-101": {
+      "title": "Fix CSV Import Price Data",
+      "description": "Restore Numista price data integration in CSV import process",
+      "category": "bug_fix",
+      "priority": "high",
+      "status": "completed",
+      "created_date": "2025-08-14",
+      "completed_date": "2025-08-15",
+      "due_date": "2025-08-16",
+      "estimated_effort": "3h",
+      "actual_effort": "2.5h",
+      "assigned_to": "claude_sonnet",
+      "related_bug": "BUG-009",
+      "related_feature": "FEAT-101",
+      "completion_notes": "Fixed data mapping in import.js and numista-modal.js",
+      "lessons_learned": [
+        "CSV edge cases need more comprehensive testing",
+        "Price data validation should be automated"
+      ]
+    },
+    "TASK-102": {
+      "title": "Clean Edit Button Hover States",
+      "description": "Remove background highlights from edit button hover interactions",
+      "category": "bug_fix",
+      "priority": "low",
+      "status": "completed",
+      "created_date": "2025-08-14",
+      "completed_date": "2025-08-15",
+      "due_date": "2025-08-17",
+      "estimated_effort": "30m",
+      "actual_effort": "20m",
+      "assigned_to": "github_copilot",
+      "related_bug": "BUG-010",
+      "related_feature": "FEAT-102",
+      "completion_notes": "Updated CSS styles.css to remove hover backgrounds",
+      "lessons_learned": [
+        "UI consistency checks should be part of development process"
+      ]
+    }
+  },
+  "task_categories": {
+    "bug_fix": {
+      "description": "Resolving identified bugs and issues",
+      "active_count": 2,
+      "completed_count": 2,
+      "average_completion_time": "1.35h"
+    },
+    "feature": {
+      "description": "New functionality development",
+      "active_count": 1,
+      "completed_count": 0,
+      "average_completion_time": null
+    },
+    "research": {
+      "description": "Investigation and planning tasks",
+      "active_count": 1,
+      "completed_count": 0,
+      "average_completion_time": null
+    },
+    "maintenance": {
+      "description": "Code cleanup and optimization",
+      "active_count": 0,
+      "completed_count": 0,
+      "average_completion_time": null
+    }
+  },
+  "assignment_tracking": {
+    "github_copilot": {
+      "active_tasks": 1,
+      "completed_tasks": 1,
+      "total_estimated_effort": "4h",
+      "total_actual_effort": "20m",
+      "efficiency_ratio": 0.08,
+      "specialties": ["ui_fixes", "javascript", "css"]
+    },
+    "claude_sonnet": {
+      "active_tasks": 0,
+      "completed_tasks": 1,
+      "total_estimated_effort": "0h",
+      "total_actual_effort": "2.5h",
+      "efficiency_ratio": null,
+      "specialties": ["data_processing", "backend_logic", "debugging"]
+    },
+    "unassigned": {
+      "active_tasks": 3,
+      "pending_assignment": ["TASK-002", "TASK-003", "TASK-004"]
+    }
+  },
+  "workflow_stages": {
+    "backlog": {
+      "description": "Tasks identified but not yet prioritized",
+      "task_count": 0
+    },
+    "pending": {
+      "description": "Tasks ready to be worked on",
+      "task_count": 3
+    },
+    "assigned": {
+      "description": "Tasks with specific agent assignment",
+      "task_count": 1
+    },
+    "in_progress": {
+      "description": "Tasks currently being worked on",
+      "task_count": 0
+    },
+    "blocked": {
+      "description": "Tasks waiting on dependencies",
+      "task_count": 1
+    },
+    "review": {
+      "description": "Tasks completed but pending validation",
+      "task_count": 0
+    },
+    "completed": {
+      "description": "Tasks finished and validated",
+      "task_count": 2
+    }
+  },
+  "statistics": {
+    "total_tasks": 6,
+    "active_tasks": 4,
+    "completed_tasks": 2,
+    "completion_rate": "33%",
+    "average_task_completion_time": "1.35h",
+    "tasks_completed_on_time": 2,
+    "tasks_completed_late": 0,
+    "on_time_completion_rate": "100%",
+    "total_estimated_effort_remaining": "20h",
+    "estimated_completion_date": "2025-09-15",
+    "blockers_count": 1,
+    "unassigned_tasks": 3
+  }
+}

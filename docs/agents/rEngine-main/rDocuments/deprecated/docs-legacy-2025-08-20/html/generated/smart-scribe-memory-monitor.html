@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Scribe Memory Health Monitor - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Smart Scribe Memory Health Monitor</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 smart-scribe-memory-monitor.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 12KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../generated/smart-scribe-memory-monitor.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/smart-scribe-memory-monitor.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="smart-scribe-memory-health-monitor">Smart Scribe Memory Health Monitor</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>smart-scribe-memory-monitor.js</code> script is a comprehensive monitoring tool that integrates with the Smart Scribe application to provide real-time monitoring of the memory health and synchronization status. This script serves the following key purposes:</p>
+<ol>
+<li><strong>Real-time Memory Health Checks</strong>: Continuously monitors the memory usage and integrity of the Smart Scribe system, including both the MCP (Memory Coordination Platform) server and the local rMemory storage.</li>
+<li><strong>MCP Connectivity Validation</strong>: Ensures that the MCP server is accessible and running, which is critical for the Smart Scribe application to function properly.</li>
+<li><strong>Local Memory File Integrity</strong>: Verifies the integrity and staleness of the local memory files, which are essential for agent continuity and data persistence.</li>
+<li><strong>Sync Gap Detection</strong>: Analyzes the sync status between the MCP server and the local rMemory storage, alerting on any potential sync gaps that could lead to data loss or inconsistencies.</li>
+<li><strong>Integration with Smart Scribe</strong>: Provides a standardized interface for the Smart Scribe application to access the memory health status, allowing for seamless integration and monitoring within the larger system.</li>
+</ol>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>SmartScribeMemoryMonitor</code> class is the main component of this script, and it encapsulates the following key functionality:</p>
+<ol>
+<li><strong>Constructor</strong>: Initializes the necessary paths and thresholds for the memory health monitoring.</li>
+<li><strong>checkMCPConnectivity()</strong>: Checks if the MCP server and related processes are running and accessible.</li>
+<li><strong>validateLocalMemory()</strong>: Validates the integrity and staleness of the critical local memory files.</li>
+<li><strong>checkSyncGaps()</strong>: Analyzes the sync status between the MCP server and the local rMemory storage.</li>
+<li><strong>performHealthCheck()</strong>: Orchestrates the various checks and produces a comprehensive health report.</li>
+<li><strong>formatForSmartScribe()</strong>: Transforms the health report into a format that is compatible with the Smart Scribe application.</li>
+<li><strong>getMemoryHealthForScribe()</strong>: Provides an integration point for the Smart Scribe application to access the memory health status.</li>
+<li><strong>quickConnectivityTest()</strong>: Performs a quick connectivity test for the Smart Scribe startup process.</li>
+</ol>
+<p>The script also includes a CLI interface for testing and debugging purposes, allowing users to run the various health checks and connectivity tests directly from the command line.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>smart-scribe-memory-monitor.js</code> script relies on the following external dependencies:</p>
+<ul>
+<li><code>fs-extra</code>: A comprehensive file system library that extends the built-in <code>fs</code> module.</li>
+<li><code>path</code>: The built-in Node.js path module, used for managing file paths.</li>
+<li><code>child_process</code>: The built-in Node.js module for executing external commands.</li>
+</ul>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="smartscribememorymonitor-class"><code>SmartScribeMemoryMonitor</code> Class</h3>
+<p><strong>Constructor</strong></p>
+<ul>
+<li>Parameters: None</li>
+<li>Returns: <code>SmartScribeMemoryMonitor</code> instance</li>
+</ul>
+<p><strong><code>checkMCPConnectivity()</code></strong></p>
+<ul>
+<li>Parameters: None</li>
+<li>Returns: <code>{ mcp_memory_server: boolean, rengine_mcp_server: boolean, overall_status: boolean, error?: string }</code><ul>
+<li><code>mcp_memory_server</code>: Indicates if the MCP memory server process is running</li>
+<li><code>rengine_mcp_server</code>: Indicates if the rEngine MCP server process is running</li>
+<li><code>overall_status</code>: Indicates if both MCP-related processes are running</li>
+<li><code>error</code>: If an error occurs during the check, this will contain the error message</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>validateLocalMemory()</code></strong></p>
+<ul>
+<li>Parameters: None</li>
+<li>Returns: <code>{ files_checked: number, files_healthy: number, files_stale: number, files_missing: number, issues: string[], overall_health: &#39;healthy&#39; | &#39;warning&#39; | &#39;critical&#39; }</code><ul>
+<li><code>files_checked</code>: The number of critical files checked</li>
+<li><code>files_healthy</code>: The number of critical files that are healthy</li>
+<li><code>files_stale</code>: The number of critical files that are stale (older than the configured threshold)</li>
+<li><code>files_missing</code>: The number of critical files that are missing</li>
+<li><code>issues</code>: A list of issues found during the validation</li>
+<li><code>overall_health</code>: The overall health status based on the validation results</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>checkSyncGaps()</code></strong></p>
+<ul>
+<li>Parameters: None</li>
+<li>Returns: <code>{ last_sync_time: string | null, sync_gap_hours: number | null, mcp_sync_summary_exists: boolean, recent_activity: boolean, status: &#39;fresh&#39; | &#39;warning&#39; | &#39;stale&#39; | &#39;error&#39;, error?: string }</code><ul>
+<li><code>last_sync_time</code>: The timestamp of the last successful sync, if available</li>
+<li><code>sync_gap_hours</code>: The number of hours since the last successful sync, if available</li>
+<li><code>mcp_sync_summary_exists</code>: Indicates if the MCP sync summary file exists</li>
+<li><code>recent_activity</code>: Indicates if there has been recent memory activity (within the last 6 hours)</li>
+<li><code>status</code>: The overall sync status based on the analysis</li>
+<li><code>error</code>: If an error occurs during the check, this will contain the error message</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>performHealthCheck()</code></strong></p>
+<ul>
+<li>Parameters: None</li>
+<li>Returns: <code>{ timestamp: string, mcp_connectivity: ReturnType&lt;checkMCPConnectivity&gt;, local_memory_validation: ReturnType&lt;validateLocalMemory&gt;, sync_gap_analysis: ReturnType&lt;checkSyncGaps&gt;, overall_status: &#39;healthy&#39; | &#39;warning&#39; | &#39;critical&#39;, recommendations: string[] }</code><ul>
+<li><code>timestamp</code>: The timestamp of the health check</li>
+<li><code>mcp_connectivity</code>: The result of the MCP connectivity check</li>
+<li><code>local_memory_validation</code>: The result of the local memory validation</li>
+<li><code>sync_gap_analysis</code>: The result of the sync gap analysis</li>
+<li><code>overall_status</code>: The overall health status based on the various checks</li>
+<li><code>recommendations</code>: A list of recommended actions based on the health check results</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>formatForSmartScribe(healthReport)</code></strong></p>
+<ul>
+<li>Parameters: <code>healthReport: ReturnType&lt;performHealthCheck&gt;</code></li>
+<li>Returns: <code>{ summary: string, details: { mcp_servers: string, local_files: string, sync_status: string, recommendations: number }, raw_report: ReturnType&lt;performHealthCheck&gt; }</code><ul>
+<li><code>summary</code>: A summary of the memory health status in a format suitable for the Smart Scribe application</li>
+<li><code>details</code>: Additional details about the memory health status</li>
+<li><code>raw_report</code>: The original health report object</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>getMemoryHealthForScribe()</code></strong></p>
+<ul>
+<li>Parameters: None</li>
+<li>Returns: <code>ReturnType&lt;formatForSmartScribe&gt;</code><ul>
+<li>This method integrates the memory health monitoring into the Smart Scribe application, providing a standardized interface for accessing the latest memory health status.</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>quickConnectivityTest()</code></strong></p>
+<ul>
+<li>Parameters: None</li>
+<li>Returns: <code>{ mcp_available: boolean, local_fallback_ready: boolean, smart_scribe_can_operate: boolean, message: string }</code><ul>
+<li><code>mcp_available</code>: Indicates if the MCP servers are available</li>
+<li><code>local_fallback_ready</code>: Indicates if the local fallback memory is available</li>
+<li><code>smart_scribe_can_operate</code>: Indicates if Smart Scribe can operate with the current connectivity status</li>
+<li><code>message</code>: A message describing the connectivity status</li>
+</ul>
+</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To use the <code>SmartScribeMemoryMonitor</code> class in your application, you can create an instance and call the various methods:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">import SmartScribeMemoryMonitor from './smart-scribe-memory-monitor.js';
+
+const monitor = new SmartScribeMemoryMonitor();
+
+// Perform a comprehensive health check
+const healthReport = await monitor.performHealthCheck();
+console.log(healthReport);
+
+// Get memory health status for integration with Smart Scribe
+const scribeHealth = await monitor.getMemoryHealthForScribe();
+console.log(scribeHealth);
+
+// Perform a quick connectivity test
+const connectivityTest = await monitor.quickConnectivityTest();
+console.log(connectivityTest);</code></pre>
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>SmartScribeMemoryMonitor</code> class has the following configuration options:</p>
+<ul>
+<li><code>baseDir</code>: The base directory where the Smart Scribe application is located (default: <code>/Volumes/DATA/GitHub/StackTrackr</code>).</li>
+<li><code>memoryDir</code>: The directory where the rMemory files are stored (default: <code>${baseDir}/rMemory/rAgentMemories</code>).</li>
+<li><code>logDir</code>: The directory where the memory health reports will be saved (default: <code>${baseDir}/logs</code>).</li>
+<li><code>criticalFiles</code>: The list of critical memory files that will be monitored (default: <code>[&#39;memory.json&#39;, &#39;handoff.json&#39;, &#39;tasks.json&#39;, &#39;persistent-memory.json&#39;, &#39;mcp-sync-summary.json&#39;]</code>).</li>
+<li><code>maxFileAge</code>: The maximum age (in milliseconds) for a memory file to be considered healthy (default: 24 hours).</li>
+<li><code>checkInterval</code>: The interval (in milliseconds) at which the comprehensive health check will be performed (default: 15 minutes).</li>
+</ul>
+<p>These configuration options can be modified by editing the corresponding properties in the <code>SmartScribeMemoryMonitor</code> constructor.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>SmartScribeMemoryMonitor</code> class handles errors in the following ways:</p>
+<ol>
+<li><strong>MCP Connectivity Check</strong>: If an error occurs during the MCP connectivity check, the method will return an object with the <code>error</code> property set to the error message.</li>
+<li><strong>Local Memory Validation</strong>: If an error occurs while reading or validating a local memory file, the validation result will include the error message in the <code>issues</code> array, and the overall health status will be set to <code>&#39;critical&#39;</code>.</li>
+<li><strong>Sync Gap Analysis</strong>: If an error occurs during the sync gap analysis, the method will return an object with the <code>status</code> property set to <code>&#39;error&#39;</code> and the <code>error</code> property set to the error message.</li>
+<li><strong>Comprehensive Health Check</strong>: If any of the underlying checks encounter an error, the error information will be propagated up to the <code>performHealthCheck()</code> method, and the overall health status will be set accordingly.</li>
+</ol>
+<p>In all cases, the error information is captured and made available in the respective method&#39;s return value, allowing the calling application to handle the errors appropriately.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>SmartScribeMemoryMonitor</code> class is designed to integrate seamlessly with the Smart Scribe application. The <code>getMemoryHealthForScribe()</code> method provides a standardized interface for the Smart Scribe application to access the latest memory health status, including a summary, detailed information, and a raw report.</p>
+<p>The Smart Scribe application can use this information to:</p>
+<ol>
+<li><strong>Display Memory Health Status</strong>: Show the current memory health status (healthy, warning, or critical) on the Smart Scribe dashboard.</li>
+<li><strong>Trigger Alerts</strong>: Generate alerts or notifications when the memory health status changes to a warning or critical state.</li>
+<li><strong>Initiate Automated Sync</strong>: Trigger an automated memory sync process when a sync gap is detected.</li>
+<li><strong>Provide Fallback Capabilities</strong>: Use the local memory files as a fallback when the MCP server is unavailable.</li>
+</ol>
+<p>By integrating the <code>SmartScribeMemoryMonitor</code> class, the Smart Scribe application can ensure the overall health and reliability of the memory system, providing a seamless experience for users.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><strong>Caching and Interval-based Checks</strong>: The <code>getMemoryHealthForScribe()</code> method utilizes caching and interval-based checks to optimize performance. If the time since the last health check is less than the configured <code>checkInterval</code>, the method will return the cached health status instead of performing a full check.</li>
+<li><strong>Comprehensive Health Reporting</strong>: The <code>performHealthCheck()</code> method consolidates the results of the various checks (MCP connectivity, local memory validation, and sync gap analysis) into a comprehensive health report, which includes an overall status and a set of recommendations.</li>
+<li><strong>Smart Scribe Integration</strong>: The <code>formatForSmartScribe()</code> method transforms the health report into a format that is compatible with the Smart Scribe application, allowing for seamless integration and display of the memory health status.</li>
+<li><strong>CLI Interface</strong>: The script includes a CLI interface for testing and debugging purposes, allowing users to run the various health checks and connectivity tests directly from the command line.</li>
+</ol>
+<p>By following these development notes, you can ensure that the <code>smart-scribe-memory-monitor.js</code> script continues to provide reliable and efficient memory health monitoring for the Smart Scribe application.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>smart-scribe-memory-monitor.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

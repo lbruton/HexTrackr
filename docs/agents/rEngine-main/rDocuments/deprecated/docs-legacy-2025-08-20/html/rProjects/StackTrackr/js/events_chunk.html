@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>events.js_chunk_2 Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>events.js_chunk_2 Documentation</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 events_chunk.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 9KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rProjects/StackTrackr/js/events_chunk.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/events_chunk.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="eventsjs_chunk_2-documentation">events.js_chunk_2 Documentation</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>This script is responsible for managing various user interactions and events within a web application, specifically related to an inventory management system. It handles the functionality for toggling grouped name chips, opening and closing details modals, sorting table columns, submitting the main inventory form, editing existing inventory items, and undoing changes.</p>
+<p>The script leverages feature flags, event listeners, and other utility functions to provide a seamless user experience and ensure data integrity.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The script is structured around the following key components:</p>
+<ol>
+<li><strong>Grouped Name Chips</strong>: This section sets up the behavior for toggling the display of grouped name chips based on a feature flag.</li>
+<li><strong>Details Modal</strong>: This section sets up the event listener for closing the details modal.</li>
+<li><strong>Table Sorting</strong>: This section sets up the event listeners for sorting the inventory table columns.</li>
+<li><strong>Main Form Submission</strong>: This section sets up the event listener for the main inventory form submission, handling data validation, calculation, and saving the new item to the inventory.</li>
+<li><strong>Edit Form Submission</strong>: This section sets up the event listener for the edit inventory form submission, handling data validation, calculation, and updating the existing item in the inventory.</li>
+<li><strong>Undo Change</strong>: This section sets up the event listener for the undo change button, allowing users to revert the last edit made to an inventory item.</li>
+<li><strong>Cancel Edit</strong>: This section sets up the event listeners for the cancel edit button and the edit modal close button, allowing users to exit the edit mode without saving changes.</li>
+</ol>
+<p>The script interacts with various DOM elements and global variables/functions to perform its functionality. It also relies on external utility functions like <code>safeAttachListener</code>, <code>closeModalById</code>, <code>renderTable</code>, <code>saveInventory</code>, and <code>logItemChanges</code>.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>The script depends on the following external imports and global variables/functions:</p>
+<ol>
+<li><strong>DOM Elements</strong>: The script relies on various DOM elements identified by IDs, such as <code>groupNameChips</code>, <code>inventoryTable</code>, <code>inventoryForm</code>, <code>editForm</code>, and more.</li>
+<li><strong>Feature Flags</strong>: The script uses the <code>window.featureFlags</code> object to manage the state of the &quot;GROUPED_NAME_CHIPS&quot; feature.</li>
+<li><strong>Utility Functions</strong>:<ul>
+<li><code>safeAttachListener</code>: A function that safely attaches event listeners to DOM elements.</li>
+<li><code>closeModalById</code>: A function that closes a modal by its ID.</li>
+<li><code>renderTable</code>: A function that renders the inventory table.</li>
+<li><code>saveInventory</code>: A function that saves the inventory data.</li>
+<li><code>logItemChanges</code>: A function that logs changes made to an inventory item.</li>
+<li><code>renderActiveFilters</code>: A function that refreshes the display of active filters.</li>
+<li><code>closeDetailsModal</code>: A function that closes the details modal.</li>
+<li><code>getNextSerial</code>: A function that generates the next serial number for a new inventory item.</li>
+<li><code>registerName</code>: A function that registers a new name in the system.</li>
+<li><code>addCompositionOption</code>: A function that adds a new composition option.</li>
+<li><code>parseNumistaMetal</code>: A function that parses the metal composition from a given string.</li>
+<li><code>gramsToOzt</code>: A function that converts grams to ounces.</li>
+<li><code>todayStr</code>: A function that returns the current date as a string.</li>
+</ul>
+</li>
+<li><strong>Global Variables</strong>:<ul>
+<li><code>inventory</code>: The array of inventory items.</li>
+<li><code>spotPrices</code>: An object containing the current spot prices for different metals.</li>
+<li><code>editingIndex</code>: The index of the inventory item currently being edited.</li>
+<li><code>editingChangeLogIndex</code>: The index of the change log entry for the currently edited item.</li>
+<li><code>catalogManager</code>: An object that manages the catalog IDs for inventory items.</li>
+</ul>
+</li>
+</ol>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<p>This script does not define any custom functions or classes. It mainly interacts with the provided DOM elements and utility functions.</p>
+<h2 id="usage-examples">Usage Examples</h2>
+<ol>
+<li><p><strong>Toggling Grouped Name Chips</strong>:</p>
+<ul>
+<li>The script sets the initial state of the grouped name chips based on the &quot;GROUPED_NAME_CHIPS&quot; feature flag.</li>
+<li>When the user changes the value of the grouped name chips toggle, the script updates the feature flag and refreshes the active filters display.</li>
+</ul>
+</li>
+<li><p><strong>Closing Details Modal</strong>:</p>
+<ul>
+<li>The script sets up an event listener on the details modal close button, which triggers the <code>closeDetailsModal</code> function when clicked.</li>
+</ul>
+</li>
+<li><p><strong>Sorting Inventory Table</strong>:</p>
+<ul>
+<li>The script sets up event listeners on the table headers, allowing users to sort the table by clicking on the headers.</li>
+<li>The script tracks the current sort column and direction, and calls the <code>renderTable</code> function to update the table display.</li>
+</ul>
+</li>
+<li><p><strong>Submitting Main Inventory Form</strong>:</p>
+<ul>
+<li>The script sets up an event listener on the main inventory form, which handles the form submission.</li>
+<li>It validates the mandatory fields, calculates the premium per ounce and total premium, generates a new serial number, and adds the new item to the inventory.</li>
+<li>The script also updates the name registry, composition options, and catalog ID (if applicable) before saving the inventory and rendering the updated table.</li>
+</ul>
+</li>
+<li><p><strong>Submitting Edit Inventory Form</strong>:</p>
+<ul>
+<li>The script sets up an event listener on the edit inventory form, which handles the form submission.</li>
+<li>It preserves the existing item data, updates the selected fields, calculates the premium per ounce and total premium, and overwrites the existing item in the inventory.</li>
+<li>The script also updates the catalog ID (if applicable) before saving the inventory and rendering the updated table.</li>
+</ul>
+</li>
+<li><p><strong>Undoing Changes</strong>:</p>
+<ul>
+<li>The script sets up an event listener on the undo change button, which allows the user to revert the last edit made to an inventory item.</li>
+<li>When the undo button is clicked, the script toggles the change, closes the edit modal, and renders the updated change log.</li>
+</ul>
+</li>
+<li><p><strong>Canceling Edit</strong>:</p>
+<ul>
+<li>The script sets up event listeners on the cancel edit button and the edit modal close button, which allow the user to exit the edit mode without saving changes.</li>
+<li>When the cancel or close button is clicked, the script clears the editing state and closes the edit modal.</li>
+</ul>
+</li>
+</ol>
+<h2 id="configuration">Configuration</h2>
+<p>This script does not have any configuration options or environment variables. It relies on the provided DOM elements and global variables/functions to operate.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The script includes some basic error handling to prevent crashes, such as:</p>
+<ul>
+<li>Checking if the required DOM elements are present before attaching event listeners.</li>
+<li>Wrapping event listener callbacks in <code>try-catch</code> blocks to handle any exceptions.</li>
+<li>Providing fallback values or handling edge cases when data is missing or invalid.</li>
+</ul>
+<p>However, the script does not have a comprehensive error handling strategy, and it primarily relies on displaying alert messages to the user when validation fails.</p>
+<h2 id="integration">Integration</h2>
+<p>This script is a crucial component of the larger inventory management system. It provides the core functionality for managing inventory items, including creating, editing, and sorting them. The script integrates with various other parts of the system, such as the feature flag management, catalog management, and the overall data storage and rendering mechanisms.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><p><strong>Dependency Management</strong>: The script heavily relies on global variables and functions, which can make it challenging to maintain and test in isolation. Considering a more modular approach with better dependency management would improve the overall maintainability of the codebase.</p>
+</li>
+<li><p><strong>Error Handling and Logging</strong>: The script&#39;s error handling is limited to basic alert messages. Implementing a more robust error handling strategy, with detailed logging and proper error reporting, would improve the debugging and troubleshooting experience.</p>
+</li>
+<li><p><strong>Separation of Concerns</strong>: The script encompasses a wide range of functionality, including form handling, table sorting, and modal management. Separating these concerns into more focused modules or components could improve the code&#39;s organization and readability.</p>
+</li>
+<li><p><strong>Testability</strong>: The script&#39;s heavy reliance on global state and side effects makes it difficult to test in isolation. Refactoring the code to be more testable, with clear input/output boundaries and minimal side effects, would improve the overall quality and maintainability of the system.</p>
+</li>
+<li><p><strong>Performance Optimization</strong>: The script performs various DOM manipulations and data processing operations. Identifying and optimizing any performance bottlenecks, such as unnecessary reflows or repaints, could improve the user experience, especially in scenarios with large inventories.</p>
+</li>
+<li><p><strong>Accessibility</strong>: The script does not appear to have any specific accessibility considerations. Ensuring the UI elements and interactions are accessible to users with disabilities would improve the inclusivity of the application.</p>
+</li>
+<li><p><strong>Documentation and Commenting</strong>: While this comprehensive documentation covers the script&#39;s functionality well, adding more inline comments within the code itself could further improve the understanding and maintainability of the codebase.</p>
+</li>
+</ol>
+<p>Overall, the script provides a solid foundation for the inventory management system, but there are opportunities for improvement in terms of modularity, error handling, testability, and overall code quality.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>events_chunk.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Search CLI - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Memory Search CLI</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 memory-search-cli.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 8KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rAgents/rEngine/memory-search-cli.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/memory-search-cli.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="memory-search-cli">Memory Search CLI</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>memory-search-cli.js</code> script is a command-line interface (CLI) tool that allows users to search and explore an in-memory database of entities. This tool is designed to demonstrate the capabilities of the <code>QuickMemorySearch</code> class, which provides a fast and efficient way to search and retrieve information from a large dataset.</p>
+<p>The script supports a variety of commands, including:</p>
+<ul>
+<li>Performing general keyword searches</li>
+<li>Searching for entities by type</li>
+<li>Viewing search index statistics</li>
+<li>Listing available entity types</li>
+<li>Suggesting search terms based on partial input</li>
+<li>Displaying related entities for a given entity</li>
+</ul>
+<p>This CLI can be used as a standalone tool or integrated into a larger system that requires efficient in-memory search functionality.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>memory-search-cli.js</code> script is built around the <code>QuickMemorySearch</code> class, which is imported from the <code>./quick-memory-search.js</code> module. The <code>QuickMemorySearch</code> class is responsible for managing the in-memory search index and providing the necessary search and retrieval functionality.</p>
+<p>The script&#39;s main function, <code>main()</code>, handles the command-line arguments and dispatches the appropriate action based on the user&#39;s input. The supported actions include:</p>
+<ol>
+<li><strong>Performing a general keyword search</strong>: The script calls the <code>search()</code> method of the <code>QuickMemorySearch</code> instance to find relevant entities based on the provided search query.</li>
+<li><strong>Searching by entity type</strong>: The script calls the <code>searchByType()</code> method of the <code>QuickMemorySearch</code> instance to retrieve all entities of a specific type.</li>
+<li><strong>Displaying search index statistics</strong>: The script calls the <code>getStats()</code> method of the <code>QuickMemorySearch</code> instance to retrieve and display various statistics about the search index.</li>
+<li><strong>Listing available entity types</strong>: The script iterates over the <code>types</code> property of the <code>QuickMemorySearch</code> instance&#39;s index to display all available entity types.</li>
+<li><strong>Suggesting search terms</strong>: The script calls the <code>suggestTerms()</code> method of the <code>QuickMemorySearch</code> instance to provide search term suggestions based on the provided partial input.</li>
+<li><strong>Displaying related entities</strong>: The script calls the <code>getEntity()</code> and <code>findRelated()</code> methods of the <code>QuickMemorySearch</code> instance to retrieve and display entities related to a given entity.</li>
+</ol>
+<p>The script also includes various helper functions to format and display the search results in a user-friendly manner.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>memory-search-cli.js</code> script has the following external dependency:</p>
+<ul>
+<li><code>QuickMemorySearch</code> class from the <code>./quick-memory-search.js</code> module</li>
+</ul>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="quickmemorysearch-class"><code>QuickMemorySearch</code> Class</h3>
+<p>The <code>QuickMemorySearch</code> class is the core component of the search functionality. It provides the following methods:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Return Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>initialize()</code></td>
+<td>-</td>
+<td><code>Promise&lt;void&gt;</code></td>
+<td>Initializes the search index.</td>
+</tr>
+<tr>
+<td><code>getStats()</code></td>
+<td>-</td>
+<td><code>{ entities: number, keywords: number, relationships: number, types: number, buildTime: number, lastUpdated: string, ready: boolean }</code></td>
+<td>Retrieves various statistics about the search index.</td>
+</tr>
+<tr>
+<td><code>search(query, options)</code></td>
+<td><code>query: string</code>, <code>options?: { maxResults?: number }</code></td>
+<td><code>{ totalMatches: number, results: { entity: Entity, score: number, relevance: string }[] }</code></td>
+<td>Performs a search for the given query and returns the top matching entities.</td>
+</tr>
+<tr>
+<td><code>searchByType(entityType)</code></td>
+<td><code>entityType: string</code></td>
+<td><code>Entity[]</code></td>
+<td>Retrieves all entities of the specified type.</td>
+</tr>
+<tr>
+<td><code>suggestTerms(partial, limit)</code></td>
+<td><code>partial: string</code>, <code>limit?: number</code></td>
+<td><code>string[]</code></td>
+<td>Provides search term suggestions based on the provided partial input.</td>
+</tr>
+<tr>
+<td><code>getEntity(entityId)</code></td>
+<td><code>entityId: string</code></td>
+<td><code>Entity</code></td>
+<td>Retrieves the entity with the specified ID.</td>
+</tr>
+<tr>
+<td><code>findRelated(entityId, maxDepth)</code></td>
+<td><code>entityId: string</code>, <code>maxDepth: number</code></td>
+<td><code>{ entity: Entity, path: string[], depth: number }[]</code></td>
+<td>Finds and returns entities related to the specified entity, up to the given maximum depth.</td>
+</tr>
+</tbody></table>
+<h3 id="main-function"><code>main()</code> Function</h3>
+<p>The <code>main()</code> function is the entry point of the script. It handles the command-line arguments and dispatches the appropriate action based on the user&#39;s input.</p>
+<h3 id="helper-functions">Helper Functions</h3>
+<p>The script also includes the following helper functions:</p>
+<ul>
+<li><code>showHelp()</code>: Displays the usage information for the CLI.</li>
+<li><code>showStats()</code>: Displays the search index statistics.</li>
+<li><code>showEntityTypes()</code>: Lists all available entity types.</li>
+<li><code>showSuggestions(partial)</code>: Displays search term suggestions for the provided partial input.</li>
+<li><code>searchByType(entityType)</code>: Performs a search by entity type and displays the results.</li>
+<li><code>showRelated(entityId)</code>: Displays the entities related to the specified entity.</li>
+<li><code>performSearch(query)</code>: Performs a general keyword search and displays the results.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="performing-a-general-keyword-search">Performing a General Keyword Search</h3>
+<pre><code><pre><code class="language-">node memory-search-cli.js "docker permission"</code></pre>
+</code></pre>
+<h3 id="searching-by-entity-type">Searching by Entity Type</h3>
+<pre><code><pre><code class="language-">node memory-search-cli.js --type development_session</code></pre>
+</code></pre>
+<h3 id="viewing-search-index-statistics">Viewing Search Index Statistics</h3>
+<pre><code><pre><code class="language-">node memory-search-cli.js --stats</code></pre>
+</code></pre>
+<h3 id="listing-available-entity-types">Listing Available Entity Types</h3>
+<pre><code><pre><code class="language-">node memory-search-cli.js --types</code></pre>
+</code></pre>
+<h3 id="getting-search-term-suggestions">Getting Search Term Suggestions</h3>
+<pre><code><pre><code class="language-">node memory-search-cli.js --suggest "dock"</code></pre>
+</code></pre>
+<h3 id="displaying-related-entities">Displaying Related Entities</h3>
+<pre><code><pre><code class="language-">node memory-search-cli.js --related stacktrackr_app</code></pre>
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>memory-search-cli.js</code> script does not require any configuration options or environment variables. The script is designed to work with the <code>QuickMemorySearch</code> class, which is responsible for managing the in-memory search index.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The script uses a <code>try-catch</code> block to handle any errors that may occur during execution. If an error is encountered, the script will display the error message and exit with a non-zero status code.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>memory-search-cli.js</code> script can be integrated into a larger system that requires efficient in-memory search functionality. The <code>QuickMemorySearch</code> class can be used as a standalone component or as part of a more complex system.</p>
+<h2 id="development-notes">Development Notes</h2>
+<p>The <code>memory-search-cli.js</code> script is a demonstration of the <code>QuickMemorySearch</code> class and its capabilities. The script is designed to be easy to understand and modify, making it a useful starting point for developers who need to implement similar search functionality in their own projects.</p>
+<p>Some key implementation details and gotchas:</p>
+<ol>
+<li><strong>Performance Considerations</strong>: The <code>QuickMemorySearch</code> class is optimized for fast search and retrieval, but the performance of the overall system will depend on the size and complexity of the dataset being searched.</li>
+<li><strong>Memory Usage</strong>: The <code>QuickMemorySearch</code> class loads the entire dataset into memory, which may not be suitable for very large datasets. In such cases, you may need to consider alternative approaches, such as using a database or a more specialized search engine.</li>
+<li><strong>Extensibility</strong>: The <code>QuickMemorySearch</code> class is designed to be extensible, allowing you to add new features or modify the existing ones as needed. For example, you could add support for additional search options or result sorting.</li>
+<li><strong>Data Format</strong>: The <code>QuickMemorySearch</code> class assumes that the input data is in a specific format (i.e., an array of <code>Entity</code> objects). You may need to modify the class or the script to accommodate different data formats.</li>
+<li><strong>Concurrency</strong>: The current implementation of the <code>QuickMemorySearch</code> class is not thread-safe, so it may not be suitable for use in a highly concurrent environment. You may need to add synchronization mechanisms or use a different data structure to support concurrent access.</li>
+</ol>
+<p>Overall, the <code>memory-search-cli.js</code> script provides a solid foundation for developers who need to implement efficient in-memory search functionality in their own projects.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>memory-search-cli.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

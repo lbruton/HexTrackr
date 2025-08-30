@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rEngine Core: About and Disclaimer Modal - rEngine Core Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #6366f1;
+            --rengine-secondary: #8b5cf6;
+            --rengine-accent: #06b6d4;
+            --rengine-text: #1f2937;
+            --rengine-text-light: #6b7280;
+            --rengine-bg: #ffffff;
+            --rengine-bg-alt: #f8fafc;
+            --rengine-border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--rengine-text);
+            background: var(--rengine-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--rengine-primary), var(--rengine-secondary));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: "⚙️";
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--rengine-primary);
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--rengine-primary);
+            border-bottom: 2px solid var(--rengine-border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--rengine-secondary);
+        }
+
+        h4, h5, h6 {
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--rengine-text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--rengine-text);
+        }
+
+        .content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        code {
+            background: var(--rengine-bg-alt);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--rengine-primary);
+        }
+
+        pre {
+            background: var(--rengine-bg-alt);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--rengine-primary);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--rengine-text);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--rengine-accent);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: var(--rengine-text-light);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--rengine-border);
+        }
+
+        th {
+            background: var(--rengine-bg-alt);
+            font-weight: 600;
+            color: var(--rengine-primary);
+        }
+
+        .metadata {
+            background: var(--rengine-bg-alt);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--rengine-border);
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: var(--rengine-text-light);
+        }
+
+        footer {
+            background: var(--rengine-bg-alt);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--rengine-text-light);
+            border-top: 1px solid var(--rengine-border);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--rengine-primary);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">rEngine Core</div>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../README.html">Documentation</a>
+                    <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <h1>rEngine Core: About and Disclaimer Modal</h1>
+            
+            
+            <div class="metadata">
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Source File:</span>
+                        <span>about.md</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Generated:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Last Modified:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Converter:</span>
+                        <span>rEngine MCP HTML Converter</span>
+                    </div>
+                
+            </div>
+            
+            
+            [36m🤖 Calling Google Gemini (gemini-1.5-flash)...[0m
+[32m✅ Response received in 21922ms[0m
+
+[1m🤖 Google Gemini Response:[0m
+
+```html
+<section class="file-overview">
+  <h1>about.js</h1>
+  <div class="metadata">
+    <p class="property">
+      <strong>about.js is:</strong> <span class="value">empty</span>
+    </p>
+    <p class="property">
+      <strong>responsible:</strong> <span class="value">cannot open `responsible' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>for:</strong> <span class="value">cannot open `for' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>managing:</strong> <span class="value">cannot open `managing' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>the:</strong> <span class="value">cannot open `the' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>About:</strong> <span class="value">cannot open `About' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>and:</strong> <span class="value">empty</span>
+    </p>
+    <p class="property">
+      <strong>Acknowledgment:</strong> <span class="value">cannot open `Acknowledgment' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>modals:</strong> <span class="value">cannot open `modals' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>within:</strong> <span class="value">cannot open `within' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>the:</strong> <span class="value">cannot open `the' (No such file or directory)</span>
+    </p>
+  </div>
+  <h2>StackTrackr</h2>
+  <ul class="function-list">
+    <li>showAboutModal()</li>
+    <li>hideAboutModal()</li>
+    <li>showAckModal()</li>
+    <li>hideAckModal()</li>
+    <li>acceptAck()</li>
+    <li>populateAboutModal()</li>
+    <li>populateAckModal()</li>
+    <li>loadAnnouncements()</li>
+    <li>setupAboutModalEvents()</li>
+    <li>setupAckModalEvents()</li>
+    <li>getEmbeddedWhatsNew()</li>
+    <li>getEmbeddedRoadmap()</li>
+  </ul>
+  <div class="metadata">
+    <p class="property">
+      <strong>about.js depends:</strong> <span class="value">cannot open `depends' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>on:</strong> <span class="value">cannot open `on' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>the:</strong> <span class="value">cannot open `the' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>following::</strong> <span class="value">cannot open `following:' (No such file or directory)</span>
+    </p>
+  </div>
+  <ul class="function-list">
+    <li>getBrandingName()</li>
+    <li>APP_VERSION</li>
+    <li>openModalById()</li>
+    <li>closeModalById()</li>
+  </ul>
+</section>
+
+<section class="code-section">
+  <h2>JavaScript Code Snippets</h2>
+  <pre><code class="language-javascript">
+// Show the "About" modal
+showAboutModal();
+
+// Show the "Acknowledgment" modal
+showAckModal();
+
+// Accept the acknowledgment and hide the modal
+acceptAck();
+  </code></pre>
+  <pre><code class="language-javascript">
+// Set up event listeners for the "About" modal
+setupAboutModalEvents();
+
+// Set up event listeners for the "Acknowledgment" modal
+setupAckModalEvents();
+  </code></pre>
+</section>
+
+<section class="file-overview">
+  <div class="metadata">
+    <p class="property">
+      <strong>about.js does:</strong> <span class="value">cannot open `does' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>not:</strong> <span class="value">cannot open `not' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>require:</strong> <span class="value">cannot open `require' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>any:</strong> <span class="value">cannot open `any' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>specific:</strong> <span class="value">cannot open `specific' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>configuration.:</strong> <span class="value">cannot open `configuration.' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>However,:</strong> <span class="value">cannot open `However,' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>it:</strong> <span class="value">cannot open `it' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>does:</strong> <span class="value">cannot open `does' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>rely:</strong> <span class="value">cannot open `rely' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>on:</strong> <span class="value">cannot open `on' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>the:</strong> <span class="value">cannot open `the' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>following::</strong> <span class="value">cannot open `following:' (No such file or directory)</span>
+    </p>
+  </div>
+  <ul class="function-list">
+    <li>APP_VERSION</li>
+    <li>getBrandingName()</li>
+    <li>openModalById()</li>
+    <li>closeModalById()</li>
+  </ul>
+  <div class="metadata">
+    <p class="property">
+      <strong>about.js is:</strong> <span class="value">empty</span>
+    </p>
+    <p class="property">
+      <strong>a:</strong> <span class="value">cannot open `a' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>standalone:</strong> <span class="value">cannot open `standalone' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>component:</strong> <span class="value">cannot open `component' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>within:</strong> <span class="value">cannot open `within' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>the:</strong> <span class="value">cannot open `the' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>rEngine:</strong> <span class="value">directory</span>
+    </p>
+    <p class="property">
+      <strong>Core:</strong> <span class="value">cannot open `Core' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>ecosystem.:</strong> <span class="value">cannot open `ecosystem.' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>It:</strong> <span class="value">cannot open `It' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>can:</strong> <span class="value">cannot open `can' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>be:</strong> <span class="value">cannot open `be' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>integrated:</strong> <span class="value">cannot open `integrated' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>into:</strong> <span class="value">cannot open `into' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>any:</strong> <span class="value">cannot open `any' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>application:</strong> <span class="value">cannot open `application' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>that:</strong> <span class="value">cannot open `that' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>requires:</strong> <span class="value">cannot open `requires' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>an:</strong> <span class="value">cannot open `an' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>About:</strong> <span class="value">cannot open `About' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>and:</strong> <span class="value">empty</span>
+    </p>
+    <p class="property">
+      <strong>Acknowledgment:</strong> <span class="value">cannot open `Acknowledgment' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>modal:</strong> <span class="value">cannot open `modal' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>functionality.:</strong> <span class="value">cannot open `functionality.' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>The:</strong> <span class="value">cannot open `The' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>file:</strong> <span class="value">cannot open `file' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>can:</strong> <span class="value">cannot open `can' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>be:</strong> <span class="value">cannot open `be' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>imported:</strong> <span class="value">cannot open `imported' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>and:</strong> <span class="value">empty</span>
+    </p>
+    <p class="property">
+      <strong>used:</strong> <span class="value">cannot open `used' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>as:</strong> <span class="value">cannot open `as' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>needed,:</strong> <span class="value">cannot open `needed,' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>and:</strong> <span class="value">empty</span>
+    </p>
+    <p class="property">
+      <strong>it:</strong> <span class="value">cannot open `it' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>can:</strong> <span class="value">cannot open `can' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>be:</strong> <span class="value">cannot open `be' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>customized:</strong> <span class="value">cannot open `customized' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>to:</strong> <span class="value">empty</span>
+    </p>
+    <p class="property">
+      <strong>fit:</strong> <span class="value">cannot open `fit' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>the:</strong> <span class="value">cannot open `the' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>specific:</strong> <span class="value">cannot open `specific' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>requirements:</strong> <span class="value">cannot open `requirements' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>of:</strong> <span class="value">cannot open `of' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>the:</strong> <span class="value">cannot open `the' (No such file or directory)</span>
+    </p>
+    <p class="property">
+      <strong>application.:</strong> <span class="value">cannot open `application.' (No such file or directory)</span>
+    </p>
+  </div>
+  <ul class="function-list">
+    <li>getBrandingName()</li>
+    <li>APP_VERSION</li>
+  </ul>
+  <p>announcements.md</p>
+  <ul class="function-list">
+    <li>setupAboutModalEvents()</li>
+    <li>setupAckModalEvents()</li>
+  </ul>
+</section>
+
+```
+
+
+[36mℹ️  Duration: 21922ms | Model: gemini-1.5-flash[0m
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../README.html">Documentation</a>
+                <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+            </div>
+            <p>Generated on 2025-08-20 by rEngine Core HTML Converter</p>
+            <p>© 2025 rEngine Core - Intelligent Development Wrapper</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation Migration Summary - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Documentation Migration Summary</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 DOCUMENTATION_MIGRATION_SUMMARY.md</span>
+                <span>📅 2025-08-19</span>
+                <span>📊 4KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../deprecated/DOCUMENTATION_MIGRATION_SUMMARY.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/DOCUMENTATION_MIGRATION_SUMMARY.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="documentation-migration-summary">Documentation Migration Summary</h1>
+<p><strong>Date</strong>: 2025-08-18<br><strong>Action</strong>: Migrated all tracking systems to single source of truth</p>
+<h2 id="files-updated">Files Updated</h2>
+<h3 id="✅-primary-documentation-files">✅ Primary Documentation Files</h3>
+<h4 id="root-project-files"><strong>Root Project Files</strong></h4>
+<ul>
+<li><strong><code>README.md</code></strong><ul>
+<li>Added MASTER_ROADMAP.md to Documentation section as &quot;Single source of truth&quot;</li>
+<li>Updated Known Issues section to reference MASTER_ROADMAP.md</li>
+<li>Added clear note about unified tracking system</li>
+</ul>
+</li>
+</ul>
+<h4 id="agent-instruction-files"><strong>Agent Instruction Files</strong></h4>
+<ul>
+<li><p><strong><code>COPILOT_INSTRUCTIONS.md</code></strong></p>
+<ul>
+<li>Added MASTER_ROADMAP.md to Memory Sources section</li>
+<li>Listed as <strong>SINGLE SOURCE OF TRUTH</strong> for all tracking</li>
+<li>Added priority system explanation (P0/P1/P2/P3)</li>
+</ul>
+</li>
+<li><p><strong><code>START.md</code></strong></p>
+<ul>
+<li>Added MASTER_ROADMAP.md check to STEP 2 context recall</li>
+<li>Created new STEP 3 section emphasizing master tracking</li>
+<li>Added commands to check critical P0 issues</li>
+</ul>
+</li>
+</ul>
+<h4 id="agent-documentation"><strong>Agent Documentation</strong></h4>
+<ul>
+<li><strong><code>docs/AGENT_DOCUMENTATION_GUIDE.md</code></strong><ul>
+<li><strong>NEW</strong>: Added &quot;0. Master Project Tracking&quot; as TOP PRIORITY in hierarchy</li>
+<li>MASTER_ROADMAP.md now ranks above even MCP memory</li>
+<li>Added Quick Reference Checklist for agents</li>
+<li>Clear workflow: Check MASTER_ROADMAP.md → MCP → Docs → Generated → Code</li>
+</ul>
+</li>
+</ul>
+<h4 id="component-readmes"><strong>Component READMEs</strong></h4>
+<ul>
+<li><strong><code>rAgents/README.md</code></strong><ul>
+<li>Added prominent note referencing MASTER_ROADMAP.md</li>
+<li>Clear link to unified tracking system</li>
+</ul>
+</li>
+</ul>
+<h3 id="✅-legacy-file-updates">✅ Legacy File Updates</h3>
+<h4 id="deprecation-notices-added"><strong>Deprecation Notices Added</strong></h4>
+<ul>
+<li><strong><code>rEngine/BUGS.md</code></strong> - Added deprecation warning redirecting to MASTER_ROADMAP.md</li>
+<li><strong><code>rEngine/ROADMAP.md</code></strong> - Added deprecation warning redirecting to MASTER_ROADMAP.md  </li>
+<li><strong><code>rAgents/ROADMAP.md</code></strong> - Added deprecation warning redirecting to MASTER_ROADMAP.md</li>
+</ul>
+<h4 id="json-metadata-updates"><strong>JSON Metadata Updates</strong></h4>
+<ul>
+<li><strong><code>rAgents/bugs.json</code></strong> - Updated metadata with deprecation flags</li>
+<li><strong><code>rAgents/tasks.json</code></strong> - Updated metadata with deprecation flags</li>
+<li><strong><code>rAgents/roadmap.json</code></strong> - Updated metadata with deprecation flags</li>
+<li>All JSON files now contain:<ul>
+<li><code>&quot;deprecated&quot;: true</code></li>
+<li><code>&quot;replacement&quot;: &quot;/MASTER_ROADMAP.md&quot;</code></li>
+<li><code>&quot;migration_date&quot;: &quot;2025-08-18&quot;</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="✅-archive-system">✅ Archive System</h3>
+<h4 id="legacy-tracking-archive"><strong>Legacy Tracking Archive</strong></h4>
+<ul>
+<li><strong><code>archive/legacy-tracking/</code></strong> - Created directory for old tracking files</li>
+<li><strong><code>archive/legacy-tracking/README.md</code></strong> - Explanation of archived files</li>
+<li>Copied all legacy tracking files for reference</li>
+</ul>
+<h2 id="migration-benefits">Migration Benefits</h2>
+<h3 id="for-agents"><strong>For Agents</strong></h3>
+<ul>
+<li>✅ <strong>Single Reference Point</strong> - No confusion about where to check project status</li>
+<li>✅ <strong>Priority System</strong> - Clear P0/P1/P2/P3 hierarchy for issue urgency</li>
+<li>✅ <strong>Component Organization</strong> - All StackTrackr + rEngine tracking unified</li>
+<li>✅ <strong>Workflow Integration</strong> - Instructions updated to reference master system</li>
+</ul>
+<h3 id="for-humans"><strong>For Humans</strong></h3>
+<ul>
+<li>✅ <strong>No Maintenance Overhead</strong> - Only one file to keep updated</li>
+<li>✅ <strong>Clear Status Overview</strong> - Complete project health in one view</li>
+<li>✅ <strong>Historical Tracking</strong> - Legacy files preserved for reference</li>
+</ul>
+<h3 id="for-project-management"><strong>For Project Management</strong></h3>
+<ul>
+<li>✅ <strong>Unified Priorities</strong> - All components use same priority system</li>
+<li>✅ <strong>Cross-Component Visibility</strong> - rEngine and StackTrackr issues in one place</li>
+<li>✅ <strong>Milestone Tracking</strong> - Component and application milestones aligned</li>
+</ul>
+<h2 id="next-steps">Next Steps</h2>
+<h3 id="for-future-changes"><strong>For Future Changes</strong></h3>
+<ol>
+<li><strong>ONLY update</strong> <code>/MASTER_ROADMAP.md</code> for any new bugs, features, or roadmap items</li>
+<li><strong>Legacy files remain archived</strong> for reference but are not maintained</li>
+<li><strong>All agents trained</strong> to check MASTER_ROADMAP.md first</li>
+</ol>
+<h3 id="validation-checklist"><strong>Validation Checklist</strong></h3>
+<ul>
+<li>✅ All major documentation files reference MASTER_ROADMAP.md</li>
+<li>✅ Agent instruction files prioritize master tracking</li>
+<li>✅ Legacy files clearly marked as deprecated  </li>
+<li>✅ JSON metadata updated with migration information</li>
+<li>✅ Archive system established for historical reference</li>
+</ul>
+<h2 id="success-metrics">Success Metrics</h2>
+<p>The migration is successful when:</p>
+<ul>
+<li>✅ <strong>Agents automatically check MASTER_ROADMAP.md first</strong></li>
+<li>✅ <strong>No confusion about where to find project status</strong>  </li>
+<li>✅ <strong>All new issues/features go to master roadmap only</strong></li>
+<li>✅ <strong>Reduced maintenance overhead for tracking systems</strong></li>
+</ul>
+<hr>
+<p><em>Migration completed successfully on 2025-08-18</em><br><em>All systems now point to single source of truth: <code>/MASTER_ROADMAP.md</code></em></p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>DOCUMENTATION_MIGRATION_SUMMARY.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-19</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Scribe Memory Monitoring - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Smart Scribe Memory Monitoring</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 smart-scribe_chunk.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 8KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../generated/smart-scribe_chunk.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/smart-scribe_chunk.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="smart-scribe-memory-monitoring">Smart Scribe Memory Monitoring</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>smart-scribe.js_chunk_2</code> script is responsible for the memory health monitoring and incident reporting functionality of the Smart Scribe system. It provides the following key capabilities:</p>
+<ol>
+<li><strong>Memory Health Monitoring</strong>: The script continuously monitors the system&#39;s memory usage and health, detecting potential incidents or issues.</li>
+<li><strong>Memory Incident Reporting</strong>: When a memory-related incident is detected, the script generates a detailed incident report, which is stored in the system&#39;s memory scribe logs.</li>
+<li><strong>Agent Handoff Log Generation</strong>: The script can create a comprehensive handoff log that captures the current system state, recent context, and next steps, allowing for seamless continuity between agents.</li>
+<li><strong>Idle-time Analysis and Maintenance</strong>: The script performs periodic, background tasks to analyze all project documentation, optimize search tables, and clean up old data, ensuring the system remains efficient and up-to-date.</li>
+</ol>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>smart-scribe.js_chunk_2</code> script is part of the larger Smart Scribe system, which is responsible for managing the system&#39;s memory, knowledge, and documentation. The key components and data flow of this script are as follows:</p>
+<ol>
+<li><strong>Memory Health Monitoring</strong>: The script continuously monitors the system&#39;s memory usage and health, and generates a detailed <code>healthReport</code> object when an incident is detected.</li>
+<li><strong>Memory Incident Reporting</strong>: The <code>reportData</code> object is created, containing the timestamp, incident type, health report, AI analysis, and other relevant information. This data is then stored in the <code>rMemory/memory-scribe/logs</code> directory, and a log entry is appended to the main <code>scribe.log</code> file.</li>
+<li><strong>Agent Handoff Log Generation</strong>: The script retrieves the current system state, analyzes the recent context, and generates a comprehensive handoff log. This log is stored in the <code>rMemory/rAgentMemories</code> directory, with old logs being archived after 8 hours.</li>
+<li><strong>Idle-time Analysis and Maintenance</strong>: The script periodically (when the system is idle) analyzes all project documentation, optimizes the search tables, and performs other maintenance tasks to keep the system efficient and up-to-date.</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>smart-scribe.js_chunk_2</code> script has the following dependencies:</p>
+<ul>
+<li><code>fs-extra</code>: A file system library that provides additional functionality over the built-in <code>fs</code> module.</li>
+<li><code>path</code>: The built-in Node.js module for working with file paths.</li>
+<li><code>axios</code>: A popular HTTP client library for making API requests.</li>
+<li><code>execSync</code>: A function from the built-in <code>child_process</code> module for executing shell commands synchronously.</li>
+</ul>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<ol>
+<li><p><strong><code>reportMemoryIncident(healthReport, analysis)</code></strong>: This function is responsible for generating and storing a memory incident report. It creates the <code>reportData</code> object, writes it to a file in the <code>rMemory/memory-scribe/logs</code> directory, and appends a log entry to the <code>scribe.log</code> file.</p>
+</li>
+<li><p><strong><code>generateHandoffLog()</code></strong>: This function generates a comprehensive agent handoff log, capturing the current system state, recent context, and next steps. The handoff log is stored in the <code>rMemory/rAgentMemories</code> directory, with old logs being archived after 8 hours.</p>
+</li>
+<li><p><strong><code>getCurrentSystemState()</code></strong>: This helper function retrieves the current system state, including active processes, recent file changes, Git status, running models, and knowledge base statistics.</p>
+</li>
+<li><p><strong><code>analyzeRecentContext()</code></strong>: This helper function analyzes the recent context, including chat sessions and document analyses, and generates a summary of the relevant activities.</p>
+</li>
+<li><p><strong><code>storeHandoffLog(handoffData)</code></strong>: This function writes the generated handoff log to a file in the <code>rMemory/rAgentMemories</code> directory, and performs cleanup of old handoff logs.</p>
+</li>
+<li><p><strong><code>cleanupOldHandoffs(handoffDir)</code></strong>: This helper function archives old handoff logs (older than 8 hours) to a dedicated &quot;archived&quot; directory.</p>
+</li>
+<li><p><strong><code>performIdleAnalysis()</code></strong>: This function is responsible for performing periodic, background tasks, including analyzing all project documentation, optimizing search tables, and performing other maintenance activities.</p>
+</li>
+<li><p><strong><code>analyzeAllDocuments()</code></strong>: This helper function iterates through all the project documentation files and analyzes them using the Ollama AI system.</p>
+</li>
+<li><p><strong><code>analyzeDocument(filePath)</code></strong>: This function analyzes a single document, extracts structured knowledge, and stores the analysis in the knowledge base.</p>
+</li>
+<li><p><strong><code>storeDocumentAnalysis(filePath, analysis)</code></strong>: This function updates the knowledge base with the extracted concepts, patterns, and search index information from the document analysis.</p>
+</li>
+<li><p><strong><code>regenerateHTMLDocumentation()</code></strong>: This function triggers the execution of the documentation HTML generator, which regenerates the HTML version of the project documentation.</p>
+</li>
+<li><p><strong><code>analyzeChatLog(logPath)</code></strong>: This function analyzes a chat log, extracting valuable technical insights, and stores the analysis in the knowledge base.</p>
+</li>
+</ol>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To use the memory monitoring and incident reporting functionality provided by this script, you would typically integrate it into your larger Smart Scribe system. For example, you might call the <code>reportMemoryIncident()</code> function whenever a memory-related incident is detected, passing in the relevant <code>healthReport</code> and <code>analysis</code> data.</p>
+<p>To generate a handoff log, you would call the <code>generateHandoffLog()</code> function, which will create a comprehensive document with the current system state and recent context.</p>
+<p>The idle-time analysis and maintenance tasks are automatically triggered by the script, so no additional usage is required.</p>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>smart-scribe.js_chunk_2</code> script relies on the following configuration options and environment variables:</p>
+<ul>
+<li><code>baseDir</code>: The base directory of the Smart Scribe system, used for file paths.</li>
+<li><code>ollamaEndpoint</code>: The URL of the Ollama AI system, used for making API requests.</li>
+<li><code>knowledgeDB</code>: The file path to the knowledge base JSON file.</li>
+<li><code>systemPrompts</code>: A set of system prompts used for various AI-based tasks.</li>
+</ul>
+<h2 id="error-handling">Error Handling</h2>
+<p>The script employs robust error handling, wrapping all its main functions in <code>try-catch</code> blocks. When an error occurs, it is logged to the console using the <code>console.error()</code> function, providing details about the failure.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>smart-scribe.js_chunk_2</code> script is a crucial component of the larger Smart Scribe system, responsible for managing the system&#39;s memory health and providing agent handoff capabilities. It integrates seamlessly with other parts of the system, such as the Ollama AI engine, the knowledge base, and the file system.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><p><strong>Memory Incident Reporting</strong>: The script uses a dedicated <code>rMemory/memory-scribe/logs</code> directory to store memory incident reports, ensuring they are easily accessible and separable from other log files.</p>
+</li>
+<li><p><strong>Agent Handoff Logs</strong>: The handoff logs are stored in the <code>rMemory/rAgentMemories</code> directory, which is distinct from the <code>rAgents</code> directory to avoid confusion.</p>
+</li>
+<li><p><strong>Idle-time Analysis</strong>: The <code>performIdleAnalysis()</code> function is designed to run periodically when the system is idle, ensuring that documentation analysis and maintenance tasks do not interfere with the system&#39;s primary functions.</p>
+</li>
+<li><p><strong>HTML Documentation Generation</strong>: The <code>regenerateHTMLDocumentation()</code> function triggers the execution of a separate HTML documentation generator, which is responsible for converting the project&#39;s Markdown documentation into a user-friendly, browsable HTML format.</p>
+</li>
+<li><p><strong>Knowledge Base Integration</strong>: The script integrates closely with the system&#39;s knowledge base, storing and retrieving information about concepts, patterns, and search indices. This ensures that the knowledge gathered through various analyses is made available to the rest of the system.</p>
+</li>
+<li><p><strong>Scalability and Performance</strong>: The script is designed to handle large-scale projects and documentation, with features like skipping large files, processing a limited number of files per idle cycle, and archiving old handoff logs to ensure the system remains efficient and responsive.</p>
+</li>
+</ol>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>smart-scribe_chunk.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

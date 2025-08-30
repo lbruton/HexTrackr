@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "scribe-system-test.js",
+    "name": "scribe-system-test",
+    "extension": ".js",
+    "directory": "",
+    "size": 0,
+    "lines": 96
+  },
+  "documentation": {
+    "markdown": "../docs/generated/scribe-system-test.md",
+    "html": "../html-docs/generated/scribe-system-test.html",
+    "generated": "2025-08-20T00:56:38.761Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "single-file",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "scribe-system-test.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for scribe-system-test.js"
+  }
+}

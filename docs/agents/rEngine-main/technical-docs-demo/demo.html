@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Documentation Demo</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+        .header { background: #2d3748; color: white; padding: 2rem; text-align: center; margin-bottom: 2rem; }
+        .file-section { background: white; margin: 1rem 0; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .file-title { color: #2d3748; border-bottom: 2px solid #68d391; padding-bottom: 0.5rem; }
+        .analysis { line-height: 1.6; }
+        .footer { text-align: center; color: #666; margin-top: 2rem; }
+        .demo-banner { background: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 Smart Documentation Demo</h1>
+        <p>AI-Powered Code Analysis with Qwen2.5-Coder 7B</p>
+    </div>
+    
+    <div class="container">
+        <div class="demo-banner">
+            <strong>🎯 Demo Features:</strong>
+            <ul>
+                <li>✅ Qwen2.5-Coder 7B code analysis</li>
+                <li>✅ Function and class extraction</li>
+                <li>✅ Dependency mapping</li>
+                <li>✅ Real-time HTML generation</li>
+                <li>🔄 Full system analyzes 500+ files with Mermaid diagrams</li>
+            </ul>
+        </div>
+        
+        
+            <div class="file-section">
+                <h2 class="file-title">📄 enhanced-scribe-console.js</h2>
+                <div class="analysis">
+                    ## enhanced-scribe-console.js<br>**Purpose**: This script enhances the functionality of StackTrackr's Scribe Console by adding features such as a Hello Kitty ASCII art welcome, clean INFO logging format, last 5 changes display, persistent terminal, and background monitoring with separate terminals. It uses an AI model for smart analysis and provides options to enable or disable various features.<br><br>**Functions**: <br>1. **main()**: The main function that initializes the console, sets up event listeners, and starts the interactive loop.<br>2. **handleInput(input)**: Handles user input in the terminal.<br>3. **displayWelcomeMessage()**: Displays a Hello Kitty ASCII art welcome message.<br>4. **setupTerminal()**: Sets up the readline interface for terminal interaction.<br>5. **monitorChanges()**: Monitors file changes and triggers analysis if necessary.<br>6. **runAnalysis()**: Runs the AI model to analyze files based on the current configuration.<br><br>**Classes**: <br>- **SessionRecapGenerator**: A class responsible for generating session recaps.<br><br>**Dependencies**: <br>- `readline`: For terminal input/output.<br>- `fs/promises`: For file system operations.<br>- `path`: For path manipulation.<br>- `child_process/spawn`: For spawning child processes.<br>- `url/fileURLToPath`: For converting file URLs to paths.<br>- `chokidar`: For watching file changes.<br>- `child_process/exec`: For executing shell commands.<br>- `util/promisify`: For promisifying functions.<br>- `./session-recap-generator.js`: A custom module for generating session recaps.<br><br>**Overall Purpose**: The script enhances the Scribe Console by providing a more interactive and feature-rich environment, leveraging AI for smart analysis and monitoring file changes in real-time.
+                </div>
+            </div>
+        
+            <div class="file-section">
+                <h2 class="file-title">📄 session-recap-generator.js</h2>
+                <div class="analysis">
+                    ## session-recap-generator.js<br>**Purpose**: This script reads data from `lastsession.json` and generates a markdown recap file named `SESSION_RECAP.md`. It focuses on summarizing the last session's objectives and key points.<br><br>**Functions**:<br>1. **generateRecap()**: Reads session data, generates markdown content, and writes it to `SESSION_RECAP.md`.<br>2. **readSessionData()**: Reads and parses the JSON data from `lastsession.json`.<br>3. **createMarkdown(sessionData)**: Creates a markdown string based on the provided session data.<br><br>**Classes**:<br>- **SessionRecapGenerator**: Contains methods for generating the recap, reading session data, and creating markdown content.<br><br>**Dependencies**:<br>- `fs/promises`: For file system operations.<br>- `path`: For path manipulation.<br>- `url`: For URL utilities.
+                </div>
+            </div>
+        
+            <div class="file-section">
+                <h2 class="file-title">📄 smart-doc-generator.js</h2>
+                <div class="analysis">
+                    ## smart-doc-generator.js<br>**Purpose**: A tool for generating technical documentation using Qwen-powered code analysis, Mermaid diagrams, and other features.<br><br>**Functions**:<br>1. **initializeSystem()**: Initializes the system by creating the output directory and loading templates.<br>2. **analyzeFiles()**: Analyzes files based on specified patterns and updates the documentation matrix.<br>3. **generateDocumentation()**: Generates the technical documentation using the collected data.<br>4. **watchFiles()**: Watches for changes in files and triggers analysis.<br><br>**Classes**:<br>1. **SmartDocumentationGenerator**: Manages the overall process of generating technical documentation, including initialization, file analysis, and documentation generation.<br><br>**Dependencies**:<br>- `fs/promises`: For file system operations.<br>- `path`: For path manipulation.<br>- `url`: For URL resolution.<br>- `chokidar`: For watching file changes.<br>- `fetch`: For making HTTP requests.
+                </div>
+            </div>
+        
+        
+        <div class="footer">
+            <p>Generated by Smart Documentation Generator • 8/23/2025, 5:01:33 AM</p>
+            <p>🚀 Launch full system with: <code>./launch-smart-system.sh</code></p>
+        </div>
+    </div>
+</body>
+</html>

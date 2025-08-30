@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>memory-health-monitor - StackTrackr Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #667eea;
+            --rengine-secondary: #764ba2;
+            --rengine-accent: #495057;
+            --rengine-accent-light: #6c757d;
+            --status-success: #28a745;
+            --status-warning: #ffc107;
+            --status-danger: #dc3545;
+            --status-info: #007acc;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-muted: #888;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --border-color: #e1e4e8;
+            --shadow-heavy: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--rengine-primary) 0%, var(--rengine-secondary) 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            border-radius: 15px;
+            box-shadow: var(--shadow-heavy);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--rengine-accent) 0%, var(--rengine-accent-light) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: var(--bg-secondary);
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: var(--status-info);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3 { 
+            color: var(--text-primary); 
+            margin-top: 2em; 
+            margin-bottom: 0.5em; 
+        }
+        .content h1 { font-size: 2em; border-bottom: 2px solid var(--rengine-primary); padding-bottom: 0.5em; }
+        .content h2 { font-size: 1.5em; }
+        .content h3 { font-size: 1.3em; }
+        
+        .content pre { 
+            background: var(--bg-secondary); 
+            padding: 1em; 
+            border-radius: 5px; 
+            overflow-x: auto; 
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+        }
+        
+        .content code { 
+            background: var(--bg-secondary); 
+            padding: 0.2em 0.4em; 
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        .content blockquote {
+            border-left: 4px solid var(--rengine-primary);
+            margin: 1em 0;
+            padding-left: 1em;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 1em 1em 1em 2em;
+            border-radius: 5px;
+        }
+        
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .content th, .content td {
+            border: 1px solid var(--border-color);
+            padding: 0.75em;
+            text-align: left;
+        }
+        
+        .content th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content a {
+            color: var(--status-info);
+            text-decoration: none;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
+        .metadata {
+            background: var(--bg-secondary);
+            padding: 1em;
+            border-radius: 5px;
+            margin-bottom: 2em;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .footer {
+            background: var(--bg-secondary);
+            padding: 20px 30px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .footer .branding {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .footer .system-name {
+            font-weight: 600;
+            color: var(--rengine-accent);
+        }
+
+        .footer .version {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .footer .divider {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .nav-bar {
+                padding: 10px 20px;
+            }
+            
+            .footer .branding {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>memory-health-monitor</h1>
+            <div class="subtitle">StackTrackr Documentation</div>
+            <div class="meta">
+                <span>📁 memory-health-monitor.md</span>
+                <span>📅 2025-08-20</span>
+                
+            </div>
+        </header>
+        
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../../html-docs/documentation.html" class="nav-link">🏠 Documentation Portal</a>
+                <a href="../index.html" class="nav-link">📚 All Docs</a>
+                <a href="../../html-docs/developmentstatus.html" class="nav-link">📊 Development Status</a>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <div class="metadata">
+                <strong>📂 Source File:</strong> memory-health-monitor.md | 
+                <strong>🕒 Generated:</strong> 8/19/2025, 9:51:45 PM |
+                <strong>🎨 Engine:</strong> Gemini HTML Converter
+            </div>
+            ```html
+<h1>Memory Health Monitor - Integrated Smart Scribe Module</h1>
+
+<h2>Purpose & Overview</h2>
+
+<p>The <code>memory-health-monitor.js</code> script is a comprehensive tool for real-time monitoring and reporting on the health of critical memory files used by the Smart Scribe system. It performs the following key functions:</p>
+
+<ol>
+  <li><strong>File Health Checks</strong>: Validates the existence, age, and size of critical memory files to ensure agent continuity.</li>
+  <li><strong>MCP Connectivity</strong>: Checks the accessibility and sync status of the Memory Coordination Plane (MCP) to ensure real-time data availability.</li>
+  <li><strong>Sync System Health</strong>: Verifies the status and timeliness of the automated memory sync process.</li>
+  <li><strong>Comprehensive Reporting</strong>: Generates detailed health reports, including overall status, specific issues found, and recommended actions.</li>
+  <li><strong>Smart Scribe Integration</strong>: Provides a quick health check method for real-time monitoring through the Smart Scribe system.</li>
+</ol>
+
+<p>This script is designed to be a critical component of the larger Smart Scribe system, ensuring the reliability and availability of the memory infrastructure.</p>
+
+<h2>Technical Architecture</h2>
+
+<p>The <code>MemoryHealthMonitor</code> class is the main entry point for the script, encapsulating all the functionality for checking the health of the memory system. The class has the following key components:</p>
+
+<ol>
+  <li><strong>Constructor</strong>: Initializes the necessary directories and thresholds for the health checks.</li>
+  <li><strong>checkFileHealth()</strong>: Validates the existence, age, and size of critical memory files.</li>
+  <li><strong>checkMCPHealth()</strong>: Checks the accessibility and sync status of the Memory Coordination Plane (MCP).</li>
+  <li><strong>checkSyncHealth()</strong>: Verifies the status and timeliness of the automated memory sync process.</li>
+  <li><strong>generateHealthReport()</strong>: Consolidates the results of the individual health checks into a comprehensive report.</li>
+  <li><strong>saveHealthReport()</strong>: Saves the health report to a JSON file in the logs directory.</li>
+  <li><strong>logHealthSummary()</strong>: Prints a human-readable summary of the health report to the console.</li>
+  <li><strong>run()</strong>: Executes the full health check process and returns the final report.</li>
+  <li><strong>quickHealthCheck()</strong>: Provides a lightweight health check method for Smart Scribe integration.</li>
+</ol>
+
+<p>The script utilizes several external dependencies, including <code>fs-extra</code> for file system operations, <code>path</code> for managing file paths, and <code>axios</code> for potential future HTTP requests (currently not used).</p>
+
+<h2>Dependencies</h2>
+
+<pre><code class="language-javascript">import fs from 'fs-extra';
+import path from 'path';
+import axios from 'axios';
+</code></pre>
+
+<h2>Key Functions/Classes</h2>
+
+<h3><code>MemoryHealthMonitor</code> Class</h3>
+
+<p><strong>Constructor</strong>:</p>
+<pre><code class="language-javascript">constructor(baseDir = '/Volumes/DATA/GitHub/StackTrackr')
+</code></pre>
+<ul>
+  <li><code>baseDir</code> (optional): The base directory for the project, default is <code>/Volumes/DATA/GitHub/StackTrackr</code>.</li>
+</ul>
+
+<p><strong>Methods</strong>:</p>
+<ol>
+<li><code>checkFileHealth()</code>:
+<ul>
+<li>Purpose: Checks the health of critical memory files.</li>
+<li>Parameters: None.</li>
+<li>Return Value: None.</li>
+</ul>
+</li>
+<li><code>checkMCPHealth()</code>:
+<ul>
+<li>Purpose: Checks the health of the Memory Coordination Plane (MCP).</li>
+<li>Parameters: None.</li>
+<li>Return Value: None.</li>
+</ul>
+</li>
+<li><code>checkSyncHealth()</code>:
+<ul>
+<li>Purpose: Checks the health of the memory sync system.</li>
+<li>Parameters: None.</li>
+<li>Return Value: None.</li>
+</ul>
+</li>
+<li><code>generateHealthReport()</code>:
+<ul>
+<li>Purpose: Generates a comprehensive health report.</li>
+<li>Parameters: None.</li>
+<li>Return Value: An object containing the health report.</li>
+</ul>
+</li>
+<li><code>saveHealthReport(report)</code>:
+<ul>
+<li>Purpose: Saves the health report to a JSON file.</li>
+<li>Parameters:
+<ul>
+<li><code>report</code>: The health report object to be saved.</li>
+</ul>
+</li>
+<li>Return Value: The path of the saved report file.</li>
+</ul>
+</li>
+<li><code>logHealthSummary(report)</code>:
+<ul>
+<li>Purpose: Logs a human-readable summary of the health report to the console.</li>
+<li>Parameters:
+<ul>
+<li><code>report</code>: The health report object to be summarized.</li>
+</ul>
+</li>
+<li>Return Value: None.</li>
+</ul>
+</li>
+<li><code>run()</code>:
+<ul>
+<li>Purpose: Executes the full health check process and returns the final report.</li>
+<li>Parameters: None.</li>
+<li>Return Value: The health report object.</li>
+</ul>
+</li>
+<li><code>quickHealthCheck()</code>:
+<ul>
+<li>Purpose: Provides a lightweight health check method for Smart Scribe integration.</li>
+<li>Parameters: None.</li>
+<li>Return Value: An object containing the quick health check results.</li>
+</ul>
+</li>
+</ol>
+
+
+
+<h2>Usage Examples</h2>
+
+<p>To use the <code>MemoryHealthMonitor</code> class, you can create an instance and call the <code>run()</code> method:</p>
+
+<pre><code class="language-javascript">const monitor = new MemoryHealthMonitor();
+const report = await monitor.run();
+</code></pre>
+
+<p>This will execute the full health check process and return the comprehensive health report.</p>
+
+<p>For the quick health check method used in Smart Scribe integration, you can call the <code>quickHealthCheck()</code> method:</p>
+
+<pre><code class="language-javascript">const quickStatus = await monitor.quickHealthCheck();
+console.log(quickStatus);
+</code></pre>
+
+<p>This will perform a lightweight health check and return an object with the current status.</p>
+
+<h2>Configuration</h2>
+
+<p>The <code>MemoryHealthMonitor</code> class has the following configuration options:</p>
+
+<ol>
+  <li><code>baseDir</code>: The base directory for the project, default is <code>/Volumes/DATA/GitHub/StackTrackr</code>.</li>
+  <li><code>thresholds</code>:
+    <ul>
+      <li><code>maxFileAge</code>: The maximum allowed age for critical memory files (48 hours).</li>
+      <li><code>maxSyncLag</code>: The maximum allowed lag for the memory sync process (24 hours).</li>
+      <li><code>minFileSize</code>: The minimum allowed size for critical memory files (100 bytes).</li>
+      <li><code>maxLogAge</code>: The maximum allowed age for log files (7 days).</li>
+    </ul>
+  </li>
+</ol>
+
+<p>These configuration values can be adjusted as needed to fit the specific requirements of your deployment.</p>
+
+<h2>Error Handling</h2>
+
+<p>The <code>MemoryHealthMonitor</code> class handles errors that may occur during the health check process. If any errors are encountered, they are caught and logged to the console. The <code>run()</code> method will throw the error, allowing the calling code to handle it as needed.</p>
+
+<h2>Integration</h2>
+
+<p>The <code>MemoryHealthMonitor</code> class is designed to be a central component of the larger Smart Scribe system. It integrates with the system in the following ways:</p>
+
+<ol>
+  <li><strong>Real-time Monitoring</strong>: The <code>quickHealthCheck()</code> method provides a lightweight health check that can be used by the Smart Scribe system for real-time monitoring and alerting.</li>
+  <li><strong>Scheduled Validation</strong>: The script can be set up to run on a regular schedule (e.g., using cron) to perform comprehensive health checks and update the system's status.</li>
+  <li><strong>Dashboard Integration</strong>: The health reports generated by the script can be used to update the status information displayed on the Smart Scribe dashboard.</li>
+  <li><strong>Alert Generation</strong>: The script can be used to trigger alerts when critical issues are detected, allowing the system to respond proactively to potential problems.</li>
+</ol>
+
+<h2>Development Notes</h2>
+
+<ol>
+  <li><strong>MCP Connectivity Simulation</strong>: In the current implementation, the script simulates the MCP connectivity and sync status by reading a local cache file. In a production environment, this would be replaced with the actual MCP integration code.</li>
+  <li><strong>Extensibility</strong>: The script is designed to be extensible, allowing for the addition of new health checks or the modification of existing ones as the requirements of the Smart Scribe system evolve.</li>
+  <li><strong>Logging and Reporting</strong>: The script generates detailed health reports and logs them to the file system. This data can be used for historical analysis and troubleshooting.</li>
+  <li><strong>Smart Scribe Integration</strong>: The <code>quickHealthCheck()</code> method provides a simple, standardized interface for integrating the memory health monitoring functionality into the Smart Scribe system.</li>
+</ol>
+```
+        </main>
+        
+        <footer class="footer">
+            <div class="branding">
+                <span>Generated from the <span class="system-name">rScribe Document System</span></span>
+                <span class="divider">•</span>
+                <span class="system-name">rEngine</span> <span class="version">(v2.1.0)</span>
+                <span class="divider">•</span>
+                <span>Last updated: 2025-08-20</span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

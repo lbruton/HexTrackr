@@ -1,0 +1,264 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-16",
+    "purpose": "User preferences and convenience tracking for StackTrackr agentic system",
+    "description": "Track user preferences, communication styles, workflow patterns, and convenience features to optimize user experience and agent interactions",
+    "retention_policy": "Keep preferences indefinitely, update based on usage patterns"
+  },
+  "user_preferences": {
+    "communication_style": {
+      "verbosity_level": "concise",
+      "explanation_depth": "minimal_unless_requested",
+      "technical_detail": "moderate",
+      "code_comments": "only_when_complex",
+      "progress_updates": "milestone_based",
+      "preferred_formats": ["bullet_points", "short_paragraphs"],
+      "avoid_formats": ["long_explanations", "unnecessary_preambles"],
+      "tone_preference": "direct_and_professional"
+    },
+    "task_preferences": {
+      "default_agent_selection": "auto_optimal",
+      "risk_tolerance": "medium",
+      "speed_vs_quality": "balanced_with_quality_bias",
+      "testing_thoroughness": "comprehensive",
+      "documentation_level": "essential_only",
+      "rollback_preparation": "always_required",
+      "change_validation": "automated_plus_spot_checks"
+    },
+    "workflow_preferences": {
+      "task_breakdown_style": "detailed_steps_with_dependencies",
+      "progress_tracking": "real_time_updates_preferred",
+      "handoff_notifications": "summary_only",
+      "error_reporting": "immediate_with_context",
+      "completion_summaries": "brief_with_key_metrics",
+      "learning_feedback": "highlight_improvements_and_patterns"
+    },
+    "notification_preferences": {
+      "critical_errors": "immediate_notification",
+      "task_completion": "summary_notification",
+      "performance_milestones": "weekly_digest",
+      "optimization_opportunities": "as_discovered",
+      "system_health": "only_when_degraded",
+      "learning_insights": "monthly_summary"
+    }
+  },
+  "convenience_features": {
+    "auto_suggestions": {
+      "task_optimization": "suggest_better_approaches_when_available",
+      "agent_selection": "recommend_optimal_agent_based_on_performance_data",
+      "time_estimation": "provide_realistic_estimates_with_confidence_intervals",
+      "risk_mitigation": "proactively_suggest_prevention_strategies",
+      "workflow_improvements": "identify_efficiency_opportunities",
+      "learning_applications": "suggest_applying_lessons_from_similar_tasks"
+    },
+    "smart_defaults": {
+      "testing_scope": "comprehensive_for_core_functions_basic_for_utilities",
+      "documentation_generation": "auto_update_json_files_minimal_external_docs",
+      "backup_creation": "before_any_architectural_changes",
+      "performance_monitoring": "enabled_for_all_optimization_tasks",
+      "error_logging": "detailed_for_failures_summary_for_successes",
+      "cross_reference_checking": "mandatory_for_function_modifications"
+    },
+    "workflow_shortcuts": {
+      "quick_rollback": "single_command_rollback_to_last_known_good_state",
+      "batch_operations": "group_similar_tasks_for_efficiency",
+      "context_preloading": "prepare_relevant_json_files_before_agent_start",
+      "smart_handoffs": "auto_prepare_context_for_next_agent",
+      "progress_snapshots": "auto_save_state_at_major_milestones",
+      "pattern_matching": "auto_suggest_similar_successful_approaches"
+    },
+    "quality_of_life": {
+      "intelligent_scheduling": "optimize_task_order_based_on_dependencies",
+      "resource_management": "auto_balance_agent_workloads",
+      "context_switching_minimization": "batch_similar_work_together",
+      "proactive_maintenance": "suggest_cleanup_and_optimization_opportunities",
+      "learning_acceleration": "highlight_patterns_and_insights_from_recent_work",
+      "predictive_assistance": "anticipate_needs_based_on_current_context"
+    }
+  },
+  "learning_patterns": {
+    "user_behavior_analysis": {
+      "task_request_patterns": [
+        {
+          "pattern": "performance_optimization_requests",
+          "frequency": "weekly",
+          "typical_scope": "table_rendering_and_search_functionality",
+          "preferred_approach": "systematic_analysis_followed_by_targeted_improvements",
+          "success_indicators": "measurable_performance_gains_with_comprehensive_testing"
+        },
+        {
+          "pattern": "bug_fix_requests",
+          "frequency": "as_needed",
+          "typical_scope": "ui_inconsistencies_and_data_synchronization",
+          "preferred_approach": "quick_diagnosis_using_json_tracking_followed_by_minimal_fix",
+          "success_indicators": "issue_resolved_without_introducing_regressions"
+        }
+      ],
+      "communication_patterns": [
+        {
+          "preference": "concise_responses",
+          "context": "routine_tasks_and_status_updates",
+          "user_satisfaction": "high_when_responses_under_4_lines"
+        },
+        {
+          "preference": "detailed_explanations",
+          "context": "complex_architectural_decisions_or_when_explicitly_requested",
+          "user_satisfaction": "high_when_reasoning_and_alternatives_provided"
+        }
+      ],
+      "workflow_adaptations": [
+        {
+          "adaptation": "proactive_json_file_updates",
+          "user_benefit": "agents_have_complete_context_without_repeated_explanations",
+          "effectiveness": "reduces_clarification_requests_by_80%"
+        },
+        {
+          "adaptation": "predictive_task_breakdown",
+          "user_benefit": "clear_expectations_and_progress_visibility",
+          "effectiveness": "improves_task_planning_satisfaction_by_60%"
+        }
+      ]
+    },
+    "efficiency_optimizations": [
+      {
+        "optimization": "context_aware_agent_selection",
+        "benefit": "optimal_agent_chosen_automatically_based_on_task_characteristics",
+        "time_saved": "5_minutes_per_task_on_average",
+        "user_satisfaction_impact": "high"
+      },
+      {
+        "optimization": "intelligent_task_sequencing",
+        "benefit": "dependencies_resolved_automatically_minimal_waiting",
+        "time_saved": "15_minutes_per_multi_task_session",
+        "user_satisfaction_impact": "very_high"
+      },
+      {
+        "optimization": "proactive_risk_assessment",
+        "benefit": "potential_issues_identified_and_prevented_before_implementation",
+        "time_saved": "30_minutes_per_avoided_rollback",
+        "user_satisfaction_impact": "extremely_high"
+      }
+    ]
+  },
+  "customization_options": {
+    "agent_behavior_tuning": {
+      "claude_models": {
+        "analysis_depth": "thorough_but_focused_on_actionable_insights",
+        "explanation_style": "architectural_reasoning_with_practical_implications",
+        "risk_assessment": "comprehensive_with_mitigation_strategies"
+      },
+      "gpt_models": {
+        "implementation_style": "efficient_with_clear_code_organization",
+        "testing_approach": "practical_validation_focused_on_likely_issues",
+        "documentation": "inline_comments_for_complex_logic_only"
+      },
+      "gemini_models": {
+        "validation_thoroughness": "comprehensive_but_efficient",
+        "reporting_style": "concise_pass_fail_with_key_metrics",
+        "issue_escalation": "immediate_for_critical_problems_batched_for_minor_issues"
+      }
+    },
+    "workflow_customization": {
+      "task_prioritization": "critical_first_then_efficiency_gains_then_nice_to_haves",
+      "change_management": "always_update_json_files_always_prepare_rollback",
+      "quality_gates": "mandatory_testing_for_core_functions_optional_for_utilities",
+      "progress_reporting": "milestone_updates_with_metrics_and_next_steps",
+      "learning_integration": "always_check_for_similar_patterns_always_update_knowledge"
+    }
+  },
+  "convenience_automations": {
+    "smart_context_loading": {
+      "performance_tasks": "auto_load_performance.json_functions.json_structure.json",
+      "ui_tasks": "auto_load_styles.json_variables.json_structure.json",
+      "bug_fixes": "auto_load_errors.json_recentissues.json_relevant_function_area",
+      "feature_development": "auto_load_structure.json_decisions.json_functions.json"
+    },
+    "intelligent_suggestions": {
+      "optimization_opportunities": "scan_performance_data_and_suggest_improvements",
+      "pattern_applications": "suggest_applying_successful_patterns_to_new_tasks",
+      "preventive_maintenance": "identify_potential_issues_before_they_become_problems",
+      "workflow_enhancements": "recommend_process_improvements_based_on_recent_learnings"
+    },
+    "proactive_assistance": {
+      "dependency_checking": "auto_verify_all_dependencies_before_changes",
+      "impact_assessment": "auto_analyze_potential_effects_of_proposed_changes",
+      "rollback_preparation": "auto_create_rollback_procedures_for_risky_changes",
+      "testing_recommendations": "suggest_testing_strategies_based_on_change_scope"
+    }
+  },
+  "user_experience_metrics": {
+    "satisfaction_indicators": {
+      "task_completion_satisfaction": "measured_by_outcome_quality_and_efficiency",
+      "communication_satisfaction": "measured_by_response_appropriateness_and_clarity",
+      "workflow_satisfaction": "measured_by_smoothness_and_predictability",
+      "learning_satisfaction": "measured_by_visible_system_improvement_over_time"
+    },
+    "efficiency_metrics": {
+      "time_to_completion": "track_actual_vs_estimated_times",
+      "rework_frequency": "measure_how_often_changes_need_modification",
+      "user_clarification_requests": "track_when_additional_information_needed",
+      "workflow_interruptions": "measure_unexpected_delays_or_issues"
+    },
+    "quality_metrics": {
+      "outcome_accuracy": "measure_how_well_results_match_user_expectations",
+      "system_stability": "track_issues_introduced_by_changes",
+      "maintainability": "assess_how_well_changes_integrate_with_existing_system",
+      "user_confidence": "measure_trust_in_system_recommendations_and_outcomes"
+    }
+  },
+  "adaptive_improvements": {
+    "preference_learning": {
+      "communication_style_refinement": "adjust_verbosity_and_detail_based_on_user_feedback",
+      "workflow_optimization": "streamline_processes_based_on_usage_patterns",
+      "quality_calibration": "balance_speed_and_thoroughness_to_user_preferences",
+      "proactivity_tuning": "adjust_level_of_automated_assistance_based_on_user_comfort"
+    },
+    "convenience_evolution": {
+      "new_automation_opportunities": "identify_repetitive_patterns_for_automation",
+      "workflow_shortcut_development": "create_shortcuts_for_frequently_performed_sequences",
+      "predictive_assistance_enhancement": "improve_anticipation_of_user_needs",
+      "context_awareness_improvement": "better_understanding_of_user_intent_and_priorities"
+    }
+  },
+  "personalization_features": {
+    "contextual_awareness": {
+      "project_phase_recognition": "understand_whether_in_development_maintenance_or_optimization_phase",
+      "urgency_detection": "recognize_urgent_vs_routine_requests_from_language_and_context",
+      "complexity_assessment": "gauge_user_technical_expertise_level_from_request_style",
+      "goal_alignment": "understand_primary_objectives_efficiency_vs_quality_vs_learning"
+    },
+    "adaptive_responses": {
+      "explanation_depth_adjustment": "provide_appropriate_level_of_detail_based_on_context",
+      "suggestion_proactivity": "balance_helpful_suggestions_with_user_autonomy",
+      "workflow_flexibility": "adapt_standard_processes_to_specific_situation_needs",
+      "learning_pace_matching": "present_insights_at_pace_that_matches_user_absorption_capacity"
+    }
+  },
+  "schema": {
+    "preference_entry": {
+      "category": "string - Area of preference (communication, workflow, task, etc.)",
+      "setting": "string - Specific preference setting",
+      "value": "any - Preference value",
+      "context": "string - When this preference applies",
+      "priority": "string - high|medium|low preference strength",
+      "learned_from": "string - How this preference was determined",
+      "last_updated": "ISO datetime - When preference was last modified",
+      "effectiveness": "string - How well this preference works for the user"
+    },
+    "convenience_feature": {
+      "feature_name": "string - Name of convenience feature",
+      "description": "string - What the feature does",
+      "trigger_conditions": "array - When feature should activate",
+      "user_benefit": "string - How this helps the user",
+      "implementation_notes": "string - How agents should implement this",
+      "effectiveness_metrics": "object - How to measure feature success"
+    }
+  },
+  "instructions": {
+    "for_agents": "Use preference data to customize interactions and workflow approaches to match user expectations and optimize their experience",
+    "preference_learning": "Observe user reactions and feedback to continuously refine preference understanding",
+    "convenience_application": "Proactively apply convenience features and automations to reduce user effort",
+    "personalization": "Adapt communication style, detail level, and workflow approach based on user preferences and context"
+  }
+}

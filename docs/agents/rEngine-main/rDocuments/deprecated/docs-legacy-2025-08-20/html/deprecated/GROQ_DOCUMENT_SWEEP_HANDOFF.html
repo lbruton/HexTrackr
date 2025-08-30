@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Groq Document Sweep Migration - Session Handoff - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-groq">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">⚡</div>
+            <h1>🚀 Groq Document Sweep Migration - Session Handoff</h1>
+            <div class="subtitle">AI Optimization</div>
+            <div class="meta">
+                <span>📁 GROQ_DOCUMENT_SWEEP_HANDOFF.md</span>
+                <span>📅 2025-08-19</span>
+                <span>📊 6KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../deprecated/GROQ_DOCUMENT_SWEEP_HANDOFF.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/GROQ_DOCUMENT_SWEEP_HANDOFF.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="🚀-groq-document-sweep-migration---session-handoff">🚀 Groq Document Sweep Migration - Session Handoff</h1>
+<p><strong>Date</strong>: August 18, 2025<br><strong>Checkpoint Commit</strong>: <code>a63c7b6</code> - &quot;CHECKPOINT: Pre-Groq Document Sweep Migration - Gemini Documentation Complete&quot;<br><strong>Next Phase</strong>: Document Sweep Optimization with Groq Primary AI</p>
+<hr>
+<h2 id="📋-current-state-summary">📋 Current State Summary</h2>
+<h3 id="✅-completed-this-session">✅ <strong>Completed This Session</strong></h3>
+<ol>
+<li><strong>Mobile Development Documentation</strong> (29 pages) - <code>docs/MOBILE_DEVELOPMENT_GUIDE.md</code></li>
+<li><strong>Docker Management Documentation</strong> (27 pages) - <code>docs/DOCKER_MANAGEMENT_GUIDE.md</code></li>
+<li><strong>Documentation Accuracy Review</strong> - Fixed critical inaccuracies in core docs</li>
+<li><strong>Strategic Document Archival</strong> - Moved outdated docs to <code>archive/outdated-docs-2025-08-18/</code></li>
+<li><strong>Git Checkpoint Created</strong> - All Gemini documentation progress preserved</li>
+</ol>
+<h3 id="🎯-immediate-next-task">🎯 <strong>Immediate Next Task</strong></h3>
+<p><strong>Migrate document-sweep system from Gemini (Tier 4) to Groq (Tier 1) for:</strong></p>
+<ul>
+<li>4-5x faster processing (50+ tokens/sec vs 8-12 tokens/sec)</li>
+<li>Better cost efficiency for batch operations</li>
+<li>Alignment with 5-tier AI architecture (use primary for automated tasks)</li>
+</ul>
+<hr>
+<h2 id="🔧-technical-implementation-plan">🔧 Technical Implementation Plan</h2>
+<h3 id="step-1-configuration-update"><strong>Step 1: Configuration Update</strong></h3>
+<p>Update <code>rEngine/system-config.json</code>:</p>
+<pre><code class="language-json"><pre><code class="language-json">"documentManager": {
+  "scriptPath": "/Volumes/DATA/GitHub/StackTrackr/rEngine/document-generator.js",
+  "api": {
+    "provider": "groq",
+    "model": "llama3-8b-8192",
+    "endpoint": "https://api.groq.com/openai/v1/chat/completions"
+  }
+}</code></pre>
+</code></pre>
+<h3 id="step-2-environment-variables"><strong>Step 2: Environment Variables</strong></h3>
+<p>Ensure <code>GROQ_API_KEY</code> is available in <code>.env</code> file alongside existing <code>GEMINI_API_KEY</code></p>
+<h3 id="step-3-code-updates-required"><strong>Step 3: Code Updates Required</strong></h3>
+<ol>
+<li><strong><code>rEngine/document-generator.js</code></strong> - Update API calls to use Groq endpoint</li>
+<li><strong>Error handling</strong> - Implement fallback to Gemini if Groq fails</li>
+<li><strong>Output format preservation</strong> - Ensure Groq maintains same documentation structure</li>
+</ol>
+<h3 id="step-4-differential-update-strategy"><strong>Step 4: Differential Update Strategy</strong></h3>
+<ul>
+<li>Groq should <strong>update existing docs</strong>, not regenerate from scratch</li>
+<li>Preserve all Gemini-generated content structure</li>
+<li>Focus on incremental improvements and new file documentation</li>
+</ul>
+<hr>
+<h2 id="📁-critical-files-to-monitor">📁 Critical Files to Monitor</h2>
+<h3 id="core-document-sweep-files"><strong>Core Document Sweep Files</strong></h3>
+<ul>
+<li><code>rEngine/document-sweep.js</code> - Main sweep orchestrator (currently uses Gemini)</li>
+<li><code>rEngine/document-generator.js</code> - Individual file processor (needs Groq integration)</li>
+<li><code>rEngine/html-doc-generator.js</code> - HTML output generator</li>
+<li><code>rEngine/system-config.json</code> - AI provider configuration</li>
+</ul>
+<h3 id="protected-documentation-do-not-regenerate"><strong>Protected Documentation</strong> (DO NOT REGENERATE)</h3>
+<ul>
+<li><code>docs/MOBILE_DEVELOPMENT_GUIDE.md</code> (29 pages, complete)</li>
+<li><code>docs/DOCKER_MANAGEMENT_GUIDE.md</code> (27 pages, complete) </li>
+<li><code>docs/RENGINE.md</code> (just corrected critical inaccuracies)</li>
+<li><code>VISION.md</code> (updated to reflect current reality)</li>
+<li>All existing <code>docs/generated/</code> content</li>
+</ul>
+<h3 id="logs-to-watch"><strong>Logs to Watch</strong></h3>
+<ul>
+<li><code>logs/document-sweep.log</code></li>
+<li><code>logs/document-sweep-results.json</code> </li>
+<li><code>logs/document-sweep-watch.log</code></li>
+</ul>
+<hr>
+<h2 id="🛡️-safety-measures">🛡️ Safety Measures</h2>
+<h3 id="git-protection"><strong>Git Protection</strong></h3>
+<ul>
+<li>✅ Checkpoint commit <code>a63c7b6</code> created</li>
+<li>All current documentation state preserved</li>
+<li>Can rollback instantly if issues occur</li>
+</ul>
+<h3 id="incremental-testing-strategy"><strong>Incremental Testing Strategy</strong></h3>
+<ol>
+<li><strong>Test on single file first</strong> - Don&#39;t run full sweep initially</li>
+<li><strong>Compare outputs</strong> - Groq vs existing Gemini documentation</li>
+<li><strong>Validate HTML generation</strong> - Ensure output format consistency</li>
+<li><strong>Check protocol compliance</strong> - Verify rScribe Document Protocol adherence</li>
+</ol>
+<h3 id="fallback-plan"><strong>Fallback Plan</strong></h3>
+<ul>
+<li>Keep Gemini configuration as backup</li>
+<li>Implement intelligent fallback if Groq fails</li>
+<li>Monitor token usage and costs during transition</li>
+</ul>
+<hr>
+<h2 id="🎯-success-criteria">🎯 Success Criteria</h2>
+<h3 id="performance-targets"><strong>Performance Targets</strong></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Document sweep completes 4-5x faster than current Gemini runs</li>
+<li><input disabled="" type="checkbox"> All existing documentation structure preserved</li>
+<li><input disabled="" type="checkbox"> HTML files properly updated with diffs, not regenerated</li>
+<li><input disabled="" type="checkbox"> Cost per document generation reduced</li>
+</ul>
+<h3 id="quality-assurance"><strong>Quality Assurance</strong></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Output quality matches or exceeds Gemini documentation</li>
+<li><input disabled="" type="checkbox"> No regression in documentation completeness</li>
+<li><input disabled="" type="checkbox"> rScribe Document Protocol compliance maintained</li>
+<li><input disabled="" type="checkbox"> Automated 6 AM/6 PM sweeps execute successfully</li>
+</ul>
+<h3 id="architecture-alignment"><strong>Architecture Alignment</strong></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Groq positioned as primary document worker (Tier 1)</li>
+<li><input disabled="" type="checkbox"> Gemini reserved for strategic market intelligence (Tier 4)</li>
+<li><input disabled="" type="checkbox"> 5-tier AI system properly utilized</li>
+</ul>
+<hr>
+<h2 id="🔄-document-sweep-protocol-compliance">🔄 Document Sweep Protocol Compliance</h2>
+<p><strong>Current Protocol</strong>: <code>RSCRIBE_DOCUMENT_PROTOCOL.md</code> specifies:</p>
+<ul>
+<li>Multi-format generation (Markdown, JSON, HTML)</li>
+<li>Incremental updates, not full regeneration</li>
+<li>Color-coded progress monitoring</li>
+<li>Summary report generation</li>
+<li>6 AM/6 PM automated execution</li>
+</ul>
+<p><strong>Groq Integration Must</strong>:</p>
+<ul>
+<li>Follow exact same protocol structure</li>
+<li>Maintain existing file organization</li>
+<li>Preserve documentation quality standards</li>
+<li>Support scheduled automation</li>
+</ul>
+<hr>
+<h2 id="📊-current-architecture-status">📊 Current Architecture Status</h2>
+<h3 id="rengine-platform-v210"><strong>rEngine Platform v2.1.0</strong></h3>
+<ul>
+<li>✅ Docker infrastructure (ports 3032-3038)</li>
+<li>✅ 5-tier AI system operational</li>
+<li>✅ Mobile development system (29MB packages)</li>
+<li>✅ MCP memory persistence</li>
+<li>✅ Comprehensive documentation</li>
+</ul>
+<h3 id="ai-tier-usage"><strong>AI Tier Usage</strong></h3>
+<ul>
+<li><strong>Tier 1 (Groq)</strong>: Primary workload → <strong>TARGET for document sweeps</strong></li>
+<li><strong>Tier 2 (Claude)</strong>: Reasoning fallback</li>
+<li><strong>Tier 3 (OpenAI)</strong>: Backup operations  </li>
+<li><strong>Tier 4 (Gemini)</strong>: Strategic tasks → <strong>Current document sweep (suboptimal)</strong></li>
+<li><strong>Tier 5 (Ollama)</strong>: Local fallback</li>
+</ul>
+<hr>
+<h2 id="🚀-next-session-action-items">🚀 Next Session Action Items</h2>
+<ol>
+<li><strong>Verify Groq API access</strong> - Ensure <code>GROQ_API_KEY</code> configured</li>
+<li><strong>Update document-generator.js</strong> - Implement Groq endpoint integration  </li>
+<li><strong>Test single file</strong> - Run Groq on one JavaScript file to validate output</li>
+<li><strong>Compare quality</strong> - Groq output vs existing Gemini documentation</li>
+<li><strong>Run limited sweep</strong> - Test on small directory before full sweep</li>
+<li><strong>Monitor performance</strong> - Measure speed improvement and cost impact</li>
+<li><strong>Validate protocol</strong> - Ensure all rScribe Document Protocol requirements met</li>
+</ol>
+<hr>
+<h2 id="💾-recovery-information">💾 Recovery Information</h2>
+<p><strong>If Issues Occur</strong>:</p>
+<pre><code class="language-bash"><pre><code class="language-bash"># Rollback to checkpoint
+git reset --hard a63c7b6
+
+# Restore original configuration  
+git checkout HEAD -- rEngine/system-config.json rEngine/document-generator.js</code></pre>
+</code></pre>
+<p><strong>Current Working State</strong>: All documentation systems operational, Gemini configuration preserved as fallback.</p>
+<hr>
+<p><em>Handoff prepared for Groq document sweep optimization - all systems ready for migration testing.</em></p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>GROQ_DOCUMENT_SWEEP_HANDOFF.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-19</p>
+        </footer>
+    </div>
+</body>
+</html>

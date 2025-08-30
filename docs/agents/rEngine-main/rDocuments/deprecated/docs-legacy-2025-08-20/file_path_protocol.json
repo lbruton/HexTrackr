@@ -1,0 +1,33 @@
+{
+  "source_file": "rProtocols/file_path_protocol.md",
+  "generated_date": "2025-08-20T01:53:21.450Z",
+  "title": "Protocol: Absolute File Path Mandate",
+  "sections": [
+    {
+      "id": "1-overview",
+      "title": "1. Overview",
+      "icon": "📋",
+      "submenu": []
+    },
+    {
+      "id": "2-the-mandate",
+      "title": "2. The Mandate",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "3-rationale",
+      "title": "3. Rationale",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "4-agent-responsibility",
+      "title": "4. Agent Responsibility",
+      "icon": "📄",
+      "submenu": []
+    }
+  ],
+  "word_count": 232,
+  "format_version": "1.0"
+}

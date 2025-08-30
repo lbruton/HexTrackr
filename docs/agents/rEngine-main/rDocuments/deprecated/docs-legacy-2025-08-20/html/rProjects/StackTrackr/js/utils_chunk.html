@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>`utils.js_chunk_2` Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>`utils.js_chunk_2` Documentation</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 utils_chunk.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 13KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rProjects/StackTrackr/js/utils_chunk.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/utils_chunk.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="utilsjs_chunk_2-documentation"><code>utils.js_chunk_2</code> Documentation</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>utils.js_chunk_2</code> script provides a collection of utility functions and constants that are used throughout the application. These functions handle various tasks such as date formatting, currency conversion, HTML sanitization, and inventory item validation.</p>
+<p>The utilities in this script are designed to be flexible, reusable, and robust, helping to ensure consistency and reliability across the application.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The script is organized into several sections, each containing related utility functions and constants:</p>
+<ol>
+<li><strong>Date Formatting</strong>: Functions for parsing and formatting date strings, including <code>parseDate</code> and <code>formatDisplayDate</code>.</li>
+<li><strong>Currency Formatting</strong>: Functions for formatting numbers as currency strings, including <code>formatCurrency</code> and <code>formatLossProfit</code>.</li>
+<li><strong>HTML Sanitization</strong>: The <code>sanitizeHtml</code> function for safely displaying user-provided text in the UI.</li>
+<li><strong>Weight Conversion</strong>: Functions for converting between grams and troy ounces, including <code>gramsToOzt</code>, <code>oztToGrams</code>, and <code>formatWeight</code>.</li>
+<li><strong>Currency Conversion</strong>: The <code>convertToUsd</code> function for converting amounts from various currencies to US Dollars.</li>
+<li><strong>String Cleaning</strong>: Functions for cleaning and sanitizing strings, including <code>stripNonAlphanumeric</code> and <code>cleanString</code>.</li>
+<li><strong>Object Sanitization</strong>: The <code>sanitizeObjectFields</code> function for sanitizing string properties of an object.</li>
+<li><strong>Inventory Normalization</strong>: Functions for normalizing inventory item types and mapping Numista types to internal categories, including <code>normalizeType</code> and <code>mapNumistaType</code>.</li>
+<li><strong>Persistent Storage</strong>: Functions for saving and loading data to/from localStorage, with optional encryption support (<code>saveData</code>, <code>loadData</code>, <code>saveDataSync</code>, <code>loadDataSync</code>).</li>
+<li><strong>Storage Cleanup</strong>: The <code>cleanupStorage</code> function for removing unknown keys from localStorage.</li>
+<li><strong>Inventory Sorting</strong>: The <code>sortInventoryByDateNewestFirst</code> function for sorting inventory items by date in descending order.</li>
+<li><strong>Inventory Validation</strong>: The <code>validateInventoryItem</code> function for validating the structure and contents of an inventory item.</li>
+</ol>
+<p>The script uses a mix of synchronous and asynchronous functions, with the asynchronous versions handling encryption-related operations.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>utils.js_chunk_2</code> script does not have any external dependencies. It relies on the built-in JavaScript APIs and the global <code>StackrTrackrEncryption</code> object (if available) for encryption-related functionality.</p>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="date-formatting">Date Formatting</h3>
+<p><strong><code>parseDate(dateStr)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>dateStr</code> (string) - A date string in any parseable format</li>
+<li><strong>Returns</strong>: <code>string</code> - The date in ISO format (YYYY-MM-DD), or &#39;—&#39; if the date could not be parsed</li>
+<li><strong>Description</strong>: Attempts to parse the input date string using various methods, falling back to a generic date parsing approach. If all parsing attempts fail, it returns the &#39;—&#39; character.</li>
+</ul>
+<p><strong><code>formatDisplayDate(dateStr)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>dateStr</code> (string) - A date string in any parseable format</li>
+<li><strong>Returns</strong>: <code>string</code> - The date formatted as &quot;Month Day, Year&quot; (e.g., &quot;Jan 1, 1969&quot;), or &#39;—&#39; if the date could not be parsed</li>
+<li><strong>Description</strong>: Formats the input date string in a human-readable format.</li>
+</ul>
+<h3 id="currency-formatting">Currency Formatting</h3>
+<p><strong><code>formatCurrency(value, currency = DEFAULT_CURRENCY)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>value</code> (number|string) - The numeric value to format, <code>currency</code> (string) - The ISO currency code (default is <code>DEFAULT_CURRENCY</code>)</li>
+<li><strong>Returns</strong>: <code>string</code> - The formatted currency string (e.g., &quot;$1,234.56&quot;)</li>
+<li><strong>Description</strong>: Formats a number as a currency string using the specified (or default) currency.</li>
+</ul>
+<p><strong><code>formatLossProfit(value)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>value</code> (number) - The profit/loss value to format</li>
+<li><strong>Returns</strong>: <code>string</code> - An HTML string with the formatted value and appropriate color styling (green for positive, red for negative)</li>
+<li><strong>Description</strong>: Formats a profit/loss value with color-coded styling.</li>
+</ul>
+<h3 id="html-sanitization">HTML Sanitization</h3>
+<p><strong><code>sanitizeHtml(text)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>text</code> (string) - The text to sanitize</li>
+<li><strong>Returns</strong>: <code>string</code> - The sanitized text, safe for HTML insertion</li>
+<li><strong>Description</strong>: Sanitizes the input text by encoding HTML special characters, preventing potential XSS attacks.</li>
+</ul>
+<h3 id="weight-conversion">Weight Conversion</h3>
+<p><strong><code>gramsToOzt(grams)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>grams</code> (number) - The weight in grams</li>
+<li><strong>Returns</strong>: <code>number</code> - The weight in troy ounces</li>
+<li><strong>Description</strong>: Converts a weight in grams to troy ounces.</li>
+</ul>
+<p><strong><code>oztToGrams(ozt)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>ozt</code> (number) - The weight in troy ounces</li>
+<li><strong>Returns</strong>: <code>number</code> - The weight in grams</li>
+<li><strong>Description</strong>: Converts a weight in troy ounces to grams.</li>
+</ul>
+<p><strong><code>formatWeight(ozt)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>ozt</code> (number) - The weight in troy ounces</li>
+<li><strong>Returns</strong>: <code>string</code> - The formatted weight string with the appropriate unit (grams or ounces)</li>
+<li><strong>Description</strong>: Formats a weight in troy ounces, displaying it in either grams or ounces depending on the value.</li>
+</ul>
+<h3 id="currency-conversion">Currency Conversion</h3>
+<p><strong><code>convertToUsd(amount, currency = &quot;USD&quot;)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>amount</code> (number) - The monetary amount to convert, <code>currency</code> (string) - The ISO currency code of the input amount (default is &quot;USD&quot;)</li>
+<li><strong>Returns</strong>: <code>number</code> - The amount converted to US Dollars</li>
+<li><strong>Description</strong>: Converts the input amount from the specified currency to US Dollars using static exchange rates.</li>
+</ul>
+<h3 id="string-cleaning">String Cleaning</h3>
+<p><strong><code>stripNonAlphanumeric(str, { allowHyphen = false, allowSlash = false })</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>str</code> (string) - The input string, <code>allowHyphen</code> (boolean) - Whether to allow hyphens, <code>allowSlash</code> (boolean) - Whether to allow slashes</li>
+<li><strong>Returns</strong>: <code>string</code> - The cleaned string containing only letters, numbers, and optionally hyphens and/or slashes</li>
+<li><strong>Description</strong>: Removes all non-alphanumeric characters from the input string, preserving spaces and optionally hyphens and/or slashes.</li>
+</ul>
+<p><strong><code>cleanString(str)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>str</code> (string) - The input string</li>
+<li><strong>Returns</strong>: <code>string</code> - The cleaned string</li>
+<li><strong>Description</strong>: Cleans the input string by stripping HTML tags, control characters, and diacritics, while preserving punctuation and normalizing whitespace.</li>
+</ul>
+<h3 id="object-sanitization">Object Sanitization</h3>
+<p><strong><code>sanitizeObjectFields(obj)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>obj</code> (object) - The object to sanitize</li>
+<li><strong>Returns</strong>: <code>object</code> - A new object with the string fields sanitized</li>
+<li><strong>Description</strong>: Sanitizes all string properties of the input object by stripping non-alphanumeric characters (except for the <code>notes</code> field).</li>
+</ul>
+<h3 id="inventory-normalization">Inventory Normalization</h3>
+<p><strong><code>normalizeType(type = &quot;&quot;)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>type</code> (string) - The raw inventory item type</li>
+<li><strong>Returns</strong>: <code>string</code> - The normalized type value, one of the predefined options</li>
+<li><strong>Description</strong>: Normalizes the input inventory item type to one of the allowed values.</li>
+</ul>
+<p><strong><code>mapNumistaType(type = &quot;&quot;)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>type</code> (string) - The Numista inventory item type</li>
+<li><strong>Returns</strong>: <code>string</code> - The mapped internal inventory type</li>
+<li><strong>Description</strong>: Maps a Numista type string to the corresponding internal StackrTrackr category.</li>
+</ul>
+<p><strong><code>parseNumistaMetal(composition = &quot;&quot;)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>composition</code> (string) - The Numista composition description</li>
+<li><strong>Returns</strong>: <code>string</code> - The recognized metal type or &quot;Alloy&quot; if not silver/gold/platinum/palladium</li>
+<li><strong>Description</strong>: Determines the metal type from the Numista composition string.</li>
+</ul>
+<h3 id="persistent-storage">Persistent Storage</h3>
+<p><strong><code>saveData(key, data)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>key</code> (string) - The storage key, <code>data</code> (any) - The data to store</li>
+<li><strong>Returns</strong>: <code>Promise&lt;void&gt;</code> - A Promise that resolves when the data is saved</li>
+<li><strong>Description</strong>: Saves data to localStorage, with optional encryption support.</li>
+</ul>
+<p><strong><code>loadData(key, defaultValue = [])</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>key</code> (string) - The storage key, <code>defaultValue</code> (any) - The default value to return if no data is found (default is an empty array)</li>
+<li><strong>Returns</strong>: <code>Promise&lt;any&gt;</code> - The loaded data, or the default value if the data could not be retrieved</li>
+<li><strong>Description</strong>: Loads data from localStorage, with optional decryption support.</li>
+</ul>
+<p><strong><code>saveDataSync(key, data)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>key</code> (string) - The storage key, <code>data</code> (any) - The data to store</li>
+<li><strong>Returns</strong>: <code>void</code></li>
+<li><strong>Description</strong>: Synchronous version of <code>saveData</code> for backwards compatibility.</li>
+</ul>
+<p><strong><code>loadDataSync(key, defaultValue = [])</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>key</code> (string) - The storage key, <code>defaultValue</code> (any) - The default value to return if no data is found (default is an empty array)</li>
+<li><strong>Returns</strong>: <code>any</code> - The loaded data, or the default value if the data could not be retrieved</li>
+<li><strong>Description</strong>: Synchronous version of <code>loadData</code> for backwards compatibility.</li>
+</ul>
+<p><strong><code>cleanupStorage()</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>none</code></li>
+<li><strong>Returns</strong>: <code>void</code></li>
+<li><strong>Description</strong>: Removes unknown localStorage keys to maintain a clean storage state.</li>
+</ul>
+<h3 id="inventory-sorting">Inventory Sorting</h3>
+<p><strong><code>sortInventoryByDateNewestFirst(data = inventory)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>data</code> (array) - The inventory data to sort (default is the global <code>inventory</code> array)</li>
+<li><strong>Returns</strong>: <code>array</code> - The sorted inventory data</li>
+<li><strong>Description</strong>: Sorts the inventory data by date in descending order (newest first), handling unknown/missing dates gracefully.</li>
+</ul>
+<h3 id="inventory-validation">Inventory Validation</h3>
+<p><strong><code>validateInventoryItem(item)</code></strong></p>
+<ul>
+<li><strong>Parameters</strong>: <code>item</code> (object) - The inventory item to validate</li>
+<li><strong>Returns</strong>: <code>{ isValid: boolean, errors: string[] }</code> - The validation result, including a boolean flag and an array of error messages</li>
+<li><strong>Description</strong>: Validates the structure and contents of an inventory item, checking for required fields, length limits, and numeric constraints.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="date-formatting-1">Date Formatting</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const dateStr = "2023-04-15";
+const formattedDate = formatDisplayDate(dateStr); // Output: "Apr 15, 2023"</code></pre>
+</code></pre>
+<h3 id="currency-formatting-1">Currency Formatting</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const amount = 1234.56;
+const formattedCurrency = formatCurrency(amount, "USD"); // Output: "$1,234.56"
+const formattedLossProfit = formatLossProfit(-100.50); // Output: "<span style="color: var(--danger);">-$100.50</span>"</code></pre>
+</code></pre>
+<h3 id="html-sanitization-1">HTML Sanitization</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const unsafeText = "<script>alert('XSS attack!');</script>";
+const sanitizedText = sanitizeHtml(unsafeText); // Output: "&lt;script&gt;alert('XSS attack!');&lt;/script&gt;"</code></pre>
+</code></pre>
+<h3 id="weight-conversion-1">Weight Conversion</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const weightInGrams = 31.1034768;
+const weightInOunces = gramsToOzt(weightInGrams); // Output: 1.0
+const formattedWeight = formatWeight(weightInOunces); // Output: "1.00 oz"</code></pre>
+</code></pre>
+<h3 id="currency-conversion-1">Currency Conversion</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const amount = 100;
+const convertedToUsd = convertToUsd(amount, "EUR"); // Output: 108</code></pre>
+</code></pre>
+<h3 id="inventory-normalization-1">Inventory Normalization</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const rawType = "CoiN";
+const normalizedType = normalizeType(rawType); // Output: "Coin"
+
+const numistaType = "Silver Coin";
+const mappedType = mapNumistaType(numistaType); // Output: "Coin"
+
+const composition = "Silver";
+const metalType = parseNumistaMetal(composition); // Output: "Silver"</code></pre>
+</code></pre>
+<h3 id="persistent-storage-1">Persistent Storage</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">// Asynchronous
+await saveData("myData", { key: "value" });
+const loadedData = await loadData("myData", { defaultKey: "defaultValue" });
+
+// Synchronous
+saveDataSync("myDataSync", { key: "value" });
+const loadedDataSync = loadDataSync("myDataSync", { defaultKey: "defaultValue" });</code></pre>
+</code></pre>
+<h3 id="inventory-sorting-1">Inventory Sorting</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const sortedInventory = sortInventoryByDateNewestFirst(inventory);</code></pre>
+</code></pre>
+<h3 id="inventory-validation-1">Inventory Validation</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const invalidItem = { qty: -1, weight: "abc" };
+const { isValid, errors } = validateInventoryItem(invalidItem);
+console.log(isValid); // Output: false
+console.log(errors); // Output: ["Quantity must be a positive integer", "Weight must be a positive number"]</code></pre>
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>This script does not have any configurable options. It relies on the global <code>DEFAULT_CURRENCY</code> constant, which should be set elsewhere in the application.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The utility functions in this script handle errors gracefully and provide fallback values or default behaviors when issues occur. For example:</p>
+<ul>
+<li>The <code>parseDate</code> function returns the &#39;—&#39; character if the input date cannot be parsed.</li>
+<li>The <code>formatCurrency</code> function has a fallback for environments without Intl.NumberFormat support.</li>
+<li>The <code>loadData</code> and <code>saveData</code> functions log errors and return default values when data could not be loaded or saved.</li>
+</ul>
+<h2 id="integration">Integration</h2>
+<p>The <code>utils.js_chunk_2</code> script is a standalone utility module that can be used throughout the application. It is designed to be easily integrated into various components and features, providing consistent and reliable functionality.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ul>
+<li>The script uses a mix of synchronous and asynchronous functions, with the asynchronous versions handling encryption-related operations.</li>
+<li>The <code>cleanupStorage</code> function is designed to maintain a clean localStorage state by removing any unknown keys.</li>
+<li>The <code>sortInventoryByDateNewestFirst</code> function handles unknown/missing dates gracefully, ensuring a consistent sorting order.</li>
+<li>The <code>validateInventoryItem</code> function provides a centralized way to validate the structure and contents of inventory items, making it easier to enforce data integrity.</li>
+<li>The script uses a combination of custom functions (e.g., <code>stripNonAlphanumeric</code>, <code>cleanString</code>) and built-in JavaScript APIs (e.g., <code>Intl.NumberFormat</code>) to achieve its functionality.</li>
+</ul>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>utils_chunk.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

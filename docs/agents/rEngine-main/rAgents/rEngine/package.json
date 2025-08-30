@@ -1,0 +1,17 @@
+{
+  "name": "stacktrackr-memory-search",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Enhanced memory search system for StackTrackr agents",
+  "main": "quick-memory-search.js",
+  "scripts": {
+    "search": "node memory-search-cli.js",
+    "demo": "node memory-search-demo.js",
+    "test": "node memory-search-cli.js --stats"
+  },
+  "keywords": ["memory", "search", "agents", "stacktrackr"],
+  "author": "StackTrackr Agent System",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

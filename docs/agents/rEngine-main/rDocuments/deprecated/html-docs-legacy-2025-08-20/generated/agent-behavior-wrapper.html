@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rEngine Core: Agent Behavior Wrapper - rEngine Core Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #6366f1;
+            --rengine-secondary: #8b5cf6;
+            --rengine-accent: #06b6d4;
+            --rengine-text: #1f2937;
+            --rengine-text-light: #6b7280;
+            --rengine-bg: #ffffff;
+            --rengine-bg-alt: #f8fafc;
+            --rengine-border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--rengine-text);
+            background: var(--rengine-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--rengine-primary), var(--rengine-secondary));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: "⚙️";
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--rengine-primary);
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--rengine-primary);
+            border-bottom: 2px solid var(--rengine-border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--rengine-secondary);
+        }
+
+        h4, h5, h6 {
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--rengine-text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--rengine-text);
+        }
+
+        .content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        code {
+            background: var(--rengine-bg-alt);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--rengine-primary);
+        }
+
+        pre {
+            background: var(--rengine-bg-alt);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--rengine-primary);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--rengine-text);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--rengine-accent);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: var(--rengine-text-light);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--rengine-border);
+        }
+
+        th {
+            background: var(--rengine-bg-alt);
+            font-weight: 600;
+            color: var(--rengine-primary);
+        }
+
+        .metadata {
+            background: var(--rengine-bg-alt);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--rengine-border);
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: var(--rengine-text-light);
+        }
+
+        footer {
+            background: var(--rengine-bg-alt);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--rengine-text-light);
+            border-top: 1px solid var(--rengine-border);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--rengine-primary);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">rEngine Core</div>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../README.html">Documentation</a>
+                    <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <h1>rEngine Core: Agent Behavior Wrapper</h1>
+            
+            
+            <div class="metadata">
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Source File:</span>
+                        <span>agent-behavior-wrapper.md</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Generated:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Last Modified:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Converter:</span>
+                        <span>rEngine MCP HTML Converter</span>
+                    </div>
+                
+            </div>
+            
+            
+            <h1 id="rengine-core-agent-behavior-wrapper">rEngine Core: Agent Behavior Wrapper</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>agent-behavior-wrapper.js</code> file in the <code>rEngine</code> module provides a comprehensive wrapper for managing the behavior of agents within the rEngine Core ecosystem. This wrapper ensures that all agents follow proper memory contribution protocols, automatically handling memory management and Git-based contributions.</p>
+<p>The primary purpose of this wrapper is to:</p>
+<ol>
+<li>Ensure consistent and reliable agent behavior across the rEngine platform.</li>
+<li>Streamline the process of tracking agent tasks, their outcomes, and the associated file modifications.</li>
+<li>Provide a unified interface for initializing, starting, completing, and cleaning up agent-related operations.</li>
+</ol>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<ol>
+<li><p><strong>AgentBehaviorWrapper</strong>:</p>
+<ul>
+<li>This is the main class that encapsulates the agent behavior management functionality.</li>
+<li>It is responsible for initializing the agent environment, starting and completing tasks, and wrapping agent functions to handle memory and Git contributions.</li>
+</ul>
+</li>
+<li><p><strong>ensureInitialized()</strong>:</p>
+<ul>
+<li>This method ensures that the agent behavior wrapper is properly initialized before any other operations are performed.</li>
+<li>It checks the agent&#39;s self-management status and initializes the wrapper if necessary.</li>
+</ul>
+</li>
+<li><p><strong>startTask(taskDescription)</strong>:</p>
+<ul>
+<li>This method starts a new agent task, logging the task description and the start time.</li>
+<li>It also logs the task initiation in the agent&#39;s self-management system.</li>
+</ul>
+</li>
+<li><p><strong>completeTask(outcome, filesModified = [])</strong>:</p>
+<ul>
+<li>This method completes an agent task, logging the outcome, duration, and the list of modified files.</li>
+<li>It updates the agent&#39;s self-management system with the task completion details.</li>
+</ul>
+</li>
+<li><p><strong>wrapFunction(taskDescription, fn, expectedFiles = [])</strong>:</p>
+<ul>
+<li>This method wraps a given agent function, automatically handling the task start, completion, and error handling.</li>
+<li>It provides a convenient way to execute agent tasks and manage their lifecycle.</li>
+</ul>
+</li>
+<li><p><strong>cleanup()</strong>:</p>
+<ul>
+<li>This method performs cleanup operations, such as finalizing the agent&#39;s self-management session.</li>
+</ul>
+</li>
+<li><p><strong>getAgentWrapper()</strong> and <strong>wrapAgentTask()</strong>:</p>
+<ul>
+<li>These are utility functions that provide a global access point to the agent behavior wrapper and a convenient way to wrap agent tasks, respectively.</li>
+</ul>
+</li>
+<li><p><strong>agentStartup()</strong> and <strong>agentCleanup()</strong>:</p>
+<ul>
+<li>These functions handle the initialization and cleanup of the agent behavior wrapper, ensuring a consistent lifecycle management.</li>
+</ul>
+</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>agent-behavior-wrapper.js</code> file depends on the following module:</p>
+<ul>
+<li><code>./agent-self-management.js</code>: This module is responsible for managing the agent&#39;s self-management aspects, such as logging task completion and handling session cleanup.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>Here are some examples of how to use the <code>AgentBehaviorWrapper</code> class and its related functions:</p>
+<pre><code class="language-javascript">import { wrapAgentTask } from &#39;rEngine/agent-behavior-wrapper&#39;;
+
+// Wrap an agent task
+await wrapAgentTask(&#39;Fetch data from API&#39;, async () =&gt; {
+  const data = await fetchDataFromAPI();
+  return data;
+}, [&#39;data.json&#39;]);
+
+// Manually use the AgentBehaviorWrapper
+const wrapper = await agentStartup();
+try {
+  await wrapper.startTask(&#39;Perform analysis&#39;);
+  const result = await analyzeData();
+  await wrapper.completeTask(&#39;Analysis complete&#39;, [&#39;analysis.report&#39;]);
+} catch (error) {
+  await wrapper.completeTask(`Error: ${error.message}`, []);
+} finally {
+  await wrapper.cleanup();
+}
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>agent-behavior-wrapper.js</code> file does not require any specific configuration. It relies on the <code>AgentSelfManagement</code> module to handle the necessary environment setup and configuration.</p>
+<h2 id="integration-points">Integration Points</h2>
+<p>The <code>agent-behavior-wrapper.js</code> file is a core component of the rEngine Core ecosystem, and it integrates with the following components:</p>
+<ol>
+<li><strong>Agent Self-Management</strong>: The <code>AgentSelfManagement</code> module is used to handle the agent&#39;s self-management aspects, such as logging task completion and managing the agent&#39;s session.</li>
+<li><strong>Agent Execution</strong>: The <code>agent-behavior-wrapper.js</code> file provides a standardized way to execute agent tasks, ensuring consistent behavior and memory management.</li>
+<li><strong>Git Integration</strong>: The task completion logging mechanism in the <code>AgentBehaviorWrapper</code> class interacts with the Git-based contribution system used in the rEngine Core platform.</li>
+</ol>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ol>
+<li><p><strong>Initialization Failure</strong>:</p>
+<ul>
+<li>If the <code>ensureInitialized()</code> method fails, check the <code>AgentSelfManagement</code> module for any issues related to the agent&#39;s startup process.</li>
+<li>Ensure that the necessary environment variables or configuration settings are properly set.</li>
+</ul>
+</li>
+<li><p><strong>Task Completion Issues</strong>:</p>
+<ul>
+<li>If tasks are not being completed correctly, check the <code>completeTask()</code> method for any errors or unexpected behavior.</li>
+<li>Verify that the <code>AgentSelfManagement</code> module is correctly logging the task completion details.</li>
+</ul>
+</li>
+<li><p><strong>Unexpected Behavior</strong>:</p>
+<ul>
+<li>If the agent behavior wrapper exhibits unexpected behavior, check the console for any error messages or warnings.</li>
+<li>Ensure that the agent function being wrapped is correct and does not introduce any issues.</li>
+<li>Verify the integration points with other rEngine Core components to identify any potential conflicts or compatibility problems.</li>
+</ul>
+</li>
+<li><p><strong>Cleanup Failures</strong>:</p>
+<ul>
+<li>If the <code>cleanup()</code> method fails, check the <code>AgentSelfManagement</code> module for any issues related to the agent&#39;s session cleanup process.</li>
+<li>Ensure that the necessary environment variables or configuration settings are properly set.</li>
+</ul>
+</li>
+</ol>
+<p>If you encounter any persistent issues, please consult the rEngine Core documentation or reach out to the development team for further assistance.</p>
+
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../README.html">Documentation</a>
+                <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+            </div>
+            <p>Generated on 2025-08-20 by rEngine Core HTML Converter</p>
+            <p>© 2025 rEngine Core - Intelligent Development Wrapper</p>
+        </div>
+    </footer>
+</body>
+</html>

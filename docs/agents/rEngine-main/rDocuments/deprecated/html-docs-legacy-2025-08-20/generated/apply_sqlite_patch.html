@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>apply sqlite patch - rEngine Core Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #6366f1;
+            --rengine-secondary: #8b5cf6;
+            --rengine-accent: #06b6d4;
+            --rengine-text: #1f2937;
+            --rengine-text-light: #6b7280;
+            --rengine-bg: #ffffff;
+            --rengine-bg-alt: #f8fafc;
+            --rengine-border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--rengine-text);
+            background: var(--rengine-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--rengine-primary), var(--rengine-secondary));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: "⚙️";
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--rengine-primary);
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--rengine-primary);
+            border-bottom: 2px solid var(--rengine-border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--rengine-secondary);
+        }
+
+        h4, h5, h6 {
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--rengine-text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--rengine-text);
+        }
+
+        .content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        code {
+            background: var(--rengine-bg-alt);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--rengine-primary);
+        }
+
+        pre {
+            background: var(--rengine-bg-alt);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--rengine-primary);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--rengine-text);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--rengine-accent);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: var(--rengine-text-light);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--rengine-border);
+        }
+
+        th {
+            background: var(--rengine-bg-alt);
+            font-weight: 600;
+            color: var(--rengine-primary);
+        }
+
+        .metadata {
+            background: var(--rengine-bg-alt);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--rengine-border);
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: var(--rengine-text-light);
+        }
+
+        footer {
+            background: var(--rengine-bg-alt);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--rengine-text-light);
+            border-top: 1px solid var(--rengine-border);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--rengine-primary);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">rEngine Core</div>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../README.html">Documentation</a>
+                    <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <h1>apply sqlite patch</h1>
+            
+            
+            <div class="metadata">
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Source File:</span>
+                        <span>apply_sqlite_patch.md</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Generated:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Last Modified:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Converter:</span>
+                        <span>rEngine MCP HTML Converter</span>
+                    </div>
+                
+            </div>
+            
+            
+            <h2 id="rengine-core-apply_sqlite_patchpy-documentation">rEngine Core: <code>apply_sqlite_patch.py</code> Documentation</h2>
+<h3 id="purpose--overview">Purpose &amp; Overview</h3>
+<p>The <code>apply_sqlite_patch.py</code> file is part of the <code>rMemory/rAgentMemories/memory_bundles/template_bundle/apply/</code> module within the rEngine Core platform. This script is responsible for applying SQLite database patches to the template bundle, which is a crucial component of the rEngine Core&#39;s memory management system.</p>
+<p>The primary function of this script is to ensure that the SQLite database used by the template bundle is up-to-date and consistent with the latest version of the rEngine Core platform. This is achieved by applying SQL patches, which may include schema changes, data migrations, or other database-related modifications.</p>
+<h3 id="key-functionsclasses">Key Functions/Classes</h3>
+<p>The <code>apply_sqlite_patch.py</code> file contains a single function, <code>apply_sqlite_patch()</code>, which is responsible for executing the SQLite database patch.</p>
+<pre><code class="language-python">def apply_sqlite_patch(database_path, patch_path):
+    &quot;&quot;&quot;
+    Applies a SQLite database patch to the specified database.
+
+    Args:
+        database_path (str): The path to the SQLite database file.
+        patch_path (str): The path to the SQL patch file.
+
+    Raises:
+        Exception: If an error occurs during the patch application.
+    &quot;&quot;&quot;
+    # Implementation details omitted for brevity
+</code></pre>
+<p>This function takes two arguments:</p>
+<ol>
+<li><code>database_path</code>: The file path to the SQLite database that needs to be patched.</li>
+<li><code>patch_path</code>: The file path to the SQL patch file that contains the necessary changes.</li>
+</ol>
+<p>The function then applies the patch to the database, ensuring that the database schema and data are updated accordingly.</p>
+<h3 id="dependencies">Dependencies</h3>
+<p>The <code>apply_sqlite_patch.py</code> file has the following dependencies:</p>
+<ol>
+<li><strong>SQLite</strong>: The script interacts with a SQLite database, so it requires the SQLite database management system to be available on the system.</li>
+<li><strong>Python SQLite3 module</strong>: The script uses the built-in <code>sqlite3</code> module in Python to execute SQL commands and manage the database.</li>
+</ol>
+<h3 id="usage-examples">Usage Examples</h3>
+<p>To use the <code>apply_sqlite_patch()</code> function, you can call it with the appropriate arguments:</p>
+<pre><code class="language-python">from rMemory.rAgentMemories.memory_bundles.template_bundle.apply.apply_sqlite_patch import apply_sqlite_patch
+
+database_path = &quot;/path/to/template_bundle.db&quot;
+patch_path = &quot;/path/to/patch.sql&quot;
+
+apply_sqlite_patch(database_path, patch_path)
+</code></pre>
+<p>This will apply the SQL patch defined in the <code>patch.sql</code> file to the SQLite database located at <code>template_bundle.db</code>.</p>
+<h3 id="configuration">Configuration</h3>
+<p>The <code>apply_sqlite_patch.py</code> file does not require any specific configuration parameters or environment variables. The only inputs needed are the file paths to the SQLite database and the SQL patch file.</p>
+<h3 id="integration-points">Integration Points</h3>
+<p>The <code>apply_sqlite_patch.py</code> file is part of the <code>rMemory/rAgentMemories/memory_bundles/template_bundle/apply/</code> module, which is responsible for managing the template bundle within the rEngine Core platform. This script is typically called as part of the rEngine Core&#39;s deployment or update process, ensuring that the template bundle&#39;s SQLite database is kept up-to-date.</p>
+<h3 id="troubleshooting">Troubleshooting</h3>
+<p>Here are some common issues and solutions related to the <code>apply_sqlite_patch.py</code> script:</p>
+<ol>
+<li><p><strong>Database Connection Error</strong>:</p>
+<ul>
+<li><strong>Issue</strong>: The script is unable to connect to the SQLite database.</li>
+<li><strong>Solution</strong>: Ensure that the <code>database_path</code> argument is correct and that the SQLite database file exists and is accessible.</li>
+</ul>
+</li>
+<li><p><strong>Patch Application Error</strong>:</p>
+<ul>
+<li><strong>Issue</strong>: The script encounters an error while applying the SQL patch.</li>
+<li><strong>Solution</strong>: Verify that the <code>patch_path</code> argument is correct and that the SQL patch file is valid. Check the error message for more information about the specific issue.</li>
+</ul>
+</li>
+<li><p><strong>Incompatible Database Schema</strong>:</p>
+<ul>
+<li><strong>Issue</strong>: The SQL patch cannot be applied due to an incompatible database schema.</li>
+<li><strong>Solution</strong>: Investigate the database schema and the SQL patch to identify any incompatibilities. You may need to modify the patch or perform additional schema changes to ensure compatibility.</li>
+</ul>
+</li>
+<li><p><strong>Permissions Issues</strong>:</p>
+<ul>
+<li><strong>Issue</strong>: The script is unable to read or write to the SQLite database or the SQL patch file.</li>
+<li><strong>Solution</strong>: Ensure that the user running the script has the necessary permissions to access the required files and directories.</li>
+</ul>
+</li>
+</ol>
+<p>By addressing these common issues, you can ensure that the <code>apply_sqlite_patch.py</code> script functions correctly within the rEngine Core platform.</p>
+
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../README.html">Documentation</a>
+                <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+            </div>
+            <p>Generated on 2025-08-20 by rEngine Core HTML Converter</p>
+            <p>© 2025 rEngine Core - Intelligent Development Wrapper</p>
+        </div>
+    </footer>
+</body>
+</html>

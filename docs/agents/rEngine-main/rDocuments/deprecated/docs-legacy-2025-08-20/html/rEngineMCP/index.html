@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Server Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>MCP Server Documentation</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 index.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 4KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rEngineMCP/index.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/index.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="mcp-server-documentation">MCP Server Documentation</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>This script sets up a simple Express.js web server that serves two basic routes: a <code>/health</code> endpoint that returns a 200 OK status, and a root <code>/</code> endpoint that returns a &quot;MCP Server is running!&quot; message. This server can be used as a foundational piece for building more complex web applications or microservices.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The code imports the <code>express</code> library, creates an Express application instance, and then defines two route handlers:</p>
+<ol>
+<li>The <code>/health</code> route, which responds with a 200 OK status when hit. This is a common health check endpoint for monitoring the availability of a service.</li>
+<li>The root <code>/</code> route, which simply returns a &quot;MCP Server is running!&quot; message.</li>
+</ol>
+<p>Finally, the server is configured to listen on port 8082 and log a message when it starts running.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>This script has the following external dependencies:</p>
+<table>
+<thead>
+<tr>
+<th>Dependency</th>
+<th>Version</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>express</code></td>
+<td>^4.17.1</td>
+<td>Fast, unopinionated, minimalist web framework for Node.js</td>
+</tr>
+</tbody></table>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="appgethealth-req-res----"><code>app.get(&#39;/health&#39;, (req, res) =&gt; { ... })</code></h3>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>req</code> (Express.Request): The incoming HTTP request object.</li>
+<li><code>res</code> (Express.Response): The outgoing HTTP response object.</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: None. The function sends a 200 OK response directly.</li>
+<li><strong>Description</strong>: Handles requests to the <code>/health</code> endpoint, responding with a 200 OK status to indicate that the server is running and healthy.</li>
+</ul>
+<h3 id="appget-req-res----"><code>app.get(&#39;/&#39;, (req, res) =&gt; { ... })</code></h3>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>req</code> (Express.Request): The incoming HTTP request object.</li>
+<li><code>res</code> (Express.Response): The outgoing HTTP response object.</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: None. The function sends a response message directly.</li>
+<li><strong>Description</strong>: Handles requests to the root <code>/</code> endpoint, responding with a &quot;MCP Server is running!&quot; message.</li>
+</ul>
+<h3 id="applistenport-----"><code>app.listen(port, () =&gt; { ... })</code></h3>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>port</code> (number): The port number to listen on.</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: None. The function starts the server and listens for incoming requests.</li>
+<li><strong>Description</strong>: Configures the Express.js app to listen for incoming HTTP requests on the specified port (8082 in this case) and logs a message when the server starts running.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To use this MCP Server, you can start the server by running the following command in your terminal:</p>
+<pre><code class="language-bash"><pre><code class="language-bash">node index.js</code></pre>
+</code></pre>
+<p>This will start the server and make it available at <code>http://localhost:8082</code>. You can then test the two available routes:</p>
+<ol>
+<li>Health Check: <code>curl http://localhost:8082/health</code><ul>
+<li>Expected Response: <code>OK</code></li>
+</ul>
+</li>
+<li>Root Route: <code>curl http://localhost:8082/</code><ul>
+<li>Expected Response: <code>MCP Server is running!</code></li>
+</ul>
+</li>
+</ol>
+<h2 id="configuration">Configuration</h2>
+<p>This MCP Server has a single configuration option:</p>
+<ul>
+<li><code>port</code> (number): The port number to listen on. In this example, the port is set to <code>8082</code>, but you can change it to any available port on your system.</li>
+</ul>
+<h2 id="error-handling">Error Handling</h2>
+<p>This simple MCP Server does not have any complex error handling mechanisms. If there are any issues with the Express.js server, such as a failed port binding, the server will log the error to the console.</p>
+<h2 id="integration">Integration</h2>
+<p>The MCP Server can be integrated into a larger system as a foundational piece for building more complex web applications or microservices. It provides a basic structure for handling HTTP requests and can be extended with additional routes, middleware, and functionality as needed.</p>
+<h2 id="development-notes">Development Notes</h2>
+<p>This MCP Server is a minimal example and does not include any advanced features or error handling. In a production environment, you would likely want to add the following improvements:</p>
+<ul>
+<li>Implement more robust error handling and logging</li>
+<li>Add middleware for parsing request bodies, handling CORS, etc.</li>
+<li>Integrate with a monitoring or health checking system</li>
+<li>Deploy the server using a containerization tool like Docker</li>
+<li>Configure the server to run as a daemon or service</li>
+</ul>
+<p>Overall, this MCP Server provides a simple starting point for building more complex web applications or microservices using Node.js and Express.js.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>index.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

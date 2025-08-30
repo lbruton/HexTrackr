@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Sync Utility - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Memory Sync Utility</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 memory-sync-utility.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 6KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../generated/memory-sync-utility.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/memory-sync-utility.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="memory-sync-utility">Memory Sync Utility</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>memory-sync-utility.js</code> script is a critical utility that bridges the gap between the MCP (Memory Control Plane) server&#39;s memory and the local <code>rMemory</code> storage. This utility resolves a previously identified 24+ hour sync issue, ensuring data continuity and preventing potential data loss for the agent.</p>
+<p>The key features of this utility include:</p>
+<ol>
+<li><strong>Pulling Latest MCP Observations</strong>: It pulls the latest observations from the MCP and stores them in the local <code>rMemory</code> storage.</li>
+<li><strong>Pushing Critical Local Data</strong>: It pushes critical local data from the <code>rMemory</code> storage to the MCP memory.</li>
+<li><strong>Validating Sync Integrity</strong>: It checks the integrity of the sync process and identifies any potential gaps or issues.</li>
+<li><strong>Reporting Sync Status</strong>: It generates a comprehensive sync report, including details on the sync operations, any identified gaps, and recommendations for further action.</li>
+</ol>
+<p>This utility is a priority-0 (P0) critical component, as it ensures data continuity and prevents data loss for the agent.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>MemorySyncUtility</code> class is the main component of this script. It performs the following key operations:</p>
+<ol>
+<li><strong>Sync to Local</strong>: This method pulls the latest MCP data and updates the local <code>rMemory</code> storage, including the <code>memory.json</code>, <code>handoff.json</code>, <code>tasks.json</code>, and <code>persistent-memory.json</code> files. It also creates an MCP sync summary file for local reference.</li>
+<li><strong>Validate Sync</strong>: This method checks the integrity of the sync process by examining the critical files in the <code>rMemory</code> directory. It identifies any sync gaps, such as missing files or stale data, and generates a validation report.</li>
+<li><strong>Generate Sync Report</strong>: This method provides a comprehensive summary of the sync operation, including the duration, the number of sync operations, and the next steps for maintaining the sync health.</li>
+</ol>
+<p>The script also includes an entry point that creates an instance of the <code>MemorySyncUtility</code> class and runs the sync process.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>This script relies on the following external dependencies:</p>
+<ol>
+<li><code>fs-extra</code>: A file system library that provides enhanced functionality over the built-in <code>fs</code> module.</li>
+<li><code>path</code>: A built-in Node.js module for working with file paths.</li>
+</ol>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="memorysyncutility-class"><code>MemorySyncUtility</code> Class</h3>
+<h4 id="constructor">Constructor</h4>
+<ul>
+<li><strong>Purpose</strong>: Initializes the class with the necessary configuration and data.</li>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Returns</strong>: A new instance of the <code>MemorySyncUtility</code> class.</li>
+</ul>
+<h4 id="synctolocal"><code>syncToLocal()</code></h4>
+<ul>
+<li><strong>Purpose</strong>: Pulls the latest MCP data and updates the local <code>rMemory</code> storage.</li>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Returns</strong>: A Promise that resolves when the sync operation is complete.</li>
+</ul>
+<h4 id="validatesync"><code>validateSync()</code></h4>
+<ul>
+<li><strong>Purpose</strong>: Checks the integrity of the sync process and identifies any sync gaps.</li>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Returns</strong>: A Promise that resolves with a validation report object.</li>
+</ul>
+<h4 id="generatesyncreport"><code>generateSyncReport()</code></h4>
+<ul>
+<li><strong>Purpose</strong>: Generates a comprehensive sync report, including details on the sync operations and recommendations for further action.</li>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Returns</strong>: None.</li>
+</ul>
+<h4 id="run"><code>run()</code></h4>
+<ul>
+<li><strong>Purpose</strong>: Orchestrates the sync process by calling the <code>syncToLocal()</code>, <code>validateSync()</code>, and <code>generateSyncReport()</code> methods.</li>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Returns</strong>: None.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To use the <code>MemorySyncUtility</code>, you can create an instance of the class and call the <code>run()</code> method:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">import MemorySyncUtility from './memory-sync-utility.js';
+
+const syncUtil = new MemorySyncUtility();
+syncUtil.run();</code></pre>
+</code></pre>
+<p>This will execute the full sync process, including pulling the latest MCP data, validating the sync integrity, and generating a sync report.</p>
+<h2 id="configuration">Configuration</h2>
+<p>This script does not require any external configuration options or environment variables. The necessary configuration, such as the base directory and critical file paths, is handled within the <code>MemorySyncUtility</code> class.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>MemorySyncUtility</code> class handles errors that may occur during the sync process. If an error is encountered, it will be caught and logged to the console, and the script will exit with a non-zero status code.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>memory-sync-utility.js</code> script is a critical component of the overall system, as it ensures data continuity and prevents potential data loss for the agent. It is designed to be integrated into the larger system&#39;s workflow, potentially running on a regular schedule (e.g., daily) to maintain the sync between the MCP and the local <code>rMemory</code> storage.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><strong>Sync Metadata</strong>: The script maintains a sync metadata object that tracks the sync direction, timestamp, critical updates, and sync status. This metadata is used to update the <code>persistent-memory.json</code> file and generate the sync log.</li>
+<li><strong>MCP Sync Summary</strong>: The script creates an <code>mcp-sync-summary.json</code> file in the <code>rMemory</code> directory to provide a local reference for the latest MCP observations and relevant system information.</li>
+<li><strong>Validation Report</strong>: The <code>validateSync()</code> method generates a detailed validation report, which is written to a file in the <code>logs</code> directory. This report can be used to identify and address any sync gaps or issues.</li>
+<li><strong>Recommendations</strong>: The validation report includes specific recommendations for addressing any identified sync gaps, such as running the sync more frequently or caching the latest MCP data locally.</li>
+<li><strong>Sync Log</strong>: The script maintains a sync log, which records the specific operations performed during the sync process. This log is included in the sync report and can be used for debugging and troubleshooting purposes.</li>
+</ol>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>memory-sync-utility.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

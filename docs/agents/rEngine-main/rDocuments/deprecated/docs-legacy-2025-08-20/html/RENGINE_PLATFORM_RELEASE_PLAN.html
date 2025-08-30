@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rEngine Platform Release Planning Document - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-rengine">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">🤖</div>
+            <h1>rEngine Platform Release Planning Document</h1>
+            <div class="subtitle">rEngine Platform</div>
+            <div class="meta">
+                <span>📁 RENGINE_PLATFORM_RELEASE_PLAN.md</span>
+                <span>📅 2025-08-19</span>
+                <span>📊 16KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../RENGINE_PLATFORM_RELEASE_PLAN.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/RENGINE_PLATFORM_RELEASE_PLAN.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="rengine-platform-release-planning-document">rEngine Platform Release Planning Document</h1>
+<p><strong>Project</strong>: Transform rEngine into Standalone AI Development Platform<br><strong>Version</strong>: rEngine Platform v1.0<br><strong>Target Date</strong>: Q4 2025<br><strong>Priority</strong>: P1 (Strategic Initiative)</p>
+<hr>
+<h2 id="🎯-executive-summary">🎯 <strong>Executive Summary</strong></h2>
+<p>Transform the current StackTrackr-specific rEngine system into a general-purpose AI development platform that can work with any project. The platform will run in Docker containers, include Ollama for local LLM processing, and provide a project-agnostic multi-agent AI orchestration system.</p>
+<h2 id="📋-project-structure-vision">📋 <strong>Project Structure Vision</strong></h2>
+<h3 id="target-directory-structure"><strong>Target Directory Structure</strong></h3>
+<pre><code><pre><code class="language-">rEngine-Platform/
+├── README.md
+├── INSTALL.md
+├── docker-compose.yml
+├── Dockerfile
+├── install.sh
+├── requirements.txt
+├── package.json
+├── rEngine/
+│   ├── core/
+│   │   ├── one-click-startup.js
+│   │   ├── smart-scribe.js
+│   │   ├── memory-sync-manager.js
+│   │   └── system-config.json
+│   ├── rAgents/
+│   │   ├── agent-coordination/
+│   │   ├── handoff-system/
+│   │   └── agent-templates/
+│   ├── rMemory/
+│   │   ├── mcp-integration/
+│   │   ├── sqlite-backend/
+│   │   └── memory-templates/
+│   ├── rSync/
+│   │   ├── git-integration/
+│   │   ├── backup-systems/
+│   │   └── version-control/
+│   ├── rScribe/
+│   │   ├── document-generation/
+│   │   ├── monitoring/
+│   │   └── analysis-tools/
+│   └── web-interface/
+│       ├── dashboard/
+│       ├── project-manager/
+│       └── system-monitor/
+├── rProjects/
+│   ├── .projects-manifest.json
+│   ├── README.md
+│   └── example-project/
+└── docs/
+    ├── api/
+    ├── user-guide/
+    └── developer-guide/</code></pre>
+</code></pre>
+<hr>
+<h2 id="🚀-phase-1-core-extraction-and-cleanup-2-weeks">🚀 <strong>Phase 1: Core Extraction and Cleanup (2 weeks)</strong></h2>
+<h3 id="✅-task-checklist-component-extraction"><strong>✅ Task Checklist: Component Extraction</strong></h3>
+<h4 id="extract-rengine-core-components"><strong>Extract rEngine Core Components</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Create new repository: <code>rEngine-Platform</code></li>
+<li><input disabled="" type="checkbox"> Extract core rEngine files (40+ scripts)</li>
+<li><input disabled="" type="checkbox"> Remove StackTrackr-specific references</li>
+<li><input disabled="" type="checkbox"> Update file paths to be project-agnostic</li>
+<li><input disabled="" type="checkbox"> Create modular configuration system</li>
+<li><input disabled="" type="checkbox"> Implement project discovery mechanism</li>
+</ul>
+<h4 id="clean-up-stacktrackr-dependencies"><strong>Clean Up StackTrackr Dependencies</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Remove references to <code>/Volumes/DATA/GitHub/StackTrackr</code></li>
+<li><input disabled="" type="checkbox"> Extract precious metals inventory logic</li>
+<li><input disabled="" type="checkbox"> Remove CSS/HTML/JS specific to StackTrackr app</li>
+<li><input disabled="" type="checkbox"> Clean up image assets (keep only generic ones)</li>
+<li><input disabled="" type="checkbox"> Remove sample.csv and inventory-specific files</li>
+<li><input disabled="" type="checkbox"> Update documentation to be project-agnostic</li>
+</ul>
+<h4 id="create-project-management-system"><strong>Create Project Management System</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Design <code>.projects-manifest.json</code> schema</li>
+<li><input disabled="" type="checkbox"> Build project discovery and indexing</li>
+<li><input disabled="" type="checkbox"> Create project switching mechanisms</li>
+<li><input disabled="" type="checkbox"> Implement project-specific memory isolation</li>
+<li><input disabled="" type="checkbox"> Design project configuration templates</li>
+</ul>
+<h3 id="✅-task-checklist-file-structure-reorganization"><strong>✅ Task Checklist: File Structure Reorganization</strong></h3>
+<h4 id="core-rengine-structure"><strong>Core rEngine Structure</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Move all rEngine scripts to <code>rEngine/core/</code></li>
+<li><input disabled="" type="checkbox"> Organize rAgents into <code>rEngine/rAgents/</code></li>
+<li><input disabled="" type="checkbox"> Consolidate rMemory into <code>rEngine/rMemory/</code></li>
+<li><input disabled="" type="checkbox"> Package rSync into <code>rEngine/rSync/</code></li>
+<li><input disabled="" type="checkbox"> Structure rScribe into <code>rEngine/rScribe/</code></li>
+</ul>
+<h4 id="configuration-management"><strong>Configuration Management</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Create master <code>system-config.json</code> template</li>
+<li><input disabled="" type="checkbox"> Design project-specific config overlays</li>
+<li><input disabled="" type="checkbox"> Implement environment variable support</li>
+<li><input disabled="" type="checkbox"> Create configuration validation system</li>
+<li><input disabled="" type="checkbox"> Build config migration tools</li>
+</ul>
+<hr>
+<h2 id="🐳-phase-2-docker-infrastructure-2-weeks">🐳 <strong>Phase 2: Docker Infrastructure (2 weeks)</strong></h2>
+<h3 id="✅-task-checklist-docker-architecture"><strong>✅ Task Checklist: Docker Architecture</strong></h3>
+<h4 id="container-design"><strong>Container Design</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Design multi-container architecture</li>
+<li><input disabled="" type="checkbox"> Create Dockerfile for rEngine platform</li>
+<li><input disabled="" type="checkbox"> Create Dockerfile for Ollama service</li>
+<li><input disabled="" type="checkbox"> Create Dockerfile for web interface</li>
+<li><input disabled="" type="checkbox"> Design data persistence strategy</li>
+<li><input disabled="" type="checkbox"> Implement container networking</li>
+</ul>
+<h4 id="docker-compose-configuration"><strong>Docker Compose Configuration</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Create <code>docker-compose.yml</code> with all services</li>
+<li><input disabled="" type="checkbox"> Configure volume mounts for rProjects</li>
+<li><input disabled="" type="checkbox"> Setup networking between containers</li>
+<li><input disabled="" type="checkbox"> Implement health checks for all services</li>
+<li><input disabled="" type="checkbox"> Configure environment variables</li>
+<li><input disabled="" type="checkbox"> Setup logging and monitoring</li>
+</ul>
+<h3 id="✅-task-checklist-ollama-integration"><strong>✅ Task Checklist: Ollama Integration</strong></h3>
+<h4 id="ollama-performance-considerations-mac-mini"><strong>Ollama Performance Considerations (Mac Mini)</strong></h4>
+<p><strong>Docker vs Native Performance Analysis:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Docker on Mac Mini</th>
+<th>Native Mac Mini</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>CPU Performance</strong></td>
+<td>5-10% overhead</td>
+<td>Full native speed</td>
+<td>Moderate</td>
+</tr>
+<tr>
+<td><strong>Memory Access</strong></td>
+<td>Shared memory overhead</td>
+<td>Direct access</td>
+<td>Moderate</td>
+</tr>
+<tr>
+<td><strong>Disk I/O</strong></td>
+<td>Volume mount overhead</td>
+<td>Native filesystem</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>GPU Access</strong></td>
+<td>Limited Metal access</td>
+<td>Full Metal support</td>
+<td>Critical</td>
+</tr>
+<tr>
+<td><strong>Model Loading</strong></td>
+<td>Slower initial load</td>
+<td>Faster cold start</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Inference Speed</strong></td>
+<td>10-15% slower</td>
+<td>Full performance</td>
+<td>High</td>
+</tr>
+</tbody></table>
+<p><strong>Recommendation</strong>: For production deployment on Mac Mini, consider <strong>hybrid approach</strong>:</p>
+<ul>
+<li>Run Ollama natively on Mac Mini for best performance</li>
+<li>Run rEngine platform in Docker for isolation</li>
+<li>Use network communication between containers and native Ollama</li>
+</ul>
+<h4 id="ollama-docker-integration-tasks"><strong>Ollama Docker Integration Tasks</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Test Ollama performance in Docker vs native</li>
+<li><input disabled="" type="checkbox"> Implement Ollama health monitoring</li>
+<li><input disabled="" type="checkbox"> Create model management system</li>
+<li><input disabled="" type="checkbox"> Design model download automation</li>
+<li><input disabled="" type="checkbox"> Implement GPU passthrough (if needed)</li>
+<li><input disabled="" type="checkbox"> Setup Ollama API security</li>
+</ul>
+<h3 id="✅-task-checklist-web-interface"><strong>✅ Task Checklist: Web Interface</strong></h3>
+<h4 id="dashboard-development"><strong>Dashboard Development</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Create project selection interface</li>
+<li><input disabled="" type="checkbox"> Build system monitoring dashboard</li>
+<li><input disabled="" type="checkbox"> Implement agent status visualization</li>
+<li><input disabled="" type="checkbox"> Create memory system browser</li>
+<li><input disabled="" type="checkbox"> Design log viewing interface</li>
+<li><input disabled="" type="checkbox"> Build configuration management UI</li>
+</ul>
+<h4 id="project-management-interface"><strong>Project Management Interface</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Create project import wizard</li>
+<li><input disabled="" type="checkbox"> Build project configuration editor</li>
+<li><input disabled="" type="checkbox"> Implement project switching</li>
+<li><input disabled="" type="checkbox"> Design project health monitoring</li>
+<li><input disabled="" type="checkbox"> Create backup/restore interface</li>
+</ul>
+<hr>
+<h2 id="🗂️-phase-3-project-management-system-1-week">🗂️ <strong>Phase 3: Project Management System (1 week)</strong></h2>
+<h3 id="✅-task-checklist-projects-manifest-system"><strong>✅ Task Checklist: Projects Manifest System</strong></h3>
+<h4 id="projects-manifestjson-schema-design"><strong><code>.projects-manifest.json</code> Schema Design</strong></h4>
+<pre><code class="language-json"><pre><code class="language-json">{
+  "version": "1.0.0",
+  "lastUpdated": "2025-08-18T10:30:00Z",
+  "projects": [
+    {
+      "id": "project-001",
+      "name": "My Web App",
+      "path": "./my-web-app",
+      "type": "web-application",
+      "language": "javascript",
+      "framework": "react",
+      "status": "active",
+      "created": "2025-08-01T09:00:00Z",
+      "lastAccessed": "2025-08-18T10:30:00Z",
+      "config": {
+        "ai_models": ["qwen2.5-coder:3b"],
+        "agent_preferences": {
+          "code_style": "modern",
+          "documentation_level": "detailed"
+        },
+        "memory_retention": "30d",
+        "backup_frequency": "daily"
+      },
+      "stats": {
+        "agent_sessions": 45,
+        "memory_entries": 1203,
+        "files_analyzed": 89,
+        "last_backup": "2025-08-18T02:00:00Z"
+      }
+    }
+  ],
+  "settings": {
+    "default_language": "en",
+    "max_projects": 50,
+    "auto_cleanup": true,
+    "backup_retention": "90d"
+  }
+}</code></pre>
+</code></pre>
+<h4 id="project-management-implementation"><strong>Project Management Implementation</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Create project registration system</li>
+<li><input disabled="" type="checkbox"> Build project discovery automation</li>
+<li><input disabled="" type="checkbox"> Implement project type detection</li>
+<li><input disabled="" type="checkbox"> Design project health monitoring</li>
+<li><input disabled="" type="checkbox"> Create project archival system</li>
+<li><input disabled="" type="checkbox"> Build project migration tools</li>
+</ul>
+<h3 id="✅-task-checklist-memory-system-adaptation"><strong>✅ Task Checklist: Memory System Adaptation</strong></h3>
+<h4 id="project-specific-memory-isolation"><strong>Project-Specific Memory Isolation</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Design project-specific memory namespaces</li>
+<li><input disabled="" type="checkbox"> Create memory isolation mechanisms</li>
+<li><input disabled="" type="checkbox"> Build project memory migration tools</li>
+<li><input disabled="" type="checkbox"> Implement cross-project memory sharing (optional)</li>
+<li><input disabled="" type="checkbox"> Design memory cleanup policies</li>
+<li><input disabled="" type="checkbox"> Create memory analytics per project</li>
+</ul>
+<h4 id="sqlite-schema-updates-for-multi-project"><strong>SQLite Schema Updates for Multi-Project</strong></h4>
+<pre><code class="language-sql"><pre><code class="language-sql">-- Add project tracking to existing tables
+ALTER TABLE entities ADD COLUMN project_id TEXT;
+ALTER TABLE conversations ADD COLUMN project_id TEXT;
+ALTER TABLE agent_memories ADD COLUMN project_id TEXT;
+
+-- New project management table
+CREATE TABLE projects (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    path TEXT NOT NULL,
+    type TEXT,
+    language TEXT,
+    framework TEXT,
+    status TEXT DEFAULT 'active',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    config JSON,
+    stats JSON
+);
+
+-- Project activity tracking
+CREATE TABLE project_activity (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id TEXT NOT NULL,
+    activity_type TEXT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    details JSON,
+    FOREIGN KEY (project_id) REFERENCES projects(id)
+);</code></pre>
+</code></pre>
+<hr>
+<h2 id="🛠️-phase-4-installation-and-dependencies-1-week">🛠️ <strong>Phase 4: Installation and Dependencies (1 week)</strong></h2>
+<h3 id="✅-task-checklist-installation-system"><strong>✅ Task Checklist: Installation System</strong></h3>
+<h4 id="install-script-development"><strong>Install Script Development</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Create cross-platform install script (<code>install.sh</code>)</li>
+<li><input disabled="" type="checkbox"> Implement dependency checking</li>
+<li><input disabled="" type="checkbox"> Build Docker installation automation</li>
+<li><input disabled="" type="checkbox"> Create system requirements validation</li>
+<li><input disabled="" type="checkbox"> Implement configuration setup wizard</li>
+<li><input disabled="" type="checkbox"> Design uninstall procedures</li>
+</ul>
+<h4 id="install-script-features"><strong>Install Script Features</strong></h4>
+<pre><code class="language-bash"><pre><code class="language-bash">#!/bin/bash
+# install.sh - rEngine Platform Installer
+
+features_to_implement() {
+    # System requirements check
+    check_docker_installed
+    check_system_resources
+    validate_port_availability
+    
+    # Installation options
+    choose_installation_type  # Docker vs Hybrid
+    configure_ollama_integration
+    setup_project_directory
+    
+    # Initial configuration
+    run_configuration_wizard
+    download_default_models
+    create_sample_project
+    
+    # Verification
+    run_health_checks
+    validate_installation
+    display_next_steps
+}</code></pre>
+</code></pre>
+<h4 id="dependency-management"><strong>Dependency Management</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Create comprehensive <code>requirements.txt</code></li>
+<li><input disabled="" type="checkbox"> Build <code>package.json</code> for Node.js dependencies</li>
+<li><input disabled="" type="checkbox"> Design Python virtual environment setup</li>
+<li><input disabled="" type="checkbox"> Implement model download automation</li>
+<li><input disabled="" type="checkbox"> Create dependency update mechanisms</li>
+</ul>
+<h3 id="✅-task-checklist-documentation"><strong>✅ Task Checklist: Documentation</strong></h3>
+<h4 id="user-documentation"><strong>User Documentation</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Create comprehensive README.md</li>
+<li><input disabled="" type="checkbox"> Write detailed INSTALL.md guide</li>
+<li><input disabled="" type="checkbox"> Build user guide with examples</li>
+<li><input disabled="" type="checkbox"> Create troubleshooting documentation</li>
+<li><input disabled="" type="checkbox"> Design video tutorials (optional)</li>
+</ul>
+<h4 id="developer-documentation"><strong>Developer Documentation</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Create API documentation</li>
+<li><input disabled="" type="checkbox"> Write architecture documentation</li>
+<li><input disabled="" type="checkbox"> Build plugin development guide</li>
+<li><input disabled="" type="checkbox"> Create contribution guidelines</li>
+<li><input disabled="" type="checkbox"> Design testing documentation</li>
+</ul>
+<hr>
+<h2 id="⚡-performance-considerations-deep-dive">⚡ <strong>Performance Considerations Deep Dive</strong></h2>
+<h3 id="ollama-on-mac-mini-docker-vs-native"><strong>Ollama on Mac Mini: Docker vs Native</strong></h3>
+<h4 id="hardware-specifications-impact"><strong>Hardware Specifications Impact</strong></h4>
+<ul>
+<li><strong>Mac Mini M1/M2</strong>: Unified memory architecture benefits native performance</li>
+<li><strong>Neural Engine</strong>: Better utilized in native mode</li>
+<li><strong>Thermal Management</strong>: Docker adds thermal overhead</li>
+<li><strong>Memory Bandwidth</strong>: Docker introduces memory copy overhead</li>
+</ul>
+<h4 id="benchmark-expectations"><strong>Benchmark Expectations</strong></h4>
+<pre><code><pre><code class="language-">Model Loading Times:
+- Native: 3-8 seconds (depending on model size)
+- Docker: 5-12 seconds (60-80% slower)
+
+Inference Performance:
+- Native: 15-30 tokens/second (typical)
+- Docker: 12-25 tokens/second (15-20% slower)
+
+Memory Usage:
+- Native: Model size + 1-2GB overhead
+- Docker: Model size + 2-4GB overhead</code></pre>
+</code></pre>
+<h4 id="recommended-hybrid-architecture"><strong>Recommended Hybrid Architecture</strong></h4>
+<pre><code class="language-yaml"><pre><code class="language-yaml"># docker-compose.yml - Hybrid Approach
+version: '3.8'
+services:
+  rengine-platform:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./rProjects:/app/rProjects
+    environment:
+      - OLLAMA_HOST=host.docker.internal:11434
+  
+  # Note: Ollama runs natively on host
+  # Connection via host.docker.internal</code></pre>
+</code></pre>
+<h3 id="scaling-considerations"><strong>Scaling Considerations</strong></h3>
+<h4 id="multi-project-performance"><strong>Multi-Project Performance</strong></h4>
+<ul>
+<li><strong>Memory Per Project</strong>: 50-200MB depending on project size</li>
+<li><strong>Concurrent Agent Limit</strong>: 3-5 agents on Mac Mini</li>
+<li><strong>SQLite Performance</strong>: Can handle 50+ projects efficiently</li>
+<li><strong>Disk Space</strong>: 100MB-1GB per project (including memory)</li>
+</ul>
+<h4 id="resource-monitoring"><strong>Resource Monitoring</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Implement CPU usage monitoring</li>
+<li><input disabled="" type="checkbox"> Create memory usage alerts</li>
+<li><input disabled="" type="checkbox"> Build disk space management</li>
+<li><input disabled="" type="checkbox"> Design performance analytics</li>
+</ul>
+<hr>
+<h2 id="🚧-phase-5-testing-and-validation-1-week">🚧 <strong>Phase 5: Testing and Validation (1 week)</strong></h2>
+<h3 id="✅-task-checklist-testing-framework"><strong>✅ Task Checklist: Testing Framework</strong></h3>
+<h4 id="system-testing"><strong>System Testing</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Create Docker deployment tests</li>
+<li><input disabled="" type="checkbox"> Build multi-project isolation tests</li>
+<li><input disabled="" type="checkbox"> Implement performance benchmarks</li>
+<li><input disabled="" type="checkbox"> Design memory system tests</li>
+<li><input disabled="" type="checkbox"> Create agent coordination tests</li>
+</ul>
+<h4 id="user-acceptance-testing"><strong>User Acceptance Testing</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Test project import workflows</li>
+<li><input disabled="" type="checkbox"> Validate agent handoff across projects</li>
+<li><input disabled="" type="checkbox"> Test backup/restore functionality</li>
+<li><input disabled="" type="checkbox"> Validate configuration management</li>
+<li><input disabled="" type="checkbox"> Test system monitoring features</li>
+</ul>
+<h4 id="performance-testing"><strong>Performance Testing</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> Benchmark Ollama performance (Docker vs Native)</li>
+<li><input disabled="" type="checkbox"> Test concurrent project handling</li>
+<li><input disabled="" type="checkbox"> Validate memory usage patterns</li>
+<li><input disabled="" type="checkbox"> Test system under load</li>
+<li><input disabled="" type="checkbox"> Measure startup/shutdown times</li>
+</ul>
+<hr>
+<h2 id="📅-implementation-timeline">📅 <strong>Implementation Timeline</strong></h2>
+<h3 id="6-week-development-plan"><strong>6-Week Development Plan</strong></h3>
+<p><strong>Weeks 1-2: Core Extraction and Cleanup</strong></p>
+<ul>
+<li>Extract and clean rEngine components</li>
+<li>Remove StackTrackr dependencies</li>
+<li>Create project management foundation</li>
+</ul>
+<p><strong>Weeks 3-4: Docker Infrastructure</strong></p>
+<ul>
+<li>Build Docker containers</li>
+<li>Implement Ollama integration</li>
+<li>Create web interface foundation</li>
+</ul>
+<p><strong>Week 5: Project Management System</strong></p>
+<ul>
+<li>Build projects manifest system</li>
+<li>Implement memory isolation</li>
+<li>Create project switching mechanisms</li>
+</ul>
+<p><strong>Week 6: Installation and Testing</strong></p>
+<ul>
+<li>Create installation scripts</li>
+<li>Build documentation</li>
+<li>Conduct comprehensive testing</li>
+</ul>
+<h3 id="delivery-milestones"><strong>Delivery Milestones</strong></h3>
+<ul>
+<li><strong>Week 2</strong>: ✅ Clean, extracted rEngine platform</li>
+<li><strong>Week 4</strong>: ✅ Functional Docker deployment</li>
+<li><strong>Week 5</strong>: ✅ Multi-project support working</li>
+<li><strong>Week 6</strong>: ✅ Production-ready release</li>
+</ul>
+<hr>
+<h2 id="🎯-success-metrics">🎯 <strong>Success Metrics</strong></h2>
+<h3 id="technical-metrics"><strong>Technical Metrics</strong></h3>
+<ul>
+<li>✅ <strong>Installation Time</strong>: &lt; 10 minutes on clean system</li>
+<li>✅ <strong>Startup Time</strong>: &lt; 30 seconds for full system</li>
+<li>✅ <strong>Project Switch Time</strong>: &lt; 5 seconds</li>
+<li>✅ <strong>Memory Isolation</strong>: 100% project separation</li>
+<li>✅ <strong>Performance</strong>: &lt; 20% overhead vs native</li>
+</ul>
+<h3 id="user-experience-metrics"><strong>User Experience Metrics</strong></h3>
+<ul>
+<li>✅ <strong>Setup Complexity</strong>: Single command installation</li>
+<li>✅ <strong>Learning Curve</strong>: &lt; 1 hour to productive use</li>
+<li>✅ <strong>Documentation Quality</strong>: Complete user/dev guides</li>
+<li>✅ <strong>System Reliability</strong>: 99%+ uptime</li>
+<li>✅ <strong>Multi-Project Support</strong>: 50+ concurrent projects</li>
+</ul>
+<hr>
+<h2 id="🚨-risk-assessment-and-mitigation">🚨 <strong>Risk Assessment and Mitigation</strong></h2>
+<h3 id="high-risk-items"><strong>High Risk Items</strong></h3>
+<h4 id="performance-degradation-in-docker"><strong>Performance Degradation in Docker</strong></h4>
+<ul>
+<li><strong>Risk</strong>: 20-30% performance loss on Mac Mini</li>
+<li><strong>Mitigation</strong>: Implement hybrid architecture with native Ollama</li>
+<li><strong>Fallback</strong>: Provide native installation option</li>
+</ul>
+<h4 id="memory-system-complexity"><strong>Memory System Complexity</strong></h4>
+<ul>
+<li><strong>Risk</strong>: Project isolation may be complex to implement</li>
+<li><strong>Mitigation</strong>: Phase rollout with single-project first</li>
+<li><strong>Fallback</strong>: Simple file-based project separation</li>
+</ul>
+<h4 id="docker-compatibility-issues"><strong>Docker Compatibility Issues</strong></h4>
+<ul>
+<li><strong>Risk</strong>: Mac Mini ARM architecture compatibility</li>
+<li><strong>Mitigation</strong>: Extensive testing on target hardware</li>
+<li><strong>Fallback</strong>: Native installation scripts</li>
+</ul>
+<h3 id="medium-risk-items"><strong>Medium Risk Items</strong></h3>
+<h4 id="configuration-management-1"><strong>Configuration Management</strong></h4>
+<ul>
+<li><strong>Risk</strong>: Complex multi-project configuration</li>
+<li><strong>Mitigation</strong>: Simple defaults with advanced options</li>
+<li><strong>Testing</strong>: Comprehensive configuration validation</li>
+</ul>
+<h4 id="user-adoption"><strong>User Adoption</strong></h4>
+<ul>
+<li><strong>Risk</strong>: Complex installation or usage</li>
+<li><strong>Mitigation</strong>: Excellent documentation and examples</li>
+<li><strong>Support</strong>: Community forums and issue tracking</li>
+</ul>
+<hr>
+<h2 id="📦-dependencies-and-requirements">📦 <strong>Dependencies and Requirements</strong></h2>
+<h3 id="system-requirements"><strong>System Requirements</strong></h3>
+<pre><code class="language-yaml"><pre><code class="language-yaml">Minimum:
+  CPU: Apple M1 or Intel i5 equivalent
+  RAM: 16GB (8GB for system, 8GB for models)
+  Storage: 50GB free space
+  OS: macOS 12+, Ubuntu 20.04+, Windows 10+
+
+Recommended:
+  CPU: Apple M2 Pro or Intel i7 equivalent
+  RAM: 32GB (16GB for system, 16GB for models)
+  Storage: 100GB SSD free space
+  OS: macOS 13+, Ubuntu 22.04+, Windows 11+</code></pre>
+</code></pre>
+<h3 id="software-dependencies"><strong>Software Dependencies</strong></h3>
+<pre><code class="language-yaml"><pre><code class="language-yaml">Required:
+  - Docker 24.0+
+  - Docker Compose 2.0+
+  - Git 2.30+
+  - Node.js 18+
+  - Python 3.9+
+
+Optional:
+  - Ollama (for native mode)
+  - VS Code (for development)
+  - Nginx (for production deployment)</code></pre>
+</code></pre>
+<hr>
+<h2 id="🔮-future-enhancements-v20">🔮 <strong>Future Enhancements (v2.0+)</strong></h2>
+<h3 id="advanced-features-roadmap"><strong>Advanced Features Roadmap</strong></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Cloud deployment options (AWS/GCP/Azure)</li>
+<li><input disabled="" type="checkbox"> Team collaboration features</li>
+<li><input disabled="" type="checkbox"> Plugin architecture for custom agents</li>
+<li><input disabled="" type="checkbox"> Integration with popular IDEs</li>
+<li><input disabled="" type="checkbox"> Advanced analytics and reporting</li>
+<li><input disabled="" type="checkbox"> Enterprise security features</li>
+<li><input disabled="" type="checkbox"> Multi-language support</li>
+<li><input disabled="" type="checkbox"> API marketplace for agents</li>
+</ul>
+<h3 id="scalability-improvements"><strong>Scalability Improvements</strong></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Kubernetes deployment options</li>
+<li><input disabled="" type="checkbox"> Horizontal scaling for large teams</li>
+<li><input disabled="" type="checkbox"> Distributed memory systems</li>
+<li><input disabled="" type="checkbox"> Advanced caching mechanisms</li>
+<li><input disabled="" type="checkbox"> Performance optimization tools</li>
+</ul>
+<hr>
+<p>This planning document provides a comprehensive roadmap for transforming rEngine into a standalone platform. The phased approach ensures manageable development while the detailed checklists provide clear implementation guidance.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>RENGINE_PLATFORM_RELEASE_PLAN.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-19</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,221 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-16",
+    "purpose": "Structured roadmap and feature planning for StackTrackr development",
+    "description": "Machine-readable roadmap with milestone tracking, feature planning, and agent integration",
+    "last_updated": "2025-08-16T23:35:55Z",
+    "gpt_export_prep": true,
+    "goomba_export_prep": true
+  },
+  "active_milestones": {
+    "v3.05.0": {
+      "title": "Enhanced Filtering & UI Polish",
+      "target_date": "2025-09-01",
+      "status": "planning",
+      "priority": "high",
+      "completion_percentage": 15,
+      "description": "Focus on filter system improvements, UI consistency, and performance optimizations",
+      "features": [
+        {
+          "id": "FEAT-001",
+          "title": "Filter System Overhaul",
+          "status": "in_progress",
+          "estimated_effort": "8h",
+          "priority": "high",
+          "description": "Complete redesign of filter chips, dropdown behavior, and color consistency",
+          "dependencies": [
+            "BUG-006"
+          ],
+          "assigned_to": null
+        },
+        {
+          "id": "FEAT-002",
+          "title": "UI Consistency Pass",
+          "status": "planning",
+          "estimated_effort": "4h",
+          "priority": "medium",
+          "description": "Address visual inconsistencies across table styling and component alignment",
+          "dependencies": [
+            "BUG-007"
+          ],
+          "assigned_to": null
+        }
+      ],
+      "bugs_blocking": [
+        "BUG-006"
+      ],
+      "estimated_total_effort": "17h",
+      "risks": [
+        "Filter system complexity may require architectural changes",
+        "UI changes may affect existing user workflows"
+      ]
+    },
+    "v3.06.0": {
+      "title": "Performance & Search Enhancement",
+      "target_date": "2025-10-15",
+      "status": "planning",
+      "priority": "medium",
+      "completion_percentage": 0,
+      "description": "Large dataset handling improvements and advanced search capabilities",
+      "features": [
+        {
+          "id": "FEAT-003",
+          "title": "Virtual Scrolling Implementation",
+          "status": "planning",
+          "estimated_effort": "12h",
+          "priority": "high",
+          "description": "Handle large collections (10k+ items) with virtual scrolling for performance",
+          "dependencies": [],
+          "assigned_to": null
+        },
+        {
+          "id": "FEAT-004",
+          "title": "Advanced Search Engine",
+          "status": "planning",
+          "estimated_effort": "10h",
+          "priority": "medium",
+          "description": "Fuzzy search, search history, saved searches, and AI-assisted search suggestions",
+          "dependencies": [
+            "FEAT-003"
+          ],
+          "assigned_to": null
+        }
+      ],
+      "bugs_blocking": [],
+      "estimated_total_effort": "22h",
+      "risks": [
+        "Virtual scrolling may require significant UI refactoring",
+        "AI search features depend on external API availability"
+      ]
+    }
+  },
+  "completed_milestones": {
+    "v3.04.88": {
+      "title": "Data Import & UI Fixes",
+      "target_date": "2025-08-15",
+      "actual_release_date": "2025-08-15",
+      "status": "released",
+      "completion_percentage": 100,
+      "description": "Critical bug fixes for data import and UI polish",
+      "features_completed": [
+        {
+          "id": "FEAT-101",
+          "title": "CSV Import Pricing Fix",
+          "effort_estimated": "3h",
+          "effort_actual": "2.5h",
+          "description": "Restored Numista price data integration in CSV imports"
+        },
+        {
+          "id": "FEAT-102",
+          "title": "Button Hover Cleanup",
+          "effort_estimated": "30m",
+          "effort_actual": "20m",
+          "description": "Cleaned up edit button hover states"
+        }
+      ],
+      "bugs_resolved": [
+        "BUG-009",
+        "BUG-010",
+        "BUG-011"
+      ],
+      "actual_total_effort": "3.5h",
+      "lessons_learned": [
+        "CSV processing edge cases require more thorough testing",
+        "UI consistency checks should be automated"
+      ]
+    }
+  },
+  "future_vision": {
+    "v4.0.0": {
+      "title": "Next Generation Architecture",
+      "tentative_date": "2025-Q4",
+      "status": "concept",
+      "priority": "medium",
+      "description": "Major architectural improvements and new capabilities",
+      "major_themes": [
+        "Multi-user collaboration features",
+        "Real-time synchronization",
+        "Plugin architecture for extensions",
+        "Advanced analytics and reporting",
+        "Mobile companion app"
+      ],
+      "estimated_effort": "200h+",
+      "research_needed": [
+        "WebRTC for real-time sync",
+        "Plugin system architecture",
+        "Mobile app framework selection"
+      ]
+    }
+  },
+  "feature_categories": {
+    "performance": {
+      "description": "Speed, memory usage, and scalability improvements",
+      "active_features": 1,
+      "completed_features": 0,
+      "priority_weight": 8
+    },
+    "user_experience": {
+      "description": "Interface improvements and user workflow enhancements",
+      "active_features": 2,
+      "completed_features": 2,
+      "priority_weight": 9
+    },
+    "data_management": {
+      "description": "Import, export, and data processing capabilities",
+      "active_features": 0,
+      "completed_features": 1,
+      "priority_weight": 7
+    },
+    "search_discovery": {
+      "description": "Finding and filtering collection items",
+      "active_features": 1,
+      "completed_features": 0,
+      "priority_weight": 8
+    }
+  },
+  "technical_debt": {
+    "high_priority": [
+      {
+        "item": "Filter system architecture needs refactoring",
+        "estimated_effort": "6h",
+        "impact": "Blocking new filter features",
+        "target_milestone": "v3.05.0"
+      },
+      {
+        "item": "Table rendering performance optimization",
+        "estimated_effort": "4h",
+        "impact": "Poor UX with large datasets",
+        "target_milestone": "v3.06.0"
+      }
+    ],
+    "medium_priority": [
+      {
+        "item": "Code organization and module separation",
+        "estimated_effort": "8h",
+        "impact": "Development velocity",
+        "target_milestone": "v3.06.0"
+      }
+    ],
+    "low_priority": [
+      {
+        "item": "Legacy CSS cleanup",
+        "estimated_effort": "3h",
+        "impact": "Maintainability",
+        "target_milestone": "v3.07.0"
+      }
+    ]
+  },
+  "statistics": {
+    "total_features_planned": 4,
+    "features_in_progress": 1,
+    "features_completed": 2,
+    "average_feature_completion_time": "1.4h",
+    "milestones_on_track": 1,
+    "milestones_at_risk": 0,
+    "total_estimated_effort_remaining": "39h",
+    "completion_rate": "33%",
+    "last_milestone_completed": "2025-08-15",
+    "next_milestone_due": "2025-09-01"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "claude-agent-init.js",
+    "name": "claude-agent-init",
+    "extension": ".js",
+    "directory": "",
+    "size": 0,
+    "lines": 275
+  },
+  "documentation": {
+    "markdown": "../docs/generated/claude-agent-init.md",
+    "html": "../html-docs/generated/claude-agent-init.html",
+    "generated": "2025-08-20T00:48:04.370Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "single-file",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "claude-agent-init.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for claude-agent-init.js"
+  }
+}

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>enhanced-smart-scribe - StackTrackr Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #667eea;
+            --rengine-secondary: #764ba2;
+            --rengine-accent: #495057;
+            --rengine-accent-light: #6c757d;
+            --status-success: #28a745;
+            --status-warning: #ffc107;
+            --status-danger: #dc3545;
+            --status-info: #007acc;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-muted: #888;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --border-color: #e1e4e8;
+            --shadow-heavy: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--rengine-primary) 0%, var(--rengine-secondary) 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            border-radius: 15px;
+            box-shadow: var(--shadow-heavy);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--rengine-accent) 0%, var(--rengine-accent-light) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: var(--bg-secondary);
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: var(--status-info);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3 { 
+            color: var(--text-primary); 
+            margin-top: 2em; 
+            margin-bottom: 0.5em; 
+        }
+        .content h1 { font-size: 2em; border-bottom: 2px solid var(--rengine-primary); padding-bottom: 0.5em; }
+        .content h2 { font-size: 1.5em; }
+        .content h3 { font-size: 1.3em; }
+        
+        .content pre { 
+            background: var(--bg-secondary); 
+            padding: 1em; 
+            border-radius: 5px; 
+            overflow-x: auto; 
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+        }
+        
+        .content code { 
+            background: var(--bg-secondary); 
+            padding: 0.2em 0.4em; 
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        .content blockquote {
+            border-left: 4px solid var(--rengine-primary);
+            margin: 1em 0;
+            padding-left: 1em;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 1em 1em 1em 2em;
+            border-radius: 5px;
+        }
+        
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .content th, .content td {
+            border: 1px solid var(--border-color);
+            padding: 0.75em;
+            text-align: left;
+        }
+        
+        .content th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content a {
+            color: var(--status-info);
+            text-decoration: none;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
+        .metadata {
+            background: var(--bg-secondary);
+            padding: 1em;
+            border-radius: 5px;
+            margin-bottom: 2em;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .footer {
+            background: var(--bg-secondary);
+            padding: 20px 30px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .footer .branding {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .footer .system-name {
+            font-weight: 600;
+            color: var(--rengine-accent);
+        }
+
+        .footer .version {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .footer .divider {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .nav-bar {
+                padding: 10px 20px;
+            }
+            
+            .footer .branding {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>enhanced-smart-scribe</h1>
+            <div class="subtitle">StackTrackr Documentation</div>
+            <div class="meta">
+                <span>📁 enhanced-smart-scribe.md</span>
+                <span>📅 2025-08-20</span>
+                
+            </div>
+        </header>
+        
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../../html-docs/documentation.html" class="nav-link">🏠 Documentation Portal</a>
+                <a href="../index.html" class="nav-link">📚 All Docs</a>
+                <a href="../../html-docs/developmentstatus.html" class="nav-link">📊 Development Status</a>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <div class="metadata">
+                <strong>📂 Source File:</strong> enhanced-smart-scribe.md | 
+                <strong>🕒 Generated:</strong> 8/19/2025, 9:47:18 PM |
+                <strong>🎨 Engine:</strong> Gemini HTML Converter
+            </div>
+            ```html
+<h1>Enhanced Smart Scribe with Gemini Fallback &amp; Documentation Generator</h1>
+
+<h2>Purpose &amp; Overview</h2>
+
+<p>The <code>enhanced-smart-scribe.js</code> script is a powerful tool that enhances the functionality of the Smart Scribe, a key component in the StackTrackr system. This script introduces several key features:</p>
+
+<ol>
+  <li><strong>Gemini Fallback</strong>: The script incorporates a fallback to the Gemini language model, which provides more reliable JSON parsing compared to the primary Ollama model.</li>
+  <li><strong>Comprehensive Documentation</strong>: The script includes a built-in documentation generator that creates detailed documentation for the entire system, including the API, agent workflows, memory management, and troubleshooting guides.</li>
+  <li><strong>Robust Error Handling</strong>: The script intelligently handles failures in the JSON parsing process, automatically switching to the more reliable Gemini model when necessary.</li>
+  <li><strong>Optimized Performance</strong>: The script adjusts the temperature parameter for the language models based on the expected output, using a lower temperature for JSON-related tasks to improve accuracy.</li>
+</ol>
+
+<p>This script is a crucial component of the StackTrackr project, providing a reliable and self-documenting interface for the system's core functionality.</p>
+
+<h2>Technical Architecture</h2>
+
+<p>The <code>EnhancedSmartScribe</code> class is the main component of this script, and it is responsible for the following key tasks:</p>
+
+<ol>
+  <li><strong>Model Initialization</strong>: The class checks the available models from the Ollama endpoint and determines if the Gemini API is available as a fallback.</li>
+  <li><strong>Model Selection</strong>: The class selects the most appropriate model to use based on the current JSON parsing success rate, preferring the primary model but falling back to Gemini or a secondary model if necessary.</li>
+  <li><strong>Query Handling</strong>: The <code>queryWithFallback</code> method handles making requests to the Ollama or Gemini APIs, automatically retrying with the fallback model if the primary request fails.</li>
+  <li><strong>JSON Parsing</strong>: The script includes a <code>cleanJSONContent</code> method that attempts to extract the valid JSON from the language model's output, handling common formatting issues.</li>
+  <li><strong>Documentation Generation</strong>: The <code>generateSystemDocumentation</code> method coordinates the creation of various documentation artifacts, including the README, API documentation, agent workflow guide, memory system documentation, and troubleshooting guide.</li>
+</ol>
+
+<p>The script also includes a CLI interface that allows users to generate the comprehensive system documentation on demand.</p>
+
+<h2>Dependencies</h2>
+
+<p>This script relies on the following external dependencies:</p>
+
+<ul>
+  <li><code>fs-extra</code>: For extended file system operations</li>
+  <li><code>path</code>: For working with file paths</li>
+  <li><code>axios</code>: For making HTTP requests to the Ollama and Gemini APIs</li>
+  <li><code>child_process</code>: For executing system commands (used in the documentation generation)</li>
+  <li><code>url</code>: For converting file URLs to paths</li>
+</ul>
+
+<h2>Key Functions/Classes</h2>
+
+<h3><code>EnhancedSmartScribe</code> Class</h3>
+
+<p>This is the main class that encapsulates the functionality of the enhanced Smart Scribe.</p>
+
+<h4>Constructor</h4>
+<ul>
+    <li>Initializes the class with default configuration values, such as the base directory, Ollama endpoint, and the primary and fallback language models.</li>
+    <li>Calls the <code>initialize</code> method to check available models and select the optimal model.</li>
+</ul>
+
+<h4>Methods</h4>
+<ol>
+    <li><code>initialize()</code>: Checks the available models and Gemini API availability, then selects the optimal model to use.</li>
+    <li><code>checkAvailableModels()</code>: Retrieves the list of available models from the Ollama endpoint and checks if the Gemini API is available.</li>
+    <li><code>selectOptimalModel()</code>: Determines the best model to use based on the current JSON parsing failure rate, preferring the primary model but falling back to Gemini or a secondary model if necessary.</li>
+    <li><code>queryWithFallback(prompt, systemPrompt, expectJSON)</code>: Sends a query to the selected model (Ollama or Gemini) and handles any failures by retrying with the fallback model.</li>
+    <li><code>queryGemini(prompt, systemPrompt, expectJSON)</code>: Sends a query to the Gemini API and handles the response, including parsing the JSON output.</li>
+    <li><code>queryOllama(prompt, systemPrompt, expectJSON)</code>: Sends a query to the Ollama API and handles the response, including parsing the JSON output.</li>
+    <li><code>cleanJSONContent(content)</code>: Attempts to extract the valid JSON from the language model's output, handling common formatting issues.</li>
+    <li><code>generateSystemDocumentation()</code>: Coordinates the creation of various documentation artifacts, including the README, API documentation, agent workflow guide, memory system documentation, and troubleshooting guide.</li>
+    <li><code>generateReadme()</code>: Generates the project's README.md file.</li>
+    <li><code>generateAPIDocumentation()</code>: Generates the API documentation for the system's key components.</li>
+    <li><code>generateAgentWorkflowGuide()</code>: Generates a guide for the agent system workflows.</li>
+    <li><code>generateMemorySystemDocumentation()</code>: Generates documentation for the memory management system.</li>
+    <li><code>generateTroubleshootingGuide()</code>: Generates a troubleshooting guide for the system.</li>
+</ol>
+
+
+<h3><code>systemPrompts</code> Property</h3>
+
+<p>This property contains the system prompt used for the documentation generation tasks. The prompt provides guidance to the language model on how to approach the documentation analysis and generation.</p>
+
+
+<h2>Usage Examples</h2>
+
+<p>To use the <code>EnhancedSmartScribe</code> class, you can create an instance of the class and call its methods:</p>
+
+<pre><code class="language-javascript">import EnhancedSmartScribe from './enhanced-smart-scribe.js';
+
+const enhancedScribe = new EnhancedSmartScribe();
+
+// Generate system documentation
+await enhancedScribe.generateSystemDocumentation();
+</code></pre>
+
+<p>To generate the documentation from the command line, run the script with the <code>--generate-docs</code> flag:</p>
+
+<pre><code class="language-bash">node enhanced-smart-scribe.js --generate-docs
+</code></pre>
+
+<h2>Configuration</h2>
+
+<p>The <code>EnhancedSmartScribe</code> class is configured with the following parameters:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>baseDir</code></td>
+      <td>The base directory for the StackTrackr project</td>
+    </tr>
+    <tr>
+      <td><code>ollamaEndpoint</code></td>
+      <td>The URL of the Ollama API endpoint</td>
+    </tr>
+    <tr>
+      <td><code>primaryModel</code></td>
+      <td>The name of the primary language model to use</td>
+    </tr>
+    <tr>
+      <td><code>fallbackModel</code></td>
+      <td>The name of the fallback language model to use</td>
+    </tr>
+    <tr>
+      <td><code>maxJsonFailures</code></td>
+      <td>The maximum number of JSON parsing failures before switching to the fallback model</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The <code>GEMINI_API_KEY</code> environment variable must be set if you want to use the Gemini API as a fallback.</p>
+
+<h2>Error Handling</h2>
+
+<p>The <code>EnhancedSmartScribe</code> class handles errors in the following ways:</p>
+
+<ol>
+  <li><strong>Query Failures</strong>: If a query to the Ollama or Gemini API fails, the class will log the error and attempt to retry the query using the fallback model.</li>
+  <li><strong>JSON Parsing Failures</strong>: If the class encounters an issue parsing the JSON output from the language model, it will log a warning and return the raw content, along with the parsing error.</li>
+  <li><strong>Documentation Generation Failures</strong>: If any of the documentation generation tasks fail, the class will log the error and continue with the remaining tasks.</li>
+</ol>
+
+<p>The class also includes a <code>maxJsonFailures</code> parameter that determines the maximum number of JSON parsing failures before switching to the fallback model.</p>
+
+
+<h2>Integration</h2>
+
+<p>The <code>EnhancedSmartScribe</code> class is a crucial component of the StackTrackr system, providing a reliable and self-documenting interface for the system's memory intelligence and agent management functionality. It integrates with the following key components:</p>
+
+<ol>
+  <li><strong>Memory Intelligence System</strong>: The class interacts with the memory management APIs, such as <code>recall.js</code> and <code>memory-intelligence.js</code>, to query and manage the system's memory.</li>
+  <li><strong>Dual Memory Writer</strong>: The class integrates with the <code>dual-memory-writer.js</code> module to ensure data is consistently stored in the system's persistent and MCP memory stores.</li>
+  <li><strong>Agent Management</strong>: The class integrates with the <code>universal-agent-init.js</code> module to manage the system's agent workflows and handoffs.</li>
+  <li><strong>MCP Integration</strong>: The class may interact with various MCP-related APIs to retrieve data or perform actions.</li>
+  <li><strong>Smart Scribe</strong>: The class extends the functionality of the existing Smart Scribe, providing more robust error handling and fallback capabilities.</li>
+</ol>
+
+
+
+<h2>Development Notes</h2>
+
+<ol>
+  <li><strong>Gemini API Availability</strong>: The script checks for the availability of the Gemini API as a fallback, but it requires the <code>GEMINI_API_KEY</code> environment variable to be set. If the Gemini API is not available, the script will use the fallback model specified in the <code>fallbackModel</code> parameter.</li>
+  <li><strong>JSON Parsing Robustness</strong>: The script includes a <code>cleanJSONContent</code> method that attempts to extract the valid JSON from the language model's output, handling common formatting issues. This is a crucial feature, as the language models can sometimes produce output that is not directly parsable as JSON.</li>
+  <li><strong>Documentation Generation</strong>: The script includes a comprehensive documentation generation system, which creates several key artifacts for the StackTrackr project. This self-documenting nature is a valuable feature, as it helps maintain the system's documentation and ensures it stays up-to-date with the codebase.</li>
+  <li><strong>Performance Optimization</strong>: The script adjusts the temperature parameter for the language models based on the expected output, using a lower temperature for JSON-related tasks to improve accuracy. This is an important optimization, as the language models can sometimes produce more creative and less structured output at higher temperatures, which can lead to parsing issues.</li>
+  <li><strong>Error Handling and Fallback</strong>: The script's error handling and fallback mechanisms are a crucial part of its design, as they ensure that the system can continue to function even when there are issues with the primary language model or the JSON parsing process. This robustness is essential for the StackTrackr project, which relies on the Smart Scribe for various critical tasks.</li>
+</ol>
+
+<p>Overall, the <code>enhanced-smart-scribe.js</code> script is a powerful and versatile component that enhances the functionality of the StackTrackr system, providing improved reliability, error handling, and comprehensive documentation generation capabilities.</p>
+```
+        </main>
+        
+        <footer class="footer">
+            <div class="branding">
+                <span>Generated from the <span class="system-name">rScribe Document System</span></span>
+                <span class="divider">•</span>
+                <span class="system-name">rEngine</span> <span class="version">(v2.1.0)</span>
+                <span class="divider">•</span>
+                <span>Last updated: 2025-08-20</span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

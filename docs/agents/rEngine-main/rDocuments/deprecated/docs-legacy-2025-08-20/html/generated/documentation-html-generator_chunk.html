@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation: Documentation HTML Generator - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Documentation: Documentation HTML Generator</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 documentation-html-generator_chunk.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 8KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../generated/documentation-html-generator_chunk.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/documentation-html-generator_chunk.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="documentation-documentation-html-generator">Documentation: Documentation HTML Generator</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>DocumentationHTMLGenerator</code> class is responsible for generating comprehensive HTML documentation from Markdown files. It is designed to be a powerful and flexible tool for creating high-quality, accessible documentation for software projects.</p>
+<p>The main functionality of this class includes:</p>
+<ol>
+<li><strong>Parsing Markdown Files</strong>: The class can locate and read all Markdown files from specified directories, including the <code>docs</code>, <code>patchnotes</code>, and <code>rEngine-patchnotes</code> directories.</li>
+<li><strong>HTML Generation</strong>: For each Markdown file, the class generates an HTML page with a consistent layout and design, replacing various template variables with the appropriate content.</li>
+<li><strong>Index Page Generation</strong>: The class also generates a centralized index page that lists all the generated HTML documentation pages, providing an easy way for users to navigate the documentation.</li>
+<li><strong>Error Handling</strong>: The class gracefully handles any errors that may occur during the HTML generation process, logging the errors and continuing the generation of other documentation pages.</li>
+</ol>
+<p>This script is an essential component of the overall documentation system, ensuring that the project&#39;s documentation is well-organized, visually appealing, and easy to navigate for both developers and users.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>DocumentationHTMLGenerator</code> class is the main entry point for the documentation generation process. It consists of the following key components:</p>
+<ol>
+<li><p><strong><code>generateHTML(mdFilePath)</code></strong>: This method is responsible for generating the HTML content for a single Markdown file. It performs the following tasks:</p>
+<ul>
+<li>Reads the Markdown file and extracts the necessary metadata (title, category, last updated, file size, etc.).</li>
+<li>Replaces the template variables in the HTML template with the extracted metadata.</li>
+<li>Writes the generated HTML file to the appropriate output directory.</li>
+<li>Returns an object with the generated file information.</li>
+</ul>
+</li>
+<li><p><strong><code>generateAllHTML()</code></strong>: This method is the main entry point for generating the complete set of HTML documentation. It performs the following steps:</p>
+<ul>
+<li>Finds all Markdown files in the <code>docs</code>, <code>patchnotes</code>, and <code>rEngine-patchnotes</code> directories.</li>
+<li>Calls the <code>generateHTML()</code> method for each Markdown file and collects the results.</li>
+<li>Generates the centralized index page that lists all the generated HTML documentation pages.</li>
+</ul>
+</li>
+<li><p><strong><code>findMarkdownFiles(dir)</code></strong>: This helper method recursively searches a given directory for Markdown files and returns their full file paths.</p>
+</li>
+<li><p><strong><code>generateIndexPage(results)</code></strong>: This method generates the HTML content for the centralized index page, which displays a grid of all the generated documentation pages with relevant metadata (title, category, etc.).</p>
+</li>
+</ol>
+<p>The data flow in this system is as follows:</p>
+<ol>
+<li>The <code>generateAllHTML()</code> method is called, which initiates the documentation generation process.</li>
+<li>The <code>findMarkdownFiles()</code> method is used to locate all the Markdown files in the specified directories.</li>
+<li>For each Markdown file, the <code>generateHTML()</code> method is called, which reads the file, generates the HTML content, and writes the output to the appropriate location.</li>
+<li>After all the HTML files have been generated, the <code>generateIndexPage()</code> method is called to create the centralized index page.</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>This script has the following external dependencies:</p>
+<ol>
+<li><strong>Node.js</strong>: The script is written in JavaScript and designed to run in a Node.js environment.</li>
+<li><strong>Node.js File System (fs) Module</strong>: The script uses the built-in <code>fs</code> module to read and write files.</li>
+<li><strong>Node.js Path Module</strong>: The script uses the built-in <code>path</code> module to handle file paths.</li>
+</ol>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="documentationhtmlgenerator-class"><code>DocumentationHTMLGenerator</code> Class</h3>
+<p><strong>Purpose</strong>: The main class responsible for generating the HTML documentation.</p>
+<p><strong>Methods</strong>:</p>
+<ol>
+<li><p><code>generateHTML(mdFilePath)</code>:</p>
+<ul>
+<li><strong>Parameters</strong>: <code>mdFilePath</code> (string) - The full file path of the Markdown file to be processed.</li>
+<li><strong>Return Value</strong>: An object containing the generated file information, or <code>null</code> if an error occurred.</li>
+</ul>
+</li>
+<li><p><code>generateAllHTML()</code>:</p>
+<ul>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Return Value</strong>: An array of generated file information objects.</li>
+</ul>
+</li>
+<li><p><code>findMarkdownFiles(dir)</code>:</p>
+<ul>
+<li><strong>Parameters</strong>: <code>dir</code> (string) - The directory to search for Markdown files.</li>
+<li><strong>Return Value</strong>: An array of full file paths for all Markdown files found in the directory and its subdirectories.</li>
+</ul>
+</li>
+<li><p><code>generateIndexPage(results)</code>:</p>
+<ul>
+<li><strong>Parameters</strong>: <code>results</code> (array) - An array of generated file information objects.</li>
+<li><strong>Return Value</strong>: None. This method generates the HTML content for the centralized index page and writes it to the output directory.</li>
+</ul>
+</li>
+</ol>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To use the <code>DocumentationHTMLGenerator</code> class, you can create an instance of the class and call the <code>generateAllHTML()</code> method:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const generator = new DocumentationHTMLGenerator();
+generator.generateAllHTML().catch(console.error);</code></pre>
+</code></pre>
+<p>This will generate the complete HTML documentation for all Markdown files found in the <code>docs</code>, <code>patchnotes</code>, and <code>rEngine-patchnotes</code> directories, and write the output to the configured output directory.</p>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>DocumentationHTMLGenerator</code> class has the following configuration options:</p>
+<ol>
+<li><strong><code>docsDir</code></strong>: The directory containing the Markdown documentation files.</li>
+<li><strong><code>patchNotesDir</code></strong>: The directory containing the Markdown patch note files.</li>
+<li><strong><code>rEnginePatchNotesDir</code></strong>: The directory containing the Markdown rEngine patch note files.</li>
+<li><strong><code>outputDir</code></strong>: The directory where the generated HTML files will be written.</li>
+</ol>
+<p>These configuration options can be set by modifying the class properties or passing them as constructor arguments when creating a new instance of the <code>DocumentationHTMLGenerator</code> class.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>DocumentationHTMLGenerator</code> class handles errors gracefully by catching any exceptions that may occur during the HTML generation process. When an error occurs, the class logs the error message and continues the generation of other documentation pages.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>DocumentationHTMLGenerator</code> class is designed to be a standalone component that can be integrated into a larger documentation or content management system. It can be used as part of a build or deployment process to automatically generate the HTML documentation for a software project.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><p><strong>Extensibility</strong>: The class is designed to be extensible, allowing for the addition of new features or customizations, such as the ability to generate documentation in different formats (e.g., PDF, ePub) or the integration of additional metadata sources.</p>
+</li>
+<li><p><strong>Efficiency</strong>: The class uses a recursive directory search to find all Markdown files, which may not be the most efficient approach for very large documentation repositories. In such cases, a more targeted file discovery mechanism may be required.</p>
+</li>
+<li><p><strong>Customization</strong>: The HTML template and styling used in the generated documentation can be customized to match the branding and design requirements of the project.</p>
+</li>
+<li><p><strong>Performance</strong>: The class may need to be optimized for performance, especially when generating documentation for a large number of Markdown files. Techniques such as asynchronous file processing or caching could be explored to improve the generation speed.</p>
+</li>
+<li><p><strong>Error Handling</strong>: While the class currently handles errors gracefully, it may be beneficial to add more detailed error reporting and handling mechanisms to provide better visibility into the documentation generation process.</p>
+</li>
+</ol>
+<p>Overall, the <code>DocumentationHTMLGenerator</code> class is a powerful and flexible tool for creating comprehensive, professional-grade documentation for software projects. Its modular design and extensibility make it a valuable asset in the documentation ecosystem.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>documentation-html-generator_chunk.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

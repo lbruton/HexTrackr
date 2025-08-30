@@ -1,0 +1,148 @@
+{
+  "source_file": "rProtocols/USER_STARTUP_PROTOCOL.md",
+  "generated_date": "2025-08-20T01:53:21.491Z",
+  "title": "StackTrackr User Startup Protocol",
+  "sections": [
+    {
+      "id": "quick-reference-guide",
+      "title": "Quick Reference Guide",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "universal-startup-commands",
+      "title": "Universal Startup Commands",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "autodetection-recommended",
+          "title": "Auto-Detection (Recommended)"
+        },
+        {
+          "id": "specific-agent-types",
+          "title": "Specific Agent Types"
+        }
+      ]
+    },
+    {
+      "id": "alternative-startup-methods",
+      "title": "Alternative Startup Methods",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "method-1-quick-start-minimal-output",
+          "title": "Method 1: Quick Start (Minimal Output)"
+        },
+        {
+          "id": "method-2-full-startup-detailed-output",
+          "title": "Method 2: Full Startup (Detailed Output)"
+        },
+        {
+          "id": "method-3-new-terminal-window-macos",
+          "title": "Method 3: New Terminal Window (macOS)"
+        },
+        {
+          "id": "method-4-direct-nodejs-advanced",
+          "title": "Method 4: Direct Node.js (Advanced)"
+        }
+      ]
+    },
+    {
+      "id": "what-these-scripts-do",
+      "title": "What These Scripts Do",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "usage-examples",
+      "title": "Usage Examples",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "start-claude-session",
+          "title": "Start Claude Session"
+        },
+        {
+          "id": "start-gpt-session-with-full-logging",
+          "title": "Start GPT Session with Full Logging"
+        },
+        {
+          "id": "autodetect-agent-type",
+          "title": "Auto-Detect Agent Type"
+        }
+      ]
+    },
+    {
+      "id": "agent-detection-logic",
+      "title": "Agent Detection Logic",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "memory-files-created",
+      "title": "Memory Files Created",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "troubleshooting",
+      "title": "Troubleshooting",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "script-hangs-or-prompts-for-input",
+          "title": "Script Hangs or Prompts for Input"
+        },
+        {
+          "id": "agent-not-detected",
+          "title": "Agent Not Detected"
+        },
+        {
+          "id": "services-not-running",
+          "title": "Services Not Running"
+        },
+        {
+          "id": "memory-errors",
+          "title": "Memory Errors"
+        }
+      ]
+    },
+    {
+      "id": "system-requirements",
+      "title": "System Requirements",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "environment-variables-optional",
+      "title": "Environment Variables (Optional)",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "success-indicators",
+      "title": "Success Indicators",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "migration-from-old-scripts",
+      "title": "Migration from Old Scripts",
+      "icon": "🗄️",
+      "submenu": [
+        {
+          "id": "if-you-were-using",
+          "title": "If you were using:"
+        }
+      ]
+    },
+    {
+      "id": "quick-command-reference",
+      "title": "Quick Command Reference",
+      "icon": "📄",
+      "submenu": []
+    }
+  ],
+  "word_count": 744,
+  "format_version": "1.0"
+}
