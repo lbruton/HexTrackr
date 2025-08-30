@@ -34,15 +34,27 @@ Copy `agents-default-workflow.prompt.md` and customize for your project:
 
 ### 4. Configure Project Classification
 
-Add your project keywords to memory scribe classification:
+Add your project keywords to the Symbol Table Processor classification system:
 
 ```javascript
-// In .rMemory/scribes/real-time-scribe.js
-this.projectKeywords = {
-    'rMemory': ['rmemory', 'ragent', 'rengine', 'memory', 'embedding', 'neo4j', 'ollama'],
-    'HexTrackr': ['hex', 'cyber', 'security', 'vulnerability', 'threat', 'ticket'],
-    'StackTrackr': ['stack', 'portfolio', 'investment', 'financial', 'coin', 'precious'],
-    'YourProject': ['keyword1', 'keyword2', 'keyword3'] // Add your keywords
+// In .rMemory/tools/symbol-table-processor.js
+// Project-specific classification rules
+const projectClassificationRules = {
+    'rMemory': {
+        keywords: ['rmemory', 'ragent', 'rengine', 'memory', 'embedding', 'neo4j', 'ollama'],
+        entityTypes: ['EVIDENCE', 'NOTE', 'TODO', 'PLAN'],
+        intentTypes: ['DECISION', 'ACTION', 'CONTEXT']
+    },
+    'HexTrackr': {
+        keywords: ['hex', 'cyber', 'security', 'vulnerability', 'threat', 'ticket'],
+        entityTypes: ['TICKET', 'API', 'DOC', 'FUNCTION'],
+        intentTypes: ['ACTION', 'STATUS', 'QUESTION']
+    },
+    'YourProject': {
+        keywords: ['keyword1', 'keyword2', 'keyword3'],
+        entityTypes: ['FILE', 'CLASS', 'METHOD', 'VAR'],
+        intentTypes: ['DECISION', 'ACTION', 'CONTEXT']
+    }
 };
 ```
 
@@ -53,7 +65,11 @@ this.projectKeywords = {
 ```
 .rMemory/                    # Symlink to centralized system
 ├── scribes/                 # Shared real-time monitoring
-├── tools/                   # Shared analysis tools
+├── tools/                   # Symbol Table Processor, Evidence pipeline
+│   └── symbol-table-processor.js  # GPT Memory MCP integration
+├── sqlite/                  # GPT Memory MCP databases
+│   ├── memory-mcp.db       # Evidence → Notes → Todos pipeline
+│   └── extended-memory.db  # Legacy compatibility
 └── logs/                    # Project-specific logs
 
 YourProject/
@@ -67,22 +83,24 @@ YourProject/
 └── [project files]
 ```
 
-### Memory Categories for New Projects
+### GPT Memory MCP Categories
 
-## Primary Categories:
+## Evidence Processing
 
-- `architecture/` - System design, schemas, technical decisions
-- `documentation/` - Synced with docs-source/, user guides
-- `roadmaps/` - Current plans, sprints, feature planning
-- `bugs/` - Issue tracking, problem resolution
-- `versioning/` - Release info, changelog tracking
+- `evidence/` - Raw chat spans with UUID generation and simhash deduplication
+- `classifications/` - Deterministic + LLM backup classification results
+- `notes/` - Canonical summaries from 15-minute reconciliation cycles
+- `todos/` - Actionable items with priority scoring and due dates
+- `plans/` - Sequential Thinking outputs stored as JSON steps
+- `code_index/` - Symbol Table with FTS5 full-text search capabilities
 
-## Secondary Categories:
+## Classification Schema
 
-- `achievements/` - Major milestones, breakthroughs
-- `analysis/` - Performance studies, technical analysis
-- `strategy/` - Business logic, domain decisions
-- `integration/` - External API, service connections
+**Entity Types (15)**: FILE, CLASS, FUNCTION, METHOD, VAR, TICKET, COMMIT, API, ENV, DOC, NOTE, EVIDENCE, TODO, PLAN, PROTOCOL
+
+**Intent Types (5)**: DECISION, ACTION, QUESTION, STATUS, CONTEXT
+
+**Confidentiality Levels (3)**: public, internal, confidential
 
 ## Memory Tagging Strategy
 
@@ -138,7 +156,7 @@ Your project will automatically benefit from:
 
 ### Common Issues
 
-## Symlink not working:
+## Symlink not working
 
 ```bash
 
@@ -148,13 +166,13 @@ rm .rMemory
 ln -s /Volumes/DATA/GitHub/.rMemory .rMemory
 ```
 
-## Memory not being captured:
+## Memory not being captured
 
 - Check project keywords in classification
 - Verify VS Code workspace is being monitored
 - Check .rMemory/logs/ for real-time activity
 
-## Opus analysis not running:
+## Opus analysis not running
 
 - Verify CLAUDE_API_KEY in /Volumes/DATA/GitHub/.rMemory/.env
 - Check memory scribe logs for API errors

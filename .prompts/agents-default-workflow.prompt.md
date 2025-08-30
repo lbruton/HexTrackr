@@ -67,12 +67,37 @@ Always execute these steps in order:
 
 ## Memory Backend
 
-- **Primary memory backend**: `memento-mcp` via VS Code Chat MCP
+- **Primary memory backend**: `GPT Memory MCP` + `memento-mcp` via VS Code Chat MCP
+- **Architecture**: Evidence → Canonical Notes → Todos pipeline with SQLite + Neo4j hybrid
 - **Memory tools** (use explicit paths to prevent skipping):
   - `mcp_memento_search_nodes` → Search entities by name/content
-  - `mcp_memento_semantic_search` → Semantic similarity search
+  - `mcp_memento_semantic_search` → Semantic similarity search  
   - `mcp_memento_create_entities` → Write new memories
   - `mcp_memento_read_graph` → Full memory graph access
+
+- **GPT Memory MCP Schema**:
+
+  ```
+  Evidence Processing Pipeline:
+  ├── evidence/           # Raw chat spans with UUID + simhash deduplication
+  ├── classifications/    # 15 entity types, 5 intent types, 3 confidentiality levels
+  ├── notes/             # Canonical summaries (15-minute reconciliation cycles)
+  ├── todos/             # Actionable items with priority and due dates
+  ├── plans/             # Sequential Thinking outputs (JSON steps)
+  └── code_index/        # Symbol Table with FTS5 full-text search
+  
+  Classification System:
+  Entity Types (15): FILE, CLASS, FUNCTION, METHOD, VAR, TICKET, COMMIT, API, ENV, DOC, NOTE, EVIDENCE, TODO, PLAN, PROTOCOL
+  Intent Types (5): DECISION, ACTION, QUESTION, STATUS, CONTEXT
+  Confidentiality (3): public, internal, confidential
+  
+  Deterministic Classification + LLM Backup:
+
+  - Regex-based rules with 0.7 confidence threshold
+  - Ollama qwen2.5-coder:7b for edge cases
+  - Signal strength scoring (0.0-1.0)
+
+  ```
 
 - **Memory Hierarchy** (implemented):
 
