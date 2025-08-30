@@ -124,8 +124,7 @@ Output as JSON entities for Memento MCP with this structure:
             const logDirs = await fs.readdir(this.logsPath);
             const recentDirs = logDirs
                 .filter(dir => dir.match(/^\d{8}T\d{6}$/))
-                .sort()
-                .slice(-20); // Last 20 sessions
+                .sort(); // ALL sessions back to August 16th
 
             const logFiles = [];
             
@@ -464,7 +463,7 @@ ${report.entities.length > 10 ? `\n... and ${report.entities.length - 10} more e
     async ensureOutputDirectory() {
         try {
             await fs.mkdir(this.outputPath, { recursive: true });
-        } catch (error) {
+        } catch (_error) {
             // Directory might already exist
         }
     }
