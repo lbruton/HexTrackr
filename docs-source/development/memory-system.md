@@ -292,6 +292,76 @@ npm list -g | grep memento-mcp
 - Maintain clear separation between historical and current knowledge
 - Preserve valuable historical context for reference
 
+## Temporary Development Enhancements
+
+### memento-protocol-enhanced Wrapper (Development Only)
+
+**Purpose**: Enhanced memory capabilities during development phase, easily removable before shipping.
+
+**Status**: Available in separate repository: `lbruton/memento-protocol-enhanced`
+
+#### Features Added
+
+- **Protocol Engine**: YAML-based rule enforcement outside LLM control
+- **Quality Management**: Confidence scoring, freshness decay, deduplication
+- **Enhanced Search**: Hybrid strategies (semantic + keyword + temporal + confidence)
+- **Synthesis Reporting**: "Ask the Scribe" functionality for memory insights
+
+#### Integration Approach
+
+```bash
+
+# Install wrapper as development dependency
+
+npm install --save-dev memento-protocol-enhanced
+
+# Configure as optional MCP server
+
+# Add to VS Code MCP settings (development profile only):
+
+{
+  "memento-enhanced": {
+    "command": "node",
+    "args": ["./node_modules/memento-protocol-enhanced/src/index.js"],
+    "env": {
+      "MEMENTO_WRAPPER_MODE": "development",
+      "FALLBACK_TO_STANDARD": "true"
+    }
+  }
+}
+```
+
+#### Easy Removal Strategy
+
+1. **Development Dependency**: Installed as `devDependency`, not shipped in production
+2. **Graceful Fallbacks**: Wrapper automatically falls back to standard memento-mcp if unavailable
+3. **Separate Configuration**: Uses dedicated MCP server entry, easily removed
+4. **No Data Lock-in**: All data remains in standard memento-mcp format
+5. **Clean Uninstall**: Simple `npm uninstall` and MCP config removal
+
+#### Benefits for Development
+
+- **Enhanced Search**: Better context retrieval during development
+- **Quality Control**: Automatic confidence scoring and memory cleanup
+- **Protocol Enforcement**: Consistent memory operations (backup-before-write, etc.)
+- **Debugging**: Synthesis reports help understand memory state
+
+#### Shipping Preparation
+
+```bash
+
+# Remove wrapper before shipping
+
+npm uninstall memento-protocol-enhanced
+
+# Remove from MCP configuration
+
+# (delete memento-enhanced section from VS Code settings)
+
+# Standard memento-mcp continues working unchanged
+
+```
+
 ## Future Enhancements
 
 ### Planned Features
