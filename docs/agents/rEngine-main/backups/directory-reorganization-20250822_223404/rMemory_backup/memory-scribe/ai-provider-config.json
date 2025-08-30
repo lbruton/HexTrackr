@@ -1,9 +1,0 @@
-{
-  "primaryProvider": "ollama",
-  "fallbackProvider": "gemini",
-  "enableSmartRouting": true,
-  "maxCostPerRequest": 0.01,
-  "apiKeys": {
-    "openai": "your_openai_api_key_here"
-  }
-}

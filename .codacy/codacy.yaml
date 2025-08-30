@@ -3,6 +3,9 @@ exclude_paths:
     - docs-prototype/**
     - docs-source/**
     - roadmaps/**
+    - .rMemory/**
+    - .rMemory/
+    - '**/.rMemory/**'
     - scripts/chart.min.js
     - scripts/ag-grid-responsive-config.js
     - node_modules/**

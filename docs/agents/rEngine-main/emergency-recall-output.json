@@ -1,7 +1,0 @@
-{
-  "timestamp": "2025-08-23T19:07:53.589Z",
-  "source": "emergency-vscode-recall",
-  "conversations": [],
-  "summary": "Emergency recall recovered 0 conversation fragments from VS Code debug logs",
-  "systemState": "context-restored"
-}

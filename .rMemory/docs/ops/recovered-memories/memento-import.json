@@ -1,14 +1,23 @@
 {
   "type": "chat_archaeology_import",
-  "generated_at": "2025-08-30T04:54:14.656Z",
+  "generated_at": "2025-08-30T05:27:16.526Z",
   "entities": [
+    {
+      "name": "Chat Session e6c0545b-bf03-42ca-b50a-4611665355f9",
+      "entityType": "chat_session",
+      "observations": [
+        "Processed 6 messages",
+        "Workspace: 1e021a91f96ec733f89597596e621688",
+        "Timestamp: Sat Aug 30 2025 00:26:00 GMT-0500 (Central Daylight Time)"
+      ]
+    },
     {
       "name": "Chat Session 637a0c3c-da7d-4214-a60b-21f23e8c4830",
       "entityType": "chat_session",
       "observations": [
-        "Processed 120 messages",
+        "Processed 128 messages",
         "Workspace: 1e021a91f96ec733f89597596e621688",
-        "Timestamp: Fri Aug 29 2025 23:52:58 GMT-0500 (Central Daylight Time)"
+        "Timestamp: Sat Aug 30 2025 00:09:11 GMT-0500 (Central Daylight Time)"
       ]
     },
     {
@@ -171,15 +180,6 @@
         "Processed 35 messages",
         "Workspace: 1e021a91f96ec733f89597596e621688",
         "Timestamp: Thu Aug 28 2025 13:03:00 GMT-0500 (Central Daylight Time)"
-      ]
-    },
-    {
-      "name": "Chat Session efc42315-1fe6-4093-870f-7985dd879d79",
-      "entityType": "chat_session",
-      "observations": [
-        "Processed 7 messages",
-        "Workspace: 1e021a91f96ec733f89597596e621688",
-        "Timestamp: Thu Aug 28 2025 10:53:24 GMT-0500 (Central Daylight Time)"
       ]
     }
   ],
