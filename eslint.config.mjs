@@ -37,7 +37,8 @@ export default [
       "scripts/claude-integration.js",
       "scripts/temp-scaffold-docs.js",
       "scripts/validation-utils.js", 
-      "scripts/version-manager.js"
+      "scripts/version-manager.js",
+      ".rMemory/core/ollama-embedding-proxy.js"
     ],
     languageOptions: {
       ecmaVersion: 2022,

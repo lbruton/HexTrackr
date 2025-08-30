@@ -1,0 +1,502 @@
+[
+  {
+    "id": "CHAT-commandEmbeddings.json-1756535829899-1756535829904",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "commandEmbeddings.json:1756535829899",
+    "text": "user: ",
+    "quality": 0.3,
+    "createdAt": "2025-08-30T06:37:09.899Z",
+    "simHash": 836031439
+  },
+  {
+    "id": "CHAT-settingEmbeddings.json-1756535829959-1756535829959",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "settingEmbeddings.json:1756535829959",
+    "text": "user: ",
+    "quality": 0.3,
+    "createdAt": "2025-08-30T06:37:09.959Z",
+    "simHash": 836031439
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: {\n  \"remote.extensionKind\": {\n      \"ms-azuretools.vscode-cosmosdb\": [\"ui\"],\n      \"ms-vscode-remote.remote-ssh-edit\": [\"workspace\"]\n  }\n}\n",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1681186395
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:workspace-data.json:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: import * as vscode from 'vscode';\n\nexport function activate(context: vscode.ExtensionContext) {\n    context.subscriptions.push(\n        vscode.commands.registerCommand('myAmazingExtension.persistWorkspaceData', async () => {\n            if (!context.storageUri) {\n                return;\n            }\n\n            // Create the extension's workspace storage folder if it doesn't already exist\n            try {\n                // When folder doesn't exist, and error gets thrown\n                await vscode.workspace.fs.stat(context.storageUri);\n            } catch {\n                // Create the extension's workspace storage folder\n                await vscode.workspace.fs.createDirectory(context.storageUri)\n            }\n\n            const workspaceData = vscode.Uri.joinPath(context.storageUri, 'workspace-data.json');\n            const writeData = new TextEncoder().encode(JSON.stringify({ now: Date.now() }));\n            vscode.workspace.fs.writeFile(workspaceData, writeData);\n        }\n    ));\n\n    context.subscriptions.push(\n        vscode.commands.registerCommand('myAmazingExtension.persistGlobalData', async () => {\n\n        if (!context.globalStorageUri) {\n            return;\n        }\n\n        // Create the extension's global (cross-workspace) folder if it doesn't already exist\n        try {\n            // When folder doesn't exist, and error gets thrown\n            await vscode.workspace.fs.stat(context.globalStorageUri);\n        } catch {\n            await vscode.workspace.fs.createDirectory(context.globalStorageUri)\n        }\n\n        const workspaceData = vscode.Uri.joinPath(context.globalStorageUri, 'global-data.json');\n        const writeData = new TextEncoder().encode(JSON.stringify({ now: Date.now() }));\n        vscode.workspace.fs.writeFile(workspaceData, writeData);\n    ));\n}\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1782287625
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:api:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: import * as vscode from 'vscode';\n\nexport function activate(context: vscode.ExtensionContext) {\n    // ...\n    const myApiKey = context.secrets.get('apiKey');\n    // ...\n    context.secrets.delete('apiKey');\n    // ...\n    context.secrets.store('apiKey', myApiKey);\n}\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1322264253
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: import * as vscode from 'vscode';\n\nexport function activate(context: vscode.ExtensionContext) {\n    context.subscriptions.push(vscode.commands.registerCommand('myAmazingExtension.clipboardIt', async () => {\n        // Read from clipboard\n        const text = await vscode.env.clipboard.readText();\n\n        // Write to clipboard\n        await vscode.env.clipboard.writeText(`It looks like you're copying \"${text}\". Would you like help?`);\n    }));\n}\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 2027821941
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:api:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: import * as vscode from 'vscode';\n\nexport async function activate(context: vscode.ExtensionContext) {\n    context.subscriptions.push(vscode.commands.registerCommand('myAmazingExtension.openExternal', () => {\n\n        // Example 1 - Open the VS Code homepage in the default browser.\n        vscode.env.openExternal(vscode.Uri.parse('https://code.visualstudio.com'));\n\n        // Example 2 - Open an auto-forwarded localhost HTTP server.\n        vscode.env.openExternal(vscode.Uri.parse('http://localhost:3000'));\n\n        // Example 3 - Open the default email application.\n        vscode.env.openExternal(vscode.Uri.parse('mailto:<fill in your email here>'));\n    }));\n}\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1251960153
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:api:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: import * as vscode from 'vscode';\nimport { getExpressServerPort } from './server';\n\nexport async function activate(context: vscode.ExtensionContext) {\n\n    const dynamicServerPort = await getWebServerPort();\n\n    context.subscriptions.push(vscode.commands.registerCommand('myAmazingExtension.forwardLocalhost', async () =>\n\n        // Make the port available locally and get the full URI\n        const fullUri = await vscode.env.asExternalUri(\n            vscode.Uri.parse(`http://localhost:${dynamicServerPort}`));\n\n        // ... do something with the fullUri ...\n\n    }));\n}\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1341009232
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:package.json:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: import * as vscode from 'vscode';\n\n// This is ${publisher}.${name} from package.json\nconst extensionId = 'my.amazing-extension';\n\nexport async function activate(context: vscode.ExtensionContext) {\n\n    // Register a URI handler for the authentication callback\n    vscode.window.registerUriHandler({\n        handleUri(uri: vscode.Uri): vscode.ProviderResult<void> {\n\n            // Add your code for what to do when the authentication completes here.\n            if (uri.path === '/auth-complete') {\n                vscode.window.showInformationMessage('Sign in successful!');\n            }\n\n        }\n    });\n\n    // Register a sign in command\n    context.subscriptions.push(vscode.commands.registerCommand(`${extensionId}.signin`, async () => {\n\n        // Get an externally addressable callback URI for the handler that the authentication provider can use\n        const callbackUri = await vscode.env.asExternalUri(vscode.Uri.parse(`${vscode.env.uriScheme}://${extensionId}/auth-complete`));\n\n        // Add your code to integrate with an authentication provider here - we'll fake it.\n        vscode.env.clipboard.writeText(callbackUri.toString());\n        await vscode.window.showInformationMessage('Open the URI copied to the clipboard in a browser window to authorize.');\n    }));\n}\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 684101745
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: import * as vscode from 'vscode';\n\nexport async function activate(context: vscode.ExtensionContext) {\n\n    // extensionKind returns ExtensionKind.UI when running locally, so use this to detect remote\n    const extension = vscode.extensions.getExtension('your.extensionId');\n    if (extension.extensionKind === vscode.ExtensionKind.Workspace) {\n        vscode.window.showInformationMessage('I am running remotely!');\n    }\n\n    // Codespaces browser-based editor will return UIKind.Web for uiKind\n    if (vscode.env.uiKind === vscode.UIKind.Web) {\n        vscode.window.showInformationMessage('I am running in the Codespaces browser editor!');\n    }\n\n    // VS Code will return undefined for remoteName if working with a local workspace\n    if (typeof(vscode.env.remoteName) === 'undefined') {\n        vscode.window.showInformationMessage('Not currently connected to a remote workspace.');\n    }\n\n}\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1999625198
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: import * as vscode from 'vscode';\n\nexport async function activate(context: vscode.ExtensionContext) {\n    // Register the private echo command\n    const echoCommand = vscode.commands.registerCommand('_private.command.called.echo',\n        (value: string) => {\n            return value;\n        }\n    );\n    context.subscriptions.push(echoCommand);\n}\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 970047461
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:webview.html:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: // Create the webview\nconst panel = vscode.window.createWebviewPanel(\n    'catWebview',\n    'Cat Webview',\n    vscode.ViewColumn.One);\n\n// Get the content Uri\nconst catGifUri = panel.webview.asWebviewUri(\n    vscode.Uri.joinPath(context.extensionUri, 'media', 'cat.gif'));\n\n// Reference it in your content\npanel.webview.html = `<!DOCTYPE html>\n<html>\n<body>\n    <img src=\"${catGifUri}\" width=\"300\" />\n</body>\n</html>`;\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 608090365
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:api:webview.html:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: // Use asExternalUri to get the URI for the web server\nconst dynamicWebServerPort = await getWebServerPort();\nconst fullWebServerUri = await vscode.env.asExternalUri(\n        vscode.Uri.parse(`http://localhost:${dynamicWebServerPort}`)\n    );\n\n// Create the webview\nconst panel = vscode.window.createWebviewPanel(\n    'asExternalUriWebview',\n    'asExternalUri Example',\n    vscode.ViewColumn.One, {\n        enableScripts: true\n    });\n\nconst cspSource = panel.webview.cspSource;\npanel.webview.html = `<!DOCTYPE html>\n        <head>\n            <meta\n                http-equiv=\"Content-Security-Policy\"\n                content=\"default-src 'none'; frame-src ${fullWebServerUri} ${cspSource} https:; img-src ${cspSource} https:; script-src ${cspSource}; style-src ${cspSource};\"\n            />\n        </head>\n        <body>\n        <!-- All content from the web server must be in an iframe -->\n        <iframe src=\"${fullWebServerUri}\">\n    </body>\n    </html>`;\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 106656077
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:api:webview.html:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: const LOCAL_STATIC_PORT = 3000;\nconst dynamicServerPort = await getWebServerPort();\n\n// Create webview and pass portMapping in\nconst panel = vscode.window.createWebviewPanel(\n    'remoteMappingExample',\n    'Remote Mapping Example',\n    vscode.ViewColumn.One, {\n        portMapping: [\n            // This maps localhost:3000 in the webview to the web server port on the remote host.\n            { webviewPort: LOCAL_STATIC_PORT, extensionHostPort: dynamicServerPort }\n        ]\n    });\n\n// Reference the port in any full URIs you reference in your HTML.\npanel.webview.html = `<!DOCTYPE html>\n    <body>\n        <!-- This will resolve to the dynamic server port on the remote machine -->\n        <img src=\"http://localhost:${LOCAL_STATIC_PORT}/canvas.png\">\n    </body>\n    </html>`;\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 845075199
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: function requireWithFallback(electronModule: string, nodeModule: string) {\n    try {\n        return require(electronModule);\n    }\n    catch (err) { }\n    return require(nodeModule);\n}\n\nconst fs = requireWithFallback('original-fs', 'fs');\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1042850995
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin\n",
+    "quality": 0.3,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1362940825
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: yarn add eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin --dev\n",
+    "quality": 0.3,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 614000268
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: npx tslint-to-eslint-config\n",
+    "quality": 0.3,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 709894386
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:eslintrc.js:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: \"lint\": \"eslint -c .eslintrc.js --ext .ts <mySrcFolder>\"\n",
+    "quality": 0.3,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1251171642
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: \"recommendations\": [\n    \"dbaeumer.vscode-eslint\"\n  ]\n  ",
+    "quality": 0.3,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 803075658
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:api:d.ts:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: > npx @vscode/dts dev\nDownloading vscode.proposed.languageStatus.d.ts\nTo:   /Users/Me/Code/MyExtension/vscode.proposed.languageStatus.d.ts\nFrom: https://raw.githubusercontent.com/microsoft/vscode/main/src/vscode-dts/vscode.proposed.languageStatus.d.ts\nRead more about proposed API at: https://code.visualstudio.com/api/advanced-topics/using-proposed-api\n",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 361200677
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:api:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: {\n    ...\n    \"enable-proposed-api\": [\"<YOUR-EXTENSION-ID>\"]\n}\n",
+    "quality": 0.3,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 853419005
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: // on activate\nconst versionKey = 'shown.version';\ncontext.globalState.setKeysForSync([versionKey]);\n\n// later on show page\nconst currentVersion = context.extension.packageJSON.version;\nconst lastVersionShown = context.globalState.get(versionKey);\nif (isHigher(currentVersion, lastVersionShown)) {\n    context.globalState.update(versionKey, currentVersion);\n}\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1088981550
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: npx --package yo --package generator-code -- yo code\n",
+    "quality": 0.3,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 920718729
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: # ? What type of extension do you want to create? New Extension (TypeScript)\n# ? What's the name of your extension? Code Tutor\n\n### Press <Enter> to choose default for all options below ###\n\n# ? What's the identifier of your extension? code-tutor\n# ? What's the description of your extension? LEAVE BLANK\n# ? Initialize a git repository? Yes\n# ? Bundle the source code with webpack? No\n# ? Which package manager to use? npm\n\n# ? Do you want to open the new folder with Visual Studio Code? Open with `code`\n",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 2010698774
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: \"contributes\":{\n    \"chatParticipants\": [\n    {\n        \"id\": \"chat-tutorial.code-tutor\",\n        \"fullName\": \"Code Tutor\",\n        \"name\": \"tutor\",\n        \"description\": \"What can I teach you?\",\n        \"isSticky\": true\n    }\n    ]\n}\n",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 99145728
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: const BASE_PROMPT = 'You are a helpful code tutor. Your job is to teach the user with simple descriptions and sample code of the concept. Respond with a guided overview of the concept in a series of messages. Do not give the user the answer directly, but guide them to find the answer themselves. If the user asks a non-programming question, politely decline to respond.';\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 326147806
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: // define a chat handler\nconst handler: vscode.ChatRequestHandler = async (request: vscode.ChatRequest, context: vscode.ChatContext, stream: vscode.ChatResponseStream, token: vscode.CancellationToken) => {\n\n    return;\n}\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1922608765
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: // define a chat handler\nconst handler: vscode.ChatRequestHandler = async (request: vscode.ChatRequest, context: vscode.ChatContext, stream: vscode.ChatResponseStream, token: vscode.CancellationToken) => {\n\n    // initialize the prompt\n    let prompt = BASE_PROMPT;\n\n    // initialize the messages array with the prompt\n    const messages = [\n        vscode.LanguageModelChatMessage.User(prompt),\n    ];\n\n    // add in the user's message\n    messages.push(vscode.LanguageModelChatMessage.User(request.prompt));\n\n    // send the request\n    const chatResponse = await request.model.sendRequest(messages, {}, token);\n\n    // stream the response\n    for await (const fragment of chatResponse.text) {\n        stream.markdown(fragment);\n    }\n\n    return;\n};\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1828273078
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: // define a chat handler\nconst handler: vscode.ChatRequestHandler = async (request: vscode.ChatRequest, context: vscode.ChatContext, stream: vscode.ChatResponseStream, token: vscode.CancellationToken) => {\n\n    // initialize the prompt\n    let prompt = BASE_PROMPT;\n\n    // initialize the messages array with the prompt\n    const messages = [\n        vscode.LanguageModelChatMessage.User(prompt),\n    ];\n\n    // add in the user's message\n    messages.push(vscode.LanguageModelChatMessage.User(request.prompt));\n\n    // send the request\n    const chatResponse = await request.model.sendRequest(messages, {}, token);\n\n    // stream the response\n    for await (const fragment of chatResponse.text) {\n        stream.markdown(fragment);\n    }\n\n    return;\n};\n\n// create participant\nconst tutor = vscode.chat.createChatParticipant(\"chat-tutorial.code-tutor\", handler);\n\n// add icon to participant\ntutor.iconPath = vscode.Uri.joinPath(context.extensionUri, 'tutor.jpeg');\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1635707571
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: // define a chat handler\nconst handler: vscode.ChatRequestHandler = async (request: vscode.ChatRequest, context: vscode.ChatContext, stream: vscode.ChatResponseStream, token: vscode.CancellationToken) => {\n\n    // initialize the prompt\n    let prompt = BASE_PROMPT;\n\n    // initialize the messages array with the prompt\n    const messages = [\n        vscode.LanguageModelChatMessage.User(prompt),\n    ];\n\n    // get all the previous participant messages\n    const previousMessages = context.history.filter(\n        (h) => h instanceof vscode.ChatResponseTurn\n    );\n\n    // add the previous messages to the messages array\n    previousMessages.forEach((m) => {\n        let fullMessage = '';\n        m.response.forEach((r) => {\n            const mdPart = r as vscode.ChatResponseMarkdownPart;\n            fullMessage += mdPart.value.value;\n        });\n        messages.push(vscode.LanguageModelChatMessage.Assistant(fullMessage));\n    });\n\n    // add in the user's message\n    messages.push(vscode.LanguageModelChatMessage.User(request.prompt));\n\n    // send the request\n    const chatResponse = await request.model.sendRequest(messages, {}, token);\n\n    // stream the response\n    for await (const fragment of chatResponse.text) {\n        stream.markdown(fragment);\n    }\n\n    return;\n};\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1594101659
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: \"contributes\": {\n    \"chatParticipants\": [\n      {\n        \"id\": \"chat-tutorial.code-tutor\",\n        \"fullName\": \"Code Tutor\",\n        \"name\": \"tutor\",\n        \"description\": \"What can I teach you?\",\n        \"isSticky\": true,\n        \"commands\": [\n          {\n            \"name\": \"exercise\",\n            \"description\": \"Provide exercises to practice a concept.\"\n          }\n        ]\n      }\n    ]\n  },\n",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 876368540
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: const EXERCISES_PROMPT = 'You are a helpful tutor. Your job is to teach the user with fun, simple exercises that they can complete in the editor. Your exercises should start simple and get more complex as the user progresses. Move one concept at a time, and do not move on to the next concept until the user provides the correct answer. Give hints in your exercises to help the user learn. If the user is stuck, you can provide the answer and explain why it is the answer. If the user asks a non-programming question, politely decline to respond.';\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 372642359
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: // define a chat handler\nconst handler: vscode.ChatRequestHandler = async (request: vscode.ChatRequest, context: vscode.ChatContext, stream: vscode.ChatResponseStream, token: vscode.CancellationToken) => {\n\n    // initialize the prompt\n    let prompt = BASE_PROMPT;\n\n    if (request.command === 'exercise') {\n        prompt = EXERCISES_PROMPT;\n    }\n\n    // initialize the messages array with the prompt\n    const messages = [\n        vscode.LanguageModelChatMessage.User(prompt),\n    ];\n\n    // get all the previous participant messages\n    const previousMessages = context.history.filter(\n        (h) => h instanceof vscode.ChatResponseTurn\n    );\n\n    // add the previous messages to the messages array\n    previousMessages.forEach((m) => {\n        let fullMessage = '';\n        m.response.forEach((r) => {\n            const mdPart = r as vscode.ChatResponseMarkdownPart;\n            fullMessage += mdPart.value.value;\n        });\n        messages.push(vscode.LanguageModelChatMessage.Assistant(fullMessage));\n    });\n\n    // add in the user's message\n    messages.push(vscode.LanguageModelChatMessage.User(request.prompt));\n\n    // send the request\n    const chatResponse = await request.model.sendRequest(messages, {}, token);\n\n    // stream the response\n    for await (const fragment of chatResponse.text) {\n        stream.markdown(fragment);\n    }\n\n    return;\n};\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1288943476
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: \"contributes\": {\n        \"chatParticipants\": [\n            {\n                \"id\": \"chat-sample.my-participant\",\n                \"name\": \"my-participant\",\n                \"fullName\": \"My Participant\",\n                \"description\": \"What can I teach you?\",\n                \"isSticky\": true\n            }\n        ]\n}\n",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 250194402
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user:  export function activate(context: vscode.ExtensionContext) {\n\n        // Register the chat participant and its request handler\n        const cat = vscode.chat.createChatParticipant('chat-sample.my-participant', handler);\n\n        // Optionally, set some properties for @cat\n        cat.iconPath = vscode.Uri.joinPath(context.extensionUri, 'cat.jpeg');\n\n        // Add the chat request handler here\n    }\n   ",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 470096171
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user:  const handler: vscode.ChatRequestHandler = async (request: vscode.ChatRequest, context: vscode.ChatContext, stream: vscode.ChatResponseStream, token: vscode.CancellationToken): Promise<ICatChatResult> => {\n\n        // Chat request handler implementation goes here\n\n    };\n   ",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1252132325
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user:  const handler: vscode.ChatRequestHandler = async (request: vscode.ChatRequest, context: vscode.ChatContext, stream: vscode.ChatResponseStream, token: vscode.CancellationToken): Promise<ICatChatResult> => {\n\n        // Test for the `teach` command\n        if (request.command == 'teach') {\n\n            // Add logic here to handle the teaching scenario\n            doTeaching(request.prompt, request.variables);\n\n        } else {\n\n            // Determine the user's intent\n            const intent = determineUserIntent(request.prompt, request.variables, request.model);\n\n            // Add logic here to handle other scenarios\n        }\n    };\n   ",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 316300802
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user:  stream.progress('Picking the right topic to teach...');\n    stream.markdown(`\\`\\`\\`typescript\n    const myStack = new Stack();\n    myStack.push(1); // pushing a number on the stack (or let's say, adding a fish to the stack)\n    myStack.push(2); // adding another fish (number 2)\n    console.log(myStack.pop()); // eating the top fish, will output: 2\n    \\`\\`\\`\n    So remember, Code Kitten, in a stack, the last fish in is the first fish out - which we tech cats call LIFO (Last In, First Out).`);\n\n    stream.button({\n        command: 'cat.meow',\n        title: vscode.l10n.t('Meow!'),\n        arguments: []\n    });\n   ",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 936243741
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: \"contributes\": {\n    \"chatParticipants\": [\n        {\n            \"id\": \"chat-sample.cat\",\n            \"name\": \"cat\",\n            \"fullName\": \"Cat\",\n            \"description\": \"Meow! What can I teach you?\",\n            \"isSticky\": true,\n            \"commands\": [\n                {\n                    \"name\": \"teach\",\n                    \"description\": \"Pick at random a computer science concept then explain it in purfect way of a cat\"\n                },\n                {\n                    \"name\": \"play\",\n                    \"description\": \"Do whatever you want, you are a cat after all\"\n                }\n            ]\n        }\n    ]\n}\n",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 695138853
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: cat.followupProvider = {\n    provideFollowups(result: ICatChatResult, context: vscode.ChatContext, token: vscode.CancellationToken) {\n        if (result.metadata.command === 'teach') {\n            return [{\n                prompt: 'let us play',\n                title: vscode.l10n.t('Play with the cat')\n            } satisfies vscode.ChatFollowup];\n        }\n    }\n};\n",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1205230718
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: \"contributes\": {\n    \"chatParticipants\": [\n        {\n            \"id\": \"chat-sample.cat\",\n            \"fullName\": \"Cat\",\n            \"name\": \"cat\",\n            \"description\": \"Meow! What can I teach you?\",\n\n            \"disambiguation\": [\n                {\n                    \"category\": \"cat\",\n                    \"description\": \"The user wants to learn a specific computer science topic in an informal way.\",\n                    \"examples\": [\n                        \"Teach me C++ pointers using metaphors\",\n                        \"Explain to me what is a linked list in a simple way\",\n                        \"Can you explain to me what is a function in programming?\"\n                    ]\n                }\n            ]\n        }\n    ]\n}\n",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 517878297
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user: const previousMessages = context.history.filter(h => h instanceof vscode.ChatRequestTurn);\n",
+    "quality": 0.49999999999999994,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 731930958
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user:   // Render Markdown text\n    stream.markdown('# This is a title \\n');\n    stream.markdown('This is stylized text that uses _italics_ and **bold**. ');\n    stream.markdown('This is a [link](https://code.visualstudio.com).\\n\\n');\n    stream.markdown('![VS Code](https://code.visualstudio.com/assets/favicon.ico)');\n  ",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 293605386
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user:   // Render a code block that enables users to interact with\n    stream.markdown('```bash\\n');\n    stream.markdown('```ls -l\\n');\n    stream.markdown('```');\n  ",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 264264921
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user:   // Use command URIs to link to commands from Markdown\n    let markdownCommandString: vscode.MarkdownString = new vscode.MarkdownString(`[Use cat names](command:${CAT_NAMES_COMMAND_ID})`);\n    markdownCommandString.isTrusted = { enabledCommands: [ CAT_NAMES_COMMAND_ID ] };\n\n    stream.markdown(markdownCommandString);\n  ",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 2075298366
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830040",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user:   // Encode the command arguments\n    const encodedArgs = encodeURIComponent(JSON.stringify(args));\n\n    // Use command URIs with arguments to link to commands from Markdown\n    let markdownCommandString: vscode.MarkdownString = new vscode.MarkdownString(`[Use cat names](command:${CAT_NAMES_COMMAND_ID}?${encodedArgs})`);\n    markdownCommandString.isTrusted = { enabledCommands: [ CAT_NAMES_COMMAND_ID ] };\n\n    stream.markdown(markdownCommandString);\n  ",
+    "quality": 0.7,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 923274385
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830041",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user:   // Render a button to trigger a VS Code command\n    stream.button({\n        command: 'my.command',\n        title: vscode.l10n.t('Run my command')\n    });\n  ",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 318704991
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830041",
+    "topicKey": "hextrackr:development:app.js:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user:   // Create a file tree instance\n    var tree: vscode.ChatResponseFileTree[] = [\n        { name: 'myworkspace', children: [\n            { name: 'README' },\n            { name: 'app.js' },\n            { name: 'package.json' }\n        ]}\n    ];\n\n    // Render the file tree control at a base location\n    stream.filetree(tree, baseLocation);\n  ",
+    "quality": 0.5,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 1060117285
+  },
+  {
+    "id": "CHAT-api.json-1756535830038-1756535830041",
+    "topicKey": "hextrackr:development:general:2025-08-30",
+    "source": "vscode_chat",
+    "spanRef": "api.json:1756535830038",
+    "text": "user:   // Render a progress message\n    stream.progress('Connecting to the database.');\n  ",
+    "quality": 0.3,
+    "createdAt": "2025-08-30T06:37:10.038Z",
+    "simHash": 626452550
+  }
+]
