@@ -493,7 +493,8 @@ function findDocsSectionForFilename(filename) {
     return null;
 }
 
-app.get(/^\/docs-html\/(.*)\.html$/, (req, res) => {
+// Only redirect direct section requests (not content files which are loaded by AJAX)
+app.get(/^\/docs-html\/([^\/]+)\.html$/, (req, res) => {
     let section = req.params[0];
     // If the request is only a filename (no directory), try to resolve the correct section path
     if (!section.includes("/")) {
