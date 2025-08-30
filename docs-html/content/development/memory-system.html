@@ -1,24 +1,135 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>Memory System (Memento MCP)</h1>
-<p>This document outlines HexTrackr&#39;s persistent memory system using memento-mcp with Neo4j backend for enhanced development workflows and knowledge retention.</p>
-<h2>Overview</h2>
-<p>HexTrackr uses a memory-first development approach with the memento-mcp (Model Context Protocol) server to maintain persistent knowledge across development sessions. This system provides:</p>
+    <h1>Memory System - Perfect Continuity Architecture</h1>
+<p>This document outlines HexTrackr&#39;s advanced <code>.rMemory</code> system - achieving <strong>perfect continuity</strong> where every chat feels like &quot;we never stopped working together&quot;.</p>
+<h2>System Overview</h2>
+<p>HexTrackr implements a comprehensive memory architecture combining:</p>
 <ul>
-<li><strong>Persistent Knowledge</strong>: Project context survives VS Code restarts</li>
-<li><strong>Semantic Search</strong>: Find relevant information using natural language</li>
-<li><strong>Relationship Mapping</strong>: Automatic connections between entities</li>
-<li><strong>Archive Separation</strong>: Historical vs current project knowledge</li>
+<li><strong><code>.rMemory</code> Scribes System</strong>: Specialized AI analysis tools for frustration learning and context preservation</li>
+<li><strong>Memento MCP Integration</strong>: Neo4j-backed persistent memory with semantic search</li>
+<li><strong>Perfect Continuity Protocols</strong>: Instant project context loading and sprint awareness</li>
+<li><strong>Frustration Prevention Matrix</strong>: Learning from pain points to prevent repeated issues</li>
+<li><strong>Agent Context Loading</strong>: Complete briefings for seamless collaboration</li>
 </ul>
-<h2>Architecture</h2>
-<h3>Components</h3>
+<h2>Core Components</h2>
+<h3>1. <strong>Perfect Continuity Experience</strong></h3>
+<ul>
+<li><strong>Agent Context Loader</strong>: Comprehensive briefings with project state, frustrations, roadmap</li>
+<li><strong>Boot Protocols</strong>: Instant context loading for any new chat session</li>
+<li><strong>Memory-First Search</strong>: Always start with project memory before planning</li>
+<li><strong>Relationship Continuity</strong>: Consistent collaborative tone and preferences</li>
+</ul>
+<h3>2. <strong>Frustration Learning &amp; Prevention</strong></h3>
+<ul>
+<li><strong>Frustration Matrix</strong>: Claude Opus-powered analysis of development pain points</li>
+<li><strong>Prevention Strategies</strong>: Automatic generation of solutions for recurring issues</li>
+<li><strong>Pain Point Classification</strong>: Categorization and searchable storage of frustrations</li>
+<li><strong>Time Impact Analysis</strong>: Productivity impact assessment and resolution tracking</li>
+</ul>
+<h2>Architecture Evolution</h2>
+<h3>Current Architecture: <code>.rMemory</code> Perfect Continuity System</h3>
+<p>Our advanced memory architecture combines multiple layers for perfect context preservation:</p>
+<pre><code>.rMemory/
+├── scribes/                    # Specialized analysis tools
+│   ├── agent-context-loader.js    # Complete context briefing generator
+│   ├── frustration-matrix.js      # Pain point analysis &amp; prevention
+│   ├── deep-chat-analysis.js      # Enhanced memory processing
+│   └── real-time-analysis.js      # Continuous learning monitor
+├── agent-playbooks/            # Project-specific context briefings
+│   ├── agent-playbook-hextrackr.md    # HexTrackr project context
+│   ├── agent-playbook-stacktrackr.md  # StackTrackr project context
+│   └── agent-playbook-new-project.md  # Template for new projects
+├── agent-context/              # Generated briefings
+│   ├── agent-briefing-YYYY-MM-DD.md   # Daily context briefings
+│   └── context-data-YYYY-MM-DD.json   # Structured context data
+└── docs/ops/                   # Memory outputs
+    ├── frustration-analysis/        # Categorized pain points
+    └── live-insights/              # Real-time analysis results
+</code></pre>
+<h3>Integration with Memento MCP</h3>
 <ul>
 <li><strong>memento-mcp v0.3.9</strong>: Neo4j-backed MCP server for VS Code</li>
-<li><strong>Neo4j Database</strong>: Graph database for storing entities and relationships</li>
-<li><strong>Docker Environment</strong>: Isolated development container</li>
-<li><strong>VS Code Integration</strong>: MCP tools available in Copilot chat</li>
+<li><strong>Neo4j Database</strong>: Graph database for storing entities and relationships  </li>
+<li><strong>OpenAI Embeddings</strong>: text-embedding-3-small (1536 dimensions) for semantic search</li>
+<li><strong>Claude Opus Integration</strong>: Advanced analysis and frustration learning</li>
+<li><strong>Docker Environment</strong>: Isolated development container with full memory stack</li>
 </ul>
-<h3>Data Model</h3>
+<h3>Perfect Continuity Protocols</h3>
+<p>Located in <code>.prompts/</code> folder:</p>
+<ul>
+<li><strong><code>perfect-continuity-boot.prompt.md</code></strong>: Complete boot protocol for instant context loading</li>
+<li><strong><code>perfect-continuity-quick-start.md</code></strong>: Usage guide and example commands</li>
+<li><strong><code>agent-project-playbook-v2.prompt.md</code></strong>: Enhanced 7-step workflow with memory integration</li>
+</ul>
+<h4>How Perfect Continuity Works</h4>
+<ol>
+<li><strong>Pin Boot Protocol</strong>: Attach <code>perfect-continuity-boot.prompt.md</code> to new chat</li>
+<li><strong>Instant Context</strong>: Agent loads recent briefing, searches memory, prevents frustrations</li>
+<li><strong>Sprint Awareness</strong>: Immediate knowledge of current phase, priorities, and next steps</li>
+<li><strong>Relationship Continuity</strong>: Maintains collaborative tone and working preferences</li>
+</ol>
+<h2>Perfect Continuity Usage</h2>
+<h3>Starting a New Chat Session</h3>
+<pre><code class="language-markdown"># Attach: .prompts/perfect-continuity-boot.prompt.md
+# Pin it to chat (📌)
+
+Execute Perfect Continuity Boot Protocol.
+Load our current project context and sprint status.
+</code></pre>
+<p><strong>Result</strong>: Instant project awareness with complete context preservation</p>
+<h3>Memory Search Patterns</h3>
+<p>The system automatically searches for:</p>
+<p><strong>Current Status</strong> (Priority 1):</p>
+<ul>
+<li><code>project:HexTrackr status:current sprint:*</code></li>
+<li><code>project:HexTrackr next:* goal:*</code></li>
+<li><code>project:HexTrackr phase:* round:*</code></li>
+</ul>
+<p><strong>Recent Work</strong> (Priority 2):</p>
+<ul>
+<li><code>project:HexTrackr session:recent</code></li>
+<li><code>project:HexTrackr branch:copilot</code></li>
+<li><code>project:HexTrackr error:blocking</code></li>
+</ul>
+<p><strong>Context Expansion</strong> (Priority 3):</p>
+<ul>
+<li><code>project:HexTrackr roadmap:*</code></li>
+<li><code>project:HexTrackr frustration:*</code></li>
+<li><code>project:HexTrackr decision:*</code></li>
+</ul>
+<h3>Agent Context Loading</h3>
+<p>Generate comprehensive briefings:</p>
+<pre><code class="language-bash"># Generate current project briefing
+node .rMemory/scribes/agent-context-loader.js
+
+# Analyze frustration patterns
+node .rMemory/scribes/frustration-matrix.js
+
+# Process recent chat logs
+node .rMemory/scribes/deep-chat-analysis.js
+</code></pre>
+<h2>Key Benefits Achieved</h2>
+<h3>✅ Perfect Continuity Experience</h3>
+<ul>
+<li><strong>&quot;Never-ending friendship&quot;</strong>: Every chat feels continuous</li>
+<li><strong>Zero context loss</strong>: Complete memory of decisions and solutions</li>
+<li><strong>Instant sprint awareness</strong>: Always know current phase and priorities</li>
+<li><strong>Frustration prevention</strong>: Never repeat solved problems</li>
+</ul>
+<h3>✅ Development Acceleration</h3>
+<ul>
+<li><strong>Reduced onboarding</strong>: New sessions start with full context</li>
+<li><strong>Proactive issue prevention</strong>: Learn from past pain points</li>
+<li><strong>Consistent architecture</strong>: Reference established patterns and decisions</li>
+<li><strong>Quality maintenance</strong>: Memory-driven quality gates and standards</li>
+</ul>
+<h3>✅ Knowledge Preservation</h3>
+<ul>
+<li><strong>Complete decision history</strong>: Every architectural choice preserved</li>
+<li><strong>Solution library</strong>: Searchable database of solved problems</li>
+<li><strong>Communication patterns</strong>: Consistent collaborative relationships</li>
+<li><strong>Project evolution</strong>: Full timeline of development progress</li>
+</ul>
 <p>The memory system uses a graph-based approach:</p>
 <pre><code class="language-mermaid">Entity → Properties (name, type, status, confidence, etc.)
 Entity → Relationships → Other Entities
@@ -226,6 +337,65 @@ npm list -g | grep memento-mcp
 <li>Maintain clear separation between historical and current knowledge</li>
 <li>Preserve valuable historical context for reference</li>
 </ul>
+<h2>Temporary Development Enhancements</h2>
+<h3>memento-protocol-enhanced Wrapper (Development Only)</h3>
+<p><strong>Purpose</strong>: Enhanced memory capabilities during development phase, easily removable before shipping.</p>
+<p><strong>Status</strong>: Available in separate repository: <code>lbruton/memento-protocol-enhanced</code></p>
+<h4>Features Added</h4>
+<ul>
+<li><strong>Protocol Engine</strong>: YAML-based rule enforcement outside LLM control</li>
+<li><strong>Quality Management</strong>: Confidence scoring, freshness decay, deduplication</li>
+<li><strong>Enhanced Search</strong>: Hybrid strategies (semantic + keyword + temporal + confidence)</li>
+<li><strong>Synthesis Reporting</strong>: &quot;Ask the Scribe&quot; functionality for memory insights</li>
+</ul>
+<h4>Integration Approach</h4>
+<pre><code class="language-bash">
+# Install wrapper as development dependency
+
+npm install --save-dev memento-protocol-enhanced
+
+# Configure as optional MCP server
+
+# Add to VS Code MCP settings (development profile only):
+
+{
+  &quot;memento-enhanced&quot;: {
+    &quot;command&quot;: &quot;node&quot;,
+    &quot;args&quot;: [&quot;./node_modules/memento-protocol-enhanced/src/index.js&quot;],
+    &quot;env&quot;: {
+      &quot;MEMENTO_WRAPPER_MODE&quot;: &quot;development&quot;,
+      &quot;FALLBACK_TO_STANDARD&quot;: &quot;true&quot;
+    }
+  }
+}
+</code></pre>
+<h4>Easy Removal Strategy</h4>
+<ol>
+<li><strong>Development Dependency</strong>: Installed as <code>devDependency</code>, not shipped in production</li>
+<li><strong>Graceful Fallbacks</strong>: Wrapper automatically falls back to standard memento-mcp if unavailable</li>
+<li><strong>Separate Configuration</strong>: Uses dedicated MCP server entry, easily removed</li>
+<li><strong>No Data Lock-in</strong>: All data remains in standard memento-mcp format</li>
+<li><strong>Clean Uninstall</strong>: Simple <code>npm uninstall</code> and MCP config removal</li>
+</ol>
+<h4>Benefits for Development</h4>
+<ul>
+<li><strong>Enhanced Search</strong>: Better context retrieval during development</li>
+<li><strong>Quality Control</strong>: Automatic confidence scoring and memory cleanup</li>
+<li><strong>Protocol Enforcement</strong>: Consistent memory operations (backup-before-write, etc.)</li>
+<li><strong>Debugging</strong>: Synthesis reports help understand memory state</li>
+</ul>
+<h4>Shipping Preparation</h4>
+<pre><code class="language-bash">
+# Remove wrapper before shipping
+
+npm uninstall memento-protocol-enhanced
+
+# Remove from MCP configuration
+
+# (delete memento-enhanced section from VS Code settings)
+
+# Standard memento-mcp continues working unchanged
+</code></pre>
 <h2>Future Enhancements</h2>
 <h3>Planned Features</h3>
 <ul>

@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /* eslint-env node */
+/* global require, module, __dirname, console, process, setTimeout */
 
 /**
  * Chat Log Archaeology Tool
  * 
  * Processes VS Code chat sessions to reconstruct project memory
- * Uses Claude-4 API for high-quality analysis and insight extraction
+ * Uses Claude Opus API for highest quality analysis and insight extraction
  * Feeds extracted insights into Memento MCP for searchable memory
  */
 
@@ -19,13 +20,13 @@ class ChatLogArchaeologist {
         this.anthropic = new Anthropic({
             apiKey: process.env.ANTHROPIC_API_KEY,
         });
-        this.model = "claude-3-5-haiku-20241022"; // Fast, efficient model for bulk processing
+        this.model = "claude-opus-4-1-20250805"; // Latest Claude Opus 4.1 with correct format
         this.chatSessionsPath = path.join(
             process.env.HOME,
             "Library/Application Support/Code/User/workspaceStorage"
         );
         this.outputPath = path.join(__dirname, "../docs/ops/recovered-memories");
-        this.batchSize = 3; // Reduced batch size for API processing
+        this.batchSize = 1; // Reduced batch size for Opus processing
     }
 
     /**
@@ -95,7 +96,7 @@ class ChatLogArchaeologist {
                     
                     sessions.push(...jsonFiles);
                 }
-            } catch (error) {
+            } catch (_error) {
                 // Skip if chatSessions doesn't exist
                 continue;
             }
@@ -177,7 +178,7 @@ class ChatLogArchaeologist {
     /**
      * Extract insights from chat data using Claude API
      */
-    async extractInsights(chatData, session) {
+    async extractInsights(chatData, _session) {
         try {
             // Prepare conversation text for analysis
             const conversationText = this.formatChatForAnalysis(chatData);
