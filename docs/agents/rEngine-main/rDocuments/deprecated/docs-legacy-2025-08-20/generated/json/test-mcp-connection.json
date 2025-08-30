@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "test-mcp-connection.js",
+    "name": "test-mcp-connection",
+    "extension": ".js",
+    "directory": "",
+    "size": 0,
+    "lines": 17
+  },
+  "documentation": {
+    "markdown": "../docs/generated/test-mcp-connection.md",
+    "html": "../html-docs/generated/test-mcp-connection.html",
+    "generated": "2025-08-20T00:58:50.691Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "single-file",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "test-mcp-connection.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for test-mcp-connection.js"
+  }
+}

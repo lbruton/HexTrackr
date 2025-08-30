@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open WebUI API Reference & Model Compatibility Guide - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Open WebUI API Reference & Model Compatibility Guide</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 openwebui-api-reference.md</span>
+                <span>📅 2025-08-19</span>
+                <span>📊 10KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../openwebui-api-reference.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/openwebui-api-reference.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="open-webui-api-reference--model-compatibility-guide">Open WebUI API Reference &amp; Model Compatibility Guide</h1>
+<h2 id="🚀-open-webui-api-overview">🚀 <strong>Open WebUI API Overview</strong></h2>
+<p>Open WebUI provides a comprehensive set of APIs and integration capabilities that make it incredibly versatile for AI model integration. Here&#39;s everything you need to know:</p>
+<h2 id="📡-core-api-endpoints">📡 <strong>Core API Endpoints</strong></h2>
+<h3 id="1-openai-compatible-api">1. <strong>OpenAI-Compatible API</strong></h3>
+<ul>
+<li><strong>Base URL</strong>: <code>http://localhost:3031/v1/</code> (or your port)</li>
+<li><strong>Authentication</strong>: Bearer token or API key</li>
+<li><strong>Endpoints</strong>:<ul>
+<li><code>/v1/chat/completions</code> - Chat completions</li>
+<li><code>/v1/models</code> - List available models</li>
+<li><code>/v1/embeddings</code> - Text embeddings</li>
+<li><code>/v1/images/generations</code> - Image generation</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-ollama-proxy-api">2. <strong>Ollama Proxy API</strong></h3>
+<ul>
+<li><strong>Base URL</strong>: <code>http://localhost:3031/ollama/api/</code></li>
+<li><strong>Endpoints</strong>:<ul>
+<li><code>/ollama/api/tags</code> - List Ollama models</li>
+<li><code>/ollama/api/generate</code> - Generate completions</li>
+<li><code>/ollama/api/chat</code> - Chat with models</li>
+<li><code>/ollama/api/pull</code> - Pull new models</li>
+<li><code>/ollama/api/push</code> - Push models</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-webui-native-api">3. <strong>WebUI Native API</strong></h3>
+<ul>
+<li><strong>Base URL</strong>: <code>http://localhost:3031/api/v1/</code></li>
+<li><strong>Endpoints</strong>:<ul>
+<li><code>/api/v1/auths/signin</code> - Authentication</li>
+<li><code>/api/v1/chats</code> - Chat management</li>
+<li><code>/api/v1/models</code> - Model management</li>
+<li><code>/api/v1/users</code> - User management</li>
+<li><code>/api/v1/configs</code> - Configuration management</li>
+</ul>
+</li>
+</ul>
+<h2 id="🤖-model-provider-support">🤖 <strong>Model Provider Support</strong></h2>
+<h3 id="✅-native-support-built-in"><strong>✅ Native Support (Built-in)</strong></h3>
+<ol>
+<li><p><strong>Ollama Models</strong> ⭐</p>
+<ul>
+<li>All Ollama models work out-of-the-box</li>
+<li>Local inference</li>
+<li>Full feature support</li>
+</ul>
+</li>
+<li><p><strong>OpenAI Models</strong> ⭐</p>
+<ul>
+<li>GPT-3.5, GPT-4, GPT-4 Turbo</li>
+<li>DALL-E for image generation</li>
+<li>Full API compatibility</li>
+</ul>
+</li>
+<li><p><strong>Azure OpenAI</strong> ⭐</p>
+<ul>
+<li>All Azure OpenAI models</li>
+<li>Enterprise features</li>
+<li>Custom deployments</li>
+</ul>
+</li>
+</ol>
+<h3 id="�-via-pipelines-framework">*<strong>� Via Pipelines Framework</strong></h3>
+<p>The Pipelines framework provides extensive provider support:</p>
+<h4 id="google-models"><strong>Google Models</strong></h4>
+<ul>
+<li><strong>Gemini Pro</strong> ✅ (via <code>google_manifold_pipeline.py</code>)</li>
+<li><strong>Gemini Pro Vision</strong> ✅</li>
+<li><strong>PaLM 2</strong> ✅</li>
+<li><strong>Vertex AI Integration</strong> ✅ (via <code>google_vertexai_manifold_pipeline.py</code>)</li>
+</ul>
+<h4 id="alibaba-qwen-models"><strong>Alibaba Qwen Models</strong></h4>
+<ul>
+<li><strong>Qwen Models</strong> ✅ (works through multiple pipelines)<ul>
+<li>Via Hugging Face API</li>
+<li>Via Ollama (qwen2.5-coder:3b confirmed working)</li>
+<li>Via custom provider pipelines</li>
+</ul>
+</li>
+</ul>
+<h4 id="popular-providers-via-pipelines"><strong>Popular Providers via Pipelines</strong></h4>
+<ul>
+<li><strong>Anthropic Claude</strong> ✅ (<code>anthropic_manifold_pipeline.py</code>)</li>
+<li><strong>Groq</strong> ✅ (<code>groq_manifold_pipeline.py</code>) </li>
+<li><strong>Cohere</strong> ✅ (<code>cohere_manifold_pipeline.py</code>)</li>
+<li><strong>DeepSeek</strong> ✅ (<code>deepseek_manifold_pipeline.py</code>)</li>
+<li><strong>Perplexity</strong> ✅ (<code>perplexity_manifold_pipeline.py</code>)</li>
+<li><strong>AWS Bedrock</strong> ✅ (<code>aws_bedrock_claude_pipeline.py</code>, <code>aws_bedrock_deepseek_pipeline.py</code>)</li>
+<li><strong>Cloudflare AI</strong> ✅ (<code>cloudflare_ai_pipeline.py</code>)</li>
+<li><strong>LiteLLM</strong> ✅ (<code>litellm_manifold_pipeline.py</code>) - <strong>Meta option for 100+ providers</strong></li>
+</ul>
+<h2 id="🛠️-available-pipelines">🛠️ <strong>Available Pipelines</strong></h2>
+<h3 id="provider-pipelines"><strong>Provider Pipelines</strong></h3>
+<pre><code><pre><code class="language-">anthropic_manifold_pipeline.py      - Anthropic Claude models
+aws_bedrock_claude_pipeline.py      - AWS Bedrock Claude
+aws_bedrock_deepseek_pipeline.py    - AWS Bedrock DeepSeek
+azure_dalle_manifold_pipeline.py    - Azure DALL-E
+azure_deepseek_r1_pipeline.py       - Azure DeepSeek R1
+azure_jais_core42_pipeline.py       - Azure Jais Core42
+azure_openai_manifold_pipeline.py   - Azure OpenAI
+azure_openai_pipeline.py            - Azure OpenAI (simple)
+cloudflare_ai_pipeline.py           - Cloudflare AI
+cohere_manifold_pipeline.py         - Cohere models
+deepseek_manifold_pipeline.py       - DeepSeek models
+google_manifold_pipeline.py         - Google Gemini models ⭐
+google_vertexai_manifold_pipeline.py - Google Vertex AI ⭐
+groq_manifold_pipeline.py           - Groq models
+litellm_manifold_pipeline.py        - LiteLLM (100+ providers) ⭐
+llama_cpp_pipeline.py               - Local llama.cpp
+mlx_manifold_pipeline.py            - Apple MLX
+ollama_manifold_pipeline.py         - Ollama models
+openai_dalle_manifold_pipeline.py   - OpenAI DALL-E
+openai_manifold_pipeline.py         - OpenAI models
+perplexity_manifold_pipeline.py     - Perplexity models</code></pre>
+</code></pre>
+<h3 id="filter--enhancement-pipelines"><strong>Filter &amp; Enhancement Pipelines</strong></h3>
+<pre><code><pre><code class="language-">function_calling_filter_pipeline.py  - Function calling support
+langfuse_filter_pipeline.py         - Langfuse monitoring
+rate_limit_filter_pipeline.py       - Rate limiting
+detoxify_filter_pipeline.py         - Toxic content filtering
+libretranslate_filter_pipeline.py   - Real-time translation
+llmguard_prompt_injection_filter_pipeline.py - Security filtering</code></pre>
+</code></pre>
+<h2 id="🎯-gemini-integration-guide">🎯 <strong>Gemini Integration Guide</strong></h2>
+<h3 id="method-1-google-manifold-pipeline-⭐-recommended"><strong>Method 1: Google Manifold Pipeline</strong> ⭐ Recommended</h3>
+<pre><code class="language-python"><pre><code class="language-python"># Install via Pipelines
+# URL: https://github.com/open-webui/pipelines/blob/main/examples/pipelines/providers/google_manifold_pipeline.py
+
+# Configuration:
+- API Key: Your Google AI API key
+- Models: gemini-pro, gemini-pro-vision, gemini-1.5-pro, etc.
+- Features: Function calling, vision, embeddings</code></pre>
+</code></pre>
+<h3 id="method-2-vertex-ai-pipeline"><strong>Method 2: Vertex AI Pipeline</strong></h3>
+<pre><code class="language-python"><pre><code class="language-python"># For enterprise Google Cloud users
+# URL: https://github.com/open-webui/pipelines/blob/main/examples/pipelines/providers/google_vertexai_manifold_pipeline.py
+
+# Configuration:
+- Service Account JSON
+- Project ID
+- Region
+- Full Vertex AI model catalog</code></pre>
+</code></pre>
+<h3 id="method-3-litellm-pipeline-universal"><strong>Method 3: LiteLLM Pipeline</strong> (Universal)</h3>
+<pre><code class="language-python"><pre><code class="language-python"># LiteLLM supports 100+ providers including Gemini
+# URL: https://github.com/open-webui/pipelines/blob/main/examples/pipelines/providers/litellm_manifold_pipeline.py
+
+# Supports:
+- gemini/gemini-pro
+- gemini/gemini-pro-vision  
+- vertex_ai/gemini-pro
+- All major providers through one interface</code></pre>
+</code></pre>
+<h2 id="🔧-qwen-integration-guide">🔧 <strong>Qwen Integration Guide</strong></h2>
+<h3 id="method-1-ollama-⭐-confirmed-working"><strong>Method 1: Ollama</strong> ⭐ Confirmed Working</h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Already working in your setup
+ollama pull qwen2.5-coder:3b
+# Available models: qwen2:0.5b, qwen2:1.5b, qwen2:7b, qwen2.5-coder, etc.</code></pre>
+</code></pre>
+<h3 id="method-2-via-hugging-face-api"><strong>Method 2: Via Hugging Face API</strong></h3>
+<pre><code class="language-python"><pre><code class="language-python"># Through OpenAI-compatible endpoint or custom pipeline
+# Supports: Qwen2.5, Qwen2.5-Coder, Qwen-VL, etc.</code></pre>
+</code></pre>
+<h3 id="method-3-litellm-pipeline"><strong>Method 3: LiteLLM Pipeline</strong></h3>
+<pre><code class="language-python"><pre><code class="language-python"># LiteLLM supports Hugging Face endpoints
+# Can integrate Qwen models via HF API</code></pre>
+</code></pre>
+<h2 id="🚀-installation--setup">🚀 <strong>Installation &amp; Setup</strong></h2>
+<h3 id="installing-pipelines"><strong>Installing Pipelines</strong></h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Method 1: Docker (Recommended)
+docker run -d -p 9099:9099 \
+  --add-host=host.docker.internal:host-gateway \
+  -v pipelines:/app/pipelines \
+  --name pipelines --restart always \
+  ghcr.io/open-webui/pipelines:main
+
+# Method 2: Direct Installation
+docker run -d -p 9099:9099 \
+  -e PIPELINES_URLS="https://github.com/open-webui/pipelines/blob/main/examples/pipelines/providers/google_manifold_pipeline.py" \
+  --add-host=host.docker.internal:host-gateway \
+  -v pipelines:/app/pipelines \
+  --name pipelines --restart always \
+  ghcr.io/open-webui/pipelines:main</code></pre>
+</code></pre>
+<h3 id="connecting-to-open-webui"><strong>Connecting to Open WebUI</strong></h3>
+<ol>
+<li>Navigate to <strong>Settings → Connections → OpenAI API</strong></li>
+<li>Set API URL to: <code>http://localhost:9099</code> (or <code>http://host.docker.internal:9099</code> if in Docker)</li>
+<li>Set API Key to: <code>0p3n-w3bu!</code></li>
+<li>Your pipelines should now be active</li>
+</ol>
+<h3 id="managing-pipelines"><strong>Managing Pipelines</strong></h3>
+<ol>
+<li>Go to <strong>Admin Settings → Pipelines</strong></li>
+<li>Upload pipeline files or paste URLs</li>
+<li>Configure valve values (API keys, endpoints, etc.)</li>
+<li>Enable/disable pipelines as needed</li>
+</ol>
+<h2 id="📝-api-integration-examples">📝 <strong>API Integration Examples</strong></h2>
+<h3 id="using-with-renginemcp"><strong>Using with rEngineMCP</strong></h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">// Already integrated in your setup!
+// Groq primary, Ollama fallback architecture
+// Can easily add more providers via pipelines</code></pre>
+</code></pre>
+<h3 id="direct-api-usage"><strong>Direct API Usage</strong></h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Chat completion
+curl -X POST http://localhost:3031/v1/chat/completions \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gemini-pro",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+
+# List models
+curl http://localhost:3031/v1/models \
+  -H "Authorization: Bearer your-api-key"</code></pre>
+</code></pre>
+<h2 id="🎨-enhanced-features">🎨 <strong>Enhanced Features</strong></h2>
+<h3 id="rag-retrieval-augmented-generation"><strong>RAG (Retrieval Augmented Generation)</strong></h3>
+<ul>
+<li>Document upload and processing</li>
+<li>Web search integration (SearXNG, Google, Brave, etc.)</li>
+<li>Citation support</li>
+<li>Hybrid search with BM25 + CrossEncoder</li>
+</ul>
+<h3 id="multi-modal-support"><strong>Multi-Modal Support</strong></h3>
+<ul>
+<li>Image generation (DALL-E, Automatic1111, ComfyUI)</li>
+<li>Vision models (LlaVA, GPT-4V, Gemini Pro Vision)</li>
+<li>Voice and video calls</li>
+<li>File upload support</li>
+</ul>
+<h3 id="advanced-features"><strong>Advanced Features</strong></h3>
+<ul>
+<li>Function calling</li>
+<li>Code execution (Python via Pyodide)</li>
+<li>Real-time collaboration (Channels)</li>
+<li>Memory and personalization</li>
+<li>Conversation cloning and sharing</li>
+</ul>
+<h2 id="🔐-security--administration">🔐 <strong>Security &amp; Administration</strong></h2>
+<h3 id="authentication"><strong>Authentication</strong></h3>
+<ul>
+<li>Role-based access control (RBAC)</li>
+<li>LDAP integration</li>
+<li>OAuth support</li>
+<li>API key management</li>
+</ul>
+<h3 id="enterprise-features"><strong>Enterprise Features</strong></h3>
+<ul>
+<li>User groups and permissions</li>
+<li>Model whitelisting</li>
+<li>Rate limiting</li>
+<li>Audit logging</li>
+<li>Webhook integration</li>
+</ul>
+<h2 id="🌟-recommendations-for-your-setup">🌟 <strong>Recommendations for Your Setup</strong></h2>
+<h3 id="high-priority-⭐"><strong>High Priority</strong> ⭐</h3>
+<ol>
+<li><strong>Install Google Manifold Pipeline</strong> - Native Gemini support</li>
+<li><strong>Install LiteLLM Pipeline</strong> - 100+ providers in one pipeline</li>
+<li><strong>Add rate limiting</strong> - Prevent API abuse</li>
+<li><strong>Setup monitoring</strong> - Langfuse or Opik integration</li>
+</ol>
+<h3 id="medium-priority"><strong>Medium Priority</strong></h3>
+<ol>
+<li><strong>Anthropic Claude Pipeline</strong> - Excellent reasoning</li>
+<li><strong>Function calling pipeline</strong> - Enhanced capabilities  </li>
+<li><strong>Toxic content filtering</strong> - Safety</li>
+<li><strong>Translation pipeline</strong> - Multi-language support</li>
+</ol>
+<h3 id="your-current-status-✅"><strong>Your Current Status</strong> ✅</h3>
+<ul>
+<li>✅ Open WebUI running on port 3031</li>
+<li>✅ Groq API integrated in rEngineMCP</li>
+<li>✅ Ollama with Qwen models working</li>
+<li>✅ Docker setup complete</li>
+<li>🔄 Ready to add more providers via Pipelines</li>
+</ul>
+<h2 id="🎯-next-steps">🎯 <strong>Next Steps</strong></h2>
+<ol>
+<li><strong>Add Gemini</strong>: Install Google Manifold Pipeline</li>
+<li><strong>Expand Qwen</strong>: Test other Qwen variants via Ollama</li>
+<li><strong>Universal Access</strong>: Install LiteLLM for 100+ providers</li>
+<li><strong>Enhance Security</strong>: Add rate limiting and content filtering</li>
+<li><strong>Monitor Usage</strong>: Setup Langfuse integration</li>
+</ol>
+<p>Your setup is already excellent with Groq + Ollama! Adding these pipelines will give you access to virtually every AI model available. 🚀</p>
+<hr>
+<p><em>Generated for StackTrackr rEngineMCP Integration - August 17, 2025</em></p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>openwebui-api-reference.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-19</p>
+        </footer>
+    </div>
+</body>
+</html>

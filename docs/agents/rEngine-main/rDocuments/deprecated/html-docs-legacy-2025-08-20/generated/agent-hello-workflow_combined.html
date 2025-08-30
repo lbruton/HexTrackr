@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>agent-hello-workflow.js - Combined Documentation - rEngine Core Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #6366f1;
+            --rengine-secondary: #8b5cf6;
+            --rengine-accent: #06b6d4;
+            --rengine-text: #1f2937;
+            --rengine-text-light: #6b7280;
+            --rengine-bg: #ffffff;
+            --rengine-bg-alt: #f8fafc;
+            --rengine-border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--rengine-text);
+            background: var(--rengine-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--rengine-primary), var(--rengine-secondary));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: "⚙️";
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--rengine-primary);
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--rengine-primary);
+            border-bottom: 2px solid var(--rengine-border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--rengine-secondary);
+        }
+
+        h4, h5, h6 {
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--rengine-text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--rengine-text);
+        }
+
+        .content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        code {
+            background: var(--rengine-bg-alt);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--rengine-primary);
+        }
+
+        pre {
+            background: var(--rengine-bg-alt);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--rengine-primary);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--rengine-text);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--rengine-accent);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: var(--rengine-text-light);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--rengine-border);
+        }
+
+        th {
+            background: var(--rengine-bg-alt);
+            font-weight: 600;
+            color: var(--rengine-primary);
+        }
+
+        .metadata {
+            background: var(--rengine-bg-alt);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--rengine-border);
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: var(--rengine-text-light);
+        }
+
+        footer {
+            background: var(--rengine-bg-alt);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--rengine-text-light);
+            border-top: 1px solid var(--rengine-border);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--rengine-primary);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">rEngine Core</div>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../README.html">Documentation</a>
+                    <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <h1>agent-hello-workflow.js - Combined Documentation</h1>
+            
+            
+            <div class="metadata">
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Source File:</span>
+                        <span>agent-hello-workflow_combined.md</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Generated:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Last Modified:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Converter:</span>
+                        <span>rEngine MCP HTML Converter</span>
+                    </div>
+                
+            </div>
+            
+            
+            <h1 id="agent-hello-workflowjs---combined-documentation">agent-hello-workflow.js - Combined Documentation</h1>
+<blockquote>
+<p><strong>Note</strong>: This file was too large for single analysis and was processed in 2 chunks.
+Successfully processed: 2/2 chunks.</p>
+</blockquote>
+<h2 id="file-overview">File Overview</h2>
+<p>This documentation was generated by analyzing the file in chunks due to size limitations.</p>
+<h2 id="chunk-1-analysis">Chunk 1 Analysis</h2>
+<h1 id="agent-hello-workflow---persistent-memory-and-context-continuity">Agent Hello Workflow - Persistent Memory and Context Continuity</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>agent-hello-workflow.js</code> script manages the initialization and context loading process for an intelligent agent. It handles the integration of various memory sources, including the latest handoff, personal memories, MCP (Memory and Cognition Platform) memories, and technical knowledge, to provide a seamless and contextual experience for the agent.</p>
+<p>The script&#39;s primary objectives are:</p>
+<ol>
+<li><strong>Persistent Memory</strong>: Ensure the agent maintains continuity of context and access to its previous interactions, knowledge, and memories.</li>
+<li><strong>Intelligent Initialization</strong>: Load and synthesize relevant information from different memory sources to generate a comprehensive continuation prompt for the agent.</li>
+<li><strong>Memory Management</strong>: Provide functionality to save personal context, search through memories, and generate detailed context summaries.</li>
+<li><strong>Memory System Integration</strong>: Integrate with the Memory Intelligence System, including the <code>memory-intelligence.js</code>, <code>recall.js</code>, and <code>add-context.js</code> modules.</li>
+</ol>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>AgentHelloWorkflow</code> class is the main component of this script, responsible for managing the agent&#39;s initialization and memory-related operations. The class has the following key components:</p>
+<ol>
+<li><strong>Memory Paths</strong>: Defines the file paths for various memory-related resources, such as the <code>rAgentMemories</code> directory, <code>memory-intelligence.js</code>, <code>recall.js</code>, and <code>add-context.js</code> modules.</li>
+<li><strong>Memory System Status</strong>: Checks the status of the Memory Intelligence System.</li>
+<li><strong>Initialization</strong>: The <code>initializeAgent()</code> method loads the latest handoff, personal memories, MCP memories, and technical knowledge, and generates a continuation prompt based on the available context.</li>
+<li><strong>Memory Handling</strong>: Methods for loading and extracting information from the different memory sources, such as <code>getLatestHandoff()</code>, <code>loadPersonalMemories()</code>, <code>loadMCPMemories()</code>, and <code>loadKnowledgeDB()</code>.</li>
+<li><strong>Continuation Prompt Generation</strong>: The <code>generateContinuationPrompt()</code> method combines the loaded memory information to create a comprehensive prompt for the agent to continue its workflow.</li>
+<li><strong>Detailed Context Summary</strong>: The <code>generateDetailedContext()</code> method generates a detailed summary of the agent&#39;s current context, including the latest handoff, personal memories, and knowledge base updates.</li>
+<li><strong>Time Ago Calculation</strong>: The <code>getTimeAgo()</code> method calculates the time difference between the current time and a given timestamp, returning a human-readable string.</li>
+<li><strong>Personal Context Saving</strong>: The <code>savePersonalContext()</code> method saves the agent&#39;s personal context to the <code>personal-context.json</code> file.</li>
+<li><strong>Memory Searching</strong>: The <code>searchMemories()</code> method allows searching through the agent&#39;s handoff files, personal memories, and knowledge base for specific query terms.</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>The script has the following external dependencies:</p>
+<ol>
+<li><code>fs-extra</code>: A comprehensive file system library for Node.js, providing enhanced versions of the core <code>fs</code> module.</li>
+<li><code>path</code>: The built-in Node.js module for working with file and directory paths.</li>
+<li><code>fileURLToPath</code>: A utility function from the built-in <code>url</code> module, used for converting a file URL to a file path.</li>
+</ol>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="agenthelloworkflow-class"><code>AgentHelloWorkflow</code> Class</h3>
+<p>The <code>AgentHelloWorkflow</code> class is the main component of the script, responsible for managing the agent&#39;s initialization and memory-related operations.</p>
+<h4 id="constructor"><code>constructor()</code></h4>
+<p>The constructor initializes the class properties, including the base directory, memory directory, agents directory, and various Memory Intelligence System file paths.</p>
+<h4 id="initializeagent"><code>initializeAgent()</code></h4>
+<p>This method is responsible for loading the latest handoff, personal memories, MCP memories, and technical knowledge, and generating a continuation prompt based on the available context.</p>
+<p><strong>Parameters</strong>: None
+<strong>Returns</strong>: An object containing the following properties:</p>
+<ul>
+<li><code>hasContext</code>: A boolean indicating whether the agent has any context available.</li>
+<li><code>continuationPrompt</code>: The generated continuation prompt.</li>
+<li><code>latestHandoff</code>: Information about the latest handoff, including the filename, content, timestamp, and summary.</li>
+<li><code>memoryCount</code>: An object containing the count of personal memories, MCP memories, handoffs, and knowledge concepts.</li>
+<li><code>detailedContext</code>: An object containing the detailed context information, including the latest handoff, personal memories, MCP memories, and knowledge database.</li>
+</ul>
+<h4 id="getlatesthandoff"><code>getLatestHandoff()</code></h4>
+<p>This method loads the latest handoff file from the <code>handoffDir</code> directory and extracts the relevant information, including the filename, content, timestamp, and a summary.</p>
+<p><strong>Parameters</strong>: None
+<strong>Returns</strong>: An object containing the latest handoff information, or <code>null</code> if no handoff files are found.</p>
+<h4 id="loadpersonalmemories"><code>loadPersonalMemories()</code></h4>
+<p>This method loads the agent&#39;s personal memories from the <code>personal-context.json</code> file in the <code>rAgentMemories</code> directory.</p>
+<p><strong>Parameters</strong>: None
+<strong>Returns</strong>: An array of the last 10 personal memory contexts, or <code>null</code> if no personal memories are found.</p>
+<h4 id="loadmcpmemories"><code>loadMCPMemories()</code></h4>
+<p>This method loads the agent&#39;s MCP (Memory and Cognition Platform) memories from the <code>scribe-mcp-export.json</code> file in the <code>rEngine</code> directory.</p>
+<p><strong>Parameters</strong>: None
+<strong>Returns</strong>: The MCP memories object, or <code>null</code> if no MCP export file is found.</p>
+<h4 id="loadknowledgedb"><code>loadKnowledgeDB()</code></h4>
+<p>This method loads the agent&#39;s technical knowledge from the <code>technical-knowledge.json</code> file in the <code>rEngine</code> directory.</p>
+<p><strong>Parameters</strong>: None
+<strong>Returns</strong>: The technical knowledge object, or <code>null</code> if no knowledge database file is found.</p>
+<h4 id="generatecontinuationprompt"><code>generateContinuationPrompt()</code></h4>
+<p>This method generates a comprehensive continuation prompt for the agent, based on the available context (latest handoff, personal memories, MCP memories, and technical knowledge).</p>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><code>handoff</code>: The latest handoff information.</li>
+<li><code>personal</code>: The agent&#39;s personal memories.</li>
+<li><code>mcp</code>: The agent&#39;s MCP memories.</li>
+<li><code>knowledge</code>: The agent&#39;s technical knowledge.</li>
+</ul>
+<p><strong>Returns</strong>: The generated continuation prompt.</p>
+<h4 id="generatedetailedcontext"><code>generateDetailedContext()</code></h4>
+<p>This method generates a detailed context summary for the agent, including the latest handoff, personal memories, and recent knowledge base updates.</p>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><code>handoff</code>: The latest handoff information.</li>
+<li><code>personal</code>: The agent&#39;s personal memories.</li>
+<li><code>mcp</code>: The agent&#39;s MCP memories.</li>
+<li><code>knowledge</code>: The agent&#39;s technical knowledge.</li>
+</ul>
+<p><strong>Returns</strong>: The detailed context summary.</p>
+<h4 id="gettimeago"><code>getTimeAgo()</code></h4>
+<p>This method calculates the time difference between the current time and a given timestamp, returning a human-readable string.</p>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><code>timestamp</code>: The timestamp to calculate the time difference from.</li>
+</ul>
+<p><strong>Returns</strong>: A human-readable string representing the time difference.</p>
+<h4 id="savepersonalcontext"><code>savePersonalContext()</code></h4>
+<p>This method saves the agent&#39;s personal context to the <code>personal-context.json</code> file in the <code>rAgentMemories</code> directory, keeping the last 100 personal contexts.</p>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><code>context</code>: The personal context to be saved.</li>
+</ul>
+<p><strong>Returns</strong>: None</p>
+<h4 id="searchmemories"><code>searchMemories()</code></h4>
+<p>This method searches through the agent&#39;s handoff files, personal memories, and knowledge base for a given query term, and returns the search results.</p>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><code>query</code>: The search query term.</li>
+</ul>
+<p><strong>Returns</strong>: An object containing the search results, including handoffs, personal memories, and knowledge base matches.</p>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>Here&#39;s an example of how to use the <code>AgentHelloWorkflow</code> class:</p>
+<pre><code class="language-javascript">const workflow = new AgentHelloWorkflow();
+
+async function initializeAgent() {
+  const result = await workflow.initializeAgent();
+  if (result.hasContext) {
+    console.log(result.continuationPrompt);
+    // Handle user input and continue the workflow
+  } else {
+    console.error(&#39;Failed to initialize agent:&#39;, result.error);
+  }
+}
+
+async function searchMemories(query) {
+  const results = await workflow.searchMemories(query);
+  console.log(&#39;Search results:&#39;, results);
+}
+
+initializeAgent();
+searchMemories(&#39;specific search query&#39;);
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>The script does not require any external configuration options or environment variables. The necessary file paths and directories are hardcoded within the <code>AgentHelloWorkflow</code> class.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The script uses try-catch blocks to handle errors that may occur during the various memory loading and processing operations. When an error occurs, the script logs the error message and returns appropriate error information in the response objects.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>agent-hello-workflow.js</code> script is a core component of the agent&#39;s initialization and memory management process. It integrates with the Memory Intelligence System, including the <code>memory-intelligence.js</code>, <code>recall.js</code>, and <code>add-context.js</code> modules, to provide a seamless and contextual experience for the agent.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><strong>Persistent Memory</strong>: The script&#39;s focus on maintaining persistent memory and context continuity is crucial for the agent&#39;s long-term performance and user experience.</li>
+<li><strong>Memory Source Integration</strong>: The ability to load and synthesize information from various memory sources (handoffs, personal memories, MCP memories, and technical knowledge) is a key feature of this script, allowing the agent to access a comprehensive set of contextual information.</li>
+<li><strong>Memory Management</strong>: The script provides a robust set of memory management functions, including saving personal context, searching through memories, and generating detailed context summaries, which are essential for the agent&#39;s development and debugging.</li>
+<li><strong>Memory Intelligence System Integration</strong>: The tight integration with the Memory Intelligence System, including the <code>memory-intelligence.js</code>, <code>recall.js</code>, and <code>add-context.js</code> modules, ensures that the agent&#39;s memory capabilities are well-aligned with the broader system architecture.</li>
+<li><strong>Error Handling</strong>: The script&#39;s thorough error handling and logging mechanisms help to identify and address any issues that may arise during the agent&#39;s initialization and memory-related operations.</li>
+</ol>
+<p>Overall, the <code>agent-hello-workflow.js</code> script is a crucial component of the agent&#39;s architecture, providing a solid foundation for maintaining persistent memory and context continuity, which is essential for the agent&#39;s long-term development and user interaction.</p>
+<hr>
+<h2 id="chunk-2-analysis">Chunk 2 Analysis</h2>
+<h1 id="agent-hello-workflow-documentation">Agent Hello Workflow Documentation</h1>
+<h2 id="purpose--overview-1">Purpose &amp; Overview</h2>
+<p>The <code>agent-hello-workflow.js</code> script is a part of a larger system that provides an artificial intelligence (AI) agent with memory and context capabilities. This script is responsible for managing the initialization, status checking, and command-line interface (CLI) interactions of the agent&#39;s memory intelligence system.</p>
+<p>The script is designed to ensure that the necessary memory-related components are available and functioning correctly, allowing the agent to access and manipulate its memory and context data. It provides methods for checking the status of the memory system, initializing the system, and displaying available memory-related commands.</p>
+<h2 id="technical-architecture-1">Technical Architecture</h2>
+<p>The <code>AgentHelloWorkflow</code> class is the main component of this script. It contains the following key properties and methods:</p>
+<h3 id="properties">Properties</h3>
+<ul>
+<li><code>memoryIntelligencePath</code>: The file path to the <code>memory-intelligence.js</code> module.</li>
+<li><code>fastRecallPath</code>: The file path to the <code>recall.js</code> module.</li>
+<li><code>addContextPath</code>: The file path to the <code>add-context.js</code> module.</li>
+<li><code>extendedContextPath</code>: The file path to the <code>extendedcontext.json</code> file.</li>
+<li><code>memorySystemStatus</code>: An object that tracks the availability of various memory system components.</li>
+</ul>
+<h3 id="methods">Methods</h3>
+<ul>
+<li><code>checkMemorySystemStatus()</code>: Checks the existence of the required memory system files and updates the <code>memorySystemStatus</code> object accordingly.</li>
+<li><code>initializeMemorySystem()</code>: Logs the current status of the memory system and performs a quick memory test if all components are available.</li>
+<li><code>showMemoryCommands()</code>: Displays the available memory-related commands and their usage examples.</li>
+</ul>
+<p>The script also includes a CLI section that allows users to interact with the agent&#39;s memory system by running the script with different commands (e.g., <code>init</code>, <code>search</code>, <code>context</code>).</p>
+<h2 id="dependencies-1">Dependencies</h2>
+<p>The <code>agent-hello-workflow.js</code> script imports the following dependencies:</p>
+<ul>
+<li><code>fs</code>: The Node.js file system module, used for checking the existence of memory system files.</li>
+<li><code>child_process</code>: The Node.js child process module, used for executing a memory test command.</li>
+<li><code>util</code>: The Node.js utility module, used for promisifying the <code>exec</code> function from the <code>child_process</code> module.</li>
+</ul>
+<h2 id="key-functionsclasses-1">Key Functions/Classes</h2>
+<h3 id="agenthelloworkflow-class-1"><code>AgentHelloWorkflow</code> Class</h3>
+<h4 id="checkmemorysystemstatus"><code>checkMemorySystemStatus()</code></h4>
+<ul>
+<li><strong>Purpose</strong>: Checks the existence of the required memory system files and updates the <code>memorySystemStatus</code> object accordingly.</li>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Return Value</strong>: An object containing the status of each memory system component.</li>
+</ul>
+<h4 id="initializememorysystem"><code>initializeMemorySystem()</code></h4>
+<ul>
+<li><strong>Purpose</strong>: Logs the current status of the memory system and performs a quick memory test if all components are available.</li>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Return Value</strong>: A boolean indicating whether all memory system components are ready.</li>
+</ul>
+<h4 id="showmemorycommands"><code>showMemoryCommands()</code></h4>
+<ul>
+<li><strong>Purpose</strong>: Displays the available memory-related commands and their usage examples.</li>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Return Value</strong>: None.</li>
+</ul>
+<h2 id="usage-examples-1">Usage Examples</h2>
+<p>To use the <code>AgentHelloWorkflow</code> class, you can create an instance of it and call the available methods:</p>
+<pre><code class="language-javascript">const workflow = new AgentHelloWorkflow();
+
+// Check the memory system status
+const status = workflow.checkMemorySystemStatus();
+console.log(status);
+
+// Initialize the memory system
+const isReady = await workflow.initializeMemorySystem();
+console.log(isReady);
+
+// Display the available memory commands
+workflow.showMemoryCommands();
+</code></pre>
+<p>You can also run the script from the command line with the following commands:</p>
+<pre><code class="language-bash"># Initialize the agent
+node agent-hello-workflow.js init
+
+# Search for a specific term in the memory
+node agent-hello-workflow.js search &quot;javascript bug&quot;
+
+# Display the detailed context
+node agent-hello-workflow.js context
+</code></pre>
+<h2 id="configuration-1">Configuration</h2>
+<p>The <code>AgentHelloWorkflow</code> class requires the following configuration:</p>
+<ul>
+<li><code>memoryIntelligencePath</code>: The file path to the <code>memory-intelligence.js</code> module.</li>
+<li><code>fastRecallPath</code>: The file path to the <code>recall.js</code> module.</li>
+<li><code>addContextPath</code>: The file path to the <code>add-context.js</code> module.</li>
+<li><code>extendedContextPath</code>: The file path to the <code>extendedcontext.json</code> file.</li>
+</ul>
+<p>These paths should be set correctly to ensure that the memory system components are properly recognized.</p>
+<h2 id="error-handling-1">Error Handling</h2>
+<p>The <code>AgentHelloWorkflow</code> class handles errors that occur during the memory system status check and the memory test execution. In case of errors, the script logs the error message and continues to operate, albeit with limited functionality.</p>
+<h2 id="integration-1">Integration</h2>
+<p>The <code>AgentHelloWorkflow</code> class is designed to be a part of a larger system that provides an AI agent with memory and context capabilities. It is responsible for managing the initialization and status of the memory system, allowing other components of the system to interact with the agent&#39;s memory and context data.</p>
+<h2 id="development-notes-1">Development Notes</h2>
+<ul>
+<li>The script uses colored console logs to provide a better visual experience for the user.</li>
+<li>The <code>initializeMemorySystem()</code> method includes a quick memory test to ensure that the memory system is functioning correctly.</li>
+<li>The CLI usage section allows developers to interact with the agent&#39;s memory system directly from the command line.</li>
+<li>The script is designed to be modular and extensible, allowing for the addition of new memory-related features and components in the future.</li>
+</ul>
+<hr>
+<h2 id="processing-summary">Processing Summary</h2>
+<ul>
+<li><strong>Total Chunks</strong>: 2</li>
+<li><strong>Successful</strong>: 2</li>
+<li><strong>Failed</strong>: 0</li>
+<li><strong>Processing Method</strong>: Smart chunking with rate limiting</li>
+<li><strong>Generated</strong>: 2025-08-20T00:47:34.874Z</li>
+</ul>
+
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../README.html">Documentation</a>
+                <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+            </div>
+            <p>Generated on 2025-08-20 by rEngine Core HTML Converter</p>
+            <p>© 2025 rEngine Core - Intelligent Development Wrapper</p>
+        </div>
+    </footer>
+</body>
+</html>

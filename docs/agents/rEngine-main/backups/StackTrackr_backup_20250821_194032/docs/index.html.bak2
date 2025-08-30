@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StackTrackr Application Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b35, #e55a32);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #ff6b35;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .doc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .doc-card {
+            background: #f8f9fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .doc-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #ff6b35;
+        }
+
+        .doc-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .doc-type {
+            background: #ff6b35;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .back-link {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border: 2px solid #007acc;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #007acc;
+            color: white;
+        }
+
+        .app-link {
+            color: #ff6b35;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border: 2px solid #ff6b35;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .app-link:hover {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .stats {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .stats h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>💎 StackTrackr Application Documentation</h1>
+            <div class="subtitle">Comprehensive Development Documentation</div>
+        </header>
+        
+        <main class="content">
+            <div class="nav-links">
+                <a href="../../../html-docs/index.html" class="back-link">← Back to Documentation Portal</a>
+                <a href="../index.html" class="app-link">🚀 Open StackTrackr App</a>
+            </div>
+            
+            <div class="stats">
+                <h3>📊 Documentation Overview</h3>
+                <p><strong>Total Documentation Files:</strong> 39</p>
+                <p><strong>Markdown Files:</strong> 37 | <strong>HTML Files:</strong> 2</p>
+                <p><strong>Last Updated:</strong> 8/19/2025, 10:42:30 AM</p>
+            </div>
+
+            
+            <div class="section">
+                <h2>📖 HTML Documentation</h2>
+                <div class="doc-grid">
+                    
+                        <a href="html/rProjects/StackTrackr/css/styles_combined.html" class="doc-card">
+                            <div class="doc-title">Styles_combined</div>
+                            <span class="doc-type">HTML</span>
+                        </a>
+                        <a href="html/rProjects/StackTrackr/css/styles_chunk.html" class="doc-card">
+                            <div class="doc-title">Styles_chunk</div>
+                            <span class="doc-type">HTML</span>
+                        </a>
+                </div>
+            </div>
+            
+
+            <div class="section">
+                <h2>📝 Source Documentation</h2>
+                <div class="doc-grid">
+                    
+                        <a href="../../../docs/generated/html/js/versionCheck.html" class="doc-card">
+                            <div class="doc-title">VersionCheck</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../docs/generated/html/js/utils.html" class="doc-card">
+                            <div class="doc-title">Utils</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../docs/generated/html/js/theme.html" class="doc-card">
+                            <div class="doc-title">Theme</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/state.html" class="doc-card">
+                            <div class="doc-title">State</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/spot.html" class="doc-card">
+                            <div class="doc-title">Spot</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/sorting.html" class="doc-card">
+                            <div class="doc-title">Sorting</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/search.html" class="doc-card">
+                            <div class="doc-title">Search</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/rsynk-integration.html" class="doc-card">
+                            <div class="doc-title">Rsynk Integration</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/rengine-api-client.html" class="doc-card">
+                            <div class="doc-title">Rengine Api Client</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/pagination.html" class="doc-card">
+                            <div class="doc-title">Pagination</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/numista-modal.html" class="doc-card">
+                            <div class="doc-title">Numista Modal</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                                                    <a href="../../../html-docs/generated/js/inventory.html" class="doc-link">
+                                <div class="doc-item">
+                                    <div class="doc-icon">📄</div>
+                                    <div class="doc-info">
+                                        <h4>inventory.js</h4>
+                                        <p>Core inventory management system with item tracking, search, and data persistence</p>
+                                    </div>
+                                </div>
+                            </a>
+                        <a href="../../../html-docs/generated/js/init.html" class="doc-card">
+                            <div class="doc-title">Init</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/fuzzy-search.html" class="doc-card">
+                            <div class="doc-title">Fuzzy Search</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/filters.html" class="doc-card">
+                            <div class="doc-title">Filters</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/file-protocol-fix.html" class="doc-card">
+                            <div class="doc-title">File Protocol Fix</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                                                    <a href="../../../html-docs/generated/js/events.html" class="doc-link">
+                                <div class="doc-item">
+                                    <div class="doc-icon">⚡</div>
+                                    <div class="doc-info">
+                                        <h4>events.js</h4>
+                                        <p>Event handling system for user interactions and application state management</p>
+                                    </div>
+                                </div>
+                            </a>
+                        <a href="../../../html-docs/generated/js/encryption.html" class="doc-card">
+                            <div class="doc-title">Encryption</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/detailsModal.html" class="doc-card">
+                            <div class="doc-title">DetailsModal</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/debugModal.html" class="doc-card">
+                            <div class="doc-title">DebugModal</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/debug-log.html" class="doc-card">
+                            <div class="doc-title">Debug Log</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/customMapping.html" class="doc-card">
+                            <div class="doc-title">CustomMapping</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/constants.html" class="doc-card">
+                            <div class="doc-title">Constants</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/charts.html" class="doc-card">
+                            <div class="doc-title">Charts</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/changeLog.html" class="doc-card">
+                            <div class="doc-title">ChangeLog</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/catalog-providers.html" class="doc-card">
+                            <div class="doc-title">Catalog Providers</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/catalog-manager.html" class="doc-card">
+                            <div class="doc-title">Catalog Manager</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/catalog-api.html" class="doc-card">
+                            <div class="doc-title">Catalog Api</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/autocomplete.html" class="doc-card">
+                            <div class="doc-title">Autocomplete</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/api.html" class="doc-card">
+                            <div class="doc-title">Api</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/ai-search-prototype.html" class="doc-card">
+                            <div class="doc-title">Ai Search Prototype</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="../../../html-docs/generated/js/about.html" class="doc-card">
+                            <div class="doc-title">About</div>
+                            <span class="doc-type">JS</span>
+                        </a>
+                        <a href="rProjects/StackTrackr/css/styles_combined.md" class="doc-card">
+                            <div class="doc-title">Styles_combined</div>
+                            <span class="doc-type">CSS</span>
+                        </a>
+                        <a href="rProjects/StackTrackr/css/styles_chunk.md" class="doc-card">
+                            <div class="doc-title">Styles_chunk</div>
+                            <span class="doc-type">CSS</span>
+                        </a>
+                        <a href="docs/generated/rProjects/StackTrackr/css/styles_combined.md" class="doc-card">
+                            <div class="doc-title">Styles_combined</div>
+                            <span class="doc-type">CSS</span>
+                        </a>
+                        <a href="docs/generated/docs/generated/rProjects/StackTrackr/css/styles_combined.md" class="doc-card">
+                            <div class="doc-title">Styles_combined</div>
+                            <span class="doc-type">CSS</span>
+                        </a>
+                        <a href="docs/generated/docs/generated/docs/generated/rProjects/StackTrackr/css/styles_combined.md" class="doc-card">
+                            <div class="doc-title">Styles_combined</div>
+                            <span class="doc-type">CSS</span>
+                        </a>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

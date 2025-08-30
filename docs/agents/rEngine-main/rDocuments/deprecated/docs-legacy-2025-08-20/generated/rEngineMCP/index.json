@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "../rEngineMCP/index.js",
+    "name": "index",
+    "extension": ".js",
+    "directory": "../rEngineMCP",
+    "size": 0,
+    "lines": 16
+  },
+  "documentation": {
+    "markdown": "../docs/rEngineMCP/index.md",
+    "html": "../docs/rEngineMCP/index.html",
+    "generated": "2025-08-20T01:00:31.131Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "single-file",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "index.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for ../rEngineMCP/index.js"
+  }
+}

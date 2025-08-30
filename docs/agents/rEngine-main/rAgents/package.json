@@ -1,0 +1,72 @@
+{
+  "name": "ragents",
+  "version": "1.2.2",
+  "description": "rAgents - Agentic Operating System Plugin for StackTrackr",
+  "type": "module",
+  "main": "memory.json",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "version": "node version-manager.js",
+    "version:status": "node version-manager.js --status",
+    "version:bump:patch": "node version-manager.js bump patch",
+    "version:bump:minor": "node version-manager.js bump minor",
+    "version:bump:major": "node version-manager.js bump major",
+    "version:history": "node version-manager.js history",
+    "version:capabilities": "node version-manager.js capabilities",
+    "search": "cd .. && node agents/engine/memory-search-cli.js",
+    "memory:stats": "cd .. && node agents/engine/memory-search-cli.js --stats",
+    "sync": "node scripts/sync.js",
+    "backup": "node scripts/backup.js",
+    "docs": "cat VERSION.md",
+    "pm:guide": "cat docs/PROJECT-MANAGER-HANDOFF.md",
+    "pm:templates": "cat templates/task-delegation.md",
+    "prompts": "ls -la docs/rPrompts/",
+    "prompts:list": "cat docs/rPrompts/README.md",
+    "test": "node engine/memory-search-cli.js --stats"
+  },
+  "dependencies": {
+    "stacktrackr": "^3.04.87"
+  },
+  "keywords": [
+    "ai-agents",
+    "memory-system",
+    "mcp",
+    "agentic",
+    "coordination",
+    "plugin"
+  ],
+  "author": "StackTrackr Agent System",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lbruton/StackTrackr.git",
+    "directory": "agents"
+  },
+  "bugs": {
+    "url": "https://github.com/lbruton/StackTrackr/issues"
+  },
+  "homepage": "https://github.com/lbruton/StackTrackr#readme",
+  "ragents": {
+    "plugin_type": "agentic_system",
+    "compatibility": {
+      "stacktrackr": ">=3.04.70",
+      "mcp": ">=1.0.0"
+    },
+    "features": [
+      "multi_agent_coordination",
+      "memory_management",
+      "cross_session_persistence",
+      "workflow_automation",
+      "search_optimization",
+      "export_collaboration"
+    ],
+    "architecture": {
+      "memory_system": "json_with_mcp_fallback",
+      "search_engine": "in_memory_index_matrix",
+      "agent_coordination": "unified_workflow_protocols",
+      "backup_strategy": "automated_timestamped_snapshots"
+    }
+  }
+}

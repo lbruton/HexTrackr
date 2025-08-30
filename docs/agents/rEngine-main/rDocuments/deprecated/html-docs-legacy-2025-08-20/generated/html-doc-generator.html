@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>html-doc-generator - StackTrackr Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #667eea;
+            --rengine-secondary: #764ba2;
+            --rengine-accent: #495057;
+            --rengine-accent-light: #6c757d;
+            --status-success: #28a745;
+            --status-warning: #ffc107;
+            --status-danger: #dc3545;
+            --status-info: #007acc;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-muted: #888;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --border-color: #e1e4e8;
+            --shadow-heavy: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--rengine-primary) 0%, var(--rengine-secondary) 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            border-radius: 15px;
+            box-shadow: var(--shadow-heavy);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--rengine-accent) 0%, var(--rengine-accent-light) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: var(--bg-secondary);
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: var(--status-info);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3 { 
+            color: var(--text-primary); 
+            margin-top: 2em; 
+            margin-bottom: 0.5em; 
+        }
+        .content h1 { font-size: 2em; border-bottom: 2px solid var(--rengine-primary); padding-bottom: 0.5em; }
+        .content h2 { font-size: 1.5em; }
+        .content h3 { font-size: 1.3em; }
+        
+        .content pre { 
+            background: var(--bg-secondary); 
+            padding: 1em; 
+            border-radius: 5px; 
+            overflow-x: auto; 
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+        }
+        
+        .content code { 
+            background: var(--bg-secondary); 
+            padding: 0.2em 0.4em; 
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        .content blockquote {
+            border-left: 4px solid var(--rengine-primary);
+            margin: 1em 0;
+            padding-left: 1em;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 1em 1em 1em 2em;
+            border-radius: 5px;
+        }
+        
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .content th, .content td {
+            border: 1px solid var(--border-color);
+            padding: 0.75em;
+            text-align: left;
+        }
+        
+        .content th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content a {
+            color: var(--status-info);
+            text-decoration: none;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
+        .metadata {
+            background: var(--bg-secondary);
+            padding: 1em;
+            border-radius: 5px;
+            margin-bottom: 2em;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .footer {
+            background: var(--bg-secondary);
+            padding: 20px 30px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .footer .branding {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .footer .system-name {
+            font-weight: 600;
+            color: var(--rengine-accent);
+        }
+
+        .footer .version {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .footer .divider {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .nav-bar {
+                padding: 10px 20px;
+            }
+            
+            .footer .branding {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>html-doc-generator</h1>
+            <div class="subtitle">StackTrackr Documentation</div>
+            <div class="meta">
+                <span>📁 html-doc-generator.md</span>
+                <span>📅 2025-08-20</span>
+                
+            </div>
+        </header>
+        
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../../html-docs/documentation.html" class="nav-link">🏠 Documentation Portal</a>
+                <a href="../index.html" class="nav-link">📚 All Docs</a>
+                <a href="../../html-docs/developmentstatus.html" class="nav-link">📊 Development Status</a>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <div class="metadata">
+                <strong>📂 Source File:</strong> html-doc-generator.md | 
+                <strong>🕒 Generated:</strong> 8/19/2025, 9:49:53 PM |
+                <strong>🎨 Engine:</strong> Gemini HTML Converter
+            </div>
+            ```html
+<article>
+  <h1>HTML Documentation Generator for rScribe Workers</h1>
+
+  <section>
+    <h2>Purpose & Overview</h2>
+    <p>The <code>html-doc-generator.js</code> script is a powerful tool that converts Markdown files into professional-looking HTML documentation. It was created to streamline the documentation process for rScribe, a platform that manages various worker-related tasks and processes.</p>
+    <p>The primary purpose of this script is to generate comprehensive, visually appealing, and easily navigable HTML documentation from Markdown source files. This allows rScribe team members and users to access the documentation in a user-friendly format, making it easier to understand and reference the project's technical details.</p>
+  </section>
+
+  <section>
+    <h2>Technical Architecture</h2>
+    <p>The <code>HTMLDocGenerator</code> class is the main component of this script, responsible for the entire documentation generation process. Here's a breakdown of its key functionality:</p>
+    <ol>
+      <li><strong>Template Loading</strong>: The constructor loads a pre-defined HTML template that serves as the base for the generated documentation. This template includes the CSS styles and the navigation structure.</li>
+      <li><strong>Markdown Conversion</strong>: The <code>convertMarkdownToHTML</code> method reads the Markdown content, parses it into HTML using the <code>marked</code> library, and then generates the complete HTML document by combining the parsed content with the navigation and the CSS styles.</li>
+      <li><strong>Navigation Generation</strong>: The <code>generateNavigation</code> method analyzes the Markdown content to extract the section titles and structure, and then generates the navigation sidebar based on this information.</li>
+      <li><strong>Structured Data Generation</strong>: The <code>generateJSON</code> method extracts key metadata from the Markdown content (such as title, sections, word count, etc.) and saves it as a JSON file, providing a structured representation of the documentation.</li>
+      <li><strong>Multi-Format Generation</strong>: The <code>generateMultiFormat</code> method is a convenience wrapper that calls both the <code>convertMarkdownToHTML</code> and <code>generateJSON</code> methods to generate both the HTML and JSON outputs.</li>
+    </ol>
+    <p>The script also includes a command-line interface (CLI) that allows users to generate documentation for a single Markdown file or process multiple files in a batch.</p>
+  </section>
+
+  <section>
+    <h2>Dependencies</h2>
+    <ul>
+      <li><code>fs/promises</code>: The Node.js file system module, used for reading and writing files.</li>
+      <li><code>path</code>: The Node.js path module, used for managing file paths.</li>
+      <li><code>marked</code>: A Markdown-to-HTML conversion library.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Key Functions/Classes</h2>
+
+    <section>
+      <h3><code>HTMLDocGenerator</code> Class</h3>
+      <p>This class is responsible for the entire documentation generation process.</p>
+      <h4>Constructor</h4>
+      <ul>
+        <li><code>constructor()</code>: Initializes the class by setting the path to the HTML template file and initializing the CSS and navigation templates.</li>
+      </ul>
+      <h4>Methods</h4>
+      <ul>
+        <li><code>loadTemplate()</code>: Reads the HTML template file and extracts the CSS and navigation structures.</li>
+        <li><code>generateNavigation(sections)</code>: Generates the navigation sidebar based on the provided section information.</li>
+        <li><code>convertMarkdownToHTML(markdownPath, outputPath, options)</code>: Reads a Markdown file, converts it to HTML, and writes the result to the specified output path.</li>
+        <li><code>extractSections(markdownContent)</code>: Analyzes the Markdown content and extracts the section structure (titles and sub-titles).</li>
+        <li><code>generateId(title)</code>: Generates a unique ID for a section based on its title.</li>
+        <li><code>getIconForSection(title)</code>: Determines an appropriate icon for a section based on its title.</li>
+        <li><code>generateCompleteHTML(title, navigation, content)</code>: Generates the complete HTML document by combining the title, navigation, and content.</li>
+        <li><code>generateJSON(markdownPath, jsonPath)</code>: Generates a JSON file containing structured data about the documentation.</li>
+        <li><code>generateMultiFormat(markdownPath)</code>: A convenience method that generates both HTML and JSON outputs for a Markdown file.</li>
+        <li><code>generateHtml(markdownPath)</code>: An alias for <code>generateMultiFormat</code> for backward compatibility.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>CLI Usage</h3>
+      <pre><code class="language-bash">📄 HTML Documentation Generator for rScribe Workers
+
+Usage:
+  node html-doc-generator.js &lt;markdown-file&gt;     # Generate HTML only
+  node html-doc-generator.js --all &lt;markdown&gt;    # Generate HTML + JSON
+  node html-doc-generator.js --batch *.md        # Process multiple files
+
+Examples:
+  node html-doc-generator.js TASK_SUMMARY.md
+  node html-doc-generator.js --all SQLITE_MIGRATION_PLAN.md
+</code></pre>
+    </section>
+  </section>
+
+  <section>
+    <h2>Usage Examples</h2>
+    <ol>
+      <li>
+        <strong>Generate HTML Documentation for a Single Markdown File</strong>:
+        <pre><code class="language-bash">node html-doc-generator.js TASK_SUMMARY.md</code></pre>
+        <p>This will generate an HTML file named <code>TASK_SUMMARY.html</code> in the same directory as the Markdown file.</p>
+      </li>
+      <li>
+        <strong>Generate HTML and JSON Documentation for a Single Markdown File</strong>:
+        <pre><code class="language-bash">node html-doc-generator.js --all SQLITE_MIGRATION_PLAN.md</code></pre>
+        <p>This will generate both an HTML file (<code>SQLITE_MIGRATION_PLAN.html</code>) and a JSON file (<code>SQLITE_MIGRATION_PLAN.json</code>) in the same directory as the Markdown file.</p>
+      </li>
+      <li>
+        <strong>Process Multiple Markdown Files in a Batch</strong>:
+        <pre><code class="language-bash">node html-doc-generator.js --batch *.md</code></pre>
+        <p>This will generate HTML and JSON files for all Markdown files in the current directory.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Configuration</h2>
+    <p>The script does not require any specific configuration options or environment variables. However, the HTML template file path is hardcoded in the <code>HTMLDocGenerator</code> constructor, so you may need to update this path if the template file is located in a different location.</p>
+  </section>
+
+    <section>
+        <h2>Error Handling</h2>
+        <p>The <code>HTMLDocGenerator</code> class handles errors during the following operations:</p>
+        <ol>
+            <li><strong>Template Loading</strong>: If the HTML template file cannot be read, an error is thrown with the corresponding error message.</li>
+            <li><strong>Markdown Conversion</strong>: If there is an issue reading the Markdown file or converting it to HTML, an error is thrown with the error message.</li>
+            <li><strong>JSON Generation</strong>: If there is an issue reading the Markdown file or generating the JSON file, an error is thrown with the error message.</li>
+        </ol>
+        <p>In the CLI usage, any errors that occur during the documentation generation process are caught and logged to the console.</p>
+    </section>
+
+    <section>
+        <h2>Integration</h2>
+        <p>The <code>HTMLDocGenerator</code> class is designed to be used as a standalone tool for generating HTML and JSON documentation from Markdown files. It can be easily integrated into other scripts or processes that require automated documentation generation.</p>
+        <p>For example, you could integrate this script into a continuous integration (CI) pipeline, where Markdown files are automatically converted to HTML and JSON formats whenever changes are made to the project's documentation.</p>
+    </section>
+
+    <section>
+        <h2>Development Notes</h2>
+        <ol>
+            <li><strong>Markdown Parsing</strong>: The script uses the <code>marked</code> library for converting Markdown to HTML. This library is a popular and well-maintained choice for this task, as it provides a simple and robust API.</li>
+            <li><strong>Navigation Generation</strong>: The navigation sidebar is generated dynamically based on the section structure extracted from the Markdown content. This ensures that the navigation accurately reflects the structure of the documentation.</li>
+            <li><strong>Structured Data Generation</strong>: The JSON output provides a structured representation of the documentation, making it easier to integrate with other systems or processes that require access to the documentation metadata.</li>
+            <li><strong>Customization</strong>: While the script provides a default HTML template, it is designed to be easily customizable. You can modify the template file to change the styling, layout, or additional functionality of the generated documentation.</li>
+            <li><strong>Backward Compatibility</strong>: The <code>generateHtml</code> method is provided as an alias for the <code>generateMultiFormat</code> method to maintain backward compatibility with previous versions of the script.</li>
+        </ol>
+        <p>Overall, this script is a powerful tool for automating the generation of professional-looking HTML documentation from Markdown sources, making it a valuable asset for the rScribe project and its users.</p>
+    </section>
+</article>
+```
+        </main>
+        
+        <footer class="footer">
+            <div class="branding">
+                <span>Generated from the <span class="system-name">rScribe Document System</span></span>
+                <span class="divider">•</span>
+                <span class="system-name">rEngine</span> <span class="version">(v2.1.0)</span>
+                <span class="divider">•</span>
+                <span>Last updated: 2025-08-20</span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

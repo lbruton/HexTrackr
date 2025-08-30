@@ -1,0 +1,89 @@
+{
+  "source_file": "/Volumes/DATA/GitHub/rEngine/docs/TASK_SUMMARY.md",
+  "generated_date": "2025-08-20T01:16:40.681Z",
+  "title": "Complete Task Breakdown Summary",
+  "sections": [
+    {
+      "id": "-immediate-action-required",
+      "title": "🚨 IMMEDIATE ACTION REQUIRED",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "critical-issues-2",
+          "title": "Critical Issues (2)"
+        }
+      ]
+    },
+    {
+      "id": "-this-week-priorities",
+      "title": "🔥 THIS WEEK PRIORITIES",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "high-priority-issues-2",
+          "title": "High Priority Issues (2)"
+        }
+      ]
+    },
+    {
+      "id": "-active-projects-tasks",
+      "title": "📋 ACTIVE PROJECTS & TASKS",
+      "icon": "🚀",
+      "submenu": [
+        {
+          "id": "project001-performance-optimization-sprint-85-comp",
+          "title": "PROJECT-001: Performance Optimization Sprint (85% Complete)"
+        },
+        {
+          "id": "project002-inline-editing-enhancement-60-complete",
+          "title": "PROJECT-002: Inline Editing Enhancement (60% Complete)"
+        },
+        {
+          "id": "project003-sqlite-migration-planning-phase",
+          "title": "PROJECT-003: SQLite Migration (Planning Phase)"
+        },
+        {
+          "id": "project005-file-cleanup-optimization-planning-phas",
+          "title": "PROJECT-005: File Cleanup & Optimization (Planning Phase)"
+        },
+        {
+          "id": "project006-rengine-platform-release-strategic-plan",
+          "title": "PROJECT-006: rEngine Platform Release (Strategic - Planning)"
+        }
+      ]
+    },
+    {
+      "id": "-quick-stats",
+      "title": "📊 QUICK STATS",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "-version-status",
+      "title": "🔢 VERSION STATUS",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "-next-actions",
+      "title": "📅 NEXT ACTIONS",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "today-immediate",
+          "title": "Today (Immediate)"
+        },
+        {
+          "id": "this-week",
+          "title": "This Week"
+        },
+        {
+          "id": "next-week",
+          "title": "Next Week"
+        }
+      ]
+    }
+  ],
+  "word_count": 581,
+  "format_version": "1.0"
+}

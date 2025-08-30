@@ -1,0 +1,268 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-16",
+    "purpose": "Architectural mapping and structural relationships for StackTrackr",
+    "description": "Complete application structure, file relationships, data flow, and component hierarchy for rapid navigation and impact assessment"
+  },
+  "architecture": {
+    "core_layers": {
+      "presentation": {
+        "description": "User interface and presentation logic",
+        "files": ["index.html", "css/*.css", "js/ui/*.js"],
+        "responsibilities": ["DOM manipulation", "User interactions", "Visual presentation"],
+        "dependencies": ["business_logic", "data_layer"]
+      },
+      "business_logic": {
+        "description": "Application logic and processing",
+        "files": ["js/inventory.js", "js/charts.js", "js/events.js", "js/search.js", "js/filters.js"],
+        "responsibilities": [
+          "Data processing",
+          "Business rules",
+          "State management",
+          "Search and filtering",
+          "Table rendering and pagination"
+        ],
+        "dependencies": ["data_layer", "utilities"],
+        "components": {
+          "table_system": {
+            "description": "Core table functionality including rendering, filtering, and interaction",
+            "key_files": {
+              "js/inventory.js": {
+                "role": "Core table rendering and data management",
+                "key_features": [
+                  "Table rendering engine",
+                  "Pagination system",
+                  "Column management",
+                  "Item CRUD operations"
+                ]
+              },
+              "js/search.js": {
+                "role": "Search and filtering logic",
+                "key_features": [
+                  "Multi-criteria search",
+                  "Filter application",
+                  "Result processing"
+                ]
+              },
+              "js/filters.js": {
+                "role": "Advanced filtering system",
+                "key_features": [
+                  "Filter state management",
+                  "Filter chip UI",
+                  "Category filtering"
+                ]
+              },
+              "js/events.js": {
+                "role": "Event handling and user interaction",
+                "key_features": [
+                  "Event delegation",
+                  "Debounced handlers",
+                  "Column sorting",
+                  "Responsive behavior"
+                ]
+              }
+            },
+            "data_flow": {
+              "input": ["User interactions", "Search queries", "Filter selections"],
+              "processing": ["Filter application", "Sorting", "Pagination"],
+              "output": ["Rendered table", "Filter chips", "Summary updates"]
+            },
+            "optimization_features": [
+              "Debounced search",
+              "DocumentFragment usage",
+              "Batched DOM updates",
+              "Dynamic column visibility"
+            ]
+          }
+        }
+      },
+      "data_layer": {
+        "description": "Data storage and retrieval",
+        "files": ["js/storage.js", "js/api.js", "js/export.js"],
+        "responsibilities": ["Data persistence", "API communication", "Data validation"],
+        "dependencies": ["utilities"]
+      },
+      "utilities": {
+        "description": "Shared utilities and helpers",
+        "files": ["js/utils.js", "js/constants.js"],
+        "responsibilities": ["Helper functions", "Constants", "Common utilities"],
+        "dependencies": []
+      }
+    }
+  },
+  "file_relationships": {
+    "dependency_graph": {
+      "index.html": {
+        "depends_on": ["css/themes.css", "js/inventory.js", "js/events.js"],
+        "depended_by": [],
+        "relationship_type": "root_entry_point"
+      },
+      "js/inventory.js": {
+        "depends_on": ["js/utils.js", "js/storage.js", "js/charts.js"],
+        "depended_by": ["index.html", "js/events.js"],
+        "relationship_type": "core_module"
+      },
+      "js/utils.js": {
+        "depends_on": [],
+        "depended_by": ["js/inventory.js", "js/storage.js", "js/charts.js"],
+        "relationship_type": "utility_module"
+      }
+    },
+    "import_patterns": {
+      "global_scripts": [
+        "Script tags in index.html load modules in dependency order",
+        "No module bundler - direct script loading",
+        "Global namespace management through object patterns"
+      ],
+      "dependency_resolution": "Manual dependency management through script order"
+    }
+  },
+  "data_flow": {
+    "user_interactions": {
+      "input_flow": "User → Events → Business Logic → Data Layer → Storage",
+      "output_flow": "Storage → Data Layer → Business Logic → Presentation → User",
+      "key_pathways": [
+        {
+          "name": "inventory_crud",
+          "path": "User Input → events.js → inventory.js → storage.js → localStorage",
+          "reverse_path": "localStorage → storage.js → inventory.js → DOM rendering"
+        },
+        {
+          "name": "search_filter",
+          "path": "Search Input → events.js → inventory.js (filter) → DOM update",
+          "performance_notes": "Debouncing implemented to prevent excessive filtering"
+        },
+        {
+          "name": "chart_generation",
+          "path": "Data Selection → charts.js → Chart.js library → Canvas rendering",
+          "cleanup_required": "Chart instances must be destroyed to prevent memory leaks"
+        }
+      ]
+    },
+    "api_flow": {
+      "spot_prices": {
+        "source": "External APIs (metals pricing)",
+        "path": "API → js/api.js → data processing → inventory.js → UI update",
+        "caching": "Results cached in localStorage with expiration",
+        "error_handling": "Graceful fallback to cached data"
+      },
+      "numista_integration": {
+        "source": "Numista API for coin data",
+        "path": "User search → API call → data normalization → inventory addition",
+        "rate_limiting": "Implemented to respect API limits"
+      }
+    }
+  },
+  "component_hierarchy": {
+    "ui_components": {
+      "inventory_table": {
+        "file": "js/inventory.js",
+        "functions": ["renderTable", "sortTable", "filterTable"],
+        "dom_targets": ["#inventory-table", ".table-container"],
+        "child_components": ["table_rows", "filter_controls", "sort_headers"],
+        "state_dependencies": ["inventory_data", "filter_state", "sort_state"]
+      },
+      "modals": {
+        "file": "js/inventory.js",
+        "functions": ["showDetailsModal", "showEditModal", "closeModal"],
+        "dom_targets": [".modal", ".modal-overlay"],
+        "child_components": ["modal_content", "modal_buttons", "form_inputs"],
+        "state_dependencies": ["selected_item", "edit_mode"]
+      },
+      "charts": {
+        "file": "js/charts.js", 
+        "functions": ["createChart", "updateChart", "destroyChart"],
+        "dom_targets": ["#chart-container", ".chart-canvas"],
+        "child_components": ["chart_legend", "chart_tooltips"],
+        "state_dependencies": ["chart_data", "chart_type", "chart_options"]
+      }
+    },
+    "layout_structure": {
+      "header": {
+        "contains": ["navigation", "theme_toggle", "search_bar"],
+        "styling": "Fixed header with responsive design"
+      },
+      "main_content": {
+        "contains": ["inventory_table", "action_buttons", "filters"],
+        "styling": "Flexible layout with sidebar support"
+      },
+      "footer": {
+        "contains": ["status_info", "version_info"],
+        "styling": "Minimal footer with utility information"
+      }
+    }
+  },
+  "performance_considerations": {
+    "bottlenecks": [
+      {
+        "area": "table_rendering",
+        "issue": "Large datasets cause slow DOM updates",
+        "mitigation": "DOM fragment batching, virtualization considerations"
+      },
+      {
+        "area": "search_filtering",
+        "issue": "Real-time search can be expensive",
+        "mitigation": "Debouncing, indexing for large datasets"
+      },
+      {
+        "area": "chart_rendering",
+        "issue": "Memory leaks from chart instances",
+        "mitigation": "Proper cleanup in chart lifecycle management"
+      }
+    ],
+    "optimization_opportunities": [
+      "Implement virtual scrolling for large tables",
+      "Add service worker for offline functionality",
+      "Optimize CSS delivery and unused style removal",
+      "Implement lazy loading for chart components"
+    ]
+  },
+  "security_boundaries": {
+    "client_side_only": {
+      "description": "All processing happens client-side",
+      "implications": ["No server-side validation", "Data stored in localStorage", "XSS prevention critical"],
+      "mitigations": ["Input sanitization", "CSP headers", "Secure data handling"]
+    },
+    "external_apis": {
+      "risks": ["API key exposure", "CORS issues", "Rate limiting"],
+      "protections": ["Environment-based API keys", "Proper CORS configuration", "Request throttling"]
+    }
+  },
+  "testing_structure": {
+    "unit_testable": {
+      "utilities": "js/utils.js functions are pure and easily testable",
+      "data_processing": "Business logic functions in inventory.js",
+      "api_integration": "API response handling and error cases"
+    },
+    "integration_points": [
+      "localStorage interaction patterns",
+      "DOM manipulation and event handling",
+      "Chart.js integration and lifecycle",
+      "External API communication"
+    ]
+  },
+  "schema": {
+    "file_entry": {
+      "depends_on": "array - Files this file requires",
+      "depended_by": "array - Files that require this file", 
+      "relationship_type": "string - Type of dependency relationship",
+      "performance_impact": "string - Performance considerations",
+      "testing_approach": "string - How to test this file"
+    },
+    "component": {
+      "file": "string - Source file location",
+      "functions": "array - Functions that implement this component",
+      "dom_targets": "array - DOM elements this component manages",
+      "child_components": "array - Sub-components",
+      "state_dependencies": "array - Application state this component depends on",
+      "performance_notes": "string - Performance characteristics"
+    }
+  },
+  "instructions": {
+    "for_agents": "Use this file to understand application architecture before making changes. Check dependencies to assess impact of modifications.",
+    "dependency_tracking": "When adding new files or changing relationships, update the dependency graph",
+    "performance_monitoring": "Track performance implications of architectural changes",
+    "testing_guidance": "Use component hierarchy to identify integration test requirements"
+  }
+}

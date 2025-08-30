@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>demo-document-sweep-colors - StackTrackr Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #667eea;
+            --rengine-secondary: #764ba2;
+            --rengine-accent: #495057;
+            --rengine-accent-light: #6c757d;
+            --status-success: #28a745;
+            --status-warning: #ffc107;
+            --status-danger: #dc3545;
+            --status-info: #007acc;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-muted: #888;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --border-color: #e1e4e8;
+            --shadow-heavy: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--rengine-primary) 0%, var(--rengine-secondary) 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            border-radius: 15px;
+            box-shadow: var(--shadow-heavy);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--rengine-accent) 0%, var(--rengine-accent-light) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: var(--bg-secondary);
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: var(--status-info);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3 { 
+            color: var(--text-primary); 
+            margin-top: 2em; 
+            margin-bottom: 0.5em; 
+        }
+        .content h1 { font-size: 2em; border-bottom: 2px solid var(--rengine-primary); padding-bottom: 0.5em; }
+        .content h2 { font-size: 1.5em; }
+        .content h3 { font-size: 1.3em; }
+        
+        .content pre { 
+            background: var(--bg-secondary); 
+            padding: 1em; 
+            border-radius: 5px; 
+            overflow-x: auto; 
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+        }
+        
+        .content code { 
+            background: var(--bg-secondary); 
+            padding: 0.2em 0.4em; 
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        .content blockquote {
+            border-left: 4px solid var(--rengine-primary);
+            margin: 1em 0;
+            padding-left: 1em;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 1em 1em 1em 2em;
+            border-radius: 5px;
+        }
+        
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .content th, .content td {
+            border: 1px solid var(--border-color);
+            padding: 0.75em;
+            text-align: left;
+        }
+        
+        .content th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content a {
+            color: var(--status-info);
+            text-decoration: none;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
+        .metadata {
+            background: var(--bg-secondary);
+            padding: 1em;
+            border-radius: 5px;
+            margin-bottom: 2em;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .footer {
+            background: var(--bg-secondary);
+            padding: 20px 30px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .footer .branding {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .footer .system-name {
+            font-weight: 600;
+            color: var(--rengine-accent);
+        }
+
+        .footer .version {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .footer .divider {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .nav-bar {
+                padding: 10px 20px;
+            }
+            
+            .footer .branding {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>demo-document-sweep-colors</h1>
+            <div class="subtitle">StackTrackr Documentation</div>
+            <div class="meta">
+                <span>📁 demo-document-sweep-colors.md</span>
+                <span>📅 2025-08-20</span>
+                
+            </div>
+        </header>
+        
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../../html-docs/documentation.html" class="nav-link">🏠 Documentation Portal</a>
+                <a href="../index.html" class="nav-link">📚 All Docs</a>
+                <a href="../../html-docs/developmentstatus.html" class="nav-link">📊 Development Status</a>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <div class="metadata">
+                <strong>📂 Source File:</strong> demo-document-sweep-colors.md | 
+                <strong>🕒 Generated:</strong> 8/19/2025, 9:42:46 PM |
+                <strong>🎨 Engine:</strong> Gemini HTML Converter
+            </div>
+            ```html
+<h1>Document Sweep Color Demo</h1>
+
+<section>
+  <h2>Purpose & Overview</h2>
+  <p>This script demonstrates how the Split Scribe console will display document sweep activities. It simulates a series of document sweep events, such as starting a sweep, generating files, and completing the process, and presents them in a color-coded format to showcase the visibility provided by the Split Scribe console.</p>
+  <p>The script serves as a visual aid to help users understand how the Split Scribe console can effectively monitor and display document sweep operations, which are an important part of the larger Split Scribe system.</p>
+</section>
+
+<section>
+  <h2>Technical Architecture</h2>
+  <p>The script is structured as follows:</p>
+  <ol>
+    <li><strong>Color Definitions</strong>: The script defines a set of ANSI escape codes for various colors, which are used to colorize the output in the console.</li>
+    <li><strong>Simulation Function</strong>: The <code>simulateDocumentSweepDisplay()</code> function is the main entry point of the script. It clears the console, prints the header, and then iterates through a pre-defined set of document sweep activities, displaying them in a split-screen format.</li>
+    <li><strong>Activity Data</strong>: The script maintains an array of document sweep activities, each with a timestamp, message, type, and associated color.</li>
+    <li><strong>Console Output</strong>: The function outputs the activities in a formatted, color-coded manner, with the "Last 5 Changes" displayed on the left and the "Full Verbose Log" on the right.</li>
+    <li><strong>Additional Information</strong>: The script also includes a color legend, command options, and a final message indicating the purpose of the demonstration.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Dependencies</h2>
+  <p>This script does not have any external dependencies. It uses only built-in Node.js functionality to display the console output.</p>
+</section>
+
+<section>
+  <h2>Key Functions/Classes</h2>
+  <p>The main function in this script is <code>simulateDocumentSweepDisplay()</code>, which is responsible for the entire demonstration:</p>
+  <pre><code class="language-javascript">async function simulateDocumentSweepDisplay() {
+    // ...
+}
+</code></pre>
+  <p>This function performs the following tasks:</p>
+  <ol>
+    <li>Clears the console and prints the header.</li>
+    <li>Iterates through the pre-defined set of document sweep activities and displays them in a split-screen format.</li>
+    <li>Prints additional information, such as the color legend and command options.</li>
+    <li>Displays a final message indicating the purpose of the demonstration.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Usage Examples</h2>
+  <p>To run the script, simply execute the following command in your terminal:</p>
+  <pre><code>node demo-document-sweep-colors.js
+</code></pre>
+  <p>This will display the simulated document sweep monitoring in the console.</p>
+</section>
+
+<section>
+  <h2>Configuration</h2>
+  <p>This script does not require any configuration or environment variables. It is a self-contained demonstration that can be executed as-is.</p>
+</section>
+
+<section>
+  <h2>Error Handling</h2>
+  <p>This script does not include any explicit error handling, as it is a simple demonstration script that does not interact with external systems or handle user input. In a production environment, you would want to add appropriate error handling mechanisms to ensure the script can gracefully handle any unexpected situations.</p>
+</section>
+
+<section>
+  <h2>Integration</h2>
+  <p>This script is a standalone demonstration and is not directly integrated into the larger Split Scribe system. However, it serves as a visual aid to help users understand how the Split Scribe console would display document sweep monitoring in the context of the overall system.</p>
+</section>
+
+<section>
+  <h2>Development Notes</h2>
+  <p>The implementation of this script is straightforward and does not include any complex logic or algorithms. The key aspects are:</p>
+  <ol>
+    <li>The use of ANSI escape codes to colorize the console output.</li>
+    <li>The pre-defined set of document sweep activities, which could be replaced with real-time data from the Split Scribe system.</li>
+    <li>The formatting and layout of the console output to mimic the split-screen format of the Split Scribe console.</li>
+  </ol>
+  <p>Overall, this script is a simple and effective way to demonstrate the document sweep monitoring capabilities of the Split Scribe console.</p>
+</section>
+```
+        </main>
+        
+        <footer class="footer">
+            <div class="branding">
+                <span>Generated from the <span class="system-name">rScribe Document System</span></span>
+                <span class="divider">•</span>
+                <span class="system-name">rEngine</span> <span class="version">(v2.1.0)</span>
+                <span class="divider">•</span>
+                <span>Last updated: 2025-08-20</span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

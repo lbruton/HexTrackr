@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "../deprecated/split-scribe-console.js",
+    "name": "split-scribe-console",
+    "extension": ".js",
+    "directory": "../deprecated",
+    "size": 0,
+    "lines": 284
+  },
+  "documentation": {
+    "markdown": "../docs/deprecated/split-scribe-console_chunk.md",
+    "html": "../docs/deprecated/split-scribe-console_chunk.html",
+    "generated": "2025-08-20T00:44:17.660Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "chunked",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "split-scribe-console.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for ../deprecated/split-scribe-console.js"
+  }
+}

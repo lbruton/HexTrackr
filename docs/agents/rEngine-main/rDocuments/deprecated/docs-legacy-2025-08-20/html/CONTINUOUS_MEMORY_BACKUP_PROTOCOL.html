@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 **CONTINUOUS MEMORY & BACKUP PROTOCOL** - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #20c997 0%, #198754 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-protocol">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📋</div>
+            <h1>🧠 **CONTINUOUS MEMORY & BACKUP PROTOCOL**</h1>
+            <div class="subtitle">Protocol Guide</div>
+            <div class="meta">
+                <span>📁 CONTINUOUS_MEMORY_BACKUP_PROTOCOL.md</span>
+                <span>📅 2025-08-19</span>
+                <span>📊 5KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../CONTINUOUS_MEMORY_BACKUP_PROTOCOL.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/CONTINUOUS_MEMORY_BACKUP_PROTOCOL.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="🧠-continuous-memory--backup-protocol">🧠 <strong>CONTINUOUS MEMORY &amp; BACKUP PROTOCOL</strong></h1>
+<h2 id="🚨-critical-workflow-requirements">🚨 <strong>CRITICAL WORKFLOW REQUIREMENTS</strong></h2>
+<p>This protocol addresses the identified gap where agents stop writing to memory and making git backups as sessions progress. <strong>THESE ARE MANDATORY PRACTICES</strong>.</p>
+<hr>
+<h2 id="📋-mandatory-startup-sequence">📋 <strong>MANDATORY STARTUP SEQUENCE</strong></h2>
+<h3 id="step-0-docker-environment-mandatory"><strong>STEP 0: Docker Environment (MANDATORY)</strong></h3>
+<p>🐳 <strong>CRITICAL</strong>: Always use Docker to prevent macOS security slowdowns!</p>
+<pre><code class="language-bash"><pre><code class="language-bash"># PRIMARY startup (Docker-based) - MANDATORY
+cd /Volumes/DATA/GitHub/StackTrackr && ./docker-dev.sh start
+
+# Verify Docker containers running
+docker ps</code></pre>
+</code></pre>
+<p><strong>Docker Benefits:</strong></p>
+<ul>
+<li>❌ No macOS security prompts</li>
+<li>⚡ Faster command execution  </li>
+<li>🔒 Consistent development environment</li>
+<li>🚀 Zero VS Code script execution delays</li>
+</ul>
+<h3 id="step-1-system-launch"><strong>STEP 1: System Launch</strong></h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Inside Docker container or fallback
+cd /Volumes/DATA/GitHub/StackTrackr/rEngine && node one-click-startup.js</code></pre>
+</code></pre>
+<h3 id="step-2-mandatory-memory-recap"><strong>STEP 2: MANDATORY MEMORY RECAP</strong></h3>
+<p>*<strong>� REQUIRED - Ask memory scribe for context:</strong></p>
+<pre><code class="language-bash"><pre><code class="language-bash"># Get last hour of work (MANDATORY)
+node recall.js "last hour of work"
+
+# Get recent progress summary (MANDATORY)  
+node memory-intelligence.js recall "recent progress"
+
+# Get current session status (MANDATORY)
+node recall.js "current session status"</code></pre>
+</code></pre>
+<h3 id="step-3-verify-memory-access"><strong>STEP 3: Verify Memory Access</strong></h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Test MCP Memory connection (MANDATORY)
+node recall.js "test connection"</code></pre>
+</code></pre>
+<hr>
+<h2 id="⚡-continuous-memory-protocol">⚡ <strong>CONTINUOUS MEMORY PROTOCOL</strong></h2>
+<h3 id="after-every-major-task-completion"><strong>After Every Major Task Completion:</strong></h3>
+<ol>
+<li><strong>Write to MCP Memory</strong> (use MCP tools)</li>
+<li><strong>Add context entry</strong>:<pre><code class="language-bash"><pre><code class="language-bash">node add-context.js "Task Title" "What was accomplished" "completion"</code></pre>
+</code></pre>
+</li>
+<li><strong>Git checkpoint</strong>:<pre><code class="language-bash"><pre><code class="language-bash">bash scripts/git-checkpoint.sh</code></pre>
+</code></pre>
+</li>
+</ol>
+<h3 id="memory-write-triggers-mandatory"><strong>Memory Write Triggers</strong> (MANDATORY):</h3>
+<ul>
+<li>✅ <strong>File Creation/Modification</strong> → Write to memory</li>
+<li>✅ <strong>Problem Solved</strong> → Document solution  </li>
+<li>✅ <strong>Bug Fixed</strong> → Record fix pattern</li>
+<li>✅ <strong>Feature Added</strong> → Update knowledge base</li>
+<li>✅ <strong>Configuration Changed</strong> → Log modification</li>
+<li>✅ <strong>Discovery Made</strong> → Preserve insight</li>
+</ul>
+<h3 id="git-backup-triggers-mandatory"><strong>Git Backup Triggers</strong> (MANDATORY):</h3>
+<ul>
+<li>✅ <strong>Every 15 minutes</strong> during active work</li>
+<li>✅ <strong>Before major file changes</strong></li>
+<li>✅ <strong>After completing any task</strong></li>
+<li>✅ <strong>Before switching contexts</strong></li>
+<li>✅ <strong>When user requests new feature</strong></li>
+<li>✅ <strong>At session milestones</strong></li>
+</ul>
+<hr>
+<h2 id="🔄-session-maintenance-habits">🔄 <strong>SESSION MAINTENANCE HABITS</strong></h2>
+<h3 id="every-10-15-minutes-during-work"><strong>Every 10-15 Minutes During Work:</strong></h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Quick memory sync
+node add-context.js "Progress Update" "Current work: [describe]" "progress"
+
+# Git checkpoint  
+bash scripts/git-checkpoint.sh</code></pre>
+</code></pre>
+<h3 id="when-context-switching"><strong>When Context Switching:</strong></h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Document current state
+node add-context.js "Context Switch" "Switching from X to Y because..." "transition"
+
+# Backup current work
+bash scripts/git-checkpoint.sh</code></pre>
+</code></pre>
+<h3 id="before-major-changes"><strong>Before Major Changes:</strong></h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Document intent
+node add-context.js "Pre-Change" "About to modify X for Y reason" "planning"
+
+# Safety backup
+bash scripts/git-checkpoint.sh  </code></pre>
+</code></pre>
+<hr>
+<h2 id="🎯-memory-writing-examples">🎯 <strong>MEMORY WRITING EXAMPLES</strong></h2>
+<h3 id="use-mcp-memory-tools-for"><strong>Use MCP Memory Tools For:</strong></h3>
+<ul>
+<li>Project decisions and rationale</li>
+<li>Bug patterns and solutions  </li>
+<li>Feature implementations</li>
+<li>Configuration discoveries</li>
+<li>User feedback and requests</li>
+<li>System behavior observations</li>
+</ul>
+<h3 id="use-add-contextjs-for"><strong>Use add-context.js For:</strong></h3>
+<ul>
+<li>Quick progress logs</li>
+<li>Session transitions</li>
+<li>Problem-solving steps</li>
+<li>Discovery documentation</li>
+<li>Workflow improvements</li>
+</ul>
+<hr>
+<h2 id="🚨-enforcement-reminders">🚨 <strong>ENFORCEMENT REMINDERS</strong></h2>
+<h3 id="set-mental-triggers"><strong>Set Mental Triggers:</strong></h3>
+<ul>
+<li>&quot;Just completed a task&quot; → Memory + Git</li>
+<li>&quot;About to start something new&quot; → Memory + Git</li>
+<li>&quot;Found a solution&quot; → Memory + Git</li>
+<li>&quot;User gave feedback&quot; → Memory + Git</li>
+<li>&quot;Made a discovery&quot; → Memory + Git</li>
+</ul>
+<h3 id="visual-cues"><strong>Visual Cues:</strong></h3>
+<ul>
+<li>Look for <code>🟢 &gt;RAN MCP Memory Write:</code> notifications</li>
+<li>Check terminal for git checkpoint confirmations</li>
+<li>Monitor Smart Scribe console activity</li>
+</ul>
+<hr>
+<h2 id="�-docker-protocol-integration">� <strong>DOCKER PROTOCOL INTEGRATION</strong></h2>
+<h3 id="all-commands-must-use-docker"><strong>ALL COMMANDS MUST USE DOCKER:</strong></h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Correct Docker command pattern (NO user prompts)
+docker-compose exec -T development node /workspace/rEngine/add-context.js "Title" "Description" "type"
+
+# Docker-based memory recap (MANDATORY startup)
+docker-compose exec -T development node /workspace/rEngine/recall.js "last hour of work"
+
+# Docker-based git checkpoints
+docker-compose exec -T development bash /workspace/scripts/git-checkpoint.sh</code></pre>
+</code></pre>
+<h3 id="key-docker-requirements"><strong>Key Docker Requirements:</strong></h3>
+<ul>
+<li>✅ Use <code>-T</code> flag to disable TTY allocation (prevents prompts)</li>
+<li>✅ Use full workspace paths <code>/workspace/rEngine/</code></li>
+<li>✅ Never run commands on host system during development</li>
+<li>✅ All memory, recall, and git operations through Docker</li>
+</ul>
+<h2 id="�🔧-protocol-integration">�🔧 <strong>PROTOCOL INTEGRATION</strong></h2>
+<h3 id="update-copilot_instructionsmd"><strong>Update COPILOT_INSTRUCTIONS.md:</strong></h3>
+<ul>
+<li>Add mandatory memory recap requirement</li>
+<li>Include continuous memory triggers  </li>
+<li>Embed git checkpoint habits</li>
+<li><strong>ENFORCE Docker-only command execution</strong></li>
+</ul>
+<h3 id="update-agent-workflows"><strong>Update Agent Workflows:</strong></h3>
+<ul>
+<li>Make memory writing automatic habit</li>
+<li>Enforce git backup discipline</li>
+<li>Create accountability checkpoints</li>
+<li><strong>Use Docker for ALL development commands</strong></li>
+</ul>
+<hr>
+<p><strong>Priority</strong>: P0 (Critical)<br><strong>Requirement</strong>: MANDATORY for all agents<br><strong>Enforcement</strong>: Every session, every task<br><strong>Goal</strong>: Never lose context or progress again</p>
+<blockquote>
+<p><strong>Remember</strong>: Your memory and git backups are &quot;LLM vitamins&quot; - they keep the entire system healthy and preserve all progress for future agents and sessions.</p>
+</blockquote>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>CONTINUOUS_MEMORY_BACKUP_PROTOCOL.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-19</p>
+        </footer>
+    </div>
+</body>
+</html>

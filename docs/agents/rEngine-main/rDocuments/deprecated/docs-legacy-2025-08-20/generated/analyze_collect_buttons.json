@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "../analyze_collect_buttons.js",
+    "name": "analyze_collect_buttons",
+    "extension": ".js",
+    "directory": "..",
+    "size": 0,
+    "lines": 152
+  },
+  "documentation": {
+    "markdown": "../docs/analyze_collect_buttons.md",
+    "html": "../docs/analyze_collect_buttons.html",
+    "generated": "2025-08-20T00:43:01.560Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "single-file",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "analyze_collect_buttons.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for ../analyze_collect_buttons.js"
+  }
+}

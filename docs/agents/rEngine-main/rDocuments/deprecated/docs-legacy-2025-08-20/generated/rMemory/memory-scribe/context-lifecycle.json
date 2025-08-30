@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "../rMemory/memory-scribe/context-lifecycle.js",
+    "name": "context-lifecycle",
+    "extension": ".js",
+    "directory": "../rMemory/memory-scribe",
+    "size": 0,
+    "lines": 58
+  },
+  "documentation": {
+    "markdown": "../docs/rMemory/memory-scribe/context-lifecycle.md",
+    "html": "../docs/rMemory/memory-scribe/context-lifecycle.html",
+    "generated": "2025-08-20T01:01:07.971Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "single-file",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "context-lifecycle.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for ../rMemory/memory-scribe/context-lifecycle.js"
+  }
+}

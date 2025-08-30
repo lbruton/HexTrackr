@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "../rMemory/memory-scribe/dashboard-server.js",
+    "name": "dashboard-server",
+    "extension": ".js",
+    "directory": "../rMemory/memory-scribe",
+    "size": 0,
+    "lines": 400
+  },
+  "documentation": {
+    "markdown": "../docs/rMemory/memory-scribe/dashboard-server_chunk.md",
+    "html": "../docs/rMemory/memory-scribe/dashboard-server_chunk.html",
+    "generated": "2025-08-20T01:01:39.269Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "chunked",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "dashboard-server.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for ../rMemory/memory-scribe/dashboard-server.js"
+  }
+}

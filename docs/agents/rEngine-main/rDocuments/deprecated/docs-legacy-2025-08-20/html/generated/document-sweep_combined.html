@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>document-sweep.js - Combined Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>document-sweep.js - Combined Documentation</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 document-sweep_combined.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 14KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../generated/document-sweep_combined.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/document-sweep_combined.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="document-sweepjs---combined-documentation">document-sweep.js - Combined Documentation</h1>
+<blockquote>
+<p><strong>Note</strong>: This file was too large for single analysis and was processed in 2 chunks.
+Successfully processed: 2/2 chunks.</p>
+</blockquote>
+<h2 id="file-overview">File Overview</h2>
+<p>This documentation was generated by analyzing the file in chunks due to size limitations.</p>
+<h2 id="chunk-1-analysis">Chunk 1 Analysis</h2>
+<h1 id="document-sweep---batch-documentation-generator-using-ai-apis">Document Sweep - Batch Documentation Generator using AI APIs</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>document-sweep.js</code> script is a powerful tool that automates the generation of comprehensive documentation for all JavaScript files within a specified set of directories. It utilizes the AI-powered <code>document-generator.js</code> (which supports Groq and Gem APIs) to create detailed documentation for each file.</p>
+<p>The primary goals of this script are to:</p>
+<ol>
+<li><strong>Streamline Documentation Creation</strong>: By automating the documentation generation process, this script saves time and ensures consistency across the project&#39;s codebase.</li>
+<li><strong>Maintain Accurate Documentation</strong>: The script tracks changes in the documentation and generates diffs, allowing for easy identification and tracking of updates.</li>
+<li><strong>Facilitate Developer Onboarding</strong>: The generated documentation provides clear, comprehensive information to help new developers quickly understand the project&#39;s code and architecture.</li>
+</ol>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>DocumentSweep</code> class is the core of this script, and it performs the following key tasks:</p>
+<ol>
+<li><strong>File Discovery</strong>: The <code>findJavaScriptFiles()</code> method scans the specified target directories and identifies all JavaScript files, excluding those that match the configured exclusion patterns.</li>
+<li><strong>Documentation Generation</strong>: The <code>generateDocumentation()</code> method uses the <code>document-generator.js</code> script to generate documentation for each JavaScript file. It checks for existing documentation and generates diffs if an update is detected.</li>
+<li><strong>Diff Generation and Tracking</strong>: The <code>generateAndSaveDiff()</code> method creates a git-format diff for updated documentation files and logs the changes in a change log file.</li>
+<li><strong>HTML Documentation Generation</strong>: The <code>generateHtmlDocumentation()</code> method converts select Markdown files (e.g., roadmaps) to HTML format using the <code>HTMLDocGenerator</code> class.</li>
+<li><strong>Multi-Format Summary</strong>: The <code>generateMultiFormatSummary()</code> method creates a detailed summary of the documentation sweep in Markdown, JSON, and HTML formats.</li>
+</ol>
+<p>The script also includes various utility methods, such as <code>scanDirectory()</code> and <code>generateGitDiff()</code>, to support the main functionality.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>document-sweep.js</code> script relies on the following external dependencies:</p>
+<ul>
+<li><code>fs-extra</code>: A comprehensive file system library for Node.js, providing enhanced functionality over the built-in <code>fs</code> module.</li>
+<li><code>path</code>: The built-in Node.js module for handling file paths.</li>
+<li><code>child_process</code>: The built-in Node.js module for spawning child processes.</li>
+<li><code>url</code>: The built-in Node.js module for URL resolution and parsing.</li>
+<li><code>crypto</code>: The built-in Node.js module for cryptographic functionality.</li>
+<li><code>./html-doc-generator.js</code>: A custom module that generates HTML documentation from Markdown files.</li>
+</ul>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="documentsweep-class"><code>DocumentSweep</code> Class</h3>
+<p>The <code>DocumentSweep</code> class is the main entry point for the script and handles the entire documentation generation process.</p>
+<p><strong>Constructor</strong>:</p>
+<ul>
+<li>Initializes the base directory, paths to the document generator and HTML generator, target directories, roadmap files, and exclusion patterns.</li>
+<li>Sets up the results object to track the progress and outcomes of the documentation sweep.</li>
+</ul>
+<p><strong><code>findJavaScriptFiles()</code></strong>:</p>
+<ul>
+<li>Recursively scans the target directories to find all JavaScript files, excluding those that match the configured exclusion patterns.</li>
+<li>Returns an array of file paths.</li>
+</ul>
+<p><strong><code>generateDocumentation(filePath)</code></strong>:</p>
+<ul>
+<li>Generates documentation for the specified JavaScript file using the <code>document-generator.js</code> script.</li>
+<li>Checks if the documentation already exists and generates a diff if an update is detected.</li>
+<li>Updates the results object with the success/failure status and any errors.</li>
+</ul>
+<p><strong><code>generateAndSaveDiff(sourceFilePath, docPath, previousContent)</code></strong>:</p>
+<ul>
+<li>Generates a git-format diff between the previous and new documentation content.</li>
+<li>Saves the diff to a file in the <code>logs/documentation-diffs</code> directory.</li>
+<li>Logs the change details in the <code>logs/documentation-changes.log</code> file.</li>
+</ul>
+<p><strong><code>generateGitDiff(filePath, oldContent, newContent)</code></strong>:</p>
+<ul>
+<li>Generates a git-format diff between the old and new content.</li>
+<li>Includes a unified diff header and the line-by-line changes.</li>
+</ul>
+<p><strong><code>generateHtmlDocumentation()</code></strong>:</p>
+<ul>
+<li>Generates HTML documentation for the specified roadmap Markdown files using the <code>HTMLDocGenerator</code> class.</li>
+<li>Updates the results object with the success/failure status and any errors.</li>
+</ul>
+<p><strong><code>generateMultiFormatSummary()</code></strong>:</p>
+<ul>
+<li>Generates a detailed summary of the documentation sweep in Markdown, JSON, and HTML formats.</li>
+<li>Includes information about the processing, success rates, changes, diffs, and errors.</li>
+</ul>
+<p><strong><code>performSweep()</code></strong>:</p>
+<ul>
+<li>Orchestrates the entire documentation sweep process, including file discovery, documentation generation, HTML generation, and multi-format summary creation.</li>
+<li>Prints a final summary of the results.</li>
+</ul>
+<h3 id="htmldocgenerator-class"><code>HTMLDocGenerator</code> Class</h3>
+<p>The <code>HTMLDocGenerator</code> class is responsible for converting Markdown files to HTML format. It uses the <code>marked</code> library for Markdown parsing and the <code>highlight.js</code> library for syntax highlighting.</p>
+<p><strong><code>generateHtml(markdownPath)</code></strong>:</p>
+<ul>
+<li>Reads the Markdown content from the specified file.</li>
+<li>Converts the Markdown to HTML using the <code>marked</code> library.</li>
+<li>Adds syntax highlighting to the code blocks using the <code>highlight.js</code> library.</li>
+<li>Writes the resulting HTML content to a file in the <code>html-docs</code> directory.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To run the <code>document-sweep.js</code> script, follow these steps:</p>
+<ol>
+<li>Ensure that you have Node.js and npm installed on your system.</li>
+<li>Clone the repository containing the <code>document-sweep.js</code> script and the <code>document-generator.js</code> script.</li>
+<li>Install the required dependencies by running <code>npm install</code> in the project directory.</li>
+<li>Customize the <code>DocumentSweep</code> class constructor to specify the appropriate base directory, target directories, and any other configurations.</li>
+<li>Run the script using the command <code>node document-sweep.js</code>.</li>
+</ol>
+<p>The script will automatically generate documentation for all JavaScript files in the specified directories and create a multi-format summary in the <code>logs</code> directory.</p>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>DocumentSweep</code> class has several configuration options that can be adjusted:</p>
+<ul>
+<li><code>baseDir</code>: The base directory where the project files are located.</li>
+<li><code>documentGenerator</code>: The path to the <code>document-generator.js</code> script.</li>
+<li><code>htmlGenerator</code>: An instance of the <code>HTMLDocGenerator</code> class for generating HTML documentation.</li>
+<li><code>targetDirectories</code>: An array of directories to scan for JavaScript files.</li>
+<li><code>roadmapFiles</code>: An array of Markdown files to be converted to HTML documentation.</li>
+<li><code>excludePatterns</code>: An array of directory and file patterns to exclude from the documentation sweep.</li>
+</ul>
+<p>These configuration options can be modified in the <code>DocumentSweep</code> constructor to suit the specific needs of the project.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>DocumentSweep</code> class handles errors in the following ways:</p>
+<ol>
+<li>If an error occurs while scanning a directory, it logs the error message and continues processing the remaining files.</li>
+<li>If an error occurs during the documentation generation for a file, it logs the error message, updates the results object, and continues with the next file.</li>
+<li>If an error occurs during the HTML documentation generation, it logs the error message, updates the results object, and continues with the next file.</li>
+</ol>
+<p>All errors are logged in the <code>results.errors</code> array, which is included in the final multi-format summary.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>document-sweep.js</code> script is designed to be a standalone utility that can be integrated into a larger project or development workflow. It can be used as part of a continuous integration/continuous deployment (CI/CD) pipeline to automatically generate and update the project&#39;s documentation.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ul>
+<li>The script uses a simple line-by-line diff algorithm to generate git-format diffs. This could be enhanced with a more sophisticated diff algorithm for better accuracy.</li>
+<li>The script currently uses a hard-coded timeout of 30 seconds per file for the documentation generation. This may need to be adjusted based on the complexity of the project&#39;s codebase and the performance of the AI-powered documentation generator.</li>
+<li>The script could be further extended to support additional output formats, integration with version control systems, or automatic deployment of the generated documentation.</li>
+</ul>
+<hr>
+<h2 id="chunk-2-analysis">Chunk 2 Analysis</h2>
+<h1 id="document-sweep-summary">Document Sweep Summary</h1>
+<h2 id="purpose--overview-1">Purpose &amp; Overview</h2>
+<p>The <code>document-sweep.js</code> script is responsible for generating comprehensive documentation for a codebase. It scans the project directory, identifies JavaScript files, and generates Markdown, JSON, and HTML summaries of the changes and errors detected during the documentation generation process. The script is designed to be run as a part of a continuous integration (CI) or automation workflow to ensure that the project&#39;s documentation is up-to-date and accessible in multiple formats.</p>
+<h2 id="technical-architecture-1">Technical Architecture</h2>
+<p>The <code>DocumentSweep</code> class is the main entry point for the script. It has the following key components:</p>
+<ol>
+<li><strong>File Discovery</strong>: The <code>findJavaScriptFiles()</code> method is responsible for locating all JavaScript files in the project directory.</li>
+<li><strong>Markdown Summary Generation</strong>: The <code>generateMarkdownSummary()</code> method generates a detailed Markdown summary of the documentation generation process, including the overall execution summary, changes detected, and any errors encountered.</li>
+<li><strong>HTML Generation</strong>: The <code>HTMLGenerator</code> class (not shown in the provided code) is responsible for generating HTML documentation from the source files.</li>
+<li><strong>Logging and Reporting</strong>: The <code>printSummary()</code> method logs the overall results of the documentation sweep to the console, and also saves a detailed JSON report to the <code>logs/</code> directory.</li>
+<li><strong>Auto-Sync</strong>: The <code>startAutoSync()</code> method sets up a file watcher using the <code>chokidar</code> library to automatically regenerate the HTML documentation when changes are detected in the &quot;roadmap&quot; files.</li>
+</ol>
+<p>The script uses several external dependencies, including <code>fs-extra</code> for file system operations and <code>chokidar</code> for the auto-sync functionality.</p>
+<h2 id="dependencies-1">Dependencies</h2>
+<p>The script has the following external dependencies:</p>
+<ul>
+<li><code>fs-extra</code>: For advanced file system operations</li>
+<li><code>chokidar</code>: For file change monitoring and auto-sync functionality</li>
+</ul>
+<h2 id="key-functionsclasses-1">Key Functions/Classes</h2>
+<h3 id="documentsweep-class-1"><code>DocumentSweep</code> Class</h3>
+<p>The <code>DocumentSweep</code> class is the main entry point for the script and has the following key methods:</p>
+<ol>
+<li><strong><code>performSweep()</code></strong>: Performs the main documentation generation process, including file discovery, HTML generation, and summary reporting.</li>
+<li><strong><code>generateMarkdownSummary(data)</code></strong>: Generates a detailed Markdown summary of the documentation generation process, based on the provided <code>data</code> object.</li>
+<li><strong><code>printSummary()</code></strong>: Logs the overall results of the documentation sweep to the console and saves a detailed JSON report to the <code>logs/</code> directory.</li>
+<li><strong><code>startAutoSync()</code></strong>: Sets up a file watcher to automatically regenerate the HTML documentation when changes are detected in the &quot;roadmap&quot; files.</li>
+<li><strong><code>dryRun()</code></strong>: Previews the files that would be processed without actually generating the documentation.</li>
+</ol>
+<h3 id="htmlgenerator-class-not-shown"><code>HTMLGenerator</code> Class (Not Shown)</h3>
+<p>The <code>HTMLGenerator</code> class is responsible for generating HTML documentation from the source files. It is not shown in the provided code, but it likely has methods for parsing the source files, generating the HTML content, and saving the output files.</p>
+<h2 id="usage-examples-1">Usage Examples</h2>
+<ol>
+<li><p><strong>Perform a full documentation sweep</strong>:</p>
+<pre><code class="language-bash"><pre><code class="language-bash">node document-sweep.js</code></pre>
+</code></pre>
+</li>
+<li><p><strong>Run a dry run to preview the files that would be processed</strong>:</p>
+<pre><code class="language-bash"><pre><code class="language-bash">node document-sweep.js --dry-run</code></pre>
+</code></pre>
+</li>
+<li><p><strong>Start the auto-sync mode to watch for changes in the roadmap files</strong>:</p>
+<pre><code class="language-bash"><pre><code class="language-bash">node document-sweep.js --auto-sync</code></pre>
+</code></pre>
+</li>
+</ol>
+<h2 id="configuration-1">Configuration</h2>
+<p>The script does not have any explicit configuration options or environment variables. However, the paths and file names for the &quot;roadmap&quot; files are hardcoded in the <code>startAutoSync()</code> method:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const roadmapFiles = [
+    'MASTER_ROADMAP.md',
+    'TASK_SUMMARY.md', 
+    'RSCRIBE_DOCUMENT_PROTOCOL.md'
+].map(file => path.join(this.baseDir, file));</code></pre>
+</code></pre>
+<p>You may need to update these paths and file names to match your project&#39;s structure.</p>
+<h2 id="error-handling-1">Error Handling</h2>
+<p>The script handles errors in the following ways:</p>
+<ol>
+<li><strong>HTML Generation Errors</strong>: If there is an error during the HTML generation process, the script logs the error message to the console using <code>console.error()</code>.</li>
+<li><strong>General Errors</strong>: If an error occurs during the main <code>performSweep()</code> or <code>startAutoSync()</code> methods, the script logs the error message to the console using <code>console.error()</code> and then exits the process with a non-zero exit code.</li>
+</ol>
+<h2 id="integration-1">Integration</h2>
+<p>The <code>document-sweep.js</code> script is designed to be integrated into a larger system or workflow, such as a continuous integration (CI) pipeline. It can be used to automatically generate and update the project&#39;s documentation as part of the build process, ensuring that the documentation remains up-to-date and accessible in multiple formats (Markdown, JSON, and HTML).</p>
+<h2 id="development-notes-1">Development Notes</h2>
+<ol>
+<li><strong>Dependency Management</strong>: The script uses the <code>chokidar</code> library for file change monitoring and auto-sync functionality. This library is not a standard Node.js module and may need to be installed separately.</li>
+<li><strong>Path Handling</strong>: The script uses the <code>path</code> module to handle file and directory paths in a cross-platform manner.</li>
+<li><strong>Logging and Reporting</strong>: The script generates detailed logs and reports, which can be useful for troubleshooting and monitoring the documentation generation process.</li>
+<li><strong>Extensibility</strong>: The script is designed to be extensible, with the ability to add new features or customize the documentation generation process as needed.</li>
+</ol>
+<hr>
+<h2 id="processing-summary">Processing Summary</h2>
+<ul>
+<li><strong>Total Chunks</strong>: 2</li>
+<li><strong>Successful</strong>: 2</li>
+<li><strong>Failed</strong>: 0</li>
+<li><strong>Processing Method</strong>: Smart chunking with rate limiting</li>
+<li><strong>Generated</strong>: 2025-08-20T00:48:51.748Z</li>
+</ul>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>document-sweep_combined.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

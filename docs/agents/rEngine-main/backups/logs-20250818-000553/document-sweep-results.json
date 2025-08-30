@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-08-17T23:45:00.123Z",
+  "summary": {
+    "processed": 195,
+    "succeeded": 190,
+    "failed": 5,
+    "successRate": 97.4,
+    "duration": 120.5,
+    "updatesDetected": 25,
+    "diffsGenerated": 25
+  },
+  "changes": [
+    {
+      "timestamp": "2025-08-17T23:44:12.456Z",
+      "sourceFile": "js/app.js",
+      "docFile": "docs/generated/js/app.md", 
+      "diffFile": "logs/documentation-diffs/app_2025-08-17T23-44-12-456Z.diff",
+      "changeHash": "a1b2c3d4"
+    },
+    {
+      "timestamp": "2025-08-17T23:44:30.789Z",
+      "sourceFile": "rEngine/smart-scribe.js",
+      "docFile": "docs/generated/rEngine/smart-scribe.md",
+      "diffFile": "logs/documentation-diffs/smart-scribe_2025-08-17T23-44-30-789Z.diff", 
+      "changeHash": "e5f6g7h8"
+    }
+  ],
+  "diffs": [
+    "logs/documentation-diffs/app_2025-08-17T23-44-12-456Z.diff",
+    "logs/documentation-diffs/smart-scribe_2025-08-17T23-44-30-789Z.diff"
+  ],
+  "errors": [
+    "Failed to generate docs for test-broken.js: API timeout"
+  ]
+}

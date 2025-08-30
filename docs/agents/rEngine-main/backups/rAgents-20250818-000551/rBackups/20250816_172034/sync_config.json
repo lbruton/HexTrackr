@@ -1,0 +1,355 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-16",
+    "purpose": "MCP-JSON synchronization configuration and mapping rules",
+    "description": "Defines exact 1:1 mapping between JSON files and MCP entities to ensure perfect synchronization"
+  },
+  "sync_configuration": {
+    "bidirectional_sync": true,
+    "conflict_resolution": "manual_review",
+    "backup_before_sync": true,
+    "validation_enabled": true,
+    "auto_sync_interval": "5_minutes"
+  },
+  "file_mappings": {
+    "tasks.json": {
+      "mcp_entity_prefix": "Task",
+      "sync_priority": 1,
+      "bidirectional": true,
+      "validation_schema": "task_schema.json",
+      "mapping_rules": {
+        "active_projects": {
+          "target_entity": "TaskProject",
+          "id_mapping": "project_id -> name",
+          "field_mappings": {
+            "title": "observations[0]",
+            "description": "observations[1]",
+            "status": "observations[2]",
+            "priority": "observations[3]",
+            "lead_coordinator": "observations[4]",
+            "started": "observations[5]",
+            "target_completion": "observations[6]",
+            "estimated_total_time": "observations[7]",
+            "success_criteria": "observations[8]"
+          }
+        },
+        "phases": {
+          "target_entity": "TaskPhase",
+          "id_mapping": "project_id + '_' + phase_id -> name",
+          "parent_relation": "belongs_to_project",
+          "field_mappings": {
+            "title": "observations[0]",
+            "agent": "observations[1]",
+            "status": "observations[2]",
+            "priority": "observations[3]",
+            "estimated_time": "observations[4]",
+            "dependencies": "observations[5]",
+            "files_affected": "observations[6]",
+            "success_criteria": "observations[7]",
+            "testing_requirements": "observations[8]",
+            "rollback_procedure": "observations[9]"
+          }
+        }
+      }
+    },
+    "agents.json": {
+      "mcp_entity_prefix": "Agent",
+      "sync_priority": 2,
+      "bidirectional": true,
+      "validation_schema": "agent_schema.json",
+      "mapping_rules": {
+        "agent_profiles": {
+          "target_entity": "Agent",
+          "id_mapping": "agent_id -> name",
+          "field_mappings": {
+            "display_name": "observations[0]",
+            "category": "observations[1]",
+            "subcategory": "observations[2]",
+            "optimal_task_complexity": "observations[3]",
+            "optimal_time_range": "observations[4]",
+            "risk_tolerance": "observations[5]",
+            "collaboration_style": "observations[6]",
+            "quality_profile": "observations[7]",
+            "specializations": "observations[8]",
+            "strengths": "observations[9]",
+            "limitations": "observations[10]",
+            "preferred_file_types": "observations[11]",
+            "fallback_capabilities": "observations[12]"
+          }
+        },
+        "capabilities_matrix": {
+          "target_entity": "AgentCapability",
+          "id_mapping": "generated_capability_id -> name",
+          "field_mappings": {
+            "task_type_assignments": "observations[0]",
+            "file_type_expertise": "observations[1]",
+            "complexity_handling": "observations[2]"
+          }
+        }
+      }
+    },
+    "errors.json": {
+      "mcp_entity_prefix": "Error",
+      "sync_priority": 3,
+      "bidirectional": true,
+      "validation_schema": "error_schema.json",
+      "mapping_rules": {
+        "error_signatures.common_failure_modes": {
+          "target_entity": "ErrorPattern",
+          "id_mapping": "signature -> name",
+          "field_mappings": {
+            "error_type": "observations[0]",
+            "signature": "observations[1]",
+            "frequency": "observations[2]",
+            "impact_severity": "observations[3]",
+            "detection_pattern": "observations[4]",
+            "prevention_strategy": "observations[5]",
+            "symptoms": "observations[6]",
+            "root_causes": "observations[7]"
+          }
+        },
+        "prevention_strategies": {
+          "target_entity": "ErrorPrevention",
+          "id_mapping": "strategy_id -> name",
+          "field_mappings": {
+            "strategy_name": "observations[0]",
+            "description": "observations[1]",
+            "implementation": "observations[2]",
+            "effectiveness": "observations[3]"
+          }
+        }
+      }
+    },
+    "decisions.json": {
+      "mcp_entity_prefix": "Decision",
+      "sync_priority": 3,
+      "bidirectional": true,
+      "validation_schema": "decision_schema.json",
+      "mapping_rules": {
+        "architectural_decisions": {
+          "target_entity": "ArchitecturalDecision",
+          "id_mapping": "decision_id -> name",
+          "field_mappings": {
+            "title": "observations[0]",
+            "description": "observations[1]",
+            "status": "observations[2]",
+            "rationale": "observations[3]",
+            "alternatives": "observations[4]",
+            "consequences": "observations[5]",
+            "date_made": "observations[6]"
+          }
+        }
+      }
+    },
+    "functions.json": {
+      "mcp_entity_prefix": "Function",
+      "sync_priority": 4,
+      "bidirectional": true,
+      "validation_schema": "function_schema.json",
+      "mapping_rules": {
+        "core_functions": {
+          "target_entity": "CoreFunction",
+          "id_mapping": "function_name -> name",
+          "field_mappings": {
+            "description": "observations[0]",
+            "file_location": "observations[1]",
+            "owner_agent": "observations[2]",
+            "dependencies": "observations[3]",
+            "parameters": "observations[4]",
+            "return_type": "observations[5]",
+            "complexity": "observations[6]"
+          }
+        }
+      }
+    },
+    "preferences.json": {
+      "mcp_entity_prefix": "Preference",
+      "sync_priority": 5,
+      "bidirectional": true,
+      "validation_schema": "preference_schema.json",
+      "mapping_rules": {
+        "user_preferences": {
+          "target_entity": "UserPreference",
+          "id_mapping": "preference_key -> name",
+          "field_mappings": {
+            "value": "observations[0]",
+            "type": "observations[1]",
+            "description": "observations[2]",
+            "category": "observations[3]"
+          }
+        }
+      }
+    },
+    "styles.json": {
+      "mcp_entity_prefix": "Style",
+      "sync_priority": 5,
+      "bidirectional": true,
+      "validation_schema": "style_schema.json",
+      "mapping_rules": {
+        "themes": {
+          "target_entity": "Theme",
+          "id_mapping": "theme_name -> name",
+          "field_mappings": {
+            "colors": "observations[0]",
+            "typography": "observations[1]",
+            "spacing": "observations[2]",
+            "components": "observations[3]"
+          }
+        }
+      }
+    },
+    "memory.json": {
+      "mcp_entity_prefix": "Memory",
+      "sync_priority": 1,
+      "bidirectional": true,
+      "validation_schema": "memory_schema.json",
+      "mapping_rules": {
+        "entities": {
+          "target_entity": "MemoryEntity",
+          "id_mapping": "entity_id -> name",
+          "preserve_structure": true,
+          "field_mappings": {
+            "type": "observations[0]",
+            "description": "observations[1]",
+            "status": "observations[2]",
+            "context": "observations[3]"
+          }
+        }
+      }
+    },
+    "patterns.json": {
+      "mcp_entity_prefix": "Patterns",
+      "sync_priority": 3,
+      "bidirectional": true,
+      "validation_schema": "patterns_schema.json",
+      "auto_generated": true,
+      "mapping_rules": {
+        "patterns_data": {
+          "target_entity": "PatternsEntry",
+          "id_mapping": "entry_id -> name",
+          "field_mappings": {
+            "type": "observations[0]",
+            "description": "observations[1]",
+            "status": "observations[2]",
+            "context": "observations[3]",
+            "effectiveness": "observations[4]"
+          }
+        }
+      }
+    },
+    "communications.json": {
+      "mcp_entity_prefix": "Communications",
+      "sync_priority": 2,
+      "bidirectional": true,
+      "validation_schema": "communications_schema.json",
+      "auto_generated": true,
+      "mapping_rules": {
+        "communications_data": {
+          "target_entity": "CommunicationsEntry",
+          "id_mapping": "entry_id -> name",
+          "field_mappings": {
+            "type": "observations[0]",
+            "description": "observations[1]",
+            "status": "observations[2]",
+            "context": "observations[3]",
+            "effectiveness": "observations[4]"
+          }
+        }
+      }
+    }
+  },
+  "relationship_mappings": {
+    "task_phase_to_project": {
+      "source_entity": "TaskPhase",
+      "target_entity": "TaskProject",
+      "relationship_type": "belongs_to",
+      "mapping_rule": "extract_project_id_from_phase_name"
+    },
+    "agent_to_task": {
+      "source_entity": "Agent",
+      "target_entity": "TaskPhase",
+      "relationship_type": "assigned_to",
+      "mapping_rule": "match_agent_field_in_phase"
+    },
+    "error_to_function": {
+      "source_entity": "ErrorPattern",
+      "target_entity": "CoreFunction",
+      "relationship_type": "affects",
+      "mapping_rule": "match_affected_files"
+    }
+  },
+  "validation_rules": {
+    "required_fields": {
+      "TaskProject": [
+        "title",
+        "status",
+        "priority"
+      ],
+      "Agent": [
+        "display_name",
+        "category",
+        "specializations"
+      ],
+      "ErrorPattern": [
+        "error_type",
+        "signature",
+        "prevention_strategy"
+      ]
+    },
+    "data_types": {
+      "status": [
+        "active",
+        "pending",
+        "completed",
+        "on_hold"
+      ],
+      "priority": [
+        "high",
+        "medium",
+        "low",
+        "critical"
+      ],
+      "agent_category": [
+        "builder",
+        "architect",
+        "validator"
+      ]
+    },
+    "cross_references": {
+      "agent_in_tasks": "verify_agent_exists_in_agents_json",
+      "file_references": "verify_file_paths_exist"
+    }
+  },
+  "sync_hooks": {
+    "pre_sync": [
+      "validate_json_schemas",
+      "backup_current_state",
+      "check_file_locks"
+    ],
+    "post_sync": [
+      "validate_mcp_entities",
+      "update_sync_metadata",
+      "send_notifications"
+    ],
+    "on_conflict": [
+      "create_conflict_report",
+      "prompt_for_resolution",
+      "backup_conflicted_state"
+    ]
+  },
+  "monitoring": {
+    "track_metrics": [
+      "sync_duration",
+      "entities_created",
+      "entities_updated",
+      "conflicts_detected",
+      "validation_errors"
+    ],
+    "alerting": {
+      "sync_failures": "immediate",
+      "validation_errors": "immediate",
+      "conflicts": "within_5_minutes"
+    }
+  }
+}

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console Log Monitor - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Console Log Monitor</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 console-log-monitor.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 7KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rMemory/memory-scribe/console-log-monitor.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/console-log-monitor.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="console-log-monitor">Console Log Monitor</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>ConsoleLogMonitor</code> class is a powerful tool that provides real-time monitoring and logging of console activity, with a specific focus on tracking AI agent interactions. This script serves several key purposes:</p>
+<ol>
+<li><strong>Console Logging</strong>: It intercepts and logs all <code>console.log</code>, <code>console.error</code>, and <code>console.warn</code> statements, creating a comprehensive record of console activity.</li>
+<li><strong>AI Agent Tracking</strong>: The script identifies and logs any console output related to AI agents, such as GitHub Copilot, Claude, GPT, and others. This allows for detailed analysis of AI agent usage and behavior.</li>
+<li><strong>Activity Tracking</strong>: The script maintains a detailed log of all monitored activity, including the type of activity (file edit, file creation, terminal commands, etc.), the timestamp, and the associated AI agent.</li>
+<li><strong>Analytics and Reporting</strong>: The script provides methods to retrieve activity summaries, recent activity logs, and agent-specific statistics, enabling users to gain valuable insights into the system&#39;s operations.</li>
+</ol>
+<p>This script is a crucial component in a larger system, where it serves as a real-time monitor and data collector for the various AI agents and processes running within the environment.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>ConsoleLogMonitor</code> class is the main component of this script, and it comprises the following key elements:</p>
+<ol>
+<li><strong>Initialization</strong>: The constructor sets up the necessary file paths, loads existing AI activity data, and defines patterns to identify AI agent-related console output.</li>
+<li><strong>Monitoring</strong>: The <code>startMonitoring()</code> method sets up the console log monitoring, including:<ul>
+<li>Watching for changes in the VS Code extension host logs</li>
+<li>Intercepting and logging the process&#39;s console output</li>
+<li>Tailing potential log files for additional AI agent activity</li>
+</ul>
+</li>
+<li><strong>Log Processing</strong>: The <code>processLogContent()</code> method analyzes the console output, identifies AI agent-related entries, and logs the activity details.</li>
+<li><strong>Activity Tracking</strong>: The <code>trackAIActivity()</code> method records the details of each AI agent-related activity, including the timestamp, agent name, source, and activity type. It also maintains overall activity statistics and agent-specific data.</li>
+<li><strong>Reporting</strong>: The <code>getActivitySummary()</code> and <code>getRecentActivity()</code> methods provide access to the monitored activity data, allowing users to retrieve summary information and the most recent activities.</li>
+</ol>
+<p>The script utilizes several built-in Node.js modules, such as <code>fs</code>, <code>child_process</code>, and <code>path</code>, to perform file operations, spawn processes, and handle file paths.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>This script has no external dependencies. It uses only built-in Node.js modules.</p>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="consolelogmonitor-class"><code>ConsoleLogMonitor</code> Class</h3>
+<p><strong>Constructor</strong>:</p>
+<ul>
+<li><code>memoryScribePath</code> (string): The path to the &quot;Memory Scribe&quot; directory, where the log files and activity data will be stored.</li>
+</ul>
+<p><strong>Methods</strong>:</p>
+<ol>
+<li><code>loadAIActivity()</code>: Loads the existing AI activity data from the <code>ai-agent-activity.json</code> file.</li>
+<li><code>saveAIActivity()</code>: Saves the current AI activity data to the <code>ai-agent-activity.json</code> file.</li>
+<li><code>startMonitoring()</code>: Starts the real-time console log monitoring, including watching for VS Code logs, intercepting process console output, and tailing potential log files.</li>
+<li><code>monitorVSCodeLogs()</code>: Sets up a file watcher to monitor changes in the VS Code extension host logs.</li>
+<li><code>monitorProcessConsole()</code>: Intercepts and logs the console output from the current process.</li>
+<li><code>monitorTerminalActivity()</code>: Tails potential log files that might contain AI agent-related activity.</li>
+<li><code>tailLogFile(filePath)</code>: Spawns a <code>tail</code> process to monitor changes in a specific log file.</li>
+<li><code>processLogFile(filePath)</code>: Reads and processes the content of a specific log file.</li>
+<li><code>processLogContent(content, source)</code>: Analyzes the console output, identifies AI agent-related entries, and logs the activity details.</li>
+<li><code>isAIAgentActivity(line)</code>: Checks if a given line of console output is related to an AI agent.</li>
+<li><code>logActivity(type, content)</code>: Writes a log entry to the <code>console-activity.log</code> file.</li>
+<li><code>trackAIActivity(content, source)</code>: Records the details of an AI agent-related activity, including updating the activity statistics.</li>
+<li><code>classifyActivity(content)</code>: Determines the type of activity based on the console output.</li>
+<li><code>stopMonitoring()</code>: Stops the real-time console log monitoring.</li>
+<li><code>getActivitySummary()</code>: Retrieves a summary of the monitored activity, including the total activities, today&#39;s activities, agent statistics, and file paths.</li>
+<li><code>getRecentActivity(limit = 50)</code>: Retrieves the most recent activities, up to the specified limit.</li>
+</ol>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To use the <code>ConsoleLogMonitor</code> class, you can create an instance and start the monitoring process:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const ConsoleLogMonitor = require('./console-log-monitor');
+
+const monitor = new ConsoleLogMonitor('/path/to/memory-scribe');
+monitor.startMonitoring();</code></pre>
+</code></pre>
+<p>To retrieve the activity summary:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const summary = monitor.getActivitySummary();
+console.log(summary);</code></pre>
+</code></pre>
+<p>To get the most recent activities:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const recentActivity = monitor.getRecentActivity(20);
+console.log(recentActivity);</code></pre>
+</code></pre>
+<p>To stop the monitoring:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">monitor.stopMonitoring();</code></pre>
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>ConsoleLogMonitor</code> class has the following configuration options:</p>
+<ul>
+<li><code>memoryScribePath</code> (required): The path to the &quot;Memory Scribe&quot; directory, where the log files and activity data will be stored.</li>
+</ul>
+<p>The script also defines several hardcoded paths and patterns that can be customized if needed:</p>
+<ul>
+<li><code>consoleSources</code>: An array of common paths where VS Code console logs are located.</li>
+<li><code>agentPatterns</code>: An array of regular expressions used to identify AI agent-related console output.</li>
+</ul>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>ConsoleLogMonitor</code> class handles several potential errors, including:</p>
+<ul>
+<li>Errors when loading or saving the AI activity data</li>
+<li>Errors when tailing or processing log files</li>
+<li>Errors when writing to the console log file</li>
+</ul>
+<p>In case of any errors, the script logs the error message to the console for debugging purposes.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>ConsoleLogMonitor</code> class is designed to be a modular component within a larger system. It can be easily integrated into other applications or services that require real-time monitoring and analysis of console activity, with a focus on tracking AI agent interactions.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ul>
+<li>The script uses a combination of file watching, console output interception, and log file tailing to capture console activity from various sources.</li>
+<li>The <code>trackAIActivity()</code> method maintains a detailed log of AI agent-related activities, including the ability to classify the type of activity (file edit, file creation, terminal command, etc.).</li>
+<li>The activity data is stored in a JSON file (<code>ai-agent-activity.json</code>) for persistence and easy access.</li>
+<li>The script is designed to be lightweight and efficient, with minimal impact on the overall system performance.</li>
+<li>The use of regular expressions to identify AI agent-related console output can be expanded or modified to suit specific requirements.</li>
+<li>The script could be further enhanced with features like email/Slack notifications, real-time dashboards, or integration with external monitoring/analytics tools.</li>
+</ul>
+<p>Overall, this <code>ConsoleLogMonitor</code> script provides a robust and versatile solution for tracking and analyzing console activity, with a strong focus on AI agent interactions within a larger system.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>console-log-monitor.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,73 @@
+{
+  "metadata": {
+    "agent_name": "GPT-4",
+    "agent_type": "Direct API Access",
+    "technical_base": "GPT-4",
+    "created": "2025-08-16",
+    "last_updated": "2025-08-16 11:47",
+    "session_count": 0,
+    "total_tasks_completed": 0
+  },
+  "shared_memory_index": {
+    "agents": {
+      "file": "agents/agents.json",
+      "purpose": "Agent definitions and capabilities",
+      "last_checked": "2025-08-16 11:47"
+    },
+    "tasks": {
+      "file": "agents/tasks.json",
+      "purpose": "Active tasks and project status",
+      "last_checked": "2025-08-16 11:47"
+    },
+    "decisions": {
+      "file": "agents/decisions.json",
+      "purpose": "Architectural and design decisions",
+      "last_checked": "2025-08-16 11:47"
+    },
+    "functions": {
+      "file": "agents/functions.json",
+      "purpose": "Function definitions and ownership",
+      "last_checked": "2025-08-16 11:47"
+    },
+    "errors": {
+      "file": "agents/errors.json",
+      "purpose": "Known errors and solutions",
+      "last_checked": "2025-08-16 11:47"
+    },
+    "memory": {
+      "file": "agents/memory.json",
+      "purpose": "Shared project memory",
+      "last_checked": "2025-08-16 11:47"
+    },
+    "preferences": {
+      "file": "agents/preferences.json",
+      "purpose": "Project preferences and settings",
+      "last_checked": "2025-08-16 11:47"
+    },
+    "styles": {
+      "file": "agents/styles.json",
+      "purpose": "Visual style definitions",
+      "last_checked": "2025-08-16 11:47"
+    }
+  },
+  "personal_insights": {
+    "coding_patterns": [],
+    "optimization_discoveries": [],
+    "debugging_strategies": [],
+    "performance_observations": []
+  },
+  "task_preferences": {
+    "preferred_approaches": [],
+    "avoided_patterns": [],
+    "efficiency_notes": []
+  },
+  "learned_solutions": {
+    "recurring_issues": [],
+    "effective_fixes": [],
+    "context_specific_solutions": []
+  },
+  "session_notes": {
+    "current_session": "",
+    "previous_sessions": []
+  }
+}

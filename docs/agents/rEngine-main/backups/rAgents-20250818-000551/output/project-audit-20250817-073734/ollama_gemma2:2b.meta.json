@@ -1,0 +1,8 @@
+{
+                    "provider": "ollama",
+                    "model": "gemma2:2b",
+                    "duration_seconds": 0,
+                    "word_count":        1,
+                    "timestamp": "2025-08-17T07:37:34-05:00",
+                    "status": "success"
+                }

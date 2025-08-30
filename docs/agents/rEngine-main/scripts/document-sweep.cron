@@ -1,0 +1,8 @@
+# rEngine Automated Document Sweep
+# Runs every 12 hours (6 AM and 6 PM) to generate comprehensive documentation
+
+# At 6:00 AM every day
+0 6 * * * /Volumes/DATA/GitHub/rEngine/scripts/automated-document-sweep.sh >> /Volumes/DATA/GitHub/rEngine/logs/document-sweep.log 2>&1
+
+# At 6:00 PM every day  
+0 18 * * * /Volumes/DATA/GitHub/rEngine/scripts/automated-document-sweep.sh >> /Volumes/DATA/GitHub/rEngine/logs/document-sweep.log 2>&1

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management Script Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Inventory Management Script Documentation</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 inventory_chunk.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 6KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rProjects/StackTrackr/js/inventory_chunk.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/inventory_chunk.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="inventory-management-script-documentation">Inventory Management Script Documentation</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>inventory.js_chunk_2</code> script is a crucial component of the inventory management system. It handles the loading, saving, and display of the user&#39;s precious metal inventory. The script provides a comprehensive set of features, including data migration, error handling, and integration with the larger system.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The script is structured around several key functions and utilities:</p>
+<ol>
+<li><strong><code>loadInventory()</code></strong>: Responsible for loading inventory data from local storage, handling data migration, and updating the global <code>inventory</code> array.</li>
+<li><strong><code>sanitizeTablesOnLoad()</code></strong>: Removes non-alphanumeric characters from inventory records.</li>
+<li><strong><code>renderTable()</code></strong>: Generates the HTML table for displaying the current inventory, applying filters, sorting, and pagination.</li>
+<li><strong><code>persistInventoryAndRefresh()</code></strong>: Saves the inventory and refreshes the table display.</li>
+<li><strong><code>validateFieldValue()</code></strong>: Provides enhanced validation for inline edits, ensuring data integrity.</li>
+<li><strong><code>startCellEdit()</code></strong>: Handles the inline editing of table cells, supporting various field types.</li>
+</ol>
+<p>The script also defines several utility functions, color schemes, and formatting helpers to enhance the user experience and ensure consistent presentation.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>The script relies on the following external dependencies:</p>
+<ol>
+<li><strong><code>LS_KEY</code></strong>: A constant representing the key used to store inventory data in local storage.</li>
+<li><strong><code>SERIAL_KEY</code></strong>: A constant representing the key used to store the serial number counter in local storage.</li>
+<li><strong><code>METALS</code></strong>: An object containing configuration data for different metal types.</li>
+<li><strong><code>spotPrices</code></strong>: An object containing the current spot prices for various metals.</li>
+<li><strong><code>catalogManager</code></strong>: An instance of the <code>CatalogManager</code> class, responsible for synchronizing inventory items with the product catalog.</li>
+<li><strong><code>elements</code></strong>: An object containing references to various DOM elements used in the script.</li>
+</ol>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="loadinventory"><code>loadInventory()</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Loads inventory data from local storage, handles data migration, and updates the global <code>inventory</code> array.</li>
+<li><strong>Parameters</strong>: None</li>
+<li><strong>Return Value</strong>: Void</li>
+<li><strong>Throws</strong>: <code>Error</code> if localStorage access fails</li>
+</ul>
+<h3 id="sanitizetablesonload"><code>sanitizeTablesOnLoad()</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Removes non-alphanumeric characters from inventory records.</li>
+<li><strong>Parameters</strong>: None</li>
+<li><strong>Return Value</strong>: Void</li>
+</ul>
+<h3 id="rendertable"><code>renderTable()</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Generates the HTML table for displaying the current inventory, applying filters, sorting, and pagination.</li>
+<li><strong>Parameters</strong>: None</li>
+<li><strong>Return Value</strong>: Void</li>
+</ul>
+<h3 id="persistinventoryandrefresh"><code>persistInventoryAndRefresh()</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Saves the inventory and refreshes the table display.</li>
+<li><strong>Parameters</strong>: None</li>
+<li><strong>Return Value</strong>: Void</li>
+</ul>
+<h3 id="validatefieldvalue"><code>validateFieldValue()</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Provides enhanced validation for inline edits, ensuring data integrity.</li>
+<li><strong>Parameters</strong>:<ul>
+<li><code>field</code> (string): The field being edited</li>
+<li><code>value</code> (string): The proposed value for the field</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: <code>boolean</code> indicating whether the value is valid</li>
+</ul>
+<h3 id="startcelledit"><code>startCellEdit()</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Handles the inline editing of table cells, supporting various field types.</li>
+<li><strong>Parameters</strong>:<ul>
+<li><code>idx</code> (number): The index of the item to edit</li>
+<li><code>field</code> (string): The field name to update</li>
+<li><code>icon</code> (HTMLElement): The clicked pencil icon</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: Void</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To use the <code>inventory.js_chunk_2</code> script, you would typically call the <code>loadInventory()</code> function to load the inventory data, and then call <code>renderTable()</code> to display the inventory in the user interface.</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">// Load the inventory
+loadInventory();
+
+// Render the inventory table
+renderTable();</code></pre>
+</code></pre>
+<p>Additionally, you can use the <code>persistInventoryAndRefresh()</code> function to save the inventory and update the table display after any changes.</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">// Save the inventory and refresh the table
+persistInventoryAndRefresh();</code></pre>
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>The script relies on several configuration constants and external dependencies, which should be set up properly in the larger system:</p>
+<ul>
+<li><code>LS_KEY</code>: The key used to store inventory data in local storage.</li>
+<li><code>SERIAL_KEY</code>: The key used to store the serial number counter in local storage.</li>
+<li><code>METALS</code>: An object containing configuration data for different metal types.</li>
+<li><code>spotPrices</code>: An object containing the current spot prices for various metals.</li>
+<li><code>catalogManager</code>: An instance of the <code>CatalogManager</code> class, responsible for synchronizing inventory items with the product catalog.</li>
+</ul>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>loadInventory()</code> function is wrapped in a <code>try-catch</code> block to handle any errors that may occur during local storage access. If an error occurs, the function logs the error to the console and resets the <code>inventory</code> array to an empty state.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>inventory.js_chunk_2</code> script is a crucial component of the larger inventory management system. It integrates with the <code>CatalogManager</code> class to synchronize inventory items with the product catalog, ensuring consistency and accurate data.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><strong>Synchronous Loading</strong>: The current implementation of <code>loadInventory()</code> uses synchronous loading to maintain backwards compatibility. This will be updated to use asynchronous loading in the future.</li>
+<li><strong>Orphaned Catalog Mappings</strong>: The script includes a <code>cleanupOrphans()</code> function in the <code>CatalogManager</code> to remove any orphaned catalog mappings, which helps maintain data integrity.</li>
+<li><strong>Inline Editing Enhancements</strong>: The <code>validateFieldValue()</code> function provides comprehensive field validation to ensure data integrity during inline editing.</li>
+<li><strong>Color Scheme Management</strong>: The script defines several color-related utilities and constants to ensure consistent styling across the inventory table, including metal-specific colors and type-specific backgrounds.</li>
+<li><strong>Accessibility Considerations</strong>: The script includes accessibility features, such as adding <code>tabindex</code> and <code>role</code> attributes to interactive elements, and handling keyboard events for inline editing.</li>
+</ol>
+<p>Overall, the <code>inventory.js_chunk_2</code> script is a well-designed and comprehensive solution for managing the user&#39;s precious metal inventory, with a focus on data integrity, user experience, and integration with the larger system.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>inventory_chunk.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

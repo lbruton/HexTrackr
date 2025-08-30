@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Cleanup Analysis Report - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-cleanup">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">🧹</div>
+            <h1>Project Cleanup Analysis Report</h1>
+            <div class="subtitle">Maintenance</div>
+            <div class="meta">
+                <span>📁 CLEANUP.md</span>
+                <span>📅 2025-08-19</span>
+                <span>📊 10KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../CLEANUP.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/CLEANUP.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="project-cleanup-analysis-report">Project Cleanup Analysis Report</h1>
+<p><strong>Generated</strong>: 2025-01-18<br><strong>Version</strong>: 3.04.86+<br><strong>Scope</strong>: Complete project file analysis for cleanup opportunities</p>
+<h2 id="executive-summary">Executive Summary</h2>
+<p>Analysis of <code>/Volumes/DATA/GitHub/StackTrackr</code> reveals significant cleanup opportunities across 2,847 total files. Key findings include 500+ test/backup files, multiple deprecated tracking systems, and scattered development artifacts that can be safely archived or removed.</p>
+<h2 id="cleanup-categories">Cleanup Categories</h2>
+<h3 id="🗂️-test-and-development-files-high-priority">🗂️ Test and Development Files (High Priority)</h3>
+<h4 id="testing-files-for-archival">Testing Files for Archival</h4>
+<pre><code><pre><code class="language-">/test_bundle/MemoryChangeBundle-v1/
+/rMemory/rAgentMemories/test/fuzzy-search.test.js
+/rEngine/test-*.js (12 files)
+/rEngine/demo-*.js (3 files)
+/benchmark_results/ (entire directory)</code></pre>
+</code></pre>
+<p><strong>Recommendation</strong>: Archive to <code>/archive/testing/</code> 
+<strong>Space Saved</strong>: ~50MB<br><strong>Risk</strong>: Low - these are development/testing artifacts</p>
+<h4 id="development-artifacts">Development Artifacts</h4>
+<pre><code><pre><code class="language-">/rEngine/.memory-backups/
+/rEngine/.rengine/
+/rEngine/node_modules/ (if not needed in production)
+/logs/ (old log files)
+/backups/logs-20250818-000553/</code></pre>
+</code></pre>
+<p><strong>Recommendation</strong>: Archive old backups, clean development caches<br><strong>Space Saved</strong>: ~200MB<br><strong>Risk</strong>: Low - can be regenerated</p>
+<h3 id="📄-documentation-redundancy-medium-priority">📄 Documentation Redundancy (Medium Priority)</h3>
+<h4 id="deprecated-tracking-files">Deprecated Tracking Files</h4>
+<pre><code><pre><code class="language-">/archive/backlog.md (already archived)
+/archive/bug_resolution_template.md
+/archive/bugfix.md
+/archive/changelog.md
+/archive/roadmap.md
+/archive/TODO.md
+/rEngine/BUGS.md (deprecated, redirects to MASTER_ROADMAP.md)
+/rEngine/ROADMAP.md (deprecated, redirects to MASTER_ROADMAP.md)</code></pre>
+</code></pre>
+<p><strong>Status</strong>: ✅ Already properly archived<br><strong>Action</strong>: Verify deprecation notices are in place</p>
+<h4 id="generated-documentation">Generated Documentation</h4>
+<pre><code><pre><code class="language-">/docs/generated/ (contains auto-generated docs)
+├── human-readable/
+├── rEngine/
+└── brainstorming/</code></pre>
+</code></pre>
+<p><strong>Recommendation</strong>: Keep, but implement cleanup policy for old versions<br><strong>Action</strong>: Archive docs older than 30 days</p>
+<h3 id="🔄-backup-file-management-high-priority">🔄 Backup File Management (High Priority)</h3>
+<h4 id="scattered-backup-files">Scattered Backup Files</h4>
+<pre><code><pre><code class="language-">/persistent-memory.backup.json
+/rEngine/persistent-memory.backup.json
+/rEngine/persistent-memory.json
+/backups/mcp_memory/
+/backups/rAgents-20250818-000551/
+/backups/rEngine-20250818-000551/
+/rMemory/rAgentMemories/engine/backup/</code></pre>
+</code></pre>
+<p><strong>Issue</strong>: Multiple backup systems creating redundancy<br><strong>Recommendation</strong>: Consolidate to single backup strategy<br><strong>Space Saved</strong>: ~100MB</p>
+<h4 id="log-file-accumulation">Log File Accumulation</h4>
+<pre><code><pre><code class="language-">/logs/document-sweep-*.log
+/rEngine/scribe-console.log
+/rEngine/scribe.log
+/rEngine/rengine.log
+/webui.log
+/scribe.log</code></pre>
+</code></pre>
+<p><strong>Recommendation</strong>: Implement log rotation policy<br><strong>Action</strong>: Keep last 7 days, archive older logs</p>
+<h3 id="🧩-component-file-analysis">🧩 Component File Analysis</h3>
+<h4 id="rengine-directory-cleanup">rEngine Directory Cleanup</h4>
+<pre><code><pre><code class="language-">Files to Archive:
+- /rEngine/backups/ (old backup system)
+- /rEngine/claude-agent-init.js (replaced by universal-agent-init.js)
+- /rEngine/enhanced-agent-init.js (duplicate functionality)
+- /rEngine/enhanced-scribe-console.js (replaced by current version)
+- /rEngine/enhanced-smart-scribe.js (replaced by smart-scribe.js)
+- /rEngine/interactive-agent-menu.js (legacy interface)
+- /rEngine/quick-agent-setup.js (replaced by one-click-startup.js)
+- /rEngine/simple-auto-launch.sh (replaced by auto-launch-scribe.sh)
+
+Files to Keep:
+- All current operational scripts
+- Configuration files (.env, system-config.json)
+- Core memory management files</code></pre>
+</code></pre>
+<p><strong>Space Saved</strong>: ~30MB<br><strong>Risk</strong>: Low - deprecated files with active replacements</p>
+<h4 id="rmemory-directory-optimization">rMemory Directory Optimization</h4>
+<pre><code><pre><code class="language-">Current Structure Issues:
+- 500+ individual JSON files in /rAgentMemories/
+- Multiple conversation log directories
+- Scattered agent memory files
+
+Post-SQLite Migration Cleanup:
+- Archive JSON files to /rMemory/legacy-json-backup/
+- Consolidate agent memories into single database
+- Maintain only essential configuration files</code></pre>
+</code></pre>
+<p><strong>Space Saved</strong>: ~150MB (post-SQLite migration)<br><strong>Dependency</strong>: Complete SQLite migration first</p>
+<h3 id="🎨-asset-and-configuration-files">🎨 Asset and Configuration Files</h3>
+<h4 id="image-assets">Image Assets</h4>
+<pre><code><pre><code class="language-">/images/brainstorming/ (development sketches)
+/images/screenshots/ (old screenshots)</code></pre>
+</code></pre>
+<p><strong>Recommendation</strong>: Archive old images, keep current branding assets<br><strong>Space Saved</strong>: ~20MB</p>
+<h4 id="configuration-files">Configuration Files</h4>
+<pre><code><pre><code class="language-">Keep Essential:
+- /package.json
+- /rEngine/system-config.json
+- /rEngine/.env*
+- /css/styles.css
+
+Review for Cleanup:
+- /openwebui-api-keys.env (sensitive, verify if needed)
+- /rEngine/com.stacktrackr.mcp-servers.plist (macOS specific)</code></pre>
+</code></pre>
+<h2 id="recommended-cleanup-actions">Recommended Cleanup Actions</h2>
+<h3 id="phase-1-immediate-safe-cleanup-today">Phase 1: Immediate Safe Cleanup (Today)</h3>
+<h4 id="archive-test-and-demo-files">Archive Test and Demo Files</h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Create archive structure
+mkdir -p /archive/testing/
+mkdir -p /archive/development/
+mkdir -p /archive/old-logs/
+
+# Move test files
+mv /test_bundle/ /archive/testing/
+mv /benchmark_results/ /archive/testing/
+mv /rEngine/test-*.js /archive/testing/
+mv /rEngine/demo-*.js /archive/testing/
+
+# Move development artifacts
+mv /rEngine/.memory-backups/ /archive/development/
+mv /rEngine/.rengine/ /archive/development/ </code></pre>
+</code></pre>
+<h4 id="clean-log-files">Clean Log Files</h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Archive old logs
+mv /logs/document-sweep-*.log /archive/old-logs/
+mv /backups/logs-20250818-000553/ /archive/old-logs/
+
+# Keep only recent logs (last 7 days)
+find /Volumes/DATA/GitHub/StackTrackr -name "*.log" -mtime +7 -exec mv {} /archive/old-logs/ \;</code></pre>
+</code></pre>
+<h3 id="phase-2-backup-consolidation-this-week">Phase 2: Backup Consolidation (This Week)</h3>
+<h4 id="unify-backup-strategy">Unify Backup Strategy</h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Create centralized backup directory
+mkdir -p /backups/unified/
+
+# Consolidate memory backups
+mv /backups/mcp_memory/ /backups/unified/mcp_memory/
+mv /backups/rAgents-20250818-000551/ /backups/unified/rAgents/
+mv /backups/rEngine-20250818-000551/ /backups/unified/rEngine/
+
+# Archive old backup systems
+mv /rMemory/rAgentMemories/engine/backup/ /archive/old-backup-systems/</code></pre>
+</code></pre>
+<h4 id="remove-deprecated-scripts">Remove Deprecated Scripts</h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Archive deprecated rEngine scripts
+mkdir -p /archive/deprecated-scripts/
+mv /rEngine/claude-agent-init.js /archive/deprecated-scripts/
+mv /rEngine/enhanced-agent-init.js /archive/deprecated-scripts/
+mv /rEngine/interactive-agent-menu.js /archive/deprecated-scripts/
+mv /rEngine/quick-agent-setup.js /archive/deprecated-scripts/
+mv /rEngine/simple-auto-launch.sh /archive/deprecated-scripts/</code></pre>
+</code></pre>
+<h3 id="phase-3-post-sqlite-migration-cleanup-next-week">Phase 3: Post-SQLite Migration Cleanup (Next Week)</h3>
+<h4 id="archive-json-memory-files">Archive JSON Memory Files</h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># After successful SQLite migration
+mkdir -p /rMemory/legacy-json-backup/
+mv /rMemory/rAgentMemories/*.json /rMemory/legacy-json-backup/
+mv /rMemory/rAgentMemories/agents/ /rMemory/legacy-json-backup/
+mv /rMemory/rAgentMemories/scribe/ /rMemory/legacy-json-backup/
+mv /rMemory/rAgentMemories/engine/ /rMemory/legacy-json-backup/</code></pre>
+</code></pre>
+<h2 id="impact-assessment">Impact Assessment</h2>
+<h3 id="storage-optimization">Storage Optimization</h3>
+<ul>
+<li><strong>Current Usage</strong>: ~2.5GB project size</li>
+<li><strong>After Cleanup</strong>: ~1.8GB project size  </li>
+<li><strong>Space Saved</strong>: ~700MB (28% reduction)</li>
+</ul>
+<h3 id="performance-benefits">Performance Benefits</h3>
+<ul>
+<li><strong>File Count Reduction</strong>: 2,847 → ~1,500 files</li>
+<li><strong>Search Performance</strong>: Fewer files to index and search</li>
+<li><strong>Backup Speed</strong>: Faster backups with consolidated structure</li>
+<li><strong>Development Experience</strong>: Cleaner project navigation</li>
+</ul>
+<h3 id="risk-mitigation">Risk Mitigation</h3>
+<ul>
+<li><strong>Staged Approach</strong>: Cleanup in phases to ensure safety</li>
+<li><strong>Archive Strategy</strong>: Move rather than delete for recovery options</li>
+<li><strong>Testing</strong>: Validate system functionality after each phase</li>
+<li><strong>Rollback Plan</strong>: Maintain archive structure for 30 days</li>
+</ul>
+<h2 id="automation-opportunities">Automation Opportunities</h2>
+<h3 id="implement-cleanup-policies">Implement Cleanup Policies</h3>
+<h4 id="log-rotation-policy">Log Rotation Policy</h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Add to cron job
+0 2 * * * find /Volumes/DATA/GitHub/StackTrackr -name "*.log" -mtime +7 -exec mv {} /archive/old-logs/ \;</code></pre>
+</code></pre>
+<h4 id="backup-cleanup-policy">Backup Cleanup Policy</h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Keep only last 10 backups
+ls -t /backups/unified/ | tail -n +11 | xargs -I {} mv /backups/unified/{} /archive/old-backups/</code></pre>
+</code></pre>
+<h4 id="development-file-cleanup">Development File Cleanup</h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Monthly cleanup of temp files
+find /Volumes/DATA/GitHub/StackTrackr -name "*.tmp" -o -name "*.temp" -o -name ".DS_Store" -delete</code></pre>
+</code></pre>
+<h3 id="monitoring-and-alerts">Monitoring and Alerts</h3>
+<h4 id="disk-usage-monitoring">Disk Usage Monitoring</h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Alert when project size exceeds 3GB
+du -sh /Volumes/DATA/GitHub/StackTrackr | awk '$1 > "3G" {print "Project size warning: " $1}'</code></pre>
+</code></pre>
+<h2 id="implementation-timeline">Implementation Timeline</h2>
+<h3 id="week-1-safe-cleanup">Week 1: Safe Cleanup</h3>
+<ul>
+<li>✅ <strong>Day 1</strong>: Archive test files and development artifacts</li>
+<li>✅ <strong>Day 2</strong>: Clean old log files and temporary files  </li>
+<li>✅ <strong>Day 3</strong>: Consolidate backup directories</li>
+<li>✅ <strong>Day 4</strong>: Remove deprecated scripts (with archival)</li>
+<li>✅ <strong>Day 5</strong>: Validate system functionality</li>
+</ul>
+<h3 id="week-2-sqlite-migration">Week 2: SQLite Migration</h3>
+<ul>
+<li><strong>Day 1-3</strong>: Complete SQLite migration (see SQLITE_MIGRATION_PLAN.md)</li>
+<li><strong>Day 4-5</strong>: Archive JSON memory files post-migration</li>
+</ul>
+<h3 id="week-3-automation-and-policies">Week 3: Automation and Policies</h3>
+<ul>
+<li><strong>Day 1-2</strong>: Implement automated cleanup policies</li>
+<li><strong>Day 3-4</strong>: Setup monitoring and alerts</li>
+<li><strong>Day 5</strong>: Documentation updates and team training</li>
+</ul>
+<h2 id="success-metrics">Success Metrics</h2>
+<ul>
+<li>✅ <strong>Storage Reduction</strong>: Achieve 25%+ space savings</li>
+<li>✅ <strong>File Count</strong>: Reduce total files by 40%+</li>
+<li>✅ <strong>Search Performance</strong>: Improve project search speed by 50%+</li>
+<li>✅ <strong>Backup Speed</strong>: Reduce backup time by 60%+</li>
+<li>✅ <strong>System Stability</strong>: Maintain 100% system functionality</li>
+<li>✅ <strong>Team Productivity</strong>: Improve project navigation experience</li>
+</ul>
+<h2 id="validation-commands">Validation Commands</h2>
+<h3 id="before-cleanup-snapshot">Before Cleanup Snapshot</h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Take baseline measurements
+du -sh /Volumes/DATA/GitHub/StackTrackr > cleanup_baseline.txt
+find /Volumes/DATA/GitHub/StackTrackr -type f | wc -l >> cleanup_baseline.txt</code></pre>
+</code></pre>
+<h3 id="after-cleanup-validation">After Cleanup Validation</h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Measure improvement
+du -sh /Volumes/DATA/GitHub/StackTrackr > cleanup_results.txt
+find /Volumes/DATA/GitHub/StackTrackr -type f | wc -l >> cleanup_results.txt
+
+# Test system functionality
+cd /Volumes/DATA/GitHub/StackTrackr/rEngine
+node test-mcp-connection.js
+node test-memory.js
+./health-monitor.sh</code></pre>
+</code></pre>
+<h2 id="archive-directory-structure">Archive Directory Structure</h2>
+<pre><code><pre><code class="language-">/archive/
+├── testing/
+│   ├── test_bundle/
+│   ├── benchmark_results/
+│   └── rEngine_test_scripts/
+├── development/
+│   ├── memory-backups/
+│   ├── rengine-runtime/
+│   └── node_modules_snapshots/
+├── deprecated-scripts/
+│   ├── claude-agent-init.js
+│   ├── enhanced-scripts/
+│   └── legacy-interfaces/
+├── old-logs/
+│   ├── document-sweep-logs/
+│   ├── system-logs/
+│   └── backup-logs/
+└── old-backups/
+    ├── pre-cleanup-snapshots/
+    └── legacy-backup-systems/</code></pre>
+</code></pre>
+<p>This cleanup plan provides comprehensive file organization while maintaining system integrity and enabling easy recovery if needed.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>CLEANUP.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-19</p>
+        </footer>
+    </div>
+</body>
+</html>

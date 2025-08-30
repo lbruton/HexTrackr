@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>`visible-memory-writer.js` Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>`visible-memory-writer.js` Documentation</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 visible-memory-writer.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 4KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../generated/visible-memory-writer.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/visible-memory-writer.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="visible-memory-writerjs-documentation"><code>visible-memory-writer.js</code> Documentation</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>VisibleMemoryWriter</code> class is a utility that simplifies the process of writing data to a file on the file system. It provides a standardized way to log the write operation and display relevant information, making it easier to track and debug memory-related tasks in your application.</p>
+<p>The primary use case for this class is to handle the writing of application state or configuration data to a file, ensuring that the process is well-documented and consistent across your codebase.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>VisibleMemoryWriter</code> class has a single static method, <code>writeWithNotification</code>, which takes the following parameters:</p>
+<ul>
+<li><code>file</code>: The path to the file where the data will be written.</li>
+<li><code>data</code>: The data to be written, which will be converted to a JSON string.</li>
+<li><code>operation</code> (optional): The type of write operation being performed, such as &quot;write&quot; or &quot;update&quot;. This is used for logging purposes.</li>
+</ul>
+<p>The method performs the following steps:</p>
+<ol>
+<li>Logs the start of the write operation, including the file path, operation type, and the size of the data being written.</li>
+<li>Uses the <code>fs-extra</code> library to write the JSON-encoded data to the specified file.</li>
+<li>Logs a success message once the write operation is complete.</li>
+</ol>
+<p>The class exports the <code>VisibleMemoryWriter</code> class, which can be imported and used throughout your application.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>VisibleMemoryWriter</code> class has the following dependencies:</p>
+<ul>
+<li><code>fs-extra</code>: A file system library that provides additional functionality on top of the built-in <code>fs</code> module.</li>
+</ul>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="visiblememorywriterwritewithnotificationfile-data-operation--write"><code>VisibleMemoryWriter.writeWithNotification(file, data, operation = &#39;write&#39;)</code></h3>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>file</code> (string): The path to the file where the data will be written.</li>
+<li><code>data</code> (any): The data to be written, which will be converted to a JSON string.</li>
+<li><code>operation</code> (string, optional): The type of write operation being performed, such as &quot;write&quot; or &quot;update&quot;. Defaults to &quot;write&quot;.</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: This method does not return a value, but writes the data to the specified file.</li>
+<li><strong>Description</strong>: This method logs the start of the write operation, writes the JSON-encoded data to the file, and logs a success message upon completion.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>Here are some examples of how to use the <code>VisibleMemoryWriter</code> class:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const VisibleMemoryWriter = require('./visible-memory-writer');
+
+// Write application configuration to a file
+const config = {
+  port: 3000,
+  database: {
+    host: 'localhost',
+    user: 'myuser',
+    password: 'mypassword'
+  }
+};
+
+await VisibleMemoryWriter.writeWithNotification('config.json', config);
+
+// Update a user's profile information
+const userData = {
+  name: 'John Doe',
+  email: 'john.doe@example.com',
+  age: 35
+};
+
+await VisibleMemoryWriter.writeWithNotification('user-profile.json', userData, 'update');</code></pre>
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>VisibleMemoryWriter</code> class does not require any specific configuration. It uses the <code>fs-extra</code> library, which may have its own configuration options, but these are not managed by the <code>VisibleMemoryWriter</code> class.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>VisibleMemoryWriter.writeWithNotification</code> method does not explicitly handle errors. If an error occurs during the write operation, it will be thrown and can be caught by the calling code. For example:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">try {
+  await VisibleMemoryWriter.writeWithNotification('non-existent-directory/file.json', data);
+} catch (err) {
+  console.error('Error writing file:', err);
+}</code></pre>
+</code></pre>
+<h2 id="integration">Integration</h2>
+<p>The <code>VisibleMemoryWriter</code> class is designed to be a standalone utility that can be used throughout your application to handle the writing of data to files. It can be integrated into any part of your codebase that requires persistent storage of application state or configuration data.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ul>
+<li>The <code>VisibleMemoryWriter</code> class uses ANSI escape codes to colorize the console output, which may not be compatible with all terminal environments. Consider adding support for alternative logging methods, such as using a logging library, if you need to ensure consistent output across different environments.</li>
+<li>The class currently only supports writing data to files, but you could extend it to support other types of persistent storage, such as databases or cloud storage services, if needed.</li>
+<li>The class does not currently provide any options for configuring the logging behavior, such as the level of detail or the formatting of the output. You may want to add these features if you need more control over the logging process.</li>
+</ul>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>visible-memory-writer.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

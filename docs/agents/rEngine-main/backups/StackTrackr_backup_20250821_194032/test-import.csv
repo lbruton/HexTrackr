@@ -1,0 +1,3 @@
+Metal,Name,Qty,Type,Weight(oz),Purchase Price,Spot Price ($/oz),Premium ($/oz),Total Premium,Purchase Location,Storage Location,N#,Collectable,Notes,Date
+Silver,Test Coin,1,Coin,1.0,35.00,30.00,5.00,5.00,Test Shop,Home Safe,,Yes,Test import data,2025-08-18
+Gold,Test Bar,1,Bar,0.1,250.00,2400.00,100.00,10.00,Online,Bank Box,,No,Another test item,2025-08-17

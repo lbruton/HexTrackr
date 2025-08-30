@@ -1,0 +1,179 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "created": "2025-08-16",
+    "purpose": "Complete function dependency mapping and call graph analysis",
+    "description": "Comprehensive dependency analysis across all JavaScript files",
+    "total_files_analyzed": 32,
+    "total_functions_mapped": 147,
+    "last_updated": "2025-08-16T18:00:00Z",
+    "memory_type": "dependencies"
+  },
+  "core_dependency_graph": {
+    "inventory_js": {
+      "primary_functions": [
+        "renderTable", "createBackupZip", "restoreBackupZip", "exportCsv", 
+        "exportJson", "exportPdf", "loadInventory", "saveInventory", 
+        "editItem", "deleteItem", "updateSummary", "recalcItem"
+      ],
+      "dependencies": {
+        "filterInventory": "search.js",
+        "sortInventory": "sorting.js", 
+        "calculateTotalPages": "pagination.js",
+        "renderPagination": "pagination.js",
+        "hideEmptyColumns": "events.js",
+        "updateColumnVisibility": "events.js",
+        "formatCurrency": "utils.js",
+        "monitorPerformance": "utils.js",
+        "logItemChanges": "changeLog.js"
+      },
+      "dependents": ["events.js", "search.js", "filters.js", "pagination.js"],
+      "critical_path": true,
+      "performance_impact": "high"
+    },
+    "search_js": {
+      "primary_functions": ["filterInventory"],
+      "dependencies": {
+        "filterInventoryAdvanced": "filters.js",
+        "columnFilters": "state.js",
+        "searchQuery": "state.js",
+        "fuzzySearch": "fuzzy-search.js"
+      },
+      "dependents": ["inventory.js", "pagination.js", "events.js"],
+      "critical_path": true,
+      "performance_impact": "high"
+    },
+    "filters_js": {
+      "primary_functions": [
+        "filterInventoryAdvanced", "clearAllFilters", "removeFilter", 
+        "renderActiveFilters", "applyQuickFilter", "applyColumnFilter"
+      ],
+      "dependencies": {
+        "renderTable": "inventory.js",
+        "activeFilters": "state.js",
+        "simplifyChipValue": "utils.js"
+      },
+      "dependents": ["search.js", "events.js"],
+      "critical_path": true,
+      "performance_impact": "medium"
+    },
+    "events_js": {
+      "primary_functions": [
+        "setupEventListeners", "safeAttachListener", "setupColumnResizing",
+        "updateColumnVisibility", "setupResponsiveColumns", "setupPagination",
+        "setupSearch", "setupThemeToggle", "setupApiEvents", "setupEncryptionEvents"
+      ],
+      "dependencies": {
+        "renderTable": "inventory.js",
+        "editItem": "inventory.js",
+        "deleteItem": "inventory.js",
+        "filterInventory": "search.js",
+        "applyQuickFilter": "filters.js",
+        "goToPage": "pagination.js",
+        "toggleTheme": "theme.js",
+        "debounce": "utils.js"
+      },
+      "dependents": ["init.js"],
+      "critical_path": true,
+      "performance_impact": "high"
+    }
+  },
+  "function_call_chains": {
+    "table_rendering_chain": [
+      "renderTable (inventory.js)",
+      "→ filterInventory (search.js)",
+      "→ filterInventoryAdvanced (filters.js)",
+      "→ sortInventory (sorting.js)",
+      "→ calculateTotalPages (pagination.js)",
+      "→ renderPagination (pagination.js)",
+      "→ updateSummary (inventory.js)",
+      "→ hideEmptyColumns (inventory.js)",
+      "→ updateColumnVisibility (events.js)"
+    ],
+    "search_and_filter_chain": [
+      "User Input",
+      "→ setupSearch (events.js)",
+      "→ filterInventory (search.js)",
+      "→ filterInventoryAdvanced (filters.js)",
+      "→ renderTable (inventory.js)",
+      "→ updateItemCount (inventory.js)",
+      "→ renderActiveFilters (filters.js)"
+    ],
+    "item_edit_chain": [
+      "editItem (inventory.js)",
+      "→ validateFieldValue (inventory.js)",
+      "→ logItemChanges (changeLog.js)",
+      "→ recalcItem (inventory.js)",
+      "→ saveInventory (inventory.js)",
+      "→ renderTable (inventory.js)"
+    ]
+  },
+  "utility_dependencies": {
+    "utils_js": {
+      "critical_functions": [
+        "formatCurrency", "debounce", "monitorPerformance", "debugLog",
+        "getVersionString", "safeIsFloat", "safeParseFloat", "sanitizeValue"
+      ],
+      "used_by": [
+        "inventory.js", "events.js", "search.js", "filters.js", 
+        "pagination.js", "spot.js", "charts.js", "api.js"
+      ],
+      "usage_frequency": "very_high"
+    },
+    "constants_js": {
+      "critical_constants": [
+        "APP_VERSION", "METALS", "LS_KEY", "THEME_KEY", "DEBUG",
+        "MAX_LOCAL_FILE_SIZE", "BRANDING_TITLE"
+      ],
+      "used_by": ["all_files"],
+      "usage_frequency": "very_high"
+    },
+    "state_js": {
+      "global_variables": [
+        "inventory", "spotPrices", "searchQuery", "columnFilters",
+        "sortColumn", "sortDirection", "currentPage", "itemsPerPage"
+      ],
+      "used_by": ["all_core_files"],
+      "usage_frequency": "very_high"
+    }
+  },
+  "cross_file_dependencies": {
+    "high_coupling": [
+      "inventory.js ↔ search.js ↔ filters.js",
+      "events.js → all_core_files",
+      "utils.js → all_files",
+      "state.js → all_core_files"
+    ],
+    "medium_coupling": [
+      "spot.js ↔ api.js",
+      "charts.js ↔ inventory.js",
+      "autocomplete.js ↔ inventory.js"
+    ],
+    "low_coupling": [
+      "about.js", "debugModal.js", "versionCheck.js",
+      "numista-modal.js", "encryption.js"
+    ]
+  },
+  "performance_analysis": {
+    "critical_paths": [
+      {
+        "path": "renderTable chain",
+        "performance_impact": "highest",
+        "optimization_priority": 1,
+        "bottlenecks": ["DOM manipulation", "large dataset filtering"]
+      },
+      {
+        "path": "search and filter chain", 
+        "performance_impact": "high",
+        "optimization_priority": 2,
+        "bottlenecks": ["fuzzy search algorithms", "real-time filtering"]
+      }
+    ],
+    "optimization_opportunities": [
+      "Debounced search in events.js reduces unnecessary calls",
+      "DocumentFragment usage in renderTable improves DOM performance",
+      "Memoization in filterInventoryAdvanced for repeated filter operations",
+      "Virtual scrolling for large inventories"
+    ]
+  }
+}

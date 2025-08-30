@@ -1,0 +1,39 @@
+{
+  "target_database": "agents/memory.sqlite",
+  "sqlite_operations": [
+    {
+      "table": "agent_memories",
+      "operation": "INSERT",
+      "where_clause": "agent_id = 'github_copilot'",
+      "data": {
+        "observation": "Successfully integrated MemoryChangeBundle format for standardized LLM collaboration",
+        "timestamp": "2024-01-01T00:00:00Z",
+        "version": 4
+      }
+    },
+    {
+      "table": "agent_memories", 
+      "operation": "UPDATE",
+      "where_clause": "agent_id = 'github_copilot' AND id = 1",
+      "data": {
+        "last_interaction": "2024-01-01T00:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "dependencies",
+      "operation": "INSERT", 
+      "data": {
+        "component": "memory_collaboration",
+        "description": "MemoryChangeBundle RFC-6902 patch system",
+        "status": "integrated",
+        "features": ["json_patch", "sqlite_patch", "universal_export"]
+      }
+    }
+  ],
+  "validation": {
+    "check_constraints": true,
+    "verify_foreign_keys": true,
+    "rollback_on_error": true
+  }
+}

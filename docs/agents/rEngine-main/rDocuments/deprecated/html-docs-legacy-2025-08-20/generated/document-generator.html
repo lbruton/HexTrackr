@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>document-generator - StackTrackr Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #667eea;
+            --rengine-secondary: #764ba2;
+            --rengine-accent: #495057;
+            --rengine-accent-light: #6c757d;
+            --status-success: #28a745;
+            --status-warning: #ffc107;
+            --status-danger: #dc3545;
+            --status-info: #007acc;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-muted: #888;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --border-color: #e1e4e8;
+            --shadow-heavy: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--rengine-primary) 0%, var(--rengine-secondary) 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            border-radius: 15px;
+            box-shadow: var(--shadow-heavy);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--rengine-accent) 0%, var(--rengine-accent-light) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: var(--bg-secondary);
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: var(--status-info);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3 { 
+            color: var(--text-primary); 
+            margin-top: 2em; 
+            margin-bottom: 0.5em; 
+        }
+        .content h1 { font-size: 2em; border-bottom: 2px solid var(--rengine-primary); padding-bottom: 0.5em; }
+        .content h2 { font-size: 1.5em; }
+        .content h3 { font-size: 1.3em; }
+        
+        .content pre { 
+            background: var(--bg-secondary); 
+            padding: 1em; 
+            border-radius: 5px; 
+            overflow-x: auto; 
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+        }
+        
+        .content code { 
+            background: var(--bg-secondary); 
+            padding: 0.2em 0.4em; 
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        .content blockquote {
+            border-left: 4px solid var(--rengine-primary);
+            margin: 1em 0;
+            padding-left: 1em;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 1em 1em 1em 2em;
+            border-radius: 5px;
+        }
+        
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .content th, .content td {
+            border: 1px solid var(--border-color);
+            padding: 0.75em;
+            text-align: left;
+        }
+        
+        .content th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content a {
+            color: var(--status-info);
+            text-decoration: none;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
+        .metadata {
+            background: var(--bg-secondary);
+            padding: 1em;
+            border-radius: 5px;
+            margin-bottom: 2em;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .footer {
+            background: var(--bg-secondary);
+            padding: 20px 30px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .footer .branding {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .footer .system-name {
+            font-weight: 600;
+            color: var(--rengine-accent);
+        }
+
+        .footer .version {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .footer .divider {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .nav-bar {
+                padding: 10px 20px;
+            }
+            
+            .footer .branding {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>document-generator</h1>
+            <div class="subtitle">StackTrackr Documentation</div>
+            <div class="meta">
+                <span>📁 document-generator.md</span>
+                <span>📅 2025-08-20</span>
+                
+            </div>
+        </header>
+        
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../../html-docs/documentation.html" class="nav-link">🏠 Documentation Portal</a>
+                <a href="../index.html" class="nav-link">📚 All Docs</a>
+                <a href="../../html-docs/developmentstatus.html" class="nav-link">📊 Development Status</a>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <div class="metadata">
+                <strong>📂 Source File:</strong> document-generator.md | 
+                <strong>🕒 Generated:</strong> 8/19/2025, 9:43:10 PM |
+                <strong>🎨 Engine:</strong> Gemini HTML Converter
+            </div>
+            ```html
+<h1>Document Generator</h1>
+
+<h2>Overview</h2>
+
+<p>The <code>document-generator.js</code> script is a powerful tool that automatically generates high-quality documentation for any given JavaScript script. It leverages the capabilities of the Gemini or Groq AI-powered language models to create detailed, markdown-formatted documentation that includes an overview, usage instructions, a breakdown of the core logic, configuration details, and a machine-readable summary.</p>
+
+<p>This script is part of a larger "BrainShare System" that provides various utilities and services to manage and document a software project. By automating the documentation process, this tool helps ensure that all scripts in the system are accompanied by clear, comprehensive, and up-to-date documentation.</p>
+
+<h2>How to Use</h2>
+
+<p>To generate documentation for a script, run the <code>document-generator.js</code> script from the command line, passing the path to the target script file as an argument:</p>
+
+<pre><code class="language-bash">node document-generator.js /path/to/your-script.js
+</code></pre>
+
+<p>This will create a new Markdown file in the <code>docs/generated</code> directory, with the same name as the source script but with a <code>.md</code> extension. The generated documentation will be saved to this file.</p>
+
+<p>Example usage:</p>
+
+<pre><code class="language-bash">node document-generator.js ./my-awesome-script.js
+</code></pre>
+
+<h2>Core Logic Breakdown</h2>
+
+<p>The <code>DocumentManager</code> class is the main component of this script. It is responsible for the following tasks:</p>
+
+<ol>
+  <li><strong>Configuration Loading</strong>: The constructor reads the <code>system-config.json</code> file to get the necessary configuration options, such as the API endpoint, model, and provider (Gemini or Groq).</li>
+  <li><strong>API Key Management</strong>: The constructor also retrieves the appropriate API key (either <code>GEMINI_API_KEY</code> or <code>GROQ_API_KEY</code>) from the <code>.env</code> file based on the configured provider.</li>
+  <li><strong>Documentation Generation</strong>: The <code>generate()</code> method is the main entry point for the documentation generation process. It takes the path to the target script file as an argument, reads the file content, and creates a prompt for the language model. It then sends the prompt to the configured API endpoint and saves the generated documentation to a Markdown file.</li>
+  <li><strong>Prompt Creation</strong>: The <code>createPrompt()</code> method constructs the prompt for the language model, which includes instructions for the desired documentation structure and the full script content.</li>
+  <li><strong>Documentation Saving</strong>: The <code>saveDocumentation()</code> method saves the generated documentation to a Markdown file in the <code>docs/generated</code> directory, relative to the script's location.</li>
+  <li><strong>System Information Update</strong>: The <code>updateGeneratedSystemInfo()</code> method updates the <code>generated-system-info.json</code> file with the machine-readable summary extracted from the generated documentation.</li>
+</ol>
+
+<p>The script also includes some error handling and command-line execution logic to handle the case where no file path is provided.</p>
+
+<h2>Configuration &amp; Dependencies</h2>
+
+<p>The <code>document-generator.js</code> script relies on the following external dependencies:</p>
+
+<ul>
+  <li><code>fs-extra</code>: Provides an enhanced file system API with additional utilities.</li>
+  <li><code>path</code>: Handles file and directory paths.</li>
+  <li><code>axios</code>: Sends HTTP requests to the Gemini or Groq API.</li>
+  <li><code>dotenv</code>: Loads environment variables from the <code>.env</code> file.</li>
+</ul>
+
+<p>The script also uses the <code>system-config.json</code> file to retrieve configuration options, such as the API endpoint, model, and provider. This file is expected to be present in the same directory as the <code>document-generator.js</code> script.</p>
+
+<p>The required environment variables are:</p>
+
+<ul>
+  <li><code>GEMINI_API_KEY</code>: The API key for the Gemini language model.</li>
+  <li><code>GROQ_API_KEY</code>: The API key for the Groq language model.</li>
+</ul>
+
+<h2>Machine-Readable Summary</h2>
+
+<pre><code class="language-json">{
+  "scriptName": "document-generator.js",
+  "purpose": "Automatically generates high-quality documentation for any given JavaScript script using AI-powered language models.",
+  "inputs": {
+    "arguments": [
+      {
+        "name": "filePath",
+        "description": "The path to the script file to be documented."
+      }
+    ],
+    "dependencies": [
+      "fs-extra",
+      "path",
+      "axios",
+      "dotenv"
+    ],
+    "configuration": {
+      "system-config.json": {
+        "brainShareSystem": {
+          "documentManager": {
+            "api": {
+              "endpoint": "The API endpoint for the language model",
+              "model": "The name of the language model to use",
+              "provider": "The provider of the language model ('gemini' or 'groq')"
+            }
+          },
+          "storage": {
+            "memoryDirectory": "The directory where generated documentation is stored"
+          }
+        }
+      },
+      "environment variables": {
+        "GEMINI_API_KEY": "The API key for the Gemini language model",
+        "GROQ_API_KEY": "The API key for the Groq language model"
+      }
+    }
+  },
+  "outputs": {
+    "files": [
+      {
+        "name": "{scriptName}.md",
+        "description": "The generated Markdown documentation for the script"
+      },
+      {
+        "name": "generated-system-info.json",
+        "description": "An updated JSON file containing metadata about all generated scripts in the system"
+      }
+    ]
+  }
+}
+</code></pre>
+
+<h2>Error Handling</h2>
+
+<p>The <code>document-generator.js</code> script includes the following error handling mechanisms:</p>
+
+<ol>
+  <li><strong>Missing system-config.json</strong>: If the <code>system-config.json</code> file is not found, the script will exit with an error message.</li>
+  <li><strong>Missing API key</strong>: If the required API key (either <code>GEMINI_API_KEY</code> or <code>GROQ_API_KEY</code>) is not found in the <code>.env</code> file, the script will exit with an error message.</li>
+  <li><strong>File not found</strong>: If the provided file path does not exist, the script will display an error message.</li>
+  <li><strong>API errors</strong>: If an error occurs during the API request (either Gemini or Groq), the script will log the error details.</li>
+  <li><strong>Parsing errors</strong>: If the machine-readable summary cannot be parsed from the generated documentation, the script will log a warning message.</li>
+</ol>
+
+<h2>Integration</h2>
+
+<p>The <code>document-generator.js</code> script is part of a larger "BrainShare System" that provides various utilities and services to manage and document a software project. It is designed to be used as a standalone tool to generate documentation for any JavaScript script, but it can also be integrated into a broader system or workflow.</p>
+
+<p>For example, the <code>document-generator.js</code> script could be incorporated into a continuous integration (CI) pipeline, automatically generating documentation for all scripts in the project whenever changes are made. The generated documentation files could then be committed to the project's repository, ensuring that the documentation is always up-to-date and accessible to the development team.</p>
+
+<h2>Development Notes</h2>
+
+<ol>
+  <li><strong>API Provider Selection</strong>: The script supports both Gemini and Groq language models, allowing users to choose the provider that best suits their needs. The provider is determined by the <code>brainShareSystem.documentManager.api.provider</code> configuration in the <code>system-config.json</code> file.</li>
+  <li><strong>Relative File Paths</strong>: The script generates documentation files in the <code>docs/generated</code> directory, relative to the location of the <code>document-generator.js</code> script. This allows the generated documentation to be easily integrated into the project's file structure.</li>
+  <li><strong>Machine-Readable Summary</strong>: The script extracts a machine-readable JSON summary from the generated documentation and updates the <code>generated-system-info.json</code> file. This can be useful for programmatically accessing and processing information about the documented scripts.</li>
+  <li><strong>Extensibility</strong>: The <code>DocumentManager</code> class is designed to be extensible, allowing for potential future improvements or the addition of new features, such as support for additional language models or more customizable documentation templates.</li>
+  <li><strong>Error Handling Robustness</strong>: The script includes thorough error handling to ensure that it can gracefully handle a variety of issues, such as missing configuration files, missing API keys, and API errors. This makes the script more resilient and user-friendly.</li>
+  <li><strong>Dependency Management</strong>: The script uses standard Node.js dependency management techniques, with external dependencies declared in the <code>package.json</code> file and loaded using <code>import</code> statements. This ensures that the script can be easily integrated into other projects or distributed as a standalone utility.</li>
+</ol>
+```
+        </main>
+        
+        <footer class="footer">
+            <div class="branding">
+                <span>Generated from the <span class="system-name">rScribe Document System</span></span>
+                <span class="divider">•</span>
+                <span class="system-name">rEngine</span> <span class="version">(v2.1.0)</span>
+                <span class="divider">•</span>
+                <span>Last updated: 2025-08-20</span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

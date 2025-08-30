@@ -1,0 +1,10 @@
+{
+    "provider": "ollama",
+    "model": "qwen2.5:3b",
+    "execution_time_seconds": 47,
+    "word_count":      973,
+    "character_count":     7930,
+    "line_count":      280,
+    "timestamp": "2025-08-17T07:03:37-05:00",
+    "words_per_second": 20.70
+}

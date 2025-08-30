@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Scribe Dashboard Server Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Memory Scribe Dashboard Server Documentation</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 dashboard-server_chunk.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 10KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rMemory/memory-scribe/dashboard-server_chunk.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/dashboard-server_chunk.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="memory-scribe-dashboard-server-documentation">Memory Scribe Dashboard Server Documentation</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>dashboard-server.js</code> script is a part of the Memory Scribe system, which provides a real-time monitoring and control interface for the Memory Scribe process. This server-side script sets up an HTTP server that exposes various API endpoints for managing the Memory Scribe, analyzing the context, cleaning up memory, and performing other related tasks.</p>
+<p>The key responsibilities of this script include:</p>
+<ol>
+<li>Starting and stopping the Memory Scribe process</li>
+<li>Analyzing the context and generating reports</li>
+<li>Cleaning up and archiving old conversation data and memory items</li>
+<li>Providing a search interface to explore conversations and memory</li>
+<li>Allowing users to flag items for review or action</li>
+</ol>
+<p>By running this dashboard server, developers and administrators can monitor the health and status of the Memory Scribe, as well as perform various management and maintenance tasks to ensure the smooth operation of the overall system.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>dashboard-server.js</code> script is built using Node.js and the Express.js web framework. It defines a <code>MemoryScribeDashboardServer</code> class that encapsulates the server&#39;s functionality.</p>
+<p>The main components of the script are:</p>
+<ol>
+<li><strong>Server Setup</strong>: The <code>start()</code> method sets up the Express.js server and starts listening on the configured port.</li>
+<li><strong>Memory Scribe Management</strong>: The <code>startMemoryScribe()</code> and <code>stopMemoryScribe()</code> methods allow starting and stopping the Memory Scribe process.</li>
+<li><strong>Context Analysis</strong>: The <code>analyzeContext()</code> method runs the context analysis and returns the results.</li>
+<li><strong>Memory Cleanup</strong>: The <code>cleanupMemory()</code> method archives old conversation and memory data based on the configured retention policy.</li>
+<li><strong>Search and Flagging</strong>: The <code>performSearch()</code> and <code>flagItem()</code> methods provide search functionality and the ability to flag items for review.</li>
+<li><strong>Utility Methods</strong>: The script includes several utility methods for working with files, reading/writing JSON data, and extracting text snippets.</li>
+</ol>
+<p>The script also includes the code for a basic <code>ContextLifecycleManager</code> class, which is responsible for managing the lifecycle configuration and performing cleanup tasks.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>dashboard-server.js</code> script has the following dependencies:</p>
+<ol>
+<li><code>fs</code>: Node.js built-in file system module</li>
+<li><code>path</code>: Node.js built-in path module</li>
+<li><code>child_process</code>: Node.js built-in child process module (used for executing external commands)</li>
+</ol>
+<p>The script also makes use of the following external dependencies:</p>
+<ol>
+<li><code>express</code>: Web framework for Node.js</li>
+</ol>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="memoryscribedashboardserver-class"><code>MemoryScribeDashboardServer</code> Class</h3>
+<p>This is the main class that encapsulates the server&#39;s functionality.</p>
+<p><strong>Constructor</strong>:</p>
+<ul>
+<li><code>constructor(port = 3000)</code>: Initializes the server with the specified port number (default is 3000).</li>
+</ul>
+<p><strong>Public Methods</strong>:</p>
+<ol>
+<li><code>startMemoryScribe()</code>: Starts the Memory Scribe process, ensuring that the <code>context-lifecycle.js</code> file exists and creating it if necessary.</li>
+<li><code>stopMemoryScribe()</code>: Stops the running Memory Scribe process.</li>
+<li><code>analyzeContext()</code>: Runs the context analysis and returns the results.</li>
+<li><code>cleanupMemory()</code>: Performs cleanup by archiving old conversation and memory data based on the configured retention policy.</li>
+<li><code>testOllama()</code>: Checks if the Ollama tool is available and returns its version.</li>
+<li><code>saveConfig(config)</code>: Saves the provided configuration to the <code>lifecycle-config.json</code> file.</li>
+<li><code>performSearch(query)</code>: Searches for the given query in conversations and memory, and returns the results.</li>
+<li><code>flagItem({ type, id, action, reason })</code>: Flags an item (conversation or memory) with the specified action and reason.</li>
+</ol>
+<p><strong>Utility Methods</strong>:</p>
+<ul>
+<li><code>checkFileExists(filename)</code>: Checks if the specified file exists.</li>
+<li><code>readJSONFile(filename)</code>: Reads and parses the JSON content of the specified file.</li>
+<li><code>writeJSONFile(filename, data)</code>: Writes the provided data to the specified JSON file.</li>
+<li><code>getBackupCount()</code>: Returns the number of backup files in the <code>backups</code> directory.</li>
+<li><code>extractSnippet(text, query)</code>: Extracts a snippet of text around the provided query.</li>
+<li><code>createContextLifecycle()</code>: Creates a basic <code>context-lifecycle.js</code> file with default configuration.</li>
+</ul>
+<h3 id="contextlifecyclemanager-class"><code>ContextLifecycleManager</code> Class</h3>
+<p>This class is responsible for managing the context lifecycle configuration and performing cleanup tasks.</p>
+<p><strong>Constructor</strong>:</p>
+<ul>
+<li><code>constructor()</code>: Initializes the class with the paths for the configuration file, flagged items file, and cleanup log file.</li>
+</ul>
+<p><strong>Public Methods</strong>:</p>
+<ul>
+<li><code>initialize()</code>: Ensures that the <code>lifecycle-config.json</code> file exists with default configuration.</li>
+<li><code>getConfig()</code>: Reads and returns the configuration from the <code>lifecycle-config.json</code> file.</li>
+<li><code>performCleanup()</code>: Performs the cleanup process based on the configured retention policy.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="starting-the-memory-scribe-dashboard-server">Starting the Memory Scribe Dashboard Server</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const server = new MemoryScribeDashboardServer();
+server.start();</code></pre>
+</code></pre>
+<p>This will start the Memory Scribe Dashboard server and listen for incoming requests on the configured port (default is 3000).</p>
+<h3 id="starting-the-memory-scribe-process">Starting the Memory Scribe Process</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const result = await server.startMemoryScribe();
+if (result.success) {
+    console.log(result.message);
+} else {
+    console.error(result.message);
+}</code></pre>
+</code></pre>
+<p>This will start the Memory Scribe process and return the result as an object with <code>success</code> and <code>message</code> properties.</p>
+<h3 id="performing-context-analysis">Performing Context Analysis</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const result = await server.analyzeContext();
+if (result.success) {
+    console.log(result.analysis);
+} else {
+    console.error(result.error);
+}</code></pre>
+</code></pre>
+<p>This will run the context analysis and return the results or an error message.</p>
+<h3 id="cleaning-up-memory">Cleaning up Memory</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const result = await server.cleanupMemory();
+if (result.success) {
+    console.log(`Archived ${result.archived} items`);
+} else {
+    console.error(result.error);
+}</code></pre>
+</code></pre>
+<p>This will perform the memory cleanup process and return the number of archived items or an error message.</p>
+<h3 id="searching-for-items">Searching for Items</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const result = await server.performSearch('example query');
+if (result.error) {
+    console.error(result.error);
+} else {
+    console.log(result.results);
+}</code></pre>
+</code></pre>
+<p>This will search for the provided query in conversations and memory, and return the search results.</p>
+<h3 id="flagging-an-item">Flagging an Item</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const result = await server.flagItem({
+    type: 'conversation',
+    id: '123',
+    action: 'review',
+    reason: 'Contains sensitive information'
+});
+
+if (result.success) {
+    console.log(result.message);
+} else {
+    console.error(result.error);
+}</code></pre>
+</code></pre>
+<p>This will flag the specified item (conversation or memory) with the provided action and reason.</p>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>dashboard-server.js</code> script uses the following configuration options:</p>
+<ol>
+<li><strong>Port</strong>: The port on which the server will listen for incoming requests. This can be set in the constructor of the <code>MemoryScribeDashboardServer</code> class.</li>
+<li><strong>Lifecycle Configuration</strong>: The <code>ContextLifecycleManager</code> class manages the lifecycle configuration, which includes the following options:<ul>
+<li><code>retentionDays</code>: The number of days to retain conversation and memory data.</li>
+<li><code>foreverMode</code>: If set to <code>true</code>, the cleanup process will be skipped, and all data will be retained.</li>
+<li><code>autoCleanup</code>: If set to <code>true</code>, the cleanup process will be automatically triggered at regular intervals.</li>
+<li><code>lastCleanup</code>: The timestamp of the last successful cleanup operation.</li>
+</ul>
+</li>
+</ol>
+<p>These configuration options can be modified by editing the <code>lifecycle-config.json</code> file or by using the <code>saveConfig()</code> method of the <code>MemoryScribeDashboardServer</code> class.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>dashboard-server.js</code> script includes various error handling mechanisms:</p>
+<ol>
+<li><strong>Memory Scribe Process Errors</strong>: If the Memory Scribe process encounters an error, the error will be logged to the console using the <code>console.error()</code> method.</li>
+<li><strong>Asynchronous Method Errors</strong>: Most asynchronous methods in the <code>MemoryScribeDashboardServer</code> class return an object with <code>success</code> and <code>error</code> or <code>message</code> properties, allowing the caller to handle errors appropriately.</li>
+<li><strong>File System Errors</strong>: When reading or writing files, the script handles potential errors and returns <code>null</code> or an error message, depending on the context.</li>
+</ol>
+<p>If an unhandled error occurs, the script will throw an error, which can be caught and handled by the calling code or the overall application.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>dashboard-server.js</code> script is designed to be a part of the larger Memory Scribe system. It integrates with the following components:</p>
+<ol>
+<li><strong>Memory Scribe Process</strong>: The script is responsible for starting, stopping, and monitoring the Memory Scribe process.</li>
+<li><strong>Context Analysis</strong>: The script can run the context analysis and return the results.</li>
+<li><strong>Data Storage</strong>: The script interacts with the <code>conversations.json</code>, <code>memory.json</code>, <code>patterns.json</code>, and <code>flagged-items.json</code> files to manage the data.</li>
+<li><strong>Configuration Management</strong>: The script reads and writes the <code>lifecycle-config.json</code> file to manage the context lifecycle configuration.</li>
+</ol>
+<p>By providing a centralized dashboard and management interface, the <code>dashboard-server.js</code> script allows developers and administrators to monitor and control the overall Memory Scribe system.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><strong>Ollama Dependency</strong>: The script assumes the presence of the Ollama tool, which is used for context analysis. If Ollama is not available, the <code>analyzeContext()</code> method will throw an error.</li>
+<li><strong>File Structure</strong>: The script assumes that all necessary files (configuration, data, and logs) are located in the same directory as the script itself.</li>
+<li><strong>Backup Management</strong>: The script includes a method to retrieve the number of backup files in the <code>backups</code> directory, but it does not currently include any logic for managing or cleaning up these backups.</li>
+<li><strong>Lifecycle Configuration</strong>: The <code>ContextLifecycleManager</code> class provides a basic implementation for managing the context lifecycle configuration. In a production environment, this class may need to be extended or replaced with a more sophisticated solution.</li>
+<li><strong>Security Considerations</strong>: The script does not currently include any authentication or authorization mechanisms. In a production environment, it is recommended to implement appropriate security measures to control access to the dashboard and its functionality.</li>
+</ol>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>dashboard-server_chunk.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

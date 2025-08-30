@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # Main API server (simulates AWS Lambda + API Gateway)
+  stacktrackr-api:
+    build: ./api
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - METALS_DEV_API_KEY=${METALS_DEV_API_KEY}
+      - METALS_API_KEY=${METALS_API_KEY}
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  # Redis for caching (simulates AWS ElastiCache)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+  # PostgreSQL for price history (simulates RDS/Turso)
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=stacktrackr_prices
+      - POSTGRES_USER=stacktrackr
+      - POSTGRES_PASSWORD=dev_password_change_in_prod
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # Web server for StackTrackr app (simulates S3/CloudFront)
+  stacktrackr-web:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ..:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - stacktrackr-api
+
+  # Price fetcher service (simulates CloudWatch scheduled Lambda)
+  price-fetcher:
+    build: ./api
+    command: node scripts/price-fetcher.js
+    environment:
+      - NODE_ENV=development
+      - METALS_DEV_API_KEY=${METALS_DEV_API_KEY}
+      - METALS_API_KEY=${METALS_API_KEY}
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://stacktrackr:dev_password_change_in_prod@postgres:5432/stacktrackr_prices
+      - FETCH_INTERVAL=300000  # 5 minutes for testing
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  postgres_data:

@@ -1,0 +1,585 @@
+{
+  "version": "1.0",
+  "description": "This file is an automatically generated catalog of all documented scripts in the system. It is maintained by the Document Manager and serves as a backup source of machine-readable information.",
+  "scripts": {
+    "mcp-fallback-handler.js": {
+      "scriptName": "mcp-fallback-handler.js",
+      "purpose": "Provides automatic fallback to local JSON memory files when the MCP server is unavailable for StackTrackr.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "command",
+            "type": "string",
+            "description": "The command to execute (test, search, handoff, emergency)"
+          },
+          {
+            "name": "searchTerm",
+            "type": "string",
+            "description": "The search term for memory retrieval (used with the 'search' command)"
+          }
+        ],
+        "dependencies": [
+          "fs/promises",
+          "path",
+          "child_process",
+          "url"
+        ],
+        "files": [
+          "/Volumes/DATA/GitHub/rEngine/rAgents/*",
+          "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/*",
+          "/Volumes/DATA/GitHub/rEngine/rEngine/recall.js"
+        ]
+      },
+      "outputs": {
+        "consoleOutput": {
+          "type": "JSON",
+          "description": "Status information, search results, or error messages."
+        }
+      }
+    },
+    "scribe-system-test.js": {
+      "scriptName": "scribe-system-test.js",
+      "purpose": "Tests the Smart Scribe (Ollama/Llama) and Document Generator (Gemini API) components of the StackTrackr system.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "child_process",
+          "fs-extra",
+          "path"
+        ],
+        "files": [
+          "/Volumes/DATA/GitHub/rEngine/rEngine/technical-knowledge.json",
+          "/Volumes/DATA/GitHub/rEngine/rEngine/search-optimization.json",
+          "/Volumes/DATA/GitHub/rEngine/rEngine/document-generator.js",
+          "/Volumes/DATA/GitHub/rEngine/docs/generated/*.md",
+          "/Volumes/DATA/GitHub/rEngine/rEngine/*.js"
+        ]
+      },
+      "outputs": {
+        "consoleOutput": "Test results and recommendations.",
+        "files": []
+      }
+    },
+    "agent-behavior-wrapper.js": {
+      "scriptName": "agent-behavior-wrapper.js",
+      "purpose": "Provides a wrapper for agent functions to manage task execution, logging, and memory contributions.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "./agent-self-management.js"
+        ],
+        "functionInputs": {
+          "wrapAgentTask": [
+            "taskDescription: string",
+            "fn: function",
+            "expectedFiles?: string[]"
+          ],
+          "agentStartup": [],
+          "agentCleanup": []
+        }
+      },
+      "outputs": {
+        "consoleOutput": [
+          "logs of task start/completion, outcomes, and durations"
+        ],
+        "sideEffects": [
+          "memory contributions managed via agent-self-management.js"
+        ]
+      }
+    },
+    "agent-hello-workflow.js": {
+      "scriptName": "agent-hello-workflow.js",
+      "purpose": "Manages agent initialization with handoff logs and memory integration, providing context continuity and memory search capabilities.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "command",
+            "type": "string",
+            "values": [
+              "init",
+              "search",
+              "context"
+            ],
+            "description": "The command to execute."
+          },
+          {
+            "name": "query",
+            "type": "string",
+            "optional": true,
+            "description": "The search query for the 'search' command."
+          }
+        ],
+        "dependencies": [
+          {
+            "name": "fs-extra",
+            "type": "npm package"
+          },
+          {
+            "name": "path",
+            "type": "npm package"
+          },
+          {
+            "name": "rMemory/rAgentMemories/personal-context.json",
+            "type": "file"
+          },
+          {
+            "name": "rMemory/rAgentMemories/extendedcontext.json",
+            "type": "file"
+          },
+          {
+            "name": "rEngine/memory-intelligence.js",
+            "type": "file"
+          },
+          {
+            "name": "rEngine/recall.js",
+            "type": "file"
+          },
+          {
+            "name": "rEngine/add-context.js",
+            "type": "file"
+          },
+          {
+            "name": "rEngine/technical-knowledge.json",
+            "type": "file"
+          },
+          {
+            "name": "rEngine/scribe-mcp-export.json",
+            "type": "file"
+          },
+          {
+            "name": "handoffDir",
+            "type": "directory"
+          }
+        ]
+      },
+      "outputs": {
+        "console output": [
+          {
+            "type": "agent initialization status"
+          },
+          {
+            "type": "continuation prompt"
+          },
+          {
+            "type": "search results"
+          },
+          {
+            "type": "detailed context summary"
+          },
+          {
+            "type": "memory system status"
+          },
+          {
+            "type": "memory commands"
+          },
+          {
+            "type": "usage instructions"
+          }
+        ],
+        "files": [
+          {
+            "name": "rMemory/rAgentMemories/personal-context.json",
+            "description": "Updated personal context memory"
+          }
+        ]
+      }
+    },
+    "agent-menu.js": {
+      "scriptName": "agent-menu.js",
+      "purpose": "Provides a command-line menu for initializing and controlling an agent workflow, including options for continuing previous sessions, starting fresh, viewing context summaries, and accessing memory search functionality.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "choice",
+            "type": "string",
+            "description": "A numerical choice representing the desired menu option (1-4)."
+          }
+        ],
+        "dependencies": [
+          {
+            "name": "agent-hello-workflow.js",
+            "type": "module",
+            "description": "Provides the AgentHelloWorkflow class for core agent logic and memory interactions."
+          }
+        ]
+      },
+      "outputs": {
+        "consoleOutput": {
+          "description": "Displays menu options, status messages, context summaries, and memory search instructions to the console."
+        }
+      }
+    },
+    "agent-self-management.js": {
+      "scriptName": "agent-self-management.js",
+      "purpose": "Manage agent sessions, track task completions, and handle memory contributions.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "command",
+            "type": "string",
+            "description": "The command to execute (startup, task-complete, cleanup)"
+          },
+          {
+            "name": "taskDescription",
+            "type": "string",
+            "description": "Description of the completed task (for task-complete command)",
+            "optional": true
+          },
+          {
+            "name": "outcome",
+            "type": "string",
+            "description": "Outcome of the completed task (for task-complete command)",
+            "optional": true
+          }
+        ],
+        "dependencies": [
+          "fs/promises",
+          "path",
+          "url",
+          "child_process",
+          "util"
+        ],
+        "files": [
+          "rMemory/rAgentMemories/agent-session-memory.json",
+          "rEngine/persistent-memory.json",
+          "rMemory/rAgentMemories/extendedcontext.json",
+          "rEngine/add-context.js"
+        ]
+      },
+      "outputs": {
+        "consoleOutput": "Status messages, logs, and session summaries.",
+        "files": [
+          "rMemory/rAgentMemories/agent-session-memory.json",
+          "rMemory/rAgentMemories/extendedcontext.json",
+          "Git repository changes (optional backups)"
+        ]
+      }
+    },
+    "add-context.js": {
+      "scriptName": "add-context.js",
+      "purpose": "Adds context entries to a persistent JSON file for long-term memory and context retrieval.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "title",
+            "type": "string",
+            "description": "Title of the context entry"
+          },
+          {
+            "name": "description",
+            "type": "string",
+            "description": "Description of the context entry"
+          },
+          {
+            "name": "type",
+            "type": "string",
+            "description": "Type/category of the context entry (optional, defaults to 'manual_entry')"
+          },
+          {
+            "name": "--mcp-mode",
+            "type": "flag",
+            "description": "Enables MCP mode for reading input from stdin"
+          }
+        ],
+        "dependencies": [
+          "fs/promises",
+          "path",
+          "url",
+          "readline"
+        ],
+        "stdin": {
+          "mcpMode": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "context_entry"
+              },
+              "title": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "content",
+              "category"
+            ]
+          }
+        }
+      },
+      "outputs": {
+        "files": [
+          "rMemory/rAgentMemories/extendedcontext.json"
+        ],
+        "console": {
+          "success": "Confirmation message with details of the added entry",
+          "error": "Error message if the operation fails"
+        }
+      }
+    },
+    "claude-agent-init.js": {
+      "scriptName": "claude-agent-init.js",
+      "purpose": "Initializes the Claude Agent's memory system, checks MCP server status, and prepares the environment for a new session.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "fs/promises",
+          "path",
+          "child_process",
+          "util",
+          "url"
+        ],
+        "files": [
+          "rMemory/rAgentMemories/*.json",
+          "extendedcontext.json",
+          "claude_sonnet_memories.json",
+          "tasks.json",
+          "decisions.json",
+          "start-mcp-servers.sh"
+        ]
+      },
+      "outputs": {
+        "files": [
+          "rMemory/rAgentMemories/claude_35_sonnet_session_*.json"
+        ],
+        "consoleOutput": [
+          "Session initialization messages",
+          "MCP server status",
+          "Active memory file information",
+          "Git checkpoint recommendations"
+        ]
+      }
+    },
+    "document-generator.js": {
+      "scriptName": "document-generator.js",
+      "purpose": "Generates markdown documentation for JavaScript files using a Large Language Model (LLM) API.",
+      "inputs": {
+        "arguments": [
+          "<path/to/file.js>"
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "axios",
+          "dotenv"
+        ],
+        "configurationFiles": [
+          "system-config.json",
+          ".env"
+        ],
+        "environmentVariables": [
+          "GEMINI_API_KEY"
+        ]
+      },
+      "outputs": {
+        "files": [
+          "<path/to/file.md>",
+          "generated-system-info.json"
+        ],
+        "consoleOutput": [
+          "Logging messages indicating progress and errors"
+        ]
+      }
+    },
+    "document-sweep.js": {
+      "scriptName": "document-sweep.js",
+      "purpose": "Generates or updates documentation for JavaScript files using a Gemini-powered document generator, tracks changes, and provides a summary report.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "--dry-run",
+            "description": "Performs a dry run without generating documentation."
+          }
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "child_process",
+          "crypto"
+        ],
+        "configuration": {
+          "baseDir": "Base directory of the project",
+          "targetDirectories": "Array of directories to scan",
+          "excludePatterns": "Patterns to exclude files/directories",
+          "documentGenerator": "Path to the document-generator.js script"
+        },
+        "files": "JavaScript files in the specified target directories"
+      },
+      "outputs": {
+        "markdownFiles": "Generated or updated markdown documentation files in 'docs/generated/'",
+        "diffFiles": "Diff files for updated documentation in 'logs/documentation-diffs/'",
+        "changelog": "Change log file 'logs/documentation-changes.log'",
+        "summaryReport": "Console output summarizing the results",
+        "detailedResults": "JSON file 'logs/document-sweep-results.json' containing detailed results"
+      }
+    },
+    "dual-memory-writer.js": {
+      "scriptName": "dual-memory-writer.js",
+      "purpose": "Ensures data consistency by writing entries to three memory stores: persistent memory, agent-specific memory, and extended context.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "agentType",
+            "type": "string",
+            "description": "The type of agent",
+            "default": "claude"
+          },
+          {
+            "name": "title",
+            "type": "string",
+            "description": "Title of the entry",
+            "default": "Test Entry"
+          },
+          {
+            "name": "content",
+            "type": "string",
+            "description": "Content of the entry",
+            "default": "Test dual memory write"
+          }
+        ],
+        "dependencies": [
+          "fs/promises",
+          "path",
+          "url"
+        ]
+      },
+      "outputs": [
+        {
+          "type": "file",
+          "path": "persistent-memory.json"
+        },
+        {
+          "type": "file",
+          "path": "rMemory/rAgentMemories/{agentType}-memory.json"
+        },
+        {
+          "type": "file",
+          "path": "rMemory/rAgentMemories/extendedcontext.json"
+        },
+        {
+          "type": "console",
+          "description": "Logging messages indicating success or failure of write operations"
+        }
+      ]
+    },
+    "enhanced-agent-init.js": {
+      "scriptName": "enhanced-agent-init.js",
+      "purpose": "Initializes an intelligent agent, optimizing LLM and memory systems based on available resources and configuration.",
+      "inputs": {
+        "arguments": [],
+        "environmentVariables": [
+          "GROQ_API_KEY",
+          "ANTHROPIC_API_KEY",
+          "OPENAI_API_KEY",
+          "GEMINI_API_KEY"
+        ],
+        "dependencies": [
+          "fs/promises",
+          "path",
+          "url",
+          "child_process",
+          "util"
+        ]
+      },
+      "outputs": {
+        "consoleOutput": "Status messages, initialization results, and usage instructions.",
+        "files": [
+          "active-agent-profile.json"
+        ]
+      }
+    },
+    "enhanced-scribe-console.js": {
+      "scriptName": "enhanced-scribe-console.js",
+      "purpose": "Provides a console interface for interacting with the StackTrackr Scribe system, including memory management, summary generation, and real-time file monitoring.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "readline",
+          "fs/promises",
+          "path",
+          "child_process",
+          "chokidar"
+        ],
+        "files": [
+          "rMemory/rAgentMemories/*.json",
+          "rEngine/scribe-summary.js",
+          "index.html",
+          "js/**/*.js",
+          "css/**/*.css"
+        ]
+      },
+      "outputs": {
+        "consoleOutput": "Logs, status messages, command results, summary output",
+        "files": []
+      }
+    },
+    "enhanced-smart-scribe.js": {
+      "scriptName": "enhanced-smart-scribe.js",
+      "purpose": "Enhances smart scribe functionality with Gemini fallback and generates system documentation.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "--generate-docs",
+            "description": "Triggers the generation of system documentation."
+          }
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "axios",
+          "child_process"
+        ],
+        "environmentVariables": [
+          {
+            "name": "GEMINI_API_KEY",
+            "description": "API key for Google Gemini."
+          }
+        ]
+      },
+      "outputs": {
+        "files": [
+          "README.md",
+          "docs/API.md",
+          "Other documentation files as defined in generateSystemDocumentation"
+        ],
+        "consoleOutput": [
+          "Logging messages indicating progress and errors."
+        ]
+      }
+    },
+    "index.js": {
+      "scriptName": "index.js",
+      "purpose": "Provide enhanced AI capabilities and memory management for VS Code Copilot Chat using a 5-tier AI fallback system and Ollama-powered search matrix.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "@modelcontextprotocol/sdk",
+          "axios",
+          "fs-extra",
+          "path",
+          "@google/generative-ai",
+          "@anthropic-ai/sdk",
+          "openai"
+        ],
+        "environmentVariables": [
+          "GROQ_API_KEY",
+          "GEMINI_API_KEY",
+          "ANTHROPIC_API_KEY",
+          "OPENAI_API_KEY",
+          "OLLAMA_URL"
+        ]
+      },
+      "outputs": {
+        "consoleOutput": "Logs and status messages",
+        "memoryFiles": "Files storing conversation history and search matrix data",
+        "mcpResponses": "Responses to VS Code Copilot Chat requests via the MCP server"
+      }
+    }
+  }
+}

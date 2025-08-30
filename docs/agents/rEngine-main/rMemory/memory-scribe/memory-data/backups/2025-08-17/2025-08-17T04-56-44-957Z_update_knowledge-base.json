@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "timestamp": "2025-08-17T04:34:15.309Z",
+    "category": "concept",
+    "keyConcept": "memory scribe",
+    "description": "Install dependencies and start the WebSocket server",
+    "sourceConversations": "1",
+    "usageCount": 1,
+    "lastAccessed": "2025-08-17T04:34:15.311Z"
+  },
+  {
+    "id": 2,
+    "timestamp": "2025-08-17T04:34:15.311Z",
+    "category": "concept",
+    "keyConcept": "WebSocket server",
+    "description": "Install dependencies and start the WebSocket server",
+    "sourceConversations": "1",
+    "usageCount": 1,
+    "lastAccessed": "2025-08-17T04:34:15.311Z"
+  },
+  {
+    "id": 3,
+    "timestamp": "2025-08-17T04:34:15.311Z",
+    "category": "concept",
+    "keyConcept": "dependencies",
+    "description": "Install dependencies and start the WebSocket server",
+    "sourceConversations": "1",
+    "usageCount": 1,
+    "lastAccessed": "2025-08-17T04:34:15.311Z"
+  },
+  {
+    "id": 4,
+    "timestamp": "2025-08-17T04:50:00.139Z",
+    "category": "concept",
+    "keyConcept": "memory",
+    "description": "To set up memory scribe, you need to install dependencies and start the WebSocket server...",
+    "sourceConversations": "3",
+    "usageCount": 1,
+    "lastAccessed": "2025-08-17T04:50:00.139Z"
+  }
+]

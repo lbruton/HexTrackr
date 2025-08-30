@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "../rProjects/StackTrackr/js/file-protocol-fix.js",
+    "name": "file-protocol-fix",
+    "extension": ".js",
+    "directory": "../rProjects/StackTrackr/js",
+    "size": 0,
+    "lines": 55
+  },
+  "documentation": {
+    "markdown": "../docs/rProjects/StackTrackr/js/file-protocol-fix.md",
+    "html": "../docs/rProjects/StackTrackr/js/file-protocol-fix.html",
+    "generated": "2025-08-20T01:08:27.583Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "single-file",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "file-protocol-fix.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for ../rProjects/StackTrackr/js/file-protocol-fix.js"
+  }
+}

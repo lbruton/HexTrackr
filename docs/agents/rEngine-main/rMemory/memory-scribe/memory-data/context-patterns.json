@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "patternType": "file_modified",
+    "patternData": "{\"file\":\"debug.js\"}",
+    "frequency": 1,
+    "effectivenessScore": 0.5,
+    "lastSeen": "2025-08-17T04:35:55.663Z"
+  },
+  {
+    "id": 2,
+    "patternType": "file_modified",
+    "patternData": "{\"file\":\"memory-protector.js\"}",
+    "frequency": 1,
+    "effectivenessScore": 0.5,
+    "lastSeen": "2025-08-17T04:50:41.568Z"
+  },
+  {
+    "id": 3,
+    "patternType": "file_modified",
+    "patternData": "{\"file\":\"scribe-json.js\"}",
+    "frequency": 1,
+    "effectivenessScore": 0.5,
+    "lastSeen": "2025-08-17T04:50:50.755Z"
+  },
+  {
+    "id": 4,
+    "patternType": "file_modified",
+    "patternData": "{\"file\":\"scribe-json.js\"}",
+    "frequency": 1,
+    "effectivenessScore": 0.5,
+    "lastSeen": "2025-08-17T04:50:58.829Z"
+  },
+  {
+    "id": 5,
+    "patternType": "file_modified",
+    "patternData": "{\"file\":\"scribe-json.js\"}",
+    "frequency": 1,
+    "effectivenessScore": 0.5,
+    "lastSeen": "2025-08-17T04:51:13.166Z"
+  },
+  {
+    "id": 6,
+    "patternType": "file_modified",
+    "patternData": "{\"file\":\"scribe-json.js\"}",
+    "frequency": 1,
+    "effectivenessScore": 0.5,
+    "lastSeen": "2025-08-17T04:51:25.085Z"
+  },
+  {
+    "id": 7,
+    "patternType": "file_modified",
+    "patternData": "{\"file\":\"scribe-json.js\"}",
+    "frequency": 1,
+    "effectivenessScore": 0.5,
+    "lastSeen": "2025-08-17T04:51:45.172Z"
+  },
+  {
+    "id": 8,
+    "patternType": "file_modified",
+    "patternData": "{\"file\":\"scribe-json.js\"}",
+    "frequency": 1,
+    "effectivenessScore": 0.5,
+    "lastSeen": "2025-08-17T04:52:03.552Z"
+  },
+  {
+    "id": 9,
+    "patternType": "file_modified",
+    "patternData": "{\"file\":\"bootstrap.js\"}",
+    "frequency": 1,
+    "effectivenessScore": 0.5,
+    "lastSeen": "2025-08-17T04:53:00.807Z"
+  },
+  {
+    "id": 10,
+    "patternType": "file_modified",
+    "patternData": "{\"file\":\"protection-monitor.js\"}",
+    "frequency": 1,
+    "effectivenessScore": 0.5,
+    "lastSeen": "2025-08-17T04:53:46.347Z"
+  }
+]

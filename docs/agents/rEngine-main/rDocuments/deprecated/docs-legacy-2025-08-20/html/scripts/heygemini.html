@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>heygemini.js Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>heygemini.js Documentation</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 heygemini.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 5KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../scripts/heygemini.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/heygemini.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="heygeminijs-documentation">heygemini.js Documentation</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p><code>heygemini.js</code> is a command-line script that allows users to interact directly with the Gemini API, a large language model developed by Google. This script enables users to submit a question or prompt to Gemini and receive a generated response. It serves as a simple, accessible interface for developers and users to explore the capabilities of the Gemini model.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>heygemini.js</code> script is built using Node.js and the following key components:</p>
+<ol>
+<li><p><strong>Environment Variables</strong>: The script loads environment variables from a <code>.env</code> file located in the <code>rEngine</code> directory, specifically the <code>GEMINI_API_KEY</code> variable, which is required to authenticate with the Gemini API.</p>
+</li>
+<li><p><strong>Gemini API Integration</strong>: The script uses the <code>@google/generative-ai</code> package to interact with the Gemini API. It creates a <code>GoogleGenerativeAI</code> instance, retrieves the &quot;gemini-1.5-pro&quot; model, and generates a response based on the user&#39;s input question.</p>
+</li>
+<li><p><strong>Command-Line Interface</strong>: The script accepts the user&#39;s question as a command-line argument, and the <code>askGemini</code> function is called with this input to fetch the Gemini response.</p>
+</li>
+<li><p><strong>Error Handling</strong>: The script includes error handling to gracefully handle any issues that may arise during the API call, such as missing API keys or other errors.</p>
+</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>heygemini.js</code> script has the following dependencies:</p>
+<ul>
+<li><code>fs</code>: For file system operations</li>
+<li><code>path</code>: For file path manipulation</li>
+<li><code>url</code>: For URL-related utilities</li>
+<li><code>dotenv</code>: For loading environment variables from a <code>.env</code> file</li>
+<li><code>@google/generative-ai</code>: The package that provides the Gemini API integration</li>
+</ul>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="askgeminiquestion"><code>askGemini(question)</code></h3>
+<p><strong>Purpose</strong>: Sends a user&#39;s question to the Gemini API and returns the generated response.</p>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><code>question</code> (string): The user&#39;s question or prompt to be sent to the Gemini API.</li>
+</ul>
+<p><strong>Return Value</strong>:</p>
+<ul>
+<li><code>text</code> (string): The response generated by the Gemini API.</li>
+</ul>
+<p><strong>Example Usage</strong>:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const response = await askGemini('What is the meaning of life?');
+console.log(response);</code></pre>
+</code></pre>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To use the <code>heygemini.js</code> script, follow these steps:</p>
+<ol>
+<li>Ensure you have Node.js installed on your system.</li>
+<li>Clone the repository or copy the <code>heygemini.js</code> file to your local machine.</li>
+<li>Create a <code>.env</code> file in the <code>rEngine</code> directory and add your Gemini API key as <code>GEMINI_API_KEY</code>.</li>
+<li>Run the script from the command line:</li>
+</ol>
+<pre><code><pre><code class="language-">node heygemini.js "What is the capital of France?"</code></pre>
+</code></pre>
+<p>or</p>
+<pre><code><pre><code class="language-">./heygemini "What is the capital of France?"</code></pre>
+</code></pre>
+<p>The script will send the question to the Gemini API and display the generated response in the console.</p>
+<h2 id="configuration">Configuration</h2>
+<p>The only configuration required for the <code>heygemini.js</code> script is the <code>GEMINI_API_KEY</code> environment variable. This variable must be set in the <code>.env</code> file located in the <code>rEngine</code> directory.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>heygemini.js</code> script includes error handling to handle the following scenarios:</p>
+<ol>
+<li><strong>Missing API Key</strong>: If the <code>GEMINI_API_KEY</code> environment variable is not found, the script will display an error message and exit.</li>
+<li><strong>API Call Errors</strong>: If there are any issues during the Gemini API call, the script will catch the error and display an error message.</li>
+</ol>
+<p>In both cases, the script will exit with a non-zero status code to indicate an error.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>heygemini.js</code> script is a standalone utility that can be used independently. It does not directly integrate with any larger system, but it can be used as a building block or a reference implementation for developers who need to interact with the Gemini API.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><p><strong>Environment Variable Management</strong>: The script uses the <code>dotenv</code> package to load environment variables from a <code>.env</code> file. This approach keeps sensitive information (like the API key) out of the source code, making it easier to manage and share the script.</p>
+</li>
+<li><p><strong>Modular Design</strong>: The script separates the API integration logic into the <code>askGemini</code> function, making it easier to maintain and extend the functionality in the future.</p>
+</li>
+<li><p><strong>Error Handling</strong>: The script includes robust error handling, ensuring that any issues during the API call are properly reported to the user.</p>
+</li>
+<li><p><strong>Command-Line Interface</strong>: The script accepts the user&#39;s question as a command-line argument, providing a simple and accessible interface for interacting with the Gemini API.</p>
+</li>
+<li><p><strong>Dependency Management</strong>: The script uses modern ES module syntax (<code>import</code> and <code>export</code>) to manage dependencies, which provides a cleaner and more maintainable codebase.</p>
+</li>
+</ol>
+<p>Overall, the <code>heygemini.js</code> script is a well-designed, production-ready utility that can serve as a valuable tool for developers working with the Gemini API.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>heygemini.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

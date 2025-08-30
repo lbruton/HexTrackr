@@ -1,0 +1,3136 @@
+{
+  "version": "1.0",
+  "description": "This file is an automatically generated catalog of all documented scripts in the system. It is maintained by the Document Manager and serves as a backup source of machine-readable information.",
+  "scripts": {
+    "mcp-fallback-handler.js": {
+      "scriptName": "mcp-fallback-handler.js",
+      "purpose": "Provides fallback to local JSON memory files when the MCP server is unavailable.",
+      "inputs": {
+        "arguments": [
+          "test",
+          "search",
+          "handoff",
+          "emergency",
+          "searchTerm"
+        ],
+        "dependencies": [
+          "fs/promises",
+          "path",
+          "child_process",
+          "url",
+          "recall.js"
+        ],
+        "configuration": {
+          "basePath": "/Volumes/DATA/GitHub/rEngine",
+          "ragentsPath": "{basePath}/rAgents",
+          "rMemoryPath": "{basePath}/rMemory/rAgentMemories"
+        }
+      },
+      "outputs": {
+        "console": "MCP status, search results (JSON), handoff information (JSON), emergency handoff data (JSON)",
+        "files": null
+      }
+    },
+    "scribe-system-test.js": {
+      "scriptName": "scribe-system-test.js",
+      "purpose": "To test the Smart Scribe (Ollama/Llama) and Gemini (Document Generator) components of the StackTrackr system.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": {
+          "npmPackages": [
+            "fs-extra",
+            "child_process"
+          ],
+          "externalScripts": [
+            "/Volumes/DATA/GitHub/rEngine/rEngine/document-generator.js"
+          ],
+          "configurationFiles": []
+        },
+        "environmentVariables": [
+          "baseDir"
+        ]
+      },
+      "outputs": {
+        "console": "Test results including Smart Scribe process status, generated file information, Gemini API output, and recommendations for batch processing.",
+        "files": []
+      }
+    },
+    "agent-behavior-wrapper.js": {
+      "scriptName": "agent-behavior-wrapper.js",
+      "purpose": "Wraps agent functions to standardize logging, memory management, and Git contributions.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "agent-self-management.js"
+        ],
+        "environment": {
+          "NODE_ENV": "Any environment variable that impacts 'agent-self-management.js'"
+        }
+      },
+      "outputs": {
+        "console": [
+          "Task start logs",
+          "Task completion logs",
+          "Error logs"
+        ],
+        "agent-self-management": [
+          "Memory modifications",
+          "Git commits"
+        ],
+        "returnValues": [
+          "Result of wrapped function (if successful)"
+        ]
+      }
+    },
+    "agent-hello-workflow.js": {
+      "scriptName": "agent-hello-workflow.js",
+      "purpose": "Manages agent initialization, loading persistent memory and context from various sources (handoff logs, personal memories, knowledge base), and provides a continuation prompt.",
+      "inputs": {
+        "arguments": [
+          "init",
+          "search <query>",
+          "context"
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "url",
+          "child_process",
+          "util"
+        ],
+        "files": [
+          "rMemory/rAgentMemories/personal-context.json",
+          "rEngine/memory-intelligence.js",
+          "rEngine/recall.js",
+          "rEngine/add-context.js",
+          "rMemory/rAgentMemories/extendedcontext.json",
+          "agents/*",
+          "handoffs/*.md",
+          "rEngine/technical-knowledge.json",
+          "rEngine/scribe-mcp-export.json"
+        ]
+      },
+      "outputs": {
+        "console": [
+          "continuation prompt",
+          "search results",
+          "detailed context summary",
+          "memory system status",
+          "memory commands"
+        ],
+        "files": [
+          "rMemory/rAgentMemories/personal-context.json"
+        ]
+      }
+    },
+    "agent-menu.js": {
+      "scriptName": "agent-menu.js",
+      "purpose": "Provides a command-line interface for initializing an agent, offering options to continue a previous session, start a fresh one, view detailed context, or access memory search.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "choice",
+            "type": "string",
+            "description": "A numerical value (1, 2, 3, or 4) representing the menu option selected by the user."
+          }
+        ],
+        "dependencies": [
+          "./agent-hello-workflow.js"
+        ]
+      },
+      "outputs": {
+        "console": "Provides feedback to the user through colored console output, including information about the agent's status, memory system initialization, and the selected menu choice.  For option 3, it also outputs the detailed context summary. For invalid choices, the console output shows an error message and default fallback."
+      }
+    },
+    "agent-self-management.js": {
+      "scriptName": "agent-self-management.js",
+      "purpose": "Manages agent session lifecycle, tracking tasks, memory usage, and creating Git backups.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "command",
+            "description": "Command to execute (startup, task-complete, cleanup)",
+            "required": true
+          },
+          {
+            "name": "taskDescription",
+            "description": "Description of the completed task (used with 'task-complete' command)",
+            "required": false
+          },
+          {
+            "name": "outcome",
+            "description": "Outcome of the completed task (used with 'task-complete' command)",
+            "required": false
+          }
+        ],
+        "dependencies": [
+          "fs/promises",
+          "path",
+          "url",
+          "child_process",
+          "util",
+          "add-context.js",
+          "git"
+        ],
+        "files": [
+          "rMemory/rAgentMemories/agent-session-memory.json",
+          "rEngine/persistent-memory.json",
+          "rMemory/extendedcontext.json"
+        ]
+      },
+      "outputs": {
+        "console": "Status messages, summaries, and error messages.",
+        "files": [
+          "rMemory/rAgentMemories/agent-session-memory.json",
+          "rMemory/extendedcontext.json"
+        ],
+        "git": "Incremental Git commits (optional)"
+      }
+    },
+    "add-context.js": {
+      "scriptName": "add-context.js",
+      "purpose": "Submit context entries to an MCP memory server.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "title",
+            "type": "string",
+            "description": "Title of the context entry."
+          },
+          {
+            "name": "description",
+            "type": "string",
+            "description": "Description of the context entry."
+          },
+          {
+            "name": "type",
+            "type": "string",
+            "description": "Type of the context entry (optional, defaults to 'general')."
+          }
+        ],
+        "dependencies": [
+          {
+            "name": "readline",
+            "version": "latest",
+            "description": "For interactive command-line input."
+          },
+          {
+            "name": "./mcp-client.js",
+            "description": "Module for interacting with the MCP server."
+          }
+        ]
+      },
+      "outputs": {
+        "console": [
+          {
+            "type": "success",
+            "message": "Confirmation message upon successful submission."
+          },
+          {
+            "type": "error",
+            "message": "Error message upon failure, including error details."
+          }
+        ]
+      }
+    },
+    "claude-agent-init.js": {
+      "scriptName": "claude-agent-init.js",
+      "purpose": "Initialize Claude Agent's memory system, create session-specific memory, activate MCP servers, and show memory status.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": {
+          "npmPackages": [
+            "fs/promises",
+            "path",
+            "child_process",
+            "util",
+            "url"
+          ],
+          "files": [
+            "start-mcp-servers.sh",
+            "rMemory/extendedcontext.json",
+            "rMemory/claude_sonnet_memories.json",
+            "rMemory/tasks.json",
+            "rMemory/decisions.json"
+          ],
+          "environment": {
+            "git": "Git must be installed and configured."
+          }
+        }
+      },
+      "outputs": {
+        "console": "Displays initialization status, previous work summary, MCP server status, and active memory files.",
+        "files": [
+          "rMemory/rAgentMemories/*.json"
+        ]
+      }
+    },
+    "document-generator.js": {
+      "scriptName": "document-generator.js",
+      "purpose": "Generates documentation for JavaScript files using an LLM.",
+      "inputs": {
+        "arguments": [
+          "<path/to/file.js>"
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "axios",
+          "dotenv"
+        ],
+        "configurationFiles": [
+          ".env",
+          "system-config.json"
+        ],
+        "environmentVariables": [
+          "GEMINI_API_KEY"
+        ]
+      },
+      "outputs": {
+        "files": [
+          "<docs/generated/path/to/file.md>",
+          "generated-system-info.json"
+        ],
+        "consoleOutput": [
+          "Status messages, errors, and file paths"
+        ]
+      }
+    },
+    "document-sweep.js": {
+      "scriptName": "document-sweep.js",
+      "purpose": "Automate generation of documentation for JavaScript projects using an AI API, manage updates, generate diffs, and create comprehensive summaries.",
+      "inputs": {
+        "arguments": [
+          "--dry-run",
+          "--auto-sync"
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "child_process",
+          "url",
+          "crypto",
+          "chokidar",
+          "document-generator.js",
+          "html-doc-generator.js"
+        ],
+        "config": {
+          "baseDir": "/Volumes/DATA/GitHub/rEngine",
+          "targetDirectories": [
+            "rEngine",
+            "rProjects/StackTrackr/js",
+            "rMemory/memory-scribe",
+            "scripts",
+            "rAgents",
+            "rMemory",
+            "rScribe",
+            "tools",
+            "bin",
+            "."
+          ],
+          "excludePatterns": [
+            "node_modules",
+            ".git",
+            "test_bundle",
+            "backups",
+            "archive",
+            "docs/generated",
+            "logs",
+            ".vscode",
+            ".DS_Store"
+          ],
+          "roadmapFiles": [
+            "docs/MASTER_ROADMAP.md",
+            "docs/TASK_SUMMARY.md",
+            "docs/SQLITE_MIGRATION_PLAN.md",
+            "docs/RENGINE_SCRIPT_DOCUMENTATION.md",
+            "docs/CLEANUP.md",
+            "docs/QUICK_START_GUIDE.md",
+            "docs/RENGINE_PLATFORM_RELEASE_PLAN.md"
+          ]
+        }
+      },
+      "outputs": {
+        "markdownDocs": "docs/generated/*.md",
+        "htmlDocs": "docs/generated/*.html",
+        "diffFiles": "logs/documentation-diffs/*.diff",
+        "changelog": "logs/documentation-changes.log",
+        "summaryFiles": [
+          "logs/document-sweep-summary*.md",
+          "logs/document-sweep-summary*.json",
+          "logs/document-sweep-summary*.html",
+          "logs/document-sweep-results.json"
+        ],
+        "consoleOutput": "Summary of processed files, success/failure counts, duration, and any errors."
+      }
+    },
+    "dual-memory-writer.js": {
+      "scriptName": "dual-memory-writer.js",
+      "purpose": "Write agent interaction data to persistent and agent-specific memory stores, ensuring data redundancy and providing a comprehensive history.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "agentType",
+            "type": "string",
+            "description": "Type of agent (e.g., claude, gpt-3)"
+          },
+          {
+            "name": "title",
+            "type": "string",
+            "description": "Title of the entry"
+          },
+          {
+            "name": "content",
+            "type": "string",
+            "description": "Content of the entry"
+          }
+        ],
+        "dependencies": [
+          "fs/promises",
+          "path",
+          "node:url"
+        ],
+        "files": [
+          "persistent-memory.json",
+          "rMemory/rAgentMemories/{agentType}-memory.json",
+          "rMemory/rAgentMemories/extendedcontext.json"
+        ]
+      },
+      "outputs": {
+        "files": [
+          "persistent-memory.json",
+          "rMemory/rAgentMemories/{agentType}-memory.json",
+          "rMemory/rAgentMemories/extendedcontext.json"
+        ],
+        "console": "Success/failure messages for each write operation and an overall success summary."
+      }
+    },
+    "enhanced-agent-init.js": {
+      "scriptName": "enhanced-agent-init.js",
+      "purpose": "Automates the configuration of AI agents, optimizing LLM selection and memory system integration.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "fs",
+          "path",
+          "url",
+          "child_process",
+          "util"
+        ],
+        "environmentVariables": [
+          "GROQ_API_KEY",
+          "ANTHROPIC_API_KEY",
+          "OPENAI_API_KEY",
+          "GEMINI_API_KEY"
+        ]
+      },
+      "outputs": {
+        "console": "System status, initialization progress, configuration details, usage instructions, and final status.",
+        "files": [
+          "active-agent-profile.json"
+        ]
+      }
+    },
+    "enhanced-scribe-console.js": {
+      "scriptName": "enhanced-scribe-console.js",
+      "purpose": "Provides an interactive command-line interface for monitoring and managing the StackTrackr system, including real-time file monitoring and background processes.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "readline",
+          "fs/promises",
+          "path",
+          "child_process",
+          "url",
+          "chokidar"
+        ],
+        "files": [
+          "rMemory/rAgentMemories/*.json",
+          "rEngine/*.json",
+          "index.html",
+          "js/**/*.js",
+          "css/**/*.css",
+          "rEngine/scribe-summary.js"
+        ]
+      },
+      "outputs": {
+        "console": [
+          "Welcome message",
+          "Activity logs",
+          "System status",
+          "Command responses",
+          "Summary output",
+          "Error messages"
+        ],
+        "files": []
+      }
+    },
+    "enhanced-smart-scribe.js": {
+      "scriptName": "enhanced-smart-scribe.js",
+      "purpose": "Interact with LLMs (Ollama and Gemini), prioritize JSON response reliability, and generate system documentation.",
+      "inputs": {
+        "arguments": [
+          "--generate-docs"
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "axios",
+          "child_process",
+          "url"
+        ],
+        "environmentVariables": [
+          "GEMINI_API_KEY"
+        ],
+        "configuration": {
+          "baseDir": "/Volumes/DATA/GitHub/rEngine",
+          "ollamaEndpoint": "http://localhost:11434",
+          "primaryModel": "qwen2.5-coder:3b",
+          "fallbackModel": "gemma2:2b",
+          "maxJsonFailures": 3
+        }
+      },
+      "outputs": {
+        "files": [
+          "README.md",
+          "docs/API.md"
+        ],
+        "console": [
+          "Logs indicating script status, model selection, and errors."
+        ]
+      }
+    },
+    "index.js": {
+      "scriptName": "index.js",
+      "purpose": "Provides an enhanced multi-provider AI memory scribe server for VS Code Copilot Chat, acting as an MCP server offering various AI-powered tools.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "@modelcontextprotocol/sdk",
+          "axios",
+          "fs-extra",
+          "path",
+          "url",
+          "@google/generative-ai",
+          "@anthropic-ai/sdk",
+          "openai"
+        ],
+        "environmentVariables": [
+          "GROQ_API_KEY",
+          "GEMINI_API_KEY",
+          "ANTHROPIC_API_KEY",
+          "OPENAI_API_KEY",
+          "OLLAMA_URL"
+        ]
+      },
+      "outputs": {
+        "stdio": true,
+        "files": [
+          ".rengine/memory/*.json",
+          ".rengine/conversations/*.json",
+          ".rengine/search-matrix/context-matrix.json",
+          "../rMemory/agents/memory.json",
+          "../rAgents/memory.json",
+          "../rAgents/session_handoffs.json"
+        ],
+        "mcp_tools": [
+          "analyze_with_ai",
+          "rapid_context_search",
+          "get_instant_code_target",
+          "get_continuation_context",
+          "ingest_full_project",
+          "get_agents_memory",
+          "vscode_system_status",
+          "force_memory_scribe",
+          "trigger_session_handoff",
+          "resume_session_context",
+          "benchmark_all_models",
+          "record_manual_memory",
+          "ask_llamabro_scribe",
+          "llamabro_build_lookup_table"
+        ]
+      }
+    },
+    "interactive-agent-menu.js": {
+      "scriptName": "interactive-agent-menu.js",
+      "purpose": "Provides an interactive command-line interface for managing an agent's memory system.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "readline",
+          "./agent-hello-workflow.js"
+        ],
+        "configuration": {}
+      },
+      "outputs": {
+        "console": [
+          "Menu prompts",
+          "Agent status messages",
+          "Detailed context summaries",
+          "Search results",
+          "Error messages"
+        ]
+      }
+    },
+    "memory-intelligence.js": {
+      "scriptName": "memory-intelligence.js",
+      "purpose": "Provides fast information retrieval and pattern matching by searching across multiple memory sources (MCP Memory, extended context, agent memory, and tasks).",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "command",
+            "type": "string",
+            "description": "Command to execute (recall, recent)",
+            "required": true
+          },
+          {
+            "name": "query",
+            "type": "string",
+            "description": "Search query string",
+            "required": true
+          },
+          {
+            "name": "timeframe",
+            "type": "string",
+            "description": "Timeframe for extended context search (optional)",
+            "required": false
+          }
+        ],
+        "dependencies": [
+          {
+            "name": "fs/promises",
+            "type": "npm package",
+            "description": "For asynchronous file system operations"
+          },
+          {
+            "name": "path",
+            "type": "npm package",
+            "description": "For path manipulation"
+          },
+          {
+            "name": "url",
+            "type": "npm package",
+            "description": "For handling URLs"
+          },
+          {
+            "name": "extendedcontext.json",
+            "type": "file",
+            "description": "JSON file containing session data"
+          },
+          {
+            "name": "memory.json",
+            "type": "file",
+            "description": "JSON file containing agent memory data"
+          },
+          {
+            "name": "tasks.json",
+            "type": "file",
+            "description": "JSON file containing task data"
+          }
+        ]
+      },
+      "outputs": {
+        "console": "Formatted search results displayed to the console, including recent sessions, historical patterns, related tasks, and smart suggestions."
+      }
+    },
+    "memory-safety.js": {
+      "scriptName": "memory-safety.js",
+      "purpose": "To manage and secure memory access within a multi-agent system, ensuring data isolation and providing automatic backups.",
+      "inputs": {
+        "arguments": [
+          "init",
+          "status",
+          "update-lookup",
+          "recover <filename>"
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "url",
+          "child_process",
+          "memory-sync-manager.js"
+        ],
+        "files": [
+          "master_memory_lookup.json",
+          "deletedMemories24h.json",
+          "scribe_analysis.json",
+          "scribe_patterns.json",
+          "scribe_handoffs.json",
+          "scribe_conversations.json",
+          "scribe_system_health.json",
+          "github_copilot_memories.json",
+          "claude_sonnet_memories.json",
+          "claude_opus_memories.json",
+          "gpt4_memories.json",
+          "gpt4o_memories.json",
+          "gemini_pro_memories.json",
+          "memory.json",
+          "tasks.json",
+          "decisions.json",
+          "functions.json",
+          "errors.json",
+          "preferences.json",
+          "styles.json",
+          "patterns.json"
+        ]
+      },
+      "outputs": {
+        "console": [
+          "Initialization messages",
+          "Status reports",
+          "Lookup update confirmations",
+          "Recovered file content",
+          "Error messages"
+        ],
+        "files": [
+          "master_memory_lookup.json",
+          "deletedMemories24h.json",
+          "README.md (in scribeDir and agentDir)",
+          "*.backup.* (backup files)"
+        ]
+      }
+    },
+    "memory-sync-manager.js": {
+      "scriptName": "memory-sync-manager.js",
+      "purpose": "Manages bidirectional synchronization between persistent JSON data and rEngine MCP memory, ensuring data persistence and resilience against MCP crashes.",
+      "inputs": {
+        "arguments": [
+          "health",
+          "backup",
+          "pre-commit",
+          "merge-scribe"
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "scribe-mcp-export.json"
+        ],
+        "files": [
+          "persistent-memory.json",
+          "persistent-memory.backup.json"
+        ]
+      },
+      "outputs": {
+        "console": "Logs status updates, errors, and health check results.",
+        "files": [
+          "persistent-memory.json",
+          "persistent-memory.backup.json",
+          "scribe-export-processed-*.json"
+        ],
+        "exitCode": "0 for success, 1 for failure (pre-commit command only)"
+      }
+    },
+    "one-click-startup.js": {
+      "scriptName": "one-click-startup.js",
+      "purpose": "Automates the complete startup of the StackTrackr AI system, including MCP Memory, Smart Scribe, git backup, and system health checks.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "@modelcontextprotocol/server-memory",
+          "fs-extra",
+          "smart-scribe.js",
+          "split-scribe-console.js",
+          "add-context.js",
+          "recall.js",
+          "protocol-compliance-checker.js",
+          "docker-requirement-check.sh",
+          "git-checkpoint.sh"
+        ],
+        "environmentVariables": []
+      },
+      "outputs": {
+        "consoleOutput": "Detailed startup progress, system status, and live dashboard information.",
+        "files": [
+          "visible-memory-writer.js",
+          "git commits and backup"
+        ],
+        "systemChanges": [
+          "MCP Memory server started",
+          "Smart Scribe started",
+          "Scribe console launched",
+          "Inline notifications enabled"
+        ]
+      }
+    },
+    "protocol-compliance-checker.js": {
+      "scriptName": "protocol-compliance-checker.js",
+      "purpose": "Enforce critical protocols within the StackTrackr rEngine to prevent agent-induced system issues.",
+      "inputs": {
+        "arguments": [
+          "check",
+          "backup [description]"
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "child_process"
+        ],
+        "configuration": {
+          "projectRoot": "/Volumes/DATA/GitHub/rEngine"
+        }
+      },
+      "outputs": {
+        "console": "Compliance report detailing violations (if any) and overall compliance status.",
+        "exitCode": "0 for compliant, 1 for non-compliant."
+      }
+    },
+    "protocol-enforcer.js": {
+      "scriptName": "protocol-enforcer.js",
+      "purpose": "Enforces security protocols before allowing significant system operations, preventing unauthorized changes and rogue behavior. Integrates with a memory safety system.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "operation",
+            "type": "string",
+            "description": "The operation being performed (e.g., 'file_modification', 'code_rewrite')."
+          },
+          {
+            "name": "details",
+            "type": "JSON object",
+            "description": "Optional details about the operation, including files involved, git commands, user confirmation status, etc."
+          }
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "child_process",
+          "url",
+          "./memory-safety.js"
+        ],
+        "environment": {
+          "git": "Git must be installed and accessible from the command line."
+        }
+      },
+      "outputs": {
+        "console": "Prints protocol check results, violations (if any), and overall operation status.",
+        "exitCode": "Returns 0 for successful operation approval, 1 for blocked operation or errors."
+      }
+    },
+    "quick-agent-setup.js": {
+      "scriptName": "quick-agent-setup",
+      "purpose": "Initialize any agent with full memory intelligence",
+      "inputs": {
+        "arguments": [
+          "api-preference"
+        ],
+        "dependencies": [
+          "child_process",
+          "util"
+        ]
+      },
+      "outputs": {
+        "consoleOutput": "Quick reference guide for the agent",
+        "memoryLogging": "Setup completion logged to memory via MCP"
+      }
+    },
+    "recall.js": {
+      "scriptName": "recall.js",
+      "purpose": "Fast information retrieval from an agent's memory stores.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "query",
+            "type": "string",
+            "description": "The search term."
+          },
+          {
+            "name": "--silent",
+            "type": "flag",
+            "description": "Suppresses console output."
+          }
+        ],
+        "dependencies": [
+          "fs/promises",
+          "path",
+          "url"
+        ],
+        "files": [
+          "rMemory/rAgentMemories/extendedcontext.json",
+          "agents/memory.json",
+          "rMemory/rAgentMemories/tasks.json"
+        ]
+      },
+      "outputs": {
+        "console": "Ranked list of search results, including relevance score, source, and content snippet.",
+        "returnCode": "0 for success, 1 for failure (e.g., missing arguments)"
+      }
+    },
+    "scribe-console.js": {
+      "scriptName": "scribe-console.js",
+      "purpose": "Provides an interactive console for managing conversation summaries and interacting with agent memory files.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "readline",
+          "fs/promises",
+          "path",
+          "child_process"
+        ],
+        "files": [
+          "rMemory/rAgentMemories/*.json",
+          "rEngine/scribe-summary.js"
+        ]
+      },
+      "outputs": {
+        "console": [
+          "interactive prompt",
+          "log messages",
+          "summaries",
+          "memory file contents",
+          "system status"
+        ],
+        "files": []
+      }
+    },
+    "scribe-summary.js": {
+      "scriptName": "scribe-summary.js",
+      "purpose": "Generate concise summaries of recent system activity from various sources using an AI model.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "timeframe",
+            "type": "string",
+            "description": "Timeframe for the summary (last, 1h, 6h, 12h, 24h). Defaults to 1h.",
+            "optional": true
+          }
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "axios",
+          "url",
+          "child_process",
+          "ollama"
+        ],
+        "configuration": {
+          "baseDir": "string (project base directory)",
+          "memoryDir": "string (memory data directory)",
+          "handoffDir": "string (handoff data directory)",
+          "ollamaEndpoint": "string (Ollama API endpoint URL)",
+          "model": "string (Ollama model name)"
+        }
+      },
+      "outputs": {
+        "console": "A summary of recent system activity, either generated by AI or a simple text-based summary."
+      }
+    },
+    "demo-document-sweep-colors.js": {
+      "scriptName": "demo-document-sweep-colors.js",
+      "purpose": "Simulate the display of document sweep activities with color-coded console output.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "Node.js"
+        ]
+      },
+      "outputs": {
+        "type": "console",
+        "description": "Color-coded console output simulating document sweep monitoring, including a summary and color legend."
+      }
+    },
+    "smart-scribe.js": {
+      "scriptName": "smart-scribe.js",
+      "purpose": "Continuous knowledge management system for technical documentation and development workflow enhancement using a large language model (Qwen2.5-Coder).",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "axios",
+          "chokidar",
+          "child_process"
+        ],
+        "configuration": "system-config.json",
+        "files": [
+          "*.md",
+          "*.js",
+          "*.json",
+          "*.sh",
+          "Chat logs"
+        ]
+      },
+      "outputs": {
+        "knowledgeDatabase": "technical-knowledge.json",
+        "searchTables": "search-optimization.json",
+        "handoffLogs": "rMemory/rAgentMemories/catch-up-*.md",
+        "memoryReports": "rMemory/memory-scribe/logs/memory-incident-*.json",
+        "mcpExport": "rEngine/scribe-mcp-export.json",
+        "consoleLogs": "System status and processing information",
+        "htmlDocumentation": "Generated HTML files (if documentation-html-generator.js is present)"
+      }
+    },
+    "split-scribe-console.js": {
+      "scriptName": "split-scribe-console.js",
+      "purpose": "Provides an enhanced console interface for monitoring and logging system activity, featuring a split display showing recent activity and a full verbose log.  Persists session information to extendedcontext.json.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "readline",
+          "fs/promises",
+          "path",
+          "child_process",
+          "url",
+          "chokidar"
+        ],
+        "files": [
+          "rMemory/rAgentMemories/extendedcontext.json",
+          "rEngine/scribe-summary.js",
+          "logs/document-sweep.log",
+          "logs/document-sweep-results.json",
+          "docs/generated/**/*.md",
+          "js/**/*.js",
+          "css/**/*.css"
+        ]
+      },
+      "outputs": {
+        "console": "Interactive console interface with split display showing recent activity and a full verbose log.",
+        "files": [
+          "rMemory/rAgentMemories/extendedcontext.json"
+        ]
+      }
+    },
+    "test-ai-providers.js": {
+      "scriptName": "test-ai-providers.js",
+      "purpose": "Tests the 5-tier AI provider system by sending a sample request and evaluating the response.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "Node.js",
+          "child_process module",
+          "/Volumes/DATA/GitHub/rEngine/rEngineMCP/index.js"
+        ]
+      },
+      "outputs": {
+        "consoleOutput": "Test results including success/failure status, AI response, and any error messages."
+      }
+    },
+    "test-colors.js": {
+      "scriptName": "test-colors.js",
+      "purpose": "Verify the correct display of color codes in the Split Scribe Console.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": []
+      },
+      "outputs": {
+        "type": "console",
+        "description": "Colored text output to the console, demonstrating each defined color code."
+      }
+    },
+    "test-intelligence.js": {
+      "scriptName": "test-intelligence.js",
+      "purpose": "Test the rEngineMCP Advanced Intelligence System's agent database loading and intelligent search capabilities.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "url"
+        ],
+        "dataFiles": [
+          "rMemory/rAgentMemories/functions.json",
+          "rMemory/rAgentMemories/errors.json",
+          "rMemory/rAgentMemories/memory.json",
+          "rMemory/rAgentMemories/tasks.json",
+          "rMemory/rAgentMemories/github_copilot_memories.json"
+        ]
+      },
+      "outputs": {
+        "console": "Test results, including loading status of agent databases and results of intelligent search queries."
+      }
+    },
+    "test-mcp-connection.js": {
+      "scriptName": "test-mcp-connection.js",
+      "purpose": "Verify MCP server connectivity after Smart Scribe startup.",
+      "inputs": {
+        "dependencies": [
+          "dual-memory-writer.js"
+        ],
+        "arguments": []
+      },
+      "outputs": {
+        "console": [
+          "'🧪 Testing MCP connection after Smart Scribe startup...'",
+          "'✅ MCP memory sync working! Server is responding properly.' or '❌ MCP sync still failing: ...'",
+          "'📊 Error details: ...'"
+        ]
+      }
+    },
+    "test-memory.js": {
+      "scriptName": "test-memory.js",
+      "purpose": "Verify rEngineMCP conversation memory functionality by saving and reading a test conversation.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "fs-extra",
+          "path"
+        ]
+      },
+      "outputs": {
+        "console": "Success/failure messages, file location, and saved conversation data summary.",
+        "file": ".rengine/conversations/test_mac_mini_session.json"
+      }
+    },
+    "test-simple.js": {
+      "scriptName": "test-simple.js",
+      "purpose": "To test the integration of Groq and Gemini APIs within a multi-provider AI system.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": {
+          "node": ">=16.0.0",
+          "environmentVariables": [
+            "GROQ_API_KEY",
+            "GEMINI_API_KEY"
+          ]
+        }
+      },
+      "outputs": {
+        "console": [
+          "Start message",
+          "Groq API test results",
+          "Gemini API test results",
+          "Overall success or failure message"
+        ]
+      }
+    },
+    "test-smart-hello.js": {
+      "scriptName": "test-smart-hello.js",
+      "purpose": "Test the enhanced rEngineMCP system with Groq integration and smart hello functionality.",
+      "inputs": {
+        "arguments": [],
+        "environmentVariables": {
+          "GROQ_API_KEY": "Groq API key (optional, defaults to placeholder)"
+        },
+        "dependencies": [
+          "fs-extra",
+          "path"
+        ],
+        "files": [
+          ".rengine/conversations/*.json"
+        ]
+      },
+      "outputs": {
+        "console": "Test results, including status of directory checks, API key configuration, existing conversation sessions, and a summary of system capabilities."
+      }
+    },
+    "universal-agent-init.js": {
+      "scriptName": "universal-agent-init.js",
+      "purpose": "Initialize a universal AI agent, handling various models (Claude, GPT, Gemini, etc.), creating agent-specific memory, ensuring MCP integration, and managing context.",
+      "inputs": {
+        "arguments": [
+          "--agent-type {agentName}"
+        ],
+        "dependencies": {
+          "npmPackages": [
+            "fs/promises",
+            "path",
+            "url",
+            "child_process",
+            "util",
+            "readline"
+          ],
+          "externalScripts": [
+            "git-checkpoint.sh",
+            "add-context.js",
+            "memory-intelligence.js",
+            "launch-rEngine-services.sh",
+            "view_mcp_memory_log.sh",
+            "open-service-monitor.sh",
+            "start-mcp-servers.sh",
+            "start-smart-scribe.sh",
+            "split-scribe-console.js",
+            "gpt-mandatory-startup.js",
+            "update-agent-requirements.js"
+          ],
+          "environmentVariables": [
+            "ANTHROPIC_API_KEY",
+            "OPENAI_API_KEY",
+            "GEMINI_API_KEY",
+            "GOOGLE_API_KEY",
+            "GITHUB_TOKEN",
+            "VSCODE_PID",
+            "VSCODE_CONTEXT",
+            "VSCODE_COPILOT_CHAT",
+            "COPILOT_CONTEXT",
+            "CI",
+            "NON_INTERACTIVE"
+          ]
+        },
+        "configurationFiles": []
+      },
+      "outputs": {
+        "files": [
+          "{agentType}-memory.json",
+          "{agentType}-session-{timestamp}.json",
+          "extendedcontext.json",
+          "tasks.json",
+          "decisions.json",
+          "handoff.json"
+        ],
+        "console": "Initialization status, agent detection information, session details, and prompts for user interaction."
+      }
+    },
+    "update-agent-requirements.js": {
+      "scriptName": "update-agent-requirements.js",
+      "purpose": "Enforce agent memory requirements as defined in COPILOT_INSTRUCTIONS.md, updating agent memory files and a central persistent memory file.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": {
+          "modules": [
+            "fs",
+            "path"
+          ],
+          "files": [
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/github_copilot_memories.json",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/claude-memory.json",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/gpt4_memories.json",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/gpt4o_memories.json",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/gemini_pro_memories.json",
+            "/Volumes/DATA/GitHub/rEngine/rEngine/persistent-memory.json",
+            "/Volumes/DATA/GitHub/rEngine/rEngine/gpt-mandatory-startup.js",
+            "/Volumes/DATA/GitHub/rEngine/rEngine/protocol-enforcer.js",
+            "/Volumes/DATA/GitHub/rEngine/rEngine/scribe-console.js",
+            "/Volumes/DATA/GitHub/rEngine/rAgents/unified-workflow.md",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/tasks.json",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/agents.json",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/decisions.json",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/functions.json",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/errors.json",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/memory.json",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/preferences.json",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/styles.json",
+            "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/patterns.json",
+            "/Volumes/DATA/GitHub/rEngine/COPILOT_INSTRUCTIONS.md",
+            "/Volumes/DATA/GitHub/rEngine/AGENT.md"
+          ]
+        }
+      },
+      "outputs": {
+        "console": "Success/error messages for each file updated.",
+        "files": [
+          "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/github_copilot_memories.json",
+          "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/claude-memory.json",
+          "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/gpt4_memories.json",
+          "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/gpt4o_memories.json",
+          "/Volumes/DATA/GitHub/rEngine/rMemory/rAgentMemories/gemini_pro_memories.json",
+          "/Volumes/DATA/GitHub/rEngine/rEngine/persistent-memory.json"
+        ]
+      }
+    },
+    "visible-memory-writer.js": {
+      "scriptName": "visible-memory-writer",
+      "purpose": "Write data to a file with console notifications",
+      "inputs": {
+        "arguments": [
+          "file",
+          "data",
+          "operation"
+        ],
+        "dependencies": [
+          "fs-extra"
+        ]
+      },
+      "outputs": {
+        "file": "The written file",
+        "consoleOutput": "Notifications about the write operation"
+      }
+    },
+    "about.js": {
+      "scriptName": "about.js",
+      "purpose": "Manages 'About' and 'Acknowledgment' modals, displaying application information and handling user interaction.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "APP_VERSION",
+          "getBrandingName()",
+          "sanitizeHtml",
+          "docs/announcements.md",
+          "localStorage",
+          "openModalById (optional)",
+          "closeModalById (optional)"
+        ],
+        "environmentVariables": [
+          "ACK_DISMISSED_KEY"
+        ]
+      },
+      "outputs": {
+        "domManipulations": [
+          "Updates content of about and acknowledgment modals",
+          "Shows/hides modals",
+          "Manages body overflow"
+        ],
+        "localStorage": [
+          "Sets ACK_DISMISSED_KEY"
+        ]
+      }
+    },
+    "ai-search-prototype.js": {
+      "scriptName": "ai-search-prototype.js",
+      "purpose": "Enhance StackTrackr's search functionality using AI-powered natural language interpretation via the OpenAI API.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": {
+          "openai_api_key": "Required.  OpenAI API key for accessing GPT models.",
+          "window.filterInventory": "Existing StackTrackr function for traditional search.",
+          "window.searchInventory": "Existing StackTrackr function to trigger a new search.",
+          "window.inventory": "StackTrackr's inventory data.",
+          "window.searchQuery": "User's current search query."
+        }
+      },
+      "outputs": {
+        "enhancedResults": "An object containing the enhanced search results, AI insights, and metadata.",
+        "uiUpdates": "Updates to the UI displaying AI insights and suggestions."
+      }
+    },
+    "api.js": {
+      "scriptName": "api.js",
+      "purpose": "Manage integration with multiple metal price APIs, handle API key storage, data caching, fetching spot prices, usage tracking, and provide a user interface for configuration and interaction.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "API_PROVIDERS",
+          "METALS",
+          "DEFAULT_API_QUOTA",
+          "API_KEY_STORAGE_KEY",
+          "API_CACHE_KEY",
+          "currentMonthKey()",
+          "formatCurrency()",
+          "recordSpot()",
+          "updateSpotCardColor()",
+          "updateSpotTimestamp()",
+          "updateSummary()",
+          "saveData()",
+          "loadData()",
+          "loadDataSync()",
+          "saveSpotHistory()",
+          "loadSpotHistory()",
+          "spotPrices",
+          "elements",
+          "Papa.unparse"
+        ],
+        "configuration": {
+          "source": "localStorage",
+          "parameters": [
+            "provider",
+            "keys",
+            "cacheHours",
+            "customConfig",
+            "metals",
+            "usage",
+            "historyDays",
+            "historyTimes",
+            "usageMonth"
+          ]
+        }
+      },
+      "outputs": {
+        "uiUpdates": [
+          "API status display",
+          "metal price display",
+          "API history table",
+          "provider settings",
+          "sync button states"
+        ],
+        "localStorageUpdates": [
+          "API configuration",
+          "API cache",
+          "spot price history"
+        ],
+        "backupFiles": [
+          "inventory CSV",
+          "spot price history CSV",
+          "complete JSON backup",
+          "Markdown documentation"
+        ]
+      }
+    },
+    "autocomplete.js": {
+      "scriptName": "autocomplete.js",
+      "purpose": "Provides autocomplete functionality for StackTrackr by generating and managing a lookup table for fuzzy matching of inventory items, locations, and types.",
+      "inputs": {
+        "inventoryData": "Array of inventory objects (optional, defaults to window.inventory)",
+        "dependencies": [
+          "fuzzy-search.js"
+        ],
+        "localStorage": "Browser's LocalStorage for caching"
+      },
+      "outputs": {
+        "lookupTable": "A LookupTable object containing inventory data, search indices, and metadata",
+        "consoleOutput": "Log messages indicating progress, errors, and statistics"
+      }
+    },
+    "catalog-api.js": {
+      "scriptName": "catalog-api.js",
+      "purpose": "Provides a provider-agnostic catalog API for accessing coin catalog data from Numista and (future) rSynk, with a local fallback.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "localStorage",
+          "crypto.subtle",
+          "fetch"
+        ],
+        "configuration": {
+          "numistaApiKey": "String (encrypted)",
+          "rsynkApiKey": "String (encrypted)",
+          "activeProvider": "String ('numista' or 'rsynk')",
+          "enableFallback": "Boolean",
+          "cacheDuration": "Number (milliseconds)"
+        }
+      },
+      "outputs": {
+        "catalogAPI": "Object (global CatalogAPI instance)",
+        "catalogConfig": "Object (global CatalogConfig instance)",
+        "console": "Log messages indicating status, errors, and API interaction"
+      }
+    },
+    "catalog-manager.js": {
+      "scriptName": "catalog-manager.js",
+      "purpose": "Manage mappings between item serial numbers and catalog IDs (e.g., Numista IDs) using localStorage for persistence.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "localStorage",
+          "loadDataSync",
+          "saveData",
+          "CATALOG_MAP_KEY",
+          "DEBUG",
+          "updateStorageStats"
+        ],
+        "configuration": {
+          "storageKey": "String (optional)",
+          "saveCallback": "Function (optional)",
+          "debug": "Boolean (optional)"
+        }
+      },
+      "outputs": {
+        "catalogManager": "A CatalogManager instance added to the global window object.",
+        "localStorage": "Updated localStorage with catalog mappings."
+      }
+    },
+    "catalog-providers.js": {
+      "scriptName": "catalog-providers.js",
+      "purpose": "Provides a module for managing and accessing different catalog providers, currently supporting Numista.",
+      "inputs": {
+        "dependencies": [
+          "catalog-api.js"
+        ],
+        "arguments": []
+      },
+      "outputs": {
+        "window.NumistaCatalogProvider": "A class for interacting with the Numista catalog.",
+        "window.CatalogProviders": "A singleton module for managing registered catalog providers."
+      }
+    },
+    "changeLog.js": {
+      "scriptName": "changeLog.js",
+      "purpose": "Track and manage changes to an inventory table, allowing undo/redo functionality and persistent storage.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "sanitizeHtml",
+          "saveInventory",
+          "renderTable",
+          "inventory",
+          "catalogMap"
+        ],
+        "localStorage": "changeLog"
+      },
+      "outputs": {
+        "changeLogTable": "Updates the HTML content of a table with id '#changeLogTable' to display the change log.",
+        "localStorage": "Persists the change log data in the browser's local storage under the key 'changeLog'."
+      }
+    },
+    "charts.js": {
+      "scriptName": "charts.js",
+      "purpose": "Provides utility functions for creating and managing interactive pie charts using Chart.js, including theme-aware color selection and detailed data display.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "canvas",
+            "type": "HTMLCanvasElement",
+            "description": "Canvas element to render the chart on."
+          },
+          {
+            "name": "data",
+            "type": "Object",
+            "description": "Chart data with labels and values (e.g., { 'Label A': {value: 100}, 'Label B': {value: 200} })"
+          },
+          {
+            "name": "title",
+            "type": "string",
+            "description": "Title of the chart."
+          }
+        ],
+        "dependencies": [
+          {
+            "name": "Chart.js",
+            "type": "library",
+            "version": "Specify version used"
+          }
+        ]
+      },
+      "outputs": {
+        "type": "Chart.js instance",
+        "description": "A Chart.js pie chart instance rendered on the provided canvas."
+      }
+    },
+    "constants.js": {
+      "scriptName": "constants.js",
+      "purpose": "Defines global constants and configuration parameters for a metal pricing application, including API provider configurations, application version, branding, feature flags, and persistent storage.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "localStorage"
+        ]
+      },
+      "outputs": {
+        "globals": [
+          "API_PROVIDERS",
+          "APP_VERSION",
+          "DEFAULT_CURRENCY",
+          "getVersionString",
+          "getTemplateVariables",
+          "replaceTemplateVariables",
+          "MAX_LOCAL_FILE_SIZE",
+          "cloudBackupEnabled",
+          "injectVersionString",
+          "BRANDING_TITLE",
+          "BRANDING_DOMAIN_OPTIONS",
+          "BRANDING_DOMAIN_OVERRIDE",
+          "LS_KEY",
+          "SERIAL_KEY",
+          "CATALOG_MAP_KEY",
+          "SPOT_HISTORY_KEY",
+          "THEME_KEY",
+          "ACK_DISMISSED_KEY",
+          "API_KEY_STORAGE_KEY",
+          "API_CACHE_KEY",
+          "LAST_CACHE_REFRESH_KEY",
+          "LAST_API_SYNC_KEY",
+          "APP_VERSION_KEY",
+          "VERSION_ACK_KEY",
+          "FEATURE_FLAGS_KEY",
+          "ALLOWED_STORAGE_KEYS",
+          "DEFAULT_API_CACHE_DURATION",
+          "DEFAULT_API_QUOTA",
+          "DEV_MODE",
+          "DEBUG",
+          "FEATURE_FLAGS",
+          "featureFlags",
+          "isFeatureEnabled",
+          "enableFeature",
+          "disableFeature",
+          "toggleFeature",
+          "METALS"
+        ]
+      }
+    },
+    "customMapping.js": {
+      "scriptName": "customMapping.js",
+      "purpose": "Provides a regex-based mapping engine for transforming field names.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": []
+      },
+      "outputs": {
+        "mappedField": "Returns the mapped field name (string) or null if no match is found.",
+        "list": "Returns an array of current mappings (array of objects with regex and field properties).",
+        "consoleWarnings": "Outputs warnings to the console for invalid regex patterns."
+      }
+    },
+    "debug-log.js": {
+      "scriptName": "debug-log.js",
+      "purpose": "Provides a client-side JavaScript debugging logging utility with varying severity levels and local storage based enable/disable functionality.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": []
+      },
+      "outputs": {
+        "consoleOutput": "Log messages to the browser's console (INFO, WARN, ERROR)",
+        "returnValues": [
+          "array (getDebugHistory): a copy of the internal log history array"
+        ],
+        "localStorage": "Uses 'stackrtrackr.debug' for enabling/disabling logging."
+      }
+    },
+    "debugModal.js": {
+      "scriptName": "debugModal.js",
+      "purpose": "Provides functions to display and hide a modal dialog containing debug information.",
+      "inputs": {
+        "htmlElements": [
+          "#debugModal",
+          "#debugModalContent"
+        ],
+        "dependencies": [
+          "window.getDebugHistory",
+          "window.openModalById (optional)",
+          "window.closeModalById (optional)"
+        ]
+      },
+      "outputs": {
+        "modalDisplay": "Displays or hides a modal dialog based on function calls.",
+        "consoleOutput": "No direct console output, but potential errors are caught."
+      }
+    },
+    "detailsModal.js": {
+      "scriptName": "detailsModal.js",
+      "purpose": "Displays a details modal showing a breakdown of inventory data by metal type, including pie charts and a detailed table.",
+      "inputs": {
+        "arguments": [
+          "metal (string): The type of metal to display details for."
+        ],
+        "dependencies": [
+          "inventory (global array): Inventory data.",
+          "elements (global object): DOM element references.",
+          "formatCurrency (function): Currency formatting function.",
+          "createPieChart (function): Pie chart creation function.",
+          "openModalById (function, optional): Modal opening function.",
+          "closeModalById (function, optional): Modal closing function."
+        ]
+      },
+      "outputs": {
+        "modal": "Displays a details modal with pie charts and a detailed breakdown of inventory data.",
+        "sideEffects": [
+          "Modifies the DOM to display the modal and its content."
+        ]
+      }
+    },
+    "server.js": {
+      "scriptName": "server.js",
+      "purpose": "Provides a RESTful API for fetching and caching precious metal price data.",
+      "inputs": {
+        "arguments": [],
+        "environmentVariables": [
+          "PORT",
+          "REDIS_URL",
+          "POSTGRES_URL",
+          "CORS_ORIGIN",
+          "RATE_LIMIT"
+        ],
+        "dependencies": [
+          "express",
+          "cors",
+          "helmet",
+          "express-rate-limit",
+          "express-validator",
+          "redis",
+          "pg",
+          "winston",
+          "dotenv"
+        ],
+        "database": "PostgreSQL (price_snapshots table)",
+        "cache": "Redis"
+      },
+      "outputs": {
+        "apiEndpoints": [
+          "/health",
+          "/api/prices",
+          "/api/proxy/:provider",
+          "/api/config"
+        ],
+        "logs": "JSON formatted logs to console via Winston"
+      }
+    },
+    "console-log-monitor.js": {
+      "scriptName": "console-log-monitor.js",
+      "purpose": "Real-time monitoring and tracking of console logs, particularly AI agent activity.",
+      "inputs": {
+        "arguments": [
+          "memoryScribePath: The path to a directory for saving log files."
+        ],
+        "dependencies": [
+          "fs",
+          "child_process",
+          "path"
+        ]
+      },
+      "outputs": {
+        "console-activity.log": "A file containing all logged console activity.",
+        "ai-agent-activity.json": "A JSON file containing detailed AI agent activity statistics and data.",
+        "console output": "Real-time messages indicating monitoring status, errors, and warnings."
+      }
+    },
+    "context-lifecycle.js": {
+      "scriptName": "context-lifecycle.js",
+      "purpose": "Manages the lifecycle of contextual data, providing initialization and cleanup functionality based on configurable retention policies.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "fs.promises",
+          "path"
+        ],
+        "configurationFiles": [
+          "lifecycle-config.json"
+        ]
+      },
+      "outputs": {
+        "console": [
+          "Initialization messages",
+          "Cleanup status messages (including recommendations)"
+        ],
+        "files": [
+          "lifecycle-config.json"
+        ]
+      }
+    },
+    "memory-search-cli.js": {
+      "scriptName": "memory-search-cli.js",
+      "purpose": "Provides a command-line interface for querying a memory-based search index.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "search query",
+            "description": "Keywords to search for",
+            "type": "string"
+          },
+          {
+            "name": "--type",
+            "description": "Filter results by entity type",
+            "type": "string"
+          },
+          {
+            "name": "--stats",
+            "description": "Display search index statistics",
+            "type": "boolean"
+          },
+          {
+            "name": "--types",
+            "description": "List all entity types",
+            "type": "boolean"
+          },
+          {
+            "name": "--suggest",
+            "description": "Get search term suggestions",
+            "type": "string"
+          },
+          {
+            "name": "--related",
+            "description": "Show related entities",
+            "type": "string"
+          }
+        ],
+        "dependencies": [
+          "./quick-memory-search.js"
+        ]
+      },
+      "outputs": {
+        "type": "console",
+        "description": "Displays search results, statistics, suggestions, entity types, or related entities to the console."
+      }
+    },
+    "quick-memory-search.js": {
+      "scriptName": "quick-memory-search.js",
+      "purpose": "Provides fast in-memory search across StackTrackr agent memory data loaded from JSON files.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "fs/promises",
+          "path"
+        ],
+        "configFiles": [
+          "agents/memory.json",
+          "agents/agents.json",
+          "agents/tasks.json",
+          "agents/decisions.json"
+        ]
+      },
+      "outputs": {
+        "console": [
+          "Search results",
+          "Search index statistics"
+        ],
+        "dataStructures": [
+          "In-memory search index"
+        ]
+      }
+    },
+    "version-manager.js": {
+      "scriptName": "version-manager.js",
+      "purpose": "Manages versioning for the rAgents agentic layer, tracks capabilities, generates changelogs and status reports.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "command",
+            "type": "string",
+            "description": "The command to execute (bump, show, history, capabilities)"
+          },
+          {
+            "name": "type",
+            "type": "string",
+            "description": "Version bump type (patch, minor, major)",
+            "optional": true
+          },
+          {
+            "name": "description",
+            "type": "string",
+            "description": "Description of changes",
+            "optional": true
+          }
+        ],
+        "dependencies": [
+          "fs/promises",
+          "path",
+          "package.json",
+          "version-history.json",
+          "CHANGELOG.md",
+          "memory.json",
+          "agents.json"
+        ],
+        "files": [
+          "backups/",
+          "engine/",
+          "scripts/",
+          "test/",
+          "unified-workflow.md",
+          "tasks.json",
+          "memory/bundles/",
+          "zip_workflow.json",
+          "mcp_available.flag",
+          "lab/serverless-plugin/",
+          "debug/"
+        ]
+      },
+      "outputs": {
+        "console": [
+          "status report",
+          "current version",
+          "version history",
+          "capabilities",
+          "version bump confirmation"
+        ],
+        "files": [
+          "package.json",
+          "version-history.json",
+          "CHANGELOG.md"
+        ]
+      }
+    },
+    "ai-provider-manager.js": {
+      "scriptName": "ai-provider-manager.js",
+      "purpose": "Provides a unified interface for interacting with multiple AI providers (Ollama, OpenAI, Google, Anthropic, Groq), allowing users to check provider status, retrieve available models, and send queries.",
+      "inputs": {
+        "dependencies": [
+          "axios"
+        ],
+        "arguments": [],
+        "configuration": {
+          "providers": {
+            "ollama": {
+              "endpoint": "http://localhost:11434",
+              "models": []
+            },
+            "openai": {
+              "endpoint": "https://api.openai.com/v1",
+              "models": [
+                "gpt-4o",
+                "gpt-4-turbo",
+                "gpt-3.5-turbo"
+              ]
+            },
+            "google": {
+              "endpoint": "https://generativelanguage.googleapis.com/v1beta",
+              "models": [
+                "gemini-1.5-pro",
+                "gemini-1.5-flash",
+                "gemini-pro"
+              ]
+            },
+            "anthropic": {
+              "endpoint": "https://api.anthropic.com/v1",
+              "models": [
+                "claude-3-5-sonnet-20241022",
+                "claude-3-haiku-20240307",
+                "claude-3-opus-20240229"
+              ]
+            },
+            "groq": {
+              "endpoint": "https://api.groq.com/openai/v1",
+              "models": [
+                "llama-3.1-70b-versatile",
+                "mixtral-8x7b-32768",
+                "gemma2-9b-it"
+              ]
+            }
+          }
+        }
+      },
+      "outputs": {
+        "console": [
+          "Provider status messages",
+          "Available model lists",
+          "Responses from AI providers"
+        ],
+        "functions": [
+          "checkProviderStatus",
+          "getAvailableModels",
+          "queryProvider",
+          "queryOllama",
+          "initializeProviders"
+        ]
+      }
+    },
+    "conversation-bridge.js": {
+      "scriptName": "conversation-bridge.js",
+      "purpose": "Manage multiple conversational threads, track message history, and integrate with external AI providers.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": []
+      },
+      "outputs": {
+        "conversation objects": "Creates and manages conversation objects containing messages, metadata and context.",
+        "context history": "Provides a chronological log of all messages across conversations.",
+        "AI bridge requests": "Generates requests for external AI models, including contextualized messages."
+      }
+    },
+    "dashboard-server.js": {
+      "scriptName": "dashboard-server.js",
+      "purpose": "Provides a RESTful API server and dashboard for monitoring and controlling the Memory Scribe application.",
+      "inputs": {
+        "arguments": [],
+        "environmentVariables": [
+          "PORT"
+        ],
+        "dependencies": [
+          "express",
+          "cors",
+          "path",
+          "fs.promises",
+          "child_process",
+          "util",
+          "./ai-provider-manager",
+          "./conversation-bridge",
+          "./console-log-monitor"
+        ],
+        "configurationFiles": [
+          "lifecycle-config.json",
+          "conversations.json",
+          "memory.json",
+          "patterns.json",
+          "flagged-items.json"
+        ]
+      },
+      "outputs": {
+        "httpServer": true,
+        "consoleOutput": true,
+        "dataFiles": [
+          "lifecycle-config.json",
+          "conversations.json",
+          "memory.json",
+          "patterns.json",
+          "flagged-items.json"
+        ]
+      }
+    },
+    "fuzzy-search.test.js": {
+      "scriptName": "fuzzy-search.test.js",
+      "purpose": "Unit testing of the fuzzySearch function to verify its accuracy in identifying partial string matches.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "../js/fuzzy-search.js",
+          "assert"
+        ]
+      },
+      "outputs": {
+        "console": [
+          "Pass/Fail messages indicating the test results",
+          "Success message if tests pass"
+        ],
+        "assertions": [
+          "Check for absence of 'American Gold Eagle'",
+          "Check for presence of 'American Silver Eagle'"
+        ]
+      }
+    },
+    "header-name-centering.test.js": {
+      "scriptName": "header-name-centering.test.js",
+      "purpose": "To test the horizontal centering of the 'Name' header in an HTML table across different viewport widths using Puppeteer.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "puppeteer",
+          "assert"
+        ],
+        "files": [
+          "index.html"
+        ]
+      },
+      "outputs": {
+        "console": [
+          "Center difference for each tested width",
+          "Success or failure message based on assertions"
+        ]
+      }
+    },
+    "encryption.js": {
+      "scriptName": "encryption.js",
+      "purpose": "Securely encrypt and decrypt application data using a master password.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "browser's crypto API",
+          "localStorage"
+        ],
+        "configuration": {
+          "encryptedStoragePrefix": "stackrtrackr_encrypted_",
+          "saltKey": "stackrtrackr_master_salt",
+          "debugDecryption": false,
+          "protectedKeys": [
+            "stackrtrackr.inventory",
+            "stackrtrackr.spotPrices",
+            "stackrtrackr.settings",
+            "catalog_api_config",
+            "stackrtrackr.changeLog",
+            "stackrtrackr.apiConfig",
+            "stackrtrackr.api.keys",
+            "stackrtrackr.metals.settings",
+            "stackrtrackr.userPreferences"
+          ]
+        }
+      },
+      "outputs": {
+        "localStorage": "Encrypted and unencrypted data stored in localStorage.",
+        "console": "Debug messages (if debugDecryption is true), error messages."
+      }
+    },
+    "events.js": {
+      "scriptName": "events.js",
+      "purpose": "Manages all DOM event listeners, handles user interactions, responsive design, data manipulation, and application-level features like theming, API integration, and data import/export.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": {
+          "htmlElements": [
+            "Numerous elements with specific IDs",
+            "data attributes"
+          ],
+          "externalFunctions": [
+            "renderTable",
+            "saveInventory",
+            "showDetailsModal",
+            "debounce",
+            "gramsToOzt",
+            "parseNumistaMetal",
+            "getCompositionFirstWords",
+            "getNextSerial",
+            "spotPrices",
+            "METALS",
+            "APP_VERSION",
+            "LS_KEY",
+            "SPOT_HISTORY_KEY",
+            "API_KEY_STORAGE_KEY",
+            "API_CACHE_KEY",
+            "THEME_KEY",
+            "elements",
+            "loadInventory",
+            "filterInventory",
+            "calculateTotalPages",
+            "registerName",
+            "addCompositionOption",
+            "catalogManager",
+            "updateSyncButtonStates",
+            "syncSpotPricesFromApi",
+            "updateManualSpot",
+            "importCsv",
+            "importJson",
+            "importNumistaCsv",
+            "exportCsv",
+            "exportJson",
+            "exportPdf",
+            "clearApiCache",
+            "updateProviderHistoryTables",
+            "showApiProvidersModal",
+            "hideApiProvidersModal",
+            "showApiHistoryModal",
+            "hideApiHistoryModal",
+            "setDefaultProvider",
+            "handleProviderSync",
+            "showProviderInfo",
+            "hideProviderInfo",
+            "clearApiKey",
+            "loadApiConfig",
+            "saveApiConfig",
+            "toggleChange",
+            "renderChangeLog",
+            "clearChangeLog",
+            "initTheme",
+            "setTheme",
+            "setupSystemThemeListener",
+            "toggleTheme",
+            "StackrTrackrEncryption",
+            "loadAndDisplayData",
+            "checkFileSize",
+            "openModalById",
+            "closeModalById"
+          ],
+          "localStorage": [
+            "inventory data",
+            "spot prices",
+            "theme settings",
+            "API keys"
+          ],
+          "APIs": [
+            "Metals API (optional)",
+            "Other APIs (as configured)"
+          ],
+          "featureFlags": "window.featureFlags object"
+        }
+      },
+      "outputs": {
+        "console": [
+          "Log messages (warnings, errors, debug messages)"
+        ],
+        "DOM": [
+          "Updates to the UI based on user interactions and data changes"
+        ],
+        "localStorage": [
+          "Updated application data and settings"
+        ],
+        "externalServices": [
+          "API calls",
+          "File system interactions"
+        ]
+      }
+    },
+    "file-protocol-fix.js": {
+      "scriptName": "file-protocol-fix.js",
+      "purpose": "Provide localStorage fallback for file:// protocol.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": []
+      },
+      "outputs": {
+        "consoleOutput": [
+          "Debug messages indicating script status and any localStorage errors."
+        ],
+        "localStorageFallback": "Provides persistent storage using window.tempStorage if localStorage is unavailable."
+      }
+    },
+    "filters.js": {
+      "scriptName": "filters.js",
+      "purpose": "Provides an advanced filtering and search system for an inventory of items, dynamically rendering filter chips in the UI.",
+      "inputs": {
+        "inventory": "A globally defined array of inventory items (objects).",
+        "DOM elements": "#searchInput, #typeFilter, #metalFilter, #activeFilters, #chipMinCount",
+        "METAL_COLORS": "Global variable mapping metal types to colors.",
+        "METAL_TEXT_COLORS": "Global variable mapping metal types to text colors (functions).",
+        "nameColors": "Global variable, color array for fallback.",
+        "getTypeColor": "Function to get type color.",
+        "getPurchaseLocationColor": "Function to get purchase location color.",
+        "getStorageLocationColor": "Function to get storage location color.",
+        "getContrastColor": "Function to get contrasting text color.",
+        "formatDisplayDate": "Function for date formatting.",
+        "columnFilters": "Legacy object for column-based filters.",
+        "currentPage": "Variable tracking the current page.",
+        "searchQuery": "Variable storing the search term.",
+        "renderTable": "Function for rendering the inventory table.",
+        "window.autocomplete": "Object for name normalization.",
+        "window.featureFlags": "Object holding feature flags.",
+        "localStorage": "For chipMinCount defaults.",
+        "PREBUILT_LOOKUP_DATA": "Implicit, lookup data for coin name simplifications."
+      },
+      "outputs": {
+        "filteredInventory": "Filtered inventory array.",
+        "UI updates": "Dynamically updated filter chips and inventory table."
+      }
+    },
+    "fuzzy-search.js": {
+      "scriptName": "fuzzy-search.js",
+      "purpose": "Provides a fuzzy search engine for typo-tolerant string matching.",
+      "inputs": {
+        "arguments": [
+          {
+            "query": "string",
+            "description": "User's search query"
+          },
+          {
+            "targets": "string[]",
+            "description": "Array of strings to search within"
+          }
+        ],
+        "options": [
+          {
+            "threshold": "number (default: 0.6)",
+            "description": "Minimum similarity score"
+          },
+          {
+            "maxResults": "number (default: Infinity)",
+            "description": "Maximum results to return"
+          },
+          {
+            "caseSensitive": "boolean (default: false)",
+            "description": "Case sensitive matching"
+          }
+        ],
+        "dependencies": []
+      },
+      "outputs": {
+        "fuzzyMatch": {
+          "type": "number",
+          "description": "Similarity score between 0 and 1"
+        },
+        "fuzzySearch": {
+          "type": "object[]",
+          "description": "Array of {text: string, score: number} objects, representing matches and their scores"
+        }
+      }
+    },
+    "init.js": {
+      "scriptName": "init.js",
+      "purpose": "Initializes the StackTrackr application, handles DOM element retrieval, data loading, event listener setup, and integration with the Memory Intelligence System.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "APP_VERSION",
+          "METALS",
+          "THEME_KEY",
+          "inventory",
+          "apiConfig",
+          "apiCache",
+          "elements",
+          "DOM",
+          "Various external functions (e.g., loadInventory, setupEventListeners)"
+        ]
+      },
+      "outputs": {
+        "consoleOutput": [
+          "Initialization logs",
+          "Debug messages",
+          "Error messages"
+        ],
+        "sideEffects": [
+          "Modifies DOM elements",
+          "Sets up event listeners",
+          "Loads data from storage",
+          "Initializes application state"
+        ]
+      }
+    },
+    "numista-modal.js": {
+      "scriptName": "numista-modal.js",
+      "purpose": "Provides a modal interface for displaying Numista coin database pages, handling navigation and accessibility.",
+      "inputs": {
+        "arguments": [
+          "numistaId (string)",
+          "coinName (string)"
+        ],
+        "dependencies": [
+          "numistaModal",
+          "numistaIframe",
+          "numistaModalTitle",
+          "numistaCloseBtn",
+          "numistaBackBtn",
+          "numistaForwardBtn"
+        ]
+      },
+      "outputs": {
+        "modalDisplay": "Displays a modal window containing an iframe showing the Numista page.",
+        "navigation": "Enables back and forward navigation within the modal (if not using `file://` protocol).",
+        "consoleLogs": "Provides console messages for debugging purposes (e.g., iframe load status)."
+      }
+    },
+    "pagination.js": {
+      "scriptName": "pagination.js",
+      "purpose": "Provides client-side pagination functionality for displaying large datasets.",
+      "inputs": [
+        {
+          "name": "inventory",
+          "type": "array",
+          "description": "Data array to be paginated."
+        },
+        {
+          "name": "itemsPerPage",
+          "type": "number",
+          "description": "Number of items per page."
+        },
+        {
+          "name": "searchQuery",
+          "type": "string",
+          "description": "Current search query used for filtering data."
+        },
+        {
+          "name": "filterInventory",
+          "type": "function",
+          "description": "Function to filter inventory based on searchQuery."
+        },
+        {
+          "name": "elements",
+          "type": "object",
+          "description": "Object containing references to HTML elements."
+        },
+        {
+          "name": "renderTable",
+          "type": "function",
+          "description": "Function to update the displayed table."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Updated HTML",
+          "type": "HTML modification",
+          "description": "Updates the pagination controls and displayed data on the page."
+        }
+      ]
+    },
+    "rengine-api-client.js": {
+      "scriptName": "rengine-api-client.js",
+      "purpose": "To provide an enhanced API client for StackTrackr that routes API calls through rEngine's relay infrastructure for caching, rate limiting, and market intelligence aggregation.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [],
+        "configuration": {
+          "RENGINE_CONFIG": {
+            "relay": {
+              "production": "https://api.rengine.dev/relay",
+              "staging": "https://staging-api.rengine.dev/relay",
+              "development": "http://localhost:8080/relay"
+            },
+            "client": {
+              "name": "StackTrackr",
+              "version": "3.04.86",
+              "capabilities": [
+                "metals-tracking",
+                "market-intelligence",
+                "community-data"
+              ]
+            },
+            "serviceTiers": {
+              "free": {
+                "requestsPerMonth": 1000,
+                "marketIntel": false
+              },
+              "pro": {
+                "requestsPerMonth": 10000,
+                "marketIntel": true
+              },
+              "enterprise": {
+                "requestsPerMonth": 100000,
+                "marketIntel": true,
+                "priority": true
+              }
+            },
+            "cache": {
+              "spotPrices": 900000,
+              "marketIntel": 3600000,
+              "numistaMeta": 86400000
+            }
+          },
+          "localStorage": [
+            "rengine_user_tier",
+            "rengine_api_key",
+            "rengine_api_usage",
+            "stacktrackr_data_sharing_opt_in"
+          ]
+        },
+        "globalObjects": {
+          "window": [
+            "apiConfig",
+            "inventory",
+            "spotPrices",
+            "enhanceWithrEngine"
+          ]
+        }
+      },
+      "outputs": {
+        "spotPrices": "Updated spot prices in the UI and localStorage",
+        "marketIntelligence": "Market intelligence data displayed in UI",
+        "communityContribution": "Successful contribution result to community data",
+        "numistaResults": "Enhanced Numista search results",
+        "consoleLogs": "Debug and informational messages to the console",
+        "localStorage": "Updated usage data and user preferences in localStorage"
+      }
+    },
+    "rsynk-integration.js": {
+      "scriptName": "rsynk-integration.js",
+      "purpose": "Integrates rSynk LLM-powered search enhancement into StackTrackr, providing fallback to local AI and traditional search.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "window.aiSearchEngine",
+          "window.filterInventory",
+          "fetch API",
+          "localStorage"
+        ],
+        "configuration": "RSYNK_CONFIG object (serverUrl, localUrl, fallback settings, timeout, etc.)"
+      },
+      "outputs": {
+        "enhancedSearchResults": "Object containing enhanced search results from rSynk, local AI, or traditional search. Includes metadata about the search process.",
+        "UIUpdates": "Updates the UI to reflect rSynk's connection status and availability.",
+        "consoleLogs": "Debug information and error messages."
+      }
+    },
+    "search.js": {
+      "scriptName": "search.js",
+      "purpose": "To provide a robust search and filtering mechanism for an inventory of coins and metals, handling single and multi-term searches, phrase searches, and series-specific logic.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "filterInventoryAdvanced (optional)",
+          "formatDisplayDate()",
+          "debounce()",
+          "inventory",
+          "columnFilters",
+          "searchInput (HTML element)"
+        ],
+        "configuration": {
+          "columnFilters": "An object defining filter criteria for inventory columns.",
+          "searchInputId": "searchInput"
+        }
+      },
+      "outputs": {
+        "filteredInventory": "An array of inventory items matching the search criteria."
+      }
+    },
+    "sorting.js": {
+      "scriptName": "sorting.js",
+      "purpose": "Sorts an array of inventory items based on a specified column and sort direction.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "data",
+            "type": "Array<Object>",
+            "description": "Array of inventory items to sort (defaults to global 'inventory' variable)."
+          }
+        ],
+        "dependencies": [
+          {
+            "name": "inventory",
+            "type": "Array<Object>",
+            "description": "Global variable containing the inventory data."
+          },
+          {
+            "name": "sortColumn",
+            "type": "integer",
+            "description": "Global variable specifying the column index to sort by (0-indexed)."
+          },
+          {
+            "name": "sortDirection",
+            "type": "string",
+            "description": "Global variable specifying the sort direction ('asc' or 'desc')."
+          }
+        ]
+      },
+      "outputs": {
+        "type": "Array<Object>",
+        "description": "A new array containing the sorted inventory data."
+      }
+    },
+    "spot.js": {
+      "scriptName": "spot.js",
+      "purpose": "Manages spot prices for precious metals, storing history in localStorage and updating a user interface.",
+      "inputs": {
+        "dependencies": [
+          "saveDataSync",
+          "loadDataSync",
+          "saveData",
+          "elements",
+          "METALS",
+          "formatCurrency",
+          "apiCache",
+          "API_PROVIDERS",
+          "hideManualInput"
+        ],
+        "localStorageKeys": [
+          "SPOT_HISTORY_KEY",
+          "LAST_API_SYNC_KEY",
+          "LAST_CACHE_REFRESH_KEY"
+        ],
+        "userInputs": [
+          "Manual spot price inputs via UI elements"
+        ]
+      },
+      "outputs": {
+        "UIUpdates": [
+          "Spot price displays",
+          "Spot price change indicators",
+          "Timestamps"
+        ],
+        "localStorageUpdates": [
+          "Spot price history",
+          "Last API sync timestamp",
+          "Last cache refresh timestamp"
+        ]
+      }
+    },
+    "state.js": {
+      "scriptName": "state.js",
+      "purpose": "Manages application state for a precious metals inventory management application.",
+      "inputs": {
+        "localStorage": "For persistent storage of change log.",
+        "catalogManager": "Optional, for catalog ID management.",
+        "Metals API": "For retrieving spot price data."
+      },
+      "outputs": {
+        "global variables": "Provides globally accessible variables representing the application's state, including inventory, change log, spot prices, UI settings, and cached elements."
+      }
+    },
+    "theme.js": {
+      "scriptName": "theme.js",
+      "purpose": "Manages application theme (dark, light, sepia) using localStorage and system preferences.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "localStorage",
+          "THEME_KEY (external constant)",
+          "renderTable (optional function)"
+        ],
+        "system": [
+          "User's operating system theme preference"
+        ]
+      },
+      "outputs": {
+        "localStorage": "Stores the selected theme in localStorage under the THEME_KEY.",
+        "DOM": "Updates the document's root element with a data-theme attribute.",
+        "UI": "Potentially updates the UI (if renderTable function exists)"
+      }
+    },
+    "utils.js": {
+      "scriptName": "utils.js",
+      "purpose": "Provides utility functions for debugging, branding, performance monitoring, data validation, formatting, storage management, and inventory handling.",
+      "inputs": [
+        {
+          "type": "global",
+          "name": "DEBUG",
+          "description": "Boolean flag for debug logging"
+        },
+        {
+          "type": "global",
+          "name": "BRANDING_DOMAIN_OVERRIDE",
+          "description": "Domain-based branding override"
+        },
+        {
+          "type": "global",
+          "name": "BRANDING_TITLE",
+          "description": "Default branding title"
+        },
+        {
+          "type": "global",
+          "name": "MAX_LOCAL_FILE_SIZE",
+          "description": "Maximum local file size"
+        },
+        {
+          "type": "global",
+          "name": "cloudBackupEnabled",
+          "description": "Flag indicating cloud backup usage"
+        },
+        {
+          "type": "global",
+          "name": "spotHistory",
+          "description": "Array of spot price history data"
+        },
+        {
+          "type": "global",
+          "name": "LAST_API_SYNC_KEY",
+          "description": "Key for API sync data in storage"
+        },
+        {
+          "type": "global",
+          "name": "LAST_CACHE_REFRESH_KEY",
+          "description": "Key for cache data in storage"
+        },
+        {
+          "type": "global",
+          "name": "DEFAULT_CURRENCY",
+          "description": "Default currency code"
+        },
+        {
+          "type": "global",
+          "name": "ALLOWED_STORAGE_KEYS",
+          "description": "Allowed localStorage keys"
+        },
+        {
+          "type": "global",
+          "name": "inventory",
+          "description": "Inventory data array"
+        },
+        {
+          "type": "global",
+          "name": "APP_VERSION",
+          "description": "Application version"
+        },
+        {
+          "type": "global",
+          "name": "API_KEY_STORAGE_KEY",
+          "description": "Storage key for API keys"
+        },
+        {
+          "type": "library",
+          "name": "LZString",
+          "description": "Compression library (placeholder)"
+        },
+        {
+          "type": "library",
+          "name": "StackrTrackrEncryption",
+          "description": "Optional encryption library"
+        },
+        {
+          "type": "library",
+          "name": "JSZip",
+          "description": "Optional library for ZIP generation"
+        },
+        {
+          "type": "function",
+          "name": "myExpensiveFunction",
+          "description": "Example function passed to debounce"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "function",
+          "name": "stripNonAlphanumeric",
+          "description": "Returns a sanitized string"
+        },
+        {
+          "type": "function",
+          "name": "sanitizeObjectFields",
+          "description": "Returns a sanitized object"
+        },
+        {
+          "type": "function",
+          "name": "sanitizeImportedItem",
+          "description": "Returns a sanitized item"
+        },
+        {
+          "type": "function",
+          "name": "getContrastColor",
+          "description": "Returns a contrasting color"
+        },
+        {
+          "type": "function",
+          "name": "debounce",
+          "description": "Returns a debounced function"
+        },
+        {
+          "type": "console",
+          "description": "Debug messages (if DEBUG flag is true)"
+        },
+        {
+          "type": "console",
+          "description": "Performance warnings"
+        },
+        {
+          "type": "localStorage",
+          "description": "Data stored in localStorage"
+        },
+        {
+          "type": "file",
+          "description": "Downloaded file (via downloadFile function)"
+        },
+        {
+          "type": "file",
+          "description": "Compressed storage report"
+        },
+        {
+          "type": "popup",
+          "description": "eBay search window"
+        }
+      ]
+    },
+    "inventory.js": {
+      "scriptName": "inventory.js",
+      "purpose": "Manage a precious metals inventory, providing functionalities for data storage, manipulation, backup, restoration, and export/import.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "JSZip",
+          "Papa Parse",
+          "catalogManager",
+          "localStorage",
+          "APP_VERSION",
+          "LS_KEY",
+          "THEME_KEY",
+          "METALS",
+          "spotPrices"
+        ],
+        "files": [
+          "CSV files",
+          "JSON files",
+          "ZIP files"
+        ]
+      },
+      "outputs": {
+        "files": [
+          "ZIP archive",
+          "CSV file",
+          "JSON file",
+          "HTML file",
+          "PDF file"
+        ],
+        "console": [
+          "Debug logs",
+          "Error messages"
+        ],
+        "ui": [
+          "Updated inventory table",
+          "Summary totals"
+        ]
+      }
+    },
+    "versionCheck.js": {
+      "scriptName": "versionCheck.js",
+      "purpose": "Detect version changes and display a changelog to the user.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "./docs/changelog.md",
+          "localStorage",
+          "showAckModal (optional)",
+          "loadAnnouncements (optional)"
+        ],
+        "environmentVariables": [
+          "APP_VERSION",
+          "LS_KEY",
+          "VERSION_ACK_KEY",
+          "APP_VERSION_KEY"
+        ]
+      },
+      "outputs": {
+        "modal": "Displays a changelog modal if a new version is detected.",
+        "localStorage": "Updates localStorage with the acknowledged version."
+      }
+    },
+    "price-fetcher.js": {
+      "scriptName": "price-fetcher.js",
+      "purpose": "Fetches real-time precious metal prices, stores them in a PostgreSQL database, and caches them in Redis.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": {
+          "npmPackages": [
+            "redis",
+            "pg",
+            "winston",
+            "dotenv"
+          ],
+          "environmentVariables": [
+            "REDIS_URL",
+            "POSTGRES_URL",
+            "FETCH_INTERVAL"
+          ],
+          "providerModules": [
+            "../providers/metals-dev"
+          ]
+        }
+      },
+      "outputs": {
+        "database": "price_snapshots table in PostgreSQL database",
+        "cache": "Redis cache (prices:* keys)",
+        "logs": "Console logs (using Winston)"
+      }
+    },
+    "sanitize-name-slash.test.js": {
+      "scriptName": "sanitize-name-slash.test.js",
+      "purpose": "Unit test to verify that the sanitizeImportedItem function preserves slashes in item names.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "assert",
+          "../js/utils.js"
+        ]
+      },
+      "outputs": {
+        "console": "A success message ('sanitizeImportedItem keeps slash in name') or an assertion error."
+      }
+    },
+    "metals-dev.js": {
+      "scriptName": "metals-dev.js",
+      "purpose": "Fetch real-time precious metal price data from the Metals.dev API.",
+      "inputs": {
+        "arguments": [
+          {
+            "metal": "String (e.g., 'gold', 'silver')"
+          },
+          {
+            "currency": "String (e.g., 'USD', 'EUR', default: 'USD')"
+          }
+        ],
+        "dependencies": [
+          "axios"
+        ],
+        "environmentVariables": [
+          "METALS_DEV_API_KEY"
+        ]
+      },
+      "outputs": {
+        "fetchPrice": {
+          "type": "object",
+          "description": "A structured object containing price data (timestamp, metal, currency, price, bid, ask, etc.)"
+        },
+        "isHealthy": {
+          "type": "boolean",
+          "description": "Indicates whether the API is reachable and functional."
+        }
+      }
+    },
+    "html-doc-generator.js": {
+      "scriptName": "html-doc-generator.js",
+      "purpose": "Converts Markdown files to HTML documentation with optional JSON metadata generation, utilizing a template for consistent formatting.",
+      "inputs": {
+        "arguments": [
+          "<markdown-file>",
+          "--all <markdown-file>",
+          "--batch *.md"
+        ],
+        "dependencies": [
+          "fs/promises",
+          "path",
+          "marked",
+          "./docs/html/MASTER_ROADMAP.html"
+        ]
+      },
+      "outputs": {
+        "html": "<markdown-filename>.html",
+        "json": "<markdown-filename>.json"
+      }
+    },
+    "gemini-scribe.js": {
+      "scriptName": "gemini-scribe.js",
+      "purpose": "Converts Markdown files to HTML and generates an index file for easy navigation of the generated documentation.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "marked",
+          "fs/promises",
+          "path"
+        ],
+        "inputDirectory": "/Volumes/DATA/GitHub/rEngine/docs/generated"
+      },
+      "outputs": {
+        "outputDirectory": "/Volumes/DATA/GitHub/rEngine/docs/generated/human-readable",
+        "files": [
+          "*.html",
+          "index.html"
+        ],
+        "consoleOutput": "Generated HTML files and index."
+      }
+    },
+    "documentation-html-generator.js": {
+      "scriptName": "documentation-html-generator.js",
+      "purpose": "Generate HTML documentation from Markdown files.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "url",
+          "marked"
+        ],
+        "markdownFiles": [
+          "docs/*.md",
+          "patchnotes/*.md",
+          "rEngine-patchnotes/*.md"
+        ]
+      },
+      "outputs": {
+        "htmlFiles": "docs/html/*.html",
+        "indexHtml": "docs/html/index.html",
+        "consoleOutput": [
+          "Success/Error messages for each file processed"
+        ]
+      }
+    },
+    "memory-health-monitor.js": {
+      "scriptName": "memory-health-monitor.js",
+      "purpose": "Real-time monitoring of system memory health, including critical file integrity, MCP connectivity, and sync status. Integrates with Smart Scribe for real-time monitoring and provides scheduled validation.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "axios"
+        ],
+        "configuration": {
+          "baseDir": "/Volumes/DATA/GitHub/rEngine",
+          "thresholds": {
+            "maxFileAge": 4147200000,
+            "maxSyncLag": 86400000,
+            "minFileSize": 100,
+            "maxLogAge": 604800000
+          }
+        }
+      },
+      "outputs": {
+        "console": "Summary report to the console.",
+        "file": "Detailed JSON report saved to the logs directory."
+      }
+    },
+    "memory-sync-utility.js": {
+      "scriptName": "memory-sync-utility.js",
+      "purpose": "Synchronizes data between an MCP server and local rMemory storage, addressing potential data loss and ensuring agent continuity.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": [
+          "fs-extra",
+          "path"
+        ],
+        "configuration": {
+          "baseDir": "process.cwd()",
+          "memoryDir": "path.join(this.baseDir, 'rMemory', 'rAgentMemories')",
+          "criticalFiles": [
+            "memory.json",
+            "handoff.json",
+            "tasks.json",
+            "persistent-memory.json"
+          ]
+        }
+      },
+      "outputs": {
+        "console": "Sync status updates, validation results, and a final report.",
+        "files": [
+          "logs/memory-sync-YYYY-MM-DD.json",
+          "logs/sync-validation-YYYY-MM-DD.json",
+          "rMemory/rAgentMemories/memory.json",
+          "rMemory/rAgentMemories/handoff.json",
+          "rMemory/rAgentMemories/tasks.json",
+          "rMemory/rAgentMemories/persistent-memory.json",
+          "rMemory/rAgentMemories/mcp-sync-summary.json"
+        ]
+      }
+    },
+    "smart-scribe-memory-monitor.js": {
+      "scriptName": "smart-scribe-memory-monitor.js",
+      "purpose": "Monitor the memory health of the Smart Scribe system, including MCP server connectivity and local memory file integrity.",
+      "inputs": {
+        "arguments": [
+          "health",
+          "connectivity",
+          "scribe"
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "child_process"
+        ],
+        "config": {
+          "baseDir": "/Volumes/DATA/GitHub/rEngine",
+          "memoryDir": "path derived from baseDir",
+          "logDir": "path derived from baseDir",
+          "criticalFiles": [
+            "memory.json",
+            "handoff.json",
+            "tasks.json",
+            "persistent-memory.json",
+            "mcp-sync-summary.json"
+          ],
+          "maxFileAge": 86400000,
+          "checkInterval": 900000
+        }
+      },
+      "outputs": {
+        "console": "Detailed health reports or connectivity test results.",
+        "file": "/Volumes/DATA/GitHub/rEngine/logs/smart-scribe-memory-health.json"
+      }
+    },
+    "mcp-client.js": {
+      "scriptName": "mcp-client.js",
+      "purpose": "Add memory entries to a remote server via HTTP POST requests.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "title",
+            "type": "string",
+            "description": "Title of the memory entry."
+          },
+          {
+            "name": "description",
+            "type": "string",
+            "description": "Description of the memory entry."
+          },
+          {
+            "name": "type",
+            "type": "string",
+            "description": "Type of the memory entry (e.g., 'work', 'personal')."
+          }
+        ],
+        "dependencies": [
+          {
+            "name": "node-fetch",
+            "version": "See package.json"
+          }
+        ],
+        "url": "http://localhost:3036/add"
+      },
+      "outputs": {
+        "console": [
+          {
+            "type": "success",
+            "message": "Memory added successfully: [JSON response]"
+          },
+          {
+            "type": "error",
+            "message": "Failed to add memory: [Error message]"
+          }
+        ]
+      }
+    },
+    "rengine-client.js": {
+      "scriptName": "rengine-client.js",
+      "purpose": "Send commands to the rEngine MCP server for execution.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "command",
+            "type": "string",
+            "description": "The command to execute."
+          },
+          {
+            "name": "args",
+            "type": "object",
+            "description": "An object containing key-value pairs and a 'values' array for additional arguments."
+          }
+        ],
+        "dependencies": [
+          {
+            "name": "node-fetch",
+            "version": "See package.json"
+          }
+        ],
+        "configuration": {
+          "RENGINE_URL": "http://localhost:3034"
+        }
+      },
+      "outputs": {
+        "console": [
+          "Command execution status messages",
+          "rEngine server responses",
+          "Error messages"
+        ]
+      }
+    },
+    "mobile-checkin.js": {
+      "scriptName": "mobile-checkin.js",
+      "purpose": "Automates merging mobile development changes into the main codebase, handling conflicts and generating reports.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "checkoutId",
+            "type": "string",
+            "description": "Unique identifier for the mobile checkout package."
+          },
+          {
+            "name": "zipPath",
+            "type": "string",
+            "description": "Path to the checkout zip file (optional)."
+          }
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "url",
+          "child_process",
+          "util",
+          "unzipper"
+        ],
+        "configuration": {
+          "baseDir": "/Volumes/DATA/GitHub/rEngine",
+          "memoryScript": "/Volumes/DATA/GitHub/rEngine/rEngine/add-context.js"
+        }
+      },
+      "outputs": {
+        "report": {
+          "type": "json",
+          "path": "<checkin-id>-report.json",
+          "description": "Detailed JSON report of the checkin process."
+        },
+        "summary": {
+          "type": "markdown",
+          "path": "<checkin-id>-summary.md",
+          "description": "Human-readable Markdown summary of the checkin process."
+        },
+        "memoryUpdate": {
+          "type": "contextualData",
+          "description": "Updates a centralized memory system (or saves data locally if the system is unavailable)."
+        },
+        "consoleOutput": "Provides real-time feedback on the checkin progress, including conflicts and success messages."
+      }
+    },
+    "mobile-checkout.js": {
+      "scriptName": "mobile-checkout.js",
+      "purpose": "Creates a portable development package for offline mobile development, securely handling sensitive data.",
+      "inputs": {
+        "arguments": [
+          {
+            "name": "destination-folder",
+            "description": "The folder where the checkout package will be created (currently ignored, writes to source directory)."
+          }
+        ],
+        "dependencies": [
+          "fs-extra",
+          "path",
+          "url",
+          "child_process",
+          "util",
+          "archiver",
+          "git"
+        ],
+        "configurationFiles": [
+          ".env",
+          ".env.local",
+          "openwebui-api-keys.env",
+          "rEngine/.env",
+          "rMemory/.env",
+          "rEngine/config.json",
+          "rMemory/config.json",
+          "rAgents/config.json"
+        ]
+      },
+      "outputs": {
+        "files": [
+          "{checkoutId}.zip",
+          "{checkoutId}-manifest.json",
+          ".mobile-env/mobile.env"
+        ],
+        "console": "Progress messages, success/failure indicators, and checkout information."
+      }
+    },
+    "temp_collect_button_analysis.md": {
+      "scriptName": "temp_collect_button_analysis",
+      "purpose": "Analyze and diagnose a UI issue with the 'collect' button toggle in the StackTrackr application.",
+      "inputs": {
+        "files": [
+          "/rProjects/StackTrackr/css/styles.css",
+          "/rProjects/StackTrackr/index.html",
+          "/rProjects/StackTrackr/js/inventory.js",
+          "/rProjects/StackTrackr/js/events.js",
+          "/rProjects/StackTrackr/js/utils.js"
+        ],
+        "problemDescription": "Visual mismatch in collect button toggle states."
+      },
+      "outputs": {
+        "type": "report",
+        "content": [
+          "Root Cause Analysis",
+          "Visual Element Issues",
+          "CSS Recommendations",
+          "JavaScript Issues",
+          "Priority Assessment"
+        ]
+      }
+    },
+    "styles.css": {
+      "scriptName": "styles.css",
+      "purpose": "Define the visual theme and layout for a web application, supporting light, dark, and sepia modes.",
+      "inputs": {
+        "arguments": [],
+        "dependencies": []
+      },
+      "outputs": {
+        "type": "CSS stylesheet",
+        "description": "A CSS stylesheet that renders visual styles to the application."
+      }
+    },
+    "collect_button_analysis_request.md": {
+      "scriptName": "Collect Button Toggle Color Analysis Request",
+      "purpose": "To identify and resolve a visual bug causing color mismatches in the 'collect' button toggles of the StackTrackr application.",
+      "inputs": {
+        "files": [
+          "/rProjects/StackTrackr/css/styles.css",
+          "/rProjects/StackTrackr/js/inventory.js",
+          "/rProjects/StackTrackr/js/events.js",
+          "/rProjects/StackTrackr/index.html"
+        ],
+        "userReport": "User report detailing the button color mismatch issue."
+      },
+      "outputs": {
+        "analysisReport": "A detailed report outlining the root cause(s) of the issue, specific code areas to investigate, recommended debugging steps, and suggested fixes for visual consistency."
+      }
+    }
+  }
+}

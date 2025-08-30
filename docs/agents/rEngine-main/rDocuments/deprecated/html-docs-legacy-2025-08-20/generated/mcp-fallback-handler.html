@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mcp-fallback-handler - StackTrackr Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #667eea;
+            --rengine-secondary: #764ba2;
+            --rengine-accent: #495057;
+            --rengine-accent-light: #6c757d;
+            --status-success: #28a745;
+            --status-warning: #ffc107;
+            --status-danger: #dc3545;
+            --status-info: #007acc;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-muted: #888;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --border-color: #e1e4e8;
+            --shadow-heavy: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--rengine-primary) 0%, var(--rengine-secondary) 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            border-radius: 15px;
+            box-shadow: var(--shadow-heavy);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--rengine-accent) 0%, var(--rengine-accent-light) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: var(--bg-secondary);
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: var(--status-info);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3 { 
+            color: var(--text-primary); 
+            margin-top: 2em; 
+            margin-bottom: 0.5em; 
+        }
+        .content h1 { font-size: 2em; border-bottom: 2px solid var(--rengine-primary); padding-bottom: 0.5em; }
+        .content h2 { font-size: 1.5em; }
+        .content h3 { font-size: 1.3em; }
+        
+        .content pre { 
+            background: var(--bg-secondary); 
+            padding: 1em; 
+            border-radius: 5px; 
+            overflow-x: auto; 
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+        }
+        
+        .content code { 
+            background: var(--bg-secondary); 
+            padding: 0.2em 0.4em; 
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        .content blockquote {
+            border-left: 4px solid var(--rengine-primary);
+            margin: 1em 0;
+            padding-left: 1em;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 1em 1em 1em 2em;
+            border-radius: 5px;
+        }
+        
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .content th, .content td {
+            border: 1px solid var(--border-color);
+            padding: 0.75em;
+            text-align: left;
+        }
+        
+        .content th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content a {
+            color: var(--status-info);
+            text-decoration: none;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
+        .metadata {
+            background: var(--bg-secondary);
+            padding: 1em;
+            border-radius: 5px;
+            margin-bottom: 2em;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .footer {
+            background: var(--bg-secondary);
+            padding: 20px 30px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .footer .branding {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .footer .system-name {
+            font-weight: 600;
+            color: var(--rengine-accent);
+        }
+
+        .footer .version {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .footer .divider {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .nav-bar {
+                padding: 10px 20px;
+            }
+            
+            .footer .branding {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>mcp-fallback-handler</h1>
+            <div class="subtitle">StackTrackr Documentation</div>
+            <div class="meta">
+                <span>📁 mcp-fallback-handler.md</span>
+                <span>📅 2025-08-20</span>
+                
+            </div>
+        </header>
+        
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../../html-docs/documentation.html" class="nav-link">🏠 Documentation Portal</a>
+                <a href="../index.html" class="nav-link">📚 All Docs</a>
+                <a href="../../html-docs/developmentstatus.html" class="nav-link">📊 Development Status</a>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <div class="metadata">
+                <strong>📂 Source File:</strong> mcp-fallback-handler.md | 
+                <strong>🕒 Generated:</strong> 8/19/2025, 9:51:20 PM |
+                <strong>🎨 Engine:</strong> Gemini HTML Converter
+            </div>
+            ```html
+<h1>MCP Fallback Handler for StackTrackr</h1>
+
+<h2>Purpose & Overview</h2>
+
+<p>The <code>mcp-fallback-handler.js</code> script provides an automatic fallback mechanism to local JSON memory files when the MCP (Memory Coordination Platform) server is unavailable or fails. This ensures that the application can continue to function and retrieve memory data even when the primary MCP server is inaccessible.</p>
+
+<p>The script is designed to be used as a dependency in the StackTrackr application, allowing it to seamlessly switch between the MCP server and local JSON files for memory retrieval, ensuring a robust and reliable user experience.</p>
+
+<h2>Technical Architecture</h2>
+
+<p>The <code>MCPFallbackHandler</code> class is the main component of this script and provides the following key functionality:</p>
+
+<ol>
+  <li><strong>MCP Connection Testing</strong>: The <code>testMCPConnection()</code> method checks if the MCP server is available and running.</li>
+  <li><strong>Local Memory Fallback</strong>: The <code>getLocalMemory()</code> method retrieves memory data from local JSON files when the MCP server is unavailable.</li>
+  <li><strong>Memory File Retrieval</strong>: The <code>getMemoryFile()</code> method retrieves a specific JSON memory file from predefined locations.</li>
+  <li><strong>Handoff Information</strong>: The <code>getHandoffInfo()</code> method retrieves critical handoff information, which is essential for agent transitions.</li>
+  <li><strong>Memory Retrieval with Fallback</strong>: The <code>getMemoryWithFallback()</code> method is the main entry point, which first checks the MCP server availability and then falls back to the local JSON files if necessary.</li>
+  <li><strong>Emergency Handoff</strong>: The <code>emergencyHandoff()</code> method retrieves all critical files for emergency handoff, regardless of the MCP server status.</li>
+</ol>
+
+<p>The script also includes a CLI interface that allows users to interact with the various functionalities of the <code>MCPFallbackHandler</code> class.</p>
+
+<h2>Dependencies</h2>
+
+<p>This script imports the following external dependencies:</p>
+
+<ul>
+  <li><code>fs/promises</code>: For file system operations.</li>
+  <li><code>path</code>: For handling file paths.</li>
+  <li><code>child_process</code>: For executing external commands.</li>
+  <li><code>url</code>: For converting file URLs to file paths.</li>
+</ul>
+
+<h2>Key Functions/Classes</h2>
+
+<h3><code>MCPFallbackHandler</code> Class</h3>
+
+<h4><code>testMCPConnection()</code></h4>
+<ul>
+  <li><strong>Purpose</strong>: Checks if the MCP server is available and running.</li>
+  <li><strong>Parameters</strong>: None.</li>
+  <li><strong>Return Value</strong>: <code>true</code> if the MCP server is available, <code>false</code> otherwise.</li>
+</ul>
+
+<h4><code>getLocalMemory(searchTerm)</code></h4>
+<ul>
+  <li><strong>Purpose</strong>: Retrieves memory data from local JSON files using the existing <code>recall.js</code> system.</li>
+  <li><strong>Parameters</strong>: <code>searchTerm</code> (optional) - The search term for the memory retrieval.</li>
+  <li><strong>Return Value</strong>: An object containing the source, success status, data (or error message), and the search term.</li>
+</ul>
+
+<h4><code>getMemoryFile(filename)</code></h4>
+<ul>
+  <li><strong>Purpose</strong>: Retrieves a specific JSON memory file from predefined locations.</li>
+  <li><strong>Parameters</strong>: <code>filename</code> - The name of the memory file to retrieve.</li>
+  <li><strong>Return Value</strong>: An object containing the source, success status, file path, and the data (or error message).</li>
+</ul>
+
+<h4><code>getHandoffInfo()</code></h4>
+<ul>
+  <li><strong>Purpose</strong>: Retrieves the handoff information, which is critical for agent transitions.</li>
+  <li><strong>Parameters</strong>: None.</li>
+  <li><strong>Return Value</strong>: An object containing the source, success status, file path, data, and a summary of the current handoff.</li>
+</ul>
+
+<h4><code>getMemoryWithFallback(searchTerm)</code></h4>
+<ul>
+  <li><strong>Purpose</strong>: Retrieves memory data, first checking the MCP server availability and then falling back to local JSON files if necessary.</li>
+  <li><strong>Parameters</strong>: <code>searchTerm</code> (optional) - The search term for the memory retrieval.</li>
+  <li><strong>Return Value</strong>: An object containing the source, success status, data (or error message), and the search term.</li>
+</ul>
+
+<h4><code>emergencyHandoff()</code></h4>
+<ul>
+  <li><strong>Purpose</strong>: Retrieves all critical files for emergency handoff, regardless of the MCP server status.</li>
+  <li><strong>Parameters</strong>: None.</li>
+  <li><strong>Return Value</strong>: An object containing the source, success status, and the retrieved critical data.</li>
+</ul>
+
+<h2>Usage Examples</h2>
+
+<ol>
+  <li><strong>Retrieving Memory with Fallback</strong>:
+<pre><code class="language-javascript">const fallback = require('./mcp-fallback-handler.js');
+const memory = await fallback.getMemoryWithFallback('search term');
+console.log(memory);
+</code></pre></li>
+  <li><strong>Retrieving Handoff Information</strong>:
+<pre><code class="language-javascript">const fallback = require('./mcp-fallback-handler.js');
+const handoff = await fallback.getHandoffInfo();
+console.log(handoff);
+</code></pre></li>
+  <li><strong>Performing Emergency Handoff</strong>:
+<pre><code class="language-javascript">const fallback = require('./mcp-fallback-handler.js');
+const emergency = await fallback.emergencyHandoff();
+console.log(emergency);
+</code></pre></li>
+  <li><strong>Testing MCP Server Availability</strong>:
+<pre><code class="language-javascript">const fallback = require('./mcp-fallback-handler.js');
+const available = await fallback.testMCPConnection();
+console.log(`MCP Server is ${available ? 'available' : 'unavailable'}`);
+</code></pre></li>
+</ol>
+
+<h2>Configuration</h2>
+
+<p>This script does not require any external configuration. The necessary paths and file locations are hardcoded within the <code>MCPFallbackHandler</code> class.</p>
+
+<h2>Error Handling</h2>
+
+<p>The script handles errors in the following ways:</p>
+
+<ol>
+  <li><strong>MCP Connection Testing</strong>: If the MCP server is not detected, the <code>testMCPConnection()</code> method returns <code>false</code> and logs a message indicating the fallback to local JSON memory.</li>
+  <li><strong>Local Memory Retrieval</strong>: If the local memory retrieval fails, the <code>getLocalMemory()</code> method returns an object with the <code>success</code> property set to <code>false</code> and the error message.</li>
+  <li><strong>Memory File Retrieval</strong>: If the memory file is not found in any of the predefined locations, the <code>getMemoryFile()</code> method returns an object with the <code>success</code> property set to <code>false</code> and an error message.</li>
+  <li><strong>Handoff Information Retrieval</strong>: If the handoff information is not found, the <code>getHandoffInfo()</code> method returns an object with the <code>success</code> property set to <code>false</code> and an error message.</li>
+</ol>
+
+<h2>Integration</h2>
+
+<p>This <code>mcp-fallback-handler.js</code> script is designed to be used as a dependency within the StackTrackr application. It provides a seamless fallback mechanism for memory retrieval, ensuring that the application can continue to function even when the primary MCP server is unavailable.</p>
+
+<h2>Development Notes</h2>
+
+<ul>
+  <li>The script uses the existing <code>recall.js</code> system for local memory retrieval, which is a part of the StackTrackr application.</li>
+  <li>The hardcoded file paths and locations may need to be adjusted based on the specific project structure and deployment environment.</li>
+  <li>The script assumes the existence of certain critical JSON files (e.g., <code>handoff.json</code>, <code>tasks.json</code>, etc.) in the predefined locations.</li>
+  <li>The emergency handoff functionality is designed to provide a last-resort option for retrieving critical data, regardless of the MCP server status.</li>
+</ul>
+```
+        </main>
+        
+        <footer class="footer">
+            <div class="branding">
+                <span>Generated from the <span class="system-name">rScribe Document System</span></span>
+                <span class="divider">•</span>
+                <span class="system-name">rEngine</span> <span class="version">(v2.1.0)</span>
+                <span class="divider">•</span>
+                <span>Last updated: 2025-08-20</span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

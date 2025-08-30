@@ -1,0 +1,47 @@
+{
+    "audit_info": {
+        "timestamp": "2025-08-17T07:37:35-05:00",
+        "repository": "StackTrackr",
+        "branch": "main",
+        "audit_type": "multi_agent_assessment",
+        "output_directory": "/Volumes/DATA/GitHub/rEngine/rAgents/output/project-audit-20250817-073734"
+    },
+    "agents_used": [
+  {
+    "provider": "anthropic",
+    "model": "claude-3-5-sonnet-20241022",
+    "status": "failed"
+  },
+  {
+    "provider": "google",
+    "model": "gemini-1.5-flash",
+    "status": "skipped"
+  },
+  {
+    "provider": "ollama",
+    "model": "gemma2:2b",
+    "status": "success"
+  },
+  {
+    "provider": "ollama",
+    "model": "llama3:8b",
+    "status": "success"
+  },
+  {
+    "provider": "ollama",
+    "model": "qwen2:7b",
+    "status": "success"
+  },
+  {
+    "provider": "ollama",
+    "model": "qwen2.5:3b",
+    "status": "success"
+  },
+  {
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "status": "failed"
+  }
+],
+    "performance_summary": {}
+}

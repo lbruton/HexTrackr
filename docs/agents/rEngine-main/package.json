@@ -1,0 +1,61 @@
+{
+  "name": "stacktrackr-rengine-platform",
+  "version": "3.04.87",
+  "description": "StackTrackr precious metals inventory with rEngine Platform v2.1.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo 'No tests specified' && exit 1",
+    "start": "node index.js",
+  "dev": "nodemon index.js",
+  "code:audit": "node tools/code-audit.js",
+  "code:audit:pdf": "node tools/generate-pdf.js docs/code-review/RENGINE_CODE_REVIEW.html docs/code-review/RENGINE_CODE_REVIEW.pdf",
+    "mobile-dev": "NODE_ENV=mobile npm start",
+    "mobile-checkout": "node scripts/mobile-checkout.js",
+    "mobile-checkin": "node scripts/mobile-checkin.js",
+    "docker:start": "./docker/docker-dev.sh start",
+    "docker:stop": "./docker/docker-dev.sh stop",
+    "docker:restart": "./docker/docker-dev.sh restart",
+    "docker:build": "./docker/docker-dev.sh build",
+    "docker:logs": "./docker/docker-dev.sh logs",
+    "docker:shell": "./docker/docker-dev.sh shell",
+    "docker:vscode": "./docker/docker-dev.sh vscode",
+    "docker:clean": "./docker/docker-dev.sh clean",
+    "docs:publish": "node rEngine/publish-docs.js",
+    "docs:publish:stacktrackr": "node rEngine/publish-docs.js --project=StackTrackr",
+    "docs:publish:vulntrackr": "node rEngine/publish-docs.js --project=VulnTrackr"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server-filesystem": "^2025.8.21",
+    "@modelcontextprotocol/server-memory": "^2025.8.4",
+    "@modelcontextprotocol/server-github": "^0.6.0",
+    "@modelcontextprotocol/server-git": "^0.6.0",
+    "@modelcontextprotocol/server-sqlite": "^0.6.0",
+    "@upstash/context7-mcp": "^1.0.16",
+    "esprima": "^4.0.1",
+    "archiver": "^7.0.1",
+    "axios": "^1.7.2",
+    "chokidar": "^4.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "fs-extra": "^11.2.0",
+    "glob": "^11.0.3",
+    "marked": "^16.2.0",
+    "playwright": "^1.55.0",
+    "unzipper": "^0.12.3",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "inventory",
+    "precious-metals",
+    "rengine",
+    "ai-platform",
+    "docker"
+  ],
+  "author": "lbruton",
+  "license": "MIT"
+}
