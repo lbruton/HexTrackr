@@ -1,7 +1,0 @@
-{
-  "model": "mistral:7b",
-  "success": false,
-  "error": "API error: 404",
-  "responseTime": 7,
-  "timestamp": "2025-08-23T10:29:43.771Z"
-}

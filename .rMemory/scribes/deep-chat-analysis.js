@@ -20,13 +20,14 @@ class DeepChatAnalysisScribe {
         this.anthropic = new Anthropic({
             apiKey: process.env.ANTHROPIC_API_KEY,
         });
-        this.model = "claude-opus-4-1-20250805"; // Latest Claude Opus 4.1 with correct format
+        this.model = "claude-3-5-sonnet-20241022"; // Using current Sonnet model 
         this.chatSessionsPath = path.join(
             process.env.HOME,
             "Library/Application Support/Code/User/workspaceStorage"
         );
         this.outputPath = path.join(__dirname, "../docs/ops/recovered-memories");
-        this.batchSize = 1; // Reduced batch size for Opus processing
+        this.batchSize = 3; // Increased batch size for Sonnet efficiency
+        this.mementoTools = true; // Use Memento MCP for direct integration
     }
 
     /**
@@ -97,7 +98,7 @@ class DeepChatAnalysisScribe {
                     
                     sessions.push(...jsonFiles);
                 }
-            } catch (error) {
+            } catch (_error) {
                 // Skip if chatSessions doesn't exist
                 continue;
             }
@@ -179,7 +180,7 @@ class DeepChatAnalysisScribe {
     /**
      * Extract insights from chat data using Claude API
      */
-    async extractInsights(chatData, session) {
+    async extractInsights(chatData, _session) {
         try {
             // Prepare conversation text for analysis
             const conversationText = this.formatChatForAnalysis(chatData);
@@ -234,62 +235,84 @@ class DeepChatAnalysisScribe {
     }
 
     /**
-     * Create prompt for insight extraction (optimized for Claude) with project classification
+     * Create prompt for insight extraction using comprehensive memory analysis framework
      */
     createInsightExtractionPrompt(conversationText) {
-        return `You are an expert AI assistant analyzing VS Code chat conversations to extract key insights for project memory reconstruction. 
+        
+        return `You are an expert memory analyst for the HexTrackr project following the comprehensive memory analysis framework.
 
-CONVERSATION TO ANALYZE:
+## Conversation Data to Analyze
 ${conversationText}
 
-First, identify which project this conversation belongs to based on context clues:
-- **HexTrackr**: Task tracking, project management, Docker, Neo4j, .rMemory system, Memento MCP
-- **StackTrackr**: Precious metals tracking, financial data, market analysis
-- **rMemory**: Memory system development, AI embeddings, chat analysis tools, agent systems
-- **Legacy rMemory**: Historical rEngine, rAgents, rScribe, rMemories ecosystem (mark as "rMemory")
+## Analysis Instructions
+Process this VS Code chat conversation to identify:
+1. **Technical Decisions** - Architecture choices, technology selections, design patterns
+2. **Problem Solutions** - Bug fixes, implementation strategies, workarounds  
+3. **Code Insights** - Function discoveries, API integrations, security patterns
+4. **Process Knowledge** - Workflows, tool configurations, deployment procedures
+5. **Project Context** - Goals, constraints, user requirements, business logic
 
-For legacy content, look for references to: rEngine, rAgents, rScribe, rMemories, or similar r-prefixed tools.
-All legacy rMemory ecosystem content should be classified as "rMemory" project.
-
-Extract and categorize the following information as valid JSON:
+## Required Output Format
+Structure your analysis as JSON entities for Memento MCP:
 
 {
-  "project_classification": {
-    "primary_project": "HexTrackr|StackTrackr|rMemory|Unknown",
-    "confidence": 0.95,
-    "legacy_detected": false,
-    "context_clues": ["specific terms, file paths, or concepts that indicated the project"]
-  },
-  "decisions": ["specific architectural or technical decisions made"],
-  "problems_solved": ["concrete technical problems that were resolved"],
-  "frustrations": [
+  "entities": [
     {
-      "issue": "specific frustration or pain point encountered",
-      "category": "build_error|import_issue|config_problem|syntax_error|logic_bug|performance|deployment|testing|documentation|tooling",
-      "time_impact": "immediate|minutes|hours|recurring",
-      "resolution_status": "solved|workaround|unresolved"
+      "name": "Technical Decision: [Brief Description]",
+      "entityType": "technical_decision",
+      "observations": [
+        "Decision: [What was decided]",
+        "Rationale: [Why this was chosen]",
+        "Implementation: [How it was implemented]",
+        "Impact: [Effect on project]",
+        "Date: [When this occurred]"
+      ]
+    },
+    {
+      "name": "Problem Solution: [Brief Description]", 
+      "entityType": "problem_solution",
+      "observations": [
+        "Problem: [Issue description]",
+        "Cause: [Root cause analysis]",
+        "Solution: [How it was resolved]",
+        "Prevention: [How to avoid future occurrence]",
+        "Context": [Related information]"
+      ]
+    },
+    {
+      "name": "Code Discovery: [Function/API/Pattern Name]",
+      "entityType": "code_knowledge", 
+      "observations": [
+        "Type: [Function/API/Library/Pattern]",
+        "Purpose: [What it does]",
+        "Usage: [How to use it]",
+        "Integration: [How it fits with other code]",
+        "Notes: [Important considerations]"
+      ]
+    },
+    {
+      "name": "Process Knowledge: [Workflow/Tool/Configuration]",
+      "entityType": "process_knowledge",
+      "observations": [
+        "Process: [What workflow or procedure]",
+        "Steps: [How to execute]", 
+        "Tools: [Required tools or dependencies]",
+        "Gotchas: [Common pitfalls or important notes]",
+        "Context": [When to use this process]"
+      ]
     }
-  ],
-  "code_changes": ["files, functions, or components modified/created"],
-  "insights": ["key learnings, discoveries, or realizations"],
-  "context": ["important project context or state changes"],
-  "next_steps": ["planned actions, follow-ups, or future work"],
-  "entities": ["important project entities, tools, or components mentioned"],
-  "relationships": ["connections between concepts, dependencies, or workflows"],
-  "timeline": ["chronological sequence of major events in this session"]
+  ]
 }
 
-Guidelines:
-- Project classification is CRITICAL - analyze file paths, terminology, and context carefully
-- Focus on actionable, concrete information that would help future developers understand what happened
-- CAPTURE FRUSTRATIONS: Extract any pain points, blockers, errors, or time-wasting issues encountered
-- Ignore small talk, routine operations, or basic troubleshooting
-- Prioritize decisions, code changes, problem resolutions, and frustration patterns
-- Extract specific file names, function names, and technical details when mentioned
-- Identify patterns, workflows, or methodologies discussed
-- Note any architectural patterns, design decisions, or best practices established
+## Quality Standards
+- **Be Specific**: Include exact function names, file paths, command syntax
+- **Capture Context**: Explain why decisions were made, not just what was done
+- **Link Relationships**: Note how different decisions/solutions relate to each other
+- **Preserve Rationale**: The thinking behind choices is as important as the choices themselves
 
-Return ONLY the JSON object, no additional text.`;
+Focus on conversations that contain architecture decisions, problem-solving sessions, tool configurations, code implementations, or process improvements. Skip pure social interaction or off-topic discussions.
+
+Your analysis feeds directly into Memento MCP for persistent knowledge storage that will help future AI assistants understand the reasoning and context behind technical decisions.`;
     }
 
     /**
@@ -319,31 +342,27 @@ Return ONLY the JSON object, no additional text.`;
      */
     parseInsightResponse(response) {
         try {
-            // Claude typically provides better structured JSON responses
+            // Try to extract JSON from response
             const jsonMatch = response.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                const parsed = JSON.parse(jsonMatch[0]);
-                return {
-                    ...parsed,
-                    extracted_at: new Date().toISOString(),
-                    source: "claude-api"
-                };
+            if (!jsonMatch) {
+                console.warn("⚠️  No JSON found in response");
+                return null;
             }
+
+            const parsed = JSON.parse(jsonMatch[0]);
             
-            // Fallback: treat as plain text summary
-            return {
-                summary: response,
-                extracted_at: new Date().toISOString(),
-                source: "claude-api"
-            };
+            // Validate the expected structure from our comprehensive prompt
+            if (!parsed.entities || !Array.isArray(parsed.entities)) {
+                console.warn("⚠️  Response missing entities array");
+                return null;
+            }
+
+            // Return the entities directly for Memento MCP
+            return parsed;
             
         } catch (error) {
-            return {
-                raw_response: response,
-                parse_error: error.message,
-                extracted_at: new Date().toISOString(),
-                source: "claude-api"
-            };
+            console.warn("⚠️  Failed to parse insight response:", error.message);
+            return null;
         }
     }
 
@@ -444,52 +463,77 @@ ${session.insights.code_changes.map(c => `- ${c}`).join("\n")}
     }
 
     /**
-     * Create Memento import file
+     * Create Memento import file and directly integrate with Memento MCP
      */
     async createMementoImport(memories) {
-        const entities = [];
+        console.log("📊 Creating Memento MCP integration...");
+        
+        const allEntities = [];
         const relations = [];
 
+        // Process each memory session
         memories.forEach(session => {
-            if (!session.insights) {return;}
+            if (!session.insights?.entities) {return;}
 
-            // Create session entity
+            // Add entities from the comprehensive analysis
+            session.insights.entities.forEach(entity => {
+                // Enhance entity with session context
+                const enhancedEntity = {
+                    ...entity,
+                    observations: [
+                        ...entity.observations,
+                        `Source: VS Code Chat Session ${session.sessionId}`,
+                        `Workspace: ${session.workspace}`,
+                        `Extracted: ${new Date().toISOString()}`
+                    ]
+                };
+                allEntities.push(enhancedEntity);
+            });
+
+            // Create a session entity to track the source
             const sessionEntity = {
                 name: `Chat Session ${session.sessionId}`,
                 entityType: "chat_session",
                 observations: [
-                    `Processed ${session.messageCount} messages`,
+                    `Processed ${session.messageCount || 0} messages`,
                     `Workspace: ${session.workspace}`,
-                    `Timestamp: ${session.timestamp}`
+                    `Timestamp: ${session.timestamp}`,
+                    `Entities extracted: ${session.insights.entities.length}`
                 ]
             };
+            allEntities.push(sessionEntity);
 
-            if (session.insights.decisions) {
-                sessionEntity.observations.push(...session.insights.decisions.map(d => `Decision: ${d}`));
-            }
-
-            if (session.insights.problems_solved) {
-                sessionEntity.observations.push(...session.insights.problems_solved.map(p => `Solved: ${p}`));
-            }
-
-            if (session.insights.frustrations) {
-                sessionEntity.observations.push(...session.insights.frustrations.map(f => 
-                    `Frustration: ${f.issue} [${f.category}] - ${f.time_impact} impact, ${f.resolution_status}`
-                ));
-            }
-
-            entities.push(sessionEntity);
+            // Create relations between session and extracted entities
+            session.insights.entities.forEach(entity => {
+                relations.push({
+                    from: sessionEntity.name,
+                    to: entity.name,
+                    relationshipType: "extracted_from",
+                    observations: [`Extracted from chat analysis on ${new Date().toISOString()}`]
+                });
+            });
         });
 
         const importData = {
-            type: "chat_archaeology_import",
+            type: "comprehensive_chat_analysis",
             generated_at: new Date().toISOString(),
-            entities,
-            relations
+            entities: allEntities,
+            relations,
+            summary: {
+                total_entities: allEntities.length,
+                total_relations: relations.length,
+                sessions_processed: memories.length
+            }
         };
 
-        const importPath = path.join(this.outputPath, "memento-import.json");
+        // Save to file for backup
+        const importPath = path.join(this.outputPath, "memento-comprehensive-import.json");
         await fs.writeFile(importPath, JSON.stringify(importData, null, 2));
+        
+        console.log(`💾 Saved ${allEntities.length} entities to ${importPath}`);
+        console.log("🔄 TODO: Integrate with Memento MCP to store entities directly in Neo4j");
+        
+        return importData;
     }
 
     /**

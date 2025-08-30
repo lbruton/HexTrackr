@@ -1,0 +1,13 @@
+[
+  {
+    "entityType": "chat_evidence_cluster",
+    "name": "Chat Evidence: hextrackr:development:general:2025-08-30",
+    "observations": [
+      "Topic: hextrackr:development:general:2025-08-30",
+      "Evidence count: 38",
+      "Quality range: 0.3 - 0.7",
+      "Date range: 2025-08-30T06:37:09.899Z to 2025-08-30T06:37:10.038Z",
+      "Sources: vscode_chat"
+    ]
+  }
+]

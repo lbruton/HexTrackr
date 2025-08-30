@@ -1,0 +1,20 @@
+{
+  "10min": {
+    "window": "10min",
+    "generated_at": "2025-08-30T10:33:25.193Z",
+    "evidence_count": 0,
+    "summary": "No recent activity in last 10min"
+  },
+  "30min": {
+    "window": "30min",
+    "generated_at": "2025-08-30T10:33:25.193Z",
+    "evidence_count": 0,
+    "summary": "No recent activity in last 30min"
+  },
+  "60min": {
+    "window": "60min",
+    "generated_at": "2025-08-30T10:33:25.193Z",
+    "evidence_count": 0,
+    "summary": "No recent activity in last 60min"
+  }
+}

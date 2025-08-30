@@ -1,0 +1,1581 @@
+{
+  "metadata": {
+    "project": "HexTrackr",
+    "created_at": "2025-08-30T07:17:41.128Z",
+    "total_items": 102,
+    "embedding_model": "nomic-embed-text:latest",
+    "version": "1.0.0"
+  },
+  "embeddings_summary": {
+    "rengine_backup": {
+      "count": 50,
+      "topics": [
+        "hextrackr:backup:context-matrix",
+        "hextrackr:backup:consolidated-matrix",
+        "hextrackr:backup:backup-context-matrix",
+        "hextrackr:backup:variables",
+        "hextrackr:backup:version-history",
+        "hextrackr:backup:workflow-protocols",
+        "hextrackr:backup:zip_workflow",
+        "hextrackr:backup:tasks",
+        "hextrackr:backup:test-memory",
+        "hextrackr:backup:tools",
+        "hextrackr:backup:structure",
+        "hextrackr:backup:structure_complete",
+        "hextrackr:backup:styles",
+        "hextrackr:backup:sync_config",
+        "hextrackr:backup:sync_metadata",
+        "hextrackr:backup:rgemini_pro_memories",
+        "hextrackr:backup:roadmap",
+        "hextrackr:backup:seamless_experience",
+        "hextrackr:backup:session-history",
+        "hextrackr:backup:restoration-1755924494946",
+        "hextrackr:backup:restoration-1755924535160",
+        "hextrackr:backup:restoration-1755924817296",
+        "hextrackr:backup:restoration_metadata",
+        "hextrackr:backup:prompts",
+        "hextrackr:backup:rclaude_sonnet_memories",
+        "hextrackr:backup:recentissues",
+        "hextrackr:backup:restoration-1755924494845",
+        "hextrackr:backup:persistent-memory",
+        "hextrackr:backup:personality-profile",
+        "hextrackr:backup:preferences",
+        "hextrackr:backup:project-states",
+        "hextrackr:backup:natural_communication",
+        "hextrackr:ragents",
+        "hextrackr:backup:patterns",
+        "hextrackr:backup:performance",
+        "hextrackr:backup:live_coordination",
+        "hextrackr:backup:master_memory_lookup",
+        "hextrackr:backup:mcp-sync-summary",
+        "hextrackr:backup:memory-snapshot",
+        "hextrackr:backup:memory",
+        "hextrackr:backup:gpt-session-1755707428067",
+        "hextrackr:backup:gpt-session-1755876045139",
+        "hextrackr:backup:gpt-session-1755877104533",
+        "hextrackr:backup:gpt4_memories",
+        "hextrackr:backup:gpt4o_memories",
+        "hextrackr:backup:handoff",
+        "hextrackr:backup:interactions",
+        "hextrackr:backup:lease",
+        "hextrackr:backup:gpt-session-1755564666251",
+        "hextrackr:backup:gpt-session-1755565108556"
+      ],
+      "avg_dimensions": 768
+    },
+    "canonical_note": {
+      "count": 52,
+      "topics": [
+        "hextrackr:backup:context-matrix",
+        "hextrackr:backup:consolidated-matrix",
+        "hextrackr:backup:backup-context-matrix",
+        "hextrackr:backup:variables",
+        "hextrackr:backup:version-history",
+        "hextrackr:backup:workflow-protocols",
+        "hextrackr:backup:zip_workflow",
+        "hextrackr:backup:tasks",
+        "hextrackr:backup:test-memory",
+        "hextrackr:backup:tools",
+        "hextrackr:backup:structure",
+        "hextrackr:backup:structure_complete",
+        "hextrackr:backup:styles",
+        "hextrackr:backup:sync_config",
+        "hextrackr:backup:sync_metadata",
+        "hextrackr:backup:rgemini_pro_memories",
+        "hextrackr:backup:roadmap",
+        "hextrackr:backup:seamless_experience",
+        "hextrackr:backup:session-history",
+        "hextrackr:backup:restoration-1755924494946",
+        "hextrackr:backup:restoration-1755924535160",
+        "hextrackr:backup:restoration-1755924817296",
+        "hextrackr:backup:restoration_metadata",
+        "hextrackr:backup:prompts",
+        "hextrackr:backup:rclaude_sonnet_memories",
+        "hextrackr:backup:recentissues",
+        "hextrackr:backup:restoration-1755924494845",
+        "hextrackr:backup:persistent-memory",
+        "hextrackr:backup:personality-profile",
+        "hextrackr:backup:preferences",
+        "hextrackr:backup:project-states",
+        "hextrackr:backup:natural_communication",
+        "hextrackr:ragents",
+        "hextrackr:backup:patterns",
+        "hextrackr:backup:performance",
+        "hextrackr:backup:live_coordination",
+        "hextrackr:backup:master_memory_lookup",
+        "hextrackr:backup:mcp-sync-summary",
+        "hextrackr:backup:memory-snapshot",
+        "hextrackr:backup:memory",
+        "hextrackr:backup:gpt-session-1755707428067",
+        "hextrackr:backup:gpt-session-1755876045139",
+        "hextrackr:backup:gpt-session-1755877104533",
+        "hextrackr:backup:gpt4_memories",
+        "hextrackr:backup:gpt4o_memories",
+        "hextrackr:backup:handoff",
+        "hextrackr:backup:interactions",
+        "hextrackr:backup:lease",
+        "hextrackr:backup:gpt-session-1755564666251",
+        "hextrackr:backup:gpt-session-1755565108556",
+        "hextrackr:backup:gpt-session-1755641837859",
+        "hextrackr:backup:gpt-session-1755565554957"
+      ],
+      "avg_dimensions": 768
+    }
+  },
+  "topic_hierarchy": {
+    "hextrackr": {
+      "children": {
+        "backup": {
+          "children": {
+            "context-matrix": {
+              "children": {},
+              "items": [
+                "backup-1756536258838-ioo1akd2a",
+                "canonical:hextrackr:backup:context-matrix"
+              ]
+            },
+            "consolidated-matrix": {
+              "children": {},
+              "items": [
+                "backup-1756536258823-tpouajxi3",
+                "canonical:hextrackr:backup:consolidated-matrix"
+              ]
+            },
+            "backup-context-matrix": {
+              "children": {},
+              "items": [
+                "backup-1756536258808-h4b8z32qx",
+                "canonical:hextrackr:backup:backup-context-matrix"
+              ]
+            },
+            "variables": {
+              "children": {},
+              "items": [
+                "backup-1756536258802-er6mxs90n",
+                "canonical:hextrackr:backup:variables"
+              ]
+            },
+            "version-history": {
+              "children": {},
+              "items": [
+                "backup-1756536258802-pf63oq9do",
+                "canonical:hextrackr:backup:version-history"
+              ]
+            },
+            "workflow-protocols": {
+              "children": {},
+              "items": [
+                "backup-1756536258802-vfkjngwh7",
+                "canonical:hextrackr:backup:workflow-protocols"
+              ]
+            },
+            "zip_workflow": {
+              "children": {},
+              "items": [
+                "backup-1756536258802-te3fzs8es",
+                "canonical:hextrackr:backup:zip_workflow"
+              ]
+            },
+            "tasks": {
+              "children": {},
+              "items": [
+                "backup-1756536258801-4n2nzldzg",
+                "canonical:hextrackr:backup:tasks"
+              ]
+            },
+            "test-memory": {
+              "children": {},
+              "items": [
+                "backup-1756536258801-1cz8gq7if",
+                "canonical:hextrackr:backup:test-memory"
+              ]
+            },
+            "tools": {
+              "children": {},
+              "items": [
+                "backup-1756536258801-339honyce",
+                "canonical:hextrackr:backup:tools"
+              ]
+            },
+            "structure": {
+              "children": {},
+              "items": [
+                "backup-1756536258800-4zmz2t6bu",
+                "canonical:hextrackr:backup:structure"
+              ]
+            },
+            "structure_complete": {
+              "children": {},
+              "items": [
+                "backup-1756536258800-2ygkz8jca",
+                "canonical:hextrackr:backup:structure_complete"
+              ]
+            },
+            "styles": {
+              "children": {},
+              "items": [
+                "backup-1756536258800-y30wv11sc",
+                "canonical:hextrackr:backup:styles"
+              ]
+            },
+            "sync_config": {
+              "children": {},
+              "items": [
+                "backup-1756536258800-j7uidp4y5",
+                "canonical:hextrackr:backup:sync_config"
+              ]
+            },
+            "sync_metadata": {
+              "children": {},
+              "items": [
+                "backup-1756536258800-g2jhodixo",
+                "canonical:hextrackr:backup:sync_metadata"
+              ]
+            },
+            "rgemini_pro_memories": {
+              "children": {},
+              "items": [
+                "backup-1756536258799-g6sfufa2r",
+                "canonical:hextrackr:backup:rgemini_pro_memories"
+              ]
+            },
+            "roadmap": {
+              "children": {},
+              "items": [
+                "backup-1756536258799-m67shkxy2",
+                "canonical:hextrackr:backup:roadmap"
+              ]
+            },
+            "seamless_experience": {
+              "children": {},
+              "items": [
+                "backup-1756536258799-kozc9bo2t",
+                "canonical:hextrackr:backup:seamless_experience"
+              ]
+            },
+            "session-history": {
+              "children": {},
+              "items": [
+                "backup-1756536258799-sjngi1d40",
+                "canonical:hextrackr:backup:session-history"
+              ]
+            },
+            "restoration-1755924494946": {
+              "children": {},
+              "items": [
+                "backup-1756536258798-2svn1o16c",
+                "canonical:hextrackr:backup:restoration-1755924494946"
+              ]
+            },
+            "restoration-1755924535160": {
+              "children": {},
+              "items": [
+                "backup-1756536258798-obh5vgw3e",
+                "canonical:hextrackr:backup:restoration-1755924535160"
+              ]
+            },
+            "restoration-1755924817296": {
+              "children": {},
+              "items": [
+                "backup-1756536258798-vfpfitlx6",
+                "canonical:hextrackr:backup:restoration-1755924817296"
+              ]
+            },
+            "restoration_metadata": {
+              "children": {},
+              "items": [
+                "backup-1756536258798-huektygdx",
+                "canonical:hextrackr:backup:restoration_metadata"
+              ]
+            },
+            "prompts": {
+              "children": {},
+              "items": [
+                "backup-1756536258797-ocyfe8v82",
+                "canonical:hextrackr:backup:prompts"
+              ]
+            },
+            "rclaude_sonnet_memories": {
+              "children": {},
+              "items": [
+                "backup-1756536258797-p7fw9gqp5",
+                "canonical:hextrackr:backup:rclaude_sonnet_memories"
+              ]
+            },
+            "recentissues": {
+              "children": {},
+              "items": [
+                "backup-1756536258797-k0ofjrtyb",
+                "canonical:hextrackr:backup:recentissues"
+              ]
+            },
+            "restoration-1755924494845": {
+              "children": {},
+              "items": [
+                "backup-1756536258797-f75qv1mw4",
+                "canonical:hextrackr:backup:restoration-1755924494845"
+              ]
+            },
+            "persistent-memory": {
+              "children": {},
+              "items": [
+                "backup-1756536258796-e93kjnirg",
+                "canonical:hextrackr:backup:persistent-memory"
+              ]
+            },
+            "personality-profile": {
+              "children": {},
+              "items": [
+                "backup-1756536258796-757fugq97",
+                "canonical:hextrackr:backup:personality-profile"
+              ]
+            },
+            "preferences": {
+              "children": {},
+              "items": [
+                "backup-1756536258796-1m39dv9wb",
+                "canonical:hextrackr:backup:preferences"
+              ]
+            },
+            "project-states": {
+              "children": {},
+              "items": [
+                "backup-1756536258796-7we4aztv2",
+                "canonical:hextrackr:backup:project-states"
+              ]
+            },
+            "natural_communication": {
+              "children": {},
+              "items": [
+                "backup-1756536258795-g1sbjcxv4",
+                "canonical:hextrackr:backup:natural_communication"
+              ]
+            },
+            "patterns": {
+              "children": {},
+              "items": [
+                "backup-1756536258795-zwb51zw13",
+                "canonical:hextrackr:backup:patterns"
+              ]
+            },
+            "performance": {
+              "children": {},
+              "items": [
+                "backup-1756536258795-6zvn6jk5u",
+                "canonical:hextrackr:backup:performance"
+              ]
+            },
+            "live_coordination": {
+              "children": {},
+              "items": [
+                "backup-1756536258794-3vou5tqvm",
+                "canonical:hextrackr:backup:live_coordination"
+              ]
+            },
+            "master_memory_lookup": {
+              "children": {},
+              "items": [
+                "backup-1756536258794-kmhd3ss8z",
+                "canonical:hextrackr:backup:master_memory_lookup"
+              ]
+            },
+            "mcp-sync-summary": {
+              "children": {},
+              "items": [
+                "backup-1756536258794-ru655t18n",
+                "canonical:hextrackr:backup:mcp-sync-summary"
+              ]
+            },
+            "memory-snapshot": {
+              "children": {},
+              "items": [
+                "backup-1756536258794-ftqku0kdf",
+                "canonical:hextrackr:backup:memory-snapshot"
+              ]
+            },
+            "memory": {
+              "children": {},
+              "items": [
+                "backup-1756536258794-uietgqoi8",
+                "canonical:hextrackr:backup:memory"
+              ]
+            },
+            "gpt-session-1755707428067": {
+              "children": {},
+              "items": [
+                "backup-1756536258793-gtronqpp1",
+                "canonical:hextrackr:backup:gpt-session-1755707428067"
+              ]
+            },
+            "gpt-session-1755876045139": {
+              "children": {},
+              "items": [
+                "backup-1756536258793-pxjxsbrgf",
+                "canonical:hextrackr:backup:gpt-session-1755876045139"
+              ]
+            },
+            "gpt-session-1755877104533": {
+              "children": {},
+              "items": [
+                "backup-1756536258793-b88gdqm1m",
+                "canonical:hextrackr:backup:gpt-session-1755877104533"
+              ]
+            },
+            "gpt4_memories": {
+              "children": {},
+              "items": [
+                "backup-1756536258793-o3cc3b8ay",
+                "canonical:hextrackr:backup:gpt4_memories"
+              ]
+            },
+            "gpt4o_memories": {
+              "children": {},
+              "items": [
+                "backup-1756536258793-9layv7y3w",
+                "canonical:hextrackr:backup:gpt4o_memories"
+              ]
+            },
+            "handoff": {
+              "children": {},
+              "items": [
+                "backup-1756536258793-ca9wfh4ux",
+                "canonical:hextrackr:backup:handoff"
+              ]
+            },
+            "interactions": {
+              "children": {},
+              "items": [
+                "backup-1756536258793-p2ynt8sax",
+                "canonical:hextrackr:backup:interactions"
+              ]
+            },
+            "lease": {
+              "children": {},
+              "items": [
+                "backup-1756536258793-gcmfiqntd",
+                "canonical:hextrackr:backup:lease"
+              ]
+            },
+            "gpt-session-1755564666251": {
+              "children": {},
+              "items": [
+                "backup-1756536258792-af7n5c2o4",
+                "canonical:hextrackr:backup:gpt-session-1755564666251"
+              ]
+            },
+            "gpt-session-1755565108556": {
+              "children": {},
+              "items": [
+                "backup-1756536258792-6tw4amib7",
+                "canonical:hextrackr:backup:gpt-session-1755565108556"
+              ]
+            },
+            "gpt-session-1755641837859": {
+              "children": {},
+              "items": [
+                "canonical:hextrackr:backup:gpt-session-1755641837859"
+              ]
+            },
+            "gpt-session-1755565554957": {
+              "children": {},
+              "items": [
+                "canonical:hextrackr:backup:gpt-session-1755565554957"
+              ]
+            }
+          },
+          "items": []
+        },
+        "ragents": {
+          "children": {},
+          "items": [
+            "backup-1756536258795-svwwr3zeo",
+            "canonical:hextrackr:ragents"
+          ]
+        }
+      },
+      "items": []
+    }
+  },
+  "search_index": {
+    "backup-1756536258838-ioo1akd2a": {
+      "topic_key": "hextrackr:backup:context-matrix",
+      "source": "rengine_backup",
+      "preview": "{\n  \"function:addContextEntry\": {\n    \"category\": \"code_functions\",\n    \"keyword\": \"addContextEntry\",\n    \"files\": [\n      \"rEngine/add-context.js\"\n    ],\n    \"functions\": [\n      \"addContextEntry\"\n  "
+    },
+    "backup-1756536258823-tpouajxi3": {
+      "topic_key": "hextrackr:backup:consolidated-matrix",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"created\": \"2025-08-23T04:53:10.007Z\",\n    \"version\": \"2.0.0\",\n    \"totalEntries\": 3262,\n    \"lastRebuild\": \"2025-08-23T04:53:10.007Z\"\n  },\n  \"entityIndex\": {\n    \"--help-memory_"
+    },
+    "backup-1756536258808-h4b8z32qx": {
+      "topic_key": "hextrackr:backup:backup-context-matrix",
+      "source": "rengine_backup",
+      "preview": "{\n  \"function:addContextEntry\": {\n    \"category\": \"code_functions\",\n    \"keyword\": \"addContextEntry\",\n    \"files\": [\n      \"rEngine/add-context.js\"\n    ],\n    \"functions\": [\n      \"addContextEntry\"\n  "
+    },
+    "backup-1756536258802-er6mxs90n": {
+      "topic_key": "hextrackr:backup:variables",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Variable and state tracking for StackTrackr application\",\n    \"description\": \"Complete mapping of global variables,"
+    },
+    "backup-1756536258802-pf63oq9do": {
+      "topic_key": "hextrackr:backup:version-history",
+      "source": "rengine_backup",
+      "preview": "{\n  \"releases\": [\n    {\n      \"version\": \"1.2.2\",\n      \"type\": \"patch\",\n      \"date\": \"2025-08-20T02:41:40.690Z\",\n      \"description\": \"rEngine Core: Complete branding overhaul with marketing website"
+    },
+    "backup-1756536258802-vfkjngwh7": {
+      "topic_key": "hextrackr:backup:workflow-protocols",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"created\": \"2025-08-23T04:48:14.514Z\",\n    \"last_updated\": \"2025-08-23T04:48:14.514Z\",\n    \"version\": \"1.0.0\"\n  },\n  \"startup_protocol\": {\n    \"order\": [\n      \"git_status_check\""
+    },
+    "backup-1756536258802-te3fzs8es": {
+      "topic_key": "hextrackr:backup:zip_workflow",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Cross-platform workflow for ChatGPT/GPT5 zip file collaboration\",\n    \"description\": \"Handles the zip→upload→downlo"
+    },
+    "backup-1756536258801-4n2nzldzg": {
+      "topic_key": "hextrackr:backup:tasks",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Unified task management and project coordination for StackTrackr agentic system\",\n    \"description\": \"Complete task"
+    },
+    "backup-1756536258801-1cz8gq7if": {
+      "topic_key": "hextrackr:backup:test-memory",
+      "source": "rengine_backup",
+      "preview": "{\n  \"agent_type\": \"test\",\n  \"created_at\": \"2025-08-23T01:12:05.312Z\",\n  \"sessions\": {\n    \"2025-08-23\": [\n      {\n        \"session_id\": \"test-1755911525313\",\n        \"timestamp\": \"2025-08-23T01:12:05."
+    },
+    "backup-1756536258801-339honyce": {
+      "topic_key": "hextrackr:backup:tools",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Available tools and capabilities for StackTrackr agentic operating system\",\n    \"description\": \"Comprehensive regis"
+    },
+    "backup-1756536258800-4zmz2t6bu": {
+      "topic_key": "hextrackr:backup:structure",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Architectural mapping and structural relationships for StackTrackr\",\n    \"description\": \"Complete application struc"
+    },
+    "backup-1756536258800-2ygkz8jca": {
+      "topic_key": "hextrackr:backup:structure_complete",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"2.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Complete architectural mapping for StackTrackr application\",\n    \"description\": \"Comprehensive application structur"
+    },
+    "backup-1756536258800-y30wv11sc": {
+      "topic_key": "hextrackr:backup:styles",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"CSS and styling tracking for StackTrackr application\",\n    \"description\": \"Complete mapping of styles, themes, UI c"
+    },
+    "backup-1756536258800-j7uidp4y5": {
+      "topic_key": "hextrackr:backup:sync_config",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"MCP-JSON synchronization configuration and mapping rules\",\n    \"description\": \"Defines exact 1:1 mapping between JS"
+    },
+    "backup-1756536258800-g2jhodixo": {
+      "topic_key": "hextrackr:backup:sync_metadata",
+      "source": "rengine_backup",
+      "preview": "{\n  \"last_sync\": \"2025-08-16T17:33:25.394758\",\n  \"file_hashes\": {\n    \"tasks.json\": \"94dcbb9f7c50f3e57c813d6588ae1da9\",\n    \"agents.json\": \"b4b7b8c7a1e6d7d2a961ce11eeeb07f5\",\n    \"errors.json\": \"366b5"
+    },
+    "backup-1756536258799-g6sfufa2r": {
+      "topic_key": "hextrackr:backup:rgemini_pro_memories",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"agent_name\": \"Remote Gemini Pro\",\n    \"agent_type\": \"Remote Worker via rEngineMCP\",\n    \"technical_base\": \"Gemini Pro API\",\n    \"created\": \"2025-08-17\",\n    \"last_updated\": \"202"
+    },
+    "backup-1756536258799-m67shkxy2": {
+      "topic_key": "hextrackr:backup:roadmap",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"DEPRECATED - See /MASTER_ROADMAP.md for current tracking\",\n    \"description\": \"This file has been superseded by /MA"
+    },
+    "backup-1756536258799-kozc9bo2t": {
+      "topic_key": "hextrackr:backup:seamless_experience",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Seamless development experience that feels like working with office partners\",\n    \"description\": \"Natural developm"
+    },
+    "backup-1756536258799-sjngi1d40": {
+      "topic_key": "hextrackr:backup:session-history",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"created\": \"2025-08-23T04:48:14.515Z\",\n    \"last_updated\": \"2025-08-23T04:48:14.515Z\",\n    \"version\": \"1.0.0\"\n  },\n  \"sessions\": {},\n  \"personality_observations\": [],\n  \"workflow"
+    },
+    "backup-1756536258798-2svn1o16c": {
+      "topic_key": "hextrackr:backup:restoration-1755924494946",
+      "source": "rengine_backup",
+      "preview": "{\n  \"timestamp\": \"2025-08-23T04:48:14.946Z\",\n  \"target_date\": \"2025-08-23T04:48:14.912Z\",\n  \"personality_summary\": {\n    \"communication_style\": \"friendly_technical\",\n    \"key_traits\": {\n      \"backup_"
+    },
+    "backup-1756536258798-obh5vgw3e": {
+      "topic_key": "hextrackr:backup:restoration-1755924535160",
+      "source": "rengine_backup",
+      "preview": "{\n  \"timestamp\": \"2025-08-23T04:48:55.160Z\",\n  \"target_date\": \"2025-08-15T00:00:00.000Z\",\n  \"personality_summary\": {\n    \"communication_style\": \"friendly_technical\",\n    \"key_traits\": {\n      \"backup_"
+    },
+    "backup-1756536258798-vfpfitlx6": {
+      "topic_key": "hextrackr:backup:restoration-1755924817296",
+      "source": "rengine_backup",
+      "preview": "{\n  \"timestamp\": \"2025-08-23T04:53:37.296Z\",\n  \"target_date\": \"2025-08-15T00:00:00.000Z\",\n  \"personality_summary\": {\n    \"communication_style\": \"friendly_technical\",\n    \"key_traits\": {\n      \"backup_"
+    },
+    "backup-1756536258798-huektygdx": {
+      "topic_key": "hextrackr:backup:restoration_metadata",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"created\": \"2025-08-16T23:25:17Z\",\n    \"original_project_root\": \"/Volumes/DATA/GitHub/rEngine\",\n    \"zip_preparation_version\": \"1.0\",\n    \"platform\": \"Darwin\",\n    \"user\": \"lbrut"
+    },
+    "backup-1756536258797-ocyfe8v82": {
+      "topic_key": "hextrackr:backup:prompts",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.1\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Centralized prompt library for common tasks and quality-of-life improvements\",\n    \"description\": \"Quick access to "
+    },
+    "backup-1756536258797-p7fw9gqp5": {
+      "topic_key": "hextrackr:backup:rclaude_sonnet_memories",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"agent_name\": \"Remote Claude Sonnet\",\n    \"agent_type\": \"Remote Worker via rEngine\",\n    \"technical_base\": \"Claude 3.5 Sonnet API\",\n    \"created\": \"2025-08-17\",\n    \"last_updated"
+    },
+    "backup-1756536258797-k0ofjrtyb": {
+      "topic_key": "hextrackr:backup:recentissues",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Issue tracking and recovery system for StackTrackr agentic operating system\",\n    \"description\": \"Centralized log o"
+    },
+    "backup-1756536258797-f75qv1mw4": {
+      "topic_key": "hextrackr:backup:restoration-1755924494845",
+      "source": "rengine_backup",
+      "preview": "{\n  \"timestamp\": \"2025-08-23T04:48:14.845Z\",\n  \"target_date\": \"2025-08-23T04:48:14.806Z\",\n  \"personality_summary\": {\n    \"communication_style\": \"friendly_technical\",\n    \"key_traits\": {\n      \"backup_"
+    },
+    "backup-1756536258796-e93kjnirg": {
+      "topic_key": "hextrackr:backup:persistent-memory",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0.0\",\n    \"created\": \"2025-08-18T01:28:08.797Z\",\n    \"lastSync\": \"2025-08-23T01:00:58.676Z\",\n    \"purpose\": \"Persistent memory store for rEngine MCP server\",\n    \"s"
+    },
+    "backup-1756536258796-757fugq97": {
+      "topic_key": "hextrackr:backup:personality-profile",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"created\": \"2025-08-23T04:48:14.512Z\",\n    \"last_updated\": \"2025-08-23T04:48:14.562Z\",\n    \"version\": \"1.0.0\",\n    \"learning_sessions\": 1\n  },\n  \"personality_traits\": {\n    \"comm"
+    },
+    "backup-1756536258796-1m39dv9wb": {
+      "topic_key": "hextrackr:backup:preferences",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"User preferences and convenience tracking for StackTrackr agentic system\",\n    \"description\": \"Track user preferenc"
+    },
+    "backup-1756536258796-7we4aztv2": {
+      "topic_key": "hextrackr:backup:project-states",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"created\": \"2025-08-23T04:48:14.515Z\",\n    \"last_updated\": \"2025-08-23T04:48:14.515Z\",\n    \"version\": \"1.0.0\"\n  },\n  \"active_projects\": {\n    \"rEngine\": {\n      \"status\": \"active"
+    },
+    "backup-1756536258795-g1sbjcxv4": {
+      "topic_key": "hextrackr:backup:natural_communication",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Natural communication and handoff system for seamless multi-agent collaboration\",\n    \"description\": \"Office-partne"
+    },
+    "backup-1756536258795-svwwr3zeo": {
+      "topic_key": "hextrackr:ragents",
+      "source": "rengine_backup",
+      "preview": "{\n  \"name\": \"ragents\",\n  \"version\": \"1.2.1\",\n  \"description\": \"rAgents - Agentic Operating System Plugin for StackTrackr\",\n  \"type\": \"module\",\n  \"main\": \"memory.json\",\n  \"engines\": {\n    \"node\": \">=16"
+    },
+    "backup-1756536258795-zwb51zw13": {
+      "topic_key": "hextrackr:backup:patterns",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Learning patterns to prevent recurring errors and improve efficiency\",\n    \"description\": \"Dynamic memory system fo"
+    },
+    "backup-1756536258795-6zvn6jk5u": {
+      "topic_key": "hextrackr:backup:performance",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Performance metrics and optimization tracking for StackTrackr agentic system\",\n    \"description\": \"Real-time and hi"
+    },
+    "backup-1756536258794-3vou5tqvm": {
+      "topic_key": "hextrackr:backup:live_coordination",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"Real-time agent coordination and live collaboration system\",\n    \"description\": \"Live status dashboard for seamless"
+    },
+    "backup-1756536258794-kmhd3ss8z": {
+      "topic_key": "hextrackr:backup:master_memory_lookup",
+      "source": "rengine_backup",
+      "preview": "{\n  \"version\": \"1.0\",\n  \"last_updated\": \"2025-08-19T03:13:08.573Z\",\n  \"scribe_files\": {},\n  \"agent_files\": {},\n  \"shared_files\": {\n    \"memory.json\": {\n      \"path\": \"/Volumes/DATA/GitHub/rEngine/rMem"
+    },
+    "backup-1756536258794-ru655t18n": {
+      "topic_key": "hextrackr:backup:mcp-sync-summary",
+      "source": "rengine_backup",
+      "preview": "{\n  \"last_sync\": \"2025-08-23T01:00:58.676Z\",\n  \"critical_system_requirements\": [\n    \"Terminal.app launch requirement for Split Scribe Console\",\n    \"Background terminal usage for long-running tasks\","
+    },
+    "backup-1756536258794-ftqku0kdf": {
+      "topic_key": "hextrackr:backup:memory-snapshot",
+      "source": "rengine_backup",
+      "preview": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"$id\": \"https://stacktrackr.dev/schemas/memory-snapshot.json\",\n  \"title\": \"StackTrackr Memory Snapshot\",\n  \"description\": \"Central memory sn"
+    },
+    "backup-1756536258794-uietgqoi8": {
+      "topic_key": "hextrackr:backup:memory",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"last_updated\": \"2025-08-17\",\n    \"purpose\": \"Structured MCP memory system for StackTrackr project coordination and context man"
+    },
+    "backup-1756536258793-gtronqpp1": {
+      "topic_key": "hextrackr:backup:gpt-session-1755707428067",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"agent_name\": \"ChatGPT/GPT-4\",\n    \"agent_type\": \"gpt\",\n    \"session_id\": \"gpt-session-1755707427497\",\n    \"start_time\": \"2025-08-20T16:30:27.497Z\",\n    \"detection_method\": \"open"
+    },
+    "backup-1756536258793-pxjxsbrgf": {
+      "topic_key": "hextrackr:backup:gpt-session-1755876045139",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"agent_name\": \"ChatGPT/GPT-4\",\n    \"agent_type\": \"gpt\",\n    \"session_id\": \"gpt-session-1755876044748\",\n    \"start_time\": \"2025-08-22T15:20:44.748Z\",\n    \"detection_method\": \"open"
+    },
+    "backup-1756536258793-b88gdqm1m": {
+      "topic_key": "hextrackr:backup:gpt-session-1755877104533",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"agent_name\": \"ChatGPT/GPT-4\",\n    \"agent_type\": \"gpt\",\n    \"session_id\": \"gpt-session-1755877104093\",\n    \"start_time\": \"2025-08-22T15:38:24.093Z\",\n    \"detection_method\": \"open"
+    },
+    "backup-1756536258793-o3cc3b8ay": {
+      "topic_key": "hextrackr:backup:gpt4_memories",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"agent_name\": \"GPT-4\",\n    \"agent_type\": \"Direct API Access\",\n    \"technical_base\": \"GPT-4\",\n    \"created\": \"2025-08-16\",\n    \"last_updated\": \"2025-08-16 11:47\",\n    \"session_cou"
+    },
+    "backup-1756536258793-9layv7y3w": {
+      "topic_key": "hextrackr:backup:gpt4o_memories",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"agent_name\": \"GPT-4 Opus\",\n    \"agent_type\": \"Direct API Access\",\n    \"technical_base\": \"GPT-4\",\n    \"created\": \"2025-08-16\",\n    \"last_updated\": \"2025-08-16 11:47\",\n    \"sessio"
+    },
+    "backup-1756536258793-ca9wfh4ux": {
+      "topic_key": "hextrackr:backup:handoff",
+      "source": "rengine_backup",
+      "preview": "{\n  \"handoff_summary\": \"rEngine system fully operational. HexTrackr comprehensive documentation framework ready. Task: Generate complete HexTrackr technical documentation using rEngine Gemini scribe s"
+    },
+    "backup-1756536258793-p2ynt8sax": {
+      "topic_key": "hextrackr:backup:interactions",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"version\": \"1.0\",\n    \"created\": \"2025-08-16\",\n    \"purpose\": \"User interaction flows and system component communication patterns\",\n    \"description\": \"Dynamic memory system for "
+    },
+    "backup-1756536258793-gcmfiqntd": {
+      "topic_key": "hextrackr:backup:lease",
+      "source": "rengine_backup",
+      "preview": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"$id\": \"https://stacktrackr.dev/schemas/lease.json\",\n  \"title\": \"StackTrackr Memory Lease\",\n  \"description\": \"Memory access lease for atomic"
+    },
+    "backup-1756536258792-af7n5c2o4": {
+      "topic_key": "hextrackr:backup:gpt-session-1755564666251",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"agent_name\": \"ChatGPT/GPT-4\",\n    \"agent_type\": \"gpt\",\n    \"session_id\": \"gpt-session-1755564580773\",\n    \"start_time\": \"2025-08-19T00:49:40.773Z\",\n    \"detection_method\": \"open"
+    },
+    "backup-1756536258792-6tw4amib7": {
+      "topic_key": "hextrackr:backup:gpt-session-1755565108556",
+      "source": "rengine_backup",
+      "preview": "{\n  \"metadata\": {\n    \"agent_name\": \"ChatGPT/GPT-4\",\n    \"agent_type\": \"gpt\",\n    \"session_id\": \"gpt-session-1755565108199\",\n    \"start_time\": \"2025-08-19T00:58:28.199Z\",\n    \"detection_method\": \"comm"
+    },
+    "canonical:hextrackr:backup:context-matrix": {
+      "topic_key": "hextrackr:backup:context-matrix",
+      "source": "canonical_note",
+      "preview": "**Title:** HexTrackr Backup Context Matrix Implementation"
+    },
+    "canonical:hextrackr:backup:consolidated-matrix": {
+      "topic_key": "hextrackr:backup:consolidated-matrix",
+      "source": "canonical_note",
+      "preview": "**Title:** Consolidated Backup Matrix for HexTrackr"
+    },
+    "canonical:hextrackr:backup:backup-context-matrix": {
+      "topic_key": "hextrackr:backup:backup-context-matrix",
+      "source": "canonical_note",
+      "preview": "**Title:** Backup Context Matrix Implementation Details for HexTrackr Project"
+    },
+    "canonical:hextrackr:backup:variables": {
+      "topic_key": "hextrackr:backup:variables",
+      "source": "canonical_note",
+      "preview": "**Title:** Variable Management for StackTrackr Application"
+    },
+    "canonical:hextrackr:backup:version-history": {
+      "topic_key": "hextrackr:backup:version-history",
+      "source": "canonical_note",
+      "preview": "Canonical Note: Version History of rEngine Backup Module"
+    },
+    "canonical:hextrackr:backup:workflow-protocols": {
+      "topic_key": "hextrackr:backup:workflow-protocols",
+      "source": "canonical_note",
+      "preview": "Title: Backup Workflow Protocol in HexTrackr"
+    },
+    "canonical:hextrackr:backup:zip_workflow": {
+      "topic_key": "hextrackr:backup:zip_workflow",
+      "source": "canonical_note",
+      "preview": "**Title:** Zip Workflow for Cross-platform Collaboration with ChatGPT/GPT5"
+    },
+    "canonical:hextrackr:backup:tasks": {
+      "topic_key": "hextrackr:backup:tasks",
+      "source": "canonical_note",
+      "preview": "Title: Unified Task Management for HexTrackr Backups"
+    },
+    "canonical:hextrackr:backup:test-memory": {
+      "topic_key": "hextrackr:backup:test-memory",
+      "source": "canonical_note",
+      "preview": "**Title:** Test Memory Backup Implementation"
+    },
+    "canonical:hextrackr:backup:tools": {
+      "topic_key": "hextrackr:backup:tools",
+      "source": "canonical_note",
+      "preview": "**Title:** HexTrackr Backup Tools Registry Overview"
+    },
+    "canonical:hextrackr:backup:structure": {
+      "topic_key": "hextrackr:backup:structure",
+      "source": "canonical_note",
+      "preview": "Canonical Note"
+    },
+    "canonical:hextrackr:backup:structure_complete": {
+      "topic_key": "hextrackr:backup:structure_complete",
+      "source": "canonical_note",
+      "preview": "**Title:** HexTrackr Backup Structure Completion"
+    },
+    "canonical:hextrackr:backup:styles": {
+      "topic_key": "hextrackr:backup:styles",
+      "source": "canonical_note",
+      "preview": "**Title:** HexTrackr Backup Styles Integration"
+    },
+    "canonical:hextrackr:backup:sync_config": {
+      "topic_key": "hextrackr:backup:sync_config",
+      "source": "canonical_note",
+      "preview": "**Title:** MCP-JSON Synchronization Configuration for HexTrackr Backup"
+    },
+    "canonical:hextrackr:backup:sync_metadata": {
+      "topic_key": "hextrackr:backup:sync_metadata",
+      "source": "canonical_note",
+      "preview": "**Title:** Sync Metadata for HexTrackr Backup"
+    },
+    "canonical:hextrackr:backup:rgemini_pro_memories": {
+      "topic_key": "hextrackr:backup:rgemini_pro_memories",
+      "source": "canonical_note",
+      "preview": "**Title:** Remote Gemini Pro Memory Backup Configuration"
+    },
+    "canonical:hextrackr:backup:roadmap": {
+      "topic_key": "hextrackr:backup:roadmap",
+      "source": "canonical_note",
+      "preview": "**Title:** Deprecated Backup Roadmap File in HexTrackr Project"
+    },
+    "canonical:hextrackr:backup:seamless_experience": {
+      "topic_key": "hextrackr:backup:seamless_experience",
+      "source": "canonical_note",
+      "preview": "**Title:** Seamless Experience Backup for HexTrackr"
+    },
+    "canonical:hextrackr:backup:session-history": {
+      "topic_key": "hextrackr:backup:session-history",
+      "source": "canonical_note",
+      "preview": "Canonical Note: HexTrackr Session History Backup"
+    },
+    "canonical:hextrackr:backup:restoration-1755924494946": {
+      "topic_key": "hextrackr:backup:restoration-1755924494946",
+      "source": "canonical_note",
+      "preview": "**Title:** HexTrackr Backup Restoration Implementation"
+    },
+    "canonical:hextrackr:backup:restoration-1755924535160": {
+      "topic_key": "hextrackr:backup:restoration-1755924535160",
+      "source": "canonical_note",
+      "preview": "**Title:** HexTrackr Backup Restoration Process - Update 1755924535160"
+    },
+    "canonical:hextrackr:backup:restoration-1755924817296": {
+      "topic_key": "hextrackr:backup:restoration-1755924817296",
+      "source": "canonical_note",
+      "preview": "**Title:** Backup Restoration Plan for HexTrackr (2025-08-15)"
+    },
+    "canonical:hextrackr:backup:restoration_metadata": {
+      "topic_key": "hextrackr:backup:restoration_metadata",
+      "source": "canonical_note",
+      "preview": "Title: Backup Restoration Metadata Documentation for HexTrackr"
+    },
+    "canonical:hextrackr:backup:prompts": {
+      "topic_key": "hextrackr:backup:prompts",
+      "source": "canonical_note",
+      "preview": "**Title:** Centralized Prompt Library Implementation in HexTrackr Backup System"
+    },
+    "canonical:hextrackr:backup:rclaude_sonnet_memories": {
+      "topic_key": "hextrackr:backup:rclaude_sonnet_memories",
+      "source": "canonical_note",
+      "preview": "**Title:** Backup and Management of Remote Claude Sonnet Agent Memories"
+    },
+    "canonical:hextrackr:backup:recentissues": {
+      "topic_key": "hextrackr:backup:recentissues",
+      "source": "canonical_note",
+      "preview": "**Title:** Recent Issues Backup System for HexTrackr"
+    },
+    "canonical:hextrackr:backup:restoration-1755924494845": {
+      "topic_key": "hextrackr:backup:restoration-1755924494845",
+      "source": "canonical_note",
+      "preview": "**Title:** HexTrackr Backup Restoration - Event 1755924494845"
+    },
+    "canonical:hextrackr:backup:persistent-memory": {
+      "topic_key": "hextrackr:backup:persistent-memory",
+      "source": "canonical_note",
+      "preview": "**Title:** Persistent Memory Store Configuration for rEngine MCP Server"
+    },
+    "canonical:hextrackr:backup:personality-profile": {
+      "topic_key": "hextrackr:backup:personality-profile",
+      "source": "canonical_note",
+      "preview": "**Title:** HexTrackr Personality Profile Backup"
+    },
+    "canonical:hextrackr:backup:preferences": {
+      "topic_key": "hextrackr:backup:preferences",
+      "source": "canonical_note",
+      "preview": "Title: User Preferences Backup for StackTrackr Agentic System"
+    },
+    "canonical:hextrackr:backup:project-states": {
+      "topic_key": "hextrackr:backup:project-states",
+      "source": "canonical_note",
+      "preview": "**Title:** Project State Backup for rEngine"
+    },
+    "canonical:hextrackr:backup:natural_communication": {
+      "topic_key": "hextrackr:backup:natural_communication",
+      "source": "canonical_note",
+      "preview": "Title: Natural Communication System for Multi-Agent Collaboration"
+    },
+    "canonical:hextrackr:ragents": {
+      "topic_key": "hextrackr:ragents",
+      "source": "canonical_note",
+      "preview": "**Title:** hextrackr:ragents Package Analysis and Update"
+    },
+    "canonical:hextrackr:backup:patterns": {
+      "topic_key": "hextrackr:backup:patterns",
+      "source": "canonical_note",
+      "preview": "**Title:** Backup Patterns Management for HexTrackr"
+    },
+    "canonical:hextrackr:backup:performance": {
+      "topic_key": "hextrackr:backup:performance",
+      "source": "canonical_note",
+      "preview": "**Title:** Performance Metrics and Optimization Tracking for StackTrackr Agentic System"
+    },
+    "canonical:hextrackr:backup:live_coordination": {
+      "topic_key": "hextrackr:backup:live_coordination",
+      "source": "canonical_note",
+      "preview": "**Title:** Real-time Agent Coordination System (RACS) - Live Collaboration Dashboard"
+    },
+    "canonical:hextrackr:backup:master_memory_lookup": {
+      "topic_key": "hextrackr:backup:master_memory_lookup",
+      "source": "canonical_note",
+      "preview": "**Title:** Master Memory Lookup in HexTrackr Backup"
+    },
+    "canonical:hextrackr:backup:mcp-sync-summary": {
+      "topic_key": "hextrackr:backup:mcp-sync-summary",
+      "source": "canonical_note",
+      "preview": "**Title:** MCP-Sync Summary Backup Analysis"
+    },
+    "canonical:hextrackr:backup:memory-snapshot": {
+      "topic_key": "hextrackr:backup:memory-snapshot",
+      "source": "canonical_note",
+      "preview": "**Title:** Central Memory Snapshot for Multi-Agent Collaboration"
+    },
+    "canonical:hextrackr:backup:memory": {
+      "topic_key": "hextrackr:backup:memory",
+      "source": "canonical_note",
+      "preview": "**Title:** HexTrackr Backup Memory Initialization"
+    },
+    "canonical:hextrackr:backup:gpt-session-1755707428067": {
+      "topic_key": "hextrackr:backup:gpt-session-1755707428067",
+      "source": "canonical_note",
+      "preview": "**Title:** GPT Session Backup Overview"
+    },
+    "canonical:hextrackr:backup:gpt-session-1755876045139": {
+      "topic_key": "hextrackr:backup:gpt-session-1755876045139",
+      "source": "canonical_note",
+      "preview": "**Title:** GPT Session Backup and Analysis"
+    },
+    "canonical:hextrackr:backup:gpt-session-1755877104533": {
+      "topic_key": "hextrackr:backup:gpt-session-1755877104533",
+      "source": "canonical_note",
+      "preview": "**Title:** HexTrackr Backup: GPT Session 1755877104533"
+    },
+    "canonical:hextrackr:backup:gpt4_memories": {
+      "topic_key": "hextrackr:backup:gpt4_memories",
+      "source": "canonical_note",
+      "preview": "Canonical Note for hextrackr:backup:gpt4_memories"
+    },
+    "canonical:hextrackr:backup:gpt4o_memories": {
+      "topic_key": "hextrackr:backup:gpt4o_memories",
+      "source": "canonical_note",
+      "preview": "**Title:** Backup of GPT-4 Opus Agent Memory for HexTrackr Project"
+    },
+    "canonical:hextrackr:backup:handoff": {
+      "topic_key": "hextrackr:backup:handoff",
+      "source": "canonical_note",
+      "preview": "Canonical Note: HexTrackr Backup Handoff Summary"
+    },
+    "canonical:hextrackr:backup:interactions": {
+      "topic_key": "hextrackr:backup:interactions",
+      "source": "canonical_note",
+      "preview": "**Title:** User Interaction Flows and System Communication Patterns Backup Integration"
+    },
+    "canonical:hextrackr:backup:lease": {
+      "topic_key": "hextrackr:backup:lease",
+      "source": "canonical_note",
+      "preview": "**Title:** Leasing Memory for Atomic Operations in HexTrackr Backup System"
+    },
+    "canonical:hextrackr:backup:gpt-session-1755564666251": {
+      "topic_key": "hextrackr:backup:gpt-session-1755564666251",
+      "source": "canonical_note",
+      "preview": "**Title:** GPT Session Backup for HexTrackr"
+    },
+    "canonical:hextrackr:backup:gpt-session-1755565108556": {
+      "topic_key": "hextrackr:backup:gpt-session-1755565108556",
+      "source": "canonical_note",
+      "preview": "**Title:** HexTrackr Backup Session 1755565108556 Analysis"
+    },
+    "canonical:hextrackr:backup:gpt-session-1755641837859": {
+      "topic_key": "hextrackr:backup:gpt-session-1755641837859",
+      "source": "canonical_note",
+      "preview": "**Title:** Backup and Management of GPT Session in HexTrackr"
+    },
+    "canonical:hextrackr:backup:gpt-session-1755565554957": {
+      "topic_key": "hextrackr:backup:gpt-session-1755565554957",
+      "source": "canonical_note",
+      "preview": "**Title:** HexTrackr Backup Session 1755565554957 - GPT Agent Memory Recovery"
+    }
+  },
+  "similarity_clusters": {
+    "hextrackr:backup:context-matrix": {
+      "members": [
+        "backup-1756536258838-ioo1akd2a",
+        "canonical:hextrackr:backup:context-matrix"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:consolidated-matrix": {
+      "members": [
+        "backup-1756536258823-tpouajxi3",
+        "canonical:hextrackr:backup:consolidated-matrix"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:backup-context-matrix": {
+      "members": [
+        "backup-1756536258808-h4b8z32qx",
+        "canonical:hextrackr:backup:backup-context-matrix"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:variables": {
+      "members": [
+        "backup-1756536258802-er6mxs90n",
+        "canonical:hextrackr:backup:variables"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:version-history": {
+      "members": [
+        "backup-1756536258802-pf63oq9do",
+        "canonical:hextrackr:backup:version-history"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:workflow-protocols": {
+      "members": [
+        "backup-1756536258802-vfkjngwh7",
+        "canonical:hextrackr:backup:workflow-protocols"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:zip_workflow": {
+      "members": [
+        "backup-1756536258802-te3fzs8es",
+        "canonical:hextrackr:backup:zip_workflow"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:tasks": {
+      "members": [
+        "backup-1756536258801-4n2nzldzg",
+        "canonical:hextrackr:backup:tasks"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:test-memory": {
+      "members": [
+        "backup-1756536258801-1cz8gq7if",
+        "canonical:hextrackr:backup:test-memory"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:tools": {
+      "members": [
+        "backup-1756536258801-339honyce",
+        "canonical:hextrackr:backup:tools"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:structure": {
+      "members": [
+        "backup-1756536258800-4zmz2t6bu",
+        "canonical:hextrackr:backup:structure"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:structure_complete": {
+      "members": [
+        "backup-1756536258800-2ygkz8jca",
+        "canonical:hextrackr:backup:structure_complete"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:styles": {
+      "members": [
+        "backup-1756536258800-y30wv11sc",
+        "canonical:hextrackr:backup:styles"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:sync_config": {
+      "members": [
+        "backup-1756536258800-j7uidp4y5",
+        "canonical:hextrackr:backup:sync_config"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:sync_metadata": {
+      "members": [
+        "backup-1756536258800-g2jhodixo",
+        "canonical:hextrackr:backup:sync_metadata"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:rgemini_pro_memories": {
+      "members": [
+        "backup-1756536258799-g6sfufa2r",
+        "canonical:hextrackr:backup:rgemini_pro_memories"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:roadmap": {
+      "members": [
+        "backup-1756536258799-m67shkxy2",
+        "canonical:hextrackr:backup:roadmap"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:seamless_experience": {
+      "members": [
+        "backup-1756536258799-kozc9bo2t",
+        "canonical:hextrackr:backup:seamless_experience"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:session-history": {
+      "members": [
+        "backup-1756536258799-sjngi1d40",
+        "canonical:hextrackr:backup:session-history"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:restoration-1755924494946": {
+      "members": [
+        "backup-1756536258798-2svn1o16c",
+        "canonical:hextrackr:backup:restoration-1755924494946"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:restoration-1755924535160": {
+      "members": [
+        "backup-1756536258798-obh5vgw3e",
+        "canonical:hextrackr:backup:restoration-1755924535160"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:restoration-1755924817296": {
+      "members": [
+        "backup-1756536258798-vfpfitlx6",
+        "canonical:hextrackr:backup:restoration-1755924817296"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:restoration_metadata": {
+      "members": [
+        "backup-1756536258798-huektygdx",
+        "canonical:hextrackr:backup:restoration_metadata"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:prompts": {
+      "members": [
+        "backup-1756536258797-ocyfe8v82",
+        "canonical:hextrackr:backup:prompts"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:rclaude_sonnet_memories": {
+      "members": [
+        "backup-1756536258797-p7fw9gqp5",
+        "canonical:hextrackr:backup:rclaude_sonnet_memories"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:recentissues": {
+      "members": [
+        "backup-1756536258797-k0ofjrtyb",
+        "canonical:hextrackr:backup:recentissues"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:restoration-1755924494845": {
+      "members": [
+        "backup-1756536258797-f75qv1mw4",
+        "canonical:hextrackr:backup:restoration-1755924494845"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:persistent-memory": {
+      "members": [
+        "backup-1756536258796-e93kjnirg",
+        "canonical:hextrackr:backup:persistent-memory"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:personality-profile": {
+      "members": [
+        "backup-1756536258796-757fugq97",
+        "canonical:hextrackr:backup:personality-profile"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:preferences": {
+      "members": [
+        "backup-1756536258796-1m39dv9wb",
+        "canonical:hextrackr:backup:preferences"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:project-states": {
+      "members": [
+        "backup-1756536258796-7we4aztv2",
+        "canonical:hextrackr:backup:project-states"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:natural_communication": {
+      "members": [
+        "backup-1756536258795-g1sbjcxv4",
+        "canonical:hextrackr:backup:natural_communication"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:ragents": {
+      "members": [
+        "backup-1756536258795-svwwr3zeo",
+        "canonical:hextrackr:ragents"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:patterns": {
+      "members": [
+        "backup-1756536258795-zwb51zw13",
+        "canonical:hextrackr:backup:patterns"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:performance": {
+      "members": [
+        "backup-1756536258795-6zvn6jk5u",
+        "canonical:hextrackr:backup:performance"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:live_coordination": {
+      "members": [
+        "backup-1756536258794-3vou5tqvm",
+        "canonical:hextrackr:backup:live_coordination"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:mcp-sync-summary": {
+      "members": [
+        "backup-1756536258794-ru655t18n",
+        "canonical:hextrackr:backup:mcp-sync-summary"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:memory-snapshot": {
+      "members": [
+        "backup-1756536258794-ftqku0kdf",
+        "canonical:hextrackr:backup:memory-snapshot"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:memory": {
+      "members": [
+        "backup-1756536258794-uietgqoi8",
+        "canonical:hextrackr:backup:memory"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:gpt-session-1755707428067": {
+      "members": [
+        "backup-1756536258793-gtronqpp1",
+        "canonical:hextrackr:backup:gpt-session-1755707428067"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:gpt-session-1755876045139": {
+      "members": [
+        "backup-1756536258793-pxjxsbrgf",
+        "canonical:hextrackr:backup:gpt-session-1755876045139"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:gpt-session-1755877104533": {
+      "members": [
+        "backup-1756536258793-b88gdqm1m",
+        "canonical:hextrackr:backup:gpt-session-1755877104533"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:gpt4_memories": {
+      "members": [
+        "backup-1756536258793-o3cc3b8ay",
+        "canonical:hextrackr:backup:gpt4_memories"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:gpt4o_memories": {
+      "members": [
+        "backup-1756536258793-9layv7y3w",
+        "canonical:hextrackr:backup:gpt4o_memories"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:handoff": {
+      "members": [
+        "backup-1756536258793-ca9wfh4ux",
+        "canonical:hextrackr:backup:handoff"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:interactions": {
+      "members": [
+        "backup-1756536258793-p2ynt8sax",
+        "canonical:hextrackr:backup:interactions"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:lease": {
+      "members": [
+        "backup-1756536258793-gcmfiqntd",
+        "canonical:hextrackr:backup:lease"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:gpt-session-1755564666251": {
+      "members": [
+        "backup-1756536258792-af7n5c2o4",
+        "canonical:hextrackr:backup:gpt-session-1755564666251"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:gpt-session-1755565108556": {
+      "members": [
+        "backup-1756536258792-6tw4amib7",
+        "canonical:hextrackr:backup:gpt-session-1755565108556"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "rengine_backup",
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:master_memory_lookup": {
+      "members": [
+        "canonical:hextrackr:backup:master_memory_lookup",
+        "backup-1756536258794-kmhd3ss8z"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "canonical_note",
+        "rengine_backup"
+      ]
+    },
+    "hextrackr:backup:gpt-session-1755641837859": {
+      "members": [
+        "canonical:hextrackr:backup:gpt-session-1755641837859"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "canonical_note"
+      ]
+    },
+    "hextrackr:backup:gpt-session-1755565554957": {
+      "members": [
+        "canonical:hextrackr:backup:gpt-session-1755565554957"
+      ],
+      "avg_similarity": 0,
+      "sources": [
+        "canonical_note"
+      ]
+    }
+  }
+}
