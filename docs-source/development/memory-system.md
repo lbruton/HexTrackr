@@ -11,7 +11,34 @@ HexTrackr uses a memory-first development approach with the memento-mcp (Model C
 - **Relationship Mapping**: Automatic connections between entities
 - **Archive Separation**: Historical vs current project knowledge
 
-## Architecture
+## Architecture Evolution
+
+### Current Architecture (Neo4j + OpenAI)
+
+- **memento-mcp v0.3.9**: Neo4j-backed MCP server for VS Code
+- **Neo4j Database**: Graph database for storing entities and relationships
+- **OpenAI Embeddings**: text-embedding-3-small (1536 dimensions)
+- **Docker Environment**: Isolated development container
+- **VS Code Integration**: MCP tools available in Copilot chat
+
+### Future Architecture (rMemory-Inspired + Claude)
+
+Based on learnings from the `Lonnie-Bruton/rEngine/rMemory` project, we're evolving toward:
+
+- **Claude Embeddings**: AI-to-AI semantic alignment for superior memory retrieval
+- **Dual-Backend Design**: Neo4j primary + JSON fallbacks (like rMemory's MCP + local files)
+- **Search Matrix System**: Claude-generated semantic matrices for fast context retrieval
+- **Protocol-Based Operations**: Numbered memory protocols for systematic operations
+- **Agent-Specific Memory**: Project namespaces following rMemory patterns
+
+#### rMemory Learnings Applied
+
+The rEngine project's rMemory system demonstrates proven patterns:
+
+1. **Protocol Memory System**: 27 numbered protocols for systematic operations
+2. **Search Matrices**: Multi-layered context mapping (consolidated-matrix.json, context-matrix.json)
+3. **Agent-Specific Memory**: Separate memory namespaces (rAgentMemories/)
+4. **Dual Architecture**: Primary system + local JSON fallbacks for reliability
 
 ### Components
 
