@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-08-30T04:54:14.646Z",
+  "generated_at": "2025-08-30T11:14:50.558Z",
   "total_sessions": 20,
   "summary": {
     "sessions_processed": 20,
@@ -7,18 +7,45 @@
     "problems_solved": 0,
     "frustrations_captured": 0,
     "code_changes_tracked": 0,
-    "oldest_session": 1756396404888,
-    "newest_session": 1756529578518
+    "oldest_session": 1756412261352,
+    "newest_session": 1756552428072
   },
   "sessions": [
     {
+      "sessionId": "94236409-c53f-4f67-8915-15b71f43c2e2",
+      "workspace": "1e021a91f96ec733f89597596e621688",
+      "timestamp": "2025-08-30T11:13:48.072Z",
+      "insights": {
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoC8rqdFftrwsvs2AiM\"}"
+      },
+      "messageCount": 104
+    },
+    {
+      "sessionId": "741b62e2-c31d-4994-921f-48da2942b163",
+      "workspace": "1e021a91f96ec733f89597596e621688",
+      "timestamp": "2025-08-30T09:32:07.187Z",
+      "insights": {
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoC83yPBZS1U5krJfMF\"}"
+      },
+      "messageCount": 2
+    },
+    {
+      "sessionId": "e6c0545b-bf03-42ca-b50a-4611665355f9",
+      "workspace": "1e021a91f96ec733f89597596e621688",
+      "timestamp": "2025-08-30T06:01:44.475Z",
+      "insights": {
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoC8E8ouSzBHMT8hUwC\"}"
+      },
+      "messageCount": 22
+    },
+    {
       "sessionId": "637a0c3c-da7d-4214-a60b-21f23e8c4830",
       "workspace": "1e021a91f96ec733f89597596e621688",
-      "timestamp": "2025-08-30T04:52:58.518Z",
+      "timestamp": "2025-08-30T05:09:11.216Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoCKjw2rmwDdQWY6CAy\"}"
       },
-      "messageCount": 120
+      "messageCount": 128
     },
     {
       "sessionId": "be30cf2d-96f8-4338-a1d8-8ea2971aa3aa",
@@ -34,7 +61,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-29T23:50:57.157Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoCJtam36KZhEhyTyi8\"}"
       },
       "messageCount": 55
     },
@@ -43,7 +70,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-29T20:50:13.111Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoCVcG2VESSPgYTyXWZ\"}"
       },
       "messageCount": 44
     },
@@ -52,7 +79,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-29T19:19:58.532Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoCWCUt8Xo9e4w2at1P\"}"
       },
       "messageCount": 45
     },
@@ -61,7 +88,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-29T18:14:52.526Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoCVGuwWUhvEkL7eeYF\"}"
       },
       "messageCount": 4
     },
@@ -70,7 +97,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-29T17:57:55.617Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoCfHfwktkUsv1vnUWd\"}"
       },
       "messageCount": 16
     },
@@ -79,7 +106,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-29T16:22:56.015Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoCgLBdDw8Rfe3hZjL5\"}"
       },
       "messageCount": 34
     },
@@ -88,7 +115,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-29T13:35:04.087Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoCfrf8xgRKDRbu9wFZ\"}"
       },
       "messageCount": 27
     },
@@ -97,7 +124,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-29T03:52:08.400Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoCrEVYHLw8HiVGMc1F\"}"
       },
       "messageCount": 33
     },
@@ -106,7 +133,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-29T02:02:10.017Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoCqnTR1zCAn8bnB55v\"}"
       },
       "messageCount": 23
     },
@@ -115,7 +142,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-29T00:05:40.785Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoCqWaoLKrqCzKKRsrP\"}"
       },
       "messageCount": 6
     },
@@ -133,7 +160,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-28T22:29:12.134Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoD2YMZLsC1p4FBz39D\"}"
       },
       "messageCount": 31
     },
@@ -142,7 +169,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-28T20:45:53.634Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoD1DUxDeXDL3jkTWSG\"}"
       },
       "messageCount": 3
     },
@@ -151,7 +178,7 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-28T20:43:48.018Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoDBbKhvziSQmEWfftP\"}"
       },
       "messageCount": 24
     },
@@ -160,36 +187,9 @@
       "workspace": "1e021a91f96ec733f89597596e621688",
       "timestamp": "2025-08-28T20:17:41.352Z",
       "insights": {
-        "error": "Insufficient content for analysis"
+        "error": "Claude API failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-sonnet-20241220\"},\"request_id\":\"req_011CSdoDBkzGhrSo5ch94H6R\"}"
       },
       "messageCount": 6
-    },
-    {
-      "sessionId": "3f621a50-431b-4c7b-92d7-363f7da636ee",
-      "workspace": "1e021a91f96ec733f89597596e621688",
-      "timestamp": "2025-08-28T19:45:49.386Z",
-      "insights": {
-        "error": "Insufficient content for analysis"
-      },
-      "messageCount": 30
-    },
-    {
-      "sessionId": "7de9f482-d50b-4809-b0c5-435d70c55ec5",
-      "workspace": "1e021a91f96ec733f89597596e621688",
-      "timestamp": "2025-08-28T18:03:00.833Z",
-      "insights": {
-        "error": "Insufficient content for analysis"
-      },
-      "messageCount": 35
-    },
-    {
-      "sessionId": "efc42315-1fe6-4093-870f-7985dd879d79",
-      "workspace": "1e021a91f96ec733f89597596e621688",
-      "timestamp": "2025-08-28T15:53:24.888Z",
-      "insights": {
-        "error": "Insufficient content for analysis"
-      },
-      "messageCount": 7
     }
   ]
 }

@@ -9,30 +9,25 @@ Always execute these steps in order:
 1. **observe**
    - Gather current repo status, open PRs, recent changes, and workspace context.
    - Read impacted files and constraints (security, quality gates, protocols).
-   - Call `memory.search` with tags including `project:${workspaceFolderBasename}` and the observations.
 
 1. **plan**
    - Produce a short actionable checklist tied to requirements.
    - Identify files to change and expected outputs.
-   - Update memory with: decisions, file list, impacts, and follow-ups.
 
 1. **safeguards**
    - Ensure git status is clean OR create a feature branch.
    - Make a pre-flight commit to snapshot baseline.
    - Note roll-back strategy.
-   - Update memory with: decisions, file list, impacts, and follow-ups.
 
 1. **execute**
    - Apply the smallest changes needed.
    - After each file edit, run Codacy CLI analysis for the edited file.
    - Prefer incremental, verifiable steps.
-   - Update memory with: decisions, file list, impacts, and follow-ups.
 
 1. **verify**
    - Run linters and tests.
    - Perform a small smoke test where applicable.
    - Fix issues before proceeding.
-   - Update memory with: decisions, file list, impacts, and follow-ups.
 
 1. **map-update**
    - Update memory with: decisions, file list, impacts, and follow-ups.

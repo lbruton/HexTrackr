@@ -13,6 +13,7 @@
 require("dotenv").config();
 const fs = require("fs").promises;
 const path = require("path");
+const fetch = require("node-fetch").default || require("node-fetch"); // Add fetch polyfill for Node.js
 
 class RealTimeScribe {
     constructor() {
@@ -62,9 +63,9 @@ class RealTimeScribe {
             );
 
             const response = await fetch(`${this.ollamaBaseUrl}/api/generate`, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     model: this.model,
@@ -112,7 +113,7 @@ class RealTimeScribe {
     async scanChatSessions() {
         try {
             const workspaces = await fs.readdir(this.chatSessionsPath);
-            let newChats = [];
+            const newChats = [];
 
             for (const workspace of workspaces) {
                 const chatPath = path.join(this.chatSessionsPath, workspace, "ms-vscode.vscode-copilot", "chatSessions");
@@ -121,13 +122,13 @@ class RealTimeScribe {
                     const chatFiles = await fs.readdir(chatPath);
                     
                     for (const chatFile of chatFiles) {
-                        if (!chatFile.endsWith('.json')) continue;
+                        if (!chatFile.endsWith(".json")) {continue;}
                         
                         const fullPath = path.join(chatPath, chatFile);
                         const stats = await fs.stat(fullPath);
                         
                         if (stats.mtime.getTime() > this.lastProcessedTime) {
-                            const content = await fs.readFile(fullPath, 'utf8');
+                            const content = await fs.readFile(fullPath, "utf8");
                             newChats.push({
                                 file: chatFile,
                                 workspace: workspace,
@@ -153,19 +154,92 @@ class RealTimeScribe {
     async analyzeChatUpdate(chatData) {
         console.log(`🔍 Analyzing: ${chatData.file} (${chatData.workspace})`);
         
-        const prompt = `Analyze this VS Code chat session for key insights:
+        const prompt = `🧠 REAL-TIME MEMORY ANALYSIS - HexTrackr .rMemory Scribe
 
-CHAT DATA:
+You are a sophisticated AI scribe within the HexTrackr .rMemory system, designed to provide comprehensive analysis of VS Code chat sessions for perfect development continuity.
+
+## 📊 ANALYSIS FRAMEWORK
+
+### 1. PROJECT CLASSIFICATION
+Classify this conversation by project context:
+- **HexTrackr**: Issue tracking + .rMemory system development
+- **StackTrackr**: Legacy coin tracking system (numismatic focus)
+- **rMemory Legacy**: Historical rEngine ecosystem discussions
+- **General Development**: Cross-project or general programming
+
+### 2. CONVERSATION CONTEXT ANALYSIS
+- **Session Type**: New feature, debugging, refactoring, planning, architecture
+- **Complexity Level**: Simple task, complex implementation, architectural decision
+- **Stakeholder Involvement**: Solo development, collaboration, user feedback
+- **Urgency Indicators**: Deadline pressure, blocking issues, routine enhancement
+
+### 3. TECHNICAL INSIGHT EXTRACTION
+- **Code Changes**: Files modified, new implementations, deletions
+- **Architecture Decisions**: Design patterns, technology choices, structural changes
+- **Dependencies**: New packages, API integrations, external services
+- **Testing Strategy**: Unit tests, integration tests, validation approaches
+- **Performance Considerations**: Optimization needs, scaling concerns, bottlenecks
+
+### 4. FRUSTRATION PATTERN DETECTION
+Identify and categorize frustrations for learning:
+- **Technical Blockers**: API issues, environment problems, configuration errors
+- **Process Inefficiencies**: Repetitive tasks, unclear workflows, context switching
+- **Tool Limitations**: IDE issues, extension problems, missing features
+- **Knowledge Gaps**: Learning needs, documentation gaps, unclear requirements
+
+### 5. CONTINUITY TRACKING
+- **Progress Momentum**: What was accomplished, what's next
+- **Context Preservation**: Key decisions, rationale, trade-offs made
+- **Relationship Building**: Communication patterns, collaboration style
+- **Success Patterns**: What approaches worked well
+
+### 6. MEMORY SYNTHESIS
+- **Actionable Insights**: Immediate next steps, follow-up actions
+- **Learning Opportunities**: Skills to develop, patterns to remember
+- **Prevention Strategies**: How to avoid similar frustrations
+- **Knowledge Assets**: Reusable solutions, patterns, configurations
+
+## 🎯 CURRENT SESSION DATA
+
+WORKSPACE: ${chatData.workspace}
+SESSION FILE: ${chatData.file}
+TIMESTAMP: ${new Date().toISOString()}
+
+CHAT CONTENT:
 ${chatData.content}
 
-Please extract:
-1. Main topics discussed
-2. Code changes or file modifications mentioned
-3. Any issues or bugs identified
-4. Next steps or action items
-5. Technical decisions made
+## 📝 REQUIRED OUTPUT FORMAT
 
-Keep response concise but informative.`;
+Provide a comprehensive analysis in this structure:
+
+**PROJECT CLASSIFICATION:** [Project type and confidence level]
+
+**TECHNICAL SUMMARY:**
+- Main topics and objectives
+- Code changes and implementations
+- Architecture decisions made
+
+**FRUSTRATION ANALYSIS:**
+- Pain points identified
+- Root causes
+- Prevention strategies
+
+**CONTINUITY INSIGHTS:**
+- Progress achieved
+- Context to preserve
+- Next logical steps
+
+**MEMORY SYNTHESIS:**
+- Key learnings
+- Reusable patterns
+- Action items
+
+**QUALITY INDICATORS:**
+- Collaboration effectiveness
+- Decision quality
+- Progress momentum
+
+Keep analysis detailed but focused. This will feed into the broader .rMemory system for perfect development continuity.`;
 
         const analysis = await this.callOllama(prompt, chatData.file);
         
@@ -192,6 +266,8 @@ Keep response concise but informative.`;
         console.log("⏰ Checking for updates every 30 seconds");
         console.log("");
 
+        // Real-time monitoring loop
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             try {
                 const newChats = await this.scanChatSessions();
