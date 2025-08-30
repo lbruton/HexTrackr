@@ -1,5 +1,5 @@
 /* eslint-env node */
-/* global __dirname, require, console, process, setTimeout */
+/* global __dirname, __filename, require, console, process, setTimeout */
  
 const express = require("express");
 const path = require("path");
@@ -463,13 +463,6 @@ app.get("/api/imports", (req, res) => {
   });
 });
 
-// Serve static files from current directory
-app.use(express.static(__dirname, {
-  maxAge: "1m", // Short cache for development
-  etag: true,
-  lastModified: true
-}));
-
 // Documentation portal routes: serve index for docs root and redirect deep links to hash routing
 app.get("/docs-html", (req, res) => {
     res.sendFile(path.join(__dirname, "docs-html", "index.html"));
@@ -510,6 +503,84 @@ app.get(/^\/docs-html\/(.*)\.html$/, (req, res) => {
     // Redirect to hash-based section so the SPA shell loads correctly
     res.redirect(302, `/docs-html/#${section}`);
 });
+
+// Documentation statistics endpoint (used by docs portal homepage)
+// Computes:
+//  - apiEndpoints: number of unique Express routes under /api
+//  - jsFunctions: approximate count of JS function definitions in key folders
+app.get("/api/docs/stats", async (req, res) => {
+    try {
+        const readText = (p) => PathValidator.safeReadFileSync(p, "utf8");
+
+        // 1) Count /api routes by scanning this server.js file
+        const serverCode = readText(__filename);
+        const apiRouteRegex = /app\.(get|post|put|delete|patch)\s*\(\s*["'`]\/api\/[^"'`]+["'`]/g;
+        const matches = serverCode.match(apiRouteRegex) || [];
+        const apiEndpoints = [...new Set(matches)].length; // dedupe
+
+        // 2) Approximate JS function count across scripts/ and docs-html/js and server.js
+        const jsTargets = [
+            path.join(__dirname, "scripts"),
+            path.join(__dirname, "docs-html", "js")
+        ];
+        let jsFunctions = 0;
+        const fnRegexes = [
+            /function\s+\w+/g,
+            /const\s+\w+\s*=\s*\(/g,
+            /\w+\s*:\s*function/g
+        ];
+
+        const filesToScan = [__filename]; // always include server.js
+        for (const dir of jsTargets) {
+            try {
+                const files = PathValidator.safeReaddirSync(dir);
+                for (const file of files) {
+                    if (file.endsWith(".js")) {
+                        filesToScan.push(path.join(dir, file));
+                    }
+                }
+            } catch (_) { /* ignore missing directories */ }
+        }
+
+        for (const f of filesToScan) {
+            try {
+                const src = readText(f);
+                for (const rx of fnRegexes) {
+                    const matches = src.match(rx);
+                    if (matches) {jsFunctions += matches.length;}
+                }
+            } catch (_) { /* ignore file read errors */ }
+        }
+
+        // 3) Rough framework count (static list of primary frameworks)
+        const frameworks = ["Express", "Bootstrap", "Tabler", "SQLite"];
+
+        res.json({
+            apiEndpoints,
+            jsFunctions,
+            frameworks: frameworks.length,
+            computedAt: new Date().toISOString()
+        });
+    } catch (_err) {
+        res.status(500).json({ error: "Failed to compute docs stats" });
+    }
+});
+
+// Serve docs-html content files directly (before general static middleware)
+app.use("/docs-html", express.static(path.join(__dirname, "docs-html"), {
+  maxAge: "1m",
+  etag: true,
+  lastModified: true
+}));
+
+// Serve static files from current directory
+app.use(express.static(__dirname, {
+  maxAge: "1m", // Short cache for development
+  etag: true,
+  lastModified: true
+}));
+
+// Clear data endpoint
 
 // Documentation statistics endpoint (used by docs portal homepage)
 // Computes:
