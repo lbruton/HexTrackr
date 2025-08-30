@@ -56,3 +56,4 @@ scripts/stop-dev-env.sh
 
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
+.rMemory
