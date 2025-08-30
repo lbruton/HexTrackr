@@ -1,8 +1,8 @@
 # HTML Generation Report
 
-Generated: 2025-08-30T03:58:13.718Z
+Generated: 2025-08-30T20:52:49.618Z
 Duration: 1.9s
-Files Generated: 35
+Files Generated: 34
 Errors: 0
 
 ## Generated Files
@@ -24,7 +24,6 @@ Errors: 0
 - development/index.html
 - development/memory-system.html
 - development/pre-commit-hooks.html
-- development/rmemory-system.html
 - getting-started/index.html
 - getting-started/installation.html
 - html-update-report.html
@@ -45,4 +44,4 @@ Errors: 0
 
 ## Summary
 
-The HTML generator successfully created 35 HTML files from their corresponding markdown sources using the master template.
+The HTML generator successfully created 34 HTML files from their corresponding markdown sources using the master template.
