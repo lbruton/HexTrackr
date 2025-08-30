@@ -1,0 +1,33 @@
+{
+  "source_file": "rProtocols/view_mcp_memory_log.md",
+  "generated_date": "2025-08-20T01:53:21.499Z",
+  "title": "Protocol: View MCP Memory Log",
+  "sections": [
+    {
+      "id": "purpose",
+      "title": "Purpose",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "steps",
+      "title": "Steps",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "prompt-for-copilot",
+      "title": "Prompt for Copilot",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "notes",
+      "title": "Notes",
+      "icon": "📄",
+      "submenu": []
+    }
+  ],
+  "word_count": 140,
+  "format_version": "1.0"
+}

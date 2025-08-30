@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rEngine Agent Startup Architecture - Technical Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-rengine">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">🤖</div>
+            <h1>rEngine Agent Startup Architecture - Technical Documentation</h1>
+            <div class="subtitle">rEngine Platform</div>
+            <div class="meta">
+                <span>📁 RENGINE_AGENT_STARTUP_ARCHITECTURE.md</span>
+                <span>📅 2025-08-19</span>
+                <span>📊 5KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../RENGINE_AGENT_STARTUP_ARCHITECTURE.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/RENGINE_AGENT_STARTUP_ARCHITECTURE.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="rengine-agent-startup-architecture---technical-documentation">rEngine Agent Startup Architecture - Technical Documentation</h1>
+<h2 id="🏗️-system-architecture-overview">🏗️ System Architecture Overview</h2>
+<p>The rEngine platform uses a <strong>single-instance, Docker-first</strong> architecture to prevent resource conflicts and ensure consistent agent behavior across sessions.</p>
+<h3 id="core-principles">Core Principles</h3>
+<ol>
+<li><strong>Single Instance Enforcement</strong> - Only one Smart Scribe instance runs at a time</li>
+<li><strong>Docker-First Strategy</strong> - Prefer containerized services over local processes</li>
+<li><strong>External Monitoring</strong> - Console output in Terminal.app, not VS Code</li>
+<li><strong>Memory Efficiency</strong> - Use optimized models (qwen2.5-coder:7b vs llama3:8b)</li>
+<li><strong>Conflict Prevention</strong> - Pre-flight checks before launching any services</li>
+</ol>
+<h2 id="📋-service-dependencies">📋 Service Dependencies</h2>
+<pre><code><pre><code class="language-">rEngine Platform Startup Chain:
+├── Docker Environment (docker-compose.yml)
+│   ├── StackTrackr Application Container
+│   ├── rEngine Platform Container  
+│   ├── MCP Memory Server Container
+│   └── Development Environment Container
+├── Smart Scribe Service (in Docker)
+│   ├── qwen2.5-coder:7b Model (~6-7GB RAM)
+│   ├── File Watching System
+│   ├── Memory Health Monitoring
+│   └── Technical Knowledge Database
+└── External Monitoring Console (Terminal.app)
+    ├── Docker Log Aggregation
+    ├── Real-time Activity Display
+    └── 10-second Refresh Cycle</code></pre>
+</code></pre>
+<h2 id="🚀-startup-scripts">🚀 Startup Scripts</h2>
+<h3 id="primary-launch-script">Primary Launch Script</h3>
+<ul>
+<li><strong>File</strong>: <code>bin/launch-rEngine-services.sh</code></li>
+<li><strong>Purpose</strong>: Start entire Docker environment</li>
+<li><strong>Output</strong>: Opens new Terminal.app window</li>
+<li><strong>Dependencies</strong>: Docker, docker-compose</li>
+</ul>
+<h3 id="smart-scribe-monitor">Smart Scribe Monitor</h3>
+<ul>
+<li><strong>File</strong>: <code>launch-smart-scribe-monitor.applescript</code></li>
+<li><strong>Purpose</strong>: External console for Docker Smart Scribe</li>
+<li><strong>Output</strong>: Terminal.app monitoring window</li>
+<li><strong>Dependencies</strong>: Docker containers running</li>
+</ul>
+<h3 id="safety-wrapper">Safety Wrapper</h3>
+<ul>
+<li><strong>File</strong>: <code>bin/safe-smart-scribe-start.sh</code></li>
+<li><strong>Purpose</strong>: Conflict detection and prevention</li>
+<li><strong>Output</strong>: Interactive prompts for conflict resolution</li>
+<li><strong>Dependencies</strong>: Process checking, Docker detection</li>
+</ul>
+<h2 id="🔧-technical-implementation">🔧 Technical Implementation</h2>
+<h3 id="memory-management">Memory Management</h3>
+<pre><code class="language-json"><pre><code class="language-json">{
+  "model": "qwen2.5-coder:7b",
+  "memory_usage": "~6-7GB RAM",
+  "optimization": "Specialized for code analysis",
+  "fallback": "gemma2:2b (~2-3GB if needed)"
+}</code></pre>
+</code></pre>
+<h3 id="process-detection-logic">Process Detection Logic</h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Check for local Smart Scribe processes
+EXISTING_SCRIBE=$(ps aux | grep -E "smart-scribe\.js" | grep -v grep)
+
+# Check for Docker containers
+DOCKER_SCRIBE=$(docker ps --format "{{.Names}}" | grep -E "scribe|development")
+
+# Conflict resolution matrix:
+# Local + Docker = Prompt user choice
+# Local only = Continue local
+# Docker only = Use Docker
+# Neither = Start preferred method</code></pre>
+</code></pre>
+<h3 id="container-communication">Container Communication</h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Docker log monitoring
+CONTAINER_NAME=$(docker ps --format '{{.Names}}' | grep -E 'development')
+docker logs $CONTAINER_NAME --tail 10 --follow
+
+# Container health checking
+docker ps --format 'table {{.Names}}\t{{.Status}}'</code></pre>
+</code></pre>
+<h2 id="🛡️-error-prevention">🛡️ Error Prevention</h2>
+<h3 id="double-launch-prevention">Double-Launch Prevention</h3>
+<ol>
+<li><strong>Process Scanning</strong>: Check for existing Smart Scribe instances</li>
+<li><strong>Docker Detection</strong>: Verify container status before local launch</li>
+<li><strong>User Confirmation</strong>: Interactive prompts for conflict scenarios</li>
+<li><strong>Resource Monitoring</strong>: Memory usage warnings at 80%+ threshold</li>
+</ol>
+<h3 id="recovery-procedures">Recovery Procedures</h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Complete service restart
+docker-compose down
+docker-compose up -d
+./launch-smart-scribe-monitor.applescript
+
+# Emergency cleanup
+pkill -f smart-scribe
+docker stop $(docker ps -q)
+brew services stop ollama</code></pre>
+</code></pre>
+<h2 id="📊-monitoring--logging">📊 Monitoring &amp; Logging</h2>
+<h3 id="log-locations">Log Locations</h3>
+<ul>
+<li><strong>Docker Logs</strong>: <code>docker logs &lt;container_name&gt;</code></li>
+<li><strong>Local Logs</strong>: <code>rEngine/logs/smart-scribe.log</code></li>
+<li><strong>Process IDs</strong>: <code>rEngine/logs/smart-scribe.pid</code></li>
+<li><strong>System Logs</strong>: <code>rEngine/logs/deprecation.log</code></li>
+</ul>
+<h3 id="monitoring-metrics">Monitoring Metrics</h3>
+<ul>
+<li><strong>Memory Usage</strong>: Per-process RAM consumption</li>
+<li><strong>Container Status</strong>: Running/stopped state</li>
+<li><strong>Model Loading</strong>: Ollama model status</li>
+<li><strong>File Watching</strong>: Active directory monitoring</li>
+<li><strong>API Connectivity</strong>: MCP server health</li>
+</ul>
+<h2 id="🔄-standard-operating-procedure">🔄 Standard Operating Procedure</h2>
+<h3 id="daily-startup">Daily Startup</h3>
+<ol>
+<li>Run <code>./launch-smart-scribe-monitor.applescript</code></li>
+<li>Verify Docker containers are healthy</li>
+<li>Confirm Smart Scribe is active in monitoring console</li>
+<li>Check memory usage is within acceptable range</li>
+</ol>
+<h3 id="troubleshooting">Troubleshooting</h3>
+<ol>
+<li><strong>High Memory</strong>: Switch to smaller model (gemma2:2b)</li>
+<li><strong>Double Launch</strong>: Use safe-smart-scribe-start.sh</li>
+<li><strong>Container Issues</strong>: docker-compose down/up cycle</li>
+<li><strong>Log Analysis</strong>: Check both Docker and local logs</li>
+</ol>
+<h3 id="clean-shutdown">Clean Shutdown</h3>
+<ol>
+<li>Stop monitoring console (Ctrl+C)</li>
+<li>Stop Docker containers: <code>docker-compose down</code></li>
+<li>Verify no orphaned processes: <code>ps aux | grep scribe</code></li>
+</ol>
+<h2 id="📝-configuration-files">📝 Configuration Files</h2>
+<h3 id="primary-config">Primary Config</h3>
+<ul>
+<li><strong>File</strong>: <code>rEngine/system-config.json</code></li>
+<li><strong>Model</strong>: <code>qwen2.5-coder:7b</code></li>
+<li><strong>Provider</strong>: <code>ollama</code></li>
+<li><strong>Endpoint</strong>: <code>http://localhost:11434</code></li>
+</ul>
+<h3 id="docker-config">Docker Config</h3>
+<ul>
+<li><strong>File</strong>: <code>docker-compose.yml</code></li>
+<li><strong>Version</strong>: No version attribute (modern Docker Compose)</li>
+<li><strong>Services</strong>: stacktrackr-app, rengine-platform, mcp-server, development</li>
+</ul>
+<h2 id="🎯-performance-targets">🎯 Performance Targets</h2>
+<ul>
+<li><strong>Startup Time</strong>: &lt; 30 seconds for full environment</li>
+<li><strong>Memory Usage</strong>: &lt; 8GB total (Smart Scribe + containers)</li>
+<li><strong>CPU Usage</strong>: &lt; 50% sustained during normal operation</li>
+<li><strong>Log Refresh</strong>: 10-second monitoring intervals</li>
+<li><strong>Response Time</strong>: &lt; 2 seconds for Smart Scribe queries</li>
+</ul>
+<hr>
+<p><strong>Version</strong>: 1.0<br><strong>Last Updated</strong>: August 19, 2025<br><strong>Maintainer</strong>: rEngine Platform Team</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>RENGINE_AGENT_STARTUP_ARCHITECTURE.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-19</p>
+        </footer>
+    </div>
+</body>
+</html>

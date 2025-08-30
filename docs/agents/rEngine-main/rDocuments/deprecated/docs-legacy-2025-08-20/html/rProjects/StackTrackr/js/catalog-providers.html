@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog Providers Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Catalog Providers Documentation</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 catalog-providers.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 6KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rProjects/StackTrackr/js/catalog-providers.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/catalog-providers.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="catalog-providers-documentation">Catalog Providers Documentation</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>catalog-providers.js</code> script defines a set of classes and utilities for interacting with various coin and currency data catalogs. It serves as a foundation for the &quot;Phase 1D&quot; of the application and provides a consistent interface for accessing catalog data from different sources.</p>
+<p>The primary component is the <code>NumistaCatalogProvider</code> class, which extends the base <code>CatalogProvider</code> class (defined elsewhere in the codebase). This class encapsulates the logic for interacting with the Numista online catalog, including normalizing identifier formats, building links to catalog entries, and validating identifiers.</p>
+<p>The <code>CatalogProviders</code> module acts as a registry and utility for managing the available catalog providers. It allows you to register new providers, retrieve a specific provider by key, and list all registered providers.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>catalog-providers.js</code> script consists of the following key components:</p>
+<ol>
+<li><p><strong>NumistaCatalogProvider Class</strong>: This class extends the <code>CatalogProvider</code> base class and implements the necessary methods for interacting with the Numista catalog. It handles identifier normalization, link generation, and validity checking.</p>
+</li>
+<li><p><strong>CatalogProviders Module</strong>: This module acts as a singleton registry for managing the available catalog providers. It provides three main functions:</p>
+<ul>
+<li><code>register(p)</code>: Registers a new catalog provider instance.</li>
+<li><code>get(key)</code>: Retrieves a catalog provider instance by its key (or the &quot;numista&quot; provider by default).</li>
+<li><code>list()</code>: Returns an array of all registered catalog provider instances.</li>
+</ul>
+</li>
+</ol>
+<p>The data flow within this script is as follows:</p>
+<ol>
+<li>The <code>NumistaCatalogProvider</code> class is defined, which extends the <code>CatalogProvider</code> base class.</li>
+<li>The <code>CatalogProviders</code> module is immediately invoked, creating a private <code>map</code> object to store the registered providers.</li>
+<li>The <code>register()</code> function is defined within the <code>CatalogProviders</code> module, allowing new providers to be registered.</li>
+<li>The <code>NumistaCatalogProvider</code> instance is immediately registered with the <code>CatalogProviders</code> module.</li>
+<li>The <code>CatalogProviders</code> module exposes the <code>register()</code>, <code>get()</code>, and <code>list()</code> functions as its public API.</li>
+<li>If the script is running in a browser environment, the <code>NumistaCatalogProvider</code> and <code>CatalogProviders</code> are attached to the global <code>window</code> object.</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>This script has the following dependencies:</p>
+<ul>
+<li><code>CatalogProvider</code> class (defined in <code>catalog-api.js</code>)</li>
+</ul>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="numistacatalogprovider-class">NumistaCatalogProvider Class</h3>
+<p><strong>Constructor</strong>:</p>
+<pre><code class="language-typescript"><pre><code class="language-typescript">constructor()</code></pre>
+</code></pre>
+<p>Creates a new instance of the <code>NumistaCatalogProvider</code> class, which extends the <code>CatalogProvider</code> base class. The constructor calls the parent constructor with an object containing the provider&#39;s name and key.</p>
+<p><strong>normalizeId(id)</strong>:</p>
+<pre><code class="language-typescript"><pre><code class="language-typescript">normalizeId(id: string): string</code></pre>
+</code></pre>
+<p>Normalizes the provided <code>id</code> by trimming whitespace and removing any leading &quot;N#&quot; prefix (case-insensitive). This ensures a consistent format for the catalog identifier.</p>
+<p><strong>buildLink(id)</strong>:</p>
+<pre><code class="language-typescript"><pre><code class="language-typescript">buildLink(id: string): string | null</code></pre>
+</code></pre>
+<p>Builds a URL link to the Numista catalog entry for the provided <code>id</code>. If the <code>id</code> is invalid, <code>null</code> is returned.</p>
+<p><strong>isValid(id)</strong>:</p>
+<pre><code class="language-typescript"><pre><code class="language-typescript">isValid(id: string): boolean</code></pre>
+</code></pre>
+<p>Checks if the provided <code>id</code> is a valid Numista catalog identifier. The identifier must match the pattern <code>^N?#?\d+$/i</code> (optionally starting with &quot;N#&quot;) or simply <code>^\d+$</code>.</p>
+<h3 id="catalogproviders-module">CatalogProviders Module</h3>
+<p><strong>register(p)</strong>:</p>
+<pre><code class="language-typescript"><pre><code class="language-typescript">register(p: CatalogProvider): void</code></pre>
+</code></pre>
+<p>Registers a new catalog provider instance in the <code>CatalogProviders</code> module.</p>
+<p><strong>get(key)</strong>:</p>
+<pre><code class="language-typescript"><pre><code class="language-typescript">get(key: string): CatalogProvider</code></pre>
+</code></pre>
+<p>Retrieves a catalog provider instance by its <code>key</code> (or the &quot;numista&quot; provider by default if the key is not found).</p>
+<p><strong>list()</strong>:</p>
+<pre><code class="language-typescript"><pre><code class="language-typescript">list(): CatalogProvider[]</code></pre>
+</code></pre>
+<p>Returns an array of all registered catalog provider instances.</p>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="retrieving-a-catalog-provider">Retrieving a Catalog Provider</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">// Get the "numista" provider
+const numista = CatalogProviders.get('numista');
+
+// Get a different provider by key
+const myProvider = CatalogProviders.get('my-custom-provider');</code></pre>
+</code></pre>
+<h3 id="checking-identifier-validity">Checking Identifier Validity</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const numista = CatalogProviders.get('numista');
+
+// Check if an ID is valid
+console.log(numista.isValid('N#12345')); // true
+console.log(numista.isValid('12345')); // true
+console.log(numista.isValid('abc')); // false</code></pre>
+</code></pre>
+<h3 id="building-a-catalog-entry-link">Building a Catalog Entry Link</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const numista = CatalogProviders.get('numista');
+
+// Build a link to a catalog entry
+const link = numista.buildLink('N#12345');
+console.log(link); // https://en.numista.com/catalogue/pieces12345.html</code></pre>
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>This script does not require any specific configuration options or environment variables.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>NumistaCatalogProvider</code> class does not explicitly handle any errors. If an invalid identifier is provided to the <code>buildLink()</code> method, it will return <code>null</code> instead of a valid URL.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>catalog-providers.js</code> script is part of the larger application infrastructure, providing a consistent interface for accessing catalog data from different sources. It is likely used in conjunction with other components, such as the <code>CatalogApi</code> class (defined in <code>catalog-api.js</code>), to facilitate the retrieval and display of catalog information.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ul>
+<li>The <code>NumistaCatalogProvider</code> class is the only concrete implementation of a <code>CatalogProvider</code> in this script. Additional catalog providers can be added by creating new classes that extend the <code>CatalogProvider</code> base class and registering them with the <code>CatalogProviders</code> module.</li>
+<li>The <code>CatalogProviders</code> module uses a private <code>map</code> object to store the registered providers, ensuring a singleton-like behavior and allowing for easy retrieval and listing of the available providers.</li>
+<li>The script is designed to be compatible with both server-side (Node.js) and client-side (browser) environments. In the browser, the <code>NumistaCatalogProvider</code> and <code>CatalogProviders</code> are exposed on the global <code>window</code> object.</li>
+</ul>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>catalog-providers.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

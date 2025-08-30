@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Quick AI consultation script for Gemini
+# Usage: ./heygemini "your question"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Load environment variables for API keys
+if [ -f "$PROJECT_ROOT/rEngine/.env" ]; then
+    source "$PROJECT_ROOT/rEngine/.env"
+fi
+
+QUESTION="$1"
+if [ -z "$QUESTION" ]; then
+    echo "Usage: $0 'your question'"
+    exit 1
+fi
+
+# Add context about current project state
+CONTEXT="Project: StackTrackr - Memory System Assessment
+Current Status: Memory Scribe with real-time console monitoring active
+Recent Changes: Implemented comprehensive memory monitoring with 15-min health checks
+Question: $QUESTION"
+
+# Call Gemini API
+if [ -n "$GEMINI_API_KEY" ]; then
+    curl -s -X POST \
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=$GEMINI_API_KEY" \
+        -H "Content-Type: application/json" \
+        -d "{\"contents\":[{\"parts\":[{\"text\":\"$CONTEXT\"}]}]}" | \
+        jq -r '.candidates[0].content.parts[0].text' 2>/dev/null || echo "Gemini API call failed"
+else
+    echo "GEMINI_API_KEY not found in rEngine/.env"
+fi

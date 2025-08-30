@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "../rProjects/VulnTrackr/app.js",
+    "name": "app",
+    "extension": ".js",
+    "directory": "../rProjects/VulnTrackr",
+    "size": 0,
+    "lines": 400
+  },
+  "documentation": {
+    "markdown": "../docs/rProjects/VulnTrackr/app_chunk.md",
+    "html": "../docs/rProjects/VulnTrackr/app_chunk.html",
+    "generated": "2025-08-20T01:14:04.425Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "chunked",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "app.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for ../rProjects/VulnTrackr/app.js"
+  }
+}

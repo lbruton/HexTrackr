@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "visible-memory-writer.js",
+    "name": "visible-memory-writer",
+    "extension": ".js",
+    "directory": "",
+    "size": 0,
+    "lines": 17
+  },
+  "documentation": {
+    "markdown": "../docs/generated/visible-memory-writer.md",
+    "html": "../html-docs/generated/visible-memory-writer.html",
+    "generated": "2025-08-20T01:00:23.130Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "single-file",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "visible-memory-writer.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for visible-memory-writer.js"
+  }
+}

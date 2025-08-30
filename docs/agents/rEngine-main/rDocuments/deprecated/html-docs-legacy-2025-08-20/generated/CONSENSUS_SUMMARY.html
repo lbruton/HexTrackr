@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rScribe Benchmark Memory Review Summary - rEngine Core Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #6366f1;
+            --rengine-secondary: #8b5cf6;
+            --rengine-accent: #06b6d4;
+            --rengine-text: #1f2937;
+            --rengine-text-light: #6b7280;
+            --rengine-bg: #ffffff;
+            --rengine-bg-alt: #f8fafc;
+            --rengine-border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--rengine-text);
+            background: var(--rengine-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--rengine-primary), var(--rengine-secondary));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: "⚙️";
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--rengine-primary);
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--rengine-primary);
+            border-bottom: 2px solid var(--rengine-border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--rengine-secondary);
+        }
+
+        h4, h5, h6 {
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--rengine-text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--rengine-text);
+        }
+
+        .content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        code {
+            background: var(--rengine-bg-alt);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--rengine-primary);
+        }
+
+        pre {
+            background: var(--rengine-bg-alt);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--rengine-primary);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--rengine-text);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--rengine-accent);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: var(--rengine-text-light);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--rengine-border);
+        }
+
+        th {
+            background: var(--rengine-bg-alt);
+            font-weight: 600;
+            color: var(--rengine-primary);
+        }
+
+        .metadata {
+            background: var(--rengine-bg-alt);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--rengine-border);
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: var(--rengine-text-light);
+        }
+
+        footer {
+            background: var(--rengine-bg-alt);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--rengine-text-light);
+            border-top: 1px solid var(--rengine-border);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--rengine-primary);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">rEngine Core</div>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../README.html">Documentation</a>
+                    <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <h1>rScribe Benchmark Memory Review Summary</h1>
+            
+            
+            <div class="metadata">
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Source File:</span>
+                        <span>CONSENSUS_SUMMARY.md</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Generated:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Last Modified:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Converter:</span>
+                        <span>rEngine MCP HTML Converter</span>
+                    </div>
+                
+            </div>
+            
+            
+            [36m🤖 Calling Google Gemini (gemini-1.5-flash)...[0m
+[32m✅ Response received in 9538ms[0m
+
+[1m🤖 Google Gemini Response:[0m
+
+```html
+<section class="report-section">
+  <h1>File Access Report</h1>
+  <p class="intro">This report summarizes attempts to access various files and directories.</p>
+
+  <table class="file-access-table">
+    <thead>
+      <tr>
+        <th>File/Directory</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>CONSENSUS_SUMMARY.mdis</code></td>
+        <td>empty</td>
+      </tr>
+      <tr>
+        <td><code>a</code></td>
+        <td>cannot open `a' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>summary</code></td>
+        <td>cannot open `summary' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>report</code></td>
+        <td>cannot open `report' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>generated</code></td>
+        <td>cannot open `generated' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>by</code></td>
+        <td>cannot open `by' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>the</code></td>
+        <td>cannot open `the' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>CONSENSUS_SUMMARY.mdis</code></td>
+        <td>empty</td>
+      </tr>
+      <tr>
+        <td><code>a</code></td>
+        <td>cannot open `a' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>standalone</code></td>
+        <td>cannot open `standalone' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>documentation</code></td>
+        <td>cannot open `documentation' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>artifact</code></td>
+        <td>cannot open `artifact' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>and</code></td>
+        <td>empty</td>
+      </tr>
+      <tr>
+        <td><code>does</code></td>
+        <td>cannot open `does' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>not</code></td>
+        <td>cannot open `not' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>directly</code></td>
+        <td>cannot open `directly' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>depend</code></td>
+        <td>cannot open `depend' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>on</code></td>
+        <td>cannot open `on' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>any</code></td>
+        <td>cannot open `any' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>specific</code></td>
+        <td>cannot open `specific' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>code</code></td>
+        <td>cannot open `code' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>or</code></td>
+        <td>cannot open `or' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>components</code></td>
+        <td>cannot open `components' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>within</code></td>
+        <td>cannot open `within' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>the</code></td>
+        <td>cannot open `the' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>rEngine</code></td>
+        <td>directory</td>
+      </tr>
+      <tr>
+        <td><code>Core</code></td>
+        <td>cannot open `Core' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>platform.</code></td>
+        <td>cannot open `platform.' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>It</code></td>
+        <td>cannot open `It' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>is</code></td>
+        <td>empty</td>
+      </tr>
+      <tr>
+        <td><code>generated</code></td>
+        <td>cannot open `generated' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>based</code></td>
+        <td>cannot open `based' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>on</code></td>
+        <td>cannot open `on' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>the</code></td>
+        <td>cannot open `the' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>results</code></td>
+        <td>cannot open `results' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>of</code></td>
+        <td>cannot open `of' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>the</code></td>
+        <td>cannot open `the' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>memory</code></td>
+        <td>cannot open `memory' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>management</code></td>
+        <td>cannot open `management' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>system</code></td>
+        <td>cannot open `system' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>review</code></td>
+        <td>cannot open `review' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>conducted</code></td>
+        <td>cannot open `conducted' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>by</code></td>
+        <td>cannot open `by' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>the</code></td>
+        <td>cannot open `the' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>CONSENSUS_SUMMARY.mdis</code></td>
+        <td>empty</td>
+      </tr>
+      <tr>
+        <td><code>an</code></td>
+        <td>cannot open `an' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>output</code></td>
+        <td>cannot open `output' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>of</code></td>
+        <td>cannot open `of' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>the</code></td>
+        <td>cannot open `the' (No such file or directory)</td>
+      </tr>
+      <tr>
+        <td><code>rScribeCONSENSUS_SUMMARY.md</code></td>
+        <td>rScribe</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+```
+
+
+[36mℹ️  Duration: 9538ms | Model: gemini-1.5-flash[0m
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../README.html">Documentation</a>
+                <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+            </div>
+            <p>Generated on 2025-08-20 by rEngine Core HTML Converter</p>
+            <p>© 2025 rEngine Core - Intelligent Development Wrapper</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "source_file": "rProtocols/README.md",
+  "generated_date": "2025-08-20T01:53:21.457Z",
+  "title": "StackTrackr Protocols Directory",
+  "sections": [
+    {
+      "id": "-active-protocols",
+      "title": "📋 Active Protocols",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "-deprecated-protocols",
+      "title": "🗂️ Deprecated Protocols",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "-for-github-copilot-head-orchestrator",
+      "title": "🎯 For GitHub Copilot (Head Orchestrator)",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "-protocol-updates",
+      "title": "🔄 Protocol Updates",
+      "icon": "📄",
+      "submenu": []
+    }
+  ],
+  "word_count": 238,
+  "format_version": "1.0"
+}

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rScribe Document Sweep Protocol</title>
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Sidebar -->
+        <nav class="nav-sidebar">
+            
+      <div class="nav-header">
+        <h1>rScribe Document Sweep Protocol</h1>
+        <div class="nav-subtitle">Generated from Markdown</div>
+      </div>
+      
+      <ul class="nav-menu">
+    <li><a href="#-core-protocol">📄 🎯 Core Protocol</a><ul class="nav-submenu"><li><a href="#multiformat-output-standard">Multi-Format Output Standard</a></li><li><a href="#html-format-requirements">HTML Format Requirements</a></li></ul></li><li><a href="#-rscribe-worker-instructions">📄 🤖 rScribe Worker Instructions</a><ul class="nav-submenu"><li><a href="#document-sweep-automation">Document Sweep Automation</a></li><li><a href="#file-naming-convention">File Naming Convention</a></li></ul></li><li><a href="#-sync-protocol">📄 🔄 Sync Protocol</a><ul class="nav-submenu"><li><a href="#automatic-html-generation">Automatic HTML Generation</a></li><li><a href="#summary-generation">Summary Generation</a></li></ul></li><li><a href="#files-updated-x">📄 Files Updated: X</a><ul class="nav-submenu"></ul></li><li><a href="#new-content-added-x">📄 New Content Added: X</a><ul class="nav-submenu"></ul></li><li><a href="#crossreferences-updated-x">📄 Cross-References Updated: X</a><ul class="nav-submenu"></ul></li><li><a href="#-priority-files-for-multiformat">📄 📋 Priority Files for Multi-Format</a><ul class="nav-submenu"><li><a href="#immediate-multiformat-generation">Immediate Multi-Format Generation</a></li><li><a href="#autosync-monitoring">Auto-Sync Monitoring</a></li></ul></li><li><a href="#-implementation-commands">📄 ⚙️ Implementation Commands</a><ul class="nav-submenu"><li><a href="#for-rscribe-workers">For rScribe Workers</a></li><li><a href="#document-sweep-enhancement">Document Sweep Enhancement</a></li></ul></li><li><a href="#-html-template-structure">📄 🎨 HTML Template Structure</a><ul class="nav-submenu"><li><a href="#required-elements">Required Elements</a></li><li><a href="#css-framework">CSS Framework</a></li></ul></li><li><a href="#-success-metrics">📄 📊 Success Metrics</a><ul class="nav-submenu"><li><a href="#quality-indicators">Quality Indicators</a></li><li><a href="#user-experience-goals">User Experience Goals</a></li></ul></li></ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h1 id="rscribe-document-sweep-protocol">rScribe Document Sweep Protocol</h1>
+<p><strong>Multi-Format Documentation Generation &amp; Auto-Sync Protocol</strong></p>
+<hr>
+<h2 id="🎯-core-protocol">🎯 <strong>Core Protocol</strong></h2>
+<h3 id="multi-format-output-standard"><strong>Multi-Format Output Standard</strong></h3>
+<p>All major documentation files must be generated and maintained in three formats:</p>
+<ul>
+<li><strong><code>.md</code></strong> - Source of truth, human-readable Markdown</li>
+<li><strong><code>.json</code></strong> - Structured data for programmatic access</li>
+<li><strong><code>.html</code></strong> - Formatted web interface with navigation</li>
+</ul>
+<h3 id="html-format-requirements"><strong>HTML Format Requirements</strong></h3>
+<ul>
+<li><strong>Navigation Sidebar</strong> - Fixed left sidebar with section links</li>
+<li><strong>Responsive Design</strong> - Mobile-friendly layout</li>
+<li><strong>Consistent Styling</strong> - Use StackTrackr roadmap CSS framework</li>
+<li><strong>Interactive Elements</strong> - Smooth scrolling, priority badges, status indicators</li>
+<li><strong>Cross-References</strong> - Hyperlinks between related documents</li>
+</ul>
+<hr>
+<h2 id="🤖-rscribe-worker-instructions">🤖 <strong>rScribe Worker Instructions</strong></h2>
+<h3 id="document-sweep-automation"><strong>Document Sweep Automation</strong></h3>
+<p>When rScribe document sweep workers execute:</p>
+<ol>
+<li><p><strong>Generate Multi-Format Output</strong>:</p>
+<pre><code class="language-bash"># For each major document (ROADMAP, TASKS, etc.)
+# Generate .md (source)
+# Generate .json (structured data)
+# Generate .html (web interface)
+</code></pre>
+</li>
+<li><p><strong>HTML Template Standards</strong>:</p>
+<ul>
+<li>Use <code>MASTER_ROADMAP.html</code> as CSS/layout template</li>
+<li>Include navigation sidebar with document-specific sections</li>
+<li>Add priority badges and status indicators</li>
+<li>Ensure responsive design patterns</li>
+</ul>
+</li>
+<li><p><strong>Auto-Sync Triggers</strong>:</p>
+<ul>
+<li>When any <code>.md</code> roadmap file is updated</li>
+<li>When project status changes</li>
+<li>When new issues are added/resolved</li>
+<li>During scheduled document sweeps (6 AM/6 PM)</li>
+</ul>
+</li>
+</ol>
+<h3 id="file-naming-convention"><strong>File Naming Convention</strong></h3>
+<pre><code>DOCUMENT_NAME.md          # Source markdown
+DOCUMENT_NAME.json        # Structured data
+DOCUMENT_NAME.html        # Web interface
+</code></pre>
+<p><strong>Examples:</strong></p>
+<ul>
+<li><code>MASTER_ROADMAP.md/json/html</code></li>
+<li><code>TASK_SUMMARY.md/json/html</code></li>
+<li><code>SQLITE_MIGRATION_PLAN.md/json/html</code></li>
+<li><code>PROJECT_STATUS.md/json/html</code></li>
+</ul>
+<hr>
+<h2 id="🔄-sync-protocol">🔄 <strong>Sync Protocol</strong></h2>
+<h3 id="automatic-html-generation"><strong>Automatic HTML Generation</strong></h3>
+<p>rScribe workers must:</p>
+<ol>
+<li><p><strong>Monitor Source Files</strong>:</p>
+<ul>
+<li>Watch for changes to <code>.md</code> files in root directory</li>
+<li>Detect updates to project documentation</li>
+<li>Track roadmap and task list modifications</li>
+</ul>
+</li>
+<li><p><strong>Trigger HTML Updates</strong>:</p>
+<ul>
+<li>Parse updated <code>.md</code> content</li>
+<li>Apply HTML template with navigation</li>
+<li>Generate responsive web interface</li>
+<li>Maintain cross-document links</li>
+</ul>
+</li>
+<li><p><strong>Validation Checks</strong>:</p>
+<ul>
+<li>Verify HTML validates properly</li>
+<li>Test navigation links work</li>
+<li>Ensure responsive design functions</li>
+<li>Confirm all sections are accessible</li>
+</ul>
+</li>
+</ol>
+<h3 id="summary-generation"><strong>Summary Generation</strong></h3>
+<p>During document sweeps, generate summary reports in all three formats:</p>
+<p><strong><code>.md</code> Summary:</strong></p>
+<pre><code class="language-markdown"># Document Sweep Summary - [Date]
+## Files Updated: X
+## New Content Added: X
+## Cross-References Updated: X
+</code></pre>
+<p><strong><code>.json</code> Summary:</strong></p>
+<pre><code class="language-json">{
+  &quot;sweep_date&quot;: &quot;2025-08-18&quot;,
+  &quot;files_updated&quot;: [],
+  &quot;formats_generated&quot;: [&quot;md&quot;, &quot;json&quot;, &quot;html&quot;],
+  &quot;cross_references&quot;: [],
+  &quot;validation_status&quot;: &quot;passed&quot;
+}
+</code></pre>
+<p><strong><code>.html</code> Summary:</strong></p>
+<ul>
+<li>Formatted report with navigation</li>
+<li>Visual indicators for updated files</li>
+<li>Interactive links to generated documents</li>
+</ul>
+<hr>
+<h2 id="📋-priority-files-for-multi-format">📋 <strong>Priority Files for Multi-Format</strong></h2>
+<h3 id="immediate-multi-format-generation"><strong>Immediate Multi-Format Generation</strong></h3>
+<ol>
+<li><code>MASTER_ROADMAP</code> (already complete)</li>
+<li><code>TASK_SUMMARY</code> (needs HTML)</li>
+<li><code>SQLITE_MIGRATION_PLAN</code> (needs HTML)</li>
+<li><code>RENGINE_SCRIPT_DOCUMENTATION</code> (needs HTML)</li>
+<li><code>CLEANUP</code> (needs HTML)</li>
+</ol>
+<h3 id="auto-sync-monitoring"><strong>Auto-Sync Monitoring</strong></h3>
+<ul>
+<li>Any file in root directory ending in <code>.md</code></li>
+<li>Project documentation in <code>/docs/</code></li>
+<li>Roadmap files in <code>/archive/</code></li>
+<li>Agent memory files requiring documentation</li>
+</ul>
+<hr>
+<h2 id="⚙️-implementation-commands">⚙️ <strong>Implementation Commands</strong></h2>
+<h3 id="for-rscribe-workers"><strong>For rScribe Workers</strong></h3>
+<pre><code class="language-bash"># Generate HTML from markdown
+node rEngine/generate-html-docs.js [source.md] [output.html]
+
+# Auto-sync all documentation
+node rEngine/sync-documentation.js --format=all
+
+# Monitor and auto-update
+node rEngine/watch-docs.js --auto-html
+</code></pre>
+<h3 id="document-sweep-enhancement"><strong>Document Sweep Enhancement</strong></h3>
+<p>Update <code>rEngine/document-sweep.js</code> to include:</p>
+<ul>
+<li>Multi-format generation</li>
+<li>HTML template application</li>
+<li>Cross-reference validation</li>
+<li>Summary report in all formats</li>
+</ul>
+<hr>
+<h2 id="🎨-html-template-structure">🎨 <strong>HTML Template Structure</strong></h2>
+<h3 id="required-elements"><strong>Required Elements</strong></h3>
+<pre><code class="language-html">&lt;!-- Navigation Sidebar --&gt;
+&lt;nav class=&quot;nav-sidebar&quot;&gt;
+  &lt;!-- Document-specific navigation --&gt;
+&lt;/nav&gt;
+
+&lt;!-- Main Content --&gt;
+&lt;main class=&quot;main-content&quot;&gt;
+  &lt;!-- Generated from .md content --&gt;
+&lt;/main&gt;
+
+&lt;!-- Status Indicators --&gt;
+&lt;div class=&quot;status-badges&quot;&gt;
+  &lt;!-- Priority/status badges --&gt;
+&lt;/div&gt;
+</code></pre>
+<h3 id="css-framework"><strong>CSS Framework</strong></h3>
+<ul>
+<li>Copy base styles from <code>MASTER_ROADMAP.html</code></li>
+<li>Maintain consistent color scheme</li>
+<li>Use responsive breakpoints</li>
+<li>Include priority badge styles</li>
+</ul>
+<hr>
+<h2 id="📊-success-metrics">📊 <strong>Success Metrics</strong></h2>
+<h3 id="quality-indicators"><strong>Quality Indicators</strong></h3>
+<ul>
+<li>All major docs available in 3 formats</li>
+<li>HTML pages load properly with navigation</li>
+<li>Cross-references work correctly</li>
+<li>Mobile responsive design functions</li>
+<li>Auto-sync operates without errors</li>
+</ul>
+<h3 id="user-experience-goals"><strong>User Experience Goals</strong></h3>
+<ul>
+<li>HTML format preferred for daily use</li>
+<li>Quick navigation between sections</li>
+<li>Visual priority indicators</li>
+<li>Consistent styling across documents</li>
+<li>Fast loading and smooth interactions</li>
+</ul>
+<hr>
+<p><em>Protocol Version: 1.0</em><br><em>Effective Date: August 18, 2025</em><br><em>Next Review: September 1, 2025</em></p>
+
+            
+            <footer style="margin-top: 40px; padding: 20px 0; border-top: 1px solid #e1e4e8; text-align: center; color: #666;">
+                <p><em>Generated: 8/19/2025</em></p>
+                <p><em>Source: Markdown → HTML via rScribe Worker</em></p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Highlight current section in navigation
+        window.addEventListener('scroll', function() {
+            let current = '';
+            const sections = document.querySelectorAll('h2, h3');
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (pageYOffset >= sectionTop) {
+                    current = section.id;
+                }
+            });
+
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.style.background = '#e1f5fe';
+                    link.style.color = '#007acc';
+                    link.style.fontWeight = 'bold';
+                } else {
+                    link.style.background = '';
+                    link.style.color = '';
+                    link.style.fontWeight = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

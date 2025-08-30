@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Documentation Guide - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #28a745 0%, #198754 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-agent">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">🤖</div>
+            <h1>Agent Documentation Guide</h1>
+            <div class="subtitle">Agent System</div>
+            <div class="meta">
+                <span>📁 AGENT_DOCUMENTATION_GUIDE.md</span>
+                <span>📅 2025-08-19</span>
+                <span>📊 4KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../AGENT_DOCUMENTATION_GUIDE.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/AGENT_DOCUMENTATION_GUIDE.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="agent-documentation-guide">Agent Documentation Guide</h1>
+<p>This document outlines the priority and usage of documentation resources within the StackTrackr repository for all AI agents. Adhering to this guide will improve efficiency, accuracy, and reduce token consumption.</p>
+<h2 id="emergency-startup-protocol">Emergency Startup Protocol</h2>
+<h3 id="startmd---write-protected-emergency-backup">START.md - Write-Protected Emergency Backup</h3>
+<ul>
+<li><strong>Location:</strong> <code>/START.md</code> (root directory)</li>
+<li><strong>Purpose:</strong> Emergency backup of <code>COPILOT_INSTRUCTIONS.md</code> for human use when agent chat sessions fail to auto-load main instructions</li>
+<li><strong>Protection:</strong> Write-protected (chmod 444) - can only be overwritten by explicit user request</li>
+<li><strong>Usage:</strong> Human fallback when normal agent initialization fails</li>
+</ul>
+<h2 id="information-retrieval-hierarchy">Information Retrieval Hierarchy</h2>
+<p>When tasked with finding information, analyzing code, or understanding a feature, agents MUST follow this retrieval hierarchy in order:</p>
+<h3 id="0-master-project-tracking-new---top-priority">0. Master Project Tracking (NEW - TOP PRIORITY)</h3>
+<ul>
+<li><strong>Location:</strong> <code>/MASTER_ROADMAP.md</code> (root directory)</li>
+<li><strong>Description:</strong> <strong>SINGLE SOURCE OF TRUTH</strong> for all bugs, features, roadmaps, and project status across StackTrackr application and all rEngine components (rAgents, rMemory, rSync, rScribe).</li>
+<li><strong>Priority:</strong> <strong>HIGHEST.</strong> Always check here first for current issues, priorities, and project status.</li>
+<li><strong>Usage:</strong> Use this for understanding what&#39;s broken, what needs to be done, and current development priorities.</li>
+</ul>
+<h3 id="1-primary-memory-mcp--json">1. Primary Memory (MCP &amp; JSON)</h3>
+<ul>
+<li><strong>Location:</strong> <code>rMemory/</code>, <code>rEngine/*.json</code></li>
+<li><strong>Description:</strong> The agent&#39;s own memory is the first and most immediate source of information. This includes the Memory Compliance Protocol (MCP) servers and various JSON files that store state, knowledge, and configuration.</li>
+<li><strong>Priority:</strong> <strong>Highest.</strong> Information here is considered active and immediately relevant.</li>
+</ul>
+<h3 id="2-primary-documentation-human-curated">2. Primary Documentation (Human-Curated)</h3>
+<ul>
+<li><strong>Location:</strong> <code>/docs/</code> (excluding <code>/docs/generated/</code>)</li>
+<li><strong>Description:</strong> This directory contains hand-written documentation, architectural decisions, and strategic guides. It is the definitive source of truth for the project&#39;s design and intent.</li>
+<li><strong>Priority:</strong> <strong>High.</strong> This is the most reliable source for understanding <em>why</em> the system is built the way it is. It should be trusted over AI-generated documentation.</li>
+</ul>
+<h3 id="3-secondary-documentation-ai-generated">3. Secondary Documentation (AI-Generated)</h3>
+<ul>
+<li><strong>Location:</strong> <code>/docs/generated/</code></li>
+<li><strong>Description:</strong> This directory contains AI-generated documentation created by the <code>rScribe</code> agent. It serves as a highly detailed, file-by-file index of the codebase.</li>
+<li><strong>Usage:</strong> This is an invaluable resource for quickly understanding the functions, dependencies, and purpose of specific files without needing to read the raw source code. It is a massive time and context saver.</li>
+<li><strong>Caveat:</strong> As this documentation is AI-generated, it should be considered a high-quality summary, but <strong>not infallible</strong>. If there is a conflict or ambiguity, the source code or primary documentation takes precedence.</li>
+<li><strong>Priority:</strong> <strong>Medium.</strong> Use this as the first stop for &quot;what does this file do?&quot; or &quot;where is the function for X?&quot; before resorting to a full code scan.</li>
+</ul>
+<h3 id="4-source-code">4. Source Code</h3>
+<ul>
+<li><strong>Location:</strong> The entire repository.</li>
+<li><strong>Description:</strong> The code itself.</li>
+<li><strong>Usage:</strong> This is the last resort. A full scan of the project is time-consuming and token-intensive. It should only be performed if the required information cannot be found in any of the documentation tiers above.</li>
+</ul>
+<h2 id="quick-reference-checklist">Quick Reference Checklist</h2>
+<p><strong>Before starting any work:</strong></p>
+<ol>
+<li>✅ Check <code>/MASTER_ROADMAP.md</code> for current priorities and known issues</li>
+<li>✅ Search MCP memory for relevant context</li>
+<li>✅ Review relevant human documentation in <code>/docs/</code></li>
+<li>✅ Use AI-generated docs in <code>/docs/generated/</code> for file understanding</li>
+<li>✅ Only then scan source code if needed</li>
+</ol>
+<p>By following this hierarchy, agents will operate more efficiently and make better-informed decisions.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>AGENT_DOCUMENTATION_GUIDE.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-19</p>
+        </footer>
+    </div>
+</body>
+</html>

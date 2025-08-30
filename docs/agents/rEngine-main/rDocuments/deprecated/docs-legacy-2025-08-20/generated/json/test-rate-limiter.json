@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "test-rate-limiter.js",
+    "name": "test-rate-limiter",
+    "extension": ".js",
+    "directory": "",
+    "size": 0,
+    "lines": 228
+  },
+  "documentation": {
+    "markdown": "../docs/generated/test-rate-limiter.md",
+    "html": "../html-docs/generated/test-rate-limiter.html",
+    "generated": "2025-08-20T00:59:09.557Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "single-file",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "test-rate-limiter.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for test-rate-limiter.js"
+  }
+}

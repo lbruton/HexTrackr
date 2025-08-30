@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "gemini-restoration-request.js",
+    "name": "gemini-restoration-request",
+    "extension": ".js",
+    "directory": "",
+    "size": 0,
+    "lines": 56
+  },
+  "documentation": {
+    "markdown": "../docs/generated/gemini-restoration-request.md",
+    "html": "../html-docs/generated/gemini-restoration-request.html",
+    "generated": "2025-08-20T00:51:33.180Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "single-file",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "gemini-restoration-request.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for gemini-restoration-request.js"
+  }
+}

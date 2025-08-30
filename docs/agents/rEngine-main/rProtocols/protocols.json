@@ -1,0 +1,476 @@
+{
+  "protocol_stack": {
+    "version": "2.0.0",
+    "last_updated": "2025-08-20T17:07:15.482Z",
+    "description": "Auto-generated centralized index of all rEngine operational protocols",
+    "auto_generated": true,
+    "total_protocols": 26,
+    "active_protocols": 26,
+    "execution_hierarchy": [
+      {
+        "tier": "tier_1_foundation",
+        "description": "Core system protocols - execute first",
+        "protocols": [
+          {
+            "priority": 1,
+            "protocol": "memory_management_protocol.md",
+            "title": "Protocol: Memory Management & Synchronization",
+            "required": true,
+            "description": "This document provides the definitive protocol for managing and synchronizing the project's dual-memory architecture. Adherence to this protocol is mandatory to ensure data integrity, prevent context loss between sessions, and maintain system health.",
+            "status": "active"
+          },
+          {
+            "priority": 2,
+            "protocol": "rEngine_startup_protocol.md",
+            "title": "Protocol: rEngine Startup & Operations",
+            "required": true,
+            "description": "This document provides the official protocol for starting, stopping, restarting, and interacting with the `rEngine` service. The `rEngine` is the core AI orchestration and command execution server for this project. It is a sophisticated system that manages AI provider interactions, memory analysis, and tool execution.",
+            "status": "active"
+          },
+          {
+            "priority": 3,
+            "protocol": "enhanced_scribe_system_protocol.md",
+            "title": "Enhanced Scribe System Protocol v2.0",
+            "required": true,
+            "description": "Operational protocol",
+            "status": "active"
+          }
+        ]
+      },
+      {
+        "tier": "tier_2_coordination",
+        "description": "Agent coordination and communication",
+        "protocols": [
+          {
+            "priority": 4,
+            "protocol": "session_handoff_protocol.md",
+            "title": "Protocol: Session Handoff & Summarization",
+            "required": true,
+            "description": "This protocol defines the process for summarizing conversations, creating handoffs between AI agents, and preserving context for future sessions. It serves as the primary context management solution until the rolling memory system (PROJECT-003 SQLite migration) is implemented.",
+            "status": "active"
+          },
+          {
+            "priority": 5,
+            "protocol": "rapid_context_recall_protocol.md",
+            "title": "Rapid Context Recall Protocol",
+            "required": true,
+            "description": "Operational protocol",
+            "status": "active"
+          },
+          {
+            "priority": 6,
+            "protocol": "recall_prime_directive_protocol.md",
+            "title": "Recall Prime Directive Protocol",
+            "required": true,
+            "description": "Operational protocol",
+            "status": "active"
+          }
+        ]
+      },
+      {
+        "tier": "tier_3_operations",
+        "description": "Operational procedures and workflows",
+        "protocols": [
+          {
+            "priority": 7,
+            "protocol": "document_sweep_protocol.md",
+            "title": "Protocol: Document Sweep",
+            "required": false,
+            "description": "This document outlines the protocol for initiating a \"Document Sweep,\" an automated process managed by the `rScribe` agent family. The purpose of the sweep is to scan the entire codebase, identify undocumented or under-documented scripts, and generate comprehensive technical documentation for them.",
+            "status": "active"
+          },
+          {
+            "priority": 8,
+            "protocol": "documentation_structure_protocol.md",
+            "title": "Protocol: Documentation Structure & Organization",
+            "required": false,
+            "description": "This protocol establishes the definitive structure for documentation organization within the StackTrackr/rEngine ecosystem. It defines directory purposes, file naming conventions, and indexing requirements to ensure consistent documentation management across all AI agents and human contributors.",
+            "status": "active"
+          },
+          {
+            "priority": 9,
+            "protocol": "file_cleanup_protocol.md",
+            "title": "File Cleanup Protocol",
+            "required": false,
+            "description": "Operational protocol",
+            "status": "active"
+          },
+          {
+            "priority": 10,
+            "protocol": "folder_organization_protocol.md",
+            "title": "Folder Organization Protocol",
+            "required": false,
+            "description": "Operational protocol",
+            "status": "active"
+          }
+        ]
+      },
+      {
+        "tier": "tier_4_intelligence",
+        "description": "AI enhancement and optimization",
+        "protocols": [
+          {
+            "priority": 11,
+            "protocol": "ai_intelligence_enhancement_protocol.md",
+            "title": "AI Agent Intelligence Enhancement Protocol",
+            "required": false,
+            "description": "Operational protocol",
+            "status": "active"
+          },
+          {
+            "priority": 12,
+            "protocol": "ai_tools_registry_protocol.md",
+            "title": "🔧 AI Tools Registry Protocol",
+            "required": false,
+            "description": "This protocol establishes a centralized registry for tracking, documenting, and managing all custom-built AI tools within the rEngine ecosystem. These tools represent critical capabilities that enable advanced AI-powered development workflows.",
+            "status": "active"
+          },
+          {
+            "priority": 13,
+            "protocol": "unified_document_scribe_protocol.md",
+            "title": "Protocol: Unified Document Scribe System",
+            "required": false,
+            "description": "This protocol defines the operation of the unified Document Scribe system, which provides intelligent documentation generation, API communication, and idle-time processing capabilities. The system replaces multiple scattered API communication scripts with a single, rate-limited, intelligent tool.",
+            "status": "active"
+          }
+        ]
+      },
+      {
+        "tier": "tier_5_specialized",
+        "description": "Specialized operational procedures",
+        "protocols": [
+          {
+            "priority": 14,
+            "protocol": "document_publication_protocol.md",
+            "title": "📋 Document Publication Protocol",
+            "required": false,
+            "description": "This protocol handles the systematic distribution of generated HTML documentation from the central `html-docs/` directory to individual project `docs/html/` directories within the `rProjects/` ecosystem.",
+            "status": "active"
+          },
+          {
+            "priority": 15,
+            "protocol": "patch_note_protocol.md",
+            "title": "Protocol: Patch Note Management",
+            "required": false,
+            "description": "This document establishes the official protocol for creating, naming, and storing patch notes for the `rEngine` component. The purpose of these notes is to maintain a clear, chronological record of changes, bug fixes, and enhancements. Adherence to this protocol is mandatory for all agents to ensure consistency and traceability.",
+            "status": "active"
+          },
+          {
+            "priority": 16,
+            "protocol": "root_directory_cleanup_protocol.md",
+            "title": "Root Directory Cleanup Summary",
+            "required": false,
+            "description": "Operational protocol",
+            "status": "active"
+          },
+          {
+            "priority": 17,
+            "protocol": "api_configuration_protocol.md",
+            "title": "API Configuration Protocol for StackTrackr",
+            "required": false,
+            "description": "This protocol provides a secure, streamlined way for users to configure API keys for StackTrackr's LLM integration system. API keys are encrypted locally and never transmitted or stored in plain text.",
+            "status": "active"
+          },
+          {
+            "priority": 18,
+            "protocol": "file_path_protocol.md",
+            "title": "Protocol: Absolute File Path Mandate",
+            "required": false,
+            "description": "This protocol establishes a mandatory requirement for the use of absolute (full) file paths in all scripts, commands, and agent actions. The purpose is to eliminate ambiguity and prevent errors that arise from inconsistent working directories.",
+            "status": "active"
+          }
+        ]
+      },
+      {
+        "tier": "tier_6_additional",
+        "description": "Additional operational protocols",
+        "protocols": [
+          {
+            "priority": 19,
+            "protocol": "git_commit_standards_protocol.md",
+            "title": "Protocol: Git Commit Standards & Change Documentation",
+            "required": false,
+            "description": "This protocol establishes standards for git commit messages and comprehensive change documentation. It ensures commit messages remain concise while detailed change information is preserved in a structured format for future reference.",
+            "status": "active"
+          },
+          {
+            "priority": 20,
+            "protocol": "handoff.md",
+            "title": "Protocol: Agent Handoff (DEPRECATED)",
+            "required": false,
+            "description": "Operational protocol",
+            "status": "active"
+          },
+          {
+            "priority": 21,
+            "protocol": "launch-scribe-console.md",
+            "title": "Protocol: Launch Scribe Console",
+            "required": false,
+            "description": "This protocol defines the steps for launching the Split Scribe Console for real-time monitoring of StackTrackr sessions.",
+            "status": "active"
+          },
+          {
+            "priority": 22,
+            "protocol": "rscribe_search_matrix_integration.md",
+            "title": "rScribe Search Matrix Integration Protocol",
+            "required": false,
+            "description": "Operational protocol",
+            "status": "active"
+          },
+          {
+            "priority": 23,
+            "protocol": "scribe_deprecation_summary.md",
+            "title": "Deprecation Summary - Enhanced Scribe System Migration",
+            "required": false,
+            "description": "Operational protocol",
+            "status": "active"
+          },
+          {
+            "priority": 24,
+            "protocol": "seamless_agent_continuity_protocol.md",
+            "title": "Protocol: Seamless Agent Continuity & User Context Loading",
+            "required": false,
+            "description": "This protocol ensures that every AI agent conversation feels like a continuous, never-ending chat with no memory gaps. It establishes the framework for instant context loading, user preference application, and seamless conversation continuity across sessions.",
+            "status": "active"
+          },
+          {
+            "priority": 25,
+            "protocol": "UNIVERSAL_AGENT_SYSTEM_PROMPT.md",
+            "title": "🎯 UNIVERSAL AGENT SYSTEM PROMPT",
+            "required": false,
+            "description": "Operational protocol",
+            "status": "active"
+          },
+          {
+            "priority": 26,
+            "protocol": "view_mcp_memory_log.md",
+            "title": "Protocol: View MCP Memory Log",
+            "required": false,
+            "description": "This protocol defines the steps for viewing MCP memory operation logs in the StackTrackr environment.",
+            "status": "active"
+          }
+        ]
+      }
+    ],
+    "protocol_files": [
+      {
+        "filename": "ai_intelligence_enhancement_protocol.md",
+        "title": "AI Agent Intelligence Enhancement Protocol",
+        "description": "Operational protocol",
+        "status": "active",
+        "lastModified": "2025-08-20T02:51:07.000Z",
+        "size": 10210
+      },
+      {
+        "filename": "ai_tools_registry_protocol.md",
+        "title": "🔧 AI Tools Registry Protocol",
+        "description": "This protocol establishes a centralized registry for tracking, documenting, and managing all custom-built AI tools within the rEngine ecosystem. These tools represent critical capabilities that enable advanced AI-powered development workflows.",
+        "status": "active",
+        "lastModified": "2025-08-20T02:51:07.000Z",
+        "size": 9088
+      },
+      {
+        "filename": "api_configuration_protocol.md",
+        "title": "API Configuration Protocol for StackTrackr",
+        "description": "This protocol provides a secure, streamlined way for users to configure API keys for StackTrackr's LLM integration system. API keys are encrypted locally and never transmitted or stored in plain text.",
+        "status": "active",
+        "lastModified": "2025-08-20T02:51:07.000Z",
+        "size": 7263
+      },
+      {
+        "filename": "document_publication_protocol.md",
+        "title": "📋 Document Publication Protocol",
+        "description": "This protocol handles the systematic distribution of generated HTML documentation from the central `html-docs/` directory to individual project `docs/html/` directories within the `rProjects/` ecosystem.",
+        "status": "active",
+        "lastModified": "2025-08-20T06:25:57.000Z",
+        "size": 6580
+      },
+      {
+        "filename": "document_sweep_protocol.md",
+        "title": "Protocol: Document Sweep",
+        "description": "This document outlines the protocol for initiating a \"Document Sweep,\" an automated process managed by the `rScribe` agent family. The purpose of the sweep is to scan the entire codebase, identify undocumented or under-documented scripts, and generate comprehensive technical documentation for them.",
+        "status": "active",
+        "lastModified": "2025-08-20T06:25:57.000Z",
+        "size": 3499
+      },
+      {
+        "filename": "documentation_structure_protocol.md",
+        "title": "Protocol: Documentation Structure & Organization",
+        "description": "This protocol establishes the definitive structure for documentation organization within the StackTrackr/rEngine ecosystem. It defines directory purposes, file naming conventions, and indexing requirements to ensure consistent documentation management across all AI agents and human contributors.",
+        "status": "active",
+        "lastModified": "2025-08-20T02:51:07.000Z",
+        "size": 5872
+      },
+      {
+        "filename": "enhanced_scribe_system_protocol.md",
+        "title": "Enhanced Scribe System Protocol v2.0",
+        "description": "Operational protocol",
+        "status": "active",
+        "lastModified": "2025-08-20T06:25:57.000Z",
+        "size": 6779
+      },
+      {
+        "filename": "file_cleanup_protocol.md",
+        "title": "File Cleanup Protocol",
+        "description": "Operational protocol",
+        "status": "active",
+        "lastModified": "2025-08-20T02:51:07.000Z",
+        "size": 5944
+      },
+      {
+        "filename": "file_path_protocol.md",
+        "title": "Protocol: Absolute File Path Mandate",
+        "description": "This protocol establishes a mandatory requirement for the use of absolute (full) file paths in all scripts, commands, and agent actions. The purpose is to eliminate ambiguity and prevent errors that arise from inconsistent working directories.",
+        "status": "active",
+        "lastModified": "2025-08-19T05:05:30.000Z",
+        "size": 1664
+      },
+      {
+        "filename": "folder_organization_protocol.md",
+        "title": "Folder Organization Protocol",
+        "description": "Operational protocol",
+        "status": "active",
+        "lastModified": "2025-08-20T02:51:07.000Z",
+        "size": 3897
+      },
+      {
+        "filename": "git_commit_standards_protocol.md",
+        "title": "Protocol: Git Commit Standards & Change Documentation",
+        "description": "This protocol establishes standards for git commit messages and comprehensive change documentation. It ensures commit messages remain concise while detailed change information is preserved in a structured format for future reference.",
+        "status": "active",
+        "lastModified": "2025-08-20T16:56:35.000Z",
+        "size": 5788
+      },
+      {
+        "filename": "handoff.md",
+        "title": "Protocol: Agent Handoff (DEPRECATED)",
+        "description": "Operational protocol",
+        "status": "active",
+        "lastModified": "2025-08-20T02:51:07.000Z",
+        "size": 4788
+      },
+      {
+        "filename": "launch-scribe-console.md",
+        "title": "Protocol: Launch Scribe Console",
+        "description": "This protocol defines the steps for launching the Split Scribe Console for real-time monitoring of StackTrackr sessions.",
+        "status": "active",
+        "lastModified": "2025-08-19T05:05:30.000Z",
+        "size": 857
+      },
+      {
+        "filename": "memory_management_protocol.md",
+        "title": "Protocol: Memory Management & Synchronization",
+        "description": "This document provides the definitive protocol for managing and synchronizing the project's dual-memory architecture. Adherence to this protocol is mandatory to ensure data integrity, prevent context loss between sessions, and maintain system health.",
+        "status": "active",
+        "lastModified": "2025-08-19T05:05:30.000Z",
+        "size": 4264
+      },
+      {
+        "filename": "patch_note_protocol.md",
+        "title": "Protocol: Patch Note Management",
+        "description": "This document establishes the official protocol for creating, naming, and storing patch notes for the `rEngine` component. The purpose of these notes is to maintain a clear, chronological record of changes, bug fixes, and enhancements. Adherence to this protocol is mandatory for all agents to ensure consistency and traceability.",
+        "status": "active",
+        "lastModified": "2025-08-19T05:05:30.000Z",
+        "size": 2592
+      },
+      {
+        "filename": "rapid_context_recall_protocol.md",
+        "title": "Rapid Context Recall Protocol",
+        "description": "Operational protocol",
+        "status": "active",
+        "lastModified": "2025-08-20T03:24:08.000Z",
+        "size": 5797
+      },
+      {
+        "filename": "recall_prime_directive_protocol.md",
+        "title": "Recall Prime Directive Protocol",
+        "description": "Operational protocol",
+        "status": "active",
+        "lastModified": "2025-08-20T03:24:08.000Z",
+        "size": 6091
+      },
+      {
+        "filename": "rEngine_startup_protocol.md",
+        "title": "Protocol: rEngine Startup & Operations",
+        "description": "This document provides the official protocol for starting, stopping, restarting, and interacting with the `rEngine` service. The `rEngine` is the core AI orchestration and command execution server for this project. It is a sophisticated system that manages AI provider interactions, memory analysis, and tool execution.",
+        "status": "active",
+        "lastModified": "2025-08-19T05:05:30.000Z",
+        "size": 3855
+      },
+      {
+        "filename": "root_directory_cleanup_protocol.md",
+        "title": "Root Directory Cleanup Summary",
+        "description": "Operational protocol",
+        "status": "active",
+        "lastModified": "2025-08-20T06:25:57.000Z",
+        "size": 3569
+      },
+      {
+        "filename": "rscribe_search_matrix_integration.md",
+        "title": "rScribe Search Matrix Integration Protocol",
+        "description": "Operational protocol",
+        "status": "active",
+        "lastModified": "2025-08-20T02:51:07.000Z",
+        "size": 8950
+      },
+      {
+        "filename": "scribe_deprecation_summary.md",
+        "title": "Deprecation Summary - Enhanced Scribe System Migration",
+        "description": "Operational protocol",
+        "status": "active",
+        "lastModified": "2025-08-20T06:25:57.000Z",
+        "size": 3105
+      },
+      {
+        "filename": "seamless_agent_continuity_protocol.md",
+        "title": "Protocol: Seamless Agent Continuity & User Context Loading",
+        "description": "This protocol ensures that every AI agent conversation feels like a continuous, never-ending chat with no memory gaps. It establishes the framework for instant context loading, user preference application, and seamless conversation continuity across sessions.",
+        "status": "active",
+        "lastModified": "2025-08-20T17:06:27.000Z",
+        "size": 8400
+      },
+      {
+        "filename": "session_handoff_protocol.md",
+        "title": "Protocol: Session Handoff & Summarization",
+        "description": "This protocol defines the process for summarizing conversations, creating handoffs between AI agents, and preserving context for future sessions. It serves as the primary context management solution until the rolling memory system (PROJECT-003 SQLite migration) is implemented.",
+        "status": "active",
+        "lastModified": "2025-08-20T00:51:23.000Z",
+        "size": 7152
+      },
+      {
+        "filename": "unified_document_scribe_protocol.md",
+        "title": "Protocol: Unified Document Scribe System",
+        "description": "This protocol defines the operation of the unified Document Scribe system, which provides intelligent documentation generation, API communication, and idle-time processing capabilities. The system replaces multiple scattered API communication scripts with a single, rate-limited, intelligent tool.",
+        "status": "active",
+        "lastModified": "2025-08-20T06:25:57.000Z",
+        "size": 8671
+      },
+      {
+        "filename": "UNIVERSAL_AGENT_SYSTEM_PROMPT.md",
+        "title": "🎯 UNIVERSAL AGENT SYSTEM PROMPT",
+        "description": "Operational protocol",
+        "status": "active",
+        "lastModified": "2025-08-20T16:52:14.000Z",
+        "size": 5949
+      },
+      {
+        "filename": "view_mcp_memory_log.md",
+        "title": "Protocol: View MCP Memory Log",
+        "description": "This protocol defines the steps for viewing MCP memory operation logs in the StackTrackr environment.",
+        "status": "active",
+        "lastModified": "2025-08-19T05:05:30.000Z",
+        "size": 1020
+      }
+    ],
+    "usage_instructions": {
+      "agent_bootstrap": "Load tier_1_foundation protocols first, then tier_2_coordination",
+      "validation": "Verify all required protocols are available before proceeding",
+      "fallback": "If protocol missing, check archive/ or contact system administrator"
+    },
+    "vs_code_integration": {
+      "settings_location": ".vscode/settings.json",
+      "mcp_server": "rengine",
+      "bootstrap_instruction": "github.copilot.chat.instructions references COPILOT_INSTRUCTIONS.md"
+    }
+  }
+}

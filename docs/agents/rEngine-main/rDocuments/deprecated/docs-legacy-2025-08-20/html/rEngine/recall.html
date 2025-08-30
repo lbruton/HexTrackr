@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Recall - Instant Memory Lookup for Agents - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Fast Recall - Instant Memory Lookup for Agents</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 recall.md</span>
+                <span>📅 2025-08-19</span>
+                <span>📊 5KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rEngine/recall.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/recall.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="fast-recall---instant-memory-lookup-for-agents">Fast Recall - Instant Memory Lookup for Agents</h1>
+<p>This script provides a fast and efficient way to search an agent&#39;s memory, recent context, and tasks based on a given search term. It prioritizes recent information and presents the most relevant results to the user, aiding in quick information retrieval and decision-making. This is crucial for agents operating in dynamic environments where access to past experiences and knowledge is essential.</p>
+<h2 id="how-to-use">How to Use</h2>
+<p>Run the script from the command line using the following syntax:</p>
+<pre><code class="language-bash"><pre><code class="language-bash">node recall.js "search term"</code></pre>
+</code></pre>
+<p>For silent mode (MCP mode, no console output):</p>
+<pre><code class="language-bash"><pre><code class="language-bash">node recall.js "search term" --silent</code></pre>
+</code></pre>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-bash"><pre><code class="language-bash">node recall.js "menu system"
+node recall.js "console split"
+node recall.js "javascript bug"
+node recall.js "memory intelligence"</code></pre>
+</code></pre>
+<h2 id="core-logic-breakdown">Core Logic Breakdown</h2>
+<ol>
+<li><p><strong>Initialization:</strong> The script begins by importing necessary modules (<code>fs/promises</code>, <code>path</code>, <code>url</code>) and determining if silent mode is enabled via the <code>--silent</code> flag.</p>
+</li>
+<li><p><strong><code>fastRecall(query)</code> Function:</strong> This is the core function that performs the memory lookup.</p>
+<ul>
+<li>It defines the base directory and initializes an empty <code>results</code> array.</li>
+<li>It establishes a prioritized list of search paths: <code>extendedcontext.json</code>, <code>memory.json</code>, and <code>tasks.json</code>.</li>
+<li>If not in silent mode, it logs the search query to the console.</li>
+</ul>
+</li>
+<li><p><strong>Searching Extended Context:</strong> The script attempts to read and parse <code>extendedcontext.json</code>. If successful, it iterates through the last 10 days of session data (newest first). For each session, it calculates the relevance of the session summary and activities to the query using the <code>calculateRelevance</code> function.  Results with a relevance score greater than 0.2 are added to the <code>results</code> array.</p>
+</li>
+<li><p><strong>Searching Agent Memory:</strong> The script attempts to read and parse <code>memory.json</code>.  For each key-value pair in the memory, it calculates the relevance to the query.  Results with a relevance score greater than 0.2 are added to the <code>results</code> array.</p>
+</li>
+<li><p><strong>Searching Tasks:</strong> The script attempts to read and parse <code>tasks.json</code>. If successful, it iterates through the tasks, calculating the relevance of the title and description to the query. Results with a relevance score greater than 0.2 are added to the <code>results</code> array.</p>
+</li>
+<li><p><strong>Sorting and Displaying Results:</strong> The <code>results</code> array is sorted by relevance (with a slight boost for recent items).  The top 5 results are then displayed to the console (unless in silent mode), including their source, title, relevance score, date (if applicable), status (if applicable), and a truncated content preview.  If there are more than 5 results, a message indicating the number of additional matches is displayed.</p>
+</li>
+<li><p><strong><code>calculateRelevance(query, text)</code> Function:</strong> This helper function determines the relevance of a given text string to the search query. It performs an exact match check and also calculates a word match score based on the number of matching words (excluding short words). The relevance score is a value between 0 and 1.</p>
+</li>
+<li><p><strong>CLI Usage:</strong> The script checks if it&#39;s being run directly from the command line.  If so, it retrieves the search query from the command-line arguments. If no query is provided, it displays usage instructions.  Finally, it calls the <code>fastRecall</code> function with the provided query.</p>
+</li>
+</ol>
+<h2 id="configuration--dependencies">Configuration &amp; Dependencies</h2>
+<p><strong>Dependencies:</strong></p>
+<ul>
+<li><code>fs/promises</code>: Used for asynchronous file system operations.</li>
+<li><code>path</code>: Used for path manipulation.</li>
+<li><code>url</code>: Used for URL parsing, specifically <code>fileURLToPath</code> for compatibility with ES modules.</li>
+</ul>
+<p><strong>Configuration:</strong></p>
+<p>The script relies on the following JSON files:</p>
+<ul>
+<li><code>extendedcontext.json</code>: Stores extended context information, including session summaries and activities.  Located in <code>rMemory/rAgentMemories/</code>.</li>
+<li><code>memory.json</code>: Stores the agent&#39;s memory (concepts and entities). Located in <code>agents/</code>.</li>
+<li><code>tasks.json</code>: Stores task information, including titles, descriptions, and statuses.  Located in <code>rMemory/rAgentMemories/</code>.</li>
+</ul>
+<p>The script doesn&#39;t use any external configuration parameters beyond the search query provided as a command-line argument and the <code>--silent</code> flag.</p>
+<h2 id="machine-readable-summary">Machine-Readable Summary</h2>
+<pre><code class="language-json"><pre><code class="language-json">{
+  "scriptName": "recall.js",
+  "purpose": "Provides fast memory lookup for agents based on a search query, searching across extended context, agent memory, and tasks.",
+  "inputs": {
+    "arguments": [
+      {
+        "name": "search term",
+        "type": "string",
+        "description": "The term to search for in the agent's memory."
+      },
+      {
+        "name": "--silent",
+        "type": "flag",
+        "description": "Enables silent mode (MCP mode), suppressing console output."
+      }
+    ],
+    "dependencies": [
+      "fs/promises",
+      "path",
+      "url"
+    ],
+    "files": [
+      "rMemory/rAgentMemories/extendedcontext.json",
+      "agents/memory.json",
+      "rMemory/rAgentMemories/tasks.json"
+    ]
+  },
+  "outputs": {
+    "console": "Displays search results, including source, title, relevance, date, status, and content preview (unless in silent mode).",
+    "exitCode": "0 on success, 1 on error or if no search query is provided."
+  }
+}</code></pre>
+</code></pre>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>recall.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-19</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,4 @@
+Version: 3.04.86
+Date: 2025-08-17
+Agent: GPT
+Summary: Wrapped Name header text with `.header-text` span and removed special centering override.

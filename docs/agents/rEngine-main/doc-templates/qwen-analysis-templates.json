@@ -1,0 +1,77 @@
+{
+  "codeAnalysisTemplate": {
+    "systemPrompt": "You are a technical documentation expert. Analyze code and return structured JSON for documentation generation.",
+    "analysisStructure": {
+      "fileInfo": {
+        "name": "string",
+        "path": "string", 
+        "type": "string",
+        "size": "number",
+        "lastModified": "string"
+      },
+      "codeStructure": {
+        "functions": [
+          {
+            "name": "string",
+            "parameters": ["string"],
+            "returnType": "string",
+            "description": "string",
+            "complexity": "low|medium|high",
+            "dependencies": ["string"]
+          }
+        ],
+        "classes": [
+          {
+            "name": "string",
+            "methods": ["string"],
+            "properties": ["string"],
+            "extends": "string",
+            "description": "string"
+          }
+        ],
+        "imports": [
+          {
+            "module": "string",
+            "from": "string",
+            "type": "import|require"
+          }
+        ],
+        "exports": ["string"]
+      },
+      "relationships": {
+        "calls": [
+          {
+            "from": "string",
+            "to": "string",
+            "type": "function|method|class"
+          }
+        ],
+        "dependencies": [
+          {
+            "file": "string",
+            "dependsOn": ["string"]
+          }
+        ]
+      },
+      "documentation": {
+        "summary": "string",
+        "purpose": "string",
+        "keyFeatures": ["string"],
+        "technicalNotes": ["string"],
+        "examples": ["string"]
+      },
+      "mermaidDiagram": {
+        "type": "flowchart|classDiagram|sequenceDiagram",
+        "code": "string"
+      }
+    }
+  },
+  "promptTemplate": "Analyze this code file and return a JSON object following the exact structure provided. Focus on:\n\n1. Extract all functions, classes, and their relationships\n2. Identify dependencies and imports\n3. Create a mermaid diagram showing the code structure\n4. Provide clear documentation\n\nFile: {{fileName}}\nContent:\n{{fileContent}}\n\nReturn ONLY valid JSON following the structure. No additional text.",
+  "htmlTemplate": {
+    "header": "<!DOCTYPE html><html><head><title>{{projectName}} - Technical Documentation</title><style>{{css}}</style></head><body>",
+    "navigation": "<nav class='nav-bar'><h1>{{projectName}} Documentation</h1><div class='nav-links'>{{navLinks}}</div></nav>",
+    "fileSection": "<section class='file-section'><h2>{{fileName}}</h2><div class='file-meta'>{{fileMeta}}</div><div class='functions'>{{functions}}</div><div class='diagram'>{{diagram}}</div></section>",
+    "footer": "<script src='https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js'></script><script>mermaid.initialize({startOnLoad:true});</script></body></html>"
+  },
+  "cssTemplate": "\n    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; background: #f5f5f5; }\n    .nav-bar { background: #2d3748; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }\n    .nav-links { display: flex; gap: 1rem; }\n    .nav-links a { color: #68d391; text-decoration: none; }\n    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }\n    .file-section { background: white; margin: 1rem 0; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }\n    .file-meta { background: #f7fafc; padding: 1rem; border-radius: 4px; margin: 1rem 0; }\n    .function-card { border: 1px solid #e2e8f0; padding: 1rem; margin: 0.5rem 0; border-radius: 4px; }\n    .function-name { font-weight: bold; color: #2d3748; }\n    .function-params { color: #4a5568; font-family: monospace; }\n    .mermaid { background: white; border: 1px solid #e2e8f0; border-radius: 4px; padding: 1rem; }\n    .key-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }\n    .key-table th, .key-table td { border: 1px solid #e2e8f0; padding: 0.5rem; text-align: left; }\n    .key-table th { background: #f7fafc; }\n    .search-box { width: 100%; padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 4px; margin: 1rem 0; }\n  "
+}

@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "smart-scribe.js",
+    "name": "smart-scribe",
+    "extension": ".js",
+    "directory": "",
+    "size": 0,
+    "lines": 400
+  },
+  "documentation": {
+    "markdown": "../docs/generated/smart-scribe_chunk.md",
+    "html": "../html-docs/generated/smart-scribe_chunk.html",
+    "generated": "2025-08-20T00:57:52.614Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "chunked",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "smart-scribe.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for smart-scribe.js"
+  }
+}

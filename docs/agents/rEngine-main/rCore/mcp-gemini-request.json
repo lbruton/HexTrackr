@@ -1,0 +1,44 @@
+{
+  "request_type": "gemini_analysis",
+  "task": "file_comparison_diff",
+  "priority": "critical",
+  "files": {
+    "current_broken": {
+      "path": "/Volumes/DATA/GitHub/rEngine/rProjects/StackTrackr/js/inventory.js",
+      "line_count": 1473,
+      "status": "truncated_missing_imports"
+    },
+    "working_reference": {
+      "path": "/tmp/working_inventory.js",
+      "line_count": 2416,
+      "source": "git_commit_d9a9285_v3.04.87"
+    }
+  },
+  "analysis_request": {
+    "missing_functions": [
+      "importCsv",
+      "importJson", 
+      "importNumistaCsv",
+      "startImportProgress",
+      "updateImportProgress", 
+      "endImportProgress"
+    ],
+    "missing_exports": [
+      "window.importCsv",
+      "window.importJson"
+    ],
+    "objectives": [
+      "Identify exact truncation point",
+      "List all missing code blocks",
+      "Recommend safe restoration approach",
+      "Preserve any manual user changes",
+      "Verify function dependencies"
+    ]
+  },
+  "context": {
+    "version": "3.04.87",
+    "production_status": "working_at_stackrtrackr.com",
+    "truncation_cause": "likely_automated_checkpoint_commits",
+    "user_manual_edits": "recent_changes_need_preservation"
+  }
+}

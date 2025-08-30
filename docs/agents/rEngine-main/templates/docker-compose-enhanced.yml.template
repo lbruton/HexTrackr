@@ -1,0 +1,236 @@
+version: '3.8'
+
+services:
+  # NGINX Reverse Proxy - Central routing for all services
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf
+      - .:/var/www/html
+    depends_on:
+      - project-dashboard
+      - code-executor
+      - dev-server
+    networks:
+      - rengine-network
+    restart: unless-stopped
+
+  # MCP Memory Server - Persistent memory across sessions
+  mcp-memory-persistent:
+    image: node:20-alpine
+    ports:
+      - "4041:4041"
+    volumes:
+      - ./rMemory:/data/memory
+      - ./persistent-memory.json:/data/persistent-memory.json
+    working_dir: /data
+    command: >
+      sh -c "npm install -g @modelcontextprotocol/server-memory && 
+             npx @modelcontextprotocol/server-memory"
+    environment:
+      - MCP_MEMORY_FILE=/data/persistent-memory.json
+      - MCP_SERVER_PORT=4041
+    networks:
+      - rengine-network
+    restart: unless-stopped
+
+  # MCP GitHub Server - Project tracking and repo management
+  mcp-github:
+    image: node:20-alpine
+    ports:
+      - "4042:4042"
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: >
+      sh -c "npm install -g @modelcontextprotocol/server-github && 
+             npx @modelcontextprotocol/server-github"
+    environment:
+      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_TOKEN:-}
+      - GITHUB_REPO_OWNER=lbruton
+      - GITHUB_REPO_NAME=rEngine
+      - MCP_SERVER_PORT=4042
+    networks:
+      - rengine-network
+    restart: unless-stopped
+
+  # Web-based Code Executor - Test code in isolated environment
+  code-executor:
+    image: node:20-alpine
+    ports:
+      - "4043:4043"
+    volumes:
+      - .:/workspace
+      - ./rLogs:/logs
+      - ./docker/code-executor.sh:/start.sh
+    working_dir: /workspace
+    command: sh /start.sh
+    networks:
+      - rengine-network
+    restart: unless-stopped
+
+  # Live Development Server with Hot Reload
+  dev-server:
+    image: node:20-alpine
+    ports:
+      - "4044:4044"
+      - "4045:35729" # LiveReload port
+    volumes:
+      - .:/workspace
+      - ./rProjects:/projects
+      - ./docker/live-dev.sh:/start.sh
+    working_dir: /workspace
+    command: sh /start.sh
+    networks:
+      - rengine-network
+    restart: unless-stopped
+
+  # Project Management Dashboard
+  project-dashboard:
+    image: node:20-alpine
+    ports:
+      - "4046:4046"
+    volumes:
+      - .:/workspace
+      - ./docs:/docs
+      - ./rMemory:/memory
+      - ./docker/project-dashboard.sh:/start.sh
+    working_dir: /workspace
+    command: sh /start.sh
+    networks:
+      - rengine-network
+    restart: unless-stopped
+
+  # MCP Git Server - Version control tracking
+  mcp-git:
+    image: node:20-alpine
+    ports:
+      - "4047:4047"
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: >
+      sh -c "npm install -g @modelcontextprotocol/server-git && 
+             npx @modelcontextprotocol/server-git"
+    environment:
+      - MCP_SERVER_PORT=4047
+    networks:
+      - rengine-network
+    restart: unless-stopped
+
+  # MCP SQLite Server - Local database for development
+  mcp-sqlite:
+    image: node:20-alpine
+    ports:
+      - "4048:4048"
+    volumes:
+      - .:/workspace
+      - ./rMemory:/data
+    working_dir: /workspace
+    command: >
+      sh -c "npm install -g @modelcontextprotocol/server-sqlite && 
+             npx @modelcontextprotocol/server-sqlite /data/rengine.db"
+    environment:
+      - MCP_SERVER_PORT=4048
+    networks:
+      - rengine-network
+    restart: unless-stopped
+
+  # Context7 MCP Server - Enhanced library context tracking
+  context7:
+    image: node:20-alpine
+    ports:
+      - "4049:4049"
+    volumes:
+      - .:/workspace
+      - ./rMemory:/data
+    working_dir: /workspace
+    command: >
+      sh -c "npm install -g @upstash/context7-mcp@latest && 
+             npx @upstash/context7-mcp"
+    environment:
+      - MCP_SERVER_PORT=4049
+      - CONTEXT7_DB_PATH=/data/context7.db
+    networks:
+      - rengine-network
+    restart: unless-stopped
+
+  # MCP Playwright Server - Browser automation and HTML/JS testing
+  mcp-playwright:
+    image: node:20-alpine
+    ports:
+      - "4050:4050"
+    volumes:
+      - .:/workspace
+      - ./rLogs:/logs
+      - ./docker/playwright-mcp.sh:/start.sh
+    working_dir: /workspace
+    command: sh /start.sh
+    networks:
+      - rengine-network
+    restart: unless-stopped
+
+  # MCP TimeSeries Server - Context time tracking and analytics
+  mcp-timeseries:
+    image: node:20-alpine
+    ports:
+      - "4051:4051"
+    volumes:
+      - .:/workspace
+      - ./rMemory:/data
+      - ./docker/timeseries-mcp.sh:/start.sh
+    working_dir: /workspace
+    command: sh /start.sh
+    networks:
+      - rengine-network
+    restart: unless-stopped
+
+  # LLM Gateway - Secure API gateway for all LLM providers
+  llm-gateway:
+    image: node:20-alpine
+    ports:
+      - "4052:4052"
+    volumes:
+      - .:/workspace
+      - ~/.rengine/secrets:/secrets:ro  # Read-only mount of API keys
+      - ./docker/llm-gateway.sh:/start.sh
+    working_dir: /workspace
+    command: sh /start.sh
+    environment:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+    networks:
+      - rengine-network
+    restart: unless-stopped
+    depends_on:
+      - usage-tracker
+
+  # API Usage Tracker - Monitor costs and usage patterns
+  usage-tracker:
+    image: node:20-alpine
+    ports:
+      - "4054:4054"
+    volumes:
+      - .:/workspace
+      - ~/.rengine/logs:/logs
+      - ./docker/usage-tracker.sh:/start.sh
+    working_dir: /workspace
+    command: sh /start.sh
+    networks:
+      - rengine-network
+    restart: unless-stopped
+
+networks:
+  rengine-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  memory-data:
+  context7-data:
+  logs-data:

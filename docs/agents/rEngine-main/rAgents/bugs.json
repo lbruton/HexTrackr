@@ -1,0 +1,218 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-16",
+    "purpose": "DEPRECATED - See /MASTER_ROADMAP.md for current tracking",
+    "description": "This file has been superseded by /MASTER_ROADMAP.md single source of truth system",
+    "last_updated": "2025-08-18T00:00:00Z",
+    "deprecated": true,
+    "replacement": "/MASTER_ROADMAP.md",
+    "migration_date": "2025-08-18",
+    "gpt_export_prep": true,
+    "goomba_export_prep": true
+  },
+  "active_bugs": {
+    "BUG-006": {
+      "title": "Filter Chips Multiple Issues",
+      "description": "Combined filter chip functionality problems: (1) Chips display wrong styling on page load, correct after filter interaction, (2) Filter chips lose color consistency when filters change, colors shift after add/remove operations despite hash-based color generation fix, (3) Filter chips dropdown is filtering inversely, expected behavior unclear, may affect core filtering functionality",
+      "category": "ui_functionality",
+      "priority": "high",
+      "severity": "medium",
+      "status": "open",
+      "created_date": "2025-08-16",
+      "estimated_effort": "4h",
+      "affects_milestone": "v3.05.0",
+      "related_features": [
+        "filtering",
+        "ui",
+        "chips"
+      ],
+      "affected_files": [
+        "js/filters.js",
+        "css/styles.css"
+      ],
+      "agent_assigned": null,
+      "blocking_issues": [],
+      "blocked_by": [],
+      "reproduction_steps": [
+        "Load page with filter chips",
+        "Observe incorrect initial styling",
+        "Interact with filters",
+        "Notice color consistency issues"
+      ],
+      "technical_notes": "Originally tracked as BUG-006, BUG-007, BUG-008 - consolidated as same underlying issue"
+    },
+    "BUG-007": {
+      "title": "Table Collect Column Dark Background Bug",
+      "description": "Collect column shows alternating dark backgrounds on every other row that appear to be malformed highlights, creating visual inconsistency and poor readability in the table display",
+      "category": "visual_styling",
+      "priority": "medium",
+      "severity": "low",
+      "status": "open",
+      "created_date": "2025-08-16",
+      "estimated_effort": "1h",
+      "affects_milestone": "v3.05.0",
+      "related_features": [
+        "table",
+        "styling",
+        "ui"
+      ],
+      "affected_files": [
+        "css/styles.css",
+        "js/inventory.js"
+      ],
+      "agent_assigned": null,
+      "blocking_issues": [],
+      "blocked_by": [],
+      "reproduction_steps": [
+        "Load inventory table",
+        "Observe Collect column",
+        "Notice alternating dark backgrounds on rows"
+      ],
+      "technical_notes": "Appears to be malformed highlight styling affecting table readability"
+    }
+  },
+  "resolved_bugs": {
+    "BUG-009": {
+      "title": "CSV Import Price Data Loss Bug",
+      "description": "CSV imports no longer pulling estimated price and purchase prices from Numista import data, causing data loss during import process",
+      "category": "data_import",
+      "priority": "high",
+      "severity": "high",
+      "status": "fixed",
+      "created_date": "2025-08-14",
+      "resolved_date": "2025-08-15",
+      "estimated_effort": "3h",
+      "actual_effort": "2.5h",
+      "milestone_resolved": "v3.04.88",
+      "related_features": [
+        "csv_import",
+        "numista_integration"
+      ],
+      "affected_files": [
+        "js/import.js",
+        "js/numista-modal.js"
+      ],
+      "resolution_summary": "Fixed data mapping in CSV import process to properly extract Numista pricing data"
+    },
+    "BUG-010": {
+      "title": "Edit Button Hover Background Bug",
+      "description": "Edit action buttons still show background highlight on hover despite animation removal request, should have clean hover state",
+      "category": "visual_styling",
+      "priority": "low",
+      "severity": "low",
+      "status": "fixed",
+      "created_date": "2025-08-14",
+      "resolved_date": "2025-08-15",
+      "estimated_effort": "30m",
+      "actual_effort": "20m",
+      "milestone_resolved": "v3.04.88",
+      "related_features": [
+        "ui",
+        "buttons"
+      ],
+      "affected_files": [
+        "css/styles.css"
+      ],
+      "resolution_summary": "Removed hover background styling from edit buttons for clean interface"
+    },
+    "BUG-011": {
+      "title": "Fraction Display Bug",
+      "description": "CSV imports converting '1/2' to '12' in name fields, resolved by re-importing data with corrected CSV processing",
+      "category": "data_import",
+      "priority": "medium",
+      "severity": "medium",
+      "status": "fixed",
+      "created_date": "2025-08-13",
+      "resolved_date": "2025-08-14",
+      "estimated_effort": "1h",
+      "actual_effort": "45m",
+      "milestone_resolved": "v3.04.87",
+      "related_features": [
+        "csv_import",
+        "data_processing"
+      ],
+      "affected_files": [
+        "js/import.js"
+      ],
+      "resolution_summary": "Fixed CSV processing to properly handle fraction characters in text fields"
+    }
+  },
+  "bug_categories": {
+    "ui_functionality": {
+      "description": "User interface behavior and interaction issues",
+      "active_count": 1,
+      "resolved_count": 0
+    },
+    "visual_styling": {
+      "description": "Visual appearance and styling problems",
+      "active_count": 1,
+      "resolved_count": 2
+    },
+    "data_import": {
+      "description": "Issues with data import and processing",
+      "active_count": 0,
+      "resolved_count": 2
+    }
+  },
+  "priority_levels": {
+    "critical": {
+      "description": "System breaking, immediate attention required",
+      "target_resolution": "24h",
+      "active_count": 0
+    },
+    "high": {
+      "description": "Significant impact on functionality",
+      "target_resolution": "1 week",
+      "active_count": 1
+    },
+    "medium": {
+      "description": "Moderate impact, should be addressed",
+      "target_resolution": "2 weeks",
+      "active_count": 1
+    },
+    "low": {
+      "description": "Minor issues, address when convenient",
+      "target_resolution": "1 month",
+      "active_count": 0
+    }
+  },
+  "milestone_tracking": {
+    "v3.05.0": {
+      "target_date": "2025-09-01",
+      "status": "planning",
+      "bugs_assigned": [
+        "BUG-006",
+        "BUG-007"
+      ],
+      "bugs_blocking_release": [
+        "BUG-006"
+      ],
+      "estimated_bug_fix_time": "5h"
+    },
+    "v3.04.88": {
+      "release_date": "2025-08-15",
+      "status": "released",
+      "bugs_resolved": [
+        "BUG-009",
+        "BUG-010"
+      ],
+      "total_bugs_fixed": 2
+    }
+  },
+  "statistics": {
+    "total_bugs_tracked": 5,
+    "active_bugs": 2,
+    "resolved_bugs": 3,
+    "average_resolution_time": "1.4h",
+    "bugs_by_priority": {
+      "critical": 0,
+      "high": 1,
+      "medium": 1,
+      "low": 0
+    },
+    "resolution_rate": "60%",
+    "last_bug_created": "2025-08-16",
+    "last_bug_resolved": "2025-08-15"
+  }
+}

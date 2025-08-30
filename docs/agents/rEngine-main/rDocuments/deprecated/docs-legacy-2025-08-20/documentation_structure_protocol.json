@@ -1,0 +1,105 @@
+{
+  "source_file": "rProtocols/documentation_structure_protocol.md",
+  "generated_date": "2025-08-20T01:53:21.447Z",
+  "title": "Protocol: Documentation Structure & Organization",
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "icon": "📋",
+      "submenu": []
+    },
+    {
+      "id": "directory-structure",
+      "title": "Directory Structure",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "rengine-platform-architecture",
+          "title": "rEngine Platform Architecture"
+        },
+        {
+          "id": "project-organization",
+          "title": "Project Organization"
+        },
+        {
+          "id": "htmldocs-dashboard-interactive-documentation",
+          "title": "`/html-docs/` - Dashboard & Interactive Documentation"
+        },
+        {
+          "id": "docs-technical-documentation-repository-",
+          "title": "`/docs/` - Technical Documentation Repository  "
+        },
+        {
+          "id": "rprotocols-operational-procedures",
+          "title": "`/rProtocols/` - Operational Procedures"
+        },
+        {
+          "id": "rprompts-ai-agent-prompt-library",
+          "title": "`/rPrompts/` - AI Agent Prompt Library"
+        }
+      ]
+    },
+    {
+      "id": "index-system-requirements",
+      "title": "Index System Requirements",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "for-ai-agents-presqlite",
+          "title": "For AI Agents (Pre-SQLite)"
+        }
+      ]
+    },
+    {
+      "id": "agent-memory-integration",
+      "title": "Agent Memory Integration",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "current-implementation-jsonbased",
+          "title": "Current Implementation (JSON-Based)"
+        },
+        {
+          "id": "postsqlite-implementation-databasebased",
+          "title": "Post-SQLite Implementation (Database-Based)"
+        }
+      ]
+    },
+    {
+      "id": "protocol-compliance",
+      "title": "Protocol Compliance",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "for-ai-agents",
+          "title": "For AI Agents"
+        },
+        {
+          "id": "for-human-contributors",
+          "title": "For Human Contributors"
+        }
+      ]
+    },
+    {
+      "id": "integration-with-prime-directives",
+      "title": "Integration with Prime Directives",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "future-roadmap",
+      "title": "Future Roadmap",
+      "icon": "🔮",
+      "submenu": []
+    },
+    {
+      "id": "related-protocols",
+      "title": "Related Protocols",
+      "icon": "📄",
+      "submenu": []
+    }
+  ],
+  "word_count": 686,
+  "format_version": "1.0"
+}

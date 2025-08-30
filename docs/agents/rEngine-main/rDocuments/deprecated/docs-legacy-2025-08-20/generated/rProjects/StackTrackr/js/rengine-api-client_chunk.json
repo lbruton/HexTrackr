@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "../rProjects/StackTrackr/js/rengine-api-client.js",
+    "name": "rengine-api-client",
+    "extension": ".js",
+    "directory": "../rProjects/StackTrackr/js",
+    "size": 0,
+    "lines": 400
+  },
+  "documentation": {
+    "markdown": "../docs/rProjects/StackTrackr/js/rengine-api-client_chunk.md",
+    "html": "../docs/rProjects/StackTrackr/js/rengine-api-client_chunk.html",
+    "generated": "2025-08-20T01:10:57.169Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "chunked",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "rengine-api-client.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for ../rProjects/StackTrackr/js/rengine-api-client.js"
+  }
+}

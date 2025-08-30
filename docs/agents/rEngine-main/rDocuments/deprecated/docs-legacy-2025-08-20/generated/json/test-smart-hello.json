@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "test-smart-hello.js",
+    "name": "test-smart-hello",
+    "extension": ".js",
+    "directory": "",
+    "size": 0,
+    "lines": 75
+  },
+  "documentation": {
+    "markdown": "../docs/generated/test-smart-hello.md",
+    "html": "../html-docs/generated/test-smart-hello.html",
+    "generated": "2025-08-20T00:59:27.358Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "single-file",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "test-smart-hello.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for test-smart-hello.js"
+  }
+}
