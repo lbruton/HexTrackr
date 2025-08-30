@@ -155,12 +155,12 @@ Last updated: January 29, 2025
   - [ ] Truth consistency validation
   - [ ] Bidirectional sync capabilities
 
-- [ ] **Docker-Portable Memory System**
-  - [ ] Memory system independence from VS Code
-  - [ ] Cross-project memory accessibility
-  - [ ] Local fallback integration scripts
-  - [ ] Memory export/import tooling
-  - [ ] Distributed memory capabilities
+- [ ] **Docker-Portable Memory System** → **See: [rMemory Open Source Initiative](.rMemory/roadmaps/SPRINT-RMEMORY-DOCKER-OPENSOURCE-2025-08-30.md)**
+  - [ ] Standalone rMemory repository creation
+  - [ ] One-click Docker installer system  
+  - [ ] Multi-environment configurations (dev/prod/test)
+  - [ ] Community documentation and contribution guidelines
+  - [ ] Migration to git submodule architecture
 
 ### 🏛️ **Architecture Evolution** (Claude-4 Recommendations)
 
