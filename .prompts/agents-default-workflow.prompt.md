@@ -7,9 +7,11 @@ This playbook defines how engineering agents operate within the HexTrackr projec
 Always execute these steps in order:
 
 1. **observe**
-   - Gather current repo status, open PRs, recent changes, and workspace context.
-   - Call `memory.search` with tags including `project:${workspaceFolderBasename}` )
-   - Read impacted files and constraints (security, quality gates, protocols).
+   - FIRST: Analyze current context window (attachments, conversation history, workspace state)
+   - THEN: Identify knowledge gaps requiring memory search via `mcp_memento_search_nodes` and `mcp_memento_semantic_search`
+   - Call memory tools with tags including `project:${workspaceFolderBasename}` for specific gaps only
+   - Gather current repo status, open PRs, recent changes as needed
+   - Read impacted files and constraints (security, quality gates, protocols)
 
 1. **plan**
    - Produce a short actionable checklist tied to requirements.
@@ -66,10 +68,32 @@ Always execute these steps in order:
 ## Memory Backend
 
 - **Primary memory backend**: `memento-mcp` via VS Code Chat MCP
-- **Route aliases**:
-  - `memory.write` → `memento.write`
-  - `memory.search` → `memento.search`
-  - `memory.tag` → `memento.tag`
+- **Memory tools** (use explicit paths to prevent skipping):
+  - `mcp_memento_search_nodes` → Search entities by name/content
+  - `mcp_memento_semantic_search` → Semantic similarity search
+  - `mcp_memento_create_entities` → Write new memories
+  - `mcp_memento_read_graph` → Full memory graph access
+
+- **Memory Hierarchy** (planned):
+
+  ```
+  Projects/
+  ├── HexTrackr/
+  │   ├── architecture/     # System info, schemas
+  │   ├── documentation/    # Synced with docs-source/
+  │   ├── roadmaps/        # Current plans, sprints
+  │   ├── bugs/            # Issue tracking
+  │   └── versioning/      # Release info
+  ├── rMemory/             # Memory system itself
+  └── StackTrackr/         # Future project
+  
+  Personality/
+  ├── phrases/             # "refresh context" → auto-prompt
+  ├── preferences/         # Working patterns
+  └── shortcuts/           # Command mappings
+  ```
+
+- **Document Synchronization**: Auto-sync project files with memory for perfect consistency
 
 If the MCP server is unavailable, use a local fallback note in `docs/ops/AGENTS_LOG.md` and open a task to restore MCP.
 
