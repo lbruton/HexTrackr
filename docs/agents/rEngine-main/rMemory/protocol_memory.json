@@ -1,0 +1,377 @@
+{
+  "protocol_memory_system": {
+    "version": "3.0.0",
+    "created": "2025-08-23T00:00:00Z",
+    "purpose": "Comprehensive AI agent protocol memory - always accessible context",
+    "status": "active",
+    "total_protocols": 27,
+    "memory_sync_enabled": true,
+    "backup_locations": [
+      "rProtocols/numbered/",
+      "rMemory/protocol_memory.json",
+      "persistent-memory.json"
+    ]
+  },
+  "foundation_protocols": {
+    "description": "Core system protocols - execute first, required for all operations",
+    "protocols": {
+      "001": {
+        "id": "001-MEMORY-MGT-001",
+        "title": "Memory Management & Synchronization Protocol",
+        "file": "memory_management_protocol.md",
+        "priority": 1,
+        "required": true,
+        "summary": "Dual-memory architecture with MCP memory + local JSON. Manual sync required at session start/end. Critical for context preservation.",
+        "key_commands": [
+          "bash memory-sync-automation.sh manual",
+          "mcp_memory_create_entities",
+          "node recall.js"
+        ],
+        "execution_order": "FIRST - Before any other protocols"
+      },
+      "002": {
+        "id": "002-RENGINE-START-001", 
+        "title": "rEngine Startup & Operations Protocol",
+        "file": "rEngine_startup_protocol.md",
+        "priority": 2,
+        "required": true,
+        "summary": "Core AI orchestration server startup/shutdown procedures. Docker-based system with health monitoring.",
+        "key_commands": [
+          "docker-compose up rEngine",
+          "curl http://localhost:4034/health",
+          "docker logs rEngine"
+        ],
+        "execution_order": "SECOND - After memory sync"
+      },
+      "003": {
+        "id": "003-SCRIBE-SYS-001",
+        "title": "Enhanced Scribe System Protocol",
+        "file": "enhanced_scribe_system_protocol.md", 
+        "priority": 3,
+        "required": true,
+        "summary": "Background memory processing with Ollama. Monitors conversations, updates memory matrix automatically.",
+        "key_commands": [
+          "node enhanced-scribe-console.js",
+          "node smart-scribe.js --status",
+          "ollama run llama3.1:8b"
+        ],
+        "execution_order": "THIRD - After rEngine startup"
+      }
+    }
+  },
+  "coordination_protocols": {
+    "description": "Agent coordination and session management",
+    "protocols": {
+      "004": {
+        "id": "004-SESSION-HANDOFF-001",
+        "title": "Session Handoff & Summarization Protocol", 
+        "file": "session_handoff_protocol.md",
+        "priority": 4,
+        "required": true,
+        "summary": "Context preservation between sessions. Creates MCP memory entities + backup files. Critical until rolling memory implemented.",
+        "key_commands": [
+          "mcp_memory_create_entities for session_handoff",
+          "Create handoff-YYYY-MM-DD-HHMMSS.prompt.md",
+          "git commit with session summary"
+        ],
+        "trigger": "End of session or when user requests summarization"
+      },
+      "005": {
+        "id": "005-RAPID-RECALL-001",
+        "title": "Rapid Context Recall Protocol",
+        "file": "rapid_context_recall_protocol.md", 
+        "priority": 5,
+        "required": true,
+        "summary": "Fast context loading at session start. Queries MCP memory + search matrix for relevant information.",
+        "key_commands": [
+          "node recall.js 'last session summary'",
+          "Search consolidated-matrix.json",
+          "Query MCP memory for recent entities"
+        ],
+        "trigger": "Start of every session"
+      },
+      "006": {
+        "id": "006-PRIME-DIRECTIVE-001", 
+        "title": "Recall Prime Directive Protocol",
+        "file": "recall_prime_directive_protocol.md",
+        "priority": 6,
+        "required": true,
+        "summary": "Core mission and behavior guidelines. Ensures consistent AI agent behavior across sessions.",
+        "core_directives": [
+          "Memory first - always sync and recall",
+          "Context preservation is critical",
+          "Protocol adherence mandatory",
+          "User goals are primary objective"
+        ]
+      }
+    }
+  },
+  "operational_protocols": {
+    "description": "Day-to-day operational procedures",
+    "protocols": {
+      "007": {
+        "id": "007-DOC-SWEEP-001",
+        "title": "Document Sweep Protocol", 
+        "file": "document_sweep_protocol.md",
+        "priority": 7,
+        "summary": "Automated documentation generation for undocumented code. Uses rScribe agents with Groq/Gemini APIs.",
+        "schedule": "6 AM/6 PM automated execution",
+        "key_commands": [
+          "node document-sweep.js",
+          "cron schedule validation", 
+          "Check logs/document-sweep.log"
+        ]
+      },
+      "008": {
+        "id": "008-DOC-STRUCTURE-001",
+        "title": "Documentation Structure & Organization Protocol",
+        "file": "documentation_structure_protocol.md",
+        "priority": 8, 
+        "summary": "Directory structure, file naming, indexing requirements. Ensures consistent documentation across ecosystem.",
+        "directory_structure": {
+          "docs/": "Technical documentation",
+          "rProtocols/": "Operational procedures", 
+          "rMemory/": "Agent memory files",
+          "rDocuments/": "Generated documentation"
+        }
+      },
+      "009": {
+        "id": "009-FILE-CLEANUP-001",
+        "title": "File Cleanup Protocol",
+        "file": "file_cleanup_protocol.md",
+        "priority": 9,
+        "summary": "Safe file system maintenance. Archive, backup, and cleanup procedures with rollback capability."
+      },
+      "010": {
+        "id": "010-FOLDER-ORG-001", 
+        "title": "Folder Organization Protocol",
+        "file": "folder_organization_protocol.md",
+        "priority": 10,
+        "summary": "Systematic folder structure reorganization for r_ namespace compliance."
+      }
+    }
+  },
+  "intelligence_protocols": {
+    "description": "AI enhancement and optimization",
+    "protocols": {
+      "011": {
+        "id": "011-AI-ENHANCE-001",
+        "title": "AI Intelligence Enhancement Protocol",
+        "file": "ai_intelligence_enhancement_protocol.md", 
+        "priority": 11,
+        "summary": "AI system optimization, capability enhancement, learning adaptation."
+      },
+      "012": {
+        "id": "012-AI-TOOLS-REG-001",
+        "title": "AI Tools Registry Protocol", 
+        "file": "ai_tools_registry_protocol.md",
+        "priority": 12,
+        "summary": "Centralized registry for custom AI tools. Tracks capabilities, versions, dependencies.",
+        "registry_file": "ai_tools_registry.json"
+      },
+      "013": {
+        "id": "013-UNIFIED-SCRIBE-001",
+        "title": "Unified Document Scribe Protocol",
+        "file": "unified_document_scribe_protocol.md",
+        "priority": 13,
+        "summary": "Intelligent documentation generation with API rate limiting. Replaces scattered API scripts."
+      }
+    }
+  },
+  "specialized_protocols": {
+    "description": "Specialized operational procedures", 
+    "protocols": {
+      "014": {
+        "id": "014-DOC-PUB-001",
+        "title": "Document Publication Protocol",
+        "file": "document_publication_protocol.md",
+        "priority": 14,
+        "summary": "HTML documentation distribution from central location to project directories."
+      },
+      "015": {
+        "id": "015-PATCH-NOTE-001",
+        "title": "Patch Note Management Protocol",
+        "file": "patch_note_protocol.md", 
+        "priority": 15,
+        "summary": "Standardized patch note creation, naming, storage. Chronological change tracking."
+      },
+      "016": {
+        "id": "016-ROOT-CLEANUP-001",
+        "title": "Root Directory Cleanup Protocol",
+        "file": "root_directory_cleanup_protocol.md",
+        "priority": 16,
+        "summary": "Root directory maintenance and organization procedures."
+      },
+      "017": {
+        "id": "017-API-CONFIG-001", 
+        "title": "API Configuration Protocol",
+        "file": "api_configuration_protocol.md",
+        "priority": 17,
+        "summary": "Secure API key management with local encryption. No plain text storage."
+      },
+      "018": {
+        "id": "018-FILE-PATH-001",
+        "title": "Absolute File Path Mandate Protocol", 
+        "file": "file_path_protocol.md",
+        "priority": 18,
+        "summary": "Mandatory absolute file paths in all scripts/commands. Eliminates working directory ambiguity."
+      },
+      "019": {
+        "id": "019-TOKEN-MGT-001",
+        "title": "Token Limit Management Protocol",
+        "file": "numbered/019-TOKEN-MGT-001_token_limit_management.md",
+        "priority": 19,
+        "summary": "Comprehensive token limit management for AI providers. Batch processing, rate limiting, large file handling.",
+        "current_status": "ACTIVE - Currently open in editor"
+      }
+    }
+  },
+  "additional_protocols": {
+    "description": "Additional operational procedures",
+    "protocols": {
+      "020": {
+        "id": "020-GIT-STANDARDS-001",
+        "title": "Git Commit Standards Protocol",
+        "file": "git_commit_standards_protocol.md",
+        "priority": 20, 
+        "summary": "Standardized git commit messages and change documentation."
+      },
+      "021": {
+        "id": "021-AGENT-HANDOFF-001",
+        "title": "Agent Handoff Protocol (DEPRECATED)",
+        "file": "handoff.md",
+        "priority": 21,
+        "status": "DEPRECATED - Use 004-SESSION-HANDOFF-001 instead"
+      },
+      "022": {
+        "id": "022-SCRIBE-CONSOLE-001",
+        "title": "Launch Scribe Console Protocol",
+        "file": "launch-scribe-console.md", 
+        "priority": 22,
+        "summary": "Split Scribe Console launch for real-time StackTrackr monitoring."
+      },
+      "023": {
+        "id": "023-SEARCH-MATRIX-001",
+        "title": "rScribe Search Matrix Integration Protocol", 
+        "file": "rscribe_search_matrix_integration.md",
+        "priority": 23,
+        "summary": "Search matrix integration for rScribe system."
+      },
+      "024": {
+        "id": "024-SCRIBE-DEPRECATION-001",
+        "title": "Scribe Deprecation Summary Protocol",
+        "file": "scribe_deprecation_summary.md",
+        "priority": 24,
+        "summary": "Enhanced Scribe System migration procedures."
+      },
+      "025": {
+        "id": "025-SEAMLESS-CONTINUITY-001", 
+        "title": "Seamless Agent Continuity Protocol",
+        "file": "seamless_agent_continuity_protocol.md",
+        "priority": 25,
+        "summary": "Continuous conversation experience across sessions. Instant context loading, no memory gaps."
+      },
+      "026": {
+        "id": "026-UNIVERSAL-PROMPT-001",
+        "title": "Universal Agent System Prompt Protocol", 
+        "file": "UNIVERSAL_AGENT_SYSTEM_PROMPT.md",
+        "priority": 26,
+        "summary": "Standard system prompt for all AI agents."
+      },
+      "027": {
+        "id": "027-MCP-LOG-VIEW-001",
+        "title": "MCP Memory Log Viewing Protocol",
+        "file": "view_mcp_memory_log.md", 
+        "priority": 27,
+        "summary": "Procedures for viewing MCP memory operation logs."
+      }
+    }
+  },
+  "execution_sequence": {
+    "session_startup": [
+      "001-MEMORY-MGT-001: Manual memory sync", 
+      "002-RENGINE-START-001: Verify rEngine operational",
+      "003-SCRIBE-SYS-001: Start scribe monitoring",
+      "005-RAPID-RECALL-001: Load session context",
+      "006-PRIME-DIRECTIVE-001: Confirm mission parameters"
+    ],
+    "during_session": [
+      "001-MEMORY-MGT-001: Continuous memory updates",
+      "018-FILE-PATH-001: Use absolute paths only", 
+      "019-TOKEN-MGT-001: Manage token usage",
+      "020-GIT-STANDARDS-001: Follow commit standards"
+    ],
+    "session_end": [
+      "004-SESSION-HANDOFF-001: Create session summary",
+      "001-MEMORY-MGT-001: Final memory sync",
+      "020-GIT-STANDARDS-001: Commit with proper message"
+    ]
+  },
+  "critical_commands": {
+    "memory_management": [
+      "bash memory-sync-automation.sh manual",
+      "node recall.js 'query'", 
+      "mcp_memory_create_entities",
+      "node memory-intelligence.js recall"
+    ],
+    "system_health": [
+      "docker-compose ps",
+      "curl http://localhost:4034/health",
+      "ollama list",
+      "node smart-scribe.js --status"
+    ],
+    "context_loading": [
+      "node recall.js 'last session summary'",
+      "Search consolidated-matrix.json",
+      "Check rMemory/rAgentMemories/"
+    ]
+  },
+  "emergency_procedures": {
+    "memory_system_failure": {
+      "steps": [
+        "Check MCP server connectivity",
+        "Fallback to local JSON files", 
+        "Create manual backup",
+        "Document issue for next session"
+      ]
+    },
+    "protocol_violation": {
+      "steps": [
+        "Stop current operation",
+        "Review applicable protocol",
+        "Correct procedure",
+        "Document deviation"
+      ]
+    },
+    "context_loss": {
+      "steps": [
+        "Run memory sync immediately", 
+        "Check handoff files",
+        "Query search matrix",
+        "Reconstruct from git history"
+      ]
+    }
+  },
+  "always_remember": {
+    "core_principles": [
+      "Memory synchronization is MANDATORY at session start/end",
+      "All protocols have specific execution order - follow hierarchy", 
+      "Context preservation is critical - never lose work",
+      "Use absolute file paths always",
+      "Token management prevents API overruns",
+      "Git standards ensure proper change tracking",
+      "Session handoffs preserve continuity"
+    ],
+    "current_session_context": {
+      "user_goal": "Complete protocol memory system with clean numbered files for human readability",
+      "active_protocols": ["001", "004", "019"],
+      "docker_setup": "Enhanced Docker platform with MCP servers ready",
+      "memory_status": "Bridge operational on port 8092",
+      "next_actions": [
+        "Create numbered protocol files", 
+        "Sync to persistent memory",
+        "Test memory recall system"
+      ]
+    }
+  }
+}

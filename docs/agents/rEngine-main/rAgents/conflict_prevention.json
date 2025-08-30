@@ -1,0 +1,204 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-16",
+    "purpose": "Conflict prevention protocols for multi-environment workflows",
+    "description": "Coordination strategies to prevent conflicts between local VS Code work and remote Codex changes",
+    "last_updated": "2025-08-16T19:00:00Z"
+  },
+  "conflict_prevention_strategy": {
+    "core_principle": "NEVER work in multiple environments simultaneously on the same repository",
+    "workflow_coordination": {
+      "local_vs_code_session": {
+        "before_starting": [
+          "git pull origin main",
+          "verify clean working directory",
+          "check no Codex sessions are active",
+          "commit to working locally for session duration"
+        ],
+        "during_session": [
+          "regular commits every 15-30 minutes",
+          "push major milestones immediately",
+          "avoid long periods without syncing",
+          "monitor for any unexpected remote changes"
+        ],
+        "before_switching_to_codex": [
+          "commit ALL local changes",
+          "push to GitHub immediately", 
+          "verify remote repository is updated",
+          "close VS Code to avoid accidental local work"
+        ]
+      },
+      "codex_web_session": {
+        "before_starting": [
+          "verify no local work in progress",
+          "confirm latest changes are on GitHub",
+          "check branch status is clean",
+          "ensure VS Code is not open with this repo"
+        ],
+        "during_session": [
+          "work directly on GitHub repository",
+          "commit changes immediately when complete",
+          "avoid leaving work in progress state",
+          "document session scope and completion"
+        ],
+        "before_switching_back": [
+          "ensure all Codex changes are committed",
+          "verify GitHub repository is in clean state",
+          "document what was changed for local session",
+          "wait for any background processes to complete"
+        ]
+      }
+    }
+  },
+  "specific_conflict_risks": {
+    "memory_file_collisions": {
+      "high_risk_files": [
+        "agents/tasks.json",
+        "agents/memory.json", 
+        "agents/github_copilot_memories.json",
+        "agents/errors.json",
+        "agents/performance.json"
+      ],
+      "risk_level": "CRITICAL - these files update frequently",
+      "prevention": "strict single-environment rule for memory updates"
+    },
+    "code_file_conflicts": {
+      "high_risk_files": [
+        "js/*.js files being actively developed",
+        "css/styles.css",
+        "index.html"
+      ],
+      "risk_level": "HIGH - functional code conflicts hard to resolve",
+      "prevention": "coordinate specific file ownership per session"
+    },
+    "configuration_conflicts": {
+      "high_risk_files": [
+        "package.json",
+        "COPILOT_INSTRUCTIONS.md",
+        "AGENTS.md"
+      ],
+      "risk_level": "MEDIUM - but can break agent coordination",
+      "prevention": "avoid configuration changes in Codex sessions"
+    }
+  },
+  "safe_coordination_protocols": {
+    "session_handoff_checklist": {
+      "ending_local_session": [
+        "✓ git status (verify clean)",
+        "✓ git add -A",
+        "✓ git commit -m 'Pre-Codex handoff: [session summary]'",
+        "✓ git push origin main",
+        "✓ close VS Code completely",
+        "✓ verify GitHub shows latest changes"
+      ],
+      "starting_codex_session": [
+        "✓ confirm no VS Code instances open",
+        "✓ verify GitHub repository is current",
+        "✓ check branch status (should be main)",
+        "✓ review what local session accomplished",
+        "✓ define clear scope for Codex work"
+      ],
+      "ending_codex_session": [
+        "✓ ensure all changes committed in Codex",
+        "✓ verify GitHub repository updated",
+        "✓ document Codex session accomplishments",
+        "✓ prepare handoff notes for local session"
+      ],
+      "resuming_local_session": [
+        "✓ git pull origin main",
+        "✓ review Codex changes",
+        "✓ update local memory files if needed",
+        "✓ verify environment consistency",
+        "✓ test changes locally before continuing"
+      ]
+    },
+    "emergency_conflict_resolution": {
+      "if_conflicts_occur": [
+        "STOP immediately - don't force push",
+        "create backup branch of local work",
+        "fetch latest remote changes",
+        "manually resolve conflicts file by file",
+        "test thoroughly before committing resolution",
+        "document what went wrong to prevent recurrence"
+      ],
+      "prevention_automation": [
+        "set up Git hooks to warn about dirty state",
+        "create shell aliases for safe handoff commands", 
+        "implement status checks before environment switches",
+        "automate backup creation before risky operations"
+      ]
+    }
+  },
+  "workflow_optimization": {
+    "ideal_session_patterns": {
+      "focused_local_sessions": {
+        "duration": "1-3 hours of focused development",
+        "scope": "specific feature or bug fix completion",
+        "sync_frequency": "every 30 minutes or major milestone",
+        "handoff_preparation": "always end with complete, tested feature"
+      },
+      "targeted_codex_sessions": {
+        "duration": "quick, specific fixes or enhancements", 
+        "scope": "well-defined, isolated changes",
+        "sync_approach": "immediate commit when complete",
+        "handoff_preparation": "clear documentation of what was changed"
+      }
+    },
+    "communication_strategies": {
+      "session_coordination": [
+        "document active work in agents/tasks.json",
+        "use commit messages to communicate handoffs",
+        "create session notes for context preservation",
+        "establish clear ownership periods"
+      ],
+      "conflict_avoidance": [
+        "never assume the other environment is idle",
+        "always check repository status before starting",
+        "communicate major architectural changes",
+        "coordinate timing of memory file updates"
+      ]
+    }
+  },
+  "technical_safeguards": {
+    "git_workflow_protection": {
+      "branch_strategy": {
+        "main_branch": "always keep clean and deployable",
+        "feature_branches": "consider for major changes",
+        "safety_branches": "automatic backups before handoffs"
+      },
+      "commit_strategy": {
+        "frequent_commits": "every 15-30 minutes during active work",
+        "descriptive_messages": "clear indication of work state",
+        "handoff_markers": "special commit messages for environment switches"
+      }
+    },
+    "automation_opportunities": {
+      "pre_commit_hooks": "verify clean state before commits",
+      "handoff_scripts": "automate safe environment switching",
+      "status_monitoring": "track repository state across environments",
+      "backup_automation": "automatic safety branches before major operations"
+    }
+  },
+  "best_practices_summary": {
+    "golden_rules": [
+      "NEVER work in multiple environments simultaneously",
+      "ALWAYS commit before switching environments", 
+      "ALWAYS pull before starting new environment session",
+      "ALWAYS verify clean state before handoffs",
+      "ALWAYS document what you accomplished"
+    ],
+    "warning_signs": [
+      "git status shows uncommitted changes when switching",
+      "GitHub shows different state than local repository",
+      "memory files have unexpected timestamps",
+      "VS Code and Codex show different current state"
+    ],
+    "recovery_protocols": [
+      "immediate backup of current state",
+      "systematic conflict resolution",
+      "thorough testing after resolution",
+      "process improvement to prevent recurrence"
+    ]
+  }
+}

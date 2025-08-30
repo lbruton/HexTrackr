@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rEngine Core: Agent Hello Workflow - rEngine Core Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #6366f1;
+            --rengine-secondary: #8b5cf6;
+            --rengine-accent: #06b6d4;
+            --rengine-text: #1f2937;
+            --rengine-text-light: #6b7280;
+            --rengine-bg: #ffffff;
+            --rengine-bg-alt: #f8fafc;
+            --rengine-border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--rengine-text);
+            background: var(--rengine-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--rengine-primary), var(--rengine-secondary));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: "⚙️";
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--rengine-primary);
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--rengine-primary);
+            border-bottom: 2px solid var(--rengine-border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--rengine-secondary);
+        }
+
+        h4, h5, h6 {
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--rengine-text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--rengine-text);
+        }
+
+        .content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        code {
+            background: var(--rengine-bg-alt);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--rengine-primary);
+        }
+
+        pre {
+            background: var(--rengine-bg-alt);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--rengine-primary);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--rengine-text);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--rengine-accent);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: var(--rengine-text-light);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--rengine-border);
+        }
+
+        th {
+            background: var(--rengine-bg-alt);
+            font-weight: 600;
+            color: var(--rengine-primary);
+        }
+
+        .metadata {
+            background: var(--rengine-bg-alt);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--rengine-border);
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: var(--rengine-text-light);
+        }
+
+        footer {
+            background: var(--rengine-bg-alt);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--rengine-text-light);
+            border-top: 1px solid var(--rengine-border);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--rengine-primary);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">rEngine Core</div>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../README.html">Documentation</a>
+                    <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <h1>rEngine Core: Agent Hello Workflow</h1>
+            
+            
+            <div class="metadata">
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Source File:</span>
+                        <span>agent-hello-workflow.md</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Generated:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Last Modified:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Converter:</span>
+                        <span>rEngine MCP HTML Converter</span>
+                    </div>
+                
+            </div>
+            
+            
+            [36m🤖 Calling Google Gemini (gemini-1.5-flash)...[0m
+[32m✅ Response received in 12520ms[0m
+
+[1m🤖 Google Gemini Response:[0m
+
+```html
+<section class="overview">
+  <h1>Agent Hello Workflow</h1>
+  <p>This workflow handles the loading and integration of an agent's persistent memory, including handoff logs, personal memories, and technical knowledge, to ensure a seamless and contextual interaction experience.</p>
+
+  <h2>Primary Objectives</h2>
+  <ol>
+    <li><strong>Agent Initialization</strong>: Load and prepare the agents' memory, context, including the latest handoff, personal memories, MCP memories, and technical knowledge.</li>
+  </ol>
+</section>
+
+<section class="file-structure">
+  <h2>File Structure</h2>
+  <ul>
+    <li><code>agent-hello-workflow.js</code>: (empty)</li>
+    <li><code>a</code>: cannot open `a' (No such file or directory)</li>
+    <li><code>core</code>: cannot open `core' (No such file or directory)</li>
+    <li><code>component</code>: cannot open `component' (No such file or directory)</li>
+    <li><code>of</code>: cannot open `of' (No such file or directory)</li>
+    <li><code>the</code>: cannot open `the' (No such file or directory)</li>
+    <li><code>rEngine</code>: directory</li>
+    <li><code>Core</code>: cannot open `Core' (No such file or directory)</li>
+    <li><code>platform,</code>: cannot open `platform,' (No such file or directory)</li>
+    <li><code>responsible</code>: cannot open `responsible' (No such file or directory)</li>
+    <li><code>for</code>: cannot open `for' (No such file or directory)</li>
+    <li><code>managing</code>: cannot open `managing' (No such file or directory)</li>
+    <li><code>the</code>: cannot open `the' (No such file or directory)</li>
+    <li><code>initialization</code>: cannot open `initialization' (No such file or directory)</li>
+    <li><code>and</code>: (empty)</li>
+    <li><code>context</code>: cannot open `context' (No such file or directory)</li>
+    <li><code>continuity</code>: cannot open `continuity' (No such file or directory)</li>
+    <li><code>of</code>: cannot open `of' (No such file or directory)</li>
+    <li><code>intelligent</code>: cannot open `intelligent' (No such file or directory)</li>
+    <li><code>agents.</code>: cannot open `agents.' (No such file or directory)</li>
+    <li><code>This</code>: cannot open `This' (No such file or directory)</li>
+    <li><code>workflow</code>: cannot open `workflow' (No such file or directory)</li>
+    <li><code>handles</code>: cannot open `handles' (No such file or directory)</li>
+    <li><code>the</code>: cannot open `the' (No such file or directory)</li>
+    <li><code>loading</code>: cannot open `loading' (No such file or directory)</li>
+    <li><code>and</code>: (empty)</li>
+    <li><code>integration</code>: cannot open `integration' (No such file or directory)</li>
+    <li><code>of</code>: cannot open `of' (No such file or directory)</li>
+    <li><code>an</code>: cannot open `an' (No such file or directory)</li>
+
+  </ul>
+</section>
+
+<section class="dependencies">
+  <h2>Dependencies</h2>
+  <ul>
+    <li><code>memory</code>: cannot open `memory' (No such file or directory)</li>
+    <li><code>context,</code>: cannot open `context,' (No such file or directory)</li>
+    <li><code>including</code>: cannot open `including' (No such file or directory)</li>
+    <li><code>the</code>: cannot open `the' (No such file or directory)</li>
+    <li><code>latest</code>: cannot open `latest' (No such file or directory)</li>
+    <li><code>handoff,</code>: cannot open `handoff,' (No such file or directory)</li>
+    <li><code>personal</code>: cannot open `personal' (No such file or directory)</li>
+    <li><code>memories,</code>: cannot open `memories,' (No such file or directory)</li>
+    <li><code>MCP</code>: cannot open `MCP' (No such file or directory)</li>
+    <li><code>memories,</code>: cannot open `memories,' (No such file or directory)</li>
+    <li><code>and</code>: (empty)</li>
+    <li><code>technical</code>: cannot open `technical' (No such file or directory)</li>
+    <li><code>knowledge.</code>: cannot open `knowledge.' (No such file or directory)</li>
+    <li><code>agent-hello-workflow.js</code> depends on:</li>
+    <li><code>depends</code>: cannot open `depends' (No such file or directory)</li>
+    <li><code>on</code>: cannot open `on' (No such file or directory)</li>
+    <li><code>the</code>: cannot open `the' (No such file or directory)</li>
+    <li><code>following</code>: cannot open `following' (No such file or directory)</li>
+    <li><code>components</code>: cannot open `components' (No such file or directory)</li>
+    <li><code>and</code>: (empty)</li>
+    <li><code>libraries:</code>: cannot open `libraries:' (No such file or directory)</li>
+    <li><code>fs-extra</code></li>
+    <li><code>path</code></li>
+    <li><code>file-url-to-path</code></li>
+    <li><code>url</code></li>
+    <li><code>memory-intelligence.js</code></li>
+    <li><code>recall.js</code></li>
+    <li><code>add-context.js</code></li>
+    <li><code>extendedcontext.json</code></li>
+  </ul>
+</section>
+
+<section class="usage">
+  <h2>Usage</h2>
+  <p><code>agent-hello-workflow.js</code> can be used in two ways:</p>
+  <pre><code class="language-javascript">
+import AgentHelloWorkflow from './agent-hello-workflow.js';
+
+const workflow = new AgentHelloWorkflow();
+const initResult = await workflow.initializeAgent();
+console.log(initResult.continuationPrompt);
+  </code></pre>
+  <pre><code class="language-bash">
+# Initialize the agent
+node agent-hello-workflow.js init
+
+# Search the agent's memories
+node agent-hello-workflow.js search "search term"
+
+# Display the detailed context
+node agent-hello-workflow.js context
+  </code></pre>
+</section>
+
+<section class="core-component">
+  <h2>Core Component</h2>
+  <p><code>agent-hello-workflow.js</code> is a core component of the rEngine platform, and is designed to integrate seamlessly with other components, such as:</p>
+  <ul>
+    <li><code>initializeMemorySystem()</code></li>
+    <li><code>memory-intelligence.js</code></li>
+    <li><code>recall.js</code></li>
+    <li><code>add-context.js</code></li>
+    <li><code>extendedcontext.json</code></li>
+    <li><code>searchMemories()</code></li>
+  </ul>
+  <table>
+    <thead>
+      <tr>
+        <th>Variable</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>baseDir</code></td>
+        <td>(No description provided)</td>
+      </tr>
+      <tr>
+        <td><code>memoryDir</code></td>
+        <td>(No description provided)</td>
+      </tr>
+      <tr>
+        <td><code>agentsDir</code></td>
+        <td>(No description provided)</td>
+      </tr>
+      <tr>
+        <td><code>memoryIntelligencePath</code></td>
+        <td>(No description provided)</td>
+      </tr>
+      <tr>
+        <td><code>fastRecallPath</code></td>
+        <td>(No description provided)</td>
+      </tr>
+      <tr>
+        <td><code>addContextPath</code></td>
+        <td>(No description provided)</td>
+      </tr>
+      <tr>
+        <td><code>extendedContextPath</code></td>
+        <td>(No description provided)</td>
+      </tr>
+      <tr>
+        <td><code>SESSION_ID</code></td>
+        <td>(No description provided)</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+```
+
+
+[36mℹ️  Duration: 12520ms | Model: gemini-1.5-flash[0m
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../README.html">Documentation</a>
+                <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+            </div>
+            <p>Generated on 2025-08-20 by rEngine Core HTML Converter</p>
+            <p>© 2025 rEngine Core - Intelligent Development Wrapper</p>
+        </div>
+    </footer>
+</body>
+</html>

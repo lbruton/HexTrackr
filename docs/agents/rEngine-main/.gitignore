@@ -1,0 +1,84 @@
+# rEngine Git Ignore Rules
+
+# Node modules and dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Environment and configuration files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+config/local.json
+config/secrets.json
+
+# API keys and sensitive data
+api-keys.json
+secrets/
+*.key
+*.pem
+
+# Build outputs and temporary files
+dist/
+build/
+temp/
+tmp/
+*.tmp
+*.cache
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs and debugging
+logs/
+*.log
+debug.log
+error.log
+
+# Test coverage and reports
+coverage/
+test-results/
+*.lcov
+
+# Local development files
+local_memory.json
+debug_data.json
+
+# Ideas and internal planning (keep private - competitive advantage)
+ideas/
+internal/
+planning/
+strategy/
+roadmap/
+competitive-analysis/
+business-plans/
+
+# Agent development and training data
+agent-training/
+model-experiments/
+ai-responses/
+
+# Backup files
+*.backup
+*.bak
+backup_*/
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

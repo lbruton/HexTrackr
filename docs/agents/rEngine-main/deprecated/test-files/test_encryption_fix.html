@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encryption System Test</title>
+</head>
+<body>
+    <h1>Encryption System Test</h1>
+    
+    <div id="test-results"></div>
+    
+    <script src="/Volumes/DATA/GitHub/StackTrackr/rProjects/StackTrackr/js/encryption.js"></script>
+    <script>
+        async function testEncryption() {
+            const results = document.getElementById('test-results');
+            
+            try {
+                // Test basic encryption system initialization
+                const encryption = new StackrTrackrEncryption();
+                results.innerHTML += '<p>✅ StackrTrackrEncryption initialized successfully</p>';
+                
+                // Test if methods exist
+                if (typeof encryption.hasMasterPassword === 'function') {
+                    results.innerHTML += '<p>✅ hasMasterPassword method exists</p>';
+                } else {
+                    results.innerHTML += '<p>❌ hasMasterPassword method missing</p>';
+                }
+                
+                if (typeof encryption.setupMasterPassword === 'function') {
+                    results.innerHTML += '<p>✅ setupMasterPassword method exists</p>';
+                } else {
+                    results.innerHTML += '<p>❌ setupMasterPassword method missing</p>';
+                }
+                
+                if (typeof encryption.unlockWithPassword === 'function') {
+                    results.innerHTML += '<p>✅ unlockWithPassword method exists</p>';
+                } else {
+                    results.innerHTML += '<p>❌ unlockWithPassword method missing</p>';
+                }
+                
+                // Test basic functionality
+                const hasMasterPassword = encryption.hasMasterPassword();
+                results.innerHTML += `<p>📋 Has master password: ${hasMasterPassword}</p>`;
+                
+                const isUnlocked = encryption.isUnlocked();
+                results.innerHTML += `<p>📋 Is unlocked: ${isUnlocked}</p>`;
+                
+                results.innerHTML += '<p>✅ Basic encryption system tests passed!</p>';
+                
+            } catch (error) {
+                results.innerHTML += `<p>❌ Encryption test failed: ${error.message}</p>`;
+                console.error('Encryption test error:', error);
+            }
+        }
+        
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', testEncryption);
+    </script>
+</body>
+</html>

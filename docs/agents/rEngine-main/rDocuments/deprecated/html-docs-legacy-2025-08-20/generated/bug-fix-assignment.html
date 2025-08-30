@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rPrompts: Bug Fix Assignment - rEngine Core Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #6366f1;
+            --rengine-secondary: #8b5cf6;
+            --rengine-accent: #06b6d4;
+            --rengine-text: #1f2937;
+            --rengine-text-light: #6b7280;
+            --rengine-bg: #ffffff;
+            --rengine-bg-alt: #f8fafc;
+            --rengine-border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--rengine-text);
+            background: var(--rengine-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--rengine-primary), var(--rengine-secondary));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: "⚙️";
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--rengine-primary);
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--rengine-primary);
+            border-bottom: 2px solid var(--rengine-border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--rengine-secondary);
+        }
+
+        h4, h5, h6 {
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--rengine-text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--rengine-text);
+        }
+
+        .content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        code {
+            background: var(--rengine-bg-alt);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--rengine-primary);
+        }
+
+        pre {
+            background: var(--rengine-bg-alt);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--rengine-primary);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--rengine-text);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--rengine-accent);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: var(--rengine-text-light);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--rengine-border);
+        }
+
+        th {
+            background: var(--rengine-bg-alt);
+            font-weight: 600;
+            color: var(--rengine-primary);
+        }
+
+        .metadata {
+            background: var(--rengine-bg-alt);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--rengine-border);
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: var(--rengine-text-light);
+        }
+
+        footer {
+            background: var(--rengine-bg-alt);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--rengine-text-light);
+            border-top: 1px solid var(--rengine-border);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--rengine-primary);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">rEngine Core</div>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../README.html">Documentation</a>
+                    <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <h1>rPrompts: Bug Fix Assignment</h1>
+            
+            
+            <div class="metadata">
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Source File:</span>
+                        <span>bug-fix-assignment.md</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Generated:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Last Modified:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Converter:</span>
+                        <span>rEngine MCP HTML Converter</span>
+                    </div>
+                
+            </div>
+            
+            
+            <h1 id="rprompts-bug-fix-assignment">rPrompts: Bug Fix Assignment</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>bug-fix-assignment.md</code> file is a template used within the <code>rAgents/rLegacy</code> component of the rEngine Core platform. This file outlines the process and details for an urgent bug fix assignment, providing a standardized format for agents to diagnose, fix, and document the resolution of a critical issue.</p>
+<p>The purpose of this file is to guide agents through the necessary steps to effectively address a reported bug, ensuring a consistent and efficient workflow for bug triage and remediation within the rEngine Core ecosystem.</p>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<p>The <code>bug-fix-assignment.md</code> file does not contain any specific functions or classes. Instead, it provides a structured template with the following key sections:</p>
+<ol>
+<li><strong>Bug Details</strong>: Describes the bug that needs to be addressed, including reproduction steps, expected behavior, and the current (incorrect) behavior.</li>
+<li><strong>Files to Check</strong>: Lists the specific files and locations that should be inspected for the bug.</li>
+<li><strong>Your Task</strong>: Outlines the steps the agent should follow to diagnose, fix, and test the bug.</li>
+<li><strong>Success Criteria</strong>: Defines the conditions that must be met for the bug fix to be considered successful.</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>bug-fix-assignment.md</code> file relies on the following dependencies within the rEngine Core ecosystem:</p>
+<ol>
+<li><strong>agents/errors.json</strong>: A JSON file containing known error patterns and their associated resolutions.</li>
+<li><strong>agents/recentissues.json</strong>: A JSON file tracking recent bug fixes and their corresponding details.</li>
+<li><strong>agents/tasks.json</strong>: A JSON file containing the task details for the bug fix assignment.</li>
+</ol>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To use the <code>bug-fix-assignment.md</code> template, follow these steps:</p>
+<ol>
+<li>Open the file and review the provided information, including the bug details, reproduction steps, and files to check.</li>
+<li>Update the <code>agents/tasks.json</code> file with the task details.</li>
+<li>Set the task status to &quot;in_progress&quot; to indicate that the bug fix is underway.</li>
+<li>Follow the phases outlined in the &quot;Your Task&quot; section: diagnosis, fix, and test.</li>
+<li>Document your findings and discoveries in your memory file.</li>
+<li>Ensure that the success criteria are met before marking the task as complete.</li>
+</ol>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>bug-fix-assignment.md</code> file does not require any specific configuration. However, the agent may need to access and update the related JSON files (e.g., <code>agents/errors.json</code>, <code>agents/recentissues.json</code>, <code>agents/tasks.json</code>) as part of the bug fix process.</p>
+<h2 id="integration-points">Integration Points</h2>
+<p>The <code>bug-fix-assignment.md</code> file is closely integrated with the following components of the rEngine Core platform:</p>
+<ol>
+<li><strong>rAgents/rLegacy</strong>: The file is part of the <code>rAgents/rLegacy</code> component, which handles the management and execution of agent-based tasks.</li>
+<li><strong>Reporting and Tracking</strong>: The file&#39;s contents are linked to the <code>agents/tasks.json</code>, <code>agents/errors.json</code>, and <code>agents/recentissues.json</code> files, which are used for reporting and tracking bug fixes.</li>
+</ol>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p>If an agent encounters any issues while following the instructions in the <code>bug-fix-assignment.md</code> file, they should refer to the following resources for troubleshooting:</p>
+<ol>
+<li><strong>agents/errors.json</strong>: This file contains known error patterns and their associated resolutions, which may provide guidance for diagnosing and fixing the current bug.</li>
+<li><strong>agents/recentissues.json</strong>: This file tracks recent bug fixes and their corresponding details, which can be used to identify similar issues and their resolutions.</li>
+<li><strong>rEngine Core Documentation</strong>: The comprehensive documentation for the rEngine Core platform may provide additional information and support for the bug fix process.</li>
+</ol>
+<p>If the agent is unable to resolve the issue using the available resources, they should escalate the problem to the appropriate rEngine Core support team for further assistance.</p>
+
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../README.html">Documentation</a>
+                <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+            </div>
+            <p>Generated on 2025-08-20 by rEngine Core HTML Converter</p>
+            <p>© 2025 rEngine Core - Intelligent Development Wrapper</p>
+        </div>
+    </footer>
+</body>
+</html>

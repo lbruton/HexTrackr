@@ -1,0 +1,64 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-08-19T00:00:00Z",
+  "purpose": "Technical documentation navigation index",
+  "categories": {
+    "architecture": {
+      "description": "System structure and component documentation",
+      "files": ["PROJECT_STRUCTURE.md", "COPILOT_INSTRUCTIONS.md"],
+      "notes": "rEngine platform encompasses everything above /rProjects/ directory"
+    },
+    "projects": {
+      "description": "Individual project documentation within rProjects container",
+      "path": "../rProjects/",
+      "structure": "Each project subfolder contains its own documentation",
+      "isolation": "Projects leverage shared rEngine infrastructure but maintain separate docs"
+    },
+    "strategic": {
+      "description": "High-level roadmaps and strategic planning documents",
+      "files": ["MASTER_ROADMAP.md", "SYSTEM_USAGE_ASSESSMENT.md", "CRITICAL_HANDOFF_DASHBOARD.md"]
+    },
+    "protocols": {
+      "description": "Operational procedures (linked from protocols directory)",
+      "path": "../rProtocols/",
+      "files": ["documentation_structure_protocol.md", "document_sweep_protocol.md", "memory_management_protocol.md", "session_handoff_protocol.md", "rEngine_startup_protocol.md", "patch_note_protocol.md", "USER_STARTUP_PROTOCOL.md"]
+    },
+    "prompts": {
+      "description": "AI agent prompts for transparency and auditing",
+      "path": "../rPrompts/",
+      "files": [
+        "document-generation.prompt.md",
+        "github-copilot-orchestrator.prompt.md", 
+        "quick-start-initialization.prompt.md",
+        "rengine-platform-coordination.prompt.md"
+      ],
+      "purpose": "Full transparency into AI agent instructions and decision-making"
+    },
+    "generated": {
+      "description": "AI-generated documentation from document sweeps",
+      "path": "generated/",
+      "files": [],
+      "note": "Populated by document sweep operations"
+    },
+    "analysis": {
+      "description": "Analysis requests and reports",
+      "files": ["GEMINI_ANALYSIS_REQUEST.md", "collect_button_analysis_report.md", "collect_button_analysis_request.md"]
+    },
+    "maintenance": {
+      "description": "System maintenance and cleanup documentation",
+      "files": ["DASHBOARD_CLEANUP_ROADMAP.md", "CLEAN_SYSTEM_SUMMARY.md"]
+    }
+  },
+  "quick_access": {
+    "roadmap": "MASTER_ROADMAP.md",
+    "structure": "PROJECT_STRUCTURE.md", 
+    "protocols_index": "../rProtocols/README.md",
+    "agent_instructions": "COPILOT_INSTRUCTIONS.md"
+  },
+  "sqlite_migration_note": "This index system will be replaced by SQLite FTS5 search in PROJECT-003 (Aug 25-27, 2025)",
+  "metadata": {
+    "total_categories": 6,
+    "protocol_files": 6,
+    "maintenance_status": "Active - Updated Aug 19, 2025"
+  }
+}

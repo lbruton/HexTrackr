@@ -1,0 +1,10 @@
+{
+    "provider": "openai",
+    "model": "gpt-4o",
+    "execution_time_seconds": 2,
+    "word_count":        4,
+    "character_count":       23,
+    "line_count":        1,
+    "timestamp": "2025-08-17T07:09:10-05:00",
+    "words_per_second": 2.00
+}

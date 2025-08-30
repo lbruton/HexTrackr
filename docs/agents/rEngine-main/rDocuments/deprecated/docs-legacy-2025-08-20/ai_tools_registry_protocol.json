@@ -1,0 +1,139 @@
+{
+  "source_file": "rProtocols/ai_tools_registry_protocol.md",
+  "generated_date": "2025-08-20T01:53:21.438Z",
+  "title": "🔧 AI Tools Registry Protocol",
+  "sections": [
+    {
+      "id": "-overview",
+      "title": "🎯 Overview",
+      "icon": "📋",
+      "submenu": []
+    },
+    {
+      "id": "-critical-missing-tools-mcp-integration-lost",
+      "title": "🚨 Critical Missing Tools (MCP Integration Lost)",
+      "icon": "🚨",
+      "submenu": [
+        {
+          "id": "missing-tools-inventory",
+          "title": "Missing Tools Inventory"
+        }
+      ]
+    },
+    {
+      "id": "-complete-ai-tools-registry",
+      "title": "📋 Complete AI Tools Registry",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "tier-1-core-analysis-tools",
+          "title": "Tier 1: Core Analysis Tools"
+        },
+        {
+          "id": "tier-2-support-tools",
+          "title": "Tier 2: Support Tools"
+        }
+      ]
+    },
+    {
+      "id": "-technical-architecture",
+      "title": "🏗 Technical Architecture",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "ai-provider-integration",
+          "title": "AI Provider Integration"
+        },
+        {
+          "id": "tool-routing-logic",
+          "title": "Tool Routing Logic"
+        },
+        {
+          "id": "context-matrix-system",
+          "title": "Context Matrix System"
+        }
+      ]
+    },
+    {
+      "id": "-restoration-priority",
+      "title": "🚨 Restoration Priority",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "p0-critical-this-week",
+          "title": "P0 (Critical - This Week)"
+        },
+        {
+          "id": "p1-high-next-week",
+          "title": "P1 (High - Next Week)"
+        }
+      ]
+    },
+    {
+      "id": "-tool-performance-metrics",
+      "title": "📊 Tool Performance Metrics",
+      "icon": "📈",
+      "submenu": [
+        {
+          "id": "target-performance",
+          "title": "Target Performance"
+        },
+        {
+          "id": "success-indicators",
+          "title": "Success Indicators"
+        }
+      ]
+    },
+    {
+      "id": "-access-control-security",
+      "title": "🔐 Access Control & Security",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "tool-access-levels",
+          "title": "Tool Access Levels"
+        },
+        {
+          "id": "security-protocols",
+          "title": "Security Protocols"
+        }
+      ]
+    },
+    {
+      "id": "-related-systems",
+      "title": "📚 Related Systems",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "dependencies",
+          "title": "Dependencies"
+        },
+        {
+          "id": "integration-points",
+          "title": "Integration Points"
+        }
+      ]
+    },
+    {
+      "id": "-maintenance-protocol",
+      "title": "🔄 Maintenance Protocol",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "daily-monitoring",
+          "title": "Daily Monitoring"
+        },
+        {
+          "id": "weekly-maintenance",
+          "title": "Weekly Maintenance"
+        },
+        {
+          "id": "monthly-reviews",
+          "title": "Monthly Reviews"
+        }
+      ]
+    }
+  ],
+  "word_count": 1082,
+  "format_version": "1.0"
+}

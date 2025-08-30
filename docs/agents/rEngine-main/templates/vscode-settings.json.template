@@ -1,0 +1,35 @@
+{
+  "mcp.servers": {
+    "memory-docker": {
+      "command": "tcp://localhost:4041",
+      "disabled": false,
+      "timeout": 30000,
+      "restart": true
+    },
+    "context7-docker": {
+      "command": "tcp://localhost:4049",
+      "disabled": false,
+      "timeout": 30000,
+      "restart": true
+    },
+    "github-docker": {
+      "command": "tcp://localhost:4042",
+      "disabled": false,
+      "timeout": 30000,
+      "restart": true
+    },
+    "sqlite-docker": {
+      "command": "tcp://localhost:4043",
+      "disabled": false,
+      "timeout": 30000,
+      "restart": true
+    }
+  },
+  "mcp.logging.level": "debug",
+  "mcp.autoRestart": true,
+  "mcp.connectionTimeout": 60000,
+  "mcp.heartbeatInterval": 30000,
+  "files.associations": {
+    "*.json": "jsonc"
+  }
+}

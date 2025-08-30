@@ -1,0 +1,132 @@
+{
+  "source_file": "/Volumes/DATA/GitHub/rEngine/docs/RSCRIBE_DOCUMENT_PROTOCOL.md",
+  "generated_date": "2025-08-20T01:16:40.683Z",
+  "title": "rScribe Document Sweep Protocol",
+  "sections": [
+    {
+      "id": "-core-protocol",
+      "title": "🎯 Core Protocol",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "multiformat-output-standard",
+          "title": "Multi-Format Output Standard"
+        },
+        {
+          "id": "html-format-requirements",
+          "title": "HTML Format Requirements"
+        }
+      ]
+    },
+    {
+      "id": "-rscribe-worker-instructions",
+      "title": "🤖 rScribe Worker Instructions",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "document-sweep-automation",
+          "title": "Document Sweep Automation"
+        },
+        {
+          "id": "file-naming-convention",
+          "title": "File Naming Convention"
+        }
+      ]
+    },
+    {
+      "id": "-sync-protocol",
+      "title": "🔄 Sync Protocol",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "automatic-html-generation",
+          "title": "Automatic HTML Generation"
+        },
+        {
+          "id": "summary-generation",
+          "title": "Summary Generation"
+        }
+      ]
+    },
+    {
+      "id": "files-updated-x",
+      "title": "Files Updated: X",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "new-content-added-x",
+      "title": "New Content Added: X",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "crossreferences-updated-x",
+      "title": "Cross-References Updated: X",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "-priority-files-for-multiformat",
+      "title": "📋 Priority Files for Multi-Format",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "immediate-multiformat-generation",
+          "title": "Immediate Multi-Format Generation"
+        },
+        {
+          "id": "autosync-monitoring",
+          "title": "Auto-Sync Monitoring"
+        }
+      ]
+    },
+    {
+      "id": "-implementation-commands",
+      "title": "⚙️ Implementation Commands",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "for-rscribe-workers",
+          "title": "For rScribe Workers"
+        },
+        {
+          "id": "document-sweep-enhancement",
+          "title": "Document Sweep Enhancement"
+        }
+      ]
+    },
+    {
+      "id": "-html-template-structure",
+      "title": "🎨 HTML Template Structure",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "required-elements",
+          "title": "Required Elements"
+        },
+        {
+          "id": "css-framework",
+          "title": "CSS Framework"
+        }
+      ]
+    },
+    {
+      "id": "-success-metrics",
+      "title": "📊 Success Metrics",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "quality-indicators",
+          "title": "Quality Indicators"
+        },
+        {
+          "id": "user-experience-goals",
+          "title": "User Experience Goals"
+        }
+      ]
+    }
+  ],
+  "word_count": 661,
+  "format_version": "1.0"
+}

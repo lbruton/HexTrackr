@@ -1,0 +1,148 @@
+{
+  "source_file": "rProtocols/file_cleanup_protocol.md",
+  "generated_date": "2025-08-20T01:53:21.449Z",
+  "title": "File Cleanup Protocol",
+  "sections": [
+    {
+      "id": "-objective",
+      "title": "🎯 Objective",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "-cleanup-cycle-process",
+      "title": "🔄 Cleanup Cycle Process",
+      "icon": "🔄",
+      "submenu": [
+        {
+          "id": "phase-1-discovery-analysis",
+          "title": "Phase 1: Discovery & Analysis"
+        },
+        {
+          "id": "phase-2-human-review",
+          "title": "Phase 2: Human Review"
+        },
+        {
+          "id": "phase-3-safe-archival",
+          "title": "Phase 3: Safe Archival"
+        },
+        {
+          "id": "phase-4-testing-validation",
+          "title": "Phase 4: Testing & Validation"
+        }
+      ]
+    },
+    {
+      "id": "-file-discovery-criteria",
+      "title": "📋 File Discovery Criteria",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "high-priority-candidates",
+          "title": "HIGH Priority Candidates"
+        },
+        {
+          "id": "medium-priority-candidates-",
+          "title": "MEDIUM Priority Candidates  "
+        },
+        {
+          "id": "low-priority-candidates",
+          "title": "LOW Priority Candidates"
+        }
+      ]
+    },
+    {
+      "id": "-never-touch-criteria",
+      "title": "🚫 NEVER Touch Criteria",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "-documentation-requirements",
+      "title": "📝 Documentation Requirements",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "cleanup-log-format",
+          "title": "Cleanup Log Format"
+        },
+        {
+          "id": "archive-directory-structure",
+          "title": "Archive Directory Structure"
+        }
+      ]
+    },
+    {
+      "id": "-rollback-procedures",
+      "title": "🔧 Rollback Procedures",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "immediate-rollback-within-testing-period",
+          "title": "Immediate Rollback (within testing period)"
+        },
+        {
+          "id": "gitbased-recovery",
+          "title": "Git-Based Recovery"
+        }
+      ]
+    },
+    {
+      "id": "-agent-commands",
+      "title": "🎛️ Agent Commands",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "discovery-command",
+          "title": "Discovery Command"
+        },
+        {
+          "id": "batch-discovery-command",
+          "title": "Batch Discovery Command"
+        },
+        {
+          "id": "postcleanup-command",
+          "title": "Post-Cleanup Command"
+        }
+      ]
+    },
+    {
+      "id": "-automation-safeguards",
+      "title": "⚙️ Automation Safeguards",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "precleanup-checks",
+          "title": "Pre-Cleanup Checks"
+        },
+        {
+          "id": "postcleanup-validation",
+          "title": "Post-Cleanup Validation"
+        }
+      ]
+    },
+    {
+      "id": "-success-metrics",
+      "title": "📊 Success Metrics",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "percycle-tracking",
+          "title": "Per-Cycle Tracking"
+        },
+        {
+          "id": "overall-goals",
+          "title": "Overall Goals"
+        }
+      ]
+    },
+    {
+      "id": "-integration-with-project005",
+      "title": "🎯 Integration with PROJECT-005",
+      "icon": "📄",
+      "submenu": []
+    }
+  ],
+  "word_count": 807,
+  "format_version": "1.0"
+}

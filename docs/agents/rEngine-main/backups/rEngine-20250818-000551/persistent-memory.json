@@ -1,0 +1,194 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2025-08-17T00:00:00Z",
+    "lastSync": "2025-08-18T04:53:36.051Z",
+    "purpose": "Persistent memory store for rEngine MCP server",
+    "syncToMCP": true,
+    "copilot_instructions_enforced": true,
+    "requirements_last_updated": "2025-08-18T00:31:29.225Z"
+  },
+  "entities": {},
+  "relations": {},
+  "conversations": {
+    "claude_1755475712046": {
+      "agent": "claude",
+      "title": "Dual Memory Protocol Test",
+      "content": "Testing sanitized dual memory writes for all agents",
+      "type": "test",
+      "timestamp": "2025-08-18T00:08:32.046Z",
+      "sanitized": true
+    },
+    "claude_1755475788917": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755475788681",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755475788681",
+        "timestamp": "2025-08-18T00:09:48.916Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-18T00:09:48.917Z",
+      "sanitized": true
+    },
+    "claude_1755475801386": {
+      "agent": "claude",
+      "title": "Dual Memory Protocol Enforcement",
+      "content": "Claude agent now enforcing dual memory writes to persistent-memory.json, claude-memory.json, and extended context with full JSON sanitization to prevent parse errors. All future agents will follow same protocol.",
+      "type": "system_enforcement",
+      "features": {
+        "0": "dual_memory",
+        "1": "json_sanitization",
+        "2": "all_agents_compliance"
+      },
+      "timestamp": "2025-08-18T00:10:01.386Z",
+      "sanitized": true
+    },
+    "claude_critical_learning_aug17": {
+      "agent": "claude",
+      "title": "CRITICAL DISCOVERY - MCP Server Was Not Running",
+      "content": "MAJOR SYSTEM ISSUE IDENTIFIED: The entire session I was implementing timeout fixes and protocol enforcement, but the ROOT CAUSE was that Smart Scribe MCP server was not running. This caused: 1) All memory sync operations to fail silently, 2) Git commits to hang on pre-commit hooks, 3) Agent to implement complex timeout solutions for simple infrastructure issue. LESSON: Always verify MCP server status FIRST before any memory operations. Fixed by starting Smart Scribe with ./start-smart-scribe.sh. Future agents MUST check MCP health before claiming memory system issues.",
+      "type": "critical_system_learning",
+      "root_cause": "MCP_SERVER_NOT_RUNNING",
+      "symptoms": [
+        "git_hanging",
+        "memory_sync_timeouts",
+        "protocol_violations",
+        "silent_mcp_failures"
+      ],
+      "solution": "Start Smart Scribe MCP server first, then verify connectivity before implementing complex fixes",
+      "prevention": "Add MCP health check to universal-agent-init.js",
+      "timestamp": "2025-08-17T19:30:00.000Z",
+      "priority": "CRITICAL"
+    },
+    "copilot-agent_1755477250864": {
+      "agent": "copilot-agent",
+      "title": "COPILOT-AGENT Agent Session Complete",
+      "content": "copilot-agent agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: copilot-agent-session-1755477250703",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "copilot-agent-session-1755477250703",
+        "timestamp": "2025-08-18T00:34:10.863Z",
+        "agent_type": "copilot-agent"
+      },
+      "timestamp": "2025-08-18T00:34:10.864Z",
+      "sanitized": true
+    },
+    "claude_1755480039306": {
+      "agent": "claude",
+      "title": "MCP Visibility Test",
+      "content": "Testing the enhanced dual memory system with visible widgets",
+      "type": "test",
+      "timestamp": "2025-08-18T01:20:39.306Z",
+      "sanitized": true
+    }
+  },
+  "system_state": {
+    "health_check": {
+      "last_check": "2025-08-18T00:49:59.715Z",
+      "status": "healthy",
+      "issues": []
+    },
+    "sync_status": {
+      "last_mcp_sync": null,
+      "sync_failures": "unknown_due_to_server_not_running",
+      "auto_sync_enabled": true,
+      "mcp_server_status": "recently_started_needs_verification"
+    },
+    "critical_learnings": {
+      "session_date": "2025-08-17",
+      "key_discovery": "MCP server infrastructure must be verified before implementing memory protocols",
+      "agent_reminder": "ALWAYS check MCP server status in universal-agent-init.js startup"
+    }
+  },
+  "project_context": {
+    "stacktrackr": {
+      "type": "precious_metals_inventory",
+      "status": "active",
+      "last_interaction": null
+    },
+    "rengine": {
+      "type": "mcp_server_platform",
+      "status": "active",
+      "last_interaction": null
+    }
+  },
+  "agent_requirements": {
+    "mandatory_startup_protocols": {
+      "gpt_agents": {
+        "command": "node gpt-mandatory-startup.js",
+        "location": "/Volumes/DATA/GitHub/rEngine/rEngine",
+        "description": "MANDATORY for GPT agents - handles git backup, memory protocols, session logging, MCP integration",
+        "failure_consequence": "BROKEN HANDOFFS & LOST WORK"
+      },
+      "all_agents": {
+        "step_1": "Check COPILOT_INSTRUCTIONS.md",
+        "step_2": "Check AGENT.md",
+        "step_3": "Follow rAgents/unified-workflow.md",
+        "step_4": "Memory recall and status check"
+      }
+    },
+    "memory_system_paths": {
+      "tasks": "rMemory/rAgentMemories/tasks.json",
+      "agents": "rMemory/rAgentMemories/agents.json",
+      "decisions": "rMemory/rAgentMemories/decisions.json",
+      "functions": "rMemory/rAgentMemories/functions.json",
+      "errors": "rMemory/rAgentMemories/errors.json",
+      "memory": "rMemory/rAgentMemories/memory.json",
+      "preferences": "rMemory/rAgentMemories/preferences.json",
+      "styles": "rMemory/rAgentMemories/styles.json",
+      "patterns": "rMemory/rAgentMemories/patterns.json"
+    },
+    "protocol_enforcement": {
+      "before_work": [
+        "Git checkpoint: git add -A && git commit -m 'Checkpoint before [task]'",
+        "Protocol check: node rEngine/protocol-enforcer.js file_modification",
+        "Check tasks: Read rMemory/rAgentMemories/tasks.json",
+        "Memory check: Review agent memory and shared context"
+      ],
+      "during_work": [
+        "Follow rAgents/unified-workflow.md protocols",
+        "Update memory files with discoveries",
+        "Sync to MCP using agent memory system",
+        "Document changes in appropriate JSON files",
+        "Never write outside StackTrackr directory"
+      ],
+      "after_completion": [
+        "Final commit with complete description",
+        "Update documentation (decisions, functions, memory)",
+        "Update agent memory with lessons learned",
+        "Run protocol compliance check"
+      ]
+    },
+    "mcp_integration": {
+      "server_check": "ALWAYS verify Smart Scribe MCP server is running first",
+      "critical_learning": "MCP server not running causes silent failures in memory sync",
+      "startup_command": "./start-smart-scribe.sh",
+      "health_check": "ps aux | grep smart-scribe"
+    },
+    "scribe_console": {
+      "command": "node scribe-console.js",
+      "location": "/Volumes/DATA/GitHub/rEngine/rEngine",
+      "features": [
+        "Status bar",
+        "Pink verbose logs",
+        "Memory statistics",
+        "Auto-refresh"
+      ],
+      "purpose": "Real-time monitoring of system health and activity"
+    }
+  }
+}

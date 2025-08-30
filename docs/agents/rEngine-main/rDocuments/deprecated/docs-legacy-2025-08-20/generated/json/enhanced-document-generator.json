@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "enhanced-document-generator.js",
+    "name": "enhanced-document-generator",
+    "extension": ".js",
+    "directory": "",
+    "size": 0,
+    "lines": 456
+  },
+  "documentation": {
+    "markdown": "../docs/generated/enhanced-document-generator.md",
+    "html": "../html-docs/generated/enhanced-document-generator.html",
+    "generated": "2025-08-20T00:50:10.033Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "single-file",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "enhanced-document-generator.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for enhanced-document-generator.js"
+  }
+}

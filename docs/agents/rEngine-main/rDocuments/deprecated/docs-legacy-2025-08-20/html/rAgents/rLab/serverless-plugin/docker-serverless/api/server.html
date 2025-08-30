@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StackTrackr API Server - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>StackTrackr API Server</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 server.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 9KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rAgents/rLab/serverless-plugin/docker-serverless/api/server.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/server.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="stacktrackr-api-server">StackTrackr API Server</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>server.js</code> script is the main entry point for the StackTrackr API, a service that provides real-time precious metal price data. This API allows users to retrieve the latest prices for gold, silver, platinum, and palladium, along with historical price series data. The script sets up an Express.js server, configures middleware, and handles various API endpoints for fetching prices, proxying external provider data, and managing the application&#39;s configuration.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The StackTrackr API server is built on the following key components:</p>
+<ol>
+<li><strong>Express.js</strong>: The main web framework used to handle HTTP requests and define API endpoints.</li>
+<li><strong>Redis</strong>: An in-memory data store used for caching price data to improve response times.</li>
+<li><strong>PostgreSQL</strong>: A relational database used to store the historical price data.</li>
+<li><strong>Winston</strong>: A logging library used for recording information, warnings, and errors.</li>
+<li><strong>Express Validator</strong>: A middleware used for validating and sanitizing user input.</li>
+<li><strong>Helmet</strong>: A middleware that helps secure the Express apps by setting various HTTP headers.</li>
+<li><strong>CORS</strong>: A middleware that provides a way to specify what origins can access the API.</li>
+<li><strong>Express Rate Limit</strong>: A middleware used to limit repeated requests to public APIs and endpoints.</li>
+</ol>
+<p>The data flow in the application is as follows:</p>
+<ol>
+<li>A client makes a request to one of the API endpoints (e.g., <code>/api/prices</code>).</li>
+<li>The server first checks the Redis cache for the requested data.</li>
+<li>If the data is not found in the cache, the server queries the PostgreSQL database to fetch the latest price data.</li>
+<li>The fetched data is then cached in Redis for a configurable amount of time (e.g., 5 minutes).</li>
+<li>The server returns the price data to the client in the response.</li>
+</ol>
+<p>The server also provides a <code>/api/proxy</code> endpoint that allows clients to fetch prices directly from external price data providers. This is useful for cases where the StackTrackr API does not have the necessary data or when clients need to access provider-specific features.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>server.js</code> script relies on the following external dependencies:</p>
+<table>
+<thead>
+<tr>
+<th>Dependency</th>
+<th>Version</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>express</code></td>
+<td>^4.17.1</td>
+<td>Web framework for Node.js</td>
+</tr>
+<tr>
+<td><code>cors</code></td>
+<td>^2.8.5</td>
+<td>Middleware for handling CORS with various options</td>
+</tr>
+<tr>
+<td><code>helmet</code></td>
+<td>^4.4.1</td>
+<td>Middleware that adds security-related HTTP headers</td>
+</tr>
+<tr>
+<td><code>express-rate-limit</code></td>
+<td>^5.2.6</td>
+<td>Middleware for limiting repeated requests to public APIs and endpoints</td>
+</tr>
+<tr>
+<td><code>express-validator</code></td>
+<td>^6.12.1</td>
+<td>Middleware for validating and sanitizing user input</td>
+</tr>
+<tr>
+<td><code>redis</code></td>
+<td>^3.1.2</td>
+<td>Client for interacting with Redis</td>
+</tr>
+<tr>
+<td><code>pg</code></td>
+<td>^8.7.1</td>
+<td>Client for interacting with PostgreSQL</td>
+</tr>
+<tr>
+<td><code>winston</code></td>
+<td>^3.3.3</td>
+<td>Logging library for Node.js</td>
+</tr>
+<tr>
+<td><code>dotenv</code></td>
+<td>^10.0.0</td>
+<td>Loads environment variables from a <code>.env</code> file</td>
+</tr>
+</tbody></table>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="middleware-setup">Middleware Setup</h3>
+<ol>
+<li><p><strong>Logging Configuration</strong>:</p>
+<ul>
+<li>Creates a Winston logger instance with custom formatting and transports.</li>
+</ul>
+</li>
+<li><p><strong>Express App Initialization</strong>:</p>
+<ul>
+<li>Sets up the Express application and defines the server port.</li>
+</ul>
+</li>
+<li><p><strong>Redis Client</strong>:</p>
+<ul>
+<li>Creates a Redis client instance using the provided connection URL.</li>
+</ul>
+</li>
+<li><p><strong>PostgreSQL Pool</strong>:</p>
+<ul>
+<li>Creates a PostgreSQL connection pool using the provided connection string.</li>
+</ul>
+</li>
+<li><p><strong>Express Middleware</strong>:</p>
+<ul>
+<li>Applies Helmet, CORS, and JSON parsing middleware to the Express app.</li>
+<li>Enables rate limiting for the <code>/api/</code> endpoint.</li>
+</ul>
+</li>
+</ol>
+<h3 id="api-endpoints">API Endpoints</h3>
+<ol>
+<li><p><strong>Health Check</strong>:</p>
+<ul>
+<li>Provides a basic health check endpoint at <code>/health</code>.</li>
+</ul>
+</li>
+<li><p><strong>Get Latest Prices</strong>:</p>
+<ul>
+<li>Implements the <code>/api/prices</code> endpoint, which allows clients to fetch the latest precious metal prices.</li>
+<li>Supports optional query parameters for filtering by metal, currency, unit, and time window.</li>
+<li>Caches the response in Redis for a configurable amount of time.</li>
+</ul>
+</li>
+<li><p><strong>Provider Proxy</strong>:</p>
+<ul>
+<li>Implements the <code>/api/proxy/:provider</code> endpoint, which allows clients to fetch prices directly from external providers.</li>
+<li>Validates the input parameters and dynamically imports the corresponding provider module.</li>
+</ul>
+</li>
+<li><p><strong>Configuration Management</strong>:</p>
+<ul>
+<li>Implements the <code>/api/config</code> endpoint, which allows administrators to update the application&#39;s configuration (e.g., provider settings, cache TTL).</li>
+<li>Stores the configuration in Redis for easy access.</li>
+</ul>
+</li>
+</ol>
+<h3 id="error-handling">Error Handling</h3>
+<ul>
+<li>The script includes a global error handling middleware that logs unhandled errors and returns a generic 500 Internal Server Error response to the client.</li>
+</ul>
+<h3 id="initialization-and-graceful-shutdown">Initialization and Graceful Shutdown</h3>
+<ul>
+<li>The <code>startServer</code> function initializes the Redis and PostgreSQL connections, then starts the Express server.</li>
+<li>The script listens for the <code>SIGTERM</code> signal and gracefully shuts down the server, closing the Redis and PostgreSQL connections.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="fetch-latest-precious-metal-prices">Fetch Latest Precious Metal Prices</h3>
+<pre><code><pre><code class="language-">GET /api/prices?metal=gold&currency=USD&unit=toz&window=24h</code></pre>
+</code></pre>
+<p>This request will fetch the latest gold prices in US dollars per troy ounce for the past 24 hours.</p>
+<p>Example response:</p>
+<pre><code class="language-json"><pre><code class="language-json">{
+  "metal": "gold",
+  "currency": "USD",
+  "unit": "toz",
+  "window": "24h",
+  "latest": {
+    "ts": "2023-04-26T12:00:00.000Z",
+    "metal": "gold",
+    "currency": "USD",
+    "unit": "toz",
+    "price": 2000.00,
+    "ask": 2000.50,
+    "bid": 1999.50,
+    "high24h": 2001.00,
+    "low24h": 1998.00,
+    "change_amount": 10.00,
+    "change_percent": 0.005,
+    "provider": "kitco",
+    "source": "https://www.kitco.com"
+  },
+  "series": [
+    // Historical price data
+  ],
+  "cached_at": "2023-04-26T12:00:10.000Z",
+  "count": 100
+}</code></pre>
+</code></pre>
+<h3 id="fetch-prices-from-external-provider">Fetch Prices from External Provider</h3>
+<pre><code><pre><code class="language-">GET /api/proxy/kitco?metal=gold&currency=USD</code></pre>
+</code></pre>
+<p>This request will fetch the latest gold price in US dollars from the Kitco provider.</p>
+<p>Example response:</p>
+<pre><code class="language-json"><pre><code class="language-json">{
+  "metal": "gold",
+  "currency": "USD",
+  "price": 2000.00,
+  "ask": 2000.50,
+  "bid": 1999.50,
+  "timestamp": "2023-04-26T12:00:00.000Z",
+  "provider": "kitco",
+  "source": "https://www.kitco.com"
+}</code></pre>
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>The StackTrackr API server can be configured using the following environment variables:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>PORT</code></td>
+<td>The port the server will listen on</td>
+<td><code>3001</code></td>
+</tr>
+<tr>
+<td><code>REDIS_URL</code></td>
+<td>The connection URL for the Redis server</td>
+<td><code>redis://localhost:6379</code></td>
+</tr>
+<tr>
+<td><code>POSTGRES_URL</code></td>
+<td>The connection string for the PostgreSQL database</td>
+<td><code>postgresql://stacktrackr:dev_password_change_in_prod@localhost:5432/stacktrackr_prices</code></td>
+</tr>
+<tr>
+<td><code>CORS_ORIGIN</code></td>
+<td>Allowed origin URLs for CORS</td>
+<td><code>[&#39;http://localhost:3000&#39;, &#39;file://&#39;]</code></td>
+</tr>
+<tr>
+<td><code>RATE_LIMIT</code></td>
+<td>The maximum number of requests per minute</td>
+<td><code>60</code></td>
+</tr>
+</tbody></table>
+<p>Additionally, the <code>/api/config</code> endpoint allows administrators to update the following configuration options:</p>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Description</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>providers</code></td>
+<td>An object containing settings for each price data provider</td>
+<td><code>{}</code></td>
+</tr>
+<tr>
+<td><code>cache.ttlSeconds</code></td>
+<td>The time-to-live (in seconds) for cached price data</td>
+<td><code>300</code> (5 minutes)</td>
+</tr>
+</tbody></table>
+<h2 id="error-handling-1">Error Handling</h2>
+<p>The StackTrackr API server handles errors in the following ways:</p>
+<ol>
+<li><p><strong>Validation Errors</strong>: If the client provides invalid input, the server will return a 400 Bad Request response with details about the errors.</p>
+</li>
+<li><p><strong>Provider Errors</strong>: If an error occurs while fetching data from an external price provider, the server will return a 500 Internal Server Error response with a generic &quot;Provider error&quot; message.</p>
+</li>
+<li><p><strong>Unhandled Errors</strong>: Any unhandled errors in the server code will be logged using the Winston logger and a 500 Internal Server Error response will be returned to the client.</p>
+</li>
+</ol>
+<h2 id="integration">Integration</h2>
+<p>The StackTrackr API server is designed to be a standalone service that can be integrated into a larger system. It can be consumed by various client applications (e.g., web applications, mobile apps, data analysis tools) that need access to real-time and historical precious metal price data.</p>
+<p>The API can be easily integrated into other systems by making HTTP requests to the defined endpoints. Clients can fetch the latest prices, historical price series, and even proxy data from external providers.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><p><strong>Provider Modules</strong>: The <code>server.js</code> script uses a dynamic import to load provider-specific modules. This allows the API to be easily extended with support for new price data providers without modifying the core server code.</p>
+</li>
+<li><p><strong>Configuration Management</strong>: The ability to update the application&#39;s configuration through the <code>/api/config</code> endpoint makes it easy to adjust settings (e.g., provider settings, cache TTL) without restarting the server.</p>
+</li>
+<li><p><strong>Caching</strong>: The use of Redis for caching price data significantly improves the server&#39;s response times, especially for frequently requested data.</p>
+</li>
+<li><p><strong>Error Handling</strong>: The comprehensive error handling, including validation errors, provider-specific errors, and unhandled errors, ensures that the API provides clear and informative responses to clients.</p>
+</li>
+<li><p><strong>Logging</strong>: The Winston logger set up in the script provides a centralized logging solution, making it easier to diagnose and debug issues in the production environment.</p>
+</li>
+<li><p><strong>Graceful Shutdown</strong>: The script listens for the <code>SIGTERM</code> signal and gracefully shuts down the server, closing the Redis and PostgreSQL connections, to ensure a clean shutdown process.</p>
+</li>
+</ol>
+<p>Overall, the <code>server.js</code> script demonstrates a well-structured, scalable, and production-ready implementation of the StackTrackr API server.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>server.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

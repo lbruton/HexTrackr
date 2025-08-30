@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scribe Summary System - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Scribe Summary System</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 scribe-summary.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 8KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../generated/scribe-summary.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/scribe-summary.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="scribe-summary-system">Scribe Summary System</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>scribe-summary.js</code> script is a part of the Scribe system, which provides on-demand conversation summaries for multiple timeframes. This script can be called from any chat to quickly get context about recent development activity, including handoffs, memory updates, git commits, and scribe logs.</p>
+<p>The script uses a combination of local file system data and AI-powered summarization to generate concise, informative summaries that help developers stay up-to-date on the project&#39;s progress.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>ScribeSummarySystem</code> class is the main entry point for the script. It handles the following key responsibilities:</p>
+<ol>
+<li><strong>Data Gathering</strong>: The class retrieves relevant data from various sources, such as handoff files, memory updates, git history, and scribe logs, based on a given timeframe.</li>
+<li><strong>AI Summarization</strong>: The class uses the Ollama AI model to generate a summary of the gathered data, highlighting the main objectives, technical changes, issues, current status, and any warnings or concerns.</li>
+<li><strong>Fallback Summary</strong>: If the AI-powered summarization fails, the class generates a simpler, text-based summary.</li>
+<li><strong>Pre-Chunking Analysis</strong>: The class analyzes recent code changes and creates an optimized chunking plan for documentation generation.</li>
+<li><strong>Documentation Queueing</strong>: The class queues the files with pre-chunked content for the documentation generation process.</li>
+</ol>
+<p>The script also includes a CLI interface that allows users to generate summaries for different timeframes.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>The script relies on the following external dependencies:</p>
+<ul>
+<li><code>fs-extra</code>: Provides an enhanced file system API with additional functionality.</li>
+<li><code>path</code>: Handles file paths and directory operations.</li>
+<li><code>axios</code>: Makes HTTP requests to the Ollama AI endpoint for summarization.</li>
+<li><code>child_process</code>: Executes git commands to retrieve the commit history.</li>
+</ul>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="scribesummarysystem-class"><code>ScribeSummarySystem</code> Class</h3>
+<p>This is the main class that provides the functionality for the Scribe Summary System.</p>
+<p><strong>Constructor</strong></p>
+<ul>
+<li>Initializes the class with the necessary directories and configurations.</li>
+</ul>
+<p><strong><code>generateSummary(timeframe)</code></strong></p>
+<ul>
+<li>Generates a summary for the specified timeframe.</li>
+<li>Parameters:<ul>
+<li><code>timeframe</code> (optional, default: <code>&#39;1h&#39;</code>): The timeframe for which to generate the summary (e.g., <code>&#39;last&#39;</code>, <code>&#39;1h&#39;</code>, <code>&#39;6h&#39;</code>, <code>&#39;12h&#39;</code>, <code>&#39;24h&#39;</code>).</li>
+</ul>
+</li>
+<li>Returns: A promise that resolves to the generated summary.</li>
+</ul>
+<p><strong><code>getTimeframeCutoff(timeframe)</code></strong></p>
+<ul>
+<li>Calculates the cutoff time for the specified timeframe.</li>
+<li>Parameters:<ul>
+<li><code>timeframe</code>: The timeframe to use for the cutoff calculation.</li>
+</ul>
+</li>
+<li>Returns: A <code>Date</code> object representing the cutoff time.</li>
+</ul>
+<p><strong><code>gatherRelevantData(cutoffTime)</code></strong></p>
+<ul>
+<li>Gathers relevant data (handoff files, memory updates, git history, and scribe logs) based on the provided cutoff time.</li>
+<li>Parameters:<ul>
+<li><code>cutoffTime</code>: The cutoff time to use for gathering the data.</li>
+</ul>
+</li>
+<li>Returns: An array of data objects, each with a <code>type</code>, <code>timestamp</code>, <code>source</code>, and <code>content</code> property.</li>
+</ul>
+<p><strong><code>summarizeWithAI(data, timeframe)</code></strong></p>
+<ul>
+<li>Generates a summary using the Ollama AI model.</li>
+<li>Parameters:<ul>
+<li><code>data</code>: The data to be summarized.</li>
+<li><code>timeframe</code>: The timeframe for the summary.</li>
+</ul>
+</li>
+<li>Returns: A promise that resolves to the generated summary.</li>
+</ul>
+<p><strong><code>generateSimpleSummary(data, timeframe)</code></strong></p>
+<ul>
+<li>Generates a simple, text-based summary of the provided data.</li>
+<li>Parameters:<ul>
+<li><code>data</code>: The data to be summarized.</li>
+<li><code>timeframe</code>: The timeframe for the summary.</li>
+</ul>
+</li>
+<li>Returns: The generated summary.</li>
+</ul>
+<p><strong><code>analyzeAndPreChunk(targetFile)</code></strong></p>
+<ul>
+<li>Analyzes recent code changes and creates an optimized chunking plan for documentation generation.</li>
+<li>Parameters:<ul>
+<li><code>targetFile</code> (optional): A specific file to analyze and pre-chunk. If not provided, the script will look for recent changes.</li>
+</ul>
+</li>
+<li>Returns: An array of pre-chunking results, each with the file, analysis, chunk plan, and timestamp.</li>
+</ul>
+<p><strong><code>findRecentChanges()</code></strong></p>
+<ul>
+<li>Finds the files that have been recently changed (in the last 30 minutes).</li>
+<li>Returns: An array of file paths.</li>
+</ul>
+<p><strong><code>analyzeFileStructure(filePath)</code></strong></p>
+<ul>
+<li>Analyzes the structure of a given file and identifies optimal chunking boundaries.</li>
+<li>Parameters:<ul>
+<li><code>filePath</code>: The path of the file to analyze.</li>
+</ul>
+</li>
+<li>Returns: An object with the recommended chunk size, identified boundaries, and the overall complexity of the file.</li>
+</ul>
+<p><strong><code>createChunkPlan(filePath, analysis)</code></strong></p>
+<ul>
+<li>Creates a detailed chunk plan based on the file analysis.</li>
+<li>Parameters:<ul>
+<li><code>filePath</code>: The path of the file.</li>
+<li><code>analysis</code>: The file structure analysis.</li>
+</ul>
+</li>
+<li>Returns: An object with the chunk plan, including the file, total lines, chunks, and the strategy used.</li>
+</ul>
+<p><strong><code>queueForDocumentation(filePath, chunkPlan)</code></strong></p>
+<ul>
+<li>Queues the file with the pre-chunked content for the documentation generation process.</li>
+<li>Parameters:<ul>
+<li><code>filePath</code>: The path of the file.</li>
+<li><code>chunkPlan</code>: The chunk plan for the file.</li>
+</ul>
+</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To generate a summary for the last hour, run the script with the following command:</p>
+<pre><code><pre><code class="language-">node scribe-summary.js 1h</code></pre>
+</code></pre>
+<p>This will output the summary for the last hour&#39;s development activity.</p>
+<p>To generate a summary for the last 6 hours, run the script with the following command:</p>
+<pre><code><pre><code class="language-">node scribe-summary.js 6h</code></pre>
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>ScribeSummarySystem</code> class has the following configuration options:</p>
+<ul>
+<li><code>baseDir</code>: The base directory for the project.</li>
+<li><code>memoryDir</code>: The directory where the agent memories are stored.</li>
+<li><code>handoffDir</code>: The directory where the handoff files are stored.</li>
+<li><code>ollamaEndpoint</code>: The URL of the Ollama AI endpoint.</li>
+<li><code>model</code>: The name of the Ollama AI model to use for summarization.</li>
+</ul>
+<p>These values are set in the constructor of the <code>ScribeSummarySystem</code> class.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The script handles errors in the following ways:</p>
+<ol>
+<li>If there is an error during the data gathering process, the script logs the error and continues with the available data.</li>
+<li>If the AI-powered summarization fails, the script falls back to generating a simple, text-based summary.</li>
+<li>If there is an error during the pre-chunking analysis or documentation queueing, the script logs the error and continues with the next file.</li>
+</ol>
+<h2 id="integration">Integration</h2>
+<p>The Scribe Summary System is intended to be integrated into a larger system that manages the overall documentation and knowledge management processes. The script can be called from any chat or interface to provide quick context on recent development activity.</p>
+<p>The pre-chunking analysis and documentation queueing features are designed to work alongside the main documentation generation process, ensuring that files are optimized for efficient documentation creation.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><strong>AI Summarization</strong>: The script uses the Ollama AI model for generating the summaries. The model and endpoint configuration can be adjusted to use a different AI service or model if needed.</li>
+<li><strong>Timeframe Handling</strong>: The script supports several predefined timeframes (e.g., <code>&#39;last&#39;</code>, <code>&#39;1h&#39;</code>, <code>&#39;6h&#39;</code>, <code>&#39;12h&#39;</code>, <code>&#39;24h&#39;</code>), but it can be extended to handle custom timeframes as well.</li>
+<li><strong>File Tracking</strong>: The script relies on various file-based data sources (handoff files, memory updates, scribe logs) to gather the relevant information. The specific file naming conventions and locations may need to be adjusted based on the project&#39;s setup.</li>
+<li><strong>Git Integration</strong>: The script uses the <code>child_process</code> module to execute git commands and retrieve the commit history. This approach may need to be revised if the project uses a different version control system.</li>
+<li><strong>Documentation Queueing</strong>: The pre-chunking analysis and documentation queueing features are designed to work with a separate documentation generation process. The specific implementation and integration points may need to be adjusted based on the project&#39;s architecture.</li>
+</ol>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>scribe-summary.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

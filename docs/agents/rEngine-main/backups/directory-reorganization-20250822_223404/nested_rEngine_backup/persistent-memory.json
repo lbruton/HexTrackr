@@ -1,0 +1,704 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2025-08-17T00:00:00Z",
+    "lastSync": "2025-08-23T01:12:05.314Z",
+    "purpose": "Persistent memory store for rEngine MCP server",
+    "syncToMCP": true,
+    "copilot_instructions_enforced": true,
+    "requirements_last_updated": "2025-08-18T00:31:29.225Z"
+  },
+  "entities": {},
+  "relations": {},
+  "conversations": {
+    "claude_1755475712046": {
+      "agent": "claude",
+      "title": "Dual Memory Protocol Test",
+      "content": "Testing sanitized dual memory writes for all agents",
+      "type": "test",
+      "timestamp": "2025-08-18T00:08:32.046Z",
+      "sanitized": true
+    },
+    "claude_1755475788917": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755475788681",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755475788681",
+        "timestamp": "2025-08-18T00:09:48.916Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-18T00:09:48.917Z",
+      "sanitized": true
+    },
+    "claude_1755475801386": {
+      "agent": "claude",
+      "title": "Dual Memory Protocol Enforcement",
+      "content": "Claude agent now enforcing dual memory writes to persistent-memory.json, claude-memory.json, and extended context with full JSON sanitization to prevent parse errors. All future agents will follow same protocol.",
+      "type": "system_enforcement",
+      "features": {
+        "0": "dual_memory",
+        "1": "json_sanitization",
+        "2": "all_agents_compliance"
+      },
+      "timestamp": "2025-08-18T00:10:01.386Z",
+      "sanitized": true
+    },
+    "claude_critical_learning_aug17": {
+      "agent": "claude",
+      "title": "CRITICAL DISCOVERY - MCP Server Was Not Running",
+      "content": "MAJOR SYSTEM ISSUE IDENTIFIED: The entire session I was implementing timeout fixes and protocol enforcement, but the ROOT CAUSE was that Smart Scribe MCP server was not running. This caused: 1) All memory sync operations to fail silently, 2) Git commits to hang on pre-commit hooks, 3) Agent to implement complex timeout solutions for simple infrastructure issue. LESSON: Always verify MCP server status FIRST before any memory operations. Fixed by starting Smart Scribe with ./start-smart-scribe.sh. Future agents MUST check MCP health before claiming memory system issues.",
+      "type": "critical_system_learning",
+      "root_cause": "MCP_SERVER_NOT_RUNNING",
+      "symptoms": [
+        "git_hanging",
+        "memory_sync_timeouts",
+        "protocol_violations",
+        "silent_mcp_failures"
+      ],
+      "solution": "Start Smart Scribe MCP server first, then verify connectivity before implementing complex fixes",
+      "prevention": "Add MCP health check to universal-agent-init.js",
+      "timestamp": "2025-08-17T19:30:00.000Z",
+      "priority": "CRITICAL"
+    },
+    "copilot-agent_1755477250864": {
+      "agent": "copilot-agent",
+      "title": "COPILOT-AGENT Agent Session Complete",
+      "content": "copilot-agent agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: copilot-agent-session-1755477250703",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "copilot-agent-session-1755477250703",
+        "timestamp": "2025-08-18T00:34:10.863Z",
+        "agent_type": "copilot-agent"
+      },
+      "timestamp": "2025-08-18T00:34:10.864Z",
+      "sanitized": true
+    },
+    "claude_1755480039306": {
+      "agent": "claude",
+      "title": "MCP Visibility Test",
+      "content": "Testing the enhanced dual memory system with visible widgets",
+      "type": "test",
+      "timestamp": "2025-08-18T01:20:39.306Z",
+      "sanitized": true
+    },
+    "gpt_1755564666215": {
+      "agent": "gpt",
+      "title": "GPT Agent Session Complete",
+      "content": "gpt agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gpt-session-1755564580773",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gpt-session-1755564580773",
+        "timestamp": "2025-08-19T00:51:06.215Z",
+        "agent_type": "gpt"
+      },
+      "timestamp": "2025-08-19T00:51:06.215Z",
+      "sanitized": true
+    },
+    "claude_1755564683296": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755564677928",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755564677928",
+        "timestamp": "2025-08-19T00:51:23.295Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-19T00:51:23.296Z",
+      "sanitized": true
+    },
+    "claude_1755564998625": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755564994570",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755564994570",
+        "timestamp": "2025-08-19T00:56:38.624Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-19T00:56:38.625Z",
+      "sanitized": true
+    },
+    "gpt_1755565108539": {
+      "agent": "gpt",
+      "title": "GPT Agent Session Complete",
+      "content": "gpt agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gpt-session-1755565108199",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gpt-session-1755565108199",
+        "timestamp": "2025-08-19T00:58:28.539Z",
+        "agent_type": "gpt"
+      },
+      "timestamp": "2025-08-19T00:58:28.539Z",
+      "sanitized": true
+    },
+    "gpt_1755565554942": {
+      "agent": "gpt",
+      "title": "GPT Agent Session Complete",
+      "content": "gpt agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gpt-session-1755565554522",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gpt-session-1755565554522",
+        "timestamp": "2025-08-19T01:05:54.941Z",
+        "agent_type": "gpt"
+      },
+      "timestamp": "2025-08-19T01:05:54.942Z",
+      "sanitized": true
+    },
+    "gpt_1755565664425": {
+      "agent": "gpt",
+      "title": "GPT Agent Session Complete",
+      "content": "gpt agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gpt-session-1755565664063",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gpt-session-1755565664063",
+        "timestamp": "2025-08-19T01:07:44.425Z",
+        "agent_type": "gpt"
+      },
+      "timestamp": "2025-08-19T01:07:44.425Z",
+      "sanitized": true
+    },
+    "claude_1755565674032": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755565673714",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755565673714",
+        "timestamp": "2025-08-19T01:07:54.032Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-19T01:07:54.032Z",
+      "sanitized": true
+    },
+    "claude_1755566127230": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755566126791",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755566126791",
+        "timestamp": "2025-08-19T01:15:27.229Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-19T01:15:27.230Z",
+      "sanitized": true
+    },
+    "claude_1755566183804": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755566183339",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755566183339",
+        "timestamp": "2025-08-19T01:16:23.803Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-19T01:16:23.804Z",
+      "sanitized": true
+    },
+    "claude_1755566288749": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755566288214",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755566288214",
+        "timestamp": "2025-08-19T01:18:08.748Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-19T01:18:08.749Z",
+      "sanitized": true
+    },
+    "claude_1755566640988": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755566640407",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755566640407",
+        "timestamp": "2025-08-19T01:24:00.986Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-19T01:24:00.988Z",
+      "sanitized": true
+    },
+    "gpt_1755567617680": {
+      "agent": "gpt",
+      "title": "GPT Agent Session Complete",
+      "content": "gpt agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gpt-session-1755567617084",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gpt-session-1755567617084",
+        "timestamp": "2025-08-19T01:40:17.680Z",
+        "agent_type": "gpt"
+      },
+      "timestamp": "2025-08-19T01:40:17.680Z",
+      "sanitized": true
+    },
+    "gpt_1755567662641": {
+      "agent": "gpt",
+      "title": "GPT Agent Session Complete",
+      "content": "gpt agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gpt-session-1755567662062",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gpt-session-1755567662062",
+        "timestamp": "2025-08-19T01:41:02.641Z",
+        "agent_type": "gpt"
+      },
+      "timestamp": "2025-08-19T01:41:02.641Z",
+      "sanitized": true
+    },
+    "claude_1755568853146": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755568852480",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755568852480",
+        "timestamp": "2025-08-19T02:00:53.146Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-19T02:00:53.146Z",
+      "sanitized": true
+    },
+    "gpt_1755573767113": {
+      "agent": "gpt",
+      "title": "GPT Agent Session Complete",
+      "content": "gpt agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gpt-session-1755573766372",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gpt-session-1755573766372",
+        "timestamp": "2025-08-19T03:22:47.113Z",
+        "agent_type": "gpt"
+      },
+      "timestamp": "2025-08-19T03:22:47.113Z",
+      "sanitized": true
+    },
+    "gpt_1755573994345": {
+      "agent": "gpt",
+      "title": "GPT Agent Session Complete",
+      "content": "gpt agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gpt-session-1755573993625",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gpt-session-1755573993625",
+        "timestamp": "2025-08-19T03:26:34.344Z",
+        "agent_type": "gpt"
+      },
+      "timestamp": "2025-08-19T03:26:34.345Z",
+      "sanitized": true
+    },
+    "gemini_1755585305591": {
+      "agent": "gemini",
+      "title": "GEMINI Agent Session Complete",
+      "content": "gemini agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gemini-session-1755585301953",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gemini-session-1755585301953",
+        "timestamp": "2025-08-19T06:35:05.590Z",
+        "agent_type": "gemini"
+      },
+      "timestamp": "2025-08-19T06:35:05.591Z",
+      "sanitized": true
+    },
+    "gemini_1755585445390": {
+      "agent": "gemini",
+      "title": "GEMINI Agent Session Complete",
+      "content": "gemini agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gemini-session-1755585441794",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gemini-session-1755585441794",
+        "timestamp": "2025-08-19T06:37:25.389Z",
+        "agent_type": "gemini"
+      },
+      "timestamp": "2025-08-19T06:37:25.390Z",
+      "sanitized": true
+    },
+    "claude_1755587269191": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755587265535",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755587265535",
+        "timestamp": "2025-08-19T07:07:49.191Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-19T07:07:49.191Z",
+      "sanitized": true
+    },
+    "claude_1755589677792": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755589674274",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755589674274",
+        "timestamp": "2025-08-19T07:47:57.792Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-19T07:47:57.792Z",
+      "sanitized": true
+    },
+    "claude_1755590170244": {
+      "agent": "claude",
+      "title": "CLAUDE Agent Session Complete",
+      "content": "claude agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: claude-session-1755590166610",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "claude-session-1755590166610",
+        "timestamp": "2025-08-19T07:56:10.243Z",
+        "agent_type": "claude"
+      },
+      "timestamp": "2025-08-19T07:56:10.244Z",
+      "sanitized": true
+    },
+    "gpt_1755641837832": {
+      "agent": "gpt",
+      "title": "GPT Agent Session Complete",
+      "content": "gpt agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gpt-session-1755641836284",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gpt-session-1755641836284",
+        "timestamp": "2025-08-19T22:17:17.831Z",
+        "agent_type": "gpt"
+      },
+      "timestamp": "2025-08-19T22:17:17.832Z",
+      "sanitized": true
+    },
+    "GPT_1755671504187": {
+      "agent": "GPT",
+      "title": "GPT Agent Session Complete",
+      "content": "GPT agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: GPT-session-1755671503655",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "GPT-session-1755671503655",
+        "timestamp": "2025-08-20T06:31:44.186Z",
+        "agent_type": "GPT"
+      },
+      "timestamp": "2025-08-20T06:31:44.187Z",
+      "sanitized": true
+    },
+    "gpt_1755707428044": {
+      "agent": "gpt",
+      "title": "GPT Agent Session Complete",
+      "content": "gpt agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gpt-session-1755707427497",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gpt-session-1755707427497",
+        "timestamp": "2025-08-20T16:30:28.043Z",
+        "agent_type": "gpt"
+      },
+      "timestamp": "2025-08-20T16:30:28.044Z",
+      "sanitized": true
+    },
+    "gpt_1755876045137": {
+      "agent": "gpt",
+      "title": "GPT Agent Session Complete",
+      "content": "gpt agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gpt-session-1755876044748",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gpt-session-1755876044748",
+        "timestamp": "2025-08-22T15:20:45.126Z",
+        "agent_type": "gpt"
+      },
+      "timestamp": "2025-08-22T15:20:45.137Z",
+      "sanitized": true
+    },
+    "gpt_1755877104517": {
+      "agent": "gpt",
+      "title": "GPT Agent Session Complete",
+      "content": "gpt agent initialized with dual memory protocol, JSON sanitization, MCP integration, and full system compliance. Session: gpt-session-1755877104093",
+      "type": "agent_initialization",
+      "features": {
+        "0": "dual_memory_write",
+        "1": "json_sanitization",
+        "2": "error_handling",
+        "3": "mcp_integration"
+      },
+      "session_info": {
+        "session_id": "gpt-session-1755877104093",
+        "timestamp": "2025-08-22T15:38:24.516Z",
+        "agent_type": "gpt"
+      },
+      "timestamp": "2025-08-22T15:38:24.517Z",
+      "sanitized": true
+    },
+    "claude_1755911302485": {
+      "agent": "claude",
+      "title": "Memory Test",
+      "content": "Testing the dual memory write system with multiple stores",
+      "type": "test",
+      "timestamp": "2025-08-23T01:08:22.485Z",
+      "sanitized": true
+    },
+    "test_1755911525314": {
+      "agent": "test",
+      "title": "Validation Test",
+      "content": "Post-startup validation entry",
+      "type": "test",
+      "timestamp": "2025-08-23T01:12:05.314Z",
+      "sanitized": true
+    }
+  },
+  "system_state": {
+    "health_check": {
+      "last_check": "2025-08-19T03:13:08.630Z",
+      "status": "healthy",
+      "issues": []
+    },
+    "sync_status": {
+      "last_mcp_sync": null,
+      "sync_failures": "unknown_due_to_server_not_running",
+      "auto_sync_enabled": true,
+      "mcp_server_status": "recently_started_needs_verification"
+    },
+    "critical_learnings": {
+      "session_date": "2025-08-17",
+      "key_discovery": "MCP server infrastructure must be verified before implementing memory protocols",
+      "agent_reminder": "ALWAYS check MCP server status in universal-agent-init.js startup"
+    }
+  },
+  "project_context": {
+    "stacktrackr": {
+      "type": "precious_metals_inventory",
+      "status": "active",
+      "last_interaction": null
+    },
+    "rengine": {
+      "type": "mcp_server_platform",
+      "status": "active",
+      "last_interaction": null
+    }
+  },
+  "agent_requirements": {
+    "mandatory_startup_protocols": {
+      "gpt_agents": {
+        "command": "node gpt-mandatory-startup.js",
+        "location": "/Volumes/DATA/GitHub/rEngine/rEngine",
+        "description": "MANDATORY for GPT agents - handles git backup, memory protocols, session logging, MCP integration",
+        "failure_consequence": "BROKEN HANDOFFS & LOST WORK"
+      },
+      "all_agents": {
+        "step_1": "Check COPILOT_INSTRUCTIONS.md",
+        "step_2": "Check AGENT.md",
+        "step_3": "Follow rAgents/unified-workflow.md",
+        "step_4": "Memory recall and status check"
+      }
+    },
+    "memory_system_paths": {
+      "tasks": "rMemory/rAgentMemories/tasks.json",
+      "agents": "rMemory/rAgentMemories/agents.json",
+      "decisions": "rMemory/rAgentMemories/decisions.json",
+      "functions": "rMemory/rAgentMemories/functions.json",
+      "errors": "rMemory/rAgentMemories/errors.json",
+      "memory": "rMemory/rAgentMemories/memory.json",
+      "preferences": "rMemory/rAgentMemories/preferences.json",
+      "styles": "rMemory/rAgentMemories/styles.json",
+      "patterns": "rMemory/rAgentMemories/patterns.json"
+    },
+    "protocol_enforcement": {
+      "before_work": [
+        "Git checkpoint: git add -A && git commit -m 'Checkpoint before [task]'",
+        "Protocol check: node rEngine/protocol-enforcer.js file_modification",
+        "Check tasks: Read rMemory/rAgentMemories/tasks.json",
+        "Memory check: Review agent memory and shared context"
+      ],
+      "during_work": [
+        "Follow rAgents/unified-workflow.md protocols",
+        "Update memory files with discoveries",
+        "Sync to MCP using agent memory system",
+        "Document changes in appropriate JSON files",
+        "Never write outside rEngine directory"
+      ],
+      "after_completion": [
+        "Final commit with complete description",
+        "Update documentation (decisions, functions, memory)",
+        "Update agent memory with lessons learned",
+        "Run protocol compliance check"
+      ]
+    },
+    "mcp_integration": {
+      "server_check": "ALWAYS verify Smart Scribe MCP server is running first",
+      "critical_learning": "MCP server not running causes silent failures in memory sync",
+      "startup_command": "./start-smart-scribe.sh",
+      "health_check": "ps aux | grep smart-scribe"
+    },
+    "scribe_console": {
+      "command": "node scribe-console.js",
+      "location": "/Volumes/DATA/GitHub/rEngine/rEngine",
+      "features": [
+        "Status bar",
+        "Pink verbose logs",
+        "Memory statistics",
+        "Auto-refresh"
+      ],
+      "purpose": "Real-time monitoring of system health and activity"
+    }
+  }
+}

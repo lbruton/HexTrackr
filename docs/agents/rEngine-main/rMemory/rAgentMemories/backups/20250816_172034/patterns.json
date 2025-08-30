@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-16",
+    "purpose": "Learning patterns to prevent recurring errors and improve efficiency",
+    "description": "Dynamic memory system for patterns management",
+    "mcp_fallback": "Complete patterns information available when MCP is unavailable",
+    "auto_generated": true,
+    "memory_type": "patterns"
+  },
+  "patterns_data": {
+    "entries": {},
+    "categories": [],
+    "patterns": [],
+    "relationships": {}
+  },
+  "learning_metrics": {
+    "total_entries": 0,
+    "last_updated": "2025-08-16T17:15:47.575415",
+    "effectiveness_score": 0.0,
+    "usage_frequency": 0
+  },
+  "integration_points": {
+    "related_memory_types": [],
+    "cross_references": {},
+    "auto_triggers": []
+  }
+}

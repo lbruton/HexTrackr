@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog Manager - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Catalog Manager</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 catalog-manager.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 9KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rProjects/StackTrackr/js/catalog-manager.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/catalog-manager.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="catalog-manager">Catalog Manager</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>CatalogManager</code> class is responsible for managing the mapping between item serials and catalog IDs, specifically for the Numista catalog. This is an enhanced implementation that replaces the basic <code>catalogMap</code> object with a robust class that provides better data integrity, validation, and future extensibility.</p>
+<p>The key features of the <code>CatalogManager</code> include:</p>
+<ul>
+<li>Data validation and integrity checking</li>
+<li>Synchronization between <code>item.numistaId</code> and mapping data</li>
+<li>Storage optimization to reduce the localStorage footprint</li>
+<li>Provider-agnostic architecture for future catalog support</li>
+<li>Full backward compatibility with existing data</li>
+</ul>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>CatalogManager</code> class has the following key components:</p>
+<ol>
+<li><strong>Configuration</strong>: The constructor takes an options object that allows setting the storage key, a save callback, and debug mode.</li>
+<li><strong>Data Storage</strong>: The mapping data is stored in the <code>_mappings</code> object, which is loaded from and saved to localStorage.</li>
+<li><strong>Provider Management</strong>: The <code>_providers</code> object allows for future support of multiple catalog providers, with the current implementation focused on Numista.</li>
+<li><strong>Mapping Management</strong>: The class provides methods for managing the mapping data, including setting, getting, and synchronizing catalog IDs with inventory items.</li>
+<li><strong>Utility Methods</strong>: The class includes utility methods for removing orphaned mappings, deduplicating mappings, and getting storage statistics.</li>
+</ol>
+<p>The data flow in the <code>CatalogManager</code> is as follows:</p>
+<ol>
+<li>On initialization, the <code>_load()</code> method retrieves the mapping data from localStorage and initializes the <code>_mappings</code> object.</li>
+<li>When a catalog ID is set or updated, the <code>setCatalogId()</code> method is called, which validates the input and updates the <code>_mappings</code> object.</li>
+<li>The <code>_save()</code> method is called after any changes to the <code>_mappings</code> object, which persists the data to localStorage.</li>
+<li>The <code>syncItem()</code> and <code>syncInventory()</code> methods ensure that the <code>_mappings</code> object is synchronized with the <code>item.numistaId</code> values in the inventory.</li>
+<li>The <code>removeOrphanedMappings()</code> and <code>cleanupOrphans()</code> methods remove mappings that no longer correspond to inventory items.</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>CatalogManager</code> class has the following external dependencies:</p>
+<ol>
+<li><code>loadDataSync()</code> and <code>saveData()</code> functions for loading and saving data to/from localStorage.</li>
+<li>The <code>window.inventory</code> array, which contains the current inventory items.</li>
+<li>The <code>updateStorageStats()</code> function, which is called as a save callback to update storage statistics.</li>
+</ol>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="catalogmanager-class"><code>CatalogManager</code> Class</h3>
+<p>The <code>CatalogManager</code> class provides the following key functions:</p>
+<h4 id="constructor">Constructor</h4>
+<pre><code class="language-javascript"><pre><code class="language-javascript">constructor(options = {})</code></pre>
+</code></pre>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>options</code> (Object): Configuration options, including <code>storageKey</code>, <code>saveCallback</code>, and <code>debug</code>.</li>
+</ul>
+</li>
+<li><strong>Returns</strong>: A new instance of the <code>CatalogManager</code> class.</li>
+</ul>
+<h4 id="removeorphanedmappingscurrentinventory--null"><code>removeOrphanedMappings(currentInventory = null)</code></h4>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>currentInventory</code> (Array): An array of current inventory items. If not provided, it will use the global <code>window.inventory</code>.</li>
+</ul>
+</li>
+<li><strong>Returns</strong>: The number of mappings removed.</li>
+</ul>
+<h4 id="deduplicatemappings"><code>deduplicateMappings()</code></h4>
+<ul>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Returns</strong>: The number of entries simplified (kept first occurrence).</li>
+</ul>
+<h4 id="getstoragestats"><code>getStorageStats()</code></h4>
+<ul>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Returns</strong>: An object with storage statistics, including the storage key, size in bytes and kilobytes, and the number of entries.</li>
+</ul>
+<h4 id="validatecatalogidcatalogid-provider--numista"><code>validateCatalogId(catalogId, provider = &#39;numista&#39;)</code></h4>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>catalogId</code> (string): The catalog ID to validate.</li>
+<li><code>provider</code> (string): The provider key (default is &#39;numista&#39;).</li>
+</ul>
+</li>
+<li><strong>Returns</strong>: <code>true</code> if the catalog ID is valid, <code>false</code> otherwise.</li>
+</ul>
+<h4 id="getcatalogidserial-provider--numista"><code>getCatalogId(serial, provider = &#39;numista&#39;)</code></h4>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>serial</code> (number|string): The item serial number.</li>
+<li><code>provider</code> (string): The provider key (default is &#39;numista&#39;).</li>
+</ul>
+</li>
+<li><strong>Returns</strong>: The catalog ID associated with the given serial, or <code>null</code> if not found.</li>
+</ul>
+<h4 id="setcatalogidserial-catalogid-provider--numista"><code>setCatalogId(serial, catalogId, provider = &#39;numista&#39;)</code></h4>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>serial</code> (number|string): The item serial number.</li>
+<li><code>catalogId</code> (string): The catalog ID to set.</li>
+<li><code>provider</code> (string): The provider key (default is &#39;numista&#39;).</li>
+</ul>
+</li>
+<li><strong>Returns</strong>: <code>true</code> if the operation was successful, <code>false</code> otherwise.</li>
+</ul>
+<h4 id="getserialsbycatalogidcatalogid-provider--numista"><code>getSerialsByCatalogId(catalogId, provider = &#39;numista&#39;)</code></h4>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>catalogId</code> (string): The catalog ID to look up.</li>
+<li><code>provider</code> (string): The provider key (default is &#39;numista&#39;).</li>
+</ul>
+</li>
+<li><strong>Returns</strong>: An array of serials associated with the given catalog ID.</li>
+</ul>
+<h4 id="syncitemitem"><code>syncItem(item)</code></h4>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>item</code> (Object): The inventory item to synchronize.</li>
+</ul>
+</li>
+<li><strong>Returns</strong>: The updated inventory item.</li>
+</ul>
+<h4 id="syncinventoryitems"><code>syncInventory(items)</code></h4>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>items</code> (Array): An array of inventory items to synchronize.</li>
+</ul>
+</li>
+<li><strong>Returns</strong>: The updated array of inventory items.</li>
+</ul>
+<h4 id="cleanuporphansinventory"><code>cleanupOrphans(inventory)</code></h4>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>inventory</code> (Array): The current inventory items.</li>
+</ul>
+</li>
+<li><strong>Returns</strong>: The number of orphaned mappings removed.</li>
+</ul>
+<h4 id="exportmappings"><code>exportMappings()</code></h4>
+<ul>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Returns</strong>: An object containing the serialized export of all mappings.</li>
+</ul>
+<h4 id="importmappingsmappings-merge--false"><code>importMappings(mappings, merge = false)</code></h4>
+<ul>
+<li><strong>Parameters</strong>:<ul>
+<li><code>mappings</code> (Object): The mappings data to import.</li>
+<li><code>merge</code> (boolean): If <code>true</code>, merge the new mappings with the existing ones, otherwise replace them.</li>
+</ul>
+</li>
+<li><strong>Returns</strong>: The number of mappings imported.</li>
+</ul>
+<h4 id="getstats"><code>getStats()</code></h4>
+<ul>
+<li><strong>Parameters</strong>: None.</li>
+<li><strong>Returns</strong>: An object with summary statistics about the mappings, including the total number of mappings, the counts by provider, and the storage size.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>Here are some examples of how to use the <code>CatalogManager</code> class:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">// Initialize the CatalogManager
+const catalogManager = new CatalogManager({
+  storageKey: CATALOG_MAP_KEY,
+  debug: DEBUG,
+  saveCallback: () => {
+    updateStorageStats();
+  }
+});
+
+// Set a catalog ID for an item
+catalogManager.setCatalogId(12345, 'n123456');
+
+// Get the catalog ID for an item
+const catalogId = catalogManager.getCatalogId(12345);
+
+// Sync an inventory item with the catalog mapping
+const updatedItem = catalogManager.syncItem(inventoryItem);
+
+// Sync the entire inventory with the catalog mappings
+const updatedInventory = catalogManager.syncInventory(inventory);
+
+// Clean up orphaned mappings
+const orphansRemoved = catalogManager.cleanupOrphans(inventory);
+
+// Get storage statistics
+const stats = catalogManager.getStorageStats();</code></pre>
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>CatalogManager</code> class can be configured using the following options:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>storageKey</code></td>
+<td><code>string</code></td>
+<td>The localStorage key used to store the catalog mappings. Default is <code>CATALOG_MAP_KEY</code>.</td>
+</tr>
+<tr>
+<td><code>saveCallback</code></td>
+<td><code>Function</code></td>
+<td>An optional callback function that is called whenever the mapping data is saved to localStorage.</td>
+</tr>
+<tr>
+<td><code>debug</code></td>
+<td><code>boolean</code></td>
+<td>Enables debug logging if set to <code>true</code>. Default is <code>DEBUG</code>.</td>
+</tr>
+</tbody></table>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>CatalogManager</code> class handles errors that may occur during the following operations:</p>
+<ul>
+<li>Loading data from localStorage (<code>_load()</code>)</li>
+<li>Saving data to localStorage (<code>_save()</code>)</li>
+<li>Removing orphaned mappings (<code>removeOrphanedMappings()</code>)</li>
+<li>Deduplicating mappings (<code>deduplicateMappings()</code>)</li>
+<li>Getting storage statistics (<code>getStorageStats()</code>)</li>
+</ul>
+<p>In case of an error, the class logs a warning message to the console and falls back to a default state (e.g., an empty <code>_mappings</code> object).</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>CatalogManager</code> class is designed to be a self-contained module that can be easily integrated into a larger system. It provides a clean, structured API for managing catalog mappings, which can be used throughout the application as needed.</p>
+<p>The class is initialized with a global instance (<code>window.catalogManager</code>) that can be accessed and used by other parts of the application. The <code>syncItem()</code> and <code>syncInventory()</code> methods are particularly useful for ensuring that the catalog mappings are kept in sync with the inventory data.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ul>
+<li>The <code>CatalogManager</code> class is designed to be provider-agnostic, allowing for future support of multiple catalog providers. The current implementation is focused on the Numista provider, but the architecture allows for easy expansion to other providers.</li>
+<li>The class maintains backward compatibility with the legacy <code>catalogMap</code> data format, ensuring a smooth transition for existing applications.</li>
+<li>The storage optimization techniques, such as deduplicating mappings and removing orphaned entries, help to reduce the localStorage footprint and improve performance.</li>
+<li>The class includes comprehensive error handling and logging to aid in debugging and troubleshooting.</li>
+<li>The documentation focuses on providing clear, practical information to help developers understand and use the <code>CatalogManager</code> class effectively.</li>
+</ul>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>catalog-manager.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

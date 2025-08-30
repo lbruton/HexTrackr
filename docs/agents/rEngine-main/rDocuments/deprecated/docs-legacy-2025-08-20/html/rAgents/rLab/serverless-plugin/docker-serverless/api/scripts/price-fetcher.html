@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Fetcher Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Price Fetcher Documentation</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 price-fetcher.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 7KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rAgents/rLab/serverless-plugin/docker-serverless/api/scripts/price-fetcher.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/price-fetcher.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="price-fetcher-documentation">Price Fetcher Documentation</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>price-fetcher.js</code> script is a key component of the StackTrackr system, responsible for fetching and storing up-to-date prices for various precious metals (gold, silver, platinum, palladium) across multiple currencies (USD, EUR, GBP). This data is essential for the StackTrackr application to provide accurate and timely price information to its users.</p>
+<p>The script uses a <code>PriceFetcher</code> class to manage the price data retrieval and storage process. It periodically (configurable interval) fetches the latest prices from one or more provider modules, stores the data in a PostgreSQL database, and clears the relevant cache keys in Redis. This ensures that the application&#39;s price data is always fresh and reliable.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>price-fetcher.js</code> script is structured as follows:</p>
+<ol>
+<li><strong>Logging Setup</strong>: The script configures a Winston logger to handle informational, warning, and error logs.</li>
+<li><strong>Connection Initialization</strong>: The script initializes connections to Redis and PostgreSQL using the provided environment variables.</li>
+<li><strong>Provider Modules</strong>: The script imports one or more provider modules (e.g., <code>metalsDevProvider</code>) that are responsible for fetching the actual price data from external sources.</li>
+<li><strong>PriceFetcher Class</strong>: The main logic is encapsulated in the <code>PriceFetcher</code> class, which has the following key components:<ul>
+<li><code>fetchAndStore()</code>: Fetches the latest prices from all configured providers and stores the data in the PostgreSQL database.</li>
+<li><code>storePriceData()</code>: Inserts or updates the price data in the <code>price_snapshots</code> table.</li>
+<li><code>clearCache()</code>: Clears the relevant cache keys in Redis to ensure the application uses the latest data.</li>
+<li><code>start()</code>: Initializes the connections, performs the initial price fetch, and schedules regular fetch cycles.</li>
+<li><code>stop()</code>: Gracefully shuts down the price fetcher by closing the database and Redis connections.</li>
+</ul>
+</li>
+<li><strong>Graceful Shutdown</strong>: The script sets up event listeners for <code>SIGTERM</code> and <code>SIGINT</code> signals to ensure a graceful shutdown of the price fetcher.</li>
+<li><strong>Startup</strong>: The script checks if it&#39;s the main module and starts the price fetcher if so.</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>price-fetcher.js</code> script has the following dependencies:</p>
+<ul>
+<li><code>redis</code>: For connecting to and interacting with the Redis cache.</li>
+<li><code>pg</code>: For connecting to and querying the PostgreSQL database.</li>
+<li><code>winston</code>: For logging informational, warning, and error messages.</li>
+<li><code>dotenv</code>: For loading environment variables from a <code>.env</code> file.</li>
+<li><code>../providers/metals-dev</code>: A provider module that fetches the actual price data.</li>
+</ul>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="pricefetcher-class"><code>PriceFetcher</code> Class</h3>
+<p>The <code>PriceFetcher</code> class is the main component of the script and has the following key methods:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Return Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>constructor()</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>Initializes the <code>PriceFetcher</code> instance with the list of supported metals, currencies, and provider modules.</td>
+</tr>
+<tr>
+<td><code>fetchAndStore()</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>Fetches the latest prices from all configured providers and stores the data in the PostgreSQL database. Also clears the relevant cache keys in Redis.</td>
+</tr>
+<tr>
+<td><code>storePriceData(data)</code></td>
+<td><code>data</code> (object): Price data to be stored</td>
+<td>N/A</td>
+<td>Inserts or updates the price data in the <code>price_snapshots</code> table.</td>
+</tr>
+<tr>
+<td><code>clearCache()</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>Clears the relevant cache keys in Redis.</td>
+</tr>
+<tr>
+<td><code>start()</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>Initializes the connections to Redis and PostgreSQL, performs the initial price fetch, and schedules regular fetch cycles.</td>
+</tr>
+<tr>
+<td><code>stop()</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>Gracefully shuts down the price fetcher by closing the database and Redis connections.</td>
+</tr>
+</tbody></table>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To use the <code>price-fetcher.js</code> script, you can follow these steps:</p>
+<ol>
+<li>Ensure that you have a Redis server and a PostgreSQL database set up and configured.</li>
+<li>Create a <code>.env</code> file in the project root directory and add the necessary environment variables:<pre><code><pre><code class="language-">REDIS_URL=redis://localhost:6379
+POSTGRES_URL=postgresql://stacktrackr:dev_password_change_in_prod@localhost:5432/stacktrackr_prices
+FETCH_INTERVAL=300000 # 5 minutes</code></pre>
+</code></pre>
+</li>
+<li>Run the script using Node.js:<pre><code><pre><code class="language-">node price-fetcher.js</code></pre>
+</code></pre>
+This will start the price fetcher, which will periodically (every 5 minutes by default) fetch the latest prices and store them in the PostgreSQL database.</li>
+</ol>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>price-fetcher.js</code> script can be configured using the following environment variables:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>REDIS_URL</code></td>
+<td><code>redis://localhost:6379</code></td>
+<td>The URL to connect to the Redis server.</td>
+</tr>
+<tr>
+<td><code>POSTGRES_URL</code></td>
+<td><code>postgresql://stacktrackr:dev_password_change_in_prod@localhost:5432/stacktrackr_prices</code></td>
+<td>The URL to connect to the PostgreSQL database.</td>
+</tr>
+<tr>
+<td><code>FETCH_INTERVAL</code></td>
+<td><code>300000</code> (5 minutes)</td>
+<td>The interval (in milliseconds) at which the price fetcher should run.</td>
+</tr>
+</tbody></table>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>price-fetcher.js</code> script uses the <code>winston</code> logger to handle errors and log them appropriately. When an error occurs during the price fetch or storage process, the script will log the error message and stack trace to the console.</p>
+<p>Additionally, the <code>PriceFetcher</code> class has error handling built into the <code>fetchAndStore()</code> method. If an error occurs while fetching prices from a provider or storing the data in the database, the method will log the error and continue with the next provider or currency. This ensures that a failure in one part of the process doesn&#39;t prevent the entire price fetch cycle from completing.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>price-fetcher.js</code> script is a key component of the StackTrackr system, responsible for providing the latest precious metal prices to the application. The data stored in the PostgreSQL database by this script is then used by other parts of the StackTrackr application, such as the frontend, to display current and historical price information to users.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ul>
+<li>The script uses the <code>dotenv</code> library to load environment variables from a <code>.env</code> file. This allows for easy configuration of the Redis and PostgreSQL connection details, as well as the price fetch interval.</li>
+<li>The <code>PriceFetcher</code> class is designed to be extensible, allowing for the addition of new provider modules in the future. This ensures that the script can be easily updated to fetch data from additional sources as needed.</li>
+<li>The script uses a combination of Redis and PostgreSQL to store and manage the price data. Redis is used for caching, while PostgreSQL is used as the primary data store. This approach helps to improve the overall performance and reliability of the StackTrackr application.</li>
+<li>The script includes graceful shutdown functionality, allowing it to be easily stopped and restarted without losing data or causing issues in the larger system.</li>
+</ul>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>price-fetcher.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

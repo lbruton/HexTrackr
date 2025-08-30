@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VulnTrackr Deployment Documentation - rEngine Core Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #6366f1;
+            --rengine-secondary: #8b5cf6;
+            --rengine-accent: #06b6d4;
+            --rengine-text: #1f2937;
+            --rengine-text-light: #6b7280;
+            --rengine-bg: #ffffff;
+            --rengine-bg-alt: #f8fafc;
+            --rengine-border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--rengine-text);
+            background: var(--rengine-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--rengine-primary), var(--rengine-secondary));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: "⚙️";
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--rengine-primary);
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--rengine-primary);
+            border-bottom: 2px solid var(--rengine-border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--rengine-secondary);
+        }
+
+        h4, h5, h6 {
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--rengine-text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--rengine-text);
+        }
+
+        .content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        code {
+            background: var(--rengine-bg-alt);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--rengine-primary);
+        }
+
+        pre {
+            background: var(--rengine-bg-alt);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--rengine-primary);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--rengine-text);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--rengine-accent);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: var(--rengine-text-light);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--rengine-border);
+        }
+
+        th {
+            background: var(--rengine-bg-alt);
+            font-weight: 600;
+            color: var(--rengine-primary);
+        }
+
+        .metadata {
+            background: var(--rengine-bg-alt);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--rengine-border);
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: var(--rengine-text-light);
+        }
+
+        footer {
+            background: var(--rengine-bg-alt);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--rengine-text-light);
+            border-top: 1px solid var(--rengine-border);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--rengine-primary);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">rEngine Core</div>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../README.html">Documentation</a>
+                    <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <h1>VulnTrackr Deployment Documentation</h1>
+            
+            
+            <div class="metadata">
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Source File:</span>
+                        <span>DEPLOYMENT.md</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Generated:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Last Modified:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Converter:</span>
+                        <span>rEngine MCP HTML Converter</span>
+                    </div>
+                
+            </div>
+            
+            
+            [36m🤖 Calling Google Gemini (gemini-1.5-flash)...[0m
+[32m✅ Response received in 8868ms[0m
+
+[1m🤖 Google Gemini Response:[0m
+
+```html
+<article>
+  <h1>VulnTrackr Deployment Guide</h1>
+
+  <section class="deployment-scenarios">
+    <h2>Deployment Scenarios</h2>
+    <p>This document covers the following key deployment scenarios and configurations:</p>
+    <ul>
+      <li>Local Development</li>
+      <li>Docker Containerization</li>
+      <li>Kubernetes Deployment</li>
+      <li>Post-Deployment Configuration and Monitoring</li>
+    </ul>
+  </section>
+
+  <section class="local-development">
+    <h2>Local Development</h2>
+    <pre><code class="bash">
+# Clone the repository
+git clone https://github.com/lbruton/StackTrackr.git
+cd StackTrackr/rProjects/VulnTrackr
+
+# Start local server (option 1: Python)
+python3 -m http.server 8080
+
+# Start local server (option 2: Node.js)
+npx serve -s . -l 8080
+
+# Open browser
+open http://localhost:8080
+    </code></pre>
+  </section>
+
+  <section class="docker-containerization">
+    <h2>Docker Containerization</h2>
+    <pre><code class="bash">
+# Build container
+docker build -t vulntrackr:1.0.0 .
+
+# Run container
+docker run -d --name vulntrackr -p 8080:80 -v /Volumes/DATA/GitHub/StackTrackr/data:/usr/share/nginx/html/data vulntrackr:1.0.0
+
+# Access application
+open http://localhost:8080
+    </code></pre>
+  </section>
+
+  <section class="kubernetes-deployment">
+    <h2>Kubernetes Deployment</h2>
+    <pre><code class="bash">
+# Deploy to Kubernetes
+kubectl apply -f kubernetes/
+
+# Check deployment status
+kubectl get pods -n vulntrackr
+kubectl get svc -n vulntrackr
+kubectl get ingress -n vulntrackr
+    </code></pre>
+  </section>
+
+  <section class="configuration">
+    <h2>Configuration</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>VULNTRACKR_VERSION</code></td>
+          <td><code>1.0.0</code></td>
+        </tr>
+        <tr>
+          <td><code>VULNTRACKR_ENVIRONMENT</code></td>
+          <td><code>production</code></td>
+        </tr>
+        <tr>
+          <td><code>DATA_RETENTION_DAYS</code></td>
+          <td><code>1825</code></td>
+        </tr>
+        <tr>
+          <td><code>MAX_FILE_SIZE_MB</code></td>
+          <td><code>50</code></td>
+        </tr>
+        <tr>
+          <td><code>MAX_RECORDS_PER_IMPORT</code></td>
+          <td><code>100000</code></td>
+        </tr>
+        <tr>
+          <td><code>ENABLE_HTTPS</code></td>
+          <td><code>true</code></td>
+        </tr>
+        <tr>
+          <td><code>SSL_CERT_PATH</code></td>
+          <td><code>/etc/nginx/ssl/cert.pem</code></td>
+        </tr>
+        <tr>
+          <td><code>SSL_KEY_PATH</code></td>
+          <td><code>/etc/nginx/ssl/key.pem</code></td>
+        </tr>
+        <tr>
+          <td><code>API_RATE_LIMIT</code></td>
+          <td><code>1000</code></td>
+        </tr>
+        <tr>
+          <td><code>API_TIMEOUT_SECONDS</code></td>
+          <td><code>30</code></td>
+        </tr>
+        <tr>
+          <td><code>ENABLE_API_LOGGING</code></td>
+          <td><code>true</code></td>
+        </tr>
+        <tr>
+          <td><code>NGINX_WORKER_PROCESSES</code></td>
+          <td><code>auto</code></td>
+        </tr>
+        <tr>
+          <td><code>NGINX_WORKER_CONNECTIONS</code></td>
+          <td><code>1024</code></td>
+        </tr>
+        <tr>
+          <td><code>CLIENT_MAX_BODY_SIZE</code></td>
+          <td><code>50m</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="post-deployment">
+    <h2>Post-Deployment Monitoring and Troubleshooting</h2>
+    <pre><code class="bash">
+# Check container logs
+docker logs vulntrackr
+
+# Common fixes
+docker restart vulntrackr
+docker system prune -f
+
+# Check file permissions
+ls -la /opt/vulntrackr/data
+chmod -R 755 /opt/vulntrackr/data
+
+# Monitor memory usage
+docker stats vulntrackr
+
+# Adjust container limits
+docker update --memory=1g vulntrackr
+
+# Kubernetes resource limits
+kubectl patch deployment vulntrackr -n vulntrackr -p '{"spec":{"template":{"spec":{"containers":[{"name":"vulntrackr","resources":{"limits":{"memory":"1Gi"}}}]}}}}'
+    </code></pre>
+  </section>
+
+  <section class="ssl-management">
+    <h2>SSL Certificate Management</h2>
+    <pre><code class="bash">
+# Check certificate validity
+openssl x509 -in /etc/nginx/ssl/cert.pem -text -noout
+
+# Renew Let's Encrypt certificate
+certbot renew --nginx
+
+# Test SSL configuration
+openssl s_client -connect vulntrackr.company.com:443
+    </code></pre>
+  </section>
+
+  <section class="nginx-optimization">
+    <h2>Nginx Optimization</h2>
+    <pre><code class="nginx">
+# Optimize Nginx configuration
+worker_processes auto;
+worker_connections 2048;
+keepalive_timeout 30;
+client_body_timeout 30;
+client_header_timeout 30;
+
+# Enable caching
+location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+}
+
+# Monitor performance
+docker exec vulntrackr nginx -T
+curl -w "%{time_total}" http://localhost:8080/
+    </code></pre>
+  </section>
+</article>
+```
+
+
+[36mℹ️  Duration: 8868ms | Model: gemini-1.5-flash[0m
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../README.html">Documentation</a>
+                <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+            </div>
+            <p>Generated on 2025-08-20 by rEngine Core HTML Converter</p>
+            <p>© 2025 rEngine Core - Intelligent Development Wrapper</p>
+        </div>
+    </footer>
+</body>
+</html>

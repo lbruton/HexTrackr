@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management Script (inventory.js) - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Inventory Management Script (inventory.js)</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 inventory.md</span>
+                <span>📅 2025-08-18</span>
+                <span>📊 5KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../generated/js/inventory.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/inventory.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="inventory-management-script-inventoryjs">Inventory Management Script (inventory.js)</h1>
+<p>This script manages the inventory of precious metals, providing functionality for data storage, retrieval, manipulation, export (CSV, JSON, PDF, HTML), backup/restore, and integration with external catalogs (e.g., Numista). It interacts with the user interface via DOM manipulation and utilizes local storage for persistent data storage.  It also includes data migration capabilities to ensure compatibility with older versions of the data format.</p>
+<h2 id="how-to-use">How to Use</h2>
+<p>This script is designed to be used within a web browser environment. It doesn&#39;t run from the command line. It is linked to HTML elements and event handlers within a web page. The provided functions are then called in response to user interactions or other events on the page.</p>
+<p><strong>Example usage within an HTML file:</strong></p>
+<pre><code class="language-html"><pre><code class="language-html"><button id="backupAllBtn" onclick="createBackupZip()">Backup All Data</button>
+<input type="file" id="restoreInput" onchange="restoreBackupZip(this.files[0])">
+
+<script src="inventory.js"></script> </code></pre>
+</code></pre>
+<h2 id="core-logic-breakdown">Core Logic Breakdown</h2>
+<p>The script provides the following core functionalities:</p>
+<ul>
+<li><strong>Backup and Restore:</strong> <code>createBackupZip()</code> creates a comprehensive backup of the inventory data, settings, and spot price history in a ZIP archive.  <code>restoreBackupZip()</code> restores data from such a ZIP file.</li>
+<li><strong>Exporting Data:</strong>  <code>exportCsv()</code>, <code>exportJson()</code>, and <code>exportPdf()</code> export the inventory data in CSV, JSON, and PDF formats respectively.  <code>generateBackupHtml()</code> creates an HTML report included in backups.</li>
+<li><strong>Data Management:</strong> <code>loadInventory()</code> loads inventory data from local storage, handling data migration from older versions.  <code>saveInventory()</code> saves the current inventory to local storage. <code>sanitizeTablesOnLoad()</code> sanitizes loaded data. <code>getNextSerial()</code> manages unique serial numbers for inventory items.</li>
+<li><strong>Table Rendering and Interaction:</strong> <code>renderTable()</code> renders the inventory table in the UI, incorporating sorting, filtering, and pagination. <code>startCellEdit()</code> enables inline editing of table cells. <code>toggleCollectable()</code> toggles the collectable status of an item. <code>deleteItem()</code> deletes an item after confirmation. <code>showNotes()</code> displays and allows editing of item notes.  <code>formatPurchaseLocation()</code> and <code>formatStorageLocation()</code> format the respective fields for display, including URL handling and truncation.</li>
+<li><strong>Utility Functions:</strong> <code>validateFieldValue()</code> validates input during inline editing. <code>recalcItem()</code> recalculates premium and market value. <code>persistInventoryAndRefresh()</code> saves inventory and refreshes the table display. <code>updateItemCount()</code> updates the item count display.  <code>hideEmptyColumns()</code> manages column visibility based on data presence (currently placeholder functionality). <code>editItem()</code> prepares and displays the edit modal for a specific item. <code>updateTypeSummary()</code> manages the type summary display (currently placeholder functionality). <code>updateSummary()</code> triggers summary calculations (delegated to other systems). <code>monitorPerformance()</code> measures and logs performance metrics. <code>escapeAttribute()</code> escapes special characters in HTML attributes. <code>filterLink()</code> creates clickable filter links in the table.</li>
+</ul>
+<h2 id="configuration--dependencies">Configuration &amp; Dependencies</h2>
+<p>The script relies on the following dependencies and configurations:</p>
+<ul>
+<li><strong>JSZip:</strong> Used for creating and reading ZIP archives.</li>
+<li><strong>Papa Parse:</strong>  Used for CSV parsing and generation.</li>
+<li><strong>Local Storage:</strong> Used for persistent storage of inventory data, settings, and spot prices.</li>
+<li><strong>External Constants/Variables:</strong> The script relies on several external constants and variables assumed to be defined elsewhere, including: <code>APP_VERSION</code>, <code>LS_KEY</code>, <code>THEME_KEY</code>, <code>METALS</code>, <code>spotPrices</code>, <code>spotHistory</code>, <code>itemsPerPage</code>, <code>currentPage</code>, <code>searchQuery</code>, <code>sortColumn</code>, <code>sortDirection</code>, <code>inventory</code>, and a <code>catalogManager</code> instance.  Also uses several utility functions such as <code>formatCurrency</code>, <code>sortInventoryByDateNewestFirst</code>, <code>sortInventory</code>, <code>calculateTotalPages</code>, <code>renderPagination</code>, <code>getCompositionFirstWords</code>, <code>getDisplayComposition</code>, <code>formatDisplayDate</code>, <code>formatWeight</code>, <code>oztToGrams</code>, <code>gramsToOzt</code>, <code>getContrastColor</code>, <code>sanitizeHtml</code>, <code>sanitizeImportedItem</code>, <code>normalizeType</code>, <code>logChange</code>, <code>openModalById</code>, and DOM elements cached in an <code>elements</code> object.</li>
+</ul>
+<h2 id="machine-readable-summary">Machine-Readable Summary</h2>
+<pre><code class="language-json"><pre><code class="language-json">{
+  "scriptName": "inventory.js",
+  "purpose": "Manages and maintains an inventory of precious metals within a web application, providing features for data entry, editing, export, backup/restore, and integration with external resources.",
+  "inputs": {
+    "arguments": "None (browser-based script)",
+    "dependencies": [
+      "JSZip",
+      "Papa Parse",
+      "Local Storage"
+    ],
+    "configuration": [
+      "APP_VERSION",
+      "LS_KEY",
+      "THEME_KEY",
+      "METALS",
+      "SPOT_HISTORY_KEY",
+      "SERIAL_KEY",
+      "spotPrices",
+      "spotHistory",
+      "itemsPerPage",
+      "currentPage",
+      "searchQuery",
+      "sortColumn",
+      "sortDirection",
+      "inventory",
+      "catalogManager",
+      "various utility functions and DOM elements"
+    ]
+  },
+  "outputs": {
+    "files": [
+      "precious_metals_backup_[date].zip",
+      "precious_metals_inventory_[date].csv",
+      "precious_metals_inventory_[date].json"
+    ],
+    "uiUpdates": [
+      "Inventory table updates",
+      "Summary card updates",
+      "Modal displays",
+      "Alert messages"
+    ],
+    "localStorageUpdates": [
+      "Inventory data",
+      "Settings",
+      "Spot prices",
+      "Spot price history"
+    ]
+  }
+}</code></pre>
+</code></pre>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>inventory.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-18</p>
+        </footer>
+    </div>
+</body>
+</html>

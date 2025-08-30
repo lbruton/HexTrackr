@@ -1,0 +1,142 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-16",
+    "purpose": "Git integration and version control awareness for multi-agent collaboration",
+    "description": "Natural Git workflow integration that makes agents branch-aware and collaborative",
+    "auto_sync_with_git": true,
+    "branch_awareness": true,
+    "last_updated": "2025-08-16T18:30:00Z"
+  },
+  "git_integration": {
+    "current_context": {
+      "repository": "StackTrackr",
+      "owner": "lbruton",
+      "current_branch": "main",
+      "default_branch": "main",
+      "branch_status": "up_to_date",
+      "uncommitted_changes": true,
+      "last_commit": "2025-08-16T17:00:00Z",
+      "working_directory_clean": false,
+      "files_modified_since_last_commit": [
+        "agents/dependencies.json",
+        "agents/interactions.json", 
+        "agents/functions_expanded.json",
+        "agents/structure_complete.json",
+        "agents/tasks/comprehensive-audit-task.md"
+      ]
+    },
+    "agent_workflow_integration": {
+      "pre_task_git_checks": {
+        "verify_branch_status": "ensure_on_correct_branch_for_task",
+        "check_for_conflicts": "prevent_merge_conflicts_before_starting",
+        "sync_with_remote": "pull_latest_changes_if_collaborative",
+        "create_feature_branch": "for_major_changes_or_experiments"
+      },
+      "during_task_git_awareness": {
+        "file_modification_tracking": "track_which_files_agent_is_changing",
+        "incremental_commits": "commit_logical_chunks_with_descriptive_messages",
+        "conflict_detection": "alert_if_files_modified_by_multiple_agents",
+        "backup_commits": "create_safety_commits_before_risky_operations"
+      },
+      "post_task_git_integration": {
+        "automatic_commit_generation": {
+          "commit_message_format": "[Agent: {agent_name}] {task_summary} - {files_modified}",
+          "include_performance_notes": true,
+          "reference_task_ids": true,
+          "tag_breaking_changes": true
+        },
+        "pull_request_preparation": {
+          "suggest_pr_title": "based_on_agent_work_summary",
+          "generate_pr_description": "include_task_context_and_testing_notes",
+          "tag_reviewers": "based_on_files_modified_and_expertise",
+          "include_rollback_notes": "if_complex_changes_made"
+        }
+      }
+    },
+    "natural_collaboration_features": {
+      "branch_recommendations": {
+        "feature_branches": {
+          "when_to_create": "for_tasks_lasting_longer_than_30_minutes",
+          "naming_convention": "agent/{agent_name}/{task_type}/{date}",
+          "auto_cleanup": "delete_after_successful_merge",
+          "collaborative_branches": "when_multiple_agents_work_together"
+        },
+        "experimental_branches": {
+          "when_to_create": "for_performance_optimizations_or_architectural_changes",
+          "safety_measures": "always_include_rollback_instructions",
+          "testing_requirements": "comprehensive_testing_before_merge",
+          "review_process": "human_review_required_for_experimental_work"
+        }
+      },
+      "conflict_prevention": {
+        "file_locking_awareness": "check_live_coordination_before_modifying_files",
+        "merge_conflict_prediction": "analyze_file_changes_for_potential_conflicts",
+        "collaborative_editing": "suggest_file_splitting_for_simultaneous_work",
+        "communication_triggers": "auto_notify_when_conflicts_detected"
+      },
+      "rollback_intelligence": {
+        "automatic_rollback_triggers": [
+          "test_failures_after_agent_changes",
+          "performance_regression_detection",
+          "user_reports_of_broken_functionality",
+          "multiple_error_patterns_in_short_timeframe"
+        ],
+        "rollback_procedures": {
+          "simple_revert": "for_single_commit_changes",
+          "selective_rollback": "for_complex_multi_file_changes",
+          "feature_branch_deletion": "for_experimental_work",
+          "backup_restoration": "for_critical_system_failures"
+        },
+        "rollback_communication": {
+          "notify_affected_agents": "alert_agents_working_on_related_features",
+          "update_task_status": "mark_dependent_tasks_as_blocked",
+          "human_notification": "for_critical_rollbacks_affecting_user_experience",
+          "learning_integration": "update_error_patterns_to_prevent_recurrence"
+        }
+      }
+    },
+    "intelligent_commit_generation": {
+      "commit_message_templates": {
+        "feature_implementation": "[Agent: {agent}] Implement {feature_name}\n\n- {detailed_changes}\n- Files modified: {files}\n- Testing: {testing_status}\n- Performance impact: {performance_notes}",
+        "bug_fix": "[Agent: {agent}] Fix {bug_description}\n\n- Root cause: {root_cause}\n- Solution: {solution_approach}\n- Affected components: {components}\n- Regression test: {test_added}",
+        "optimization": "[Agent: {agent}] Optimize {component_name}\n\n- Performance improvement: {metrics}\n- Method: {optimization_technique}\n- Backward compatibility: {compatibility_status}\n- Benchmarks: {before_after_metrics}",
+        "documentation": "[Agent: {agent}] Update documentation for {component}\n\n- Coverage: {documentation_scope}\n- Accuracy improvements: {corrections_made}\n- New examples: {examples_added}\n- Cross-references: {links_updated}"
+      },
+      "smart_file_grouping": {
+        "logical_commits": "group_related_changes_across_multiple_files",
+        "atomic_operations": "ensure_each_commit_represents_complete_working_state",
+        "dependency_awareness": "commit_dependencies_before_dependent_changes",
+        "rollback_friendly": "structure_commits_for_easy_selective_rollback"
+      }
+    },
+    "collaborative_workflows": {
+      "pair_programming_simulation": {
+        "agent_handoffs": "seamless_branch_switching_between_agents",
+        "context_preservation": "detailed_commit_messages_for_next_agent",
+        "work_in_progress_commits": "wip_commits_for_agent_coordination",
+        "review_requests": "automatic_review_assignment_based_on_expertise"
+      },
+      "code_review_integration": {
+        "agent_review_comments": "agents_can_comment_on_pr_changes",
+        "automated_review_checks": "syntax_performance_security_validation",
+        "human_review_triggers": "when_complex_or_architectural_changes",
+        "review_learning": "integrate_review_feedback_into_agent_learning"
+      }
+    }
+  },
+  "office_partner_experience": {
+    "git_communication": {
+      "status_sharing": "Hey! I just pushed my changes to the feature branch - ready for your review",
+      "conflict_alerts": "Heads up - I see you're working on the same file. Want to coordinate?",
+      "completion_updates": "Feature complete! Created a PR with detailed testing notes",
+      "help_requests": "Could use a second pair of eyes on this commit - the changes are complex"
+    },
+    "natural_git_habits": {
+      "frequent_small_commits": "like_a_careful_developer_saving_work_regularly",
+      "descriptive_messages": "write_commits_like_explaining_to_a_colleague",
+      "branch_hygiene": "clean_up_branches_like_organizing_a_shared_workspace",
+      "backup_awareness": "always_ensure_work_is_safely_committed_before_risky_operations"
+    }
+  }
+}

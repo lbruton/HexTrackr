@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "file": {
+    "original": "../rProjects/StackTrackr/js/events.js",
+    "name": "events",
+    "extension": ".js",
+    "directory": "../rProjects/StackTrackr/js",
+    "size": 0,
+    "lines": 400
+  },
+  "documentation": {
+    "markdown": "../docs/rProjects/StackTrackr/js/events_chunk.md",
+    "html": "../docs/rProjects/StackTrackr/js/events_chunk.html",
+    "generated": "2025-08-20T01:08:18.664Z",
+    "generator": "smart-document-generator",
+    "provider": "claude",
+    "model": "claude-3-haiku-20240307"
+  },
+  "processing": {
+    "chunked": false,
+    "chunks": 1,
+    "method": "chunked",
+    "preChunked": false
+  },
+  "metadata": {
+    "title": "events.js",
+    "category": "JavaScript",
+    "icon": "⚡",
+    "description": "Documentation for ../rProjects/StackTrackr/js/events.js"
+  }
+}

@@ -1,0 +1,299 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-16",
+    "purpose": "Variable and state tracking for StackTrackr application",
+    "description": "Complete mapping of global variables, state management, data structures, and configuration for rapid debugging and state analysis"
+  },
+  "global_variables": {
+    "application_state": {
+      "currentInventory": {
+        "type": "array",
+        "description": "Main inventory data array",
+        "file": "js/inventory.js",
+        "scope": "global",
+        "initialized_in": "loadInventory()",
+        "modified_by": ["addItem()", "editItem()", "deleteItem()", "loadInventory()"],
+        "structure": "Array of objects with properties: id, name, type, weight, purity, spot_price, etc.",
+        "persistence": "localStorage key 'inventory'",
+        "validation": "Required fields: name, type, weight"
+      },
+      "currentFilters": {
+        "type": "object",
+        "description": "Active filter state for inventory display",
+        "file": "js/inventory.js",
+        "scope": "global",
+        "initialized_in": "initializeFilters()",
+        "modified_by": ["applyFilter()", "clearFilters()", "updateFilterChips()"],
+        "structure": "{search: string, type: string, dateRange: {start: Date, end: Date}}",
+        "persistence": "sessionStorage key 'filters'",
+        "performance_impact": "Triggers table re-rendering when changed"
+      },
+      "sortState": {
+        "type": "object", 
+        "description": "Current table sorting configuration",
+        "file": "js/inventory.js",
+        "scope": "global",
+        "initialized_in": "initializeSort()",
+        "modified_by": ["sortTable()", "resetSort()"],
+        "structure": "{column: string, direction: 'asc'|'desc'}",
+        "persistence": "sessionStorage key 'sortState'",
+        "default_value": "{column: 'date_added', direction: 'desc'}"
+      }
+    },
+    "configuration": {
+      "appConfig": {
+        "type": "object",
+        "description": "Application configuration settings",
+        "file": "js/utils.js",
+        "scope": "global",
+        "initialized_in": "loadConfig()",
+        "modified_by": ["updateConfig()", "resetConfig()"],
+        "structure": "{theme: string, currency: string, dateFormat: string, apiSettings: object}",
+        "persistence": "localStorage key 'appConfig'",
+        "default_value": "{theme: 'light', currency: 'USD', dateFormat: 'MM/DD/YYYY'}"
+      },
+      "apiKeys": {
+        "type": "object",
+        "description": "API keys and endpoint configurations",
+        "file": "js/api.js",
+        "scope": "global",
+        "initialized_in": "initializeAPI()",
+        "modified_by": ["setAPIKey()", "updateEndpoint()"],
+        "structure": "{metals: string, numista: string, endpoints: object}",
+        "persistence": "localStorage key 'apiKeys'",
+        "security_notes": "Keys should be environment-specific, avoid hardcoding"
+      }
+    },
+    "ui_state": {
+      "modalState": {
+        "type": "object",
+        "description": "Current modal display state",
+        "file": "js/inventory.js",
+        "scope": "global",
+        "initialized_in": "initializeModals()",
+        "modified_by": ["showModal()", "closeModal()", "switchModalMode()"],
+        "structure": "{isOpen: boolean, mode: 'view'|'edit'|'add', currentItem: object|null}",
+        "persistence": "none - ephemeral state",
+        "cleanup_required": "Reset on page reload or navigation"
+      },
+      "chartState": {
+        "type": "object",
+        "description": "Chart display and interaction state",
+        "file": "js/charts.js",
+        "scope": "global",
+        "initialized_in": "initializeCharts()",
+        "modified_by": ["createChart()", "updateChart()", "destroyChart()"],
+        "structure": "{activeChart: Chart|null, chartType: string, chartData: object}",
+        "persistence": "none - ephemeral state",
+        "memory_management": "Chart instances must be destroyed to prevent leaks"
+      },
+      "loadingState": {
+        "type": "object",
+        "description": "Loading indicators and async operation state",
+        "file": "js/utils.js",
+        "scope": "global",
+        "initialized_in": "initializeLoadingState()",
+        "modified_by": ["showLoading()", "hideLoading()", "setLoadingProgress()"],
+        "structure": "{isLoading: boolean, operation: string, progress: number}",
+        "persistence": "none - ephemeral state"
+      }
+    }
+  },
+  "local_variables": {
+    "function_scoped": {
+      "inventory.js": {
+        "renderTable": [
+          {
+            "name": "fragment",
+            "type": "DocumentFragment",
+            "purpose": "DOM fragment for batch table row insertion",
+            "performance_impact": "Reduces DOM reflow by batching insertions",
+            "lifecycle": "Created and appended within function scope"
+          },
+          {
+            "name": "filteredData",
+            "type": "array",
+            "purpose": "Inventory items after applying current filters",
+            "dependencies": ["currentInventory", "currentFilters"],
+            "performance_impact": "Size affects rendering time"
+          }
+        ],
+        "addItem": [
+          {
+            "name": "newItem",
+            "type": "object",
+            "purpose": "New inventory item being added",
+            "validation": "Required: name, type, weight; Optional: purity, notes",
+            "data_flow": "Form input → validation → newItem → currentInventory"
+          }
+        ]
+      },
+      "charts.js": [
+        {
+          "name": "chartInstance",
+          "type": "Chart",
+          "purpose": "Chart.js instance for active chart",
+          "memory_management": "Must call destroy() method before creating new instance",
+          "lifecycle": "Created in createChart(), destroyed in destroyChart()"
+        }
+      ]
+    },
+    "closure_variables": {
+      "debounce_timers": {
+        "description": "Timer IDs for debounced functions",
+        "location": "js/utils.js debounce functions",
+        "type": "number|null",
+        "cleanup": "Cleared automatically by debounce mechanism"
+      },
+      "event_handlers": {
+        "description": "Event listener references for cleanup",
+        "location": "js/events.js event delegation setup",
+        "type": "function references",
+        "cleanup": "Removed during page unload or component destruction"
+      }
+    }
+  },
+  "data_structures": {
+    "inventory_item": {
+      "schema": {
+        "id": "string - Unique identifier (UUID or timestamp)",
+        "name": "string - Item name/description",
+        "type": "string - Metal type (gold, silver, platinum, etc.)",
+        "weight": "number - Weight in troy ounces",
+        "purity": "number - Purity percentage (0-100)",
+        "spot_price": "number - Current spot price per ounce",
+        "premium": "number - Premium over spot price",
+        "total_value": "number - Calculated total value",
+        "date_added": "string - ISO date when item was added",
+        "date_modified": "string - ISO date of last modification",
+        "notes": "string - Optional user notes",
+        "image_url": "string - Optional image URL",
+        "numista_id": "string - Optional Numista database ID"
+      },
+      "validation_rules": {
+        "required": ["id", "name", "type", "weight"],
+        "constraints": {
+          "weight": "Must be positive number",
+          "purity": "0-100 range",
+          "type": "Must be from predefined list"
+        }
+      },
+      "calculated_fields": {
+        "total_value": "weight * purity/100 * (spot_price + premium)",
+        "value_per_ounce": "total_value / weight"
+      }
+    },
+    "filter_object": {
+      "schema": {
+        "search": "string - Text search query",
+        "type": "string - Metal type filter",
+        "purity_min": "number - Minimum purity filter",
+        "purity_max": "number - Maximum purity filter",
+        "weight_min": "number - Minimum weight filter",
+        "weight_max": "number - Maximum weight filter",
+        "date_range": "object - {start: Date, end: Date}",
+        "value_min": "number - Minimum value filter",
+        "value_max": "number - Maximum value filter"
+      },
+      "application_order": "Search text → Type → Purity → Weight → Date → Value",
+      "performance_notes": "Filters applied sequentially, early filters reduce dataset for later filters"
+    },
+    "chart_data": {
+      "schema": {
+        "labels": "array - Chart axis labels",
+        "datasets": "array - Chart.js dataset objects",
+        "options": "object - Chart configuration options",
+        "type": "string - Chart type (pie, bar, line, doughnut)"
+      },
+      "data_sources": "Derived from currentInventory with aggregation/grouping",
+      "update_triggers": ["inventory changes", "filter changes", "chart type selection"]
+    }
+  },
+  "state_management": {
+    "persistence_strategy": {
+      "localStorage": {
+        "keys": ["inventory", "appConfig", "apiKeys"],
+        "data_types": "JSON serialized objects",
+        "size_limits": "~5-10MB browser dependent",
+        "cleanup_strategy": "Manual cleanup on app reset"
+      },
+      "sessionStorage": {
+        "keys": ["filters", "sortState", "viewState"],
+        "lifecycle": "Cleared on tab close",
+        "use_case": "Temporary UI state that shouldn't persist across sessions"
+      },
+      "memory_only": {
+        "variables": ["modalState", "loadingState", "chartState"],
+        "lifecycle": "Cleared on page reload",
+        "use_case": "Ephemeral UI state and temporary objects"
+      }
+    },
+    "synchronization": {
+      "cross_tab": "No cross-tab synchronization implemented",
+      "data_consistency": "Last write wins for localStorage data",
+      "conflict_resolution": "Manual user intervention required for conflicts"
+    }
+  },
+  "performance_tracking": {
+    "memory_usage": {
+      "high_impact_variables": [
+        "currentInventory - grows with user data",
+        "chartInstance - Chart.js objects can be memory intensive",
+        "filteredData - temporary arrays during table operations"
+      ],
+      "optimization_strategies": [
+        "Paginate large inventory datasets",
+        "Implement chart instance cleanup",
+        "Use object pooling for temporary data structures"
+      ]
+    },
+    "computation_cost": {
+      "expensive_operations": [
+        "Table sorting with large datasets",
+        "Real-time filtering on text search",
+        "Chart data aggregation and transformation"
+      ],
+      "mitigation_techniques": [
+        "Debouncing for search operations",
+        "Web Workers for heavy computations",
+        "Memoization for repeated calculations"
+      ]
+    }
+  },
+  "debugging_aids": {
+    "state_inspection": {
+      "global_access": "All major state variables accessible via browser console",
+      "debugging_functions": [
+        "window.debugState() - Dump all application state",
+        "window.validateInventory() - Check inventory data integrity",
+        "window.clearAllData() - Reset application state"
+      ]
+    },
+    "common_issues": {
+      "undefined_variables": "Check initialization order and async loading",
+      "stale_data": "Verify localStorage/sessionStorage sync",
+      "memory_leaks": "Confirm chart instances and event listeners are cleaned up"
+    }
+  },
+  "schema": {
+    "variable_entry": {
+      "type": "string - JavaScript type",
+      "description": "string - Variable purpose and usage",
+      "file": "string - Source file location",
+      "scope": "string - global|local|closure",
+      "initialized_in": "string - Function where variable is created",
+      "modified_by": "array - Functions that change this variable",
+      "structure": "string - Data structure description",
+      "persistence": "string - How/where variable is stored",
+      "dependencies": "array - Other variables this depends on",
+      "performance_impact": "string - Performance considerations"
+    }
+  },
+  "instructions": {
+    "for_agents": "Use this file to understand application state before making changes. Check variable dependencies and lifecycle management.",
+    "state_tracking": "When adding new variables or changing state management, update this file with complete information",
+    "debugging_support": "Use variable tracking to isolate state-related issues quickly",
+    "performance_monitoring": "Track memory usage and computational cost of state operations"
+  }
+}

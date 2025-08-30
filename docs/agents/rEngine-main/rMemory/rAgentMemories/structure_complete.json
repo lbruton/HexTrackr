@@ -1,0 +1,83 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "created": "2025-08-16",
+    "purpose": "Complete architectural mapping for StackTrackr application",
+    "description": "Comprehensive application structure across all files with relationships and optimization insights",
+    "files_analyzed": 36,
+    "js_files": 32,
+    "css_files": 1,
+    "html_files": 3,
+    "last_updated": "2025-08-16T18:00:00Z"
+  },
+  "complete_architecture": {
+    "application_layers": {
+      "presentation_layer": {
+        "description": "User interface and visual presentation",
+        "files": ["index.html", "css/styles.css", "agents/lab/*.html"],
+        "main_sections": [
+          "app-header with dynamic logo and navigation",
+          "control-panel with search, filters, and pagination", 
+          "inventory-table (core data display)",
+          "modal-system (edit, add, details, about)",
+          "spot-price-cards section",
+          "summary-section with charts and statistics"
+        ]
+      },
+      "business_logic_layer": {
+        "description": "Core application logic and data processing",
+        "primary_modules": {
+          "inventory_management": {
+            "files": ["js/inventory.js"],
+            "key_functions": ["renderTable", "editItem", "deleteItem", "saveInventory"],
+            "responsibilities": ["CRUD operations", "Table rendering", "Data validation"]
+          },
+          "search_and_filter": {
+            "files": ["js/search.js", "js/filters.js", "js/fuzzy-search.js"],
+            "key_functions": ["filterInventory", "filterInventoryAdvanced", "fuzzySearch"],
+            "responsibilities": ["Multi-criteria filtering", "Real-time search", "Filter state management"]
+          }
+        }
+      },
+      "integration_layer": {
+        "description": "External integrations and API management",
+        "modules": {
+          "api_integration": {
+            "files": ["js/api.js", "js/spot.js"],
+            "responsibilities": ["Spot price fetching", "Provider management", "Cache handling"]
+          }
+        }
+      },
+      "utility_layer": {
+        "description": "Shared utilities and helper functions",
+        "files": ["js/utils.js", "js/constants.js", "js/state.js"],
+        "critical_functions": ["formatCurrency", "debounce", "monitorPerformance"]
+      }
+    }
+  },
+  "dependency_relationships": {
+    "high_coupling": [
+      "inventory.js ↔ search.js ↔ filters.js",
+      "events.js → all_core_files",
+      "utils.js → all_files"
+    ],
+    "critical_paths": [
+      "renderTable pipeline",
+      "search and filter pipeline",
+      "event handling system"
+    ]
+  },
+  "performance_architecture": {
+    "optimization_features": [
+      "DocumentFragment for DOM efficiency",
+      "Debounced search input",
+      "Performance monitoring wrapper",
+      "Efficient filter caching"
+    ],
+    "bottlenecks": [
+      "Large inventory rendering",
+      "Complex filter combinations",
+      "Real-time search processing"
+    ]
+  }
+}

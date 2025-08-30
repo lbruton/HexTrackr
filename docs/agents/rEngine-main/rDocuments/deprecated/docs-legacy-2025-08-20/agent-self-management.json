@@ -1,0 +1,81 @@
+{
+  "source_file": "docs/generated/agent-self-management.md",
+  "generated_date": "2025-08-20T01:27:06.432Z",
+  "title": "Agent Self-Management Protocol",
+  "sections": [
+    {
+      "id": "purpose-overview",
+      "title": "Purpose & Overview",
+      "icon": "📋",
+      "submenu": []
+    },
+    {
+      "id": "technical-architecture",
+      "title": "Technical Architecture",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "dependencies",
+      "title": "Dependencies",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "key-functionsclasses",
+      "title": "Key Functions/Classes",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "agentselfmanagement-class",
+          "title": "`AgentSelfManagement` Class"
+        }
+      ]
+    },
+    {
+      "id": "usage-examples",
+      "title": "Usage Examples",
+      "icon": "📄",
+      "submenu": [
+        {
+          "id": "startup-check",
+          "title": "Startup Check"
+        },
+        {
+          "id": "task-completion",
+          "title": "Task Completion"
+        },
+        {
+          "id": "session-cleanup",
+          "title": "Session Cleanup"
+        }
+      ]
+    },
+    {
+      "id": "configuration",
+      "title": "Configuration",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "error-handling",
+      "title": "Error Handling",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "integration",
+      "title": "Integration",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "development-notes",
+      "title": "Development Notes",
+      "icon": "📄",
+      "submenu": []
+    }
+  ],
+  "word_count": 934,
+  "format_version": "1.0"
+}

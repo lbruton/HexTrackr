@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rEngine MCP Workflow Flowchart - rEngine Core Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #6366f1;
+            --rengine-secondary: #8b5cf6;
+            --rengine-accent: #06b6d4;
+            --rengine-text: #1f2937;
+            --rengine-text-light: #6b7280;
+            --rengine-bg: #ffffff;
+            --rengine-bg-alt: #f8fafc;
+            --rengine-border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--rengine-text);
+            background: var(--rengine-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--rengine-primary), var(--rengine-secondary));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: "⚙️";
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--rengine-primary);
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--rengine-primary);
+            border-bottom: 2px solid var(--rengine-border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--rengine-secondary);
+        }
+
+        h4, h5, h6 {
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--rengine-text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--rengine-text);
+        }
+
+        .content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        code {
+            background: var(--rengine-bg-alt);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--rengine-primary);
+        }
+
+        pre {
+            background: var(--rengine-bg-alt);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--rengine-primary);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--rengine-text);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--rengine-accent);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: var(--rengine-text-light);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--rengine-border);
+        }
+
+        th {
+            background: var(--rengine-bg-alt);
+            font-weight: 600;
+            color: var(--rengine-primary);
+        }
+
+        .metadata {
+            background: var(--rengine-bg-alt);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--rengine-border);
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: var(--rengine-text-light);
+        }
+
+        footer {
+            background: var(--rengine-bg-alt);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--rengine-text-light);
+            border-top: 1px solid var(--rengine-border);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--rengine-primary);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">rEngine Core</div>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../README.html">Documentation</a>
+                    <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <h1>rEngine MCP Workflow Flowchart</h1>
+            
+            
+            <div class="metadata">
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Source File:</span>
+                        <span>WORKFLOW_FLOWCHART.md</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Generated:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Last Modified:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Converter:</span>
+                        <span>rEngine MCP HTML Converter</span>
+                    </div>
+                
+            </div>
+            
+            
+            <h1 id="rengine-mcp-workflow-flowchart">rEngine MCP Workflow Flowchart</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>WORKFLOW_FLOWCHART.md</code> file in the <code>rAgents/output</code> directory provides a comprehensive overview of the core workflow and architecture for the rEngine Core platform. This flowchart and accompanying documentation describe the various components, processes, and principles that drive the intelligent development capabilities of the rEngine system.</p>
+<p>The rEngine Core platform is an &quot;Intelligent Development Wrapper&quot; that integrates with the user&#39;s Visual Studio Code (VS Code) environment, providing advanced features for rapid context search, session management, AI-powered analysis, and persistent memory management. This file serves as a technical reference for understanding the underlying mechanics and design principles of the rEngine workflow.</p>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<p>The rEngine MCP (Multimodal Conversation Processing) workflow consists of the following key components:</p>
+<ol>
+<li><strong>User Interaction</strong>: Handles various user actions, such as development requests, break requests, resume requests, and analysis requests.</li>
+<li><strong>Rapid Context Search</strong>: Performs targeted searches within the project context to quickly locate relevant information.</li>
+<li><strong>Session Handoff/Resume</strong>: Manages the continuity of development sessions, including session handoffs and resumption.</li>
+<li><strong>AI Analysis</strong>: Integrates with various AI providers (Groq, Claude, ChatGPT, Gemini, Ollama) to perform code analysis and context understanding.</li>
+<li><strong>Memory Management</strong>: Maintains a persistent memory matrix to enhance the search capabilities and provide context-aware responses.</li>
+<li><strong>Prompt Engineering</strong>: Optimizes the prompts and prompt engineering architecture to ensure token efficiency, context continuity, rapid targeting, and AI provider resilience.</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>The rEngine MCP workflow relies on the following core dependencies:</p>
+<ol>
+<li><strong>Ollama</strong>: The local AI analysis engine that powers the token-efficient processing, context compression, and memory management capabilities.</li>
+<li><strong>rAgents/session_handoffs.json</strong>: A JSON file that stores the session handoff data for continuity between development sessions.</li>
+<li><strong>Search Matrix</strong>: A knowledge base that maps project context to specific files, functions, and code elements for rapid targeting.</li>
+</ol>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>The rEngine MCP workflow is primarily triggered by the user&#39;s actions within the VS Code environment. The following usage scenarios are supported:</p>
+<ol>
+<li><strong>Development Request</strong>: The user initiates a development-related request, which triggers the rapid context search and AI analysis processes.</li>
+<li><strong>Break Request</strong>: The user requests a break in the development session, which triggers the session handoff process.</li>
+<li><strong>Resume Request</strong>: The user resumes a previous development session, which triggers the session resume process.</li>
+<li><strong>Analysis Request</strong>: The user requests an analysis of the current context, which triggers the AI analysis process.</li>
+</ol>
+<p>These user actions are handled by the rEngine Core platform, and the workflow ensures efficient processing, context preservation, and seamless integration with the user&#39;s development environment.</p>
+<h2 id="configuration">Configuration</h2>
+<p>The rEngine MCP workflow does not require any specific configuration parameters or environment variables. However, it relies on the proper setup and integration of the rEngine Core platform within the user&#39;s VS Code environment.</p>
+<h2 id="integration-points">Integration Points</h2>
+<p>The rEngine MCP workflow is a core component of the rEngine Core platform, which integrates with the following components:</p>
+<ol>
+<li><strong>VS Code Extension</strong>: The rEngine Core platform is delivered as a VS Code extension, providing the user interface and integration with the development environment.</li>
+<li><strong>rAgents</strong>: The rAgents directory contains the session handoff data and other supporting files for the workflow.</li>
+<li><strong>Ollama</strong>: The local AI analysis engine is a critical dependency for the token-efficient processing and memory management capabilities.</li>
+<li><strong>AI Providers</strong>: The workflow integrates with various AI providers (Groq, Claude, ChatGPT, Gemini, Ollama) to leverage their analysis capabilities.</li>
+</ol>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p>Common issues and solutions related to the rEngine MCP workflow include:</p>
+<ol>
+<li><p><strong>Slow Response Times</strong>: If the response times are slower than expected, check the following:</p>
+<ul>
+<li>Ensure the search matrix is up-to-date and comprehensive.</li>
+<li>Verify the Ollama engine is functioning correctly and providing efficient context compression.</li>
+<li>Evaluate the AI provider integration and fallback mechanisms.</li>
+</ul>
+</li>
+<li><p><strong>Inconsistent Session Continuity</strong>: If the session handoff or resume process is not working as expected, check the following:</p>
+<ul>
+<li>Verify the integrity of the <code>rAgents/session_handoffs.json</code> file.</li>
+<li>Ensure the Ollama engine is correctly processing the session data and creating the memory matrix.</li>
+</ul>
+</li>
+<li><p><strong>Analysis Inaccuracies</strong>: If the AI analysis results are not meeting expectations, check the following:</p>
+<ul>
+<li>Evaluate the prompt engineering strategy and the specialization of the various system roles.</li>
+<li>Ensure the AI provider integrations are functioning correctly and returning accurate responses.</li>
+<li>Verify the memory management and context preservation mechanisms are working as intended.</li>
+</ul>
+</li>
+</ol>
+<p>By addressing these common issues, you can ensure the rEngine MCP workflow operates efficiently and provides the expected intelligent development capabilities within the rEngine Core platform.</p>
+
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../README.html">Documentation</a>
+                <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+            </div>
+            <p>Generated on 2025-08-20 by rEngine Core HTML Converter</p>
+            <p>© 2025 rEngine Core - Intelligent Development Wrapper</p>
+        </div>
+    </footer>
+</body>
+</html>

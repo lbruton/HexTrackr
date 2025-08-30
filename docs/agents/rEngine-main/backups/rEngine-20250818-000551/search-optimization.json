@@ -1,0 +1,3024 @@
+{
+  "metadata": {
+    "created": "2025-08-17T20:57:31.780Z",
+    "last_optimized": "2025-08-18T04:57:04.977Z",
+    "optimization_count": 36
+  },
+  "keyword_frequency": {
+    "api_key": 4,
+    "google_cloud": 1,
+    "_shims": 4,
+    "auto": 3,
+    "bun runtime": 1,
+    "types-node": 1,
+    "__createBinding": 3,
+    "__exportStar": 4,
+    "table system architecture documentation": 1,
+    "vanilla JavaScript": 1,
+    "inventory management capabilities": 1,
+    "responsive design": 1,
+    "inline editing": 1,
+    "sort headers": 1,
+    "filter chips": 1,
+    "batch operations": 1,
+    "change logging": 1,
+    "undo capability": 1,
+    "debounced search input": 1,
+    "paginated data display": 1,
+    "responsive column hiding": 1,
+    "LICENSE": 1,
+    "BSD 3-Clause License": 1,
+    "Kim Davies": 1,
+    "contributors": 1,
+    "redistribution": 1,
+    "binary forms": 1,
+    "source code": 1,
+    "copyright notice": 1,
+    "modification": 1,
+    "disclaimer": 1,
+    "commercial use": 1,
+    "endorsement": 1,
+    "bootstrap": 1,
+    "memory": 2,
+    "protocol": 1,
+    "bootstrapping": 1,
+    "memory initialization": 1,
+    "boot process": 1,
+    "agent escalation protocol": 1,
+    "cost-efficient escalation strategy": 1,
+    "escalation tiers": 1,
+    "tier 1 claude 3 haiku": 1,
+    "tier 2 gpt-4o-mini": 1,
+    "tier 3 claude sonnet 4": 1,
+    "escalation phrases for lower-tier models": 1,
+    "context handoff template": 1,
+    "escalation criteria matrix": 1,
+    "implementation in vs code": 1,
+    "escalation triggers by domain": 1,
+    "cost-benefit analysis": 1,
+    "training examples": 1,
+    "monitoring & optimization": 1,
+    "emergency escalation": 1,
+    "JSON tracking files": 1,
+    "MCP Memory": 3,
+    "Agent workflow process": 1,
+    "GPT Models": 1,
+    "Claude Models": 1,
+    "Gemini Models": 1,
+    "Dependency Tracking": 1,
+    "Rollback Plan Creation": 1,
+    "JSON File Maintenance": 1,
+    "Versioning": 1,
+    "Header Text Span": 1,
+    "SVG Optimization": 1,
+    "Composition Helper Cleanup": 1,
+    "Dynamic Item Counter": 1,
+    "CSV Import/Export Fixes": 1,
+    "Changelog Loading Fix": 1,
+    "Filter Logic Overhaul": 1,
+    "Search Logic Fix": 1,
+    "Grouped Filter Chips": 1,
+    "Code Audit": 1,
+    "Performance Metrics": 1,
+    "Benchmarking": 1,
+    "Security Audits": 1,
+    "Comprehensive Code Audit": 1,
+    "StackTrackr LLM Benchmark Report": 1,
+    "google_cloud_services": 1,
+    "authentication": 4,
+    "configuration": 1,
+    "shim": 3,
+    "runtime": 2,
+    "@anthropic-ai/sdk": 2,
+    "_shims/auto/runtime.js": 1,
+    "web-runtime.js": 1,
+    "memory initialization tool": 1,
+    "bootstrap memories": 1,
+    "agent-specific memories": 1,
+    "shared memories": 1,
+    "memory structure": 1,
+    "memory validation": 1,
+    "backup and safety": 1,
+    "memory schema": 1,
+    "best practices": 2,
+    "integration": 1,
+    "security considerations": 3,
+    "memory vault backup system": 1,
+    "sync script": 1,
+    "memory files tracked": 1,
+    "backup repository": 1,
+    "automatic synchronization": 1,
+    "version control": 2,
+    "crash recovery": 1,
+    "monitoring": 2,
+    "setup": 1,
+    "recovery process": 1,
+    "maintenance": 1,
+    "api key not set": 1,
+    "authentication error": 1,
+    "node_modules": 4,
+    "@anthropic-ai-sdk": 1,
+    "runtime-node.js": 1,
+    "Node.js runtime environment": 1,
+    "API Key Audit": 2,
+    "Configuration Parameters": 3,
+    "Secret Management": 1,
+    "Authentication Mechanism": 1,
+    "Error Handling": 5,
+    "Logging": 1,
+    "auto-shimming": 1,
+    "modules-in-shims-are-not-intended-to-be-imported-by-sdk-users": 1,
+    "array": 1,
+    "flattening": 1,
+    "deeply-nested": 1,
+    "recursive-algorithm": 1,
+    "openai gpt-4o": 1,
+    "memory system review": 1,
+    "api endpoints": 3,
+    "performance optimization": 2,
+    "failover mechanism": 1,
+    "security concerns": 2,
+    "load balancing": 1,
+    "elk stack": 1,
+    "open source": 1,
+    "license": 1,
+    "BSD": 1,
+    "free software": 1,
+    "API Key": 4,
+    "Anthropic API": 2,
+    "Authentication": 3,
+    "Configuration": 2,
+    "google_api": 2,
+    "runtime-shim": 1,
+    "Bun Runtime": 1,
+    "environment adapter": 1,
+    "polyfill": 1,
+    "accepts": 2,
+    "mime-types": 1,
+    "negotiator": 2,
+    "Smart Scribe": 3,
+    "File Monitoring": 2,
+    "Chat Log Monitoring": 1,
+    "File Analysis": 1,
+    "Chat Log Analysis": 1,
+    "runtime-bun.js": 1,
+    "__esModule": 1,
+    "API Key Not Set": 2,
+    "Missing Credentials Error": 1,
+    "Authentication Failure": 2,
+    "anthropic_api": 2,
+    "error_handling": 3,
+    "configuration_parameters": 1,
+    "Google Cloud Services": 1,
+    "Security Best Practices": 1,
+    "Configuration Checks": 1,
+    "Development Prerequisites": 1,
+    "Shim": 1,
+    "_shims Directory": 1,
+    "Integration Points": 1,
+    "bsd": 1,
+    "agent-accountability-report": 1,
+    "git-backups": 1,
+    "memory-startup-checks": 1,
+    "short-term-memory": 1,
+    "task-completion-logging": 1,
+    "brainpool-contribution": 1,
+    "self-management-system": 1,
+    "behavior-wrapper": 1,
+    "bootstrap-protocol": 1,
+    "session-start": 1,
+    "during-work": 1,
+    "session-end": 1,
+    "accountability-metrics": 1,
+    "current-session": 1,
+    "github-copilot": 1,
+    "files-created": 1,
+    "protocol-compliance-verification": 1,
+    "before-major-changes": 1,
+    "during-implementation": 1,
+    "for-this-task-completion": 1,
+    "brainpool-contribution-summary": 1,
+    "next-steps": 1,
+    "complete-task": 1,
+    "create-git-backup": 1,
+    "test-agent-wrapper": 1,
+    "update-existing-agents": 1,
+    "monitor-compliance": 1,
+    "api-key": 2,
+    "smart_scribe": 1,
+    "continuous_knowledge_management": 1,
+    "file_watching": 1,
+    "chat_log_monitoring": 1,
+    "knowledge_extraction": 1,
+    "technical_analysis": 1,
+    "shims": 2,
+    "modules": 1,
+    "compatibility": 1,
+    "Node.js": 3,
+    "node.js": 4,
+    "npm": 2,
+    "express": 1,
+    "dependencies": 1,
+    "dependency management": 1,
+    "anymatch": 1,
+    "node.js module": 1,
+    "glob patterns": 1,
+    "regular expressions": 1,
+    "functions": 1,
+    "matchers": 1,
+    "flatten": 1,
+    "recursion": 1,
+    "algorithm": 1,
+    "asynckit": 1,
+    "async_job": 1,
+    "parallel_jobs": 1,
+    "serial_jobs": 1,
+    "Memory Scribe Dashboard": 1,
+    "Real-time Console Monitoring": 2,
+    "MCP Server Integration": 1,
+    "Management": 1,
+    "Console Log Monitoring": 1,
+    "AI Agent Activity Tracking": 1,
+    "15-Minute Automated Health Checks": 1,
+    "Desktop Alerts": 1,
+    "Port Management": 2,
+    "Data Synchonization": 1,
+    "Shared Memory Files": 1,
+    "Personal Agent Memory Files": 1,
+    "API Endpoints": 3,
+    "Console Interception": 1,
+    "Activity Logging": 1,
+    "Scalability": 1,
+    "Redundancy": 1,
+    "Security Concerns": 1,
+    "free_software": 1,
+    "agent initialization protocol": 1,
+    "workflow protocols": 1,
+    "protocol enforcement": 1,
+    "directory structure": 1,
+    "quick start commands": 1,
+    "google_cloud_service": 1,
+    "Node.js Runtime": 1,
+    "runtime.js": 1,
+    "SDK": 1,
+    "library updates": 1,
+    "versioning": 1,
+    "release notes": 1,
+    "module": 1,
+    "matcher": 1,
+    "glob": 1,
+    "regular expression": 1,
+    "function": 1,
+    "AI Memory System Review Results Summary": 1,
+    "Benchmark Date": 1,
+    "Models Tested": 1,
+    "Same Prompt": 1,
+    "Overall Scores": 1,
+    "Critical Issues Identified by ALL Models": 1,
+    "Single Point of Failure (UNANIMOUS)": 1,
+    "Security Vulnerabilities (UNANIMOUS)": 1,
+    "Performance Concerns (UNANIMOUS)": 1,
+    "Missing Conflict Resolution": 1,
+    "Overcomplicated Components": 1,
+    "MCP server": 2,
+    "API Authentication & Authorization": 1,
+    "Data Encryption (at rest and in transit)": 1,
+    "Shared Memory File Race Conditions": 1,
+    "Health Checks": 1,
+    "Fault Tolerance Mechanisms": 1,
+    "Load Balancing for Scalability": 1,
+    "Centralized Configuration Management": 1,
+    "Agent Initialization Protocol": 1,
+    "COPILOT_INSTRUCTIONS.md": 1,
+    "rAgents/unified-workflow.md": 1,
+    "agent-hello-workflow.js": 2,
+    "protocol-compliance-checker.js": 1,
+    "scribe-summary.js": 1,
+    "manual_check.js": 1,
+    "StackTrackr AI Collaboration Framework": 1,
+    "AI Engine": 1,
+    "Unified Workflow": 1,
+    "Protocol Enforcement": 1,
+    "Directory Structure": 1,
+    "Critical Warning": 1,
+    "security": 3,
+    "google api key": 1,
+    "content negotiation": 1,
+    "http headers": 1,
+    "mime types": 1,
+    "memory management": 2,
+    "race condition": 1,
+    "API endpoint": 1,
+    "central management server": 1,
+    "mandatory steps": 1,
+    "critical steps": 1,
+    "initiation workflow": 1,
+    "auto-backup before changes": 1,
+    "file containment validation": 1,
+    "memory consistency checks": 1,
+    "rogue operations": 1,
+    "critical warning": 1,
+    "Error Patterns": 1,
+    "Security": 2,
+    "memory-sync-manager": 2,
+    "persistent-memory": 3,
+    "mcp-memory": 2,
+    "bidirectional-synchronization": 2,
+    "json-file": 1,
+    "health-check": 2,
+    "error-handling": 2,
+    "runtime-nodejs": 1,
+    "node-runtime-js": 1,
+    "sdk-modules": 1,
+    "version history": 1,
+    "package.json": 1,
+    "Anthropic": 2,
+    "Missing Configuration": 1,
+    "Memory Sync Manager": 1,
+    "Persistent Memory": 1,
+    "Entity Management": 1,
+    "Conversation Management": 1,
+    "System State": 1,
+    "Project Context": 1,
+    "Git Integration": 1,
+    "Smart Scribe Export": 1,
+    "Health Check": 1,
+    "real-time_monitoring": 1,
+    "centralized_server_integration": 1,
+    "log_rotation_and_filtering": 1,
+    "adaptive_monitoring": 1,
+    "load_balancing_and_redundancy": 1,
+    "distributed_logging_systems": 1,
+    "API_endpoints": 1,
+    "memory_synchronization": 1,
+    "Audit Logs": 1,
+    "Access Management": 1,
+    "configuration_error": 1,
+    "javascript module": 1,
+    "function matcher": 1,
+    "mcp server": 2,
+    "security vulnerabilities": 2,
+    "performance concerns": 1,
+    "conflict resolution": 2,
+    "system architecture": 1,
+    "stacktrackr": 2,
+    "mandatory first steps": 1,
+    "API Key Missing": 1,
+    "Anthropic API Configuration Error": 1,
+    "Authentication Issue": 1,
+    "API": 3,
+    "Continuous Knowledge Management": 1,
+    "Qwen2.5-Coder": 1,
+    "File Watching": 1,
+    "Knowledge Database": 1,
+    "Search Tables": 1,
+    "change log": 1,
+    "HTTP": 1,
+    "koa": 1,
+    "async": 2,
+    "jobs": 1,
+    "parallel": 1,
+    "serial": 1,
+    "iterator": 1,
+    "callback": 1,
+    "abort": 1,
+    "error": 1,
+    "performance": 2,
+    "order": 1,
+    "BSD 3-Clause": 1,
+    "license agreement": 1,
+    "google-apis": 1,
+    "agent_hello_workflow": 1,
+    "memory_intelligence_system_paths": 1,
+    "handoff_details": 1,
+    "personal_memories": 1,
+    "mcp_memories": 1,
+    "knowledge_database": 1,
+    "smart-scribe-data": 1,
+    "MCP Server": 1,
+    "Security Vulnerabilities": 1,
+    "Performance Concerns": 1,
+    "Error Patterns and Debugging Approaches": 1,
+    "Performance Optimizations and Bottlenecks": 1,
+    "Integration Points Between Systems": 1,
+    "User Workflow Patterns and Preferences": 1,
+    "License": 1,
+    "Copyright": 1,
+    "Redistribution": 1,
+    "Key": 2,
+    "Claude": 1,
+    "Missing Configuration Parameter": 2,
+    "google-api-key": 2,
+    "authorization": 1,
+    "Audit": 1,
+    "Google Gemini": 1,
+    "1.5 Pro": 1,
+    "Missing": 1,
+    "agent initialization": 1,
+    "handoff logs": 1,
+    "personal memories": 1,
+    "MCP memories": 1,
+    "technical knowledge": 1,
+    "continuation prompt": 1,
+    "memory intelligence system": 1,
+    "recall.js": 1,
+    "add-context.js": 1,
+    "MemorySyncManager": 2,
+    "persistentJSON": 1,
+    "entityData": 1,
+    "conversationData": 1,
+    "Singleton": 1,
+    "ErrorHandling": 1,
+    "BestEffortSyncing": 1,
+    "javascript": 3,
+    "regex": 1,
+    "string": 1,
+    "config": 2,
+    "pattern matching": 1,
+    "micromatch": 1,
+    "api_endpoints": 2,
+    "logging_and_monitoring": 1,
+    "scalability": 1,
+    "rate_limiting": 2,
+    "input_validation": 1,
+    "message_broker": 1,
+    "performance_optimizations": 1,
+    "Git Backups": 1,
+    "Session Tracking": 1,
+    "Incremental Commits": 1,
+    "Short-term Memory": 1,
+    "Extended Context": 2,
+    "Agent Self-Management System": 1,
+    "Agent Behavior Wrapper": 1,
+    "API key not set": 1,
+    "api key": 2,
+    "google api": 1,
+    "Code Review": 1,
+    "Testing": 1,
+    "memory_sync_manager": 2,
+    "persistent_memory": 1,
+    "mcp_sync": 1,
+    "file_io": 1,
+    "timeout_mechanism": 1,
+    "PersistentMemory.json": 1,
+    "BackupFile": 1,
+    "Entity": 1,
+    "Conversation": 1,
+    "Singleton Pattern": 1,
+    "Two-Way Synchronization": 1,
+    "JavaScript module": 1,
+    "matching strings": 1,
+    "picomatch options": 1,
+    "utility library": 1,
+    "streams support": 1,
+    "npm package": 1,
+    "memory system": 1,
+    "real-time console monitoring": 1,
+    "scalability concerns": 1,
+    "frequent logging and monitoring": 1,
+    "API endpoints": 4,
+    "Agent System": 1,
+    "Quick Start": 1,
+    "Memory Intelligence System": 2,
+    "LLM Optimization": 1,
+    "Memory Hierarchy": 1,
+    "Agent Workflow Commands": 1,
+    "Configuration Files Updated": 1,
+    "Integration Examples": 1,
+    "Success Metrics": 1,
+    "Emergency Recovery": 1,
+    "Next Week Scenario": 1,
+    "Google API": 1,
+    "Configuration Issue": 1,
+    "Unauthorized Access": 1,
+    "gemini_1_5_pro_audit": 1,
+    "package version": 1,
+    "flatten_array": 1,
+    "recursive_traversal": 1,
+    "multidimensional_arrays": 1,
+    "data corruption": 1,
+    "real-time monitoring": 3,
+    "logging": 2,
+    "Audit Report": 2,
+    "Configuration Error": 1,
+    "Audit Failure": 1,
+    "misconfigured": 1,
+    "asyncjobs": 1,
+    "library": 1,
+    "utility": 1,
+    "job": 1,
+    "open-source": 1,
+    "permission": 1,
+    "terms of use": 1,
+    "agent system": 1,
+    "memory intelligence": 2,
+    "llm optimization": 1,
+    "memory hierarchy": 1,
+    "agent workflow commands": 1,
+    "configuration files": 1,
+    "success metrics": 1,
+    "emergency recovery": 1,
+    "anthropic": 2,
+    "claude-3-haiku-20240307": 1,
+    "audit": 2,
+    "Google Services Authentication": 1,
+    "Audit Logging": 1,
+    "streaming": 1,
+    "fault tolerance": 1,
+    "logging granularity": 1,
+    "microservices architecture": 1,
+    "configuration management": 1,
+    "Google": 1,
+    "Cloud": 1,
+    "missing": 1,
+    "PersistentMemory": 1,
+    "MCPMemory": 1,
+    "PersistenceMechanism": 1,
+    "SyncType": 1,
+    "HealthCheck": 1,
+    "MergeProcess": 1,
+    "SingletonPattern": 1,
+    "CommandPattern": 1,
+    "bsd license": 1,
+    "Initialization": 1,
+    "Workflow Protocols": 1,
+    "Protocol Compliance Checker": 1,
+    "Backup Protocols": 1,
+    "File Containment Rules": 1,
+    "fast recall": 1,
+    "add context entry": 1,
+    "extended context": 1,
+    "agent memory": 1,
+    "tasks": 1,
+    "llm benchmark report": 1,
+    "code audit challenge": 1,
+    "model evaluation": 1,
+    "performance metrics": 1,
+    "language model performance": 1,
+    "gcp-configuration": 1,
+    "api-calls": 1,
+    "rEngine-mcp-server": 1,
+    "persistent-memory-management": 1,
+    "bidirectional-sync": 2,
+    "history": 1,
+    "HTTP headers": 1,
+    "MIME types": 1,
+    "client preferences": 1,
+    "parallel jobs": 1,
+    "serial jobs": 1,
+    "async iterator": 1,
+    "error handling": 4,
+    "abort function": 1,
+    "memory_scribe": 1,
+    "security_vulnerabilities": 1,
+    "logging_mechanism": 1,
+    "dynamic_port_allocation": 1,
+    "fast_recall": 1,
+    "add_context": 1,
+    "advanced_intelligence": 1,
+    "extended_context": 1,
+    "agent_memory": 1,
+    "API Key Check": 1,
+    "Anthropic Authentication": 1,
+    "Language Model API Audit": 1,
+    "smart scribe": 1,
+    "knowledge management": 1,
+    "file monitoring": 2,
+    "chat log monitoring": 1,
+    "idle processor": 1,
+    "asynchronous": 1,
+    "file_management": 1,
+    "json_operations": 1,
+    "date_manipulation": 1,
+    "singleton_pattern": 1,
+    "single_responsibility_principle": 1,
+    "error_strategy": 1,
+    "array-flatten": 1,
+    "nested-arrays": 1,
+    "free": 1,
+    "advanced memory intelligence": 1,
+    "API key": 1,
+    "Knowledge Management": 1,
+    "AI Analysis": 1,
+    "Event-Driven Architecture": 1,
+    "Database Integration": 1,
+    "npm module": 1,
+    "dependency update process": 1,
+    "versioning system": 1,
+    "memory review results summary": 1,
+    "ai memory system": 1,
+    "benchmark date": 1,
+    "models tested": 1,
+    "prompt": 1,
+    "overall scores": 1,
+    "critical issues identified by all models": 1,
+    "single point of failure (unanimous)": 1,
+    "security vulnerabilities (unanimous)": 1,
+    "performance concerns (unanimous)": 1,
+    "missing conflict resolution (3/4 models)": 1,
+    "overcomplicated components (3/4 models)": 1,
+    "catastrophic failure scenarios": 1,
+    "top improvement recommendations": 1,
+    "immediate (critical)": 1,
+    "short-term (important)": 1,
+    "long-term (architecture)": 1,
+    "security gaps identified": 1,
+    "consensus on architecture issues": 1,
+    "why the low scores?": 1,
+    "action items": 1,
+    "memory review": 2,
+    "MCP server integration": 1,
+    "shared memory files": 2,
+    "scalable real-time monitoring": 1,
+    "robust logging mechanism": 1,
+    "OpenAI gpt-4o": 1,
+    "15-minute health checks": 1,
+    "port management": 1,
+    "console interception": 1,
+    "Anthropic CLaude-3.5-Sonnet-20241022": 1,
+    "Audit Error": 1,
+    "API Authentication": 1,
+    "AI Model Usage": 1,
+    "memory sync manager": 1,
+    "bidirectional synchronization": 1,
+    "persistent json": 1,
+    "mcp memory": 1,
+    "backup strategy": 1,
+    "pre-commit hook": 1,
+    "smart scribe data": 1,
+    "Authentication & Authorization": 1,
+    "Rate Limiting": 1,
+    "Logging Mechanism": 1,
+    "Security Measures": 1,
+    "Sensitive Information Exfiltration": 1,
+    "Secure Communication Channels": 1,
+    "semver": 1,
+    "release history": 1,
+    "update strategy": 1,
+    "nested arrays": 1,
+    "BSD_3-Clause": 1,
+    "use": 1,
+    "google cloud api key": 1,
+    "technical knowledge database": 2,
+    "search optimization tables": 1,
+    "mcp-memory-sync": 1,
+    "rengine-mcp-synchronization": 1,
+    "single-level array": 1,
+    "npm install": 1,
+    "memory model design": 1,
+    "real-time conflict resolution": 1,
+    "centralized configuration management": 1,
+    "environment_variables": 1,
+    "google_gemini": 2,
+    "audit_report": 1,
+    "api_authentication": 1,
+    "json": 2,
+    "file-system": 1,
+    "git-integration": 1,
+    "smart-scribe": 2,
+    "package manager": 1,
+    "git": 1,
+    "version control history": 1,
+    "matching": 1,
+    "globbing": 1,
+    "options": 1,
+    "Memory Scribe dashboard": 1,
+    "Console log monitoring": 1,
+    "15-minute automated checks": 1,
+    "Port management": 1,
+    "Shared memory files": 1,
+    "File monitoring": 1,
+    "Scalability Concerns": 1,
+    "Fast Recall": 1,
+    "Add Context Entry": 1,
+    "Advanced Memory Intelligence": 1,
+    "Context Entry": 1,
+    "Relevance Scoring": 1,
+    "Model Testing": 1,
+    "Benchmark Report": 1,
+    "Analysis Summary": 1,
+    "google-api": 1,
+    "continuous-knowledge-management": 1,
+    "qwen2.5-coder": 1,
+    "chokidar": 1,
+    "axios": 1,
+    "file-watching": 1,
+    "chat-logs": 1,
+    "knowledge-database": 1,
+    "search-optimization": 1,
+    "idle-processing": 1,
+    "dependency updates": 1,
+    "performance improvements": 1,
+    "array matching": 1,
+    "free-software": 1,
+    "mit-license": 1,
+    "python-licenses": 1,
+    "llm": 1,
+    "benchmark report": 1,
+    "openai": 1,
+    "ollama": 1,
+    "groq": 1,
+    "Google Gemini API": 1,
+    "google_gemini-1.5-pro_audit": 1,
+    "google_api_key_not_set": 1,
+    "Memory System Review": 3,
+    "Ollama llama3:8b": 1,
+    "Real-time Monitoring": 2,
+    "Logging Mechanism Improvement": 1,
+    "Server Integration": 1,
+    "AI Agents": 1,
+    "audit_log": 1,
+    "AgentHelloWorkflow": 1,
+    "context-continuity": 1,
+    "async/await": 1,
+    "try-catch": 1,
+    "string-manipulation": 1,
+    "color-codes": 1,
+    "MCP": 1,
+    "Best Effort Sync": 1,
+    "Timeout Handling": 1,
+    "fast commands": 1,
+    "context entry": 1,
+    "task": 1,
+    "integration example": 1,
+    "Environment Variables": 1,
+    "Flash Audit": 1,
+    "Google API Service": 1,
+    "agent": 2,
+    "workflow": 2,
+    "handoff": 1,
+    "context": 1,
+    "await": 1,
+    "file i/o": 1,
+    "date and time": 1,
+    "string manipulation": 1,
+    "persistent-json-data": 1,
+    "entity-data": 1,
+    "conversation-data": 1,
+    "array_flatten": 1,
+    "nested_arrays": 1,
+    "flat_array": 1,
+    "depth_parameter": 1,
+    "optional_depth": 1,
+    "authentication & authorization": 1,
+    "data encryption": 1,
+    "initialization": 1,
+    "strict protocol enforcement": 1,
+    "anthropic api": 2,
+    "anthropic_api_key_not_set": 1,
+    "agent hello workflow": 1,
+    "persistence": 1,
+    "mcp memories": 1,
+    "configuration parameters": 1,
+    "Real-Time Console Monitoring Dashboard": 1,
+    "MCP Server Management": 1,
+    "Open Source": 1,
+    "Use": 1,
+    "Software Development": 1,
+    "persistent-memory-json": 1,
+    "resilience": 1,
+    "error-patterns": 1,
+    "performance-optimizations": 1,
+    "integration-points": 1,
+    "user-workflow-patters": 1,
+    "flat-array": 1,
+    "recursive-flatten": 1,
+    "npm-package": 1,
+    "bsd-3-clause-license": 1,
+    "free-software-license": 1,
+    "copyright-notice": 1,
+    "permissive-license": 1,
+    "open-source-license": 1,
+    "agent handoff": 1,
+    "initialization workflow": 1,
+    "context recall": 1,
+    "automatic hello detection": 1,
+    "dual memory writer": 1,
+    "multi-provider query protocol": 1,
+    "Fast Commands": 1,
+    "Memory Intelligence": 1,
+    "Agent Memory": 1,
+    "Tasks": 1,
+    "API Endpoints for Memory System Access": 1,
+    "Load Balancing": 1,
+    "license_type": 1,
+    "copyright_notice": 1,
+    "open_source": 1,
+    "Agent Hello Protocol": 1,
+    "Quick Start Commands": 1,
+    "git backups": 1,
+    "session tracking": 1,
+    "behavior wrapper": 1,
+    "brainpool contribution": 1,
+    "Generative AI": 1,
+    "Text Generation": 1,
+    "Configuration Parameter": 1,
+    "google_cloud_platform": 1,
+    "Google API Key": 1,
+    "flatten-array": 1,
+    "deep-arrays": 1,
+    "api": 1,
+    "key": 1,
+    "claude": 1,
+    "authentication-identifier": 1,
+    "persistent_memory_integrity": 1,
+    "handoff_handling": 1,
+    "context_continuity": 1,
+    "memory_management": 1,
+    "System Health Monitoring": 1,
+    "code versioning": 1,
+    "package management": 1,
+    "maintaining compatibility": 1,
+    "up-to-date": 1,
+    "clear and consistent": 1,
+    "testString": 1,
+    "ollama qwen2.5:3b": 1,
+    "sftp integration": 1,
+    "agent management": 1,
+    "BSD License": 1,
+    "3-Clause License": 1,
+    "promotion": 1,
+    "StackTrackr": 1,
+    "AI Collaboration Framework": 1,
+    "AGENT_INITIALIZATION_PROTOCOL": 1,
+    "MANDATORY_FIRST_STEPS": 1,
+    "READ_MAIN_INSTRUCTIONS": 1,
+    "FOLLOW_COMPLETE_WORKFLOW": 1,
+    "AGENT_HELLO_PROTOCOL": 1,
+    "INITIALIZATION_WORKFLOW": 1,
+    "PROTOCOL_ENFORCEMENT": 1,
+    "AUTO-BACKUP_BEFORE_CHANGES": 1,
+    "FILE_CONTAINMENT_VALIDATION": 1,
+    "MEMORY_CONSISTENCY_CHECKS": 1,
+    "NO_ROGUE_OPERATIONS": 1,
+    "QUICK_START_COMMANDS": 1,
+    "PROTOCOL_COMPLIANCE_CHECKER": 1,
+    "SCRIBE_SUMMARY": 1,
+    "PROTOCAL_ENFORCER": 1,
+    "DIRECTORY_STRUCTURE": 1,
+    "google-gemini-api": 1,
+    "missing-configuration-parameter": 1,
+    "authentication-error": 1,
+    "depth": 1,
+    "Metrics": 1,
+    "Local Models": 1,
+    "Online Models": 1,
+    "Use of Multiple Models for Benchmarking": 1,
+    "Qwen2.5:3B": 1,
+    "Llama3:8B": 1,
+    "Gemma2:2B": 1,
+    "GPT-4o": 1,
+    "GPT-4 Turbo": 1,
+    "Claude 3.5 Sonnet": 1,
+    "Claude 3 Haiku": 1,
+    "Gemini 1.5 Pro": 1,
+    "Gemini 1.5 Flash": 1,
+    "Llama 3.1 70B": 1,
+    "Mixtral 8x7B": 1,
+    "Google Cloud Platform (GCP)": 1,
+    "Authorization": 1,
+    "Configuration Management": 1,
+    "rengine-mcp-server": 1,
+    "system-state": 1,
+    "pre-commit-sync": 1,
+    "nested-array": 1,
+    "functional-programming": 1,
+    "data-processing": 1,
+    "agent-self-management-system": 1,
+    "agent-behavior-wrapper": 1,
+    "extended-context": 1,
+    "task-logging": 1,
+    "automatic-compliance": 1,
+    "incremental-commits": 1,
+    "session-cleanup": 1
+  },
+  "concept_relationships": {
+    "API Key": [
+      "Authentication",
+      "Authorization"
+    ],
+    "_shims": [
+      "modules",
+      "runtime-bun.js"
+    ],
+    "auto": [
+      "generated",
+      "configured"
+    ],
+    "Bun runtime": [
+      "runtime-bun.js"
+    ],
+    "_shims/auto/types-node.js": [
+      "rEngine/node_modules/@anthropic-ai/sdk"
+    ],
+    "__createBinding": [],
+    "__exportStar": [],
+    "API endpoints": [
+      "security vulnerabilities",
+      "overcomplicated components"
+    ],
+    "Class structures and inheritance patterns": [
+      "document_analysis"
+    ],
+    "Configuration parameters and their effects": [
+      "knowledgeDB"
+    ],
+    "Error patterns and debugging approaches": [
+      "debugging"
+    ],
+    "Performance optimizations and bottlenecks": [
+      "document_analysis"
+    ],
+    "Integration points between systems": [],
+    "User workflow patterns and preferences": [
+      "chatAnalysis"
+    ],
+    "Bootstrap Memory Protocol": [
+      "Memory Initialization",
+      "Boot Process"
+    ],
+    "Agent Escalation Protocol": [
+      "Cost-Efficient Escalation Strategy",
+      "Escalation Tiers"
+    ],
+    "Cost-Efficient Escalation Strategy": [
+      "Overview",
+      "Primary Principle"
+    ],
+    "Escalation Tiers": [
+      "Cost-Efficient Escalation Strategy",
+      "Tier 1: Claude 3 Haiku (Entry Level)",
+      "Tier 2: GPT-4o-mini (Code Specialist)",
+      "Tier 3: Claude Sonnet 4 (Senior Architect)"
+    ],
+    "Tier 1: Claude 3 Haiku": [
+      "Cost-Efficient Escalation Strategy",
+      "Escalation Triggers for Haiku"
+    ],
+    "Tier 2: GPT-4o-mini": [
+      "Cost-Efficient Escalation Strategy",
+      "Escalation Triggers for GPT-4o-mini"
+    ],
+    "Tier 3: Claude Sonnet 4": [
+      "Cost-Efficient Escalation Strategy",
+      "Final Escalation Authority"
+    ],
+    "Escalation Phrases for Lower-Tier Models": [
+      "Haiku Escalation Signals",
+      "GPT-4o-mini Escalation Signals"
+    ],
+    "Context Handoff Template": [
+      "Escalation Protocol Implementation",
+      "Context Summary",
+      "Recommendation"
+    ],
+    "Escalation Criteria Matrix": [
+      "Escalation Triggers by Domain",
+      "Cost-Benefit Analysis",
+      "Training Examples",
+      "Monitoring & Optimization"
+    ],
+    "Implementation in VS Code": [
+      "Prompt Engineering",
+      "Multi-Agent Workflow",
+      "Conditional Routing"
+    ],
+    "Escalation Triggers by Domain": [
+      "JavaScript/Web Development",
+      "System Architecture",
+      "Debugging",
+      "Documentation"
+    ],
+    "Cost-Benefit Analysis": [
+      "Efficient Escalation Saves Money",
+      "Escalation Decision Framework"
+    ],
+    "Training Examples": [
+      "Good Escalation (GPT-4o-mini)",
+      "Poor Escalation (GPT-4o-mini)"
+    ],
+    "Monitoring & Optimization": [
+      "Track Escalation Metrics",
+      "Continuous Improvement"
+    ],
+    "Emergency Escalation": [
+      "CRITICAL ESCALATION TO CLAUDE SONNET 4"
+    ],
+    "JSON Tracking Files": [
+      "functions.json",
+      "structure.json",
+      "variables.json",
+      "styles.json",
+      "recentissues.json",
+      "performance.json",
+      "decisions.json",
+      "errors.json"
+    ],
+    "MCP Memory": [],
+    "Agent Workflow Process": [
+      "intelligence_gathering",
+      "impact_analysis",
+      "implementation",
+      "update_json_files",
+      "validate_changes"
+    ],
+    "GPT Models": [
+      "functions.json",
+      "structure.json"
+    ],
+    "Claude Models": [
+      "all_json_files"
+    ],
+    "Gemini Models": [
+      "all_json_files"
+    ],
+    "Versioning": [
+      "releases",
+      "dependencies"
+    ],
+    "Header Text Span": [
+      "CSS Styling",
+      "HTML Headers"
+    ],
+    "SVG Optimization": [
+      "CSS Styling",
+      "Image Optimization"
+    ],
+    "Composition Helper Cleanup": [
+      "Code Refactoring",
+      "Legacy Code"
+    ],
+    "Dynamic Item Counter": [
+      "User Interface Elements",
+      "Data Binding"
+    ],
+    "CSV Import/Export Fixes": [
+      "File Handling",
+      "Data Integrity"
+    ],
+    "Changelog Loading Fix": [
+      "Error Handling",
+      "Fallback Mechanisms"
+    ],
+    "Filter Logic Overhaul": [
+      "User Interface Elements",
+      "Feature Enhancement"
+    ],
+    "Search Logic Fix": [
+      "Data Retrieval",
+      "User Experience Optimization"
+    ],
+    "Grouped Filter Chips": [
+      "User Interface Elements",
+      "Data Filtering"
+    ],
+    "Code Audit": [
+      "Comprehensive",
+      "Security",
+      "Performance",
+      "Code Quality",
+      "Architecture"
+    ],
+    "Security Audits": [
+      "Code Audit"
+    ],
+    "Performance Metrics": [
+      "Models Tested",
+      "Quality Score"
+    ],
+    "Benchmarks": [
+      "Models Tested",
+      "Performance Metrics"
+    ],
+    "Google Cloud Services": [
+      "APIs",
+      "platforms"
+    ],
+    "runtime-node.js": [
+      "_shims",
+      "@anthropic-ai/sdk"
+    ],
+    "_shims/auto/runtime.js": [
+      "runtime.js"
+    ],
+    "Memory Initialization Tool": [
+      "Bootstrap Memories",
+      "Agent-Specific Memories",
+      "Shared Memories"
+    ],
+    "Memory Structure": [
+      "Bootstrap Memories",
+      "Agent-Specific Memories",
+      "Shared Memories"
+    ],
+    "Memory Validation": [
+      "Validation Issues"
+    ],
+    "Backup and Safety": [],
+    "Memory Schema": [
+      "Memory Files"
+    ],
+    "Best Practices": [],
+    "Integration": [
+      "GitHub Copilot Agent",
+      "GPT-4 Agent",
+      "Extended Context Management",
+      "Cross-App Coordination System"
+    ],
+    "Security Considerations": [],
+    "Memory Vault": [
+      "Backup Repository",
+      "Sync Script",
+      "Memory Files Tracked"
+    ],
+    "Backup Repository": [
+      "Memory Vault"
+    ],
+    "Sync Script": [
+      "Memory Vault",
+      "Memory Files Tracked",
+      "Backup Repository"
+    ],
+    "Memory Files": [
+      "Memory Vault",
+      "Sync Script"
+    ],
+    "API key": [
+      "Google Cloud",
+      "authentication"
+    ],
+    "Anthropic": [
+      "Company",
+      "Technology Provider"
+    ],
+    "auto-shimming": [
+      "shimming"
+    ],
+    "Array": [
+      "Elements"
+    ],
+    "Flatten": [
+      "array"
+    ],
+    "OpenAI gpt-4o": [
+      "gpt-4"
+    ],
+    "Memory System Review": [
+      "Model",
+      "Duration",
+      "Timestamp"
+    ],
+    "API Endpoints": [
+      "security",
+      "performance"
+    ],
+    "Performance Optimization": [],
+    "Failover Mechanism": [
+      "redundancy"
+    ],
+    "Security Concerns": [
+      "Data Protection"
+    ],
+    "Load Balancing": [
+      "MCP Server Integration and Management"
+    ],
+    "ELK Stack": [
+      "log monitoring"
+    ],
+    "BSD 3-Clause License": [
+      "mit_license",
+      "apache_2.0"
+    ],
+    "Redistribution and use in source and binary forms": [
+      "BSD 3-Clause License"
+    ],
+    "Anthropic API": [
+      "AI",
+      "language models"
+    ],
+    "runtime-shim": [
+      "runtime",
+      "adapter"
+    ],
+    "Bun Runtime": [
+      "Node.js",
+      "JavaScript"
+    ],
+    "shim": [
+      "modules",
+      "libraries"
+    ],
+    "version history": [
+      "code versioning"
+    ],
+    "dependency management": [
+      "dependencies"
+    ],
+    "package version": [
+      "dependency management",
+      "version history"
+    ],
+    "Smart Scribe": [
+      "Qwen2.5-Coder"
+    ],
+    "File Monitoring": [
+      "file changes",
+      "system operations"
+    ],
+    "Chat Log Monitoring": [
+      "chokidar",
+      "change event"
+    ],
+    "auto-runtime-bun.js": [
+      "_shims",
+      "runtime-bun.js"
+    ],
+    "API Endpoint": [
+      "service endpoints",
+      "integration points"
+    ],
+    "Security Best Practices": [
+      "API Keys",
+      "Data Protection"
+    ],
+    "Shims": [
+      "APIs",
+      "Modules"
+    ],
+    "_shims Directory": [
+      "Shims",
+      "Runtime-Bun.js"
+    ],
+    "Agent Accountability System": [
+      "Self-Management Protocol",
+      "Behavior Wrapper",
+      "Bootstrap Protocol"
+    ],
+    "Git Backup": [
+      "Self-Management Protocol",
+      "Task Tracking"
+    ],
+    "Memory Startup Check": [
+      "Self-Management Protocol",
+      "Short-term Memory"
+    ],
+    "Incremental Git Backups": [
+      "Self-Management Protocol",
+      "Git Backup"
+    ],
+    "Task Completion Logging": [
+      "Self-Management Protocol",
+      "Extended Context Integration"
+    ],
+    "Brainpool Contribution Summary": [
+      "Agent Accountability System",
+      "Agent Behavior Wrapper"
+    ],
+    "Continuous Knowledge Management": [
+      "Smart Scribe",
+      "Automated Analysis"
+    ],
+    "node.js runtime": [
+      "JavaScript",
+      "Node.js"
+    ],
+    "Node.js": [
+      "JavaScript",
+      "Web Development"
+    ],
+    "NPM": [
+      "Node.js"
+    ],
+    "Express": [
+      "Node.js"
+    ],
+    "anymatch": [
+      "picomatch"
+    ],
+    "matchers": [],
+    "testString": [
+      "matchers"
+    ],
+    "options": [],
+    "glob patterns": [
+      "matchers"
+    ],
+    "regular expressions": [
+      "matchers"
+    ],
+    "functions": [
+      "matchers"
+    ],
+    "returnIndex": [
+      "options"
+    ],
+    "picomatch options": [],
+    "Flattening": [
+      "Arrays",
+      "Recursion"
+    ],
+    "asynckit": [
+      "async",
+      "iterator",
+      "parallel",
+      "serial"
+    ],
+    "parallel": [
+      "serial",
+      "iterator",
+      "job"
+    ],
+    "serial": [
+      "parallel",
+      "iterator",
+      "job"
+    ],
+    "asynckit.parallel": [
+      "asynckit",
+      "parallelism",
+      "array",
+      "callback"
+    ],
+    "asynckit.serial": [
+      "asynckit",
+      "serialism",
+      "array",
+      "callback"
+    ],
+    "gpt-4o": [],
+    "MCP Server Integration and Management": [
+      "Memory Scribe Dashboard with Real-Time Console Monitoring"
+    ],
+    "Health Checks": [
+      "15-Minute Automated Health Checks with Desktop Alerts"
+    ],
+    "Redundancy": [
+      "MCP Server Integration and Management"
+    ],
+    "BSD License": [
+      "open-source",
+      "free-software"
+    ],
+    "Agent": [
+      "Framework",
+      "User",
+      "COPILOT_INSTRUCTIONS.md"
+    ],
+    "Workflow Protocol": [
+      "Agent Hello Protocol",
+      "unified-workflow.md"
+    ],
+    "Protocol Enforcement": [
+      "AGENT.md"
+    ],
+    "Directory Structure": [
+      "AGENT.md",
+      "rAgents/",
+      "rEngine/",
+      "rMemory/",
+      "rScribe/"
+    ],
+    "Error Patterns": [
+      "debugging approaches",
+      "performance optimizations"
+    ],
+    "SDK (Software Development Kit)": [
+      "API",
+      "Development"
+    ],
+    "Module": [
+      "JavaScript",
+      "ES6 Modules"
+    ],
+    "Dependency Update": [
+      "Versioning",
+      "Release Notes"
+    ],
+    "Glob Patterns": [],
+    "Regular Expressions": [],
+    "Function Matchers": [
+      "anymatch"
+    ],
+    "Array of Matchers": [
+      "anymatch",
+      "micromatch"
+    ],
+    "returnIndex Option": [
+      "anymatch"
+    ],
+    "Picomatch": [
+      "micromatch",
+      "anymatch"
+    ],
+    "AI Memory System": [
+      "Monitoring",
+      "Security",
+      "Performance",
+      "Scalability"
+    ],
+    "Benchmarking": [
+      "Results Summary"
+    ],
+    "GPT-4o, Qwen2.5:3b, Gemma2:2b, Llama3:8b": [
+      "Models Tested",
+      "Benchmarking"
+    ],
+    "Review Prompt": [
+      "Critical Issues Identified by ALL Models",
+      "Specific Catastrophic Failure Scenarios"
+    ],
+    "Single Point of Failure (UNANIMOUS)": [
+      "MCP server",
+      "Security Vulnerabilities"
+    ],
+    "Authentication/Authorization": [
+      "API Authentication & Authorization"
+    ],
+    "Data Encryption": [
+      "Data Encryption (at rest and in transit)"
+    ],
+    "Shared Memory File Race Conditions": [
+      "conflict resolution",
+      "data corruption"
+    ],
+    "Fault Tolerance Mechanisms": [
+      "Reliability"
+    ],
+    "Load Balancing for Scalability": [
+      "Centralized Configuration Management"
+    ],
+    "Higher level content negotiation": [
+      "API",
+      "HTTP"
+    ],
+    "NPM Versioning and Download Counting": [
+      "npm",
+      "Node.js"
+    ],
+    "memory management": [
+      "data synchronization",
+      "conflict resolution",
+      "performance optimization"
+    ],
+    "race condition": [
+      "concurrent_access",
+      "data_corruption"
+    ],
+    "version control": [
+      "conflict resolution",
+      "revisions"
+    ],
+    "API endpoint": [
+      "RESTful API",
+      "HTTP protocol"
+    ],
+    "central management server (MCP server)": [
+      "device communication",
+      "agent integration"
+    ],
+    "Initialization Protocol": [],
+    "MANDATORY FIRST STEPS": [
+      "COPILOT_INSTRUCTIONS.md",
+      "rAgents/unified-workflow.md"
+    ],
+    "Critical Steps": [],
+    "Initialization Workflow": [
+      "Agent Hello Protocol"
+    ],
+    "Auto-backup before changes": [
+      "Memory Consistency Checks",
+      "No Rogue Operations"
+    ],
+    "File containment validation": [
+      "Protocol Enforcement",
+      "Backup Protocols"
+    ],
+    "Memory consistency checks": [],
+    "Rogue Operations": [
+      "File containment validation"
+    ],
+    "Quick Start Commands": [
+      "AGENT.md",
+      "rEngine/agent-hello-workflow.js",
+      "node rEngine/protocol-compliance-checker.js check",
+      "node rEngine/scribe-summary.js 6h",
+      "node rEngine/protocol-enforcer.js manual_check"
+    ],
+    "Critical Warning": [
+      "AGENT.md"
+    ],
+    "MemorySyncManager": [
+      "constructor",
+      "loadPersistentMemory",
+      "savePersistentMemory",
+      "createEmptyMemory",
+      "addEntity",
+      "addConversation",
+      "syncToMCP",
+      "preCommitSync",
+      "healthCheck",
+      "mergeSmartScribeData"
+    ],
+    "persistentJSON file": [
+      "MemorySyncManager"
+    ],
+    "backupFile": [
+      "MemorySyncManager",
+      "backup"
+    ],
+    "entity": [
+      "MemorySyncManager.addEntity",
+      "MemorySyncManager.createEmptyMemory"
+    ],
+    "conversation": [
+      "MemorySyncManager.addConversation",
+      "MemorySyncManager.createEmptyMemory"
+    ],
+    "healthCheck": [
+      "MemorySyncManager"
+    ],
+    "Memory Sync Manager": [
+      "persistent-memory.json",
+      "MCP Memory"
+    ],
+    "Persistent File": [
+      "Memory Sync Manager",
+      "Data Management"
+    ],
+    "Backup File": [
+      "persistent-memory.json",
+      "Memory Sync Manager"
+    ],
+    "Entity": [
+      "memory.entities",
+      "Memory Sync Manager"
+    ],
+    "Conversation": [
+      "memory.conversations",
+      "Memory Sync Manager"
+    ],
+    "System State": [
+      "Memory Sync Manager",
+      "Data Management"
+    ],
+    "Project Context": [
+      "Memory Sync Manager",
+      "Data Management"
+    ],
+    "Git Integration": [
+      "Pre-commit Sync",
+      "Version Control"
+    ],
+    "Smart Scribe Export": [
+      "Smart Scribe Data Merging",
+      "Merge Process"
+    ],
+    "Health Check": [
+      "system_state.health_check",
+      "Memory Sync Manager"
+    ],
+    "real-time monitoring": [
+      "performance analysis",
+      "debugging"
+    ],
+    "centralized server integration": [
+      "MCP_server_integrations"
+    ],
+    "log rotation and filtering": [
+      "console_log_monitoring"
+    ],
+    "adaptive monitoring": [
+      "real_time_monitoring"
+    ],
+    "load balancing and redundancy": [
+      "MCP_server_integrations"
+    ],
+    "distributed logging systems": [
+      "log_rotation_and_filtering"
+    ],
+    "memory synchronization": [
+      "shared_memory_files_vs_personal_agent_memory_files"
+    ],
+    "Google API key not set": [
+      "Configuration issues",
+      "API security"
+    ],
+    "glob pattern": [
+      "anymatch"
+    ],
+    "regular expression": [
+      "anymatch"
+    ],
+    "function matcher": [
+      "anymatch"
+    ],
+    "picomatch": [
+      "anymatch",
+      "glob patterns"
+    ],
+    "MCP server": [
+      "single point of failure"
+    ],
+    "Configuration parameters": [
+      "performance concerns",
+      "memory usage"
+    ],
+    "Conflict Resolution": [
+      "shared memory file race conditions"
+    ],
+    "Security Vulnerabilities": [
+      "unsecured API endpoints",
+      "data breaches and unauthorized access"
+    ],
+    "Performance Concerns": [
+      "real-time monitoring",
+      "excessive logging",
+      "scalability issues",
+      "performance impact of constant monitoring"
+    ],
+    "AGENT_INITIALIZATION_PROTOCOL": [
+      "MANDATORY_FIRST_STEPS",
+      "PROTOCOL_ENFORCEMENT",
+      "QUICK_START_COMMANDS"
+    ],
+    "AUTO-BACKUP BEFORE CHANGES": [
+      "PROTOCOL ENFORCEMENT",
+      "File containment validation",
+      "Memory consistency checks"
+    ],
+    "FILE CONTAINMENT VALIDATION": [
+      "PROTOCOL ENFORCEMENT",
+      "Auto-backup before changes",
+      "Memory consistency checks"
+    ],
+    "MEMORY CONSISTENCY CHECKS": [
+      "PROTOCOL ENFORCEMENT",
+      "Auto-backup before changes",
+      "File containment validation"
+    ],
+    "NO ROGUE OPERATIONS": [
+      "PROTOCOL ENFORCEMENT",
+      "Auto-backup before changes",
+      "File containment validation"
+    ],
+    "QUICK START COMMANDS": [
+      "AGENT_INITIALIZATION_PROTOCOL",
+      "DIRECTORY STRUCTURE"
+    ],
+    "DIRECTORY STRUCTURE": [
+      "AGENT_INITIALIZATION_PROTOCOL",
+      "QUICK START COMMANDS"
+    ],
+    "CRITICAL WARNING": [
+      "PROTOCOL ENFORCEMENT",
+      "Agent handles GitHub sync via Desktop app only!"
+    ],
+    "File watching": [
+      "File system"
+    ],
+    "Knowledge database": [],
+    "Search tables": [],
+    "Version History": [
+      "changelog"
+    ],
+    "API": [
+      "communication",
+      "interoperability"
+    ],
+    "negotiator": [
+      "mime-types"
+    ],
+    "koa": [
+      "accepts",
+      "Higher level content negotiation"
+    ],
+    "async job": [
+      "parallel jobs",
+      "serial jobs"
+    ],
+    "abort function": [
+      "asynckit.parallel",
+      "asynckit.serial"
+    ],
+    "error event": [
+      "abort function",
+      "asynckit.parallel",
+      "asynckit.serial"
+    ],
+    "parallel iterator": [
+      "asynckit.parallel",
+      "asynckit.serial"
+    ],
+    "serial iterator": [
+      "asynckit.parallel",
+      "asynckit.serial"
+    ],
+    "sort helpers": [
+      "parallel jobs",
+      "serial jobs"
+    ],
+    "AgentHelloWorkflow": [],
+    "Memory Intelligence System Paths": [],
+    "Handoff Details": [
+      "get_latest_handoff",
+      "extract_handoff_summary"
+    ],
+    "Personal Memories": [
+      "Memory Intelligence System",
+      "AgentHelloWorkflow"
+    ],
+    "MCP Memories": [
+      "Memory Intelligence System",
+      "AgentHelloWorkflow"
+    ],
+    "Knowledge Database": [
+      "technical-knowledge.json"
+    ],
+    "PersistentJSON": [
+      "MemorySyncManager",
+      "File: rEngine/backups/2025-08-18_protocol/memory-sync-manager.js"
+    ],
+    "Smart Scribe Data": [
+      "MemorySyncManager",
+      "File: rEngine/backups/2025-08-18_protocol/memory-sync-manager.js"
+    ],
+    "MCP Server": [
+      "single point of failure",
+      "dependency"
+    ],
+    "Configuration Parameters": [
+      "Initialization Workflow",
+      "Memory Management"
+    ],
+    "Error Patterns and Debugging Approaches": [
+      "debugging approaches"
+    ],
+    "Performance Optimizations and Bottlenecks": [
+      "bottlenecks"
+    ],
+    "Integration Points Between Systems": [
+      "integration patterns"
+    ],
+    "User Workflow Patterns and Preferences": [
+      "workflow patterns"
+    ],
+    "Copyright": [
+      "License",
+      "Trademarks",
+      "Trademark Infringement"
+    ],
+    "Redistribution": [
+      "source_code",
+      "binary_form"
+    ],
+    "Anthropic CLaude-3-5-sonnet-20241022": [],
+    "Google API key": [
+      "Google Cloud",
+      "API Authentication"
+    ],
+    "Audit": [
+      "Compliance",
+      "Monitoring"
+    ],
+    "persistent memory and context continuity": [
+      "AgentHelloWorkflow"
+    ],
+    "handoff logs": [
+      "AgentHelloWorkflow",
+      "initializeAgent"
+    ],
+    "personal memories": [
+      "AgentHelloWorkflow",
+      "initializeAgent"
+    ],
+    "MCP memories": [
+      "AgentHelloWorkflow",
+      "loadMCPMemories"
+    ],
+    "technical knowledge": [
+      "AgentHelloWorkflow",
+      "loadKnowledgeDB"
+    ],
+    "continuation prompt": [
+      "generateContinuationPrompt"
+    ],
+    "memory intelligence system": [
+      "AgentHelloWorkflow",
+      "memoryIntelligencePath",
+      "fastRecallPath",
+      "addContextPath"
+    ],
+    "recall.js": [
+      "AgentHelloWorkflow"
+    ],
+    "add-context.js": [
+      "AgentHelloWorkflow"
+    ],
+    "BackupFile": [
+      "MemorySyncManager",
+      "PersistenceJsonData"
+    ],
+    "EntityData": [
+      "MemorySyncManager",
+      "PersistentJsonData"
+    ],
+    "ConversationData": [
+      "MemorySyncManager",
+      "PersistentJsonData"
+    ],
+    "Logging and monitoring": [
+      "code_patterns",
+      "performance_optimizations",
+      "error_patterns"
+    ],
+    "Security": [
+      "Code Audit Challenge",
+      "Performance Metrics"
+    ],
+    "Scalability": [
+      "performance_optimizations"
+    ],
+    "Git Backups": [
+      "Incremental Commits",
+      "Error Patterns"
+    ],
+    "Session Tracking": [
+      "Task Completion Logging",
+      "Memory Protocols"
+    ],
+    "Incremental Commits": [
+      "Git Backups"
+    ],
+    "Short-term Memory": [
+      "Session Tracking",
+      "Extended Context"
+    ],
+    "Extended Context": [
+      "Agent Memory"
+    ],
+    "Agent Self-Management System": [
+      "Git Backups",
+      "Session Tracking",
+      "Short-term Memory"
+    ],
+    "Agent Behavior Wrapper": [
+      "Task Lifecycle Management",
+      "Error Handling"
+    ],
+    "PersistentMemory.json": [
+      "MemorySyncManager",
+      "BackupFile"
+    ],
+    "parallel jobs": [
+      "asynckit.parallel"
+    ],
+    "serial jobs": [
+      "asynckit.serial"
+    ],
+    "memory system": [
+      "AI agent",
+      "data storage"
+    ],
+    "real-time console monitoring": [
+      "memory system dashboard"
+    ],
+    "scalability concerns": [
+      "real-time console monitoring",
+      "15-minute automated health checks"
+    ],
+    "frequent logging and monitoring": [
+      "file monitoring",
+      "console interception",
+      "activity logging"
+    ],
+    "security concerns": [
+      "unsecured API endpoints",
+      "poor logging practices"
+    ],
+    "Agent System": [
+      "Configuration Files",
+      "Memory Intelligence",
+      "LLM Optimization"
+    ],
+    "Quick Start": [
+      "Agent System",
+      "Memory Intelligence System",
+      "LLM Optimization",
+      "Configuration Files Updated",
+      "Integration Examples",
+      "Success Metrics",
+      "Emergency Recovery"
+    ],
+    "Memory Intelligence System": [
+      "AgentHelloWorkflow"
+    ],
+    "LLM Optimization": [
+      "API Priority",
+      "Performance Recommendations"
+    ],
+    "Memory Hierarchy": [
+      "Extended Context",
+      "MCP Memory Server",
+      "Agent Memory",
+      "Tasks Memory"
+    ],
+    "Agent Workflow Commands": [
+      "Agent Menu System",
+      "Agent Hello Workflow"
+    ],
+    "Configuration Files Updated": [
+      "Agent System",
+      "Quick Start",
+      "Memory Intelligence System",
+      "LLM Optimization",
+      "Memory Hierarchy",
+      "Agent Workflow Commands",
+      "Integration Examples",
+      "Success Metrics",
+      "Emergency Recovery"
+    ],
+    "Integration Examples": [
+      "Agent System",
+      "Quick Start",
+      "Memory Intelligence System",
+      "LLM Optimization",
+      "Memory Hierarchy",
+      "Agent Workflow Commands",
+      "Configuration Files Updated",
+      "Success Metrics",
+      "Emergency Recovery"
+    ],
+    "Success Metrics": [
+      "Memory Intelligence",
+      "Fast Recall",
+      "API LLMs",
+      "MCP Integration"
+    ],
+    "Emergency Recovery": [
+      "Memory Systems Fail"
+    ],
+    "Next Week Scenario": [
+      "Agent System",
+      "Quick Start",
+      "Memory Intelligence System",
+      "LLM Optimization",
+      "Memory Hierarchy",
+      "Agent Workflow Commands",
+      "Configuration Files Updated",
+      "Integration Examples",
+      "Success Metrics"
+    ],
+    "Error Pattern": [
+      "Google API Key not set",
+      "API Authentication"
+    ],
+    "version": [
+      "change_log",
+      "package"
+    ],
+    "dependency": [
+      "package",
+      "module"
+    ],
+    "Array Flatten": [
+      "Functional Programming",
+      "Data Processing"
+    ],
+    "data corruption": [
+      "corruption"
+    ],
+    "conflict resolution": [
+      "atomic_operations",
+      "synchronization_practices"
+    ],
+    "logging": [
+      "debugging",
+      "troubleshooting"
+    ],
+    "Audit Report": [
+      "System Evaluation",
+      "Debugging"
+    ],
+    "License": [
+      "open-source",
+      "permission"
+    ],
+    "Configuration Files": [
+      "Bootstrap Config Enhanced",
+      "Agent Initialization Enhanced",
+      "Memory Intelligence Core"
+    ],
+    "Audit Log": [
+      "logging",
+      "audit",
+      "compliance"
+    ],
+    "async": [
+      "parallel",
+      "serial"
+    ],
+    "callback function": [
+      "parallel iterator",
+      "serial iterator"
+    ],
+    "error handling": [
+      "error patterns",
+      "debugging approaches"
+    ],
+    "streaming interface": [
+      "async"
+    ],
+    "fault tolerance": [
+      "recovery_strategies",
+      "system_stability"
+    ],
+    "logging granularity": [
+      "debugging_process",
+      "forensic_analysis"
+    ],
+    "microservices architecture": [
+      "scalability",
+      "maintainability",
+      "resilience"
+    ],
+    "configuration management": [
+      "decoupling components into independent services",
+      "centralized configuration management"
+    ],
+    "not set": [
+      "value",
+      "configuration"
+    ],
+    "PersistenceMechanism": [
+      "FileIO",
+      "BackupStrategy"
+    ],
+    "SyncType": [
+      "ReadWriteMode",
+      "BidirectionalSync"
+    ],
+    "HealthCheck": [
+      "MemorySyncManager"
+    ],
+    "MergeProcess": [
+      "DataSource",
+      "DataDestination"
+    ],
+    "Copyright notice": [
+      "BSD License"
+    ],
+    "StackTrackr": [
+      "code_audit_challenge"
+    ],
+    "Protocol": [
+      "Initialization Protocol",
+      "Workflow Protocols",
+      "Protocol Compliance Checker"
+    ],
+    "Agent Initialization Protocol": [
+      "COPILOT_INSTRUCTIONS.md",
+      "rAgents/unified-workflow.md"
+    ],
+    "Unified Workflow Protocols": [
+      "Completed Workflow",
+      "rAgents/unified-workflow.md"
+    ],
+    "Fast Recall": [
+      "recall.js",
+      "node"
+    ],
+    "Add Context Entry": [
+      "add-context.js",
+      "node"
+    ],
+    "Memory Intelligence": [
+      "Pattern Matching",
+      "Smart Suggestions"
+    ],
+    "Agent Memory": [
+      "Extended Context",
+      "Tasks"
+    ],
+    "Tasks": [
+      "Agent Memory"
+    ],
+    "code_audit": [
+      "benchmark_report",
+      "performance_metrics"
+    ],
+    "LLM Benchmark Report": [
+      "benchmark_report"
+    ],
+    "Google Cloud Platform (GCP)": [
+      "APIs",
+      "Compute Resources"
+    ],
+    "persistent-memory.json": [
+      "MemorySyncManager",
+      "MemorySyncManager.loadPersistentMemory",
+      "MemorySyncManager.savePersistentMemory"
+    ],
+    "package manager": [
+      "packages",
+      "dependency management"
+    ],
+    "Accepts": [
+      "negotiator",
+      "koa"
+    ],
+    "Content Negotiation": [
+      "MIME types",
+      "Encodings",
+      "Languages"
+    ],
+    "asyncJob": [
+      "parallel iterator",
+      "serial iterator"
+    ],
+    "Memory Scribe Dashboard": [
+      "inconsistency",
+      "data presentation"
+    ],
+    "MCP Server Management": [
+      "Single Point of Failure (SPOF)",
+      "Dependency on SFTP"
+    ],
+    "Port Management": [
+      "Excessive Complexity",
+      "Conflicting Ports"
+    ],
+    "Logging Mechanism": [
+      "Insufficient Traceability",
+      "No Audit Trails"
+    ],
+    "Memory & Intelligence Commands": [
+      "commands"
+    ],
+    "Advanced Memory Intelligence": [
+      "memory-intelligence.js",
+      "node"
+    ],
+    "Smart Scribe System": [
+      "Qwen2.5-Coder"
+    ],
+    "Search Optimization Tables": [
+      "knowledgeDB"
+    ],
+    "Idle Processor": [
+      "setInterval",
+      "idleAnalysis"
+    ],
+    "asyncKit": [
+      "asynckit.parallel",
+      "asynckit.serial"
+    ],
+    "Filesystem Operations": [
+      "loadPersistentMemory",
+      "savePersistentMemory",
+      "createEmptyMemory"
+    ],
+    "JSON Parsing/Serialization": [
+      "loadPersistentMemory",
+      "savePersistentMemory",
+      "mergeSmartScribeData"
+    ],
+    "Date Manipulation": [
+      "createEmptyMemory"
+    ],
+    "Error Handling": [
+      "AgentHelloWorkflow"
+    ],
+    "Sync Patterns": [
+      "loadPersistentMemory",
+      "savePersistentMemory",
+      "syncToMCP"
+    ],
+    "Google API": [
+      "Google Gemini"
+    ],
+    "npm module": [
+      "dependencies",
+      "versions"
+    ],
+    "MCP server integration": [
+      "Data Exchange Protocols",
+      "Protocol APIs"
+    ],
+    "Real-time console monitoring": [
+      "MCP server integration"
+    ],
+    "Shared memory files": [
+      "API endpoints",
+      "console log monitoring"
+    ],
+    "Real-time Monitoring": [
+      "Memory Scribe Dashboard"
+    ],
+    "15-Minute Automated Health Checks": [
+      "health monitoring",
+      "preemptive troubleshooting"
+    ],
+    "Shared Memory Files": [
+      "Personal Agent Memory Files",
+      "File Monitoring, Console Interception, and Activity Logging"
+    ],
+    "Console Interception": [
+      "debugging",
+      "console logs"
+    ],
+    "Activity Logging": [
+      "audit trail",
+      "system events"
+    ],
+    "Anthropic CLaude-3.5-Sonnet-20241022": [
+      "AI Models",
+      "Models"
+    ],
+    "backup-file.json": [
+      "MemorySyncManager",
+      "MemorySyncManager.loadPersistentMemory",
+      "MemorySyncManager.savePersistentMemory"
+    ],
+    "system_state": [
+      "MemorySyncManager.healthCheck",
+      "MemorySyncManager.createEmptyMemory"
+    ],
+    "metadata": [
+      "MemorySyncManager.loadPersistentMemory",
+      "MemorySyncManager.savePersistentMemory"
+    ],
+    "sync_status": [
+      "MemorySyncManager.syncToMCP",
+      "MemorySyncManager.healthCheck"
+    ],
+    "project_context": [
+      "MemorySyncManager.loadPersistentMemory",
+      "MemorySyncManager.savePersistentMemory"
+    ],
+    "Smart Scribe data": [
+      "MemorySyncManager.mergeSmartScribeData",
+      "MemorySyncManager.preCommitSync"
+    ],
+    "health check": [
+      "MemorySyncManager.healthCheck",
+      "Persistent memory file"
+    ],
+    "Authentication & Authorization": [
+      "API Authentication & Authorization"
+    ],
+    "Rate Limiting": [
+      "API Endpoints"
+    ],
+    "Security Measures": [
+      "API Authentication & Authorization",
+      "Data Encryption",
+      "Agent Integrity Checks"
+    ],
+    "Sensitive Information Exfiltration": [
+      "Data Encryption"
+    ],
+    "Secure Communication Channels": [
+      "API Authentication & Authorization",
+      "TLS/SSL"
+    ],
+    "Dependency Management": [
+      "dependencies",
+      "versioning"
+    ],
+    "Node.js Module": [
+      "Package Manager",
+      "Version Control Systems"
+    ],
+    "license": [
+      "open_source",
+      "free_software"
+    ],
+    "authentication": [
+      "API key",
+      "authorization"
+    ],
+    "technical knowledge database": [
+      "knowledgeDB"
+    ],
+    "search optimization tables": [
+      "searchTables"
+    ],
+    "Persistent Memory": [
+      "Memory Sync Manager",
+      "system_state"
+    ],
+    "MCP (Mission Control Platform)": [
+      "MemorySyncManager"
+    ],
+    "Depth Parameter": [
+      "Array Flatten Function",
+      "Functionality Customization",
+      "Algorithm Complexity"
+    ],
+    "memory model design": [
+      "data_isolation",
+      "synchronization_practices"
+    ],
+    "real-time conflict resolution": [
+      "conflict resolution strategies",
+      "error recovery mechanism"
+    ],
+    "security considerations": [
+      "critical gaps & improvements",
+      "security considerations"
+    ],
+    "centralized configuration management": [
+      "configuration_automation",
+      "system_scaling"
+    ],
+    "google_gemini-1.5-pro_audit.md": [],
+    "PersistenceFile": [
+      "MemorySyncManager",
+      "PersistentJsonData"
+    ],
+    "ReadWriteToMCP": [
+      "MemorySyncManager",
+      "PersistenceFile"
+    ],
+    "PersistentMemory": [
+      "MemorySyncManager",
+      "JSON",
+      "BackupFile"
+    ],
+    "Metadata": [
+      "MemorySyncManager",
+      "PersistentMemory",
+      "SystemState",
+      "Entity",
+      "Conversation"
+    ],
+    "SmartScribeData": [
+      "MergeSmartScribeData",
+      "PersistentJsonData"
+    ],
+    "PreCommitSync": [
+      "MemorySyncManager",
+      "Git Integration"
+    ],
+    "version control history": [
+      "repository",
+      "changes"
+    ],
+    "Real-time Console Monitoring": [
+      "Scalability Concerns"
+    ],
+    "Memory Scribe dashboard": [
+      "API endpoints",
+      "Console log monitoring"
+    ],
+    "MCP server integration and management": [
+      "Console log monitoring and AI agent activity tracking",
+      "15-minute automated health checks with desktop alerts"
+    ],
+    "Console log monitoring and AI agent activity tracking": [
+      "Real-time Console Monitoring",
+      "MCP server integration and management"
+    ],
+    "15-minute automated health checks with desktop alerts": [
+      "Real-time Console Monitoring",
+      "MCP server integration and management"
+    ],
+    "Port management and conflict resolution": [
+      "Real-time Console Monitoring",
+      "MCP server integration and management"
+    ],
+    "Shared memory files vs personal agent memory files": [
+      "Real-time Console Monitoring",
+      "MCP server integration and management"
+    ],
+    "API endpoints for memory system access": [
+      "Real-time Console Monitoring",
+      "MCP server integration and management"
+    ],
+    "File monitoring, console interception, and activity logging": [
+      "Real-time Console Monitoring",
+      "MCP server integration and management"
+    ],
+    "Scalability Concerns": [
+      "Real-time Console Monitoring"
+    ],
+    "Context Entry": [
+      "Add Context Entry",
+      "Fast Commands"
+    ],
+    "Relevance Scoring": [
+      "Fast Recall",
+      "Advanced Memory Intelligence",
+      "Add Context Entry"
+    ],
+    "Model Testing": [
+      "Models Tested",
+      "Performance Metrics"
+    ],
+    "Benchmark Report": [
+      "StackTrackr LLM Benchmark Report"
+    ],
+    "Technical Documentation Expert and Knowledge Architect": [],
+    "API endpoints and their purposes": [
+      "documentation_analysis"
+    ],
+    "Knowledge Base (Technical Knowledge Database)": [
+      "search_tables"
+    ],
+    "Qwen2.5-Coder": [
+      "Smart Scribe",
+      "System Health Monitoring"
+    ],
+    "Chokidar": [
+      "file_watching"
+    ],
+    "Axios": [
+      "api_requests"
+    ],
+    "Chat Logs Path": [
+      "chat_log_monitoring"
+    ],
+    "mime-types": [
+      "negotiator"
+    ],
+    "Functions": [
+      "anymatch"
+    ],
+    "Array Matching": [
+      "anymatch"
+    ],
+    "Picomatch Options": [],
+    "Modification": [
+      "modification",
+      "improvement"
+    ],
+    "StackTrackr LLM Benchmark Report": [
+      "Code Audit Challenge Results"
+    ],
+    "Code Audit Challenge": [
+      "Code Audit Challenge Results",
+      "Models Tested",
+      "Performance Metrics"
+    ],
+    "StackTrackr JavaScript Codebase": [
+      "Code Audit Challenge",
+      "Models Tested",
+      "Performance Metrics"
+    ],
+    "OpenAI Models": [
+      "GPT-4o",
+      "GPT-4 Turbo",
+      "Claude 3.5 Sonnet",
+      "Claude 3 Haiku",
+      "Gemini 1.5 Pro",
+      "Gemini 1.5 Flash"
+    ],
+    "Ollama Models": [
+      "Qwen2.5:3B",
+      "Llama3:8B",
+      "Gemma2:2B"
+    ],
+    "Groq Models": [
+      "Llama 3.1 70B",
+      "Mixtral 8x7B-32768"
+    ],
+    "Models Tested": [
+      "Code Audit Challenge Results",
+      "Performance Metrics"
+    ],
+    "Performance": [
+      "Code Audit Challenge",
+      "Performance Metrics"
+    ],
+    "Code Quality": [
+      "Code Audit Challenge",
+      "Performance Metrics"
+    ],
+    "Architecture": [
+      "Code Audit Challenge",
+      "Performance Metrics"
+    ],
+    "Bug Detection": [
+      "Code Audit Challenge",
+      "Performance Metrics"
+    ],
+    "Google Gemini API": [
+      "AI",
+      "Natural Language Processing"
+    ],
+    "Middleware": [
+      "Express.js",
+      "Koa"
+    ],
+    "Shared Memory Files vs Personal Agent Memory Files": [
+      "File Systems or Databases"
+    ],
+    "API Endpoints for Memory System Access": [
+      "Security Measures",
+      "Authentication, Rate Limiting, Input Validation"
+    ],
+    "File Monitoring, Console Interception, and Activity Logging": [
+      "Performance Impact",
+      "Logging Mechanism",
+      "Filtering Options"
+    ],
+    "MemoryIntelligenceSystemPaths": [],
+    "handoffDir": [
+      "AgentHelloWorkflow"
+    ],
+    "personalContext.json": [
+      "AgentHelloWorkflow",
+      "loadPersonalMemories"
+    ],
+    "scribe-mcp-export.json": [
+      "AgentHelloWorkflow",
+      "loadMCPMemories"
+    ],
+    "technical-knowledge.json": [
+      "AgentHelloWorkflow",
+      "loadKnowledgeDB"
+    ],
+    "MemorySystemStatus": [
+      "AgentHelloWorkflow"
+    ],
+    "MCP (Multi-Cloud Provider)": [
+      "MemorySyncManager",
+      "syncToMCP"
+    ],
+    "Fast Commands": [
+      "Recall",
+      "Add Context"
+    ],
+    "Task": [
+      "Tasks",
+      "Advanced Memory Intelligence"
+    ],
+    "Integration Example": [
+      "Files Created",
+      "Quick Usage Tips"
+    ],
+    "Flash Audit": [
+      "Google Play Store",
+      "Security Audits"
+    ],
+    "Memory Intelligence System Status": [
+      "checkMemorySystemStatus"
+    ],
+    "Persistent Memory and Context Continuity": [],
+    "array": [
+      "nested_arrays",
+      "flattened_array"
+    ],
+    "flatten": [
+      "simplify",
+      "reduce_complexity"
+    ],
+    "authentication & authorization": [
+      "security_policies",
+      "authorization_models"
+    ],
+    "data encryption": [
+      "network_security",
+      "data_protection"
+    ],
+    "Persistence": [
+      "Memory Intelligence System",
+      "AgentHelloWorkflow"
+    ],
+    "Handoff Logs": [
+      "AgentHelloWorkflow"
+    ],
+    "Technical Knowledge Database": [
+      "Memory Intelligence System",
+      "AgentHelloWorkflow"
+    ],
+    "Continuation Prompt": [
+      "AgentHelloWorkflow"
+    ],
+    "Real-Time Console Monitoring Dashboard": [
+      "Inconsistent Data Presentation",
+      "Limited Filtering and Sorting Capabilities"
+    ],
+    "Open Source License": [
+      "BSD License",
+      "MIT License"
+    ],
+    "Redistribution and Use": [
+      "Source Code",
+      "Binary Form"
+    ],
+    "File System Operations": [
+      "loadPersistentMemory",
+      "savePersistentMemory",
+      "createEmptyMemory",
+      "addEntity",
+      "addConversation"
+    ],
+    "Date Operations": [
+      "syncToMCP",
+      "healthCheck"
+    ],
+    "Nesting": [
+      "array",
+      "flatten"
+    ],
+    "Depth": [
+      "flatten"
+    ],
+    "Optional Parameters": [
+      "function"
+    ],
+    "Copyright (c) 2013-2024": [
+      "year",
+      "copyright_holder"
+    ],
+    "Agent Handoff System": [
+      "Initialization Workflow",
+      "Memory Management",
+      "Context Recall"
+    ],
+    "Handoff JSON": [
+      "Initialization Workflow",
+      "Memory Management"
+    ],
+    "Class Structures": [
+      "Initialization Workflow",
+      "Memory Management"
+    ],
+    "Dependency Updates": [
+      "package_manager"
+    ],
+    "StackTrackr AI Collaboration Framework": [
+      "COPILOT_INSTRUCTIONS.md",
+      "rAgents/unified-workflow.md"
+    ],
+    "Agent Hello Protocol": [
+      "AGENT.md",
+      "rEngine/agent-hello-workflow.js"
+    ],
+    "Behavior Wrapper": [
+      "Automatic Compliance",
+      "Error Handling",
+      "Session Cleanup"
+    ],
+    "Brainpool Contribution": [
+      "Memory Protocols",
+      "Git Discipline",
+      "Extended Context"
+    ],
+    "anthropic_claude-3-5-sonnet-20241022_audit.md": [
+      "log",
+      "audit"
+    ],
+    "Agent Hello Workflow": [
+      "agent",
+      "workflow"
+    ],
+    "Context Continuity": [
+      "agent",
+      "workflow"
+    ],
+    "Knowledge Management": [
+      "Continuous Knowledge Management"
+    ],
+    "System Health Monitoring": [
+      "Jamaican AI Assistant",
+      "Smart Scribe"
+    ],
+    "dependency updates": [
+      "package management",
+      "dependencies"
+    ],
+    "SFTP Integration": [
+      "backup",
+      "data loss"
+    ],
+    "Agent Management": [
+      "monitoring",
+      "security"
+    ],
+    "MANDATORY_FIRST_STEPS": [
+      "READ_MAIN_INSTRUCTIONS",
+      "FOLLOW_COMPLETE_WORKFLOW"
+    ],
+    "READ_MAIN_INSTRUCTIONS": [
+      "MANDATORY_FIRST_STEPS"
+    ],
+    "FOLLOW_COMPLETE_WORKFLOW": [
+      "MANDATORY_FIRST_STEPS"
+    ],
+    "AGENT_HELLO_PROTOCOL": [
+      "INITIALIZATION_WORKFLOW",
+      "QUICK_START_COMMANDS"
+    ],
+    "INITIALIZATION_WORKFLOW": [
+      "AGENT_HELLO_PROTOCOL",
+      "QUICK_START_COMMANDS"
+    ],
+    "PROTOCOL_ENFORCEMENT": [
+      "AUTO-BACKUP_BEFORE_CHANGES",
+      "FILE_CONTAINMENT_VALIDATION",
+      "MEMORY_CONSISTENCY_CHECKS",
+      "NO_ROGUE_OPERATIONS"
+    ],
+    "AUTO-BACKUP_BEFORE_CHANGES": [
+      "PROTOCOL_ENFORCEMENT"
+    ],
+    "FILE_CONTAINMENT_VALIDATION": [
+      "PROTOCOL_ENFORCEMENT"
+    ],
+    "MEMORY_CONSISTENCY_CHECKS": [
+      "PROTOCOL_ENFORCEMENT"
+    ],
+    "NO_ROGUE_OPERATIONS": [
+      "PROTOCOL_ENFORCEMENT"
+    ],
+    "QUICK_START_COMMANDS": [
+      "INITIALIZATION_WORKFLOW",
+      "PROTOCOL_COMPLIANCE_CHECKER",
+      "SCRIBE_SUMMARY",
+      "PROTOCAL_ENFORCER"
+    ],
+    "PROTOCOL_COMPLIANCE_CHECKER": [
+      "QUICK_START_COMMANDS"
+    ],
+    "SCRIBE_SUMMARY": [
+      "QUICK_START_COMMANDS"
+    ],
+    "PROTOCAL_ENFORCER": [
+      "QUICK_START_COMMANDS"
+    ],
+    "DIRECTORY_STRUCTURE": [],
+    "array flattening": [
+      "recursion",
+      "iteration"
+    ],
+    "depth parameter": [],
+    "Metrics": [
+      "Time (s)",
+      "Words",
+      "Words/sec",
+      "Quality Score"
+    ],
+    "MCP (Micro Controller Platform)": [
+      "Memory Sync Manager",
+      "syncToMCP"
+    ],
+    "Sync Status": [
+      "system_state.sync_status",
+      "Memory Sync Manager"
+    ],
+    "git-backups": [
+      "incremental-commits",
+      "error-handling"
+    ],
+    "short-term-memory": [
+      "session-termination",
+      "brainpool-contribution"
+    ],
+    "agent-self-management-system": [
+      "task-tracking",
+      "incremental-backups",
+      "short-term-memory"
+    ],
+    "agent-behavior-wrapper": [
+      "automatic-compliance",
+      "error-handling",
+      "session-cleanup"
+    ],
+    "bootstrap-protocol": [
+      "mandatory-startup",
+      "task-completion",
+      "session-cleanup"
+    ],
+    "extended-context": [
+      "brainpool-contribution",
+      "memory-protocols",
+      "git-backups"
+    ],
+    "task-logging": [
+      "session-tracking",
+      "incremental-commits",
+      "error-handling"
+    ]
+  },
+  "search_performance": {},
+  "optimization_history": [
+    {
+      "timestamp": "2025-08-17T21:05:46.146Z",
+      "keywords_processed": 73,
+      "concepts_analyzed": 46,
+      "patterns_indexed": 14
+    },
+    {
+      "timestamp": "2025-08-17T22:25:52.190Z",
+      "keywords_processed": 139,
+      "concepts_analyzed": 80,
+      "patterns_indexed": 32
+    },
+    {
+      "timestamp": "2025-08-17T22:34:04.188Z",
+      "keywords_processed": 151,
+      "concepts_analyzed": 87,
+      "patterns_indexed": 36
+    },
+    {
+      "timestamp": "2025-08-18T00:09:58.159Z",
+      "keywords_processed": 199,
+      "concepts_analyzed": 101,
+      "patterns_indexed": 46
+    },
+    {
+      "timestamp": "2025-08-18T00:17:52.688Z",
+      "keywords_processed": 252,
+      "concepts_analyzed": 131,
+      "patterns_indexed": 63
+    },
+    {
+      "timestamp": "2025-08-18T00:26:00.450Z",
+      "keywords_processed": 296,
+      "concepts_analyzed": 150,
+      "patterns_indexed": 77
+    },
+    {
+      "timestamp": "2025-08-18T00:33:13.770Z",
+      "keywords_processed": 313,
+      "concepts_analyzed": 167,
+      "patterns_indexed": 84
+    },
+    {
+      "timestamp": "2025-08-18T00:56:45.019Z",
+      "keywords_processed": 346,
+      "concepts_analyzed": 190,
+      "patterns_indexed": 102
+    },
+    {
+      "timestamp": "2025-08-18T01:04:34.663Z",
+      "keywords_processed": 358,
+      "concepts_analyzed": 208,
+      "patterns_indexed": 111
+    },
+    {
+      "timestamp": "2025-08-18T01:13:14.048Z",
+      "keywords_processed": 382,
+      "concepts_analyzed": 221,
+      "patterns_indexed": 119
+    },
+    {
+      "timestamp": "2025-08-18T01:21:54.569Z",
+      "keywords_processed": 400,
+      "concepts_analyzed": 237,
+      "patterns_indexed": 130
+    },
+    {
+      "timestamp": "2025-08-18T01:30:41.363Z",
+      "keywords_processed": 445,
+      "concepts_analyzed": 262,
+      "patterns_indexed": 148
+    },
+    {
+      "timestamp": "2025-08-18T01:38:49.058Z",
+      "keywords_processed": 483,
+      "concepts_analyzed": 281,
+      "patterns_indexed": 166
+    },
+    {
+      "timestamp": "2025-08-18T01:47:04.556Z",
+      "keywords_processed": 494,
+      "concepts_analyzed": 288,
+      "patterns_indexed": 172
+    },
+    {
+      "timestamp": "2025-08-18T01:56:01.728Z",
+      "keywords_processed": 513,
+      "concepts_analyzed": 291,
+      "patterns_indexed": 186
+    },
+    {
+      "timestamp": "2025-08-18T02:03:58.002Z",
+      "keywords_processed": 523,
+      "concepts_analyzed": 300,
+      "patterns_indexed": 194
+    },
+    {
+      "timestamp": "2025-08-18T02:13:28.527Z",
+      "keywords_processed": 545,
+      "concepts_analyzed": 315,
+      "patterns_indexed": 201
+    },
+    {
+      "timestamp": "2025-08-18T02:22:45.169Z",
+      "keywords_processed": 573,
+      "concepts_analyzed": 329,
+      "patterns_indexed": 220
+    },
+    {
+      "timestamp": "2025-08-18T02:30:58.484Z",
+      "keywords_processed": 582,
+      "concepts_analyzed": 333,
+      "patterns_indexed": 227
+    },
+    {
+      "timestamp": "2025-08-18T02:38:37.728Z",
+      "keywords_processed": 592,
+      "concepts_analyzed": 338,
+      "patterns_indexed": 233
+    },
+    {
+      "timestamp": "2025-08-18T02:46:40.067Z",
+      "keywords_processed": 630,
+      "concepts_analyzed": 348,
+      "patterns_indexed": 248
+    },
+    {
+      "timestamp": "2025-08-18T02:56:00.983Z",
+      "keywords_processed": 647,
+      "concepts_analyzed": 361,
+      "patterns_indexed": 255
+    },
+    {
+      "timestamp": "2025-08-18T03:04:02.757Z",
+      "keywords_processed": 653,
+      "concepts_analyzed": 364,
+      "patterns_indexed": 258
+    },
+    {
+      "timestamp": "2025-08-18T03:12:26.070Z",
+      "keywords_processed": 663,
+      "concepts_analyzed": 374,
+      "patterns_indexed": 272
+    },
+    {
+      "timestamp": "2025-08-18T03:21:18.306Z",
+      "keywords_processed": 689,
+      "concepts_analyzed": 394,
+      "patterns_indexed": 286
+    },
+    {
+      "timestamp": "2025-08-18T03:30:34.003Z",
+      "keywords_processed": 708,
+      "concepts_analyzed": 408,
+      "patterns_indexed": 299
+    },
+    {
+      "timestamp": "2025-08-18T03:39:50.072Z",
+      "keywords_processed": 722,
+      "concepts_analyzed": 424,
+      "patterns_indexed": 304
+    },
+    {
+      "timestamp": "2025-08-18T03:47:32.945Z",
+      "keywords_processed": 736,
+      "concepts_analyzed": 434,
+      "patterns_indexed": 312
+    },
+    {
+      "timestamp": "2025-08-18T03:56:01.015Z",
+      "keywords_processed": 759,
+      "concepts_analyzed": 441,
+      "patterns_indexed": 327
+    },
+    {
+      "timestamp": "2025-08-18T04:03:54.929Z",
+      "keywords_processed": 770,
+      "concepts_analyzed": 448,
+      "patterns_indexed": 332
+    },
+    {
+      "timestamp": "2025-08-18T04:12:32.922Z",
+      "keywords_processed": 794,
+      "concepts_analyzed": 457,
+      "patterns_indexed": 341
+    },
+    {
+      "timestamp": "2025-08-18T04:22:04.624Z",
+      "keywords_processed": 805,
+      "concepts_analyzed": 462,
+      "patterns_indexed": 352
+    },
+    {
+      "timestamp": "2025-08-18T04:30:41.839Z",
+      "keywords_processed": 812,
+      "concepts_analyzed": 462,
+      "patterns_indexed": 355
+    },
+    {
+      "timestamp": "2025-08-18T04:39:23.319Z",
+      "keywords_processed": 851,
+      "concepts_analyzed": 485,
+      "patterns_indexed": 370
+    },
+    {
+      "timestamp": "2025-08-18T04:47:39.415Z",
+      "keywords_processed": 855,
+      "concepts_analyzed": 487,
+      "patterns_indexed": 374
+    },
+    {
+      "timestamp": "2025-08-18T04:57:04.977Z",
+      "keywords_processed": 886,
+      "concepts_analyzed": 497,
+      "patterns_indexed": 385
+    }
+  ]
+}

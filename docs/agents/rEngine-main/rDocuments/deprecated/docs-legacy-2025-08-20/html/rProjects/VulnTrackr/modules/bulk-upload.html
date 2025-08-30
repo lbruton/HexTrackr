@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Upload Module for VPR Score Tracking - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Bulk Upload Module for VPR Score Tracking</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 bulk-upload.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 8KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rProjects/VulnTrackr/modules/bulk-upload.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/bulk-upload.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="bulk-upload-module-for-vpr-score-tracking">Bulk Upload Module for VPR Score Tracking</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>bulk-upload.js</code> script provides a set of functions for handling the bulk upload and processing of VPR (Vulnerability Priority Rating) data. This script is designed to simplify the process of importing and analyzing VPR data from multiple CSV files, making it easier to track and monitor VPR scores across an organization.</p>
+<p>The script includes the following key features:</p>
+<ol>
+<li><strong>Batch File Handling</strong>: The <code>handleBulkUpload</code> function allows users to upload multiple CSV files simultaneously and process the data in a batch.</li>
+<li><strong>CSV Parsing</strong>: The <code>parseCSVFile</code> function uses the PapaParse library to parse the contents of a CSV file, handling errors and validating the data.</li>
+<li><strong>VPR Data Processing</strong>: The <code>processVPRData</code> function analyzes the parsed CSV data, extracting relevant VPR information (severity, score) and calculating various statistics (mean, min, max) for each severity level.</li>
+<li><strong>Result Persistence</strong>: The <code>saveResultsToHistory</code> function stores the processed VPR data in the browser&#39;s local storage, allowing users to access and review past upload results.</li>
+</ol>
+<p>By providing a centralized and streamlined approach to VPR data management, this script aims to improve the efficiency and accuracy of vulnerability tracking and reporting within an organization.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>bulk-upload.js</code> script is organized into several key components:</p>
+<ol>
+<li><strong>Bulk Upload Handling</strong>: The <code>handleBulkUpload</code> function is the main entry point, responsible for iterating through the provided files, parsing the CSV data, and processing the VPR information.</li>
+<li><strong>CSV Parsing</strong>: The <code>parseCSVFile</code> function uses the PapaParse library to parse the contents of a CSV file, handling errors and validating the data structure.</li>
+<li><strong>VPR Data Processing</strong>: The <code>processVPRData</code> function is responsible for analyzing the parsed CSV data, extracting the relevant VPR information, and calculating various statistics.</li>
+<li><strong>Result Persistence</strong>: The <code>saveResultsToHistory</code> function is used to store the processed VPR data in the browser&#39;s local storage, allowing users to access and review past upload results.</li>
+</ol>
+<p>The data flow within the script is as follows:</p>
+<ol>
+<li>The <code>handleBulkUpload</code> function receives an array of CSV files.</li>
+<li>For each file, the <code>parseCSVFile</code> function is called to parse the CSV data.</li>
+<li>The <code>processVPRData</code> function is then used to extract and analyze the VPR information from the parsed data.</li>
+<li>The processed results are returned by <code>handleBulkUpload</code>.</li>
+<li>The <code>saveResultsToHistory</code> function is used to store the processed results in the browser&#39;s local storage.</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>bulk-upload.js</code> script has the following external dependency:</p>
+<ul>
+<li><strong>PapaParse</strong>: A powerful CSV parsing library used to handle the parsing of CSV files.</li>
+</ul>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="handlebulkuploadfiles"><code>handleBulkUpload(files)</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Handles the bulk upload and processing of multiple CSV files containing VPR data.</li>
+<li><strong>Parameters</strong>:<ul>
+<li><code>files</code>: An array of File objects representing the CSV files to be processed.</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: An object with the following properties:<ul>
+<li><code>results</code>: An array of objects, each representing the processed data for a single file. Each object has the following properties:<ul>
+<li><code>filename</code>: The name of the processed file.</li>
+<li><code>date</code>: The date when the file was processed.</li>
+<li><code>data</code>: The processed VPR data, as returned by the <code>processVPRData</code> function.</li>
+</ul>
+</li>
+<li><code>warnings</code>: An array of strings, each representing a warning or error message encountered during the processing of a file.</li>
+</ul>
+</li>
+</ul>
+<h3 id="parsecsvfilefile"><code>parseCSVFile(file)</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Parses the contents of a CSV file using the PapaParse library.</li>
+<li><strong>Parameters</strong>:<ul>
+<li><code>file</code>: A File object representing the CSV file to be parsed.</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: A Promise that resolves to the parsed CSV data (an array of arrays).</li>
+</ul>
+<h3 id="processvprdatadata"><code>processVPRData(data)</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Processes the parsed CSV data, extracting and analyzing the VPR information.</li>
+<li><strong>Parameters</strong>:<ul>
+<li><code>data</code>: The parsed CSV data, represented as an array of arrays.</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: An object containing the processed VPR data, with the following properties:<ul>
+<li>For each severity level (&#39;low&#39;, &#39;medium&#39;, &#39;high&#39;, &#39;critical&#39;):<ul>
+<li><code>count</code>: The number of VPR entries with the given severity.</li>
+<li><code>sum</code>: The sum of the VPR scores for the given severity.</li>
+<li><code>mean</code>: The average VPR score for the given severity.</li>
+<li><code>min</code>: The minimum VPR score for the given severity.</li>
+<li><code>max</code>: The maximum VPR score for the given severity.</li>
+</ul>
+</li>
+<li><code>total</code>:<ul>
+<li><code>count</code>: The total number of VPR entries.</li>
+<li><code>sum</code>: The sum of all VPR scores.</li>
+<li><code>mean</code>: The average VPR score across all entries.</li>
+<li><code>min</code>: The minimum VPR score across all entries.</li>
+<li><code>max</code>: The maximum VPR score across all entries.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="saveresultstohistoryresults"><code>saveResultsToHistory(results)</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Saves the processed VPR data to the browser&#39;s local storage, allowing users to access and review past upload results.</li>
+<li><strong>Parameters</strong>:<ul>
+<li><code>results</code>: The <code>results</code> array returned by the <code>handleBulkUpload</code> function.</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: The updated history array, including the newly saved results.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<ol>
+<li><strong>Bulk Upload and Process VPR Data</strong>:</li>
+</ol>
+<pre><code class="language-javascript"><pre><code class="language-javascript">import { handleBulkUpload, saveResultsToHistory } from './bulk-upload.js';
+
+// Assuming you have an array of File objects representing the CSV files to be processed
+const csvFiles = [file1, file2, file3];
+
+// Process the CSV files
+const { results, warnings } = await handleBulkUpload(csvFiles);
+
+// Save the processed results to history
+const history = saveResultsToHistory(results);
+
+// Display any warnings
+warnings.forEach(warning => console.warn(warning));
+
+// Access the processed VPR data
+console.log(history);</code></pre>
+</code></pre>
+<ol start="2">
+<li><strong>Retrieve Past Upload Results</strong>:</li>
+</ol>
+<pre><code class="language-javascript"><pre><code class="language-javascript">import { saveResultsToHistory } from './bulk-upload.js';
+
+// Get the existing upload history from local storage
+const history = saveResultsToHistory([]);
+
+// Access the processed VPR data
+console.log(history);</code></pre>
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>bulk-upload.js</code> script does not require any specific configuration options or environment variables. It relies on the browser&#39;s local storage to persist the processed VPR data.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>bulk-upload.js</code> script handles the following types of errors:</p>
+<ol>
+<li><strong>CSV Parsing Errors</strong>: If the PapaParse library encounters any errors while parsing a CSV file, the <code>parseCSVFile</code> function will reject the Promise with an error message.</li>
+<li><strong>Missing Required Columns</strong>: If the <code>processVPRData</code> function does not find the required &#39;definition.vpr.severity&#39; or &#39;definition.vpr.score&#39; columns in the parsed CSV data, it will throw an error.</li>
+<li><strong>General Errors</strong>: Any other errors that occur during the processing of a file will be caught and added to the <code>warnings</code> array returned by the <code>handleBulkUpload</code> function.</li>
+</ol>
+<h2 id="integration">Integration</h2>
+<p>The <code>bulk-upload.js</code> script is designed to be a standalone module that can be integrated into a larger system or application. It can be imported and used in other parts of the codebase to provide bulk VPR data processing and history management functionality.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><strong>PapaParse Usage</strong>: The <code>parseCSVFile</code> function uses the PapaParse library to parse the CSV files. PapaParse is a powerful and flexible CSV parsing library that can handle a wide range of CSV formats and edge cases.</li>
+<li><strong>Local Storage Usage</strong>: The <code>saveResultsToHistory</code> function uses the browser&#39;s local storage to persist the processed VPR data. This allows users to access and review past upload results, even after refreshing the page or closing the application.</li>
+<li><strong>Separation of Concerns</strong>: The script is designed with a clear separation of concerns, with each function focusing on a specific task (file handling, CSV parsing, VPR data processing, and result persistence). This makes the code more modular, maintainable, and testable.</li>
+<li><strong>Error Handling</strong>: The script includes robust error handling, with specific error messages and warnings to help users troubleshoot any issues that may arise during the upload and processing of VPR data.</li>
+<li><strong>Performance Considerations</strong>: The script is designed to handle batch processing of multiple CSV files, which may involve processing large amounts of data. While the current implementation is efficient, for extremely large datasets, further optimizations may be necessary to ensure smooth performance.</li>
+</ol>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>bulk-upload.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

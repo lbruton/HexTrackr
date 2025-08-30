@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About.js Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>About.js Documentation</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 about.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 8KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rProjects/StackTrackr/js/about.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/about.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="aboutjs-documentation">About.js Documentation</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>about.js</code> script is responsible for handling the display and functionality of the &quot;About&quot; and &quot;Acknowledgment&quot; modals in the application. It provides a set of functions to show, hide, and populate these modals with relevant information, such as the current version, changelog, and development roadmap.</p>
+<p>The script is designed to work seamlessly with the application&#39;s overall modal management system, allowing for a consistent and user-friendly experience. It also includes fallback mechanisms to ensure the modals can be displayed even if the external announcement data is unavailable.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>about.js</code> script is structured around several key functions:</p>
+<ol>
+<li><p><strong>Modal Display Functions</strong>:</p>
+<ul>
+<li><code>showAboutModal()</code>: Displays the &quot;About&quot; modal and populates it with data.</li>
+<li><code>hideAboutModal()</code>: Hides the &quot;About&quot; modal.</li>
+<li><code>showAckModal()</code>: Displays the &quot;Acknowledgment&quot; modal and populates it with data.</li>
+<li><code>hideAckModal()</code>: Hides the &quot;Acknowledgment&quot; modal.</li>
+</ul>
+</li>
+<li><p><strong>Modal Interaction Functions</strong>:</p>
+<ul>
+<li><code>acceptAck()</code>: Saves the user&#39;s acknowledgment and hides the &quot;Acknowledgment&quot; modal.</li>
+</ul>
+</li>
+<li><p><strong>Modal Population Functions</strong>:</p>
+<ul>
+<li><code>populateAboutModal()</code>: Fills the &quot;About&quot; modal with version information and fetches the latest announcements.</li>
+<li><code>populateAckModal()</code>: Fills the &quot;Acknowledgment&quot; modal with version information.</li>
+<li><code>loadAnnouncements()</code>: Fetches the latest announcements from a Markdown file and populates the &quot;What&#39;s New&quot; and &quot;Roadmap&quot; sections.</li>
+</ul>
+</li>
+<li><p><strong>Fallback Functions</strong>:</p>
+<ul>
+<li><code>getEmbeddedWhatsNew()</code>: Provides a fallback for the &quot;What&#39;s New&quot; section when the external announcements data is unavailable.</li>
+<li><code>getEmbeddedRoadmap()</code>: Provides a fallback for the &quot;Roadmap&quot; section when the external announcements data is unavailable.</li>
+</ul>
+</li>
+<li><p><strong>Event Setup Functions</strong>:</p>
+<ul>
+<li><code>setupAboutModalEvents()</code>: Attaches event listeners to the &quot;About&quot; modal elements.</li>
+<li><code>setupAckModalEvents()</code>: Attaches event listeners to the &quot;Acknowledgment&quot; modal elements.</li>
+</ul>
+</li>
+</ol>
+<p>The script uses the <code>elements</code> object to access the necessary DOM elements, and it also assumes the existence of certain global functions (<code>openModalById</code>, <code>closeModalById</code>, <code>sanitizeHtml</code>) and variables (<code>APP_VERSION</code>, <code>ACK_DISMISSED_KEY</code>, <code>getBrandingName</code>) that are not defined within the script itself.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>about.js</code> script has the following external dependencies:</p>
+<ol>
+<li><strong>Fetch API</strong>: Used to fetch the latest announcements from a Markdown file.</li>
+<li><strong>Branding Name</strong>: Relies on the <code>getBrandingName()</code> function to retrieve the application&#39;s branding name.</li>
+<li><strong>Modal Management</strong>: Assumes the existence of <code>openModalById()</code> and <code>closeModalById()</code> functions to handle modal display.</li>
+<li><strong>HTML Sanitization</strong>: Uses the <code>sanitizeHtml()</code> function to sanitize the announcements data.</li>
+<li><strong>Local Storage</strong>: Utilizes the <code>localStorage</code> API to store the user&#39;s acknowledgment status.</li>
+</ol>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="modal-display-functions">Modal Display Functions</h3>
+<ol>
+<li><p><strong><code>showAboutModal()</code></strong>:</p>
+<ul>
+<li>Parameters: None</li>
+<li>Return Value: None</li>
+<li>Description: Displays the &quot;About&quot; modal and populates it with data.</li>
+</ul>
+</li>
+<li><p><strong><code>hideAboutModal()</code></strong>:</p>
+<ul>
+<li>Parameters: None</li>
+<li>Return Value: None</li>
+<li>Description: Hides the &quot;About&quot; modal.</li>
+</ul>
+</li>
+<li><p><strong><code>showAckModal()</code></strong>:</p>
+<ul>
+<li>Parameters: None</li>
+<li>Return Value: None</li>
+<li>Description: Displays the &quot;Acknowledgment&quot; modal and populates it with data.</li>
+</ul>
+</li>
+<li><p><strong><code>hideAckModal()</code></strong>:</p>
+<ul>
+<li>Parameters: None</li>
+<li>Return Value: None</li>
+<li>Description: Hides the &quot;Acknowledgment&quot; modal.</li>
+</ul>
+</li>
+</ol>
+<h3 id="modal-interaction-functions">Modal Interaction Functions</h3>
+<ol>
+<li><strong><code>acceptAck()</code></strong>:<ul>
+<li>Parameters: None</li>
+<li>Return Value: None</li>
+<li>Description: Saves the user&#39;s acknowledgment and hides the &quot;Acknowledgment&quot; modal.</li>
+</ul>
+</li>
+</ol>
+<h3 id="modal-population-functions">Modal Population Functions</h3>
+<ol>
+<li><p><strong><code>populateAboutModal()</code></strong>:</p>
+<ul>
+<li>Parameters: None</li>
+<li>Return Value: None</li>
+<li>Description: Fills the &quot;About&quot; modal with version information and fetches the latest announcements.</li>
+</ul>
+</li>
+<li><p><strong><code>populateAckModal()</code></strong>:</p>
+<ul>
+<li>Parameters: None</li>
+<li>Return Value: None</li>
+<li>Description: Fills the &quot;Acknowledgment&quot; modal with version information.</li>
+</ul>
+</li>
+<li><p><strong><code>loadAnnouncements()</code></strong>:</p>
+<ul>
+<li>Parameters: None</li>
+<li>Return Value: Promise</li>
+<li>Description: Fetches the latest announcements from a Markdown file and populates the &quot;What&#39;s New&quot; and &quot;Roadmap&quot; sections.</li>
+</ul>
+</li>
+</ol>
+<h3 id="fallback-functions">Fallback Functions</h3>
+<ol>
+<li><p><strong><code>getEmbeddedWhatsNew()</code></strong>:</p>
+<ul>
+<li>Parameters: None</li>
+<li>Return Value: String</li>
+<li>Description: Provides a fallback for the &quot;What&#39;s New&quot; section when the external announcements data is unavailable.</li>
+</ul>
+</li>
+<li><p><strong><code>getEmbeddedRoadmap()</code></strong>:</p>
+<ul>
+<li>Parameters: None</li>
+<li>Return Value: String</li>
+<li>Description: Provides a fallback for the &quot;Roadmap&quot; section when the external announcements data is unavailable.</li>
+</ul>
+</li>
+</ol>
+<h3 id="event-setup-functions">Event Setup Functions</h3>
+<ol>
+<li><p><strong><code>setupAboutModalEvents()</code></strong>:</p>
+<ul>
+<li>Parameters: None</li>
+<li>Return Value: None</li>
+<li>Description: Attaches event listeners to the &quot;About&quot; modal elements.</li>
+</ul>
+</li>
+<li><p><strong><code>setupAckModalEvents()</code></strong>:</p>
+<ul>
+<li>Parameters: None</li>
+<li>Return Value: None</li>
+<li>Description: Attaches event listeners to the &quot;Acknowledgment&quot; modal elements.</li>
+</ul>
+</li>
+</ol>
+<h2 id="usage-examples">Usage Examples</h2>
+<ol>
+<li><p><strong>Displaying the &quot;About&quot; Modal</strong>:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">showAboutModal();</code></pre>
+</code></pre>
+</li>
+<li><p><strong>Displaying the &quot;Acknowledgment&quot; Modal</strong>:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">showAckModal();</code></pre>
+</code></pre>
+</li>
+<li><p><strong>Accepting the Acknowledgment</strong>:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">acceptAck();</code></pre>
+</code></pre>
+</li>
+<li><p><strong>Manually Fetching the Latest Announcements</strong>:</p>
+<pre><code class="language-javascript"><pre><code class="language-javascript">loadAnnouncements();</code></pre>
+</code></pre>
+</li>
+</ol>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>about.js</code> script does not have any specific configuration options or environment variables. It relies on the following global variables and functions:</p>
+<ul>
+<li><code>APP_VERSION</code>: The current version of the application.</li>
+<li><code>ACK_DISMISSED_KEY</code>: The key used to store the user&#39;s acknowledgment status in localStorage.</li>
+<li><code>getBrandingName()</code>: A function that returns the application&#39;s branding name.</li>
+<li><code>openModalById(id)</code>: A function that opens a modal with the specified ID.</li>
+<li><code>closeModalById(id)</code>: A function that closes a modal with the specified ID.</li>
+<li><code>sanitizeHtml(html)</code>: A function that sanitizes the provided HTML content.</li>
+</ul>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>about.js</code> script handles errors that may occur during the fetch of the latest announcements. If the fetch fails, it falls back to using the embedded &quot;What&#39;s New&quot; and &quot;Roadmap&quot; data. Any errors are logged to the console using <code>console.warn()</code>.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>about.js</code> script is designed to integrate seamlessly with the larger application. It provides a set of globally exposed functions that can be called from other parts of the codebase to manage the &quot;About&quot; and &quot;Acknowledgment&quot; modals.</p>
+<p>The script assumes the existence of a modal management system that can handle the opening and closing of modals, as well as the necessary HTML elements and global variables/functions required for its operation.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><p><strong>Announcements Fetch</strong>: The script fetches the latest announcements from a Markdown file located at <code>docs/announcements.md</code>. If this file is not available or the fetch fails, the script will use the embedded fallback data.</p>
+</li>
+<li><p><strong>Modal Event Handling</strong>: The script sets up event listeners for the &quot;About&quot; and &quot;Acknowledgment&quot; modal elements, allowing users to close the modals by clicking outside or using the Escape key.</p>
+</li>
+<li><p><strong>Branding Name</strong>: The script relies on the <code>getBrandingName()</code> function to retrieve the application&#39;s branding name, which is used to populate the modal content.</p>
+</li>
+<li><p><strong>Versioning</strong>: The script uses the <code>APP_VERSION</code> global variable to display the current version of the application in the modals.</p>
+</li>
+<li><p><strong>Acknowledgment Persistence</strong>: The script stores the user&#39;s acknowledgment status in the browser&#39;s localStorage, using the <code>ACK_DISMISSED_KEY</code> constant as the key.</p>
+</li>
+<li><p><strong>Sanitization</strong>: The script uses the <code>sanitizeHtml()</code> function to sanitize the announcements data before displaying it in the modals, to prevent potential security issues.</p>
+</li>
+<li><p><strong>Modal Management Integration</strong>: The script assumes the existence of <code>openModalById()</code> and <code>closeModalById()</code> functions to handle the opening and closing of modals. If these functions are not available, the script will use its own methods to display and hide the modals.</p>
+</li>
+</ol>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>about.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

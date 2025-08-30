@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rEngine Core Branding Protocol - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-rengine">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">🤖</div>
+            <h1>rEngine Core Branding Protocol</h1>
+            <div class="subtitle">rEngine Platform</div>
+            <div class="meta">
+                <span>📁 RENGINE_CORE_BRANDING_PROTOCOL.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 9KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../reports/RENGINE_CORE_BRANDING_PROTOCOL.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/RENGINE_CORE_BRANDING_PROTOCOL.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="rengine-core-branding-protocol">rEngine Core Branding Protocol</h1>
+<p><strong>Version:</strong> 1.0<br><strong>Date:</strong> August 19, 2025<br><strong>Status:</strong> ACTIVE - ALL AGENTS &amp; DEVELOPERS MUST FOLLOW</p>
+<hr>
+<h2 id="🎯-brand-identity-mandate">🎯 BRAND IDENTITY MANDATE</h2>
+<h3 id="primary-brand-name">Primary Brand Name</h3>
+<ul>
+<li><strong>OFFICIAL NAME:</strong> <code>rEngine Core</code></li>
+<li><strong>NEVER USE:</strong> StackTrackr (legacy brand - domains retained as strategic backup)</li>
+<li><strong>PRONUNCIATION:</strong> &quot;R-Engine Core&quot; (pronounced as separate words)</li>
+</ul>
+<h3 id="brand-logo--symbol">Brand Logo &amp; Symbol</h3>
+<ul>
+<li><strong>PRIMARY EMOJI:</strong> ⚙️ (gear/cog symbol)</li>
+<li><strong>LEGACY EMOJI:</strong> 🚀 (DO NOT USE - reserved for StackTrackr backup brand)</li>
+<li><strong>SYMBOL MEANING:</strong> Represents the core engine that powers intelligent development</li>
+</ul>
+<hr>
+<h2 id="📝-messaging-framework">📝 MESSAGING FRAMEWORK</h2>
+<h3 id="core-positioning-statement">Core Positioning Statement</h3>
+<pre><code><pre><code class="language-">rEngine Core: The intelligent development wrapper that transforms 
+how teams build, deploy, and scale software systems.</code></pre>
+</code></pre>
+<h3 id="primary-taglines-use-consistently">Primary Taglines (Use Consistently)</h3>
+<ol>
+<li><strong>Main Tagline:</strong> &quot;Intelligent Development Wrapper&quot;</li>
+<li><strong>Secondary:</strong> &quot;The Core Engine of Modern Development&quot;</li>
+<li><strong>Technical:</strong> &quot;Unified Development Intelligence Platform&quot;</li>
+</ol>
+<h3 id="messaging-pillars">Messaging Pillars</h3>
+<ol>
+<li><strong>Intelligence:</strong> AI-powered development automation</li>
+<li><strong>Integration:</strong> Seamless tool and workflow unification  </li>
+<li><strong>Efficiency:</strong> Dramatic reduction in development overhead</li>
+<li><strong>Scale:</strong> Enterprise-ready architecture and deployment</li>
+</ol>
+<hr>
+<h2 id="🎨-visual-brand-standards">🎨 VISUAL BRAND STANDARDS</h2>
+<h3 id="color-palette">Color Palette</h3>
+<pre><code class="language-css"><pre><code class="language-css">/* Primary Brand Colors */
+--brand-primary: #6366f1;     /* Indigo */
+--brand-secondary: #8b5cf6;   /* Purple */
+--brand-accent: #06b6d4;      /* Cyan */
+
+/* Gradient System */
+--brand-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+--hero-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+/* Supporting Colors */
+--success: #10b981;           /* Green */
+--warning: #f59e0b;           /* Amber */
+--error: #ef4444;             /* Red */
+--neutral: #6b7280;           /* Gray */</code></pre>
+</code></pre>
+<h3 id="typography">Typography</h3>
+<ul>
+<li><strong>Primary Font:</strong> Inter (Google Fonts)</li>
+<li><strong>Fallback Stack:</strong> -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif</li>
+<li><strong>Usage:</strong> All marketing materials, documentation, and web properties</li>
+</ul>
+<h3 id="logo-usage">Logo Usage</h3>
+<ul>
+<li><strong>Digital:</strong> ⚙️ rEngine Core</li>
+<li><strong>Text-only:</strong> rEngine Core (no emoji in formal documentation)</li>
+<li><strong>Minimum spacing:</strong> Always include space between emoji and text</li>
+<li><strong>Case sensitivity:</strong> Always capitalize &quot;Core&quot;</li>
+</ul>
+<hr>
+<h2 id="🔧-technical-implementation">🔧 TECHNICAL IMPLEMENTATION</h2>
+<h3 id="file-naming-conventions">File Naming Conventions</h3>
+<pre><code><pre><code class="language-">✅ CORRECT:
+- rEngine_core_feature.js
+- RENGINE_CORE_CONFIG.md
+- rengine-core-component.html
+
+❌ INCORRECT:
+- stacktrackr_anything
+- rengine_anything (missing "core")
+- REngine-feature (inconsistent casing)</code></pre>
+</code></pre>
+<h3 id="code-comments--documentation">Code Comments &amp; Documentation</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">/**
+ * rEngine Core - [Component Name]
+ * Intelligent Development Wrapper
+ * 
+ * This module is part of the rEngine Core platform,
+ * the unified development intelligence system.
+ */</code></pre>
+</code></pre>
+<h3 id="git-commit-message-format">Git Commit Message Format</h3>
+<pre><code><pre><code class="language-">rEngine Core: [type] - [brief description]
+
+Examples:
+- "rEngine Core: feat - add intelligent code analysis"
+- "rEngine Core: fix - resolve deployment pipeline issue"
+- "rEngine Core: docs - update branding protocol"</code></pre>
+</code></pre>
+<hr>
+<h2 id="📊-marketing-content-standards">📊 MARKETING CONTENT STANDARDS</h2>
+<h3 id="website-headers">Website Headers</h3>
+<pre><code class="language-html"><pre><code class="language-html"><title>rEngine Core - Intelligent Development Wrapper</title>
+<meta name="description" content="rEngine Core transforms development workflows with intelligent automation, unified tooling, and enterprise-scale deployment capabilities."></code></pre>
+</code></pre>
+<h3 id="social-media-templates">Social Media Templates</h3>
+<pre><code><pre><code class="language-">📱 Twitter/X:
+"⚙️ rEngine Core: The intelligent development wrapper that [specific benefit]. 
+Transform your workflow today. #rEngineCore #DevTools #AI"
+
+💼 LinkedIn:
+"Introducing rEngine Core - the intelligent development wrapper that's revolutionizing how teams build software. [Specific achievement/metric]"</code></pre>
+</code></pre>
+<h3 id="email-signatures">Email Signatures</h3>
+<pre><code><pre><code class="language-">[Name]
+rEngine Core Team
+⚙️ The Intelligent Development Wrapper
+[contact-info]</code></pre>
+</code></pre>
+<hr>
+<h2 id="🚫-brand-violations-to-avoid">🚫 BRAND VIOLATIONS TO AVOID</h2>
+<h3 id="forbidden-practices">Forbidden Practices</h3>
+<ol>
+<li><strong>NEVER</strong> reference StackTrackr in new materials</li>
+<li><strong>NEVER</strong> use 🚀 emoji with rEngine branding</li>
+<li><strong>NEVER</strong> write &quot;rengine&quot; without &quot;Core&quot;</li>
+<li><strong>NEVER</strong> use inconsistent capitalization</li>
+<li><strong>NEVER</strong> mix legacy and current branding in same document</li>
+</ol>
+<h3 id="legacy-content-handling">Legacy Content Handling</h3>
+<ul>
+<li><strong>Existing StackTrackr content:</strong> Mark as &quot;[LEGACY]&quot; if kept</li>
+<li><strong>Domain strategy:</strong> Maintain StackTrackr domains as strategic backup</li>
+<li><strong>Historical references:</strong> Always clarify &quot;formerly StackTrackr&quot; when necessary</li>
+</ul>
+<hr>
+<h2 id="�️-terminal--script-execution-protocol">�️ TERMINAL &amp; SCRIPT EXECUTION PROTOCOL</h2>
+<h3 id="external-applescript-terminal-usage">External AppleScript Terminal Usage</h3>
+<p><strong>MANDATE:</strong> All long-running documentation processes MUST use external AppleScript terminals to prevent session interruption.</p>
+<h4 id="html-documentation-generation">HTML Documentation Generation</h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Launch external terminal for HTML conversion
+osascript -e "tell application \"Terminal\"
+    activate
+    do script \"cd '/Volumes/DATA/GitHub/StackTrackr' && node rEngine/gemini-html-converter.js\"
+end tell"</code></pre>
+</code></pre>
+<h4 id="document-sweep-monitoring">Document Sweep Monitoring</h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Launch external terminal for sweep monitoring
+osascript -e "tell application \"Terminal\"
+    activate
+    do script \"cd '/Volumes/DATA/GitHub/StackTrackr' && tail -f logs/document-sweep.log\"
+end tell"</code></pre>
+</code></pre>
+<h4 id="html-generation-monitoring">HTML Generation Monitoring</h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Launch external terminal for HTML generation monitoring
+osascript -e "tell application \"Terminal\"
+    activate
+    do script \"cd '/Volumes/DATA/GitHub/StackTrackr' && tail -f logs/html-generation.log\"
+end tell"</code></pre>
+</code></pre>
+<h3 id="process-management-standards">Process Management Standards</h3>
+<ul>
+<li><strong>Background Processes:</strong> Always use external terminals for operations &gt;30 seconds</li>
+<li><strong>Monitoring:</strong> Separate terminal windows for log tailing</li>
+<li><strong>Session Safety:</strong> Prevent interruption of critical documentation generation</li>
+<li><strong>Parallel Operations:</strong> Allow multiple documentation processes simultaneously</li>
+</ul>
+<hr>
+<h2 id="�🔄-brand-migration-checklist">�🔄 BRAND MIGRATION CHECKLIST</h2>
+<h3 id="for-all-new-content">For All New Content</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Use &quot;rEngine Core&quot; name consistently</li>
+<li><input disabled="" type="checkbox"> Include ⚙️ symbol in headers/titles</li>
+<li><input disabled="" type="checkbox"> Apply &quot;Intelligent Development Wrapper&quot; positioning</li>
+<li><input disabled="" type="checkbox"> Use approved color palette and typography</li>
+<li><input disabled="" type="checkbox"> Follow file naming conventions</li>
+<li><input disabled="" type="checkbox"> Use external AppleScript terminals for long processes</li>
+</ul>
+<h3 id="for-legacy-content-updates">For Legacy Content Updates</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Replace &quot;StackTrackr&quot; with &quot;rEngine Core&quot;</li>
+<li><input disabled="" type="checkbox"> Update 🚀 to ⚙️ symbols</li>
+<li><input disabled="" type="checkbox"> Revise taglines to current messaging</li>
+<li><input disabled="" type="checkbox"> Update file names per convention</li>
+<li><input disabled="" type="checkbox"> Verify all links and references</li>
+<li><input disabled="" type="checkbox"> Update terminal execution protocols</li>
+</ul>
+<hr>
+<h2 id="📈-brand-implementation-tracking">📈 BRAND IMPLEMENTATION TRACKING</h2>
+<h3 id="success-metrics">Success Metrics</h3>
+<ul>
+<li><strong>Consistency Score:</strong> &gt;95% brand compliance across all materials</li>
+<li><strong>Recognition:</strong> Unified brand identity in all customer touchpoints</li>
+<li><strong>Migration Progress:</strong> 100% legacy content updated or archived</li>
+</ul>
+<h3 id="quality-assurance">Quality Assurance</h3>
+<ul>
+<li><strong>Review Process:</strong> All public materials must pass brand compliance check</li>
+<li><strong>Approval Authority:</strong> Lead developer or designated brand guardian</li>
+<li><strong>Documentation:</strong> Track all brand-related changes in this protocol</li>
+</ul>
+<hr>
+<h2 id="🎯-strategic-brand-positioning">🎯 STRATEGIC BRAND POSITIONING</h2>
+<h3 id="market-differentiation">Market Differentiation</h3>
+<pre><code><pre><code class="language-">rEngine Core vs. Traditional Development Tools:
+
+Traditional: Fragmented tools, manual processes, siloed workflows
+rEngine Core: Unified intelligence, automated optimization, integrated ecosystem</code></pre>
+</code></pre>
+<h3 id="value-proposition-hierarchy">Value Proposition Hierarchy</h3>
+<ol>
+<li><strong>Immediate:</strong> Reduce development complexity and overhead</li>
+<li><strong>Short-term:</strong> Accelerate delivery timelines and quality</li>
+<li><strong>Long-term:</strong> Transform development culture and capabilities</li>
+</ol>
+<h3 id="competitive-advantages">Competitive Advantages</h3>
+<ul>
+<li><strong>Unified Platform:</strong> Single system vs. tool sprawl</li>
+<li><strong>Intelligence Layer:</strong> AI-powered vs. manual processes  </li>
+<li><strong>Integration Depth:</strong> Native unification vs. loose coupling</li>
+<li><strong>Scale Architecture:</strong> Enterprise-ready vs. startup limitations</li>
+</ul>
+<hr>
+<h2 id="📞-brand-compliance-contacts">📞 BRAND COMPLIANCE CONTACTS</h2>
+<h3 id="questions--clarifications">Questions &amp; Clarifications</h3>
+<ul>
+<li><strong>Primary Contact:</strong> Development Team Lead</li>
+<li><strong>Documentation:</strong> This protocol document (authoritative source)</li>
+<li><strong>Updates:</strong> Version control through standard git workflow</li>
+<li><strong>Violations:</strong> Report immediately for correction</li>
+</ul>
+<h3 id="version-history">Version History</h3>
+<ul>
+<li><strong>v1.0 (Aug 19, 2025):</strong> Initial brand protocol establishment</li>
+<li><strong>Next Review:</strong> September 2025 or before major releases</li>
+</ul>
+<hr>
+<h2 id="⚡-quick-reference-card">⚡ QUICK REFERENCE CARD</h2>
+<pre><code><pre><code class="language-">BRAND: rEngine Core ⚙️
+TAGLINE: Intelligent Development Wrapper  
+COLORS: Indigo (#6366f1) + Purple (#8b5cf6)
+FONT: Inter
+LEGACY: StackTrackr (backup domains only)
+FILES: rEngine_core_* or rengine-core-*
+COMMITS: "rEngine Core: [type] - [description]"</code></pre>
+</code></pre>
+<hr>
+<p><strong>END OF PROTOCOL</strong></p>
+<p><em>This document is the authoritative source for all rEngine Core branding decisions. All team members, agents, and external contractors must follow these guidelines without exception.</em></p>
+<p><strong>Last Updated:</strong> August 19, 2025<br><strong>Next Review:</strong> September 19, 2025<br><strong>Protocol Owner:</strong> StackTrackr Development Team</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>RENGINE_CORE_BRANDING_PROTOCOL.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

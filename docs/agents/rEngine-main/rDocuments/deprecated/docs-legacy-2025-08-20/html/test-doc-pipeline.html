@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Documentation Pipeline - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Test Documentation Pipeline</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 test-doc-pipeline.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 7KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../test-doc-pipeline.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/test-doc-pipeline.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="test-documentation-pipeline">Test Documentation Pipeline</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>test-doc-pipeline.js</code> script is a utility that demonstrates an enhanced documentation generation pipeline. It uses the <code>SmartDocumentManager</code> class from the <code>rEngine/smart-document-generator.js</code> module to generate comprehensive documentation for a sample CSS file.</p>
+<p>The primary purpose of this script is to:</p>
+<ol>
+<li>Create a test CSS file with sample styles.</li>
+<li>Initialize the <code>SmartDocumentManager</code> and generate documentation for the test file.</li>
+<li>Validate the generated documentation files (Markdown, HTML, JSON, and index.html).</li>
+<li>Provide statistics about the documentation generation process.</li>
+<li>Clean up the test file after the pipeline test is complete.</li>
+</ol>
+<p>This script serves as a reference for integrating the <code>SmartDocumentManager</code> into a project&#39;s documentation workflow and ensuring the pipeline is functioning as expected.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The <code>test-doc-pipeline.js</code> script consists of the following key components:</p>
+<ol>
+<li><p><strong>Main Function</strong>: <code>testDocumentationPipeline()</code> is the entry point of the script, which orchestrates the entire documentation generation process.</p>
+</li>
+<li><p><strong>SmartDocumentManager</strong>: This is the core component responsible for generating the documentation. It is imported from the <code>rEngine/smart-document-generator.js</code> module.</p>
+</li>
+<li><p><strong>File System Operations</strong>: The script uses the <code>fs-extra</code> module to create the test CSS file, write the generated documentation files, and perform cleanup.</p>
+</li>
+<li><p><strong>Error Handling</strong>: The script wraps the entire process in a <code>try-catch</code> block to handle any errors that may occur during the pipeline execution.</p>
+</li>
+</ol>
+<p>The data flow within the script is as follows:</p>
+<ol>
+<li>The test CSS file is created in the current working directory.</li>
+<li>The <code>SmartDocumentManager</code> is initialized.</li>
+<li>The <code>generate()</code> method of the <code>SmartDocumentManager</code> is called to generate the documentation for the test CSS file.</li>
+<li>The generated files (Markdown, HTML, JSON, and index.html) are checked for their existence and basic content validation.</li>
+<li>The test CSS file is removed, and the final pipeline statistics are logged.</li>
+<li>The <code>SmartDocumentManager</code> is shut down, and the script completes.</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>This script relies on the following external dependencies:</p>
+<ol>
+<li><code>rEngine/smart-document-generator.js</code>: The <code>SmartDocumentManager</code> class, which is responsible for generating the documentation.</li>
+<li><code>path</code>: The Node.js built-in module for working with file paths.</li>
+<li><code>fs-extra</code>: An enhanced file system module that provides additional functionality over the built-in <code>fs</code> module.</li>
+</ol>
+<h2 id="key-functionsclasses">Key Functions/Classes</h2>
+<h3 id="testdocumentationpipeline"><code>testDocumentationPipeline()</code></h3>
+<p>This is the main function that orchestrates the entire documentation generation pipeline.</p>
+<p><strong>Parameters</strong>: None</p>
+<p><strong>Return Value</strong>: None</p>
+<p><strong>Functionality</strong>:</p>
+<ol>
+<li>Creates a test CSS file with sample styles.</li>
+<li>Initializes the <code>SmartDocumentManager</code>.</li>
+<li>Generates the documentation for the test CSS file using the <code>generate()</code> method of the <code>SmartDocumentManager</code>.</li>
+<li>Checks the existence and basic content of the generated documentation files (Markdown, HTML, JSON, and index.html).</li>
+<li>Removes the test CSS file.</li>
+<li>Logs the final pipeline statistics.</li>
+<li>Shuts down the <code>SmartDocumentManager</code>.</li>
+</ol>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>To use the <code>test-doc-pipeline.js</code> script, follow these steps:</p>
+<ol>
+<li><p>Ensure you have Node.js installed on your system.</p>
+</li>
+<li><p>Clone the repository or copy the <code>test-doc-pipeline.js</code> file to your local machine.</p>
+</li>
+<li><p>Open a terminal or command prompt and navigate to the directory containing the <code>test-doc-pipeline.js</code> file.</p>
+</li>
+<li><p>Run the script using the following command:</p>
+<pre><code><pre><code class="language-">node test-doc-pipeline.js</code></pre>
+</code></pre>
+<p>This will execute the <code>testDocumentationPipeline()</code> function and generate the documentation for the test CSS file.</p>
+</li>
+<li><p>Observe the output in the terminal, which will include the following information:</p>
+<ul>
+<li>Confirmation of the test CSS file creation</li>
+<li>Progress of the documentation generation</li>
+<li>Validation of the generated documentation files</li>
+<li>Final pipeline statistics</li>
+</ul>
+</li>
+<li><p>After the script completes, you can check the <code>docs</code> directory in the same location as the test CSS file, which will contain the generated Markdown, HTML, JSON, and index.html files.</p>
+</li>
+</ol>
+<h2 id="configuration">Configuration</h2>
+<p>This script does not require any external configuration options or environment variables. All the necessary settings are hardcoded within the script.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>test-doc-pipeline.js</code> script uses a <code>try-catch</code> block to handle any errors that may occur during the documentation generation process. If an error is encountered, the script will log the error message and stack trace to the console, and then perform cleanup by removing the test CSS file before exiting with a non-zero status code.</p>
+<h2 id="integration">Integration</h2>
+<p>This <code>test-doc-pipeline.js</code> script is designed to be a standalone utility that demonstrates the usage of the <code>SmartDocumentManager</code> class from the <code>rEngine/smart-document-generator.js</code> module. It can be integrated into a larger project&#39;s documentation workflow to ensure the pipeline is functioning as expected and to provide a reference for how to use the <code>SmartDocumentManager</code>.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ol>
+<li><p><strong>Test File Creation</strong>: The script creates a small CSS file with sample styles to serve as the input for the documentation generation pipeline. This allows for easy testing and validation of the generated documentation files.</p>
+</li>
+<li><p><strong>Validation Checks</strong>: The script performs basic checks on the generated documentation files to ensure they were created successfully. This includes checking for the existence of the files and performing simple content validation (e.g., checking for the presence of certain HTML tags or JSON properties).</p>
+</li>
+<li><p><strong>Cleanup</strong>: After the pipeline test is complete, the script removes the test CSS file to clean up the working directory.</p>
+</li>
+<li><p><strong>Pipeline Statistics</strong>: The script logs the final pipeline statistics, including the total number of requests, successful requests, errors, and rate limit hits. This information can be useful for monitoring and debugging the documentation generation process.</p>
+</li>
+<li><p><strong>Shutdown</strong>: The script calls the <code>shutdown()</code> method of the <code>SmartDocumentManager</code> to ensure proper cleanup and resource release when the pipeline test is complete.</p>
+</li>
+<li><p><strong>Error Handling</strong>: The script wraps the entire pipeline execution in a <code>try-catch</code> block to handle any errors that may occur during the process. This ensures that the script can provide meaningful error messages and perform cleanup even in the case of failures.</p>
+</li>
+</ol>
+<p>By following this comprehensive documentation, developers can understand the purpose, technical architecture, usage, and key details of the <code>test-doc-pipeline.js</code> script, which can serve as a valuable reference for integrating the <code>SmartDocumentManager</code> into their own projects.</p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>test-doc-pipeline.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

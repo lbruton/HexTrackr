@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StackTrackr Agent Ecosystem - Memory File Directory - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #28a745 0%, #198754 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-agent">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">🤖</div>
+            <h1>StackTrackr Agent Ecosystem - Memory File Directory</h1>
+            <div class="subtitle">Agent System</div>
+            <div class="meta">
+                <span>📁 AGENTS.md</span>
+                <span>📅 2025-08-19</span>
+                <span>📊 5KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../AGENTS.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/AGENTS.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="stacktrackr-agent-ecosystem---memory-file-directory">StackTrackr Agent Ecosystem - Memory File Directory</h1>
+<p><strong>Universal Agent Support</strong>: Claude, GPT, Gemini, and all future Copilot agents</p>
+<h2 id="🧠-memory-file-locations">🧠 Memory File Locations</h2>
+<h3 id="agent-specific-memory-files"><strong>Agent-Specific Memory Files</strong></h3>
+<p>Each agent creates its own dedicated memory file:</p>
+<pre><code><pre><code class="language-">/Volumes/DATA/GitHub/StackTrackr/rMemory/rAgentMemories/
+├── claude-memory.json          # Claude (Anthropic) agent sessions
+├── gpt-memory.json             # GPT (OpenAI) agent sessions  
+├── gemini-memory.json          # Gemini (Google) agent sessions
+├── copilot-agent-memory.json   # Generic Copilot agents
+└── [future-agent]-memory.json  # Any new agents added to ecosystem</code></pre>
+</code></pre>
+<h3 id="shared-memory-files"><strong>Shared Memory Files</strong></h3>
+<p>Cross-agent memory accessible by all agents:</p>
+<pre><code><pre><code class="language-">/Volumes/DATA/GitHub/StackTrackr/rMemory/rAgentMemories/
+├── extendedcontext.json        # Shared context and session history
+├── tasks.json                  # Task tracking and project management
+├── memory.json                 # Legacy shared memory
+└── agent-session-memory.json   # Short-term session memory</code></pre>
+</code></pre>
+<h3 id="system-memory-files"><strong>System Memory Files</strong></h3>
+<p>Core system and configuration memory:</p>
+<pre><code><pre><code class="language-">/Volumes/DATA/GitHub/StackTrackr/rEngine/
+├── persistent-memory.json      # Cross-session persistent memory
+├── active-agent-profile.json   # Current agent configuration
+└── search-optimization.json    # Memory search optimization</code></pre>
+</code></pre>
+<h2 id="🤖-agent-initialization">🤖 Agent Initialization</h2>
+<h3 id="universal-initialization-recommended"><strong>Universal Initialization</strong> (Recommended)</h3>
+<pre><code class="language-bash"><pre><code class="language-bash">cd /Volumes/DATA/GitHub/StackTrackr/rEngine
+node universal-agent-init.js --agent-type [claude|gpt|gemini|auto]</code></pre>
+</code></pre>
+<h3 id="agent-specific-initialization"><strong>Agent-Specific Initialization</strong></h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Claude
+node claude-agent-init.js
+
+# GPT  
+node gpt-mandatory-startup.js
+
+# Gemini (uses universal)
+node universal-agent-init.js --agent-type gemini
+
+# Auto-detect
+node universal-agent-init.js</code></pre>
+</code></pre>
+<h2 id="📋-memory-file-purposes">📋 Memory File Purposes</h2>
+<h3 id="agent-specific-files-agent-memoryjson"><strong>Agent-Specific Files</strong> (<code>{agent}-memory.json</code>)</h3>
+<ul>
+<li><strong>Purpose</strong>: Track individual agent sessions, capabilities, and performance</li>
+<li><strong>Contains</strong>: Session history, agent-specific tasks, learning patterns</li>
+<li><strong>Access</strong>: Read/write by specific agent, read-only by others</li>
+<li><strong>Format</strong>: <pre><code class="language-json"><pre><code class="language-json">{
+  "agent_type": "claude|gpt|gemini",
+  "created_at": "ISO timestamp",
+  "sessions": { "YYYY-MM-DD": [...] },
+  "capabilities": [...],
+  "memory_stats": {...}
+}</code></pre>
+</code></pre>
+</li>
+</ul>
+<h3 id="shared-memory-files-1"><strong>Shared Memory Files</strong></h3>
+<h4 id="extendedcontextjson"><strong>extendedcontext.json</strong></h4>
+<ul>
+<li><strong>Purpose</strong>: Cross-agent context sharing and session handoffs</li>
+<li><strong>Contains</strong>: Detailed session logs, decisions, code changes</li>
+<li><strong>Access</strong>: Read/write by all agents</li>
+<li><strong>Use Case</strong>: Agent handoffs, context preservation, decision tracking</li>
+</ul>
+<h4 id="tasksjson"><strong>tasks.json</strong></h4>
+<ul>
+<li><strong>Purpose</strong>: Project task management and tracking</li>
+<li><strong>Contains</strong>: Task definitions, progress, assignments</li>
+<li><strong>Access</strong>: Read/write by all agents</li>
+<li><strong>Use Case</strong>: Project coordination, task delegation, progress tracking</li>
+</ul>
+<h4 id="persistent-memoryjson"><strong>persistent-memory.json</strong></h4>
+<ul>
+<li><strong>Purpose</strong>: Core system memory that persists across all sessions</li>
+<li><strong>Contains</strong>: System state, key configurations, critical knowledge</li>
+<li><strong>Access</strong>: Read/write by all agents</li>
+<li><strong>Use Case</strong>: System continuity, configuration management</li>
+</ul>
+<h2 id="🔗-mcp-integration">🔗 MCP Integration</h2>
+<p>All memory files are accessible via Model Context Protocol (MCP):</p>
+<pre><code class="language-bash"><pre><code class="language-bash"># MCP Memory Server
+cd /Volumes/DATA/GitHub/StackTrackr/rEngine
+node start-mcp-servers.sh</code></pre>
+</code></pre>
+<p><strong>MCP Endpoints</strong>:</p>
+<ul>
+<li><code>memory://agent-specific/{agent}-memory.json</code></li>
+<li><code>memory://shared/extendedcontext.json</code>  </li>
+<li><code>memory://shared/tasks.json</code></li>
+<li><code>memory://system/persistent-memory.json</code></li>
+</ul>
+<h2 id="🌍-external-agent-access">🌍 External Agent Access</h2>
+<p>For agents outside VS Code (CLI, API, other IDEs):</p>
+<h3 id="direct-file-access"><strong>Direct File Access</strong></h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Read agent memory
+cat /Volumes/DATA/GitHub/StackTrackr/rMemory/rAgentMemories/claude-memory.json
+
+# Write to shared context  
+echo '{"entry": "data"}' >> /Volumes/DATA/GitHub/StackTrackr/rMemory/rAgentMemories/extendedcontext.json</code></pre>
+</code></pre>
+<h3 id="script-interface"><strong>Script Interface</strong></h3>
+<pre><code class="language-bash"><pre><code class="language-bash"># Add context via script
+cd /Volumes/DATA/GitHub/StackTrackr/rEngine
+node add-context.js "title" "description" "type"
+
+# Recall memory
+node recall.js "search term"
+
+# Memory intelligence
+node memory-intelligence.js recall "query"</code></pre>
+</code></pre>
+<h3 id="api-integration-future"><strong>API Integration</strong> (Future)</h3>
+<pre><code class="language-javascript"><pre><code class="language-javascript">// REST API access (planned)
+GET /api/memory/agent/{agent-type}
+POST /api/memory/shared/context
+PUT /api/memory/system/persistent</code></pre>
+</code></pre>
+<h2 id="🎯-agent-ecosystem-vision">🎯 Agent Ecosystem Vision</h2>
+<p><strong>Goal</strong>: Seamless collaboration between all AI agents working on StackTrackr</p>
+<p><strong>Principles</strong>:</p>
+<ol>
+<li><strong>Agent Independence</strong>: Each agent has its own memory space</li>
+<li><strong>Shared Context</strong>: Common memory for handoffs and collaboration  </li>
+<li><strong>External Access</strong>: Memory accessible outside VS Code</li>
+<li><strong>Future-Proof</strong>: System supports any new agents added to ecosystem</li>
+<li><strong>MCP Integration</strong>: Standard protocol for memory access</li>
+<li><strong>Git Integration</strong>: All memory changes are version controlled</li>
+</ol>
+<p><strong>Supported Agents</strong>:</p>
+<ul>
+<li>✅ Claude (Anthropic) - Advanced reasoning and function calling</li>
+<li>✅ GPT (OpenAI) - Code generation and web browsing  </li>
+<li>✅ Gemini (Google) - Multimodal and search integration</li>
+<li>✅ Generic Copilot Agents - Future-proof support</li>
+<li>🔄 Custom Agents - Via universal initialization system</li>
+</ul>
+<h2 id="🚀-quick-start-for-new-agents">🚀 Quick Start for New Agents</h2>
+<ol>
+<li><strong>Initialize</strong>: <code>node universal-agent-init.js</code></li>
+<li><strong>Verify</strong>: Check that <code>{agent}-memory.json</code> was created</li>
+<li><strong>Test MCP</strong>: Ensure MCP server shows memory access notifications</li>
+<li><strong>Collaborate</strong>: Use shared memory files for cross-agent work</li>
+</ol>
+<p><strong>Memory files should be visible and actively updated during agent sessions!</strong></p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>AGENTS.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-19</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,888 @@
+{
+  "metadata": {
+    "created": "2025-08-16",
+    "last_updated": "2025-08-16",
+    "version": "1.0.0",
+    "purpose": "Persistent memory storage for important discussions and long-term context"
+  },
+  "discussions": {
+    "features": {
+      "template": {
+        "id": "feature-[timestamp]",
+        "date": "YYYY-MM-DD",
+        "participants": ["user", "agent"],
+        "topic": "Feature name/description",
+        "key_points": [],
+        "decisions": [],
+        "open_questions": [],
+        "next_steps": [],
+        "related_discussions": []
+      }
+    },
+    "brainstorming": {
+      "template": {
+        "id": "brain-[timestamp]",
+        "date": "YYYY-MM-DD",
+        "topic": "Brainstorming topic",
+        "context": "Why this brainstorming was initiated",
+        "ideas": [],
+        "potential_impacts": [],
+        "resources_needed": [],
+        "priority": "high|medium|low",
+        "status": "active|on-hold|completed"
+      }
+    },
+    "architecture": {
+      "template": {
+        "id": "arch-[timestamp]",
+        "date": "YYYY-MM-DD",
+        "topic": "Architecture discussion topic",
+        "current_state": "",
+        "proposed_changes": [],
+        "considerations": [],
+        "decisions": [],
+        "implementation_notes": []
+      }
+    },
+    "research": {
+      "template": {
+        "id": "research-[timestamp]",
+        "date": "YYYY-MM-DD",
+        "topic": "Research topic",
+        "background": "",
+        "findings": [],
+        "conclusions": [],
+        "action_items": [],
+        "references": []
+      }
+    }
+  },
+  "long_term_planning": {
+    "roadmap_items": {
+      "template": {
+        "id": "plan-[timestamp]",
+        "created": "YYYY-MM-DD",
+        "target_date": "YYYY-MM-DD",
+        "category": "feature|enhancement|maintenance",
+        "title": "",
+        "description": "",
+        "objectives": [],
+        "dependencies": [],
+        "status": "proposed|approved|in-progress|completed",
+        "related_discussions": []
+      }
+    },
+    "technical_debt": {
+      "template": {
+        "id": "debt-[timestamp]",
+        "identified": "YYYY-MM-DD",
+        "area": "",
+        "description": "",
+        "impact": "high|medium|low",
+        "proposed_solutions": [],
+        "status": "identified|scheduled|in-progress|resolved"
+      }
+    }
+  },
+  "knowledge_base": {
+    "patterns": {
+      "template": {
+        "id": "pattern-[timestamp]",
+        "identified": "YYYY-MM-DD",
+        "name": "",
+        "context": "",
+        "solution": "",
+        "examples": [],
+        "considerations": []
+      }
+    },
+    "lessons_learned": {
+      "template": {
+        "id": "lesson-[timestamp]",
+        "date": "YYYY-MM-DD",
+        "context": "",
+        "challenge": "",
+        "solution": "",
+        "outcome": "",
+        "recommendations": []
+      }
+    }
+  },
+  "strategic_vision": {
+    "master_plan": {
+      "id": "vision-20250816-001",
+      "timestamp": "2025-08-16",
+      "title": "Universal AI-Driven Asset Intelligence Platform",
+      "vision_statement": "StackTrackr transforms from precious metals tracker to Universal AI-Driven Asset Intelligence Platform - where Gemini orchestrates the synthesis of community data, public markets, and real-time intelligence into a centralized database that outclasses every static competitor across multiple asset classes.",
+      "core_architecture": {
+        "data_flow": [
+          "Community Data + Public Markets + Real-Time Intelligence",
+          "↓ (Gemini AI Processing) ↓",
+          "Universal Asset Intelligence Database",
+          "↓ (StackTrackr API) ↓",
+          "Multiple Vertical Applications"
+        ],
+        "gemini_capabilities": {
+          "ingestion": ["Numista catalogs", "market feeds", "news sentiment", "economic indicators"],
+          "processing": ["validation", "normalization", "cross-referencing"],
+          "synthesis": "Creates compound intelligence no single-source platform can match",
+          "delivery": "Real-time insights through unified StackTrackr API"
+        }
+      },
+      "expansion_phases": {
+        "phase1": {
+          "focus": "Precious Metals",
+          "features": [
+            "Gold, Silver, Platinum, Palladium tracking",
+            "Numismatic collections and valuations",
+            "Market intelligence and portfolio analytics"
+          ]
+        },
+        "phase2": {
+          "focus": "Network & IT Assets",
+          "features": [
+            "Hardware inventory management",
+            "Vulnerability tracking and remediation",
+            "Asset lifecycle analytics",
+            "Security compliance"
+          ]
+        },
+        "phase3": {
+          "focus": "Universal Asset Classes",
+          "features": [
+            "Art and collectibles",
+            "Equipment and machinery",
+            "Real estate portfolio",
+            "Intellectual property",
+            "Custom enterprise inventory"
+          ]
+        },
+        "phase4": {
+          "focus": "Intelligence-as-a-Service Platform",
+          "features": [
+            "Universal asset intelligence API",
+            "Multi-tenant architecture",
+            "White-label deployment",
+            "Enterprise integration partnerships"
+          ]
+        }
+      },
+      "technical_architecture": {
+        "layers": [
+          {
+            "name": "Data Ingestion",
+            "components": ["Community", "Public", "Real-time"]
+          },
+          {
+            "name": "AI Processing",
+            "components": ["Validation", "Normalization", "Synthesis"]
+          },
+          {
+            "name": "Intelligence Cache",
+            "components": ["Optimized storage", "Retrieval"]
+          },
+          {
+            "name": "API Gateway",
+            "components": ["Rate limiting", "Authentication", "Fallback"]
+          },
+          {
+            "name": "Application Layer",
+            "components": ["Web", "Mobile", "Integrations"]
+          }
+        ],
+        "scalability": [
+          "Microservices for independent scaling",
+          "Event-driven real-time updates",
+          "Multi-tenant architecture",
+          "Global CDN distribution"
+        ]
+      },
+      "business_model": {
+        "tiers": {
+          "freemium": "Cached intelligence, basic analytics",
+          "premium": "Real-time updates, advanced analytics",
+          "professional": "API access, bulk operations, integrations",
+          "enterprise": "White-label, custom intelligence, dedicated resources"
+        },
+        "advantages": [
+          "Network Effects: More users = better data = more users",
+          "Data Moats: Proprietary AI synthesis",
+          "Vertical Expansion: Same platform, multiple markets",
+          "API Economy: Intelligence-as-a-Service model"
+        ]
+      },
+      "implementation_timeline": {
+        "months_1_3": {
+          "phase": "Prove Intelligence Synthesis",
+          "goals": [
+            "Gemini-powered precious metals intelligence",
+            "Community data integration",
+            "Basic caching and optimization",
+            "User API fallback system"
+          ]
+        },
+        "months_4_6": {
+          "phase": "Platform Foundation",
+          "goals": [
+            "Multi-tenant architecture",
+            "Universal asset intelligence API",
+            "Network inventory prototype",
+            "Advanced analytics"
+          ]
+        },
+        "months_7_12": {
+          "phase": "Horizontal Expansion",
+          "goals": [
+            "Additional vertical markets",
+            "White-label deployment",
+            "Enterprise integrations",
+            "Global scaling"
+          ]
+        },
+        "year_2_plus": {
+          "phase": "Intelligence-as-a-Service",
+          "goals": [
+            "Universal asset intelligence platform",
+            "API marketplace",
+            "Strategic partnerships",
+            "IPO preparation"
+          ]
+        }
+      }
+    }
+  },
+  "technical_implementations": {
+    "search_algorithm": {
+      "id": "impl-20250816-001",
+      "type": "enhancement",
+      "component": "search",
+      "files": ["filters.js", "search.js"],
+      "description": "Comprehensive search algorithm improvements for precious metals",
+      "core_logic": {
+        "flow": [
+          "Exact Phrase Check",
+          "Word Boundary Validation",
+          "Series-Specific Rules",
+          "Fraction/Weight Handling",
+          "Broad Term Filtering"
+        ],
+        "rules": {
+          "metal_specific": "Prevents cross-metal contamination",
+          "phrase_matching": "Handles multi-word combinations",
+          "weight_precision": "Accurate fractional weight handling",
+          "broad_filtering": "Blocks overly generic terms"
+        }
+      },
+      "supported_series": {
+        "eagles": ["Gold", "Silver", "Platinum", "Palladium"],
+        "maple_leafs": ["Gold", "Silver", "Platinum", "Palladium"],
+        "britannias": ["Gold", "Silver", "Platinum"],
+        "krugerrands": ["Gold", "Silver", "Platinum"],
+        "buffalos": ["Gold", "Silver"],
+        "pandas": ["Gold", "Silver"],
+        "kangaroos": ["Gold", "Silver"]
+      },
+      "extensibility": {
+        "new_series": ["Libertads", "Philharmonics"],
+        "new_metals": ["Copper", "Nickel"],
+        "variations": ["Weight denominations", "Country specifics"]
+      },
+      "ai_readiness": {
+        "pattern_recognition": true,
+        "structured_results": true,
+        "metadata_support": true,
+        "integration_points": [
+          "Result enhancement",
+          "Query understanding",
+          "Pattern learning",
+          "Dynamic optimization"
+        ]
+      }
+    }
+  },
+  "project_architecture": {
+    "ecosystem": {
+      "id": "arch-20250816-001",
+      "timestamp": "2025-08-16 00:00:00",
+      "overview": {
+        "components": [
+          {
+            "name": "StackrTrackr",
+            "type": "application",
+            "purpose": "Primary product - Precious metals tracking platform",
+            "status": "active_development",
+            "priority": "high",
+            "current_focus": "bug fixes and stability",
+            "next_phases": [
+              "Encrypted file storage",
+              "Backups",
+              "Cloud sync"
+            ]
+          },
+          {
+            "name": "rSynk",
+            "type": "api_server",
+            "purpose": "Agentic API server and protocol layer",
+            "status": "planned",
+            "dependencies": ["stable StackrTrackr"],
+            "features": [
+              "Application connectivity",
+              "Protocol management",
+              "Agent coordination"
+            ]
+          },
+          {
+            "name": "rEngine",
+            "type": "ai_service",
+            "purpose": "AI-powered search and database API",
+            "status": "planned",
+            "integrations": [
+              {
+                "service": "Gemini",
+                "purpose": "User search assistance",
+                "demo_location": "agents/lab/"
+              }
+            ],
+            "dependencies": ["rSynk"]
+          }
+        ],
+        "development_strategy": {
+          "current_phase": "StackrTrackr Stabilization",
+          "approach": "multi_app",
+          "scaling": "start small, focused on single product",
+          "expansion": "prepared for multiple products in future"
+        }
+      }
+    }
+  },
+  "context_storage": {
+    "sessions": {
+      "ctx-20250816-001": {
+        "id": "ctx-20250816-001",
+        "timestamp": "2025-08-16 00:00:00",
+        "topic": "rAgent Ecosystem Vision - Context Management System",
+        "handoff_summary": {
+          "prompt": "rAgent ecosystem implements sophisticated context management through extendedcontext.json. Key features: 1) Efficient handoffs with condensed summaries, 2) Full context preservation with proper linking, 3) Quick reference system for rapid recall. Agents maintain context across sessions through structured storage of discussions, planning, and knowledge.",
+          "key_points": [
+            "Context storage uses both condensed handoffs and full preservation",
+            "System builds cumulative intelligence over time",
+            "Structured approach to memory management differentiates from simple chat interfaces",
+            "Implementation done through extendedcontext.json with clear categorization"
+          ],
+          "critical_context": [
+            "All agents must maintain README.md accuracy",
+            "Context should be stored in most efficient form possible",
+            "Full context must be preserved alongside condensed versions",
+            "System designed for long-term knowledge accumulation"
+          ]
+        },
+        "full_context": {
+          "discussion": "Initial discussion about implementing extended context storage in rAgent ecosystem. Started with creating extendedcontext.json, evolved into deeper discussion about efficient context preservation and handoff system. Key realization that system should store both condensed and full versions of context for different use cases.",
+          "decisions": [
+            "Implement extendedcontext.json for persistent storage",
+            "Structure includes discussions, long-term planning, and knowledge base",
+            "Added specific context_storage section for efficient handoffs",
+            "Store both condensed and full versions of context"
+          ],
+          "code_changes": [
+            "Created extendedcontext.json",
+            "Updated README.md to include new file in structure",
+            "Implemented context_storage section with sessions and quick_references"
+          ],
+          "related_files": [
+            "/agents/extendedcontext.json",
+            "/agents/README.md"
+          ],
+          "environment_state": {
+            "project": "StackTrackr",
+            "branch": "main",
+            "date": "2025-08-16"
+          }
+        },
+        "tags": [
+          "architecture",
+          "context-management",
+          "agent-memory",
+          "system-design"
+        ],
+        "priority": "high",
+        "follow_up_required": false,
+        "related_sessions": []
+      },
+      "ctx-20250816-003": {
+        "id": "ctx-20250816-003",
+        "timestamp": "2025-08-16 00:00:02",
+        "topic": "rEngine Search and Data Processing Vision",
+        "handoff_summary": {
+          "prompt": "rEngine will provide intelligent search and data processing: User queries coin -> Agent processes search -> Formats data -> Injects into StackrTrackr. System learns from searches to proactively cache relevant data (prices, metadata) through web scraping.",
+          "key_points": [
+            "AI-assisted search with automatic data formatting",
+            "Dynamic learning from user search patterns",
+            "Proactive data caching for common queries",
+            "Automated web scraping for price updates"
+          ],
+          "critical_context": [
+            "System builds intelligence over time from user interactions",
+            "Focus on perfect data formatting for ingestion",
+            "Caching strategy reduces latency and load",
+            "Web scraping component for real-time data"
+          ]
+        },
+        "full_context": {
+          "discussion": "Detailed exploration of rEngine's planned capabilities. System will act as an intelligent intermediary between user searches and data presentation. When users search for items (e.g., specific coins), the agent will not only find the data but ensure it's perfectly formatted for ingestion into StackrTrackr. The system is designed to learn from user search patterns and proactively cache relevant data, including pricing and metadata, through automated web scraping. This creates a continuously improving knowledge base that anticipates user needs.",
+          "decisions": [
+            "Implement agent-assisted search processing",
+            "Build dynamic learning from user search patterns",
+            "Develop proactive data caching system",
+            "Create automated web scraping for price updates"
+          ],
+          "implications": [
+            "Need robust data formatting standards",
+            "Must handle rate limiting for web scraping",
+            "Consider cache invalidation strategies",
+            "Plan for data storage scaling"
+          ],
+          "environment_state": {
+            "project": "StackTrackr",
+            "branch": "main",
+            "date": "2025-08-16"
+          }
+        },
+        "tags": [
+          "rEngine",
+          "search",
+          "ai",
+          "caching",
+          "web-scraping",
+          "data-processing",
+          "user-interaction"
+        ],
+        "priority": "high",
+        "follow_up_required": true,
+        "related_sessions": ["ctx-20250816-001", "ctx-20250816-002"]
+      },
+      "ctx-20250816-004": {
+        "id": "ctx-20250816-004",
+        "timestamp": "2025-08-16 00:00:03",
+        "topic": "AI Search Demo Implementation Details",
+        "handoff_summary": {
+          "prompt": "AI Search demo shows integration between StackrTrackr UI and rEngine. Features toggle for AI-enhanced search, insights panel, and dynamic result enhancement. Demonstrates UI/UX for upcoming search capabilities.",
+          "key_points": [
+            "Modern, responsive search interface",
+            "AI toggle for enhanced search",
+            "Insights panel for additional context",
+            "Visual feedback through badges and panels"
+          ],
+          "critical_context": [
+            "UI design patterns for AI integration",
+            "Demonstrates planned user interaction flow",
+            "Shows how AI insights will be presented",
+            "Provides foundation for rEngine integration"
+          ]
+        },
+        "full_context": {
+          "discussion": "The AI search demo in agents/lab/ai-search-demo.html provides a comprehensive preview of how the AI-enhanced search will be integrated into StackrTrackr. The interface includes a modern search input with AI toggle, an insights panel for additional context, and visual feedback through badges. This implementation shows how user queries will be enhanced by rEngine and how the results will be presented back to users.",
+          "technical_details": {
+            "ui_components": [
+              "search-input: Main search field with AI toggle",
+              "ai-insights-panel: Collapsible panel for AI context",
+              "ai-badge: Visual indicators for AI-enhanced results"
+            ],
+            "interaction_flow": [
+              "User enters search query",
+              "Optional AI enhancement via toggle",
+              "Results displayed with insights panel",
+              "Dynamic updates as user refines search"
+            ]
+          },
+          "relevant_files": [
+            "/agents/lab/ai-search-demo.html"
+          ]
+        },
+        "tags": [
+          "ai-search",
+          "demo",
+          "ui-design",
+          "rEngine",
+          "user-interaction"
+        ],
+        "priority": "high",
+        "follow_up_required": false,
+        "related_sessions": ["ctx-20250816-001", "ctx-20250816-002", "ctx-20250816-003"]
+      },
+      "ctx-20250816-005": {
+        "id": "ctx-20250816-005",
+        "timestamp": "2025-08-16 00:00:04",
+        "topic": "Strategic Vision: Universal AI-Driven Asset Intelligence Platform",
+        "handoff_summary": {
+          "prompt": "StackTrackr evolving from precious metals tracker to Universal AI-Driven Asset Intelligence Platform. Gemini orchestrates data synthesis from multiple sources, creating unique compound intelligence. Four-phase expansion plan from precious metals to full Intelligence-as-a-Service platform.",
+          "key_points": [
+            "Gemini AI as core intelligence orchestrator",
+            "Multi-source data synthesis creates unique value",
+            "Cost-optimized through intelligent processing",
+            "Four-phase expansion across multiple verticals"
+          ],
+          "critical_context": [
+            "Current focus: Stabilize StackrTrackr for platform foundation",
+            "Next major milestone: Gemini-powered intelligence synthesis",
+            "Strategic goal: Universal asset intelligence platform",
+            "Business model evolves from product to platform"
+          ]
+        },
+        "full_context": {
+          "discussion": "Comprehensive strategic vision outlining StackTrackr's evolution into a Universal AI-Driven Asset Intelligence Platform. The plan leverages Gemini's AI capabilities to synthesize multiple data sources, creating compound intelligence that outclasses static competitors. The implementation follows a four-phase expansion strategy, starting with precious metals and expanding through IT assets to become a universal asset intelligence platform.",
+          "key_innovations": [
+            "AI-synthesized compound intelligence",
+            "Cost-optimized processing architecture",
+            "Multi-vertical platform expansion",
+            "Intelligence-as-a-Service model"
+          ],
+          "strategic_moats": [
+            "Dynamic AI synthesis vs static databases",
+            "Platform network effects across verticals",
+            "Sustainable economics through optimization",
+            "Universal platform applicability"
+          ],
+          "implementation_priorities": [
+            "Stabilize current precious metals platform",
+            "Implement Gemini intelligence synthesis",
+            "Build multi-tenant architecture",
+            "Develop universal asset API"
+          ]
+        },
+        "tags": [
+          "strategic-vision",
+          "platform-evolution",
+          "ai-architecture",
+          "business-model",
+          "implementation-plan"
+        ],
+        "priority": "critical",
+        "follow_up_required": true,
+        "related_sessions": ["ctx-20250816-001", "ctx-20250816-002", "ctx-20250816-003", "ctx-20250816-004"]
+      },
+      "ctx-20250816-006": {
+        "id": "ctx-20250816-006",
+        "timestamp": "2025-08-16 00:00:05",
+        "topic": "Enhanced Search Algorithm Implementation",
+        "handoff_summary": {
+          "prompt": "Comprehensive search algorithm enhancement to prevent cross-metal contamination and improve precision. Implemented metal-specific exact phrase matching, major coin series coverage, and precise filtering rules. Critical foundation for future AI-powered search features.",
+          "key_points": [
+            "Eliminated cross-metal search contamination",
+            "Implemented precise coin series matching",
+            "Added fractional weight precision",
+            "Blocked overly broad searches"
+          ],
+          "critical_context": [
+            "Modified filterInventoryAdvanced() in filters.js",
+            "Modified filterInventory() in search.js",
+            "Backward compatible with existing searches",
+            "Foundation for future AI search integration"
+          ]
+        },
+        "full_context": {
+          "discussion": "Detailed documentation of search algorithm improvements focusing on precision and preventing cross-metal contamination. The implementation provides a foundation for future AI-powered search features while ensuring accurate results for all major precious metals coin series.",
+          "technical_details": {
+            "core_flow": [
+              "Exact Phrase Check",
+              "Word Boundary Validation",
+              "Series-Specific Rules",
+              "Fraction/Weight Handling",
+              "Broad Term Filtering"
+            ],
+            "coin_series_coverage": [
+              "Eagles (Gold/Silver/Platinum/Palladium)",
+              "Maple Leafs (Gold/Silver/Platinum/Palladium)",
+              "Britannias (Gold/Silver/Platinum)",
+              "Krugerrands (Gold/Silver/Platinum)",
+              "Buffalos (Gold/Silver)",
+              "Pandas (Gold/Silver)",
+              "Kangaroos (Gold/Silver)"
+            ],
+            "search_behavior_examples": {
+              "Silver Eagle": {
+                "matches": ["American Silver Eagle", "Silver Eagle Colorized"],
+                "excludes": ["American Gold Eagle", "Gold Eagle"]
+              },
+              "Gold Maple": {
+                "matches": ["Canadian Gold Maple Leaf"],
+                "excludes": ["Canadian Silver Maple Leaf"]
+              }
+            }
+          },
+          "benefits": [
+            "Eliminated false positives",
+            "Improved user experience",
+            "Maintained flexibility",
+            "Prevented noise",
+            "Scalable pattern"
+          ],
+          "future_extensibility": {
+            "supported_additions": [
+              "New coin series (Libertads, Philharmonics)",
+              "Additional metals (copper, nickel)",
+              "New weight denominations",
+              "Country-specific variations"
+            ]
+          },
+          "code_changes": {
+            "files": [
+              "filters.js",
+              "search.js"
+            ],
+            "functions": [
+              "filterInventoryAdvanced()",
+              "filterInventory()"
+            ]
+          }
+        },
+        "tags": [
+          "search-algorithm",
+          "precious-metals",
+          "coin-series",
+          "data-precision",
+          "user-experience"
+        ],
+        "priority": "high",
+        "follow_up_required": false,
+        "related_sessions": ["ctx-20250816-001", "ctx-20250816-002", "ctx-20250816-003", "ctx-20250816-004", "ctx-20250816-005"]
+      },
+      "ctx-20250816-002": {
+        "id": "ctx-20250816-002",
+        "timestamp": "2025-08-16 00:00:01",
+        "topic": "rAgent Ecosystem Architecture and Component Relationships",
+        "handoff_summary": {
+          "prompt": "Three-tier system architecture: 1) StackrTrackr (product layer - precious metals tracking), 2) rSynk (agentic API/protocol layer), 3) rEngine (AI-powered search/DB with Gemini). Current priority: Stabilize StackrTrackr before implementing rSynk/rEngine features.",
+          "key_points": [
+            "StackrTrackr is primary product, needs stability first",
+            "rSynk will provide agentic API server capabilities",
+            "rEngine will power AI search with Gemini integration",
+            "System designed for multi-app scalability"
+          ],
+          "critical_context": [
+            "Immediate focus: Bug fixes and stability in StackrTrackr",
+            "Next phase: Encrypted storage, backups, cloud sync",
+            "rSynk/rEngine development follows StackrTrackr stabilization",
+            "Architecture supports future product expansion"
+          ]
+        },
+        "full_context": {
+          "discussion": "Detailed overview of the three-tiered architecture approach. StackrTrackr serves as the initial product (precious metals tracking) while rSynk and rEngine are planned as supporting services. Development strategy emphasizes stabilizing StackrTrackr before implementing advanced features or additional services. System designed with multi-app scalability in mind but focusing on single product initially.",
+          "decisions": [
+            "Prioritize StackrTrackr stability before other components",
+            "Plan for encrypted storage, backups, cloud sync as next phase",
+            "Implement Gemini-powered search through rEngine",
+            "Design for future product expansion"
+          ],
+          "related_files": [
+            "/agents/lab/*",
+            "Demo docs for rEngine integration"
+          ],
+          "environment_state": {
+            "project": "StackTrackr",
+            "branch": "main",
+            "date": "2025-08-16"
+          }
+        },
+        "tags": [
+          "architecture",
+          "system-design",
+          "roadmap",
+          "priorities",
+          "rSynk",
+          "rEngine",
+          "StackrTrackr"
+        ],
+        "priority": "high",
+        "follow_up_required": false,
+        "related_sessions": ["ctx-20250816-001"]
+      },
+      "template": {
+        "id": "ctx-[timestamp]",
+        "timestamp": "YYYY-MM-DD HH:mm:ss",
+        "topic": "",
+        "handoff_summary": {
+          "prompt": "",
+          "key_points": [],
+          "critical_context": []
+        },
+        "full_context": {
+          "discussion": "",
+          "decisions": [],
+          "code_changes": [],
+          "related_files": [],
+          "environment_state": {}
+        },
+        "tags": [],
+        "priority": "high|medium|low",
+        "follow_up_required": false,
+        "related_sessions": []
+      }
+    },
+    "quick_references": {
+      "template": {
+        "id": "qref-[timestamp]",
+        "topic": "",
+        "prompt": "",
+        "linked_session": "ctx-[timestamp]"
+      }
+    }
+  },
+  "system_context": {
+    "operational_environment": {
+      "project": "StackTrackr",
+      "repository": "lbruton/StackTrackr",
+      "primary_branch": "main",
+      "development_phase": "active"
+    },
+    "interaction_protocols": {
+      "agent_communication": {
+        "synchronous_channels": [
+          "direct_prompts",
+          "handoff_protocol",
+          "git_checkpoints"
+        ],
+        "asynchronous_channels": [
+          "memory_updates",
+          "documentation_changes",
+          "task_queue"
+        ]
+      },
+      "memory_management": {
+        "read_protocols": [
+          "validate_timestamps",
+          "check_shared_index",
+          "load_personal_context"
+        ],
+        "write_protocols": [
+          "update_timestamps",
+          "maintain_shared_index",
+          "document_changes"
+        ]
+      }
+    },
+    "behavioral_guidelines": {
+      "task_handling": {
+        "priority_levels": [
+          "critical",
+          "high",
+          "normal",
+          "low",
+          "background"
+        ],
+        "handoff_requirements": [
+          "current_state",
+          "progress_metrics",
+          "next_steps",
+          "known_issues"
+        ]
+      },
+      "documentation_standards": {
+        "required_updates": [
+          "README.md structure",
+          "API documentation",
+          "architectural changes",
+          "dependency updates"
+        ],
+        "formatting_rules": {
+          "markdown": "Standard GitHub Flavored Markdown",
+          "code_blocks": "Include language specification",
+          "diagrams": ["ASCII", "Mermaid"],
+          "spacing": "Double newline between sections"
+        }
+      }
+    },
+    "system_capabilities": {
+      "core_functions": [
+        "task_management",
+        "memory_operations",
+        "documentation_maintenance",
+        "code_generation",
+        "system_analysis"
+      ],
+      "specialized_tools": {
+        "code_analysis": [
+          "semantic_search",
+          "dependency_tracking",
+          "impact_analysis"
+        ],
+        "documentation": [
+          "auto_documentation",
+          "diagram_generation",
+          "patch_notes_creation"
+        ],
+        "quality_assurance": [
+          "code_review",
+          "test_generation",
+          "performance_monitoring"
+        ]
+      }
+    },
+    "integration_points": {
+      "external_systems": {
+        "version_control": "Git",
+        "documentation": "GitHub Wiki",
+        "ci_cd": "GitHub Actions",
+        "project_management": "GitHub Projects"
+      },
+      "api_interfaces": {
+        "github": "GitHub REST & GraphQL APIs",
+        "vscode": "VS Code Extension API",
+        "custom": "StackTrackr Internal APIs"
+      }
+    }
+  },
+  "runtime_context": {
+    "active_configurations": {
+      "memory_allocation": {
+        "personal_memory_limit": "10MB per agent",
+        "shared_memory_limit": "100MB total",
+        "cleanup_threshold": "80% usage"
+      },
+      "performance_targets": {
+        "response_time": "< 2 seconds",
+        "memory_sync": "< 5 seconds",
+        "documentation_update": "< 1 minute"
+      }
+    },
+    "system_states": {
+      "normal_operation": {
+        "memory_validation": true,
+        "documentation_sync": true,
+        "task_processing": true
+      },
+      "maintenance_mode": {
+        "memory_validation": true,
+        "documentation_sync": false,
+        "task_processing": false
+      },
+      "emergency_mode": {
+        "memory_validation": false,
+        "documentation_sync": false,
+        "task_processing": true
+      }
+    }
+  },
+  "extension_points": {
+    "custom_protocols": {
+      "template": {
+        "name": "protocol_name",
+        "version": "1.0.0",
+        "description": "Protocol description",
+        "implementation": {
+          "steps": [],
+          "validation": [],
+          "fallback": []
+        }
+      }
+    },
+    "behavior_modifications": {
+      "template": {
+        "trigger": "event_name",
+        "conditions": [],
+        "actions": [],
+        "validation": []
+      }
+    }
+  }
+}

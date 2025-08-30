@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-16",
+    "purpose": "Inter-agent communication protocols and message routing",
+    "description": "Dynamic memory system for communications management",
+    "mcp_fallback": "Complete communications information available when MCP is unavailable",
+    "auto_generated": true,
+    "memory_type": "communications"
+  },
+  "communications_data": {
+    "entries": {},
+    "categories": [],
+    "patterns": [],
+    "relationships": {}
+  },
+  "learning_metrics": {
+    "total_entries": 0,
+    "last_updated": "2025-08-16T17:18:23.807358",
+    "effectiveness_score": 0.0,
+    "usage_frequency": 0
+  },
+  "integration_points": {
+    "related_memory_types": [],
+    "cross_references": {},
+    "auto_triggers": []
+  }
+}

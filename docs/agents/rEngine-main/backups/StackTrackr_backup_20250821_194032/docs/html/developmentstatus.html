@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rEngine Platform v2.1.1 - Development Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .header .timestamp {
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        .status-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-active { background: #28a745; }
+        .status-warning { background: #ffc107; }
+        .status-critical { background: #dc3545; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        /* Managed Projects Section */
+        .managed-projects {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .projects-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .project-card {
+            background: white;
+            border: 2px solid #e1e4e8;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: move;
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            border-color: #007acc;
+        }
+
+        .project-card.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .project-info h3 {
+            font-size: 1.4em;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .project-type {
+            font-size: 0.85em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .project-type.primary {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .project-type.secondary {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .project-version {
+            background: #f8f9fa;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .project-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .project-stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .project-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-docs {
+            background: linear-gradient(135deg, #007acc, #0056b3);
+            color: white;
+        }
+
+        .btn-issues {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .btn-roadmap {
+            background: linear-gradient(135deg, #28a745, #218838);
+            color: white;
+        }
+
+        .btn-patches {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #212529;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Platform Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .service-card {
+            background: white;
+            border: 1px solid #e1e4e8;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: move;
+        }
+
+        .service-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .service-card.dragging {
+            opacity: 0.5;
+            transform: rotate(3deg);
+        }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .service-icon {
+            font-size: 1.8em;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .core-icon { background: linear-gradient(135deg, #2c3e50, #34495e); }
+        .memory-icon { background: linear-gradient(135deg, #6f42c1, #495057); }
+        .docs-icon { background: linear-gradient(135deg, #007acc, #0056b3); }
+        .agent-icon { background: linear-gradient(135deg, #20c997, #198754); }
+        .backup-icon { background: linear-gradient(135deg, #fd7e14, #dc3545); }
+
+        .service-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .service-description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .service-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .service-status.active {
+            color: #28a745;
+        }
+
+        /* Drag and Drop Styles */
+        .drag-handle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: grab;
+            color: #999;
+            font-size: 1.2em;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .drop-zone {
+            border: 2px dashed #007acc;
+            background: rgba(0, 122, 204, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            color: #007acc;
+            font-weight: 500;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .drop-zone.active {
+            display: block;
+        }
+
+        /* Memory Sync Status */
+        .memory-sync-status {
+            background: linear-gradient(135deg, #e8f5e8, #d4edda);
+            border: 1px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sync-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .sync-status-icon {
+            font-size: 1.5em;
+            color: #28a745;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e1e4e8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .projects-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .project-actions {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>🤖 rEngine Platform v2.1.1</h1>
+            <div class="subtitle">Multi-Agent AI Orchestration & Development Dashboard</div>
+            <div class="timestamp">Last Updated: <span id="currentTimestamp">August 19, 2025</span></div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-indicator status-active"></span>
+                <span>rEngine Core: v2.1.1 ✅</span>
+            </div>
+            <div class="status-item">
+                <span class="status-indicator status-active"></span>
+                <span>StackTrackr Project: v3.04.87 ✅</span>
+            </div>
+            <div class="status-item">
+                <span class="status-indicator status-active"></span>
+                <span>Memory Sync: Synchronized ✅</span>
+            </div>
+            <div class="status-item">
+                <span class="status-indicator status-active"></span>
+                <span>MCP Servers: Running</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Managed Projects Section -->
+            <div class="managed-projects">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        📁 Managed Projects
+                        <span style="font-size: 0.6em; color: #666;">(Drag to reorder)</span>
+                    </h2>
+                </div>
+                
+                <div class="projects-container" id="projectsContainer">
+                    <!-- StackTrackr Project -->
+                    <div class="project-card" draggable="true" data-project="stacktrackr">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="project-header">
+                            <div class="project-info">
+                                <h3>📊 StackTrackr <span class="project-type primary">Primary</span></h3>
+                                <div class="project-version">v3.04.87</div>
+                            </div>
+                        </div>
+                        <div class="project-description">
+                            Precious metals inventory management application with advanced search, filtering, catalog integration, and real-time spot price tracking. Production application with comprehensive patch note history.
+                        </div>
+                        <div class="project-stats">
+                            <div class="stat-item">📦 25 Patches</div>
+                            <div class="stat-item">🔄 Active Development</div>
+                            <div class="stat-item">💰 Production Ready</div>
+                        </div>
+                        <div class="project-actions">
+                            <a href="documentation.html" class="action-btn btn-docs">
+                                📚 Documentation
+                            </a>
+                            <a href="#" onclick="openIssues('stacktrackr')" class="action-btn btn-issues">
+                                🐛 Issues
+                            </a>
+                            <a href="#" onclick="openRoadmap('stacktrackr')" class="action-btn btn-roadmap">
+                                🗺️ Roadmap
+                            </a>
+                            <a href="#" onclick="openPatches('stacktrackr')" class="action-btn btn-patches">
+                                📝 Patches
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- VulnTrackr Project -->
+                    <div class="project-card" draggable="true" data-project="vulntrackr">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="project-header">
+                            <div class="project-info">
+                                <h3>🛡️ VulnTrackr <span class="project-type secondary">Secondary</span></h3>
+                                <div class="project-version">v1.0.0</div>
+                            </div>
+                        </div>
+                        <div class="project-description">
+                            Vulnerability tracking and security management system for comprehensive security assessment, risk tracking, compliance monitoring, and automated report generation.
+                        </div>
+                        <div class="project-stats">
+                            <div class="stat-item">🚀 New Project</div>
+                            <div class="stat-item">🔧 In Development</div>
+                            <div class="stat-item">🛡️ Security Focus</div>
+                        </div>
+                        <div class="project-actions">
+                            <a href="documentation.html" class="action-btn btn-docs">
+                                📚 Documentation
+                            </a>
+                            <a href="#" onclick="openIssues('vulntrackr')" class="action-btn btn-issues">
+                                🐛 Issues
+                            </a>
+                            <a href="#" onclick="openRoadmap('vulntrackr')" class="action-btn btn-roadmap">
+                                🗺️ Roadmap
+                            </a>
+                            <a href="#" onclick="openPatches('vulntrackr')" class="action-btn btn-patches">
+                                📝 Patches
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Platform Services Section -->
+            <div class="platform-services">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        ⚙️ Platform Services
+                        <span style="font-size: 0.6em; color: #666;">(Drag to reorder)</span>
+                    </h2>
+                </div>
+                
+                <div class="services-grid" id="servicesContainer">
+                    <!-- rEngine Core -->
+                    <div class="service-card" draggable="true" data-service="core">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="service-header">
+                            <div class="service-icon core-icon">⚙️</div>
+                            <div class="service-title">rEngine Core</div>
+                        </div>
+                        <div class="service-description">
+                            Core AI orchestration platform with multi-provider support, session management, and universal agent initialization protocols.
+                        </div>
+                        <div class="service-status active">
+                            ● Active - 5 AI providers available
+                        </div>
+                    </div>
+
+                    <!-- rSync Memory Management -->
+                    <div class="service-card" draggable="true" data-service="memory">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="service-header">
+                            <div class="service-icon memory-icon">🧠</div>
+                            <div class="service-title">rSync (Memory)</div>
+                        </div>
+                        <div class="service-description">
+                            Distributed memory system with MCP server integration and local storage synchronization for persistent agent memory across sessions.
+                        </div>
+                        <div class="service-status active">
+                            ● Active - Health checks every 15 minutes
+                        </div>
+                    </div>
+
+                    <!-- rScribe Document Generation -->
+                    <div class="service-card" draggable="true" data-service="documentation">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="service-header">
+                            <div class="service-icon docs-icon">📚</div>
+                            <div class="service-title">rScribe (Documentation)</div>
+                        </div>
+                        <div class="service-description">
+                            LLM-neutral documentation pipeline with multi-provider AI support for automated code analysis and technical documentation.
+                        </div>
+                        <div class="service-status active">
+                            ● Active - Processing 324 files
+                        </div>
+                    </div>
+
+                    <!-- rAgents Orchestration -->
+                    <div class="service-card" draggable="true" data-service="agents">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="service-header">
+                            <div class="service-icon agent-icon">🤝</div>
+                            <div class="service-title">rAgents (Orchestration)</div>
+                        </div>
+                        <div class="service-description">
+                            Multi-agent task orchestration system for distributed work coordination and intelligent task routing across the platform.
+                        </div>
+                        <div class="service-status active">
+                            ● Active - 2 agents running
+                        </div>
+                    </div>
+
+                    <!-- Backup & Sync -->
+                    <div class="service-card" draggable="true" data-service="backup">
+                        <div class="drag-handle">⋮⋮</div>
+                        <div class="service-header">
+                            <div class="service-icon backup-icon">🔄</div>
+                            <div class="service-title">Git + Backup Sync</div>
+                        </div>
+                        <div class="service-description">
+                            Automated backup integration with Git version control and real-time synchronization protocols.
+                        </div>
+                        <div class="service-status active">
+                            ● Active - Last sync 2 minutes ago
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🚀 rEngine Platform v2.1.1 - Powered by LLM-Neutral Multi-Agent AI Architecture | Memory Synchronized | Documentation Auto-Generated</p>
+            <p style="margin-top: 5px; font-size: 0.9em;">Dashboard auto-refreshes when roadmap files are updated via rScribe Document Protocol</p>
+        </div>
+    </div>
+
+    <script>
+        // Drag and Drop Functionality
+        let draggedElement = null;
+        let draggedContainer = null;
+
+        // Project Cards Drag and Drop
+        const projectsContainer = document.getElementById('projectsContainer');
+        const projectCards = projectsContainer.querySelectorAll('.project-card');
+
+        projectCards.forEach(card => {
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragover', handleDragOver);
+            card.addEventListener('drop', handleDrop);
+            card.addEventListener('dragend', handleDragEnd);
+        });
+
+        // Services Cards Drag and Drop
+        const servicesContainer = document.getElementById('servicesContainer');
+        const serviceCards = servicesContainer.querySelectorAll('.service-card');
+
+        serviceCards.forEach(card => {
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragover', handleDragOver);
+            card.addEventListener('drop', handleDrop);
+            card.addEventListener('dragend', handleDragEnd);
+        });
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            draggedContainer = this.parentElement;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            if (this !== draggedElement && this.parentElement === draggedContainer) {
+                const allCards = Array.from(draggedContainer.children);
+                const draggedIndex = allCards.indexOf(draggedElement);
+                const targetIndex = allCards.indexOf(this);
+
+                if (draggedIndex < targetIndex) {
+                    draggedContainer.insertBefore(draggedElement, this.nextSibling);
+                } else {
+                    draggedContainer.insertBefore(draggedElement, this);
+                }
+
+                // Save order to localStorage
+                saveOrder();
+            }
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedElement = null;
+            draggedContainer = null;
+        }
+
+        // Save and Load Order
+        function saveOrder() {
+            const projectOrder = Array.from(projectsContainer.children).map(card => 
+                card.getAttribute('data-project'));
+            const serviceOrder = Array.from(servicesContainer.children).map(card => 
+                card.getAttribute('data-service'));
+
+            localStorage.setItem('dashboardOrder', JSON.stringify({
+                projects: projectOrder,
+                services: serviceOrder
+            }));
+
+            console.log('✅ Dashboard order saved');
+        }
+
+        function loadOrder() {
+            const saved = localStorage.getItem('dashboardOrder');
+            if (saved) {
+                const order = JSON.parse(saved);
+                
+                // Reorder projects
+                order.projects.forEach(projectId => {
+                    const card = projectsContainer.querySelector(`[data-project="${projectId}"]`);
+                    if (card) projectsContainer.appendChild(card);
+                });
+
+                // Reorder services
+                order.services.forEach(serviceId => {
+                    const card = servicesContainer.querySelector(`[data-service="${serviceId}"]`);
+                    if (card) servicesContainer.appendChild(card);
+                });
+
+                console.log('✅ Dashboard order loaded');
+            }
+        }
+
+        // Project Action Functions
+        function openIssues(project) {
+            const urls = {
+                'stacktrackr': '/rProjects/StackTrackr/docs/issues/',
+                'vulntrackr': '/rProjects/VulnTrackr/docs/issues/'
+            };
+            window.open(urls[project], '_blank');
+        }
+
+        function openRoadmap(project) {
+            const urls = {
+                'stacktrackr': '/rProjects/StackTrackr/docs/roadmap/',
+                'vulntrackr': '/rProjects/VulnTrackr/docs/roadmap/'
+            };
+            window.open(urls[project], '_blank');
+        }
+
+        function openPatches(project) {
+            const urls = {
+                'stacktrackr': '/rProjects/StackTrackr/docs/patches/',
+                'vulntrackr': '/rProjects/VulnTrackr/docs/patches/'
+            };
+            window.open(urls[project], '_blank');
+        }
+
+        // Dynamic Updates
+        function updateProjectStats() {
+            // This would connect to your backend to get real-time stats
+            // For now, we'll simulate updates
+            console.log('🔄 Updating project statistics...');
+        }
+
+        // Auto-refresh timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            const timeString = now.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('currentTimestamp').textContent = timeString;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOrder();
+            updateTimestamp();
+            
+            // Update timestamp every minute
+            setInterval(updateTimestamp, 60000);
+            
+            // Update project stats every 5 minutes
+            setInterval(updateProjectStats, 300000);
+            
+            console.log('🚀 rEngine Platform Dashboard v2.1.1 initialized');
+            console.log('📊 Drag and drop enabled for projects and services');
+            console.log('🔄 Auto-updates enabled');
+        });
+
+        // Add smooth hover effects
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px) scale(1.05)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

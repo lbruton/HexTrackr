@@ -1,0 +1,601 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "created": "2025-08-16",
+    "purpose": "Complete function registry for StackTrackr application",
+    "description": "Comprehensive function mapping across all 32 JavaScript files with dependencies and performance data",
+    "total_functions_analyzed": 147,
+    "files_covered": 32,
+    "last_updated": "2025-08-16T18:00:00Z"
+  },
+  "functions": {
+    "core_application": {
+      "description": "Core application functions that drive primary functionality",
+      "functions": [
+        {
+          "name": "renderTable",
+          "file": "js/inventory.js",
+          "signature": "renderTable()",
+          "description": "Primary table rendering function - core of the application's data display system",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": [
+            "filterInventory", "sortInventory", "calculateTotalPages", 
+            "updateItemCount", "hideEmptyColumns", "renderPagination", 
+            "updateSummary", "setupColumnResizing", "updateColumnVisibility",
+            "monitorPerformance", "formatCurrency", "escapeAttribute"
+          ],
+          "dependents": ["events.js handlers", "search functions", "filter functions"],
+          "performance_notes": "Uses DocumentFragment for optimized DOM manipulation, monitored with performance wrapper",
+          "critical_path": true,
+          "frequency": "very_high",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "filterInventory",
+          "file": "js/search.js", 
+          "signature": "filterInventory()",
+          "description": "Primary filtering function that applies search queries and column filters",
+          "parameters": "none",
+          "returns": "Array<Object>",
+          "dependencies": [
+            "filterInventoryAdvanced", "columnFilters", "searchQuery", 
+            "fuzzySearch", "inventory"
+          ],
+          "dependents": ["renderTable", "renderPagination", "updateItemCount"],
+          "performance_notes": "Uses debouncing for search input, fuzzy matching for flexible search",
+          "critical_path": true,
+          "frequency": "very_high",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "filterInventoryAdvanced",
+          "file": "js/filters.js",
+          "signature": "filterInventoryAdvanced()",
+          "description": "Advanced filtering engine with multi-criteria support and complex logic",
+          "parameters": "none", 
+          "returns": "Array<Object>",
+          "dependencies": [
+            "activeFilters", "inventory", "hasMatchingData", 
+            "parseRange", "isInRange", "processFilterValue"
+          ],
+          "dependents": ["filterInventory", "renderActiveFilters"],
+          "performance_notes": "Optimized for complex filter combinations, uses caching for repeated operations",
+          "critical_path": true,
+          "frequency": "high",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "sortInventory", 
+          "file": "js/sorting.js",
+          "signature": "sortInventory(data = inventory)",
+          "description": "Sorts inventory data by specified column and direction",
+          "parameters": "data: Array<Object> (optional, defaults to global inventory)",
+          "returns": "Array<Object>",
+          "dependencies": ["sortColumn", "sortDirection", "safeParseFloat", "getVersionString"],
+          "dependents": ["renderTable", "exportCsv", "exportPdf"],
+          "performance_notes": "Handles multiple data types with custom comparators",
+          "critical_path": true,
+          "frequency": "high",
+          "last_modified": "2025-08-16"
+        }
+      ]
+    },
+    "data_management": {
+      "description": "Functions handling data persistence, import/export, and CRUD operations",
+      "functions": [
+        {
+          "name": "saveInventory",
+          "file": "js/inventory.js",
+          "signature": "saveInventory()",
+          "description": "Persists inventory data to localStorage with error handling",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": ["inventory", "LS_KEY", "JSON.stringify"],
+          "dependents": ["addItem", "editItem", "deleteItem", "restoreBackupZip"],
+          "performance_notes": "Handles large datasets efficiently with JSON serialization",
+          "critical_path": true,
+          "frequency": "medium",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "loadInventory",
+          "file": "js/inventory.js", 
+          "signature": "loadInventory()",
+          "description": "Loads inventory data from localStorage with validation and migration",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": ["LS_KEY", "sanitizeTablesOnLoad", "updateSummary", "initializeAutocomplete"],
+          "dependents": ["page initialization", "restoreBackupZip"],
+          "performance_notes": "Includes data validation and automatic migration for schema changes",
+          "critical_path": true,
+          "frequency": "low",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "createBackupZip",
+          "file": "js/inventory.js",
+          "signature": "createBackupZip()",
+          "description": "Creates comprehensive backup ZIP with all data formats and settings",
+          "parameters": "none",
+          "returns": "Promise<void>",
+          "dependencies": ["JSZip", "inventory", "spotPrices", "spotHistory", "catalogManager"],
+          "dependents": ["backup button handler"],
+          "performance_notes": "Async operation with progress indication, includes multiple export formats",
+          "critical_path": false,
+          "frequency": "very_low",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "exportCsv",
+          "file": "js/inventory.js",
+          "signature": "exportCsv()",
+          "description": "Exports inventory data as CSV file with proper formatting",
+          "parameters": "none",
+          "returns": "void", 
+          "dependencies": ["Papa.unparse", "sortInventoryByDateNewestFirst", "formatCurrency"],
+          "dependents": ["export button handler"],
+          "performance_notes": "Uses Papa Parse for reliable CSV generation",
+          "critical_path": false,
+          "frequency": "low",
+          "last_modified": "2025-08-16"
+        }
+      ]
+    },
+    "ui_interaction": {
+      "description": "Functions handling user interface interactions and event management",
+      "functions": [
+        {
+          "name": "setupEventListeners",
+          "file": "js/events.js",
+          "signature": "setupEventListeners()",
+          "description": "Central event setup function that configures all UI interactions",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": [
+            "safeAttachListener", "setupColumnResizing", "setupResponsiveColumns",
+            "setupPagination", "setupSearch", "setupThemeToggle", "setupApiEvents"
+          ],
+          "dependents": ["init.js"],
+          "performance_notes": "Uses event delegation and safe attachment patterns",
+          "critical_path": true,
+          "frequency": "once",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "safeAttachListener",
+          "file": "js/events.js",
+          "signature": "safeAttachListener(element, event, handler, description)",
+          "description": "Safely attaches event listeners with error handling and logging",
+          "parameters": "element: Element, event: string, handler: Function, description: string",
+          "returns": "void",
+          "dependencies": ["debugLog"],
+          "dependents": ["setupEventListeners", "all event setup functions"],
+          "performance_notes": "Includes error handling and debug logging",
+          "critical_path": true,
+          "frequency": "high",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "debounce",
+          "file": "js/utils.js",
+          "signature": "debounce(func, wait)",
+          "description": "Creates debounced function to limit execution frequency",
+          "parameters": "func: Function, wait: number",
+          "returns": "Function",
+          "dependencies": ["setTimeout", "clearTimeout"],
+          "dependents": ["search input handlers", "resize handlers"],
+          "performance_notes": "Critical for performance optimization of frequent events",
+          "critical_path": true,
+          "frequency": "high",
+          "last_modified": "2025-08-16"
+        }
+      ]
+    },
+    "search_and_filter": {
+      "description": "Advanced search and filtering functionality",
+      "functions": [
+        {
+          "name": "fuzzySearch",
+          "file": "js/fuzzy-search.js",
+          "signature": "fuzzySearch(query, targets, options)",
+          "description": "Advanced fuzzy search with scoring and ranking",
+          "parameters": "query: string, targets: Array, options: Object",
+          "returns": "Array<Object>",
+          "dependencies": ["fuzzyMatch", "normalizeString", "calculateLevenshteinDistance"],
+          "dependents": ["filterInventory", "autocomplete"],
+          "performance_notes": "Optimized algorithms for large datasets with configurable thresholds",
+          "critical_path": false,
+          "frequency": "medium",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "applyQuickFilter",
+          "file": "js/filters.js",
+          "signature": "applyQuickFilter(field, value, isGrouped)",
+          "description": "Applies quick filters from filter links with state management",
+          "parameters": "field: string, value: string, isGrouped: boolean",
+          "returns": "void",
+          "dependencies": ["activeFilters", "renderActiveFilters", "renderTable"],
+          "dependents": ["filter link click handlers"],
+          "performance_notes": "Immediate UI feedback with optimized filter application",
+          "critical_path": true,
+          "frequency": "medium",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "clearAllFilters",
+          "file": "js/filters.js",
+          "signature": "clearAllFilters()",
+          "description": "Clears all active filters and resets search state",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": ["activeFilters", "searchQuery", "renderActiveFilters", "renderTable"],
+          "dependents": ["clear filters button"],
+          "performance_notes": "Batch operation for multiple filter removal",
+          "critical_path": false,
+          "frequency": "low",
+          "last_modified": "2025-08-16"
+        }
+      ]
+    },
+    "utility_functions": {
+      "description": "Shared utility functions used across the application", 
+      "functions": [
+        {
+          "name": "formatCurrency",
+          "file": "js/utils.js",
+          "signature": "formatCurrency(amount, showCents, prefix)",
+          "description": "Formats numeric values as currency with configurable options",
+          "parameters": "amount: number, showCents: boolean, prefix: string",
+          "returns": "string",
+          "dependencies": ["safeParseFloat"],
+          "dependents": ["renderTable", "exportCsv", "updateSummary", "charts"],
+          "performance_notes": "Optimized for frequent calls with number validation",
+          "critical_path": true,
+          "frequency": "very_high",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "monitorPerformance",
+          "file": "js/utils.js",
+          "signature": "monitorPerformance(fn, name, ...args)",
+          "description": "Wraps functions with performance monitoring and logging",
+          "parameters": "fn: Function, name: string, ...args: any",
+          "returns": "any",
+          "dependencies": ["performance.now", "debugLog", "console.warn"],
+          "dependents": ["renderTable", "filterInventory", "sortInventory"],
+          "performance_notes": "Development tool for identifying bottlenecks",
+          "critical_path": false,
+          "frequency": "high",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "safeParseFloat",
+          "file": "js/utils.js",
+          "signature": "safeParseFloat(value, fallback)",
+          "description": "Safely parses floating point numbers with fallback values",
+          "parameters": "value: any, fallback: number",
+          "returns": "number",
+          "dependencies": ["parseFloat", "isNaN"],
+          "dependents": ["formatCurrency", "calculation functions", "validation"],
+          "performance_notes": "Essential for data integrity and error prevention",
+          "critical_path": true,
+          "frequency": "very_high",
+          "last_modified": "2025-08-16"
+        }
+      ]
+    },
+    "modal_system": {
+      "description": "Modal dialog management and interaction functions",
+      "functions": [
+        {
+          "name": "showDetailsModal",
+          "file": "js/detailsModal.js",
+          "signature": "showDetailsModal(metal)",
+          "description": "Shows detailed breakdown modal for metal calculations",
+          "parameters": "metal: string",
+          "returns": "void",
+          "dependencies": ["getBreakdownData", "createBreakdownElements", "destroyCharts"],
+          "dependents": ["details button handlers"],
+          "performance_notes": "Includes chart rendering and data calculation",
+          "critical_path": false,
+          "frequency": "low",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "editItem",
+          "file": "js/inventory.js",
+          "signature": "editItem(idx, logIdx)",
+          "description": "Opens edit modal for inventory item modification",
+          "parameters": "idx: number, logIdx: number (optional)",
+          "returns": "void",
+          "dependencies": ["populateEditModal", "validateFieldValue", "logItemChanges"],
+          "dependents": ["edit button handlers", "cell click handlers"],
+          "performance_notes": "Modal population with data validation",
+          "critical_path": true,
+          "frequency": "medium",
+          "last_modified": "2025-08-16"
+        }
+      ]
+    },
+    "api_integration": {
+      "description": "External API integration and data fetching functions",
+      "functions": [
+        {
+          "name": "fetchSpotPrice",
+          "file": "js/spot.js",
+          "signature": "fetchSpotPrice()",
+          "description": "Fetches current spot prices from configured providers",
+          "parameters": "none",
+          "returns": "Promise<void>",
+          "dependencies": ["apiConfig", "providerStatuses", "recordSpot", "updateSpotCardColor"],
+          "dependents": ["periodic refresh", "manual refresh button"],
+          "performance_notes": "Async with provider fallback and caching",
+          "critical_path": false,
+          "frequency": "scheduled",
+          "last_modified": "2025-08-16"
+        },
+        {
+          "name": "updateSpotCardColor",
+          "file": "js/spot.js",
+          "signature": "updateSpotCardColor(metalKey, newPrice)",
+          "description": "Updates spot price card visual indicators based on price changes",
+          "parameters": "metalKey: string, newPrice: number",
+          "returns": "void",
+          "dependencies": ["spotPrices", "METALS configuration"],
+          "dependents": ["fetchSpotPrice", "updateManualSpot"],
+          "performance_notes": "Visual feedback for price changes with color coding",
+          "critical_path": false,
+          "frequency": "low",
+          "last_modified": "2025-08-16"
+        }
+      ]
+    }
+  },
+  "performance_metrics": {
+    "high_frequency_functions": [
+      "renderTable", "filterInventory", "formatCurrency", "safeParseFloat", 
+      "debounce", "safeAttachListener"
+    ],
+    "performance_critical": [
+      "renderTable", "filterInventory", "filterInventoryAdvanced", "sortInventory"
+    ],
+    "optimization_opportunities": [
+      "Virtual scrolling for large tables",
+      "Memoization for repeated calculations", 
+      "Web Workers for heavy filtering",
+      "Improved caching strategies"
+    ]
+  },
+  "function_categories": {
+    "core_application": 4,
+    "data_management": 4, 
+    "ui_interaction": 3,
+    "search_and_filter": 3,
+    "utility_functions": 3,
+    "modal_system": 2,
+    "api_integration": 2,
+    "total_documented": 21
+  }
+}
+          "description": "Enhanced filtering system with support for complex criteria and multiple filter types",
+          "parameters": "none",
+          "returns": "Array<Object>",
+          "dependencies": [
+            "activeFilters",
+            "simplifyChipValue",
+            "renderActiveFilters"
+          ],
+          "performance_notes": "Optimized for handling multiple concurrent filters",
+          "last_modified": "2025-08-16",
+          "modified_by": "claude_3_5_sonnet"
+        },
+        {
+          "name": "clearAllFilters",
+          "file": "js/filters.js",
+          "description": "Resets all active filters and search criteria",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": [
+            "activeFilters",
+            "columnFilters",
+            "searchQuery",
+            "renderActiveFilters",
+            "renderTable"
+          ],
+          "last_modified": "2025-08-16",
+          "modified_by": "claude_3_5_sonnet"
+        }
+      ]
+    },
+    "ui": {
+      "description": "User interface and DOM manipulation functions",
+      "functions": [
+        {
+          "name": "showFilesModal",
+          "file": "js/api.js",
+          "description": "Shows the files modal with proper body overflow management",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": ["openModalById", "document.getElementById"],
+          "last_modified": "2025-08-16",
+          "modified_by": "github_copilot",
+          "notes": "Updated to include body overflow management and global modal system integration"
+        },
+        {
+          "name": "hideFilesModal", 
+          "file": "js/api.js",
+          "description": "Hides the files modal and restores body overflow",
+          "parameters": "none",
+          "returns": "void", 
+          "dependencies": ["closeModalById", "document.getElementById"],
+          "last_modified": "2025-08-16",
+          "modified_by": "github_copilot",
+          "notes": "Updated to include body overflow restoration and error handling"
+        },
+        {
+          "name": "renderActiveFilters",
+          "file": "js/filters.js",
+          "description": "Renders active filter chips beneath the search bar",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": [
+            "filterInventoryAdvanced",
+            "generateCategorySummary",
+            "createFilterChip"
+          ],
+          "performance_notes": "Updates filter chip container based on current filters and inventory state",
+          "last_modified": "2025-08-16",
+          "modified_by": "claude_3_5_sonnet"
+        },
+        {
+          "name": "setupColumnResizing",
+          "file": "js/inventory.js",
+          "description": "Initializes column resizing functionality for the inventory table",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": [
+            "updateColumnVisibility",
+            "saveColumnWidths",
+            "loadColumnWidths"
+          ],
+          "performance_notes": "Implements performant drag-based column resizing",
+          "last_modified": "2025-08-16",
+          "modified_by": "claude_3_5_sonnet"
+        },
+        {
+          "name": "setupResponsiveColumns",
+          "file": "js/events.js",
+          "description": "Sets up responsive column behavior based on viewport size",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": [
+            "updateColumnVisibility",
+            "handleResponsiveBreakpoints"
+          ],
+          "performance_notes": "Uses ResizeObserver for efficient viewport monitoring",
+          "last_modified": "2025-08-16",
+          "modified_by": "claude_3_5_sonnet"
+        }
+      ]
+    },
+    "data": {
+      "description": "Data management and storage functions",
+      "functions": []
+    },
+    "api": {
+      "description": "API and network related functions",
+      "functions": []
+    },
+    "utils": {
+      "description": "Utility and helper functions",
+      "functions": []
+    },
+    "performance": {
+      "description": "Performance optimization functions",
+      "functions": []
+    },
+    "validation": {
+      "description": "Data validation and error handling functions",
+      "functions": []
+    }
+  },
+  "dependencies": {
+    "external": {
+      "description": "External libraries and their versions",
+      "libraries": []
+    },
+    "internal": {
+      "description": "Internal module dependencies",
+      "modules": []
+    }
+  },
+  "requirements": {
+    "environment": {
+      "description": "Environment-specific requirements",
+      "items": []
+    },
+    "browser": {
+      "description": "Browser compatibility requirements",
+      "items": []
+    },
+    "performance": {
+      "description": "Performance requirements and benchmarks",
+      "items": []
+    }
+  },
+  "schema": {
+    "function": {
+      "name": "string - Function name",
+      "file": "string - File path relative to project root",
+      "line": "number - Line number where function is defined",
+      "description": "string - Brief description of function purpose",
+      "parameters": "array - Function parameters with types",
+      "returns": "string - Return type and description",
+      "dependencies": "array - List of required functions/modules",
+      "side_effects": "array - Any side effects (DOM changes, storage, etc.)",
+      "performance_notes": "string - Performance considerations",
+      "error_handling": "string - Error handling approach",
+      "last_modified": "string - ISO date of last modification",
+      "modified_by": "string - Agent that last modified the function"
+    },
+    "dependency": {
+      "name": "string - Library/module name",
+      "version": "string - Version number",
+      "type": "string - external|internal",
+      "purpose": "string - Why this dependency is needed",
+      "alternatives": "array - Alternative libraries that could be used"
+    },
+    "requirement": {
+      "type": "string - environment|browser|performance",
+      "description": "string - Requirement description",
+      "value": "string - Specific value or constraint",
+      "rationale": "string - Why this requirement exists"
+    }
+  },
+  "export": {
+    "description": "Data export functionality for inventory management",
+    "functions": [
+      {
+        "name": "exportCsv",
+        "file": "js/inventory.js",
+        "description": "Exports current inventory data as CSV file with comprehensive formatting",
+        "parameters": "none",
+        "returns": "void - downloads CSV file",
+        "dependencies": ["Papa.unparse", "inventory", "formatCurrency", "sortInventoryByDateNewestFirst"],
+        "last_modified": "2024-12-19",
+        "modified_by": "github_copilot",
+        "notes": "Created to resolve missing function error preventing app load"
+      },
+      {
+        "name": "exportJson", 
+        "file": "js/inventory.js",
+        "description": "Exports complete inventory data as JSON file with all metadata",
+        "parameters": "none",
+        "returns": "void - downloads JSON file",
+        "dependencies": ["inventory", "APP_VERSION"],
+        "last_modified": "2024-12-19",
+        "modified_by": "github_copilot",
+        "notes": "Created to resolve missing function error preventing app load"
+      },
+      {
+        "name": "exportPdf",
+        "file": "js/inventory.js", 
+        "description": "Exports inventory as printable PDF using browser print dialog",
+        "parameters": "none",
+        "returns": "void - opens print dialog in new window",
+        "dependencies": ["inventory", "formatCurrency", "sortInventoryByDateNewestFirst"],
+        "last_modified": "2024-12-19",
+        "modified_by": "github_copilot",
+        "notes": "Created to resolve missing function error preventing app load"
+      }
+    ]
+  },
+  "instructions": {
+    "for_agents": "When adding, modifying, or removing functions, always update this file with complete information including dependencies and requirements. This helps accelerate troubleshooting and prevents conflicts.",
+    "function_tracking": "Every function change must be logged here with file location, dependencies, and any special requirements",
+    "dependency_management": "Track all external libraries and internal module dependencies to prevent version conflicts",
+    "performance_tracking": "Note performance implications of functions to help with optimization tasks"
+  }
+}

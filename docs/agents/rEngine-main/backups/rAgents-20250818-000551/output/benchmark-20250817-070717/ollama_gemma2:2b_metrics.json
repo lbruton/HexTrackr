@@ -1,0 +1,10 @@
+{
+    "provider": "ollama",
+    "model": "gemma2:2b",
+    "execution_time_seconds": 29,
+    "word_count":      793,
+    "character_count":     6095,
+    "line_count":       74,
+    "timestamp": "2025-08-17T07:09:08-05:00",
+    "words_per_second": 27.34
+}

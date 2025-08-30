@@ -1,0 +1,57 @@
+{
+  "source_file": "docs/generated/document-generator.md",
+  "generated_date": "2025-08-20T01:27:06.434Z",
+  "title": "Document Generator",
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "icon": "📋",
+      "submenu": []
+    },
+    {
+      "id": "how-to-use",
+      "title": "How to Use",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "core-logic-breakdown",
+      "title": "Core Logic Breakdown",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "configuration-dependencies",
+      "title": "Configuration & Dependencies",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "machinereadable-summary",
+      "title": "Machine-Readable Summary",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "error-handling",
+      "title": "Error Handling",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "integration",
+      "title": "Integration",
+      "icon": "📄",
+      "submenu": []
+    },
+    {
+      "id": "development-notes",
+      "title": "Development Notes",
+      "icon": "📄",
+      "submenu": []
+    }
+  ],
+  "word_count": 1116,
+  "format_version": "1.0"
+}

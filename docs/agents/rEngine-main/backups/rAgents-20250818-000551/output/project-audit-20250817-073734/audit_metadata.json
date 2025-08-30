@@ -1,0 +1,52 @@
+[
+  {
+    "provider": "anthropic",
+    "model": "claude-3-5-sonnet-20241022",
+    "status": "failed",
+    "error": "api_error"
+  },
+  {
+    "provider": "google",
+    "model": "gemini-1.5-flash",
+    "status": "skipped",
+    "error": "no_api_key"
+  },
+  {
+    "provider": "ollama",
+    "model": "gemma2:2b",
+    "duration_seconds": 0,
+    "word_count": 1,
+    "timestamp": "2025-08-17T07:37:34-05:00",
+    "status": "success"
+  },
+  {
+    "provider": "ollama",
+    "model": "llama3:8b",
+    "duration_seconds": 0,
+    "word_count": 1,
+    "timestamp": "2025-08-17T07:37:34-05:00",
+    "status": "success"
+  },
+  {
+    "provider": "ollama",
+    "model": "qwen2:7b",
+    "duration_seconds": 0,
+    "word_count": 1,
+    "timestamp": "2025-08-17T07:37:34-05:00",
+    "status": "success"
+  },
+  {
+    "provider": "ollama",
+    "model": "qwen2.5:3b",
+    "duration_seconds": 0,
+    "word_count": 1,
+    "timestamp": "2025-08-17T07:37:34-05:00",
+    "status": "success"
+  },
+  {
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "status": "failed",
+    "error": "api_error"
+  }
+]

@@ -1,0 +1,10 @@
+{
+    "provider": "ollama",
+    "model": "llama3:8b",
+    "execution_time_seconds": 49,
+    "word_count":      491,
+    "character_count":     3589,
+    "line_count":       46,
+    "timestamp": "2025-08-17T07:08:39-05:00",
+    "words_per_second": 10.02
+}

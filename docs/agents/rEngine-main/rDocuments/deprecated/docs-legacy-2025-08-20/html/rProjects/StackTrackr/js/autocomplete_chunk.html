@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autocomplete.js Documentation - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-default">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📄</div>
+            <h1>Autocomplete.js Documentation</h1>
+            <div class="subtitle">Documentation</div>
+            <div class="meta">
+                <span>📁 autocomplete_chunk.md</span>
+                <span>📅 2025-08-20</span>
+                <span>📊 7KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../rProjects/StackTrackr/js/autocomplete_chunk.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/autocomplete_chunk.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="autocompletejs-documentation">Autocomplete.js Documentation</h1>
+<h2 id="purpose--overview">Purpose &amp; Overview</h2>
+<p>The <code>autocomplete.js</code> script is a comprehensive utility for managing an autocomplete system within a precious metals inventory management application. It provides functions to generate, load, and refresh a lookup table that powers the autocomplete functionality. The lookup table includes data such as item names, purchase locations, storage locations, and item types, as well as pre-built industry data and search indices for efficient autocomplete suggestions.</p>
+<h2 id="technical-architecture">Technical Architecture</h2>
+<p>The script is organized into several key components:</p>
+<ol>
+<li><p><strong>Lookup Table Generation</strong>: The <code>generateLookupTable</code> function extracts unique values from the provided inventory data and combines them with pre-built industry data to create a comprehensive lookup table. It also supports optional configuration to include metal abbreviations and build search indices.</p>
+</li>
+<li><p><strong>Lookup Table Loading and Caching</strong>: The <code>loadLookupTable</code> function checks for a cached lookup table and uses it if available, otherwise it generates a new one. The <code>cacheLookupTable</code> and <code>getCachedLookupTable</code> functions handle the caching process, storing and retrieving the lookup table from the browser&#39;s localStorage.</p>
+</li>
+<li><p><strong>Search Indices</strong>: The <code>buildSearchIndices</code> function creates search indices for efficient autocomplete suggestions, indexing the lookup table data by name, location, and type variants.</p>
+</li>
+<li><p><strong>Utility Functions</strong>: The script includes several utility functions, such as <code>extractUniqueValues</code>, <code>generateVariations</code>, and <code>normalizeItemName</code>, which are used throughout the main functionality.</p>
+</li>
+<li><p><strong>Configuration and State Management</strong>: The script exposes a global <code>autocomplete</code> object that contains the core functions, utility functions, configuration options, and access to the current lookup table state.</p>
+</li>
+</ol>
+<h2 id="dependencies">Dependencies</h2>
+<p>The <code>autocomplete.js</code> script does not have any external dependencies. It is a self-contained module that can be used independently within a larger application.</p>
+<h2 id="key-functions-and-classes">Key Functions and Classes</h2>
+<h3 id="generatelookuptableinventory-options"><code>generateLookupTable(inventory, options)</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Generates a comprehensive lookup table from the provided inventory data, optionally including pre-built industry data.</li>
+<li><strong>Parameters</strong>:<ul>
+<li><code>inventory</code> (optional): An array of inventory items.</li>
+<li><code>options</code> (optional): An object with the following properties:<ul>
+<li><code>includeAbbreviations</code> (boolean, default: <code>true</code>): Include metal abbreviations in the lookup table.</li>
+<li><code>buildIndices</code> (boolean, default: <code>true</code>): Build search indices for the lookup table.</li>
+<li><code>usePrebuiltData</code> (boolean, default: <code>true</code>): Include pre-built industry data in the lookup table.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: A <code>LookupTable</code> object containing the generated lookup table data.</li>
+</ul>
+<h3 id="loadlookuptableinventory-forcerefresh"><code>loadLookupTable(inventory, forceRefresh)</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Loads the lookup table from the cache or generates a new one if the cache is invalid or <code>forceRefresh</code> is <code>true</code>.</li>
+<li><strong>Parameters</strong>:<ul>
+<li><code>inventory</code> (optional): An array of inventory items.</li>
+<li><code>forceRefresh</code> (boolean, default: <code>false</code>): Force the generation of a new lookup table, ignoring the cache.</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: A <code>LookupTable</code> object containing the loaded or generated lookup table data.</li>
+</ul>
+<h3 id="refreshlookuptableinventory"><code>refreshLookupTable(inventory)</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Clears the lookup table cache and generates a new lookup table from the provided inventory data.</li>
+<li><strong>Parameters</strong>:<ul>
+<li><code>inventory</code> (optional): An array of inventory items.</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: A <code>LookupTable</code> object containing the refreshed lookup table data.</li>
+</ul>
+<h3 id="initializeautocompleteinventory"><code>initializeAutocomplete(inventory)</code></h3>
+<ul>
+<li><strong>Purpose</strong>: Initializes the autocomplete system by loading or generating the lookup table.</li>
+<li><strong>Parameters</strong>:<ul>
+<li><code>inventory</code> (optional): An array of inventory items.</li>
+</ul>
+</li>
+<li><strong>Return Value</strong>: A <code>LookupTable</code> object containing the initialized lookup table data.</li>
+</ul>
+<h3 id="lookuptable-object"><code>LookupTable</code> (Object)</h3>
+<p>The <code>LookupTable</code> object has the following properties:</p>
+<ul>
+<li><code>names</code>: An array of unique item names.</li>
+<li><code>purchaseLocations</code>: An array of unique purchase locations.</li>
+<li><code>storageLocations</code>: An array of unique storage locations.</li>
+<li><code>types</code>: An array of unique item types.</li>
+<li><code>abbreviations</code>: An object containing metal abbreviations.</li>
+<li><code>lastUpdated</code>: The timestamp of the last lookup table update.</li>
+<li><code>itemCount</code>: The total number of inventory items.</li>
+<li><code>prebuiltItemCount</code>: The number of pre-built items in the lookup table.</li>
+<li><code>searchIndices</code>: An object containing search indices for efficient autocomplete suggestions.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<ol>
+<li><strong>Initialize the Autocomplete System</strong>:</li>
+</ol>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const inventory = [
+  { name: 'Gold Coin', purchase_location: 'APMEX', storage_location: 'Home Safe', type: 'Coin' },
+  { name: 'Silver Bar', purchase_location: 'JM Bullion', storage_location: 'Bank Vault', type: 'Bar' },
+  // ... more inventory items
+];
+
+const lookupTable = initializeAutocomplete(inventory);</code></pre>
+</code></pre>
+<ol start="2">
+<li><strong>Refresh the Lookup Table</strong>:</li>
+</ol>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const updatedInventory = [
+  // ... updated inventory data
+];
+
+const refreshedLookupTable = refreshLookupTable(updatedInventory);</code></pre>
+</code></pre>
+<ol start="3">
+<li><strong>Access Lookup Table Statistics</strong>:</li>
+</ol>
+<pre><code class="language-javascript"><pre><code class="language-javascript">const stats = getLookupStats();
+console.log(stats);</code></pre>
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>autocomplete.js</code> script uses the following configuration options, exposed through the <code>AUTOCOMPLETE_CONFIG</code> object:</p>
+<ul>
+<li><code>cacheKey</code>: The key used to store the cached lookup table in localStorage.</li>
+<li><code>timestampKey</code>: The key used to store the timestamp of the cached lookup table in localStorage.</li>
+<li><code>cacheTTL</code>: The time-to-live (in milliseconds) for the cached lookup table.</li>
+</ul>
+<h2 id="error-handling">Error Handling</h2>
+<p>The <code>autocomplete.js</code> script uses <code>try-catch</code> blocks to handle errors that may occur during the various operations, such as lookup table generation, caching, and retrieval. Any errors are logged to the console using <code>console.error</code>.</p>
+<h2 id="integration">Integration</h2>
+<p>The <code>autocomplete.js</code> script is designed to be a standalone utility that can be integrated into a larger application. It exposes its functionality through a global <code>autocomplete</code> object, which can be accessed and used by other parts of the application.</p>
+<h2 id="development-notes">Development Notes</h2>
+<ul>
+<li>The script uses localStorage to cache the lookup table, which may not be suitable for all use cases (e.g., server-side rendering). In such cases, the caching mechanism may need to be modified to use a different storage solution.</li>
+<li>The pre-built industry data (e.g., common purchase locations, storage locations, and item types) can be expanded or customized to better fit the specific requirements of the application.</li>
+<li>The search indices implementation can be further optimized for performance, depending on the size and complexity of the inventory data.</li>
+<li>The script assumes that the inventory data is an array of objects with specific properties (e.g., <code>name</code>, <code>purchase_location</code>, <code>storage_location</code>, <code>type</code>). If the inventory data has a different structure, the script may need to be modified accordingly.</li>
+</ul>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>autocomplete_chunk.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-20</p>
+        </footer>
+    </div>
+</body>
+</html>

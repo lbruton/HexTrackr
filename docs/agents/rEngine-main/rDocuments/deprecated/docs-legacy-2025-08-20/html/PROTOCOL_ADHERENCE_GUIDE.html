@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Protocol Adherence Guide - StackTrackr Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #20c997 0%, #198754 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            background: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+            max-width: none;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 2.2em; border-bottom: 3px solid #007acc; padding-bottom: 10px; }
+        .content h2 { font-size: 1.8em; color: #007acc; }
+        .content h3 { font-size: 1.4em; color: #495057; }
+        .content h4 { font-size: 1.2em; color: #6c757d; }
+
+        .content p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .content code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th, .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .content th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content a {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e4e8;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        .doc-meta h3 {
+            color: #007acc;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .nav-bar { padding: 15px 20px; }
+            .nav-links { justify-content: center; }
+            .header .meta { flex-direction: column; gap: 10px; }
+        }
+
+        /* Category-specific colors */
+        .color-vision { --primary: #9c27b0; --secondary: #7b1fa2; }
+        .color-roadmap { --primary: #007acc; --secondary: #0056b3; }
+        .color-engine { --primary: #2c3e50; --secondary: #34495e; }
+        .color-agent { --primary: #28a745; --secondary: #198754; }
+        .color-brain { --primary: #6f42c1; --secondary: #495057; }
+        .color-docker { --primary: #0db7ed; --secondary: #086dd7; }
+        .color-mobile { --primary: #fd7e14; --secondary: #dc3545; }
+        .color-protocol { --primary: #20c997; --secondary: #198754; }
+        .color-scribe { --primary: #17a2b8; --secondary: #138496; }
+        .color-groq { --primary: #ffc107; --secondary: #e0a800; }
+        .color-task { --primary: #dc3545; --secondary: #c82333; }
+        .color-cleanup { --primary: #6c757d; --secondary: #5a6268; }
+        .color-quickstart { --primary: #28a745; --secondary: #198754; }
+        .color-patch { --primary: #ff6b35; --secondary: #e55a32; }
+        .color-rengine { --primary: #8b5cf6; --secondary: #7c3aed; }
+        .color-default { --primary: #495057; --secondary: #6c757d; }
+    </style>
+</head>
+<body class="color-protocol">
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📋</div>
+            <h1>🎯 Protocol Adherence Guide</h1>
+            <div class="subtitle">Protocol Guide</div>
+            <div class="meta">
+                <span>📁 PROTOCOL_ADHERENCE_GUIDE.md</span>
+                <span>📅 2025-08-19</span>
+                <span>📊 8KB</span>
+            </div>
+        </header>
+
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Documentation Home</a>
+                <a href="../developmentstatus.html" class="nav-link">📊 Development Status</a>
+                <a href="../PROTOCOL_ADHERENCE_GUIDE.md" class="nav-link">📝 View Source MD</a>
+                <a href="../json/PROTOCOL_ADHERENCE_GUIDE.json" class="nav-link">🔧 JSON Data</a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <h1 id="🎯-protocol-adherence-guide">🎯 Protocol Adherence Guide</h1>
+<p><strong>Purpose</strong>: Maintain consistency and prevent protocol drift during AI agent sessions<br><strong>Date</strong>: August 18, 2025<br><strong>Version</strong>: 1.0</p>
+<hr>
+<h2 id="📋-overview">📋 Overview</h2>
+<p>This guide provides strategies for maintaining protocol adherence during extended AI agent sessions, preventing drift from established workflows, and ensuring consistent implementation of StackTrackr systems.</p>
+<hr>
+<h2 id="🔧-user-side-protocol-enforcement">🔧 User-Side Protocol Enforcement</h2>
+<h3 id="trigger-phrases-for-protocol-compliance"><strong>Trigger Phrases for Protocol Compliance</strong></h3>
+<h4 id="universal-reset-phrases"><strong>Universal Reset Phrases</strong></h4>
+<ul>
+<li><p><code>&quot;Following our protocol...&quot;</code></p>
+<ul>
+<li>Forces agent to check established procedures first</li>
+<li>Most effective for redirecting off-track behavior</li>
+<li>Example: &quot;Following our protocol, please update the handoff.json with...&quot;</li>
+</ul>
+</li>
+<li><p><code>&quot;Per our established workflow...&quot;</code></p>
+<ul>
+<li>References existing documented procedures</li>
+<li>Reminds agent to verify current patterns</li>
+<li>Example: &quot;Per our established workflow, document sweeps should use handoff.json&quot;</li>
+</ul>
+</li>
+</ul>
+<h4 id="specific-protocol-references"><strong>Specific Protocol References</strong></h4>
+<ul>
+<li><p><code>&quot;According to [PROTOCOL_FILE].md...&quot;</code></p>
+<ul>
+<li>Forces agent to read specific protocol documentation</li>
+<li>Ensures compliance with detailed procedures</li>
+<li>Example: &quot;According to RSCRIBE_DOCUMENT_PROTOCOL.md, we need multi-format output&quot;</li>
+</ul>
+</li>
+<li><p><code>&quot;Check our [SYSTEM] protocol first&quot;</code></p>
+<ul>
+<li>Directs agent to research before implementing</li>
+<li>Prevents assumption-based actions</li>
+<li>Example: &quot;Check our git checkpoint protocol first&quot;</li>
+</ul>
+</li>
+</ul>
+<h3 id="correction-phrases-when-agent-drifts"><strong>Correction Phrases When Agent Drifts</strong></h3>
+<h4 id="immediate-corrections"><strong>Immediate Corrections</strong></h4>
+<ul>
+<li><code>&quot;Hold on - check our protocol for this&quot;</code></li>
+<li><code>&quot;This isn&#39;t following our established pattern&quot;</code></li>
+<li><code>&quot;Review our existing workflow first&quot;</code></li>
+<li><code>&quot;This deviates from our standard procedure&quot;</code></li>
+</ul>
+<h4 id="specific-redirections"><strong>Specific Redirections</strong></h4>
+<ul>
+<li><code>&quot;We use handoff.json, not markdown for handoffs&quot;</code></li>
+<li><code>&quot;Remember: all documentation goes in docs/ folder&quot;</code></li>
+<li><code>&quot;Follow the existing git checkpoint procedure&quot;</code></li>
+<li><code>&quot;Use our established AI tier assignments&quot;</code></li>
+</ul>
+<h3 id="prevention-strategies"><strong>Prevention Strategies</strong></h3>
+<h4 id="checkpoint-phrases"><strong>Checkpoint Phrases</strong></h4>
+<ul>
+<li><code>&quot;Before proceeding, verify our established workflow&quot;</code></li>
+<li><code>&quot;Check the existing protocol first&quot;</code></li>
+<li><code>&quot;What&#39;s our standard procedure for this?&quot;</code></li>
+<li><code>&quot;Does this follow our documented pattern?&quot;</code></li>
+</ul>
+<h4 id="quality-assurance-prompts"><strong>Quality Assurance Prompts</strong></h4>
+<ul>
+<li><code>&quot;Confirm this follows [SPECIFIC_PROTOCOL]&quot;</code></li>
+<li><code>&quot;Validate against our existing documentation&quot;</code></li>
+<li><code>&quot;Check for consistency with current practices&quot;</code></li>
+</ul>
+<hr>
+<h2 id="🤖-agent-side-protocol-adherence">🤖 Agent-Side Protocol Adherence</h2>
+<h3 id="required-pre-action-checks"><strong>Required Pre-Action Checks</strong></h3>
+<h4 id="for-handoffs"><strong>For Handoffs</strong></h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Always search for existing handoff protocol
+grep_search: "handoff.json|handoff protocol"
+# Read current handoff structure before updating
+read_file: "rMemory/rAgentMemories/handoff.json"</code></pre>
+</code></pre>
+<h4 id="for-documentation"><strong>For Documentation</strong></h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Check existing documentation protocols
+grep_search: "RSCRIBE_DOCUMENT_PROTOCOL|documentation protocol"
+# Verify docs folder organization
+list_dir: "docs/"</code></pre>
+</code></pre>
+<h4 id="for-git-operations"><strong>For Git Operations</strong></h4>
+<pre><code class="language-bash"><pre><code class="language-bash"># Check existing checkpoint procedures
+grep_search: "git checkpoint|backup protocol"
+# Verify established commit patterns</code></pre>
+</code></pre>
+<h3 id="protocol-verification-steps"><strong>Protocol Verification Steps</strong></h3>
+<ol>
+<li><strong>Search for existing patterns</strong> before creating new procedures</li>
+<li><strong>Read established protocols</strong> before implementing changes</li>
+<li><strong>Verify file organization</strong> against current structure</li>
+<li><strong>Ask clarifying questions</strong> when protocols are unclear</li>
+</ol>
+<h3 id="common-protocol-areas"><strong>Common Protocol Areas</strong></h3>
+<h4 id="file-organization"><strong>File Organization</strong></h4>
+<ul>
+<li><strong>Root Directory</strong>: Only <code>START.md</code> and <code>COPILOT_INSTRUCTIONS.md</code></li>
+<li><strong>Documentation</strong>: All other MD files in <code>docs/</code> folder</li>
+<li><strong>Archives</strong>: Outdated files in <code>archive/</code> with timestamps</li>
+<li><strong>Handoffs</strong>: Always use <code>rMemory/rAgentMemories/handoff.json</code></li>
+</ul>
+<h4 id="ai-provider-usage"><strong>AI Provider Usage</strong></h4>
+<ul>
+<li><strong>Tier 1 (Groq)</strong>: Primary workloads, document sweeps</li>
+<li><strong>Tier 2 (Claude)</strong>: Reasoning tasks, complex analysis</li>
+<li><strong>Tier 3 (OpenAI)</strong>: Backup operations</li>
+<li><strong>Tier 4 (Gemini)</strong>: Strategic market intelligence</li>
+<li><strong>Tier 5 (Ollama)</strong>: Local fallback</li>
+</ul>
+<h4 id="git-management"><strong>Git Management</strong></h4>
+<ul>
+<li><strong>Checkpoints</strong>: Use <code>scripts/git-checkpoint.sh</code></li>
+<li><strong>Commits</strong>: Descriptive messages with system impact</li>
+<li><strong>Protection</strong>: Always create safety checkpoints before major changes</li>
+</ul>
+<hr>
+<h2 id="📊-protocol-compliance-monitoring">📊 Protocol Compliance Monitoring</h2>
+<h3 id="success-indicators"><strong>Success Indicators</strong></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Handoffs use handoff.json format consistently</li>
+<li><input disabled="" type="checkbox"> Documentation follows established file organization</li>
+<li><input disabled="" type="checkbox"> Git operations use standardized checkpoint procedures</li>
+<li><input disabled="" type="checkbox"> AI provider selection follows tier assignments</li>
+<li><input disabled="" type="checkbox"> File creation follows folder structure protocols</li>
+</ul>
+<h3 id="warning-signs-of-protocol-drift"><strong>Warning Signs of Protocol Drift</strong></h3>
+<ul>
+<li>Creating markdown files for handoffs instead of updating handoff.json</li>
+<li>Placing documentation files in root instead of docs/</li>
+<li>Using suboptimal AI providers for established workloads</li>
+<li>Implementing new procedures without checking existing patterns</li>
+<li>Skipping established safety checkpoints</li>
+</ul>
+<h3 id="recovery-procedures"><strong>Recovery Procedures</strong></h3>
+<ol>
+<li><strong>Immediate Stop</strong>: Use trigger phrases to halt off-protocol actions</li>
+<li><strong>Protocol Check</strong>: Direct agent to read relevant protocol documentation</li>
+<li><strong>Correction</strong>: Guide agent back to established procedures</li>
+<li><strong>Validation</strong>: Confirm corrected approach follows protocols</li>
+</ol>
+<hr>
+<h2 id="🎯-implementation-strategy">🎯 Implementation Strategy</h2>
+<h3 id="for-new-sessions"><strong>For New Sessions</strong></h3>
+<ol>
+<li><strong>Start with protocol reminder</strong>: &quot;Following our protocol, let&#39;s begin with...&quot;</li>
+<li><strong>Reference handoff.json</strong>: Ensure agent reads complete context</li>
+<li><strong>Verify understanding</strong>: Confirm agent knows current procedures</li>
+<li><strong>Set expectations</strong>: Remind about protocol adherence importance</li>
+</ol>
+<h3 id="during-sessions"><strong>During Sessions</strong></h3>
+<ol>
+<li><strong>Monitor for drift</strong>: Watch for off-protocol behaviors</li>
+<li><strong>Use trigger phrases</strong>: Redirect immediately when needed</li>
+<li><strong>Reference specific protocols</strong>: Point to documented procedures</li>
+<li><strong>Maintain consistency</strong>: Ensure all actions follow established patterns</li>
+</ol>
+<h3 id="for-session-handoffs"><strong>For Session Handoffs</strong></h3>
+<ol>
+<li><strong>Update handoff.json</strong>: Never use markdown for handoffs</li>
+<li><strong>Include protocol reminders</strong>: Note any protocol drift in session</li>
+<li><strong>Validate completeness</strong>: Ensure all context preserved properly</li>
+<li><strong>Set next session expectations</strong>: Clear protocol adherence requirements</li>
+</ol>
+<hr>
+<h2 id="📚-key-protocol-documents">📚 Key Protocol Documents</h2>
+<h3 id="core-protocols"><strong>Core Protocols</strong></h3>
+<ul>
+<li><code>rMemory/rAgentMemories/handoff.json</code> - Agent transition procedures</li>
+<li><code>RSCRIBE_DOCUMENT_PROTOCOL.md</code> - Documentation generation standards</li>
+<li><code>docs/RENGINE.md</code> - Platform architecture and procedures</li>
+<li><code>VISION.md</code> - Strategic direction and AI tier assignments</li>
+</ul>
+<h3 id="operational-procedures"><strong>Operational Procedures</strong></h3>
+<ul>
+<li><code>scripts/git-checkpoint.sh</code> - Standardized backup procedures</li>
+<li><code>rEngine/system-config.json</code> - AI provider configurations</li>
+<li><code>docs/DOCKER_MANAGEMENT_GUIDE.md</code> - Container management protocols</li>
+<li><code>docs/MOBILE_DEVELOPMENT_GUIDE.md</code> - Portable development procedures</li>
+</ul>
+<hr>
+<h2 id="💡-best-practices">💡 Best Practices</h2>
+<h3 id="for-users"><strong>For Users</strong></h3>
+<ol>
+<li><strong>Be specific</strong>: Reference exact protocol files when correcting</li>
+<li><strong>Be immediate</strong>: Correct drift as soon as it&#39;s noticed</li>
+<li><strong>Be consistent</strong>: Use the same trigger phrases repeatedly</li>
+<li><strong>Be supportive</strong>: Guide agent back to protocols constructively</li>
+</ol>
+<h3 id="for-agents"><strong>For Agents</strong></h3>
+<ol>
+<li><strong>Always verify</strong>: Check existing protocols before implementing</li>
+<li><strong>Never assume</strong>: Research established patterns first</li>
+<li><strong>Ask when uncertain</strong>: Better to clarify than implement incorrectly</li>
+<li><strong>Document deviations</strong>: Note any protocol changes in handoffs</li>
+</ol>
+<hr>
+<h2 id="🔄-continuous-improvement">🔄 Continuous Improvement</h2>
+<h3 id="protocol-evolution"><strong>Protocol Evolution</strong></h3>
+<ul>
+<li>Update this guide when new protocols are established</li>
+<li>Document successful trigger phrases and correction methods</li>
+<li>Track common drift patterns and prevention strategies</li>
+<li>Refine procedures based on real session experience</li>
+</ul>
+<h3 id="feedback-loop"><strong>Feedback Loop</strong></h3>
+<ul>
+<li>Monitor protocol adherence success rates</li>
+<li>Identify most effective user correction methods</li>
+<li>Update agent training based on common failure points</li>
+<li>Improve documentation clarity for better compliance</li>
+</ul>
+<hr>
+<p><em>This guide ensures consistent protocol adherence across all StackTrackr operations, maintaining system integrity and operational efficiency.</em></p>
+
+        </main>
+
+        <footer class="footer">
+            <p>Generated from <strong>PROTOCOL_ADHERENCE_GUIDE.md</strong> • StackTrackr Documentation System • Last updated: 2025-08-19</p>
+        </footer>
+    </div>
+</body>
+</html>

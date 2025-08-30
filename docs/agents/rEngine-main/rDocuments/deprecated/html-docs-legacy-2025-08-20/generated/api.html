@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rEngine Core - API Integration - rEngine Core Documentation</title>
+    <style>
+        :root {
+            --rengine-primary: #6366f1;
+            --rengine-secondary: #8b5cf6;
+            --rengine-accent: #06b6d4;
+            --rengine-text: #1f2937;
+            --rengine-text-light: #6b7280;
+            --rengine-bg: #ffffff;
+            --rengine-bg-alt: #f8fafc;
+            --rengine-border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--rengine-text);
+            background: var(--rengine-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--rengine-primary), var(--rengine-secondary));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: "⚙️";
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--rengine-primary);
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--rengine-primary);
+            border-bottom: 2px solid var(--rengine-border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--rengine-secondary);
+        }
+
+        h4, h5, h6 {
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--rengine-text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--rengine-text);
+        }
+
+        .content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        code {
+            background: var(--rengine-bg-alt);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--rengine-primary);
+        }
+
+        pre {
+            background: var(--rengine-bg-alt);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--rengine-primary);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--rengine-text);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--rengine-accent);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: var(--rengine-text-light);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--rengine-border);
+        }
+
+        th {
+            background: var(--rengine-bg-alt);
+            font-weight: 600;
+            color: var(--rengine-primary);
+        }
+
+        .metadata {
+            background: var(--rengine-bg-alt);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--rengine-border);
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: var(--rengine-text-light);
+        }
+
+        footer {
+            background: var(--rengine-bg-alt);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--rengine-text-light);
+            border-top: 1px solid var(--rengine-border);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--rengine-primary);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">rEngine Core</div>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../README.html">Documentation</a>
+                    <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <h1>rEngine Core - API Integration</h1>
+            
+            
+            <div class="metadata">
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Source File:</span>
+                        <span>api.md</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Generated:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Last Modified:</span>
+                        <span>2025-08-20</span>
+                    </div>
+                
+                    <div class="metadata-item">
+                        <span class="metadata-label">Converter:</span>
+                        <span>rEngine MCP HTML Converter</span>
+                    </div>
+                
+            </div>
+            
+            
+            [36m🤖 Calling Anthropic Claude (claude-3-haiku-20240307)...[0m
+[32m✅ Response received in 13586ms[0m
+
+[1m🤖 Anthropic Claude Response:[0m
+
+Here is the HTML content converted from the provided Markdown documentation, with a focus on clean, semantic structure, proper heading hierarchy, code blocks with syntax highlighting, tables and lists, and appropriate CSS classes for styling:
+
+<h1 class="section-title">StackTrackr API</h1>
+
+<h2 class="section-subtitle">API Functions</h2>
+
+<h3 class="function-name">loadApiConfig()</h3>
+<p>Loads the current API configuration.</p>
+
+<h3 class="function-name">saveApiConfig(config)</h3>
+<p>Saves the API configuration.</p>
+
+<h3 class="function-name">clearApiConfig()</h3>
+<p>Clears the API configuration and cache.</p>
+
+<h3 class="function-name">clearApiCache()</h3>
+<p>Clears only the API cache.</p>
+
+<h3 class="function-name">setProviderStatus(provider, status)</h3>
+<p>Sets the status of a specific API provider.</p>
+
+<h3 class="function-name">updateProviderHistoryTables()</h3>
+<p>Updates the provider history tables.</p>
+
+<h3 class="function-name">refreshProviderStatuses()</h3>
+<p>Refreshes the statuses of all API providers.</p>
+
+<h3 class="function-name">fetchSpotPricesFromApi(provider, apiKey)</h3>
+<p>Fetches spot prices from a specific API provider.</p>
+
+<h3 class="function-name">fetchBatchSpotPrices(provider, apiKey, selectedMetals, historyDays, historyTimes)</h3>
+<p>Fetches a batch of spot prices from a specific API provider.</p>
+
+<h3 class="function-name">syncSpotPricesFromApi(showProgress, forceSync)</h3>
+<p>Synchronizes spot prices from the configured API.</p>
+
+<h3 class="function-name">loadApiCache()</h3>
+<p>Loads the API cache.</p>
+
+<h3 class="function-name">saveApiCache(data, provider)</h3>
+<p>Saves the API cache.</p>
+
+<h3 class="function-name">refreshFromCache()</h3>
+<p>Refreshes the data from the API cache.</p>
+
+<h3 class="function-name">calculateApiUsage(selectedMetals, historyDays, batchSupported)</h3>
+<p>Calculates the API usage based on the selected metals, history days, and batch support.</p>
+
+<h3 class="function-name">updateBatchCalculation(provider)</h3>
+<p>Updates the batch calculation for a specific API provider.</p>
+
+<h3 class="function-name">updateProviderSettings(provider)</h3>
+<p>Updates the settings for a specific API provider.</p>
+
+<h3 class="function-name">setupProviderSettingsListeners(provider)</h3>
+<p>Sets up event listeners for a specific API provider's settings.</p>
+
+<h3 class="function-name">showApiModal()</h3>
+<p>Shows the API settings modal.</p>
+
+<h3 class="function-name">hideApiModal()</h3>
+<p>Hides the API settings modal.</p>
+
+<h3 class="function-name">showApiHistoryModal()</h3>
+<p>Shows the API history modal.</p>
+
+<h3 class="function-name">hideApiHistoryModal()</h3>
+<p>Hides the API history modal.</p>
+
+<h3 class="function-name">showApiProvidersModal()</h3>
+<p>Shows the API providers modal.</p>
+
+<h3 class="function-name">hideApiProvidersModal()</h3>
+<p>Hides the API providers modal.</p>
+
+<h3 class="function-name">showProviderInfo(providerKey)</h3>
+<p>Shows the provider information modal.</p>
+
+<h3 class="function-name">hideProviderInfo()</h3>
+<p>Hides the provider information modal.</p>
+
+<h2 class="section-subtitle">API Dependencies</h2>
+
+<p>The <code>api.js</code> file depends on the following:</p>
+
+<table class="api-dependencies-table">
+  <thead>
+    <tr>
+      <th>Dependency</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>API_PROVIDERS</td>
+      <td>The available API providers.</td>
+    </tr>
+    <tr>
+      <td>METALS</td>
+      <td>The elements and spot prices.</td>
+    </tr>
+    <tr>
+      <td>spotPrices</td>
+      <td>The spot prices data.</td>
+    </tr>
+    <tr>
+      <td>spotHistory</td>
+      <td>The spot price history data.</td>
+    </tr>
+    <tr>
+      <td>APP_VERSION</td>
+      <td>The version of the application.</td>
+    </tr>
+    <tr>
+      <td>LS_KEY</td>
+      <td>The key for localStorage.</td>
+    </tr>
+    <tr>
+      <td>SPOT_HISTORY_KEY</td>
+      <td>The key for spot price history data.</td>
+    </tr>
+    <tr>
+      <td>API_KEY_STORAGE_KEY</td>
+      <td>The key for API key storage.</td>
+    </tr>
+    <tr>
+      <td>API_CACHE_KEY</td>
+      <td>The key for API cache storage.</td>
+    </tr>
+    <tr>
+      <td>DEFAULT_API_QUOTA</td>
+      <td>The default API quota.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="section-subtitle">API Integration</h2>
+
+<p>The <code>api.js</code> file integrates with the following components of the StackTrackr Core ecosystem:</p>
+
+<ul class="api-integration-list">
+  <li>The data storage and caching mechanisms</li>
+  <li>The UI elements for displaying and interacting with the API data</li>
+</ul>
+
+<p>The <code>api.js</code> file is a critical component of the StackTrackr application, as it handles the interactions with the various API providers and manages the caching of the spot price data.</p>
+
+<h2 class="section-subtitle">API Cache</h2>
+
+<p>The <code>api.js</code> file also manages the caching of the API data, allowing for faster access to the spot price information. The cache is stored for a configurable number of hours, as defined by the <code>cacheHours</code> variable.</p>
+
+<h2 class="section-subtitle">API Usage Tracking</h2>
+
+<p>The <code>api.js</code> file also tracks the usage of the API, including the number of requests made, the number of metals selected, and the number of history days requested. This information is used to optimize the API calls and ensure that the application stays within the API provider's usage limits.</
+
+<style>
+  .section-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .section-subtitle {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .function-name {
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+
+  .api-dependencies-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  .api-dependencies-table th,
+  .api-dependencies-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .api-dependencies-table th {
+    background-color: #f2f2f2;
+  }
+
+  .api-integration-list {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin-top: 10px;
+  }
+
+  pre {
+    background-color: #f2f2f2;
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+
+  code {
+    font-family: monospace;
+    color: #333;
+  }
+</style>
+
+[36mℹ️  Duration: 13586ms | Model: claude-3-haiku-20240307[0m
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../README.html">Documentation</a>
+                <a href="https://github.com/lbruton/StackTrackr">GitHub</a>
+            </div>
+            <p>Generated on 2025-08-20 by rEngine Core HTML Converter</p>
+            <p>© 2025 rEngine Core - Intelligent Development Wrapper</p>
+        </div>
+    </footer>
+</body>
+</html>

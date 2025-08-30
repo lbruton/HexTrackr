@@ -1,0 +1,270 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-16",
+    "purpose": "Function registry for StackTrackr agentic operating system",
+    "description": "Centralized memory for all functions, dependencies, and requirements to accelerate troubleshooting and development"
+  },
+  "functions": {
+    "core": {
+      "description": "Core application functions",
+      "functions": [
+        {
+          "name": "renderTable",
+          "file": "js/inventory.js",
+          "description": "Primary table rendering function that handles filtering, sorting, and pagination",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": [
+            "filterInventory",
+            "sortInventory",
+            "calculateTotalPages",
+            "updateItemCount",
+            "hideEmptyColumns",
+            "renderPagination",
+            "updateSummary",
+            "setupColumnResizing",
+            "updateColumnVisibility"
+          ],
+          "performance_notes": "Uses monitorPerformance wrapper and DocumentFragment for optimized rendering",
+          "last_modified": "2025-08-16",
+          "modified_by": "claude_3_5_sonnet"
+        },
+        {
+          "name": "filterInventory",
+          "file": "js/search.js",
+          "description": "Filters inventory based on search query and active column filters",
+          "parameters": "none",
+          "returns": "Array<Object>",
+          "dependencies": [
+            "filterInventoryAdvanced",
+            "columnFilters",
+            "searchQuery"
+          ],
+          "performance_notes": "Uses debouncing for search input handling",
+          "last_modified": "2025-08-16",
+          "modified_by": "claude_3_5_sonnet"
+        },
+        {
+          "name": "filterInventoryAdvanced",
+          "file": "js/filters.js",
+          "description": "Enhanced filtering system with support for complex criteria and multiple filter types",
+          "parameters": "none",
+          "returns": "Array<Object>",
+          "dependencies": [
+            "activeFilters",
+            "simplifyChipValue",
+            "renderActiveFilters"
+          ],
+          "performance_notes": "Optimized for handling multiple concurrent filters",
+          "last_modified": "2025-08-16",
+          "modified_by": "claude_3_5_sonnet"
+        },
+        {
+          "name": "clearAllFilters",
+          "file": "js/filters.js",
+          "description": "Resets all active filters and search criteria",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": [
+            "activeFilters",
+            "columnFilters",
+            "searchQuery",
+            "renderActiveFilters",
+            "renderTable"
+          ],
+          "last_modified": "2025-08-16",
+          "modified_by": "claude_3_5_sonnet"
+        }
+      ]
+    },
+    "ui": {
+      "description": "User interface and DOM manipulation functions",
+      "functions": [
+        {
+          "name": "showFilesModal",
+          "file": "js/api.js",
+          "description": "Shows the files modal with proper body overflow management",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": ["openModalById", "document.getElementById"],
+          "last_modified": "2025-08-16",
+          "modified_by": "github_copilot",
+          "notes": "Updated to include body overflow management and global modal system integration"
+        },
+        {
+          "name": "hideFilesModal", 
+          "file": "js/api.js",
+          "description": "Hides the files modal and restores body overflow",
+          "parameters": "none",
+          "returns": "void", 
+          "dependencies": ["closeModalById", "document.getElementById"],
+          "last_modified": "2025-08-16",
+          "modified_by": "github_copilot",
+          "notes": "Updated to include body overflow restoration and error handling"
+        },
+        {
+          "name": "renderActiveFilters",
+          "file": "js/filters.js",
+          "description": "Renders active filter chips beneath the search bar",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": [
+            "filterInventoryAdvanced",
+            "generateCategorySummary",
+            "createFilterChip"
+          ],
+          "performance_notes": "Updates filter chip container based on current filters and inventory state",
+          "last_modified": "2025-08-16",
+          "modified_by": "claude_3_5_sonnet"
+        },
+        {
+          "name": "setupColumnResizing",
+          "file": "js/inventory.js",
+          "description": "Initializes column resizing functionality for the inventory table",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": [
+            "updateColumnVisibility",
+            "saveColumnWidths",
+            "loadColumnWidths"
+          ],
+          "performance_notes": "Implements performant drag-based column resizing",
+          "last_modified": "2025-08-16",
+          "modified_by": "claude_3_5_sonnet"
+        },
+        {
+          "name": "setupResponsiveColumns",
+          "file": "js/events.js",
+          "description": "Sets up responsive column behavior based on viewport size",
+          "parameters": "none",
+          "returns": "void",
+          "dependencies": [
+            "updateColumnVisibility",
+            "handleResponsiveBreakpoints"
+          ],
+          "performance_notes": "Uses ResizeObserver for efficient viewport monitoring",
+          "last_modified": "2025-08-16",
+          "modified_by": "claude_3_5_sonnet"
+        }
+      ]
+    },
+    "data": {
+      "description": "Data management and storage functions",
+      "functions": []
+    },
+    "api": {
+      "description": "API and network related functions",
+      "functions": []
+    },
+    "utils": {
+      "description": "Utility and helper functions",
+      "functions": []
+    },
+    "performance": {
+      "description": "Performance optimization functions",
+      "functions": []
+    },
+    "validation": {
+      "description": "Data validation and error handling functions",
+      "functions": []
+    }
+  },
+  "dependencies": {
+    "external": {
+      "description": "External libraries and their versions",
+      "libraries": []
+    },
+    "internal": {
+      "description": "Internal module dependencies",
+      "modules": []
+    }
+  },
+  "requirements": {
+    "environment": {
+      "description": "Environment-specific requirements",
+      "items": []
+    },
+    "browser": {
+      "description": "Browser compatibility requirements",
+      "items": []
+    },
+    "performance": {
+      "description": "Performance requirements and benchmarks",
+      "items": []
+    }
+  },
+  "schema": {
+    "function": {
+      "name": "string - Function name",
+      "file": "string - File path relative to project root",
+      "line": "number - Line number where function is defined",
+      "description": "string - Brief description of function purpose",
+      "parameters": "array - Function parameters with types",
+      "returns": "string - Return type and description",
+      "dependencies": "array - List of required functions/modules",
+      "side_effects": "array - Any side effects (DOM changes, storage, etc.)",
+      "performance_notes": "string - Performance considerations",
+      "error_handling": "string - Error handling approach",
+      "last_modified": "string - ISO date of last modification",
+      "modified_by": "string - Agent that last modified the function"
+    },
+    "dependency": {
+      "name": "string - Library/module name",
+      "version": "string - Version number",
+      "type": "string - external|internal",
+      "purpose": "string - Why this dependency is needed",
+      "alternatives": "array - Alternative libraries that could be used"
+    },
+    "requirement": {
+      "type": "string - environment|browser|performance",
+      "description": "string - Requirement description",
+      "value": "string - Specific value or constraint",
+      "rationale": "string - Why this requirement exists"
+    }
+  },
+  "export": {
+    "description": "Data export functionality for inventory management",
+    "functions": [
+      {
+        "name": "exportCsv",
+        "file": "js/inventory.js",
+        "description": "Exports current inventory data as CSV file with comprehensive formatting",
+        "parameters": "none",
+        "returns": "void - downloads CSV file",
+        "dependencies": ["Papa.unparse", "inventory", "formatCurrency", "sortInventoryByDateNewestFirst"],
+        "last_modified": "2024-12-19",
+        "modified_by": "github_copilot",
+        "notes": "Created to resolve missing function error preventing app load"
+      },
+      {
+        "name": "exportJson", 
+        "file": "js/inventory.js",
+        "description": "Exports complete inventory data as JSON file with all metadata",
+        "parameters": "none",
+        "returns": "void - downloads JSON file",
+        "dependencies": ["inventory", "APP_VERSION"],
+        "last_modified": "2024-12-19",
+        "modified_by": "github_copilot",
+        "notes": "Created to resolve missing function error preventing app load"
+      },
+      {
+        "name": "exportPdf",
+        "file": "js/inventory.js", 
+        "description": "Exports inventory as printable PDF using browser print dialog",
+        "parameters": "none",
+        "returns": "void - opens print dialog in new window",
+        "dependencies": ["inventory", "formatCurrency", "sortInventoryByDateNewestFirst"],
+        "last_modified": "2024-12-19",
+        "modified_by": "github_copilot",
+        "notes": "Created to resolve missing function error preventing app load"
+      }
+    ]
+  },
+  "instructions": {
+    "for_agents": "When adding, modifying, or removing functions, always update this file with complete information including dependencies and requirements. This helps accelerate troubleshooting and prevents conflicts.",
+    "function_tracking": "Every function change must be logged here with file location, dependencies, and any special requirements",
+    "dependency_management": "Track all external libraries and internal module dependencies to prevent version conflicts",
+    "performance_tracking": "Note performance implications of functions to help with optimization tasks"
+  }
+}
