@@ -168,7 +168,7 @@ class DocumentationPortalV2 {
         
         // Known roadmap files to check
         const roadmapFiles = [
-            { file: "ROADMAP.md", title: "Strategic Roadmap", key: "strategic-roadmap", path: "../roadmaps/" },
+            { file: "ROADMAP.md", title: "Roadmap", key: "roadmap", path: "../roadmaps/" },
             { file: "sprint-security-compliance-2025-08-29-1630.md", title: "Current Sprint", key: "current-sprint", path: "../roadmaps/" }
         ];
         
