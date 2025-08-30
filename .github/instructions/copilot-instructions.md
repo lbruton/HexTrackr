@@ -7,8 +7,11 @@ This playbook defines how engineering agents operate within the HexTrackr projec
 Always execute these steps in order:
 
 1. **observe**
-   - Gather current repo status, open PRs, recent changes, and workspace context.
-   - Read impacted files and constraints (security, quality gates, protocols).
+   - FIRST: Analyze current context window (attachments, conversation history, workspace state)
+   - THEN: Identify knowledge gaps requiring memory search via `mcp_memento_search_nodes` and `mcp_memento_semantic_search`
+   - Call memory tools with tags including `project:${workspaceFolderBasename}` for specific gaps only
+   - Gather current repo status, open PRs, recent changes as needed
+   - Read impacted files and constraints (security, quality gates, protocols)
 
 1. **plan**
    - Produce a short actionable checklist tied to requirements.
@@ -64,11 +67,75 @@ Always execute these steps in order:
 
 ## Memory Backend
 
-- **Primary memory backend**: `memento-mcp` via VS Code Chat MCP
-- **Route aliases**:
-  - `memory.write` → `memento.write`
-  - `memory.search` → `memento.search`
-  - `memory.tag` → `memento.tag`
+- **Primary memory backend**: `GPT Memory MCP` + `memento-mcp` via VS Code Chat MCP
+- **Architecture**: Evidence → Canonical Notes → Todos pipeline with SQLite + Neo4j hybrid
+- **Memory tools** (use explicit paths to prevent skipping):
+  - `mcp_memento_search_nodes` → Search entities by name/content
+  - `mcp_memento_semantic_search` → Semantic similarity search  
+  - `mcp_memento_create_entities` → Write new memories
+  - `mcp_memento_read_graph` → Full memory graph access
+
+- **GPT Memory MCP Schema**:
+
+  ```
+  Evidence Processing Pipeline:
+  ├── evidence/           # Raw chat spans with UUID + simhash deduplication
+  ├── classifications/    # 15 entity types, 5 intent types, 3 confidentiality levels
+  ├── notes/             # Canonical summaries (15-minute reconciliation cycles)
+  ├── todos/             # Actionable items with priority and due dates
+  ├── plans/             # Sequential Thinking outputs (JSON steps)
+  └── code_index/        # Symbol Table with FTS5 full-text search
+  
+  Classification System:
+  Entity Types (15): FILE, CLASS, FUNCTION, METHOD, VAR, TICKET, COMMIT, API, ENV, DOC, NOTE, EVIDENCE, TODO, PLAN, PROTOCOL
+  Intent Types (5): DECISION, ACTION, QUESTION, STATUS, CONTEXT
+  Confidentiality (3): public, internal, confidential
+  
+  Deterministic Classification + LLM Backup:
+
+  - Regex-based rules with 0.7 confidence threshold
+  - Ollama qwen2.5-coder:7b for edge cases
+  - Signal strength scoring (0.0-1.0)
+
+  ```
+
+- **Memory Hierarchy** (implemented):
+
+  ```
+  Current Organization (207 entities total):
+  
+  Projects/
+  ├── HexTrackr/ (Cybersecurity Management)
+  │   ├── architecture/     # System info, schemas (147 entities)
+  │   ├── documentation/    # Synced with docs-source/ (27 entities)  
+  │   ├── roadmaps/        # Current plans, sprints (3 entities)
+  │   ├── bugs/            # Issue tracking (6 entities)
+  │   └── versioning/      # Release info (6 entities)
+  ├── rMemory/ (AI Development Tooling - COMPLETE)
+  │   ├── core/            # Hierarchical organizer, scribes
+  │   ├── scribes/         # Memory processing pipeline
+  │   └── agents/          # Agent playbooks
+  └── StackTrackr/ (Precious Metals Portfolio)
+      ├── playbooks/       # Financial domain guidelines
+      ├── architecture/    # Backup system integration
+      └── planning/        # Development phases
+  
+  Categories by Intelligence:
+  ├── Architecture: 147 entities
+  ├── Documentation: 27 entities  
+  ├── Bugs and Issues: 6 entities
+  ├── Version History: 6 entities
+  ├── Symbol Index: 6 entities
+  ├── Function Table: 6 entities
+  ├── Roadmaps: 3 entities
+  ├── Vision and Planning: 3 entities
+  └── Project Schema: 3 entities
+  
+  🔗 Total Relationships: 31,417 (optimized from 98K+)
+  🤖 Ollama-powered categorization with 0.8 confidence ratings
+  ```
+
+- **Document Synchronization**: Auto-sync project files with memory for perfect consistency
 
 If the MCP server is unavailable, use a local fallback note in `docs/ops/AGENTS_LOG.md` and open a task to restore MCP.
 
