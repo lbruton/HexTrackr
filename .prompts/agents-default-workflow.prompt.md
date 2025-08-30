@@ -74,23 +74,40 @@ Always execute these steps in order:
   - `mcp_memento_create_entities` → Write new memories
   - `mcp_memento_read_graph` → Full memory graph access
 
-- **Memory Hierarchy** (planned):
+- **Memory Hierarchy** (implemented):
 
   ```
-  Projects/
-  ├── HexTrackr/
-  │   ├── architecture/     # System info, schemas
-  │   ├── documentation/    # Synced with docs-source/
-  │   ├── roadmaps/        # Current plans, sprints
-  │   ├── bugs/            # Issue tracking
-  │   └── versioning/      # Release info
-  ├── rMemory/             # Memory system itself
-  └── StackTrackr/         # Future project
+  Current Organization (207 entities total):
   
-  Personality/
-  ├── phrases/             # "refresh context" → auto-prompt
-  ├── preferences/         # Working patterns
-  └── shortcuts/           # Command mappings
+  Projects/
+  ├── HexTrackr/ (Cybersecurity Management)
+  │   ├── architecture/     # System info, schemas (147 entities)
+  │   ├── documentation/    # Synced with docs-source/ (27 entities)  
+  │   ├── roadmaps/        # Current plans, sprints (3 entities)
+  │   ├── bugs/            # Issue tracking (6 entities)
+  │   └── versioning/      # Release info (6 entities)
+  ├── rMemory/ (AI Development Tooling - COMPLETE)
+  │   ├── core/            # Hierarchical organizer, scribes
+  │   ├── scribes/         # Memory processing pipeline
+  │   └── agents/          # Agent playbooks
+  └── StackTrackr/ (Precious Metals Portfolio)
+      ├── playbooks/       # Financial domain guidelines
+      ├── architecture/    # Backup system integration
+      └── planning/        # Development phases
+  
+  Categories by Intelligence:
+  ├── Architecture: 147 entities
+  ├── Documentation: 27 entities  
+  ├── Bugs and Issues: 6 entities
+  ├── Version History: 6 entities
+  ├── Symbol Index: 6 entities
+  ├── Function Table: 6 entities
+  ├── Roadmaps: 3 entities
+  ├── Vision and Planning: 3 entities
+  └── Project Schema: 3 entities
+  
+  🔗 Total Relationships: 31,417 (optimized from 98K+)
+  🤖 Ollama-powered categorization with 0.8 confidence ratings
   ```
 
 - **Document Synchronization**: Auto-sync project files with memory for perfect consistency
