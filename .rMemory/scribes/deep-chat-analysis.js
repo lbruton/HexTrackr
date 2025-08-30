@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /* eslint-env node */
+/* global require, module, __dirname, console, process, setTimeout */
 
 /**
- * Chat Log Archaeology Tool
+ * Deep Chat Analysis Scribe
  * 
- * Processes VS Code chat sessions to reconstruct project memory
- * Uses Claude-4 API for high-quality analysis and insight extraction
- * Feeds extracted insights into Memento MCP for searchable memory
+ * High-quality retrospective analysis of VS Code chat sessions
+ * Uses Claude Opus for comprehensive insight extraction and memory reconstruction
+ * Part of HexTrackr .rMemory scribes system for advanced memory processing
  */
 
 require("dotenv").config();
@@ -14,25 +15,26 @@ const { Anthropic } = require("@anthropic-ai/sdk");
 const fs = require("fs").promises;
 const path = require("path");
 
-class ChatLogArchaeologist {
+class DeepChatAnalysisScribe {
     constructor() {
         this.anthropic = new Anthropic({
             apiKey: process.env.ANTHROPIC_API_KEY,
         });
-        this.model = "claude-3-5-haiku-20241022"; // Fast, efficient model for bulk processing
+        this.model = "claude-opus-4-1-20250805"; // Latest Claude Opus 4.1 with correct format
         this.chatSessionsPath = path.join(
             process.env.HOME,
             "Library/Application Support/Code/User/workspaceStorage"
         );
         this.outputPath = path.join(__dirname, "../docs/ops/recovered-memories");
-        this.batchSize = 3; // Reduced batch size for API processing
+        this.batchSize = 1; // Reduced batch size for Opus processing
     }
 
     /**
      * Main execution flow
      */
     async excavate() {
-        console.log("🏺 Starting Chat Log Archaeology with Claude API...");
+        console.log("🔍 Starting Deep Chat Analysis with Claude Opus...");
+        console.log("📊 Mode: Retrospective high-quality analysis");
         
         try {
             // Ensure output directory exists
@@ -202,18 +204,37 @@ class ChatLogArchaeologist {
     formatChatForAnalysis(chatData) {
         if (!Array.isArray(chatData)) {return "";}
 
-        return chatData
-            .filter(msg => msg.message && msg.message.length > 10)
+        const messages = [];
+        
+        for (const item of chatData) {
+            // Add user message
+            if (item.message && item.message.text) {
+                const userText = item.message.text.trim();
+                if (userText.length > 10) {
+                    messages.push(`USER: ${userText}`);
+                }
+            }
+            
+            // Add assistant response
+            if (item.response && Array.isArray(item.response)) {
+                const responseTexts = item.response
+                    .filter(r => r.value && typeof r.value === "string")
+                    .map(r => r.value.trim())
+                    .filter(text => text.length > 10);
+                
+                for (const responseText of responseTexts) {
+                    messages.push(`ASSISTANT: ${responseText}`);
+                }
+            }
+        }
+
+        return messages
             .slice(-100) // Last 100 messages - Claude can handle more than Ollama
-            .map(msg => {
-                const role = msg.variableName === "request" ? "USER" : "ASSISTANT";
-                return `${role}: ${msg.message}`;
-            })
             .join("\n\n");
     }
 
     /**
-     * Create prompt for insight extraction (optimized for Claude)
+     * Create prompt for insight extraction (optimized for Claude) with project classification
      */
     createInsightExtractionPrompt(conversationText) {
         return `You are an expert AI assistant analyzing VS Code chat conversations to extract key insights for project memory reconstruction. 
@@ -221,11 +242,34 @@ class ChatLogArchaeologist {
 CONVERSATION TO ANALYZE:
 ${conversationText}
 
+First, identify which project this conversation belongs to based on context clues:
+- **HexTrackr**: Task tracking, project management, Docker, Neo4j, .rMemory system, Memento MCP
+- **StackTrackr**: Precious metals tracking, financial data, market analysis
+- **rMemory**: Memory system development, AI embeddings, chat analysis tools, agent systems
+- **Legacy rMemory**: Historical rEngine, rAgents, rScribe, rMemories ecosystem (mark as "rMemory")
+
+For legacy content, look for references to: rEngine, rAgents, rScribe, rMemories, or similar r-prefixed tools.
+All legacy rMemory ecosystem content should be classified as "rMemory" project.
+
 Extract and categorize the following information as valid JSON:
 
 {
+  "project_classification": {
+    "primary_project": "HexTrackr|StackTrackr|rMemory|Unknown",
+    "confidence": 0.95,
+    "legacy_detected": false,
+    "context_clues": ["specific terms, file paths, or concepts that indicated the project"]
+  },
   "decisions": ["specific architectural or technical decisions made"],
   "problems_solved": ["concrete technical problems that were resolved"],
+  "frustrations": [
+    {
+      "issue": "specific frustration or pain point encountered",
+      "category": "build_error|import_issue|config_problem|syntax_error|logic_bug|performance|deployment|testing|documentation|tooling",
+      "time_impact": "immediate|minutes|hours|recurring",
+      "resolution_status": "solved|workaround|unresolved"
+    }
+  ],
   "code_changes": ["files, functions, or components modified/created"],
   "insights": ["key learnings, discoveries, or realizations"],
   "context": ["important project context or state changes"],
@@ -236,9 +280,11 @@ Extract and categorize the following information as valid JSON:
 }
 
 Guidelines:
+- Project classification is CRITICAL - analyze file paths, terminology, and context carefully
 - Focus on actionable, concrete information that would help future developers understand what happened
+- CAPTURE FRUSTRATIONS: Extract any pain points, blockers, errors, or time-wasting issues encountered
 - Ignore small talk, routine operations, or basic troubleshooting
-- Prioritize decisions, code changes, and problem resolutions
+- Prioritize decisions, code changes, problem resolutions, and frustration patterns
 - Extract specific file names, function names, and technical details when mentioned
 - Identify patterns, workflows, or methodologies discussed
 - Note any architectural patterns, design decisions, or best practices established
@@ -329,6 +375,8 @@ Return ONLY the JSON object, no additional text.`;
             acc + (m.insights?.decisions?.length || 0), 0);
         const totalProblems = memories.reduce((acc, m) => 
             acc + (m.insights?.problems_solved?.length || 0), 0);
+        const totalFrustrations = memories.reduce((acc, m) => 
+            acc + (m.insights?.frustrations?.length || 0), 0);
         const totalCodeChanges = memories.reduce((acc, m) => 
             acc + (m.insights?.code_changes?.length || 0), 0);
 
@@ -336,6 +384,7 @@ Return ONLY the JSON object, no additional text.`;
             sessions_processed: memories.length,
             decisions_extracted: totalDecisions,
             problems_solved: totalProblems,
+            frustrations_captured: totalFrustrations,
             code_changes_tracked: totalCodeChanges,
             oldest_session: memories.length > 0 ? 
                 Math.min(...memories.map(m => new Date(m.timestamp))) : null,
@@ -348,7 +397,7 @@ Return ONLY the JSON object, no additional text.`;
      * Generate markdown report
      */
     generateMarkdownReport(report) {
-        return `# Chat Log Archaeology Report
+        return `# Deep Chat Analysis Report
 
 Generated: ${report.generated_at}
 
@@ -357,6 +406,7 @@ Generated: ${report.generated_at}
 - **Sessions Processed**: ${report.summary.sessions_processed}
 - **Decisions Extracted**: ${report.summary.decisions_extracted}
 - **Problems Solved**: ${report.summary.problems_solved}
+- **Frustrations Captured**: ${report.summary.frustrations_captured}
 - **Code Changes**: ${report.summary.code_changes_tracked}
 
 ## Session Details
@@ -376,6 +426,11 @@ ${session.insights.decisions.map(d => `- ${d}`).join("\n")}
 ${session.insights?.problems_solved ? `
 **Problems Solved**:
 ${session.insights.problems_solved.map(p => `- ${p}`).join("\n")}
+` : ""}
+
+${session.insights?.frustrations ? `
+**Frustrations Encountered**:
+${session.insights.frustrations.map(f => `- ${f.issue} (${f.category}, ${f.time_impact} impact, ${f.resolution_status})`).join("\n")}
 ` : ""}
 
 ${session.insights?.code_changes ? `
@@ -417,6 +472,12 @@ ${session.insights.code_changes.map(c => `- ${c}`).join("\n")}
                 sessionEntity.observations.push(...session.insights.problems_solved.map(p => `Solved: ${p}`));
             }
 
+            if (session.insights.frustrations) {
+                sessionEntity.observations.push(...session.insights.frustrations.map(f => 
+                    `Frustration: ${f.issue} [${f.category}] - ${f.time_impact} impact, ${f.resolution_status}`
+                ));
+            }
+
             entities.push(sessionEntity);
         });
 
@@ -452,17 +513,17 @@ ${session.insights.code_changes.map(c => `- ${c}`).join("\n")}
 
 // CLI interface
 if (require.main === module) {
-    const archaeologist = new ChatLogArchaeologist();
+    const scribe = new DeepChatAnalysisScribe();
     
-    archaeologist.excavate()
+    scribe.excavate()
         .then(() => {
-            console.log("🎉 Archaeology complete! Your memory has been reconstructed.");
+            console.log("🎉 Deep analysis complete! High-quality insights extracted.");
             process.exit(0);
         })
         .catch(error => {
-            console.error("💥 Archaeology failed:", error);
+            console.error("💥 Deep analysis failed:", error);
             process.exit(1);
         });
 }
 
-module.exports = { ChatLogArchaeologist };
+module.exports = { DeepChatAnalysisScribe };
