@@ -91,7 +91,7 @@ class MemoryScribeSummarizer {
                 text: record.get("text"),
                 project: record.get("project"),
                 type: record.get("type"),
-                importance: record.get("importance").toNumber(),
+                importance: this.safeToNumber(record.get("importance")),
                 timestamp: record.get("timestamp"),
                 keywords: record.get("keywords")
             }));
@@ -236,8 +236,8 @@ SUMMARY:`;
             for (const record of result.records) {
                 const projects = record.get("projects");
                 const summaries = record.get("summaries");
-                const summaryCount = record.get("summaryCount").toNumber();
-                const totalEntries = record.get("totalEntries").toNumber();
+                const summaryCount = this.safeToNumber(record.get("summaryCount"));
+                const totalEntries = this.safeToNumber(record.get("totalEntries"));
                 
                 for (const project of projects) {
                     // Create project-level summary
@@ -303,6 +303,43 @@ PROJECT SUMMARY:`;
         }
     }
 
+    /**
+     * Safely convert Neo4j result to number
+     * @param {any} value - Neo4j query result value
+     * @returns {number} - JavaScript number
+     */
+    safeToNumber(value) {
+        if (value === null || value === undefined) {
+            return 0;
+        }
+        if (typeof value === "number") {
+            return value;
+        }
+        if (value && typeof value.toNumber === "function") {
+            return value.toNumber();
+        }
+        return Number(value) || 0;
+    }
+
+    async checkRecentSummaries() {
+        const session = this.driver.session({ database: "neo4j" });
+        
+        try {
+            const result = await session.run(`
+                MATCH (s:Summary)
+                WHERE datetime(s.createdAt) > datetime() - duration("PT1H")
+                RETURN count(s) as recentCount
+            `);
+            
+            return this.safeToNumber(result.records[0]?.get("recentCount"));
+        } catch (error) {
+            console.warn("   ⚠️  Could not check recent summaries:", error.message);
+            return 0;
+        } finally {
+            await session.close();
+        }
+    }
+
     async generateMemoryReport() {
         console.log("\n📊 Memory Architecture Report");
         console.log("=" .repeat(50));
@@ -345,19 +382,19 @@ PROJECT SUMMARY:`;
             const primaryRecord = primaryStats.records[0];
             
             console.log("🗄️  Multi-Tier Memory Architecture:");
-            console.log(`   Extended Memory: ${extendedRecord.get("totalExtended").toNumber()} raw chat sessions`);
-            console.log(`   Batch Summaries: ${summaryRecord.get("totalSummaries").toNumber()} summaries covering ${summaryRecord.get("summarizedEntries").toNumber()} entries`);
-            console.log(`   Project Summaries: ${projectRecord.get("totalProjectSummaries").toNumber()} project overviews`);
-            console.log(`   Primary Memory: ${primaryRecord.get("totalEntities").toNumber()} canonical entities`);
+            console.log(`   Extended Memory: ${this.safeToNumber(extendedRecord.get("totalExtended"))} raw chat sessions`);
+            console.log(`   Batch Summaries: ${this.safeToNumber(summaryRecord.get("totalSummaries"))} summaries covering ${this.safeToNumber(summaryRecord.get("summarizedEntries"))} entries`);
+            console.log(`   Project Summaries: ${this.safeToNumber(projectRecord.get("totalProjectSummaries"))} project overviews`);
+            console.log(`   Primary Memory: ${this.safeToNumber(primaryRecord.get("totalEntities"))} canonical entities`);
             
             console.log(`\n🎯 Projects: ${extendedRecord.get("projects").join(", ")}`);
-            console.log(`📊 Average Importance: ${extendedRecord.get("avgImportance").toNumber().toFixed(2)}/5`);
+            console.log(`📊 Average Importance: ${this.safeToNumber(extendedRecord.get("avgImportance")).toFixed(2)}/5`);
             
             return {
-                extendedMemory: extendedRecord.get("totalExtended").toNumber(),
-                batchSummaries: summaryRecord.get("totalSummaries").toNumber(),
-                projectSummaries: projectRecord.get("totalProjectSummaries").toNumber(),
-                primaryMemory: primaryRecord.get("totalEntities").toNumber()
+                extendedMemory: this.safeToNumber(extendedRecord.get("totalExtended")),
+                batchSummaries: this.safeToNumber(summaryRecord.get("totalSummaries")),
+                projectSummaries: this.safeToNumber(projectRecord.get("totalProjectSummaries")),
+                primaryMemory: this.safeToNumber(primaryRecord.get("totalEntities"))
             };
             
         } finally {
@@ -369,6 +406,14 @@ PROJECT SUMMARY:`;
         console.log("🚀 Starting Memory Scribe Summarization...");
         
         try {
+            // Check for recent summaries to prevent duplicate processing
+            const recentSummaries = await this.checkRecentSummaries();
+            if (recentSummaries > 0) {
+                console.log(`⚠️  Found ${recentSummaries} summaries created in the last hour.`);
+                console.log("🛑 Skipping to prevent duplicates. Use --force to override.");
+                return;
+            }
+            
             // Get extended memory in batches
             const batches = await this.getExtendedMemoryBatches(8); // Smaller batches for better summaries
             
