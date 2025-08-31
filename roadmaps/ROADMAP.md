@@ -129,6 +129,15 @@ Last updated: August 30 2025
     - [ ] Success criteria: 60% faster custom security pattern detection vs Codacy
     - [ ] Use cases: XSS pattern detection, path traversal rules, HexTrackr-specific security patterns
     - [ ] Integration: Complement Codacy compliance with real-time development security feedback
+  - [ ] **lucidity-mcp Pre-commit Quality Analysis** (Q2 2025)
+    - [ ] Setup lucidity-mcp for AI-powered git change analysis and quality assurance
+    - [ ] Integrate with pre-commit hooks for automated quality gate enforcement
+    - [ ] Implement 10-dimension code quality analysis (complexity, security, performance, etc.)
+    - [ ] Create structured quality feedback prompts for AI-assisted code review
+    - [ ] Build git-aware analysis workflow for contextual change evaluation
+    - [ ] Success criteria: 40% reduction in post-commit quality issues and rework
+    - [ ] Use cases: Pre-commit quality gates, AI-guided code review, change impact analysis
+    - [ ] Integration: Bridge between development-time quality (lucidity) and compliance (Codacy)
   - [ ] **Pattern Library Development**
     - [ ] Store HexTrackr-specific XSS protection patterns
     - [ ] Accumulate Codacy compliance solution templates
