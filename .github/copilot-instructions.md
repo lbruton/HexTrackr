@@ -52,7 +52,7 @@ node server.js
 docker-compose up --build
 ```
 
-## Docker Configuration:
+## Docker Configuration
 
 - Uses `Dockerfile.node` (not the main `Dockerfile`)
 - Single container setup on port 8080
@@ -61,7 +61,7 @@ docker-compose up --build
 
 ### Testing Setup
 
-## Playwright Testing:
+## Playwright Testing
 
 - Requires Docker container restart: `docker-compose restart`
 - Browser automation tests need clean container state
@@ -157,6 +157,34 @@ HexTrackr uses a persistent AI memory system to maintain context across sessions
 - Use semantic search to find previous solutions to similar problems
 - Maintain audit trail of all security-related decisions and implementations
 - Store user preferences and coding standards for consistency
+
+## Versioning Standards
+
+### Keep a Changelog
+
+- **Format**: Follow [Keep a Changelog v1.0.0](https://keepachangelog.com/en/1.0.0/) format
+- **File**: `CHANGELOG.md` must be updated for ALL releases
+- **Sections**: Unreleased, Added, Changed, Deprecated, Removed, Fixed, Security
+- **Badges**: [![Keep a Changelog](https://img.shields.io/badge/Keep%20a%20Changelog-v1.0.0-orange)](https://keepachangelog.com/en/1.0.0/)
+
+### Semantic Versioning
+
+- **Standard**: Follow [Semantic Versioning v2.0.0](https://semver.org/spec/v2.0.0.html)
+- **Format**: MAJOR.MINOR.PATCH (e.g., 1.0.2)
+- **Current Version**: 1.0.2 (in package.json)
+- **Rules**:
+  - **MAJOR**: Breaking changes or major architectural updates
+  - **MINOR**: New features and enhancements (backward compatible)  
+  - **PATCH**: Bug fixes and minor improvements
+- **Badges**: [![Semantic Versioning](https://img.shields.io/badge/Semantic%20Versioning-v2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
+
+### Release Process
+
+1. Update CHANGELOG.md with new version section
+2. Update package.json version number
+3. Commit with descriptive message following SemVer
+4. Create Git tag matching version number
+5. Push changes and tags to GitHub
 
 ## Documentation
 
