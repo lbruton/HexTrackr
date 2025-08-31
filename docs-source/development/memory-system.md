@@ -1,53 +1,76 @@
-# HexTrackr Memory System - Perfect Continuity Architecture
+# HexTrackr Memory System - Multi-Source Intelligence Architecture
 
-This document outlines HexTrackr's unified `.rMemory` system that achieves **perfect continuity** where every chat feels like "we never stopped working together".
+This document outlines HexTrackr's enhanced `.rMemory` system that achieves **comprehensive memory coverage** through multiple data sources and AI analysis layers.
 
 ## System Overview
 
-HexTrackr implements a breakthrough memory architecture combining multiple layers for seamless AI collaboration:
+HexTrackr implements a revolutionary memory architecture combining multiple data sources and AI layers for complete conversation continuity:
 
-- **`.rMemory` Scribes System**: Specialized AI analysis tools for frustration learning and context preservation
-- **Memento MCP Integration**: Neo4j Enterprise-backed persistent memory with semantic search (125 entities, 26 relationships)
-- **Perfect Continuity Protocols**: Instant project context loading and sprint awareness
-- **Frustration Prevention Matrix**: Learning from pain points to prevent repeated issues
-- **Agent Context Loading**: Complete briefings for seamless collaboration
-- **Real-time Memory Pipeline**: Live monitoring and embedding generation
+- **Multi-Source Data Pipeline**: VS Code workspaces + JSON sessions + metadata extraction
+- **Dual-AI Analysis**: Ollama (qwen2.5-coder:7b) for real-time + Claude Opus for deep analysis  
+- **Comprehensive Coverage**: 2,799+ sessions across 20 workspace directories (43MB+ data)
+- **Semantic Relationship Engine**: Neo4j-backed knowledge graph with relationship mapping
+- **Real-time + Historical**: Live monitoring combined with comprehensive workspace extraction
+- **Cost-Optimized Intelligence**: Ollama for frequent operations, Claude for deep insights
 
 ## System Status
 
-**Current State (January 29, 2025)**:
+**Current State (August 31, 2025)**:
 
-- **Neo4j Enterprise**: 125 entities and 26 relationships in unified knowledge graph
-- **Memento MCP**: @gannonh/memento-mcp v0.3.9 integrated with VS Code
-- **Memory Pipeline**: embedding-indexer.js running (PID 52143), orchestrator and chat-scribe ready
-- **Docker Environment**: hextrackr-neo4j-dev container operational on localhost:7687
-- **Knowledge Integration**: Complete merge of .rMemory archives with live Neo4j backend
+- **Multi-Source Extraction**: 2,799 sessions from 20 VS Code workspace directories
+- **Data Volume**: 43MB+ conversation data with importance scoring (0-5 levels)
+- **Real-time Scribe**: Enhanced with ChatDatabaseExtractor integration
+- **SQLite Storage**: Extended-memory.db + memory-mcp.db + symbol_index.db
+- **JSON Summaries**: Time-based summaries (10min/30min/60min windows)
+- **Cost Optimization**: Ollama for monitoring, Claude Opus for analysis
 
 ## Core Components
 
-### 1. **Perfect Continuity Experience**
+### 1. **Multi-Source Data Pipeline**
 
-- **Agent Context Loader**: Comprehensive briefings with project state, frustrations, roadmap
-- **Boot Protocols**: Instant context loading for any new chat session via `.prompts/perfect-continuity-boot.prompt.md`
-- **Memory-First Search**: Always start with project memory before planning
-- **Relationship Continuity**: Consistent collaborative tone and preferences
-- **Seamless Session Handoffs**: "Never-ending friendship" collaboration experience
+**VS Code Data Sources**:
 
-### 2. **Frustration Learning & Prevention**
+- **SQLite Databases**: workspace-chunks.db, local-index.1.db (comprehensive historical conversations)
+- **JSON Chat Sessions**: Real-time conversation files with immediate updates
+- **Session Metadata**: Timestamps, authentication state, performance metrics
 
-- **Frustration Matrix**: Claude Opus-powered analysis of development pain points
-- **Prevention Strategies**: Automatic generation of solutions for recurring issues
-- **Pain Point Classification**: Categorization and searchable storage of frustrations
-- **Time Impact Analysis**: Productivity impact assessment and resolution tracking
-- **Proactive Detection**: Real-time monitoring for similar problem patterns
+**Data Extraction**:
 
-### 3. **.rMemory Scribes System**
+- **ChatDatabaseExtractor.js**: Enhanced multi-workspace scanner covering 20 directories
+- **Real-time Monitoring**: Live JSON session monitoring with 30-second intervals
+- **Importance Scoring**: 0-5 level classification (2,799 sessions processed)
+- **Volume**: 43MB+ conversation data with semantic indexing
 
-**Core Processing Scripts** (`.rMemory/core/`):
+### 2. **Dual AI Analysis Engine**
 
-- **`embedding-indexer.js`**: Currently running (PID 52143) - handles embedding and search matrix generation
-- **`memory-orchestrator.js`**: Main pipeline orchestrator using qwen2.5-coder:7b model
-- **`realtime-chat-scribe.js`**: Monitors VS Code chat databases in real-time
+**Ollama (qwen2.5-coder:7b) - Real-time Operations**:
+
+- 15-minute conversation summaries
+- Pattern recognition and anomaly detection
+- Real-time monitoring (30-second intervals)
+- Cost: $0/month (local processing)
+
+**Claude Opus - Deep Analysis**:
+
+- Comprehensive conversation analysis for all 2,799 sessions
+- Semantic relationship extraction and gap filling
+- Context enhancement and entity linking
+- Estimated cost: ~$22.50/month operational
+
+### 3. **Dual Storage Architecture**
+
+**SQLite Databases** (`.rMemory/sqlite/`):
+
+- **extended-memory.db**: Comprehensive historical storage
+- **memory-mcp.db**: Memento MCP integration data
+- **symbol_index.db**: Code symbols and entity relationships
+
+**JSON Summaries** (`.rMemory/json/`):
+
+- **time-summaries.json**: 10min/30min/60min time windows
+- **realtime-chat-data.json**: Live conversation monitoring
+- **evidence.json**: Structured conversation evidence
+- **symbols-table.json**: Entity and relationship index
 - **`chat-scanner.js`**: Processes chat logs for decision extraction
 
 **Analysis Tools** (`.rMemory/scribes/`):
