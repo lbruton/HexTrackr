@@ -691,13 +691,8 @@ app.get("/api/docs/stats", async (req, res) => {
 // Clear data endpoint
 app.delete("/api/backup/clear/:type", (req, res) => {
     const { type } = req.params;
-    let query = "";
     
-    if (type === "vulnerabilities") {
-        query = "DELETE FROM vulnerabilities";
-    } else if (type === "tickets") {
-        query = "DELETE FROM tickets";
-    } else if (type === "all") {
+    if (type === "all") {
         // For 'all', we'll run multiple queries
         db.run("DELETE FROM vulnerabilities", (vulnErr) => {
             if (vulnErr) {
@@ -715,7 +710,13 @@ app.delete("/api/backup/clear/:type", (req, res) => {
             });
         });
         return; // Exit early since we're handling the response in the nested callbacks
-    } else {
+    }
+    
+    // Determine query based on type - using const for better code quality
+    const query = type === "vulnerabilities" ? "DELETE FROM vulnerabilities" :
+                  type === "tickets" ? "DELETE FROM tickets" : null;
+    
+    if (!query) {
         res.status(400).json({ error: "Invalid data type" });
         return;
     }
