@@ -160,6 +160,119 @@ Last updated: August 30 2025
     - [ ] Model consensus system for critical decisions
     - [ ] Automated comparison reports across providers
 
+### 🌐 **HTML/JavaScript Development Tools Enhancement** (Priority: MEDIUM)
+
+**Expansion of Core 5-Tool Framework** - Adds 12 specialized tools for web application development
+
+#### **Phase 1: Core Browser & Security Integration** (Q2 2025)
+
+- [ ] **microsoft/playwright-mcp - Official Browser Automation** 
+  - [ ] Setup official Microsoft Playwright MCP server for AI-driven browser automation
+  - [ ] Integrate with existing Playwright testing infrastructure (requires Docker restart)
+  - [ ] Enable LLM interaction with web pages through accessibility snapshots
+  - [ ] Success criteria: Streamlined browser testing workflow with AI assistance
+  - [ ] Use cases: Automated UI testing, visual regression detection, accessibility validation
+
+- [ ] **qianniuspace/mcp-security-audit - NPM Dependency Security**
+  - [ ] Setup NPM security vulnerability auditor with remote registry integration
+  - [ ] Implement real-time dependency security checks for Node.js projects
+  - [ ] Create automated security alerts for new package vulnerabilities
+  - [ ] Success criteria: 100% dependency security coverage with real-time alerts
+  - [ ] Use cases: Dependency vulnerability detection, package security validation
+  - [ ] Integration: Complements semgrep-mcp (code) with dependency-level security
+
+- [ ] **docker/hub-mcp - Official Docker Hub Integration**
+  - [ ] Setup official Docker Hub MCP server for container workflow enhancement
+  - [ ] Enable repository management, image search, and Docker Hardened Images access
+  - [ ] Integrate with existing containerized deployment processes
+  - [ ] Success criteria: Streamlined Docker operations with AI assistance
+  - [ ] Use cases: Image management, security-hardened container selection, deployment automation
+
+#### **Phase 2: Development Workflow Enhancement** (Q3 2025)
+
+- [ ] **sammcj/mcp-package-version - Package Management Efficiency**
+  - [ ] Setup package version suggestion server for latest stable versions
+  - [ ] Prevent outdated package usage during development with real-time suggestions
+  - [ ] Support NPM, PyPI, NuGet, and Cargo package registries
+  - [ ] Success criteria: 95% up-to-date package usage in new development
+  - [ ] Use cases: Dependency version management, security through currency
+
+- [ ] **neilberkman/editorconfig_mcp - Automatic Code Formatting**
+  - [ ] Setup EditorConfig-based automatic code formatting enforcement
+  - [ ] Integrate with pre-commit hooks for proactive formatting validation
+  - [ ] Ensure AI-generated code adheres to project formatting standards
+  - [ ] Success criteria: 100% consistent code formatting without manual intervention
+  - [ ] Use cases: Code consistency, reduced formatting-related PR comments
+  - [ ] Integration: Complements lucidity-mcp quality analysis with formatting enforcement
+
+- [ ] **r33drichards/mcp-js - JavaScript Execution Sandbox**
+  - [ ] Setup V8-isolated JavaScript execution environment for safe code testing
+  - [ ] Enable secure execution of AI-generated JavaScript without security risks
+  - [ ] Implement heap snapshotting for persistent development sessions
+  - [ ] Success criteria: Safe code experimentation with zero security incidents
+  - [ ] Use cases: Code prototyping, AI-generated script validation, safe testing
+
+#### **Phase 3: Advanced Capabilities** (Q4 2025)
+
+- [ ] **ananddtyagi/webpage-screenshot-mcp - Visual UI Development**
+  - [ ] Setup webpage screenshot capture for UI development feedback loops
+  - [ ] Enable visual regression testing and UI validation workflows
+  - [ ] Integrate with existing Playwright testing for enhanced visual validation
+  - [ ] Success criteria: Automated visual testing pipeline with AI analysis
+  - [ ] Use cases: Visual regression testing, UI development feedback, accessibility screenshots
+
+- [ ] **automation-ai-labs/mcp-link - API Integration Tools**
+  - [ ] Setup OpenAPI schema-based API integration for seamless backend connectivity
+  - [ ] Enable AI agents to interact with any API using OpenAPI specifications
+  - [ ] Streamline API testing and development workflow automation
+  - [ ] Success criteria: 80% reduction in manual API integration time
+  - [ ] Use cases: API testing automation, backend service integration, workflow automation
+
+- [ ] **grafana/mcp-grafana - Production Monitoring Integration**
+  - [ ] Setup Grafana integration for AI-driven monitoring and incident investigation
+  - [ ] Enable dashboard search, datasource queries, and alert management
+  - [ ] Create automated incident response with AI-powered analysis
+  - [ ] Success criteria: 50% faster incident investigation and resolution
+  - [ ] Use cases: Production monitoring, performance analysis, incident response
+  - [ ] Integration: Complements static analysis with runtime monitoring insights
+
+#### **Phase 4: Specialized Enhancement Tools** (2026+)
+
+- [ ] **davidan90/time-node-mcp - Timezone Operations**
+  - [ ] Timezone-aware date/time operations with IANA timezone support
+  - [ ] Handle Daylight Saving Time complexity for global applications
+  - [ ] Success criteria: Zero timezone-related bugs in production
+
+- [ ] **gorosun/unified-diff-mcp - Enhanced Diff Visualization**
+  - [ ] Generate and visualize unified diff comparisons with HTML/PNG output
+  - [ ] Support side-by-side and line-by-line diff views for code review
+  - [ ] Success criteria: Enhanced code review process with visual diff analysis
+
+- [ ] **cjo4m06/mcp-shrimp-task-manager - Programming-Focused Project Management**
+  - [ ] Programming-specific task management with self-reflection and dependency tracking
+  - [ ] Enhance coding agent capabilities with advanced task memory
+  - [ ] Success criteria: Improved project tracking for development workflows
+
+#### **Integration Strategy & Success Metrics**
+
+- [ ] **Framework Integration Assessment**
+  - [ ] Evaluate 17-tool comprehensive framework (5 core + 12 HTML/JS tools)
+  - [ ] Measure complementary value vs overlap with existing 5-tool framework
+  - [ ] Document tool selection criteria for future HTML/JavaScript enhancements
+  - [ ] Success criteria: Each tool provides unique value without redundancy
+
+- [ ] **HTML/JavaScript Development Workflow Optimization**
+  - [ ] Integrate browser automation, dependency security, and code quality tools
+  - [ ] Create unified development workflow with AI-enhanced capabilities
+  - [ ] Measure development cycle time improvements for web application features
+  - [ ] Success criteria: 40% reduction in HTML/JavaScript development cycle time
+
+- [ ] **Phased Implementation Success Validation**
+  - [ ] Phase 1: Core browser testing and security dependency management
+  - [ ] Phase 2: Development workflow efficiency and code quality enforcement
+  - [ ] Phase 3: Advanced monitoring and API integration capabilities
+  - [ ] Phase 4: Specialized tools for complex web application requirements
+
 ---
 
 ## 📊 **v1.2.0 - MONITORING & OBSERVABILITY**
