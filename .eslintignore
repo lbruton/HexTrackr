@@ -1,0 +1,19 @@
+# ESLint ignore patterns
+node_modules/
+**/node_modules/
+dist/
+build/
+coverage/
+uploads/
+
+# Minified files
+**/*.min.js
+scripts/chart.min.js
+scripts/utils/purify.min.js
+
+# Temporary directories
+**/temp/
+**/tmp/
+
+# Configuration files that are already properly configured
+.eslintrc.js
