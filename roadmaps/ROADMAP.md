@@ -113,6 +113,22 @@ Last updated: August 30 2025
     - [ ] Test security review outsourcing to specialized models (Claude, GPT-4)
     - [ ] Success criteria: 70% reduction in manual code review time
     - [ ] Use cases: Codacy compliance automation, documentation accuracy validation
+  - [ ] **FileScopeMCP Codebase Analysis Integration** (Q2 2025)
+    - [ ] Setup FileScopeMCP for HexTrackr dependency analysis and file importance scoring
+    - [ ] Generate architecture visualization with Mermaid diagrams and dependency maps
+    - [ ] Implement automated file importance tracking for security sprint planning
+    - [ ] Create file summaries for critical components (server.js, security.js, etc.)
+    - [ ] Success criteria: 80% faster architecture comprehension for new contributors
+    - [ ] Use cases: Impact analysis for security fixes, code review prioritization
+  - [ ] **semgrep-mcp Advanced Security Analysis** (Q2 2025)
+    - [ ] Setup semgrep-mcp server alongside existing Codacy CLI integration
+    - [ ] Create custom semgrep rules for HexTrackr-specific vulnerability patterns
+    - [ ] Implement real-time security scanning during development (vs batch Codacy analysis)
+    - [ ] Use AST analysis for deeper code understanding and pattern detection
+    - [ ] Build interactive security rule development workflow
+    - [ ] Success criteria: 60% faster custom security pattern detection vs Codacy
+    - [ ] Use cases: XSS pattern detection, path traversal rules, HexTrackr-specific security patterns
+    - [ ] Integration: Complement Codacy compliance with real-time development security feedback
   - [ ] **Pattern Library Development**
     - [ ] Store HexTrackr-specific XSS protection patterns
     - [ ] Accumulate Codacy compliance solution templates
