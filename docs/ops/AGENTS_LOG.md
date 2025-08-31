@@ -1,6 +1,8 @@
 # | Date | Agent | Actions | Artifacts | Next Steps |
 
 |------|--------|---------|-----------|------------|
+| 2025-08-30 | GitHub Copilot | Wired Opus deep-scan into MCP with rolling context; added storeOpusAnalysis (notes/todos/plans); 24h Neo4j prune; updated sprint roadmap | .rMemory/scribes/real-time-scribe.js, .rMemory/tools/symbol-table-processor.js, .rMemory/core/hierarchical-memory-organizer.js, .rMemory/roadmaps/SPRINT-GPT-MEMORY-MCP-INTEGRATION.md | Build code_index adapter; run organizer categorize+prune; bulk re-ingest chats and verify topicKey reconciliation |
+| 2025-08-30 | GitHub Copilot | Added MCP sync to code symbol indexer via --sync-mcp flag; populated code_index in memory-mcp.db; generated JSON indices | scripts/code-symbol-indexer.js; .rMemory/sqlite/memory-mcp.db (code_index); .rMemory/json/symbol-index.json; .rMemory/json/memento-import.json | Run organizer categorize + prune; kick off bulk chat re-ingestion |
 | 2025-08-30 | GitHub Copilot | GUI path fix; Symbol Table LLM backstop + simhash dedup; evidence→notes reconciliation keyed by topic; Codacy checks | .rMemory/gui/rmemory-control-center.py, .rMemory/tools/symbol-table-processor.js, .rMemory/scribes/real-time-scribe.js, docs/adr/ADR-0006-llm-backstop-classification.md | Bulk chat re-ingest, run organizer categorize step, wire CLI buttons to reconcile per topic and show counts |
 | 2025-01-29 | GitHub Copilot | Memory restoration complete: 109 entities + 7 relationships restored to Memento MCP | Working memory scripts in .rMemory/core/, Neo4j Enterprise operational | Start memory-orchestrator.js and realtime-chat-scribe.js, verify memory scribe recording |gents Operations Log
 
