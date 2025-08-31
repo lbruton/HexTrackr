@@ -31,9 +31,11 @@ module.exports = {
     "build/**",
     "coverage/**",
     "scripts/chart.min.js",
+    "scripts/utils/purify.min.js",
     "**/*.min.js",
     "**/temp/**",
-    "**/tmp/**"
+    "**/tmp/**",
+    "uploads/**"
   ],
   overrides: [
     {
