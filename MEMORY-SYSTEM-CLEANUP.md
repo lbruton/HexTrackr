@@ -62,10 +62,12 @@ Based on GUI and testing:
    - Clean up startup scripts
    - Remove unused scribes
 
-1. **Phase 2: Database Cleanup** (15 min)  
-   - Identify core vs scattered entities
-   - Wipe non-essential memories
-   - Preserve HexTrackr/project data
+1. **Phase 2: Database Cleanup (Graph + SQLite)** (30-45 min)
+    - Neo4j (dev): backup, then prune noisy relationships
+       - Delete transitive/precomputed relations: SAME_PROJECT, PRECEDED_BY (transitive), REDUNDANT_LINKS
+       - Rebuild with Symbol Table outputs (Evidence→Note→CodeSymbol edges only)
+    - SQLite: vacuum and reindex FTS5 after pruning
+    - Preserve HexTrackr/rMemory/StackTrackr core nodes and current sprint entities
 
 1. **Phase 3: Documentation** (30 min)
    - Rewrite Memory-System.md accurately
@@ -73,9 +75,10 @@ Based on GUI and testing:
    - Update sprint status
 
 1. **Phase 4: Re-generation** (45 min)
-   - Run working scribes to populate clean data
-   - Test Evidence processing
-   - Verify Canonical Notes generation
+   - Run real-time scribe and reconcile per-topic
+   - Test Evidence processing end-to-end
+   - Verify Canonical Notes generation and citations
+   - Run organizer once to rebuild essential relationships only
 
 1. **Phase 5: Verification** (30 min)
    - Full system test via GUI
@@ -88,6 +91,7 @@ Based on GUI and testing:
 - [ ] Clean database with only core data
 - [ ] Accurate documentation of working system
 - [ ] Evidence → Canonical Notes → Todos pipeline operational
+- [ ] FTS5 searchable code_index populated and synced
 - [ ] GUI shows all services green/running
 - [ ] Ready to continue sprint development
 
