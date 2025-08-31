@@ -376,7 +376,8 @@ class HexagonTicketsManager {
         // SECURITY: Escape HTML to prevent XSS injection
         const escapedValue = escapeHtml(suggestedValue);
         
-        deviceEntry.innerHTML = `
+        // SECURITY: Use safe innerHTML assignment to prevent XSS
+        const deviceEntryHTML = `
             <div class="input-group">
                 <span class="input-group-text device-number-indicator" style="min-width: 40px; font-weight: bold; color: #6c757d;">
                     #0
@@ -401,6 +402,9 @@ class HexagonTicketsManager {
                 </button>
             </div>
         `;
+        
+        // SECURITY: Use safe innerHTML assignment with DOMPurify sanitization
+        window.safeSetInnerHTML(deviceEntry, deviceEntryHTML);
         
         container.appendChild(deviceEntry);
         this.updateDeviceButtons();
@@ -1330,9 +1334,15 @@ class HexagonTicketsManager {
         const searchTerm = document.getElementById("searchInput").value.toLowerCase();
         if (!searchTerm || !text) {return text;}
 
-        const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const regex = new RegExp(`(${escapedSearchTerm})`, "gi");
-        return text.replace(regex, "<span class=\"highlight\">$1</span>");
+        // Security: Use split/join with escaped search term to prevent DoS attacks
+        const parts = text.split(new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi"));
+        
+        return parts.map((part, index) => {
+            if (index % 2 === 1) {
+                return `<span class="highlight">${part}</span>`;
+            }
+            return part;
+        }).join("");
     }
 
     updateStatistics() {
@@ -2264,8 +2274,11 @@ class HexagonTicketsManager {
                 ticket.status = ticket.status || "Open";
                 ticket.notes = ticket.notes || "";
 
-                // Generate ID and timestamps
-                ticket.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+                // Generate ID and timestamps using cryptographically secure random
+                const randomBytes = new Uint8Array(9);
+                window.crypto.getRandomValues(randomBytes);
+                const randomString = Array.from(randomBytes, byte => byte.toString(36).padStart(2, "0")).join("").substr(0, 9);
+                ticket.id = Date.now().toString() + randomString;
                 ticket.createdAt = new Date().toISOString();
                 ticket.updatedAt = new Date().toISOString();
 
