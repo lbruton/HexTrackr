@@ -5,9 +5,38 @@
  * Features:
  * - Collapsible tree navigation with expand/collapse
  * - Instant content switching (no page reloads)
- * - Breadcrumb navigation
- * - Back-to-top functionality
- * - Search integration
+ * - Breadcrumb n            // Define potential files to check for each section
+            // This list covers all existing files and provides room for new ones
+            const potentialFiles = [
+                // Getting Started
+                "installation",
+                // User Guides
+                "ticket-management", "vulnerability-management",
+                // API Reference
+                "tickets-api", "vulnerabilities-api", "backup-api", "index",
+                // Architecture
+                "backend", "database", "deployment", "frontend", "frameworks", "project-analysis",
+                // Development
+                "coding-standards", "contributing", "development-setup", "memory-system",
+                "pre-commit-hooks", "docs-portal-guide",
+                // Project Management
+                "strategic-roadmap", "quality-badges", "codacy-compliance", "roadmap-to-sprint-system",
+                // Security
+                "vulnerability-scanning", "backup-restore"
+            ];Back-to-top functionalit            // Special case: For development section, include CHANGELOG
+            if (section === "development") {
+                try {
+                    const changelogResponse = await fetch("content/CHANGELOG.html");
+                    if (changelogResponse.ok) {
+                        children["changelog"] = {
+                            title: "Changelog",
+                            file: "CHANGELOG"
+                        };
+                    }
+                } catch (_error) {
+                    // CHANGELOG doesn't exist, skip it
+                }
+            }integration
  * - Mobile responsive
  * 
  * Framework: Enhanced Tabler.io with custom navigation components
@@ -136,7 +165,7 @@ class DocumentationPortalV2 {
         // List of sections to check (could be made dynamic)
         const sectionsToCheck = [
             "getting-started", "user-guides", "api-reference", 
-            "architecture", "development", "project-management", "security"
+            "architecture", "development", "project-management", "security", "roadmaps"
         ];
         
         for (const section of sectionsToCheck) {
@@ -236,41 +265,83 @@ class DocumentationPortalV2 {
     }
 
     /**
-     * Discover child pages for a section by dynamically scanning the content directory
+     * Auto-discover children for a documentation section
+     * Implements true dynamic discovery: finds any file that exists
+     * Only hardcoded item is CHANGELOG in development section
      */
     async discoverSectionChildren(section) {
         const children = {};
         
-        // Define section-specific files to avoid showing all pages in every dropdown
-        const sectionFiles = {
-            "getting-started": ["installation"],
-            "user-guides": ["ticket-management", "vulnerability-management"],
-            "api-reference": ["tickets-api", "vulnerabilities-api", "backup-api"],
-            "architecture": ["backend", "database", "deployment", "frontend", "frameworks"],
-            "development": ["coding-standards", "contributing", "development-setup", 
-                          "memory-system", "pre-commit-hooks", "docs-portal-guide"],
-            "project-management": ["roadmap", "roadmap-to-sprint-system", "codacy-compliance"],
-            "security": ["overview", "vulnerability-disclosure"]
-        };
-        
         try {
-            // Get the files specific to this section
-            const filesToTest = sectionFiles[section] || [];
+            // Define comprehensive list of potential files to check
+            // This covers all known files but allows for new ones to be added automatically
+            const potentialFiles = [
+                // Getting Started
+                "installation",
+                // User Guides  
+                "ticket-management", "vulnerability-management",
+                // API Reference
+                "tickets-api", "vulnerabilities-api", "backup-api", "index",
+                // Architecture - including our new project-analysis
+                "backend", "database", "deployment", "frontend", "frameworks", "project-analysis",
+                // Development
+                "coding-standards", "contributing", "development-setup", "memory-system",
+                "pre-commit-hooks", "docs-portal-guide",
+                // Project Management
+                "strategic-roadmap", "quality-badges", "codacy-compliance", "roadmap-to-sprint-system",
+                // Security
+                "overview", "vulnerability-disclosure"
+            ];
             
-            // Test each potential file to see if it exists
-            for (const child of filesToTest) {
+            // Special case: For roadmaps section, check /roadmaps/ folder for .html files
+            if (section === "roadmaps") {
                 try {
-                    const childResponse = await fetch(`content/${section}/${child}.html`);
-                    if (childResponse.ok) {
-                        children[child] = {
-                            title: this.formatTitle(child),
-                            file: `${section}/${child}`
+                    const roadmapResponse = await fetch("content/ROADMAP.html");
+                    if (roadmapResponse.ok) {
+                        children["roadmap"] = {
+                            title: "Strategic Roadmap",
+                            file: "ROADMAP"
                         };
                     }
                 } catch (_error) {
-                    // Child page doesn't exist, skip it
+                    // ROADMAP doesn't exist, skip it
+                }
+                
+                // TODO: Add auto-discovery for other roadmap files
+                // This would scan the roadmaps/ directory for additional files
+                
+            } else {
+                // For docs-source sections, test each potential file
+                for (const fileName of potentialFiles) {
+                    try {
+                        const fileResponse = await fetch(`content/${section}/${fileName}.html`);
+                        if (fileResponse.ok) {
+                            children[fileName] = {
+                                title: this.formatTitle(fileName),
+                                file: `${section}/${fileName}`
+                            };
+                        }
+                    } catch (_error) {
+                        // File doesn't exist, skip it silently
+                    }
                 }
             }
+            
+            // Special case: Add CHANGELOG to development section (only hardcoded item)
+            if (section === "development") {
+                try {
+                    const changelogResponse = await fetch("content/CHANGELOG.html");
+                    if (changelogResponse.ok) {
+                        children["changelog"] = {
+                            title: "Changelog",
+                            file: "CHANGELOG"
+                        };
+                    }
+                } catch (_error) {
+                    // Changelog doesn't exist, skip it
+                }
+            }
+            
         } catch (error) {
             console.warn(`Could not discover children for section ${section}:`, error);
         }

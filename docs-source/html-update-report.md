@@ -1,8 +1,8 @@
 # HTML Generation Report
 
-Generated: 2025-08-31T15:32:44.500Z
-Duration: 1.8s
-Files Generated: 34
+Generated: 2025-08-31T23:31:29.890Z
+Duration: 1.9s
+Files Generated: 35
 Errors: 0
 
 ## Generated Files
@@ -17,6 +17,7 @@ Errors: 0
 - architecture/frameworks.html
 - architecture/frontend.html
 - architecture/index.html
+- architecture/project-analysis.html
 - development/coding-standards.html
 - development/contributing.html
 - development/development-setup.html
@@ -44,4 +45,4 @@ Errors: 0
 
 ## Summary
 
-The HTML generator successfully created 34 HTML files from their corresponding markdown sources using the master template.
+The HTML generator successfully created 35 HTML files from their corresponding markdown sources using the master template.
