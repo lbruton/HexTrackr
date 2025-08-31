@@ -84,6 +84,7 @@
 <h2>Usage Examples</h2>
 <h3>Creating Project Status Memory</h3>
 <pre><code class="language-text">create_memory:
+
 - content: &quot;HexTrackr v1.0.3 release blocked by 4 critical Codacy security issues&quot;
 - importance_level: 9
 - memory_type: &quot;security-issue&quot;
@@ -91,12 +92,14 @@
 </code></pre>
 <h3>Setting Security Fix Reminder</h3>
 <pre><code class="language-text">create_reminder:
+
 - content: &quot;Complete Generic Object Injection fix in docs-prototype/generate-docs.js&quot;
 - due_datetime: &quot;2025-09-02T09:00:00Z&quot;
 - priority_level: 9
 </code></pre>
 <h3>Searching for Previous Solutions</h3>
 <pre><code class="language-text">search_memories:
+
 - query: &quot;Codacy security vulnerability fixes Generic Object Injection&quot;
 - min_importance: 7
 - memory_type: &quot;security-issue&quot;

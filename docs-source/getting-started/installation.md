@@ -12,7 +12,7 @@ HexTrackr is designed for Docker-only deployment to ensure a consistent and reli
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/your-username/HexTrackr.git
+    git clone https://github.com/Lonnie-Bruton/HexTrackr.git
     cd HexTrackr
     ```
 
@@ -27,3 +27,10 @@ HexTrackr is designed for Docker-only deployment to ensure a consistent and reli
 1. **Access HexTrackr:**
 
     The application will be available at `http://localhost:8080`.
+
+    **Application Endpoints:**
+
+    - **Tickets Management**: `http://localhost:8080/tickets.html`
+    - **Vulnerabilities Management**: `http://localhost:8080/vulnerabilities.html`
+    - **Documentation Portal**: `http://localhost:8080/docs-html/`
+    - **API Documentation**: `http://localhost:8080/docs-html/#api-reference`
