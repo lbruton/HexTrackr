@@ -29,7 +29,6 @@ start_mcp_server() {
 
 # Start each MCP server
 start_mcp_server "filescope-mcp" "FileScopeMCP" 3500
-start_mcp_server "codacy-mcp" "CodacyMCP" 3501
 # Add more servers here as needed
 
 # Keep container running
