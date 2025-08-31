@@ -7,13 +7,11 @@ services:
       dockerfile: Dockerfile
     container_name: unified-mcp-server
     volumes:
-      # Mount each MCP server repository
-      - ../../FileScopeMCP:/mcp-servers/filescope-mcp
-      - ${CODACY_MCP_PATH:-../../CodacyMCP}:/mcp-servers/codacy-mcp
+      # Mount FileScopeMCP only - Codacy runs in VS Code
+      - /Volumes/DATA/GitHub/MCPServers/FileScopeMCP:/mcp-servers/filescope-mcp
       # Add more volume mounts as needed
     ports:
       - "3500:3500"  # FileScopeMCP
-      - "3501:3501"  # CodacyMCP
       # Add more port mappings as needed
     environment:
       - NODE_ENV=development
