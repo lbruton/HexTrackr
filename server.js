@@ -496,11 +496,35 @@ function findDocsSectionForFilename(filename) {
 // Only redirect direct section requests (not content files which are loaded by AJAX)
 app.get(/^\/docs-html\/([^\/]+)\.html$/, (req, res) => {
     let section = req.params[0];
+    
+    // Security: Validate section parameter against whitelist to prevent open redirect
+    const validSections = [
+        "getting-started", "user-guides", "development", "architecture", 
+        "api-reference", "project-management", "security", "index",
+        "getting-started/index", "getting-started/installation",
+        "user-guides/index", "user-guides/ticket-management", "user-guides/vulnerability-management",
+        "development/index", "development/coding-standards", "development/contributing", 
+        "development/development-setup", "development/docs-portal-guide", "development/memory-system", "development/pre-commit-hooks",
+        "architecture/index", "architecture/backend", "architecture/database", "architecture/deployment", 
+        "architecture/frameworks", "architecture/frontend",
+        "api-reference/index", "api-reference/backup-api", "api-reference/tickets-api", "api-reference/vulnerabilities-api",
+        "project-management/index", "project-management/codacy-compliance", "project-management/quality-badges", 
+        "project-management/roadmap-to-sprint-system", "project-management/strategic-roadmap",
+        "security/index", "security/overview", "security/vulnerability-disclosure",
+        "html-update-report", "CHANGELOG", "ROADMAP"
+    ];
+    
     // If the request is only a filename (no directory), try to resolve the correct section path
     if (!section.includes("/")) {
         const resolved = findDocsSectionForFilename(`${section}.html`);
         if (resolved) {section = resolved;}
     }
+    
+    // Security: Only redirect to valid sections, otherwise return 404
+    if (!validSections.includes(section)) {
+        return res.status(404).json({ error: "Documentation section not found" });
+    }
+    
     // Redirect to hash-based section so the SPA shell loads correctly
     res.redirect(302, `/docs-html/#${section}`);
 });
@@ -1275,6 +1299,6 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log("📊 Database-powered vulnerability management enabled");
   console.log("Available endpoints:");
   console.log(`  - Tickets: http://localhost:${PORT}/tickets.html`);
-  console.log(`  - Vulnerabilities: http://localhost:${PORT}/vulnerabilities-new.html`);
+  console.log(`  - Vulnerabilities: http://localhost:${PORT}/vulnerabilities.html`);
   console.log(`  - API: http://localhost:${PORT}/api/vulnerabilities`);
 });

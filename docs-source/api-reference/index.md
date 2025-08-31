@@ -4,9 +4,9 @@ This section provides a complete reference for the HexTrackr REST API.
 
 ## Endpoints
 
-- **[Tickets API](./tickets-api.html)**: Endpoints for managing tickets.
-- **[Vulnerabilities API](./vulnerabilities-api.html)**: Endpoints for managing vulnerabilities.
-- **[Backup & Restore API](./backup-api.html)**: Endpoints for backup and restore operations.
+- **[Tickets API](tickets-api.md)**: Endpoints for managing tickets.
+- **[Vulnerabilities API](vulnerabilities-api.md)**: Endpoints for managing vulnerabilities.
+- **[Backup & Restore API](backup-api.md)**: Endpoints for backup and restore operations.
 
 ## System Operations
 
