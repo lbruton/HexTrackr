@@ -20,8 +20,8 @@ export default [
     files: [
       "server.js",
       "docs-html/html-content-updater.js", 
-      "scripts/docs-mapping-analyzer.js",
-      "scripts/docs-repair-generator.js", 
+  "scripts/docs-mapping-analyzer.js",
+  "scripts/docs-repair-generator.js", 
       "scripts/fix-markdown.js",
       "scripts/generate-roadmap-portal.js",
       "scripts/init-database.js",
@@ -38,7 +38,8 @@ export default [
       "scripts/temp-scaffold-docs.js",
       "scripts/validation-utils.js", 
       "scripts/version-manager.js",
-      ".rMemory/core/ollama-embedding-proxy.js"
+  ".rMemory/core/ollama-embedding-proxy.js",
+  ".rMemory/tools/*.js"
     ],
     languageOptions: {
       ecmaVersion: 2022,
