@@ -111,5 +111,56 @@ if [ $OVERALL_STATUS -ne 0 ]; then
   exit $OVERALL_STATUS
 fi
 
+# ============================================================================
+# PAM CONVERSATION STORAGE
+# ============================================================================
+echo "\n${CYAN}[pre-commit]${NC} Storing conversation in Persistent AI Memory..."
+
+# Get commit message and staged files for context
+COMMIT_MSG_FILE=".git/COMMIT_EDITMSG"
+STAGED_FILES=$(git diff --cached --name-only | head -10 | tr '\n' ', ' | sed 's/,$//')
+
+# Create conversation content
+if [ -f "$COMMIT_MSG_FILE" ]; then
+  COMMIT_MSG=$(cat "$COMMIT_MSG_FILE" 2>/dev/null || echo "Code changes committed")
+else
+  COMMIT_MSG="Code changes committed"
+fi
+
+CONVERSATION_CONTENT="Git commit on $(date '+%Y-%m-%d %H:%M:%S')
+Commit message: $COMMIT_MSG
+Files modified: $STAGED_FILES
+Repository: HexTrackr
+Branch: $(git branch --show-current 2>/dev/null || echo 'unknown')"
+
+# Store conversation context for PAM processing
+echo "${GREEN}[pre-commit]${NC} Preparing commit context for PAM storage..."
+
+# Create commit context file that can be processed by PAM when next accessed
+SESSION_ID="git-commit-$(date '+%Y-%m-%d')"
+TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+# Store context in a format ready for store_conversation tool
+cat > "/tmp/hextrackr_commit_context_$(date +%s).json" << EOF
+{
+  "tool": "store_conversation",
+  "parameters": {
+    "content": "$CONVERSATION_CONTENT",
+    "role": "system", 
+    "session_id": "$SESSION_ID",
+    "metadata": {
+      "source": "git-commit-hook",
+      "timestamp": "$TIMESTAMP",
+      "project": "hextrackr",
+      "commit_sha": "$(git rev-parse HEAD 2>/dev/null || echo 'pending')",
+      "branch": "$(git branch --show-current 2>/dev/null || echo 'unknown')"
+    }
+  }
+}
+EOF
+
+echo "${GREEN}[pre-commit]${NC} Commit context ready for PAM storage 📝"
+echo "${CYAN}[pre-commit]${NC} Next VS Code session will process this commit context automatically"
+
 echo "\n${GREEN}[pre-commit]${NC} All code quality checks passed! ✅"
 exit 0
