@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* eslint-env node */
-/* global require, module, __dirname, console */
+/* global require, module, __dirname, console, process */
 
 /**
  * Code Symbol Indexer
@@ -14,10 +14,15 @@ require("dotenv").config();
 const fs = require("fs").promises;
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
-const { execSync } = require("child_process");
+// const { execSync } = require("child_process"); // unused
 
 // For AST parsing
 const esprima = require("esprima");
+const crypto = require("crypto");
+
+// Path helpers shared with rMemory tools
+const RMEMORY_SQLITE_DIR = path.join(__dirname, "..", ".rMemory", "sqlite");
+const MCP_DB_PATH = path.join(RMEMORY_SQLITE_DIR, "memory-mcp.db");
 
 class CodeSymbolIndexer {
     constructor() {
@@ -41,8 +46,11 @@ class CodeSymbolIndexer {
             "__MACOSX"
         ];
         
-        // Initialize SQLite database
-        this.initDatabase();
+    // Initialize local symbol SQLite database (for quick, real-time lookups)
+    this.initDatabase();
+
+    // Lazy handle to Memory MCP DB
+    this.mcpDb = null;
     }
 
     /**
@@ -79,6 +87,58 @@ class CodeSymbolIndexer {
             } else {
                 console.log("🗃️  Database initialized");
             }
+        });
+    }
+
+    /**
+     * Ensure Memory MCP database exists and schema is initialized.
+     * We only create the connection; schema is created by the SymbolTableProcessor.
+     */
+    async ensureMcpDb() {
+        if (this.mcpDb) {return this.mcpDb;}
+        // Ensure directory exists
+        require("fs").mkdirSync(RMEMORY_SQLITE_DIR, { recursive: true });
+        this.mcpDb = new sqlite3.Database(MCP_DB_PATH);
+        return this.mcpDb;
+    }
+
+    /**
+     * Upsert a single symbol into Memory MCP code_index table.
+     */
+    async upsertSymbolIntoMcp(symbol) {
+        const db = await this.ensureMcpDb();
+        const id = crypto.createHash("sha1").update([
+            symbol.project || "HexTrackr",
+            symbol.file,
+            symbol.type,
+            symbol.name,
+            symbol.lineStart,
+            symbol.lineEnd
+        ].join("|"), "utf8").digest("hex");
+
+        const insertSql = `INSERT OR REPLACE INTO code_index
+            (id, project, file, line_start, line_end, kind, name, signature, refs, doc)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+        return new Promise((resolve, reject) => {
+            db.run(insertSql, [
+                id,
+                symbol.project || "HexTrackr",
+                symbol.file,
+                symbol.lineStart || 0,
+                symbol.lineEnd || symbol.lineStart || 0,
+                symbol.type,
+                symbol.name,
+                symbol.signature || "",
+                JSON.stringify(symbol.refs || []),
+                symbol.documentation || ""
+            ], function(err) {
+                if (err && /no such table: code_index/.test(err.message)) {
+                    console.error("❗ Memory MCP schema missing. Run: node .rMemory/tools/symbol-table-processor.js to initialize.");
+                    return reject(err);
+                }
+                return err ? reject(err) : resolve(this.changes || 1);
+            });
         });
     }
 
@@ -135,6 +195,17 @@ class CodeSymbolIndexer {
                     
                     // Store symbols in SQLite for real-time access
                     await this.storeSymbolsInDatabase(symbols, file);
+
+                    // Optionally sync into Memory MCP code_index when flag is set
+                    if (process.argv.includes("--sync-mcp")) {
+                        for (const s of symbols) {
+                            try {
+                                await this.upsertSymbolIntoMcp(s);
+                            } catch (e) {
+                                console.warn(`⚠️  MCP sync failed for ${s.file}:${s.name} → ${e.message}`);
+                            }
+                        }
+                    }
                     
                     console.log(`📋 ${file.relativePath}: ${symbols.length} symbols`);
                 } catch (error) {
@@ -239,7 +310,7 @@ class CodeSymbolIndexer {
                     comments: true
                 });
                 this.extractSymbolsFromAST(ast, file, content, symbols);
-            } catch (moduleError) {
+            } catch (_moduleError) {
                 throw new Error(`Parse failed: ${parseError.message}`);
             }
         }
@@ -362,8 +433,7 @@ class CodeSymbolIndexer {
             return "...";
         }).join(", ") || "";
         
-        const prefix = node.static ? "static " : "";
-        const kind = node.kind === "constructor" ? "constructor" : "method";
+    const prefix = node.static ? "static " : "";
         
         return `${prefix}${name}(${params})`;
     }
@@ -371,7 +441,7 @@ class CodeSymbolIndexer {
     /**
      * Find nearest comment to a node (JSDoc style)
      */
-    findNearestComment(node, comments, lines) {
+    findNearestComment(node, comments, _lines) {
         if (!comments || !node.loc) {return null;}
         
         // Look for comment immediately before the node
