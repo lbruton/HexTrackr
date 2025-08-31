@@ -1,633 +1,121 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>HexTrackr Memory System - Perfect Continuity Architecture</h1>
-<p>This document outlines HexTrackr&#39;s unified <code>.rMemory</code> system that achieves <strong>perfect continuity</strong> where every chat feels like &quot;we never stopped working together&quot;.</p>
-<h2>System Overview</h2>
-<p>HexTrackr implements a breakthrough memory architecture combining multiple layers for seamless AI collaboration:</p>
+    <h1>Memory System Integration</h1>
+<h2>Overview</h2>
+<p>HexTrackr now integrates with a <strong>Persistent AI Memory</strong> system that provides continuity across conversation sessions, enabling intelligent context preservation, decision tracking, and workflow optimization.</p>
+<h2>Available Memory Tools</h2>
+<h3>Memory Management Tools</h3>
 <ul>
-<li><strong><code>.rMemory</code> Scribes System</strong>: Specialized AI analysis tools for frustration learning and context preservation</li>
-<li><strong>Memento MCP Integration</strong>: Neo4j Enterprise-backed persistent memory with semantic search (125 entities, 26 relationships)</li>
-<li><strong>Perfect Continuity Protocols</strong>: Instant project context loading and sprint awareness</li>
-<li><strong>Frustration Prevention Matrix</strong>: Learning from pain points to prevent repeated issues</li>
-<li><strong>Agent Context Loading</strong>: Complete briefings for seamless collaboration</li>
-<li><strong>Real-time Memory Pipeline</strong>: Live monitoring and embedding generation</li>
+<li><strong><code>create_memory</code></strong> - Create curated memory entries with importance levels, types, and tags</li>
+<li><strong><code>update_memory</code></strong> - Update existing memory entries (content, importance, tags)  </li>
+<li><strong><code>search_memories</code></strong> - Search memories using semantic similarity with filtering options</li>
 </ul>
-<h2>System Status</h2>
-<p><strong>Current State (January 29, 2025)</strong>:</p>
+<h3>Conversation Management</h3>
 <ul>
-<li><strong>Neo4j Enterprise</strong>: 125 entities and 26 relationships in unified knowledge graph</li>
-<li><strong>Memento MCP</strong>: @gannonh/memento-mcp v0.3.9 integrated with VS Code</li>
-<li><strong>Memory Pipeline</strong>: embedding-indexer.js running (PID 52143), orchestrator and chat-scribe ready</li>
-<li><strong>Docker Environment</strong>: hextrackr-neo4j-dev container operational on localhost:7687</li>
-<li><strong>Knowledge Integration</strong>: Complete merge of .rMemory archives with live Neo4j backend</li>
+<li><strong><code>store_conversation</code></strong> - Automatically store conversation content with roles and metadata</li>
+<li><strong><code>get_recent_context</code></strong> - Retrieve recent conversation context by session</li>
 </ul>
-<h2>Core Components</h2>
-<h3>1. <strong>Perfect Continuity Experience</strong></h3>
+<h3>Scheduling &amp; Reminders</h3>
 <ul>
-<li><strong>Agent Context Loader</strong>: Comprehensive briefings with project state, frustrations, roadmap</li>
-<li><strong>Boot Protocols</strong>: Instant context loading for any new chat session via <code>.prompts/perfect-continuity-boot.prompt.md</code></li>
-<li><strong>Memory-First Search</strong>: Always start with project memory before planning</li>
-<li><strong>Relationship Continuity</strong>: Consistent collaborative tone and preferences</li>
-<li><strong>Seamless Session Handoffs</strong>: &quot;Never-ending friendship&quot; collaboration experience</li>
+<li><strong><code>create_appointment</code></strong> - Create appointments with dates, locations, and descriptions</li>
+<li><strong><code>create_reminder</code></strong> - Create reminders with due dates and priority levels</li>
+<li><strong><code>get_reminders</code></strong> - Get up to 5 active (uncompleted) reminders, sorted by due date</li>
 </ul>
-<h3>2. <strong>Frustration Learning &amp; Prevention</strong></h3>
+<h3>AI Self-Reflection &amp; Analytics</h3>
 <ul>
-<li><strong>Frustration Matrix</strong>: Claude Opus-powered analysis of development pain points</li>
-<li><strong>Prevention Strategies</strong>: Automatic generation of solutions for recurring issues</li>
-<li><strong>Pain Point Classification</strong>: Categorization and searchable storage of frustrations</li>
-<li><strong>Time Impact Analysis</strong>: Productivity impact assessment and resolution tracking</li>
-<li><strong>Proactive Detection</strong>: Real-time monitoring for similar problem patterns</li>
+<li><strong><code>get_ai_insights</code></strong> - Get AI self-reflection insights and patterns</li>
+<li><strong><code>get_tool_usage_summary</code></strong> - Get AI tool usage summary and insights</li>
+<li><strong><code>reflect_on_tool_usage</code></strong> - AI self-reflection on tool usage patterns and effectiveness</li>
 </ul>
-<h3>3. <strong>.rMemory Scribes System</strong></h3>
-<p><strong>Core Processing Scripts</strong> (<code>.rMemory/core/</code>):</p>
+<h3>System Management</h3>
 <ul>
-<li><strong><code>embedding-indexer.js</code></strong>: Currently running (PID 52143) - handles embedding and search matrix generation</li>
-<li><strong><code>memory-orchestrator.js</code></strong>: Main pipeline orchestrator using qwen2.5-coder:7b model</li>
-<li><strong><code>realtime-chat-scribe.js</code></strong>: Monitors VS Code chat databases in real-time</li>
-<li><strong><code>chat-scanner.js</code></strong>: Processes chat logs for decision extraction</li>
+<li><strong><code>get_system_health</code></strong> - Get comprehensive system health, statistics, and database status</li>
 </ul>
-<p><strong>Analysis Tools</strong> (<code>.rMemory/scribes/</code>):</p>
+<h2>Key Features</h2>
 <ul>
-<li><strong><code>agent-context-loader.js</code></strong>: Generates comprehensive project briefings</li>
-<li><strong><code>frustration-matrix.js</code></strong>: Pain point analysis with prevention strategy generation</li>
-<li><strong><code>deep-chat-analysis.js</code></strong>: Enhanced memory processing with frustration tracking</li>
-<li><strong><code>real-time-analysis.js</code></strong>: Continuous learning monitor and proactive alerts</li>
+<li><strong>Semantic Search</strong> - Find relevant memories based on meaning, not just keywords</li>
+<li><strong>Importance Levels</strong> - Rank memories 1-10 for prioritization</li>
+<li><strong>Memory Types</strong> - Categorize memories (safety, preference, skill, general, etc.)</li>
+<li><strong>Cross-Session Continuity</strong> - Maintain context across different chat sessions</li>
+<li><strong>Database Filtering</strong> - Search across conversations, AI memories, schedule, or all data</li>
+<li><strong>Self-Reflection</strong> - AI can analyze its own tool usage patterns for improvement</li>
 </ul>
-<h3>4. <strong>Agent Playbooks &amp; Context Generation</strong></h3>
-<p><strong>Project-Specific Context</strong> (<code>.rMemory/agent-playbooks/</code>):</p>
+<h2>Memory Standards for HexTrackr</h2>
+<h3>Importance Levels</h3>
 <ul>
-<li><code>agent-playbook-hextrackr.md</code>: Complete HexTrackr project context</li>
-<li><code>agent-playbook-stacktrackr.md</code>: StackTrackr precious metals project context</li>
-<li><code>agent-playbook-rmemory-legacy.md</code>: Legacy rEngine ecosystem context</li>
-<li><code>agent-playbook-new-project.md</code>: Template for new project integration</li>
+<li><strong>8-10</strong>: Security issues, release blockers, critical decisions</li>
+<li><strong>5-7</strong>: Feature work, bug fixes, routine changes</li>
+<li><strong>1-4</strong>: Minor updates, documentation changes</li>
 </ul>
-<p><strong>Generated Context</strong> (<code>.rMemory/agent-context/</code>):</p>
+<h3>Required Tags</h3>
 <ul>
-<li><code>agent-briefing-YYYY-MM-DD.md</code>: Daily context summaries for instant chat startup</li>
-<li><code>context-data-YYYY-MM-DD.json</code>: Structured data for programmatic access</li>
+<li>Always include <code>[&quot;hextrackr&quot;]</code> plus specific tags:</li>
+<li><code>[&quot;security&quot;, &quot;codacy&quot;, &quot;release&quot;]</code> for security-related work</li>
+<li><code>[&quot;documentation&quot;, &quot;portal&quot;]</code> for documentation updates</li>
+<li><code>[&quot;architecture&quot;, &quot;decision&quot;]</code> for architectural choices</li>
 </ul>
-<h2>Architecture Evolution</h2>
-<h3>Current Architecture: Unified <code>.rMemory</code> Perfect Continuity System</h3>
-<p>Our breakthrough memory architecture combines multiple layers for perfect context preservation and real-time processing:</p>
-<pre><code class="language-text">.rMemory/
-├── core/                       # Working memory pipeline
-│   ├── embedding-indexer.js       # RUNNING (PID 52143) - embedding generation
-│   ├── memory-orchestrator.js     # Main pipeline orchestrator (qwen2.5-coder:7b)
-│   ├── realtime-chat-scribe.js    # VS Code chat monitoring
-│   └── chat-scanner.js            # Chat log processing
-├── scribes/                    # Specialized analysis tools
-│   ├── agent-context-loader.js    # Complete context briefing generator
-│   ├── frustration-matrix.js      # Pain point analysis &amp; prevention
-│   ├── deep-chat-analysis.js      # Enhanced memory processing
-│   └── real-time-analysis.js      # Continuous learning monitor
-├── agent-playbooks/            # Project-specific context briefings
-│   ├── agent-playbook-hextrackr.md    # HexTrackr project context
-│   ├── agent-playbook-stacktrackr.md  # StackTrackr project context
-│   ├── agent-playbook-rmemory-legacy.md # Legacy rEngine context
-│   └── agent-playbook-new-project.md  # Template for new projects
-├── agent-context/              # Generated briefings
-│   ├── agent-briefing-YYYY-MM-DD.md   # Daily context briefings
-│   └── context-data-YYYY-MM-DD.json   # Structured context data
-└── docs/ops/                   # Memory outputs
-    ├── frustration-analysis/        # Categorized pain points
-    └── live-insights/              # Real-time analysis results
-</code></pre>
-<h3>Integration with Memento MCP</h3>
-<p><strong>Current Configuration</strong>:</p>
+<h3>Memory Types</h3>
 <ul>
-<li><strong>memento-mcp v0.3.9</strong>: Neo4j Enterprise-backed MCP server for VS Code</li>
-<li><strong>Neo4j Enterprise</strong>: Graph database with 125 entities and 26 relationships</li>
-<li><strong>OpenAI Embeddings</strong>: text-embedding-3-small (1536 dimensions) for semantic search</li>
-<li><strong>Claude Opus Integration</strong>: Advanced analysis and frustration learning</li>
-<li><strong>Docker Environment</strong>: hextrackr-neo4j-dev container (localhost:7687, neo4j/qwerty1234)</li>
+<li><strong><code>security-issue</code></strong> - Security vulnerabilities and fixes</li>
+<li><strong><code>project-status</code></strong> - Current project state and milestones</li>
+<li><strong><code>user-preference</code></strong> - User coding standards and preferences</li>
+<li><strong><code>architectural-decision</code></strong> - Technical design choices and rationale</li>
 </ul>
-<p><strong>Entity Distribution</strong> (125 total):</p>
-<ul>
-<li>85 development_sessions: Detailed project work documentation</li>
-<li>14 canonical_notes: Authoritative project knowledge</li>
-<li>12 chat_sessions: VS Code interaction history</li>
-<li>3 chat_evidence_clusters: Aggregated collaboration evidence</li>
-<li>3 code_analysis: Symbol mapping and technical analysis</li>
-<li>Plus system entities: discoveries, handoffs, integrations</li>
-</ul>
-<h3>Perfect Continuity Protocols</h3>
-<p>Located in <code>.prompts/</code> folder for instant chat enhancement:</p>
-<ul>
-<li><strong><code>perfect-continuity-boot.prompt.md</code></strong>: Complete boot protocol for instant context loading</li>
-<li><strong><code>perfect-continuity-quick-start.md</code></strong>: Usage guide and example commands</li>
-<li><strong><code>agent-project-playbook-v2.prompt.md</code></strong>: Enhanced 7-step workflow with memory integration</li>
-</ul>
-<h4>How Perfect Continuity Works</h4>
+<h2>Integration with Development Workflow</h2>
+<h3>Agent Playbook Integration</h3>
+<p>The memory system is integrated into our 7-step agent playbook:</p>
 <ol>
-<li><strong>Pin Boot Protocol</strong>: Attach <code>perfect-continuity-boot.prompt.md</code> to new chat (📌)</li>
-<li><strong>Execute Protocol</strong>: &quot;Execute Perfect Continuity Boot Protocol&quot;</li>
-<li><strong>Instant Context</strong>: Agent loads recent briefing, searches memory, prevents frustrations</li>
-<li><strong>Sprint Awareness</strong>: Immediate knowledge of current phase, priorities, and next steps</li>
-<li><strong>Relationship Continuity</strong>: Maintains collaborative tone and working preferences</li>
+<li><strong>observe</strong> - Check reminders, search memories, get recent context</li>
+<li><strong>plan</strong> - Create memories for new work with proper importance and tags</li>
+<li><strong>safeguards</strong> - Store conversation state before major changes</li>
+<li><strong>execute</strong> - Apply changes incrementally</li>
+<li><strong>verify</strong> - Update memories if issues found or resolved</li>
+<li><strong>map-update</strong> - Update memories with decisions and outcomes</li>
+<li><strong>log</strong> - Store session summaries for major milestones</li>
 </ol>
-<p><strong>Result</strong>: &quot;Never-ending friendship&quot; collaboration where every chat feels continuous.</p>
-<h2>Perfect Continuity Usage</h2>
-<h3>Starting a New Chat Session</h3>
-<pre><code class="language-markdown">
-# 1. Attach: .prompts/perfect-continuity-boot.prompt.md
-
-# 2. Pin it to chat (📌)
-
-# 3. Execute command:
-
-Execute Perfect Continuity Boot Protocol.
-Load our current project context and sprint status.
+<h3>Memory-First Philosophy</h3>
+<p>🧠 <strong>Always check memory before file exploration</strong></p>
+<ul>
+<li>Memories contain context, decisions, and solutions from previous work</li>
+<li>Semantic search finds relevant information faster than folder navigation</li>
+<li>Previous solutions and patterns are preserved across sessions</li>
+<li>User preferences and project standards are maintained</li>
+</ul>
+<h2>Usage Examples</h2>
+<h3>Creating Project Status Memory</h3>
+<pre><code class="language-text">create_memory:
+- content: &quot;HexTrackr v1.0.3 release blocked by 4 critical Codacy security issues&quot;
+- importance_level: 9
+- memory_type: &quot;security-issue&quot;
+- tags: [&quot;hextrackr&quot;, &quot;security&quot;, &quot;codacy&quot;, &quot;release-blocker&quot;, &quot;v1.0.3&quot;]
 </code></pre>
-<p><strong>Outcome</strong>: Instant project awareness with complete context preservation</p>
-<h3>Generating Context Briefings</h3>
-<pre><code class="language-bash">
-# Generate comprehensive project briefing
-
-node .rMemory/scribes/agent-context-loader.js
-
-# Output files:
-
-# - .rMemory/agent-context/agent-briefing-YYYY-MM-DD.md
-
-# - .rMemory/agent-context/context-data-YYYY-MM-DD.json
+<h3>Setting Security Fix Reminder</h3>
+<pre><code class="language-text">create_reminder:
+- content: &quot;Complete Generic Object Injection fix in docs-prototype/generate-docs.js&quot;
+- due_datetime: &quot;2025-09-02T09:00:00Z&quot;
+- priority_level: 9
 </code></pre>
-<h3>Frustration Analysis and Prevention</h3>
-<pre><code class="language-bash">
-# Analyze frustration patterns
-
-node .rMemory/scribes/frustration-matrix.js
-
-# Process chat logs for pain points
-
-node .rMemory/scribes/deep-chat-analysis.js --frustration-focus
-
-# Real-time monitoring
-
-node .rMemory/scribes/real-time-analysis.js --monitor
+<h3>Searching for Previous Solutions</h3>
+<pre><code class="language-text">search_memories:
+- query: &quot;Codacy security vulnerability fixes Generic Object Injection&quot;
+- min_importance: 7
+- memory_type: &quot;security-issue&quot;
+- limit: 5
 </code></pre>
-<h3>Memory Pipeline Operations</h3>
-<pre><code class="language-bash">
-# Check current pipeline status
-
-ps aux | grep &quot;embedding-indexer\|memory-orchestrator\|realtime-chat-scribe&quot;
-
-# Start memory orchestrator
-
-node .rMemory/core/memory-orchestrator.js
-
-# Start real-time chat monitoring
-
-node .rMemory/core/realtime-chat-scribe.js
-
-# Monitor embedding generation (already running PID 52143)
-
-tail -f .rMemory/logs/embedding-indexer.log
-</code></pre>
-<h3>Memory Search Patterns</h3>
-<p>The system automatically searches the unified knowledge graph (125 entities) for:</p>
-<p><strong>Current Status</strong> (Priority 1):</p>
+<h2>Documentation and Resources</h2>
+<p>Detailed documentation for each memory tool is available in the <code>.prompts/</code> directory:</p>
 <ul>
-<li><code>project:HexTrackr status:current sprint:*</code> - Active sprint and project phase</li>
-<li><code>project:HexTrackr next:* goal:*</code> - Immediate priorities and objectives</li>
-<li><code>project:HexTrackr phase:* round:*</code> - Development cycle position</li>
-<li><code>development_session</code> entities with recent timestamps</li>
+<li>Individual tool documentation with parameters, use cases, and examples</li>
+<li>Best practices for effective memory management</li>
+<li>Integration patterns for development workflows</li>
 </ul>
-<p><strong>Recent Work</strong> (Priority 2):</p>
+<h2>Benefits for HexTrackr Development</h2>
 <ul>
-<li><code>project:HexTrackr session:recent</code> - Latest development activities</li>
-<li><code>project:HexTrackr branch:copilot</code> - GitHub Copilot integration work</li>
-<li><code>project:HexTrackr error:blocking</code> - Active blockers and issues</li>
-<li><code>chat_session</code> entities from last 48 hours</li>
-</ul>
-<p><strong>Context Expansion</strong> (Priority 3):</p>
-<ul>
-<li><code>project:HexTrackr roadmap:*</code> - Long-term planning and architecture</li>
-<li><code>project:HexTrackr frustration:*</code> - Known pain points and solutions</li>
-<li><code>project:HexTrackr decision:*</code> - Architectural and technical decisions</li>
-<li><code>canonical_note</code> entities for authoritative project knowledge</li>
-</ul>
-<p><strong>Advanced Search Patterns</strong>:</p>
-<ul>
-<li>Entity relationship traversal for connected concepts</li>
-<li>Semantic search using text-embedding-3-small embeddings</li>
-<li>Temporal queries for project evolution understanding</li>
-<li>Confidence scoring and freshness decay consideration</li>
-</ul>
-<h3>Agent Context Loading</h3>
-<p>Generate comprehensive briefings:</p>
-<pre><code class="language-bash">
-# Generate current project briefing
-
-node .rMemory/scribes/agent-context-loader.js
-
-# Analyze frustration patterns (2)
-
-node .rMemory/scribes/frustration-matrix.js
-
-# Process recent chat logs
-
-node .rMemory/scribes/deep-chat-analysis.js
-</code></pre>
-<h2>Key Benefits Achieved</h2>
-<h3>✅ Perfect Continuity Experience</h3>
-<ul>
-<li><strong>&quot;Never-ending friendship&quot;</strong>: Every chat feels continuous with zero context loss</li>
-<li><strong>Instant Sprint Awareness</strong>: Always know current phase, priorities, and next steps</li>
-<li><strong>Seamless Session Handoffs</strong>: Perfect knowledge transfer between chat sessions</li>
-<li><strong>Relationship Continuity</strong>: Consistent collaborative tone and communication patterns</li>
-<li><strong>Frustration Prevention</strong>: Never repeat solved problems or known pain points</li>
-</ul>
-<h3>✅ Development Acceleration</h3>
-<ul>
-<li><strong>Reduced Onboarding</strong>: New sessions start with full context in seconds</li>
-<li><strong>Proactive Issue Prevention</strong>: Learn from past pain points and prevent recurrence</li>
-<li><strong>Consistent Architecture</strong>: Reference established patterns and decisions from memory</li>
-<li><strong>Quality Maintenance</strong>: Memory-driven quality gates and standards</li>
-<li><strong>Accelerated Development</strong>: Build on accumulated knowledge instead of starting over</li>
-</ul>
-<h3>✅ Knowledge Preservation</h3>
-<ul>
-<li><strong>Complete Decision History</strong>: Every architectural choice preserved with rationale</li>
-<li><strong>Solution Library</strong>: Searchable database of 125 entities covering solved problems</li>
-<li><strong>Communication Patterns</strong>: Maintained terminology and collaborative preferences  </li>
-<li><strong>Project Evolution</strong>: Full timeline of development progress and lessons learned</li>
-<li><strong>Institutional Memory</strong>: Resist knowledge loss from team changes or time gaps</li>
-</ul>
-<h3>✅ Technical Excellence</h3>
-<ul>
-<li><strong>Enterprise-Grade Memory</strong>: Neo4j Enterprise with 125 entities and 26 relationships</li>
-<li><strong>Real-time Processing</strong>: Live pipeline with embedding generation and chat monitoring</li>
-<li><strong>Advanced Search</strong>: Semantic search with text-embedding-3-small embeddings</li>
-<li><strong>Frustration Learning</strong>: Claude Opus-powered analysis for continuous improvement</li>
-<li><strong>Perfect Integration</strong>: Seamless VS Code integration via Memento MCP</li>
-</ul>
-<p>The memory system uses a graph-based approach:</p>
-<pre><code class="language-mermaid">Entity → Properties (name, type, status, confidence, etc.)
-Entity → Relationships → Other Entities
-Entity → Observations → Time-stamped notes
-</code></pre>
-<h2>Setup</h2>
-<h3>Prerequisites</h3>
-<ul>
-<li>Docker Desktop installed and running</li>
-<li>VS Code with GitHub Copilot and MCP extension support</li>
-<li>Node.js 18+ for development scripts</li>
-<li>Claude Opus API access for advanced analysis</li>
-</ul>
-<h3>Current Installation (Operational)</h3>
-<p><strong>System Status</strong>: ✅ Fully operational with 125 entities and 26 relationships</p>
-<ol>
-<li><p><strong>Neo4j Enterprise Configuration</strong>:</p>
-<pre><code class="language-bash">
-# Current container (already running):
-
-docker ps | grep hextrackr-neo4j-dev
-
-# Access Neo4j browser: http://localhost:7474
-
-# Credentials: neo4j / qwerty1234
-
-# Bolt endpoint: bolt://localhost:7687
-</code></pre>
-</li>
-<li><p><strong>Memento MCP Configuration</strong>:</p>
-<pre><code class="language-json">{
-  &quot;memento&quot;: {
-    &quot;command&quot;: &quot;memento-mcp&quot;, 
-    &quot;args&quot;: [&quot;--neo4j-uri&quot;, &quot;bolt://localhost:7687&quot;, &quot;--neo4j-user&quot;, &quot;neo4j&quot;, &quot;--neo4j-password&quot;, &quot;qwerty1234&quot;]
-  }
-}
-</code></pre>
-</li>
-<li><p><strong>Memory Pipeline Status</strong>:</p>
-<pre><code class="language-bash">
-# Check running processes:
-
-ps aux | grep &quot;embedding-indexer&quot;  # Should show PID 52143
-
-# Start additional pipeline components:
-
-node .rMemory/core/memory-orchestrator.js
-node .rMemory/core/realtime-chat-scribe.js
-</code></pre>
-</li>
-</ol>
-<h3>Environment Configuration</h3>
-<p>Required environment variables:</p>
-<pre><code class="language-bash">ANTHROPIC_API_KEY=your_claude_api_key
-OPENAI_API_KEY=your_openai_api_key  # For embeddings
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=qwerty1234
-PROJECT_NAME=HexTrackr
-PROJECT_TYPE=cybersecurity_management
-</code></pre>
-<pre><code class="language-json">{
-  &quot;memento&quot;: {
-    &quot;command&quot;: &quot;memento-mcp&quot;,
-    &quot;args&quot;: [&quot;--neo4j-uri&quot;, &quot;bolt://localhost:7687&quot;]
-  }
-}
-</code></pre>
-<h2>Memory-First Development Workflow</h2>
-<h3>7-Step Protocol</h3>
-<ol>
-<li><strong>📋 Observe</strong>: Scan current context and identify key information</li>
-<li><strong>🎯 Plan</strong>: Design approach using available knowledge and tools</li>
-<li><strong>🛡️ Safeguards</strong>: Validate inputs, check constraints, ensure security</li>
-<li><strong>⚡ Execute</strong>: Implement solution with proper error handling</li>
-<li><strong>✅ Verify</strong>: Test functionality and validate results</li>
-<li><strong>🧠 Map</strong>: Update memory with new knowledge and relationships</li>
-<li><strong>📝 Log</strong>: Record decisions and outcomes for future reference</li>
-</ol>
-<h3>Entity Types</h3>
-<ul>
-<li><strong><code>project_component</code></strong>: Major system components (frontend, backend, etc.)</li>
-<li><strong><code>development_process</code></strong>: Workflows, procedures, standards</li>
-<li><strong><code>technical_decision</code></strong>: Architecture choices, technology selections</li>
-<li><strong><code>agent_memory</code></strong>: Historical knowledge with <code>status:archived</code></li>
-</ul>
-<h3>Memory Operations</h3>
-<h4>Creating Entities</h4>
-<pre><code class="language-typescript">// Create a new development process entity
-await memento.createEntity({
-  name: &quot;Code Review Process&quot;,
-  type: &quot;development_process&quot;,
-  observations: [&quot;Uses pre-commit hooks&quot;, &quot;Codacy integration required&quot;]
-});
-</code></pre>
-<h4>Searching Knowledge</h4>
-<pre><code class="language-typescript">// Find relevant entities
-const results = await memento.searchEntities(&quot;security validation&quot;);
-</code></pre>
-<h4>Managing Relationships</h4>
-<pre><code class="language-typescript">// Link related concepts
-await memento.createRelation({
-  from: &quot;ESLint Configuration&quot;,
-  to: &quot;Code Quality&quot;,
-  relationType: &quot;enhances&quot;
-});
-</code></pre>
-<h2>Archived vs Current Knowledge</h2>
-<h3>Archived Entities</h3>
-<ul>
-<li>Historical project memories from previous systems</li>
-<li>Tagged with <code>status:archived</code> for reference</li>
-<li>Searchable but distinguished from current project state</li>
-</ul>
-<h3>Current Entities</h3>
-<ul>
-<li>Active project components and processes</li>
-<li>Live development knowledge</li>
-<li>Real-time relationship mapping</li>
-</ul>
-<h2>Practical Usage</h2>
-<h3>Session Continuity</h3>
-<ol>
-<li>Start VS Code and activate memento MCP</li>
-<li>Query previous session context: &quot;What was I working on last?&quot;</li>
-<li>Retrieve relevant technical decisions and progress</li>
-<li>Continue development with full context</li>
-</ol>
-<h3>Knowledge Discovery</h3>
-<pre><code class="language-bash">
-# Search for security-related knowledge
-
-&quot;Find all entities related to security validation&quot;
-
-# Discover architectural decisions
-
-&quot;Show me technical decisions about database design&quot;
-
-# Find development processes
-
-&quot;What processes do we have for code quality?&quot;
-</code></pre>
-<h3>Development Session Logging</h3>
-<pre><code class="language-bash">
-# Record new technical decisions
-
-&quot;Create entity: API Rate Limiting Implementation&quot;
-
-# Link related components
-
-&quot;Connect API Rate Limiting to Security Framework&quot;
-
-# Add observations
-
-&quot;Add observation to ESLint Config: Fixed Node.js environment globals&quot;
-</code></pre>
-<h2>Integration with HexTrackr</h2>
-<h3>Pre-commit Hooks</h3>
-<ul>
-<li>Memory system validates against known security patterns</li>
-<li>Automatic logging of code quality improvements</li>
-<li>Cross-reference with existing technical decisions</li>
-</ul>
-<h3>Documentation Generation</h3>
-<ul>
-<li>Memory-informed documentation updates</li>
-<li>Automatic discovery of new components</li>
-<li>Relationship mapping for cross-references</li>
-</ul>
-<h3>Agent Operations</h3>
-<ul>
-<li>All AI interactions logged for future reference</li>
-<li>Decision rationale preserved</li>
-<li>Context continuity across sessions</li>
-</ul>
-<h2>Troubleshooting</h2>
-<h3>Common Issues</h3>
-<p><strong>MCP Server Not Available</strong>:</p>
-<ol>
-<li>Check Docker Neo4j container status</li>
-<li>Verify VS Code MCP configuration</li>
-<li>Restart VS Code to refresh MCP connections</li>
-</ol>
-<p><strong>Memory Persistence Issues</strong>:</p>
-<ol>
-<li>Confirm Neo4j database connectivity</li>
-<li>Check memento-mcp service status</li>
-<li>Validate environment configuration</li>
-</ol>
-<p><strong>Search Performance</strong>:</p>
-<ol>
-<li>Ensure embeddings are generated</li>
-<li>Check Neo4j index status</li>
-<li>Monitor database query performance</li>
-</ol>
-<h3>Diagnostic Commands</h3>
-<pre><code class="language-bash">
-# Check Docker containers
-
-docker ps | grep neo4j
-
-# Test Neo4j connectivity
-
-docker exec -it neo4j-dev cypher-shell -u neo4j -p password
-
-# Verify memento installation
-
-npm list -g | grep memento-mcp
-</code></pre>
-<h2>Best Practices</h2>
-<h3>Entity Naming</h3>
-<ul>
-<li>Use clear, descriptive names</li>
-<li>Follow consistent naming conventions</li>
-<li>Include context for disambiguation</li>
-</ul>
-<h3>Relationship Types</h3>
-<ul>
-<li>Use meaningful relationship labels</li>
-<li>Create bidirectional connections where appropriate</li>
-<li>Document relationship semantics</li>
-</ul>
-<h3>Observation Quality</h3>
-<ul>
-<li>Include timestamps and context</li>
-<li>Reference specific files or commits</li>
-<li>Note decision rationale</li>
-</ul>
-<h3>Archive Management</h3>
-<ul>
-<li>Regularly review and tag outdated entities</li>
-<li>Maintain clear separation between historical and current knowledge</li>
-<li>Preserve valuable historical context for reference</li>
-</ul>
-<h2>Temporary Development Enhancements</h2>
-<h3>memento-protocol-enhanced Wrapper (Development Only)</h3>
-<p><strong>Purpose</strong>: Enhanced memory capabilities during development phase, easily removable before shipping.</p>
-<p><strong>Status</strong>: Available in separate repository: <code>lbruton/memento-protocol-enhanced</code></p>
-<h4>Features Added</h4>
-<ul>
-<li><strong>Protocol Engine</strong>: YAML-based rule enforcement outside LLM control</li>
-<li><strong>Quality Management</strong>: Confidence scoring, freshness decay, deduplication</li>
-<li><strong>Enhanced Search</strong>: Hybrid strategies (semantic + keyword + temporal + confidence)</li>
-<li><strong>Synthesis Reporting</strong>: &quot;Ask the Scribe&quot; functionality for memory insights</li>
-</ul>
-<h4>Integration Approach</h4>
-<pre><code class="language-bash">
-# Install wrapper as development dependency
-
-npm install --save-dev memento-protocol-enhanced
-
-# Configure as optional MCP server
-
-# Add to VS Code MCP settings (development profile only):
-
-{
-  &quot;memento-enhanced&quot;: {
-    &quot;command&quot;: &quot;node&quot;,
-    &quot;args&quot;: [&quot;./node_modules/memento-protocol-enhanced/src/index.js&quot;],
-    &quot;env&quot;: {
-      &quot;MEMENTO_WRAPPER_MODE&quot;: &quot;development&quot;,
-      &quot;FALLBACK_TO_STANDARD&quot;: &quot;true&quot;
-    }
-  }
-}
-</code></pre>
-<h4>Easy Removal Strategy</h4>
-<ol>
-<li><strong>Development Dependency</strong>: Installed as <code>devDependency</code>, not shipped in production</li>
-<li><strong>Graceful Fallbacks</strong>: Wrapper automatically falls back to standard memento-mcp if unavailable</li>
-<li><strong>Separate Configuration</strong>: Uses dedicated MCP server entry, easily removed</li>
-<li><strong>No Data Lock-in</strong>: All data remains in standard memento-mcp format</li>
-<li><strong>Clean Uninstall</strong>: Simple <code>npm uninstall</code> and MCP config removal</li>
-</ol>
-<h4>Benefits for Development</h4>
-<ul>
-<li><strong>Enhanced Search</strong>: Better context retrieval during development</li>
-<li><strong>Quality Control</strong>: Automatic confidence scoring and memory cleanup</li>
-<li><strong>Protocol Enforcement</strong>: Consistent memory operations (backup-before-write, etc.)</li>
-<li><strong>Debugging</strong>: Synthesis reports help understand memory state</li>
-</ul>
-<h4>Shipping Preparation</h4>
-<pre><code class="language-bash">
-# Remove wrapper before shipping
-
-npm uninstall memento-protocol-enhanced
-
-# Remove from MCP configuration
-
-# (delete memento-enhanced section from VS Code settings)
-
-# Standard memento-mcp continues working unchanged
-</code></pre>
-<h3>Future Enhancements</h3>
-<h4>Planned Features</h4>
-<ul>
-<li><strong>Multi-project Memory</strong>: Seamless switching between project contexts</li>
-<li><strong>Team Memory Sharing</strong>: Collaborative frustration learning across team members</li>
-<li><strong>Predictive Frustration Detection</strong>: Proactive issue prevention based on patterns</li>
-<li><strong>Automated Documentation</strong>: Self-updating project knowledge from code changes</li>
-<li><strong>Enhanced Semantic Search</strong>: Local LLM models for improved context retrieval</li>
-<li><strong>Automated Relationship Inference</strong>: AI-powered entity connection discovery</li>
-</ul>
-<h4>Integration Opportunities</h4>
-<ul>
-<li><strong>CI/CD Pipeline</strong>: Automated context updates on code changes and deployments</li>
-<li><strong>Issue Tracking</strong>: Link frustrations to GitHub issues with resolution tracking</li>
-<li><strong>Code Review</strong>: Memory-informed review suggestions based on historical patterns</li>
-<li><strong>Project Management</strong>: Sprint progress tracking and milestone reporting</li>
-<li><strong>Custom Entity Types</strong>: Domain-specific knowledge structures for specialized projects</li>
-<li><strong>Workflow Automation</strong>: Memory pattern-driven development process optimization</li>
-</ul>
-<h2>System Achievements Summary</h2>
-<h3>Perfect Continuity Realized</h3>
-<p>The HexTrackr <code>.rMemory</code> system successfully achieves the vision of <strong>&quot;every chat feels like we never stopped working together&quot;</strong> through:</p>
-<ul>
-<li><strong>125-entity unified knowledge graph</strong> with complete project history</li>
-<li><strong>Real-time memory pipeline</strong> processing interactions as they happen</li>
-<li><strong>Frustration learning matrix</strong> preventing repeated pain points</li>
-<li><strong>Instant context loading</strong> that eliminates session startup overhead</li>
-<li><strong>Seamless agent handoffs</strong> maintaining collaborative relationships</li>
-</ul>
-<h3>Measurable Impact</h3>
-<p><strong>Before vs. After .rMemory Implementation</strong>:</p>
-<p>❌ <strong>Before</strong>: &quot;What were we working on? Let me check files...&quot;<br>✅ <strong>After</strong>: Instant sprint awareness with complete context in &lt;5 seconds</p>
-<p><strong>Development Acceleration Metrics</strong>:</p>
-<ul>
-<li><strong>Context Recovery Time</strong>: Reduced from 5-10 minutes to &lt;5 seconds</li>
-<li><strong>Problem Resolution</strong>: 90% reduction in repeated frustration incidents</li>
-<li><strong>Session Continuity</strong>: 100% preservation of project state and decisions</li>
-<li><strong>Knowledge Retention</strong>: Complete elimination of context loss between sessions</li>
-<li><strong>Collaborative Quality</strong>: Consistent communication patterns and preferences</li>
-</ul>
-<h3>Technical Excellence</h3>
-<p><strong>Enterprise-Grade Architecture</strong>:</p>
-<ul>
-<li>Neo4j Enterprise backend with real-time processing capabilities</li>
-<li>Advanced semantic search with OpenAI text-embedding-3-small</li>
-<li>Claude Opus integration for sophisticated frustration pattern analysis</li>
-<li>Docker containerization for development environment consistency</li>
-<li>VS Code integration via Memento MCP for seamless user experience</li>
-</ul>
-<h2>Conclusion</h2>
-<p>The HexTrackr Memory System represents a breakthrough in AI collaboration continuity. By unifying the <code>.rMemory</code> scribes system with Neo4j Enterprise backend and Memento MCP integration, we have achieved perfect continuity that transforms the development experience.</p>
-<p><strong>Core Achievement</strong>: Never lose context again. Every chat session begins with complete awareness of project state, recent progress, known frustrations, and established solutions.</p>
-<p><strong>Key Success Factors</strong>:</p>
-<ol>
-<li><strong>Memory-First Development</strong>: Always start with accumulated knowledge</li>
-<li><strong>Frustration Learning</strong>: Systematic prevention of repeated problems  </li>
-<li><strong>Real-time Processing</strong>: Live memory updates during active development</li>
-<li><strong>Perfect Integration</strong>: Seamless VS Code experience with no workflow disruption</li>
-<li><strong>Enterprise Scalability</strong>: Robust architecture supporting long-term project growth</li>
-</ol>
-<p>The system successfully transforms fragmented AI interactions into seamless, continuous collaboration that builds knowledge and prevents repeated frustrations over time.</p>
-<p><em>Perfect continuity achieved. Development excellence maintained. Never lose context again.</em> 🌟</p>
-<h2>Related Documentation</h2>
-<ul>
-<li><a href="../agents/AGENTS.md">Agent Operations Guide</a></li>
-<li><a href="dev-environment.md">Development Environment Setup</a></li>
-<li><a href="pre-commit-hooks.md">Pre-commit Hooks</a></li>
-<li><a href="../adr/">Architecture Decision Records</a></li>
-</ul>
-<h2>References</h2>
-<ul>
-<li><a href="https://github.com/modelcontextprotocol/servers/tree/main/src/memento">memento-mcp Documentation</a></li>
-<li><a href="https://neo4j.com/docs/">Neo4j Documentation</a></li>
-<li><a href="https://modelcontextprotocol.io/">Model Context Protocol Specification</a></li>
+<li><strong>Continuity</strong>: Resume work seamlessly across sessions</li>
+<li><strong>Context Preservation</strong>: Never lose important decisions or insights</li>
+<li><strong>Pattern Recognition</strong>: Learn from previous solutions and approaches</li>
+<li><strong>Quality Assurance</strong>: Track security fixes and compliance requirements</li>
+<li><strong>Efficiency</strong>: Memory-first approach reduces repetitive exploration</li>
 </ul>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
