@@ -83,7 +83,8 @@ export default [
     files: [
       "scripts/ag-grid-responsive-config.js",
       "scripts/pages/*.js", 
-      "scripts/shared/*.js"
+      "scripts/shared/*.js",
+      "scripts/utils/*.js"
     ],
     languageOptions: {
       ecmaVersion: 2022,
@@ -119,7 +120,8 @@ export default [
         Intl: "readonly",
         // Third-party library globals
         bootstrap: "readonly",
-        agGrid: "readonly"
+        agGrid: "readonly",
+        DOMPurify: "readonly"
       }
     },
     plugins: {

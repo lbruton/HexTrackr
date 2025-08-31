@@ -8,10 +8,10 @@ This documentation portal provides comprehensive guides, API references, and arc
 
 ## Navigation
 
-- **[Getting Started](/content/getting-started/index.html)**: New to HexTrackr? Start here.
-- **[User Guides](/content/user-guides/index.html)**: Detailed instructions for using application features.
-- **[Development](/content/development/index.html)**: Information for developers, including setup and contribution guidelines.
-- **[Architecture](/content/architecture/index.html)**: A deep dive into the system's architecture.
-- **[API Reference](/content/api-reference/index.html)**: Complete reference for the HexTrackr REST API.
-- **[Project Management](/content/project-management/index.html)**: Roadmaps and project status.
-- **[Security](/content/security/index.html)**: Security-related documentation.
+- **[Getting Started](/content/getting-started/index.md)**: New to HexTrackr? Start here.
+- **[User Guides](/content/user-guides/index.md)**: Detailed instructions for using application features.
+- **[Development](/content/development/index.md)**: Information for developers, including setup and contribution guidelines.
+- **[Architecture](/content/architecture/index.md)**: A deep dive into the system's architecture.
+- **[API Reference](/content/api-reference/index.md)**: Complete reference for the HexTrackr REST API.
+- **[Project Management](/content/project-management/index.md)**: Roadmaps and project status.
+- **[Security](/content/security/index.md)**: Security-related documentation.
