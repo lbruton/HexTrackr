@@ -1,14 +1,13 @@
 # HTML Generation Report
 
-Generated: 2025-08-31T23:31:29.890Z
-Duration: 1.9s
-Files Generated: 35
+Generated: 2025-09-01T00:00:45.259Z
+Duration: 1.5s
+Files Generated: 28
 Errors: 0
 
 ## Generated Files
 
 - api-reference/backup-api.html
-- api-reference/index.html
 - api-reference/tickets-api.html
 - api-reference/vulnerabilities-api.html
 - architecture/backend.html
@@ -16,28 +15,22 @@ Errors: 0
 - architecture/deployment.html
 - architecture/frameworks.html
 - architecture/frontend.html
-- architecture/index.html
 - architecture/project-analysis.html
 - development/coding-standards.html
 - development/contributing.html
 - development/development-setup.html
 - development/docs-portal-guide.html
-- development/index.html
 - development/memory-system.html
 - development/pre-commit-hooks.html
-- getting-started/index.html
 - getting-started/installation.html
 - html-update-report.html
 - index.html
 - project-management/codacy-compliance.html
-- project-management/index.html
 - project-management/quality-badges.html
 - project-management/roadmap-to-sprint-system.html
 - project-management/strategic-roadmap.html
-- security/index.html
 - security/overview.html
 - security/vulnerability-disclosure.html
-- user-guides/index.html
 - user-guides/ticket-management.html
 - user-guides/vulnerability-management.html
 - CHANGELOG.html
@@ -45,4 +38,4 @@ Errors: 0
 
 ## Summary
 
-The HTML generator successfully created 35 HTML files from their corresponding markdown sources using the master template.
+The HTML generator successfully created 28 HTML files from their corresponding markdown sources using the master template.
