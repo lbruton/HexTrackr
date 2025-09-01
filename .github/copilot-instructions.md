@@ -1,77 +1,68 @@
-# HexTrackr AI Assistant Instructions
 
-## Project Overview
+# AGENTS.md
 
-HexTrackr is a vulnerability and ticket management system with a monolithic Node.js/Express backend and browser-based frontend. It uses SQLite for persistence and follows a modular JavaScript architecture pattern.
+## Project: HexTrackr
 
-## Memory-First Workflow (MANDATORY)
+- **Type**: Vulnerability & Ticket Management System
+- **Backend**: Node.js/Express, SQLite
+- **Frontend**: Modular JS, AG-Grid, Chart.js, Tabler CSS
+- **Docs**: Markdown in `docs-source/`, HTML in `docs-html/`
+- **Quality**: <50 Codacy issues, zero critical/high vulnerabilities
+- **Version**: 1.0.2 (SemVer)
 
-### Core Memory System
+---
 
-1. **Initialize**: Always check `get_recent_context` and `search_memories` at session start
-2. **Document**: Create memories for decisions, store conversations at milestones  
-3. **Update**: Set reminders, update status, maintain project continuity
+## Agent Workflow (Loop)
 
-Memory tools available in `.prompts/` directory. Use semantic search to find previous solutions.
+1. **Observe**: Review current chat and user request
+2. **Context Check**: If more context is needed, pull from persistent memory (get_recent_context, search_memories)
+3. **File Check**: Gather relevant file/project context
+4. **Plan**: Propose a clear plan of action to the user
+5. **Approval**: Wait for explicit user approval
+6. **Git Backup**: Create a git checkpoint (commit) before making changes (commit hook saves chat to memory)
+7. **Execute**: Make the approved changes
+8. **Final Backup**: Create another git checkpoint after changes (commit hook saves chat to memory)
 
-## Essential Architecture
+---
 
-### Key Files
+## Memory System
 
-- `server.js`: Main backend entry point
-- `scripts/init-database.js`: DB schema and initialization
-- `scripts/shared/settings-modal.js`: Global frontend utilities
-- `data/hextrackr.db`: SQLite database
-- `docs-source/`: Markdown documentation source
+- Use persistent-ai-memory MCP for all context, decisions, and reminders
+- Always document major decisions, security fixes, and milestones
+- Tag memories with project, type, and importance
 
-## Documentation System
+---
 
-- **Source**: `docs-source/` (Markdown) → **Generated**: `docs-html/` (HTML)
-- **Update**: Run `node docs-html/html-content-updater.js` to regenerate
-- **Architecture**: `docs-source/architecture/`
-- **APIs**: `docs-source/api-reference/`
+## Codacy & Security
 
-## Current Standards
+- Run Codacy analysis after every file edit
+- Run Trivy scan after dependency changes
+- Fix critical/high issues before proceeding
 
-- **Version**: 1.0.2 (Semantic Versioning)
-- **Changelog**: Follow Keep a Changelog format
-- **Quality**: Maintain <50 Codacy issues
-- **Security**: Zero critical/high vulnerabilities
+---
 
-## When to Load Specialized Instructions
+## Documentation
 
-Load additional instruction modules based on task context:
+- Update markdown in `docs-source/`, regenerate HTML with `node docs-html/html-content-updater.js`
+- Keep docs and AGENTS.md in sync for project context
 
-- **Memory operations & workflows**: Load `.github/instructions/memory-workflow.md`
-- **Architecture & technical details**: Load `.github/instructions/architecture-guide.md`
-- **Versioning & releases**: Load `.github/instructions/versioning-standards.md`
-- **Code quality & Codacy**: Load `.github/instructions/codacy-compliance.md`
-- **Documentation system**: Load `.github/instructions/documentation-system.md`
-- **MCP tools & integrations**: Load `.github/instructions/mcp-tools-guide.md`
+---
 
-## Critical Workflows
+## Versioning & Releases
 
-### Git Checkpoint (MANDATORY)
+- Follow SemVer and Keep a Changelog
+- Update version in `package.json` and `CHANGELOG.md`
+- Tag releases as `vX.Y.Z`
 
-- **Before ANY file writes**: Create git checkpoint with `git add . && git commit -m "checkpoint: [brief description]"`
-- **Before major changes**: Ensure clean working directory
-- **Recovery point**: Enables rollback if issues occur
+---
 
-### Code Quality (MANDATORY)
+## Quick Reference
 
-- **After ANY file edit**: Run `codacy_cli_analyze` immediately
-- **After dependencies**: Run with tool "trivy"
-- **Fix issues**: Resolve before proceeding
+- Pin this workflow in chat for every session
+- Use AGENTS.md and README.md together for full project context
 
-### Common Pitfalls
+---
 
-- File uploads max 100MB
-- SQLite requires write permissions in `data/`
-- Remember to unlink temp files after processing
-- Docker container restart needed before Playwright tests
+## Format: [OpenAI agents.md standards](https://github.com/openai/agents.md)
 
-## Project Context
-
-Frontend follows modular pattern (shared/pages/utils). Backend is monolithic Express with runtime schema evolution. Integration points include ServiceNow tickets, CSV imports, and backup/restore systems.
-
-Full detailed documentation available in specialized instruction modules above.
+---
