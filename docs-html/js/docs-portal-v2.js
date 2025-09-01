@@ -277,26 +277,17 @@ class DocumentationPortalV2 {
         const children = {};
         
         try {
-            // Define comprehensive list of potential files to check
-            // This covers all known files but allows for new ones to be added automatically
-            // Note: index.md files are excluded as they're redundant with dynamic navigation
-            const potentialFiles = [
-                // Getting Started
-                "installation",
-                // User Guides  
-                "ticket-management", "vulnerability-management",
-                // API Reference
-                "tickets-api", "vulnerabilities-api", "backup-api",
-                // Architecture - including our new project-analysis
-                "backend", "database", "deployment", "frontend", "frameworks", "project-analysis",
-                // Development
-                "coding-standards", "contributing", "development-setup", "memory-system",
-                "pre-commit-hooks", "docs-portal-guide",
-                // Project Management
-                "strategic-roadmap", "quality-badges", "codacy-compliance", "roadmap-to-sprint-system",
-                // Security
-                "overview", "vulnerability-disclosure"
-            ];
+            // Define files that exist for each section
+            // This prevents 404 errors by only checking files that actually exist
+            const sectionFiles = {
+                "getting-started": ["installation"],
+                "user-guides": ["ticket-management", "vulnerability-management"],
+                "api-reference": ["tickets-api", "vulnerabilities-api", "backup-api"],
+                "architecture": ["backend", "database", "deployment", "frontend", "frameworks", "project-analysis"],
+                "development": ["coding-standards", "contributing", "development-setup", "memory-system", "pre-commit-hooks", "docs-portal-guide"],
+                "project-management": ["strategic-roadmap", "quality-badges", "codacy-compliance", "roadmap-to-sprint-system"],
+                "security": ["overview", "vulnerability-disclosure"]
+            };
             
             // Special case: Add ROADMAP and CHANGELOG to development section first
             if (section === "development") {
@@ -327,8 +318,9 @@ class DocumentationPortalV2 {
                 }
             }
             
-            // For docs-source sections, test each potential file
-            for (const fileName of potentialFiles) {
+            // Only check files that belong to this section
+            const filesToCheck = sectionFiles[section] || [];
+            for (const fileName of filesToCheck) {
                 try {
                     const fileResponse = await fetch(this.getContentUrl(`${section}/${fileName}.html`));
                     if (fileResponse.ok) {
@@ -618,7 +610,10 @@ class DocumentationPortalV2 {
             let content = this.contentCache.get(section);
             
             if (!content) {
-                if (isExternalFile) {
+                // Special handling for Overview page since we removed index.md files
+                if (section === "index") {
+                    content = this.generateOverviewContent();
+                } else if (isExternalFile) {
                     // Load external markdown file and convert to HTML
                     content = await this.loadExternalMarkdown(section);
                 } else {
@@ -662,9 +657,10 @@ class DocumentationPortalV2 {
     getBasePath() {
         const currentPath = window.location.pathname;
         
-        // If we're already in the docs-html directory, use relative path
+        // If we're in the docs-html directory, return the path to docs-html
         if (currentPath.includes("/docs-html/")) {
-            return "";
+            const basePath = currentPath.substring(0, currentPath.indexOf("/docs-html/") + "/docs-html/".length);
+            return basePath;
         }
         
         // If we're in the root directory, need to go into docs-html
@@ -672,8 +668,8 @@ class DocumentationPortalV2 {
             return "docs-html/";
         }
         
-        // Default fallback
-        return "";
+        // Default fallback - return docs-html relative path
+        return "docs-html/";
     }
 
     /**
@@ -682,6 +678,63 @@ class DocumentationPortalV2 {
     getContentUrl(relativePath) {
         const basePath = this.getBasePath();
         return `${basePath}content/${relativePath}`;
+    }
+
+    /**
+     * Generate dynamic Overview content since we removed index.md files
+     */
+    generateOverviewContent() {
+        return `
+            <h1>HexTrackr Documentation</h1>
+            <p>Welcome to the HexTrackr documentation portal. This comprehensive guide covers installation, usage, and development of the HexTrackr vulnerability and ticket management system.</p>
+            
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title"><i class="fas fa-rocket"></i> Getting Started</h3>
+                            <p class="card-text">Quick installation and setup instructions to get HexTrackr running with Docker.</p>
+                            <a href="#getting-started/installation" class="btn btn-primary">View Installation Guide</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title"><i class="fas fa-book"></i> User Guides</h3>
+                            <p class="card-text">Learn how to manage tickets and vulnerabilities effectively.</p>
+                            <a href="#user-guides/ticket-management" class="btn btn-primary">View User Guides</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title"><i class="fas fa-code"></i> API Reference</h3>
+                            <p class="card-text">Complete API documentation for developers and integrations.</p>
+                            <a href="#api-reference/tickets-api" class="btn btn-primary">View API Docs</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title"><i class="fas fa-building"></i> Architecture</h3>
+                            <p class="card-text">Technical architecture and system design documentation.</p>
+                            <a href="#architecture/backend" class="btn btn-primary">View Architecture</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <h4><i class="fas fa-info-circle"></i> About HexTrackr</h4>
+                <p>HexTrackr is a comprehensive vulnerability and ticket management system built with Node.js, Express, and SQLite. It provides tools for tracking security vulnerabilities, managing support tickets, and integrating with external systems like ServiceNow.</p>
+            </div>
+        `;
     }
 
     /**
