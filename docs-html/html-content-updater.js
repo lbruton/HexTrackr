@@ -205,47 +205,8 @@ class HtmlContentUpdater {
             }
         };
 
-        // Process main docs-source directory
+        // Process main docs-source directory (including root files like ROADMAP.md and CHANGELOG.md)
         await findMdFiles(docsSourceDir);
-        
-        // Process specific files from root directory
-        const rootFiles = ["CHANGELOG.md"];
-        for (const rootFile of rootFiles) {
-            const rootFilePath = path.join(process.cwd(), rootFile);
-            try {
-                const stat = await PathValidator.safeStat(rootFilePath);
-                if (stat.isFile()) {
-                    const htmlPath = path.join(docsProtoDir, rootFile.replace(".md", ".html"));
-                    sources.push({
-                        mdPath: rootFilePath,
-                        htmlPath: htmlPath,
-                        relativePath: rootFile
-                    });
-                }
-            } catch (_error) {
-                console.log(`ℹ️  ${rootFile} not found in root directory, skipping.`);
-            }
-        }
-        
-        // Process specific files from roadmaps directory
-        const roadmapsFiles = ["ROADMAP.md"];
-        const roadmapsDir = path.join(process.cwd(), "roadmaps");
-        for (const roadmapFile of roadmapsFiles) {
-            const roadmapFilePath = path.join(roadmapsDir, roadmapFile);
-            try {
-                const stat = await PathValidator.safeStat(roadmapFilePath);
-                if (stat.isFile()) {
-                    const htmlPath = path.join(docsProtoDir, roadmapFile.replace(".md", ".html"));
-                    sources.push({
-                        mdPath: roadmapFilePath,
-                        htmlPath: htmlPath,
-                        relativePath: roadmapFile
-                    });
-                }
-            } catch (_error) {
-                console.log(`ℹ️  ${roadmapFile} not found in roadmaps directory, skipping.`);
-            }
-        }
         
         return sources;
     }

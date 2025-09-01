@@ -1,10 +1,19 @@
 /* Add any custom styles for the documentation portal here */
 body {
-    background-color: #f5f7fb;
+  background-color: #f5f7fb;
+}
+
+/* Add spacing above navigation and body cards */
+.navbar {
+  margin-top: 1rem;
+}
+
+.page-body {
+  margin-top: 1rem;
 }
 
 .loading-spinner {
-    display: none;
+  display: none;
 }
 
 table {
