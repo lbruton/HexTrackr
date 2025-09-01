@@ -188,6 +188,13 @@ class HtmlContentUpdater {
                 if (stat.isDirectory()) {
                     await findMdFiles(fullPath, currentRelativePath);
                 } else if (validatedItem.endsWith(".md")) {
+                    // Skip section index.md files (in subdirectories) as they are redundant with dynamic navigation
+                    // But allow the root docs-source/index.md which serves as the main overview page
+                    if (validatedItem === "index.md" && relativePath !== "") {
+                        console.log(`⏭️  Skipping redundant section index file: ${currentRelativePath}`);
+                        continue;
+                    }
+                    
                     const htmlPath = path.join(docsProtoDir, currentRelativePath.replace(".md", ".html"));
                     sources.push({
                         mdPath: fullPath,

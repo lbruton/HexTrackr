@@ -24,23 +24,6 @@ Memory tools available in `.prompts/` directory. Use semantic search to find pre
 - `data/hextrackr.db`: SQLite database
 - `docs-source/`: Markdown documentation source
 
-### Quick Setup
-
-```bash
-
-# Initialize database
-
-node scripts/init-database.js
-
-# Start development server
-
-node server.js
-
-# OR use Docker (recommended for testing)
-
-docker-compose up --build
-```
-
 ## Documentation System
 
 - **Source**: `docs-source/` (Markdown) → **Generated**: `docs-html/` (HTML)
