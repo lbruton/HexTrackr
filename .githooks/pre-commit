@@ -134,7 +134,7 @@ Repository: HexTrackr
 Branch: $(git branch --show-current 2>/dev/null || echo 'unknown')"
 
 # Use our updated Python script to store in PAM
-python3 scripts/save_persistent_memory_new.py \
+python3 scripts/save_persistent_memory.py \
   --message "$CONVERSATION_CONTENT" \
   --importance 7 \
   --type "git-commit" \
