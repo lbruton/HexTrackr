@@ -28,6 +28,8 @@ HexTrackr features a breakthrough **Perfect Continuity Memory System** that enab
 ✅ Neo4j Enterprise 5.11 (Docker container: hextrackr-neo4j-dev)
 ✅ Memento MCP Server (124 entities, 26 relationships)
 ✅ embedding-indexer.js (PID 52143) - RUNNING
+✅ Ollama embedding proxy (3001) - RUNNING
+✅ Persistent AI Memory MCP - RUNNING
 ⚠️  memory-orchestrator.js - Ready to start
 ⚠️  realtime-chat-scribe.js - Ready to start
 ```
@@ -88,7 +90,8 @@ HexTrackr/
 
 - **Anthropic Claude**: Advanced analysis and embeddings
 - **Memento MCP**: VS Code memory integration
-- **OpenAI Embeddings**: text-embedding-3-small (1536 dimensions)
+- **Ollama**: Local embedding model (nomic-embed-text) for semantic search
+- **OpenAI Embeddings**: Fallback option (text-embedding-3-small, 1536 dimensions)
 - **Custom Pipeline**: `.rMemory` real-time processing
 
 ### Frontend & DevOps
@@ -146,9 +149,11 @@ docker exec hextrackr-neo4j-dev cypher-shell -u neo4j -p qwerty1234 \
 ### Architecture & Development
 
 - **[Memory System](docs-source/development/memory-system.md)**: Perfect Continuity Architecture
+- **[PAM Integration](docs-source/memory-system/pam-ollama-integration.md)**: PAM and Ollama embedding integration
 - **[Architecture Overview](docs-source/architecture/index.md)**: System components and design
 - **[ADR-0001](docs/adr/ADR-0001-memory-backend.md)**: Memory backend decisions
 - **[ADR-0003](docs/adr/ADR-0003-claude-embeddings-rMemory-inspired.md)**: Claude embeddings strategy
+- **[ADR-0004](docs/adr/ADR-0004-ollama-nomic-embed-text.md)**: Ollama with nomic-embed-text for PAM
 
 ### Operations & Memory
 
