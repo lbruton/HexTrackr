@@ -27,6 +27,7 @@ setup_mcp_server() {
 
 # Setup each MCP server
 setup_mcp_server "https://github.com/admica/FileScopeMCP.git" "FileScopeMCP"
+setup_mcp_server "https://github.com/organization/MementoMCP.git" "MementoMCP"
 # Add more MCP servers as needed
 # setup_mcp_server "https://github.com/org/CodacyMCP.git" "CodacyMCP"
 
