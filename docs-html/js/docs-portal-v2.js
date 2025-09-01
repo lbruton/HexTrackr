@@ -23,10 +23,12 @@
                 "strategic-roadmap", "quality-badges", "codacy-compliance", "roadmap-to-sprint-system",
                 // Security
                 "vulnerability-scanning", "backup-restore"
-            ];Back-to-top functionalit            // Special case: For development section, include CHANGELOG
+            ];
+
+            // Special case: For development section, include CHANGELOG
             if (section === "development") {
                 try {
-                    const changelogResponse = await fetch("content/CHANGELOG.html");
+                    const changelogResponse = await fetch(this.getContentUrl("CHANGELOG.html"));
                     if (changelogResponse.ok) {
                         children["changelog"] = {
                             title: "Changelog",
@@ -36,7 +38,7 @@
                 } catch (_error) {
                     // CHANGELOG doesn't exist, skip it
                 }
-            }integration
+            }
  * - Mobile responsive
  * 
  * Framework: Enhanced Tabler.io with custom navigation components
@@ -300,7 +302,7 @@ class DocumentationPortalV2 {
             if (section === "development") {
                 // Add roadmap first (top of development menu)
                 try {
-                    const roadmapResponse = await fetch("content/ROADMAP.html");
+                    const roadmapResponse = await fetch(this.getContentUrl("ROADMAP.html"));
                     if (roadmapResponse.ok) {
                         children["roadmap"] = {
                             title: "Strategic Roadmap",
@@ -313,7 +315,7 @@ class DocumentationPortalV2 {
                 
                 // Add changelog second
                 try {
-                    const changelogResponse = await fetch("content/CHANGELOG.html");
+                    const changelogResponse = await fetch(this.getContentUrl("CHANGELOG.html"));
                     if (changelogResponse.ok) {
                         children["changelog"] = {
                             title: "Changelog",
@@ -328,7 +330,7 @@ class DocumentationPortalV2 {
             // For docs-source sections, test each potential file
             for (const fileName of potentialFiles) {
                 try {
-                    const fileResponse = await fetch(`content/${section}/${fileName}.html`);
+                    const fileResponse = await fetch(this.getContentUrl(`${section}/${fileName}.html`));
                     if (fileResponse.ok) {
                         children[fileName] = {
                             title: this.formatTitle(fileName),
@@ -620,10 +622,13 @@ class DocumentationPortalV2 {
                     // Load external markdown file and convert to HTML
                     content = await this.loadExternalMarkdown(section);
                 } else {
-                    // Load processed HTML content
-                    const response = await fetch(`content/${section}.html`);
+                    // Load processed HTML content with proper base path
+                    const contentUrl = this.getContentUrl(`${section}.html`);
+                    console.log(`📄 Fetching content from: ${contentUrl}`);
+                    
+                    const response = await fetch(contentUrl);
                     if (!response.ok) {
-                        throw new Error(`Failed to load ${section}: ${response.statusText}`);
+                        throw new Error(`Failed to load ${section}: ${response.statusText} (URL: ${contentUrl})`);
                     }
                     content = await response.text();
                 }
@@ -648,6 +653,35 @@ class DocumentationPortalV2 {
             console.error("❌ Error loading section:", error);
             this.showError(`Failed to load documentation for "${section}"`);
         }
+    }
+
+    /**
+     * Get the correct base path for content files
+     * This handles different ways the documentation portal might be accessed
+     */
+    getBasePath() {
+        const currentPath = window.location.pathname;
+        
+        // If we're already in the docs-html directory, use relative path
+        if (currentPath.includes("/docs-html/")) {
+            return "";
+        }
+        
+        // If we're in the root directory, need to go into docs-html
+        if (currentPath === "/" || currentPath.endsWith("/")) {
+            return "docs-html/";
+        }
+        
+        // Default fallback
+        return "";
+    }
+
+    /**
+     * Helper method to create content URL with proper base path
+     */
+    getContentUrl(relativePath) {
+        const basePath = this.getBasePath();
+        return `${basePath}content/${relativePath}`;
     }
 
     /**
