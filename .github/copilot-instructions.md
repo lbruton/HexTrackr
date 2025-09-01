@@ -51,7 +51,8 @@
 ## Versioning & Releases
 
 - Follow SemVer and Keep a Changelog
-- Update version in `package.json` and `CHANGELOG.md`
+- Update version in `package.json` and `docs-source/CHANGELOG.md`
+- Update roadmap in `docs-source/ROADMAP.md`
 - Tag releases as `vX.Y.Z`
 
 ---
