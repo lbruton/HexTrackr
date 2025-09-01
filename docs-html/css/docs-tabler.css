@@ -12,6 +12,28 @@ body {
   margin-top: 1rem;
 }
 
+/* Fix breadcrumb spacing - prevent cramped appearance above menu items */
+.breadcrumb {
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+}
+
+/* Ensure proper spacing between breadcrumb and page header */
+.page-header {
+  margin-top: 0.5rem;
+}
+
+/* Add breathing room for navigation elements */
+nav.breadcrumb {
+  margin-bottom: 2rem;
+}
+
+/* Specific breadcrumb link spacing */
+.breadcrumb-item + .breadcrumb-item::before {
+  margin-right: 0.75rem;
+  margin-left: 0.75rem;
+}
+
 .loading-spinner {
   display: none;
 }
