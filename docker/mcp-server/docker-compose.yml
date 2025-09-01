@@ -9,9 +9,11 @@ services:
     volumes:
       # Mount FileScopeMCP only - Codacy runs in VS Code
       - /Volumes/DATA/GitHub/MCPServers/FileScopeMCP:/mcp-servers/filescope-mcp
+      - /Volumes/DATA/GitHub/MementoMCP:/mcp-servers/memento-mcp
       # Add more volume mounts as needed
     ports:
       - "3500:3500"  # FileScopeMCP
+      - "3502:3502"  # MementoMCP
       # Add more port mappings as needed
     environment:
       - NODE_ENV=development
