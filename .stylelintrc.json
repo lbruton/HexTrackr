@@ -12,9 +12,11 @@
     "comment-empty-line-before": null,
     "media-feature-name-no-vendor-prefix": null,
     "media-feature-range-notation": "prefix",
+    "declaration-property-value-no-unknown": null,
     "scss/declaration-property-value-no-unknown": null,
     "no-display-none": null,
     "no-outline-none": null,
-    "scss/property-no-unknown": null
+    "scss/property-no-unknown": null,
+    "property-no-unknown": null
   }
 }
