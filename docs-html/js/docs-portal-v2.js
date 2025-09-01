@@ -165,17 +165,19 @@ class DocumentationPortalV2 {
         // List of sections to check (could be made dynamic)
         const sectionsToCheck = [
             "getting-started", "user-guides", "api-reference", 
-            "architecture", "development", "project-management", "security", "roadmaps"
+            "architecture", "development", "project-management", "security"
         ];
         
         for (const section of sectionsToCheck) {
             try {
-                // Check if the main section file exists
-                const response = await fetch(`content/${section}/index.html`);
-                if (response.ok) {
+                // Since we removed index files, check if section has any children
+                const children = await this.discoverSectionChildren(section);
+                if (children && Object.keys(children).length > 0) {
+                    // Use the first child as the main section file
+                    const firstChild = Object.values(children)[0];
                     structure[section] = {
-                        file: `${section}/index`,
-                        children: await this.discoverSectionChildren(section)
+                        file: firstChild.file,
+                        children: children
                     };
                 }
             } catch (_error) {
@@ -275,13 +277,14 @@ class DocumentationPortalV2 {
         try {
             // Define comprehensive list of potential files to check
             // This covers all known files but allows for new ones to be added automatically
+            // Note: index.md files are excluded as they're redundant with dynamic navigation
             const potentialFiles = [
                 // Getting Started
                 "installation",
                 // User Guides  
                 "ticket-management", "vulnerability-management",
                 // API Reference
-                "tickets-api", "vulnerabilities-api", "backup-api", "index",
+                "tickets-api", "vulnerabilities-api", "backup-api",
                 // Architecture - including our new project-analysis
                 "backend", "database", "deployment", "frontend", "frameworks", "project-analysis",
                 // Development
@@ -293,8 +296,9 @@ class DocumentationPortalV2 {
                 "overview", "vulnerability-disclosure"
             ];
             
-            // Special case: For roadmaps section, check /roadmaps/ folder for .html files
-            if (section === "roadmaps") {
+            // Special case: Add ROADMAP and CHANGELOG to development section first
+            if (section === "development") {
+                // Add roadmap first (top of development menu)
                 try {
                     const roadmapResponse = await fetch("content/ROADMAP.html");
                     if (roadmapResponse.ok) {
@@ -307,28 +311,7 @@ class DocumentationPortalV2 {
                     // ROADMAP doesn't exist, skip it
                 }
                 
-                // TODO: Add auto-discovery for other roadmap files
-                // This would scan the roadmaps/ directory for additional files
-                
-            } else {
-                // For docs-source sections, test each potential file
-                for (const fileName of potentialFiles) {
-                    try {
-                        const fileResponse = await fetch(`content/${section}/${fileName}.html`);
-                        if (fileResponse.ok) {
-                            children[fileName] = {
-                                title: this.formatTitle(fileName),
-                                file: `${section}/${fileName}`
-                            };
-                        }
-                    } catch (_error) {
-                        // File doesn't exist, skip it silently
-                    }
-                }
-            }
-            
-            // Special case: Add CHANGELOG to development section (only hardcoded item)
-            if (section === "development") {
+                // Add changelog second
                 try {
                     const changelogResponse = await fetch("content/CHANGELOG.html");
                     if (changelogResponse.ok) {
@@ -339,6 +322,21 @@ class DocumentationPortalV2 {
                     }
                 } catch (_error) {
                     // Changelog doesn't exist, skip it
+                }
+            }
+            
+            // For docs-source sections, test each potential file
+            for (const fileName of potentialFiles) {
+                try {
+                    const fileResponse = await fetch(`content/${section}/${fileName}.html`);
+                    if (fileResponse.ok) {
+                        children[fileName] = {
+                            title: this.formatTitle(fileName),
+                            file: `${section}/${fileName}`
+                        };
+                    }
+                } catch (_error) {
+                    // File doesn't exist, skip it silently
                 }
             }
             
@@ -459,11 +457,14 @@ class DocumentationPortalV2 {
         for (const [key, section] of Object.entries(this.navigationStructure)) {
             const hasChildren = section.children && Object.keys(section.children).length > 0;
             const collapseId = `collapse-${key}`;
+            
+            // If section has children, make the button link to the first child
+            const firstChildFile = hasChildren ? Object.values(section.children)[0].file : section.file;
 
             html += `
                 <a class="list-group-item list-group-item-action d-flex align-items-center${hasChildren ? " collapsed" : ""}" 
-                   href="#${section.file}" 
-                   data-section="${section.file}"
+                   href="#${firstChildFile}" 
+                   data-section="${firstChildFile}"
                    ${hasChildren ? `data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false"` : ""}
                    style="border-left: 3px solid transparent; transition: all 0.2s ease;">
                     <div class="d-flex align-items-center w-100">
