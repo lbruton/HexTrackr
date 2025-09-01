@@ -112,9 +112,9 @@ if [ $OVERALL_STATUS -ne 0 ]; then
 fi
 
 # ============================================================================
-# PAM CONVERSATION STORAGE - Direct MCP Integration
+# PAM CONVERSATION STORAGE
 # ============================================================================
-echo "\n${CYAN}[pre-commit]${NC} Storing conversation in Persistent AI Memory..."
+echo "\n${YELLOW}[pre-commit]${NC} Storing conversation in Persistent AI Memory..."
 
 # Get commit message and staged files for context
 COMMIT_MSG_FILE=".git/COMMIT_EDITMSG"
@@ -133,34 +133,14 @@ Files modified: $STAGED_FILES
 Repository: HexTrackr
 Branch: $(git branch --show-current 2>/dev/null || echo 'unknown')"
 
-# Store in both immediate JSON (for backup) and prepare for direct MCP call
-SESSION_ID="git-commit-$(date '+%Y-%m-%d')"
-TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+# Use our updated Python script to store in PAM
+python3 scripts/save_persistent_memory_new.py \
+  --message "$CONVERSATION_CONTENT" \
+  --importance 7 \
+  --type "git-commit" \
+  --tags "git,commit,automated"
 
-# Create backup JSON file (existing functionality)
-cat > "/tmp/hextrackr_commit_context_$(date +%s).json" << EOF
-{
-  "tool": "store_conversation",
-  "parameters": {
-    "content": "$CONVERSATION_CONTENT",
-    "role": "system", 
-    "session_id": "$SESSION_ID",
-    "metadata": {
-      "source": "git-commit-hook",
-      "timestamp": "$TIMESTAMP",
-      "project": "hextrackr",
-      "commit_sha": "$(git rev-parse HEAD 2>/dev/null || echo 'pending')",
-      "branch": "$(git branch --show-current 2>/dev/null || echo 'unknown')"
-    }
-  }
-}
-EOF
-
-# TODO: Direct MCP call would go here if VS Code MCP available in git hook context
-# For now, JSON file approach ensures conversation is captured for next VS Code session
-
-echo "${GREEN}[pre-commit]${NC} Commit context stored in PAM-ready format 📝"
-echo "${CYAN}[pre-commit]${NC} Backup JSON created + ready for MCP processing"
+echo "${GREEN}[pre-commit]${NC} Commit context stored for PAM integration 📝"
 
 echo "\n${GREEN}[pre-commit]${NC} All code quality checks passed! ✅"
 exit 0
