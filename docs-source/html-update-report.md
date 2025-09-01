@@ -1,12 +1,14 @@
 # HTML Generation Report
 
-Generated: 2025-09-01T00:46:57.186Z
+Generated: 2025-09-01T15:09:26.320Z
 Duration: 1.5s
 Files Generated: 28
 Errors: 0
 
 ## Generated Files
 
+- CHANGELOG.html
+- ROADMAP.html
 - api-reference/backup-api.html
 - api-reference/tickets-api.html
 - api-reference/vulnerabilities-api.html
@@ -33,8 +35,6 @@ Errors: 0
 - security/vulnerability-disclosure.html
 - user-guides/ticket-management.html
 - user-guides/vulnerability-management.html
-- CHANGELOG.html
-- ROADMAP.html
 
 ## Summary
 
