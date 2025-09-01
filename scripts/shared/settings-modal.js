@@ -83,9 +83,9 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
     async loadModalHtml() {
       try {
     // Use appropriate path based on current location
-    // If we're in docs-prototype directory, use "../scripts/shared/settings-modal.html"
+    // If we're in docs-html directory, use "../scripts/shared/settings-modal.html"
     // Otherwise use "scripts/shared/settings-modal.html"
-    const isInDocs = window.location.pathname.includes("/docs-prototype/");
+    const isInDocs = window.location.pathname.includes("/docs-html/") || window.location.pathname.includes("/docs-prototype/");
     const modalPath = isInDocs ? "../scripts/shared/settings-modal.html" : "scripts/shared/settings-modal.html";
     const response = await fetch(modalPath);
         if (!response.ok) {
