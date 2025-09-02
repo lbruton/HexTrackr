@@ -6,14 +6,43 @@ build/
 coverage/
 uploads/
 
+# Python virtual environments - ALL patterns
+.venv/
+**/.venv/
+.venv/**
+**/.venv/**
+venv/
+**/venv/
+**/.env/
+**/site-packages/
+**/lib/python*/
+**/lib/python*/site-packages/**
+
+# Temporary directories - ALL patterns
+**/temp/
+**/tmp/
+temp/
+tmp/
+temp/**
+**/temp/**
+
 # Minified files
 **/*.min.js
 scripts/chart.min.js
 scripts/utils/purify.min.js
 
-# Temporary directories
-**/temp/
-**/tmp/
+# Test files moved to temp
+test-*.js
+**/test-*.js
+test-*.spec.js
+**/test-*.spec.js
+
+# FilScope MCP files (external tool)
+filescope-tools-demo.js
+FileScopeMCP-*.js
+FileScopeMCP-*.json
+FileScopeMCP-*.html
+FileScopeMCP-*.png
 
 # Configuration files that are already properly configured
 .eslintrc.js

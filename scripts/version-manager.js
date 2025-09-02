@@ -44,7 +44,7 @@ class PathValidator {
     }
 }
 
-const VERSION_FILES = [
+const _VERSION_FILES = [
     "package.json",
     "tickets.html",
     "vulnerabilities.html"
