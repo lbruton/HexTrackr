@@ -627,6 +627,32 @@
                     </div>
                     </div>
                     
+                    <!-- Historical Chart Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line me-2 text-primary"></i>
+                                Historical VPR Trends (Last 14 Days)
+                            </h3>
+                            <div class="card-actions">
+                                <div class="btn-group" role="group" aria-label="Chart metric switcher">
+                                    <input type="radio" class="btn-check" name="chart-metric" id="chart-count" autocomplete="off">
+                                    <label class="btn btn-outline-primary" for="chart-count" data-metric="count">
+                                        <i class="fas fa-hashtag me-1"></i>Vulnerability Count
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="chart-metric" id="chart-vpr" autocomplete="off" checked>
+                                    <label class="btn btn-outline-primary" for="chart-vpr" data-metric="vpr">
+                                        <i class="fas fa-chart-bar me-1"></i>VPR Score Sum
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="historicalChart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+
                     <!-- Search and Filters Section -->
                     <div class="card mb-4">
                         <div class="card-body">
@@ -665,32 +691,6 @@
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Historical Chart Section -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-line me-2 text-primary"></i>
-                                Historical VPR Trends (Last 14 Days)
-                            </h3>
-                            <div class="card-actions">
-                                <div class="btn-group" role="group" aria-label="Chart metric switcher">
-                                    <input type="radio" class="btn-check" name="chart-metric" id="chart-count" autocomplete="off">
-                                    <label class="btn btn-outline-primary" for="chart-count" data-metric="count">
-                                        <i class="fas fa-hashtag me-1"></i>Vulnerability Count
-                                    </label>
-                                    
-                                    <input type="radio" class="btn-check" name="chart-metric" id="chart-vpr" autocomplete="off" checked>
-                                    <label class="btn btn-outline-primary" for="chart-vpr" data-metric="vpr">
-                                        <i class="fas fa-chart-bar me-1"></i>VPR Score Sum
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div id="historicalChart" style="height: 300px;"></div>
                         </div>
                     </div>
 
