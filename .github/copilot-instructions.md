@@ -2,6 +2,15 @@
 
 Purpose: Give AI coding agents the minimum, project‑specific context to be productive without guesswork.
 
+## Project: HexTrackr
+
+- **Type**: Vulnerability & Ticket Management System
+- **Backend**: Node.js/Express, SQLite
+- **Frontend**: Modular JS, AG-Grid, Chart.js, Tabler CSS
+- **Docs**: Markdown in `docs-source/`, HTML in `docs-html/`
+- **Quality**: <50 Codacy issues, zero critical/high vulnerabilities
+- **Version**: 1.0.2 (SemVer)
+
 ## Critical rules
 
 - Git checkpoints: create a commit before any file edits and another after applying changes (keep messages short; details live in chat/memory).
