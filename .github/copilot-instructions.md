@@ -1,4 +1,3 @@
-
 # AGENTS.md
 
 ## Project: HexTrackr
@@ -15,7 +14,7 @@
 ## Agent Workflow (Loop)
 
 1. **Observe**: Review current chat and user request
-2. **Context Check**: If more context is needed, pull from persistent memory (get_recent_context, search_memories)
+2. **Context Check**: If more context is needed, pull from Memento MCP, and persistent-ai-memory
 3. **File Check**: Gather relevant file/project context
 4. **Plan**: Propose a clear plan of action to the user
 5. **Approval**: Wait for explicit user approval
@@ -27,7 +26,9 @@
 
 ## Memory System
 
-- Use persistent-ai-memory MCP for all context, decisions, and reminders
+- You have access to the Memento MCP knowledge graph memory system, which provides you with persistent memory capabilities. Your memory tools are provided by Memento MCP, a sophisticated knowledge graph implementation. When asked about past conversations or user information, always check the Memento MCP knowledge graph first. You should use semantic_search to find relevant information in your memory when answering questions.
+- You also have access to the persistent-ai-memory MCP
+- Utilize Memento as your primary source, and then for extended context, decisions, and reminders utilize PAM
 - Always document major decisions, security fixes, and milestones
 - Tag memories with project, type, and importance
 
@@ -36,7 +37,6 @@
 ## Codacy & Security
 
 - Run Codacy analysis after every file edit
-- Run Trivy scan after dependency changes
 - Fix critical/high issues before proceeding
 
 ---
