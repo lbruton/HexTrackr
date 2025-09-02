@@ -149,7 +149,7 @@ function formatApiError(err) {
     if (err.isOperational) {
         return {
             status: err.status,
-            message: err.message,
+            message: err.message
         };
     }
     // For non-operational errors, log them and send a generic message
@@ -185,13 +185,13 @@ const errorMessages = {
     db: {
         connection: "Could not connect to the database.",
         constraintViolation: "An item with this identifier already exists.",
-        operationFailed: "The database operation failed.",
+        operationFailed: "The database operation failed."
     },
     api: {
         notFound: (resource) => `${resource} not found.`,
         invalidInput: "The data provided is invalid.",
-        unauthorized: "You are not authorized to perform this action.",
-    },
+        unauthorized: "You are not authorized to perform this action."
+    }
 };
 
 
