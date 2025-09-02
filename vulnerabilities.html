@@ -1616,17 +1616,21 @@
 
             async loadStatistics() {
                 try {
-                    const response = await fetch(`${this.apiBase}/vulnerabilities/stats`);
+                    const response = await fetch(`${this.apiBase}/vulnerabilities/recent-trends`);
                     if (response.ok) {
-                        const stats = await response.json();
-                        this.statistics = stats.reduce((acc, stat) => {
-                            acc[stat.severity.toLowerCase()] = {
-                                count: stat.count,
-                                total_vpr: stat.total_vpr || 0,
-                                avg_vpr: stat.avg_vpr || 0
+                        const trends = await response.json();
+                        this.statistics = {};
+                        this.trends = trends;
+                        
+                        // Convert trends format to statistics format for compatibility
+                        Object.keys(trends).forEach(severity => {
+                            this.statistics[severity.toLowerCase()] = {
+                                count: trends[severity].current.count,
+                                total_vpr: trends[severity].current.total_vpr,
+                                avg_vpr: trends[severity].current.total_vpr / trends[severity].current.count || 0
                             };
-                            return acc;
-                        }, {});
+                        });
+                        
                         this.updateStatisticsDisplay();
                     }
                 } catch (error) {
@@ -1653,6 +1657,24 @@
                         
                         if (vprEl) {
                             vprEl.textContent = stat.total_vpr.toFixed(1);
+                        }
+                        
+                        // Update trend indicators with real data
+                        if (this.trends && this.trends[severity]) {
+                            const trendEl = document.getElementById(`${severity}Trend`);
+                            if (trendEl) {
+                                const trendData = this.trends[severity].trend;
+                                const change = this.currentMetricType === 'vpr' ? trendData.vpr_change : trendData.count_change;
+                                const direction = change > 0 ? 'up' : change < 0 ? 'down' : 'stable';
+                                const percentage = Math.abs(change);
+                                
+                                trendEl.className = `trend-indicator trend-${direction}`;
+                                if (direction === 'stable') {
+                                    trendEl.innerHTML = `<i class="fas fa-minus me-1"></i>0`;
+                                } else {
+                                    trendEl.innerHTML = `<i class="fas fa-arrow-${direction} me-1"></i>${change > 0 ? '+' : ''}${change}`;
+                                }
+                            }
                         }
                     }
                 });
