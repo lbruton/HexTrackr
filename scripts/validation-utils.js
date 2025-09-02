@@ -158,7 +158,7 @@ function formatApiError(err) {
         status: "error",
         message: "Something went very wrong!",
         // Only expose stack in development
-        ...(isDevelopment && { stack: err.stack }),
+        ...(isDevelopment && { stack: err.stack })
     };
 }
 
@@ -180,7 +180,7 @@ const errorMessages = {
     csv: {
         invalidRow: (rowNumber, error) => `Invalid data in CSV row ${rowNumber}: ${error}`,
         missingHeader: (header) => `CSV file is missing required header: "${header}".`,
-        fileReadError: "Could not read the uploaded CSV file.",
+        fileReadError: "Could not read the uploaded CSV file."
     },
     db: {
         connection: "Could not connect to the database.",
@@ -285,6 +285,6 @@ if (typeof module !== "undefined" && module.exports) {
         log,
         errorMessages,
         validateCsvRow,
-        handleDbOperation,
+        handleDbOperation
     };
 }
