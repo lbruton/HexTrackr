@@ -631,7 +631,7 @@
                     <div class="card mb-4">
                         <div class="card-body">
                             <div class="row g-2">
-                                <div class="col-md-8">
+                                <div class="col-md-6">
                                     <div class="input-group">
                                         <span class="input-group-text">
                                             <i class="fas fa-search"></i>
@@ -641,7 +641,7 @@
                                                autocomplete="off">
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="row g-2">
                                         <div class="col-6">
                                             <select class="form-select" id="severityFilter" aria-label="Filter by severity">
@@ -654,6 +654,9 @@
                                         </div>
                                         <div class="col-6">
                                             <div class="d-flex gap-2">
+                                                <button class="btn btn-outline-success" id="importCsvBtn" title="Import CSV vulnerabilities">
+                                                    <i class="fas fa-upload me-1"></i>Import
+                                                </button>
                                                 <button class="btn btn-outline-primary" id="exportBtn">
                                                     <i class="fas fa-download me-1"></i>Export
                                                 </button>
@@ -1288,10 +1291,10 @@
             }
 
             setupEventListeners() {
-                // Import CSV - DISABLED: Now handled by shared Settings modal
-                // document.getElementById('importCsvBtn').addEventListener('click', () => {
-                //     document.getElementById('csvFileInput').click();
-                // });
+                // Import CSV - Restored for vendor CSV uploads
+                document.getElementById('importCsvBtn').addEventListener('click', () => {
+                    document.getElementById('csvFileInput').click();
+                });
 
                 document.getElementById('csvFileInput').addEventListener('change', (e) => {
                     this.handleCsvImport(e);
