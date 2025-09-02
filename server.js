@@ -317,16 +317,20 @@ app.get("/api/vulnerabilities/recent-trends", (req, res) => {
       const previousData = {};
       
       previousRows.forEach(row => {
-        previousData[row.severity] = { count: row.count, total_vpr: row.total_vpr || 0 };
+        previousData[row.severity] = { 
+          count: row.count, 
+          total_vpr: Math.round((row.total_vpr || 0) * 100) / 100 
+        };
       });
       
       recentRows.forEach(row => {
         const prev = previousData[row.severity] || { count: 0, total_vpr: 0 };
+        const currentVpr = Math.round((row.total_vpr || 0) * 100) / 100;
         trends[row.severity] = {
-          current: { count: row.count, total_vpr: row.total_vpr || 0 },
+          current: { count: row.count, total_vpr: currentVpr },
           trend: {
             count_change: row.count - prev.count,
-            vpr_change: (row.total_vpr || 0) - prev.total_vpr
+            vpr_change: Math.round((currentVpr - prev.total_vpr) * 100) / 100
           }
         };
       });
@@ -370,7 +374,7 @@ app.get("/api/vulnerabilities/trends", (req, res) => {
       }
       trends[row.date][row.severity] = {
         count: row.count,
-        total_vpr: row.total_vpr || 0
+        total_vpr: Math.round((row.total_vpr || 0) * 100) / 100  // Round to 2 decimal places
       };
     });
     
