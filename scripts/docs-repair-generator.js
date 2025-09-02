@@ -176,7 +176,7 @@ class HtmlFileGenerator {
                 // Check if the corresponding .md file exists
                 try {
                     await fs.access(mdPath);
-                } catch (error) {
+                } catch (_error) {
                     console.warn(`Warning: No corresponding .md file found for ${htmlFile}, skipping`);
                     continue;
                 }
@@ -230,7 +230,7 @@ class HtmlFileGenerator {
                 await PathValidator.safeUnlink(backupPath);
                 console.log(`🗑️  Removed: ${backupFile}`);
                 cleanedFiles.push(backupPath);
-            } catch (error) {
+            } catch (_error) {
                 // File doesn't exist, which is fine
             }
         }

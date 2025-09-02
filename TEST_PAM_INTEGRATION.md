@@ -1,3 +1,0 @@
-# Test PAM Integration
-
-Testing PAM conversation storage in git hooks...

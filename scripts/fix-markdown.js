@@ -388,7 +388,7 @@ class MarkdownFormatter {
                         markdownFiles.push(path.relative(process.cwd(), fullPath));
                     }
                 }
-            } catch (error) {
+            } catch (_error) {
                 // Skip directories we can't read
             }
         };

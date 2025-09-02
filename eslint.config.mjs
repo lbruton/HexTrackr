@@ -2,18 +2,123 @@ import stylistic from '@stylistic/eslint-plugin';
 
 export default [
   {
-    // Files to ignore - placed first for priority
+    // Comprehensive ignore patterns  
     ignores: [
+      // Dependencies and build outputs
       "node_modules/**",
-      "**/node_modules/**", 
       "dist/**",
       "build/**",
       "coverage/**",
-      "scripts/chart.min.js",  // Third-party minified chart library
-      "**/*.min.js",           // All minified files
-      "**/temp/**",
-      "**/tmp/**"
+      
+      // Version control and OS files
+      ".git/**",
+      ".DS_Store",
+      
+      // Python virtual environments (all possible patterns)
+      ".venv/**/*",
+      "**/.venv/**/*",
+      ".venv/**/*.js",
+      "**/.venv/**/*.js", 
+      "venv/**",
+      "**/venv/**",
+      "**/.env/**",
+      "**/site-packages/**",
+      "**/lib/python*/**",
+      "**/lib/python*/site-packages/**",
+      ".venv/lib/python3.13/site-packages/**",
+      ".venv/lib/python*/site-packages/**",
+      
+      // Temporary and test directories 
+      "temp/**/*",
+      "**/temp/**/*",
+      "temp/**/*.js", 
+      "**/temp/**/*.js",
+      "tmp/**",
+      "**/tmp/**",
+      
+      // Generated and external files
+      "**/*.min.js",
+      "**/*.min.css", 
+      "**/bundle.js",
+      "**/webpack.config.js",
+      
+      // FilScope MCP files (external tool)
+      "filescope-tools-demo.js",
+      "FileScopeMCP-*.js",
+      "FileScopeMCP-*.json", 
+      "FileScopeMCP-*.html",
+      "FileScopeMCP-*.png",
+      "**/filescope/**",
+      
+      // Test files (moved to temp)
+      "test-*.js",
+      "**/test-*.js",
+      "test-*.spec.js",
+      "**/test-*.spec.js",
+      
+      // Documentation build outputs
+      "docs-html/**/*.html",
+      "docs-html/**/*.css",
+      "docs-html/**/*.js",
+      
+      // Database and data files
+      "data/**/*.db",
+      "data/**/*.sqlite",
+      
+      // Logs and uploads
+      "logs/**",
+      "uploads/**",
+      
+      // Docker and deployment
+      "docker/**",
+      "Dockerfile*",
+      "docker-compose*.yml",
+      
+      // IDE and editor files
+      ".vscode/**",
+      ".idea/**",
+      "*.swp",
+      "*.swo", 
+      "*~",
+      
+      // Configuration that shouldn't be linted
+      "*.config.js",
+      "*.config.mjs",
+      "nginx.conf", 
+      "ruleset.xml"
     ]
+  },
+  {
+    // Configuration for ESLint config files
+    files: [".eslintrc.js", "eslint.config.*"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "commonjs",
+      globals: {
+        // Node.js environment globals
+        require: "readonly",
+        module: "readonly", 
+        exports: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        process: "readonly",
+        console: "readonly"
+      }
+    },
+    plugins: {
+      '@stylistic': stylistic
+    },
+    rules: {
+      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/semi": ["error", "always"],
+      "curly": ["error", "all"],
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-console": "off",
+      "eqeqeq": ["error", "always"],
+      "no-var": "error",
+      "prefer-const": "error",
+      "no-undef": "error"
+    }
   },
   {
     // Configuration for Node.js scripts - specific patterns first
