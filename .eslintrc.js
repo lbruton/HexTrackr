@@ -5,7 +5,8 @@ module.exports = {
     sourceType: "script"
   },
   env: {
-    es6: true
+    es6: true,
+    node: true
   },
   extends: [],
   rules: {
@@ -35,7 +36,8 @@ module.exports = {
     "**/*.min.js",
     "**/temp/**",
     "**/tmp/**",
-    "uploads/**"
+    "uploads/**",
+    ".venv/**"
   ],
   overrides: [
     {
@@ -48,7 +50,12 @@ module.exports = {
         "scripts/fix-markdown.js",
         "scripts/init-database.js",
         "scripts/validation-utils.js", 
-        "scripts/version-manager.js"
+        "scripts/version-manager.js",
+        "import-cisco-csv.js",
+        "generate-hextrackr-diagram.js",
+        "filescope-tools-demo.js",
+        "test-charts.js",
+        "test-charts.spec.js"
       ],
       env: {
         node: true,

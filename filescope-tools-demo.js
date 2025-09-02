@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-env node */
+
 /**
  * FileScopeMCP Tools Demo - Interactive Demonstrations
  * Shows what each FileScopeMCP tool would provide for HexTrackr
@@ -14,6 +16,61 @@ const treeData = JSON.parse(fs.readFileSync(treeDataPath, "utf8"));
 
 console.log("🔍 FileScopeMCP Tools Demo for HexTrackr\n");
 console.log("=========================================\n");
+
+// Helper function for project statistics
+function getProjectStats() {
+    let totalFiles = 0;
+    let totalDirs = 0;
+    const importanceScores = [];
+    const fileTypes = {};
+    
+    function traverse(node) {
+        if (node.isDirectory) {
+            totalDirs++;
+        } else {
+            totalFiles++;
+            importanceScores.push(node.importance);
+            const ext = path.extname(node.name) || "no-ext";
+            fileTypes[ext] = (fileTypes[ext] || 0) + 1;
+        }
+        
+        if (node.children) {
+            node.children.forEach(child => traverse(child));
+        }
+    }
+    
+    traverse(treeData.fileTree);
+    
+    const criticalFiles = importanceScores.filter(s => s >= 7).length;
+    const highFiles = importanceScores.filter(s => s >= 5 && s < 7).length;
+    const mediumFiles = importanceScores.filter(s => s >= 3 && s < 5).length;
+    const avgImportance = importanceScores.reduce((a, b) => a + b, 0) / importanceScores.length;
+    
+    return {
+        totalFiles,
+        totalDirs,
+        criticalFiles,
+        highFiles,
+        mediumFiles,
+        avgImportance,
+        fileTypes
+    };
+}
+
+// Helper function to get file summary
+function getFileSummary(fileName) {
+    function findFile(node) {
+        if (node.name === fileName) {return node;}
+        if (node.children) {
+            for (const child of node.children) {
+                const result = findFile(child);
+                if (result) {return result;}
+            }
+        }
+        return null;
+    }
+    return findFile(treeData.fileTree);
+}
 
 // 1. TOOL: set_project_path (Configuration)
 console.log("📁 TOOL: set_project_path");
@@ -161,20 +218,6 @@ console.log("   Example: server.js summary:");
 
 const serverFile = findFileImportance("server.js");
 if (serverFile) {
-    function getFileSummary(fileName) {
-        function findFile(node) {
-            if (node.name === fileName) {return node;}
-            if (node.children) {
-                for (const child of node.children) {
-                    const result = findFile(child);
-                    if (result) {return result;}
-                }
-            }
-            return null;
-        }
-        return findFile(treeData.fileTree);
-    }
-    
     const summary = getFileSummary("server.js");
     console.log(`   📄 File: ${summary.name}`);
     console.log(`   📍 Path: ${summary.path}`);
@@ -205,45 +248,6 @@ console.log("");
 // Summary Statistics
 console.log("📊 PROJECT ANALYSIS SUMMARY");
 console.log("============================");
-
-function getProjectStats() {
-    let totalFiles = 0;
-    let totalDirs = 0;
-    const importanceScores = [];
-    const fileTypes = {};
-    
-    function traverse(node) {
-        if (node.isDirectory) {
-            totalDirs++;
-        } else {
-            totalFiles++;
-            importanceScores.push(node.importance);
-            const ext = path.extname(node.name) || "no-ext";
-            fileTypes[ext] = (fileTypes[ext] || 0) + 1;
-        }
-        
-        if (node.children) {
-            node.children.forEach(child => traverse(child));
-        }
-    }
-    
-    traverse(treeData.fileTree);
-    
-    const criticalFiles = importanceScores.filter(s => s >= 7).length;
-    const highFiles = importanceScores.filter(s => s >= 5 && s < 7).length;
-    const mediumFiles = importanceScores.filter(s => s >= 3 && s < 5).length;
-    const avgImportance = importanceScores.reduce((a, b) => a + b, 0) / importanceScores.length;
-    
-    return {
-        totalFiles,
-        totalDirs,
-        criticalFiles,
-        highFiles,
-        mediumFiles,
-        avgImportance,
-        fileTypes
-    };
-}
 
 const stats = getProjectStats();
 console.log(`📁 Total Directories: ${stats.totalDirs}`);

@@ -39,7 +39,12 @@ export default [
       "scripts/validation-utils.js", 
       "scripts/version-manager.js",
   ".rMemory/core/ollama-embedding-proxy.js",
-  ".rMemory/tools/*.js"
+  ".rMemory/tools/*.js",
+  "filescope-tools-demo.js",
+  "generate-hextrackr-diagram.js",
+  "import-cisco-csv.js",
+  "test-charts.js",
+  "test-charts.spec.js"
     ],
     languageOptions: {
       ecmaVersion: 2022,
@@ -75,7 +80,8 @@ export default [
       "no-console": "off",
       "eqeqeq": ["error", "always"],
       "no-var": "error",
-      "prefer-const": "error"
+      "prefer-const": "error",
+      "no-undef": "error"
     }
   },
   {
