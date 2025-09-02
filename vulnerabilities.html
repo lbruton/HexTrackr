@@ -630,42 +630,39 @@
                     <!-- Search and Filters Section -->
                     <div class="card mb-4">
                         <div class="card-body">
-                            <div class="row g-2">
-                                <div class="col-md-6">
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-search"></i>
-                                        </span>
-                                        <input type="text" class="form-control" id="searchInput" 
-                                               placeholder="Search vulnerabilities, CVEs, or hostnames..." 
-                                               autocomplete="off">
-                                    </div>
+                            <div class="d-flex gap-3 align-items-center">
+                                <!-- Left side: Search input (auto-sizes) -->
+                                <div class="input-group flex-grow-1">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="searchInput" 
+                                           placeholder="Search vulnerabilities, CVEs, or hostnames..." 
+                                           autocomplete="off">
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            <select class="form-select" id="severityFilter" aria-label="Filter by severity">
-                                                <option value="">All Severities</option>
-                                                <option value="Critical">Critical</option>
-                                                <option value="High">High</option>
-                                                <option value="Medium">Medium</option>
-                                                <option value="Low">Low</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="d-flex gap-2">
-                                                <button class="btn btn-outline-success" id="importCsvBtn" title="Import CSV vulnerabilities">
-                                                    <i class="fas fa-upload me-1"></i>Import
-                                                </button>
-                                                <button class="btn btn-outline-primary" id="exportBtn">
-                                                    <i class="fas fa-download me-1"></i>Export
-                                                </button>
-                                                <button class="btn btn-outline-secondary" id="refreshBtn" title="Refresh data">
-                                                    <i class="fas fa-sync-alt"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                
+                                <!-- Middle: Severity filter -->
+                                <div class="flex-shrink-0">
+                                    <select class="form-select severity-filter" id="severityFilter" aria-label="Filter by severity">
+                                        <option value="">All Severities</option>
+                                        <option value="Critical">Critical</option>
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Right side: Action buttons -->
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-success" id="importCsvBtn" title="Import CSV vulnerabilities">
+                                        <i class="fas fa-upload me-1"></i>Import
+                                    </button>
+                                    <button class="btn btn-outline-primary" id="exportBtn">
+                                        <i class="fas fa-download me-1"></i>Export
+                                    </button>
+                                    <button class="btn btn-outline-secondary" id="refreshBtn" title="Refresh data">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>

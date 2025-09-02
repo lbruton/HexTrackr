@@ -117,3 +117,8 @@
 .device-analysis .progress-bar {
     border-radius: 4px;
 }
+
+/* Search and filter layout */
+.severity-filter {
+    min-width: 140px;
+}
