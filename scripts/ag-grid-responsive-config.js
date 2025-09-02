@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* global window, document, setTimeout, clearTimeout, console */
+/* global window, document, setTimeout, clearTimeout */
 
 /**
  * @fileoverview This file contains the optimal AG Grid configuration for the HexTrackr vulnerabilities table.
@@ -33,6 +33,7 @@ function debounce(func, delay) {
  *                                    to access its methods and properties like `gridApi`.
  * @returns {GridOptions} A complete AG Grid `gridOptions` object.
  */
+// eslint-disable-next-line no-unused-vars
 function createVulnerabilityGridOptions(componentContext) {
 
     // =================================================================================================
@@ -51,7 +52,7 @@ function createVulnerabilityGridOptions(componentContext) {
             width: 120,
             cellRenderer: (params) => params.value ? new Date(params.value).toLocaleDateString() : "-",
             // Responsive setting for small screens
-            hide: window.innerWidth < 576,
+            hide: window.innerWidth < 576
         },
         {
             headerName: "Hostname",
@@ -71,7 +72,7 @@ function createVulnerabilityGridOptions(componentContext) {
             filter: true,
             width: 140,
             // Responsive setting for medium screens
-            hide: window.innerWidth < 992,
+            hide: window.innerWidth < 992
         },
         {
             headerName: "Severity",
@@ -105,7 +106,7 @@ function createVulnerabilityGridOptions(componentContext) {
             filter: true,
             width: 120,
             // Responsive setting for medium screens
-            hide: window.innerWidth < 992,
+            hide: window.innerWidth < 992
         },
         {
             headerName: "Vulnerability Description",
@@ -116,7 +117,7 @@ function createVulnerabilityGridOptions(componentContext) {
             minWidth: 250,
             wrapText: true,
             autoHeight: true,
-            cellRenderer: (params) => params.value || "-",
+            cellRenderer: (params) => params.value || "-"
         },
         {
             headerName: "VPR",
@@ -178,7 +179,7 @@ function createVulnerabilityGridOptions(componentContext) {
         defaultColDef: {
             resizable: true,
             sortable: true,
-            filter: true,
+            filter: true
         },
         animateRows: true,
         rowSelection: "multiple",
