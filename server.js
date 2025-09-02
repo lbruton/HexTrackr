@@ -270,6 +270,72 @@ app.get("/api/vulnerabilities/stats", (req, res) => {
   });
 });
 
+// Get recent vulnerability statistics with trend comparison (for cards)
+app.get("/api/vulnerabilities/recent-trends", (req, res) => {
+  const recentQuery = `
+    SELECT 
+      severity,
+      COUNT(*) as count,
+      SUM(vpr_score) as total_vpr
+    FROM vulnerabilities 
+    WHERE DATE(created_at) = (
+      SELECT MAX(DATE(created_at)) FROM vulnerabilities
+    )
+    GROUP BY severity
+  `;
+  
+  const previousQuery = `
+    SELECT 
+      severity,
+      COUNT(*) as count,
+      SUM(vpr_score) as total_vpr
+    FROM vulnerabilities 
+    WHERE DATE(created_at) = (
+      SELECT DISTINCT DATE(created_at) 
+      FROM vulnerabilities 
+      WHERE DATE(created_at) < (SELECT MAX(DATE(created_at)) FROM vulnerabilities)
+      ORDER BY DATE(created_at) DESC 
+      LIMIT 1
+    )
+    GROUP BY severity
+  `;
+  
+  db.all(recentQuery, [], (err, recentRows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    db.all(previousQuery, [], (err, previousRows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      
+      // Calculate trends
+      const trends = {};
+      const previousData = {};
+      
+      previousRows.forEach(row => {
+        previousData[row.severity] = { count: row.count, total_vpr: row.total_vpr || 0 };
+      });
+      
+      recentRows.forEach(row => {
+        const prev = previousData[row.severity] || { count: 0, total_vpr: 0 };
+        trends[row.severity] = {
+          current: { count: row.count, total_vpr: row.total_vpr || 0 },
+          trend: {
+            count_change: row.count - prev.count,
+            vpr_change: (row.total_vpr || 0) - prev.total_vpr
+          }
+        };
+      });
+      
+      res.json(trends);
+    });
+  });
+});
+
 // Get historical trending data (last 14 days)
 app.get("/api/vulnerabilities/trends", (req, res) => {
   const query = `
@@ -294,9 +360,18 @@ app.get("/api/vulnerabilities/trends", (req, res) => {
     const trends = {};
     rows.forEach(row => {
       if (!trends[row.date]) {
-        trends[row.date] = { date: row.date, Critical: 0, High: 0, Medium: 0, Low: 0 };
+        trends[row.date] = { 
+          date: row.date, 
+          Critical: { count: 0, total_vpr: 0 }, 
+          High: { count: 0, total_vpr: 0 }, 
+          Medium: { count: 0, total_vpr: 0 }, 
+          Low: { count: 0, total_vpr: 0 } 
+        };
       }
-      trends[row.date][row.severity] = row.count;
+      trends[row.date][row.severity] = {
+        count: row.count,
+        total_vpr: row.total_vpr || 0
+      };
     });
     
     res.json(Object.values(trends));
