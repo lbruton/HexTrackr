@@ -1451,7 +1451,13 @@
                         title: {
                             text: 'Number of Vulnerabilities'
                         },
-                        min: 0
+                        min: 0,
+                        labels: {
+                            formatter: function (val) {
+                                // Round VPR values to 2 decimal places, whole numbers for counts
+                                return val % 1 === 0 ? val.toString() : val.toFixed(2);
+                            }
+                        }
                     },
                     legend: {
                         position: 'top',
@@ -1874,7 +1880,17 @@
                         title: {
                             text: yAxisTitle
                         },
-                        min: 0
+                        min: 0,
+                        labels: {
+                            formatter: function (val) {
+                                // Round VPR values to 2 decimal places, whole numbers for counts
+                                if (metricType === 'vpr') {
+                                    return val.toFixed(2);
+                                } else {
+                                    return val % 1 === 0 ? val.toString() : val.toFixed(0);
+                                }
+                            }
+                        }
                     },
                     tooltip: {
                         shared: true,
