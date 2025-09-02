@@ -1,6 +1,9 @@
+/* eslint-env browser */
+/* global console, document, window */
+
 /**
- * HexTrackr Security Utilities
- * Provides centralized security functions for XSS prevention
+ * Security utilities for HexTrackr
+ * Provides XSS protection, input sanitization, and content security policy helpers
  */
 
 /* eslint-env browser */
@@ -15,7 +18,7 @@ function safeSetInnerHTML(element, htmlContent) {
     if (typeof DOMPurify !== "undefined") {
         element.innerHTML = DOMPurify.sanitize(htmlContent);
     } else {
-        console.warn("DOMPurify not available, falling back to textContent");
+        console.warn("DOMPurify not available, falling back to textContent"); // eslint-disable-line no-console
         element.textContent = htmlContent;
     }
 }
@@ -29,7 +32,7 @@ function escapeHtml(text) {
     if (!text) {
         return "";
     }
-    const div = document.createElement("div");
+    const div = document.createElement("div"); // eslint-disable-line no-undef
     div.textContent = text;
     return div.innerHTML;
 }
@@ -42,7 +45,7 @@ function escapeHtml(text) {
  * @returns {HTMLElement} - The created element
  */
 function safeCreateElement(tagName, content = "", attributes = {}) {
-    const element = document.createElement(tagName);
+    const element = document.createElement(tagName); // eslint-disable-line no-undef
     
     if (content) {
         if (typeof DOMPurify !== "undefined") {
@@ -55,7 +58,7 @@ function safeCreateElement(tagName, content = "", attributes = {}) {
     // Set attributes safely
     for (const [key, value] of Object.entries(attributes)) {
         if (key.startsWith("on")) {
-            console.warn(`Skipping event attribute: ${key}`);
+            console.warn(`Skipping event attribute: ${key}`); // eslint-disable-line no-console
             continue;
         }
         element.setAttribute(key, escapeHtml(value));
@@ -65,7 +68,7 @@ function safeCreateElement(tagName, content = "", attributes = {}) {
 }
 
 // Make functions globally available
-if (typeof window !== "undefined") {
+if (typeof window !== "undefined") { // eslint-disable-line no-undef
     window.safeSetInnerHTML = safeSetInnerHTML;
     window.escapeHtml = escapeHtml;
     window.safeCreateElement = safeCreateElement;
