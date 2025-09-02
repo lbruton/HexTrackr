@@ -22,7 +22,7 @@ graph TD
 ## Requirements
 
 - Ollama installed and running
-- nomic-embed-text model pulled in Ollama
+- mxbai-embed-large model pulled in Ollama
 - Embedding proxy running on port 3001
 - PAM MCP server running
 
