@@ -41,7 +41,7 @@ Purpose: Give AI coding agents the minimum, project‑specific context to be pro
 - Run locally
   - Install deps: `npm install`
   - Initialize DB: `node scripts/init-database.js`
-  - Start server: `npm start` → <http://localhost:8080>
+  - Start server: `docker-compose up` → <http://localhost:8080>
 - Lint & formatting
   - `npm run lint:all` (markdownlint, ESLint, stylelint). ESLint: `eslint.config.mjs` (double quotes, semicolons, prefer‑const, no‑var, eqeqeq, strict no‑unused‑vars, browser/Node globals scoped by file globs).
 - Docs
