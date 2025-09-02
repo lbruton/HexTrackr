@@ -534,10 +534,11 @@
             <!-- Page body -->
             <div class="page-body">
                 <div class="container-xl">
-                    <!-- VPR Statistics Cards -->
+                    <!-- Enhanced VPR Statistics Cards with Tabler.io Design -->
                     <div class="row row-deck row-cards mb-4">
+                        <!-- Critical Severity Card -->
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm">
+                            <div class="card card-sm stat-card-enhanced" data-severity="critical" onclick="vulnManager.flipStatCards()">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
@@ -546,20 +547,33 @@
                                             </span>
                                         </div>
                                         <div class="col">
-                                            <div class="font-weight-medium" id="criticalCount">0</div>
-                                            <div class="text-muted">Critical (9.0-10.0)</div>
+                                            <div class="card-front">
+                                                <div class="font-weight-medium h2 mb-1" id="criticalCount">0</div>
+                                                <div class="text-muted small">Critical Vulnerabilities</div>
+                                                <div class="text-red small fw-bold mt-1" id="criticalVPR">0.0 VPR</div>
+                                            </div>
+                                            <div class="card-back">
+                                                <div class="font-weight-medium h2 mb-1" id="criticalTotalVPR">0.0</div>
+                                                <div class="text-muted small">Total VPR Score</div>
+                                                <div class="text-red small fw-bold mt-1" id="criticalAvgVPR">0.0 avg</div>
+                                            </div>
                                         </div>
                                         <div class="col-auto">
                                             <div class="text-red" id="criticalTrend">
-                                                <i class="fas fa-trending-up"></i>
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <i class="ti ti-trending-up fs-3"></i>
+                                                    <span class="badge bg-red-lt text-red trend-value">+0%</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- High Severity Card -->
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm">
+                            <div class="card card-sm stat-card-enhanced" data-severity="high" onclick="vulnManager.flipStatCards()">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
@@ -568,20 +582,33 @@
                                             </span>
                                         </div>
                                         <div class="col">
-                                            <div class="font-weight-medium" id="highCount">0</div>
-                                            <div class="text-muted">High (7.0-8.9)</div>
+                                            <div class="card-front">
+                                                <div class="font-weight-medium h2 mb-1" id="highCount">0</div>
+                                                <div class="text-muted small">High Vulnerabilities</div>
+                                                <div class="text-orange small fw-bold mt-1" id="highVPR">0.0 VPR</div>
+                                            </div>
+                                            <div class="card-back">
+                                                <div class="font-weight-medium h2 mb-1" id="highTotalVPR">0.0</div>
+                                                <div class="text-muted small">Total VPR Score</div>
+                                                <div class="text-orange small fw-bold mt-1" id="highAvgVPR">0.0 avg</div>
+                                            </div>
                                         </div>
                                         <div class="col-auto">
                                             <div class="text-orange" id="highTrend">
-                                                <i class="fas fa-trending-up"></i>
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <i class="ti ti-trending-up fs-3"></i>
+                                                    <span class="badge bg-orange-lt text-orange trend-value">+0%</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Medium Severity Card -->
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm">
+                            <div class="card card-sm stat-card-enhanced" data-severity="medium" onclick="vulnManager.flipStatCards()">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
@@ -590,20 +617,33 @@
                                             </span>
                                         </div>
                                         <div class="col">
-                                            <div class="font-weight-medium" id="mediumCount">0</div>
-                                            <div class="text-muted">Medium (4.0-6.9)</div>
+                                            <div class="card-front">
+                                                <div class="font-weight-medium h2 mb-1" id="mediumCount">0</div>
+                                                <div class="text-muted small">Medium Vulnerabilities</div>
+                                                <div class="text-yellow small fw-bold mt-1" id="mediumVPR">0.0 VPR</div>
+                                            </div>
+                                            <div class="card-back">
+                                                <div class="font-weight-medium h2 mb-1" id="mediumTotalVPR">0.0</div>
+                                                <div class="text-muted small">Total VPR Score</div>
+                                                <div class="text-yellow small fw-bold mt-1" id="mediumAvgVPR">0.0 avg</div>
+                                            </div>
                                         </div>
                                         <div class="col-auto">
                                             <div class="text-yellow" id="mediumTrend">
-                                                <i class="fas fa-trending-up"></i>
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <i class="ti ti-trending-up fs-3"></i>
+                                                    <span class="badge bg-yellow-lt text-yellow trend-value">+0%</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Low Severity Card -->
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm">
+                            <div class="card card-sm stat-card-enhanced" data-severity="low" onclick="vulnManager.flipStatCards()">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
@@ -612,16 +652,37 @@
                                             </span>
                                         </div>
                                         <div class="col">
-                                            <div class="font-weight-medium" id="lowCount">0</div>
-                                            <div class="text-muted">Low (0.1-3.9)</div>
+                                            <div class="card-front">
+                                                <div class="font-weight-medium h2 mb-1" id="lowCount">0</div>
+                                                <div class="text-muted small">Low Vulnerabilities</div>
+                                                <div class="text-green small fw-bold mt-1" id="lowVPR">0.0 VPR</div>
+                                            </div>
+                                            <div class="card-back">
+                                                <div class="font-weight-medium h2 mb-1" id="lowTotalVPR">0.0</div>
+                                                <div class="text-muted small">Total VPR Score</div>
+                                                <div class="text-green small fw-bold mt-1" id="lowAvgVPR">0.0 avg</div>
+                                            </div>
                                         </div>
                                         <div class="col-auto">
                                             <div class="text-green" id="lowTrend">
-                                                <i class="fas fa-trending-down"></i>
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <i class="ti ti-trending-down fs-3"></i>
+                                                    <span class="badge bg-green-lt text-green trend-value">-0%</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Card Flip Instructions -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-info d-flex align-items-center" role="alert">
+                                <i class="ti ti-info-circle me-2"></i>
+                                <small>Click on any statistics card to flip between vulnerability counts and VPR scores</small>
                             </div>
                         </div>
                     </div>
@@ -1471,16 +1532,61 @@
                     tooltip: {
                         shared: true,
                         intersect: false,
+                        followCursor: false,
+                        fixed: {
+                            enabled: true,
+                            position: 'topLeft',
+                            offsetX: 20,
+                            offsetY: 20
+                        },
                         y: {
                             formatter: function (val) {
                                 return val + " vulnerabilities";
                             }
+                        },
+                        custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                            // Custom tooltip with click-to-close functionality
+                            const date = new Date(w.globals.seriesX[seriesIndex][dataPointIndex]).toLocaleDateString();
+                            let tooltipContent = `<div class="apexcharts-tooltip-custom" style="padding: 12px; background: white; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative;">`;
+                            tooltipContent += `<div style="font-weight: 600; margin-bottom: 8px; color: #374151;">${date}</div>`;
+                            
+                            w.config.series.forEach((serie, index) => {
+                                const value = series[index] ? series[index][dataPointIndex] : 0;
+                                const color = w.config.colors[index];
+                                tooltipContent += `<div style="display: flex; align-items: center; margin-bottom: 4px;">`;
+                                tooltipContent += `<div style="width: 12px; height: 12px; background: ${color}; border-radius: 50%; margin-right: 8px;"></div>`;
+                                tooltipContent += `<span style="color: #6b7280; margin-right: 8px;">${serie.name}:</span>`;
+                                tooltipContent += `<span style="font-weight: 600; color: #111827;">${value} vulnerabilities</span>`;
+                                tooltipContent += `</div>`;
+                            });
+                            
+                            tooltipContent += `<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; text-align: center;">Click anywhere to close</div>`;
+                            tooltipContent += `</div>`;
+                            
+                            return tooltipContent;
                         }
                     }
                 };
 
                 this.chart = new ApexCharts(document.getElementById('historicalChart'), options);
                 this.chart.render();
+                
+                // Add click-to-close functionality for persistent tooltips
+                setTimeout(() => {
+                    const chartContainer = document.getElementById('historicalChart');
+                    if (chartContainer) {
+                        chartContainer.addEventListener('click', (e) => {
+                            // Hide any visible tooltips when clicking on the chart
+                            const tooltips = document.querySelectorAll('.apexcharts-tooltip');
+                            tooltips.forEach(tooltip => {
+                                if (tooltip.style.opacity !== '0') {
+                                    tooltip.style.opacity = '0';
+                                    tooltip.style.display = 'none';
+                                }
+                            });
+                        });
+                    }
+                }, 100);
             }
 
             async handleCsvImport(event) {
@@ -1649,20 +1755,41 @@
                 ['critical', 'high', 'medium', 'low', 'info'].forEach(severity => {
                     const stat = this.statistics[severity];
                     if (stat) {
-                        // Try new style elements first
-                        const countEl = document.getElementById(`${severity}-count`);
-                        const vprEl = document.getElementById(`${severity}-vpr`);
+                        // Enhanced card front elements (vulnerability counts)
+                        const countEl = document.getElementById(`${severity}Count`);
+                        const vprEl = document.getElementById(`${severity}VPR`);
                         
                         if (countEl) {
                             countEl.textContent = stat.count;
-                        } else {
-                            // Fallback to old style
-                            const legacyEl = document.getElementById(`${severity}Count`);
-                            if (legacyEl) legacyEl.textContent = stat.count;
                         }
                         
                         if (vprEl) {
-                            vprEl.textContent = stat.total_vpr.toFixed(1);
+                            vprEl.textContent = `${stat.total_vpr.toFixed(1)} VPR`;
+                        }
+                        
+                        // Enhanced card back elements (VPR totals and averages)
+                        const totalVprEl = document.getElementById(`${severity}TotalVPR`);
+                        const avgVprEl = document.getElementById(`${severity}AvgVPR`);
+                        
+                        if (totalVprEl) {
+                            totalVprEl.textContent = stat.total_vpr.toFixed(1);
+                        }
+                        
+                        if (avgVprEl) {
+                            const average = stat.count > 0 ? (stat.total_vpr / stat.count).toFixed(1) : '0.0';
+                            avgVprEl.textContent = `${average} avg`;
+                        }
+                        
+                        // Legacy fallback elements
+                        const legacyCountEl = document.getElementById(`${severity}-count`);
+                        const legacyVprEl = document.getElementById(`${severity}-vpr`);
+                        
+                        if (legacyCountEl) {
+                            legacyCountEl.textContent = stat.count;
+                        }
+                        
+                        if (legacyVprEl) {
+                            legacyVprEl.textContent = stat.total_vpr.toFixed(1);
                         }
                         
                         // Update trend indicators with real data
@@ -1674,11 +1801,21 @@
                                 const direction = change > 0 ? 'up' : change < 0 ? 'down' : 'stable';
                                 const percentage = Math.abs(change);
                                 
-                                trendEl.className = `trend-indicator trend-${direction}`;
-                                if (direction === 'stable') {
-                                    trendEl.innerHTML = `<i class="fas fa-minus me-1"></i>0`;
-                                } else {
-                                    trendEl.innerHTML = `<i class="fas fa-arrow-${direction} me-1"></i>${change > 0 ? '+' : ''}${change}`;
+                                const iconEl = trendEl.querySelector('i');
+                                const badgeEl = trendEl.querySelector('.trend-value');
+                                
+                                if (iconEl && badgeEl) {
+                                    // Update Tabler.io trend icons
+                                    if (direction === 'up') {
+                                        iconEl.className = 'ti ti-trending-up fs-3';
+                                        badgeEl.textContent = `+${percentage.toFixed(0)}%`;
+                                    } else if (direction === 'down') {
+                                        iconEl.className = 'ti ti-trending-down fs-3';
+                                        badgeEl.textContent = `-${percentage.toFixed(0)}%`;
+                                    } else {
+                                        iconEl.className = 'ti ti-minus fs-3';
+                                        badgeEl.textContent = '0%';
+                                    }
                                 }
                             }
                         }
@@ -1767,6 +1904,27 @@
                     direction: percentChange > 0 ? 'up' : 'down',
                     percentage: Math.abs(percentChange).toFixed(1)
                 };
+            }
+
+            // Enhanced statistics card flip functionality
+            flipStatCards() {
+                const cards = document.querySelectorAll('.stat-card-enhanced');
+                
+                cards.forEach(card => {
+                    const cardFront = card.querySelector('.card-front');
+                    const cardBack = card.querySelector('.card-back');
+                    
+                    if (cardFront && cardBack) {
+                        // Toggle visibility with animation
+                        if (cardFront.style.display !== 'none') {
+                            cardFront.style.display = 'none';
+                            cardBack.style.display = 'block';
+                        } else {
+                            cardFront.style.display = 'block';
+                            cardBack.style.display = 'none';
+                        }
+                    }
+                });
             }
 
             // Smart timeline extension method
