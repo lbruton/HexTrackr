@@ -54,6 +54,12 @@ docker-compose.dev.yml
 scripts/start-dev-env.sh
 scripts/stop-dev-env.sh
 
+# External MCP Tools (FilScope)
+filescope-tools-demo.js
+FileScopeMCP-*.json
+FileScopeMCP-*.html
+FileScopeMCP-*.png
+
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 .rMemory
