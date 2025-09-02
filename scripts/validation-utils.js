@@ -132,6 +132,7 @@ function isValidSeverity(severity) {
 class AppError extends Error {
     constructor(message, statusCode, isOperational = true) {
         super(message);
+        // PMD-disable-next-line GlobalVariable
         this.statusCode = statusCode;
         this.isOperational = isOperational; // Operational errors are expected (e.g., user input)
         this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
