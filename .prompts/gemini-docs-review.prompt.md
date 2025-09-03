@@ -10,7 +10,12 @@ Conduct comprehensive analysis and enhancement of HexTrackr documentation to ens
 
 **Project**: HexTrackr v1.0.3 - Vulnerability & Ticket Management System
 **Architecture**: Node.js/Express backend, SQLite persistence, modular JavaScript frontend
-**Documentation System**: Markdown (`docs-source/`) → HTML portal (`docs-html/`)
+**Documentation Pipeline**:
+
+- Source: Markdown files in `docs-source/` directory structure
+- Generator: `docs-html/html-content-updater.js` converts MD → HTML  
+- Output: HTML portal in `docs-html/content/` for web interface
+- **Critical**: All improvements must update source markdown files in `docs-source/`
 
 ## Analysis Requirements
 
@@ -34,19 +39,25 @@ Conduct comprehensive analysis and enhancement of HexTrackr documentation to ens
    - Verify proper markdown structure
    - Assess user experience flow
 
-### Phase 2: Content Enhancement
+### Phase 2: Source File Enhancement
 
-1. **Missing Content Generation**
-   - Create documentation for undocumented features
-   - Generate comprehensive API reference sections
-   - Add troubleshooting guides
-   - Create quick-start tutorials
+1. **docs-source/ Structure Compliance**
+   - Ensure all documentation follows existing folder structure
+   - Create missing files in appropriate subdirectories
+   - Maintain consistency with current organization pattern
+   - Preserve existing navigation and cross-reference structure
 
-1. **Existing Content Improvement**
-   - Enhance clarity and readability
-   - Add practical examples and use cases
-   - Improve technical accuracy
-   - Update outdated information
+1. **Markdown Source Improvements**
+   - Update existing `.md` files in `docs-source/` with enhanced content
+   - Create new documentation files where gaps are identified
+   - Ensure all changes work with `html-content-updater.js` pipeline
+   - Maintain proper markdown formatting for HTML conversion
+
+1. **Pipeline Integration**
+   - Verify all updated content renders properly via HTML generator
+   - Test that new files are included in HTML generation process
+   - Ensure cross-references and links work in both MD and HTML formats
+   - Validate that documentation portal navigation remains intact
 
 1. **Structure Optimization**
    - Improve navigation and cross-references
@@ -148,11 +159,11 @@ Conduct comprehensive analysis and enhancement of HexTrackr documentation to ens
 
 ### Deliverables
 
-- Updated markdown files for all reviewed sections
-- New content for identified gaps
-- Comprehensive analysis report
-- Prioritized enhancement recommendations
-- Quality improvement metrics
+- **Updated Source Files**: Enhanced markdown files in `docs-source/` directory structure
+- **New Documentation**: Missing files created in appropriate `docs-source/` subdirectories  
+- **Analysis Reports**: Comprehensive review with specific file-by-file recommendations
+- **Integration Guidance**: Clear instructions for regenerating HTML portal via existing pipeline
+- **Quality Validation**: Verification that updates work with `html-content-updater.js`
 
 ## Success Criteria
 
