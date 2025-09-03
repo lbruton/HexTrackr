@@ -33,6 +33,8 @@ HexTrackr is a vulnerability and ticket management system with a monolithic Node
 
 ### Development Setup
 
+- **NEVER** run node.js locally for this project, always run in Docker container
+
 ## Docker Configuration
 
 - Uses `Dockerfile.node` (not the main `Dockerfile`)
