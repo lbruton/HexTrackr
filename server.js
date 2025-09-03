@@ -579,7 +579,7 @@ app.get("/api/vulnerabilities", (req, res) => {
   }
   
   const query = `
-    SELECT * FROM vulnerabilities_current 
+    SELECT * FROM vulnerabilities 
     ${whereClause}
     ORDER BY vpr_score DESC, last_seen DESC 
     LIMIT ? OFFSET ?
@@ -594,7 +594,7 @@ app.get("/api/vulnerabilities", (req, res) => {
     }
     
     // Get total count for pagination
-    const countQuery = `SELECT COUNT(*) as total FROM vulnerabilities_current ${whereClause}`;
+    const countQuery = `SELECT COUNT(*) as total FROM vulnerabilities ${whereClause}`;
     db.get(countQuery, params.slice(0, -2), (err, countResult) => {
       if (err) {
         res.status(500).json({ error: err.message });
