@@ -1057,6 +1057,42 @@
         </div>
     </div>
 
+    <!-- Date Selection Modal for CSV Import -->
+    <div class="modal modal-blur fade" id="scanDateModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-alt me-2"></i>Set Scan Date
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">
+                        Please specify the scan date for this vulnerability data. This date will be used for trending analysis.
+                    </p>
+                    <div class="mb-3">
+                        <label for="scanDateInput" class="form-label">Scan Date</label>
+                        <input type="date" class="form-control" id="scanDateInput" required>
+                        <div class="form-text">Choose the date when this vulnerability scan was performed.</div>
+                    </div>
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Tip:</strong> For trending analysis, use the actual scan date from your vulnerability management system.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confirmScanDate">
+                        <i class="fas fa-upload me-1"></i>Import with Date
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- File Input (Hidden) -->
     <input type="file" id="csvFileInput" accept=".csv" class="hidden-input">
 
@@ -1349,13 +1385,18 @@
             }
 
             setupEventListeners() {
-                // Import CSV - Restored for vendor CSV uploads
+                // Import CSV - Show date picker modal
                 document.getElementById('importCsvBtn').addEventListener('click', () => {
                     document.getElementById('csvFileInput').click();
                 });
 
                 document.getElementById('csvFileInput').addEventListener('change', (e) => {
-                    this.handleCsvImport(e);
+                    this.showScanDateModal(e);
+                });
+
+                // Confirm scan date and proceed with import
+                document.getElementById('confirmScanDate').addEventListener('click', () => {
+                    this.proceedWithImport();
                 });
 
                 // Search and filters
@@ -1587,6 +1628,85 @@
                         });
                     }
                 }, 100);
+            }
+
+            // New methods for date picker functionality
+            showScanDateModal(event) {
+                this.pendingFile = event.target.files[0];
+                if (!this.pendingFile) return;
+
+                // Set default date to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('scanDateInput').value = today;
+
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById('scanDateModal'));
+                modal.show();
+            }
+
+            async proceedWithImport() {
+                const scanDate = document.getElementById('scanDateInput').value;
+                if (!scanDate) {
+                    this.showToast('Please select a scan date', 'danger');
+                    return;
+                }
+
+                // Hide the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('scanDateModal'));
+                modal.hide();
+
+                // Proceed with import using the selected date
+                await this.handleCsvImportWithDate(this.pendingFile, scanDate);
+                
+                // Clear the pending file and file input
+                this.pendingFile = null;
+                document.getElementById('csvFileInput').value = '';
+            }
+
+            async handleCsvImportWithDate(file, scanDate) {
+                if (!file) return;
+
+                // Check file size (warn if over 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    if (!confirm(`This file is ${Math.round(file.size / (1024 * 1024))}MB. Large files will be processed server-side for better performance. Continue?`)) {
+                        return;
+                    }
+                }
+
+                this.showLoading('Uploading CSV file...');
+
+                try {
+                    // Prepare form data for upload
+                    const formData = new FormData();
+                    formData.append('csvFile', file);
+                    formData.append('vendor', 'cisco'); // Default to cisco, could be made configurable
+                    formData.append('scanDate', scanDate); // Add the scan date
+
+                    // Upload to database API
+                    const response = await fetch(`${this.apiBase}/vulnerabilities/import`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Import failed');
+                    }
+
+                    this.showLoading('Processing data...');
+                    const result = await response.json();
+
+                    this.showLoading('Updating display...');
+                    await this.loadData();
+
+                    this.hideLoading();
+                    this.showToast(`CSV import completed! Imported ${result.rowsProcessed.toLocaleString()} vulnerabilities from ${result.filename} with scan date ${scanDate}.`, 'success');
+
+                } catch (error) {
+                    this.hideLoading();
+                    console.error('Error importing CSV:', error);
+                    this.showToast('Error importing CSV: ' + error.message, 'danger');
+                }
             }
 
             async handleCsvImport(event) {
