@@ -35,7 +35,7 @@ This page documents the frameworks and libraries used across HexTrackr, what the
 - Purpose: Data table for Vulnerabilities and related device/asset grids.
 - Where:
   - `vulnerabilities.html` (CSS/JS via CDN; grid creation with `agGrid.createGrid(...)`)
-  - Config: `scripts/ag-grid-responsive-config.js`
+  - Config: `scripts/shared/ag-grid-responsive-config.js`
   - Styles: `styles/pages/vulnerabilities.css`, `styles/utils/responsive.css`
 
 ### ApexCharts
