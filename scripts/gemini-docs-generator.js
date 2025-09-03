@@ -79,6 +79,7 @@ class GeminiDocsGenerator {
         this.docsSourceDir = path.join(this.baseDir, "docs-source");
         this.docsHtmlDir = path.join(this.baseDir, "docs-html");
         this.promptsDir = path.join(this.baseDir, ".prompts");
+        this.analysisDir = path.join(this.baseDir, "docs-analysis");
         
         // Initialize Gemini API
         this.initializeGeminiAPI();
@@ -87,7 +88,9 @@ class GeminiDocsGenerator {
             scannedFiles: [],
             analysisResults: {},
             enhancements: [],
-            errors: []
+            errors: [],
+            updatedFiles: [],
+            createdFiles: []
         };
     }
 
@@ -236,6 +239,112 @@ Focus on practical improvements that enhance user experience and technical accur
                 timestamp: new Date().toISOString()
             });
             return null;
+        }
+    }
+
+    /**
+     * Update a source markdown file with enhanced content
+     */
+    async updateSourceFile(filePath, enhancedContent) {
+        try {
+            // Create backup of original file
+            const backupPath = `${filePath}.backup.${Date.now()}`;
+            const originalContent = await PathValidator.safeReadFile(filePath);
+            await PathValidator.safeWriteFile(backupPath, originalContent);
+            
+            // Write enhanced content to source file
+            await PathValidator.safeWriteFile(filePath, enhancedContent);
+            
+            this.analysis.updatedFiles.push({
+                file: filePath,
+                backup: backupPath,
+                timestamp: new Date().toISOString()
+            });
+            
+            console.log(`✅ Updated source file: ${filePath}`);
+            console.log(`💾 Backup created: ${backupPath}`);
+            
+            return true;
+        } catch (error) {
+            console.error(`❌ Failed to update source file ${filePath}: ${error.message}`);
+            this.analysis.errors.push({
+                file: filePath,
+                error: error.message,
+                timestamp: new Date().toISOString()
+            });
+            return false;
+        }
+    }
+
+    /**
+     * Create a new documentation file
+     */
+    async createNewDocFile(filePath, content) {
+        try {
+            // Ensure directory exists
+            const dir = path.dirname(filePath);
+            await fs.mkdir(dir, { recursive: true });
+            
+            // Write new file
+            await PathValidator.safeWriteFile(filePath, content);
+            
+            this.analysis.createdFiles.push({
+                file: filePath,
+                timestamp: new Date().toISOString()
+            });
+            
+            console.log(`✅ Created new documentation file: ${filePath}`);
+            return true;
+        } catch (error) {
+            console.error(`❌ Failed to create new documentation file ${filePath}: ${error.message}`);
+            this.analysis.errors.push({
+                file: filePath,
+                error: error.message,
+                timestamp: new Date().toISOString()
+            });
+            return false;
+        }
+    }
+
+    /**
+     * Regenerate HTML documentation using existing pipeline
+     */
+    async regenerateHtmlDocs() {
+        try {
+            console.log("🔄 Regenerating HTML documentation...");
+            
+            const { spawn } = require("child_process");
+            const htmlUpdaterPath = path.join(this.docsHtmlDir, "html-content-updater.js");
+            
+            return new Promise((resolve, reject) => {
+                const process = spawn("node", [htmlUpdaterPath], {
+                    cwd: this.baseDir,
+                    stdio: "inherit"
+                });
+                
+                process.on("close", (code) => {
+                    if (code === 0) {
+                        console.log("✅ HTML documentation regenerated successfully");
+                        resolve(true);
+                    } else {
+                        console.error(`❌ HTML regeneration failed with code ${code}`);
+                        reject(new Error(`HTML regeneration failed with code ${code}`));
+                    }
+                });
+                
+                process.on("error", (error) => {
+                    console.error(`❌ Failed to regenerate HTML docs: ${error.message}`);
+                    reject(error);
+                });
+            });
+        } catch (error) {
+            console.error(`❌ Failed to regenerate HTML documentation: ${error.message}`);
+            this.analysis.errors.push({
+                action: "html_regeneration",
+                error: error.message,
+                timestamp: new Date().toISOString()
+            });
+            return false;
         }
     }
 
@@ -401,14 +510,33 @@ ${this.analysis.errors.map(error => `- ❌ ${error.file}: ${error.error}`).join(
      * Generate analysis report
      */
     generateReport() {
-        const report = `# Gemini Documentation Analysis Report
+        const report = `# 🤖 Gemini Documentation Analysis Report
 *Generated: ${new Date().toISOString()}*
 
-## Summary
+## 📊 Summary
 - **Files Scanned**: ${this.analysis.scannedFiles.length}
 - **Successful Analyses**: ${Object.keys(this.analysis.analysisResults).length}
 - **Errors**: ${this.analysis.errors.length}
 - **Success Rate**: ${((Object.keys(this.analysis.analysisResults).length / this.analysis.scannedFiles.length) * 100).toFixed(1)}%
+
+## 🔄 Pipeline Integration
+
+### Current Documentation Structure
+\`\`\`
+docs-source/          ← Update these source markdown files
+├── api-reference/
+├── architecture/ 
+├── development/
+├── getting-started/
+├── memory-system/
+├── project-management/
+├── security/
+└── user-guides/
+
+docs-html/            ← HTML output (auto-generated)
+├── html-content-updater.js  ← Run this after updates
+└── content/
+\`\`\`
 
 ## Files Analyzed
 ${this.analysis.scannedFiles.map(file => {
@@ -416,15 +544,21 @@ ${this.analysis.scannedFiles.map(file => {
     return `${status} ${file.relativePath}`;
 }).join("\n")}
 
-## Errors
+${this.analysis.errors.length > 0 ? `## ⚠️ Errors
 ${this.analysis.errors.map(error => `- ❌ **${error.file}**: ${error.error}`).join("\n")}
+` : ""}
 
-## Next Steps
-1. Review generated analysis reports in docs-analysis/ directory
-2. Implement recommended improvements
-3. Update documentation files based on Gemini suggestions
-4. Run \`npm run docs:generate\` to update HTML portal
-5. Test updated documentation for accuracy and completeness
+## 📋 Next Steps
+1. **Review Analysis**: Check generated reports in docs-analysis/ directory
+2. **Update Sources**: Apply recommendations to markdown files in docs-source/
+3. **Regenerate HTML**: Run \`node docs-html/html-content-updater.js\`
+4. **Test Portal**: Verify documentation portal functionality and navigation
+5. **Quality Check**: Ensure all cross-references and links work correctly
+
+## 🔗 Pipeline Commands
+- **Analyze docs**: \`npm run docs:review\`
+- **Regenerate HTML**: \`node docs-html/html-content-updater.js\`
+- **View portal**: Open docs-html/index.html in browser
 
 ## Generated Files
 All analysis results have been saved to the docs-analysis/ directory with timestamped filenames.
@@ -468,6 +602,14 @@ async function main() {
         if (comprehensiveAnalysis) {
             const savedFiles = await generator.saveAnalysisResults(comprehensiveAnalysis);
             console.log(`\n📊 Analysis complete! Results saved to: ${savedFiles.analysisDir}`);
+            
+            // Ask user if they want to apply improvements to source files
+            console.log("\n🔄 Integration with docs-source/ pipeline:");
+            console.log("- Analysis results contain recommendations for updating source markdown files");
+            console.log("- Review the analysis in docs-analysis/ directory");
+            console.log("- Manually apply recommended changes to docs-source/ files");
+            console.log("- Run 'node docs-html/html-content-updater.js' to regenerate HTML portal");
+            console.log("\n💡 Future enhancement: Automatic application of safe improvements");
         }
         
         // Generate and display report
