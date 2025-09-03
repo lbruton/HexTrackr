@@ -91,9 +91,9 @@ function mapVulnerabilityRow(row) {
     };
 }
 
-function processVulnerabilityRows(rows, stmt, importId, filePath, responseData, res) {
+function processVulnerabilityRows(rows, stmt, importId, filePath, responseData, res, scanDate) {
     let processed = 0;
-    const currentDate = new Date().toISOString().split("T")[0];
+    const importDate = scanDate || new Date().toISOString().split("T")[0];
     
     rows.forEach(row => {
         const mapped = mapVulnerabilityRow(row);
@@ -115,7 +115,7 @@ function processVulnerabilityRows(rows, stmt, importId, filePath, responseData, 
             mapped.vendor,
             mapped.pluginPublished,
             mapped.state,
-            currentDate
+            importDate
         ], (err) => {
             if (err) {
                 console.error("Row insert error:", err);
@@ -453,6 +453,7 @@ app.post("/api/vulnerabilities/import", upload.single("csvFile"), (req, res) => 
   const startTime = Date.now();
   const filename = req.file.originalname;
   const vendor = req.body.vendor || "unknown";
+  const scanDate = req.body.scanDate || new Date().toISOString().split("T")[0]; // Use provided date or default to today
   
   // Read and parse CSV
   const csvData = PathValidator.safeReadFileSync(req.file.path, "utf8");
@@ -499,7 +500,7 @@ app.post("/api/vulnerabilities/import", upload.single("csvFile"), (req, res) => 
           importId,
           filename,
           processingTime: Date.now() - startTime
-        }, res);
+        }, res, scanDate);
       });
     },
     error: (error) => {
