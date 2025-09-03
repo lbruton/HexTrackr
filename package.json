@@ -1,6 +1,6 @@
 {
   "name": "hextrackr-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "HexTrackr with database backend",
   "main": "server.js",
   "type": "commonjs",
@@ -19,7 +19,8 @@
     "lint:md": "markdownlint --config .markdownlint.json --ignore-path .markdownlintignore '**/*.md'",
     "lint:md:fix": "node scripts/fix-markdown.js",
     "lint:all": "npm run lint:md && npm run eslint && npm run stylelint",
-    "fix:all": "npm run lint:md:fix && npm run eslint:fix && npm run stylelint:fix"
+    "fix:all": "npm run lint:md:fix && npm run eslint:fix && npm run stylelint:fix",
+    "docs:review": "node scripts/gemini-docs-generator.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.60.0",
