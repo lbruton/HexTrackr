@@ -77,15 +77,16 @@ function mapVulnerabilityRow(row) {
         ipAddress: row["asset.display_ipv4_address"] || row["asset.ipv4_addresses"] || row["ip_address"] || row["IP Address"] || "",
         cve: row["definition.cve"] || row["cve"] || row["CVE"] || "",
         severity: row["severity"] || row["Severity"] || "",
-        vprScore: parseFloat(row["definition.vpr.score"] || row["vpr_score"] || row["VPR Score"] || 0) || null,
-        cvssScore: parseFloat(row["cvss_score"] || row["CVSS Score"] || 0) || null,
+        vprScore: row["definition.vpr.score"] || row["vpr_score"] || row["VPR Score"] ? parseFloat(row["definition.vpr.score"] || row["vpr_score"] || row["VPR Score"]) : null,
+        cvssScore: row["cvss_score"] || row["CVSS Score"] ? parseFloat(row["cvss_score"] || row["CVSS Score"]) : null,
         vendor: row["definition.family"] || row["vendor"] || row["Vendor"] || "",
+        pluginName: row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "",
         description: row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "",
         pluginPublished: row["definition.plugin_published"] || row["vulnerability_date"] || row["plugin_published"] || "",
         state: row["state"] || row["State"] || "open",
         firstSeen: row["first_seen"] || row["First Seen"] || "",
         lastSeen: row["last_seen"] || row["Last Seen"] || "",
-        pluginId: row["plugin_id"] || row["Plugin ID"] || "",
+        pluginId: row["definition.id"] || row["plugin_id"] || row["Plugin ID"] || "",
         solution: row["solution"] || row["Solution"] || ""
     };
 }
@@ -108,7 +109,8 @@ function processVulnerabilityRows(rows, stmt, importId, filePath, responseData, 
             mapped.firstSeen,
             mapped.lastSeen,
             mapped.pluginId,
-            mapped.description,
+            mapped.description,  // plugin_name in SQL
+            mapped.description,  // description in SQL  
             mapped.solution,
             mapped.vendor,
             mapped.pluginPublished,
