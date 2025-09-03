@@ -1,0 +1,221 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>HexTrackr Core Engine &amp; Visualization Sprint</h1>
+<p><strong>Sprint Goal:</strong> Perfect the import/export/tracking/trending engine and solve chart visualization scaling issues</p>
+<p><strong>Date:</strong> September 3, 2025<br><strong>Target Completion:</strong> 1-2 days<br><strong>Priority:</strong> Core engine stability before cosmetic features</p>
+<hr>
+<h2>🎯 Sprint Objectives</h2>
+<h3><strong>Primary Goal: Core Engine Bulletproofing</strong></h3>
+<ul>
+<li>Perfect import/export pipeline reliability</li>
+<li>Achieve Codacy ≤2.0 issues/kLoC target (currently 9.939)</li>
+<li>Implement hostname normalization for duplicate handling</li>
+<li>Test edge cases thoroughly</li>
+</ul>
+<h3><strong>Secondary Goal: Chart Visualization Enhancement</strong></h3>
+<ul>
+<li>Solve magnitude scaling issue (Critical/Low &lt;2k vs Medium/High &gt;15k)</li>
+<li>Make 20% week-over-week trends visible instead of appearing flat</li>
+<li>Maintain data accuracy while improving visual representation</li>
+</ul>
+<hr>
+<h2>📊 Current Data Visualization Problem</h2>
+<p><strong>Issue:</strong> Chart scaling makes trends invisible</p>
+<pre><code>Critical:   ~55 (small numbers)
+Low:        ~3363 (small numbers)  
+Medium:     ~5297 (large numbers)
+High:       ~3444 (large numbers)
+</code></pre>
+<p><strong>Result:</strong> 20% week-over-week drops look like straight lines due to Y-axis scaling dominated by large values</p>
+<h2>Solution Options:</h2>
+<ol>
+<li><strong>Dual Y-Axis</strong>: Left axis for Critical/Low, Right axis for Medium/High</li>
+<li><strong>Percentage Change View</strong>: Show % change from baseline instead of absolute values</li>
+<li><strong>Normalized Scaling</strong>: Scale each severity to 0-100% of its typical range</li>
+<li><strong>Logarithmic Scale</strong>: Log scale to compress large value differences</li>
+</ol>
+<hr>
+<h2>🚀 Phase 1: Core Engine (Priority 1)</h2>
+<h3><strong>Task 1.1: Hostname Normalization</strong> ✅ COMPLETED</h3>
+<p><strong>Effort:</strong> 30 minutes<br><strong>Impact:</strong> High - Fixes duplicate detection across domain variations</p>
+<h2>IMPLEMENTATION COMPLETED:</h2>
+<ul>
+<li>✅ Enhanced <code>normalizeHostname()</code> function with IP address detection</li>
+<li>✅ Valid IP addresses (x.x.x.x, octets 0-255) preserved completely</li>
+<li>✅ Domain names normalized (remove after first period)</li>
+<li>✅ 16/16 test cases passing</li>
+<li>✅ Codacy analysis clean</li>
+</ul>
+<h2>Critical Issue Solved:</h2>
+<ul>
+<li>❌ BEFORE: <code>10.95.6.210</code> → <code>10</code> (would consolidate all 10.x IPs!)</li>
+<li>✅ AFTER: <code>10.95.6.210</code> → <code>10.95.6.210</code> (preserved correctly)</li>
+<li>✅ Domain case: <code>nwan10.mmplp.net</code> → <code>nwan10</code> (still works)</li>
+</ul>
+<h2>Test Cases Verified:</h2>
+<ul>
+<li>✅ <code>nwan10.mmplp.net</code> + <code>nwan10</code> → Same unique key</li>
+<li>✅ IP addresses preserved as complete unique identifiers  </li>
+<li>✅ Domain changes don&#39;t break duplicate detection</li>
+<li>✅ Invalid IPs (300.300.300.300) treated as hostnames</li>
+<li>✅ Existing data compatibility maintained</li>
+</ul>
+<h3><strong>Task 1.2: Import Pipeline Edge Case Testing</strong></h3>
+<p><strong>Effort:</strong> 1 hour<br><strong>Impact:</strong> High - Prevents production data corruption</p>
+<h2>Test Scenarios:</h2>
+<ul>
+<li><input disabled="" type="checkbox"> Out-of-order imports (older data after newer)</li>
+<li><input disabled="" type="checkbox"> Partial dataset overlaps</li>
+<li><input disabled="" type="checkbox"> Large file processing (&gt;10MB)</li>
+<li><input disabled="" type="checkbox"> Hostname domain variations</li>
+<li><input disabled="" type="checkbox"> Missing CVE handling</li>
+<li><input disabled="" type="checkbox"> VPR score changes for same vulnerability</li>
+</ul>
+<h3><strong>Task 1.3: Export Pipeline Enhancement</strong></h3>
+<p><strong>Effort:</strong> 1 hour<br><strong>Impact:</strong> Medium - Completes the data lifecycle</p>
+<h2>Requirements:</h2>
+<ul>
+<li>Export from <code>vulnerabilities_current</code> (not snapshots)</li>
+<li>Include normalized hostnames in export</li>
+<li>Maintain CSV format compatibility</li>
+<li>Handle large dataset exports</li>
+</ul>
+<hr>
+<h2>🔧 Phase 2: Codacy Quality Sprint (Priority 1)</h2>
+<h3><strong>Current Status:</strong> 9.939 issues/kLoC → <strong>Target:</strong> ≤2.0 issues/kLoC</h3>
+<h3><strong>Task 2.1: Critical Complexity Issues</strong></h3>
+<p><strong>Effort:</strong> 2-3 hours<br><strong>Impact:</strong> High - Biggest quality improvement per effort</p>
+<h2>Focus Areas:</h2>
+<ul>
+<li>7 critical complexity issues</li>
+<li>Function length reduction</li>
+<li>Cyclomatic complexity reduction</li>
+</ul>
+<h3><strong>Task 2.2: Quick ErrorProne Fixes</strong></h3>
+<p><strong>Effort:</strong> 1 hour<br><strong>Impact:</strong> Medium - Easy wins</p>
+<h2>Items:</h2>
+<ul>
+<li>4 trailing comma issues</li>
+<li>CSS/JS syntax cleanup</li>
+<li>Simple code pattern fixes</li>
+</ul>
+<hr>
+<h2>📈 Phase 3: Chart Visualization Enhancement (Priority 2)</h2>
+<h3><strong>Task 3.1: Implement Dual Y-Axis Chart</strong></h3>
+<p><strong>Effort:</strong> 2-3 hours<br><strong>Impact:</strong> High - Solves core visibility problem</p>
+<h2>ApexCharts Implementation:</h2>
+<pre><code class="language-javascript">// Enhanced chart configuration
+const chartOptions = {
+    chart: { type: &#39;line&#39; },
+    yaxis: [
+        {
+            title: { text: &#39;Critical &amp; Low Vulnerabilities&#39; },
+            seriesName: [&#39;Critical&#39;, &#39;Low&#39;],
+            min: 0,
+            max: dataMaxForSmallNumbers * 1.1
+        },
+        {
+            opposite: true,
+            title: { text: &#39;Medium &amp; High Vulnerabilities&#39; },
+            seriesName: [&#39;Medium&#39;, &#39;High&#39;],
+            min: 0,
+            max: dataMaxForLargeNumbers * 1.1
+        }
+    ],
+    series: [
+        { name: &#39;Critical&#39;, data: criticalData, yAxisIndex: 0 },
+        { name: &#39;Low&#39;, data: lowData, yAxisIndex: 0 },
+        { name: &#39;Medium&#39;, data: mediumData, yAxisIndex: 1 },
+        { name: &#39;High&#39;, data: highData, yAxisIndex: 1 }
+    ]
+};
+</code></pre>
+<h3><strong>Task 3.2: Alternative: Percentage Change View</strong></h3>
+<p><strong>Effort:</strong> 1-2 hours<br><strong>Impact:</strong> Medium - Shows trends clearly</p>
+<h2>Implementation:</h2>
+<ul>
+<li>Calculate baseline (first data point or average)</li>
+<li>Show percentage change from baseline</li>
+<li>Maintains trend visibility regardless of magnitude</li>
+</ul>
+<h3><strong>Task 3.3: Chart View Toggle</strong></h3>
+<p><strong>Effort:</strong> 1 hour<br><strong>Impact:</strong> Medium - User flexibility</p>
+<h2>Options:</h2>
+<ul>
+<li><input disabled="" type="checkbox"> Absolute Values (current)</li>
+<li><input disabled="" type="checkbox"> Dual Y-Axis</li>
+<li><input disabled="" type="checkbox"> Percentage Change</li>
+<li><input disabled="" type="checkbox"> Normalized (0-100%)</li>
+</ul>
+<hr>
+<h2>🧪 Phase 4: Testing &amp; Validation</h2>
+<h3><strong>Task 4.1: Import/Export Pipeline Testing</strong></h3>
+<h2>Test Data:</h2>
+<ul>
+<li>Historical data (6 months old)</li>
+<li>Domain variation samples</li>
+<li>Large datasets</li>
+<li>Malformed CSV handling</li>
+</ul>
+<h3><strong>Task 4.2: Chart Visualization Testing</strong></h3>
+<h2>Validation:</h2>
+<ul>
+<li>Trend visibility with real data</li>
+<li>Data accuracy preservation</li>
+<li>Performance with large datasets</li>
+<li>Mobile responsiveness</li>
+</ul>
+<h3><strong>Task 4.3: Codacy Validation</strong></h3>
+<p><strong>Target:</strong> Achieve ≤2.0 issues/kLoC before sprint completion</p>
+<hr>
+<h2>📋 Definition of Done</h2>
+<h3><strong>Core Engine:</strong></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Hostname normalization implemented and tested</li>
+<li><input disabled="" type="checkbox"> All import edge cases handle gracefully</li>
+<li><input disabled="" type="checkbox"> Export pipeline matches import robustness</li>
+<li><input disabled="" type="checkbox"> Codacy target achieved (≤2.0 issues/kLoC)</li>
+</ul>
+<h3><strong>Chart Visualization:</strong></h3>
+<ul>
+<li><input disabled="" type="checkbox"> 20% trends clearly visible in chart</li>
+<li><input disabled="" type="checkbox"> Data accuracy maintained</li>
+<li><input disabled="" type="checkbox"> Multiple view options available</li>
+<li><input disabled="" type="checkbox"> Performance acceptable with real datasets</li>
+</ul>
+<h3><strong>Quality Assurance:</strong></h3>
+<ul>
+<li><input disabled="" type="checkbox"> All Codacy critical issues resolved</li>
+<li><input disabled="" type="checkbox"> No regression in existing functionality</li>
+<li><input disabled="" type="checkbox"> Documentation updated</li>
+<li><input disabled="" type="checkbox"> Change log updated</li>
+</ul>
+<hr>
+<h2>🎯 Success Metrics</h2>
+<ol>
+<li><strong>Import Reliability:</strong> 100% successful imports for all test scenarios</li>
+<li><strong>Codacy Score:</strong> ≤2.0 issues/kLoC (from 9.939)</li>
+<li><strong>Chart Usability:</strong> Trends visible at 20% change threshold</li>
+<li><strong>Performance:</strong> Import/chart render times maintain current levels</li>
+<li><strong>Data Integrity:</strong> Zero data loss or corruption in testing</li>
+</ol>
+<hr>
+<h2>🚀 Next Actions</h2>
+<h2>Immediate (Today):</h2>
+<ul>
+<li><input disabled="" type="checkbox"> Review and approve sprint plan</li>
+<li><input disabled="" type="checkbox"> Set up test data for edge cases</li>
+<li><input disabled="" type="checkbox"> Prepare Codacy analysis baseline</li>
+</ul>
+<h2>Tomorrow (Start Sprint):</h2>
+<ul>
+<li><input disabled="" type="checkbox"> Task 1.1: Implement hostname normalization</li>
+<li><input disabled="" type="checkbox"> Task 1.2: Test import edge cases</li>
+<li><input disabled="" type="checkbox"> Task 2.1: Begin Codacy critical fixes</li>
+</ul>
+<p><strong>Foundation First Principle:</strong> No chart enhancements until core engine is bulletproof! 🛡️</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
