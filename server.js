@@ -91,7 +91,7 @@ function mapVulnerabilityRow(row) {
     };
 }
 
-function processVulnerabilityRows(rows, stmt, importId, filePath, responseData, res, scanDate) {
+function _processVulnerabilityRows(rows, stmt, importId, filePath, responseData, res, scanDate) {
     let processed = 0;
     const importDate = scanDate || new Date().toISOString().split("T")[0];
     
@@ -130,6 +130,172 @@ function processVulnerabilityRows(rows, stmt, importId, filePath, responseData, 
                     rowsProcessed: processed
                 });
             }
+        });
+    });
+}
+
+// Rollover architecture helper functions
+function generateUniqueKey(mapped) {
+    // Create unique key based on hostname + description + VPR score (since CVE may be empty)
+    const keyParts = [
+        (mapped.hostname || "").trim(),
+        (mapped.description || "").trim(),
+        (mapped.vprScore || 0).toString()
+    ];
+    return keyParts.join("|");
+}
+
+function processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, responseData, res, scanDate) {
+    let processed = 0;
+    const currentDate = scanDate || new Date().toISOString().split("T")[0];
+    
+    // Process each row for rollover architecture
+    rows.forEach((row) => {
+        const mapped = mapVulnerabilityRow(row);
+        const uniqueKey = generateUniqueKey(mapped);
+        
+        // Insert into snapshots (historical record)
+        db.run(`INSERT INTO vulnerability_snapshots 
+            (import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, 
+             first_seen, last_seen, plugin_id, plugin_name, description, solution, 
+             vendor_reference, vendor, vulnerability_date, state, unique_key)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            importId,
+            currentDate,
+            mapped.hostname,
+            mapped.ipAddress,
+            mapped.cve,
+            mapped.severity,
+            mapped.vprScore,
+            mapped.cvssScore,
+            mapped.firstSeen,
+            mapped.lastSeen,
+            mapped.pluginId,
+            mapped.description,
+            mapped.solution,
+            mapped.vendor,
+            mapped.vendor,
+            mapped.pluginPublished,
+            mapped.state,
+            uniqueKey
+        ], (err) => {
+            if (err) {
+                console.error("Snapshot insert error:", err);
+            }
+        });
+        
+        // Insert or replace in current table (latest state)
+        db.run(`INSERT OR REPLACE INTO vulnerabilities_current 
+            (import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, 
+             first_seen, last_seen, plugin_id, plugin_name, description, solution, 
+             vendor_reference, vendor, vulnerability_date, state, unique_key)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            importId,
+            currentDate,
+            mapped.hostname,
+            mapped.ipAddress,
+            mapped.cve,
+            mapped.severity,
+            mapped.vprScore,
+            mapped.cvssScore,
+            mapped.firstSeen,
+            mapped.lastSeen,
+            mapped.pluginId,
+            mapped.description,
+            mapped.solution,
+            mapped.vendor,
+            mapped.vendor,
+            mapped.pluginPublished,
+            mapped.state,
+            uniqueKey
+        ], (err) => {
+            if (err) {
+                console.error("Current table insert error:", err);
+            }
+            processed++;
+            
+            if (processed === rows.length) {
+                // Calculate and store daily totals
+                calculateAndStoreDailyTotals(currentDate, () => {
+                    stmt.finalize();
+                    PathValidator.safeUnlinkSync(filePath);
+                    res.json({
+                        ...responseData,
+                        rowsProcessed: processed,
+                        scanDate: currentDate,
+                        rolloverComplete: true
+                    });
+                });
+            }
+        });
+    });
+}
+
+function calculateAndStoreDailyTotals(scanDate, callback) {
+    // Calculate totals from current state (not snapshots)
+    const totalsQuery = `
+        SELECT 
+            severity,
+            COUNT(*) as count,
+            COALESCE(SUM(vpr_score), 0) as total_vpr
+        FROM vulnerabilities_current 
+        WHERE scan_date = ?
+        GROUP BY severity
+    `;
+    
+    db.all(totalsQuery, [scanDate], (err, results) => {
+        if (err) {
+            console.error("Error calculating daily totals:", err);
+            callback();
+            return;
+        }
+        
+        const totals = {
+            critical_count: 0, critical_total_vpr: 0,
+            high_count: 0, high_total_vpr: 0,
+            medium_count: 0, medium_total_vpr: 0,
+            low_count: 0, low_total_vpr: 0,
+            total_vulnerabilities: 0, total_vpr: 0
+        };
+        
+        results.forEach(row => {
+            const severity = row.severity.toLowerCase();
+            if (severity === "critical") {
+                totals.critical_count = row.count;
+                totals.critical_total_vpr = row.total_vpr;
+            } else if (severity === "high") {
+                totals.high_count = row.count;
+                totals.high_total_vpr = row.total_vpr;
+            } else if (severity === "medium") {
+                totals.medium_count = row.count;
+                totals.medium_total_vpr = row.total_vpr;
+            } else if (severity === "low") {
+                totals.low_count = row.count;
+                totals.low_total_vpr = row.total_vpr;
+            }
+            totals.total_vulnerabilities += row.count;
+            totals.total_vpr += row.total_vpr;
+        });
+        
+        // Store or update daily totals
+        db.run(`INSERT OR REPLACE INTO vulnerability_daily_totals 
+            (scan_date, critical_count, critical_total_vpr, high_count, high_total_vpr,
+             medium_count, medium_total_vpr, low_count, low_total_vpr, 
+             total_vulnerabilities, total_vpr)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            scanDate,
+            totals.critical_count, totals.critical_total_vpr,
+            totals.high_count, totals.high_total_vpr,
+            totals.medium_count, totals.medium_total_vpr,
+            totals.low_count, totals.low_total_vpr,
+            totals.total_vulnerabilities, totals.total_vpr
+        ], (err) => {
+            if (err) {
+                console.error("Error storing daily totals:", err);
+            } else {
+                console.log(`Daily totals updated for ${scanDate}`);
+            }
+            callback();
         });
     });
 }
@@ -259,7 +425,7 @@ app.get("/api/vulnerabilities/stats", (req, res) => {
       AVG(vpr_score) as avg_vpr,
       MIN(first_seen) as earliest,
       MAX(last_seen) as latest
-    FROM vulnerabilities 
+    FROM vulnerabilities_current 
     GROUP BY severity
   `;
   
@@ -346,14 +512,15 @@ app.get("/api/vulnerabilities/recent-trends", (req, res) => {
 app.get("/api/vulnerabilities/trends", (req, res) => {
   const query = `
     SELECT 
-      DATE(created_at) as date,
-      severity,
-      COUNT(*) as count,
-      SUM(vpr_score) as total_vpr
-    FROM vulnerabilities 
-    WHERE created_at >= DATE('now', '-14 days')
-    GROUP BY DATE(created_at), severity
-    ORDER BY date DESC, severity
+      scan_date as date,
+      critical_count, critical_total_vpr,
+      high_count, high_total_vpr,
+      medium_count, medium_total_vpr,
+      low_count, low_total_vpr,
+      total_vulnerabilities, total_vpr
+    FROM vulnerability_daily_totals 
+    WHERE scan_date >= DATE('now', '-14 days')
+    ORDER BY scan_date DESC
   `;
   
   db.all(query, [], (err, rows) => {
@@ -363,24 +530,27 @@ app.get("/api/vulnerabilities/trends", (req, res) => {
     }
     
     // Format data for chart consumption
-    const trends = {};
-    rows.forEach(row => {
-      if (!trends[row.date]) {
-        trends[row.date] = { 
-          date: row.date, 
-          Critical: { count: 0, total_vpr: 0 }, 
-          High: { count: 0, total_vpr: 0 }, 
-          Medium: { count: 0, total_vpr: 0 }, 
-          Low: { count: 0, total_vpr: 0 } 
-        };
+    const trends = rows.map(row => ({
+      date: row.date,
+      Critical: { 
+        count: row.critical_count, 
+        total_vpr: Math.round((row.critical_total_vpr || 0) * 100) / 100 
+      },
+      High: { 
+        count: row.high_count, 
+        total_vpr: Math.round((row.high_total_vpr || 0) * 100) / 100 
+      },
+      Medium: { 
+        count: row.medium_count, 
+        total_vpr: Math.round((row.medium_total_vpr || 0) * 100) / 100 
+      },
+      Low: { 
+        count: row.low_count, 
+        total_vpr: Math.round((row.low_total_vpr || 0) * 100) / 100 
       }
-      trends[row.date][row.severity] = {
-        count: row.count,
-        total_vpr: Math.round((row.total_vpr || 0) * 100) / 100  // Round to 2 decimal places
-      };
-    });
+    }));
     
-    res.json(Object.values(trends));
+    res.json(trends);
   });
 });
 
@@ -409,7 +579,7 @@ app.get("/api/vulnerabilities", (req, res) => {
   }
   
   const query = `
-    SELECT * FROM vulnerabilities 
+    SELECT * FROM vulnerabilities_current 
     ${whereClause}
     ORDER BY vpr_score DESC, last_seen DESC 
     LIMIT ? OFFSET ?
@@ -424,7 +594,7 @@ app.get("/api/vulnerabilities", (req, res) => {
     }
     
     // Get total count for pagination
-    const countQuery = `SELECT COUNT(*) as total FROM vulnerabilities ${whereClause}`;
+    const countQuery = `SELECT COUNT(*) as total FROM vulnerabilities_current ${whereClause}`;
     db.get(countQuery, params.slice(0, -2), (err, countResult) => {
       if (err) {
         res.status(500).json({ error: err.message });
@@ -486,16 +656,8 @@ app.post("/api/vulnerabilities/import", upload.single("csvFile"), (req, res) => 
         
         const importId = this.lastID;
         
-        // Process rows and insert vulnerabilities
-        const stmt = db.prepare(`
-          INSERT INTO vulnerabilities 
-          (import_id, hostname, ip_address, cve, severity, vpr_score, cvss_score, 
-           first_seen, last_seen, plugin_id, plugin_name, description, solution, 
-           vendor, vulnerability_date, state, import_date)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
-        
-        processVulnerabilityRows(rows, stmt, importId, req.file.path, {
+        // Process rows using rollover architecture (no stmt needed for rollover)
+        processVulnerabilityRowsWithRollover(rows, null, importId, req.file.path, {
           success: true,
           importId,
           filename,
@@ -514,12 +676,15 @@ app.delete("/api/vulnerabilities/clear", (req, res) => {
   db.serialize(() => {
     db.run("DELETE FROM ticket_vulnerabilities");
     db.run("DELETE FROM vulnerabilities");
+    db.run("DELETE FROM vulnerability_snapshots");
+    db.run("DELETE FROM vulnerabilities_current");
+    db.run("DELETE FROM vulnerability_daily_totals");
     db.run("DELETE FROM vulnerability_imports", (err) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
       }
-      res.json({ success: true, message: "All vulnerability data cleared" });
+      res.json({ success: true, message: "All vulnerability data cleared from rollover architecture" });
     });
   });
 });
@@ -849,6 +1014,116 @@ const initDb = () => {
     db.run("ALTER TABLE vulnerabilities ADD COLUMN import_date TEXT DEFAULT ''", (err) => {
       if (err && !err.message.includes("duplicate column")) {
         console.error("Error adding import_date column:", err.message);
+      }
+    });
+
+    // Create rollover architecture tables
+    db.run(`CREATE TABLE IF NOT EXISTS vulnerability_snapshots (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      import_id INTEGER NOT NULL,
+      scan_date TEXT NOT NULL,
+      hostname TEXT,
+      ip_address TEXT,
+      cve TEXT,
+      severity TEXT,
+      vpr_score REAL,
+      cvss_score REAL,
+      first_seen TEXT,
+      last_seen TEXT,
+      plugin_id TEXT,
+      plugin_name TEXT,
+      description TEXT,
+      solution TEXT,
+      vendor_reference TEXT,
+      vendor TEXT,
+      vulnerability_date TEXT,
+      state TEXT DEFAULT 'open',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      unique_key TEXT,
+      FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
+    )`, (err) => {
+      if (err) {
+        console.error("Error creating vulnerability_snapshots table:", err.message);
+      }
+    });
+
+    db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities_current (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      import_id INTEGER NOT NULL,
+      scan_date TEXT NOT NULL,
+      hostname TEXT,
+      ip_address TEXT,
+      cve TEXT,
+      severity TEXT,
+      vpr_score REAL,
+      cvss_score REAL,
+      first_seen TEXT,
+      last_seen TEXT,
+      plugin_id TEXT,
+      plugin_name TEXT,
+      description TEXT,
+      solution TEXT,
+      vendor_reference TEXT,
+      vendor TEXT,
+      vulnerability_date TEXT,
+      state TEXT DEFAULT 'open',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      unique_key TEXT UNIQUE,
+      FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
+    )`, (err) => {
+      if (err) {
+        console.error("Error creating vulnerabilities_current table:", err.message);
+      }
+    });
+
+    db.run(`CREATE TABLE IF NOT EXISTS vulnerability_daily_totals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      scan_date TEXT NOT NULL UNIQUE,
+      critical_count INTEGER DEFAULT 0,
+      critical_total_vpr REAL DEFAULT 0,
+      high_count INTEGER DEFAULT 0,
+      high_total_vpr REAL DEFAULT 0,
+      medium_count INTEGER DEFAULT 0,
+      medium_total_vpr REAL DEFAULT 0,
+      low_count INTEGER DEFAULT 0,
+      low_total_vpr REAL DEFAULT 0,
+      total_vulnerabilities INTEGER DEFAULT 0,
+      total_vpr REAL DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`, (err) => {
+      if (err) {
+        console.error("Error creating vulnerability_daily_totals table:", err.message);
+      }
+    });
+
+    // Create indexes for performance
+    db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_scan_date ON vulnerability_snapshots (scan_date)", (err) => {
+      if (err) {
+        console.error("Error creating snapshots scan_date index:", err.message);
+      }
+    });
+
+    db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_hostname ON vulnerability_snapshots (hostname)", (err) => {
+      if (err) {
+        console.error("Error creating snapshots hostname index:", err.message);
+      }
+    });
+
+    db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_severity ON vulnerability_snapshots (severity)", (err) => {
+      if (err) {
+        console.error("Error creating snapshots severity index:", err.message);
+      }
+    });
+
+    db.run("CREATE INDEX IF NOT EXISTS idx_current_unique_key ON vulnerabilities_current (unique_key)", (err) => {
+      if (err) {
+        console.error("Error creating current unique_key index:", err.message);
+      }
+    });
+
+    db.run("CREATE INDEX IF NOT EXISTS idx_current_scan_date ON vulnerabilities_current (scan_date)", (err) => {
+      if (err) {
+        console.error("Error creating current scan_date index:", err.message);
       }
     });
   });
