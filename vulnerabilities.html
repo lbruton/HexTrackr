@@ -2514,6 +2514,14 @@
 
                 this.chart.updateSeries(series);
 
+                // Reset zoom to show all data points properly after update
+                // This ensures that on initial load, all data points are visible without zooming
+                setTimeout(() => {
+                    if (this.chart && this.chart.resetSeries) {
+                        this.chart.zoomX(undefined, undefined); // Reset to full range
+                    }
+                }, 100);
+
                 // Create discrete markers - show markers only on actual data points
                 const colors = ['#dc2626', '#ea580c', '#2563eb', '#16a34a']; // Critical, High, Medium, Low
                 

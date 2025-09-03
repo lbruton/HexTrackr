@@ -135,10 +135,48 @@ function _processVulnerabilityRows(rows, stmt, importId, filePath, responseData,
 }
 
 // Rollover architecture helper functions
+function normalizeHostname(hostname) {
+    if (!hostname) {
+        return "";
+    }
+    
+    const cleanHostname = hostname.trim();
+    
+    // Check if hostname is a valid IP address (x.x.x.x pattern with valid octets)
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (ipRegex.test(cleanHostname)) {
+        // Validate that all octets are between 0-255
+        const octets = cleanHostname.split(".").map(Number);
+        const isValidIP = octets.every(octet => octet >= 0 && octet <= 255);
+        
+        if (isValidIP) {
+            // For valid IP addresses, return the full IP - don't split on periods
+            return cleanHostname.toLowerCase();
+        }
+    }
+    
+    // For domain names or invalid IPs, remove everything after first period to handle domain variations
+    // Examples: nwan10.mmplp.net -> nwan10, nswan10 -> nswan10, 300.300.300.300 -> 300
+    return cleanHostname.split(".")[0].toLowerCase();
+}
+
 function generateUniqueKey(mapped) {
-    // Create unique key based on hostname + description + VPR score (since CVE may be empty)
+    // Create unique key with normalized hostname to handle domain variations
+    const normalizedHostname = normalizeHostname(mapped.hostname);
+    
+    // Prefer CVE when available for better deduplication
+    if (mapped.cve && mapped.cve.trim()) {
+        return `${normalizedHostname}|${mapped.cve.trim()}`;
+    }
+    
+    // Fallback to plugin_id + description for vulnerabilities without CVE
+    if (mapped.pluginId && mapped.pluginId.trim()) {
+        return `${normalizedHostname}|${mapped.pluginId.trim()}|${(mapped.description || "").trim().substring(0, 100)}`;
+    }
+    
+    // Final fallback to original method with normalized hostname
     const keyParts = [
-        (mapped.hostname || "").trim(),
+        normalizedHostname,
         (mapped.description || "").trim(),
         (mapped.vprScore || 0).toString()
     ];
@@ -146,7 +184,6 @@ function generateUniqueKey(mapped) {
 }
 
 function processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, responseData, res, scanDate) {
-    let processed = 0;
     const currentDate = scanDate || new Date().toISOString().split("T")[0];
     
     console.log("Starting rollover import for scan date:", currentDate, "with", rows.length, "rows");
@@ -160,18 +197,30 @@ function processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, re
             return;
         }
         
-        // Step 2: Process all new vulnerability data
+        // Step 2: Process all new vulnerability data SEQUENTIALLY to avoid race conditions
         const processedKeys = new Set();
         let insertCount = 0;
         let updateCount = 0;
+        let finalizeCalled = false; // Prevent multiple finalize calls
         
         if (rows.length === 0) {
             // No data to process, finalize
             finalizeBatch();
             return;
         }
-        
-        rows.forEach((row) => {
+
+        // FIXED: Process rows sequentially instead of with forEach to prevent race conditions
+        function processNextRow(index) {
+            if (index >= rows.length) {
+                // All rows processed, finalize once
+                if (!finalizeCalled) {
+                    finalizeCalled = true;
+                    finalizeBatch();
+                }
+                return;
+            }
+
+            const row = rows[index];
             const mapped = mapVulnerabilityRow(row);
             const uniqueKey = generateUniqueKey(mapped);
             
@@ -180,10 +229,7 @@ function processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, re
             
             // Skip duplicates within the same batch
             if (processedKeys.has(uniqueKey)) {
-                processed++;
-                if (processed === rows.length) {
-                    finalizeBatch();
-                }
+                processNextRow(index + 1); // Continue to next row
                 return;
             }
             processedKeys.add(uniqueKey);
@@ -217,79 +263,74 @@ function processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, re
                 if (err) {
                     console.error("Snapshot insert error:", err);
                 }
-            });
-            
-            // Check if this vulnerability already exists in current table
-            db.get("SELECT id, first_seen FROM vulnerabilities_current WHERE unique_key = ?", 
-                [uniqueKey], (err, existingRow) => {
-                if (err) {
-                    console.error("Error checking existing vulnerability:", err);
-                    processed++;
-                    if (processed === rows.length) {
-                        finalizeBatch();
-                    }
-                    return;
-                }
                 
-                if (existingRow) {
-                    // Update existing vulnerability - preserve first_seen, update last_seen and other fields
-                    db.run("UPDATE vulnerabilities_current SET " +
-                        "import_id = ?, scan_date = ?, hostname = ?, ip_address = ?, cve = ?, " +
-                        "severity = ?, vpr_score = ?, cvss_score = ?, last_seen = ?, " +
-                        "plugin_id = ?, plugin_name = ?, description = ?, solution = ?, " +
-                        "vendor_reference = ?, vendor = ?, vulnerability_date = ?, state = ? " +
-                        "WHERE unique_key = ?", [
-                        importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
-                        mapped.severity, mapped.vprScore, mapped.cvssScore, mapped.lastSeen,
-                        mapped.pluginId, mapped.pluginName, mapped.description, mapped.solution,
-                        mapped.vendor, mapped.vendor, mapped.pluginPublished, mapped.state,
-                        uniqueKey
-                    ], (err) => {
-                        if (err) {
-                            console.error("Current table update error:", err);
-                        } else {
-                            updateCount++;
-                        }
-                        processed++;
-                        if (processed === rows.length) {
-                            finalizeBatch();
-                        }
-                    });
-                } else {
-                    // Insert new vulnerability
-                    db.run("INSERT INTO vulnerabilities_current " +
-                        "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
-                         "first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
-                         "vendor_reference, vendor, vulnerability_date, state, unique_key)" +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-                        importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
-                        mapped.severity, mapped.vprScore, mapped.cvssScore,
-                        mapped.firstSeen || currentDate, // Use current date as first_seen if not provided
-                        mapped.lastSeen, mapped.pluginId, mapped.pluginName, mapped.description,
-                        mapped.solution, mapped.vendor, mapped.vendor, mapped.pluginPublished,
-                        mapped.state, uniqueKey
-                    ], (err) => {
-                        if (err) {
-                            console.error("Current table insert error:", err);
-                        } else {
-                            insertCount++;
-                        }
-                        processed++;
-                        if (processed === rows.length) {
-                            finalizeBatch();
-                        }
-                    });
-                }
+                // Check if this vulnerability already exists in current table
+                db.get("SELECT id, first_seen FROM vulnerabilities_current WHERE unique_key = ?", 
+                    [uniqueKey], (err, existingRow) => {
+                    if (err) {
+                        console.error("Error checking existing vulnerability:", err);
+                        processNextRow(index + 1); // Continue to next row
+                        return;
+                    }
+                    
+                    if (existingRow) {
+                        // Update existing vulnerability - preserve first_seen, update last_seen and other fields
+                        db.run("UPDATE vulnerabilities_current SET " +
+                            "import_id = ?, scan_date = ?, hostname = ?, ip_address = ?, cve = ?, " +
+                            "severity = ?, vpr_score = ?, cvss_score = ?, last_seen = ?, " +
+                            "plugin_id = ?, plugin_name = ?, description = ?, solution = ?, " +
+                            "vendor_reference = ?, vendor = ?, vulnerability_date = ?, state = ? " +
+                            "WHERE unique_key = ?", [
+                            importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
+                            mapped.severity, mapped.vprScore, mapped.cvssScore, mapped.lastSeen,
+                            mapped.pluginId, mapped.pluginName, mapped.description, mapped.solution,
+                            mapped.vendor, mapped.vendor, mapped.pluginPublished, mapped.state,
+                            uniqueKey
+                        ], (err) => {
+                            if (err) {
+                                console.error("Current table update error:", err);
+                            } else {
+                                updateCount++;
+                            }
+                            processNextRow(index + 1); // Continue to next row
+                        });
+                    } else {
+                        // Insert new vulnerability
+                        db.run("INSERT INTO vulnerabilities_current " +
+                            "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
+                             "first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
+                             "vendor_reference, vendor, vulnerability_date, state, unique_key)" +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                            importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
+                            mapped.severity, mapped.vprScore, mapped.cvssScore,
+                            mapped.firstSeen || currentDate, // Use current date as first_seen if not provided
+                            mapped.lastSeen, mapped.pluginId, mapped.pluginName, mapped.description,
+                            mapped.solution, mapped.vendor, mapped.vendor, mapped.pluginPublished,
+                            mapped.state, uniqueKey
+                        ], (err) => {
+                            if (err) {
+                                console.error("Current table insert error:", err);
+                            } else {
+                                insertCount++;
+                            }
+                            processNextRow(index + 1); // Continue to next row
+                        });
+                    }
+                });
             });
-        });
+        }
+
+        // Start processing from the first row
+        processNextRow(0);
         
         function finalizeBatch() {
             // Step 3: Remove vulnerabilities that are no longer present (haven't been updated in this scan)
-            db.run("DELETE FROM vulnerabilities_current WHERE last_seen < ?", [currentDate], (err, result) => {
+            db.run("DELETE FROM vulnerabilities_current WHERE last_seen < ?", [currentDate], function(err) {
+                const removedCount = this.changes || 0;
                 if (err) {
                     console.error("Error removing stale vulnerabilities:", err);
                 } else {
-                    console.log("Removed", (result.changes || 0), "stale vulnerabilities from current table");
+                    console.log("Removed", removedCount, "stale vulnerabilities from current table");
                 }
                 
                 // Step 4: Calculate and store daily totals
@@ -311,7 +352,7 @@ function processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, re
                         updateCount,
                         scanDate: currentDate,
                         rolloverComplete: true,
-                        removedStale: result?.changes || 0
+                        removedStale: removedCount
                     };
                     
                     console.log("Import completed:", finalResponse);
@@ -1281,7 +1322,8 @@ const initDb = () => {
 
 // Backup API endpoints for settings modal
 app.get("/api/backup/stats", (req, res) => {
-    db.get("SELECT COUNT(*) as vulnerabilities FROM vulnerabilities", (err, vulnRow) => {
+    // Use the new table structure: vulnerabilities_current instead of vulnerabilities
+    db.get("SELECT COUNT(*) as vulnerabilities FROM vulnerabilities_current", (err, vulnRow) => {
         if (err) {
             res.status(500).json({ error: "Database error" });
             return;
