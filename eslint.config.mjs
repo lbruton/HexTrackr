@@ -229,6 +229,8 @@ export default [
         atob: "readonly",
         btoa: "readonly",
         Intl: "readonly",
+        Blob: "readonly",
+        URL: "readonly",
         // Third-party library globals
         bootstrap: "readonly",
         agGrid: "readonly",
