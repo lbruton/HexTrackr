@@ -16,7 +16,7 @@
 
 1. **Stats API Issue**: earliest/latest dates are empty strings (should show date ranges)
 2. **Trends API Issue**: Returns empty array - no daily totals for trending charts  
-3. **CVE Column**: August data missing CVE column caused rollover migration issues
+3. **CSV Import Architecture**: ✅ CORRECTLY handles missing CVE fields with graceful fallbacks
 4. **Working State**: Commit `8a5be58` had functional trends and dashboard cards
 
 ### PHASE 1: API ENDPOINT DIAGNOSTICS (Chat 1)
@@ -25,10 +25,10 @@
 
 #### Step 1.1: Trends API Investigation
 
-- [ ] Check `vulnerability_daily_totals` table for data
-- [ ] Verify trends endpoint date filtering logic
-- [ ] Generate missing historical daily totals if needed
-- [ ] Test trends API returns proper data structure
+- [ ] Check `vulnerability_daily_totals` table for data population
+- [ ] Verify trends endpoint date filtering logic (currently 14-day limit)
+- [ ] Generate missing historical daily totals if table is empty
+- [ ] Test trends API returns proper data structure for charts
 
 #### Step 1.2: Stats API Date Fields
 
@@ -37,12 +37,12 @@
 - [ ] Verify stats query uses rollover tables correctly
 - [ ] Test that dashboard cards show proper date ranges
 
-#### Step 1.3: CVE Column Data Validation
+#### Step 1.3: ✅ CVE Handling Validation (ALREADY CORRECT)
 
-- [ ] Check August import data for missing CVE fields
-- [ ] Verify rollover migration handled NULL CVE values
-- [ ] Test CSV import pipeline with missing CVE columns
-- [ ] Ensure data integrity across all rollover tables
+- [x] CSV import correctly handles missing CVE with fallback patterns
+- [x] Unique key generation uses hostname+description+VPR (not CVE-dependent)  
+- [x] Missing CVE fields default to empty string gracefully
+- [ ] Verify August import data populated correctly despite missing CVE column
 
 **Exit Criteria**: Both trends and stats APIs return complete, accurate data
 
