@@ -440,32 +440,27 @@ app.get("/api/vulnerabilities/stats", (req, res) => {
 
 // Get recent vulnerability statistics with trend comparison (for cards)
 app.get("/api/vulnerabilities/recent-trends", (req, res) => {
+  // Get current data from vulnerabilities_current
   const recentQuery = `
     SELECT 
       severity,
       COUNT(*) as count,
       SUM(vpr_score) as total_vpr
-    FROM vulnerabilities 
-    WHERE DATE(created_at) = (
-      SELECT MAX(DATE(created_at)) FROM vulnerabilities
-    )
+    FROM vulnerabilities_current 
     GROUP BY severity
   `;
   
+  // Get previous data from vulnerability_daily_totals (most recent vs previous day)
   const previousQuery = `
     SELECT 
-      severity,
-      COUNT(*) as count,
-      SUM(vpr_score) as total_vpr
-    FROM vulnerabilities 
-    WHERE DATE(created_at) = (
-      SELECT DISTINCT DATE(created_at) 
-      FROM vulnerabilities 
-      WHERE DATE(created_at) < (SELECT MAX(DATE(created_at)) FROM vulnerabilities)
-      ORDER BY DATE(created_at) DESC 
-      LIMIT 1
-    )
-    GROUP BY severity
+      scan_date,
+      critical_count as critical_count, critical_total_vpr as critical_total_vpr,
+      high_count as high_count, high_total_vpr as high_total_vpr,
+      medium_count as medium_count, medium_total_vpr as medium_total_vpr,
+      low_count as low_count, low_total_vpr as low_total_vpr
+    FROM vulnerability_daily_totals 
+    ORDER BY scan_date DESC 
+    LIMIT 2
   `;
   
   db.all(recentQuery, [], (err, recentRows) => {
@@ -474,7 +469,7 @@ app.get("/api/vulnerabilities/recent-trends", (req, res) => {
       return;
     }
     
-    db.all(previousQuery, [], (err, previousRows) => {
+    db.all(previousQuery, [], (err, dailyTotalsRows) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -482,14 +477,27 @@ app.get("/api/vulnerabilities/recent-trends", (req, res) => {
       
       // Calculate trends
       const trends = {};
-      const previousData = {};
       
-      previousRows.forEach(row => {
-        previousData[row.severity] = { 
-          count: row.count, 
-          total_vpr: Math.round((row.total_vpr || 0) * 100) / 100 
+      // If we have daily totals history, use it for comparison
+      let previousData = {};
+      if (dailyTotalsRows.length >= 2) {
+        // Use the second most recent daily total (previousData)
+        const prevRow = dailyTotalsRows[1];
+        previousData = {
+          "Critical": { count: prevRow.critical_count || 0, total_vpr: prevRow.critical_total_vpr || 0 },
+          "High": { count: prevRow.high_count || 0, total_vpr: prevRow.high_total_vpr || 0 },
+          "Medium": { count: prevRow.medium_count || 0, total_vpr: prevRow.medium_total_vpr || 0 },
+          "Low": { count: prevRow.low_count || 0, total_vpr: prevRow.low_total_vpr || 0 }
         };
-      });
+      } else if (dailyTotalsRows.length === 1) {
+        // First day of data, compare to zero
+        previousData = {
+          "Critical": { count: 0, total_vpr: 0 },
+          "High": { count: 0, total_vpr: 0 },
+          "Medium": { count: 0, total_vpr: 0 },
+          "Low": { count: 0, total_vpr: 0 }
+        };
+      }
       
       recentRows.forEach(row => {
         const prev = previousData[row.severity] || { count: 0, total_vpr: 0 };
