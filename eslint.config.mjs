@@ -192,7 +192,6 @@ export default [
   {
     // Configuration for browser scripts - specific patterns
     files: [
-      "scripts/ag-grid-responsive-config.js",
       "scripts/pages/*.js", 
       "scripts/shared/*.js",
       "scripts/utils/*.js"
