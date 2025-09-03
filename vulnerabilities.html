@@ -504,6 +504,45 @@
         .device-grid-height { height: 400px; }
         .hidden-input { display: none; }
         .progress-init { width: 0%; }
+
+        /* Custom ApexCharts tooltip styles */
+        .apexcharts-tooltip-custom {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-width: 200px;
+        }
+        
+        .tooltip-date {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1f2937;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .tooltip-series {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+            font-size: 12px;
+        }
+        
+        .tooltip-severity {
+            font-weight: 500;
+            color: #374151;
+            margin: 0 6px;
+            min-width: 50px;
+        }
+        
+        .tooltip-value {
+            font-weight: 600;
+            color: #111827;
+        }
     </style>
 </head>
 <body>
@@ -1106,9 +1145,6 @@
     <!-- Tabler.io JS -->
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
     
-    <!-- Chart.js for mini-charts - using local npm version -->
-    <script src="scripts/chart.min.js"></script>
-    
     <!-- SortableJS for drag and drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     
@@ -1125,7 +1161,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <!-- Security: DOMPurify for XSS protection -->
-    <script src="scripts/utils/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
 
     <!-- HexTrackr Modular JavaScript Architecture -->
     <script src="scripts/shared/header-loader.js"></script>
@@ -1172,7 +1208,18 @@
                     width: isDesktop ? 120 : isTablet ? 100 : 80,
                     minWidth: 80,
                     maxWidth: 130,
-                    cellRenderer: (params) => params.value ? new Date(params.value).toLocaleDateString() : '-',
+                    cellRenderer: (params) => {
+                        // Priority: last_seen date (if available) → scan_date (fallback)
+                        const lastSeen = params.data.last_seen;
+                        const scanDate = params.data.scan_date;
+                        
+                        if (lastSeen && lastSeen.trim() !== '') {
+                            return new Date(lastSeen).toLocaleDateString();
+                        } else if (scanDate && scanDate.trim() !== '') {
+                            return new Date(scanDate).toLocaleDateString();
+                        }
+                        return '-';
+                    },
                     hide: isMobile,
                 },
                 {
@@ -1377,6 +1424,7 @@
                 this.statistics = {};
                 this.uniqueAssets = new Set();
                 this.apiBase = '/api';
+                this.currentMetricType = 'count'; // Default to showing count percentages
                 
                 this.setupEventListeners();
                 this.initializeGrid();
@@ -1498,133 +1546,413 @@
                         data: []
                     }],
                     chart: {
-                        height: 300,
+                        height: 450,
                         type: 'line',
+                        background: 'transparent',
+                        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
                         zoom: {
                             enabled: true,
-                            type: 'x'
+                            type: 'x',
+                            autoScaleYaxis: true,
+                            zoomedArea: {
+                                fill: {
+                                    color: '#90CAF9',
+                                    opacity: 0.4
+                                },
+                                stroke: {
+                                    color: '#0D47A1',
+                                    opacity: 0.4,
+                                    width: 1
+                                }
+                            }
                         },
                         toolbar: {
                             show: true,
+                            offsetX: 0,
+                            offsetY: 0,
                             tools: {
-                                selection: false  // Disable selection tool - will re-enable when table filtering is implemented
+                                download: true,
+                                selection: true,
+                                zoom: true,
+                                zoomin: true,
+                                zoomout: true,
+                                pan: true,
+                                reset: true
+                            },
+                            export: {
+                                csv: {
+                                    filename: `vulnerability-trends-${new Date().toISOString().split('T')[0]}`
+                                },
+                                png: {
+                                    filename: `vulnerability-trends-${new Date().toISOString().split('T')[0]}`
+                                }
                             }
                         },
                         animations: {
                             enabled: true,
                             easing: 'easeinout',
-                            speed: 800
+                            speed: 800,
+                            animateGradually: {
+                                enabled: true,
+                                delay: 150
+                            },
+                            dynamicAnimation: {
+                                enabled: true,
+                                speed: 350
+                            }
                         }
+                    },
+                    colors: ['#dc2626', '#ea580c', '#2563eb', '#16a34a'], // Modern, accessible color palette
+                    stroke: {
+                        curve: 'smooth',
+                        width: 3,
+                        lineCap: 'round'
+                    },
+                    markers: {
+                        size: 0, // Will be controlled by discrete markers for actual data only
+                        strokeWidth: 2,
+                        strokeColors: '#ffffff',
+                        fillOpacity: 1,
+                        hover: {
+                            size: 10,
+                            sizeOffset: 3
+                        },
+                        discrete: [] // Populated dynamically with actual data points
                     },
                     dataLabels: {
                         enabled: false
                     },
-                    stroke: {
-                        curve: 'smooth',
-                        width: 3
-                    },
-                    colors: ['#dc2626', '#d97706', '#0284c7', '#059669'],
-                    title: {
-                        text: 'Vulnerability Trends Over Time (Defaulted to Last 14 Days)',
-                        align: 'left',
-                        style: {
-                            fontSize: '16px',
-                            fontWeight: '600'
-                        }
-                    },
                     grid: {
-                        borderColor: '#e2e8f0',
-                        strokeDashArray: 5
-                    },
-                    markers: {
-                        size: 6,
-                        strokeWidth: 2,
-                        hover: {
-                            size: 8
+                        show: true,
+                        borderColor: '#f1f5f9',
+                        strokeDashArray: 3,
+                        position: 'back',
+                        xaxis: {
+                            lines: {
+                                show: true
+                            }
+                        },
+                        yaxis: {
+                            lines: {
+                                show: true
+                            }
+                        },
+                        padding: {
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            left: 0
                         }
                     },
                     xaxis: {
                         type: 'datetime',
                         labels: {
-                            format: 'MMM dd'
+                            style: {
+                                colors: '#64748b',
+                                fontSize: '13px',
+                                fontFamily: 'Inter, sans-serif',
+                                fontWeight: 500
+                            },
+                            datetimeUTC: false,
+                            format: 'MMM dd',
+                            rotate: 0
+                        },
+                        axisBorder: {
+                            show: true,
+                            color: '#e2e8f0',
+                            height: 1
+                        },
+                        axisTicks: {
+                            show: true,
+                            color: '#e2e8f0',
+                            height: 4
+                        },
+                        tooltip: {
+                            enabled: false
                         }
                     },
                     yaxis: {
-                        title: {
-                            text: 'Number of Vulnerabilities'
-                        },
-                        min: 0,
                         labels: {
-                            formatter: function (val) {
-                                // Round VPR values to 2 decimal places, whole numbers for counts
-                                return val % 1 === 0 ? val.toString() : val.toFixed(2);
+                            style: {
+                                colors: '#64748b',
+                                fontSize: '13px',
+                                fontFamily: 'Inter, sans-serif',
+                                fontWeight: 500
+                            },
+                            formatter: function(value) {
+                                return Math.round(value).toLocaleString();
                             }
-                        }
+                        },
+                        axisBorder: {
+                            show: true,
+                            color: '#e2e8f0'
+                        },
+                        axisTicks: {
+                            show: true,
+                            color: '#e2e8f0'
+                        },
+                        title: {
+                            text: 'Vulnerability Count',
+                            style: {
+                                color: '#475569',
+                                fontSize: '14px',
+                                fontFamily: 'Inter, sans-serif',
+                                fontWeight: 600
+                            }
+                        },
+                        min: 0
                     },
                     legend: {
+                        show: true,
                         position: 'top',
-                        horizontalAlign: 'right',
+                        horizontalAlign: 'left',
+                        floating: false,
+                        fontSize: '14px',
+                        fontFamily: 'Inter, sans-serif',
+                        fontWeight: 500,
+                        offsetY: 0,
+                        offsetX: 0,
                         markers: {
-                            width: 8,
-                            height: 8,
-                            radius: 4
+                            width: 16,
+                            height: 16,
+                            strokeWidth: 0,
+                            radius: 8
+                        },
+                        itemMargin: {
+                            horizontal: 20,
+                            vertical: 8
+                        },
+                        labels: {
+                            colors: '#374151'
                         }
                     },
                     tooltip: {
+                        enabled: true,
                         shared: true,
                         intersect: false,
-                        followCursor: false,
-                        fixed: {
-                            enabled: true,
-                            position: 'topLeft',
-                            offsetX: 20,
-                            offsetY: 20
+                        theme: 'light',
+                        style: {
+                            fontSize: '13px',
+                            fontFamily: 'Inter, sans-serif'
                         },
-                        y: {
-                            formatter: function (val) {
-                                return val + " vulnerabilities";
-                            }
+                        x: {
+                            format: 'MMM dd, yyyy'
+                        },
+                        filter: {
+                            seriesIndex: 0,
+                            type: 'none'
                         },
                         custom: function({ series, seriesIndex, dataPointIndex, w }) {
-                            // Custom tooltip with click-to-close functionality
-                            const date = new Date(w.globals.seriesX[seriesIndex][dataPointIndex]).toLocaleDateString();
-                            let tooltipContent = `<div class="apexcharts-tooltip-custom" style="padding: 12px; background: white; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative;">`;
-                            tooltipContent += `<div style="font-weight: 600; margin-bottom: 8px; color: #374151;">${date}</div>`;
+                            // Only show tooltip for actual data points
+                            const vulnerabilityTracker = window.vulnerabilityTracker;
+                            if (!vulnerabilityTracker || !vulnerabilityTracker.historicalData) return '';
                             
-                            w.config.series.forEach((serie, index) => {
-                                const value = series[index] ? series[index][dataPointIndex] : 0;
-                                const color = w.config.colors[index];
-                                tooltipContent += `<div style="display: flex; align-items: center; margin-bottom: 4px;">`;
-                                tooltipContent += `<div style="width: 12px; height: 12px; background: ${color}; border-radius: 50%; margin-right: 8px;"></div>`;
-                                tooltipContent += `<span style="color: #6b7280; margin-right: 8px;">${serie.name}:</span>`;
-                                tooltipContent += `<span style="font-weight: 600; color: #111827;">${value} vulnerabilities</span>`;
-                                tooltipContent += `</div>`;
+                            const extendedData = vulnerabilityTracker.extendTimelineData(vulnerabilityTracker.historicalData);
+                            const dataPoint = extendedData[dataPointIndex];
+                            
+                            // Only show tooltips for actual data points
+                            if (!dataPoint || !dataPoint.hasActualData) {
+                                return '';
+                            }
+                            
+                            const date = new Date(dataPoint.scan_date || dataPoint.date).toLocaleDateString('en-US', { 
+                                weekday: 'long',
+                                month: 'long', 
+                                day: 'numeric', 
+                                year: 'numeric' 
                             });
                             
-                            tooltipContent += `<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; text-align: center;">Click anywhere to close</div>`;
-                            tooltipContent += `</div>`;
+                            const currentMetric = document.querySelector('input[name="chart-metric"]:checked')?.nextElementSibling?.dataset?.metric || 'count';
+                            
+                            let tooltipContent = `
+                                <div class="apexcharts-tooltip-custom" style="
+                                    background: white;
+                                    border: 1px solid #e2e8f0;
+                                    border-radius: 12px;
+                                    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+                                    padding: 16px;
+                                    font-family: Inter, sans-serif;
+                                    min-width: 280px;
+                                    max-width: 320px;
+                                ">
+                                    <div style="
+                                        font-weight: 600;
+                                        font-size: 14px;
+                                        color: #1f2937;
+                                        margin-bottom: 12px;
+                                        padding-bottom: 8px;
+                                        border-bottom: 1px solid #f3f4f6;
+                                        text-align: center;
+                                    ">${date}</div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                            `;
+                            
+                            const seriesNames = ['Critical', 'High', 'Medium', 'Low'];
+                            const colors = ['#dc2626', '#ea580c', '#2563eb', '#16a34a'];
+                            
+                            series.forEach((seriesData, index) => {
+                                const value = seriesData[dataPointIndex];
+                                if (value !== undefined && value !== null) {
+                                    const metric = currentMetric === 'vpr' ? ' VPR' : '';
+                                    
+                                    tooltipContent += `
+                                        <div style="
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: space-between;
+                                            padding: 6px 0;
+                                        ">
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <div style="
+                                                    width: 14px;
+                                                    height: 14px;
+                                                    border-radius: 50%;
+                                                    background-color: ${colors[index]};
+                                                    border: 2px solid white;
+                                                    box-shadow: 0 0 0 1px ${colors[index]}40;
+                                                "></div>
+                                                <span style="
+                                                    font-size: 13px;
+                                                    color: #4b5563;
+                                                    font-weight: 500;
+                                                ">${seriesNames[index]}</span>
+                                            </div>
+                                            <span style="
+                                                font-size: 14px;
+                                                font-weight: 600;
+                                                color: #1f2937;
+                                            ">${value.toLocaleString()}${metric}</span>
+                                        </div>
+                                    `;
+                                }
+                            });
+                            
+                            tooltipContent += `
+                                    </div>
+                                    <div style="
+                                        margin-top: 12px;
+                                        padding-top: 8px;
+                                        border-top: 1px solid #f3f4f6;
+                                        font-size: 11px;
+                                        color: #6b7280;
+                                        text-align: center;
+                                    ">📊 Data from vulnerability scan</div>
+                                </div>
+                            `;
                             
                             return tooltipContent;
                         }
-                    }
+                    },
+                    title: {
+                        text: 'Historical Vulnerability Trends',
+                        align: 'left',
+                        style: {
+                            fontSize: '20px',
+                            fontWeight: '600',
+                            color: '#1f2937',
+                            fontFamily: 'Inter, sans-serif'
+                        },
+                        offsetY: 20
+                    },
+                    subtitle: {
+                        text: 'Showing data points only for actual vulnerability scans',
+                        align: 'left',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: '400',
+                            color: '#6b7280',
+                            fontFamily: 'Inter, sans-serif'
+                        },
+                        offsetY: 45
+                    },
+                    theme: {
+                        mode: 'light',
+                        palette: 'palette1'
+                    },
+                    responsive: [{
+                        breakpoint: 768,
+                        options: {
+                            chart: {
+                                height: 350
+                            },
+                            legend: {
+                                position: 'bottom',
+                                offsetY: 10
+                            },
+                            title: {
+                                style: {
+                                    fontSize: '18px'
+                                }
+                            }
+                        }
+                    }]
                 };
 
                 this.chart = new ApexCharts(document.getElementById('historicalChart'), options);
                 this.chart.render();
                 
-                // Add click-to-close functionality for persistent tooltips
+                // Add improved tooltip interaction functionality
                 setTimeout(() => {
                     const chartContainer = document.getElementById('historicalChart');
                     if (chartContainer) {
+                        let pinnedTooltip = null;
+                        let tooltipCloseTime = null;
+                        
+                        // Handle tooltip pinning and reopening
                         chartContainer.addEventListener('click', (e) => {
-                            // Hide any visible tooltips when clicking on the chart
-                            const tooltips = document.querySelectorAll('.apexcharts-tooltip');
-                            tooltips.forEach(tooltip => {
-                                if (tooltip.style.opacity !== '0') {
-                                    tooltip.style.opacity = '0';
-                                    tooltip.style.display = 'none';
+                            const tooltip = document.querySelector('.apexcharts-tooltip.persistent-tooltip');
+                            if (tooltip && tooltip.style.opacity !== '0') {
+                                // Pin the current tooltip
+                                pinnedTooltip = tooltip;
+                                tooltip.style.border = '2px solid #3b82f6';
+                                tooltip.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+                                tooltip.setAttribute('data-pinned', 'true');
+                                
+                                // Add close button to pinned tooltip
+                                if (!tooltip.querySelector('.close-btn')) {
+                                    const closeBtn = document.createElement('div');
+                                    closeBtn.className = 'close-btn';
+                                    closeBtn.innerHTML = '✕';
+                                    closeBtn.style.cssText = `
+                                        position: absolute; top: 4px; right: 8px; 
+                                        cursor: pointer; color: #6b7280; font-size: 14px; 
+                                        width: 16px; height: 16px; display: flex; 
+                                        align-items: center; justify-content: center;
+                                        border-radius: 50%; background: #f3f4f6;
+                                        hover: background: #e5e7eb;
+                                    `;
+                                    closeBtn.addEventListener('click', (e) => {
+                                        e.stopPropagation();
+                                        tooltip.style.opacity = '0';
+                                        tooltip.style.display = 'none';
+                                        tooltipCloseTime = Date.now();
+                                        pinnedTooltip = null;
+                                    });
+                                    tooltip.appendChild(closeBtn);
                                 }
-                            });
+                            }
+                        });
+                        
+                        // Handle tooltip reopening on hover after close
+                        chartContainer.addEventListener('mouseover', (e) => {
+                            // If tooltip was closed recently, allow reopening on hover
+                            if (tooltipCloseTime && (Date.now() - tooltipCloseTime) > 500) {
+                                const tooltip = document.querySelector('.apexcharts-tooltip');
+                                if (tooltip && tooltip.style.opacity === '0') {
+                                    // Reset tooltip to normal hover behavior
+                                    tooltip.style.opacity = '';
+                                    tooltip.style.display = '';
+                                    tooltip.style.border = '2px solid #e5e7eb';
+                                    tooltip.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                                    tooltip.removeAttribute('data-pinned');
+                                    
+                                    // Remove close button if exists
+                                    const closeBtn = tooltip.querySelector('.close-btn');
+                                    if (closeBtn) closeBtn.remove();
+                                    
+                                    tooltipCloseTime = null;
+                                }
+                            }
                         });
                     }
                 }, 100);
@@ -1696,11 +2024,23 @@
                     this.showLoading('Processing data...');
                     const result = await response.json();
 
-                    this.showLoading('Updating display...');
+                    this.showLoading('Refreshing charts and data...');
+                    
+                    // Add a small delay to ensure database operations are complete
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Force refresh all data components
                     await this.loadData();
 
                     this.hideLoading();
-                    this.showToast(`CSV import completed! Imported ${result.rowsProcessed.toLocaleString()} vulnerabilities from ${result.filename} with scan date ${scanDate}.`, 'success');
+                    
+                    // Enhanced success message with import details
+                    let message = `CSV import completed! Processed ${result.rowsProcessed.toLocaleString()} rows from ${result.filename} with scan date ${scanDate}.`;
+                    if (result.insertCount || result.updateCount || result.removedStale) {
+                        message += ` Added: ${result.insertCount || 0}, Updated: ${result.updateCount || 0}, Removed: ${result.removedStale || 0} stale items.`;
+                    }
+                    
+                    this.showToast(message, 'success');
 
                 } catch (error) {
                     this.hideLoading();
@@ -1916,25 +2256,37 @@
                         if (this.trends && this.trends[severity]) {
                             const trendEl = document.getElementById(`${severity}Trend`);
                             if (trendEl) {
-                                const trendData = this.trends[severity].trend;
-                                const change = this.currentMetricType === 'vpr' ? trendData.vpr_change : trendData.count_change;
-                                const direction = change > 0 ? 'up' : change < 0 ? 'down' : 'stable';
-                                const percentage = Math.abs(change);
+                                // Convert severity to capitalized form to match API response
+                                const severityKey = severity.charAt(0).toUpperCase() + severity.slice(1);
+                                const trendData = this.trends[severityKey] ? this.trends[severityKey].trend : null;
                                 
-                                const iconEl = trendEl.querySelector('i');
-                                const badgeEl = trendEl.querySelector('.trend-value');
-                                
-                                if (iconEl && badgeEl) {
-                                    // Update Tabler.io trend icons
-                                    if (direction === 'up') {
-                                        iconEl.className = 'ti ti-trending-up fs-3';
-                                        badgeEl.textContent = `+${percentage.toFixed(0)}%`;
-                                    } else if (direction === 'down') {
-                                        iconEl.className = 'ti ti-trending-down fs-3';
-                                        badgeEl.textContent = `-${percentage.toFixed(0)}%`;
-                                    } else {
-                                        iconEl.className = 'ti ti-minus fs-3';
-                                        badgeEl.textContent = '0%';
+                                if (trendData) {
+                                    const change = this.currentMetricType === 'vpr' ? trendData.vpr_change : trendData.count_change;
+                                    const current = this.currentMetricType === 'vpr' ? this.trends[severityKey].current.total_vpr : this.trends[severityKey].current.count;
+                                    const previous = current - change; // Calculate previous value
+                                    const direction = change > 0 ? 'up' : change < 0 ? 'down' : 'stable';
+                                    
+                                    // Calculate percentage change: (change / previous) * 100
+                                    let percentage = 0;
+                                    if (previous !== 0) {
+                                        percentage = Math.abs((change / previous) * 100);
+                                    }
+                                    
+                                    const iconEl = trendEl.querySelector('i');
+                                    const badgeEl = trendEl.querySelector('.trend-value');
+                                    
+                                    if (iconEl && badgeEl) {
+                                        // Update Tabler.io trend icons
+                                        if (direction === 'up') {
+                                            iconEl.className = 'ti ti-trending-up fs-3';
+                                            badgeEl.textContent = `+${percentage.toFixed(1)}%`;
+                                        } else if (direction === 'down') {
+                                            iconEl.className = 'ti ti-trending-down fs-3';
+                                            badgeEl.textContent = `-${percentage.toFixed(1)}%`;
+                                        } else {
+                                            iconEl.className = 'ti ti-minus fs-3';
+                                            badgeEl.textContent = '0%';
+                                        }
                                     }
                                 }
                             }
@@ -2039,15 +2391,20 @@
                         if (cardFront.style.display !== 'none') {
                             cardFront.style.display = 'none';
                             cardBack.style.display = 'block';
+                            this.currentMetricType = 'vpr'; // Back side shows VPR
                         } else {
                             cardFront.style.display = 'block';
                             cardBack.style.display = 'none';
+                            this.currentMetricType = 'count'; // Front side shows count
                         }
                     }
                 });
+                
+                // Update percentage indicators based on new metric type
+                this.updateStatisticsDisplay();
             }
 
-            // Smart timeline extension method
+            // Smart timeline extension method for solid lines with actual data points only
             extendTimelineData(originalData) {
                 if (!originalData || originalData.length === 0) return [];
                 
@@ -2057,17 +2414,17 @@
                 // Get date range
                 const earliestDate = new Date(sortedData[0].date);
                 const latestDate = new Date(sortedData[sortedData.length - 1].date);
-                const currentDate = new Date(); // August 26, 2025
+                const currentDate = new Date(); // Current date for forward extension
                 
-                // Configuration: extend backwards by 30 days, forwards to current date
-                const backwardExtensionDays = 30;
+                // Configuration: extend backwards by 14 days, forwards to current date  
+                const backwardExtensionDays = 14;
                 const extendedStartDate = new Date(earliestDate);
                 extendedStartDate.setDate(extendedStartDate.getDate() - backwardExtensionDays);
                 
-                // Create extended dataset
+                // Create extended dataset with both line points and actual data markers
                 const extendedData = [];
                 
-                // Add backward extension with flat lines (use earliest data values)
+                // Add backward extension (line only, no markers)
                 const earliestValues = sortedData[0];
                 let currentExtensionDate = new Date(extendedStartDate);
                 
@@ -2078,16 +2435,24 @@
                         High: earliestValues.High,
                         Medium: earliestValues.Medium,
                         Low: earliestValues.Low,
-                        isExtended: true, // Mark as extended for potential styling
-                        extensionType: 'backward'
+                        isExtended: true,
+                        extensionType: 'backward',
+                        hasActualData: false // No markers/tooltips for extended points
                     });
                     currentExtensionDate.setDate(currentExtensionDate.getDate() + 1);
                 }
                 
-                // Add original data
-                extendedData.push(...sortedData);
+                // Add original data (these will have markers and tooltips)
+                sortedData.forEach(dataPoint => {
+                    extendedData.push({
+                        ...dataPoint,
+                        isExtended: false,
+                        extensionType: 'actual',
+                        hasActualData: true // Markers and tooltips for actual data
+                    });
+                });
                 
-                // Add forward extension with flat lines (use latest data values)
+                // Add forward extension (line only, no markers)
                 const latestValues = sortedData[sortedData.length - 1];
                 currentExtensionDate = new Date(latestDate);
                 currentExtensionDate.setDate(currentExtensionDate.getDate() + 1);
@@ -2099,8 +2464,9 @@
                         High: latestValues.High,
                         Medium: latestValues.Medium,
                         Low: latestValues.Low,
-                        isExtended: true, // Mark as extended for potential styling
-                        extensionType: 'forward'
+                        isExtended: true,
+                        extensionType: 'forward',
+                        hasActualData: false // No markers/tooltips for extended points
                     });
                     currentExtensionDate.setDate(currentExtensionDate.getDate() + 1);
                 }
@@ -2116,12 +2482,12 @@
                 const associatedLabel = checkedInput ? document.querySelector(`label[for="${checkedInput.id}"]`) : null;
                 const metricType = associatedLabel?.dataset?.metric || 'vpr';
                 
-                // Extend timeline data smartly in both directions
+                // Get extended data for solid lines
                 const extendedData = this.extendTimelineData(this.historicalData);
                 
-                const series = ['Critical', 'High', 'Medium', 'Low'].map((severity, index) => ({
-                    name: severity,
-                    data: extendedData.map(point => {
+                // Create series with solid lines and markers only for actual data points
+                const series = ['Critical', 'High', 'Medium', 'Low'].map((severity, index) => {
+                    const seriesData = extendedData.map(point => {
                         // Handle both old format (numbers) and new format (objects)
                         let value;
                         if (typeof point[severity] === 'object' && point[severity] !== null) {
@@ -2134,12 +2500,39 @@
                         
                         return {
                             x: new Date(point.date).getTime(),
-                            y: value || 0
+                            y: value || 0,
+                            // Store whether this point has actual data for discrete markers
+                            hasActualData: point.hasActualData
                         };
-                    })
-                }));
+                    });
+
+                    return {
+                        name: severity,
+                        data: seriesData
+                    };
+                });
 
                 this.chart.updateSeries(series);
+
+                // Create discrete markers - show markers only on actual data points
+                const colors = ['#dc2626', '#ea580c', '#2563eb', '#16a34a']; // Critical, High, Medium, Low
+                
+                this.chart.updateOptions({
+                    markers: {
+                        discrete: extendedData.flatMap((point, pointIndex) => {
+                            if (!point.hasActualData) return []; // No markers for extended data
+                            
+                            return ['Critical', 'High', 'Medium', 'Low'].map((severity, seriesIndex) => ({
+                                seriesIndex: seriesIndex,
+                                dataPointIndex: pointIndex,
+                                fillColor: colors[seriesIndex],
+                                strokeColor: '#ffffff',
+                                size: 6,
+                                strokeWidth: 2
+                            }));
+                        })
+                    }
+                });
 
                 // Update chart title and tooltip based on metric
                 const chartTitle = metricType === 'vpr' ? 
@@ -2173,24 +2566,47 @@
                     tooltip: {
                         shared: true,
                         intersect: false,
-                        y: {
-                            formatter: function (val) {
-                                if (metricType === 'vpr') {
-                                    return val.toFixed(2) + " VPR points";
-                                } else {
-                                    return val + " vulnerabilities";
-                                }
+                        custom: function({series, seriesIndex, dataPointIndex, w}) {
+                            // Only show tooltips for actual data points
+                            const point = extendedData[dataPointIndex];
+                            if (!point || !point.hasActualData) {
+                                return '<div></div>'; // Empty tooltip for extended data
                             }
+
+                            const date = new Date(point.date).toLocaleDateString();
+                            let tooltipContent = `<div class="apexcharts-tooltip-custom">
+                                <div class="tooltip-date">${date}</div>`;
+                            
+                            ['Critical', 'High', 'Medium', 'Low'].forEach((severity, index) => {
+                                const value = series[index][dataPointIndex];
+                                const color = colors[index];
+                                const label = metricType === 'vpr' ? `${value.toFixed(2)} VPR points` : `${value} vulnerabilities`;
+                                
+                                tooltipContent += `
+                                    <div class="tooltip-series">
+                                        <span style="color: ${color};">●</span>
+                                        <span class="tooltip-severity">${severity}:</span>
+                                        <span class="tooltip-value">${label}</span>
+                                    </div>`;
+                            });
+                            
+                            tooltipContent += '</div>';
+                            return tooltipContent;
                         }
                     }
                 });
 
-                // Set default zoom to last 14 days
+                // Set default zoom to last 14 days from actual data
                 if (this.historicalData.length > 0) {
-                    const today = new Date();
-                    const fourteenDaysAgo = new Date(today.getTime() - (14 * 24 * 60 * 60 * 1000));
-                    
-                    this.chart.zoomX(fourteenDaysAgo.getTime(), today.getTime());
+                    // Find the latest actual data point
+                    const actualDataPoints = extendedData.filter(point => point.hasActualData);
+                    if (actualDataPoints.length > 0) {
+                        const latestActualDate = new Date(actualDataPoints[actualDataPoints.length - 1].date);
+                        const fourteenDaysAgo = new Date(latestActualDate.getTime() - (14 * 24 * 60 * 60 * 1000));
+                        
+                        // Zoom to 14 days from latest actual data point
+                        this.chart.zoomX(fourteenDaysAgo.getTime(), latestActualDate.getTime());
+                    }
                 }
             }
 
@@ -2720,7 +3136,16 @@
                         field: 'last_seen', 
                         width: 150,
                         cellRenderer: (params) => {
-                            return params.value ? new Date(params.value).toLocaleDateString() : 'N/A';
+                            // Priority: last_seen date (if available) → scan_date (fallback)
+                            const lastSeen = params.data.last_seen;
+                            const scanDate = params.data.scan_date;
+                            
+                            if (lastSeen && lastSeen.trim() !== '') {
+                                return new Date(lastSeen).toLocaleDateString();
+                            } else if (scanDate && scanDate.trim() !== '') {
+                                return new Date(scanDate).toLocaleDateString();
+                            }
+                            return 'N/A';
                         }
                     },
                     { headerName: 'Plugin Output', field: 'plugin_output', flex: 1 }
@@ -3139,7 +3564,11 @@
                     'Plugin Name': vuln.plugin_name,
                     'Port': vuln.port || 'N/A',
                     'First Seen': vuln.first_seen ? new Date(vuln.first_seen).toLocaleDateString() : 'N/A',
-                    'Last Seen': vuln.last_seen ? new Date(vuln.last_seen).toLocaleDateString() : 'N/A'
+                    'Last Seen': vuln.last_seen && vuln.last_seen.trim() !== '' 
+                        ? new Date(vuln.last_seen).toLocaleDateString() 
+                        : (vuln.scan_date && vuln.scan_date.trim() !== '' 
+                            ? new Date(vuln.scan_date).toLocaleDateString() 
+                            : 'N/A')
                 }));
 
                 const csv = Papa.unparse(csvData);
@@ -3238,7 +3667,11 @@
                     'Port': vuln.port || 'N/A',
                     'Protocol': vuln.protocol || 'N/A',
                     'First Seen': vuln.first_seen ? new Date(vuln.first_seen).toLocaleDateString() : 'N/A',
-                    'Last Seen': vuln.last_seen ? new Date(vuln.last_seen).toLocaleDateString() : 'N/A',
+                    'Last Seen': vuln.last_seen && vuln.last_seen.trim() !== '' 
+                        ? new Date(vuln.last_seen).toLocaleDateString() 
+                        : (vuln.scan_date && vuln.scan_date.trim() !== '' 
+                            ? new Date(vuln.scan_date).toLocaleDateString() 
+                            : 'N/A'),
                     'Plugin Output': vuln.plugin_output || 'No output available'
                 }));
 

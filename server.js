@@ -149,85 +149,176 @@ function processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, re
     let processed = 0;
     const currentDate = scanDate || new Date().toISOString().split("T")[0];
     
-    // Process each row for rollover architecture
-    rows.forEach((row) => {
-        const mapped = mapVulnerabilityRow(row);
-        const uniqueKey = generateUniqueKey(mapped);
+    console.log("Starting rollover import for scan date:", currentDate, "with", rows.length, "rows");
+    
+    // Step 1: Mark all current vulnerabilities as potentially stale
+    db.run("UPDATE vulnerabilities_current SET last_seen = ? WHERE scan_date < ?", 
+        [currentDate, currentDate], (err) => {
+        if (err) {
+            console.error("Error marking vulnerabilities as stale:", err);
+            res.status(500).json({ error: "Failed to prepare for import" });
+            return;
+        }
         
-        // Insert into snapshots (historical record)
-        db.run(`INSERT INTO vulnerability_snapshots 
-            (import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, 
-             first_seen, last_seen, plugin_id, plugin_name, description, solution, 
-             vendor_reference, vendor, vulnerability_date, state, unique_key)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            importId,
-            currentDate,
-            mapped.hostname,
-            mapped.ipAddress,
-            mapped.cve,
-            mapped.severity,
-            mapped.vprScore,
-            mapped.cvssScore,
-            mapped.firstSeen,
-            mapped.lastSeen,
-            mapped.pluginId,
-            mapped.description,
-            mapped.solution,
-            mapped.vendor,
-            mapped.vendor,
-            mapped.pluginPublished,
-            mapped.state,
-            uniqueKey
-        ], (err) => {
-            if (err) {
-                console.error("Snapshot insert error:", err);
-            }
-        });
+        // Step 2: Process all new vulnerability data
+        const processedKeys = new Set();
+        let insertCount = 0;
+        let updateCount = 0;
         
-        // Insert or replace in current table (latest state)
-        db.run(`INSERT OR REPLACE INTO vulnerabilities_current 
-            (import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, 
-             first_seen, last_seen, plugin_id, plugin_name, description, solution, 
-             vendor_reference, vendor, vulnerability_date, state, unique_key)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-            importId,
-            currentDate,
-            mapped.hostname,
-            mapped.ipAddress,
-            mapped.cve,
-            mapped.severity,
-            mapped.vprScore,
-            mapped.cvssScore,
-            mapped.firstSeen,
-            mapped.lastSeen,
-            mapped.pluginId,
-            mapped.description,
-            mapped.solution,
-            mapped.vendor,
-            mapped.vendor,
-            mapped.pluginPublished,
-            mapped.state,
-            uniqueKey
-        ], (err) => {
-            if (err) {
-                console.error("Current table insert error:", err);
-            }
-            processed++;
+        if (rows.length === 0) {
+            // No data to process, finalize
+            finalizeBatch();
+            return;
+        }
+        
+        rows.forEach((row) => {
+            const mapped = mapVulnerabilityRow(row);
+            const uniqueKey = generateUniqueKey(mapped);
             
-            if (processed === rows.length) {
-                // Calculate and store daily totals
-                calculateAndStoreDailyTotals(currentDate, () => {
-                    stmt.finalize();
-                    PathValidator.safeUnlinkSync(filePath);
-                    res.json({
-                        ...responseData,
-                        rowsProcessed: processed,
-                        scanDate: currentDate,
-                        rolloverComplete: true
-                    });
-                });
+            // Use the current scan date for last_seen to indicate this vulnerability is present in current scan
+            mapped.lastSeen = currentDate;
+            
+            // Skip duplicates within the same batch
+            if (processedKeys.has(uniqueKey)) {
+                processed++;
+                if (processed === rows.length) {
+                    finalizeBatch();
+                }
+                return;
             }
+            processedKeys.add(uniqueKey);
+            
+            // Insert into snapshots (historical record)
+            db.run("INSERT INTO vulnerability_snapshots " +
+                "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
+                " first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
+                " vendor_reference, vendor, vulnerability_date, state, unique_key)" +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                importId,
+                currentDate,
+                mapped.hostname,
+                mapped.ipAddress,
+                mapped.cve,
+                mapped.severity,
+                mapped.vprScore,
+                mapped.cvssScore,
+                mapped.firstSeen,
+                mapped.lastSeen,
+                mapped.pluginId,
+                mapped.pluginName,
+                mapped.description,
+                mapped.solution,
+                mapped.vendor,
+                mapped.vendor,
+                mapped.pluginPublished,
+                mapped.state,
+                uniqueKey
+            ], (err) => {
+                if (err) {
+                    console.error("Snapshot insert error:", err);
+                }
+            });
+            
+            // Check if this vulnerability already exists in current table
+            db.get("SELECT id, first_seen FROM vulnerabilities_current WHERE unique_key = ?", 
+                [uniqueKey], (err, existingRow) => {
+                if (err) {
+                    console.error("Error checking existing vulnerability:", err);
+                    processed++;
+                    if (processed === rows.length) {
+                        finalizeBatch();
+                    }
+                    return;
+                }
+                
+                if (existingRow) {
+                    // Update existing vulnerability - preserve first_seen, update last_seen and other fields
+                    db.run("UPDATE vulnerabilities_current SET " +
+                        "import_id = ?, scan_date = ?, hostname = ?, ip_address = ?, cve = ?, " +
+                        "severity = ?, vpr_score = ?, cvss_score = ?, last_seen = ?, " +
+                        "plugin_id = ?, plugin_name = ?, description = ?, solution = ?, " +
+                        "vendor_reference = ?, vendor = ?, vulnerability_date = ?, state = ? " +
+                        "WHERE unique_key = ?", [
+                        importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
+                        mapped.severity, mapped.vprScore, mapped.cvssScore, mapped.lastSeen,
+                        mapped.pluginId, mapped.pluginName, mapped.description, mapped.solution,
+                        mapped.vendor, mapped.vendor, mapped.pluginPublished, mapped.state,
+                        uniqueKey
+                    ], (err) => {
+                        if (err) {
+                            console.error("Current table update error:", err);
+                        } else {
+                            updateCount++;
+                        }
+                        processed++;
+                        if (processed === rows.length) {
+                            finalizeBatch();
+                        }
+                    });
+                } else {
+                    // Insert new vulnerability
+                    db.run("INSERT INTO vulnerabilities_current " +
+                        "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
+                         "first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
+                         "vendor_reference, vendor, vulnerability_date, state, unique_key)" +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                        importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
+                        mapped.severity, mapped.vprScore, mapped.cvssScore,
+                        mapped.firstSeen || currentDate, // Use current date as first_seen if not provided
+                        mapped.lastSeen, mapped.pluginId, mapped.pluginName, mapped.description,
+                        mapped.solution, mapped.vendor, mapped.vendor, mapped.pluginPublished,
+                        mapped.state, uniqueKey
+                    ], (err) => {
+                        if (err) {
+                            console.error("Current table insert error:", err);
+                        } else {
+                            insertCount++;
+                        }
+                        processed++;
+                        if (processed === rows.length) {
+                            finalizeBatch();
+                        }
+                    });
+                }
+            });
         });
+        
+        function finalizeBatch() {
+            // Step 3: Remove vulnerabilities that are no longer present (haven't been updated in this scan)
+            db.run("DELETE FROM vulnerabilities_current WHERE last_seen < ?", [currentDate], (err, result) => {
+                if (err) {
+                    console.error("Error removing stale vulnerabilities:", err);
+                } else {
+                    console.log("Removed", (result.changes || 0), "stale vulnerabilities from current table");
+                }
+                
+                // Step 4: Calculate and store daily totals
+                calculateAndStoreDailyTotals(currentDate, () => {
+                    // Clean up file
+                    try {
+                        if (filePath && fs.existsSync(filePath)) {
+                            PathValidator.safeUnlinkSync(filePath);
+                        }
+                    } catch (unlinkError) {
+                        console.error("Error cleaning up file:", unlinkError);
+                    }
+                    
+                    // Send success response
+                    const finalResponse = {
+                        ...responseData,
+                        rowsProcessed: rows.length,
+                        insertCount,
+                        updateCount,
+                        scanDate: currentDate,
+                        rolloverComplete: true,
+                        removedStale: result?.changes || 0
+                    };
+                    
+                    console.log("Import completed:", finalResponse);
+                    res.json(finalResponse);
+                });
+            });
+        }
     });
 }
 
@@ -423,8 +514,8 @@ app.get("/api/vulnerabilities/stats", (req, res) => {
       COUNT(*) as count,
       SUM(vpr_score) as total_vpr,
       AVG(vpr_score) as avg_vpr,
-      MIN(first_seen) as earliest,
-      MAX(last_seen) as latest
+      MIN(COALESCE(first_seen, scan_date)) as earliest,
+      MAX(COALESCE(last_seen, scan_date)) as latest
     FROM vulnerabilities_current 
     GROUP BY severity
   `;
@@ -440,16 +531,6 @@ app.get("/api/vulnerabilities/stats", (req, res) => {
 
 // Get recent vulnerability statistics with trend comparison (for cards)
 app.get("/api/vulnerabilities/recent-trends", (req, res) => {
-  // Get current data from vulnerabilities_current
-  const recentQuery = `
-    SELECT 
-      severity,
-      COUNT(*) as count,
-      SUM(vpr_score) as total_vpr
-    FROM vulnerabilities_current 
-    GROUP BY severity
-  `;
-  
   // Get previous data from vulnerability_daily_totals (most recent vs previous day)
   const previousQuery = `
     SELECT 
@@ -462,14 +543,8 @@ app.get("/api/vulnerabilities/recent-trends", (req, res) => {
     ORDER BY scan_date DESC 
     LIMIT 2
   `;
-  
-  db.all(recentQuery, [], (err, recentRows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    db.all(previousQuery, [], (err, dailyTotalsRows) => {
+
+  db.all(previousQuery, [], (err, dailyTotalsRows) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -479,7 +554,20 @@ app.get("/api/vulnerabilities/recent-trends", (req, res) => {
       const trends = {};
       
       // If we have daily totals history, use it for comparison
+      let currentData = {};
       let previousData = {};
+      
+      if (dailyTotalsRows.length >= 1) {
+        // Use the most recent daily total as "current"
+        const currentRow = dailyTotalsRows[0];
+        currentData = {
+          "Critical": { count: currentRow.critical_count || 0, total_vpr: currentRow.critical_total_vpr || 0 },
+          "High": { count: currentRow.high_count || 0, total_vpr: currentRow.high_total_vpr || 0 },
+          "Medium": { count: currentRow.medium_count || 0, total_vpr: currentRow.medium_total_vpr || 0 },
+          "Low": { count: currentRow.low_count || 0, total_vpr: currentRow.low_total_vpr || 0 }
+        };
+      }
+      
       if (dailyTotalsRows.length >= 2) {
         // Use the second most recent daily total (previousData)
         const prevRow = dailyTotalsRows[1];
@@ -499,13 +587,15 @@ app.get("/api/vulnerabilities/recent-trends", (req, res) => {
         };
       }
       
-      recentRows.forEach(row => {
-        const prev = previousData[row.severity] || { count: 0, total_vpr: 0 };
-        const currentVpr = Math.round((row.total_vpr || 0) * 100) / 100;
-        trends[row.severity] = {
-          current: { count: row.count, total_vpr: currentVpr },
+      // Build trends for each severity
+      Object.keys(currentData).forEach(severity => {
+        const current = currentData[severity];
+        const prev = previousData[severity] || { count: 0, total_vpr: 0 };
+        const currentVpr = Math.round((current.total_vpr || 0) * 100) / 100;
+        trends[severity] = {
+          current: { count: current.count, total_vpr: currentVpr },
           trend: {
-            count_change: row.count - prev.count,
+            count_change: current.count - prev.count,
             vpr_change: Math.round((currentVpr - prev.total_vpr) * 100) / 100
           }
         };
@@ -513,11 +603,28 @@ app.get("/api/vulnerabilities/recent-trends", (req, res) => {
       
       res.json(trends);
     });
-  });
 });
 
 // Get historical trending data (last 14 days)
 app.get("/api/vulnerabilities/trends", (req, res) => {
+  // Get optional date range parameters from query string
+  const { startDate, endDate } = req.query;
+  
+  let whereClause = "";
+  let params = [];
+  
+  if (startDate && endDate) {
+    whereClause = "WHERE scan_date >= ? AND scan_date <= ?";
+    params = [startDate, endDate];
+  } else if (startDate) {
+    whereClause = "WHERE scan_date >= ?";
+    params = [startDate];
+  } else if (endDate) {
+    whereClause = "WHERE scan_date <= ?";
+    params = [endDate];
+  }
+  // No WHERE clause = return all data for ApexCharts to handle filtering
+  
   const query = `
     SELECT 
       scan_date as date,
@@ -527,11 +634,11 @@ app.get("/api/vulnerabilities/trends", (req, res) => {
       low_count, low_total_vpr,
       total_vulnerabilities, total_vpr
     FROM vulnerability_daily_totals 
-    WHERE scan_date >= DATE('now', '-14 days')
-    ORDER BY scan_date DESC
+    ${whereClause}
+    ORDER BY scan_date ASC
   `;
   
-  db.all(query, [], (err, rows) => {
+  db.all(query, params, (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -587,7 +694,7 @@ app.get("/api/vulnerabilities", (req, res) => {
   }
   
   const query = `
-    SELECT * FROM vulnerabilities 
+    SELECT * FROM vulnerabilities_current 
     ${whereClause}
     ORDER BY vpr_score DESC, last_seen DESC 
     LIMIT ? OFFSET ?
@@ -602,7 +709,7 @@ app.get("/api/vulnerabilities", (req, res) => {
     }
     
     // Get total count for pagination
-    const countQuery = `SELECT COUNT(*) as total FROM vulnerabilities ${whereClause}`;
+    const countQuery = `SELECT COUNT(*) as total FROM vulnerabilities_current ${whereClause}`;
     db.get(countQuery, params.slice(0, -2), (err, countResult) => {
       if (err) {
         res.status(500).json({ error: err.message });
@@ -683,7 +790,6 @@ app.post("/api/vulnerabilities/import", upload.single("csvFile"), (req, res) => 
 app.delete("/api/vulnerabilities/clear", (req, res) => {
   db.serialize(() => {
     db.run("DELETE FROM ticket_vulnerabilities");
-    db.run("DELETE FROM vulnerabilities");
     db.run("DELETE FROM vulnerability_snapshots");
     db.run("DELETE FROM vulnerabilities_current");
     db.run("DELETE FROM vulnerability_daily_totals");
@@ -948,43 +1054,79 @@ app.delete("/api/backup/clear/:type", (req, res) => {
     const { type } = req.params;
     
     if (type === "all") {
-        // For 'all', we'll run multiple queries
-        db.run("DELETE FROM vulnerabilities", (vulnErr) => {
-            if (vulnErr) {
-                res.status(500).json({ error: "Failed to clear vulnerabilities" });
+        // For 'all', clear all rollover vulnerability tables and tickets
+        db.run("DELETE FROM vulnerability_snapshots", (snapErr) => {
+            if (snapErr) {
+                res.status(500).json({ error: "Failed to clear vulnerability snapshots" });
                 return;
             }
             
-            db.run("DELETE FROM tickets", (ticketErr) => {
-                if (ticketErr) {
-                    res.status(500).json({ error: "Failed to clear tickets" });
+            db.run("DELETE FROM vulnerabilities_current", (currentErr) => {
+                if (currentErr) {
+                    res.status(500).json({ error: "Failed to clear current vulnerabilities" });
                     return;
                 }
                 
-                res.json({ message: "All data cleared successfully" });
+                db.run("DELETE FROM vulnerability_daily_totals", (dailyErr) => {
+                    if (dailyErr) {
+                        res.status(500).json({ error: "Failed to clear daily totals" });
+                        return;
+                    }
+                    
+                    db.run("DELETE FROM tickets", (ticketErr) => {
+                        if (ticketErr) {
+                            res.status(500).json({ error: "Failed to clear tickets" });
+                            return;
+                        }
+                        
+                        res.json({ message: "All data cleared successfully" });
+                    });
+                });
             });
         });
         return; // Exit early since we're handling the response in the nested callbacks
     }
     
-    // Determine query based on type - using const for better code quality
-    const query = type === "vulnerabilities" ? "DELETE FROM vulnerabilities" :
-                  type === "tickets" ? "DELETE FROM tickets" : null;
-    
-    if (!query) {
-        res.status(400).json({ error: "Invalid data type" });
+    if (type === "vulnerabilities") {
+        // Clear all vulnerability rollover tables
+        db.run("DELETE FROM vulnerability_snapshots", (snapErr) => {
+            if (snapErr) {
+                res.status(500).json({ error: "Failed to clear vulnerability snapshots" });
+                return;
+            }
+            
+            db.run("DELETE FROM vulnerabilities_current", (currentErr) => {
+                if (currentErr) {
+                    res.status(500).json({ error: "Failed to clear current vulnerabilities" });
+                    return;
+                }
+                
+                db.run("DELETE FROM vulnerability_daily_totals", (dailyErr) => {
+                    if (dailyErr) {
+                        res.status(500).json({ error: "Failed to clear daily totals" });
+                        return;
+                    }
+                    
+                    res.json({ message: "Vulnerabilities cleared successfully" });
+                });
+            });
+        });
         return;
     }
     
-    // Run the query for single table clear
-    db.run(query, (err) => {
-        if (err) {
-            res.status(500).json({ error: `Failed to clear ${type}` });
-            return;
-        }
-        
-        res.json({ message: `${type} cleared successfully` });
-    });
+    if (type === "tickets") {
+        db.run("DELETE FROM tickets", (err) => {
+            if (err) {
+                res.status(500).json({ error: "Failed to clear tickets" });
+                return;
+            }
+            
+            res.json({ message: "Tickets cleared successfully" });
+        });
+        return;
+    }
+    
+    res.status(400).json({ error: "Invalid data type" });
 });
 
 // Fallback to tickets.html for root
@@ -1602,9 +1744,13 @@ app.post("/api/restore", upload.single("file"), async (req, res) => {
                     // Clear existing vulnerabilities if requested
                     if (req.body.clearExisting === "true") {
                         await new Promise((resolve, reject) => {
-                            db.run("DELETE FROM vulnerabilities", (err) => {
-                                if (err) {reject(err);}
-                                else {resolve();}
+                            db.serialize(() => {
+                                db.run("DELETE FROM vulnerability_snapshots");
+                                db.run("DELETE FROM vulnerabilities_current");
+                                db.run("DELETE FROM vulnerability_daily_totals", (err) => {
+                                    if (err) {reject(err);}
+                                    else {resolve();}
+                                });
                             });
                         });
                     }
