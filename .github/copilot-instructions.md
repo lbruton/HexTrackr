@@ -33,31 +33,11 @@ HexTrackr is a vulnerability and ticket management system with a monolithic Node
 
 ### Development Setup
 
-```bash
-
-# Initialize database
-
-node scripts/init-database.js
-
-# Start development server (local)
-
-node server.js
-
-# OR use scripts
-
-./scripts/start-dev-env.sh
-
-# OR use Docker (recommended for Playwright testing)
-
-docker-compose up --build
-```
-
 ## Docker Configuration
 
 - Uses `Dockerfile.node` (not the main `Dockerfile`)
 - Single container setup on port 8080
 - **Important:** Restart Docker container before running Playwright tests
-- Neo4j container previously used for .rMemory system has been deprecated
 
 ### Testing Setup
 
