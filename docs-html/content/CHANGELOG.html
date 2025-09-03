@@ -13,7 +13,29 @@
 <h3>Planned</h3>
 <h3>Fixed</h3>
 <h3>Added</h3>
+<h2>[1.0.3] - 2025-09-03</h2>
+<h3>Added (Features)</h3>
 <ul>
+<li><strong>Gemini-Powered Documentation Enhancement</strong>: Comprehensive documentation review and update system<ul>
+<li>Created <code>scripts/gemini-docs-generator.js</code> for automated documentation analysis</li>
+<li>Added <code>.prompts/gemini-docs-review.prompt.md</code> with professional analysis standards</li>
+<li>Integrated with existing <code>docs-source/</code> → <code>docs-html/</code> workflow</li>
+<li>New npm script: <code>npm run docs:review</code> for Gemini-powered documentation analysis</li>
+<li>Generates detailed analysis reports with specific improvement recommendations</li>
+<li>Supports individual file analysis and comprehensive documentation review</li>
+<li>Built-in security validation and rate limiting for API usage</li>
+</ul>
+</li>
+</ul>
+<h3>Enhanced (Infrastructure)</h3>
+<ul>
+<li><p><strong>Documentation Infrastructure</strong>: Enhanced automation and quality assurance</p>
+<ul>
+<li>Improved documentation generation pipeline with AI-powered analysis</li>
+<li>Added comprehensive documentation review standards and metrics</li>
+<li>Enhanced cross-reference validation and content accuracy checking</li>
+</ul>
+</li>
 <li><p>Docs: Dynamic overview statistics loaded from new <code>/api/docs/stats</code> endpoint; falls back to existing static counts</p>
 <p>if API unavailable</p>
 </li>

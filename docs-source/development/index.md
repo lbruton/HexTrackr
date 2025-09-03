@@ -13,3 +13,4 @@ This section provides resources for developers working on HexTrackr.
 
 - **[Memory System](memory-system.md)**: Comprehensive overview of Persistent AI Memory integration and memory tool architecture.
 - **[Docs Portal Guide](docs-portal-guide.md)**: Documentation generation and management system.
+- **[Gemini Documentation Integration](gemini-docs-integration.md)**: AI-powered documentation enhancement system using Google Gemini API.
