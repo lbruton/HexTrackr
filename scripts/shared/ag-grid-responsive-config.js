@@ -1,15 +1,15 @@
-/* eslint-env browser */
-/* global window, document, setTimeout, clearTimeout */
-
 /**
- * @fileoverview This file contains the optimal AG Grid configuration for the HexTrackr vulnerabilities table.
- * It includes responsive behavior, auto-sizing columns, and mobile-friendly features.
- * This configuration is designed to be dropped into the existing HexTrackr application.
+ * AG Grid Responsive Configuration for HexTrackr
  * 
- * @version 1.1.0
- * @author Gemini
- * @date 2025-09-03
+ * This module provides responsive AG Grid configuration for vulnerability management.
+ * Extracted from inline JavaScript for better code organization and maintainability.
+ * 
+ * @fileoverview AG Grid responsive configuration utilities
+ * @author HexTrackr Development Team
+ * @version 1.0.0
  */
+
+/* global window, setTimeout, clearTimeout, module */
 
 /**
  * Debounce function to limit the rate at which a function gets called.
@@ -29,7 +29,7 @@ function debounce(func, delay) {
 
 /**
  * Creates and returns the complete AG Grid configuration object.
- * @param {object} componentContext - The 'this' context of the calling component (e.g., ModernVulnManager)
+ * @param {object} componentContext - The "this" context of the calling component (e.g., ModernVulnManager)
  *                                    to access its methods and properties like `gridApi`.
  * @returns {GridOptions} A complete AG Grid `gridOptions` object.
  */
@@ -148,9 +148,13 @@ function createVulnerabilityGridOptions(componentContext) {
             cellRenderer: (params) => {
                 const score = parseFloat(params.value) || 0;
                 let className = "severity-low";
-                if (score >= 9.0) {className = "severity-critical";}
-                else if (score >= 7.0) {className = "severity-high";}
-                else if (score >= 4.0) {className = "severity-medium";}
+                if (score >= 9.0) {
+                    className = "severity-critical";
+                } else if (score >= 7.0) {
+                    className = "severity-high";
+                } else if (score >= 4.0) {
+                    className = "severity-medium";
+                }
                 return `<span class="severity-badge ${className}">${score.toFixed(1)}</span>`;
             }
         }
@@ -218,7 +222,9 @@ function createVulnerabilityGridOptions(componentContext) {
         const breakpoints = { small: 768, large: 1200 };
         
         const allColumns = api.getColumns();
-        if (!allColumns) {return;}
+        if (!allColumns) {
+            return;
+        }
 
         const columnsToShow = [];
         const columnsToHide = [];
@@ -248,3 +254,15 @@ function createVulnerabilityGridOptions(componentContext) {
 
     return gridOptions;
 }
+
+// Export functions for module usage
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        debounce,
+        createVulnerabilityGridOptions
+    };
+}
+
+// Global exposure for legacy usage
+window.debounce = debounce;
+window.createVulnerabilityGridOptions = createVulnerabilityGridOptions;
