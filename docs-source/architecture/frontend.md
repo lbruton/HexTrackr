@@ -1,119 +1,79 @@
 # Frontend Architecture
 
-<!-- markdownlint-disable-next-line MD013 -->
-The UI is split into Tickets (Bootstrap/Tabler) and Vulnerabilities (Tabler + AG Grid + ApexCharts). Shared components are loaded first, then page scripts.
+The frontend of HexTrackr is composed of two main pages, each with its own set of JavaScript modules and CSS styles. Shared components, such as the header, footer, and settings modal, are loaded dynamically on each page.
 
-## Pages and frameworks
+## Page Architecture
 
-- tickets.html: Bootstrap + Tabler styles; JS: scripts/shared/settings-modal.js, scripts/pages/tickets.js
+### `tickets.html`
 
-<!-- markdownlint-disable-next-line MD013 -->
+- **Styling**: Uses a combination of Bootstrap 5 and Tabler.io for its UI components.
+- **Core Logic**: Managed by `scripts/pages/tickets.js`, which contains the `HexagonTicketsManager` class.
+- **Functionality**: Provides full CRUD operations for tickets, including filtering, pagination, and data export.
 
-- vulnerabilities.html: Tabler + AG Grid + ApexCharts; JS embedded (ModernVulnManager) with migration target scripts/pages/vulnerabilities.js
+### `vulnerabilities.html`
 
-## JavaScript layout
+- **Styling**: Uses the Tabler.io framework, with AG Grid for data tables and ApexCharts for visualizations.
+- **Core Logic**: Managed by `scripts/pages/vulnerability-manager.js`, which contains the `ModernVulnManager` class.
+- **Functionality**: A comprehensive dashboard for analyzing vulnerability data, with interactive charts, a powerful data grid, and multiple data views.
 
-- scripts/shared/
-  - settings-modal.js: Loads modal HTML, exposes actions (export/import/backup/restore, ServiceNow helpers) on window.
-  - header-loader.js/footer-loader.js: Inject shared header/footer markup.
-- scripts/pages/
-  - tickets.js: HexagonTicketsManager class handles CRUD, rendering, device list interactions, filtering, and CSV/PDF exports.
-  - vulnerabilities.js: Placeholder exposing window.refreshPageData and window.showToast for shared modal integration; main logic remains
+## JavaScript Module Layout
 
-        embedded in vulnerabilities.html.
+- **`scripts/shared/`**: Contains modules that are used across multiple pages.
+  - `header-loader.js` / `footer-loader.js`: Dynamically inject the shared header and footer.
+  - `settings-modal.js`: Manages the complex settings modal, including API configuration and data management tasks.
+  - `ag-grid-responsive-config.js`: Provides a centralized configuration for the AG Grid component.
+- **`scripts/pages/`**: Contains the main logic for each specific page.
+  - `tickets.js`: The `HexagonTicketsManager` class for the tickets page.
+  - `vulnerability-manager.js`: The `ModernVulnManager` class for the vulnerabilities dashboard.
+  - `vulnerabilities.js`: A simple loader script that initializes the `ModernVulnManager`.
 
-## Key symbols
+## Key Classes and Symbols
 
-- HexagonTicketsManager (tickets.js)
-  - init(), loadTicketsFromDB(), saveTicketToDB(), deleteTicketFromDB(), migrateFromLocalStorageIfNeeded()
-  - Device helpers: addDeviceField(), reverseDeviceOrder(), updateDeviceNumbers(), drag handlers
-  - Rendering: renderTickets(), pagination, filters, showToast
+### `HexagonTicketsManager` (in `tickets.js`)
 
-- Settings Modal (settings-modal.js IIFE)
-  - exportData(), backupData(), importData(), clearData(), restoreData()
-  - ServiceNow: load/save settings, testConnection, URL generation
-  - CSV helpers: convertTicketsToCSV(), convertVulnerabilitiesToCSV(), exportAllDataAsCSV()
+This class controls all functionality on the `tickets.html` page.
 
-- ModernVulnManager (vulnerabilities.html embedded)
-  - initializeGrid() with AG Grid responsive columns
-  - initializeChart() with ApexCharts
-  - handleCsvImport() -> POST /api/vulnerabilities/import
-  - loadData() -> GET /api/vulnerabilities (+trends), loadStatistics() -> GET /api/vulnerabilities/stats
+- **Core Methods**: `init()`, `loadTicketsFromDB()`, `saveTicketToDB()`, `deleteTicketFromDB()`
+- **Device Management**: `addDeviceField()`, `reverseDeviceOrder()`, `updateDeviceNumbers()`, and drag-and-drop handlers.
+- **UI Rendering**: `renderTickets()`, pagination, filtering, and toast notifications.
+- **Data Migration**: `migrateFromLocalStorageIfNeeded()` to move legacy data to the database.
 
-## Initialization flow
+### `ModernVulnManager` (in `vulnerability-manager.js`)
+
+This class is the engine for the `vulnerabilities.html` dashboard.
+
+- **Initialization**: `initializeGrid()`, `initializeChart()`
+- **Data Handling**: `loadData()`, `loadStatistics()`, `filterData()`
+- **User Interaction**: `setupEventListeners()`, `switchView()`, `lookupCVE()`
+- **Data Views**: `renderDeviceCards()`, `renderVulnerabilityCards()`
+
+### Settings Modal (in `settings-modal.js`)
+
+This is a shared, self-contained component that exposes global functions for data operations.
+
+- **Data Operations**: `exportData()`, `backupData()`, `importData()`, `clearData()`, `restoreData()`
+- **ServiceNow Integration**: `loadServiceNowSettings()`, `saveServiceNowSettings()`, `generateServiceNowUrl()`
+
+## Initialization Flow (`vulnerabilities.html`)
 
 ```mermaid
 sequenceDiagram
-    participant Page as tickets.html
-    participant Shared as settings-modal.js
-    participant Module as tickets.js
-    Page->>Shared: Load settings-modal.js (auto-init)
-    Page->>Module: Load tickets.js (new HexagonTicketsManager().init())
-    Module->>API: GET /api/tickets
-    API-->>Module: tickets[]
-    Module-->>Page: render table, stats
+    participant Page as vulnerabilities.html
+    participant Loader as vulnerabilities.js
+    participant Manager as vulnerability-manager.js
+    participant API as server.js
+
+    Page->>Loader: Load script
+    Loader->>Manager: new ModernVulnManager()
+    Manager->>Manager: initializeGrid(), initializeChart()
+    Manager->>API: GET /api/vulnerabilities
+    API-->>Manager: Vulnerability data
+    Manager->>API: GET /api/vulnerabilities/trends
+    API-->>Manager: Trend data
+    Manager-->>Page: Render grid and chart
 ```
 
-## Integration notes
+## Integration Notes
 
-- Shared settings modal functions call fetch endpoints and then notify the current page via window.refreshPageData(type) if provided.
-- vulnerabilities.js currently provides integration hooks; the ModernVulnManager remains in the HTML and should be migrated incrementally.
-
-## Symbol tables
-
-### scripts/pages/tickets.js (HexagonTicketsManager)
-
-<!-- markdownlint-disable MD013 -->
-| Method | Params | Returns | Purpose |
-|---|---|---|---|
-| init | none | Promise<void> | Bootstraps page: loads tickets, binds events, renders UI. |
-| loadTicketsFromDB | none | Promise<void> | Fetches tickets via GET /api/tickets and updates state. |
-| saveTicketToDB | ticket | Promise<void> | POST/PUT ticket to API depending on edit state. |
-| deleteTicketFromDB | id | Promise<void> | DELETE /api/tickets/:id and refreshes list. |
-| migrateFromLocalStorageIfNeeded | none | Promise<void> | Migrates legacy tickets to DB via POST /api/tickets/migrate. |
-| transformTicketData | ticket | ticket | Normalizes fields, computes overdue status, may update DB for overdue. |
-| renderTickets | none | void | Renders table rows, stats, and pagination. |
-| addDeviceField | name? | void | Adds a new device row to the modal form. |
-| reverseDeviceOrder | none | void | Toggles device order and renumbers items. |
-| updateDeviceNumbers | none | void | Ensures continuous numbering after changes. |
-| showToast | msg,type | void | Displays a toast/snackbar. |
-<!-- markdownlint-enable MD013 -->
-
-### vulnerabilities.html (ModernVulnManager - embedded)
-
-<!-- markdownlint-disable MD013 -->
-| Method | Params | Returns | Purpose |
-|---|---|---|---|
-| setupEventListeners | none | void | Wires buttons (import, filters) and inputs. |
-| initializeGrid | none | void | Creates AG Grid with responsive columns and handlers. |
-| initializeChart | none | void | Configures ApexCharts for 14‑day trends. |
-| handleCsvImport | File | Promise<void> | Uploads CSV to POST /api/vulnerabilities/import and refreshes grid/stats. |
-| loadData | none | Promise<void> | Loads list and trend data from API; updates grid/chart. |
-| loadStatistics | none | Promise<void> | Loads aggregated stats; updates dashboard. |
-<!-- markdownlint-enable MD013 -->
-
-### scripts/shared/settings-modal.js (IIFE)
-
-<!-- markdownlint-disable MD013 -->
-| Function (window.*) | Params | Returns | Purpose |
-|---|---|---|---|
-| exportData | type | Promise<void> | Export section or all as JSON/CSV. |
-| backupData | type | Promise<void> | Fetch backup payloads from /api/backup/* and zip as needed. |
-| importData | type,file | Promise<void> | Import CSV via /api/import/{type} (JSON pathway). |
-| clearData | type | Promise<void> | DELETE /api/backup/clear/:type. |
-| restoreData | type,zip,clearExisting | Promise<void> | POST /api/restore with zip. |
-| saveSettings | none | void | Persist ServiceNow and app settings to localStorage. |
-| testCiscoConnection/testTenableConnection | none | Promise<void> | Placeholder connectivity checks. |
-| generateServiceNowUrl | ticketId | string | Build instance-specific ServiceNow link. |
-<!-- markdownlint-enable MD013 -->
-
-### scripts/pages/vulnerabilities.js (migration placeholder)
-
-| Function (window.*) | Params | Returns | Purpose |
-|---|---|---|---|
-| refreshPageData | type | void | Hook for shared modal to trigger page refresh after imports/clears. |
-| showToast | message,type | void | Fallback toast using alert() if no page-specific UI. |
-
-## Known integration pitfalls
-
-- settings-modal.js has a generic importData() path documented as /api/import, while server routes are /api/import/{tickets|vulnerabilities}. Use the specific endpoints listed in the API docs.
+- The shared settings modal (`settings-modal.js`) is designed to be self-sufficient. It can be dropped into any page and will provide its functionality globally.
+- Page-specific scripts like `tickets.js` and `vulnerability-manager.js` are responsible for their own UI and data management but rely on the shared modal for global settings and data operations.
