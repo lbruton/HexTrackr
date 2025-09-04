@@ -1,11 +1,80 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>Getting Started</h1>
-<p>This section provides a starting point for new users of HexTrackr.</p>
-<h2>Installation</h2>
-<p>Learn how to set up and run HexTrackr using Docker.</p>
+    <h1>Getting Started with HexTrackr</h1>
+<p>This guide provides everything you need to get HexTrackr up and running, whether for a production-like environment using Docker or for local development.</p>
+<hr>
+<h2>Recommended Setup: Docker &amp; Docker Compose</h2>
+<p>The most reliable and consistent way to run HexTrackr is by using Docker. This method encapsulates the application and its dependencies, avoiding potential conflicts with your local environment.</p>
+<h3>Prerequisites</h3>
 <ul>
-<li><strong><a href="./installation.html">Installation Guide</a></strong></li>
+<li><a href="https://docs.docker.com/get-docker/">Docker</a></li>
+<li><a href="https://docs.docker.com/compose/install/">Docker Compose</a></li>
+</ul>
+<h3>Running the Application</h3>
+<ol>
+<li><p><strong>Clone the Repository</strong></p>
+<pre><code class="language-bash">git clone https://github.com/Lonnie-Bruton/HexTrackr.git
+cd HexTrackr
+</code></pre>
+</li>
+<li><p><strong>Start the Services</strong></p>
+<p> Use Docker Compose to build the image and run the application in detached mode.</p>
+<pre><code class="language-bash">docker-compose up -d --build
+</code></pre>
+</li>
+<li><p><strong>Access HexTrackr</strong></p>
+<p> The application will be available at <code>http://localhost:8080</code>.</p>
+<ul>
+<li><strong>Tickets Management</strong>: <code>http://localhost:8080/tickets.html</code></li>
+<li><strong>Vulnerabilities Management</strong>: <code>http://localhost:8080/vulnerabilities.html</code></li>
+<li><strong>Documentation Portal</strong>: <code>http://localhost:8080/docs-html/</code></li>
+</ul>
+</li>
+<li><p><strong>Stopping the Application</strong></p>
+<pre><code class="language-bash">docker-compose down
+</code></pre>
+</li>
+</ol>
+<hr>
+<h2>Local Development Setup (Without Docker)</h2>
+<p>For developers who want to work on the HexTrackr source code directly.</p>
+<h3>Prerequisites (2)</h3>
+<ul>
+<li><strong>Node.js</strong>: v18.x or later</li>
+<li><strong>npm</strong>: v8.x or later (typically comes with Node.js)</li>
+</ul>
+<h3>Setup Instructions</h3>
+<ol>
+<li><p><strong>Clone the Repository</strong> (if you haven&#39;t already)</p>
+<pre><code class="language-bash">git clone https://github.com/Lonnie-Bruton/HexTrackr.git
+cd HexTrackr
+</code></pre>
+</li>
+<li><p><strong>Install Dependencies</strong></p>
+<p> Install the required Node.js packages.</p>
+<pre><code class="language-bash">npm install
+</code></pre>
+</li>
+<li><p><strong>Initialize the Database</strong></p>
+<p> This script creates the <code>hextrackr.db</code> SQLite file in the <code>data/</code> directory and sets up the necessary tables.</p>
+<pre><code class="language-bash">node scripts/init-database.js
+</code></pre>
+</li>
+<li><p><strong>Start the Development Server</strong></p>
+<pre><code class="language-bash">node server.js
+</code></pre>
+<p> The server will start, and you can access the application at <code>http://localhost:8080</code>.</p>
+</li>
+</ol>
+<h3>Development Scripts</h3>
+<p>The project includes several scripts in the <code>package.json</code> to aid development:</p>
+<ul>
+<li><code>npm start</code>: Starts the production server.</li>
+<li><code>npm run dev</code>: Starts the server with <code>nodemon</code> for automatic restarts on file changes.</li>
+<li><code>npm run init-db</code>: Initializes or re-initializes the database.</li>
+<li><code>npm run lint:all</code>: Runs all code quality checks (ESLint for JS, Stylelint for CSS, Markdownlint for docs).</li>
+<li><code>npm run fix:all</code>: Attempts to automatically fix all code quality issues.</li>
+<li><code>npm run docs:generate</code>: Regenerates the HTML documentation portal from the markdown sources.</li>
 </ul>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
