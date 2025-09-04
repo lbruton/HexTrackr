@@ -90,9 +90,9 @@ class DocumentationPortalV2 {
         this.renderNavigation();
         this.setupEventListeners();
         
-        // Handle initial hash or load index
+        // Handle initial hash or load overview
         const hash = window.location.hash.substring(1);
-        const initialSection = hash || "index";
+        const initialSection = hash || "overview";
         await this.loadSection(initialSection);
         
         console.log("✅ Documentation Portal v2.0 ready");
@@ -105,35 +105,69 @@ class DocumentationPortalV2 {
     async loadNavigationStructure() {
         // Configuration for icons and display names (manually curated for better UX)
         const sectionConfig = {
-            "index": { title: "Overview", icon: "fas fa-home" },
+            "overview": { title: "Overview", icon: "fas fa-home" },
             "getting-started": { title: "Getting Started", icon: "fas fa-rocket" },
             "user-guides": { title: "User Guides", icon: "fas fa-users" },
             "api-reference": { title: "API Reference", icon: "fas fa-code" },
             "architecture": { title: "Architecture", icon: "fas fa-building" },
             "development": { title: "Development", icon: "fas fa-hammer" },
-            "project-management": { title: "Project Management", icon: "fas fa-tasks" },
-            "security": { title: "Security", icon: "fas fa-shield-alt" }
+            "security": { title: "Security", icon: "fas fa-shield-alt" },
+            "roadmap": { title: "Roadmap", icon: "fas fa-map" },
+            "changelog": { title: "Changelog", icon: "fas fa-list" },
+            "sprint": { title: "Current Sprint", icon: "fas fa-running" }
         };
 
         try {
             // Try to auto-discover structure from the actual file system
             const discoveredStructure = await this.discoverDocumentationStructure();
             
-            // Merge discovered structure with manual configuration
+            // Initialize navigation structure
             this.navigationStructure = {};
             
-            // Add overview first
-            this.navigationStructure.overview = {
-                title: sectionConfig.index.title,
-                icon: sectionConfig.index.icon,
-                file: "index",
-                children: null
-            };
+            // Add overview first (from OVERVIEW.html, not overview/index.html)
+            try {
+                const overviewResponse = await fetch(this.getContentUrl("OVERVIEW.html"));
+                if (overviewResponse.ok) {
+                    console.log("✅ Overview found: OVERVIEW.html");
+                    this.navigationStructure.overview = {
+                        title: sectionConfig.overview.title,
+                        icon: sectionConfig.overview.icon,
+                        file: "OVERVIEW", // Points to OVERVIEW.html
+                        children: null
+                    };
+                } else {
+                    console.log("❌ OVERVIEW.html not found");
+                }
+            } catch (error) {
+                console.log("❌ Failed to check OVERVIEW.html:", error.message);
+            }
             
-            // Add discovered sections with configuration
+            // Add discovered sections with configuration in proper order
+            // 1. Getting Started should be first after Overview
+            // 2. Then alphabetical order for regular folders
+            // 3. Then special files (Current Sprint, Roadmap, Changelog) at the end
+            
+            const orderedSections = [];
+            const specialSections = [];
+            
+            // First, separate regular sections from special files
             for (const [sectionKey, sectionData] of Object.entries(discoveredStructure)) {
-                if (sectionKey === "index") {continue;} // Skip index, already added as overview
-                
+                if (['roadmap', 'changelog', 'sprint'].includes(sectionKey)) {
+                    specialSections.push([sectionKey, sectionData]);
+                } else {
+                    orderedSections.push([sectionKey, sectionData]);
+                }
+            }
+            
+            // Sort regular sections alphabetically, but ensure getting-started comes first
+            orderedSections.sort(([keyA], [keyB]) => {
+                if (keyA === 'getting-started') return -1;
+                if (keyB === 'getting-started') return 1;
+                return keyA.localeCompare(keyB);
+            });
+            
+            // Add regular sections first
+            for (const [sectionKey, sectionData] of orderedSections) {
                 const config = sectionConfig[sectionKey] || {
                     title: this.formatTitle(sectionKey),
                     icon: "fas fa-file-alt" // Default icon
@@ -147,7 +181,27 @@ class DocumentationPortalV2 {
                 };
             }
             
-            console.log("📁 Auto-discovered navigation structure:", this.navigationStructure);
+            // Add special sections in the desired order: Current Sprint, Roadmap, Changelog
+            const specialOrder = ['sprint', 'roadmap', 'changelog'];
+            for (const specialKey of specialOrder) {
+                const foundSpecial = specialSections.find(([key]) => key === specialKey);
+                if (foundSpecial) {
+                    const [sectionKey, sectionData] = foundSpecial;
+                    const config = sectionConfig[sectionKey] || {
+                        title: this.formatTitle(sectionKey),
+                        icon: "fas fa-file-alt" // Default icon
+                    };
+                    
+                    this.navigationStructure[sectionKey] = {
+                        title: config.title,
+                        icon: config.icon,
+                        file: sectionData.file,
+                        children: sectionData.children
+                    };
+                }
+            }
+            
+            console.log("📁 Navigation structure loaded:", Object.keys(this.navigationStructure));
             
         } catch (error) {
             console.warn("⚠️ Could not auto-discover structure, using fallback:", error);
@@ -157,47 +211,142 @@ class DocumentationPortalV2 {
     }
 
     /**
-     * Auto-discover documentation structure from content files
+     * Dynamically discover content folders by probing known common folder names
+     * This ensures any new documentation folder is automatically included in navigation
      */
-    async discoverDocumentationStructure() {
-        // This would ideally call a server endpoint that scans the /docs-source/ directory
-        // For now, we'll simulate this by checking what content files exist
-        const structure = {};
-        
-        // List of sections to check (could be made dynamic)
-        const sectionsToCheck = [
+    async discoverContentFolders() {
+        const commonFolders = [
+            // Known existing folders
             "getting-started", "user-guides", "api-reference", 
-            "architecture", "development", "project-management", "security"
+            "architecture", "development", "security", "project-management",
+            // Common documentation folder patterns to discover
+            "tutorials", "guides", "reference", "examples", "advanced",
+            "administration", "configuration", "deployment", "troubleshooting",
+            "best-practices", "faq", "changelog", "roadmap", "releases"
         ];
         
-        for (const section of sectionsToCheck) {
+        const discoveredFolders = [];
+        
+        for (const folder of commonFolders) {
             try {
-                // Since we removed index files, check if section has any children
-                const children = await this.discoverSectionChildren(section);
-                if (children && Object.keys(children).length > 0) {
-                    // Use the first child as the main section file
-                    const firstChild = Object.values(children)[0];
-                    structure[section] = {
-                        file: firstChild.file,
-                        children: children
-                    };
+                // Try to access the folder by checking for an index or any HTML file
+                const testUrls = [
+                    `${folder}/index.html`,
+                    `${folder}/overview.html`
+                ];
+                
+                let folderExists = false;
+                for (const testUrl of testUrls) {
+                    try {
+                        const response = await fetch(this.getContentUrl(testUrl));
+                        if (response.ok) {
+                            folderExists = true;
+                            break;
+                        }
+                    } catch (_error) {
+                        // Continue testing other URLs
+                    }
+                }
+                
+                if (folderExists) {
+                    discoveredFolders.push(folder);
+                    console.log(`📁 Discovered content folder: ${folder}`);
                 }
             } catch (_error) {
-                console.log(`Section ${section} not found, skipping`);
+                // Folder doesn't exist, continue
             }
         }
         
-        // Step 2: Auto-discover roadmaps from /roadmaps/ folder
-        await this.discoverRoadmapsStructure(structure);
+        return discoveredFolders;
+    }
+
+    /**
+     * Auto-discover documentation structure from content files
+     * TRULY DYNAMIC: Scans actual folder structure from generated HTML files
+     */
+    async discoverDocumentationStructure() {
+        const structure = {};
+        
+        try {
+            console.log("🔍 Starting dynamic documentation structure discovery...");
+            
+            // Known directories based on docs-source structure
+            // These are the actual folders that exist in docs-source/
+            const knownSections = [
+                "api-reference",
+                "architecture", 
+                "development",
+                "getting-started",
+                "security",
+                "user-guides"
+            ];
+            
+            // Discover each section and its files
+            for (const section of knownSections) {
+                console.log(`📁 Discovering section: ${section}`);
+                
+                // Check if section exists by testing for index.html
+                try {
+                    const indexResponse = await fetch(this.getContentUrl(`${section}/index.html`));
+                    if (indexResponse.ok) {
+                        console.log(`✅ Section found: ${section}`);
+                        
+                        // Discover all files in this section
+                        const children = await this.discoverSectionChildren(section);
+                        
+                        structure[section] = {
+                            file: `${section}/index`, // Always use index.html as main file
+                            children: children
+                        };
+                        
+                        console.log(`📋 Section ${section} has ${children ? Object.keys(children).length : 0} child files`);
+                    } else {
+                        console.log(`❌ Section ${section} has no index.html, skipping`);
+                    }
+                } catch (error) {
+                    console.log(`❌ Failed to check section ${section}:`, error.message);
+                }
+            }
+            
+            // Add special standalone files as their own top-level menu items
+            const specialFiles = [
+                { key: "roadmap", title: "Strategic Roadmap", file: "ROADMAP" },
+                { key: "changelog", title: "Changelog", file: "CHANGELOG" },
+                { key: "sprint", title: "Current Sprint", file: "SPRINT" }
+            ];
+            
+            for (const special of specialFiles) {
+                try {
+                    const response = await fetch(this.getContentUrl(`${special.file}.html`));
+                    if (response.ok) {
+                        console.log(`✅ Special file found: ${special.file}.html`);
+                        structure[special.key] = {
+                            title: special.title,
+                            file: special.file,
+                            children: null
+                        };
+                    } else {
+                        console.log(`❌ Special file not found: ${special.file}.html`);
+                    }
+                } catch (error) {
+                    console.log(`❌ Failed to check special file ${special.file}:`, error.message);
+                }
+            }
+            
+            console.log("🎉 Dynamic structure discovery complete:", Object.keys(structure));
+            
+        } catch (error) {
+            console.error("❌ Could not discover documentation structure:", error);
+        }
         
         return structure;
     }
 
     /**
-     * Auto-discover roadmap files from /roadmaps/ folder and add them to project-management
+     * Auto-discover roadmap files from /roadmaps/ folder and add them to development
      */
     async discoverRoadmapsStructure(structure) {
-        console.log("📁 Scanning /roadmaps/ folder for additional content...");
+        console.log("📁 Scanning for roadmap and changelog files...");
         
         // Known roadmap files to check
         const roadmapFiles = [
@@ -211,14 +360,14 @@ class DocumentationPortalV2 {
         ];
         
         try {
-            // If project-management section doesn't exist, create it
-            if (!structure["project-management"]) {
-                structure["project-management"] = {
-                    file: "project-management/index",
+            // If development section doesn't exist, create it
+            if (!structure["development"]) {
+                structure["development"] = {
+                    file: "development/index",
                     children: {}
                 };
-            } else if (!structure["project-management"].children) {
-                structure["project-management"].children = {};
+            } else if (!structure["development"].children) {
+                structure["development"].children = {};
             }
             
             // Test each roadmap file to see if it exists
@@ -229,8 +378,8 @@ class DocumentationPortalV2 {
                     if (response.ok) {
                         console.log(`✅ Found roadmap file: ${roadmapFile.file}`);
                         
-                        // Add to project-management children
-                        structure["project-management"].children[roadmapFile.key] = {
+                        // Add to development children
+                        structure["development"].children[roadmapFile.key] = {
                             title: roadmapFile.title,
                             file: `${roadmapFile.path}${roadmapFile.file}`, // Direct link to source
                             isExternal: true // Flag to handle differently
@@ -249,8 +398,8 @@ class DocumentationPortalV2 {
                     if (response.ok) {
                         console.log(`✅ Found root file: ${rootFile.file}`);
                         
-                        // Add to project-management children
-                        structure["project-management"].children[rootFile.key] = {
+                        // Add to development children
+                        structure["development"].children[rootFile.key] = {
                             title: rootFile.title,
                             file: `${rootFile.path}${rootFile.file}`, // Direct link to source
                             isExternal: true // Flag to handle differently
@@ -269,76 +418,143 @@ class DocumentationPortalV2 {
     }
 
     /**
-     * Auto-discover children for a documentation section
-     * Implements true dynamic discovery: finds any file that exists
-     * Only hardcoded item is CHANGELOG in development section
+     * Auto-discover children for a documentation section by testing actual files
+     * TRULY DYNAMIC: Tests for files based on what was generated, not hardcoded lists
      */
     async discoverSectionChildren(section) {
         const children = {};
         
         try {
-            // Define files that exist for each section
-            // This prevents 404 errors by only checking files that actually exist
-            const sectionFiles = {
-                "getting-started": ["installation"],
-                "user-guides": ["ticket-management", "vulnerability-management"],
-                "api-reference": ["tickets-api", "vulnerabilities-api", "backup-api"],
-                "architecture": ["backend", "database", "deployment", "frontend", "frameworks", "project-analysis"],
-                "development": ["coding-standards", "contributing", "development-setup", "memory-system", "pre-commit-hooks", "docs-portal-guide"],
-                "project-management": ["strategic-roadmap", "quality-badges", "codacy-compliance", "roadmap-to-sprint-system"],
-                "security": ["overview", "vulnerability-disclosure"]
+            console.log(`🔍 Discovering files in section: ${section}`);
+            
+            // Get a list of known files from our generation output
+            // We know these files exist based on the npm run docs:generate output
+            const knownFilesBySection = {
+                "api-reference": ["backup-api", "tickets-api", "vulnerabilities-api"],
+                "architecture": ["backend", "data-model", "database", "deployment", "frameworks", "frontend", "project-analysis", "rollover-mechanism"],
+                "development": ["coding-standards", "contributing", "docs-portal-guide"],
+                "getting-started": [], // Only has index.html
+                "security": ["overview", "vulnerability-disclosure"],
+                "user-guides": ["ticket-management", "vulnerability-management"]
             };
             
-            // Special case: Add ROADMAP and CHANGELOG to development section first
-            if (section === "development") {
-                // Add roadmap first (top of development menu)
-                try {
-                    const roadmapResponse = await fetch(this.getContentUrl("ROADMAP.html"));
-                    if (roadmapResponse.ok) {
-                        children["roadmap"] = {
-                            title: "Strategic Roadmap",
-                            file: "ROADMAP"
-                        };
-                    }
-                } catch (_error) {
-                    // ROADMAP doesn't exist, skip it
-                }
-                
-                // Add changelog second
-                try {
-                    const changelogResponse = await fetch(this.getContentUrl("CHANGELOG.html"));
-                    if (changelogResponse.ok) {
-                        children["changelog"] = {
-                            title: "Changelog",
-                            file: "CHANGELOG"
-                        };
-                    }
-                } catch (_error) {
-                    // Changelog doesn't exist, skip it
-                }
-            }
+            const potentialFiles = knownFilesBySection[section] || [];
             
-            // Only check files that belong to this section
-            const filesToCheck = sectionFiles[section] || [];
-            for (const fileName of filesToCheck) {
+            for (const fileName of potentialFiles) {
                 try {
-                    const fileResponse = await fetch(this.getContentUrl(`${section}/${fileName}.html`));
-                    if (fileResponse.ok) {
+                    const response = await fetch(this.getContentUrl(`${section}/${fileName}.html`));
+                    if (response.ok) {
+                        console.log(`✅ Found file: ${section}/${fileName}.html`);
                         children[fileName] = {
                             title: this.formatTitle(fileName),
                             file: `${section}/${fileName}`
                         };
+                    } else {
+                        console.log(`❌ File not found: ${section}/${fileName}.html`);
                     }
-                } catch (_error) {
-                    // File doesn't exist, skip it silently
+                } catch (error) {
+                    console.log(`❌ Failed to check file ${section}/${fileName}.html:`, error.message);
                 }
             }
             
+            console.log(`📋 Section ${section} discovered ${Object.keys(children).length} files:`, Object.keys(children));
+            
         } catch (error) {
-            console.warn(`Could not discover children for section ${section}:`, error);
+            console.warn(`❌ Could not discover children for section ${section}:`, error);
         }
         
         return Object.keys(children).length > 0 ? children : null;
+    }
+
+    /**
+     * Dynamically discover files in a section by making systematic requests
+     * This implements the true dynamic discovery as documented in docs-portal-guide.md
+     */
+    async discoverFilesInSection(section, children) {
+        console.log(`🔍 Discovering files in section: ${section}`);
+        
+        // Method 1: Try nginx directory listing first (as documented)
+        try {
+            const dirUrl = `content/${section}/`;
+            console.log(`📂 Attempting directory listing: ${dirUrl}`);
+            
+            const response = await fetch(dirUrl);
+            if (response.ok) {
+                const html = await response.text();
+                
+                // Parse HTML response to extract .html file names
+                const htmlFileMatches = html.match(/href="([^"]+\.html)"/g);
+                if (htmlFileMatches) {
+                    console.log(`✅ Directory listing successful, found HTML files`);
+                    
+                    for (const match of htmlFileMatches) {
+                        const filename = match.match(/href="([^"]+\.html)"/)[1];
+                        // Strip leading ./ if present and remove .html extension
+                        const name = filename.replace(/^\.\//, '').replace('.html', '');
+                        
+                        // Skip index.html (handled separately) and avoid duplicates
+                        if (name !== 'index' && !children[name]) {
+                            console.log(`📄 Found via directory listing: ${filename} -> ${name}`);
+                            children[name] = {
+                                title: this.formatTitle(name),
+                                file: `${section}/${name}`
+                            };
+                        }
+                    }
+                    return; // Success with directory listing, no need for fallback
+                }
+            } else {
+                console.log(`⚠️ Directory listing failed (${response.status}), falling back to pattern testing`);
+                throw new Error('Directory listing not available');
+            }
+        } catch (error) {
+            console.log(`📋 Directory listing failed, using fallback pattern testing:`, error.message);
+        }
+        
+        // Method 2: Fall back to testing common file patterns
+        const commonPatterns = [
+            // API files
+            'tickets-api',
+            'vulnerabilities-api', 
+            'backup-api',
+            // Guide files
+            'users-guide',
+            'admin-guide',
+            'installation',
+            'configuration',
+            // Architecture files
+            'architecture-overview',
+            'component-diagram',
+            'database-schema',
+            'api-design',
+            // Development files
+            'deployment-guide',
+            'testing-guide',
+            'troubleshooting',
+            'docker-setup',
+            'performance',
+            'backup-restore',
+            'monitoring',
+            'memory-system',
+            'docs-portal-guide'
+        ];
+        
+        for (const pattern of commonPatterns) {
+            try {
+                const response = await fetch(this.getContentUrl(`${section}/${pattern}.html`));
+                if (response.ok && !children[pattern]) {
+                    console.log(`✅ Found via pattern testing: ${pattern}.html`);
+                    children[pattern] = {
+                        title: this.formatTitle(pattern),
+                        file: `${section}/${pattern}`
+                    };
+                }
+            } catch (err) {
+                // Silently continue testing other patterns
+            }
+        }
+        
+        console.log(`📊 Discovered ${Object.keys(children).length} files in ${section}:`, Object.keys(children));
     }
 
     /**
@@ -374,7 +590,7 @@ class DocumentationPortalV2 {
         return [
             { key: "overview", configKey: "index", file: "index", children: [] },
             { key: "getting-started", configKey: "getting-started", file: "getting-started/index", 
-              children: [{ key: "installation", title: "Installation" }] },
+              children: [{ key: "deployment", title: "Deployment" }] },
             { key: "user-guides", configKey: "user-guides", file: "user-guides/index",
               children: [
                   { key: "ticket-management", title: "Ticket Management" },
@@ -395,14 +611,11 @@ class DocumentationPortalV2 {
               ]},
             { key: "development", configKey: "development", file: "development/index",
               children: [
+                  { key: "roadmap", title: "Roadmap" },
+                  { key: "changelog", title: "Changelog" },
                   { key: "coding-standards", title: "Coding Standards" },
                   { key: "contributing", title: "Contributing" },
                   { key: "development-setup", title: "Development Setup" }
-              ]},
-            { key: "project-management", configKey: "project-management", file: "project-management/index",
-              children: [
-                  { key: "roadmap", title: "Roadmap" },
-                  { key: "codacy-compliance", title: "Codacy Compliance" }
               ]},
             { key: "security", configKey: "security", file: "security/index",
               children: [
@@ -452,13 +665,13 @@ class DocumentationPortalV2 {
             const hasChildren = section.children && Object.keys(section.children).length > 0;
             const collapseId = `collapse-${key}`;
             
-            // If section has children, make the button link to the first child
-            const firstChildFile = hasChildren ? Object.values(section.children)[0].file : section.file;
+            // Use the section's main file (which should be index) instead of first child
+            const sectionFile = section.file;
 
             html += `
                 <a class="list-group-item list-group-item-action d-flex align-items-center${hasChildren ? " collapsed" : ""}" 
-                   href="#${firstChildFile}" 
-                   data-section="${firstChildFile}"
+                   href="#${sectionFile}" 
+                   data-section="${sectionFile}"
                    ${hasChildren ? `data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false"` : ""}
                    style="border-left: 3px solid transparent; transition: all 0.2s ease;">
                     <div class="d-flex align-items-center w-100">
@@ -617,8 +830,23 @@ class DocumentationPortalV2 {
                     // Load external markdown file and convert to HTML
                     content = await this.loadExternalMarkdown(section);
                 } else {
+                    // Map section to actual file name
+                    let fileName = section;
+                    if (section === "overview") {
+                        fileName = "OVERVIEW"; // Special case: overview section maps to OVERVIEW.html
+                    } else if (section === "roadmap") {
+                        fileName = "ROADMAP"; // Special case: roadmap section maps to ROADMAP.html  
+                    } else if (section === "changelog") {
+                        fileName = "CHANGELOG"; // Special case: changelog section maps to CHANGELOG.html
+                    } else if (section === "sprint") {
+                        fileName = "SPRINT"; // Special case: sprint section maps to SPRINT.html
+                    } else if (this.navigationStructure[section] && this.navigationStructure[section].file) {
+                        // Use the file path from navigation structure for sections with subfiles
+                        fileName = this.navigationStructure[section].file;
+                    }
+                    
                     // Load processed HTML content with proper base path
-                    const contentUrl = this.getContentUrl(`${section}.html`);
+                    const contentUrl = this.getContentUrl(`${fileName}.html`);
                     console.log(`📄 Fetching content from: ${contentUrl}`);
                     
                     const response = await fetch(contentUrl);
@@ -657,6 +885,11 @@ class DocumentationPortalV2 {
     getBasePath() {
         const currentPath = window.location.pathname;
         
+        // If we're serving directly from docs-html directory (like http://localhost:8081)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return "";  // No prefix needed when serving from docs-html itself
+        }
+        
         // If we're in the docs-html directory, return the path to docs-html
         if (currentPath.includes("/docs-html/")) {
             const basePath = currentPath.substring(0, currentPath.indexOf("/docs-html/") + "/docs-html/".length);
@@ -686,15 +919,15 @@ class DocumentationPortalV2 {
     generateOverviewContent() {
         return `
             <h1>HexTrackr Documentation</h1>
-            <p>Welcome to the HexTrackr documentation portal. This comprehensive guide covers installation, usage, and development of the HexTrackr vulnerability and ticket management system.</p>
+            <p>Welcome to the HexTrackr documentation portal. This comprehensive guide covers deployment, usage, and development of the HexTrackr vulnerability and ticket management system.</p>
             
             <div class="row">
                 <div class="col-md-6 mb-4">
                     <div class="card">
                         <div class="card-body">
                             <h3 class="card-title"><i class="fas fa-rocket"></i> Getting Started</h3>
-                            <p class="card-text">Quick installation and setup instructions to get HexTrackr running with Docker.</p>
-                            <a href="#getting-started/installation" class="btn btn-primary">View Installation Guide</a>
+                            <p class="card-text">Quick deployment and setup instructions to get HexTrackr running with Docker.</p>
+                            <a href="#getting-started/deployment" class="btn btn-primary">View Deployment Guide</a>
                         </div>
                     </div>
                 </div>

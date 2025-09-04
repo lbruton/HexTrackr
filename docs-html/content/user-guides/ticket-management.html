@@ -1,49 +1,65 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Ticket Management Guide</h1>
-<p>The Tickets page (<code>/tickets.html</code>) lets you create, edit, filter, and export tickets. Devices can be added per ticket and reordered.</p>
-<h2>Create a ticket</h2>
-<!-- markdownlint-disable MD029 -->
-
+<p>This guide provides a comprehensive overview of the features available on the Tickets page (<code>/tickets.html</code>), from creating and managing tickets to exporting data.</p>
+<h2>Creating and Editing Tickets</h2>
+<h3>Creating a New Ticket</h3>
 <ol>
-<li>Open the Tickets page.</li>
-<li>Click Add Ticket.</li>
-<li>In the modal, fill:<ul>
-<li>XT Number (optional)</li>
-<li>Date Submitted, Date Due</li>
-<li>Hexagon Ticket, ServiceNow Ticket</li>
-<li>Site, Location</li>
-<li>Devices: Add Device to insert rows; drag to reorder; Reverse Order to flip numbering</li>
-<li>Supervisor, Tech, Status, Notes</li>
-</ul>
-</li>
-<li>Save to persist.</li>
+<li>From the main tickets view, click the <strong>Add New Ticket</strong> button to open the ticket modal.</li>
+<li>The <strong>Ticket Number (XT#)</strong> is automatically generated for you and is not editable.</li>
+<li>Fill in the required fields, including <strong>Date Submitted</strong>, <strong>Date Due</strong>, <strong>Site</strong>, and <strong>Location</strong>.</li>
+<li>Add devices to the ticket using the <strong>Devices</strong> section (see below for details).</li>
+<li>Click <strong>Save Ticket</strong> to create the new ticket.</li>
 </ol>
-<!-- markdownlint-enable MD029 -->
-
-<h2>Edit or delete</h2>
+<h3>Editing an Existing Ticket</h3>
+<ol>
+<li>Find the ticket you wish to edit in the main table.</li>
+<li>Click the <strong>Edit</strong> (pencil) icon in the <strong>Actions</strong> column.</li>
+<li>The ticket modal will open with the existing data populated.</li>
+<li>Make your changes and click <strong>Save Ticket</strong>.</li>
+</ol>
+<h2>Device Management</h2>
+<p>The ticket modal includes a powerful interface for managing a list of devices associated with a ticket.</p>
 <ul>
-<li>Click Edit on a row to modify and save.</li>
-<li>Click Delete to remove; confirm when prompted.</li>
-</ul>
-<h2>Search, filters, pagination</h2>
-<ul>
-<li>Use top search and dropdowns for Site, Location, Status. Results update instantly.</li>
-<li>Pagination controls at the bottom; adjust rows per page to change density.</li>
-</ul>
-<h2>Export and backup</h2>
-<ul>
-<li>Open Settings (gear icon):<ul>
-<li>Export Tickets/Vulnerabilities/All (CSV or JSON)</li>
-<li>Backup data and Restore from zip</li>
-<li>Clear datasets (tickets/vulns/all)</li>
+<li><strong>Adding Devices</strong>: Click the <strong>+</strong> button on any device row to add a new device entry below it. The system will attempt to &quot;smart increment&quot; the device name based on the previous entry (e.g., <code>host01</code> will suggest <code>host02</code>).</li>
+<li><strong>Removing Devices</strong>: Click the <strong>-</strong> button to remove a device entry.</li>
+<li><strong>Reordering Devices</strong>: You can reorder devices to define a specific sequence (e.g., for reboots or patching).<ul>
+<li><strong>Drag and Drop</strong>: Click and hold the drag handle (<code>::</code>) to drag a device to a new position.</li>
+<li><strong>Arrow Buttons</strong>: Use the up and down arrow buttons for fine-tuned positioning.</li>
+<li><strong>Reverse Order</strong>: Click the <strong>Reverse</strong> button to instantly invert the entire order of the device list.</li>
 </ul>
 </li>
 </ul>
-<h2>ServiceNow links</h2>
+<h2>Viewing and Exporting a Single Ticket</h2>
+<p>From the main ticket list, you can view a ticket&#39;s details or download a bundle of its information.</p>
 <ul>
-<li>Configure your instance in Settings. When enabled, ServiceNow ticket IDs link to your instance.</li>
+<li><strong>View Ticket</strong>: Click the <strong>View</strong> (eye) icon to see a clean, markdown-formatted version of the ticket&#39;s details in a modal.</li>
+<li><strong>Download Bundle</strong>: Click the <strong>Download Bundle</strong> (download icon) to get a <code>.zip</code> archive containing:<ul>
+<li>The ticket details in <strong>PDF</strong> format.</li>
+<li>The ticket details in <strong>Markdown</strong> format.</li>
+<li>Any other attached documentation.</li>
 </ul>
+</li>
+</ul>
+<h2>Searching and Filtering</h2>
+<p>The ticket list can be quickly filtered to find what you need.</p>
+<ul>
+<li><strong>Global Search</strong>: The main search bar filters tickets based on a wide range of fields, including XT#, Hexagon #, ServiceNow #, location, site, supervisor, tech, and device names.</li>
+<li><strong>Status Filter</strong>: Use the dropdown to show tickets with a specific status (e.g., &quot;Open&quot;, &quot;Overdue&quot;).</li>
+<li><strong>Location Filter</strong>: This dropdown is dynamically populated with all unique locations from the tickets in the database, allowing you to easily filter by a specific location.</li>
+</ul>
+<h2>Data Export and Backup</h2>
+<p>HexTrackr provides several options for exporting your ticket data.</p>
+<ul>
+<li><strong>Quick Exports</strong>: Use the <code>CSV</code>, <code>Excel</code>, <code>JSON</code>, <code>PDF</code>, and <code>HTML</code> buttons at the top of the page to quickly export the currently filtered list of tickets.</li>
+<li><strong>Advanced Data Management</strong>: For more comprehensive backup and restore operations, please see the following guides:<ul>
+<li><a href="./data-import-export.html">Importing and Exporting Data</a></li>
+<li><a href="./backup-restore.html">Backing Up and Restoring Data</a></li>
+</ul>
+</li>
+</ul>
+<h2>ServiceNow Integration</h2>
+<p>If ServiceNow integration is configured in the settings, all ServiceNow ticket numbers in the list will become clickable links that open directly to the corresponding ticket in your ServiceNow instance.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
