@@ -1,0 +1,403 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>HexTrackr Data Model</h1>
+<p>This document provides a definitive overview of the HexTrackr database schema. The single source of truth for the schema is the <code>scripts/init-database.js</code> script, which creates and initializes the database. The <code>server.js</code> file also performs idempotent <code>ALTER TABLE</code> operations at runtime to add columns, ensuring backward compatibility.</p>
+<h2>Database Engine</h2>
+<ul>
+<li><strong>Engine</strong>: SQLite 3</li>
+<li><strong>Database File</strong>: <code>data/hextrackr.db</code></li>
+</ul>
+<hr>
+<h2>Core Tables</h2>
+<h3><code>tickets</code></h3>
+<p>Stores all ticketing information. The schema has evolved from an initial simple structure to accommodate more detailed fields.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>TEXT</td>
+<td><strong>Primary Key</strong>. A unique identifier for the ticket (e.g., &quot;TICK-123&quot;).</td>
+</tr>
+<tr>
+<td><code>xt_number</code></td>
+<td>TEXT</td>
+<td>A human-readable ticket number (e.g., &quot;XT001&quot;). Can be used as an ID if <code>id</code> is null.</td>
+</tr>
+<tr>
+<td><code>date_submitted</code></td>
+<td>TEXT</td>
+<td>The date the ticket was submitted (ISO 8601 format).</td>
+</tr>
+<tr>
+<td><code>date_due</code></td>
+<td>TEXT</td>
+<td>The required completion date for the ticket (ISO 8601 format).</td>
+</tr>
+<tr>
+<td><code>hexagon_ticket</code></td>
+<td>TEXT</td>
+<td>The ticket number from the Hexagon system.</td>
+</tr>
+<tr>
+<td><code>service_now_ticket</code></td>
+<td>TEXT</td>
+<td>The ticket number from ServiceNow.</td>
+</tr>
+<tr>
+<td><code>location</code></td>
+<td>TEXT</td>
+<td>The primary location or site for the ticket.</td>
+</tr>
+<tr>
+<td><code>devices</code></td>
+<td>TEXT</td>
+<td>A JSON string representing an array of device hostnames.</td>
+</tr>
+<tr>
+<td><code>supervisor</code></td>
+<td>TEXT</td>
+<td>The name of the responsible supervisor.</td>
+</tr>
+<tr>
+<td><code>tech</code></td>
+<td>TEXT</td>
+<td>The name of the assigned technician.</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>TEXT</td>
+<td>The current workflow status (e.g., &quot;Open&quot;, &quot;Overdue&quot;, &quot;Completed&quot;).</td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>TEXT</td>
+<td>Free-form text for additional notes.</td>
+</tr>
+<tr>
+<td><code>attachments</code></td>
+<td>TEXT</td>
+<td>A JSON string representing an array of attached file metadata.</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>TEXT</td>
+<td>Timestamp of when the ticket was created.</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>TEXT</td>
+<td>Timestamp of the last modification.</td>
+</tr>
+<tr>
+<td><code>site</code></td>
+<td>TEXT</td>
+<td>The broader site or region for the ticket.</td>
+</tr>
+<tr>
+<td><code>site_id</code></td>
+<td>INTEGER</td>
+<td>A foreign key to a potential <code>sites</code> table (not currently implemented).</td>
+</tr>
+<tr>
+<td><code>location_id</code></td>
+<td>INTEGER</td>
+<td>A foreign key to a potential <code>locations</code> table (not currently implemented).</td>
+</tr>
+</tbody></table>
+<h3><code>vulnerability_imports</code></h3>
+<p>Tracks each CSV import event, providing an audit trail for all vulnerability data.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td><strong>Primary Key</strong>. Auto-incrementing ID for the import batch.</td>
+</tr>
+<tr>
+<td><code>filename</code></td>
+<td>TEXT</td>
+<td>The original name of the imported CSV file.</td>
+</tr>
+<tr>
+<td><code>import_date</code></td>
+<td>TEXT</td>
+<td>The timestamp when the import occurred.</td>
+</tr>
+<tr>
+<td><code>row_count</code></td>
+<td>INTEGER</td>
+<td>The total number of rows processed from the file.</td>
+</tr>
+<tr>
+<td><code>vendor</code></td>
+<td>TEXT</td>
+<td>The source of the vulnerability data (e.g., &quot;cisco&quot;, &quot;tenable&quot;).</td>
+</tr>
+<tr>
+<td><code>file_size</code></td>
+<td>INTEGER</td>
+<td>The size of the imported file in bytes.</td>
+</tr>
+<tr>
+<td><code>processing_time</code></td>
+<td>INTEGER</td>
+<td>The time taken to process the import in milliseconds.</td>
+</tr>
+<tr>
+<td><code>raw_headers</code></td>
+<td>TEXT</td>
+<td>A JSON string of the original CSV header row.</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>The timestamp when the import record was created.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Vulnerability Rollover Architecture</h2>
+<p>HexTrackr uses a &quot;rollover&quot; architecture to manage vulnerability data over time. This allows for accurate daily trending and historical analysis. It consists of three main tables.</p>
+<h3><code>vulnerabilities_current</code></h3>
+<p>This table holds the <strong>current state</strong> of all active vulnerabilities from the most recent scan for each unique vulnerability.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td><strong>Primary Key</strong>.</td>
+</tr>
+<tr>
+<td><code>unique_key</code></td>
+<td>TEXT</td>
+<td><strong>UNIQUE</strong>. A composite key to deduplicate vulnerabilities (e.g., `hostname</td>
+</tr>
+<tr>
+<td><code>import_id</code></td>
+<td>INTEGER</td>
+<td>Foreign key to <code>vulnerability_imports.id</code>.</td>
+</tr>
+<tr>
+<td><code>scan_date</code></td>
+<td>TEXT</td>
+<td>The date of the scan this vulnerability appeared in.</td>
+</tr>
+<tr>
+<td><code>hostname</code></td>
+<td>TEXT</td>
+<td>The hostname of the affected asset.</td>
+</tr>
+<tr>
+<td><code>ip_address</code></td>
+<td>TEXT</td>
+<td>The IP address of the asset.</td>
+</tr>
+<tr>
+<td><code>cve</code></td>
+<td>TEXT</td>
+<td>The CVE identifier (e.g., &quot;CVE-2023-12345&quot;).</td>
+</tr>
+<tr>
+<td><code>severity</code></td>
+<td>TEXT</td>
+<td>The severity level (e.g., &quot;Critical&quot;, &quot;High&quot;).</td>
+</tr>
+<tr>
+<td><code>vpr_score</code></td>
+<td>REAL</td>
+<td>The Vulnerability Priority Rating (VPR) score.</td>
+</tr>
+<tr>
+<td><code>cvss_score</code></td>
+<td>REAL</td>
+<td>The Common Vulnerability Scoring System (CVSS) score.</td>
+</tr>
+<tr>
+<td><code>first_seen</code></td>
+<td>TEXT</td>
+<td>The date the vulnerability was first observed.</td>
+</tr>
+<tr>
+<td><code>last_seen</code></td>
+<td>TEXT</td>
+<td>The date the vulnerability was last observed.</td>
+</tr>
+<tr>
+<td><code>plugin_id</code></td>
+<td>TEXT</td>
+<td>The ID of the scanner plugin that detected the vulnerability.</td>
+</tr>
+<tr>
+<td><code>plugin_name</code></td>
+<td>TEXT</td>
+<td>The name of the scanner plugin.</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td>A description of the vulnerability.</td>
+</tr>
+<tr>
+<td><code>solution</code></td>
+<td>TEXT</td>
+<td>The recommended solution or remediation.</td>
+</tr>
+<tr>
+<td><code>vendor</code></td>
+<td>TEXT</td>
+<td>The vendor of the affected product.</td>
+</tr>
+<tr>
+<td><code>vulnerability_date</code></td>
+<td>TEXT</td>
+<td>The date the vulnerability was published.</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>TEXT</td>
+<td>The current state of the vulnerability (e.g., &quot;open&quot;).</td>
+</tr>
+</tbody></table>
+<h3><code>vulnerability_snapshots</code></h3>
+<p>This table is an append-only log of <strong>all vulnerabilities from every scan</strong>. It serves as the historical record for trend analysis.</p>
+<p><em>This table shares the same schema as <code>vulnerabilities_current</code> but does not have a unique constraint on <code>unique_key</code>, allowing multiple entries for the same vulnerability over time.</em></p>
+<h3><code>vulnerability_daily_totals</code></h3>
+<p>This table stores pre-calculated daily aggregates to power the dashboard charts efficiently.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td><strong>Primary Key</strong>.</td>
+</tr>
+<tr>
+<td><code>scan_date</code></td>
+<td>TEXT</td>
+<td><strong>UNIQUE</strong>. The date for which the totals are calculated.</td>
+</tr>
+<tr>
+<td><code>critical_count</code></td>
+<td>INTEGER</td>
+<td>Total count of Critical vulnerabilities on this date.</td>
+</tr>
+<tr>
+<td><code>critical_total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of VPR scores for all Critical vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>high_count</code></td>
+<td>INTEGER</td>
+<td>Total count of High vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>high_total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of VPR scores for High vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>medium_count</code></td>
+<td>INTEGER</td>
+<td>Total count of Medium vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>medium_total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of VPR scores for Medium vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>low_count</code></td>
+<td>INTEGER</td>
+<td>Total count of Low vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>low_total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of VPR scores for Low vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>total_vulnerabilities</code></td>
+<td>INTEGER</td>
+<td>The sum of all vulnerability counts for the day.</td>
+</tr>
+<tr>
+<td><code>total_vpr</code></td>
+<td>REAL</td>
+<td>The sum of all VPR scores for the day.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Junction Tables</h2>
+<h3><code>ticket_vulnerabilities</code></h3>
+<p>This table creates a many-to-many relationship between tickets and vulnerabilities.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td><strong>Primary Key</strong>.</td>
+</tr>
+<tr>
+<td><code>ticket_id</code></td>
+<td>TEXT</td>
+<td>Foreign key to <code>tickets.id</code>.</td>
+</tr>
+<tr>
+<td><code>vulnerability_id</code></td>
+<td>INTEGER</td>
+<td>Foreign key to <code>vulnerabilities_current.id</code>.</td>
+</tr>
+<tr>
+<td><code>relationship_type</code></td>
+<td>TEXT</td>
+<td>The nature of the link (e.g., &quot;remediation&quot;, &quot;investigation&quot;).</td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>TEXT</td>
+<td>Notes specific to this ticket-vulnerability link.</td>
+</tr>
+</tbody></table>
+<h2>Indexes</h2>
+<p>To ensure efficient querying, the following indexes are created:</p>
+<ul>
+<li><code>idx_vulnerabilities_hostname</code> on <code>vulnerabilities_current(hostname)</code></li>
+<li><code>idx_vulnerabilities_severity</code> on <code>vulnerabilities_current(severity)</code></li>
+<li><code>idx_vulnerabilities_cve</code> on <code>vulnerabilities_current(cve)</code></li>
+<li><code>idx_snapshots_scan_date</code> on <code>vulnerability_snapshots(scan_date)</code></li>
+<li><code>idx_current_unique_key</code> on <code>vulnerabilities_current(unique_key)</code></li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

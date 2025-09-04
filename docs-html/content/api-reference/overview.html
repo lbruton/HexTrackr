@@ -1,0 +1,95 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>API Overview</h1>
+<p>Welcome to the HexTrackr REST API. This API provides programmatic access to the core functionalities of the HexTrackr system, including ticket and vulnerability management.</p>
+<h2>General Principles</h2>
+<ul>
+<li><strong>RESTful Architecture</strong>: The API follows REST principles. Resources are accessed via predictable URLs, and HTTP verbs are used to perform actions.</li>
+<li><strong>JSON Format</strong>: All API responses, including errors, are returned in JSON format.</li>
+<li><strong>Stateless</strong>: The API is stateless. Each request must contain all the information necessary to be understood by the server.</li>
+<li><strong>Standard HTTP Status Codes</strong>: The API uses standard HTTP status codes to indicate the success or failure of a request.</li>
+</ul>
+<hr>
+<h2>Authentication</h2>
+<p><strong>Currently, the API does not require authentication.</strong> This is suitable for the current single-user, locally-hosted model.</p>
+<p>Future versions will introduce a robust authentication and authorization system, likely using JWT (JSON Web Tokens), to support multi-user environments and role-based access control. When implemented, all requests will require an <code>Authorization</code> header.</p>
+<hr>
+<h2>API Endpoints</h2>
+<p>The API is organized into several resource-based collections:</p>
+<ul>
+<li><strong>/api/tickets</strong>: For managing tickets.</li>
+<li><strong>/api/vulnerabilities</strong>: For managing vulnerabilities.</li>
+<li><strong>/api/backup</strong>: For backup and restore operations.</li>
+<li><strong>/api/import</strong>: For importing data from various sources.</li>
+</ul>
+<p>For a detailed description of each endpoint, please refer to the specific API reference documents in this section.</p>
+<hr>
+<h2>Common HTTP Status Codes</h2>
+<p>The API uses the following standard HTTP status codes:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>200 OK</code></td>
+<td>The request was successful.</td>
+<td>The response body will contain the requested data.</td>
+</tr>
+<tr>
+<td><code>201 Created</code></td>
+<td>The resource was successfully created.</td>
+<td>Typically returned after a <code>POST</code> request.</td>
+</tr>
+<tr>
+<td><code>204 No Content</code></td>
+<td>The request was successful, but there is no content to return.</td>
+<td>Often used for successful <code>DELETE</code> requests.</td>
+</tr>
+<tr>
+<td><code>400 Bad Request</code></td>
+<td>The server could not understand the request due to invalid syntax.</td>
+<td>The request body may contain details about the error.</td>
+</tr>
+<tr>
+<td><code>401 Unauthorized</code></td>
+<td>Authentication is required and has failed or has not yet been provided.</td>
+<td><em>(To be implemented in future versions)</em></td>
+</tr>
+<tr>
+<td><code>403 Forbidden</code></td>
+<td>The client does not have access rights to the content.</td>
+<td><em>(To be implemented in future versions)</em></td>
+</tr>
+<tr>
+<td><code>404 Not Found</code></td>
+<td>The server cannot find the requested resource.</td>
+<td></td>
+</tr>
+<tr>
+<td><code>500 Internal Server Error</code></td>
+<td>The server has encountered a situation it doesn&#39;t know how to handle.</td>
+<td>This indicates a bug on the server side.</td>
+</tr>
+</tbody></table>
+<h2>Error Handling</h2>
+<p>When an error occurs, the API will respond with an appropriate 4xx or 5xx status code and a JSON body containing details about the error.</p>
+<h2>Example Error Response</h2>
+<pre><code class="language-json">{
+  &quot;error&quot;: &quot;No file uploaded&quot;,
+  &quot;message&quot;: &quot;A required file was not included in the request.&quot;
+}
+</code></pre>
+<ul>
+<li><strong><code>error</code></strong>: A short, machine-readable string identifying the error.</li>
+<li><strong><code>message</code></strong>: A human-readable description of the error.</li>
+</ul>
+<p>Clients should check the HTTP status code to handle responses and can use the <code>error</code> and <code>message</code> fields for debugging or displaying to the user.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
