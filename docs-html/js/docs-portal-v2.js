@@ -368,67 +368,93 @@ class DocumentationPortalV2 {
 
     /**
      * Dynamically discover files in a section by making systematic requests
-     * This replaces the hardcoded file lists with actual file discovery
+     * This implements the true dynamic discovery as documented in docs-portal-guide.md
      */
     async discoverFilesInSection(section, children) {
-        // Note: We exclude "index" files since they should be the main section target, not children
-        // Only check for "overview" as a potential child file
-        const basicFiles = ["overview"];
+        console.log(`🔍 Discovering files in section: ${section}`);
         
-        for (const filename of basicFiles) {
-            try {
-                const response = await fetch(this.getContentUrl(`${section}/${filename}.html`));
-                if (response.ok) {
-                    // Avoid duplicates
-                    if (!children[filename]) {
-                        children[filename] = {
-                            title: this.formatTitle(filename),
-                            file: `${section}/${filename}`
-                        };
-                        console.log(`✅ Discovered file: ${section}/${filename}.html`);
+        // Method 1: Try nginx directory listing first (as documented)
+        try {
+            const dirUrl = `content/${section}/`;
+            console.log(`📂 Attempting directory listing: ${dirUrl}`);
+            
+            const response = await fetch(dirUrl);
+            if (response.ok) {
+                const html = await response.text();
+                
+                // Parse HTML response to extract .html file names
+                const htmlFileMatches = html.match(/href="([^"]+\.html)"/g);
+                if (htmlFileMatches) {
+                    console.log(`✅ Directory listing successful, found HTML files`);
+                    
+                    for (const match of htmlFileMatches) {
+                        const filename = match.match(/href="([^"]+\.html)"/)[1];
+                        // Strip leading ./ if present and remove .html extension
+                        const name = filename.replace(/^\.\//, '').replace('.html', '');
+                        
+                        // Skip index.html (handled separately) and avoid duplicates
+                        if (name !== 'index' && !children[name]) {
+                            console.log(`📄 Found via directory listing: ${filename} -> ${name}`);
+                            children[name] = {
+                                title: this.formatTitle(name),
+                                file: `${section}/${name}`
+                            };
+                        }
                     }
+                    return; // Success with directory listing, no need for fallback
                 }
-            } catch (_error) {
-                // File doesn't exist, continue checking
+            } else {
+                console.log(`⚠️ Directory listing failed (${response.status}), falling back to pattern testing`);
+                throw new Error('Directory listing not available');
             }
+        } catch (error) {
+            console.log(`📋 Directory listing failed, using fallback pattern testing:`, error.message);
         }
         
-        // Try to discover additional files by checking comprehensive documentation patterns
-        // This includes all known files across all sections
-        const comprehensiveFilePatterns = [
-            // Common documentation patterns
-            "deployment", "configuration", "api", "examples", 
-            "troubleshooting", "faq", "best-practices",
-            // Development-specific files
-            "coding-standards", "contributing", "docs-portal-guide",
-            // User guide patterns  
-            "ticket-management", "vulnerability-management", "importing-and-exporting-data", "backing-up-and-restoring-data",
-            // Architecture patterns
-            "backend", "frontend", "database", "security", "deployment",
-            // API patterns
-            "tickets-api", "vulnerabilities-api", "authentication", "endpoints",
-            // Security patterns
-            "compliance", "vulnerability-scanning", "access-control", "data-protection",
-            // Getting started patterns
-            "installation", "setup", "configuration", "first-steps"
+        // Method 2: Fall back to testing common file patterns
+        const commonPatterns = [
+            // API files
+            'tickets-api',
+            'vulnerabilities-api', 
+            'backup-api',
+            // Guide files
+            'users-guide',
+            'admin-guide',
+            'installation',
+            'configuration',
+            // Architecture files
+            'architecture-overview',
+            'component-diagram',
+            'database-schema',
+            'api-design',
+            // Development files
+            'deployment-guide',
+            'testing-guide',
+            'troubleshooting',
+            'docker-setup',
+            'performance',
+            'backup-restore',
+            'monitoring',
+            'memory-system',
+            'docs-portal-guide'
         ];
         
-        for (const filename of comprehensiveFilePatterns) {
+        for (const pattern of commonPatterns) {
             try {
-                const response = await fetch(this.getContentUrl(`${section}/${filename}.html`));
-                if (response.ok) {
-                    if (!children[filename]) {
-                        children[filename] = {
-                            title: this.formatTitle(filename),
-                            file: `${section}/${filename}`
-                        };
-                        console.log(`✅ Discovered file: ${section}/${filename}.html`);
-                    }
+                const response = await fetch(this.getContentUrl(`${section}/${pattern}.html`));
+                if (response.ok && !children[pattern]) {
+                    console.log(`✅ Found via pattern testing: ${pattern}.html`);
+                    children[pattern] = {
+                        title: this.formatTitle(pattern),
+                        file: `${section}/${pattern}`
+                    };
                 }
-            } catch (_error) {
-                // File doesn't exist, continue
+            } catch (err) {
+                // Silently continue testing other patterns
             }
         }
+        
+        console.log(`📊 Discovered ${Object.keys(children).length} files in ${section}:`, Object.keys(children));
     }
 
     /**
@@ -743,6 +769,11 @@ class DocumentationPortalV2 {
      */
     getBasePath() {
         const currentPath = window.location.pathname;
+        
+        // If we're serving directly from docs-html directory (like http://localhost:8081)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return "";  // No prefix needed when serving from docs-html itself
+        }
         
         // If we're in the docs-html directory, return the path to docs-html
         if (currentPath.includes("/docs-html/")) {

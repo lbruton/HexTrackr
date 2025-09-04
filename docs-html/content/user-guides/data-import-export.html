@@ -1,0 +1,62 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Importing and Exporting Data</h1>
+<p>HexTrackr provides robust functionality for importing and exporting data in various formats, allowing for easy data migration, analysis, and integration with other tools.</p>
+<p>All data operations are handled through the <strong>Settings</strong> modal, which can be accessed by clicking the gear icon in the application header.</p>
+<h2>Accessing Data Management</h2>
+<ol>
+<li>Click the <strong>Settings</strong> (gear) icon in the top-right corner of the application.</li>
+<li>In the modal that appears, navigate to the <strong>Data Management</strong> tab.</li>
+</ol>
+<h2>Exporting Data</h2>
+<p>You can export both tickets and vulnerabilities in several formats.</p>
+<h3>Exporting as CSV</h3>
+<p>This is the most common format for use in spreadsheets like Excel or Google Sheets.</p>
+<ol>
+<li>In the <strong>Data Management</strong> tab, locate the section for either <strong>Tickets Management</strong> or <strong>Vulnerabilities Management</strong>.</li>
+<li>Click the <strong>Export ... CSV</strong> button for the data type you wish to export.</li>
+<li>A CSV file containing all the current data for that type will be generated and downloaded by your browser.</li>
+</ol>
+<h3>Exporting All Data</h3>
+<p>From the <strong>Global Data Operations</strong> section, you can export all tickets and vulnerabilities into a single ZIP archive containing separate CSV files.</p>
+<ol>
+<li>Click the <strong>Export All Data</strong> button.</li>
+<li>A ZIP file named <code>hextrackr_all_data_export_[date].zip</code> will be downloaded. This file contains <code>tickets.csv</code> and <code>vulnerabilities.csv</code>.</li>
+</ol>
+<h2>Importing Data</h2>
+<p>HexTrackr supports importing data from CSV files. This is the primary way to add vulnerability data from scanners like Tenable or Cisco.</p>
+<h3>Importing Vulnerabilities from CSV</h3>
+<ol>
+<li>On the <strong>Vulnerability Management Dashboard</strong>, click the <strong>Import</strong> button.</li>
+<li>You will be prompted to select a <strong>Scan Date</strong>. This is a crucial step for the historical trend analysis. Choose the date the vulnerability scan was performed.</li>
+<li>Click <strong>Import with Date</strong>.</li>
+<li>Select the CSV file from your computer.</li>
+</ol>
+<p>The file will be uploaded and processed. The dashboard and tables will automatically refresh with the new data.</p>
+<h3>Importing Tickets from CSV</h3>
+<ol>
+<li>Navigate to the <strong>Data Management</strong> tab in the <strong>Settings</strong> modal.</li>
+<li>Under <strong>Tickets Management</strong>, click the <strong>Import Tickets CSV</strong> button.</li>
+<li>Select the CSV file containing your ticket data.</li>
+</ol>
+<p>The system will process the file and add the tickets to the database.</p>
+<h3>CSV File Format</h3>
+<p>For a successful import, your CSV file should have a header row with column names that match the fields in HexTrackr. The system is flexible and can map common variations (e.g., <code>hostname</code>, <code>Host</code>, <code>asset.name</code>).</p>
+<h2>Required fields for Vulnerabilities</h2>
+<ul>
+<li><code>hostname</code> (or equivalent)</li>
+<li><code>cve</code> (or equivalent)</li>
+<li><code>severity</code></li>
+</ul>
+<h2>Required fields for Tickets</h2>
+<ul>
+<li><code>hexagon_ticket</code></li>
+<li><code>location</code></li>
+<li><code>date_submitted</code></li>
+<li><code>date_due</code></li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
