@@ -174,8 +174,23 @@ class DocumentationPortalV2 {
                 // Check if this section has any content by looking for HTML files
                 const children = await this.discoverSectionChildren(section);
                 if (children && Object.keys(children).length > 0) {
+                    // Determine the main file for this section (prefer index, fallback to overview)
+                    let mainFile = `${section}/index`; // Default to index
+                    try {
+                        const indexResponse = await fetch(this.getContentUrl(`${section}/index.html`));
+                        if (!indexResponse.ok) {
+                            // Index doesn't exist, try overview
+                            const overviewResponse = await fetch(this.getContentUrl(`${section}/overview.html`));
+                            if (overviewResponse.ok) {
+                                mainFile = `${section}/overview`;
+                            }
+                        }
+                    } catch (_error) {
+                        // Keep index as fallback
+                    }
+                    
                     structure[section] = {
-                        file: `${section}/overview`, // Default to overview file for section
+                        file: mainFile,
                         children: children
                     };
                 }
@@ -292,29 +307,6 @@ class DocumentationPortalV2 {
         const children = {};
         
         try {
-            // Special case: Add ROADMAP, CHANGELOG, and SPRINT to development section first
-            if (section === "development") {
-                const specialFiles = [
-                    { key: "roadmap", title: "Strategic Roadmap", file: "ROADMAP" },
-                    { key: "changelog", title: "Changelog", file: "CHANGELOG" },
-                    { key: "sprint", title: "Current Sprint", file: "SPRINT" }
-                ];
-                
-                for (const special of specialFiles) {
-                    try {
-                        const response = await fetch(this.getContentUrl(`${special.file}.html`));
-                        if (response.ok) {
-                            children[special.key] = {
-                                title: special.title,
-                                file: special.file
-                            };
-                        }
-                    } catch (_error) {
-                        // File doesn't exist, skip it
-                    }
-                }
-            }
-            
             // Dynamic discovery: Try to find what files actually exist in this section
             // We'll use a systematic approach to discover files
             await this.discoverFilesInSection(section, children);
@@ -331,8 +323,9 @@ class DocumentationPortalV2 {
      * This replaces the hardcoded file lists with actual file discovery
      */
     async discoverFilesInSection(section, children) {
-        // Start with a basic overview/index check for each section
-        const basicFiles = ["overview", "index"];
+        // Note: We exclude "index" files since they should be the main section target, not children
+        // Only check for "overview" as a potential child file
+        const basicFiles = ["overview"];
         
         for (const filename of basicFiles) {
             try {
@@ -352,14 +345,27 @@ class DocumentationPortalV2 {
             }
         }
         
-        // Try to discover additional files by checking common documentation patterns
-        // But limit this to avoid too many 404s
-        const commonFiles = [
+        // Try to discover additional files by checking comprehensive documentation patterns
+        // This includes all known files across all sections
+        const comprehensiveFilePatterns = [
+            // Common documentation patterns
             "deployment", "configuration", "api", "examples", 
-            "troubleshooting", "faq", "best-practices"
+            "troubleshooting", "faq", "best-practices",
+            // Development-specific files
+            "coding-standards", "contributing", "docs-portal-guide",
+            // User guide patterns  
+            "ticket-management", "vulnerability-management", "importing-and-exporting-data", "backing-up-and-restoring-data",
+            // Architecture patterns
+            "backend", "frontend", "database", "security", "deployment",
+            // API patterns
+            "tickets-api", "vulnerabilities-api", "authentication", "endpoints",
+            // Security patterns
+            "compliance", "vulnerability-scanning", "access-control", "data-protection",
+            // Getting started patterns
+            "installation", "setup", "configuration", "first-steps"
         ];
         
-        for (const filename of commonFiles) {
+        for (const filename of comprehensiveFilePatterns) {
             try {
                 const response = await fetch(this.getContentUrl(`${section}/${filename}.html`));
                 if (response.ok) {
@@ -485,13 +491,13 @@ class DocumentationPortalV2 {
             const hasChildren = section.children && Object.keys(section.children).length > 0;
             const collapseId = `collapse-${key}`;
             
-            // If section has children, make the button link to the first child
-            const firstChildFile = hasChildren ? Object.values(section.children)[0].file : section.file;
+            // Use the section's main file (which should be index) instead of first child
+            const sectionFile = section.file;
 
             html += `
                 <a class="list-group-item list-group-item-action d-flex align-items-center${hasChildren ? " collapsed" : ""}" 
-                   href="#${firstChildFile}" 
-                   data-section="${firstChildFile}"
+                   href="#${sectionFile}" 
+                   data-section="${sectionFile}"
                    ${hasChildren ? `data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false"` : ""}
                    style="border-left: 3px solid transparent; transition: all 0.2s ease;">
                     <div class="d-flex align-items-center w-100">
