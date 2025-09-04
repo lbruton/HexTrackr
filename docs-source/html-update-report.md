@@ -1,8 +1,8 @@
 # HTML Generation Report
 
-Generated: 2025-09-04T19:55:35.821Z
-Duration: 1.5s
-Files Generated: 28
+Generated: 2025-09-04T20:11:33.133Z
+Duration: 1.6s
+Files Generated: 29
 Files Removed: 0
 Errors: 0
 
@@ -30,6 +30,7 @@ Errors: 0
 - development/docs-portal-guide.html
 - development/index.html
 - getting-started/index.html
+- html-update-report.html
 - security/index.html
 - security/overview.html
 - security/vulnerability-disclosure.html
@@ -39,4 +40,4 @@ Errors: 0
 
 ## Summary
 
-The HTML generator successfully created 28 HTML files from their corresponding markdown sources using the master template.
+The HTML generator successfully created 29 HTML files from their corresponding markdown sources using the master template.
