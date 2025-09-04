@@ -140,20 +140,20 @@ node docs-html/html-content-updater.js
 </ol>
 <h2>Troubleshooting</h2>
 <h3>Common Issues</h3>
-<p><strong>Gemini API Key Not Found</strong></p>
+<h2>Gemini API Key Not Found</h2>
 <pre><code class="language-bash">Error: GEMINI_API_KEY not found in environment variables
 Solution: Add GEMINI_API_KEY to your .env file
 </code></pre>
-<p><strong>HTML Generation Fails</strong></p>
+<h2>HTML Generation Fails</h2>
 <pre><code class="language-bash">Error: Cannot regenerate HTML documentation
 Solution: Run `node docs-html/html-content-updater.js` manually
 </code></pre>
-<p><strong>Analysis Directory Access</strong></p>
+<h2>Analysis Directory Access</h2>
 <pre><code class="language-bash">Error: Cannot write to docs-analysis/ directory
 Solution: Ensure write permissions for docs-analysis/ directory
 </code></pre>
 <h3>Quality Assurance</h3>
-<h2>Before deploying documentation updates:</h2>
+<h2>Before deploying documentation updates</h2>
 <ol>
 <li>Run full analysis: <code>npm run docs:review</code></li>
 <li>Apply high-priority improvements</li>
