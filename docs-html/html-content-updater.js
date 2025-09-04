@@ -279,8 +279,8 @@ The HTML generator successfully created ${this.stats.filesGenerated} HTML files 
 ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orphaned HTML files were removed that no longer have corresponding markdown sources.` : ''}
 `;
 
-        await PathValidator.safeWriteFile("docs-source/html-update-report.md", report);
-        console.log("📋 HTML generation report saved: html-update-report.md");
+        await PathValidator.safeWriteFile("logs/docs-source/html-update-report.md", report);
+        console.log("📋 HTML generation report saved: logs/docs-source/html-update-report.md");
     }
 
     /**
