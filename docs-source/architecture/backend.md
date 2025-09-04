@@ -1,132 +1,87 @@
 # Backend Architecture
 
-The backend is a Node.js/Express monolithic server providing REST endpoints, CSV processing, and SQLite persistence. It also serves static frontend assets and documentation.
+The backend is a Node.js/Express monolithic server providing REST endpoints, data processing, and SQLite persistence. It also serves the static frontend assets and the documentation portal.
 
 ## Key Characteristics
 
-- **Monolithic Architecture**: Single server.js file (1,209 lines) handling all backend concerns
-- **Dual Purpose**: Acts as both API server and static file server
-- **Tightly Coupled**: Frontend applications directly depend on this server's API contracts
-- **Database**: Single SQLite database with shared connection pool
-- **Security**: Built-in PathValidator class for secure file operations
+- **Monolithic Architecture**: A single `server.js` file (over 1,200 lines) handles all backend concerns, including routing, database interaction, and business logic.
+- **Dual Purpose**: Acts as both an API server and a static file server for the UI.
+- **Database**: A single SQLite database file (`data/hextrackr.db`) with a shared connection pool.
+- **Security**: Includes a built-in `PathValidator` class for secure file system operations and sets standard security headers.
 
-## Modules
+## Core Components
 
-- **server.js**: Main entrypoint; initializes Express, SQLite, routes, and security headers
-- **scripts/init-database.js**: Creates initial tables and indexes
-- **PathValidator class**: Security utility for safe file system operations
+- **`server.js`**: The main entry point. It initializes the Express app, configures middleware, sets up all API routes, and connects to the SQLite database.
+- **`scripts/init-database.js`**: A script responsible for creating the initial database schema, including tables and indexes.
+- **`PathValidator` Class**: A security utility class within `server.js` designed to prevent path traversal attacks when accessing the file system.
 
 ## Core Middleware
 
-- cors(): Enables cross-origin requests
-- compression(): Gzip responses
-- express.json({ limit: '100mb' }): JSON parsing
-- express.urlencoded({ extended: true, limit: '100mb' }): form parsing
-- multer upload (dest: uploads/, 100MB): multipart CSV uploads
-- Security headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection
-- express.static(__dirname, { maxAge: '1m' }): serve UI assets
+- **`cors`**: Enables Cross-Origin Resource Sharing.
+- **`compression`**: Compresses response bodies for better performance.
+- **`express.json`**: Parses incoming JSON requests (limit `100mb`).
+- **`express.urlencoded`**: Parses URL-encoded data (limit `100mb`).
+- **`multer`**: Handles `multipart/form-data` for file uploads, specifically for CSV imports.
+- **Security Headers**: Sets `X-Content-Type-Options`, `X-Frame-Options`, and `X-XSS-Protection` headers on all responses.
+- **`express.static`**: Serves static files (HTML, CSS, JS) from the project root and `docs-html` directories.
 
-## Persistence
+## Persistence and Data Management
 
-- SQLite at data/hextrackr.db. See Database document for schema and ERD.
-- initDb() runs on boot: calls init script when DB file missing and adds new columns to vulnerabilities table (idempotent ALTERs).
+### Database
 
-## API surface
+The backend uses a file-based SQLite database. For a detailed schema, see the [Data Model documentation](./data-model.md).
 
-<!-- markdownlint-disable MD013 -->
+- **Initialization**: On startup, the server checks if the database file exists. If not, it runs the `scripts/init-database.js` script to create it.
+- **Schema Evolution**: The server performs idempotent `ALTER TABLE` operations on startup to add new columns to the `vulnerabilities` table, ensuring backward compatibility with older database files.
 
-- Tickets: GET/POST/PUT/DELETE /api/tickets, POST /api/tickets/migrate, GET /api/sites, GET /api/locations, POST /api/import/tickets
-- Vulnerabilities: GET /api/vulnerabilities, GET /api/vulnerabilities/stats, GET /api/vulnerabilities/trends, POST /api/vulnerabilities/import (multipart), POST /api/import/vulnerabilities, DELETE /api/vulnerabilities/clear, GET /api/imports
-- Backup/Restore: GET /api/backup/stats, GET /api/backup/{tickets|vulnerabilities|all}, DELETE /api/backup/clear/:type, POST /api/restore (zip)
+### Vulnerability Rollover Architecture
 
-<!-- markdownlint-enable MD013 -->
+A key feature of the backend is the **rollover architecture** for managing vulnerability data. This system processes daily scans to maintain both a current snapshot and a historical trend of vulnerabilities. For a detailed explanation, see the [Vulnerability Rollover Architecture documentation](./rollover-mechanism.md).
 
-Full details in API Reference.
+## API Surface
 
-## Symbol analysis (server.js)
+The backend exposes a comprehensive REST API. For full request/response details, see the [API Reference](../api-reference/overview.md).
 
-- app (Express): configured with middleware and routes.
-- db (sqlite3.Database): shared DB connection.
-- upload (multer): single-file handler for csvFile.
-- initDb(): Adds columns vendor, vulnerability_date, state, import_date to vulnerabilities; runs init script when DB absent.
-- Route handlers (inline functions): Implement business logic per endpoint.
+- **Tickets**: `GET, POST, PUT, DELETE /api/tickets`, `POST /api/tickets/migrate`, `POST /api/import/tickets`
+- **Reference Data**: `GET /api/sites`, `GET /api/locations`
+- **Vulnerabilities**: `GET /api/vulnerabilities`, `GET /api/vulnerabilities/stats`, `GET /api/vulnerabilities/recent-trends`, `GET /api/vulnerabilities/trends`, `POST /api/vulnerabilities/import`, `POST /api/import/vulnerabilities`, `DELETE /api/vulnerabilities/clear`
+- **Imports**: `GET /api/imports`
+- **Backup/Restore**: `GET /api/backup/stats`, `GET /api/backup/:type`, `POST /api/restore`, `DELETE /api/backup/clear/:type`
+- **Internal**: `GET /health`, `GET /api/docs/stats`
 
-### Error handling and responses
+## Key Business Logic Flows
 
-- Uses 400 for bad input (missing file/data), 500 for DB/processing errors, otherwise JSON 200 payloads.
+### Vulnerability CSV Import
 
-## Flows (Mermaid)
+```mermaid
+sequenceDiagram
+    participant User
+    participant API as server.js
+    participant DB as SQLite
 
-### GET /api/vulnerabilities (list)
+    User->>API: POST /api/vulnerabilities/import (multipart/form-data)
+    API->>API: Parse CSV with PapaParse
+    API->>DB: INSERT into vulnerability_imports
+    API->>API: Process rows with rollover logic
+    API->>DB: INSERT into vulnerability_snapshots
+    API->>DB: INSERT or UPDATE vulnerabilities_current
+    API->>DB: DELETE stale vulnerabilities
+    API->>DB: UPDATE vulnerability_daily_totals
+    API-->>User: { success, importId, rowsProcessed, ... }
+```
+
+### Get Paginated Vulnerabilities
 
 ```mermaid
 sequenceDiagram
     participant UI as Frontend
     participant API as server.js
     participant DB as SQLite
+
     UI->>API: GET /api/vulnerabilities?page=1&limit=50
-    API->>DB: SELECT ... ORDER BY vpr_score DESC LIMIT ? OFFSET ?
-    DB-->>API: rows
-    API->>DB: SELECT COUNT(*) as total
-    DB-->>API: total
-    API-->>UI: { data: [...], pagination }
+    API->>DB: SELECT * FROM vulnerabilities_current ... LIMIT ? OFFSET ?
+    DB-->>API: Vulnerability rows
+    API->>DB: SELECT COUNT(*) FROM vulnerabilities_current
+    DB-->>API: Total count
+    API-->>UI: { data: [...], pagination: { ... } }
 ```
-
-### POST /api/vulnerabilities/import (CSV upload)
-
-```mermaid
-sequenceDiagram
-    participant UI
-    participant API
-    participant FS as uploads/
-    participant DB
-    UI->>API: multipart/form-data (csvFile, vendor)
-    API->>FS: store temp file
-    API->>API: Papa.parse(csv)
-    API->>DB: INSERT vulnerability_imports
-    API->>DB: INSERT vulnerabilities (rows)
-    API->>FS: unlink temp file
-    API-->>UI: { success, importId, rowsProcessed }
-```
-
-### POST /api/tickets (create)
-
-```mermaid
-sequenceDiagram
-    participant UI
-    participant API
-    participant DB
-    UI->>API: POST /api/tickets { ticket }
-    API->>DB: INSERT INTO tickets (...)
-    DB-->>API: lastID
-    API-->>UI: { success, id }
-```
-
-## Security notes
-
-- Security headers applied globally.
-- Uploads capped at 100MB, temp files removed post-processing.
-- Static assets cached for 1 minute during development.
-
-## Symbol tables (server.js)
-
-| Symbol | Type | Parameters | Returns | Description |
-|-------|------|------------|---------|-------------|
-| initDb | function | none | void | Initializes DB on boot and adds columns to vulnerabilities if missing. |
-| GET /api/vulnerabilities | route handler | page, limit, search, severity (query) | JSON | Lists vulnerabilities with pagination. |
-| GET /api/vulnerabilities/stats | route handler | none | JSON[] | Aggregated stats by severity with VPR totals/avg and date bounds. |
-| GET /api/vulnerabilities/trends | route handler | none | JSON[] | 14‑day per‑day counts by severity. |
-| POST /api/vulnerabilities/import | route handler | csvFile (multipart), vendor | JSON | Parses CSV, records import, inserts vulnerabilities. |
-| POST /api/import/vulnerabilities | route handler | { data: any[] } | JSON | Imports vulnerabilities from JSON array. |
-| DELETE /api/vulnerabilities/clear | route handler | type param | JSON | Clears vulnerability-related tables. |
-| GET /api/tickets | route handler | none | JSON[] | Lists tickets ordered by created_at. Null id falls back to xt_number. |
-| POST /api/tickets | route handler | ticket body | JSON | Inserts a ticket row. |
-| PUT /api/tickets/:id | route handler | id param, ticket body | JSON | Updates a ticket row. |
-| DELETE /api/tickets/:id | route handler | id param | JSON | Deletes a ticket row. |
-| POST /api/tickets/migrate | route handler | { tickets: any[] } | JSON | Bulk INSERT OR REPLACE from legacy shape. |
-| POST /api/import/tickets | route handler | { data: any[] } | JSON | Imports tickets from JSON array. |
-| GET /api/backup/* | route handlers | none | JSON | Backup stats and dataset exports. |
-| DELETE /api/backup/clear/:type | route handler | type param | JSON | Clear tickets, vulnerabilities, or all. |
-| POST /api/restore | route handler | file (zip), type, clearExisting | JSON | Restores from backup zip. |
-
-For full request/response schemas, see API Reference.
