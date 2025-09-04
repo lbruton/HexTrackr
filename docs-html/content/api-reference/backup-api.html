@@ -1,159 +1,119 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Backup and Restore API</h1>
-<p>The Backup and Restore API provides data export capabilities and system restoration functionality for HexTrackr data.</p>
-<h2>Overview</h2>
-<ul>
-<li><strong>Export</strong>: Generate JSON backups of tickets, vulnerabilities, or complete system data</li>
-<li><strong>Statistics</strong>: Get backup-related metrics and system information  </li>
-<li><strong>Clear</strong>: Remove data by type (tickets, vulnerabilities, or all)</li>
-<li><strong>Restore</strong>: Upload and restore from backup ZIP files</li>
-</ul>
+<p>This API provides endpoints for data export, backup, restore, and clearing operations.</p>
+<hr>
 <h2>Endpoints</h2>
 <h3>GET /api/backup/stats</h3>
 <ul>
-<li><strong>Description</strong>: Get backup statistics and system metrics</li>
-<li><strong>Query</strong>: None</li>
-<li><strong>Response</strong>: 200 OK</li>
-</ul>
+<li><p><strong>Description</strong>: Retrieves statistics about the database, including record counts and file size.</p>
+</li>
+<li><p><strong>Response</strong>: <code>200 OK</code></p>
 <pre><code class="language-json">{
-  &quot;tickets&quot;: {
-    &quot;count&quot;: 145,
-    &quot;lastUpdated&quot;: &quot;2025-08-29T15:30:00.000Z&quot;
-  },
-  &quot;vulnerabilities&quot;: {
-    &quot;count&quot;: 2847,
-    &quot;lastUpdated&quot;: &quot;2025-08-29T14:15:00.000Z&quot;
-  },
-  &quot;imports&quot;: {
-    &quot;count&quot;: 12,
-    &quot;lastImport&quot;: &quot;2025-08-29T10:00:00.000Z&quot;
-  },
-  &quot;database&quot;: {
-    &quot;size&quot;: &quot;45.2 MB&quot;,
-    &quot;lastModified&quot;: &quot;2025-08-29T15:30:00.000Z&quot;
-  }
+  &quot;vulnerabilities&quot;: 100553,
+  &quot;tickets&quot;: 17,
+  &quot;total&quot;: 100570,
+  &quot;dbSize&quot;: 5468160
 }
 </code></pre>
+</li>
+</ul>
 <h3>GET /api/backup/tickets</h3>
 <ul>
-<li><strong>Description</strong>: Export all tickets as JSON array</li>
-<li><strong>Query</strong>: None</li>
-<li><strong>Response</strong>: 200 OK</li>
-<li><strong>Content-Type</strong>: application/json</li>
-</ul>
-<pre><code class="language-json">[
-  {
-    &quot;id&quot;: &quot;TICK-123&quot;,
-    &quot;xt_number&quot;: &quot;XT001&quot;,
-    &quot;date_submitted&quot;: &quot;2025-08-20T12:00:00.000Z&quot;,
-    &quot;status&quot;: &quot;Open&quot;,
-    &quot;created_at&quot;: &quot;2025-08-20T12:00:00.000Z&quot;
-  }
-]
+<li><p><strong>Description</strong>: Exports all tickets as a JSON object.</p>
+</li>
+<li><p><strong>Response</strong>: <code>200 OK</code></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;tickets&quot;,
+  &quot;count&quot;: 17,
+  &quot;data&quot;: [
+    { &quot;id&quot;: &quot;TICK-123&quot;, &quot;xt_number&quot;: &quot;XT001&quot;, ... }
+  ],
+  &quot;exported_at&quot;: &quot;2025-09-03T12:00:00.000Z&quot;
+}
 </code></pre>
+</li>
+</ul>
 <h3>GET /api/backup/vulnerabilities</h3>
 <ul>
-<li><strong>Description</strong>: Export all vulnerabilities as JSON array</li>
-<li><strong>Query</strong>: None  </li>
-<li><strong>Response</strong>: 200 OK</li>
-<li><strong>Content-Type</strong>: application/json</li>
-</ul>
-<pre><code class="language-json">[
-  {
-    &quot;id&quot;: 1,
-    &quot;hostname&quot;: &quot;server-01&quot;,
-    &quot;cve&quot;: &quot;CVE-2024-0001&quot;, 
-    &quot;severity&quot;: &quot;High&quot;,
-    &quot;import_date&quot;: &quot;2025-08-20&quot;,
-    &quot;created_at&quot;: &quot;2025-08-20T12:00:00.000Z&quot;
-  }
-]
-</code></pre>
-<h3>GET /api/backup/all</h3>
-<ul>
-<li><strong>Description</strong>: Export complete system backup as ZIP file</li>
-<li><strong>Query</strong>: None</li>
-<li><strong>Response</strong>: 200 OK  </li>
-<li><strong>Content-Type</strong>: application/zip</li>
-<li><strong>Filename</strong>: <code>hextrackr-backup-YYYY-MM-DD.zip</code></li>
-</ul>
-<p>Contains:</p>
-<ul>
-<li><code>tickets.json</code> - All ticket data</li>
-<li><code>vulnerabilities.json</code> - All vulnerability data  </li>
-<li><code>imports.json</code> - Import history</li>
-<li><code>metadata.json</code> - Backup metadata and timestamps</li>
-</ul>
-<h3>DELETE /api/backup/clear/:type</h3>
-<ul>
-<li><strong>Description</strong>: Clear data by type</li>
-<li><strong>Parameters</strong>:<ul>
-<li><code>type</code>: &quot;tickets&quot;, &quot;vulnerabilities&quot;, or &quot;all&quot;</li>
-</ul>
-</li>
-<li><strong>Response</strong>: 200 OK</li>
+<li><strong>Description</strong>: Exports up to 10,000 vulnerabilities as a JSON object.</li>
+<li><strong>Response</strong>: <code>200 OK</code></li>
 </ul>
 <pre><code class="language-json">{
-  &quot;success&quot;: true,
-  &quot;message&quot;: &quot;Tickets data cleared&quot;,
-  &quot;recordsDeleted&quot;: 145
-}
+  &quot;type&quot;: &quot;vulnerabilities&quot;,
+  &quot;count&quot;: 10000,
+  &quot;data&quot;: [
+    { &quot;id&quot;: 1, &quot;hostname&quot;: &quot;server-01&quot;, ... }
+  ],
 </code></pre>
 <h3>POST /api/restore</h3>
 <ul>
-<li><strong>Description</strong>: Restore system from backup ZIP file</li>
-<li><strong>Body</strong>: multipart/form-data<ul>
-<li><code>file</code>: ZIP file (required)</li>
-<li><code>type</code>: &quot;tickets&quot;, &quot;vulnerabilities&quot;, or &quot;all&quot; (optional, default: &quot;all&quot;)  </li>
-<li><code>clearExisting</code>: boolean (optional, default: false)</li>
+<li><strong>Description</strong>: Restore system data from a backup ZIP file. The ZIP file should contain <code>tickets.json</code> and/or <code>vulnerabilities.json</code>.</li>
+<li><strong>Body</strong>: <code>multipart/form-data</code><ul>
+<li><code>file</code>: The backup ZIP file (required).</li>
+<li><code>type</code>: The type of data to restore: &quot;tickets&quot;, &quot;vulnerabilities&quot;, or &quot;all&quot; (required).</li>
+<li><code>clearExisting</code>: If &quot;true&quot;, deletes existing data of the specified type before restoring (optional, default: &quot;false&quot;).</li>
 </ul>
 </li>
-<li><strong>Response</strong>: 200 OK</li>
+<li><strong>Response</strong>: <code>200 OK</code></li>
 </ul>
 <pre><code class="language-json">{
   &quot;success&quot;: true,
-  &quot;restored&quot;: {
-    &quot;tickets&quot;: 145,
-    &quot;vulnerabilities&quot;: 2847,
-    &quot;imports&quot;: 12
-  },
-  &quot;processingTime&quot;: 3456
+  &quot;message&quot;: &quot;Successfully restored 3012 records&quot;,
+  &quot;count&quot;: 3012
 }
 </code></pre>
-<h2>Error Responses</h2>
-<h3>400 Bad Request</h3>
+<pre><code>  &quot;exported_at&quot;: &quot;2025-09-03T12:00:00.000Z&quot;
+}
+```
+</code></pre>
+<h3>GET /api/backup/all</h3>
 <ul>
-<li>Missing required file parameter</li>
-<li>Invalid type parameter</li>
-<li>Corrupted or invalid backup file</li>
+<li><p><strong>Description</strong>: Exports all tickets and up to 10,000 vulnerabilities as a single JSON object.</p>
+</li>
+<li><p><strong>Response</strong>: <code>200 OK</code></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;complete_backup&quot;,
+  &quot;vulnerabilities&quot;: {
+    &quot;count&quot;: 10000,
+    &quot;data&quot;: [ ... ]
+  },
+  &quot;tickets&quot;: {
+    &quot;count&quot;: 17,
+    &quot;data&quot;: [ ... ]
+  },
+  &quot;exported_at&quot;: &quot;2025-09-03T12:00:00.000Z&quot;
+}
+</code></pre>
+</li>
 </ul>
-<h3>500 Internal Server Error</h3>
+<h3>DELETE /api/backup/clear/:type</h3>
 <ul>
-<li>Database operation failures</li>
-<li>File system errors during backup/restore</li>
+<li><strong>Description</strong>: Deletes data of a specified type. This is a destructive operation.</li>
+<li><strong>URL Parameters</strong>:<ul>
+<li><code>type</code> (string, required): The type of data to clear. Can be <code>tickets</code>, <code>vulnerabilities</code>, or <code>all</code>.</li>
 </ul>
-<h2>Security Notes</h2>
-<ul>
-<li>Backup files contain sensitive data and should be handled securely</li>
-<li>Clear operations are irreversible - use with caution</li>
-<li>Restore operations can overwrite existing data if <code>clearExisting</code> is true</li>
-<li>Large datasets may take significant time to backup or restore</li>
+</li>
+<li><strong>Response</strong>: <code>200 OK</code></li>
 </ul>
+<pre><code class="language-json">{
+  &quot;message&quot;: &quot;Tickets cleared successfully&quot;
+}
+</code></pre>
+<hr>
 <h2>Usage Examples</h2>
-<h2>Examples</h2>
-<h3>Complete System Backup</h3>
-<pre><code class="language-bash">curl -X GET http://localhost:3000/api/backup/all 
-  -H &quot;Accept: application/json&quot; 
-  &gt; complete_backup.json
+<h3>Get All Data as a JSON Backup</h3>
+<pre><code class="language-bash">curl -X GET http://localhost:8080/api/backup/all -o hextrackr_backup.json
 </code></pre>
-<h3>Restore from Backup</h3>
-<pre><code class="language-bash">curl -X POST http://localhost:3000/api/restore 
-  -F &quot;backupFile=@complete_backup.json&quot; 
-  -H &quot;Content-Type: multipart/form-data&quot;
+<h3>Restore Tickets from a Backup</h3>
+<p>This example restores tickets from <code>backup.zip</code> and clears existing tickets first.</p>
+<pre><code class="language-bash">curl -X POST http://localhost:8080/api/restore \
+  -F &quot;file=@/path/to/backup.zip&quot; \
+  -F &quot;type=tickets&quot; \
+  -F &quot;clearExisting=true&quot;
 </code></pre>
-<h3>Clear All Data</h3>
-<pre><code class="language-bash">curl -X DELETE http://localhost:3000/api/backup/clear/all
+<h3>Clear All Vulnerability Data</h3>
+<pre><code class="language-bash">curl -X DELETE http://localhost:8080/api/backup/clear/vulnerabilities
 </code></pre>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
