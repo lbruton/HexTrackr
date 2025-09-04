@@ -6,15 +6,17 @@ This guide explains how the HexTrackr Documentation Portal v2.0 works and how to
 
 The Documentation Portal v2.0 (`docs-portal-v2.js`) is a modern, auto-discovering documentation system built with:
 
-- **Bootstrap 5**: Collapsible navigation components
-- **Tabler.io**: Consistent design framework
+- **Tabler.io**: Primary UI framework (built on Bootstrap foundation)
+- **Bootstrap Collapse**: Collapsible navigation components (via Tabler.io)
 - **Font Awesome**: Navigation icons
 - **Prism.js**: Syntax highlighting
 - **Auto-Discovery**: Automatic content detection
+- **Ordered Navigation**: Proper menu hierarchy with pinned sections
 
 ### Key Features
 
-- **Collapsible Navigation**: Expandable/collapsible sidebar menu
+- **Collapsible Navigation**: Expandable/collapsible sidebar menu (using Tabler.io/Bootstrap collapse)
+- **Ordered Menu Structure**: Overview → Getting Started → Alphabetical folders → Special sections
 - **Auto-Discovery**: Automatically finds and organizes content
 - **Caching**: Faster content loading with browser cache
 - **Responsive Design**: Works on all screen sizes
@@ -24,16 +26,67 @@ The Documentation Portal v2.0 (`docs-portal-v2.js`) is a modern, auto-discoverin
 ### File Structure
 
 ```text
-docs-prototype/
+docs-html/
 ├── index.html              # Main portal HTML
+├── template.html           # Master template for content
+├── html-content-updater.js # Markdown to HTML converter
 ├── js/
 │   └── docs-portal-v2.js   # Portal JavaScript (this file)
 └── content/                # Generated HTML content
-    ├── index.html
+    ├── OVERVIEW.html       # Overview page
+    ├── ROADMAP.html        # Roadmap page
+    ├── CHANGELOG.html      # Changelog page
+    ├── SPRINT.html         # Current Sprint page
     ├── getting-started/
+    │   └── index.html
+    ├── user-guides/
     │   ├── index.html
-    │   └── installation.html
+    │   ├── ticket-management.html
+    │   └── vulnerability-management.html
     └── [other sections]/
+```
+
+## Navigation Structure
+
+### Menu Ordering
+
+The portal implements a specific navigation hierarchy:
+
+1. **Overview** - Always first (from `OVERVIEW.html`)
+2. **Getting Started** - Always second (pinned)
+3. **Alphabetical Sections** - Auto-discovered folders in alphabetical order:
+   - API Reference
+   - Architecture
+   - Development
+   - Security
+   - User Guides
+1. **Special Sections** - Always last in this order:
+   - Current Sprint
+   - Roadmap
+   - Changelog
+
+### Section Configuration
+
+Each section is configured with:
+
+- **Title**: Display name in navigation
+- **Icon**: Font Awesome icon class
+- **File**: Main file path for the section
+- **Children**: Sub-pages within the section
+
+```javascript
+const sectionConfig = {
+    "overview": { title: "Overview", icon: "fas fa-home" },
+    "getting-started": { title: "Getting Started", icon: "fas fa-rocket" },
+    "user-guides": { title: "User Guides", icon: "fas fa-users" },
+    "api-reference": { title: "API Reference", icon: "fas fa-code" },
+    "architecture": { title: "Architecture", icon: "fas fa-building" },
+    "development": { title: "Development", icon: "fas fa-hammer" },
+    "security": { title: "Security", icon: "fas fa-shield-alt" },
+    "roadmap": { title: "Roadmap", icon: "fas fa-map" },
+    "changelog": { title: "Changelog", icon: "fas fa-list" },
+    "sprint": { title: "Current Sprint", icon: "fas fa-running" }
+};
 ```
 
 ## Key Functions
@@ -145,252 +198,219 @@ docs-prototype/
 - **Back to Top**: Manages scroll-to-top functionality
 - **Keyboard Shortcuts**: Ctrl/Cmd+K for search
 
-#### `openSearch()`
+## Auto-Discovery System
 
-- Opens the search modal
-- Focuses search input field
-- Integrates with Bootstrap modal system
+### Content Detection
 
-## How to Add New Pages
+The portal automatically discovers:
 
-### Method 1: Auto-Discovery (Recommended)
+1. **Top-level files**: `OVERVIEW.md`, `ROADMAP.md`, `CHANGELOG.md`, `SPRINT.md`
+2. **Section directories**: Any folder in `docs-source/` with markdown files
+3. **Sub-pages**: Markdown files within section directories
+4. **Navigation structure**: Built dynamically from file system
 
-1. **Create Markdown File**:
+### Section Ordering Algorithm
 
-   ```bash
+```javascript
+// Navigation sections are ordered as follows:
 
-   # Create new content in docs-source/
+1. Push "overview" first (if exists)
+2. Push "getting-started" second (if exists)
+3. Sort remaining sections alphabetically
+4. Push special sections last: "sprint", "roadmap", "changelog"
 
-   echo "# My New Guide" > docs-source/development/my-new-guide.md
-   ```
+```
 
-1. **Generate HTML**:
+This ensures consistent navigation regardless of file system ordering.
 
-   ```bash
+## Usage Examples
 
-   # Run the HTML generator
+### Adding New Documentation
 
-   node docs-prototype/html-content-updater.js
-   ```
-
-1. **Portal Auto-Updates**: The portal will automatically discover and add the new page to navigation
-
-### Method 2: Manual Navigation Config
-
-1. **Add to Navigation Config**:
-
-   ```javascript
-   // In docs-portal-v2.js, update navigationConfig
-   this.navigationConfig = {
-     'my-section': {
-       icon: 'fa-cog',
-       title: 'My Custom Section'
-     }
-   };
-   ```
-
-1. **Create Content Structure**: Follow the same file generation process
-
-## HTML Generation Process
-
-The documentation system uses `html-content-updater.js` to convert markdown files from `docs-source/` into HTML files in `docs-prototype/content/`.
-
-### How HTML Generation Works
-
-1. **Scans Source Directory**: Finds all `.md` files in `docs-source/`
-2. **Loads Template**: Uses the master template from `docs-prototype/template.html`
-3. **Converts Markdown**: Processes markdown content with enhanced parser
-4. **Injects Content**: Replaces `<!-- CONTENT WILL BE INJECTED HERE -->` placeholder
-5. **Writes HTML Files**: Creates corresponding `.html` files with correct relative paths
-6. **Generates Report**: Creates `html-update-report.md` with generation statistics
-
-### Running HTML Generation
+1. **Create markdown file** in appropriate `docs-source/` folder:
 
 ```bash
 
-# From project root directory
+# For a new user guide
 
-node docs-prototype/html-content-updater.js
+docs-source/user-guides/new-feature.md
+
+# For a new development guide  
+
+docs-source/development/new-process.md
 ```
 
-### Output Structure
+1. **Regenerate HTML content**:
 
-The generator maintains the exact directory structure:
-
-```text
-docs-source/development/memory-system.md
-↓ (converts to)
-docs-prototype/content/development/memory-system.html
+```bash
+cd docs-html
+node html-content-updater.js
 ```
 
-### Generation Features
+1. **View in portal**: Navigate to the documentation portal and the new content will appear automatically
 
-- **Preserves Directory Structure**: Source folders map directly to content folders
-- **Template Integration**: All HTML files use consistent templating
-- **Error Handling**: Reports files that fail to convert
-- **Performance Tracking**: Shows generation time and file counts
-- **Automatic Directory Creation**: Creates missing directories as needed
+### Creating New Sections
 
-### Generation Report
+1. **Create new directory** in `docs-source/`:
 
-After running, check `docs-source/html-update-report.md` for:
+```bash
+mkdir docs-source/new-section
+```
 
-- Total files generated
-- Processing time
-- List of all generated files
-- Error count and details
+1. **Add index file** and content:
 
-### Common Generation Issues
+```bash
+echo "# New Section" > docs-source/new-section/index.md
+echo "# Page 1" > docs-source/new-section/page1.md
+```
 
-- **Permission Errors**: Ensure write access to `docs-prototype/content/`
-- **Invalid Markdown**: Check syntax in source `.md` files
-- **Missing Template**: Verify `docs-prototype/template.html` exists
-- **Path Problems**: Fixed in August 2025 update (absolute path issue resolved)
+1. **Regenerate content** and the new section will appear in alphabetical order
 
-## Configuration
+### Navigation Customization
 
-### Navigation Icons
-
-The portal uses Font Awesome icons. Configure them in the `navigationConfig`:
+To modify navigation behavior, edit `docs-html/js/docs-portal-v2.js`:
 
 ```javascript
-this.navigationConfig = {
-  'getting-started': { icon: 'fa-rocket', title: 'Getting Started' },
-  'development': { icon: 'fa-code', title: 'Development' },
-  'api-reference': { icon: 'fa-book', title: 'API Reference' },
-  'architecture': { icon: 'fa-sitemap', title: 'Architecture' },
-  'security': { icon: 'fa-shield', title: 'Security' }
+// Modify section configuration
+const sectionConfig = {
+    "new-section": { 
+        title: "Custom Title", 
+        icon: "fas fa-custom-icon" 
+    }
 };
+
+// Adjust special section ordering
+const specialOrder = ["sprint", "roadmap", "changelog", "new-special"];
 ```
 
-### Section Discovery
+## Technical Implementation
 
-The auto-discovery system looks for:
+### Core Classes and Functions
 
-- Section directories in `/docs-prototype/content/`
-- Index files (`index.html`) in each section
-- Child pages within sections
+#### NavigationBuilder Class
+
+Handles all navigation construction:
+
+```javascript
+class NavigationBuilder {
+    buildNavigation(structure)    // Main navigation builder
+    createSectionItem(...)       // Individual section creation
+    createSubPageItem(...)       // Sub-page creation
+    updateBreadcrumb(...)        // Breadcrumb updates
+}
+```
+
+#### Content Loading
+
+```javascript
+// Asynchronous content loading with caching
+async loadContent(path) {
+    // Check cache first
+    // Load from server if needed
+    // Update navigation state
+    // Handle errors gracefully
+}
+```
+
+### Error Handling
+
+The portal includes comprehensive error handling:
+
+- **404 handling**: Graceful fallback for missing content
+- **Loading states**: Progress indicators during content fetch
+- **Network errors**: Retry mechanisms and user feedback
+- **Invalid paths**: Security validation and safe defaults
 
 ## Troubleshooting
 
-### Navigation Not Updating
+### Common Issues
 
-- **Check File Paths**: Ensure HTML files exist in `/docs-prototype/content/`
-- **Regenerate Content**: Run `node docs-prototype/html-content-updater.js`
-- **Clear Browser Cache**: Refresh with Ctrl/Cmd+Shift+R
-- **Hard Refresh**: Use Ctrl/Cmd+Shift+R to bypass browser cache completely
+1. **Content not appearing**:
+   - Verify markdown files exist in `docs-source/`
+   - Run content generator: `node docs-html/html-content-updater.js`
+   - Check generation report: `logs/docs-source/html-update-report.md`
 
-### Content Not Loading
+1. **Navigation order incorrect**:
+   - Special sections have fixed ordering (Overview, Getting Started, then alphabetical)
+   - Special ending sections: Current Sprint, Roadmap, Changelog
 
-- **Verify HTML**: Check that HTML files are properly generated
-- **Check Network**: Open browser DevTools to see HTTP requests
-- **File Permissions**: Ensure files are readable by web server
-- **Path Issues**: Check browser console for 404 errors on content files
+1. **Broken links**:
+   - Ensure relative paths in markdown are correct
+   - Regenerate content after moving files
 
-### Auto-Discovery Issues
+1. **Styling issues**:
+   - Clear browser cache
+   - Verify Tabler.io CSS is loading
+   - Check for JavaScript console errors
 
-- **Missing Index Files**: Each section needs an `index.html` file
-- **Case Sensitivity**: Check filename case matches exactly  
-- **Directory Structure**: Verify proper nesting in content folder
-- **Dynamic Discovery**: The system now automatically discovers all `.html` files in each section
+### Debugging Tools
 
-### Recent Fixes (August 2025)
+```javascript
+// Enable debug mode in docs-portal-v2.js
+const DEBUG_MODE = true;
 
-The documentation system has been recently improved with the following fixes:
+// Check navigation structure
+console.log(docsPortal.navigationStructure);
 
-#### HTML Generation Path Fix
-
-- **Issue**: HTML files were generated with absolute paths instead of relative paths
-- **Fix**: Changed `path.resolve()` to `path.join()` in `html-content-updater.js` line 149
-- **Impact**: HTML files now generate in correct relative directory structure
-
-#### True Dynamic Auto-Discovery
-
-- **Issue**: Navigation used hardcoded file lists instead of dynamic discovery
-- **Fix**: Rewrote `discoverSectionChildren()` method in `docs-portal-v2.js`
-- **Features**:
-  - Attempts nginx directory listing first
-  - Falls back to testing common file patterns
-  - Automatically includes any `.html` files found (except `index.html`)
-  - No longer requires manual updates to navigation lists
-
-#### Auto-Discovery Behavior
-
-The updated auto-discovery system:
-
-1. **Tries directory listing** via HTTP request to section folder
-2. **Parses HTML responses** to extract `.html` file names
-3. **Falls back to pattern testing** if directory listing fails
-4. **Automatically excludes** `index.html` files (handled separately)
-5. **Formats titles** from filenames (e.g., `memory-system.html` → "Memory System")
-
-### Testing Auto-Discovery
-
-To verify auto-discovery is working:
-
-1. **Check Browser Console**: Look for "Auto-discovered navigation structure" log
-2. **Test New Files**: Add a new `.md` file, regenerate HTML, refresh portal
-3. **Verify Navigation**: New pages should appear automatically in sidebar menus
-4. **Check Network Tab**: Ensure no 404 errors when accessing section folders
+// Verify content cache
+console.log(docsPortal.contentCache);
+```
 
 ## Best Practices
 
-### Avoid Infinite Loops
+### Content Organization
 
-- **No Self-References**: Don't link to the portal itself within content
-- **External Links**: Use absolute URLs for external resources
-- **Relative Paths**: Keep internal links relative to content directory
+1. **Use descriptive filenames**: `ticket-management.md` not `tm.md`
+2. **Organize by audience**: Group user guides separately from developer docs
+3. **Maintain index files**: Each section should have an `index.md`
+4. **Keep navigation shallow**: Avoid deeply nested folder structures
 
-### Content Format
+### Markdown Guidelines
 
-- **Markdown Source**: Write in `/docs-source/` directory
-- **HTML Generation**: Use `html-content-updater.js` to generate HTML
-- **File Naming**: Use lowercase, hyphenated filenames (`my-guide.md`)
-- **Index Pages**: Each section should have an `index.md` file
+1. **Use proper headings**: Start with H1, use hierarchy consistently
+2. **Include front matter**: Add metadata for better organization
+3. **Optimize for web**: Keep paragraphs short, use lists effectively
+4. **Test locally**: Always regenerate and test before committing
 
-### Performance
+### Performance Tips
 
-- **Caching**: Portal caches content to reduce HTTP requests
-- **Lazy Loading**: Content loads only when requested
-- **Minification**: Consider minifying HTML for production
+1. **Keep images optimized**: Use appropriate formats and sizes
+2. **Minimize large files**: Break up lengthy documents
+3. **Use caching**: The portal caches content automatically
+4. **Regular regeneration**: Update HTML when source changes
 
-## Future Enhancements
+## Security Considerations
 
-### Planned Features
+### Path Validation
 
-- **Search Functionality**: Full-text search across documentation
-- **Table of Contents**: Auto-generated TOC for long pages
-- **Print Styles**: Better formatting for printed documentation
-- **Theme Switching**: Light/dark mode toggle
+The system uses `PathValidator` to prevent:
 
-### Extension Points
+- **Path traversal attacks**: `../../../etc/passwd`
+- **Invalid characters**: Ensures safe file operations
+- **Directory escaping**: Keeps access within allowed paths
 
-- **Custom Icons**: Easy to add new Font Awesome icons
-- **Navigation Hooks**: Extend with custom navigation logic
-- **Content Processors**: Add custom content transformation
-- **Analytics**: Track page views and popular content
+### Safe Content Generation
 
-## Example Workflow
+- All user content is processed through secure markdown parsing
+- File operations use validated paths only
+- Generated HTML is sanitized appropriately
 
-Here's a complete example of adding new documentation:
+## Integration Points
 
-1. **Create Markdown**:
+### Build Process
 
-   ```bash
-   mkdir -p docs-source/tutorials
-   echo "# Tutorial Guide\n\nThis is a new tutorial." > docs-source/tutorials/index.md
-   echo "# Advanced Tutorial\n\nAdvanced content here." > docs-source/tutorials/advanced.md
-   ```
+The documentation portal integrates with:
 
-1. **Generate HTML**:
+- **Development workflow**: Automatic regeneration during builds
+- **Version control**: Markdown files tracked, HTML files can be gitignored
+- **Deployment**: Generated content served statically
 
-   ```bash
-   node docs-prototype/html-content-updater.js
-   ```
+### External Tools
 
-1. **Verify Auto-Discovery**:
-   - Open documentation portal
-   - Look for "Tutorials" in navigation
-   - Click to expand and see "Advanced Tutorial"
+- **Markdown editors**: Any standard markdown editor works
+- **Version control**: Git tracks source files efficiently
+- **Static hosting**: Generated content works with any web server
 
-The portal automatically detects the new section and creates a collapsible navigation entry with child pages.
+---
+
+*For additional support or feature requests, see the [Development Documentation](development/) section.*
