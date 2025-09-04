@@ -7,14 +7,10 @@
 <h2>Endpoints</h2>
 <h3>GET /api/tickets</h3>
 <ul>
-<li><p><strong>Description</strong>: Retrieves a list of all tickets, ordered by creation date in descending order.</p>
-</li>
-<li><p><strong>Query Parameters</strong>: None</p>
-</li>
-<li><p><strong>Response</strong>: <code>200 OK</code></p>
-<ul>
-<li><strong>Note</strong>: The <code>devices</code> and <code>attachments</code> fields are returned as JSON strings.</li>
-</ul>
+<li><strong>Description</strong>: Retrieves a list of all tickets, ordered by creation date in descending order.</li>
+<li><strong>Query Parameters</strong>: None</li>
+<li><strong>Response</strong>: <code>200 OK</code><ul>
+<li><p><strong>Note</strong>: The <code>devices</code> and <code>attachments</code> fields are returned as JSON strings.</p>
 <pre><code class="language-json">[
   {
     &quot;id&quot;: &quot;TICK-123&quot;,
@@ -36,6 +32,8 @@
   }
 ]
 </code></pre>
+</li>
+</ul>
 </li>
 </ul>
 <h3>POST /api/tickets</h3>
@@ -192,12 +190,14 @@
 <hr>
 <h2>Error Responses</h2>
 <ul>
-<li><strong><code>400 Bad Request</code></strong>: The request body is missing or contains invalid data.<pre><code class="language-json">{
+<li><p><strong><code>400 Bad Request</code></strong>: The request body is missing or contains invalid data.</p>
+<pre><code class="language-json">{
   &quot;error&quot;: &quot;No data provided&quot;
 }
 </code></pre>
 </li>
-<li><strong><code>500 Internal Server Error</code></strong>: An error occurred during a database operation.<pre><code class="language-json">{
+<li><p><strong><code>500 Internal Server Error</code></strong>: An error occurred during a database operation.</p>
+<pre><code class="language-json">{
   &quot;error&quot;: &quot;Failed to save ticket&quot;
 }
 </code></pre>
