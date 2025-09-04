@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr Project Structure</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HexTrackr Project Structure</h1>
+        
+        <div class="mermaid">
+graph TB
+    ROOT["HexTrackr Project"]
+    
+    ROOT --> SERVER["server.js<br/>(Main App)"]
+    ROOT --> PKG["package.json<br/>(Dependencies)"]
+    ROOT --> SCRIPTS["scripts/"]
+    ROOT --> DOCS["docs-source/"]
+    ROOT --> HTML["docs-html/"]
+    ROOT --> DATA["data/"]
+    ROOT --> STYLES["styles/"]
+    
+    SCRIPTS --> INIT["init-database.js<br/>(DB Setup)"]
+    SCRIPTS --> PAGES["pages/"]
+    SCRIPTS --> SHARED["shared/"]
+    SCRIPTS --> UTILS["utils/"]
+    
+    DOCS --> API["api-reference/"]
+    DOCS --> ARCH["architecture/"]
+    DOCS --> DEV["development/"]
+    DOCS --> GUIDES["user-guides/"]
+    
+    DATA --> DB["hextrackr.db<br/>(SQLite)"]
+    
+    style SERVER fill:#e74c3c,stroke:#333,stroke-width:3px,color:#fff
+    style PKG fill:#3498db,stroke:#333,stroke-width:2px,color:#fff
+    style INIT fill:#3498db,stroke:#333,stroke-width:2px,color:#fff
+    style DB fill:#27ae60,stroke:#333,stroke-width:2px,color:#fff
+    style ROOT fill:#9b59b6,stroke:#333,stroke-width:2px,color:#fff
+        </div>
+        
+        <h2>Key Components</h2>
+        <ul>
+            <li><strong style="color:#e74c3c">server.js</strong>: Main Express application (Importance: 7)</li>
+            <li><strong style="color:#3498db">package.json</strong>: Project configuration (Importance: 4)</li>
+            <li><strong style="color:#3498db">init-database.js</strong>: Database setup (Importance: 4)</li>
+            <li><strong style="color:#27ae60">hextrackr.db</strong>: SQLite database file</li>
+            <li><strong>scripts/</strong>: Frontend JavaScript modules</li>
+            <li><strong>docs-source/</strong>: Markdown documentation</li>
+            <li><strong>docs-html/</strong>: Generated HTML documentation</li>
+        </ul>
+    </div>
+    
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                htmlLabels: true,
+                curve: 'basis',
+                nodeSpacing: 50,
+                rankSpacing: 70
+            }
+        });
+    </script>
+</body>
+</html>
