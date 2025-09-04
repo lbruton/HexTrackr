@@ -1,8 +1,44 @@
-# HexTrackr AI Assistant Instructions
+# HexTrackr AI Assistant Instructions (DRAFT)
 
 ## Project Overview
 
 HexTrackr is a vulnerability and ticket management system with a monolithic Node.js/Express backend and browser-based frontend. It uses SQLite for persistence and follows a modular JavaScript architecture pattern.
+
+## Memory Systems Integration
+
+You have access to two advanced memory systems that work together to provide comprehensive context:
+
+1. **Memento MCP**: Knowledge graph for structured technical information
+   - Stores: Code components, architectural decisions, entity relationships
+   - Optimized for: Technical knowledge, code structure, design patterns
+   - Query via: `semantic_search` with specific entity types
+
+1. **Persistent AI Memory (PAM)**: Timeline-based memory for conversational context
+   - Stores: Conversation history, git commits, user preferences
+   - Optimized for: Chronological data, conversation continuity
+   - Query via: `search_memories` with type filters
+
+### MCP Tool Reference
+
+- **Tool Documentation**: Check `.runbooks/tools/` for comprehensive MCP server documentation
+- **Available Tools**: FileScopeMCP, Codacy, GitHub, Firecrawl, Context7, and 10+ other servers
+- **Usage Patterns**: Each `.runbooks/tools/{server}-mcp.prompt.md` includes tool lists and best practices
+
+### Memory Access Optimization Protocol
+
+Follow this sequence for maximum token efficiency:
+
+1. **Context First**: Use what's in the current conversation window
+2. **Targeted Search**: Use specific 3-5 word queries with type filters
+3. **Progressive Expansion**: Only broaden search if needed after initial results
+
+```
+// EFFICIENT PATTERN
+semantic_search("express route validation", entity_types=["code-component"], limit=3)
+
+// INEFFICIENT PATTERN - AVOID
+read_graph() // Returns everything - token expensive
+```
 
 ## Key Architecture Patterns
 
@@ -31,109 +67,15 @@ HexTrackr is a vulnerability and ticket management system with a monolithic Node
 
 ## Critical Workflows
 
-## 7-Step Turn Loop
-
-# 1. observe
-
-- **CHECK CONTEXT FIRST**: Analyze if the answer exists in the current conversation context
-- If not in context, **ACCESS TIERED MEMORY**:
-  1. Check active reminders via (get_reminders)
-  2. Query Memento MCP via (semantic_search)
-
-  1. Query persistent-ai-memory via (search_memories) only if needed for:
-     - Conversation history use: (type:conversation)
-     - Git commit summaries use: (type:git-commit)
-  1. Get recent context via (get_recent_context) if continuing previous work
-- **TRACK MEMORY SOURCE** with each retrieved item: `[MEMENTO]` or `[PAM]` prefix
-
-# 2. plan
-
-- Produce a short actionable checklist tied to requirements
-- Identify files to change and expected outputs
-- **CREATE STRUCTURED MEMORIES** for new concepts:
-  - Technical concepts → Memento MCP via `create_entities` with relevant relations
-  - Conversational notes → persistent-ai-memory via `create_memory`
-
-# 3. safeguards
-
-- Make a pre-flight commit to snapshot baseline
-- Note roll-back strategy
-- Store conversation state via `store_conversation` before major changes
-- **BACKUP CRITICAL KNOWLEDGE** to both systems for redundancy
-
-# 4. execute
-
-- Apply the smallest changes needed
-- After each file edit, run Codacy CLI analysis for the edited file
-- Prefer incremental, verifiable steps
-
-# 5. verify
-
-- Run linters and tests
-- Perform a small smoke test where applicable
-- Fix issues before proceeding
-
-# 6. map-update
-
-- **DUAL MEMORY UPDATE**:
-  - Technical knowledge → Memento via `add_observations` and `create_relations`
-  - Conversation context → persistent-ai-memory via `update_memory`
-- Create reminders via `create_reminder` for time-sensitive tasks
-
-### 7. log
-
-- Store structured knowledge in Memento MCP for:
-  - Entity relationships
-  - Code structure
-  - Technical decisions with reasons
-- Store conversation logs in persistent-ai-memory for:
-  - Chat history
-  - Git commit summaries
-  - User preferences
-- Update project roadmap (`roadmaps/ROADMAP.md`) with progress
-
-## Context-First, Memory-Optimized Philosophy
-
-🧠 **Check context first, then query the right memory system**
-
-- **Context is king**: Use what's already in the conversation before memory lookup
-- **Know your memory systems**:
-  - **Memento MCP**: For structured knowledge, technical concepts, relationships between code components
-  - **persistent-ai-memory**: For conversation history, git commit logs, chronological project history
-- **Cross-reference memories**: Link information between systems with consistent entity IDs
-- **Optimize token usage**: Fetch only what's needed, in the right order:
-  1. Check context window first
-  2. Use semantic search in Memento for targeted knowledge
-  3. Fall back to persistent-ai-memory for historical context
-
-## Memory Taxonomy
-
-| Knowledge Type | Storage System | Query Method | When to Use |
-|---------------|---------------|-------------|------------|
-| Code structure | Memento MCP | `semantic_search` with `type:code-component` | Understanding architecture |
-| Technical decisions | Memento MCP | `semantic_search` with `type:decision` | Retrieving rationale |
-| User preferences | Memento MCP | `open_nodes` with user ID | Personalizing responses |
-| Conversation history | persistent-ai-memory | `search_memories` with `type:conversation` | Getting chat context |
-| Git commits | persistent-ai-memory | `search_memories` with `type:git-commit` | Understanding changes |
-| Project timelines | persistent-ai-memory | `get_memories_by_date` | Tracking progress |
-
 ### Development Setup
 
 - **NEVER** run node.js locally for this project, always run in Docker container
 
-## Docker Configuration
+### Docker Configuration
 
 - Uses `Dockerfile.node` (not the main `Dockerfile`)
 - Single container setup on port 8080
 - **Important:** Restart Docker container before running Playwright tests
-
-### Testing Setup
-
-## Playwright Testing
-
-- Requires Docker container restart: `docker-compose restart`
-- Browser automation tests need clean container state
-- All tests run against `http://localhost:8080`
 
 ### Data Import Flows
 
@@ -185,15 +127,63 @@ HexTrackr is a vulnerability and ticket management system with a monolithic Node
 - `scripts/shared/settings-modal.js`: Global frontend utilities
 - `docs-source/architecture/`: Detailed architecture documentation
 
-- Store structured knowledge in Memento MCP for:
-  - Entity relationships
-  - Code structure
-  - Technical decisions with reasons
-- Store conversation logs in persistent-ai-memory for:
-  - Chat history
-  - Git commit summaries
-  - User preferences
-- Update project roadmap (`roadmaps/ROADMAP.md`) with progress
+## 7-Step Task Execution Protocol
+
+Follow this process for every user request:
+
+### 1. Observe - Gather Context Efficiently
+
+- Check current conversation context first
+- Use targeted semantic searches with specific terms and type filters
+- Limit initial results to 3-5 items to conserve tokens
+- Track sources with [MEMENTO] or [PAM] prefixes
+
+### 2. Plan - Structure Your Approach
+
+- Create a concise checklist of 3-5 specific actions
+- Identify files that need to be changed
+- Store technical concepts as Memento entities with proper types
+
+### 3. Safeguards - Prevent Data Loss
+
+- Create safety snapshots before making changes
+- Document rollback strategies
+- Store conversation state in PAM before major operations
+
+### 4. Execute - Implement With Precision
+
+- Make minimal, focused changes
+- Run Codacy analysis after file edits
+- Work in small, verifiable increments
+
+### 5. Verify - Confirm Success
+
+- Run appropriate tests for the changes made
+- Perform targeted smoke tests
+- Fix any issues before continuing
+
+### 6. Map-Update - Enhance Knowledge
+
+- Add observations to relevant Memento entities
+- Update conversation context in PAM
+- Create reminders for follow-up tasks
+
+### 7. Log - Document Outcomes
+
+- Store structured records in both memory systems
+- Update project documentation
+- Maintain the project roadmap
+
+## Optimized Memory Taxonomy
+
+| Knowledge Type | System | Query Method | Example | When to Use |
+|---------------|--------|--------------|---------|------------|
+| Code structure | Memento | `semantic_search` + type filter | `semantic_search("server endpoints", entity_types=["code-component"])` | Understanding implementation |
+| Design decisions | Memento | `semantic_search` + type filter | `semantic_search("database schema design", entity_types=["decision"])` | Retrieving rationale |
+| User preferences | Memento | `open_nodes` with ID | `open_nodes(["user_lonnie"])` | Personalizing responses |
+| Recent conversations | PAM | `search_memories` with type | `search_memories("vulnerability import", type="conversation")` | Continuing discussions |
+| Git history | PAM | `search_memories` with type | `search_memories("fix ticket schema", type="git-commit")` | Understanding changes |
+| Project timeline | PAM | `get_memories_by_date` | `get_memories_by_date(start="2025-08-01")` | Tracking progress |
 
 ## Versioning Standards
 
@@ -208,7 +198,7 @@ HexTrackr is a vulnerability and ticket management system with a monolithic Node
 
 - **Standard**: Follow [Semantic Versioning v2.0.0](https://semver.org/spec/v2.0.0.html)
 - **Format**: MAJOR.MINOR.PATCH (e.g., 1.0.2)
-- **Current Version**: 1.0.2 (in package.json)
+- **Current Version**: 1.0.3 (in package.json)
 - **Rules**:
   - **MAJOR**: Breaking changes or major architectural updates
   - **MINOR**: New features and enhancements (backward compatible)  
@@ -222,7 +212,3 @@ HexTrackr is a vulnerability and ticket management system with a monolithic Node
 3. Commit with descriptive message following SemVer
 4. Create Git tag matching version number
 5. Push changes and tags to GitHub
-
-## Documentation
-
-Full documentation available in `docs-source/` with architecture diagrams and API references.

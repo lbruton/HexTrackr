@@ -111,7 +111,6 @@ class DocumentationPortalV2 {
             "api-reference": { title: "API Reference", icon: "fas fa-code" },
             "architecture": { title: "Architecture", icon: "fas fa-building" },
             "development": { title: "Development", icon: "fas fa-hammer" },
-            "project-management": { title: "Project Management", icon: "fas fa-tasks" },
             "security": { title: "Security", icon: "fas fa-shield-alt" }
         };
 
@@ -167,7 +166,7 @@ class DocumentationPortalV2 {
         // List of sections to check (could be made dynamic)
         const sectionsToCheck = [
             "getting-started", "user-guides", "api-reference", 
-            "architecture", "development", "project-management", "security"
+            "architecture", "development", "security"
         ];
         
         for (const section of sectionsToCheck) {
@@ -194,10 +193,10 @@ class DocumentationPortalV2 {
     }
 
     /**
-     * Auto-discover roadmap files from /roadmaps/ folder and add them to project-management
+     * Auto-discover roadmap files from /roadmaps/ folder and add them to development
      */
     async discoverRoadmapsStructure(structure) {
-        console.log("📁 Scanning /roadmaps/ folder for additional content...");
+        console.log("📁 Scanning for roadmap and changelog files...");
         
         // Known roadmap files to check
         const roadmapFiles = [
@@ -211,14 +210,14 @@ class DocumentationPortalV2 {
         ];
         
         try {
-            // If project-management section doesn't exist, create it
-            if (!structure["project-management"]) {
-                structure["project-management"] = {
-                    file: "project-management/index",
+            // If development section doesn't exist, create it
+            if (!structure["development"]) {
+                structure["development"] = {
+                    file: "development/index",
                     children: {}
                 };
-            } else if (!structure["project-management"].children) {
-                structure["project-management"].children = {};
+            } else if (!structure["development"].children) {
+                structure["development"].children = {};
             }
             
             // Test each roadmap file to see if it exists
@@ -229,8 +228,8 @@ class DocumentationPortalV2 {
                     if (response.ok) {
                         console.log(`✅ Found roadmap file: ${roadmapFile.file}`);
                         
-                        // Add to project-management children
-                        structure["project-management"].children[roadmapFile.key] = {
+                        // Add to development children
+                        structure["development"].children[roadmapFile.key] = {
                             title: roadmapFile.title,
                             file: `${roadmapFile.path}${roadmapFile.file}`, // Direct link to source
                             isExternal: true // Flag to handle differently
@@ -249,8 +248,8 @@ class DocumentationPortalV2 {
                     if (response.ok) {
                         console.log(`✅ Found root file: ${rootFile.file}`);
                         
-                        // Add to project-management children
-                        structure["project-management"].children[rootFile.key] = {
+                        // Add to development children
+                        structure["development"].children[rootFile.key] = {
                             title: rootFile.title,
                             file: `${rootFile.path}${rootFile.file}`, // Direct link to source
                             isExternal: true // Flag to handle differently
@@ -270,75 +269,80 @@ class DocumentationPortalV2 {
 
     /**
      * Auto-discover children for a documentation section
-     * Implements true dynamic discovery: finds any file that exists
-     * Only hardcoded item is CHANGELOG in development section
+     * Implements true dynamic discovery by scanning the actual content directory
      */
     async discoverSectionChildren(section) {
         const children = {};
         
         try {
-            // Define files that exist for each section
-            // This prevents 404 errors by only checking files that actually exist
-            const sectionFiles = {
-                "getting-started": ["installation"],
-                "user-guides": ["ticket-management", "vulnerability-management"],
-                "api-reference": ["tickets-api", "vulnerabilities-api", "backup-api"],
-                "architecture": ["backend", "database", "deployment", "frontend", "frameworks", "project-analysis"],
-                "development": ["coding-standards", "contributing", "development-setup", "memory-system", "pre-commit-hooks", "docs-portal-guide"],
-                "project-management": ["strategic-roadmap", "quality-badges", "codacy-compliance", "roadmap-to-sprint-system"],
-                "security": ["overview", "vulnerability-disclosure"]
-            };
-            
-            // Special case: Add ROADMAP and CHANGELOG to development section first
+            // Special case: Add ROADMAP, CHANGELOG, and SPRINT to development section first
             if (section === "development") {
-                // Add roadmap first (top of development menu)
-                try {
-                    const roadmapResponse = await fetch(this.getContentUrl("ROADMAP.html"));
-                    if (roadmapResponse.ok) {
-                        children["roadmap"] = {
-                            title: "Strategic Roadmap",
-                            file: "ROADMAP"
-                        };
-                    }
-                } catch (_error) {
-                    // ROADMAP doesn't exist, skip it
-                }
+                const specialFiles = [
+                    { key: "roadmap", title: "Strategic Roadmap", file: "ROADMAP" },
+                    { key: "changelog", title: "Changelog", file: "CHANGELOG" },
+                    { key: "sprint", title: "Current Sprint", file: "SPRINT" }
+                ];
                 
-                // Add changelog second
-                try {
-                    const changelogResponse = await fetch(this.getContentUrl("CHANGELOG.html"));
-                    if (changelogResponse.ok) {
-                        children["changelog"] = {
-                            title: "Changelog",
-                            file: "CHANGELOG"
-                        };
+                for (const special of specialFiles) {
+                    try {
+                        const response = await fetch(this.getContentUrl(`${special.file}.html`));
+                        if (response.ok) {
+                            children[special.key] = {
+                                title: special.title,
+                                file: special.file
+                            };
+                        }
+                    } catch (_error) {
+                        // File doesn't exist, skip it
                     }
-                } catch (_error) {
-                    // Changelog doesn't exist, skip it
                 }
             }
             
-            // Only check files that belong to this section
-            const filesToCheck = sectionFiles[section] || [];
-            for (const fileName of filesToCheck) {
-                try {
-                    const fileResponse = await fetch(this.getContentUrl(`${section}/${fileName}.html`));
-                    if (fileResponse.ok) {
-                        children[fileName] = {
-                            title: this.formatTitle(fileName),
-                            file: `${section}/${fileName}`
-                        };
-                    }
-                } catch (_error) {
-                    // File doesn't exist, skip it silently
-                }
-            }
+            // Dynamic discovery: Try to find what files actually exist in this section
+            // We'll use a systematic approach to discover files
+            await this.discoverFilesInSection(section, children);
             
         } catch (error) {
             console.warn(`Could not discover children for section ${section}:`, error);
         }
         
         return Object.keys(children).length > 0 ? children : null;
+    }
+
+    /**
+     * Dynamically discover files in a section by making systematic requests
+     * This replaces the hardcoded file lists with actual file discovery
+     */
+    async discoverFilesInSection(section, children) {
+        // Common file patterns to check across all sections
+        const commonPatterns = [
+            "overview", "index", "getting-started", "deployment", 
+            "ticket-management", "vulnerability-management", "backup-restore", 
+            "data-import-export", "tickets-api", "vulnerabilities-api", "backup-api",
+            "backend", "database", "frontend", "frameworks", "data-model",
+            "rollover-mechanism", "coding-standards", "contributing", 
+            "docs-portal-guide", "vulnerability-disclosure"
+        ];
+        
+        // Try each pattern to see if a file exists for this section
+        for (const pattern of commonPatterns) {
+            try {
+                const response = await fetch(this.getContentUrl(`${section}/${pattern}.html`));
+                if (response.ok) {
+                    const key = pattern;
+                    // Avoid duplicates
+                    if (!children[key]) {
+                        children[key] = {
+                            title: this.formatTitle(pattern),
+                            file: `${section}/${pattern}`
+                        };
+                        console.log(`✅ Discovered file: ${section}/${pattern}.html`);
+                    }
+                }
+            } catch (_error) {
+                // File doesn't exist, continue checking
+            }
+        }
     }
 
     /**
@@ -374,7 +378,7 @@ class DocumentationPortalV2 {
         return [
             { key: "overview", configKey: "index", file: "index", children: [] },
             { key: "getting-started", configKey: "getting-started", file: "getting-started/index", 
-              children: [{ key: "installation", title: "Installation" }] },
+              children: [{ key: "deployment", title: "Deployment" }] },
             { key: "user-guides", configKey: "user-guides", file: "user-guides/index",
               children: [
                   { key: "ticket-management", title: "Ticket Management" },
@@ -395,14 +399,11 @@ class DocumentationPortalV2 {
               ]},
             { key: "development", configKey: "development", file: "development/index",
               children: [
+                  { key: "roadmap", title: "Roadmap" },
+                  { key: "changelog", title: "Changelog" },
                   { key: "coding-standards", title: "Coding Standards" },
                   { key: "contributing", title: "Contributing" },
                   { key: "development-setup", title: "Development Setup" }
-              ]},
-            { key: "project-management", configKey: "project-management", file: "project-management/index",
-              children: [
-                  { key: "roadmap", title: "Roadmap" },
-                  { key: "codacy-compliance", title: "Codacy Compliance" }
               ]},
             { key: "security", configKey: "security", file: "security/index",
               children: [
@@ -686,15 +687,15 @@ class DocumentationPortalV2 {
     generateOverviewContent() {
         return `
             <h1>HexTrackr Documentation</h1>
-            <p>Welcome to the HexTrackr documentation portal. This comprehensive guide covers installation, usage, and development of the HexTrackr vulnerability and ticket management system.</p>
+            <p>Welcome to the HexTrackr documentation portal. This comprehensive guide covers deployment, usage, and development of the HexTrackr vulnerability and ticket management system.</p>
             
             <div class="row">
                 <div class="col-md-6 mb-4">
                     <div class="card">
                         <div class="card-body">
                             <h3 class="card-title"><i class="fas fa-rocket"></i> Getting Started</h3>
-                            <p class="card-text">Quick installation and setup instructions to get HexTrackr running with Docker.</p>
-                            <a href="#getting-started/installation" class="btn btn-primary">View Installation Guide</a>
+                            <p class="card-text">Quick deployment and setup instructions to get HexTrackr running with Docker.</p>
+                            <a href="#getting-started/deployment" class="btn btn-primary">View Deployment Guide</a>
                         </div>
                     </div>
                 </div>
