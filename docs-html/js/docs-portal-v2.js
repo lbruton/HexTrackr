@@ -112,7 +112,7 @@ class DocumentationPortalV2 {
             "architecture": { title: "Architecture", icon: "fas fa-building" },
             "development": { title: "Development", icon: "fas fa-hammer" },
             "security": { title: "Security", icon: "fas fa-shield-alt" },
-            "roadmap": { title: "Strategic Roadmap", icon: "fas fa-map" },
+            "roadmap": { title: "Roadmap", icon: "fas fa-map" },
             "changelog": { title: "Changelog", icon: "fas fa-list" },
             "sprint": { title: "Current Sprint", icon: "fas fa-running" }
         };
@@ -142,8 +142,32 @@ class DocumentationPortalV2 {
                 console.log("❌ Failed to check OVERVIEW.html:", error.message);
             }
             
-            // Add discovered sections with configuration
+            // Add discovered sections with configuration in proper order
+            // 1. Getting Started should be first after Overview
+            // 2. Then alphabetical order for regular folders
+            // 3. Then special files (Current Sprint, Roadmap, Changelog) at the end
+            
+            const orderedSections = [];
+            const specialSections = [];
+            
+            // First, separate regular sections from special files
             for (const [sectionKey, sectionData] of Object.entries(discoveredStructure)) {
+                if (['roadmap', 'changelog', 'sprint'].includes(sectionKey)) {
+                    specialSections.push([sectionKey, sectionData]);
+                } else {
+                    orderedSections.push([sectionKey, sectionData]);
+                }
+            }
+            
+            // Sort regular sections alphabetically, but ensure getting-started comes first
+            orderedSections.sort(([keyA], [keyB]) => {
+                if (keyA === 'getting-started') return -1;
+                if (keyB === 'getting-started') return 1;
+                return keyA.localeCompare(keyB);
+            });
+            
+            // Add regular sections first
+            for (const [sectionKey, sectionData] of orderedSections) {
                 const config = sectionConfig[sectionKey] || {
                     title: this.formatTitle(sectionKey),
                     icon: "fas fa-file-alt" // Default icon
@@ -155,6 +179,26 @@ class DocumentationPortalV2 {
                     file: sectionData.file,
                     children: sectionData.children
                 };
+            }
+            
+            // Add special sections in the desired order: Current Sprint, Roadmap, Changelog
+            const specialOrder = ['sprint', 'roadmap', 'changelog'];
+            for (const specialKey of specialOrder) {
+                const foundSpecial = specialSections.find(([key]) => key === specialKey);
+                if (foundSpecial) {
+                    const [sectionKey, sectionData] = foundSpecial;
+                    const config = sectionConfig[sectionKey] || {
+                        title: this.formatTitle(sectionKey),
+                        icon: "fas fa-file-alt" // Default icon
+                    };
+                    
+                    this.navigationStructure[sectionKey] = {
+                        title: config.title,
+                        icon: config.icon,
+                        file: sectionData.file,
+                        children: sectionData.children
+                    };
+                }
             }
             
             console.log("📁 Navigation structure loaded:", Object.keys(this.navigationStructure));
