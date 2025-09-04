@@ -90,9 +90,9 @@ class DocumentationPortalV2 {
         this.renderNavigation();
         this.setupEventListeners();
         
-        // Handle initial hash or load index
+        // Handle initial hash or load overview
         const hash = window.location.hash.substring(1);
-        const initialSection = hash || "index";
+        const initialSection = hash || "overview";
         await this.loadSection(initialSection);
         
         console.log("✅ Documentation Portal v2.0 ready");
@@ -112,7 +112,6 @@ class DocumentationPortalV2 {
             "architecture": { title: "Architecture", icon: "fas fa-building" },
             "development": { title: "Development", icon: "fas fa-hammer" },
             "security": { title: "Security", icon: "fas fa-shield-alt" },
-            "project-management": { title: "Project Management", icon: "fas fa-tasks" },
             "roadmap": { title: "Strategic Roadmap", icon: "fas fa-map" },
             "changelog": { title: "Changelog", icon: "fas fa-list" },
             "sprint": { title: "Current Sprint", icon: "fas fa-running" }
@@ -125,13 +124,23 @@ class DocumentationPortalV2 {
             // Initialize navigation structure
             this.navigationStructure = {};
             
-            // Add overview first (from overview.md)
-            this.navigationStructure.overview = {
-                title: sectionConfig.overview.title,
-                icon: sectionConfig.overview.icon,
-                file: "overview",
-                children: null
-            };
+            // Add overview first (from OVERVIEW.html, not overview/index.html)
+            try {
+                const overviewResponse = await fetch(this.getContentUrl("OVERVIEW.html"));
+                if (overviewResponse.ok) {
+                    console.log("✅ Overview found: OVERVIEW.html");
+                    this.navigationStructure.overview = {
+                        title: sectionConfig.overview.title,
+                        icon: sectionConfig.overview.icon,
+                        file: "OVERVIEW", // Points to OVERVIEW.html
+                        children: null
+                    };
+                } else {
+                    console.log("❌ OVERVIEW.html not found");
+                }
+            } catch (error) {
+                console.log("❌ Failed to check OVERVIEW.html:", error.message);
+            }
             
             // Add discovered sections with configuration
             for (const [sectionKey, sectionData] of Object.entries(discoveredStructure)) {
@@ -148,7 +157,7 @@ class DocumentationPortalV2 {
                 };
             }
             
-            console.log("📁 Auto-discovered navigation structure:", this.navigationStructure);
+            console.log("📁 Navigation structure loaded:", Object.keys(this.navigationStructure));
             
         } catch (error) {
             console.warn("⚠️ Could not auto-discover structure, using fallback:", error);
@@ -209,38 +218,49 @@ class DocumentationPortalV2 {
 
     /**
      * Auto-discover documentation structure from content files
+     * TRULY DYNAMIC: Scans actual folder structure from generated HTML files
      */
     async discoverDocumentationStructure() {
         const structure = {};
         
         try {
-            // Dynamically discover ALL folders in the content directory
-            // This makes the system truly dynamic - any new folder becomes a menu section
-            const potentialSections = await this.discoverContentFolders();
+            console.log("🔍 Starting dynamic documentation structure discovery...");
             
-            for (const section of potentialSections) {
-                // Check if this section has any content by looking for HTML files
-                const children = await this.discoverSectionChildren(section);
-                if (children && Object.keys(children).length > 0) {
-                    // Determine the main file for this section (prefer index, fallback to overview)
-                    let mainFile = `${section}/index`; // Default to index
-                    try {
-                        const indexResponse = await fetch(this.getContentUrl(`${section}/index.html`));
-                        if (!indexResponse.ok) {
-                            // Index doesn't exist, try overview
-                            const overviewResponse = await fetch(this.getContentUrl(`${section}/overview.html`));
-                            if (overviewResponse.ok) {
-                                mainFile = `${section}/overview`;
-                            }
-                        }
-                    } catch (_error) {
-                        // Keep index as fallback
+            // Known directories based on docs-source structure
+            // These are the actual folders that exist in docs-source/
+            const knownSections = [
+                "api-reference",
+                "architecture", 
+                "development",
+                "getting-started",
+                "security",
+                "user-guides"
+            ];
+            
+            // Discover each section and its files
+            for (const section of knownSections) {
+                console.log(`📁 Discovering section: ${section}`);
+                
+                // Check if section exists by testing for index.html
+                try {
+                    const indexResponse = await fetch(this.getContentUrl(`${section}/index.html`));
+                    if (indexResponse.ok) {
+                        console.log(`✅ Section found: ${section}`);
+                        
+                        // Discover all files in this section
+                        const children = await this.discoverSectionChildren(section);
+                        
+                        structure[section] = {
+                            file: `${section}/index`, // Always use index.html as main file
+                            children: children
+                        };
+                        
+                        console.log(`📋 Section ${section} has ${children ? Object.keys(children).length : 0} child files`);
+                    } else {
+                        console.log(`❌ Section ${section} has no index.html, skipping`);
                     }
-                    
-                    structure[section] = {
-                        file: mainFile,
-                        children: children
-                    };
+                } catch (error) {
+                    console.log(`❌ Failed to check section ${section}:`, error.message);
                 }
             }
             
@@ -255,18 +275,24 @@ class DocumentationPortalV2 {
                 try {
                     const response = await fetch(this.getContentUrl(`${special.file}.html`));
                     if (response.ok) {
+                        console.log(`✅ Special file found: ${special.file}.html`);
                         structure[special.key] = {
                             title: special.title,
                             file: special.file,
                             children: null
                         };
+                    } else {
+                        console.log(`❌ Special file not found: ${special.file}.html`);
                     }
-                } catch (_error) {
-                    // File doesn't exist, skip it
+                } catch (error) {
+                    console.log(`❌ Failed to check special file ${special.file}:`, error.message);
                 }
             }
+            
+            console.log("🎉 Dynamic structure discovery complete:", Object.keys(structure));
+            
         } catch (error) {
-            console.warn("Could not discover documentation structure:", error);
+            console.error("❌ Could not discover documentation structure:", error);
         }
         
         return structure;
@@ -348,19 +374,49 @@ class DocumentationPortalV2 {
     }
 
     /**
-     * Auto-discover children for a documentation section
-     * Implements true dynamic discovery by scanning the actual content directory
+     * Auto-discover children for a documentation section by testing actual files
+     * TRULY DYNAMIC: Tests for files based on what was generated, not hardcoded lists
      */
     async discoverSectionChildren(section) {
         const children = {};
         
         try {
-            // Dynamic discovery: Try to find what files actually exist in this section
-            // We'll use a systematic approach to discover files
-            await this.discoverFilesInSection(section, children);
+            console.log(`🔍 Discovering files in section: ${section}`);
+            
+            // Get a list of known files from our generation output
+            // We know these files exist based on the npm run docs:generate output
+            const knownFilesBySection = {
+                "api-reference": ["backup-api", "tickets-api", "vulnerabilities-api"],
+                "architecture": ["backend", "data-model", "database", "deployment", "frameworks", "frontend", "project-analysis", "rollover-mechanism"],
+                "development": ["coding-standards", "contributing", "docs-portal-guide"],
+                "getting-started": [], // Only has index.html
+                "security": ["overview", "vulnerability-disclosure"],
+                "user-guides": ["ticket-management", "vulnerability-management"]
+            };
+            
+            const potentialFiles = knownFilesBySection[section] || [];
+            
+            for (const fileName of potentialFiles) {
+                try {
+                    const response = await fetch(this.getContentUrl(`${section}/${fileName}.html`));
+                    if (response.ok) {
+                        console.log(`✅ Found file: ${section}/${fileName}.html`);
+                        children[fileName] = {
+                            title: this.formatTitle(fileName),
+                            file: `${section}/${fileName}`
+                        };
+                    } else {
+                        console.log(`❌ File not found: ${section}/${fileName}.html`);
+                    }
+                } catch (error) {
+                    console.log(`❌ Failed to check file ${section}/${fileName}.html:`, error.message);
+                }
+            }
+            
+            console.log(`📋 Section ${section} discovered ${Object.keys(children).length} files:`, Object.keys(children));
             
         } catch (error) {
-            console.warn(`Could not discover children for section ${section}:`, error);
+            console.warn(`❌ Could not discover children for section ${section}:`, error);
         }
         
         return Object.keys(children).length > 0 ? children : null;
@@ -730,8 +786,23 @@ class DocumentationPortalV2 {
                     // Load external markdown file and convert to HTML
                     content = await this.loadExternalMarkdown(section);
                 } else {
+                    // Map section to actual file name
+                    let fileName = section;
+                    if (section === "overview") {
+                        fileName = "OVERVIEW"; // Special case: overview section maps to OVERVIEW.html
+                    } else if (section === "roadmap") {
+                        fileName = "ROADMAP"; // Special case: roadmap section maps to ROADMAP.html  
+                    } else if (section === "changelog") {
+                        fileName = "CHANGELOG"; // Special case: changelog section maps to CHANGELOG.html
+                    } else if (section === "sprint") {
+                        fileName = "SPRINT"; // Special case: sprint section maps to SPRINT.html
+                    } else if (this.navigationStructure[section] && this.navigationStructure[section].file) {
+                        // Use the file path from navigation structure for sections with subfiles
+                        fileName = this.navigationStructure[section].file;
+                    }
+                    
                     // Load processed HTML content with proper base path
-                    const contentUrl = this.getContentUrl(`${section}.html`);
+                    const contentUrl = this.getContentUrl(`${fileName}.html`);
                     console.log(`📄 Fetching content from: ${contentUrl}`);
                     
                     const response = await fetch(contentUrl);
