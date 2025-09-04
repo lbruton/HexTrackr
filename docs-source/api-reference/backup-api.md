@@ -1,175 +1,132 @@
 # Backup and Restore API
 
-The Backup and Restore API provides data export capabilities and system restoration functionality for HexTrackr data.
+This API provides endpoints for data export, backup, restore, and clearing operations.
 
-## Overview
-
-- **Export**: Generate JSON backups of tickets, vulnerabilities, or complete system data
-- **Statistics**: Get backup-related metrics and system information  
-- **Clear**: Remove data by type (tickets, vulnerabilities, or all)
-- **Restore**: Upload and restore from backup ZIP files
+---
 
 ## Endpoints
 
 ### GET /api/backup/stats
 
-- **Description**: Get backup statistics and system metrics
-- **Query**: None
-- **Response**: 200 OK
+- **Description**: Retrieves statistics about the database, including record counts and file size.
+- **Response**: `200 OK`
 
-```json
-{
-  "tickets": {
-    "count": 145,
-    "lastUpdated": "2025-08-29T15:30:00.000Z"
-  },
-  "vulnerabilities": {
-    "count": 2847,
-    "lastUpdated": "2025-08-29T14:15:00.000Z"
-  },
-  "imports": {
-    "count": 12,
-    "lastImport": "2025-08-29T10:00:00.000Z"
-  },
-  "database": {
-    "size": "45.2 MB",
-    "lastModified": "2025-08-29T15:30:00.000Z"
-  }
-}
-```
+    ```json
+    {
+      "vulnerabilities": 100553,
+      "tickets": 17,
+      "total": 100570,
+      "dbSize": 5468160
+    }
+    ```
 
 ### GET /api/backup/tickets
 
-- **Description**: Export all tickets as JSON array
-- **Query**: None
-- **Response**: 200 OK
-- **Content-Type**: application/json
+- **Description**: Exports all tickets as a JSON object.
+- **Response**: `200 OK`
 
-```json
-[
-  {
-    "id": "TICK-123",
-    "xt_number": "XT001",
-    "date_submitted": "2025-08-20T12:00:00.000Z",
-    "status": "Open",
-    "created_at": "2025-08-20T12:00:00.000Z"
-  }
-]
-```
+    ```json
+    {
+      "type": "tickets",
+      "count": 17,
+      "data": [
+        { "id": "TICK-123", "xt_number": "XT001", ... }
+      ],
+      "exported_at": "2025-09-03T12:00:00.000Z"
+    }
+    ```
 
 ### GET /api/backup/vulnerabilities
 
-- **Description**: Export all vulnerabilities as JSON array
-- **Query**: None  
-- **Response**: 200 OK
-- **Content-Type**: application/json
-
-```json
-[
-  {
-    "id": 1,
-    "hostname": "server-01",
-    "cve": "CVE-2024-0001", 
-    "severity": "High",
-    "import_date": "2025-08-20",
-    "created_at": "2025-08-20T12:00:00.000Z"
-  }
-]
-```
-
-### GET /api/backup/all
-
-- **Description**: Export complete system backup as ZIP file
-- **Query**: None
-- **Response**: 200 OK  
-- **Content-Type**: application/zip
-- **Filename**: `hextrackr-backup-YYYY-MM-DD.zip`
-
-Contains:
-
-- `tickets.json` - All ticket data
-- `vulnerabilities.json` - All vulnerability data  
-- `imports.json` - Import history
-- `metadata.json` - Backup metadata and timestamps
-
-### DELETE /api/backup/clear/:type
-
-- **Description**: Clear data by type
-- **Parameters**:
-  - `type`: "tickets", "vulnerabilities", or "all"
-- **Response**: 200 OK
+- **Description**: Exports up to 10,000 vulnerabilities as a JSON object.
+- **Response**: `200 OK`
 
 ```json
 {
-  "success": true,
-  "message": "Tickets data cleared",
-  "recordsDeleted": 145
-}
+  "type": "vulnerabilities",
+  "count": 10000,
+  "data": [
+    { "id": 1, "hostname": "server-01", ... }
+  ],
 ```
 
 ### POST /api/restore
 
-- **Description**: Restore system from backup ZIP file
-- **Body**: multipart/form-data
-  - `file`: ZIP file (required)
-  - `type`: "tickets", "vulnerabilities", or "all" (optional, default: "all")  
-  - `clearExisting`: boolean (optional, default: false)
-- **Response**: 200 OK
+- **Description**: Restore system data from a backup ZIP file. The ZIP file should contain `tickets.json` and/or `vulnerabilities.json`.
+- **Body**: `multipart/form-data`
+  - `file`: The backup ZIP file (required).
+  - `type`: The type of data to restore: "tickets", "vulnerabilities", or "all" (required).
+  - `clearExisting`: If "true", deletes existing data of the specified type before restoring (optional, default: "false").
+- **Response**: `200 OK`
 
 ```json
 {
   "success": true,
-  "restored": {
-    "tickets": 145,
-    "vulnerabilities": 2847,
-    "imports": 12
-  },
-  "processingTime": 3456
+  "message": "Successfully restored 3012 records",
+  "count": 3012
 }
 ```
 
-## Error Responses
+      "exported_at": "2025-09-03T12:00:00.000Z"
+    }
+    ```
 
-### 400 Bad Request
+### GET /api/backup/all
 
-- Missing required file parameter
-- Invalid type parameter
-- Corrupted or invalid backup file
+- **Description**: Exports all tickets and up to 10,000 vulnerabilities as a single JSON object.
+- **Response**: `200 OK`
 
-### 500 Internal Server Error
+    ```json
+    {
+      "type": "complete_backup",
+      "vulnerabilities": {
+        "count": 10000,
+        "data": [ ... ]
+      },
+      "tickets": {
+        "count": 17,
+        "data": [ ... ]
+      },
+      "exported_at": "2025-09-03T12:00:00.000Z"
+    }
+    ```
 
-- Database operation failures
-- File system errors during backup/restore
+### DELETE /api/backup/clear/:type
 
-## Security Notes
+- **Description**: Deletes data of a specified type. This is a destructive operation.
+- **URL Parameters**:
+  - `type` (string, required): The type of data to clear. Can be `tickets`, `vulnerabilities`, or `all`.
+- **Response**: `200 OK`
 
-- Backup files contain sensitive data and should be handled securely
-- Clear operations are irreversible - use with caution
-- Restore operations can overwrite existing data if `clearExisting` is true
-- Large datasets may take significant time to backup or restore
+```json
+{
+  "message": "Tickets cleared successfully"
+}
+```
+
+---
 
 ## Usage Examples
 
-## Examples
-
-### Complete System Backup
+### Get All Data as a JSON Backup
 
 ```bash
-curl -X GET http://localhost:3000/api/backup/all 
-  -H "Accept: application/json" 
-  > complete_backup.json
+curl -X GET http://localhost:8080/api/backup/all -o hextrackr_backup.json
 ```
 
-### Restore from Backup
+### Restore Tickets from a Backup
+
+This example restores tickets from `backup.zip` and clears existing tickets first.
 
 ```bash
-curl -X POST http://localhost:3000/api/restore 
-  -F "backupFile=@complete_backup.json" 
-  -H "Content-Type: multipart/form-data"
+curl -X POST http://localhost:8080/api/restore \
+  -F "file=@/path/to/backup.zip" \
+  -F "type=tickets" \
+  -F "clearExisting=true"
 ```
 
-### Clear All Data
+### Clear All Vulnerability Data
 
 ```bash
-curl -X DELETE http://localhost:3000/api/backup/clear/all
+curl -X DELETE http://localhost:8080/api/backup/clear/vulnerabilities
 ```

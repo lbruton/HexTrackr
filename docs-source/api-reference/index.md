@@ -1,13 +1,9 @@
 # API Reference
 
-This section provides a complete reference for the HexTrackr REST API.
+This section provides detailed documentation for the HexTrackr REST API. Before you begin, please read the [API Overview](./overview.md) for information on general principles, authentication, and error handling.
 
-## Endpoints
+## API Collections
 
-- **[Tickets API](tickets-api.md)**: Endpoints for managing tickets.
-- **[Vulnerabilities API](vulnerabilities-api.md)**: Endpoints for managing vulnerabilities.
-- **[Backup & Restore API](backup-api.md)**: Endpoints for backup and restore operations.
-
-## System Operations
-
-The backup and restore API provides comprehensive data management capabilities for system maintenance and data recovery.
+- **[Tickets API](./tickets-api.md)**: Endpoints for creating, reading, updating, and deleting tickets.
+- **[Vulnerabilities API](./vulnerabilities-api.md)**: Endpoints for managing and analyzing vulnerability data, including the historical trend analysis.
+- **[Backup and Restore API](./backup-api.md)**: Endpoints for performing system-wide backup and restore operations.
