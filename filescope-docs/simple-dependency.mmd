@@ -1,0 +1,19 @@
+graph TB
+classDef package-node fill:#a29bfe,stroke:#2d3436,shape:ellipse
+classDef package-scope-node fill:#ffeaa7,stroke:#2d3436,shape:stadium
+
+  %% Package Scopes
+
+  %% Node Definitions & Styles
+  node3["package.json"];
+  style node3 fill:#81ecec,stroke:#333,stroke-width:1px
+  node8["init-database.js"];
+  style node8 fill:#81ecec,stroke:#333,stroke-width:1px
+  node10["server.js"];
+  style node10 fill:#74b9ff,stroke:#333,stroke-width:1px
+
+  %% Edge Definitions
+  node10 --> node3
+  linkStyle 0 stroke:#636e72,stroke-width:1px
+  node10 --> node8
+  linkStyle 1 stroke:#636e72,stroke-width:1px
