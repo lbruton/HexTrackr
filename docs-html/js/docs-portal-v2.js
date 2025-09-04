@@ -105,34 +105,36 @@ class DocumentationPortalV2 {
     async loadNavigationStructure() {
         // Configuration for icons and display names (manually curated for better UX)
         const sectionConfig = {
-            "index": { title: "Overview", icon: "fas fa-home" },
+            "overview": { title: "Overview", icon: "fas fa-home" },
             "getting-started": { title: "Getting Started", icon: "fas fa-rocket" },
             "user-guides": { title: "User Guides", icon: "fas fa-users" },
             "api-reference": { title: "API Reference", icon: "fas fa-code" },
             "architecture": { title: "Architecture", icon: "fas fa-building" },
             "development": { title: "Development", icon: "fas fa-hammer" },
-            "security": { title: "Security", icon: "fas fa-shield-alt" }
+            "security": { title: "Security", icon: "fas fa-shield-alt" },
+            "project-management": { title: "Project Management", icon: "fas fa-tasks" },
+            "roadmap": { title: "Strategic Roadmap", icon: "fas fa-map" },
+            "changelog": { title: "Changelog", icon: "fas fa-list" },
+            "sprint": { title: "Current Sprint", icon: "fas fa-running" }
         };
 
         try {
             // Try to auto-discover structure from the actual file system
             const discoveredStructure = await this.discoverDocumentationStructure();
             
-            // Merge discovered structure with manual configuration
+            // Initialize navigation structure
             this.navigationStructure = {};
             
-            // Add overview first
+            // Add overview first (from overview.md)
             this.navigationStructure.overview = {
-                title: sectionConfig.index.title,
-                icon: sectionConfig.index.icon,
-                file: "index",
+                title: sectionConfig.overview.title,
+                icon: sectionConfig.overview.icon,
+                file: "overview",
                 children: null
             };
             
             // Add discovered sections with configuration
             for (const [sectionKey, sectionData] of Object.entries(discoveredStructure)) {
-                if (sectionKey === "index") {continue;} // Skip index, already added as overview
-                
                 const config = sectionConfig[sectionKey] || {
                     title: this.formatTitle(sectionKey),
                     icon: "fas fa-file-alt" // Default icon
@@ -159,35 +161,50 @@ class DocumentationPortalV2 {
      * Auto-discover documentation structure from content files
      */
     async discoverDocumentationStructure() {
-        // This would ideally call a server endpoint that scans the /docs-source/ directory
-        // For now, we'll simulate this by checking what content files exist
         const structure = {};
         
-        // List of sections to check (could be made dynamic)
-        const sectionsToCheck = [
-            "getting-started", "user-guides", "api-reference", 
-            "architecture", "development", "security"
-        ];
-        
-        for (const section of sectionsToCheck) {
-            try {
-                // Since we removed index files, check if section has any children
+        try {
+            // First, discover what directories actually exist by trying to fetch their content
+            const potentialSections = [
+                "getting-started", "user-guides", "api-reference", 
+                "architecture", "development", "security", "project-management"
+            ];
+            
+            for (const section of potentialSections) {
+                // Check if this section has any content by looking for HTML files
                 const children = await this.discoverSectionChildren(section);
                 if (children && Object.keys(children).length > 0) {
-                    // Use the first child as the main section file
-                    const firstChild = Object.values(children)[0];
                     structure[section] = {
-                        file: firstChild.file,
+                        file: `${section}/overview`, // Default to overview file for section
                         children: children
                     };
                 }
-            } catch (_error) {
-                console.log(`Section ${section} not found, skipping`);
             }
+            
+            // Add special standalone files as their own top-level menu items
+            const specialFiles = [
+                { key: "roadmap", title: "Strategic Roadmap", file: "ROADMAP" },
+                { key: "changelog", title: "Changelog", file: "CHANGELOG" },
+                { key: "sprint", title: "Current Sprint", file: "SPRINT" }
+            ];
+            
+            for (const special of specialFiles) {
+                try {
+                    const response = await fetch(this.getContentUrl(`${special.file}.html`));
+                    if (response.ok) {
+                        structure[special.key] = {
+                            title: special.title,
+                            file: special.file,
+                            children: null
+                        };
+                    }
+                } catch (_error) {
+                    // File doesn't exist, skip it
+                }
+            }
+        } catch (error) {
+            console.warn("Could not discover documentation structure:", error);
         }
-        
-        // Step 2: Auto-discover roadmaps from /roadmaps/ folder
-        await this.discoverRoadmapsStructure(structure);
         
         return structure;
     }
@@ -314,33 +331,48 @@ class DocumentationPortalV2 {
      * This replaces the hardcoded file lists with actual file discovery
      */
     async discoverFilesInSection(section, children) {
-        // Common file patterns to check across all sections
-        const commonPatterns = [
-            "overview", "index", "getting-started", "deployment", 
-            "ticket-management", "vulnerability-management", "backup-restore", 
-            "data-import-export", "tickets-api", "vulnerabilities-api", "backup-api",
-            "backend", "database", "frontend", "frameworks", "data-model",
-            "rollover-mechanism", "coding-standards", "contributing", 
-            "docs-portal-guide", "vulnerability-disclosure"
-        ];
+        // Start with a basic overview/index check for each section
+        const basicFiles = ["overview", "index"];
         
-        // Try each pattern to see if a file exists for this section
-        for (const pattern of commonPatterns) {
+        for (const filename of basicFiles) {
             try {
-                const response = await fetch(this.getContentUrl(`${section}/${pattern}.html`));
+                const response = await fetch(this.getContentUrl(`${section}/${filename}.html`));
                 if (response.ok) {
-                    const key = pattern;
                     // Avoid duplicates
-                    if (!children[key]) {
-                        children[key] = {
-                            title: this.formatTitle(pattern),
-                            file: `${section}/${pattern}`
+                    if (!children[filename]) {
+                        children[filename] = {
+                            title: this.formatTitle(filename),
+                            file: `${section}/${filename}`
                         };
-                        console.log(`✅ Discovered file: ${section}/${pattern}.html`);
+                        console.log(`✅ Discovered file: ${section}/${filename}.html`);
                     }
                 }
             } catch (_error) {
                 // File doesn't exist, continue checking
+            }
+        }
+        
+        // Try to discover additional files by checking common documentation patterns
+        // But limit this to avoid too many 404s
+        const commonFiles = [
+            "deployment", "configuration", "api", "examples", 
+            "troubleshooting", "faq", "best-practices"
+        ];
+        
+        for (const filename of commonFiles) {
+            try {
+                const response = await fetch(this.getContentUrl(`${section}/${filename}.html`));
+                if (response.ok) {
+                    if (!children[filename]) {
+                        children[filename] = {
+                            title: this.formatTitle(filename),
+                            file: `${section}/${filename}`
+                        };
+                        console.log(`✅ Discovered file: ${section}/${filename}.html`);
+                    }
+                }
+            } catch (_error) {
+                // File doesn't exist, continue
             }
         }
     }
