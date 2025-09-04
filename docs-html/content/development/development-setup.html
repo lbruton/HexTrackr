@@ -1,0 +1,106 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Development Setup</h1>
+<p>Follow these instructions to set up a local development environment for HexTrackr.</p>
+<h2>Environment Requirements</h2>
+<ul>
+<li><strong>Runtime</strong>: Node.js (v16+ recommended)</li>
+<li><strong>Database</strong>: SQLite (bundled with Node.js)</li>
+<li><strong>Container Platform</strong>: Docker (optional but recommended)</li>
+<li><strong>Package Manager</strong>: npm</li>
+</ul>
+<h2>Docker Setup (Recommended)</h2>
+<p>The easiest way to get started is with Docker:</p>
+<ol>
+<li><p><strong>Clone the repository</strong></p>
+<pre><code class="language-bash">git clone https://github.com/Lonnie-Bruton/HexTrackr.git
+cd HexTrackr
+</code></pre>
+</li>
+<li><p><strong>Start with Docker Compose</strong></p>
+<pre><code class="language-bash">docker-compose up -d
+</code></pre>
+</li>
+<li><p><strong>Access the application</strong></p>
+<ul>
+<li>Main application: <a href="http://localhost:8080">http://localhost:8080</a></li>
+<li>Tickets management: <a href="http://localhost:8080/tickets.html">http://localhost:8080/tickets.html</a></li>
+<li>Vulnerability management: <a href="http://localhost:8080/vulnerabilities.html">http://localhost:8080/vulnerabilities.html</a></li>
+<li>Documentation portal: <a href="http://localhost:8080/docs-html/">http://localhost:8080/docs-html/</a></li>
+</ul>
+</li>
+<li><p><strong>Stop the environment</strong></p>
+<pre><code class="language-bash">docker-compose down
+</code></pre>
+</li>
+</ol>
+<h2>Local Setup (without Docker)</h2>
+<p>For direct local development:</p>
+<ol>
+<li><p><strong>Install Dependencies</strong></p>
+<pre><code class="language-bash">npm install
+</code></pre>
+</li>
+<li><p><strong>Initialize the Database</strong></p>
+<p> Create the SQLite database and schema:</p>
+<pre><code class="language-bash">node scripts/init-database.js
+</code></pre>
+</li>
+<li><p><strong>Start the Development Server</strong></p>
+<pre><code class="language-bash">node server.js
+
+# OR use the convenience script
+
+./scripts/start-dev-env.sh
+</code></pre>
+</li>
+<li><p><strong>Access the Application</strong></p>
+<p> The server will start on <code>http://localhost:8080</code></p>
+</li>
+</ol>
+<h2>Development Scripts</h2>
+<p>HexTrackr includes several utility scripts for development:</p>
+<ul>
+<li><strong><code>./scripts/start-dev-env.sh</code></strong> - Start development server</li>
+<li><strong><code>./scripts/stop-dev-env.sh</code></strong> - Stop development server</li>
+<li><strong><code>node scripts/init-database.js</code></strong> - Initialize SQLite database</li>
+<li><strong><code>node docs-html/html-content-updater.js</code></strong> - Regenerate documentation portal</li>
+</ul>
+<h2>Code Quality</h2>
+<h3>Codacy Integration</h3>
+<p>HexTrackr uses Codacy for code quality analysis. After any file edits:</p>
+<pre><code class="language-bash">
+# Run Codacy analysis (requires Codacy MCP)
+
+codacy_cli_analyze --file=path/to/edited/file
+</code></pre>
+<h3>ESLint</h3>
+<p>The project uses ESLint for code linting:</p>
+<pre><code class="language-bash">npm run lint
+</code></pre>
+<h2>Development Workflow</h2>
+<ol>
+<li><strong>Make changes</strong> to source files</li>
+<li><strong>Run Codacy analysis</strong> for edited files</li>
+<li><strong>Test changes</strong> in browser</li>
+<li><strong>Update documentation</strong> if needed</li>
+<li><strong>Regenerate docs portal</strong> if docs changed</li>
+</ol>
+<h2>Project Structure</h2>
+<pre><code>HexTrackr/
+├── server.js              # Main Express server
+├── data/                  # SQLite database
+├── scripts/               # Utility scripts
+├── styles/                # CSS stylesheets
+├── docs-source/           # Markdown documentation
+├── docs-html/             # Generated HTML docs
+├── uploads/               # File upload storage
+└── .prompts/              # AI assistant prompts
+</code></pre>
+<h2>Memory System Integration</h2>
+<p>HexTrackr includes Persistent AI Memory integration for development continuity. See the <a href="memory-system.html">Memory System documentation</a> for details on using memory tools during development.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
