@@ -9,22 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 
-### Fixed
+### Bugfixes
 
-### Added
+### Enhancements
 
 ## [1.0.3] - 2025-09-03
 
-### Added (Features)
+### Fixed
 
-- **Gemini-Powered Documentation Enhancement**: Comprehensive documentation review and update system
-  - Created `scripts/gemini-docs-generator.js` for automated documentation analysis
-  - Added `.prompts/gemini-docs-review.prompt.md` with professional analysis standards
-  - Integrated with existing `docs-source/` → `docs-html/` workflow
-  - New npm script: `npm run docs:review` for Gemini-powered documentation analysis
-  - Generates detailed analysis reports with specific improvement recommendations
-  - Supports individual file analysis and comprehensive documentation review
-  - Built-in security validation and rate limiting for API usage
+- **Documentation Accuracy**: Comprehensive documentation review and fixes
+  - Updated API reference to include missing `/api/restore` endpoint
+  - Clarified difference between `/api/vulnerabilities/import` and `/api/import/vulnerabilities` endpoints
+  - Fixed formatting and consistency issues across documentation
+  - Ensured all user guides are complete and accurate
+
+### Enhanced
+
+- **Documentation Improvements**:
+  - Added explanatory section on import API options
+  - Expanded backup and restore documentation with clearer examples
+  - Improved navigation and cross-references between related documentation
 
 ### Enhanced (Infrastructure)
 
