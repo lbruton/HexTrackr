@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr Dependency Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HexTrackr Core Dependencies</h1>
+        
+        <div class="mermaid">
+graph TB
+    A["server.js<br/>(Importance: 7)"] --> B["package.json<br/>(Importance: 4)"]
+    A --> C["init-database.js<br/>(Importance: 4)"]
+    
+    style A fill:#74b9ff,stroke:#333,stroke-width:2px
+    style B fill:#81ecec,stroke:#333,stroke-width:1px
+    style C fill:#81ecec,stroke:#333,stroke-width:1px
+        </div>
+        
+        <h2>Legend</h2>
+        <ul>
+            <li><strong>Blue (Importance 7)</strong>: Critical application entry point</li>
+            <li><strong>Light Blue (Importance 4)</strong>: Important configuration and setup files</li>
+            <li><strong>Arrows</strong>: "depends on" relationship</li>
+        </ul>
+    </div>
+    
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+</html>
