@@ -1,16 +1,19 @@
 # System Architecture
 
-This section describes the architecture of the HexTrackr system.
+This section provides a comprehensive overview of the HexTrackr system architecture, from the high-level components to the underlying data structures.
 
-## Architecture Analysis
+## Core Architecture Documents
 
-- **[Project Analysis](project-analysis.md)**: Automated codebase analysis with file importance scoring, dependency mapping, and architectural insights.
+- **[Backend Architecture](./backend.md)**: A detailed look at the Node.js/Express server, its middleware, and its core logic.
+- **[Frontend Architecture](./frontend.md)**: An explanation of the client-side architecture, including the different pages and JavaScript modules.
+- **[Database Architecture](./database.md)**: A high-level overview of the SQLite database, including data flow diagrams.
+- **[Data Model](./data-model.md)**: The definitive guide to the database schema, including detailed descriptions of all tables and columns.
 
-## Components
+## Key Architectural Concepts
 
-- **[Frontend](frontend.md)**: The user interface and client-side logic.
-- **[Backend](backend.md)**: The server-side application logic and API.
-- **[Database](database.md)**: The data storage layer.
-- **[Deployment](deployment.md)**: The deployment and hosting environment.
-- **[Frameworks](frameworks.md)**: Frameworks and libraries used across the system and where they're used.
-- **[Frameworks](./frameworks.html)**: Frameworks and libraries used across the system and where they’re used.
+- **[Vulnerability Rollover Mechanism](./rollover-mechanism.md)**: A deep dive into the process that manages historical vulnerability data and daily trending.
+- **[Deployment Architecture](./deployment.md)**: Information on how the application is deployed using Docker.
+
+## Frameworks and Libraries
+
+- **[Frameworks](./frameworks.md)**: A list of the key frameworks and libraries used in the project and where they are used.

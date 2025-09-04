@@ -83,6 +83,7 @@ class HtmlContentUpdater {
         this.stats = {
             startTime: Date.now(),
             filesGenerated: 0,
+            filesRemoved: 0,
             errors: 0
         };
         this.templateContent = null;
@@ -120,9 +121,18 @@ class HtmlContentUpdater {
                     </a>`;
                 }
                 
+                // Convert internal .md links to .html links
+                let fixedHref = href;
+                if (href && href.endsWith('.md')) {
+                    // Only transform relative links, not absolute URLs
+                    if (!href.startsWith('http://') && !href.startsWith('https://')) {
+                        fixedHref = href.replace(/\.md$/, '.html');
+                    }
+                }
+                
                 // Default link rendering for all other links
                 const titleAttr = title ? ` title="${title}"` : "";
-                return `<a href="${href}"${titleAttr}>${text}</a>`;
+                return `<a href="${fixedHref}"${titleAttr}>${text}</a>`;
             }
         };
         
@@ -263,6 +273,7 @@ class HtmlContentUpdater {
 Generated: ${new Date().toISOString()}
 Duration: ${elapsed.toFixed(1)}s
 Files Generated: ${this.stats.filesGenerated}
+Files Removed: ${this.stats.filesRemoved}
 Errors: ${this.stats.errors}
 
 ## Generated Files
@@ -272,10 +283,70 @@ ${generatedFiles.map(file => `- ${file}`).join("\n")}
 ## Summary
 
 The HTML generator successfully created ${this.stats.filesGenerated} HTML files from their corresponding markdown sources using the master template.
+${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orphaned HTML files were removed that no longer have corresponding markdown sources.` : ''}
 `;
 
         await PathValidator.safeWriteFile("docs-source/html-update-report.md", report);
         console.log("📋 HTML generation report saved: html-update-report.md");
+    }
+
+    /**
+     * Clean up HTML files that no longer have corresponding markdown sources
+     */
+    async cleanupDeletedFiles(generatedFiles) {
+        try {
+            const contentDir = path.join(process.cwd(), "docs-html/content");
+            this.stats.filesRemoved = 0;
+            
+            // Recursive function to check all directories
+            const checkDirectory = async (dir, relativePath = "") => {
+                const items = await PathValidator.safeReaddir(dir, { withFileTypes: true });
+                
+                for (const item of items) {
+                    const fullPath = path.join(dir, item.name);
+                    const currentRelPath = path.join(relativePath, item.name);
+                    
+                    if (item.isDirectory()) {
+                        // Recursively check subdirectories
+                        await checkDirectory(fullPath, currentRelPath);
+                        
+                        // Check if directory is now empty and remove it if it is
+                        const remainingItems = await PathValidator.safeReaddir(fullPath);
+                        if (remainingItems.length === 0) {
+                            try {
+                                await fs.rmdir(fullPath);
+                                console.log(`🗑️  Removed empty directory: ${currentRelPath}`);
+                            } catch (error) {
+                                console.error(`❌ Failed to remove directory ${currentRelPath}: ${error.message}`);
+                            }
+                        }
+                    } else if (item.name.endsWith(".html")) {
+                        // Check if this HTML file was generated in the current run
+                        const relativePosixPath = currentRelPath.split(path.sep).join("/");
+                        if (!generatedFiles.includes(relativePosixPath)) {
+                            try {
+                                await fs.unlink(fullPath);
+                                console.log(`🗑️  Removed orphaned HTML file: ${relativePosixPath}`);
+                                this.stats.filesRemoved++;
+                            } catch (error) {
+                                console.error(`❌ Failed to remove file ${relativePosixPath}: ${error.message}`);
+                            }
+                        }
+                    }
+                }
+            };
+            
+            // Start checking from the content root directory
+            await checkDirectory(contentDir);
+            
+            if (this.stats.filesRemoved > 0) {
+                console.log(`🧹 Cleanup complete: removed ${this.stats.filesRemoved} orphaned HTML files`);
+            } else {
+                console.log("✓ No orphaned HTML files found, nothing to clean up");
+            }
+        } catch (error) {
+            console.error(`❌ Cleanup process failed: ${error.message}`);
+        }
     }
 
     /**
@@ -312,6 +383,9 @@ The HTML generator successfully created ${this.stats.filesGenerated} HTML files 
                 await new Promise(resolve => setTimeout(resolve, 50));
             }
             
+            // Clean up deleted files
+            await this.cleanupDeletedFiles(generatedFiles);
+            
             // Generate summary report
             await this.generateUpdateReport(generatedFiles);
             
@@ -319,6 +393,10 @@ The HTML generator successfully created ${this.stats.filesGenerated} HTML files 
             console.log(`
 🎉 HTML generation complete!`);
             console.log(`📈 Generated ${this.stats.filesGenerated} files in ${elapsed.toFixed(1)}s`);
+            
+            if (this.stats.filesRemoved > 0) {
+                console.log(`🧹 Removed ${this.stats.filesRemoved} orphaned HTML files`);
+            }
             
             if (this.stats.errors > 0) {
                 console.log(`⚠️  ${this.stats.errors} errors encountered during generation.`);
