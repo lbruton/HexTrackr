@@ -158,17 +158,65 @@ class DocumentationPortalV2 {
     }
 
     /**
+     * Dynamically discover content folders by probing known common folder names
+     * This ensures any new documentation folder is automatically included in navigation
+     */
+    async discoverContentFolders() {
+        const commonFolders = [
+            // Known existing folders
+            "getting-started", "user-guides", "api-reference", 
+            "architecture", "development", "security", "project-management",
+            // Common documentation folder patterns to discover
+            "tutorials", "guides", "reference", "examples", "advanced",
+            "administration", "configuration", "deployment", "troubleshooting",
+            "best-practices", "faq", "changelog", "roadmap", "releases"
+        ];
+        
+        const discoveredFolders = [];
+        
+        for (const folder of commonFolders) {
+            try {
+                // Try to access the folder by checking for an index or any HTML file
+                const testUrls = [
+                    `${folder}/index.html`,
+                    `${folder}/overview.html`
+                ];
+                
+                let folderExists = false;
+                for (const testUrl of testUrls) {
+                    try {
+                        const response = await fetch(this.getContentUrl(testUrl));
+                        if (response.ok) {
+                            folderExists = true;
+                            break;
+                        }
+                    } catch (_error) {
+                        // Continue testing other URLs
+                    }
+                }
+                
+                if (folderExists) {
+                    discoveredFolders.push(folder);
+                    console.log(`📁 Discovered content folder: ${folder}`);
+                }
+            } catch (_error) {
+                // Folder doesn't exist, continue
+            }
+        }
+        
+        return discoveredFolders;
+    }
+
+    /**
      * Auto-discover documentation structure from content files
      */
     async discoverDocumentationStructure() {
         const structure = {};
         
         try {
-            // First, discover what directories actually exist by trying to fetch their content
-            const potentialSections = [
-                "getting-started", "user-guides", "api-reference", 
-                "architecture", "development", "security", "project-management"
-            ];
+            // Dynamically discover ALL folders in the content directory
+            // This makes the system truly dynamic - any new folder becomes a menu section
+            const potentialSections = await this.discoverContentFolders();
             
             for (const section of potentialSections) {
                 // Check if this section has any content by looking for HTML files
