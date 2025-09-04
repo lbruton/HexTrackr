@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Package Dependencies - package-dependencies.html</title>
+  <!-- Load Mermaid from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.5s ease;
+    }
+    .dark-mode {
+      background: linear-gradient(135deg, #1e1e2f 0%, #1d2426 100%);
+    }
+    .light-mode {
+      background: linear-gradient(135deg, #f5f6fa 0%, #dcdde1 100%);
+    }
+    header {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      text-align: left;
+    }
+    #theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 50px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #diagram-container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 75px 0;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      transition: all 0.5s ease;
+      position: relative;
+    }
+    #mermaid-graph {
+      overflow: auto;
+      max-height: 70vh;
+    }
+    #error-message {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+    /* Styles for collapsed nodes */
+    .collapsed-node text {
+      font-weight: bold;
+    }
+    .collapsed-node rect, .collapsed-node circle, .collapsed-node polygon {
+      stroke-width: 3px !important;
+    }
+    .collapsed-indicator {
+      fill: #4cd137;
+      font-weight: bold;
+    }
+    /* Add + symbol to collapsed nodes */
+    .collapsed-node .collapsed-icon {
+      fill: #4cd137;
+      font-size: 16px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="light-mode">
+  <!-- Header -->
+  <header style="color: #2d3436;">
+    <h1 style="margin: 0; font-size: 28px;">Package Dependencies - package-dependencies.html</h1>
+    <div style="font-size: 14px; margin-top: 5px;">Generated on Wed Sep 03 2025 9:48:51 PM</div>
+  </header>
+
+  <!-- Theme Toggle Button - Initial state for light mode -->
+  <button id="theme-toggle" style="background: #dcdde1; color: #2d3436;">Switch to Dark Mode</button>
+
+  <!-- Diagram Container - Initial state for light mode -->
+  <div id="diagram-container" style="background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.1);">
+    <div id="mermaid-graph"></div>
+    <div id="error-message" style="background: rgba(45, 52, 54, 0.9); color: #ff7675;"></div>
+    <!-- Mermaid Code -->
+    <pre id="raw-code" style="display: none;">
+graph LR
+classDef package-node fill:#a29bfe,stroke:#2d3436,shape:ellipse
+classDef package-scope-node fill:#ffeaa7,stroke:#2d3436,shape:stadium
+
+  %% Package Scopes
+
+  %% Node Definitions & Styles
+  node65["html-content-updater.js"];
+  style node65 fill:#81ecec,stroke:#333,stroke-width:1px
+  node66["dotenv v\^17.2.1"];
+  style node66 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node66 package-node
+  node67["fs"];
+  style node67 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node67 package-node
+  node68["path"];
+  style node68 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node68 package-node
+  node69["marked v\^16.2.1"];
+  style node69 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node69 package-node
+  node70["highlight.js v\^11.11.1"];
+  style node70 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node70 package-node
+  node106["docs-mapping-analyzer.js"];
+  style node106 fill:#81ecec,stroke:#333,stroke-width:1px
+  node107["docs-repair-generator.js"];
+  style node107 fill:#81ecec,stroke:#333,stroke-width:1px
+  node108["fix-markdown.js"];
+  style node108 fill:#81ecec,stroke:#333,stroke-width:1px
+  node109["gemini-docs-generator.js"];
+  style node109 fill:#81ecec,stroke:#333,stroke-width:1px
+  node110["_google_generative-ai v\^0...."];
+  style node110 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node110 package-node
+  node113["child_process"];
+  style node113 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node113 package-node
+  node115["init-database.js"];
+  style node115 fill:#81ecec,stroke:#333,stroke-width:1px
+  node116["sqlite3 v\^5.1.7"];
+  style node116 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node116 package-node
+  node125["version-manager.js"];
+  style node125 fill:#81ecec,stroke:#333,stroke-width:1px
+  node126["server.js"];
+  style node126 fill:#74b9ff,stroke:#333,stroke-width:1px
+  node127["express v\^4.18.2"];
+  style node127 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node127 package-node
+  node128["cors v\^2.8.5"];
+  style node128 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node128 package-node
+  node129["compression v\^1.7.4"];
+  style node129 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node129 package-node
+  node130["multer v\^2.0.2"];
+  style node130 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node130 package-node
+  node131["papaparse v\^5.4.1"];
+  style node131 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node131 package-node
+  node132["jszip v\^3.10.1"];
+  style node132 fill:#a29bfe,stroke:#333,stroke-width:1px
+  class node132 package-node
+
+  %% Edge Definitions
+  node65 --> node66
+  linkStyle 0 stroke:#6c5ce7,stroke-width:1.5px
+  node65 --> node67
+  linkStyle 1 stroke:#6c5ce7,stroke-width:1.5px
+  node65 --> node68
+  linkStyle 2 stroke:#6c5ce7,stroke-width:1.5px
+  node65 --> node69
+  linkStyle 3 stroke:#6c5ce7,stroke-width:1.5px
+  node65 --> node70
+  linkStyle 4 stroke:#6c5ce7,stroke-width:1.5px
+  node106 --> node67
+  linkStyle 5 stroke:#6c5ce7,stroke-width:1.5px
+  node106 --> node68
+  linkStyle 6 stroke:#6c5ce7,stroke-width:1.5px
+  node107 --> node67
+  linkStyle 7 stroke:#6c5ce7,stroke-width:1.5px
+  node107 --> node68
+  linkStyle 8 stroke:#6c5ce7,stroke-width:1.5px
+  node108 --> node67
+  linkStyle 9 stroke:#6c5ce7,stroke-width:1.5px
+  node108 --> node68
+  linkStyle 10 stroke:#6c5ce7,stroke-width:1.5px
+  node109 --> node67
+  linkStyle 11 stroke:#6c5ce7,stroke-width:1.5px
+  node109 --> node68
+  linkStyle 12 stroke:#6c5ce7,stroke-width:1.5px
+  node109 --> node110
+  linkStyle 13 stroke:#6c5ce7,stroke-width:1.5px
+  node109 --> node113
+  linkStyle 14 stroke:#6c5ce7,stroke-width:1.5px
+  node115 --> node116
+  linkStyle 15 stroke:#6c5ce7,stroke-width:1.5px
+  node115 --> node68
+  linkStyle 16 stroke:#6c5ce7,stroke-width:1.5px
+  node125 --> node67
+  linkStyle 17 stroke:#6c5ce7,stroke-width:1.5px
+  node125 --> node68
+  linkStyle 18 stroke:#6c5ce7,stroke-width:1.5px
+  node126 --> node127
+  linkStyle 19 stroke:#6c5ce7,stroke-width:1.5px
+  node126 --> node68
+  linkStyle 20 stroke:#6c5ce7,stroke-width:1.5px
+  node126 --> node128
+  linkStyle 21 stroke:#6c5ce7,stroke-width:1.5px
+  node126 --> node129
+  linkStyle 22 stroke:#6c5ce7,stroke-width:1.5px
+  node126 --> node116
+  linkStyle 23 stroke:#6c5ce7,stroke-width:1.5px
+  node126 --> node130
+  linkStyle 24 stroke:#6c5ce7,stroke-width:1.5px
+  node126 --> node131
+  linkStyle 25 stroke:#6c5ce7,stroke-width:1.5px
+  node126 --> node67
+  linkStyle 26 stroke:#6c5ce7,stroke-width:1.5px
+  node126 --> node132
+  linkStyle 27 stroke:#6c5ce7,stroke-width:1.5px
+    </pre>
+  </div>
+
+  <script>
+    // Unique render ID counter
+    let renderCount = 0;
+
+    // Track collapsible groups
+    const collapsibleGroups = {};
+    let expandedGroups = new Set();
+    let collapsedGroups = new Set();
+
+    // Initialize Mermaid with light theme by default
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      flowchart: {
+        htmlLabels: true,
+        curve: 'basis',
+        nodeSpacing: 42,
+        rankSpacing: 60,
+        useMaxWidth: true
+      },
+      themeVariables: {
+        // Default light theme variables (adjust if needed)
+        nodeBorder: "#2d3436",
+        mainBkg: "#f8f9fa",    // Light background
+        nodeTextColor: "#333333", // Dark text
+        fontSize: "16px"
+      }
+    });
+
+    // Render on DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof mermaid === 'undefined') {
+        log('Mermaid library failed to load. Check network or CDN URL.');
+        document.getElementById('error-message').style.display = 'block';
+        document.getElementById('error-message').textContent = 'Error: Mermaid library not loaded';
+        return;
+      }
+      renderMermaid();
+    });
+
+    // Handle node click events
+    window.toggleGroup = function(nodeId) {
+      if (expandedGroups.has(nodeId)) {
+        // Collapse the group
+        expandedGroups.delete(nodeId);
+        collapsedGroups.add(nodeId);
+      } else {
+        // Expand the group
+        collapsedGroups.delete(nodeId);
+        expandedGroups.add(nodeId);
+      }
+      renderMermaid();
+    };
+
+    // Re-add processMermaidSvg function
+    function processMermaidSvg(svgElement) {
+      // Process click events on nodes
+      const clickables = svgElement.querySelectorAll('[id^="flowchart-"]');
+      
+      clickables.forEach(node => {
+        const nodeId = node.id.replace('flowchart-', '');
+        
+        // Is this a collapsible group?
+        if (Object.keys(collapsibleGroups).includes(nodeId)) {
+          // Add visual indicator for collapsed/expanded state
+          const textElement = node.querySelector('text');
+          
+          if (textElement && collapsedGroups.has(nodeId)) {
+            // Add a + sign for collapsed groups
+            const currentText = textElement.textContent || '';
+            if (!currentText.includes('[+]')) {
+              textElement.textContent = currentText + ' [+]';
+            }
+            
+            // Add a class for styling
+            node.classList.add('collapsed-node');
+          }
+          
+          // Make nodes clickable visually
+          node.style.cursor = 'pointer';
+          
+          // Add the children count to the label
+          const childCount = collapsibleGroups[nodeId].length;
+          const childLabel = '(' + childCount + ' items)';
+          const label = node.querySelector('text');
+          
+          if (label && !label.textContent.includes(childLabel)) {
+            label.textContent += ' ' + childLabel;
+          }
+        }
+      });
+      
+      // Hide children of collapsed groups
+      collapsedGroups.forEach(groupId => {
+        const children = collapsibleGroups[groupId] || [];
+        children.forEach(childId => {
+          const childElement = svgElement.querySelector('#flowchart-' + childId);
+          if (childElement) {
+            childElement.style.display = 'none';
+            
+            // Also hide edges to/from this element
+            const edges = svgElement.querySelectorAll('path.flowchart-link');
+            edges.forEach(edge => {
+              const edgeId = edge.id;
+              if (edgeId.includes(childId)) {
+                edge.style.display = 'none';
+              }
+            });
+          }
+        });
+      });
+    }
+
+    // Re-add detectCollapsibleGroups function
+    function detectCollapsibleGroups(mermaidCode) {
+      // Reset the collapsible groups
+      Object.keys(collapsibleGroups).forEach(key => delete collapsibleGroups[key]);
+
+      // Look for click handler definitions like 'click node1 toggleGroup "node1"'
+      // Ensure backslashes for regex characters and quotes are properly escaped for the final HTML
+      const clickHandlerRegex = /click\s+(\w+)\s+toggleGroup\s+"([^"]+)"/g;
+      let match;
+      
+      while ((match = clickHandlerRegex.exec(mermaidCode)) !== null) {
+        const nodeId = match[1];
+        
+        // Now find children of this group in the subgraph definition
+        // Ensure backslashes for regex characters are properly escaped for the final HTML
+        const subgraphRegex = new RegExp('subgraph\s+' + nodeId + '.*?\n([\s\S]*?)\nend', 'g');
+        const subgraphMatch = subgraphRegex.exec(mermaidCode);
+        
+        if (subgraphMatch) {
+          const subgraphContent = subgraphMatch[1];
+          // Extract node IDs from the subgraph
+          // Ensure backslashes for regex characters are properly escaped for the final HTML
+          const nodeRegex = /\s+(\w+)/g;
+          const children = [];
+          let nodeMatch;
+          
+          while ((nodeMatch = nodeRegex.exec(subgraphContent)) !== null) {
+            const childId = nodeMatch[1].trim();
+            if (childId !== nodeId) {
+              children.push(childId);
+            }
+          }
+          
+          if (children.length > 0) {
+            collapsibleGroups[nodeId] = children;
+            // By default, all groups start expanded
+            expandedGroups.add(nodeId);
+          }
+        }
+      }
+      
+      log('Detected collapsible groups: ' + JSON.stringify(collapsibleGroups));
+    }
+
+    // Render Mermaid diagram
+    function renderMermaid() {
+      const mermaidDiv = document.getElementById('mermaid-graph');
+      const errorDiv = document.getElementById('error-message');
+      const rawCode = document.getElementById('raw-code').textContent.trim();
+      const uniqueId = 'mermaid-svg-' + Date.now() + '-' + renderCount++;
+
+      // Detect collapsible groups in the diagram
+      detectCollapsibleGroups(rawCode);
+
+      // Clear previous content
+      mermaidDiv.innerHTML = '';
+      errorDiv.style.display = 'none';
+
+      // Render using promise
+      mermaid.render(uniqueId, rawCode)
+        .then(({ svg }) => {
+          mermaidDiv.innerHTML = svg;
+          
+          // Process the SVG after it's been inserted into the DOM
+          const svgElement = mermaidDiv.querySelector('svg');
+          if (svgElement) {
+            processMermaidSvg(svgElement);
+          }
+        })
+        .catch(error => {
+          log('Mermaid rendering failed: ' + error);
+          errorDiv.style.display = 'block';
+          errorDiv.textContent = error.message;
+          
+          // Create a <pre> element and set its text content safely
+          const preElement = document.createElement('pre');
+          preElement.style.color = '#ff7675'; // Apply style directly
+          preElement.textContent = rawCode; // Use textContent for safety
+          
+          // Clear mermaidDiv and append the new <pre> element
+          mermaidDiv.innerHTML = ''; // Clear previous attempts
+          mermaidDiv.appendChild(preElement);
+        });
+    }
+
+    // Theme toggle function
+    function toggleTheme() {
+      const body = document.body;
+      const toggleBtn = document.getElementById('theme-toggle');
+      const diagramContainer = document.getElementById('diagram-container');
+      const header = document.querySelector('header');
+      const isDarkMode = body.classList.contains('dark-mode');
+
+      if (isDarkMode) {
+        // Switch to Light Mode
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+        toggleBtn.textContent = 'Switch to Dark Mode';
+        toggleBtn.style.background = '#dcdde1';
+        toggleBtn.style.color = '#2d3436';
+        diagramContainer.style.background = 'rgba(255, 255, 255, 0.8)';
+        diagramContainer.style.border = '1px solid rgba(0, 0, 0, 0.1)';
+        header.style.color = '#2d3436';
+        
+        // Update Mermaid theme to light with dark text
+        mermaid.initialize({
+          theme: 'default',
+          themeVariables: {
+            nodeBorder: "#2d3436",
+            mainBkg: "#f8f9fa",
+            nodeTextColor: "#333333",
+            fontSize: "16px"
+          }
+        });
+      } else {
+        // Switch to Dark Mode
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+        toggleBtn.textContent = 'Switch to Light Mode';
+        toggleBtn.style.background = '#2d3436';
+        toggleBtn.style.color = '#ffffff';
+        diagramContainer.style.background = 'rgba(255, 255, 255, 0.05)';
+        diagramContainer.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+        header.style.color = '#ffffff';
+        
+        // Update Mermaid theme to dark with bright white text
+        mermaid.initialize({
+          theme: 'dark',
+          themeVariables: {
+            nodeBorder: "#2d3436",
+            mainBkg: "#1e272e",
+            nodeTextColor: "#ffffff",
+            fontSize: "16px"
+          }
+        });
+      }
+
+      // Re-render diagram after theme change
+      renderMermaid();
+    }
+
+    // Attach theme toggle event
+    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+  </script>
+</body>
+</html>

@@ -1,0 +1,2205 @@
+{
+  "config": {
+    "filename": "hextrackr.json",
+    "baseDirectory": "/Volumes/DATA/GitHub/HexTrackr",
+    "projectRoot": "/Volumes/DATA/GitHub/HexTrackr",
+    "lastUpdated": "2025-09-04T02:47:09.287Z"
+  },
+  "fileTree": {
+    "path": "/Volumes/DATA/GitHub/HexTrackr",
+    "name": "HexTrackr",
+    "isDirectory": true,
+    "children": [
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.DS_Store",
+        "name": ".DS_Store",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy",
+        "name": ".codacy",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy/cli-config.yaml",
+            "name": "cli-config.yaml",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy/cli.sh",
+            "name": "cli.sh",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy/codacy.yaml",
+            "name": "codacy.yaml",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy/logs",
+            "name": "logs",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy/logs/codacy-cli.log",
+                "name": "codacy-cli.log",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy/tools-configs",
+            "name": "tools-configs",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy/tools-configs/eslint.config.mjs",
+                "name": "eslint.config.mjs",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy/tools-configs/languages-config.yaml",
+                "name": "languages-config.yaml",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy/tools-configs/lizard.yaml",
+                "name": "lizard.yaml",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy/tools-configs/ruleset.xml",
+                "name": "ruleset.xml",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy/tools-configs/semgrep.yaml",
+                "name": "semgrep.yaml",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/.codacy/tools-configs/trivy.yaml",
+                "name": "trivy.yaml",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.env",
+        "name": ".env",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.env.example",
+        "name": ".env.example",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.eslintrc.js",
+        "name": ".eslintrc.js",
+        "isDirectory": false,
+        "importance": 2,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.markdownlint-precommit.json",
+        "name": ".markdownlint-precommit.json",
+        "isDirectory": false,
+        "importance": 1,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.markdownlint.json",
+        "name": ".markdownlint.json",
+        "isDirectory": false,
+        "importance": 1,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.markdownlintignore",
+        "name": ".markdownlintignore",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp",
+        "name": ".playwright-mcp",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/csv-import-button-restored.png",
+            "name": "csv-import-button-restored.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/dashboard-final-state.png",
+            "name": "dashboard-final-state.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/dashboard-table-view.png",
+            "name": "dashboard-table-view.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/dashboard-with-data.png",
+            "name": "dashboard-with-data.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/duplicate-tables-screenshot.png",
+            "name": "duplicate-tables-screenshot.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/duplicate-tables-visible.png",
+            "name": "duplicate-tables-visible.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/fixed-layout-test.png",
+            "name": "fixed-layout-test.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/hextrackr-fixed-layout.png",
+            "name": "hextrackr-fixed-layout.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/hextrackr-homepage-test.png",
+            "name": "hextrackr-homepage-test.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/tabler-buttons-fixed.png",
+            "name": "tabler-buttons-fixed.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/trend-chart-close-up.png",
+            "name": "trend-chart-close-up.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/trend-chart-counts.png",
+            "name": "trend-chart-counts.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/trend-chart-fixed.png",
+            "name": "trend-chart-fixed.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/vulnerabilities-2025-09-03.csv",
+            "name": "vulnerabilities-2025-09-03.csv",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.playwright-mcp/vulnerabilities-final-verification.png",
+            "name": "vulnerabilities-final-verification.png",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.prompts",
+        "name": ".prompts",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.prompts/agent-runbook-02.prompt.md",
+            "name": "agent-runbook-02.prompt.md",
+            "isDirectory": false,
+            "importance": 1,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.prompts/draft-copilot-instructions.md",
+            "name": "draft-copilot-instructions.md",
+            "isDirectory": false,
+            "importance": 1,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.runbooks",
+        "name": ".runbooks",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.semgrep.yaml",
+        "name": ".semgrep.yaml",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.spectral.yaml",
+        "name": ".spectral.yaml",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.sqlfluff",
+        "name": ".sqlfluff",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.stylelintrc.json",
+        "name": ".stylelintrc.json",
+        "isDirectory": false,
+        "importance": 1,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/.vscode",
+        "name": ".vscode",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.vscode/extensions.json",
+            "name": "extensions.json",
+            "isDirectory": false,
+            "importance": 1,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/.vscode/settings.json",
+            "name": "settings.json",
+            "isDirectory": false,
+            "importance": 1,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/AGENTS.md",
+        "name": "AGENTS.md",
+        "isDirectory": false,
+        "importance": 1,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/Dockerfile.node",
+        "name": "Dockerfile.node",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/FileScopeMCP-tree-HexTrackr.json",
+        "name": "FileScopeMCP-tree-HexTrackr.json",
+        "isDirectory": false,
+        "importance": 1,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/LICENSE",
+        "name": "LICENSE",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/data",
+        "name": "data",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/data/hextrackr.db",
+            "name": "hextrackr.db",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/data/hextrackr.db.backup",
+            "name": "hextrackr.db.backup",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/data/hextrackr.db.backup-20250902_204554",
+            "name": "hextrackr.db.backup-20250902_204554",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/data/hextrackr_backup_20250902_180345.db",
+            "name": "hextrackr_backup_20250902_180345.db",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/data/schema.sql",
+            "name": "schema.sql",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/debug-nav.html",
+        "name": "debug-nav.html",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/deprecated",
+        "name": "deprecated",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/deprecated/Dockerfile",
+            "name": "Dockerfile",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/deprecated/README.md",
+            "name": "README.md",
+            "isDirectory": false,
+            "importance": 2,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/deprecated/copilot-instructions-new.md",
+            "name": "copilot-instructions-new.md",
+            "isDirectory": false,
+            "importance": 1,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/deprecated/html-update-report.md",
+            "name": "html-update-report.md",
+            "isDirectory": false,
+            "importance": 1,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/deprecated/index.md",
+            "name": "index.md",
+            "isDirectory": false,
+            "importance": 3,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/docker",
+        "name": "docker",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docker/mcp-server",
+            "name": "mcp-server",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docker/mcp-server/Dockerfile",
+                "name": "Dockerfile",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docker/mcp-server/docker-compose.yml",
+                "name": "docker-compose.yml",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docker/mcp-server/start-mcp-servers.sh",
+                "name": "start-mcp-servers.sh",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/docker-compose.yml",
+        "name": "docker-compose.yml",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html",
+        "name": "docs-html",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/.DS_Store",
+            "name": ".DS_Store",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content",
+            "name": "content",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/.DS_Store",
+                "name": ".DS_Store",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/CHANGELOG.html",
+                "name": "CHANGELOG.html",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/ROADMAP.html",
+                "name": "ROADMAP.html",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/SPRINT.html",
+                "name": "SPRINT.html",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/api-reference",
+                "name": "api-reference",
+                "isDirectory": true,
+                "children": [
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/api-reference/backup-api.html",
+                    "name": "backup-api.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/api-reference/overview.html",
+                    "name": "overview.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/api-reference/tickets-api.html",
+                    "name": "tickets-api.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/api-reference/vulnerabilities-api.html",
+                    "name": "vulnerabilities-api.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  }
+                ]
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/architecture",
+                "name": "architecture",
+                "isDirectory": true,
+                "children": [
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/architecture/backend.html",
+                    "name": "backend.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/architecture/data-model.html",
+                    "name": "data-model.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/architecture/database.html",
+                    "name": "database.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/architecture/deployment.html",
+                    "name": "deployment.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/architecture/frameworks.html",
+                    "name": "frameworks.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/architecture/frontend.html",
+                    "name": "frontend.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/architecture/rollover-mechanism.html",
+                    "name": "rollover-mechanism.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  }
+                ]
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/development",
+                "name": "development",
+                "isDirectory": true,
+                "children": [
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/development/coding-standards.html",
+                    "name": "coding-standards.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/development/contributing.html",
+                    "name": "contributing.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/development/docs-portal-guide.html",
+                    "name": "docs-portal-guide.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  }
+                ]
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/getting-started",
+                "name": "getting-started",
+                "isDirectory": true,
+                "children": [
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/getting-started/deployment.html",
+                    "name": "deployment.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  }
+                ]
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/html-update-report.html",
+                "name": "html-update-report.html",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/index.html",
+                "name": "index.html",
+                "isDirectory": false,
+                "importance": 2,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/security",
+                "name": "security",
+                "isDirectory": true,
+                "children": [
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/security/overview.html",
+                    "name": "overview.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/security/vulnerability-disclosure.html",
+                    "name": "vulnerability-disclosure.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  }
+                ]
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/user-guides",
+                "name": "user-guides",
+                "isDirectory": true,
+                "children": [
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/user-guides/backup-restore.html",
+                    "name": "backup-restore.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/user-guides/data-import-export.html",
+                    "name": "data-import-export.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/user-guides/ticket-management.html",
+                    "name": "ticket-management.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  },
+                  {
+                    "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/content/user-guides/vulnerability-management.html",
+                    "name": "vulnerability-management.html",
+                    "isDirectory": false,
+                    "importance": 0,
+                    "dependencies": [],
+                    "packageDependencies": [],
+                    "dependents": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/css",
+            "name": "css",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/css/docs-tabler.css",
+                "name": "docs-tabler.css",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/html-content-updater.js",
+            "name": "html-content-updater.js",
+            "isDirectory": false,
+            "importance": 3,
+            "dependencies": [],
+            "packageDependencies": [
+              {
+                "name": "dotenv",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/dotenv",
+                "version": "^17.2.1"
+              },
+              {
+                "name": "fs",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/fs"
+              },
+              {
+                "name": "path",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/path"
+              },
+              {
+                "name": "marked",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/marked",
+                "version": "^16.2.1"
+              },
+              {
+                "name": "highlight.js",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/highlight.js",
+                "version": "^11.11.1"
+              }
+            ],
+            "dependents": [],
+            "summary": "Documentation generation script - converts markdown source files to HTML using templates. Processes the entire docs-source directory to create the documentation portal with navigation and styling."
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/index.html",
+            "name": "index.html",
+            "isDirectory": false,
+            "importance": 2,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/js",
+            "name": "js",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/js/docs-portal-v2.js",
+                "name": "docs-portal-v2.js",
+                "isDirectory": false,
+                "importance": 2,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/js/docs-portal-v2.js.backup",
+                "name": "docs-portal-v2.js.backup",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/js/docs-portal-v2.js.backup-20250903_203711",
+                "name": "docs-portal-v2.js.backup-20250903_203711",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-html/template.html",
+            "name": "template.html",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source",
+        "name": "docs-source",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/.DS_Store",
+            "name": ".DS_Store",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/CHANGELOG.md",
+            "name": "CHANGELOG.md",
+            "isDirectory": false,
+            "importance": 1,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/ROADMAP.md",
+            "name": "ROADMAP.md",
+            "isDirectory": false,
+            "importance": 1,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/SPRINT.md",
+            "name": "SPRINT.md",
+            "isDirectory": false,
+            "importance": 1,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/api-reference",
+            "name": "api-reference",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/api-reference/backup-api.md",
+                "name": "backup-api.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/api-reference/index.md",
+                "name": "index.md",
+                "isDirectory": false,
+                "importance": 3,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/api-reference/overview.md",
+                "name": "overview.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/api-reference/tickets-api.md",
+                "name": "tickets-api.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/api-reference/vulnerabilities-api.md",
+                "name": "vulnerabilities-api.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/architecture",
+            "name": "architecture",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/architecture/backend.md",
+                "name": "backend.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/architecture/data-model.md",
+                "name": "data-model.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/architecture/database.md",
+                "name": "database.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/architecture/deployment.md",
+                "name": "deployment.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/architecture/frameworks.md",
+                "name": "frameworks.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/architecture/frontend.md",
+                "name": "frontend.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/architecture/index.md",
+                "name": "index.md",
+                "isDirectory": false,
+                "importance": 3,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/architecture/rollover-mechanism.md",
+                "name": "rollover-mechanism.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/development",
+            "name": "development",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/development/coding-standards.md",
+                "name": "coding-standards.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/development/contributing.md",
+                "name": "contributing.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/development/docs-portal-guide.md",
+                "name": "docs-portal-guide.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/development/index.md",
+                "name": "index.md",
+                "isDirectory": false,
+                "importance": 3,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/getting-started",
+            "name": "getting-started",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/getting-started/deployment.md",
+                "name": "deployment.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/getting-started/index.md",
+                "name": "index.md",
+                "isDirectory": false,
+                "importance": 3,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/html-update-report.md",
+            "name": "html-update-report.md",
+            "isDirectory": false,
+            "importance": 1,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/index.md",
+            "name": "index.md",
+            "isDirectory": false,
+            "importance": 3,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/security",
+            "name": "security",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/security/index.md",
+                "name": "index.md",
+                "isDirectory": false,
+                "importance": 3,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/security/overview.md",
+                "name": "overview.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/security/vulnerability-disclosure.md",
+                "name": "vulnerability-disclosure.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/user-guides",
+            "name": "user-guides",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/user-guides/backup-restore.md",
+                "name": "backup-restore.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/user-guides/data-import-export.md",
+                "name": "data-import-export.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/user-guides/index.md",
+                "name": "index.md",
+                "isDirectory": false,
+                "importance": 3,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/user-guides/ticket-management.md",
+                "name": "ticket-management.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source/user-guides/vulnerability-management.md",
+                "name": "vulnerability-management.md",
+                "isDirectory": false,
+                "importance": 1,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/docs-source-backup-20250903120000.tar.gz",
+        "name": "docs-source-backup-20250903120000.tar.gz",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/docs_findings.md",
+        "name": "docs_findings.md",
+        "isDirectory": false,
+        "importance": 1,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/eslint.config.mjs",
+        "name": "eslint.config.mjs",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/favicon.ico",
+        "name": "favicon.ico",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/import-cisco-csv.js",
+        "name": "import-cisco-csv.js",
+        "isDirectory": false,
+        "importance": 2,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/index-clean.html",
+        "name": "index-clean.html",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/index.html",
+        "name": "index.html",
+        "isDirectory": false,
+        "importance": 2,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/jsdoc.conf.json",
+        "name": "jsdoc.conf.json",
+        "isDirectory": false,
+        "importance": 1,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/logs",
+        "name": "logs",
+        "isDirectory": true,
+        "children": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/nginx.conf",
+        "name": "nginx.conf",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/package-lock.json",
+        "name": "package-lock.json",
+        "isDirectory": false,
+        "importance": 1,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/package.json",
+        "name": "package.json",
+        "isDirectory": false,
+        "importance": 4,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": [
+          "/Volumes/DATA/GitHub/HexTrackr/server.js"
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/proposed-vulnerability-schema.md",
+        "name": "proposed-vulnerability-schema.md",
+        "isDirectory": false,
+        "importance": 1,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/ruleset.xml",
+        "name": "ruleset.xml",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/scripts",
+        "name": "scripts",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/.DS_Store",
+            "name": ".DS_Store",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/README.md",
+            "name": "README.md",
+            "isDirectory": false,
+            "importance": 2,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/ag-grid-responsive-config.js.backup",
+            "name": "ag-grid-responsive-config.js.backup",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/com.hextrackr.aimemory.plist",
+            "name": "com.hextrackr.aimemory.plist",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/docs-mapping-analyzer.js",
+            "name": "docs-mapping-analyzer.js",
+            "isDirectory": false,
+            "importance": 3,
+            "dependencies": [],
+            "packageDependencies": [
+              {
+                "name": "fs",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/fs"
+              },
+              {
+                "name": "path",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/path"
+              }
+            ],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/docs-repair-generator.js",
+            "name": "docs-repair-generator.js",
+            "isDirectory": false,
+            "importance": 3,
+            "dependencies": [],
+            "packageDependencies": [
+              {
+                "name": "fs",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/fs"
+              },
+              {
+                "name": "path",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/path"
+              }
+            ],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/fix-markdown.js",
+            "name": "fix-markdown.js",
+            "isDirectory": false,
+            "importance": 3,
+            "dependencies": [],
+            "packageDependencies": [
+              {
+                "name": "fs",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/fs"
+              },
+              {
+                "name": "path",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/path"
+              }
+            ],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/gemini-docs-generator.js",
+            "name": "gemini-docs-generator.js",
+            "isDirectory": false,
+            "importance": 3,
+            "dependencies": [],
+            "packageDependencies": [
+              {
+                "name": "fs",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/fs"
+              },
+              {
+                "name": "path",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/path"
+              },
+              {
+                "name": "@google/generative-ai",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/@google/generative-ai",
+                "scope": "@google",
+                "version": "^0.24.1"
+              },
+              {
+                "name": "child_process",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/child_process"
+              }
+            ],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/init-clean-database.sh",
+            "name": "init-clean-database.sh",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/init-database.js",
+            "name": "init-database.js",
+            "isDirectory": false,
+            "importance": 4,
+            "dependencies": [],
+            "packageDependencies": [
+              {
+                "name": "sqlite3",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/sqlite3",
+                "version": "^5.1.7"
+              },
+              {
+                "name": "path",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/path"
+              }
+            ],
+            "dependents": [
+              "/Volumes/DATA/GitHub/HexTrackr/server.js"
+            ],
+            "summary": "Database initialization and schema management - creates SQLite tables for vulnerabilities, tickets, and imports. Handles schema evolution and data migration for the HexTrackr database."
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/init-db-production.sql",
+            "name": "init-db-production.sql",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/pages",
+            "name": "pages",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/pages/tickets.js",
+                "name": "tickets.js",
+                "isDirectory": false,
+                "importance": 2,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/pages/vulnerabilities.js",
+                "name": "vulnerabilities.js",
+                "isDirectory": false,
+                "importance": 2,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/pages/vulnerability-manager.js",
+                "name": "vulnerability-manager.js",
+                "isDirectory": false,
+                "importance": 2,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/save_persistent_memory.py",
+            "name": "save_persistent_memory.py",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/save_persistent_memory_new.py",
+            "name": "save_persistent_memory_new.py",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/shared",
+            "name": "shared",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/shared/ag-grid-responsive-config.js",
+                "name": "ag-grid-responsive-config.js",
+                "isDirectory": false,
+                "importance": 2,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/shared/footer-loader.js",
+                "name": "footer-loader.js",
+                "isDirectory": false,
+                "importance": 2,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/shared/footer.html",
+                "name": "footer.html",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/shared/header-loader.js",
+                "name": "header-loader.js",
+                "isDirectory": false,
+                "importance": 2,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/shared/header.html",
+                "name": "header.html",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/shared/settings-modal.html",
+                "name": "settings-modal.html",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/shared/settings-modal.js",
+                "name": "settings-modal.js",
+                "isDirectory": false,
+                "importance": 2,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/stop-dev-env.sh",
+            "name": "stop-dev-env.sh",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/utils",
+            "name": "utils",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/utils/security.js",
+                "name": "security.js",
+                "isDirectory": false,
+                "importance": 2,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/validation-utils.js",
+            "name": "validation-utils.js",
+            "isDirectory": false,
+            "importance": 2,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/scripts/version-manager.js",
+            "name": "version-manager.js",
+            "isDirectory": false,
+            "importance": 3,
+            "dependencies": [],
+            "packageDependencies": [
+              {
+                "name": "fs",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/fs"
+              },
+              {
+                "name": "path",
+                "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/path"
+              }
+            ],
+            "dependents": []
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/server.js",
+        "name": "server.js",
+        "isDirectory": false,
+        "importance": 7,
+        "dependencies": [
+          "/Volumes/DATA/GitHub/HexTrackr/package.json",
+          "/Volumes/DATA/GitHub/HexTrackr/scripts/init-database.js"
+        ],
+        "packageDependencies": [
+          {
+            "name": "express",
+            "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/express",
+            "version": "^4.18.2"
+          },
+          {
+            "name": "path",
+            "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/path"
+          },
+          {
+            "name": "cors",
+            "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/cors",
+            "version": "^2.8.5"
+          },
+          {
+            "name": "compression",
+            "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/compression",
+            "version": "^1.7.4"
+          },
+          {
+            "name": "sqlite3",
+            "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/sqlite3",
+            "version": "^5.1.7"
+          },
+          {
+            "name": "multer",
+            "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/multer",
+            "version": "^2.0.2"
+          },
+          {
+            "name": "papaparse",
+            "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/papaparse",
+            "version": "^5.4.1"
+          },
+          {
+            "name": "fs",
+            "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/fs"
+          },
+          {
+            "name": "jszip",
+            "path": "/Volumes/DATA/GitHub/HexTrackr/node_modules/jszip",
+            "version": "^3.10.1"
+          }
+        ],
+        "dependents": [],
+        "summary": "Main Express.js application server - handles vulnerability and ticket management API endpoints, file uploads, database operations, and serves static content. Entry point for the entire HexTrackr application."
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/styles",
+        "name": "styles",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/styles/pages",
+            "name": "pages",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/styles/pages/tickets.css",
+                "name": "tickets.css",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/styles/pages/vulnerabilities.css",
+                "name": "vulnerabilities.css",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/styles/shared",
+            "name": "shared",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/styles/shared/base.css",
+                "name": "base.css",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              },
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/styles/shared/header.css",
+                "name": "header.css",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/styles/utils",
+            "name": "utils",
+            "isDirectory": true,
+            "children": [
+              {
+                "path": "/Volumes/DATA/GitHub/HexTrackr/styles/utils/responsive.css",
+                "name": "responsive.css",
+                "isDirectory": false,
+                "importance": 0,
+                "dependencies": [],
+                "packageDependencies": [],
+                "dependents": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/systeminfo.json",
+        "name": "systeminfo.json",
+        "isDirectory": false,
+        "importance": 1,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/test-results",
+        "name": "test-results",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/test-results/.last-run.json",
+            "name": ".last-run.json",
+            "isDirectory": false,
+            "importance": 1,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/tickets-app.js",
+        "name": "tickets-app.js",
+        "isDirectory": false,
+        "importance": 2,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/tickets-integration.js",
+        "name": "tickets-integration.js",
+        "isDirectory": false,
+        "importance": 2,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/tickets.html",
+        "name": "tickets.html",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/uploads",
+        "name": "uploads",
+        "isDirectory": true,
+        "children": [
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/uploads/.DS_Store",
+            "name": ".DS_Store",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/uploads/583ec7d2e7496afa86e2032265ce30fb",
+            "name": "583ec7d2e7496afa86e2032265ce30fb",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/uploads/6380a1304926492cddad5dac126c68e1",
+            "name": "6380a1304926492cddad5dac126c68e1",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/uploads/7e97cd05c96a437f32142c2342e1872f",
+            "name": "7e97cd05c96a437f32142c2342e1872f",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/uploads/863e1d175e2e261881b6da5fa0a52f18",
+            "name": "863e1d175e2e261881b6da5fa0a52f18",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/uploads/8c7c21db27be8bdb12fca47bdcd57cdb",
+            "name": "8c7c21db27be8bdb12fca47bdcd57cdb",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/uploads/9a4b3f0e2ab30eb952eb2ddcc2c74ba3",
+            "name": "9a4b3f0e2ab30eb952eb2ddcc2c74ba3",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/uploads/dd334d14c6010be982dc961df5b21d24",
+            "name": "dd334d14c6010be982dc961df5b21d24",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/uploads/e288d7932c6a2e437572c701a3c9897a",
+            "name": "e288d7932c6a2e437572c701a3c9897a",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/uploads/ebb1813523aff2fcf690c9d891e9c832",
+            "name": "ebb1813523aff2fcf690c9d891e9c832",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/uploads/ecd3743799abdf0d77a9673117e42635",
+            "name": "ecd3743799abdf0d77a9673117e42635",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          },
+          {
+            "path": "/Volumes/DATA/GitHub/HexTrackr/uploads/f8176ff3a085fa21c2d8f1d0d9440b76",
+            "name": "f8176ff3a085fa21c2d8f1d0d9440b76",
+            "isDirectory": false,
+            "importance": 0,
+            "dependencies": [],
+            "packageDependencies": [],
+            "dependents": []
+          }
+        ]
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/vulnerabilities-08_19_2025_-09_02_16-cdt.csv",
+        "name": "vulnerabilities-08_19_2025_-09_02_16-cdt.csv",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/vulnerabilities-cisco-aug28.csv",
+        "name": "vulnerabilities-cisco-aug28.csv",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/vulnerabilities-cisco-sept01.csv",
+        "name": "vulnerabilities-cisco-sept01.csv",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/vulnerabilities-cisco-sept02.csv",
+        "name": "vulnerabilities-cisco-sept02.csv",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/vulnerabilities-cisco.csv",
+        "name": "vulnerabilities-cisco.csv",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/vulnerabilities.html",
+        "name": "vulnerabilities.html",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      },
+      {
+        "path": "/Volumes/DATA/GitHub/HexTrackr/vulnerabilities.html.backup",
+        "name": "vulnerabilities.html.backup",
+        "isDirectory": false,
+        "importance": 0,
+        "dependencies": [],
+        "packageDependencies": [],
+        "dependents": []
+      }
+    ]
+  }
+}
