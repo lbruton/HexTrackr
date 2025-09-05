@@ -172,3 +172,132 @@ Both flows update `vulnerability_imports` table for audit trail and `vulnerabili
 - **Errors**: Use status 400 (bad input) or 500 (server errors) with `{ error: "message" }`
 - **Dates**: Use ISO `YYYY-MM-DD` format for scan dates
 - **Pagination**: Support `page`, `limit`, `search`, and filtering parameters
+
+## Knowledge Management
+
+### Memento MCP Integration
+
+HexTrackr integrates with Memento MCP knowledge graph for persistent context sharing across AI assistants (Claude Desktop, Gemini, Codex, GitHub Copilot).
+
+### Session Workflow
+
+## At Session Start:
+
+1. **Always use semantic search first**: `mcp__memento-mcp__semantic_search` with task-specific keywords (saves tokens vs full graph reads)
+2. Review existing knowledge about current task area  
+3. Only use `search_nodes` or `read_graph` if semantic search insufficient
+
+## During Development:
+
+1. Document significant decisions and patterns as they emerge
+2. Record solutions to complex problems for future reference  
+3. Update knowledge when discovering existing patterns or anti-patterns
+
+## At Session End:
+
+1. Capture new architectural insights and decisions
+2. Document gotchas, edge cases, and solutions discovered
+3. Record user preferences and workflow patterns
+
+### What to Capture
+
+## Essential Knowledge Types:
+
+- **Architectural Decisions**: Why certain patterns were chosen, trade-offs made
+- **Gotchas & Edge Cases**: Common pitfalls and their solutions (e.g., Docker-only deployment)
+- **User Preferences**: Coding styles, workflow preferences, tool choices
+- **Performance Patterns**: Solutions to scaling issues, optimization approaches
+- **Integration Points**: How external systems connect, API patterns
+- **Bug Fixes**: Root causes and solutions to prevent recurrence
+
+## Example Usage:
+
+```javascript
+// Before implementing new feature
+mcp__memento-mcp__semantic_search("vulnerability rollover architecture patterns")
+
+// After solving complex problem
+mcp__memento-mcp__create_entities([{
+  name: "CSV Import Memory Leak Fix",
+  entityType: "bug_fix", 
+  observations: ["Root cause: Papa.parse not releasing large file handles...", "Solution: Stream processing with cleanup callbacks"]
+}])
+```
+
+### Knowledge Graph Hygiene
+
+- Use consistent entity types: `architecture_decision`, `bug_fix`, `user_preference`, `integration_pattern`
+- Write observations in past tense for completed work, present tense for current state
+- Link related entities with meaningful relationship types
+- Update existing entities rather than creating duplicates
+
+## Unified AI Development Workflow
+
+### Orchestration Strategy (Updated September 5, 2025)
+
+HexTrackr uses a unified AI development workflow with Claude Code as the central command center:
+
+**Claude Code (Central Hub)**:
+
+- Primary orchestrator with unlimited context for complex planning and implementation
+- Executes multi-step development tasks, UI/UX improvements, and architectural changes
+- Maintains project coherence through Memento MCP + PAM knowledge systems
+- Manages documentation, testing strategies, and cross-tool coordination
+
+**Task Delegation Framework**:
+
+1. **GitHub Copilot** (5-30 minutes) - Quick fixes and completions
+   - Single-file modifications and bug fixes
+   - Code completion and inline improvements
+   - Unit test writing and simple refactoring
+   - Has access to PAM for session continuity
+
+1. **Claude Desktop Agents** (30-90 minutes) - Specialized tasks
+   - `vulnerability-data-processor`: CSV imports, deduplication, rollover processes
+   - `ui-design-specialist`: UI enhancements with Playwright testing integration
+   - `docs-portal-maintainer`: Documentation updates with knowledge persistence
+   - `database-schema-manager`: SQLite migrations and integrity checks
+   - `cisco-integration-specialist`: API integrations and sync operations
+
+1. **Google Gemini CLI** (2+ hours) - Large context analysis
+   - Major refactoring requiring full codebase analysis
+   - Complex architectural changes across multiple files
+   - Performance optimization requiring deep analysis
+   - Uses `/dev-docs/session-handoff.json` for context transfer
+
+1. **OpenAI Codex** (1-2 hours) - Maintenance and cleanup
+   - Code style standardization and formatting
+   - Dependency updates and security patches
+   - Test coverage improvements and documentation generation
+   - Uses `/dev-docs/session-handoff.json` for context transfer
+
+### Session Handoff Protocol
+
+For tools without memory access (Gemini, Codex), use `/dev-docs/session-handoff.json`:
+
+```json
+{
+  "timestamp": "2025-09-05T12:00:00Z",
+  "from_tool": "claude-code",
+  "to_tool": "gemini-cli",
+  "task_context": "Description of task being handed off",
+  "project_state": {
+    "current_version": "1.0.4",
+    "active_sprint": "v1.0.5 Foundation Sprint",
+    "recent_changes": ["modal fixes", "table resizing", "pagination"],
+    "next_priorities": ["hostname normalization", "chart improvements"]
+  },
+  "files_modified": ["/path/to/files"],
+  "testing_status": "all tests passing",
+  "notes": "Any specific context or gotchas"
+}
+```
+
+### Memory System Integration
+
+- **Start every session**: Use `mcp__memento-mcp__semantic_search` first for context
+- **During development**: Document decisions and patterns as they emerge
+- **Session end**: Store achievements, solutions, and next priorities
+- **Cross-tool awareness**: PAM automatically records all VSCode Copilot interactions
+
+This workflow ensures context continuity while optimizing each tool's strengths for maximum development efficiency.

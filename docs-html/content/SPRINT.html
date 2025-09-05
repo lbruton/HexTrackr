@@ -1,79 +1,197 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>Current Sprint: Security &amp; Production Readiness</h1>
-<p><strong>Status</strong>: Active Sprint<br><strong>Period</strong>: August 29 - September 4, 2025<br><strong>Focus</strong>: Security compliance and production environment preparation</p>
-<h2>Sprint Objectives</h2>
-<h3>🔒 Security &amp; Compliance</h3>
+    <h1>HexTrackr v1.0.5 JavaScript Modularization Sprint</h1>
+<h2>Overview</h2>
+<p><strong>PRIORITY SHIFT</strong>: Focus moved from documentation to critical JavaScript modularization for widget-based dashboard architecture. Documentation updates will follow modularization completion.</p>
+<h2>Strategic Vision</h2>
+<p>Transform HexTrackr into a composable dashboard platform with drag-drop widgets for personalized user experiences. This modularization effort is essential for:</p>
 <ul>
-<li><input checked="" disabled="" type="checkbox"> Codacy integration and quality gates</li>
-<li><input checked="" disabled="" type="checkbox"> Security vulnerability scanning</li>
-<li><input checked="" disabled="" type="checkbox"> Code quality enforcement</li>
-<li><input disabled="" type="checkbox"> Security documentation updates</li>
-<li><input disabled="" type="checkbox"> Vulnerability disclosure process</li>
+<li>AI-friendly development (all files &lt;500 lines)  </li>
+<li>Future dashboard customization capabilities</li>
+<li>Parallel development across multiple AI assistants</li>
+<li>Improved code maintainability and Codacy scores</li>
 </ul>
-<h3>🚀 Production Readiness</h3>
+<h2>Phase 1 Completed ✅ <strong>Sep 5, 2025</strong></h2>
 <ul>
-<li><input checked="" disabled="" type="checkbox"> Docker containerization</li>
-<li><input checked="" disabled="" type="checkbox"> Documentation portal v2.0</li>
-<li><input disabled="" type="checkbox"> Performance optimization</li>
-<li><input disabled="" type="checkbox"> Monitoring and logging</li>
-<li><input disabled="" type="checkbox"> Backup and recovery procedures</li>
+<li>✅ Architecture documentation system (<code>/dev-docs/architecture/</code>)</li>
+<li>✅ Symbol table generation for AI navigation</li>
+<li>✅ PaginationController extraction proof-of-concept (216 lines)</li>
+<li>✅ Dashboard vision planning and widget architecture</li>
+<li>✅ Unified AI development workflow with memory systems</li>
 </ul>
-<h3>📖 Documentation</h3>
+<h2>Current Sprint Goals (Phase 2)</h2>
+<ol>
+<li><strong>Split ModernVulnManager class</strong> (2,429 lines → 8 widget-ready modules)</li>
+<li><strong>Establish widget interface standards</strong> for future dashboard implementation</li>
+<li><strong>Maintain zero functionality regression</strong> during refactoring</li>
+<li><strong>Enable parallel AI development</strong> across specialized modules</li>
+</ol>
+<hr>
+<h2>Phase 2: ModernVulnManager Modularization Tasks</h2>
+<h3>Week 1: Data Layer &amp; Statistics (Sep 9-13, 2025)</h3>
+<h4><strong>Task 2.1: Extract vulnerability-data.js</strong> 🔄 <strong>Priority: CRITICAL</strong></h4>
 <ul>
-<li><input checked="" disabled="" type="checkbox"> Auto-generating documentation portal</li>
-<li><input checked="" disabled="" type="checkbox"> API reference documentation</li>
-<li><input checked="" disabled="" type="checkbox"> Architecture documentation</li>
-<li><input disabled="" type="checkbox"> User guides completion</li>
-<li><input disabled="" type="checkbox"> Security documentation</li>
+<li><input disabled="" type="checkbox"> <strong>Create DataManager module</strong> (~350 lines)<ul>
+<li>Methods: <code>loadData()</code>, <code>processDevices()</code>, <code>filterData()</code>, <code>groupVulnerabilitiesByCVE()</code></li>
+<li>Purpose: Central data fetching, caching, and state management</li>
+<li>Dependencies: None (pure data layer)</li>
+<li>Widget Potential: Hidden DataManager service widget</li>
 </ul>
-<h2>Progress Tracking</h2>
-<h3>Completed This Sprint</h3>
+</li>
+</ul>
+<h4><strong>Task 2.2: Extract vulnerability-statistics.js</strong> 🔄 <strong>Priority: HIGH</strong></h4>
 <ul>
-<li>✅ Refactored documentation portal with dynamic navigation</li>
-<li>✅ Implemented Codacy quality gates</li>
-<li>✅ Docker deployment configuration</li>
-<li>✅ HTML content auto-generation system</li>
+<li><input disabled="" type="checkbox"> <strong>Create VPRStatistics module</strong> (~300 lines)<ul>
+<li>Methods: <code>updateStatisticsDisplay()</code>, <code>updateTrendIndicators()</code>, <code>flipStatCards()</code>, <code>calculateTrend()</code></li>
+<li>Purpose: Statistics calculation and display logic</li>
+<li>Dependencies: vulnerability-data</li>
+<li>Widget Potential: Configurable statistics widget</li>
 </ul>
-<h3>In Progress</h3>
+</li>
+</ul>
+<h4><strong>Task 2.3: Testing &amp; Integration</strong></h4>
 <ul>
-<li>🔄 Security documentation updates</li>
-<li>🔄 Navigation auto-discovery fixes</li>
-<li>🔄 Content generation pipeline restoration</li>
+<li><input disabled="" type="checkbox"> <strong>Validate data layer functionality</strong></li>
+<li><input disabled="" type="checkbox"> <strong>Test statistics calculations</strong></li>
+<li><input disabled="" type="checkbox"> <strong>Update import dependencies</strong></li>
+<li><input disabled="" type="checkbox"> <strong>Docker restart and browser testing</strong></li>
 </ul>
-<h3>Next Steps</h3>
+<h3>Week 2: UI Components (Sep 16-20, 2025)</h3>
+<h4><strong>Task 2.4: Extract vulnerability-search.js</strong> 🔄 <strong>Priority: MEDIUM</strong></h4>
 <ul>
-<li>Security compliance review</li>
-<li>Production deployment testing</li>
-<li>Performance benchmarking</li>
-<li>User acceptance testing</li>
+<li><input disabled="" type="checkbox"> <strong>Create VulnerabilitySearch module</strong> (~200 lines)<ul>
+<li>Methods: Search handlers, filter logic, view switching</li>
+<li>Purpose: Search and filtering controls</li>
+<li>Dependencies: vulnerability-data</li>
+<li>Widget Potential: Unified search/filter control panel</li>
 </ul>
-<h2>Sprint Metrics</h2>
+</li>
+</ul>
+<h4><strong>Task 2.5: Extract vulnerability-charts.js</strong> 🔄 <strong>Priority: HIGH</strong></h4>
 <ul>
-<li><strong>Code Quality</strong>: A (Codacy grade)</li>
-<li><strong>Test Coverage</strong>: 85%</li>
-<li><strong>Documentation Coverage</strong>: 90%</li>
-<li><strong>Security Compliance</strong>: In progress</li>
+<li><input disabled="" type="checkbox"> <strong>Create VulnerabilityTrendChart module</strong> (~300 lines)<ul>
+<li>Methods: <code>initializeChart()</code>, <code>updateChart()</code>, <code>extendTimelineData()</code></li>
+<li>Purpose: ApexCharts visualization and timeline</li>
+<li>Dependencies: ApexCharts, vulnerability-data</li>
+<li>Widget Potential: Configurable chart widget (line/bar/area)</li>
 </ul>
-<h2>Sprint Retrospective</h2>
-<h3>What Went Well</h3>
+</li>
+</ul>
+<h4><strong>Task 2.6: Testing &amp; Integration</strong></h4>
 <ul>
-<li>Rapid documentation portal development</li>
-<li>Effective use of auto-generation tools</li>
-<li>Strong security focus integration</li>
+<li><input disabled="" type="checkbox"> <strong>Validate search and filtering</strong></li>
+<li><input disabled="" type="checkbox"> <strong>Test chart rendering and updates</strong> </li>
+<li><input disabled="" type="checkbox"> <strong>Verify responsive behavior</strong></li>
 </ul>
-<h3>Areas for Improvement</h3>
+<h3>Week 3: Complex Components (Sep 23-27, 2025)</h3>
+<h4><strong>Task 2.7: Extract vulnerability-grid.js</strong> 🔄 <strong>Priority: HIGH</strong></h4>
 <ul>
-<li>Better preservation of work during git operations</li>
-<li>More frequent commits of configuration changes</li>
-<li>Enhanced backup procedures for development work</li>
+<li><input disabled="" type="checkbox"> <strong>Create VulnerabilityDataTable module</strong> (~400 lines)<ul>
+<li>Methods: <code>initializeGrid()</code>, grid configuration, row selection handlers</li>
+<li>Purpose: AG Grid management and table interactions</li>
+<li>Dependencies: agGrid, vulnerability-data</li>
+<li>Widget Potential: Resizable data table widget</li>
 </ul>
-<h3>Action Items</h3>
+</li>
+</ul>
+<h4><strong>Task 2.8: Extract vulnerability-cards.js</strong> 🔄 <strong>Priority: MEDIUM</strong></h4>
 <ul>
-<li>Implement automatic stashing before major operations</li>
-<li>Create development checkpoint system</li>
-<li>Enhance documentation generation pipeline</li>
+<li><input disabled="" type="checkbox"> <strong>Create DeviceVulnerabilityCards module</strong> (~400 lines)  <ul>
+<li>Methods: <code>renderDeviceCards()</code>, <code>renderVulnerabilityCards()</code>, pagination logic</li>
+<li>Purpose: Card view rendering and pagination</li>
+<li>Dependencies: PaginationController, vulnerability-data</li>
+<li>Widget Potential: Card gallery widget with pagination</li>
 </ul>
+</li>
+</ul>
+<h4><strong>Task 2.9: Extract vulnerability-modals.js</strong> 🔄 <strong>Priority: MEDIUM</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Create VulnerabilityDetailsModal module</strong> (~400 lines)<ul>
+<li>Methods: <code>viewDeviceDetails()</code>, <code>showVulnerabilityDetails()</code>, <code>showScanDateModal()</code></li>
+<li>Purpose: Modal dialogs for detailed views</li>
+<li>Dependencies: Bootstrap, vulnerability-data</li>
+<li>Widget Potential: Expandable detail widget or modal service</li>
+</ul>
+</li>
+</ul>
+<h3>Week 4: Orchestration &amp; Testing (Sep 30 - Oct 4, 2025)</h3>
+<h4><strong>Task 2.10: Create vulnerability-core.js</strong> 🔄 <strong>Priority: CRITICAL</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Create VulnerabilityOrchestrator module</strong> (~300 lines)<ul>
+<li>Methods: <code>constructor()</code>, <code>setupEventListeners()</code>, inter-widget communication</li>
+<li>Purpose: Coordinate all vulnerability widgets</li>
+<li>Dependencies: All above modules</li>
+<li>Widget Potential: Dashboard-level orchestrator (hidden)</li>
+</ul>
+</li>
+</ul>
+<h4><strong>Task 2.11: Comprehensive Integration Testing</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Full functionality validation</strong></li>
+<li><input disabled="" type="checkbox"> <strong>Performance benchmarking</strong></li>
+<li><input disabled="" type="checkbox"> <strong>Browser compatibility testing</strong></li>
+<li><input disabled="" type="checkbox"> <strong>Playwright automation tests</strong></li>
+<li><input disabled="" type="checkbox"> <strong>ESLint compliance verification</strong></li>
+</ul>
+<h4><strong>Task 2.12: Documentation &amp; Cleanup</strong></h4>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Update symbol table</strong> with new module structure</li>
+<li><input disabled="" type="checkbox"> <strong>Document widget interfaces</strong> and communication patterns</li>
+<li><input disabled="" type="checkbox"> <strong>Create refactoring lessons learned</strong> document</li>
+<li><input disabled="" type="checkbox"> <strong>Update agent instruction files</strong> with new architecture</li>
+</ul>
+<hr>
+<h2>Success Criteria</h2>
+<h3>Immediate Phase 2 Goals</h3>
+<ul>
+<li>✅ <strong>All modules &lt; 400 lines</strong> (AI context-friendly development)</li>
+<li>✅ <strong>Zero functionality regression</strong> (existing features work identically)</li>
+<li>✅ <strong>Widget-ready architecture</strong> (standardized interfaces for future dashboard)</li>
+<li>✅ <strong>Parallel development enabled</strong> (multiple AI assistants can work simultaneously)</li>
+<li>✅ <strong>Improved Codacy scores</strong> (reduced complexity through modularization)</li>
+</ul>
+<h3>Long-term Strategic Goals</h3>
+<ul>
+<li>📈 <strong>Dashboard Foundation</strong>: Widget-ready components for drag-drop customization</li>
+<li>📈 <strong>User Experience</strong>: Future personalized dashboard capabilities</li>
+<li>📈 <strong>Development Velocity</strong>: 50% faster AI-assisted development cycles</li>
+<li>📈 <strong>Code Maintainability</strong>: Clear separation of concerns and responsibilities</li>
+</ul>
+<h2>Timeline &amp; Milestones</h2>
+<ul>
+<li><strong>Week 1</strong>: Data layer and statistics extraction</li>
+<li><strong>Week 2</strong>: Search and chart component extraction</li>
+<li><strong>Week 3</strong>: Grid, cards, and modal component extraction</li>
+<li><strong>Week 4</strong>: Orchestrator creation and comprehensive testing</li>
+</ul>
+<h2>Risk Mitigation</h2>
+<ul>
+<li><strong>Dependency Management</strong>: Document all inter-module dependencies carefully</li>
+<li><strong>State Isolation</strong>: Ensure clean state management between modules</li>
+<li><strong>Performance</strong>: Monitor bundle size and rendering performance</li>
+<li><strong>Testing</strong>: Comprehensive validation at each extraction step</li>
+</ul>
+<hr>
+<p><em>Sprint updated September 5, 2025 to reflect strategic shift to modularization priority</em></p>
+<h2>Agent Coordination Strategy</h2>
+<p>This modularization sprint is designed for the unified AI development workflow:</p>
+<ul>
+<li><strong>Claude Code</strong>: Orchestrates refactoring, maintains architecture documentation</li>
+<li><strong>GitHub Copilot</strong>: Handles individual function extractions and minor refactoring tasks  </li>
+<li><strong>vulnerability-data-processor</strong>: Manages data layer extraction and validation</li>
+<li><strong>ui-design-specialist</strong>: Validates UI functionality post-refactoring with Playwright testing</li>
+<li><strong>Google Gemini CLI</strong>: Analyzes complex inter-dependencies across large codebases</li>
+<li><strong>OpenAI Codex</strong>: Standardizes extracted module patterns and cleanup</li>
+</ul>
+<h2>Documentation Priority Note</h2>
+<p><strong>Documentation sprint tasks (API overview, user guides, etc.) are intentionally deferred until Phase 2 modularization is complete.</strong> This ensures:</p>
+<ol>
+<li>Module documentation reflects actual final architecture</li>
+<li>API documentation covers refactored endpoint patterns  </li>
+<li>User guides demonstrate widget-based functionality</li>
+<li>Development resources focus on foundation-building first</li>
+</ol>
+<p>The documentation sprint will resume in v1.0.6 planning after modularization success.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
