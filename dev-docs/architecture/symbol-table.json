@@ -1,0 +1,173 @@
+{
+  "version": "1.0.0",
+  "generated": "2025-09-05T17:30:00Z",
+  "source_files_analyzed": [
+    "scripts/pages/vulnerability-manager.js",
+    "scripts/pages/tickets.js", 
+    "scripts/shared/settings-modal.js"
+  ],
+  "classes": {
+    "PaginationController": {
+      "file": "scripts/pages/vulnerability-manager.js",
+      "start_line": 22,
+      "end_line": 208,
+      "line_count": 187,
+      "type": "class",
+      "description": "Handles pagination logic and UI generation",
+      "dependencies": [],
+      "methods": [
+        {
+          "name": "constructor",
+          "line": 23,
+          "params": ["defaultPageSize", "availableSizes"],
+          "description": "Initialize pagination with default settings"
+        },
+        {
+          "name": "setTotalItems",
+          "line": 30,
+          "params": ["count"],
+          "description": "Set total item count and adjust current page if needed"
+        },
+        {
+          "name": "getTotalPages",
+          "line": 39,
+          "params": [],
+          "description": "Calculate total number of pages"
+        },
+        {
+          "name": "getCurrentPageData",
+          "line": 43,
+          "params": ["items"],
+          "description": "Get slice of items for current page"
+        },
+        {
+          "name": "renderPaginationControls",
+          "line": 78,
+          "params": ["containerId", "onPageChange", "onPageSizeChange"],
+          "description": "Generate pagination UI HTML"
+        }
+      ],
+      "refactor_priority": "HIGH",
+      "refactor_target": "scripts/shared/pagination-controller.js",
+      "refactor_notes": "Pure utility class, no dependencies, perfect extraction candidate"
+    },
+    "ModernVulnManager": {
+      "file": "scripts/pages/vulnerability-manager.js", 
+      "start_line": 209,
+      "end_line": 2614,
+      "line_count": 2406,
+      "type": "class",
+      "description": "Main vulnerability management orchestrator",
+      "dependencies": [
+        "bootstrap",
+        "agGrid", 
+        "ApexCharts",
+        "Papa",
+        "Sortable",
+        "PaginationController"
+      ],
+      "methods": [
+        {
+          "name": "constructor",
+          "line": 210,
+          "description": "Initialize vulnerability manager"
+        },
+        {
+          "name": "setupEventListeners",
+          "line": 233,
+          "description": "Set up all UI event handlers"
+        },
+        {
+          "name": "initializeGrid",
+          "line": 322,
+          "description": "Initialize AG Grid"
+        },
+        {
+          "name": "initializeChart", 
+          "line": 333,
+          "description": "Initialize ApexCharts"
+        },
+        {
+          "name": "updateChart",
+          "line": 1230,
+          "description": "Update chart with new data"
+        },
+        {
+          "name": "renderDeviceCards",
+          "line": 1457,
+          "description": "Render device view cards"
+        },
+        {
+          "name": "renderVulnerabilityCards",
+          "line": 1555,
+          "description": "Render vulnerability view cards"
+        }
+      ],
+      "refactor_priority": "CRITICAL",
+      "refactor_plan": {
+        "target_modules": [
+          "vulnerability-core.js (orchestrator)",
+          "vulnerability-grid.js (AG Grid logic)",
+          "vulnerability-charts.js (ApexCharts logic)",
+          "vulnerability-cards.js (card rendering)",
+          "vulnerability-modals.js (modal handling)",
+          "vulnerability-data.js (data operations)",
+          "vulnerability-import.js (import/export)"
+        ],
+        "estimated_modules": 7,
+        "estimated_lines_per_module": 350
+      }
+    }
+  },
+  "functions": {},
+  "globals": {
+    "window.refreshPageData": {
+      "file": "scripts/pages/vulnerability-manager.js",
+      "line": "multiple",
+      "type": "global_function",
+      "description": "Inter-module communication function",
+      "usage": "Called to refresh page data across modules"
+    }
+  },
+  "refactoring_queue": [
+    {
+      "priority": 1,
+      "file": "scripts/pages/vulnerability-manager.js",
+      "action": "extract_pagination_controller",
+      "target": "scripts/shared/pagination-controller.js",
+      "effort": "LOW",
+      "impact": "HIGH",
+      "dependencies": []
+    },
+    {
+      "priority": 2,
+      "file": "scripts/pages/vulnerability-manager.js",
+      "action": "split_modern_vuln_manager",
+      "target": "scripts/pages/vulnerability/",
+      "effort": "HIGH",
+      "impact": "CRITICAL",
+      "dependencies": ["pagination_controller_extracted"]
+    },
+    {
+      "priority": 3,
+      "file": "scripts/pages/tickets.js",
+      "action": "analyze_and_split",
+      "target": "scripts/pages/tickets/",
+      "effort": "HIGH", 
+      "impact": "HIGH",
+      "dependencies": ["vulnerability_manager_refactored"]
+    }
+  ],
+  "metrics": {
+    "total_files_analyzed": 3,
+    "total_lines_analyzed": 6347,
+    "largest_file": {
+      "name": "vulnerability-manager.js",
+      "lines": 2614
+    },
+    "classes_identified": 2,
+    "refactor_targets": 3,
+    "estimated_modules_after_refactor": 16
+  },
+  "next_update": "After PaginationController extraction"
+}
