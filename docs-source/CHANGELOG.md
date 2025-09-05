@@ -7,15 +7,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned
+### In Progress - Phase 2: JavaScript Modularization
 
-### Bugfixes
+- **ModernVulnManager Refactoring**: Splitting 2,429-line class into 8 widget-ready modules
+- **Widget Architecture Foundation**: Establishing standards for future dashboard platform
+- **AI Development Optimization**: All modules targeting <400 lines for context compatibility
 
-### Enhancements
+### Planned - v1.0.6
+
+- **Documentation Sprint Resumption**: Complete API overview and user guides after modularization
+- **Dashboard Implementation**: Begin widget-based customizable dashboard development
+- **Ticket System Modularization**: Apply lessons learned to tickets.js refactoring
+
+## [1.0.5] - 2025-09-05
+
+### Added
+
+- **JavaScript Modularization Architecture**: Established foundation for widget-based dashboard development
+  - Created `/dev-docs/architecture/` documentation system with symbol tables and module boundaries
+  - Implemented unified AI development workflow with Memento MCP and PAM integration
+  - Designed comprehensive dashboard vision for drag-drop widget customization
+
+- **PaginationController Module**: Successfully extracted first reusable component (216 lines)
+  - Reduced vulnerability-manager.js from 2,614 to 2,429 lines (185 line reduction)
+  - Established modularization patterns for future extractions
+  - Validated zero-regression refactoring process
+
+### Enhanced
+
+- **Development Workflow**: Synchronized agent instruction files across all AI tools
+  - Updated CLAUDE.md, copilot-instructions.md, GEMINI.md, AGENTS.md with delegation strategies
+  - Implemented session handoff system for non-memory AI tools
+  - Created architectural documentation for coordinated development
+
+- **Project Documentation**: Updated roadmap and sprint priorities to reflect modularization focus
+  - Moved JavaScript refactoring to top priority status
+  - Deferred documentation sprint until modularization completion
+  - Established 4-week Phase 2 timeline for ModernVulnManager splitting
+
+## [1.0.4] - 2025-09-05
+
+### Added (2)
+
+- **UI Design Specialist Agent Enhancement**: Integrated Playwright MCP for live browser testing and visual validation
+  - Enhanced agent capabilities with real-time browser automation for design verification
+  - Added comprehensive visual testing for UI improvements and changes
+  - Implemented before/after screenshot comparison for design changes
+
+### Fixed
+
+- **Version Badge Synchronization**: Fixed version inconsistency across application components
+  - Resolved version badge displaying v1.0.1 while package.json showed v1.0.3
+  - Enhanced version-manager.js to include footer badge URL synchronization
+  - Added automated version sync command: `node scripts/version-manager.js <new-version>`
+  - Implemented production safety with timestamped backups and comprehensive file manifest
+
+- **Modal Layering Bug**: Fixed critical modal interaction issue in vulnerability management
+  - Resolved hostname links within vulnerability modal opening device modal behind existing modal
+  - Added proper Bootstrap Modal.getInstance() check to close existing modals before opening new ones
+  - Implemented clean modal transitions: vulnerability modal → closes → device modal opens
+  - Comprehensive Playwright testing confirms smooth modal workflows without layering issues
+
+- **Table Resizing and Pagination**: Implemented working table resizing and card pagination system
+  - Added responsive table column resizing functionality
+  - Implemented complete pagination system with 6-card default for optimal viewing
+  - Fixed incomplete pagination code that previously broke card display functionality
+  - Restored comprehensive card functionality across all views
+
+### Enhanced (2)
+
+- **User Experience Improvements**
+  - Professional modal behavior with proper state management
+  - Improved visual consistency with synchronized version badges across all components
+  - Enhanced table interaction with responsive design and pagination controls
+  - Streamlined vulnerability-to-device navigation workflow
+
+### Technical Improvements
+
+- **Agent Architecture**: Enhanced documentation and testing agents with advanced MCP integrations
+  - Added Playwright MCP for live browser validation of UI changes
+  - Integrated Memento MCP for persistent knowledge management across development sessions
+  - Improved documentation pipeline with automated visual verification
+
+- **Version Management**: Comprehensive version synchronization system
+  - Enhanced version-manager.js with footer badge support and backup safety
+  - Added regex pattern matching for badge URL updates: `/HexTrackr-v[\\d.]+(-blue\\?style=flat)/g`
+  - Implemented automated backup system with timestamps and rollback capabilities
 
 ## [1.0.3] - 2025-09-03
 
-### Fixed
+### Fixed (2)
 
 - **Documentation Accuracy**: Comprehensive documentation review and fixes
   - Updated API reference to include missing `/api/restore` endpoint
@@ -23,7 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed formatting and consistency issues across documentation
   - Ensured all user guides are complete and accurate
 
-### Enhanced
+### Enhanced (3)
 
 - **Documentation Improvements**:
   - Added explanatory section on import API options
