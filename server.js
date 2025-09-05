@@ -72,22 +72,56 @@ class PathValidator {
 
 // Vulnerability processing helper functions
 function mapVulnerabilityRow(row) {
+    // CVE extraction logic - try direct field first, then extract from name
+    let cve = row["definition.cve"] || row["cve"] || row["CVE"] || "";
+    if (!cve && row["definition.name"]) {
+        const cveMatch = row["definition.name"].match(/(CVE-\d{4}-\d+)/);
+        cve = cveMatch ? cveMatch[1] : "";
+        
+        // Also try extracting Cisco vulnerability IDs from parentheses
+        if (!cve) {
+            const ciscoMatch = row["definition.name"].match(/\(([^)]+)\)$/);
+            cve = ciscoMatch ? ciscoMatch[1] : "";
+        }
+    }
+    
+    // Handle multiple CVEs separated by commas - take first one
+    if (cve && cve.includes(",")) {
+        cve = cve.split(",")[0].trim();
+    }
+    
+    // Enhanced hostname processing with normalization
+    let hostname = row["asset.name"] || row["hostname"] || row["Host"] || "";
+    hostname = normalizeHostname(hostname); // Use existing function
+    
+    // Enhanced IP address handling for multiple formats
+    let ipAddress = row["asset.display_ipv4_address"] || row["asset.ipv4_addresses"] || row["ip_address"] || row["IP Address"] || "";
+    if (ipAddress && ipAddress.includes(",")) {
+        // Take first valid IP from comma-separated list
+        const ips = ipAddress.split(",").map(ip => ip.trim());
+        ipAddress = ips[0]; // Use first IP as primary
+    }
+    
+    // Enhanced description handling - prefer definition.description for Tenable, name for others
+    const description = row["definition.description"] || row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "";
+    
     return {
-        hostname: row["asset.name"] || row["hostname"] || row["Host"] || "",
-        ipAddress: row["asset.display_ipv4_address"] || row["asset.ipv4_addresses"] || row["ip_address"] || row["IP Address"] || "",
-        cve: row["definition.cve"] || row["cve"] || row["CVE"] || "",
+        assetId: row["asset.id"] || row["asset_id"] || row["Asset ID"] || "",
+        hostname: hostname,
+        ipAddress: ipAddress, 
+        cve: cve,
         severity: row["severity"] || row["Severity"] || "",
-        vprScore: row["definition.vpr.score"] || row["vpr_score"] || row["VPR Score"] ? parseFloat(row["definition.vpr.score"] || row["vpr_score"] || row["VPR Score"]) : null,
+        vprScore: row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"] ? parseFloat(row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"]) : null,
         cvssScore: row["cvss_score"] || row["CVSS Score"] ? parseFloat(row["cvss_score"] || row["CVSS Score"]) : null,
         vendor: row["definition.family"] || row["vendor"] || row["Vendor"] || "",
         pluginName: row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "",
-        description: row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "",
-        pluginPublished: row["definition.plugin_published"] || row["vulnerability_date"] || row["plugin_published"] || "",
-        state: row["state"] || row["State"] || "open",
+        description: description,
+        solution: row["solution"] || row["Solution"] || "",
+        state: row["state"] || row["State"] || "ACTIVE",
         firstSeen: row["first_seen"] || row["First Seen"] || "",
         lastSeen: row["last_seen"] || row["Last Seen"] || "",
         pluginId: row["definition.id"] || row["plugin_id"] || row["Plugin ID"] || "",
-        solution: row["solution"] || row["Solution"] || ""
+        pluginPublished: row["definition.plugin_published"] || row["definition.plugin_updated"] || row["definition.vulnerability_published"] || row["vulnerability_date"] || row["plugin_published"] || ""
     };
 }
 
@@ -160,6 +194,102 @@ function normalizeHostname(hostname) {
     return cleanHostname.split(".")[0].toLowerCase();
 }
 
+// Enhanced deduplication supporting functions
+function normalizeIPAddress(ipAddress) {
+    if (!ipAddress) {return null;}
+    
+    // Handle multiple IPs (take first valid one)
+    const ips = ipAddress.split(",").map(ip => ip.trim());
+    for (const ip of ips) {
+        if (isValidIPAddress(ip)) {
+            return ip.toLowerCase();
+        }
+    }
+    return null;
+}
+
+function isValidIPAddress(ip) {
+    if (!ip) {return false;}
+    
+    // Check if IP address is valid (x.x.x.x pattern with valid octets)
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!ipRegex.test(ip)) {return false;}
+    
+    // Validate that all octets are between 0-255
+    const octets = ip.split(".").map(Number);
+    return octets.every(octet => octet >= 0 && octet <= 255);
+}
+
+function createDescriptionHash(description) {
+    if (!description) {return "empty";}
+    
+    // Create stable hash from description (first 50 chars, normalized)
+    const normalized = description.trim().toLowerCase()
+        .replace(/\s+/g, " ")
+        .substring(0, 50);
+    
+    // Simple hash function using crypto if available
+    try {
+        const crypto = require("crypto");
+        return crypto.createHash("md5").update(normalized).digest("hex").substring(0, 8);
+    } catch (_e) {
+        // Fallback hash function if crypto not available
+        let hash = 0;
+        for (let i = 0; i < normalized.length; i++) {
+            const char = normalized.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        return Math.abs(hash).toString(36);
+    }
+}
+
+function calculateDeduplicationConfidence(uniqueKey) {
+    if (uniqueKey.startsWith("asset:")) {return 95;} // Highest confidence
+    if (uniqueKey.startsWith("cve:")) {return 85;}   // High confidence
+    if (uniqueKey.startsWith("plugin:")) {return 70;} // Medium confidence
+    if (uniqueKey.startsWith("desc:")) {return 50;}   // Low confidence
+    return 25; // Very low confidence
+}
+
+function getDeduplicationTier(uniqueKey) {
+    if (uniqueKey.startsWith("asset:")) {return 1;} // Most stable
+    if (uniqueKey.startsWith("cve:")) {return 2;}   // High reliability
+    if (uniqueKey.startsWith("plugin:")) {return 3;} // Medium reliability
+    if (uniqueKey.startsWith("desc:")) {return 4;}   // Least reliable
+    return 5; // Unknown/legacy
+}
+
+// Enhanced multi-tier unique key generation
+function generateEnhancedUniqueKey(mapped) {
+    const normalizedHostname = normalizeHostname(mapped.hostname);
+    const normalizedIP = normalizeIPAddress(mapped.ipAddress);
+    
+    // Tier 1: Asset ID + Plugin ID (most stable)
+    if (mapped.assetId && mapped.pluginId) {
+        return `asset:${mapped.assetId}|plugin:${mapped.pluginId}`;
+    }
+    
+    // Tier 2: CVE + Hostname/IP (CVE-based when available)
+    if (mapped.cve && mapped.cve.trim()) {
+        const hostIdentifier = normalizedIP || normalizedHostname;
+        return `cve:${mapped.cve.trim()}|host:${hostIdentifier}`;
+    }
+    
+    // Tier 3: Plugin ID + Hostname/IP + Vendor (USER'S REQUESTED APPROACH)
+    if (mapped.pluginId && mapped.pluginId.trim()) {
+        const hostIdentifier = normalizedIP || normalizedHostname;
+        const vendor = mapped.vendor || "unknown";
+        return `plugin:${mapped.pluginId.trim()}|host:${hostIdentifier}|vendor:${vendor}`;
+    }
+    
+    // Tier 4: Description hash + Hostname/IP (fallback)
+    const descriptionHash = createDescriptionHash(mapped.description);
+    const hostIdentifier = normalizedIP || normalizedHostname;
+    return `desc:${descriptionHash}|host:${hostIdentifier}`;
+}
+
+// Legacy function maintained for backward compatibility during transition
 function generateUniqueKey(mapped) {
     // Create unique key with normalized hostname to handle domain variations
     const normalizedHostname = normalizeHostname(mapped.hostname);
@@ -183,7 +313,7 @@ function generateUniqueKey(mapped) {
     return keyParts.join("|");
 }
 
-function processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, responseData, res, scanDate) {
+function _processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, responseData, res, scanDate) {
     const currentDate = scanDate || new Date().toISOString().split("T")[0];
     
     console.log("Starting rollover import for scan date:", currentDate, "with", rows.length, "rows");
@@ -222,7 +352,7 @@ function processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, re
 
             const row = rows[index];
             const mapped = mapVulnerabilityRow(row);
-            const uniqueKey = generateUniqueKey(mapped);
+            const uniqueKey = generateEnhancedUniqueKey(mapped);
             
             // Use the current scan date for last_seen to indicate this vulnerability is present in current scan
             mapped.lastSeen = currentDate;
@@ -363,6 +493,213 @@ function processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, re
     });
 }
 
+// Enhanced vulnerability rollover with lifecycle management
+function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, filePath, responseData, res, scanDate) {
+    const currentDate = scanDate || new Date().toISOString().split("T")[0];
+    
+    console.log("Starting enhanced rollover import for scan date:", currentDate, "with", rows.length, "rows");
+    
+    // Step 1: Mark all active vulnerabilities as potentially stale (grace period)
+    db.run("UPDATE vulnerabilities_current SET lifecycle_state = 'grace_period' WHERE lifecycle_state = 'active'", (err) => {
+        if (err) {
+            console.error("Error marking vulnerabilities as stale:", err);
+            res.status(500).json({ error: "Failed to prepare for import" });
+            return;
+        }
+        
+        // Step 2: Process new vulnerability data with enhanced deduplication
+        const processedKeys = new Set();
+        const legacyProcessedKeys = new Set(); // Track legacy keys too for transition
+        const stats = {
+            inserted: 0,
+            updated: 0,
+            reopened: 0,
+            duplicate_skipped: 0,
+            enhanced_dedup_used: 0,
+            legacy_dedup_used: 0
+        };
+        let finalizeCalled = false;
+        
+        if (rows.length === 0) {
+            finalizeEnhancedRollover();
+            return;
+        }
+        
+        // Process rows sequentially to prevent race conditions
+        function processNextRow(index) {
+            if (index >= rows.length) {
+                if (!finalizeCalled) {
+                    finalizeCalled = true;
+                    finalizeEnhancedRollover();
+                }
+                return;
+            }
+            
+            const row = rows[index];
+            const mapped = mapVulnerabilityRow(row);
+            
+            // Generate both enhanced and legacy keys for transition
+            const enhancedKey = generateEnhancedUniqueKey(mapped);
+            const legacyKey = generateUniqueKey(mapped);
+            const confidence = calculateDeduplicationConfidence(enhancedKey);
+            const tier = getDeduplicationTier(enhancedKey);
+            
+            // Use enhanced key as primary, legacy as fallback during transition
+            mapped.lastSeen = currentDate;
+            
+            // Skip duplicates within same batch (check both key types)
+            if (processedKeys.has(enhancedKey) || legacyProcessedKeys.has(legacyKey)) {
+                stats.duplicate_skipped++;
+                processNextRow(index + 1);
+                return;
+            }
+            processedKeys.add(enhancedKey);
+            legacyProcessedKeys.add(legacyKey);
+            
+            // Track which deduplication method was used
+            if (enhancedKey !== legacyKey) {
+                stats.enhanced_dedup_used++;
+            } else {
+                stats.legacy_dedup_used++;
+            }
+            
+            // Insert into snapshots (historical record) with enhanced fields
+            db.run("INSERT INTO vulnerability_snapshots " +
+                "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
+                " first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
+                " vendor_reference, vendor, vulnerability_date, state, unique_key, " +
+                " enhanced_unique_key, confidence_score, dedup_tier)" +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
+                mapped.severity, mapped.vprScore, mapped.cvssScore, mapped.firstSeen,
+                currentDate, mapped.pluginId, mapped.pluginName, mapped.description,
+                mapped.solution, mapped.vendor, mapped.vendor, mapped.pluginPublished,
+                mapped.state, legacyKey, enhancedKey, confidence, tier
+            ], (err) => {
+                if (err) {
+                    console.error("Snapshot insert error:", err);
+                }
+                
+                // Check existing vulnerability state using both keys during transition
+                const checkQuery = `
+                    SELECT id, first_seen, lifecycle_state, resolved_date, unique_key, enhanced_unique_key 
+                    FROM vulnerabilities_current 
+                    WHERE unique_key = ? OR enhanced_unique_key = ? OR enhanced_unique_key = ? OR unique_key = ?
+                `;
+                
+                db.get(checkQuery, [legacyKey, enhancedKey, legacyKey, enhancedKey], (err, existingRow) => {
+                    if (err) {
+                        console.error("Error checking existing vulnerability:", err);
+                        processNextRow(index + 1);
+                        return;
+                    }
+                    
+                    if (existingRow) {
+                        // Determine lifecycle transition
+                        let newState = "active";
+                        const resolutionReason = null;
+                        
+                        if (existingRow.lifecycle_state === "resolved") {
+                            newState = "reopened";
+                            stats.reopened++;
+                        } else {
+                            stats.updated++;
+                        }
+                        
+                        // Update existing vulnerability with enhanced fields
+                        db.run("UPDATE vulnerabilities_current SET " +
+                            "import_id = ?, scan_date = ?, hostname = ?, ip_address = ?, cve = ?, " +
+                            "severity = ?, vpr_score = ?, cvss_score = ?, last_seen = ?, " +
+                            "plugin_id = ?, plugin_name = ?, description = ?, solution = ?, " +
+                            "vendor_reference = ?, vendor = ?, vulnerability_date = ?, state = ?, " +
+                            "lifecycle_state = ?, resolved_date = ?, resolution_reason = ?, " +
+                            "enhanced_unique_key = ?, confidence_score = ?, dedup_tier = ? " +
+                            "WHERE id = ?", [
+                            importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
+                            mapped.severity, mapped.vprScore, mapped.cvssScore, currentDate,
+                            mapped.pluginId, mapped.pluginName, mapped.description, mapped.solution,
+                            mapped.vendor, mapped.vendor, mapped.pluginPublished, mapped.state,
+                            newState, null, resolutionReason, enhancedKey, confidence, tier, existingRow.id
+                        ], (err) => {
+                            if (err) {
+                                console.error("Current table update error:", err);
+                            }
+                            processNextRow(index + 1);
+                        });
+                    } else {
+                        // Insert new vulnerability with enhanced fields
+                        db.run("INSERT INTO vulnerabilities_current " +
+                            "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
+                             "first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
+                             "vendor_reference, vendor, vulnerability_date, state, unique_key, " +
+                             "lifecycle_state, enhanced_unique_key, confidence_score, dedup_tier)" +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                            importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
+                            mapped.severity, mapped.vprScore, mapped.cvssScore,
+                            mapped.firstSeen || currentDate, currentDate, mapped.pluginId,
+                            mapped.pluginName, mapped.description, mapped.solution, mapped.vendor,
+                            mapped.vendor, mapped.pluginPublished, mapped.state, legacyKey,
+                            "active", enhancedKey, confidence, tier
+                        ], (err) => {
+                            if (err) {
+                                console.error("Current table insert error:", err);
+                            } else {
+                                stats.inserted++;
+                            }
+                            processNextRow(index + 1);
+                        });
+                    }
+                });
+            });
+        }
+        
+        // Start processing from the first row
+        processNextRow(0);
+        
+        function finalizeEnhancedRollover() {
+            // Step 3: Handle vulnerabilities still in grace_period (mark as resolved)
+            db.run("UPDATE vulnerabilities_current SET " +
+                "lifecycle_state = 'resolved', resolved_date = ?, resolution_reason = 'not_present_in_scan' " +
+                "WHERE lifecycle_state = 'grace_period'", [currentDate], function(err) {
+                
+                const resolvedCount = this.changes || 0;
+                if (err) {
+                    console.error("Error resolving stale vulnerabilities:", err);
+                } else {
+                    console.log("Resolved", resolvedCount, "vulnerabilities not present in current scan");
+                }
+                
+                // Step 4: Calculate and store enhanced daily totals
+                calculateAndStoreDailyTotalsEnhanced(currentDate, () => {
+                    // Clean up file
+                    try {
+                        if (filePath && PathValidator.safeExistsSync(filePath)) {
+                            PathValidator.safeUnlinkSync(filePath);
+                        }
+                    } catch (unlinkError) {
+                        console.error("Error cleaning up file:", unlinkError);
+                    }
+                    
+                    // Send enhanced success response
+                    const finalResponse = {
+                        ...responseData,
+                        rowsProcessed: rows.length,
+                        ...stats,
+                        resolvedCount,
+                        scanDate: currentDate,
+                        rolloverComplete: true,
+                        enhancedLifecycle: true,
+                        enhancedDeduplication: true
+                    };
+                    
+                    console.log("Enhanced import completed:", finalResponse);
+                    res.json(finalResponse);
+                });
+            });
+        }
+    });
+}
+
 function calculateAndStoreDailyTotals(scanDate, callback) {
     // Calculate totals from current state (not snapshots)
     const totalsQuery = `
@@ -428,6 +765,88 @@ function calculateAndStoreDailyTotals(scanDate, callback) {
                 console.log(`Daily totals updated for ${scanDate}`);
             }
             callback();
+        });
+    });
+}
+
+// Enhanced daily totals calculation with lifecycle states
+function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
+    // Calculate totals from active vulnerabilities only (excluding resolved)
+    const totalsQuery = `
+        SELECT 
+            severity,
+            COUNT(*) as count,
+            COALESCE(SUM(vpr_score), 0) as total_vpr,
+            COUNT(CASE WHEN lifecycle_state = 'reopened' THEN 1 END) as reopened_count
+        FROM vulnerabilities_current 
+        WHERE scan_date = ? AND lifecycle_state IN ('active', 'reopened')
+        GROUP BY severity
+    `;
+    
+    db.all(totalsQuery, [scanDate], (err, results) => {
+        if (err) {
+            console.error("Error calculating enhanced daily totals:", err);
+            callback();
+            return;
+        }
+        
+        // Get resolved count for the day
+        db.get("SELECT COUNT(*) as resolved_count FROM vulnerabilities_current WHERE resolved_date = ?", 
+            [scanDate], (err, resolvedResult) => {
+            
+            const resolvedCount = resolvedResult ? resolvedResult.resolved_count : 0;
+            
+            const totals = {
+                critical_count: 0, critical_total_vpr: 0,
+                high_count: 0, high_total_vpr: 0,
+                medium_count: 0, medium_total_vpr: 0,
+                low_count: 0, low_total_vpr: 0,
+                total_vulnerabilities: 0, total_vpr: 0,
+                resolved_count: resolvedCount,
+                reopened_count: 0
+            };
+            
+            results.forEach(row => {
+                const severity = row.severity.toLowerCase();
+                if (severity === "critical") {
+                    totals.critical_count = row.count;
+                    totals.critical_total_vpr = row.total_vpr;
+                } else if (severity === "high") {
+                    totals.high_count = row.count;
+                    totals.high_total_vpr = row.total_vpr;
+                } else if (severity === "medium") {
+                    totals.medium_count = row.count;
+                    totals.medium_total_vpr = row.total_vpr;
+                } else if (severity === "low") {
+                    totals.low_count = row.count;
+                    totals.low_total_vpr = row.total_vpr;
+                }
+                totals.total_vulnerabilities += row.count;
+                totals.total_vpr += row.total_vpr;
+                totals.reopened_count += row.reopened_count || 0;
+            });
+            
+            // Store enhanced daily totals
+            db.run(`INSERT OR REPLACE INTO vulnerability_daily_totals 
+                (scan_date, critical_count, critical_total_vpr, high_count, high_total_vpr,
+                 medium_count, medium_total_vpr, low_count, low_total_vpr, 
+                 total_vulnerabilities, total_vpr, resolved_count, reopened_count)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+                scanDate,
+                totals.critical_count, totals.critical_total_vpr,
+                totals.high_count, totals.high_total_vpr,
+                totals.medium_count, totals.medium_total_vpr,
+                totals.low_count, totals.low_total_vpr,
+                totals.total_vulnerabilities, totals.total_vpr,
+                totals.resolved_count, totals.reopened_count
+            ], (err) => {
+                if (err) {
+                    console.error("Error storing enhanced daily totals:", err);
+                } else {
+                    console.log(`Enhanced daily totals updated for ${scanDate}`);
+                }
+                callback();
+            });
         });
     });
 }
@@ -721,18 +1140,20 @@ app.get("/api/vulnerabilities", (req, res) => {
   let whereClause = "";
   const params = [];
   
-  if (search || severity) {
-    const conditions = [];
-    if (search) {
-      conditions.push("(hostname LIKE ? OR cve LIKE ? OR plugin_name LIKE ?)");
-      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
-    }
-    if (severity) {
-      conditions.push("severity = ?");
-      params.push(severity);
-    }
-    whereClause = "WHERE " + conditions.join(" AND ");
+  // CRITICAL FIX: Always filter by lifecycle_state to show only active vulnerabilities
+  const conditions = ["lifecycle_state IN (?, ?)"];
+  params.push("active", "reopened");
+  
+  if (search) {
+    conditions.push("(hostname LIKE ? OR cve LIKE ? OR plugin_name LIKE ?)");
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
   }
+  if (severity) {
+    conditions.push("severity = ?");
+    params.push(severity);
+  }
+  
+  whereClause = "WHERE " + conditions.join(" AND ");
   
   const query = `
     SELECT * FROM vulnerabilities_current 
@@ -765,6 +1186,71 @@ app.get("/api/vulnerabilities", (req, res) => {
           total: countResult.total,
           pages: Math.ceil(countResult.total / limit)
         }
+      });
+    });
+  });
+});
+
+// Get resolved/fixed vulnerabilities (for troubleshooting and historical analysis)
+app.get("/api/vulnerabilities/resolved", (req, res) => {
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 50;
+  const offset = (page - 1) * limit;
+  const search = req.query.search || "";
+  
+  let whereClause = "";
+  const params = [];
+  
+  // Show only resolved vulnerabilities
+  const conditions = ["lifecycle_state = ?"];
+  params.push("resolved");
+  
+  if (search) {
+    conditions.push("(hostname LIKE ? OR cve LIKE ? OR plugin_name LIKE ?)");
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+  }
+  
+  whereClause = "WHERE " + conditions.join(" AND ");
+  
+  const query = `
+    SELECT *, 
+           resolved_date,
+           resolution_reason,
+           CASE 
+             WHEN resolved_date IS NOT NULL THEN 'Fixed on ' || resolved_date
+             ELSE 'Status unknown'
+           END as resolution_summary
+    FROM vulnerabilities_current 
+    ${whereClause}
+    ORDER BY resolved_date DESC, last_seen DESC 
+    LIMIT ? OFFSET ?
+  `;
+  
+  params.push(limit, offset);
+  
+  db.all(query, params, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    
+    // Get total count for pagination
+    const countQuery = `SELECT COUNT(*) as total FROM vulnerabilities_current ${whereClause}`;
+    db.get(countQuery, params.slice(0, -2), (err, countResult) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      
+      res.json({
+        data: rows,
+        pagination: {
+          page,
+          limit,
+          total: countResult.total,
+          pages: Math.ceil(countResult.total / limit)
+        },
+        note: "These vulnerabilities were marked as resolved/fixed when they disappeared from scans"
       });
     });
   });
@@ -812,8 +1298,8 @@ app.post("/api/vulnerabilities/import", upload.single("csvFile"), (req, res) => 
         
         const importId = this.lastID;
         
-        // Process rows using rollover architecture (no stmt needed for rollover)
-        processVulnerabilityRowsWithRollover(rows, null, importId, req.file.path, {
+        // Process rows using enhanced rollover architecture with lifecycle management
+        processVulnerabilityRowsWithEnhancedLifecycle(rows, null, importId, req.file.path, {
           success: true,
           importId,
           filename,
@@ -1129,6 +1615,75 @@ const initDb = () => {
       }
     });
 
+    // Enhanced deduplication schema columns for vulnerabilities_current table
+    db.run("ALTER TABLE vulnerabilities_current ADD COLUMN lifecycle_state TEXT DEFAULT 'active'", (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        console.error("Error adding lifecycle_state column:", err.message);
+      }
+    });
+    
+    db.run("ALTER TABLE vulnerabilities_current ADD COLUMN resolved_date TEXT", (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        console.error("Error adding resolved_date column:", err.message);
+      }
+    });
+    
+    db.run("ALTER TABLE vulnerabilities_current ADD COLUMN resolution_reason TEXT", (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        console.error("Error adding resolution_reason column:", err.message);
+      }
+    });
+    
+    db.run("ALTER TABLE vulnerabilities_current ADD COLUMN confidence_score INTEGER DEFAULT 50", (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        console.error("Error adding confidence_score column:", err.message);
+      }
+    });
+    
+    db.run("ALTER TABLE vulnerabilities_current ADD COLUMN dedup_tier INTEGER DEFAULT 4", (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        console.error("Error adding dedup_tier column:", err.message);
+      }
+    });
+    
+    db.run("ALTER TABLE vulnerabilities_current ADD COLUMN enhanced_unique_key TEXT", (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        console.error("Error adding enhanced_unique_key column:", err.message);
+      }
+    });
+
+    // Enhanced deduplication schema columns for vulnerability_snapshots table
+    db.run("ALTER TABLE vulnerability_snapshots ADD COLUMN confidence_score INTEGER DEFAULT 50", (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        console.error("Error adding confidence_score column to snapshots:", err.message);
+      }
+    });
+    
+    db.run("ALTER TABLE vulnerability_snapshots ADD COLUMN dedup_tier INTEGER DEFAULT 4", (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        console.error("Error adding dedup_tier column to snapshots:", err.message);
+      }
+    });
+    
+    db.run("ALTER TABLE vulnerability_snapshots ADD COLUMN enhanced_unique_key TEXT", (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        console.error("Error adding enhanced_unique_key column to snapshots:", err.message);
+      }
+    });
+
+    // Enhanced columns for vulnerability_daily_totals table
+    db.run("ALTER TABLE vulnerability_daily_totals ADD COLUMN resolved_count INTEGER DEFAULT 0", (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        console.error("Error adding resolved_count column to daily totals:", err.message);
+      }
+    });
+    
+    db.run("ALTER TABLE vulnerability_daily_totals ADD COLUMN reopened_count INTEGER DEFAULT 0", (err) => {
+      if (err && !err.message.includes("duplicate column")) {
+        console.error("Error adding reopened_count column to daily totals:", err.message);
+      }
+    });
+
     // Create rollover architecture tables
     db.run(`CREATE TABLE IF NOT EXISTS vulnerability_snapshots (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -1238,8 +1793,208 @@ const initDb = () => {
         console.error("Error creating current scan_date index:", err.message);
       }
     });
+
+    // Enhanced performance indexes for deduplication and lifecycle management
+    db.run("CREATE INDEX IF NOT EXISTS idx_current_enhanced_unique_key ON vulnerabilities_current (enhanced_unique_key)", (err) => {
+      if (err) {
+        console.error("Error creating current enhanced_unique_key index:", err.message);
+      }
+    });
+
+    db.run("CREATE INDEX IF NOT EXISTS idx_current_lifecycle_scan ON vulnerabilities_current (lifecycle_state, scan_date)", (err) => {
+      if (err) {
+        console.error("Error creating current lifecycle_scan index:", err.message);
+      }
+    });
+
+    db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_enhanced_key ON vulnerability_snapshots (enhanced_unique_key)", (err) => {
+      if (err) {
+        console.error("Error creating snapshots enhanced_unique_key index:", err.message);
+      }
+    });
+
+    db.run("CREATE INDEX IF NOT EXISTS idx_current_confidence_tier ON vulnerabilities_current (confidence_score, dedup_tier)", (err) => {
+      if (err) {
+        console.error("Error creating current confidence_tier index:", err.message);
+      }
+    });
+
+    db.run("CREATE INDEX IF NOT EXISTS idx_current_active_severity ON vulnerabilities_current (lifecycle_state, severity)", (err) => {
+      if (err) {
+        console.error("Error creating current active_severity index:", err.message);
+      }
+    });
+
+    db.run("CREATE INDEX IF NOT EXISTS idx_current_resolved_date ON vulnerabilities_current (resolved_date)", (err) => {
+      if (err) {
+        console.error("Error creating current resolved_date index:", err.message);
+      }
+    });
+
+    // Migration script for enhanced deduplication (run once)
+    db.get("SELECT COUNT(*) as enhanced_count FROM vulnerabilities_current WHERE enhanced_unique_key IS NOT NULL", (err, result) => {
+      if (err) {
+        console.error("Error checking migration status:", err);
+        return;
+      }
+      
+      const totalCount = result ? result.enhanced_count : 0;
+      
+      // Only run migration if most records don't have enhanced keys
+      db.get("SELECT COUNT(*) as total_count FROM vulnerabilities_current", (err, totalResult) => {
+        if (err) {return;}
+        
+        const totalRecords = totalResult ? totalResult.total_count : 0;
+        const migrationNeeded = totalRecords > 0 && (totalCount / totalRecords) < 0.5;
+        
+        if (migrationNeeded) {
+          console.log("Starting enhanced deduplication migration for existing data...");
+          migrateExistingVulnerabilities();
+        }
+      });
+    });
   });
 };
+
+// Migration function for existing vulnerability data
+function migrateExistingVulnerabilities() {
+    console.log("Starting vulnerability data migration to enhanced deduplication...");
+    
+    // Get all existing vulnerabilities that need migration
+    db.all("SELECT * FROM vulnerabilities_current WHERE enhanced_unique_key IS NULL OR enhanced_unique_key = ''", [], (err, rows) => {
+        if (err) {
+            console.error("Migration failed:", err);
+            return;
+        }
+        
+        if (rows.length === 0) {
+            console.log("No vulnerabilities need migration");
+            return;
+        }
+        
+        let migrated = 0;
+        const migrationStats = {
+            duplicatesFound: 0,
+            keyUpgraded: 0,
+            confidenceImproved: 0,
+            errors: 0
+        };
+        
+        function migrateNextRow(index) {
+            if (index >= rows.length) {
+                console.log(`Migration completed: ${migrated} rows processed`, migrationStats);
+                
+                // After migration, resolve duplicates
+                if (migrationStats.keyUpgraded > 0) {
+                    setTimeout(resolveMigrationDuplicates, 1000);
+                }
+                return;
+            }
+            
+            const row = rows[index];
+            const mapped = {
+                assetId: null, // Not available in existing data
+                hostname: row.hostname,
+                ipAddress: row.ip_address,
+                cve: row.cve,
+                pluginId: row.plugin_id,
+                description: row.description,
+                vendor: row.vendor
+            };
+            
+            const enhancedKey = generateEnhancedUniqueKey(mapped);
+            const confidence = calculateDeduplicationConfidence(enhancedKey);
+            const tier = getDeduplicationTier(enhancedKey);
+            
+            // Check if enhanced key differs from original
+            if (enhancedKey !== row.unique_key) {
+                migrationStats.keyUpgraded++;
+            }
+            
+            const currentConfidence = row.confidence_score || 50;
+            if (confidence > currentConfidence) {
+                migrationStats.confidenceImproved++;
+            }
+            
+            // Update row with enhanced data
+            db.run("UPDATE vulnerabilities_current SET enhanced_unique_key = ?, confidence_score = ?, dedup_tier = ? WHERE id = ?",
+                [enhancedKey, confidence, tier, row.id], (err) => {
+                if (err) {
+                    console.error("Error migrating row:", row.id, err);
+                    migrationStats.errors++;
+                } else {
+                    migrated++;
+                }
+                migrateNextRow(index + 1);
+            });
+        }
+        
+        migrateNextRow(0);
+    });
+}
+
+// Resolve duplicates created during migration
+function resolveMigrationDuplicates() {
+    console.log("Resolving duplicates created during migration...");
+    
+    // Find duplicates based on enhanced unique key
+    const duplicateQuery = `
+        SELECT enhanced_unique_key, COUNT(*) as count, 
+               GROUP_CONCAT(id) as ids,
+               GROUP_CONCAT(confidence_score) as confidences,
+               GROUP_CONCAT(first_seen) as first_seens
+        FROM vulnerabilities_current 
+        WHERE enhanced_unique_key IS NOT NULL AND enhanced_unique_key != ''
+        GROUP BY enhanced_unique_key 
+        HAVING COUNT(*) > 1
+        LIMIT 100
+    `;
+    
+    db.all(duplicateQuery, [], (err, duplicates) => {
+        if (err) {
+            console.error("Error finding duplicates:", err);
+            return;
+        }
+        
+        console.log(`Found ${duplicates.length} groups of duplicates to resolve`);
+        
+        duplicates.forEach(duplicate => {
+            const ids = duplicate.ids.split(",");
+            const confidences = duplicate.confidences.split(",").map(Number);
+            const firstSeens = duplicate.first_seens.split(",");
+            
+            // Keep the record with highest confidence score, or earliest first_seen if tied
+            let bestIndex = 0;
+            let bestConfidence = confidences[0];
+            let bestFirstSeen = firstSeens[0];
+            
+            for (let i = 1; i < confidences.length; i++) {
+                const isNewBest = confidences[i] > bestConfidence || 
+                    (confidences[i] === bestConfidence && firstSeens[i] < bestFirstSeen);
+                
+                if (isNewBest) {
+                    bestIndex = i;
+                    bestConfidence = confidences[i];
+                    bestFirstSeen = firstSeens[i];
+                }
+            }
+            
+            const keepId = ids[bestIndex];
+            const removeIds = ids.filter(id => id !== keepId);
+            
+            // Remove duplicate records
+            removeIds.forEach(removeId => {
+                db.run("DELETE FROM vulnerabilities_current WHERE id = ?", [removeId], (err) => {
+                    if (err) {
+                        console.error("Error removing duplicate:", removeId, err);
+                    } else {
+                        console.log(`Removed duplicate vulnerability ID ${removeId}, kept ${keepId} (confidence: ${bestConfidence})`);
+                    }
+                });
+            });
+        });
+    });
+}
 
 // Backup API endpoints for settings modal
 app.get("/api/backup/stats", (req, res) => {
