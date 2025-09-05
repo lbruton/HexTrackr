@@ -1,20 +1,23 @@
-# HexTrackr v1.0.4 Documentation Sprint
+# HexTrackr v1.0.4 Combined Sprint
 
 ## Overview
 
-Comprehensive plan to update documentation for v1.0.4 release based on docs-portal-maintainer assessment and docs-temp/ review.
+Comprehensive plan combining documentation updates with critical UI performance improvements for v1.0.4 release. This sprint addresses both the documentation gap identified by docs-portal-maintainer assessment and the card pagination performance issues in the vulnerability management interface.
 
 ## Pre-Work Completed
 
 - ✅ Documentation assessment completed
 - ✅ docs-temp/ folder reviewed (24 files with substantial content ready to integrate)
+- ✅ Card pagination requirements specified (6/12/24/48 options for 3-card rows)
+- ✅ Performance issue identified (infinite card rendering)
 
 ## Sprint Goals
 
 1. Fix all critical documentation issues for v1.0.4 release
 2. Integrate useful content from docs-temp/ folder
-3. Ensure version consistency across all documentation
-4. Create missing user guides and API documentation
+3. Implement card pagination system to resolve performance issues
+4. Ensure version consistency across all documentation
+5. Create missing user guides and API documentation
 
 ---
 
@@ -107,7 +110,51 @@ Comprehensive plan to update documentation for v1.0.4 release based on docs-port
 
 ---
 
-## Phase 4: Quality Assurance
+## Phase 4: UI Performance Improvements
+
+### Card Pagination System
+
+- [ ] **Add pagination to Device Cards**
+  - Location: `vulnerabilities.html` - Device Cards section (#deviceCards)
+  - Implement pagination controls for 3-card row layout
+  - Options: 6, 12, 24, 48 cards per page (multiples of 3)
+  - Default: 6 cards per page
+  - Fix infinite card rendering performance issue
+
+- [ ] **Add pagination to Vulnerability Cards**
+  - Location: `vulnerabilities.html` - Vulnerability Cards section (#vulnerabilityCards)
+  - Implement matching pagination system
+  - Same options: 6, 12, 24, 48 cards per page
+  - Consistent UI with Device Cards pagination
+
+- [ ] **Create PaginationController component**
+  - Location: `scripts/shared/pagination-controller.js`
+  - Reusable pagination logic for card views
+  - Handle page navigation, size changes, and state management
+  - Integrate with existing card rendering functions
+
+### Performance Optimization
+
+- [ ] **Fix infinite card rendering issue**
+  - Identify root cause of continuous card creation
+  - Implement proper card lifecycle management
+  - Add performance monitoring for card operations
+
+### Core Engine Improvements (Future Considerations)
+
+- [ ] **Hostname normalization enhancement**
+  - Note: Planned improvement for normalizeHostname() function
+  - Better handling of edge cases and subdomain variations
+  - Deferred to future sprint for full testing
+
+- [ ] **Dual Y-axis chart visualization**
+  - Note: Advanced charting enhancement planned
+  - Implementation requires Chart.js version evaluation
+  - Deferred to maintain focus on critical performance issues
+
+---
+
+## Phase 5: Quality Assurance
 
 ### Documentation Pipeline
 
@@ -186,9 +233,10 @@ Comprehensive plan to update documentation for v1.0.4 release based on docs-port
 
 ## Estimated Time
 
-- Phase 1: 2-3 hours
-- Phase 2: 1-2 hours  
-- Phase 3: 1-2 hours
-- Phase 4: 30 minutes
+- Phase 1: 2-3 hours (Documentation Integration)
+- Phase 2: 1-2 hours (High Priority Fixes)
+- Phase 3: 1-2 hours (Essential Additions)
+- Phase 4: 2-3 hours (UI Performance Improvements)
+- Phase 5: 30 minutes (Quality Assurance)
 
-**Total: 4.5-7.5 hours** (perfect for an evening work session)
+**Total: 6.5-10.5 hours** (perfect for a full development session)
