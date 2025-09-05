@@ -1,0 +1,50 @@
+{
+  "Documentation Agent Activation": {
+    "prefix": "docs-agent",
+    "body": [
+      "@docs-portal-maintainer",
+      "",
+      "I need help with documentation maintenance. Please:",
+      "1. Scan the codebase for changes that require documentation updates",
+      "2. Identify any gaps between code and documentation",
+      "3. Update the relevant files in docs-source/",
+      "4. Regenerate the documentation portal",
+      "",
+      "Context: $1",
+      "Files to focus on: $2"
+    ],
+    "description": "Activate the documentation portal maintainer agent"
+  },
+  
+  "Code Quality Agent": {
+    "prefix": "quality-agent",
+    "body": [
+      "@code-quality-specialist",
+      "",
+      "Please review the code for:",
+      "- Security vulnerabilities using PathValidator patterns",
+      "- Database race conditions (sequential processing)",
+      "- Error handling patterns",
+      "- Code style compliance (2-space indent, camelCase)",
+      "",
+      "Focus area: $1"
+    ],
+    "description": "Activate code quality review agent"
+  },
+  
+  "Database Agent": {
+    "prefix": "db-agent", 
+    "body": [
+      "@database-specialist",
+      "",
+      "I need help with database operations:",
+      "- Ensure idempotent ALTER statements",
+      "- Verify rollover mechanism integrity", 
+      "- Check for race condition prevention",
+      "- Validate schema evolution compatibility",
+      "",
+      "Specific task: $1"
+    ],
+    "description": "Activate database specialist agent"
+  }
+}
