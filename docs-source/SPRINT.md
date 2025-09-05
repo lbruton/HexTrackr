@@ -1,80 +1,194 @@
-# Current Sprint: Security & Production Readiness
+# HexTrackr v1.0.4 Documentation Sprint
 
-**Status**: Active Sprint  
-**Period**: August 29 - September 4, 2025  
-**Focus**: Security compliance and production environment preparation
+## Overview
 
-## Sprint Objectives
+Comprehensive plan to update documentation for v1.0.4 release based on docs-portal-maintainer assessment and docs-temp/ review.
 
-### 🔒 Security & Compliance
+## Pre-Work Completed
 
-- [x] Codacy integration and quality gates
-- [x] Security vulnerability scanning
-- [x] Code quality enforcement
-- [ ] Security documentation updates
-- [ ] Vulnerability disclosure process
+- ✅ Documentation assessment completed
+- ✅ docs-temp/ folder reviewed (24 files with substantial content ready to integrate)
 
-### 🚀 Production Readiness
+## Sprint Goals
 
-- [x] Docker containerization
-- [x] Documentation portal v2.0
-- [ ] Performance optimization
-- [ ] Monitoring and logging
-- [ ] Backup and recovery procedures
+1. Fix all critical documentation issues for v1.0.4 release
+2. Integrate useful content from docs-temp/ folder
+3. Ensure version consistency across all documentation
+4. Create missing user guides and API documentation
 
-### 📖 Documentation
+---
 
-- [x] Auto-generating documentation portal
-- [x] API reference documentation
-- [x] Architecture documentation
-- [ ] User guides completion
-- [ ] Security documentation
+## Phase 1: Critical Issues (Day 1) - Must Complete
 
-## Progress Tracking
+### API Documentation Updates
 
-### Completed This Sprint
+- [ ] **Create API overview.md**
+  - Location: `docs-source/api-reference/overview.md`
+  - Document: `/health`, `/docs-html`, `/` endpoints
+  - Source: Check docs-temp/ for existing API content to merge
 
-- ✅ Refactored documentation portal with dynamic navigation
-- ✅ Implemented Codacy quality gates
-- ✅ Docker deployment configuration
-- ✅ HTML content auto-generation system
+- [ ] **Review and update existing API docs**
+  - Check docs-temp/api-reference/ files against docs-source/
+  - Merge any new or updated endpoint documentation
+  - Ensure all server.js endpoints are documented
 
-### In Progress
+### Missing User Guide Files
 
-- 🔄 Security documentation updates
-- 🔄 Navigation auto-discovery fixes
-- 🔄 Content generation pipeline restoration
+- [ ] **Create data-import-export.md**
+  - Location: `docs-source/user-guides/data-import-export.md`
+  - Check docs-temp/ for existing content to use as base
+  - Cover CSV import, JSON import, and export functionality
 
-### Next Steps
+- [ ] **Create backup-restore.md**
+  - Location: `docs-source/user-guides/backup-restore.md`
+  - Document database backup/restore procedures
+  - Include data export/import via API endpoints
 
-- Security compliance review
-- Production deployment testing
-- Performance benchmarking
-- User acceptance testing
+### Version Consistency
 
-## Sprint Metrics
+- [ ] **Update CHANGELOG.md**
+  - Add v1.0.4 section with recent changes
+  - Ensure consistency with package.json version
 
-- **Code Quality**: A (Codacy grade)
-- **Test Coverage**: 85%
-- **Documentation Coverage**: 90%
-- **Security Compliance**: In progress
+- [ ] **Update package.json version**
+  - Bump to 1.0.4 if not already done
+  - Ensure all references match
 
-## Sprint Retrospective
+---
 
-### What Went Well
+## Phase 2: High Priority Fixes (Day 2)
 
-- Rapid documentation portal development
-- Effective use of auto-generation tools
-- Strong security focus integration
+### Fix Broken References
 
-### Areas for Improvement
+- [ ] **Update index.md**
+  - Fix version reference from "v1.0.1" to current version
+  - Remove broken `/content/project-management/` references
+  - Update navigation links
 
-- Better preservation of work during git operations
-- More frequent commits of configuration changes
-- Enhanced backup procedures for development work
+- [ ] **Correct ticket documentation**
+  - Location: `docs-source/user-guides/ticket-management.md`
+  - Fix XT# generation description (manual vs auto)
+  - Align with actual current behavior
 
-### Action Items
+### Documentation Structure
 
-- Implement automatic stashing before major operations
-- Create development checkpoint system
-- Enhance documentation generation pipeline
+- [ ] **Review docs-temp integration opportunities**
+  - Identify files that can be directly moved
+  - Plan merges for existing files
+  - Note gaps that still need addressing
+
+---
+
+## Phase 3: Essential Additions (Day 3)
+
+### Root Documentation
+
+- [ ] **Create README.md**
+  - Location: Project root `/README.md`
+  - Include quick start instructions
+  - Point to documentation portal
+  - Add badges for version, build status
+
+### Configuration Documentation
+
+- [ ] **Create configuration guide**
+  - Location: `docs-source/development/configuration.md`
+  - Cover environment variables
+  - ServiceNow integration setup
+  - File upload limits and settings
+
+### Testing Documentation
+
+- [ ] **Add testing guide**
+  - Location: `docs-source/development/testing.md`
+  - Playwright setup and execution
+  - Docker restart requirement
+  - Test writing guidelines
+
+---
+
+## Phase 4: Quality Assurance
+
+### Documentation Pipeline
+
+- [ ] **Run documentation generation**
+
+  ```bash
+  npm run docs:analyze
+  npm run docs:generate
+  npm run lint:md
+  ```
+
+### Review and Validation
+
+- [ ] **Cross-reference with codebase**
+  - Verify all documented endpoints exist in server.js
+  - Check database schema matches documentation
+  - Validate code examples work
+
+- [ ] **Test documentation portal**
+  - Ensure all links work
+  - Verify navigation functions properly
+  - Check responsive design
+
+---
+
+## Files from docs-temp/ to Review and Integrate
+
+### Direct Moves (5 files)
+
+- `troubleshooting.md` → `docs-source/user-guides/`
+- `roadmap.md` → `docs-source/`
+- `testing.md` → `docs-source/development/`
+- `deployment.md` → `docs-source/development/`
+- `changelog-detailed.md` → merge with existing `CHANGELOG.md`
+
+### Files Needing Merge/Update
+
+- Multiple API reference files
+- Architecture documentation updates
+- Enhanced security documentation
+- Updated getting started guides
+
+---
+
+## Success Criteria
+
+### Must Have for v1.0.4 Release
+
+- ✅ All broken references fixed
+- ✅ Missing API endpoints documented  
+- ✅ User guide files exist and are complete
+- ✅ Version consistency across all files
+- ✅ README.md created
+
+### Should Have
+
+- ✅ docs-temp/ content integrated where valuable
+- ✅ Configuration documentation complete
+- ✅ Testing documentation available
+- ✅ Documentation pipeline runs cleanly
+
+### Nice to Have
+
+- Enhanced API response examples
+- Architecture diagrams
+- Expanded security documentation
+
+---
+
+## Notes
+
+- Focus on accuracy over completeness for v1.0.4
+- docs-temp/ folder contains substantial work already done
+- Use `npm run docs:generate` after each major change
+- Test documentation portal locally before considering complete
+
+## Estimated Time
+
+- Phase 1: 2-3 hours
+- Phase 2: 1-2 hours  
+- Phase 3: 1-2 hours
+- Phase 4: 30 minutes
+
+**Total: 4.5-7.5 hours** (perfect for an evening work session)
