@@ -1,214 +1,86 @@
-# HexTrackr AI Assistant Instructions (DRAFT)
+# HexTrac## Key files
 
-## Project Overview
+- `server.js`: al## Testing and qual## What to keep in mind when editing
+- DB writes that iterate rows should be sequential (avoid `forEach` + callbacks) to prevent race conditions; see the sequential loop in `processVulnerabilityRowsWithRollover`.
+- When adding docs sections, update the whitelist in `/docs-html` deep-link routing or they won't be reachable by direct URL.
+- Schema changes must be idempotent ALTERs in `server.js` to support rolling updates.
+- Always clean up temp files with `PathValidator.safeUnlinkSync()` after processing uploads.
 
-HexTrackr is a vulnerability and ticket management system with a monolithic Node.js/Express backend and browser-based frontend. It uses SQLite for persistence and follows a modular JavaScript architecture pattern.
+## Releases and versioning
 
-## Memory Systems Integration
+- Update `CHANGELOG.md` (Keep a Changelog format) and bump `package.json` version per SemVer.
+- Create git tags `MAJOR.MINOR.PATCH` for releases.
+- Commits: Use imperative mood, reference issues (`#123`).
+- PRs: Include UI screenshots, describe schema/data impacts.- E2E tests: Playwright tests expect `http://localhost:8080` and clean container state.
+- Always run `docker-compose restart` before executing tests to ensure clean state.
+- Tests should be idempotent and handle existing data gracefully.
+- Code quality: Run `npm run lint:all` and `npm run fix:all` before commits.
+- Use markdownlint for docs: `npm run lint:md` and `npm run lint:md:fix`.
 
-You have access to two advanced memory systems that work together to provide comprehensive context:
+## Conventions and patterns
 
-1. **Memento MCP**: Knowledge graph for structured technical information
-   - Stores: Code components, architectural decisions, entity relationships
-   - Optimized for: Technical knowledge, code structure, design patterns
-   - Query via: `semantic_search` with specific entity types
+- Security: Always use the `PathValidator` helpers for any FS operations; don't bypass them. Uploads are in `uploads/`, 100MB max.
+- Responses: On success, return JSON with either arrays/objects or `{ success: true, ... }`. Errors use status 400/500 with `{ error }`.
+- Dates: Use ISO `YYYY-MM-DD` for scan dates; many columns allow null/empty to support schema evolution.
+- Frontend contract: Shared components (e.g., `scripts/shared/settings-modal.js`) may call `window.refreshPageData(type)`; make sure page scripts define it.
+- Module loading order: Always load `scripts/shared/*` before `scripts/pages/*` in HTML.
+- Code style: 2-space indent, camelCase variables, kebab-case filenames, CommonJS in server code. routes, security headers, CSV parsing, rollover import (`processVulnerabilityRowsWithRollover`), docs portal routing.
+- `scripts/init-database.js`: bootstrap DB if missing; `server.js` also evolves schema with idempotent ALTERs.
+- `docs-html/*`: generated docs portal (served at `/docs-html`), with a whitelist of valid deep-link sections.
+- `Dockerfile.node`: the correct Dockerfile for development (not the main Dockerfile).
 
-1. **Persistent AI Memory (PAM)**: Timeline-based memory for conversational context
-   - Stores: Conversation history, git commits, user preferences
-   - Optimized for: Chronological data, conversation continuity
-   - Query via: `search_memories` with type filters
+## Run and develop
 
-### MCP Tool Reference
+- **CRITICAL**: Use Docker only (don't run Node locally): `docker-compose up -d --build` (exposes <http://localhost:8080>).
+- **CRITICAL**: Always restart container before running Playwright tests: `docker-compose restart`.
+- Health check: GET `/health` returns `{ status, version, db, uptime }`.
+- NPM scripts (run inside container): `npm start`, `npm run dev`, `npm run init-db`, `npm run lint:all`, `npm run fix:all`, `npm run docs:generate`, `npm run docs:analyze`.
+- Code quality: Use `npm run lint:all` and `npm run fix:all` before commits; maintain 2-space indent, camelCase variables, kebab-case filenames.ot Instructions
 
-- **Tool Documentation**: Check `.runbooks/tools/` for comprehensive MCP server documentation
-- **Available Tools**: FileScopeMCP, Codacy, GitHub, Firecrawl, Context7, and 10+ other servers
-- **Usage Patterns**: Each `.runbooks/tools/{server}-mcp.prompt.md` includes tool lists and best practices
+Purpose: Give AI coding agents the minimum context to be productive in this repo. Keep edits aligned to these conventions and examples.
 
-### Memory Access Optimization Protocol
+## Big picture
 
-Follow this sequence for maximum token efficiency:
+- Monolithic Node/Express app (`server.js`) serving static HTML + a JSON API; SQLite DB (`data/hextrackr.db`).
+- Vulnerability data uses a rollover architecture: imports write historical snapshots and a deduplicated "current" table, plus daily totals for trends.
+- Frontend is modular: `scripts/shared/*` (reusable UI/utilities) load before `scripts/pages/*` (page logic). Pages expose `window.refreshPageData(type)` for shared components to trigger refreshes.
 
-1. **Context First**: Use what's in the current conversation window
-2. **Targeted Search**: Use specific 3-5 word queries with type filters
-3. **Progressive Expansion**: Only broaden search if needed after initial results
+## Key files
 
-```
-// EFFICIENT PATTERN
-semantic_search("express route validation", entity_types=["code-component"], limit=3)
+- `server.js`: all API routes, security headers, CSV parsing, rollover import (`processVulnerabilityRowsWithRollover`), docs portal routing.
+- `scripts/init-database.js`: bootstrap DB if missing; `server.js` also evolves schema with idempotent ALTERs.
+- `docs-html/*`: generated docs portal (served at `/docs-html`), with a whitelist of valid deep-link sections.
 
-// INEFFICIENT PATTERN - AVOID
-read_graph() // Returns everything - token expensive
-```
+## Run and develop (2)
 
-## Key Architecture Patterns
+- Use Docker only (don’t run Node locally): `docker-compose up -d --build` (exposes <http://localhost:8080>).
+- Health check: GET `/health` returns `{ status, version, db, uptime }`.
+- NPM scripts (run inside container): `npm start`, `npm run dev`, `npm run init-db`, `npm run lint:all`, `npm run fix:all`, `npm run docs:generate`, `npm run docs:analyze`.
+- Playwright e2e tests are supported; restart the container before running them.
 
-### Backend Architecture
+## Data flows and APIs
 
-- Monolithic Express server (`server.js`) handling both API and static file serving
-- SQLite database with runtime schema evolution
-- Core middleware: CORS, compression, JSON/form parsing (100MB limits), security headers
-- File uploads handled via multer in `uploads/` directory
-- PathValidator class for secure file operations
+- CSV import: `POST /api/vulnerabilities/import` (multipart, field `csvFile`, body `vendor`, `scanDate`).
+  - Dedup key = `normalizeHostname(hostname)` + CVE (or plugin_id + description fallback).
+  - Updates `vulnerabilities_current`, appends `vulnerability_snapshots`, recalculates `vulnerability_daily_totals`.
+- JSON imports: `POST /api/import/vulnerabilities` and `POST /api/import/tickets` accept `{ data: [...] }` rows.
+- Querying: `/api/vulnerabilities` (pagination + search + severity), `/api/vulnerabilities/stats`, `/api/vulnerabilities/recent-trends`, `/api/vulnerabilities/trends`.
+- Backup/restore: `/api/backup/*`, `/api/restore` (ZIP of JSON parts via JSZip). Clearing data: `DELETE /api/backup/clear/:type`.
 
-### Frontend Architecture
+## Conventions and patterns (2)
 
-- Modular pattern with shared components (`scripts/shared/`), page-specific code (`scripts/pages/`), and utilities (`scripts/utils/`)
-- Page initialization flow:
-  1. Load shared components (e.g., `settings-modal.js`)
-  2. Load page-specific code (e.g., `tickets.js`)
-- Inter-module communication via `window.refreshPageData(type)` pattern
+- Security: Always use the `PathValidator` helpers for any FS operations; don’t bypass them. Uploads are in `uploads/`, 100MB max.
+- Responses: On success, return JSON with either arrays/objects or `{ success: true, ... }`. Errors use status 400/500 with `{ error }`.
+- Dates: Use ISO `YYYY-MM-DD` for scan dates; many columns allow null/empty to support schema evolution.
+- Frontend contract: Shared components (e.g., `scripts/shared/settings-modal.js`) may call `window.refreshPageData(type)`; make sure page scripts define it.
 
-### Database Schema
+## What to keep in mind when editing
 
-- Located at `data/hextrackr.db`, initialized by `scripts/init-database.js`
-- Key tables: tickets, vulnerabilities, vulnerability_imports
-- Schema evolution happens at runtime with idempotent ALTERs
-- JSON fields stored as strings (e.g., devices in tickets table)
+- DB writes that iterate rows should be sequential (avoid `forEach` + callbacks) to prevent race conditions; see the sequential loop in `processVulnerabilityRowsWithRollover`.
+- When adding docs sections, update the whitelist in `/docs-html` deep-link routing or they won’t be reachable by direct URL.
+- Maintain 2-space indent, CommonJS in server code, and keep schema changes idempotent.
 
-## Critical Workflows
+## Quick examples
 
-### Development Setup
-
-- **NEVER** run node.js locally for this project, always run in Docker container
-
-### Docker Configuration
-
-- Uses `Dockerfile.node` (not the main `Dockerfile`)
-- Single container setup on port 8080
-- **Important:** Restart Docker container before running Playwright tests
-
-### Data Import Flows
-
-1. CSV Upload:
-   - Multipart form upload → temp file storage → Papa.parse → DB insert → cleanup
-1. JSON Import (client-parsed CSV):
-   - Direct JSON payload → DB insert
-   - Both flows update both vulnerability_imports and vulnerabilities tables
-
-### Integration Points
-
-- ServiceNow ticket integration via configurable settings
-- CSV imports from various vulnerability scanners
-- Backup/restore system for all data types
-- Settings modal provides global data operation hooks
-
-## Project-Specific Conventions
-
-### File Organization
-
-- Frontend modules follow strict shared/pages/utils separation
-- API endpoints grouped by domain (tickets, vulnerabilities, backup)
-- Database initialization split between runtime (server.js) and bootstrap (init-database.js)
-
-### Error Handling
-
-- HTTP 400 for bad input (missing files/data)
-- HTTP 500 for DB/processing errors
-- Success responses always include `{ success: true }` with additional data
-
-### Data Validation
-
-- CSV imports validate required fields per vendor
-- Ticket fields allow schema evolution (nullable new columns)
-- File paths validated through PathValidator class
-
-## Common Pitfalls
-
-- settings-modal.js expects generic `/api/import` but server uses specific endpoints
-- Ticket schema has evolved - some deployments may lack newer columns
-- File uploads must not exceed 100MB limit
-- Remember to unlink temporary files after processing
-- SQLite file requires write permissions in `data/` directory
-
-## Key Files for Context
-
-- `server.js`: Main backend entry point
-- `scripts/init-database.js`: DB schema and initialization
-- `scripts/shared/settings-modal.js`: Global frontend utilities
-- `docs-source/architecture/`: Detailed architecture documentation
-
-## 7-Step Task Execution Protocol
-
-Follow this process for every user request:
-
-### 1. Observe - Gather Context Efficiently
-
-- Check current conversation context first
-- Use targeted semantic searches with specific terms and type filters
-- Limit initial results to 3-5 items to conserve tokens
-- Track sources with [MEMENTO] or [PAM] prefixes
-
-### 2. Plan - Structure Your Approach
-
-- Create a concise checklist of 3-5 specific actions
-- Identify files that need to be changed
-- Store technical concepts as Memento entities with proper types
-
-### 3. Safeguards - Prevent Data Loss
-
-- Create safety snapshots before making changes
-- Document rollback strategies
-- Store conversation state in PAM before major operations
-
-### 4. Execute - Implement With Precision
-
-- Make minimal, focused changes
-- Run Codacy analysis after file edits
-- Work in small, verifiable increments
-
-### 5. Verify - Confirm Success
-
-- Run appropriate tests for the changes made
-- Perform targeted smoke tests
-- Fix any issues before continuing
-
-### 6. Map-Update - Enhance Knowledge
-
-- Add observations to relevant Memento entities
-- Update conversation context in PAM
-- Create reminders for follow-up tasks
-
-### 7. Log - Document Outcomes
-
-- Store structured records in both memory systems
-- Update project documentation
-- Maintain the project roadmap
-
-## Optimized Memory Taxonomy
-
-| Knowledge Type | System | Query Method | Example | When to Use |
-|---------------|--------|--------------|---------|------------|
-| Code structure | Memento | `semantic_search` + type filter | `semantic_search("server endpoints", entity_types=["code-component"])` | Understanding implementation |
-| Design decisions | Memento | `semantic_search` + type filter | `semantic_search("database schema design", entity_types=["decision"])` | Retrieving rationale |
-| User preferences | Memento | `open_nodes` with ID | `open_nodes(["user_lonnie"])` | Personalizing responses |
-| Recent conversations | PAM | `search_memories` with type | `search_memories("vulnerability import", type="conversation")` | Continuing discussions |
-| Git history | PAM | `search_memories` with type | `search_memories("fix ticket schema", type="git-commit")` | Understanding changes |
-| Project timeline | PAM | `get_memories_by_date` | `get_memories_by_date(start="2025-08-01")` | Tracking progress |
-
-## Versioning Standards
-
-### Keep a Changelog
-
-- **Format**: Follow [Keep a Changelog v1.0.0](https://keepachangelog.com/en/1.0.0/) format
-- **File**: `CHANGELOG.md` must be updated for ALL releases
-- **Sections**: Unreleased, Added, Changed, Deprecated, Removed, Fixed, Security
-- **Badges**: [![Keep a Changelog](https://img.shields.io/badge/Keep%20a%20Changelog-v1.0.0-orange)](https://keepachangelog.com/en/1.0.0/)
-
-### Semantic Versioning
-
-- **Standard**: Follow [Semantic Versioning v2.0.0](https://semver.org/spec/v2.0.0.html)
-- **Format**: MAJOR.MINOR.PATCH (e.g., 1.0.2)
-- **Current Version**: 1.0.3 (in package.json)
-- **Rules**:
-  - **MAJOR**: Breaking changes or major architectural updates
-  - **MINOR**: New features and enhancements (backward compatible)  
-  - **PATCH**: Bug fixes and minor improvements
-- **Badges**: [![Semantic Versioning](https://img.shields.io/badge/Semantic%20Versioning-v2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
-
-### Release Process
-
-1. Update CHANGELOG.md with new version section
-2. Update package.json version number
-3. Commit with descriptive message following SemVer
-4. Create Git tag matching version number
-5. Push changes and tags to GitHub
+- Health probe addition: add a new `app.get('/healthz')` similar to `/health` in `server.js`.
+- New page JS: put code in `scripts/pages/newpage.js`, define `window.refreshPageData`, include shared loaders first in HTML, then your page script.

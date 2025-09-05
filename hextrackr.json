@@ -422,15 +422,6 @@
         ]
       },
       {
-        "path": "/Volumes/DATA/GitHub/HexTrackr/AGENTS.md",
-        "name": "AGENTS.md",
-        "isDirectory": false,
-        "importance": 1,
-        "dependencies": [],
-        "packageDependencies": [],
-        "dependents": []
-      },
-      {
         "path": "/Volumes/DATA/GitHub/HexTrackr/Dockerfile.node",
         "name": "Dockerfile.node",
         "isDirectory": false,
