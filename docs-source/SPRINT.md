@@ -1,17 +1,17 @@
-# HexTrackr v1.0.5 JavaScript Modularization Sprint
+# HexTrackr v1.0.8 Performance Optimization Sprint
 
 ## Overview
 
-**PRIORITY SHIFT**: Focus moved from documentation to critical JavaScript modularization for widget-based dashboard architecture. Documentation updates will follow modularization completion.
+**PRIORITY SHIFT**: Focus moved to performance bottlenecks as foundation - CSV import optimization and rollover schema enhancement. This creates the stable infrastructure needed for all future features including KEV integration.
 
 ## Strategic Vision
 
-Transform HexTrackr into a composable dashboard platform with drag-drop widgets for personalized user experiences. This modularization effort is essential for:
+Build a high-performance foundation for HexTrackr's vulnerability management system. This performance optimization sprint is essential for:
 
-- AI-friendly development (all files <500 lines)  
-- Future dashboard customization capabilities
-- Parallel development across multiple AI assistants
-- Improved code maintainability and Codacy scores
+- **Daily Workflow Efficiency**: 8-15x faster CSV imports (10-20 minutes → 1-2 minutes)
+- **Data Quality Foundation**: Eliminate duplicate vulnerabilities through enhanced rollover schema  
+- **API Integration Readiness**: Clean, deduplicated data essential for future CISCO/Tenable integrations
+- **User Experience**: Real-time progress feedback and responsive large file processing
 
 ## Phase 1 Completed ✅ **Sep 5, 2025**
 
@@ -20,52 +20,50 @@ Transform HexTrackr into a composable dashboard platform with drag-drop widgets 
 - ✅ PaginationController extraction proof-of-concept (216 lines)
 - ✅ Dashboard vision planning and widget architecture
 - ✅ Unified AI development workflow with memory systems
+- ✅ Strategic priority realignment (Sep 6, 2025) - KEV integration as #1 priority
 
-## Current Sprint Goals (Phase 2)
+## Current Sprint Goals (Performance Foundation)
 
-1. **Split ModernVulnManager class** (2,429 lines → 8 widget-ready modules)
-2. **Establish widget interface standards** for future dashboard implementation
-3. **Maintain zero functionality regression** during refactoring
-4. **Enable parallel AI development** across specialized modules
+1. **CSV Import Performance Optimization** (15-20 hours) - 8-15x speed improvement
+2. **Vulnerability Rollover Schema Enhancement** (30-40 hours) - eliminate duplicates
+3. **Real-time Progress Implementation** - WebSocket-based import status
+4. **Database Transaction Optimization** - batch processing with SQLite efficiency
 
 ---
 
-## Phase 2: ModernVulnManager Modularization Tasks
+## Performance Sprint Tasks (Phase 1)
 
-### Week 1: Data Layer & Statistics (Sep 9-13, 2025)
+### Week 1: CSV Import Optimization (Sep 9-13, 2025)
 
-#### **Task 2.1: Extract vulnerability-data.js** 🔄 **Priority: CRITICAL**
+#### **Task 1.1: Analyze Current CSV Import Bottlenecks** 🔄 **Priority: CRITICAL**
 
-- [ ] **Create DataManager module** (~350 lines)
-  - Methods: `loadData()`, `processDevices()`, `filterData()`, `groupVulnerabilitiesByCVE()`
-  - Purpose: Central data fetching, caching, and state management
-  - Dependencies: None (pure data layer)
-  - Widget Potential: Hidden DataManager service widget
+- [ ] **Profile `processVulnerabilityRowsWithRollover()`** - Identify specific performance bottlenecks
+- [ ] **Database Query Analysis** - Measure INSERT/UPDATE performance patterns  
+- [ ] **Memory Usage Profiling** - Track memory consumption during large file processing
+- [ ] **Establish Performance Baselines** - Document current import times for 10MB, 50MB, 100MB files
 
-#### **Task 2.2: Extract vulnerability-statistics.js** 🔄 **Priority: HIGH**
+#### **Task 1.2: Implement Batch Processing Architecture** 🔄 **Priority: HIGH**
 
-- [ ] **Create VPRStatistics module** (~300 lines)
-  - Methods: `updateStatisticsDisplay()`, `updateTrendIndicators()`, `flipStatCards()`, `calculateTrend()`
-  - Purpose: Statistics calculation and display logic
-  - Dependencies: vulnerability-data
-  - Widget Potential: Configurable statistics widget
+- [ ] **Design Batch Processing Logic** - Process CSV rows in configurable batches (500-1000 rows)
+- [ ] **Database Transaction Optimization** - Use SQLite transactions for batch commits
+- [ ] **Memory Management** - Stream processing to avoid loading entire file into memory  
+- [ ] **Progress Tracking Infrastructure** - Foundation for real-time progress updates
 
-#### **Task 2.3: Testing & Integration**
+#### **Task 1.3: Testing & Benchmarking**
 
-- [ ] **Validate data layer functionality**
-- [ ] **Test statistics calculations**
-- [ ] **Update import dependencies**
-- [ ] **Docker restart and browser testing**
+- [ ] **Performance Testing Suite** - Automated testing with various file sizes
+- [ ] **Memory Leak Detection** - Ensure consistent memory usage across imports
+- [ ] **Regression Testing** - Validate no data integrity issues from optimization
+- [ ] **Docker restart and browser testing** - Full integration validation
 
-### Week 2: UI Components (Sep 16-20, 2025)
+### Week 2: Rollover Schema Enhancement (Sep 16-20, 2025)
 
-#### **Task 2.4: Extract vulnerability-search.js** 🔄 **Priority: MEDIUM**
+#### **Task 2.1: Enhanced Deduplication Logic** 🔄 **Priority: CRITICAL**
 
-- [ ] **Create VulnerabilitySearch module** (~200 lines)
-  - Methods: Search handlers, filter logic, view switching
-  - Purpose: Search and filtering controls
-  - Dependencies: vulnerability-data
-  - Widget Potential: Unified search/filter control panel
+- [ ] **Multi-tier Deduplication Strategy** - Implement confidence scoring for duplicate detection
+- [ ] **Enhanced Unique Key Algorithm** - Beyond hostname + CVE matching  
+- [ ] **Lifecycle State Management** - Handle resolved/reopened vulnerability states
+- [ ] **Migration Script Development** - Safe upgrade path for existing data
 
 #### **Task 2.5: Extract vulnerability-charts.js** 🔄 **Priority: HIGH**  
 
@@ -167,7 +165,7 @@ Transform HexTrackr into a composable dashboard platform with drag-drop widgets 
 
 ---
 
-*Sprint updated September 5, 2025 to reflect strategic shift to modularization priority*
+*Sprint updated September 6, 2025 to reflect performance-first strategy and version consistency (v1.0.8)*
 
 ## Agent Coordination Strategy
 
@@ -189,4 +187,4 @@ This modularization sprint is designed for the unified AI development workflow:
 3. User guides demonstrate widget-based functionality
 4. Development resources focus on foundation-building first
 
-The documentation sprint will resume in v1.0.6 planning after modularization success.
+The documentation sprint will resume in v1.0.9 planning after modularization success and KEV integration completion.

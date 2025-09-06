@@ -105,6 +105,10 @@ function mapVulnerabilityRow(row) {
     // Enhanced description handling - prefer definition.description for Tenable, name for others
     const description = row["definition.description"] || row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "";
     
+    // Plugin name contains the full vulnerability name/description for matching and display
+    // The front-end will extract CVE/Cisco SA for the Vulnerability column display
+    const pluginName = row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "";
+    
     return {
         assetId: row["asset.id"] || row["asset_id"] || row["Asset ID"] || "",
         hostname: hostname,
@@ -113,8 +117,8 @@ function mapVulnerabilityRow(row) {
         severity: row["severity"] || row["Severity"] || "",
         vprScore: row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"] ? parseFloat(row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"]) : null,
         cvssScore: row["cvss_score"] || row["CVSS Score"] ? parseFloat(row["cvss_score"] || row["CVSS Score"]) : null,
-        vendor: row["definition.family"] || row["vendor"] || row["Vendor"] || "",
-        pluginName: row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "",
+        vendor: normalizeVendor(row["definition.family"] || row["vendor"] || row["Vendor"] || ""),
+        pluginName: pluginName,
         description: description,
         solution: row["solution"] || row["Solution"] || "",
         state: row["state"] || row["State"] || "ACTIVE",
@@ -192,6 +196,22 @@ function normalizeHostname(hostname) {
     // For domain names or invalid IPs, remove everything after first period to handle domain variations
     // Examples: nwan10.mmplp.net -> nwan10, nswan10 -> nswan10, 300.300.300.300 -> 300
     return cleanHostname.split(".")[0].toLowerCase();
+}
+
+function normalizeVendor(vendor) {
+    if (!vendor) {
+        return "Other";
+    }
+    
+    const cleanVendor = vendor.trim().toLowerCase();
+    
+    if (cleanVendor.includes("cisco")) {
+        return "CISCO";
+    } else if (cleanVendor.includes("palo alto")) {
+        return "Palo Alto";
+    } else {
+        return "Other";
+    }
 }
 
 // Enhanced deduplication supporting functions
@@ -493,19 +513,491 @@ function _processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, r
     });
 }
 
+// ✅ BULK STAGING LOADER - Session 2 Performance Enhancement
+function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, res, startTime) {
+    const loadStart = Date.now();
+    console.log(`🚀 BULK LOAD: Starting bulk insert of ${rows.length} rows to staging table`);
+    
+    // Prepare batch INSERT statement for staging table
+    const stagingInsertSQL = `
+        INSERT INTO vulnerability_staging (
+            import_id, hostname, ip_address, cve, severity, vpr_score, cvss_score,
+            plugin_id, plugin_name, description, solution, vendor_reference, vendor,
+            vulnerability_date, state, raw_csv_row
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    
+    // ✅ TRANSACTION WRAPPING FOR PERFORMANCE
+    db.serialize(() => {
+        db.run("BEGIN TRANSACTION", (err) => {
+            if (err) {
+                console.error("Error starting transaction:", err);
+                res.status(500).json({ error: "Transaction start failed" });
+                return;
+            }
+            
+            console.log("💾 Transaction started - bulk inserting rows");
+            
+            const stmt = db.prepare(stagingInsertSQL);
+            let insertedCount = 0;
+            let errorCount = 0;
+            const errors = [];
+            
+            // Process all rows in the transaction
+            rows.forEach((row, index) => {
+                try {
+                    // Map CSV row to staging table structure
+                    const mapped = mapVulnerabilityRow(row);
+                    
+                    stmt.run([
+                        importId,
+                        mapped.hostname,
+                        mapped.ipAddress,
+                        mapped.cve,
+                        mapped.severity,
+                        mapped.vprScore,
+                        mapped.cvssScore,
+                        mapped.pluginId,
+                        mapped.pluginName,
+                        mapped.description,
+                        mapped.solution,
+                        mapped.vendor,
+                        mapped.vendor,
+                        mapped.pluginPublished,
+                        mapped.state,
+                        JSON.stringify(row) // Store raw CSV row for flexibility
+                    ], function(err) {
+                        if (err) {
+                            console.error(`Row ${index + 1} insert error:`, err);
+                            errors.push(`Row ${index + 1}: ${err.message}`);
+                            errorCount++;
+                        } else {
+                            insertedCount++;
+                        }
+                    });
+                } catch (error) {
+                    console.error(`Row ${index + 1} mapping error:`, error);
+                    errors.push(`Row ${index + 1}: ${error.message}`);
+                    errorCount++;
+                }
+            });
+            
+            // Finalize the prepared statement and commit transaction
+            stmt.finalize((err) => {
+                if (err) {
+                    console.error("Error finalizing statement:", err);
+                    db.run("ROLLBACK", () => {
+                        res.status(500).json({ error: "Staging insert failed" });
+                    });
+                    return;
+                }
+                
+                // Commit the transaction
+                db.run("COMMIT", (err) => {
+                    if (err) {
+                        console.error("Error committing transaction:", err);
+                        res.status(500).json({ error: "Transaction commit failed" });
+                        return;
+                    }
+                    
+                    const loadTime = Date.now() - loadStart;
+                    const rowsPerSecond = insertedCount / (loadTime / 1000);
+                    
+                    console.log(`✅ BULK LOAD COMPLETE: ${insertedCount}/${rows.length} rows inserted in ${loadTime}ms (${rowsPerSecond.toFixed(1)} rows/sec)`);
+                    
+                    // Clean up file immediately after staging
+                    try {
+                        if (filePath && PathValidator.safeExistsSync(filePath)) {
+                            PathValidator.safeUnlinkSync(filePath);
+                            console.log("🗑️  Source file cleaned up");
+                        }
+                    } catch (unlinkError) {
+                        console.error("Error cleaning up file:", unlinkError);
+                    }
+                    
+                    // ✅ NOW PROCESS FROM STAGING TO FINAL TABLES
+                    processStagingToFinalTables(importId, scanDate, {
+                        ...responseData,
+                        bulkLoadTime: loadTime,
+                        bulkLoadRowsPerSecond: parseFloat(rowsPerSecond.toFixed(1)),
+                        insertedToStaging: insertedCount,
+                        stagingErrors: errorCount
+                    }, res, startTime);
+                });
+            });
+        });
+    });
+}
+
+// ✅ BATCH PROCESSOR - Session 2 Performance Enhancement  
+// Process staging table to final tables in configurable batches
+function processStagingToFinalTables(importId, scanDate, responseData, res, startTime) {
+    const _processStart = Date.now(); // Performance tracking (may be used in future metrics)
+    const batchSize = 1000; // Process 1000 rows at a time
+    const currentDate = scanDate;
+    
+    console.log("🔄 BATCH PROCESSOR: Starting batch processing from staging table");
+    console.log(`📊 Batch Size: ${batchSize}, Import ID: ${importId}, Scan Date: ${currentDate}`);
+    
+    // Step 1: Mark all active vulnerabilities as potentially stale (grace period)
+    const graceStart = Date.now();
+    db.run("UPDATE vulnerabilities_current SET lifecycle_state = 'grace_period' WHERE lifecycle_state = 'active'", (err) => {
+        if (err) {
+            console.error("Error marking vulnerabilities as stale:", err);
+            res.status(500).json({ error: "Failed to prepare for batch processing" });
+            return;
+        }
+        
+        console.log(`⏱️  Grace period update took ${Date.now() - graceStart}ms`);
+        
+        // Step 2: Get total count for batch processing
+        db.get("SELECT COUNT(*) as total FROM vulnerability_staging WHERE import_id = ? AND processed = 0", 
+            [importId], (err, countResult) => {
+            if (err) {
+                console.error("Error counting staging records:", err);
+                res.status(500).json({ error: "Failed to count staging records" });
+                return;
+            }
+            
+            const totalRows = countResult.total;
+            const totalBatches = Math.ceil(totalRows / batchSize);
+            
+            console.log(`📈 Processing ${totalRows} rows in ${totalBatches} batches`);
+            
+            // Initialize batch processing stats
+            const batchStats = {
+                processedRows: 0,
+                insertedToCurrent: 0,
+                updatedInCurrent: 0,
+                insertedToSnapshots: 0,
+                errors: 0,
+                currentBatch: 0,
+                totalBatches,
+                startTime: Date.now()
+            };
+            
+            // Start batch processing
+            processNextBatch(importId, currentDate, batchSize, batchStats, responseData, res, startTime);
+        });
+    });
+}
+
+// Process batches sequentially to maintain data integrity
+function processNextBatch(importId, currentDate, batchSize, batchStats, responseData, res, startTime) {
+    if (batchStats.currentBatch >= batchStats.totalBatches) {
+        // All batches processed - finalize
+        finalizeBatchProcessing(importId, currentDate, batchStats, responseData, res, startTime);
+        return;
+    }
+    
+    const batchStart = Date.now();
+    batchStats.currentBatch++;
+    
+    // Get next batch of unprocessed records
+    const selectBatchSQL = `
+        SELECT * FROM vulnerability_staging 
+        WHERE import_id = ? AND processed = 0 
+        ORDER BY id 
+        LIMIT ?
+    `;
+    
+    db.all(selectBatchSQL, [importId, batchSize], (err, batchRows) => {
+        if (err) {
+            console.error("Error selecting batch:", err);
+            batchStats.errors++;
+            processNextBatch(importId, currentDate, batchSize, batchStats, responseData, res, startTime);
+            return;
+        }
+        
+        if (batchRows.length === 0) {
+            // No more rows to process
+            finalizeBatchProcessing(importId, currentDate, batchStats, responseData, res, startTime);
+            return;
+        }
+        
+        console.log(`🔄 Processing batch ${batchStats.currentBatch}/${batchStats.totalBatches} (${batchRows.length} rows)`);
+        
+        // Process this batch using transaction
+        db.serialize(() => {
+            db.run("BEGIN TRANSACTION", (txErr) => {
+                if (txErr) {
+                    console.error("Batch transaction error:", txErr);
+                    batchStats.errors++;
+                    processNextBatch(importId, currentDate, batchSize, batchStats, responseData, res, startTime);
+                    return;
+                }
+                
+                // Process each row in the batch
+                let batchProcessed = 0;
+                const processedIds = [];
+                
+                batchRows.forEach((row, _index) => {
+                    // Generate unique keys using existing logic
+                    const enhancedKey = generateEnhancedUniqueKey(row);
+                    const legacyKey = generateUniqueKey(row);
+                    const confidence = calculateDeduplicationConfidence(enhancedKey);
+                    const tier = getDeduplicationTier(enhancedKey);
+                    
+                    // Insert to snapshots first
+                    const snapshotInsert = `
+                        INSERT INTO vulnerability_snapshots (
+                            import_id, scan_date, hostname, ip_address, cve, severity, 
+                            vpr_score, cvss_score, first_seen, last_seen, plugin_id, 
+                            plugin_name, description, solution, vendor_reference, vendor, 
+                            vulnerability_date, state, unique_key, enhanced_unique_key, 
+                            confidence_score, dedup_tier
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    `;
+                    
+                    db.run(snapshotInsert, [
+                        importId, currentDate, row.hostname, row.ip_address, row.cve,
+                        row.severity, row.vpr_score, row.cvss_score, row.vulnerability_date || currentDate,
+                        currentDate, row.plugin_id, row.plugin_name, row.description,
+                        row.solution, row.vendor_reference, row.vendor, row.vulnerability_date,
+                        row.state, legacyKey, enhancedKey, confidence, tier
+                    ], function(snapErr) {
+                        if (snapErr) {
+                            console.error(`Snapshot insert error for row ${row.id}:`, snapErr);
+                            batchStats.errors++;
+                        } else {
+                            batchStats.insertedToSnapshots++;
+                        }
+                        
+                        // Check if exists in current table
+                        const checkExisting = `
+                            SELECT id, lifecycle_state FROM vulnerabilities_current 
+                            WHERE unique_key = ? OR enhanced_unique_key = ?
+                        `;
+                        
+                        db.get(checkExisting, [legacyKey, enhancedKey], (checkErr, existing) => {
+                            if (checkErr) {
+                                console.error(`Check existing error for row ${row.id}:`, checkErr);
+                                batchStats.errors++;
+                            } else if (existing) {
+                                // Update existing
+                                const updateCurrent = `
+                                    UPDATE vulnerabilities_current SET
+                                        import_id = ?, scan_date = ?, hostname = ?, ip_address = ?, 
+                                        cve = ?, severity = ?, vpr_score = ?, cvss_score = ?,
+                                        last_seen = ?, plugin_id = ?, plugin_name = ?, 
+                                        description = ?, solution = ?, vendor_reference = ?,
+                                        vendor = ?, vulnerability_date = ?, state = ?,
+                                        lifecycle_state = 'active', enhanced_unique_key = ?,
+                                        confidence_score = ?, dedup_tier = ?
+                                    WHERE id = ?
+                                `;
+                                
+                                db.run(updateCurrent, [
+                                    importId, currentDate, row.hostname, row.ip_address, row.cve,
+                                    row.severity, row.vpr_score, row.cvss_score, currentDate,
+                                    row.plugin_id, row.plugin_name, row.description, row.solution,
+                                    row.vendor_reference, row.vendor, row.vulnerability_date,
+                                    row.state, enhancedKey, confidence, tier, existing.id
+                                ], (updateErr) => {
+                                    if (updateErr) {
+                                        console.error(`Current update error for row ${row.id}:`, updateErr);
+                                        batchStats.errors++;
+                                    } else {
+                                        batchStats.updatedInCurrent++;
+                                    }
+                                    finalizeBatchRow();
+                                });
+                            } else {
+                                // Insert new
+                                const insertCurrent = `
+                                    INSERT INTO vulnerabilities_current (
+                                        import_id, scan_date, hostname, ip_address, cve, severity,
+                                        vpr_score, cvss_score, first_seen, last_seen, plugin_id,
+                                        plugin_name, description, solution, vendor_reference, vendor,
+                                        vulnerability_date, state, unique_key, lifecycle_state,
+                                        enhanced_unique_key, confidence_score, dedup_tier
+                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)
+                                `;
+                                
+                                db.run(insertCurrent, [
+                                    importId, currentDate, row.hostname, row.ip_address, row.cve,
+                                    row.severity, row.vpr_score, row.cvss_score, 
+                                    row.vulnerability_date || currentDate, currentDate, row.plugin_id,
+                                    row.plugin_name, row.description, row.solution, row.vendor_reference,
+                                    row.vendor, row.vulnerability_date, row.state, legacyKey,
+                                    enhancedKey, confidence, tier
+                                ], (insertErr) => {
+                                    if (insertErr) {
+                                        console.error(`Current insert error for row ${row.id}:`, insertErr);
+                                        batchStats.errors++;
+                                    } else {
+                                        batchStats.insertedToCurrent++;
+                                    }
+                                    finalizeBatchRow();
+                                });
+                            }
+                        });
+                    });
+                    
+                    function finalizeBatchRow() {
+                        batchProcessed++;
+                        processedIds.push(row.id);
+                        
+                        if (batchProcessed === batchRows.length) {
+                            // Mark batch as processed
+                            const updateProcessed = `UPDATE vulnerability_staging SET processed = 1, processed_at = ? WHERE id IN (${processedIds.map(() => "?").join(",")})`;
+                            db.run(updateProcessed, [new Date().toISOString(), ...processedIds], (markErr) => {
+                                if (markErr) {
+                                    console.error("Error marking batch as processed:", markErr);
+                                }
+                                
+                                // Commit batch transaction
+                                db.run("COMMIT", (commitErr) => {
+                                    if (commitErr) {
+                                        console.error("Batch commit error:", commitErr);
+                                        batchStats.errors++;
+                                    }
+                                    
+                                    const batchTime = Date.now() - batchStart;
+                                    const batchRowsPerSec = batchRows.length / (batchTime / 1000);
+                                    batchStats.processedRows += batchRows.length;
+                                    
+                                    console.log(`✅ Batch ${batchStats.currentBatch} complete: ${batchRows.length} rows in ${batchTime}ms (${batchRowsPerSec.toFixed(1)} rows/sec)`);
+                                    
+                                    // Process next batch
+                                    setTimeout(() => {
+                                        processNextBatch(importId, currentDate, batchSize, batchStats, responseData, res, startTime);
+                                    }, 10); // Small delay to prevent overwhelming the system
+                                });
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    });
+}
+
+// Finalize batch processing and clean up staging table
+function finalizeBatchProcessing(importId, currentDate, batchStats, responseData, res, startTime) {
+    console.log("🏁 FINALIZE: Starting batch processing finalization");
+    
+    // Step 1: Handle vulnerabilities still in grace_period (mark as resolved)
+    db.run("UPDATE vulnerabilities_current SET " +
+        "lifecycle_state = 'resolved', resolved_date = ?, resolution_reason = 'not_present_in_scan' " +
+        "WHERE lifecycle_state = 'grace_period'", [currentDate], function(err) {
+        
+        const resolvedCount = this.changes || 0;
+        if (err) {
+            console.error("Error resolving stale vulnerabilities:", err);
+        } else {
+            console.log(`✅ Resolved ${resolvedCount} vulnerabilities not present in current scan`);
+        }
+        
+        // Step 2: Calculate and store enhanced daily totals
+        calculateAndStoreDailyTotalsEnhanced(currentDate, () => {
+            // Step 3: Clean up staging table for this import
+            db.run("DELETE FROM vulnerability_staging WHERE import_id = ?", [importId], function(cleanupErr) {
+                if (cleanupErr) {
+                    console.error("Error cleaning up staging table:", cleanupErr);
+                } else {
+                    console.log(`🗑️  Staging cleanup: ${this.changes} records removed`);
+                }
+                
+                // Step 4: Update import record with final processing time
+                const totalImportTime = Date.now() - startTime;
+                db.run("UPDATE vulnerability_imports SET processing_time = ? WHERE id = ?", 
+                    [totalImportTime, importId], (updateErr) => {
+                    if (updateErr) {
+                        console.error("Error updating import record:", updateErr);
+                    }
+                    
+                    // Calculate final performance metrics
+                    const totalTime = Date.now() - startTime;
+                    const totalTimeSeconds = totalTime / 1000;
+                    const overallRowsPerSecond = batchStats.processedRows / totalTimeSeconds;
+                    const batchProcessTime = Date.now() - batchStats.startTime;
+                    
+                    console.log("🎉 STAGING IMPORT COMPLETE - PERFORMANCE SUMMARY:");
+                    console.log(`⏱️  Total Import Time: ${totalTimeSeconds.toFixed(1)}s`);
+                    console.log(`⚡ Overall Speed: ${overallRowsPerSecond.toFixed(1)} rows/second`);
+                    console.log(`📊 Batch Processing: ${batchProcessTime}ms for ${batchStats.processedRows} rows`);
+                    console.log("💾 Database Operations:");
+                    console.log(`   📥 Snapshots: ${batchStats.insertedToSnapshots}`);
+                    console.log(`   ➕ Inserted: ${batchStats.insertedToCurrent}`);
+                    console.log(`   ✏️  Updated: ${batchStats.updatedInCurrent}`);
+                    console.log(`   🔄 Resolved: ${resolvedCount}`);
+                    console.log(`❌ Errors: ${batchStats.errors}`);
+                    
+                    // Send comprehensive success response
+                    const finalResponse = {
+                        ...responseData,
+                        rowsProcessed: batchStats.processedRows,
+                        inserted: batchStats.insertedToCurrent,
+                        updated: batchStats.updatedInCurrent,
+                        resolvedCount,
+                        scanDate: currentDate,
+                        rolloverComplete: true,
+                        enhancedLifecycle: true,
+                        enhancedDeduplication: true,
+                        stagingMode: true,
+                        
+                        // ✅ ENHANCED PERFORMANCE METRICS
+                        performanceMetrics: {
+                            totalImportTimeMs: totalTime,
+                            totalImportTimeSeconds: parseFloat(totalTimeSeconds.toFixed(1)),
+                            overallRowsPerSecond: parseFloat(overallRowsPerSecond.toFixed(1)),
+                            batchProcessTimeMs: batchProcessTime,
+                            
+                            stagingMetrics: {
+                                bulkLoadTime: responseData.bulkLoadTime || 0,
+                                bulkLoadRowsPerSecond: responseData.bulkLoadRowsPerSecond || 0,
+                                insertedToStaging: responseData.insertedToStaging || 0,
+                                stagingErrors: responseData.stagingErrors || 0
+                            },
+                            
+                            batchMetrics: {
+                                totalBatches: batchStats.totalBatches,
+                                batchSize: 1000,
+                                batchProcessingTimeMs: batchProcessTime,
+                                avgBatchTime: Math.round(batchProcessTime / batchStats.totalBatches),
+                                batchRowsPerSecond: parseFloat((batchStats.processedRows / (batchProcessTime / 1000)).toFixed(1))
+                            },
+                            
+                            dbOperations: {
+                                snapshotInserts: batchStats.insertedToSnapshots,
+                                currentInserts: batchStats.insertedToCurrent,
+                                currentUpdates: batchStats.updatedInCurrent,
+                                resolved: resolvedCount,
+                                errors: batchStats.errors
+                            }
+                        }
+                    };
+                    
+                    console.log("✅ Enhanced staging import completed:", JSON.stringify(finalResponse, null, 2));
+                    res.json(finalResponse);
+                });
+            });
+        });
+    });
+}
+
 // Enhanced vulnerability rollover with lifecycle management
 function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, filePath, responseData, res, scanDate) {
     const currentDate = scanDate || new Date().toISOString().split("T")[0];
     
-    console.log("Starting enhanced rollover import for scan date:", currentDate, "with", rows.length, "rows");
+    // ✅ PERFORMANCE INSTRUMENTATION - Session 1 Enhancement
+    const perfStart = Date.now();
+    const memoryStart = process.memoryUsage();
+    console.log("🚀 PERFORMANCE: Starting enhanced rollover import");
+    console.log(`📊 PERFORMANCE: Scan date: ${currentDate}, Rows: ${rows.length}`);
+    console.log(`🧠 MEMORY START: ${Math.round(memoryStart.heapUsed / 1024 / 1024)}MB heap, ${Math.round(memoryStart.rss / 1024 / 1024)}MB RSS`);
     
     // Step 1: Mark all active vulnerabilities as potentially stale (grace period)
+    const graceStart = Date.now();
     db.run("UPDATE vulnerabilities_current SET lifecycle_state = 'grace_period' WHERE lifecycle_state = 'active'", (err) => {
         if (err) {
             console.error("Error marking vulnerabilities as stale:", err);
             res.status(500).json({ error: "Failed to prepare for import" });
             return;
         }
+        
+        console.log(`⏱️  PERFORMANCE: Grace period update took ${Date.now() - graceStart}ms`);
         
         // Step 2: Process new vulnerability data with enhanced deduplication
         const processedKeys = new Set();
@@ -518,6 +1010,20 @@ function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, fil
             enhanced_dedup_used: 0,
             legacy_dedup_used: 0
         };
+        
+        // ✅ PERFORMANCE TRACKING VARIABLES
+        const perfStats = {
+            dbOperations: 0,
+            snapshotInserts: 0,
+            currentChecks: 0,
+            currentUpdates: 0,
+            currentInserts: 0,
+            totalDbTime: 0,
+            avgRowTime: 0,
+            processedRows: 0,
+            startTime: Date.now()
+        };
+        
         let finalizeCalled = false;
         
         if (rows.length === 0) {
@@ -533,6 +1039,23 @@ function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, fil
                     finalizeEnhancedRollover();
                 }
                 return;
+            }
+            
+            // ✅ PERFORMANCE: Track per-row timing and operations
+            const rowStart = Date.now();
+            perfStats.processedRows++;
+            
+            // Progress logging every 100 rows or every 10% for smaller datasets
+            const progressInterval = Math.max(100, Math.floor(rows.length / 10));
+            if (index % progressInterval === 0 && index > 0) {
+                const elapsed = (Date.now() - perfStats.startTime) / 1000;
+                const rowsPerSecond = perfStats.processedRows / elapsed;
+                const memNow = process.memoryUsage();
+                const memUsageMB = Math.round(memNow.heapUsed / 1024 / 1024);
+                const etaSeconds = Math.round((rows.length - index) / rowsPerSecond);
+                
+                console.log(`📈 PROGRESS: ${index}/${rows.length} (${Math.round(index/rows.length*100)}%) - ${rowsPerSecond.toFixed(1)} rows/sec - ETA: ${etaSeconds}s - Memory: ${memUsageMB}MB`);
+                console.log(`🔍 DB STATS: ${perfStats.dbOperations} ops, Avg: ${(perfStats.totalDbTime/perfStats.dbOperations || 0).toFixed(1)}ms per op`);
             }
             
             const row = rows[index];
@@ -564,6 +1087,8 @@ function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, fil
             }
             
             // Insert into snapshots (historical record) with enhanced fields
+            const snapshotStart = Date.now();
+            perfStats.dbOperations++;
             db.run("INSERT INTO vulnerability_snapshots " +
                 "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
                 " first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
@@ -576,11 +1101,17 @@ function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, fil
                 mapped.solution, mapped.vendor, mapped.vendor, mapped.pluginPublished,
                 mapped.state, legacyKey, enhancedKey, confidence, tier
             ], (err) => {
+                const snapshotTime = Date.now() - snapshotStart;
+                perfStats.totalDbTime += snapshotTime;
+                perfStats.snapshotInserts++;
+                
                 if (err) {
                     console.error("Snapshot insert error:", err);
                 }
                 
                 // Check existing vulnerability state using both keys during transition
+                const checkStart = Date.now();
+                perfStats.dbOperations++;
                 const checkQuery = `
                     SELECT id, first_seen, lifecycle_state, resolved_date, unique_key, enhanced_unique_key 
                     FROM vulnerabilities_current 
@@ -588,6 +1119,10 @@ function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, fil
                 `;
                 
                 db.get(checkQuery, [legacyKey, enhancedKey, legacyKey, enhancedKey], (err, existingRow) => {
+                    const checkTime = Date.now() - checkStart;
+                    perfStats.totalDbTime += checkTime;
+                    perfStats.currentChecks++;
+                    
                     if (err) {
                         console.error("Error checking existing vulnerability:", err);
                         processNextRow(index + 1);
@@ -607,6 +1142,8 @@ function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, fil
                         }
                         
                         // Update existing vulnerability with enhanced fields
+                        const updateStart = Date.now();
+                        perfStats.dbOperations++;
                         db.run("UPDATE vulnerabilities_current SET " +
                             "import_id = ?, scan_date = ?, hostname = ?, ip_address = ?, cve = ?, " +
                             "severity = ?, vpr_score = ?, cvss_score = ?, last_seen = ?, " +
@@ -621,13 +1158,24 @@ function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, fil
                             mapped.vendor, mapped.vendor, mapped.pluginPublished, mapped.state,
                             newState, null, resolutionReason, enhancedKey, confidence, tier, existingRow.id
                         ], (err) => {
+                            const updateTime = Date.now() - updateStart;
+                            perfStats.totalDbTime += updateTime;
+                            perfStats.currentUpdates++;
+                            
                             if (err) {
                                 console.error("Current table update error:", err);
                             }
+                            
+                            // ✅ PERFORMANCE: Complete row timing
+                            const totalRowTime = Date.now() - rowStart;
+                            perfStats.avgRowTime = ((perfStats.avgRowTime * (perfStats.processedRows - 1)) + totalRowTime) / perfStats.processedRows;
+                            
                             processNextRow(index + 1);
                         });
                     } else {
                         // Insert new vulnerability with enhanced fields
+                        const insertStart = Date.now();
+                        perfStats.dbOperations++;
                         db.run("INSERT INTO vulnerabilities_current " +
                             "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
                              "first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
@@ -641,11 +1189,20 @@ function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, fil
                             mapped.vendor, mapped.pluginPublished, mapped.state, legacyKey,
                             "active", enhancedKey, confidence, tier
                         ], (err) => {
+                            const insertTime = Date.now() - insertStart;
+                            perfStats.totalDbTime += insertTime;
+                            perfStats.currentInserts++;
+                            
                             if (err) {
                                 console.error("Current table insert error:", err);
                             } else {
                                 stats.inserted++;
                             }
+                            
+                            // ✅ PERFORMANCE: Complete row timing
+                            const totalRowTime = Date.now() - rowStart;
+                            perfStats.avgRowTime = ((perfStats.avgRowTime * (perfStats.processedRows - 1)) + totalRowTime) / perfStats.processedRows;
+                            
                             processNextRow(index + 1);
                         });
                     }
@@ -680,7 +1237,27 @@ function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, fil
                         console.error("Error cleaning up file:", unlinkError);
                     }
                     
-                    // Send enhanced success response
+                    // ✅ PERFORMANCE METRICS - Final Summary
+                    const totalImportTime = Date.now() - perfStart;
+                    const totalImportSeconds = totalImportTime / 1000;
+                    const rowsPerSecond = rows.length / totalImportSeconds;
+                    const memoryEnd = process.memoryUsage();
+                    const memoryDelta = Math.round((memoryEnd.heapUsed - memoryStart.heapUsed) / 1024 / 1024);
+                    const avgDbOpTime = perfStats.totalDbTime / perfStats.dbOperations;
+                    
+                    console.log("🎉 PERFORMANCE SUMMARY:");
+                    console.log(`⏱️  Total Import Time: ${totalImportSeconds.toFixed(1)}s (${totalImportTime}ms)`);
+                    console.log(`⚡ Processing Speed: ${rowsPerSecond.toFixed(1)} rows/second`);
+                    console.log(`🧠 Memory Impact: ${memoryDelta > 0 ? "+" : ""}${memoryDelta}MB (End: ${Math.round(memoryEnd.heapUsed/1024/1024)}MB)`);
+                    console.log(`💾 Database Operations: ${perfStats.dbOperations} total`);
+                    console.log(`   📥 Snapshot Inserts: ${perfStats.snapshotInserts}`);
+                    console.log(`   🔍 Current Checks: ${perfStats.currentChecks}`);
+                    console.log(`   ✏️  Current Updates: ${perfStats.currentUpdates}`);
+                    console.log(`   ➕ Current Inserts: ${perfStats.currentInserts}`);
+                    console.log(`⏲️  Avg DB Operation: ${avgDbOpTime.toFixed(1)}ms`);
+                    console.log(`📊 Avg Row Processing: ${perfStats.avgRowTime.toFixed(1)}ms`);
+                    
+                    // Send enhanced success response with performance metrics
                     const finalResponse = {
                         ...responseData,
                         rowsProcessed: rows.length,
@@ -689,7 +1266,24 @@ function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, fil
                         scanDate: currentDate,
                         rolloverComplete: true,
                         enhancedLifecycle: true,
-                        enhancedDeduplication: true
+                        enhancedDeduplication: true,
+                        // ✅ PERFORMANCE METRICS in response
+                        performanceMetrics: {
+                            totalImportTimeMs: totalImportTime,
+                            totalImportTimeSeconds: parseFloat(totalImportSeconds.toFixed(1)),
+                            rowsPerSecond: parseFloat(rowsPerSecond.toFixed(1)),
+                            memoryDeltaMB: memoryDelta,
+                            memoryEndMB: Math.round(memoryEnd.heapUsed/1024/1024),
+                            dbOperations: {
+                                total: perfStats.dbOperations,
+                                snapshotInserts: perfStats.snapshotInserts,
+                                currentChecks: perfStats.currentChecks,
+                                currentUpdates: perfStats.currentUpdates,
+                                currentInserts: perfStats.currentInserts,
+                                avgTimeMs: parseFloat(avgDbOpTime.toFixed(1))
+                            },
+                            avgRowTimeMs: parseFloat(perfStats.avgRowTime.toFixed(1))
+                        }
                     };
                     
                     console.log("Enhanced import completed:", finalResponse);
@@ -1257,6 +1851,57 @@ app.get("/api/vulnerabilities/resolved", (req, res) => {
 });
 
 // Import CSV vulnerabilities
+/**
+ * Extract scan date from filename using various patterns
+ * @param {string} filename - The CSV filename
+ * @returns {string|null} - Date in YYYY-MM-DD format or null if no pattern matches
+ */
+function extractScanDateFromFilename(filename) {
+    if (!filename) {return null;}
+    
+    const currentYear = new Date().getFullYear();
+    
+    // Pattern 1: Month abbreviations (aug28, sept01, etc.)
+    const monthAbbrMatch = filename.match(/(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)(\d{1,2})/i);
+    if (monthAbbrMatch) {
+        const monthMap = {
+            "jan": "01", "feb": "02", "mar": "03", "apr": "04", "may": "05", "jun": "06",
+            "jul": "07", "aug": "08", "sep": "09", "sept": "09", "oct": "10", "nov": "11", "dec": "12"
+        };
+        const month = monthMap[monthAbbrMatch[1].toLowerCase()];
+        const day = monthAbbrMatch[2].padStart(2, "0");
+        return `${currentYear}-${month}-${day}`;
+    }
+    
+    // Pattern 2: MM_DD_YYYY or MM-DD-YYYY format
+    const numericDateMatch = filename.match(/(\d{1,2})[_-](\d{1,2})[_-](\d{4})/);
+    if (numericDateMatch) {
+        const month = numericDateMatch[1].padStart(2, "0");
+        const day = numericDateMatch[2].padStart(2, "0"); 
+        const year = numericDateMatch[3];
+        return `${year}-${month}-${day}`;
+    }
+    
+    // Pattern 3: YYYY-MM-DD format
+    const isoDateMatch = filename.match(/(\d{4})[_-](\d{1,2})[_-](\d{1,2})/);
+    if (isoDateMatch) {
+        const year = isoDateMatch[1];
+        const month = isoDateMatch[2].padStart(2, "0");
+        const day = isoDateMatch[3].padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    }
+    
+    // Pattern 4: Just day number (assume current month/year)
+    const dayOnlyMatch = filename.match(/(\d{1,2})[^\d]/);
+    if (dayOnlyMatch) {
+        const day = dayOnlyMatch[1].padStart(2, "0");
+        const month = String(new Date().getMonth() + 1).padStart(2, "0");
+        return `${currentYear}-${month}-${day}`;
+    }
+    
+    return null; // No date pattern found
+}
+
 app.post("/api/vulnerabilities/import", upload.single("csvFile"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
@@ -1265,7 +1910,15 @@ app.post("/api/vulnerabilities/import", upload.single("csvFile"), (req, res) => 
   const startTime = Date.now();
   const filename = req.file.originalname;
   const vendor = req.body.vendor || "unknown";
-  const scanDate = req.body.scanDate || new Date().toISOString().split("T")[0]; // Use provided date or default to today
+  const extractedDate = extractScanDateFromFilename(filename);
+  const scanDate = req.body.scanDate || extractedDate || new Date().toISOString().split("T")[0];
+  
+  // Log filename date extraction for debugging
+  if (extractedDate) {
+    console.log(`Extracted date '${extractedDate}' from filename '${filename}'`);
+  } else if (!req.body.scanDate) {
+    console.log(`No date extracted from filename '${filename}', using today's date`);
+  }
   
   // Read and parse CSV
   const csvData = PathValidator.safeReadFileSync(req.file.path, "utf8");
@@ -1305,6 +1958,73 @@ app.post("/api/vulnerabilities/import", upload.single("csvFile"), (req, res) => 
           filename,
           processingTime: Date.now() - startTime
         }, res, scanDate);
+      });
+    },
+    error: (error) => {
+      res.status(400).json({ error: "CSV parsing failed: " + error.message });
+    }
+  });
+});
+
+// ✅ STAGING-BASED CSV IMPORT - Session 2 Performance Enhancement
+// High-performance import using staging table for batch processing
+app.post("/api/vulnerabilities/import-staging", upload.single("csvFile"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+  
+  const startTime = Date.now();
+  const filename = req.file.originalname;
+  const vendor = req.body.vendor || "unknown";
+  const extractedDate = extractScanDateFromFilename(filename);
+  const scanDate = req.body.scanDate || extractedDate || new Date().toISOString().split("T")[0];
+  
+  console.log("🚀 STAGING IMPORT: Starting high-performance CSV import");
+  console.log(`📊 File: ${filename}, Vendor: ${vendor}, Scan Date: ${scanDate}`);
+  
+  // Read and parse CSV
+  const csvData = PathValidator.safeReadFileSync(req.file.path, "utf8");
+  
+  Papa.parse(csvData, {
+    header: true,
+    complete: (results) => {
+      const rows = results.data.filter(row => Object.values(row).some(val => val && val.trim()));
+      
+      console.log(`📈 Parsed ${rows.length} rows from CSV`);
+      
+      // Insert import record
+      const importQuery = `
+        INSERT INTO vulnerability_imports 
+        (filename, import_date, row_count, vendor, file_size, processing_time, raw_headers)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `;
+      
+      db.run(importQuery, [
+        filename,
+        new Date().toISOString(),
+        rows.length,
+        vendor,
+        req.file.size,
+        0, // Will update after completion
+        JSON.stringify(results.meta.fields)
+      ], function(err) {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        
+        const importId = this.lastID;
+        console.log(`📝 Import record created: ID ${importId}`);
+        
+        // ✅ BULK LOAD TO STAGING TABLE
+        bulkLoadToStagingTable(rows, importId, scanDate, req.file.path, {
+          success: true,
+          importId,
+          filename,
+          vendor,
+          scanDate,
+          stagingMode: true
+        }, res, startTime);
       });
     },
     error: (error) => {
@@ -1763,6 +2483,55 @@ const initDb = () => {
       }
     });
 
+    // ✅ STAGING TABLE - Session 2 Performance Enhancement
+    // Temporary table for bulk CSV import processing
+    db.run(`CREATE TABLE IF NOT EXISTS vulnerability_staging (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      import_id INTEGER NOT NULL,
+      
+      -- Core vulnerability fields (from existing schema)
+      hostname TEXT,
+      ip_address TEXT,
+      cve TEXT,
+      severity TEXT,
+      vpr_score REAL,
+      cvss_score REAL,
+      plugin_id TEXT,
+      plugin_name TEXT,
+      description TEXT,
+      solution TEXT,
+      vendor_reference TEXT,
+      vendor TEXT,
+      vulnerability_date TEXT,
+      state TEXT,
+      
+      -- Extended fields for enhanced deduplication (from recent enhancements)
+      enhanced_unique_key TEXT,
+      confidence_score REAL,
+      dedup_tier INTEGER,
+      lifecycle_state TEXT DEFAULT 'staging',
+      
+      -- Raw CSV data for flexibility across vendors
+      raw_csv_row JSON,
+      
+      -- Processing tracking
+      processed BOOLEAN DEFAULT 0,
+      batch_id INTEGER,
+      processing_error TEXT,
+      
+      -- Timestamps
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      processed_at DATETIME,
+      
+      FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
+    )`, (err) => {
+      if (err) {
+        console.error("Error creating vulnerability_staging table:", err.message);
+      } else {
+        console.log("✅ vulnerability_staging table ready for batch processing");
+      }
+    });
+
     // Create indexes for performance
     db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_scan_date ON vulnerability_snapshots (scan_date)", (err) => {
       if (err) {
@@ -1828,6 +2597,31 @@ const initDb = () => {
     db.run("CREATE INDEX IF NOT EXISTS idx_current_resolved_date ON vulnerabilities_current (resolved_date)", (err) => {
       if (err) {
         console.error("Error creating current resolved_date index:", err.message);
+      }
+    });
+
+    // ✅ STAGING TABLE INDEXES - Session 2 Performance Enhancement
+    db.run("CREATE INDEX IF NOT EXISTS idx_staging_import_id ON vulnerability_staging (import_id)", (err) => {
+      if (err) {
+        console.error("Error creating staging import_id index:", err.message);
+      }
+    });
+
+    db.run("CREATE INDEX IF NOT EXISTS idx_staging_processed ON vulnerability_staging (processed)", (err) => {
+      if (err) {
+        console.error("Error creating staging processed index:", err.message);
+      }
+    });
+
+    db.run("CREATE INDEX IF NOT EXISTS idx_staging_batch_id ON vulnerability_staging (batch_id)", (err) => {
+      if (err) {
+        console.error("Error creating staging batch_id index:", err.message);
+      }
+    });
+
+    db.run("CREATE INDEX IF NOT EXISTS idx_staging_unprocessed_batch ON vulnerability_staging (processed, batch_id)", (err) => {
+      if (err) {
+        console.error("Error creating staging unprocessed_batch index:", err.message);
       }
     });
 
