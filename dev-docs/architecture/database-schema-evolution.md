@@ -1,4 +1,4 @@
-# Database Schema Evolution - HexTrackr v1.0.4
+# Database Schema Evolution - HexTrackr
 
 ## Overview
 
@@ -43,7 +43,7 @@ CREATE TABLE vulnerabilities_current (
 );
 ```
 
-## Deduplication Strategy:
+## Deduplication Strategy
 
 - **Primary Key**: `enhanced_unique_key` (generated column)
 - **Logic**: `normalizeHostname(hostname) + CVE` OR `hostname + plugin_id + description_prefix`
@@ -84,7 +84,7 @@ CREATE TABLE vulnerability_staging (
 );
 ```
 
-## Performance Features:
+## Performance Features
 
 - **Bulk Insert**: Optimized for high-volume CSV imports
 - **Batch Processing**: Configurable batch size (default: 1000 rows)

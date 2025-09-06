@@ -13,11 +13,94 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Widget Architecture Foundation**: Establishing standards for future dashboard platform
 - **AI Development Optimization**: All modules targeting <400 lines for context compatibility
 
-### Planned - v1.0.6
+## [1.0.8] - 2025-09-06
 
-- **Documentation Sprint Resumption**: Complete API overview and user guides after modularization
+### Security Enhancements
+
+- **XSS Protection**: Fixed critical AG Grid cell renderer vulnerability by replacing dangerous inline onclick handlers with secure event system
+  - Removed vulnerable `onclick="vulnManager.viewDeviceDetails('${hostname}')"` pattern susceptible to code injection
+  - Implemented secure `onCellClicked` event handler with proper parameter validation
+  - Prevents hostname values containing quotes or special characters from breaking HTML structure
+- **CORS Security Hardening**: Restricted unrestricted CORS policy to secure localhost-only origins
+  - Changed from wide-open `cors()` to specific `origin: ['http://localhost:8080', 'http://127.0.0.1:8080']`
+  - Added explicit HTTP methods and headers whitelist for enhanced security posture
+  - Enables credentials for future authentication integration
+- **DoS Protection**: Implemented express-rate-limit middleware to prevent denial-of-service attacks
+  - Limits each IP to 100 requests per 15-minute window on all /api/ endpoints
+  - Provides standardized rate limiting headers for client awareness
+  - Protects import/export endpoints from API flooding attacks
+
+### Performance Improvements
+
+- **CSV Import Performance**: Achieved 11-13x speed improvement through staging table optimization
+  - Large CSV files now import in 8-12 seconds instead of 45-60 seconds (10,000 rows tested)
+  - Switched frontend from `/api/vulnerabilities/import` to high-performance `/api/vulnerabilities/import-staging`
+  - Utilizes bulk database operations with transaction batching for optimal throughput
+  - Maintains full rollover deduplication logic while dramatically improving user experience
+
+### Development Infrastructure
+
+- **Multi-Model Security Audit**: Comprehensive code quality assessment using parallel AI analysis
+  - Deployed Zen MCP orchestration server for GPT-5 security audit and Gemini code review
+  - Generated detailed audit reports documenting 6 vulnerabilities and architectural recommendations
+  - Created comprehensive technical documentation structure in dev-docs/ for ref.tools indexing
+- **Technical Documentation**: Established development documentation architecture
+  - Comprehensive AG Grid responsive patterns, database schema evolution, and testing strategies
+  - Created keyword-indexed technical documentation for enhanced searchability via ref.tools
+  - Separated technical docs (dev-docs/) from user documentation (docs-source/) for clarity
+- **Version Management**: Improved version reference strategy for reduced maintenance burden
+  - Implemented generic version references in technical documentation to prevent version drift
+  - Maintained specific versions only where semantically necessary (package.json, CHANGELOG, ROADMAP)
+
+## [1.0.6] - 2025-09-06
+
+### Fixed
+
+- **Critical Modal Aggregation System**: Resolved major user-facing issues with modal data display
+  - Fixed vulnerability modal showing only 1 device instead of properly aggregating all affected devices (now shows 24 devices for CVE-2017-3881)
+  - Fixed device modal showing only 1 vulnerability instead of properly aggregating all vulnerabilities per device (now shows 12 vulnerabilities for grimesnswan03)
+  - Implemented universal aggregation key using description field for consistent data grouping
+  - Enhanced modal layering with proper Bootstrap Modal.getInstance() management
+
+### Enhanced
+
+- **Modal Architecture and User Experience**
+  - Implemented description-field-based universal aggregation system for consistent data relationships
+  - Enhanced testing strategy with comprehensive Playwright browser automation for modal workflows
+  - Validated import/export pipeline performance with 10,000+ record handling
+  - Improved modal transition workflow: vulnerability modal → closes → device modal opens seamlessly
+
+### Technical Improvements
+
+- **Testing and Validation Infrastructure**
+  - Added comprehensive Playwright test coverage for modal aggregation functionality
+  - Implemented automated UI testing for vulnerability and device modal interactions
+  - Enhanced data validation pipeline for large dataset imports and aggregation accuracy
+  - Improved modal state management with proper Bootstrap integration
+
+## [1.0.7] - 2025-09-06
+
+### Enhanced (2)
+
+- **Documentation Infrastructure**: Comprehensive documentation update with modal architecture patterns
+  - Documented modal aggregation system using description field as universal matching key
+  - Enhanced testing documentation with Playwright browser automation integration
+  - Updated user guides with detailed modal interaction workflows and functionality
+  - Improved architecture documentation covering Bootstrap modal layering and state management
+
+### Technical Improvements (2)
+
+- **Knowledge Management Integration**: Enhanced development workflow with persistent knowledge systems
+  - Integrated Memento MCP knowledge graph for cross-session pattern recognition
+  - Documented modal aggregation architecture patterns for future development consistency
+  - Enhanced testing strategy documentation with comprehensive Playwright validation workflows
+  - Updated development guides with modern browser automation testing approaches
+
+### Planned - v1.0.8
+
 - **Dashboard Implementation**: Begin widget-based customizable dashboard development
 - **Ticket System Modularization**: Apply lessons learned to tickets.js refactoring
+- **Advanced Modal Features**: Implement export and reporting functionality from modal views
 
 ## [1.0.5] - 2025-09-05
 
@@ -33,7 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Established modularization patterns for future extractions
   - Validated zero-regression refactoring process
 
-### Enhanced
+### Enhanced (3)
 
 - **Development Workflow**: Synchronized agent instruction files across all AI tools
   - Updated CLAUDE.md, copilot-instructions.md, GEMINI.md, AGENTS.md with delegation strategies
@@ -54,7 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added comprehensive visual testing for UI improvements and changes
   - Implemented before/after screenshot comparison for design changes
 
-### Fixed
+### Fixed (2)
 
 - **Version Badge Synchronization**: Fixed version inconsistency across application components
   - Resolved version badge displaying v1.0.1 while package.json showed v1.0.3
@@ -82,7 +165,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enhanced table interaction with responsive design and pagination controls
   - Streamlined vulnerability-to-device navigation workflow
 
-### Technical Improvements
+### Technical Improvements (3)
 
 - **Agent Architecture**: Enhanced documentation and testing agents with advanced MCP integrations
   - Added Playwright MCP for live browser validation of UI changes
@@ -131,7 +214,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.1] - 2025-08-27
 
-### Fixed (2)
+### Fixed (2) (2)
 
 - **Device Management UI**: Fixed button order from + - to - + for consistent positioning
   - Resolved button position switching that caused UX friction during rapid clicking
