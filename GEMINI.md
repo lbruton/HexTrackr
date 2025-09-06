@@ -1,30 +1,10 @@
-# GEMINI.md - Google Gemini CLI Instructions for HexTrackr
+# HexTrackr Project Guide for Gemini CLI
 
-## Unified AI Development Workflow Integration
+Project-specific guidance for HexTrackr vulnerability management system when using Gemini CLI.
 
-**Your Role**: Large context analysis and complex architectural tasks (2+ hours)
+## Your Role: Large Context Analysis (2+ hours)
 
-HexTrackr uses a unified AI development workflow with Claude Code as the central orchestrator. You handle tasks requiring deep codebase analysis that exceed other tools' context limits.
-
-### Session Handoff Protocol
-
-**CRITICAL**: Always check `/dev-docs/session-handoff.json` at session start for current context.
-
-**At Session Start**:
-
-1. Read `/dev-docs/session-handoff.json` for current project state
-2. Review recent changes and priorities
-3. Understand what task is being handed off and why
-
-**At Session End**:
-
-1. Update `/dev-docs/session-handoff.json` with your progress
-2. Document any architectural decisions or patterns discovered
-3. Note next steps or handoff requirements for other tools
-
-### Your Specialization Areas
-
-**Primary Tasks**:
+You handle tasks requiring deep codebase analysis that exceed other tools' context limits:
 
 - Major refactoring requiring full codebase analysis  
 - Complex architectural changes across multiple files
@@ -32,193 +12,154 @@ HexTrackr uses a unified AI development workflow with Claude Code as the central
 - Security audits and comprehensive code reviews
 - Large-scale code migrations and modernization
 
-**Handoff From**: Claude Code when context limits are reached
-**Handoff To**: Claude Code for coordination, specialized agents for implementation
+## Project Overview
 
-## Project Context
+HexTrackr is a vulnerability and ticket management system with:
 
-HexTrackr is a vulnerability and ticket management system (v1.0.4 as of September 5, 2025):
-
-### Core Technologies
-
-- **Backend:** Node.js/Express monolithic server (`server.js` ~1,200+ lines)
-- **Database:** SQLite with rollover architecture (`data/hextrackr.db`)
-- **Frontend:** Modular JavaScript, AG Grid, ApexCharts, Bootstrap 5, Tabler.io
-- **Testing:** Playwright browser automation
-- **Documentation:** Markdown-first with HTML generation
-
-### Recent Achievements (v1.0.4)
-
-- ✅ Modal layering bug fix with Bootstrap Modal.getInstance()
-- ✅ Working table resizing and card pagination (6-card default)
-- ✅ Version badge synchronization across components
-- ✅ Enhanced agent architecture with Playwright testing
+- **Version**: See package.json (current: September 2025)
+- **Stack**: Node.js/Express, SQLite, AG Grid, ApexCharts, Bootstrap 5, Tabler.io
+- **Port**: 8080 (Docker only)
 
 ## Architecture
 
-The application follows a monolithic architecture, with the Express.js server handling both API requests and serving frontend assets.
+### Backend (`server.js`)
 
-### Backend Architecture
+- Monolithic Express server (~1,200+ lines)
+- SQLite with runtime schema evolution
+- File uploads via multer (100MB limit)
+- PathValidator for security
+- JSON storage for complex fields
 
-The backend is a Node.js/Express monolithic server providing REST endpoints, data processing, and SQLite persistence. It also serves the static frontend assets and the documentation portal.
+### Database Schema
 
-- **Monolithic Architecture**: A single `server.js` file (over 1,200 lines) handles all backend concerns, including routing, database interaction, and business logic.
-- **Dual Purpose**: Acts as both an API server and a static file server for the UI.
-- **Database**: A single SQLite database file (`data/hextrackr.db`) with a shared connection pool.
-- **Security**: Includes a built-in `PathValidator` class for secure file system operations and sets standard security headers.
-
-### Frontend Architecture
-
-The frontend of HexTrackr is composed of two main pages, each with its own set of JavaScript modules and CSS styles. Shared components, such as the header, footer, and settings modal, are loaded dynamically on each page.
-
-- **`tickets.html`**: Uses a combination of Bootstrap 5 and Tabler.io for its UI components.
-- **`vulnerabilities.html`**: Uses the Tabler.io framework, with AG Grid for data tables and ApexCharts for visualizations.
-
-### Database Architecture
-
-HexTrackr uses a file-based SQLite 3 database as its primary data store.
-
-- **Engine**: SQLite 3
-- **Location**: `data/hextrackr.db`
-- **Initialization**: The database is initialized by the `scripts/init-database.js` script.
-
-#### Entity Relationship Diagram
-
-```mermaid
-erDiagram
-    vulnerability_imports ||--o{ vulnerability_snapshots : contains
-    tickets ||--o{ ticket_vulnerabilities : links
-    vulnerabilities_current ||--o{ ticket_vulnerabilities : links
-
-    vulnerability_imports {
-        INTEGER id PK
-        TEXT filename
-        TEXT import_date
-        INTEGER row_count
-    }
-
-    vulnerability_snapshots {
-        INTEGER id PK
-        INTEGER import_id FK
-        TEXT scan_date
-        TEXT hostname
-        TEXT cve
-        TEXT severity
-        REAL vpr_score
-        TEXT unique_key
-    }
-
-    vulnerabilities_current {
-        INTEGER id PK
-        TEXT unique_key UK
-        TEXT hostname
-        TEXT cve
-        TEXT severity
-        REAL vpr_score
-        TEXT last_seen
-    }
-
-    tickets {
-        TEXT id PK
-        TEXT xt_number
-        TEXT date_submitted
-        TEXT status
-    }
-
-    ticket_vulnerabilities {
-        INTEGER id PK
-        TEXT ticket_id FK
-        INTEGER vulnerability_id FK
-    }
+```
+data/hextrackr.db
+├── tickets                    # Ticket data with JSON devices/attachments
+├── vulnerabilities_current    # Deduplicated current state
+├── vulnerability_snapshots    # Historical imports
+├── vulnerability_daily_totals # Trend analysis
+└── vulnerability_imports      # Audit trail
 ```
 
-### Vulnerability Rollover Architecture
+### Frontend Structure
 
-A key feature of the backend is the **rollover architecture** for managing vulnerability data. This system processes daily scans to maintain both a current snapshot and a historical trend of vulnerabilities.
+```
+scripts/
+├── shared/     # Reusable components (modals, settings)
+├── pages/      # Page-specific logic (vulnerability-manager.js)
+└── utils/      # Helpers (security.js, data processing)
+```
 
-# Building and Running
+## Critical Patterns
 
-## Prerequisites
+### Vulnerability Rollover
 
-- Node.js
-- npm
-- Docker
+- **Dedup Key**: `normalizeHostname(hostname) + CVE` or fallback to `plugin_id + description`
+- **Process**: CSV → Papa.parse → `processVulnerabilityRowsWithRollover()` → DB
+- **Sequential Processing**: Use loops, not parallel processing to prevent race conditions
 
-## Installation
+### API Endpoints
 
-1. Clone the repository.
-2. Install the dependencies:
+```javascript
+// Vulnerabilities
+GET  /api/vulnerabilities          // List with pagination
+POST /api/vulnerabilities/import   // CSV import
+GET  /api/vulnerabilities/export   // Export data
 
-    ```bash
-    npm install
-    ```
+// Tickets  
+GET  /api/tickets                  // List tickets
+POST /api/tickets                  // Create ticket
+PUT  /api/tickets/:id             // Update ticket
+```
 
-## Running the Application
+### Inter-Module Communication
 
-## This project must be run in a Docker container
+```javascript
+// Refresh data across modules
+window.refreshPageData('vulnerabilities');
+window.refreshPageData('tickets');
+```
 
-To start the server in a Docker container:
+## Development Commands
 
 ```bash
-docker-compose up -d
+
+# Development (Docker Only)
+
+docker-compose up -d               # Start services
+npm run dev                        # Development server with nodemon
+npm run init-db                   # Initialize database
+
+# Documentation
+
+npm run docs:generate             # Update HTML docs
+npm run docs:analyze             # Architecture analysis
+
+# Quality
+
+npm run lint:all                 # Run all linters
+npm run fix:all                 # Fix all issues
+
+# Testing
+
+docker-compose restart           # ALWAYS before testing
+npx playwright test             # Browser automation
 ```
 
-The application will be available at `http://localhost:8080`.
+## Session Handoff Protocol
 
-To start the server in development mode (with automatic reloading):
+**At Session Start**:
 
-```bash
-npm run dev
-```
+1. Check `/dev-docs/session-handoff.json` for current project state
+2. Review recent changes and priorities
+3. Understand what task is being handed off
 
-To start the server in production mode:
+**At Session End**:
 
-```bash
-npm start
-```
+1. Update `/dev-docs/session-handoff.json` with progress
+2. Document architectural decisions discovered
+3. Note next steps for other tools
 
-## Database Initialization
+## Current Sprint Priorities
 
-To initialize the database, run the following command:
+1. **Security Hardening**: JWT auth, rate limiting, CORS
+2. **Testing Infrastructure**: Jest framework, coverage reporting
+3. **Database Security**: SQL injection prevention, input validation
 
-```bash
-npm run init-db
-```
+## Key Files
 
-This will create the `hextrackr.db` file in the `data` directory and create the necessary tables.
+- `server.js` - Main server with all routes
+- `scripts/init-database.js` - Database initialization
+- `scripts/shared/settings-modal.js` - Global utilities
+- `scripts/pages/vulnerability-manager.js` - Main UI logic
+- `docs-source/` - Documentation source
 
-# Development Conventions
+## Integration Points
 
-## Linting
+- **ServiceNow**: Ticket integration via settings
+- **Security Scanners**: CSV import support
+- **Backup/Restore**: Complete data export/import
 
-This project uses ESLint for JavaScript, Stylelint for CSS, and Markdownlint for Markdown. To run the linters, use the following commands:
+## Performance Requirements
 
-- `npm run eslint`: Lint JavaScript files.
-- `npm run stylelint`: Lint CSS files.
-- `npm run lint:md`: Lint Markdown files.
-- `npm run lint:all`: Run all linters.
+- Table loads: <500ms
+- Chart updates: <200ms  
+- Card transitions: <100ms
+- Initial page load: <2s
+- Animations: 60fps
 
-To automatically fix linting errors, use the following commands:
+## Common Pitfalls
 
-- `npm run eslint:fix`: Fix JavaScript files.
-- `npm run stylelint:fix`: Fix CSS files.
-- `npm run lint:md:fix`: Fix Markdown files.
-- `npm run fix:all`: Fix all files.
+1. Settings modal expects `/api/import` but server uses specific endpoints
+2. Ticket schema evolution - some deployments lack newer columns
+3. Always `unlink()` temp files after processing
+4. SQLite needs write permissions in `data/`
+5. File uploads hard-limited to 100MB
 
-## Testing
+## Agent Boundaries
 
-This project uses Playwright for end-to-end testing. Tests are located in the `.playwright-mcp` directory.
+**UI Changes Only**: CSS, HTML, animations, responsive design
+**Data Processing**: Import logic, aggregation, database operations
+**Integration Work**: API connections, external system mapping
 
-**Important:** Restart the Docker container before running Playwright tests:
-
-```bash
-docker-compose restart
-```
-
-## Documentation
-
-The documentation for this project is located in the `docs-source` directory and is written in Markdown. The documentation is then converted to HTML and served from the `docs-html` directory. To generate the HTML documentation, run the following command:
-
-```bash
-npm run docs:generate
-```
+**Critical**: ALWAYS use Docker containers - never run Node.js locally. Use `docker-compose restart` before Playwright tests.

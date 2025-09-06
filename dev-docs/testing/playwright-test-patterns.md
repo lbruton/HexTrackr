@@ -1,4 +1,4 @@
-# Playwright Testing Patterns - HexTrackr v1.0.4
+# Playwright Testing Patterns - HexTrackr
 
 ## Overview
 
@@ -74,7 +74,7 @@ test('validate vulnerability modal aggregation', async ({ page }) => {
 });
 ```
 
-## Key Features:
+## Key Features
 
 - **Timeout Management**: Progressive timeouts for different loading stages
 - **Data Validation**: Verify aggregated device counts

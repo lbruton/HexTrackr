@@ -1,6 +1,6 @@
 {
-  "version": "1.0.4",
-  "generated": "2025-09-06T00:00:00Z",
+  "version": "1.0.8",
+  "generated": "2025-09-06T14:30:00Z",
   "source_files_analyzed": [
     "server.js",
     "scripts/pages/vulnerability-manager.js",
