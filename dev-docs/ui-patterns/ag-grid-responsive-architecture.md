@@ -1,4 +1,4 @@
-# AG Grid Responsive Architecture - HexTrackr v1.0.4
+# AG Grid Responsive Architecture - HexTrackr
 
 ## Overview
 
@@ -46,7 +46,7 @@ function createVulnerabilityGridOptions(componentContext) {
 }
 ```
 
-## Benefits:
+## Benefits
 
 - **Centralized Configuration**: Single source of truth for grid setup
 - **Context Injection**: Access to parent component methods via `componentContext`
@@ -71,7 +71,7 @@ window.addEventListener("resize", debounce(() => {
 }, 200));
 ```
 
-## Performance Impact:
+## Performance Impact
 
 - **Event Throttling**: Limits resize calculations to every 200ms
 - **CPU Optimization**: Prevents excessive DOM manipulation
@@ -122,7 +122,7 @@ function updateColumnVisibility(api) {
 }
 ```
 
-## Features:
+## Features
 
 - **Visual Hierarchy**: Color-coded severity levels
 - **Consistent Styling**: Bootstrap-based badge system
@@ -146,7 +146,7 @@ function updateColumnVisibility(api) {
 }
 ```
 
-## Thresholds:
+## Thresholds
 
 - **Critical**: >= 9.0 (Red)
 - **High**: >= 7.0 (Orange)
@@ -197,7 +197,7 @@ function updateColumnVisibility(api) {
 }
 ```
 
-## Detection Logic:
+## Detection Logic
 
 1. **CVE Format**: `CVE-YYYY-NNNNN` pattern matching
 2. **Cisco SA**: `cisco-sa-*` extraction from plugin_name
@@ -228,7 +228,7 @@ function updateColumnVisibility(api) {
 }
 ```
 
-## Modal Data Flow:
+## Modal Data Flow
 
 1. **Unique ID Generation**: Timestamp-based unique identifiers
 2. **Global Storage**: `window.vulnModalData` registry
@@ -265,7 +265,7 @@ function updateColumnVisibility(api) {
 }
 ```
 
-## Impact:
+## Impact
 
 - **Mobile Optimization**: Horizontal scroll when needed
 - **Performance**: Only renders visible columns
@@ -293,19 +293,19 @@ onGridSizeChanged: (params) => {
 
 ### 1. Mobile-First Column Priority
 
-## Essential Columns (Always Visible):
+## Essential Columns (Always Visible)
 
 - Severity (visual priority)
 - Hostname (primary identifier)  
 - Description (context)
 
-## Secondary Columns (Tablet+):
+## Secondary Columns (Tablet+)
 
 - Last Seen (temporal context)
 - IP Address (technical detail)
 - CVE/Vulnerability ID (reference)
 
-## Tertiary Columns (Desktop Only):
+## Tertiary Columns (Desktop Only)
 
 - Vendor (organizational context)
 

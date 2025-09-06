@@ -36,7 +36,6 @@ function debounce(func, delay) {
 function createVulnerabilityGridOptions(componentContext) {
     // Column definitions with optimized responsive width management
     const isDesktop = window.innerWidth >= 1200;
-    const isTablet = window.innerWidth >= 768 && window.innerWidth < 1200;
     const isMobile = window.innerWidth < 768;
     
     const columnDefs = [
@@ -45,9 +44,10 @@ function createVulnerabilityGridOptions(componentContext) {
             field: "last_seen",
             sortable: true,
             filter: "agDateColumnFilter",
-            width: isDesktop ? 120 : isTablet ? 100 : 80,
-            minWidth: 80,
-            maxWidth: 130,
+            width: 120,
+            minWidth: 100,
+            maxWidth: 150,
+            resizable: true,
             cellRenderer: (params) => {
                 // Priority: last_seen date (if available) → scan_date (fallback)
                 const lastSeen = params.data.last_seen;
@@ -63,36 +63,14 @@ function createVulnerabilityGridOptions(componentContext) {
             hide: isMobile,
         },
         {
-            headerName: "Hostname",
-            field: "hostname",
-            sortable: true,
-            filter: true,
-            width: isDesktop ? 180 : isTablet ? 140 : 120,
-            minWidth: 100,
-            maxWidth: 200,
-            cellRenderer: (params) => {
-                const hostname = params.value || "-";
-                return `<a href="#" class="fw-bold text-primary text-decoration-none" onclick="vulnManager.viewDeviceDetails('${hostname}')">${hostname}</a>`;
-            }
-        },
-        {
-            headerName: "IP Address",
-            field: "ip_address",
-            sortable: true,
-            filter: true,
-            width: isDesktop ? 140 : 120,
-            minWidth: 100,
-            maxWidth: 150,
-            hide: isMobile,
-        },
-        {
             headerName: "Severity",
             field: "severity",
             sortable: true,
             filter: true,
-            width: isDesktop ? 110 : isTablet ? 100 : 90,
-            minWidth: 80,
-            maxWidth: 120,
+            width: 110,
+            minWidth: 90,
+            maxWidth: 140,
+            resizable: true,
             cellRenderer: (params) => {
                 const severity = params.value || "Low";
                 const className = `severity-${severity.toLowerCase()}`;
@@ -100,51 +78,16 @@ function createVulnerabilityGridOptions(componentContext) {
             }
         },
         {
-            headerName: "CVE",
-            field: "cve",
-            sortable: true,
-            filter: true,
-            width: isDesktop ? 150 : isTablet ? 130 : 110,
-            minWidth: 90,
-            maxWidth: 160,
-            hide: isMobile,
-            cellRenderer: (params) => {
-                if (params.value && params.value.startsWith("CVE-")) {
-                    return `<a href="#" class="text-decoration-none" onclick="vulnManager.lookupCVE('${params.value}')">${params.value}</a>`;
-                }
-                return params.value || "-";
-            }
-        },
-        {
-            headerName: "Vendor",
-            field: "vendor",
-            sortable: true,
-            filter: true,
-            width: isDesktop ? 120 : 100,
-            minWidth: 80,
-            maxWidth: 140,
-            hide: !isDesktop,
-        },
-        {
-            headerName: isMobile ? "Description" : "Vulnerability Description",
-            field: "plugin_name",
-            sortable: true,
-            filter: true,
-            flex: 1,
-            minWidth: isMobile ? 200 : isTablet ? 250 : 300,
-            maxWidth: 600,
-            wrapText: true,
-            autoHeight: true,
-            cellRenderer: (params) => params.value || "-",
-        },
-        {
             headerName: "VPR",
             field: "vpr_score",
             sortable: true,
             filter: "agNumberColumnFilter",
-            width: isDesktop ? 90 : isTablet ? 80 : 70,
-            minWidth: 60,
-            maxWidth: 100,
+            width: 90,
+            minWidth: 70,
+            maxWidth: 120,
+            resizable: true,
+            aggFunc: "sum",
+            enableValue: true,
             cellRenderer: (params) => {
                 const score = parseFloat(params.value) || 0;
                 let className = "severity-low";
@@ -157,6 +100,117 @@ function createVulnerabilityGridOptions(componentContext) {
                 }
                 return `<span class="severity-badge ${className}">${score.toFixed(1)}</span>`;
             }
+        },
+        {
+            headerName: "Hostname",
+            field: "hostname",
+            sortable: true,
+            filter: true,
+            width: 180,
+            minWidth: 120,
+            maxWidth: 250,
+            resizable: true,
+            cellRenderer: (params) => {
+                const hostname = params.value || "-";
+                return `<a href="#" class="fw-bold text-primary text-decoration-none" style="cursor: pointer;">${hostname}</a>`;
+            }
+        },
+        {
+            headerName: "IP Address",
+            field: "ip_address",
+            sortable: true,
+            filter: true,
+            width: 140,
+            minWidth: 110,
+            maxWidth: 180,
+            resizable: true,
+            hide: isMobile,
+            cellRenderer: (params) => {
+                const ip = params.value || "N/A";
+                return ip !== "N/A" ? `<code class="text-muted small">${ip}</code>` : "<span class=\"text-muted\">N/A</span>";
+            }
+        },
+        {
+            headerName: "Vendor",
+            field: "vendor",
+            sortable: true,
+            filter: true,
+            width: 120,
+            minWidth: 100,
+            maxWidth: 160,
+            resizable: true,
+            hide: !isDesktop,
+        },
+        {
+            headerName: "Vulnerability",
+            field: "cve",
+            sortable: true,
+            filter: true,
+            width: 150,
+            minWidth: 110,
+            maxWidth: 180,
+            resizable: true,
+            hide: isMobile,
+            cellRenderer: (params) => {
+                const cve = params.value;
+                const pluginName = params.data.plugin_name;
+                
+                if (cve && cve.startsWith("CVE-")) {
+                    return `<a href="#" class="text-decoration-none" onclick="vulnManager.lookupVulnerability('${cve}')">${cve}</a>`;
+                }
+                
+                // Check for Cisco SA ID in plugin name
+                if (pluginName && typeof pluginName === "string") {
+                    const ciscoSaMatch = pluginName.match(/cisco-sa-([a-zA-Z0-9-]+)/i);
+                    if (ciscoSaMatch) {
+                        const ciscoId = `cisco-sa-${ciscoSaMatch[1]}`;
+                        return `<a href="#" class="text-decoration-none text-warning" onclick="vulnManager.lookupVulnerability('${ciscoId}')">${ciscoId}</a>`;
+                    }
+                }
+                
+                // Fall back to Plugin ID
+                if (params.data.plugin_id) {
+                    return `<span class="text-muted">Plugin ${params.data.plugin_id}</span>`;
+                }
+                
+                return "-";
+            }
+        },
+        {
+            headerName: "Vulnerability Description",
+            field: "plugin_name",
+            sortable: true,
+            filter: true,
+            width: 350,
+            minWidth: 200,
+            maxWidth: 600,
+            resizable: true,
+            wrapText: false,
+            autoHeight: false,
+            cellClass: "ag-cell-wrap-text",
+            cellStyle: {
+                "white-space": "nowrap",
+                "overflow": "hidden",
+                "text-overflow": "ellipsis"
+            },
+            cellRenderer: (params) => {
+                const value = params.value || "-";
+                
+                // Create a clickable link that opens the vulnerability details modal for this specific vulnerability
+                if (value !== "-") {
+                    // Create a unique ID for this vulnerability row to store in vulnModalData
+                    const vulnDataId = `vuln_${params.data.hostname}_${params.data.cve || params.data.plugin_id}_${Date.now()}`;
+                    
+                    // Store the vulnerability data for modal access
+                    if (!window.vulnModalData) {
+                        window.vulnModalData = {};
+                    }
+                    window.vulnModalData[vulnDataId] = params.data;
+                    
+                    return `<a href="#" class="text-decoration-none text-dark" style="cursor: pointer;" title="${value}" onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}')">${value}</a>`;
+                }
+                return `<span title="${value}">${value}</span>`;
+            },
         }
     ];
 
@@ -174,44 +228,78 @@ function createVulnerabilityGridOptions(componentContext) {
         rowSelection: "multiple",
         suppressRowClickSelection: true,
         pagination: true,
-        paginationPageSize: 50,
-        paginationPageSizeSelector: [25, 50, 100, 200],
-        suppressColumnVirtualisation: true,
+        paginationPageSize: 10,
+        paginationPageSizeSelector: [10, 25, 50, 100, 200],
+        
+        // Enable auto-height to let pagination control vertical display
+        domLayout: "autoHeight",
+        
+        // Enhanced horizontal scrolling support
+        suppressColumnVirtualisation: false,
         suppressHorizontalScroll: false,
+        suppressScrollOnNewData: true,
+        alwaysShowHorizontalScroll: false,
+        
+        // Single-row display optimizations
+        rowHeight: 42,
+        suppressRowTransform: false,
+        
+        // Enhanced features for requirements
+        enableRangeSelection: true,
+        enableRangeHandle: true,
+        enableFillHandle: true,
+        
+        // Column sizing enhancements
+        maintainColumnOrder: true,
+        enableColResize: true,
+        suppressAutoSize: false,
+        skipHeaderOnAutoSize: false,
         
         onGridReady: (params) => {
             // Responsive column management on resize
             window.addEventListener("resize", debounce(() => {
                 if (componentContext.gridApi) {
-                    // Auto-size columns to fit viewport
-                    componentContext.gridApi.sizeColumnsToFit();
-                    
                     // Update column visibility based on screen size
                     updateColumnVisibility(params.api);
                 }
             }, 200));
             
-            // Initial column fitting
+            // Set initial column visibility
             setTimeout(() => {
                 if (componentContext.gridApi) {
-                    componentContext.gridApi.sizeColumnsToFit();
+                    updateColumnVisibility(params.api);
                 }
             }, 100);
         },
 
+        onCellClicked: (params) => {
+            // Secure event handling for hostname clicks
+            if (params.column.getColId() === "hostname" && params.data && componentContext.viewDeviceDetails) {
+                componentContext.viewDeviceDetails(params.data.hostname);
+            }
+        },
+
         onFirstDataRendered: (params) => {
             if (componentContext.gridApi) {
-                // Auto-size all columns to fit content and viewport
-                componentContext.gridApi.sizeColumnsToFit();
+                // Update column visibility based on screen size
                 updateColumnVisibility(params.api);
             }
         },
 
         onGridSizeChanged: (params) => {
-            // Auto-fit columns when grid container changes size
+            // Update column visibility when grid container changes size
             if (params.api) {
-                params.api.sizeColumnsToFit();
                 updateColumnVisibility(params.api);
+            }
+        },
+
+        onPaginationChanged: (params) => {
+            // Update pagination info when page size or page changes
+            if (componentContext && typeof componentContext.updatePaginationInfo === "function") {
+                const totalRows = params.api.getDisplayedRowCount();
+                const currentPage = params.api.paginationGetCurrentPage();
+                const pageSize = params.api.paginationGetPageSize();
+                componentContext.updatePaginationInfo(totalRows, currentPage, pageSize);
             }
         },
     };
