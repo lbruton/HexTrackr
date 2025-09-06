@@ -1,15 +1,15 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>HexTrackr v1.0.5 JavaScript Modularization Sprint</h1>
+    <h1>HexTrackr v1.0.8 Performance Optimization Sprint</h1>
 <h2>Overview</h2>
-<p><strong>PRIORITY SHIFT</strong>: Focus moved from documentation to critical JavaScript modularization for widget-based dashboard architecture. Documentation updates will follow modularization completion.</p>
+<p><strong>PRIORITY SHIFT</strong>: Focus moved to performance bottlenecks as foundation - CSV import optimization and rollover schema enhancement. This creates the stable infrastructure needed for all future features including KEV integration.</p>
 <h2>Strategic Vision</h2>
-<p>Transform HexTrackr into a composable dashboard platform with drag-drop widgets for personalized user experiences. This modularization effort is essential for:</p>
+<p>Build a high-performance foundation for HexTrackr&#39;s vulnerability management system. This performance optimization sprint is essential for:</p>
 <ul>
-<li>AI-friendly development (all files &lt;500 lines)  </li>
-<li>Future dashboard customization capabilities</li>
-<li>Parallel development across multiple AI assistants</li>
-<li>Improved code maintainability and Codacy scores</li>
+<li><strong>Daily Workflow Efficiency</strong>: 8-15x faster CSV imports (10-20 minutes → 1-2 minutes)</li>
+<li><strong>Data Quality Foundation</strong>: Eliminate duplicate vulnerabilities through enhanced rollover schema  </li>
+<li><strong>API Integration Readiness</strong>: Clean, deduplicated data essential for future CISCO/Tenable integrations</li>
+<li><strong>User Experience</strong>: Real-time progress feedback and responsive large file processing</li>
 </ul>
 <h2>Phase 1 Completed ✅ <strong>Sep 5, 2025</strong></h2>
 <ul>
@@ -18,54 +18,46 @@
 <li>✅ PaginationController extraction proof-of-concept (216 lines)</li>
 <li>✅ Dashboard vision planning and widget architecture</li>
 <li>✅ Unified AI development workflow with memory systems</li>
+<li>✅ Strategic priority realignment (Sep 6, 2025) - KEV integration as #1 priority</li>
 </ul>
-<h2>Current Sprint Goals (Phase 2)</h2>
+<h2>Current Sprint Goals (Performance Foundation)</h2>
 <ol>
-<li><strong>Split ModernVulnManager class</strong> (2,429 lines → 8 widget-ready modules)</li>
-<li><strong>Establish widget interface standards</strong> for future dashboard implementation</li>
-<li><strong>Maintain zero functionality regression</strong> during refactoring</li>
-<li><strong>Enable parallel AI development</strong> across specialized modules</li>
+<li><strong>CSV Import Performance Optimization</strong> (15-20 hours) - 8-15x speed improvement</li>
+<li><strong>Vulnerability Rollover Schema Enhancement</strong> (30-40 hours) - eliminate duplicates</li>
+<li><strong>Real-time Progress Implementation</strong> - WebSocket-based import status</li>
+<li><strong>Database Transaction Optimization</strong> - batch processing with SQLite efficiency</li>
 </ol>
 <hr>
-<h2>Phase 2: ModernVulnManager Modularization Tasks</h2>
-<h3>Week 1: Data Layer &amp; Statistics (Sep 9-13, 2025)</h3>
-<h4><strong>Task 2.1: Extract vulnerability-data.js</strong> 🔄 <strong>Priority: CRITICAL</strong></h4>
+<h2>Performance Sprint Tasks (Phase 1)</h2>
+<h3>Week 1: CSV Import Optimization (Sep 9-13, 2025)</h3>
+<h4><strong>Task 1.1: Analyze Current CSV Import Bottlenecks</strong> 🔄 <strong>Priority: CRITICAL</strong></h4>
 <ul>
-<li><input disabled="" type="checkbox"> <strong>Create DataManager module</strong> (~350 lines)<ul>
-<li>Methods: <code>loadData()</code>, <code>processDevices()</code>, <code>filterData()</code>, <code>groupVulnerabilitiesByCVE()</code></li>
-<li>Purpose: Central data fetching, caching, and state management</li>
-<li>Dependencies: None (pure data layer)</li>
-<li>Widget Potential: Hidden DataManager service widget</li>
+<li><input disabled="" type="checkbox"> <strong>Profile <code>processVulnerabilityRowsWithRollover()</code></strong> - Identify specific performance bottlenecks</li>
+<li><input disabled="" type="checkbox"> <strong>Database Query Analysis</strong> - Measure INSERT/UPDATE performance patterns  </li>
+<li><input disabled="" type="checkbox"> <strong>Memory Usage Profiling</strong> - Track memory consumption during large file processing</li>
+<li><input disabled="" type="checkbox"> <strong>Establish Performance Baselines</strong> - Document current import times for 10MB, 50MB, 100MB files</li>
 </ul>
-</li>
-</ul>
-<h4><strong>Task 2.2: Extract vulnerability-statistics.js</strong> 🔄 <strong>Priority: HIGH</strong></h4>
+<h4><strong>Task 1.2: Implement Batch Processing Architecture</strong> 🔄 <strong>Priority: HIGH</strong></h4>
 <ul>
-<li><input disabled="" type="checkbox"> <strong>Create VPRStatistics module</strong> (~300 lines)<ul>
-<li>Methods: <code>updateStatisticsDisplay()</code>, <code>updateTrendIndicators()</code>, <code>flipStatCards()</code>, <code>calculateTrend()</code></li>
-<li>Purpose: Statistics calculation and display logic</li>
-<li>Dependencies: vulnerability-data</li>
-<li>Widget Potential: Configurable statistics widget</li>
+<li><input disabled="" type="checkbox"> <strong>Design Batch Processing Logic</strong> - Process CSV rows in configurable batches (500-1000 rows)</li>
+<li><input disabled="" type="checkbox"> <strong>Database Transaction Optimization</strong> - Use SQLite transactions for batch commits</li>
+<li><input disabled="" type="checkbox"> <strong>Memory Management</strong> - Stream processing to avoid loading entire file into memory  </li>
+<li><input disabled="" type="checkbox"> <strong>Progress Tracking Infrastructure</strong> - Foundation for real-time progress updates</li>
 </ul>
-</li>
-</ul>
-<h4><strong>Task 2.3: Testing &amp; Integration</strong></h4>
+<h4><strong>Task 1.3: Testing &amp; Benchmarking</strong></h4>
 <ul>
-<li><input disabled="" type="checkbox"> <strong>Validate data layer functionality</strong></li>
-<li><input disabled="" type="checkbox"> <strong>Test statistics calculations</strong></li>
-<li><input disabled="" type="checkbox"> <strong>Update import dependencies</strong></li>
-<li><input disabled="" type="checkbox"> <strong>Docker restart and browser testing</strong></li>
+<li><input disabled="" type="checkbox"> <strong>Performance Testing Suite</strong> - Automated testing with various file sizes</li>
+<li><input disabled="" type="checkbox"> <strong>Memory Leak Detection</strong> - Ensure consistent memory usage across imports</li>
+<li><input disabled="" type="checkbox"> <strong>Regression Testing</strong> - Validate no data integrity issues from optimization</li>
+<li><input disabled="" type="checkbox"> <strong>Docker restart and browser testing</strong> - Full integration validation</li>
 </ul>
-<h3>Week 2: UI Components (Sep 16-20, 2025)</h3>
-<h4><strong>Task 2.4: Extract vulnerability-search.js</strong> 🔄 <strong>Priority: MEDIUM</strong></h4>
+<h3>Week 2: Rollover Schema Enhancement (Sep 16-20, 2025)</h3>
+<h4><strong>Task 2.1: Enhanced Deduplication Logic</strong> 🔄 <strong>Priority: CRITICAL</strong></h4>
 <ul>
-<li><input disabled="" type="checkbox"> <strong>Create VulnerabilitySearch module</strong> (~200 lines)<ul>
-<li>Methods: Search handlers, filter logic, view switching</li>
-<li>Purpose: Search and filtering controls</li>
-<li>Dependencies: vulnerability-data</li>
-<li>Widget Potential: Unified search/filter control panel</li>
-</ul>
-</li>
+<li><input disabled="" type="checkbox"> <strong>Multi-tier Deduplication Strategy</strong> - Implement confidence scoring for duplicate detection</li>
+<li><input disabled="" type="checkbox"> <strong>Enhanced Unique Key Algorithm</strong> - Beyond hostname + CVE matching  </li>
+<li><input disabled="" type="checkbox"> <strong>Lifecycle State Management</strong> - Handle resolved/reopened vulnerability states</li>
+<li><input disabled="" type="checkbox"> <strong>Migration Script Development</strong> - Safe upgrade path for existing data</li>
 </ul>
 <h4><strong>Task 2.5: Extract vulnerability-charts.js</strong> 🔄 <strong>Priority: HIGH</strong></h4>
 <ul>
@@ -80,7 +72,7 @@
 <h4><strong>Task 2.6: Testing &amp; Integration</strong></h4>
 <ul>
 <li><input disabled="" type="checkbox"> <strong>Validate search and filtering</strong></li>
-<li><input disabled="" type="checkbox"> <strong>Test chart rendering and updates</strong> </li>
+<li><input disabled="" type="checkbox"> <strong>Test chart rendering and updates</strong></li>
 <li><input disabled="" type="checkbox"> <strong>Verify responsive behavior</strong></li>
 </ul>
 <h3>Week 3: Complex Components (Sep 23-27, 2025)</h3>
@@ -172,7 +164,7 @@
 <li><strong>Testing</strong>: Comprehensive validation at each extraction step</li>
 </ul>
 <hr>
-<p><em>Sprint updated September 5, 2025 to reflect strategic shift to modularization priority</em></p>
+<p><em>Sprint updated September 6, 2025 to reflect performance-first strategy and version consistency (v1.0.8)</em></p>
 <h2>Agent Coordination Strategy</h2>
 <p>This modularization sprint is designed for the unified AI development workflow:</p>
 <ul>
@@ -191,7 +183,7 @@
 <li>User guides demonstrate widget-based functionality</li>
 <li>Development resources focus on foundation-building first</li>
 </ol>
-<p>The documentation sprint will resume in v1.0.6 planning after modularization success.</p>
+<p>The documentation sprint will resume in v1.0.9 planning after modularization success and KEV integration completion.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
