@@ -9,6 +9,7 @@ const sqlite3 = require("sqlite3").verbose();
 const multer = require("multer");
 const Papa = require("papaparse");
 const fs = require("fs");
+const rateLimit = require("express-rate-limit");
 
 // Security utility for path validation
 class PathValidator {
@@ -1527,8 +1528,24 @@ const PORT = process.env.PORT || 8080;
 const dbPath = path.join(__dirname, "data", "hextrackr.db");
 const db = new sqlite3.Database(dbPath);
 
-// Middleware
-app.use(cors());
+// Middleware - Secure CORS Configuration
+app.use(cors({
+    origin: ["http://localhost:8080", "http://127.0.0.1:8080"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    credentials: true
+}));
+
+// Rate Limiting - DoS Protection
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: "Too many requests from this IP, please try again later.",
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+app.use("/api/", limiter);
+
 app.use(compression());
 app.use(express.json({ limit: "100mb" }));
 app.use(express.urlencoded({ extended: true, limit: "100mb" }));
