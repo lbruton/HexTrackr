@@ -60,7 +60,7 @@ The portal implements a specific navigation hierarchy:
    - Development
    - Security
    - User Guides
-4. **Special Sections** - Always last in this order:
+1. **Special Sections** - Always last in this order:
    - Current Sprint
    - Roadmap
    - Changelog
