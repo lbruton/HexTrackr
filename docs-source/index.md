@@ -24,7 +24,7 @@ This documentation portal provides comprehensive guides, API references, and arc
 - [ ] **Core Testing Setup**: Jest framework, integration tests, coverage reporting
 - [ ] **Quality Gates**: Pre-commit hooks, automated testing, security audits
 
-### 📝 Latest Changes (v1.0.1 - Aug 27, 2025)
+### 📝 Latest Changes (v1.0.10 - Sep 7, 2025)
 
 #### Fixed
 
@@ -53,5 +53,4 @@ This documentation portal provides comprehensive guides, API references, and arc
 This project follows industry best practices:
 
 - **[Keep a Changelog](https://keepachangelog.com/en/1.0.0/)** - Structured changelog format
-- **[Semantic Versioning](https://semver.org/spec/v2.0.0.html)** - Predictable version numbering  
-- **[OpenAI AGENTS.md](https://github.com/openai/agents.md)** - AI agent workflow standards
+- **[Semantic Versioning](https://semver.org/spec/v2.0.0.html)** - Predictable version numbering

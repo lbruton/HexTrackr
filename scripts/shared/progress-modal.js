@@ -62,6 +62,7 @@ class ProgressModal {
         // Bind methods to maintain context
         this.handleProgressUpdate = this.handleProgressUpdate.bind(this);
         this.handleProgressStatus = this.handleProgressStatus.bind(this);
+        this.handleProgressComplete = this.handleProgressComplete.bind(this);
         this.handleWebSocketError = this.handleWebSocketError.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.handleClose = this.handleClose.bind(this);
@@ -116,8 +117,8 @@ class ProgressModal {
                                 </div>
                             </div>
                             
-                            <!-- Progress Details -->
-                            <div class="row text-center" id="progressDetails">
+                            <!-- Progress Details (Hidden for CSV imports as server doesn't provide current/total/eta) -->
+                            <div class="row text-center d-none" id="progressDetails">
                                 <div class="col-4">
                                     <div class="text-muted small">Current</div>
                                     <div class="fw-bold" id="progressCurrent">0</div>
@@ -222,6 +223,7 @@ class ProgressModal {
     setupWebSocketListeners() {
         this.websocketClient.on("progress", this.handleProgressUpdate);
         this.websocketClient.on("progressStatus", this.handleProgressStatus);
+        this.websocketClient.on("progressComplete", this.handleProgressComplete);
         this.websocketClient.on("connectionFailed", this.handleWebSocketError);
         this.websocketClient.on("disconnect", this.handleWebSocketError);
     }
@@ -233,6 +235,7 @@ class ProgressModal {
         if (this.websocketClient) {
             this.websocketClient.off("progress", this.handleProgressUpdate);
             this.websocketClient.off("progressStatus", this.handleProgressStatus);
+            this.websocketClient.off("progressComplete", this.handleProgressComplete);
             this.websocketClient.off("connectionFailed", this.handleWebSocketError);
             this.websocketClient.off("disconnect", this.handleWebSocketError);
         }
@@ -308,7 +311,10 @@ class ProgressModal {
      * @param {Object} data - Progress data from WebSocket
      */
     handleProgressUpdate(data) {
+        console.log("Progress update received:", data, "Visible:", this.isVisible, "Session match:", data.sessionId === this.currentSessionId);
+        
         if (!this.isVisible || data.sessionId !== this.currentSessionId) {
+            console.log("Progress update ignored - modal not visible or session mismatch");
             return;
         }
         
@@ -337,6 +343,41 @@ class ProgressModal {
             this.showSuccess(data.message || "Process completed successfully!");
         } else if (data.status === "error") {
             this.showError(data.message || "An error occurred during processing.");
+        }
+    }
+    
+    /**
+     * Handle progress completion from WebSocket
+     * @param {Object} data - Completion data from WebSocket
+     */
+    handleProgressComplete(data) {
+        if (!this.isVisible || data.sessionId !== this.currentSessionId) {
+            return;
+        }
+        
+        console.log("Progress complete event received:", data);
+        
+        // Update progress data to completion
+        this.progressData.progress = 100;
+        this.progressData.status = "completed";
+        this.progressData.message = data.message || "Import completed successfully";
+        
+        // Update UI to show 100% completion
+        this.updateUI();
+        
+        // Show success state
+        this.showSuccess(this.progressData.message);
+        
+        // Auto-close after 2 seconds on success
+        if (!this.progressData.error) {
+            setTimeout(() => {
+                this.hide();
+                
+                // Trigger page refresh to show new data
+                if (window.refreshPageData) {
+                    window.refreshPageData("vulnerabilities");
+                }
+            }, 2000);
         }
     }
     
