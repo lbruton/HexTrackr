@@ -4,40 +4,105 @@
 
 HexTrackr is a vulnerability and ticket management system with a monolithic Node.js/Express backend and browser-based frontend. It uses SQLite for persistence and follows a modular JavaScript architecture pattern.
 
+**Current Version**: See package.json (latest changes in CHANGELOG.md)
+**Release Information**: All versioning follows Semantic Versioning 2.0.0 standards
+
+**Current Version**: See package.json (latest changes in CHANGELOG.md)
+**Release Information**: All versioning follows Semantic Versioning 2.0.0 standards
+
 ## Memory Systems Integration
 
-You have access to two advanced memory systems that work together to provide comprehensive context:
+You have access to three advanced systems that work together to provide comprehensive context:
 
 1. **Memento MCP**: Knowledge graph for structured technical information
    - Stores: Code components, architectural decisions, entity relationships
    - Optimized for: Technical knowledge, code structure, design patterns
-   - Query via: `semantic_search` with specific entity types
+   - Query via: `mcp_memento-mcp_semantic_search` with specific entity types
 
-1. **Persistent AI Memory (PAM)**: Timeline-based memory for conversational context
-   - Stores: Conversation history, git commits, user preferences
-   - Optimized for: Chronological data, conversation continuity
-   - Query via: `search_memories` with type filters
+1. **Ref-Tools MCP**: Advanced search for code patterns and documentation
+   - Stores: Current best practices, framework examples, solution patterns
+   - **GitHub Repo Index**: CRITICAL - ref.tools indexes this HexTrackr repository as current source of truth
+   - Optimized for: Live technical examples, modern implementation patterns, **current codebase state**
+   - Query via: ref-tools search commands for real-time technical guidance
+
+1. **Context7 Cache**: Offline framework documentation cache
+   - Location: `.context7/frameworks/` directory
+   - Cached: Express.js, AG-Grid, ApexCharts, Tabler UI, SQLite3, Chart.js
+   - Coverage: 4,722 code snippets with trust scores 7.2-9.8/10
+
+### Enhanced Search Protocol
+
+Follow this **prioritized sequence** for maximum efficiency:
+
+1. **Context First**: Use what's in the current conversation window
+2. **Memento Semantic Search**: Query existing project knowledge
+
+   ```javascript
+   mcp_memento-mcp_semantic_search("express route validation", entity_types=["code-component"], limit=3)
+   ```
+
+1. **Ref-Tools Search**: Find current best practices and examples
+
+   ```bash
+
+   # Current HexTrackr codebase queries (PRIORITY - always current)
+
+   ref.tools search "HexTrackr vulnerability deduplication logic"
+   ref.tools search "HexTrackr server.js API endpoints current implementation"
+   
+   # External best practices
+
+   ref.tools search "Node.js Express security middleware 2025"
+   ref.tools search "SQLite database performance optimization"
+   ```
+
+1. **Context7 Cache**: Check offline documentation
+
+   ```bash
+
+   # Quick reference without web calls
+
+   cat .context7/frameworks/express.md
+   grep -n "middleware" .context7/frameworks/tabler.md
+   ```
+
+1. **Web Search**: Only if above sources insufficient
 
 ### MCP Tool Reference
 
-- **Tool Documentation**: Check `.runbooks/tools/` for comprehensive MCP server documentation
-- **Available Tools**: FileScopeMCP, Codacy, GitHub, Firecrawl, Context7, and 10+ other servers
-- **Usage Patterns**: Each `.runbooks/tools/{server}-mcp.prompt.md` includes tool lists and best practices
+- **Tool Documentation**: Enhanced multi-MCP architecture with Zen orchestration
+- **Available Tools**:
+  - **Zen MCP**: Multi-model analysis (zen analyze, debug, codereview, secaudit, testgen)
+  - **Ref-Tools MCP**: Live documentation search with API key integration
+  - **Memento MCP**: Knowledge graph with semantic search capabilities
+  - **Context7 Cache**: Offline framework docs (Express, AG-Grid, Tabler, SQLite3)
+  - **Codacy, GitHub, Playwright**: Quality, version control, and testing automation
+- **Usage Patterns**: Zen for analysis → Ref-tools for patterns → Context7 for reference → Web if needed
 
 ### Memory Access Optimization Protocol
 
 Follow this sequence for maximum token efficiency:
 
 1. **Context First**: Use what's in the current conversation window
-2. **Targeted Search**: Use specific 3-5 word queries with type filters
-3. **Progressive Expansion**: Only broaden search if needed after initial results
+2. **Memento Semantic Search**: Query project-specific knowledge with entity type filters
+3. **Ref-Tools Search**: Find current implementation patterns and best practices
+4. **Context7 Offline**: Check cached framework documentation
+5. **Progressive Expansion**: Only broaden search if needed after initial results
 
-```
-// EFFICIENT PATTERN
-semantic_search("express route validation", entity_types=["code-component"], limit=3)
+```javascript
+// ENHANCED EFFICIENT PATTERN
+// 1. Memento for project context
+mcp_memento-mcp_semantic_search("express route validation", entity_types=["code-component"], limit=3)
+
+// 2. Ref-tools for current practices AND current codebase
+ref.tools search "HexTrackr server.js route validation current implementation"
+ref.tools search "Express.js route validation middleware 2025"
+
+// 3. Context7 for offline reference
+cat .context7/frameworks/express.md | grep -A10 "validation"
 
 // INEFFICIENT PATTERN - AVOID
-read_graph() // Returns everything - token expensive
+mcp_memento-mcp_read_graph() // Returns everything - token expensive
 ```
 
 ## Key Architecture Patterns
@@ -134,9 +199,11 @@ Follow this process for every user request:
 ### 1. Observe - Gather Context Efficiently
 
 - Check current conversation context first
-- Use targeted semantic searches with specific terms and type filters
+- Use Memento semantic search with specific terms and entity type filters
+- Query ref-tools for current best practices and implementation patterns
+- Check Context7 offline cache for framework-specific patterns
 - Limit initial results to 3-5 items to conserve tokens
-- Track sources with [MEMENTO] or [PAM] prefixes
+- Store findings in Memento with proper entity types and relationships
 
 ### 2. Plan - Structure Your Approach
 
@@ -164,15 +231,16 @@ Follow this process for every user request:
 
 ### 6. Map-Update - Enhance Knowledge
 
-- Add observations to relevant Memento entities
-- Update conversation context in PAM
+- Add observations to relevant Memento entities with proper types
+- Store successful patterns and solutions for future reference
+- Document architecture decisions with relationships to affected components
 - Create reminders for follow-up tasks
 
 ### 7. Log - Document Outcomes
 
-- Store structured records in both memory systems
-- Update project documentation
-- Maintain the project roadmap
+- Store structured records in Memento with appropriate entity types
+- Update project documentation to reflect changes
+- Maintain the project roadmap with timeline updates
 
 ## Optimized Memory Taxonomy
 
@@ -180,10 +248,10 @@ Follow this process for every user request:
 |---------------|--------|--------------|---------|------------|
 | Code structure | Memento | `semantic_search` + type filter | `semantic_search("server endpoints", entity_types=["code-component"])` | Understanding implementation |
 | Design decisions | Memento | `semantic_search` + type filter | `semantic_search("database schema design", entity_types=["decision"])` | Retrieving rationale |
-| User preferences | Memento | `open_nodes` with ID | `open_nodes(["user_lonnie"])` | Personalizing responses |
-| Recent conversations | PAM | `search_memories` with type | `search_memories("vulnerability import", type="conversation")` | Continuing discussions |
-| Git history | PAM | `search_memories` with type | `search_memories("fix ticket schema", type="git-commit")` | Understanding changes |
-| Project timeline | PAM | `get_memories_by_date` | `get_memories_by_date(start="2025-08-01")` | Tracking progress |
+| User preferences | Memento | `search_nodes` with name | `search_nodes("user_lonnie")` | Personalizing responses |
+| Current patterns | Ref-Tools | Search query | `ref.tools search "Express.js middleware patterns 2025"` | Finding best practices |
+| Framework docs | Context7 | File access | `cat .context7/frameworks/express.md` | Quick reference |
+| Combined search | Multiple | Sequential query | Memento → Ref-tools → Context7 → Web | Comprehensive research |
 
 ## Versioning Standards
 
@@ -198,7 +266,7 @@ Follow this process for every user request:
 
 - **Standard**: Follow [Semantic Versioning v2.0.0](https://semver.org/spec/v2.0.0.html)
 - **Format**: MAJOR.MINOR.PATCH (e.g., 1.0.2)
-- **Current Version**: 1.0.3 (in package.json)
+- **Current Version**: See package.json for authoritative version number
 - **Rules**:
   - **MAJOR**: Breaking changes or major architectural updates
   - **MINOR**: New features and enhancements (backward compatible)  
@@ -212,3 +280,41 @@ Follow this process for every user request:
 3. Commit with descriptive message following SemVer
 4. Create Git tag matching version number
 5. Push changes and tags to GitHub
+
+## AI Agent Team Integration
+
+**You are part of a collaborative AI agent ecosystem** with shared Memento knowledge graph access. The team includes:
+
+### **Specialized Agents (Claude Environment)**
+
+- **vulnerability-data-processor**: CSV imports, rollover logic, data validation
+- **ui-design-specialist**: Frontend components, Tabler.io, AG-Grid optimization  
+- **docs-portal-maintainer**: Documentation pipeline, technical writing
+- **project-planner-manager**: Roadmaps, strategic planning, feature prioritization
+- **github-workflow-manager**: CI/CD, releases, automation
+- **database-schema-manager**: SQLite schema evolution, migration scripts
+
+### **Zen MCP Orchestration**
+
+**Enhanced Capabilities Available**:
+
+- **Multi-Model Analysis**: 31 models including GPT-5, O3, Gemini 2.5 Pro
+- **Systematic Workflows**: `zen analyze`, `zen debug`, `zen codereview`, `zen secaudit`
+- **Test Generation**: `zen testgen` with comprehensive edge case coverage
+- **Architecture Planning**: `zen planner` with revision and branching
+- **Code Tracing**: `zen tracer` for execution flow and dependency mapping
+- **Multi-Model Consensus**: `zen consensus` for complex decisions
+
+**Delegation Strategy**: Use Zen tools for:
+
+- Complex debugging requiring systematic investigation
+- Multi-model code review and security audits
+- Comprehensive test suite generation
+- Architecture analysis and refactoring recommendations
+- Pre-commit validation of changes
+
+### **Shared Knowledge Base**
+
+- **Memento Graph**: Stores architectural decisions, successful patterns, user preferences
+- **Context Continuity**: All agents contribute to and benefit from shared project memory
+- **Pattern Recognition**: Successful solutions automatically cataloged for team reuse
