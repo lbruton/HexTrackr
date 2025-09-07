@@ -119,13 +119,13 @@
 <tr>
 <td><code>site_id</code></td>
 <td>INTEGER</td>
-<td>FK → <code>sites.id</code>, Indexed</td>
+<td>FK to <code>sites.id</code>, Indexed</td>
 <td>Optional normalized site reference.</td>
 </tr>
 <tr>
 <td><code>location_id</code></td>
 <td>INTEGER</td>
-<td>FK → <code>locations.id</code>, Indexed</td>
+<td>FK to <code>locations.id</code>, Indexed</td>
 <td>Optional normalized location reference.</td>
 </tr>
 </tbody></table>
@@ -219,7 +219,7 @@
 <tr>
 <td><code>import_id</code></td>
 <td>INTEGER</td>
-<td>FK → <code>vulnerability_imports.id</code></td>
+<td>FK to <code>vulnerability_imports.id</code></td>
 <td>Batch that introduced or last updated this row.</td>
 </tr>
 <tr>
@@ -433,13 +433,13 @@
 <tr>
 <td><code>ticket_id</code></td>
 <td>TEXT</td>
-<td>FK → <code>tickets.id</code></td>
+<td>FK to <code>tickets.id</code></td>
 <td>Associated ticket.</td>
 </tr>
 <tr>
 <td><code>vulnerability_id</code></td>
 <td>INTEGER</td>
-<td>FK → <code>vulnerabilities.id</code></td>
+<td>FK to <code>vulnerabilities.id</code></td>
 <td>Associated vulnerability (legacy table).</td>
 </tr>
 <tr>
@@ -629,7 +629,7 @@
 </ul>
 <p><strong>Device → Vulnerability Aggregation</strong>:</p>
 <ul>
-<li>Query: <code>SELECT * FROM vulnerabilities_current WHERE hostname = ?</code> </li>
+<li>Query: <code>SELECT * FROM vulnerabilities_current WHERE hostname = ?</code></li>
 <li>Groups by description/CVE to show unique vulnerabilities</li>
 <li>Displays vulnerability count, severity distribution, and VPR totals</li>
 </ul>

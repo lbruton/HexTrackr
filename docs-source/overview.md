@@ -14,7 +14,7 @@ Complete API documentation for developers and integrations.
 
 HexTrackr is a comprehensive vulnerability and ticket management system designed for security teams. It provides centralized tracking of security vulnerabilities, managing support tickets, and integrating with various security tools and workflows.
 
-## Key Features:
+## Key Features
 
 - Centralized vulnerability tracking and management
 - Integrated ticket system for incident response

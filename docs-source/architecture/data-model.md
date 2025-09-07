@@ -33,8 +33,8 @@ Stores all ticketing information. This table has **indexes for query performance
 | `updated_at` | TEXT | NOT NULL | Last update timestamp. |
 | `site` | TEXT | Indexed | Higher‑level site grouping. |
 | `xt_number` | TEXT | Indexed | Alternate human-friendly number (used when `id` absent in legacy imports). |
-| `site_id` | INTEGER | FK → `sites.id`, Indexed | Optional normalized site reference. |
-| `location_id` | INTEGER | FK → `locations.id`, Indexed | Optional normalized location reference. |
+| `site_id` | INTEGER | FK to `sites.id`, Indexed | Optional normalized site reference. |
+| `location_id` | INTEGER | FK to `locations.id`, Indexed | Optional normalized location reference. |
 
 **Ticket Indexes** (all created automatically): location, status, date_submitted, date_due, hexagon_ticket, service_now_ticket, site, xt_number, site_id, location_id.
 
@@ -67,7 +67,7 @@ Current deduplicated state (one row per active unique vulnerability for the most
 | Column | Type | Constraints | Notes |
 | --- | --- | --- | --- |
 | `id` | INTEGER | PK AUTOINCREMENT |  |
-| `import_id` | INTEGER | FK → `vulnerability_imports.id` | Batch that introduced or last updated this row. |
+| `import_id` | INTEGER | FK to `vulnerability_imports.id` | Batch that introduced or last updated this row. |
 | `scan_date` | TEXT | NOT NULL | Date of the scan (YYYY-MM-DD). |
 | `hostname` | TEXT |  | Raw hostname (pre-normalization retained). |
 | `ip_address` | TEXT |  | Optional IP (may be blank). |
@@ -124,8 +124,8 @@ Many‑to‑many relationship between tickets and (legacy) `vulnerabilities` (pr
 | Column | Type | Constraints | Description |
 | --- | --- | --- | --- |
 | `id` | INTEGER | PK AUTOINCREMENT | Link row id. |
-| `ticket_id` | TEXT | FK → `tickets.id` | Associated ticket. |
-| `vulnerability_id` | INTEGER | FK → `vulnerabilities.id` | Associated vulnerability (legacy table). |
+| `ticket_id` | TEXT | FK to `tickets.id` | Associated ticket. |
+| `vulnerability_id` | INTEGER | FK to `vulnerabilities.id` | Associated vulnerability (legacy table). |
 | `relationship_type` | TEXT | DEFAULT 'remediation' | Relationship semantics. |
 | `notes` | TEXT |  | Free-form link-specific notes. |
 

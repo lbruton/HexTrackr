@@ -165,7 +165,7 @@ Build a high-performance foundation for HexTrackr's vulnerability management sys
 
 ---
 
-*Sprint updated September 6, 2025 to reflect performance-first strategy and version consistency (v1.0.8)*
+**Sprint updated September 6, 2025 to reflect performance-first strategy and version consistency (v1.0.8)**
 
 ## Agent Coordination Strategy
 
