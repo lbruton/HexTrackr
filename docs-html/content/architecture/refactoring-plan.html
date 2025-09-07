@@ -1,0 +1,266 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Server.js Modular Refactoring Plan</h1>
+<p>This document outlines the comprehensive refactoring strategy for <code>server.js</code> to achieve modular architecture and reduce complexity from 116 to target &lt;12 per module.</p>
+<h2>Current State Analysis</h2>
+<h3>Complexity Metrics (September 2025)</h3>
+<ul>
+<li><strong>Current Complexity</strong>: 116 (server.js monolith)</li>
+<li><strong>Target Complexity</strong>: &lt;12 per module</li>
+<li><strong>Total Lines</strong>: ~1,200+ lines</li>
+<li><strong>Module Count</strong>: 1 (monolithic)</li>
+</ul>
+<h3>Key Issues Identified</h3>
+<ul>
+<li><strong>Cyclomatic Complexity</strong>: Single file handles routing, business logic, database operations, and utilities</li>
+<li><strong>Code Duplication</strong>: Repeated patterns across vulnerability and ticket endpoints</li>
+<li><strong>Testing Difficulty</strong>: Monolithic structure prevents isolated unit testing</li>
+<li><strong>Maintenance Burden</strong>: Changes require understanding entire codebase</li>
+</ul>
+<h2>Proposed Modular Architecture</h2>
+<h3>Directory Structure</h3>
+<pre><code>server/
+├── routes/
+│   ├── vulnerabilities.js    # Vulnerability endpoints
+│   ├── tickets.js            # Ticket management endpoints  
+│   ├── backup.js             # Backup/restore operations
+│   └── docs.js               # Documentation endpoints
+├── services/
+│   ├── vulnerability-service.js  # Business logic for vulnerabilities
+│   ├── ticket-service.js         # Business logic for tickets
+│   ├── backup-service.js         # Backup/restore business logic
+│   └── database-service.js       # Database connection management
+├── utils/
+│   ├── validation.js         # Input validation utilities
+│   ├── security.js           # Security middleware and helpers
+│   ├── file-handler.js       # File upload/processing utilities
+│   └── csv-processor.js      # CSV import/export utilities
+└── middleware/
+    ├── auth.js              # Authentication middleware
+    ├── rate-limiting.js     # Rate limiting configuration
+    └── error-handler.js     # Centralized error handling
+</code></pre>
+<h2>Refactoring Phases</h2>
+<h3>Phase 1: Route Extraction (Week 1)</h3>
+<p><strong>Target Complexity</strong>: &lt;8 per route file</p>
+<h4>Vulnerability Routes (<code>routes/vulnerabilities.js</code>)</h4>
+<ul>
+<li><code>GET /api/vulnerabilities</code> - List with pagination</li>
+<li><code>POST /api/vulnerabilities/import</code> - CSV import</li>
+<li><code>POST /api/vulnerabilities/import-staging</code> - High-performance import</li>
+<li><code>GET /api/vulnerabilities/export</code> - Export functionality</li>
+<li><code>GET /api/vulnerabilities/stats</code> - Statistics endpoint</li>
+</ul>
+<h4>Ticket Routes (<code>routes/tickets.js</code>)</h4>
+<ul>
+<li><code>GET /api/tickets</code> - List tickets</li>
+<li><code>POST /api/tickets</code> - Create ticket</li>
+<li><code>PUT /api/tickets/:id</code> - Update ticket</li>
+<li><code>DELETE /api/tickets/:id</code> - Delete ticket</li>
+</ul>
+<h4>Backup Routes (<code>routes/backup.js</code>)</h4>
+<ul>
+<li><code>POST /api/backup</code> - Create backup</li>
+<li><code>POST /api/restore</code> - Restore from backup</li>
+<li><code>GET /api/backup/status</code> - Backup status</li>
+</ul>
+<h3>Phase 2: Service Layer Creation (Week 2)</h3>
+<p><strong>Target Complexity</strong>: &lt;10 per service</p>
+<h4>VulnerabilityService</h4>
+<pre><code class="language-javascript">class VulnerabilityService {
+    async getVulnerabilities(pagination, filters)
+    async importVulnerabilitiesCSV(csvData, stagingMode)
+    async exportVulnerabilities(format, filters)
+    async getVulnerabilityStats()
+    async processRolloverLogic(vulnerabilityData)
+}
+</code></pre>
+<h4>TicketService</h4>
+<pre><code class="language-javascript">class TicketService {
+    async getTickets(pagination, filters)
+    async createTicket(ticketData)
+    async updateTicket(id, updateData)
+    async deleteTicket(id)
+    async getTicketStatistics()
+}
+</code></pre>
+<h3>Phase 3: Utility Extraction (Week 3)</h3>
+<p><strong>Target Complexity</strong>: &lt;6 per utility</p>
+<h4>CSV Processor</h4>
+<ul>
+<li>Papa Parse integration</li>
+<li>Data validation</li>
+<li>Error reporting</li>
+<li>Progress tracking</li>
+</ul>
+<h4>File Handler</h4>
+<ul>
+<li>Upload validation</li>
+<li>Temporary file management</li>
+<li>Security checks</li>
+<li>Cleanup operations</li>
+</ul>
+<h3>Phase 4: Middleware Implementation (Week 4)</h3>
+<p><strong>Target Complexity</strong>: &lt;5 per middleware</p>
+<h4>Security Middleware</h4>
+<ul>
+<li>CORS configuration</li>
+<li>Rate limiting</li>
+<li>Input sanitization</li>
+<li>Path validation</li>
+</ul>
+<h4>Error Handling</h4>
+<ul>
+<li>Centralized error responses</li>
+<li>Logging integration</li>
+<li>Development vs. production modes</li>
+<li>Error categorization</li>
+</ul>
+<h2>Implementation Strategy</h2>
+<h3>1. Extract-First Approach</h3>
+<ul>
+<li>Start with pure functions (utilities)</li>
+<li>Move to stateless operations (routes)</li>
+<li>Extract stateful operations (services)</li>
+<li>Implement middleware last</li>
+</ul>
+<h3>2. Backward Compatibility</h3>
+<ul>
+<li>Maintain existing API contracts</li>
+<li>Preserve current endpoint behavior</li>
+<li>Keep response formats identical</li>
+<li>Ensure zero-regression testing</li>
+</ul>
+<h3>3. Testing Strategy</h3>
+<pre><code class="language-javascript">// Unit tests for each module
+describe(&#39;VulnerabilityService&#39;, () =&gt; {
+    test(&#39;should process CSV import correctly&#39;)
+    test(&#39;should handle rollover deduplication&#39;)
+    test(&#39;should validate vulnerability data&#39;)
+})
+
+describe(&#39;TicketService&#39;, () =&gt; {
+    test(&#39;should create tickets with proper validation&#39;)
+    test(&#39;should update ticket status correctly&#39;)
+    test(&#39;should handle device associations&#39;)
+})
+</code></pre>
+<h3>4. Migration Process</h3>
+<ol>
+<li><strong>Create new module structure</strong> alongside existing server.js</li>
+<li><strong>Implement modules</strong> with comprehensive tests</li>
+<li><strong>Update server.js</strong> to use new modules</li>
+<li><strong>Verify functionality</strong> with existing test suite</li>
+<li><strong>Remove redundant code</strong> from server.js</li>
+</ol>
+<h2>Success Metrics</h2>
+<h3>Complexity Targets</h3>
+<ul>
+<li><strong>Routes</strong>: &lt;8 complexity per file</li>
+<li><strong>Services</strong>: &lt;10 complexity per file</li>
+<li><strong>Utilities</strong>: &lt;6 complexity per file</li>
+<li><strong>Middleware</strong>: &lt;5 complexity per file</li>
+<li><strong>Overall</strong>: &lt;12 average complexity</li>
+</ul>
+<h3>Quality Improvements</h3>
+<ul>
+<li><strong>Code Coverage</strong>: &gt;80% unit test coverage</li>
+<li><strong>Maintainability</strong>: Individual module testing capability</li>
+<li><strong>Reusability</strong>: Service layer reusable across endpoints</li>
+<li><strong>Security</strong>: Centralized security middleware</li>
+</ul>
+<h3>Performance Targets</h3>
+<ul>
+<li><strong>Response Times</strong>: Maintain current performance levels</li>
+<li><strong>Memory Usage</strong>: No increase in memory footprint</li>
+<li><strong>Startup Time</strong>: &lt;200ms additional startup overhead</li>
+<li><strong>Error Rate</strong>: &lt;0.1% increase during transition</li>
+</ul>
+<h2>Risk Mitigation</h2>
+<h3>Technical Risks</h3>
+<ul>
+<li><strong>API Contract Changes</strong>: Comprehensive integration testing</li>
+<li><strong>Performance Degradation</strong>: Benchmarking before/after refactoring</li>
+<li><strong>Database Connection Issues</strong>: Connection pooling in database service</li>
+<li><strong>File Handling Regressions</strong>: Isolated file handling unit tests</li>
+</ul>
+<h3>Development Risks</h3>
+<ul>
+<li><strong>Context Switching</strong>: Gradual module-by-module implementation</li>
+<li><strong>Integration Complexity</strong>: Docker environment testing</li>
+<li><strong>Rollback Strategy</strong>: Feature flag approach for gradual rollout</li>
+</ul>
+<h2>Dependencies and Prerequisites</h2>
+<h3>Development Tools</h3>
+<ul>
+<li><strong>ESLint</strong>: Complexity analysis and enforcement</li>
+<li><strong>Jest</strong>: Unit testing framework</li>
+<li><strong>Docker</strong>: Isolated testing environment</li>
+<li><strong>Codacy</strong>: Automated code quality monitoring</li>
+</ul>
+<h3>Code Quality Gates</h3>
+<ul>
+<li><strong>Pre-commit Hooks</strong>: Complexity validation</li>
+<li><strong>CI/CD Pipeline</strong>: Automated testing on module changes</li>
+<li><strong>Code Review</strong>: Architecture compliance validation</li>
+<li><strong>Documentation</strong>: Updated architecture documentation</li>
+</ul>
+<h2>Timeline and Milestones</h2>
+<h3>Week 1: Route Extraction</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Extract vulnerability routes</li>
+<li><input disabled="" type="checkbox"> Extract ticket routes  </li>
+<li><input disabled="" type="checkbox"> Extract backup routes</li>
+<li><input disabled="" type="checkbox"> Integration testing</li>
+</ul>
+<h3>Week 2: Service Implementation</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Implement VulnerabilityService</li>
+<li><input disabled="" type="checkbox"> Implement TicketService</li>
+<li><input disabled="" type="checkbox"> Implement BackupService</li>
+<li><input disabled="" type="checkbox"> Service integration testing</li>
+</ul>
+<h3>Week 3: Utility Modularization</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Extract CSV processing utilities</li>
+<li><input disabled="" type="checkbox"> Extract file handling utilities</li>
+<li><input disabled="" type="checkbox"> Extract validation utilities</li>
+<li><input disabled="" type="checkbox"> Utility unit testing</li>
+</ul>
+<h3>Week 4: Middleware and Finalization</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Implement security middleware</li>
+<li><input disabled="" type="checkbox"> Implement error handling middleware</li>
+<li><input disabled="" type="checkbox"> Final integration testing</li>
+<li><input disabled="" type="checkbox"> Performance benchmarking</li>
+<li><input disabled="" type="checkbox"> Documentation updates</li>
+</ul>
+<h2>Post-Refactoring Benefits</h2>
+<h3>Development Productivity</h3>
+<ul>
+<li><strong>Faster Feature Development</strong>: Isolated module changes</li>
+<li><strong>Easier Debugging</strong>: Focused problem isolation</li>
+<li><strong>Improved Testing</strong>: Unit-level test capability</li>
+<li><strong>Better Code Review</strong>: Smaller, focused pull requests</li>
+</ul>
+<h3>System Reliability</h3>
+<ul>
+<li><strong>Reduced Bug Surface</strong>: Isolated functionality</li>
+<li><strong>Easier Maintenance</strong>: Clear module boundaries</li>
+<li><strong>Better Error Handling</strong>: Centralized error management</li>
+<li><strong>Improved Security</strong>: Dedicated security middleware</li>
+</ul>
+<h3>Future Architecture</h3>
+<ul>
+<li><strong>Widget-Ready</strong>: Modules suitable for dashboard widgets</li>
+<li><strong>API Reusability</strong>: Services consumable by multiple interfaces  </li>
+<li><strong>Scalability Prepared</strong>: Clear separation for future microservices</li>
+<li><strong>Testing Foundation</strong>: Comprehensive unit testing framework</li>
+</ul>
+<hr>
+<p><em>This refactoring plan aligns with the September 2025 Codacy resolution initiative and supports the broader widget-based dashboard architecture vision.</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
