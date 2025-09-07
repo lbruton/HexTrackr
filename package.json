@@ -1,6 +1,6 @@
 {
   "name": "hextrackr-server",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "HexTrackr with database backend",
   "main": "server.js",
   "type": "commonjs",
@@ -37,7 +37,9 @@
     "multer": "^2.0.2",
     "node-fetch": "^3.3.2",
     "papaparse": "^5.4.1",
-    "sqlite3": "^5.1.7"
+    "socket.io": "^4.8.1",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",
