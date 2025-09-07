@@ -9,7 +9,7 @@
 }
 
 .sortable-header:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgb(255, 255, 255, 0.1);
 }
 
 .sortable-header::after {
@@ -73,7 +73,7 @@
 }
 
 .table tbody tr:hover {
-    background-color: rgba(0, 123, 255, 0.05);
+    background-color: rgb(0, 123, 255, 0.05);
 }
 
 /* Status badges */
@@ -93,12 +93,12 @@
 /* Ticket form styles */
 .form-control:focus {
     border-color: var(--hextrackr-primary);
-    box-shadow: 0 0 0 0.2rem rgba(32, 107, 196, 0.25);
+    box-shadow: 0 0 0 0.2rem rgb(32, 107, 196, 0.25);
 }
 
 .form-select:focus {
     border-color: var(--hextrackr-primary);
-    box-shadow: 0 0 0 0.2rem rgba(32, 107, 196, 0.25);
+    box-shadow: 0 0 0 0.2rem rgb(32, 107, 196, 0.25);
 }
 
 /* Pagination */

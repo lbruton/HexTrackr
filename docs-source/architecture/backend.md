@@ -1,57 +1,58 @@
 # Backend Architecture
 
-The backend is a Node.js/Express monolithic server providing REST endpoints, data processing, and SQLite persistence. It also serves the static frontend assets and the documentation portal.
+The backend is a Node.js/Express monolith providing REST endpoints, rollover ingestion, documentation delivery, and SQLite persistence. It serves the static frontend pages (`tickets.html`, `vulnerabilities.html`) and the generated documentation portal (`/docs-html`).
+
+---
 
 ## Key Characteristics
 
-- **Monolithic Architecture**: A single `server.js` file (over 1,200 lines) handles all backend concerns, including routing, database interaction, and business logic.
-- **Dual Purpose**: Acts as both an API server and a static file server for the UI.
-- **Database**: A single SQLite database file (`data/hextrackr.db`) with a shared connection pool.
-- **Security**: Includes a built-in `PathValidator` class for secure file system operations and sets standard security headers.
+- **Monolithic File**: `server.js` (≈1,700+ lines) – routes, DB init, rollover logic, backups, static serving.
+- **Unified Delivery**: API + static assets + docs from one process.
+- **Embedded DB**: Single SQLite file (`data/hextrackr.db`). No external service dependency.
+- **Security Utilities**: In‑process `PathValidator` for safe file operations + security headers.
+
+---
 
 ## Core Components
 
-- **`server.js`**: The main entry point. It initializes the Express app, configures middleware, sets up all API routes, and connects to the SQLite database.
-- **`scripts/init-database.js`**: A script responsible for creating the initial database schema, including tables and indexes.
-- **`PathValidator` Class**: A security utility class within `server.js` designed to prevent path traversal attacks when accessing the file system.
+| Component | Purpose |
+| --------- | ------- |
+| `server.js` | Main application runtime (all routes + logic) |
+| `scripts/init-database.js` | Bootstrap base schema & indexes (legacy + foundational tables) |
+| Rollover Functions | Sequential import processing & aggregation (`processVulnerabilityRowsWithRollover`) |
+| `PathValidator` | Normalizes & validates file paths (defense-in-depth) |
+| Docs Portal Logic | Dynamic redirect + stats endpoint (`/api/docs/stats`) |
 
-## Core Middleware
+---
 
-- **`cors`**: Enables Cross-Origin Resource Sharing.
-- **`compression`**: Compresses response bodies for better performance.
-- **`express.json`**: Parses incoming JSON requests (limit `100mb`).
-- **`express.urlencoded`**: Parses URL-encoded data (limit `100mb`).
-- **`multer`**: Handles `multipart/form-data` for file uploads, specifically for CSV imports.
-- **Security Headers**: Sets `X-Content-Type-Options`, `X-Frame-Options`, and `X-XSS-Protection` headers on all responses.
-- **`express.static`**: Serves static files (HTML, CSS, JS) from the project root and `docs-html` directories.
+## Middleware & Infrastructure
 
-## Persistence and Data Management
+| Concern | Implementation |
+| ------- | -------------- |
+| CORS | `cors()` (open by default) |
+| Compression | `compression()` |
+| Parsing | `express.json` & `express.urlencoded` (100MB limit) |
+| Uploads | `multer` (CSV import; 100MB cap) |
+| Security Headers | `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection` |
+| Static Assets | `express.static` (root + `docs-html/`) |
 
-### Database
+---
 
-The backend uses a file-based SQLite database. For a detailed schema, see the [Data Model documentation](./data-model.md).
+## Persistence & Schema Evolution
 
-- **Initialization**: On startup, the server checks if the database file exists. If not, it runs the `scripts/init-database.js` script to create it.
-- **Schema Evolution**: The server performs idempotent `ALTER TABLE` operations on startup to add new columns to the `vulnerabilities` table, ensuring backward compatibility with older database files.
+- **Initialization**: If DB missing, runs `scripts/init-database.js`.
+- **Runtime Evolution**: Idempotent `ALTER TABLE` adds new columns (`vendor`, `vulnerability_date`, `state`, `import_date`, etc.) to legacy tables for backward compatibility.
+- **Rollover Tables**: Created on startup if absent (`vulnerability_snapshots`, `vulnerabilities_current`, `vulnerability_daily_totals`).
 
-### Vulnerability Rollover Architecture
+See: [Data Model](./data-model.md) for exhaustive schema & index inventory.
 
-A key feature of the backend is the **rollover architecture** for managing vulnerability data. This system processes daily scans to maintain both a current snapshot and a historical trend of vulnerabilities. For a detailed explanation, see the [Vulnerability Rollover Architecture documentation](./rollover-mechanism.md).
+---
 
-## API Surface
+## Vulnerability Rollover Workflow
 
-The backend exposes a comprehensive REST API. For full request/response details, see the [API Reference](../api-reference/overview.md).
+Purpose: Maintain real‑time deduplicated active set + full historical timeline + fast daily aggregates.
 
-- **Tickets**: `GET, POST, PUT, DELETE /api/tickets`, `POST /api/tickets/migrate`, `POST /api/import/tickets`
-- **Reference Data**: `GET /api/sites`, `GET /api/locations`
-- **Vulnerabilities**: `GET /api/vulnerabilities`, `GET /api/vulnerabilities/stats`, `GET /api/vulnerabilities/recent-trends`, `GET /api/vulnerabilities/trends`, `POST /api/vulnerabilities/import`, `POST /api/import/vulnerabilities`, `DELETE /api/vulnerabilities/clear`
-- **Imports**: `GET /api/imports`
-- **Backup/Restore**: `GET /api/backup/stats`, `GET /api/backup/:type`, `POST /api/restore`, `DELETE /api/backup/clear/:type`
-- **Internal**: `GET /health`, `GET /api/docs/stats`
-
-## Key Business Logic Flows
-
-### Vulnerability CSV Import
+### CSV Import (Rollover Path)
 
 ```mermaid
 sequenceDiagram
@@ -59,29 +60,105 @@ sequenceDiagram
     participant API as server.js
     participant DB as SQLite
 
-    User->>API: POST /api/vulnerabilities/import (multipart/form-data)
-    API->>API: Parse CSV with PapaParse
-    API->>DB: INSERT into vulnerability_imports
-    API->>API: Process rows with rollover logic
-    API->>DB: INSERT into vulnerability_snapshots
-    API->>DB: INSERT or UPDATE vulnerabilities_current
-    API->>DB: DELETE stale vulnerabilities
-    API->>DB: UPDATE vulnerability_daily_totals
-    API-->>User: { success, importId, rowsProcessed, ... }
+    User->>API: POST /api/vulnerabilities/import (multipart/form-data + scanDate)
+    API->>API: Parse CSV (PapaParse, filter empty rows)
+    API->>DB: INSERT vulnerability_imports
+    API->>DB: UPDATE vulnerabilities_current (mark potentially stale)
+    loop Each row (sequential to prevent race conditions)
+        API->>API: Map + generate unique_key
+        API->>DB: INSERT vulnerability_snapshots
+        API->>DB: INSERT or UPDATE vulnerabilities_current
+    end
+    API->>DB: DELETE stale rows (not seen in this scan)
+    API->>DB: INSERT OR REPLACE vulnerability_daily_totals
+    API-->>User: { importId, insertCount, updateCount, removedStale, scanDate }
 ```
 
-### Get Paginated Vulnerabilities
+### Key Safeguards
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| Row duplication in batch | In‑memory `Set` of processed unique_keys |
+| Race conditions | Explicit sequential loop instead of `forEach` callbacks |
+| Data drift | Historical record preserved in snapshots before updates |
+| Performance | Indexes on `unique_key`, `scan_date`, severities |
+
+---
+
+## API Surface (High-Level)
+
+| Domain | Endpoints (Examples) |
+| ------ | -------------------- |
+| Health | `GET /health` |
+| Vulnerabilities (Current) | `GET /api/vulnerabilities`, `/stats`, `/recent-trends`, `/trends` |
+| Vulnerability Import | `POST /api/vulnerabilities/import` (rollover), `POST /api/import/vulnerabilities` (legacy) |
+| Tickets | `GET/POST/PUT/DELETE /api/tickets`, `POST /api/tickets/migrate`, `POST /api/import/tickets` |
+| Reference | `GET /api/sites`, `GET /api/locations` |
+| Backup/Restore | `GET /api/backup/stats`, `GET /api/backup/all`, `POST /api/restore`, clear endpoints |
+| Documentation | `GET /api/docs/stats`, `/docs-html` SPA shell & hash routing |
+
+---
+
+## Pagination Flow (Current Vulnerabilities)
 
 ```mermaid
 sequenceDiagram
-    participant UI as Frontend
+    participant UI
     participant API as server.js
     participant DB as SQLite
-
     UI->>API: GET /api/vulnerabilities?page=1&limit=50
-    API->>DB: SELECT * FROM vulnerabilities_current ... LIMIT ? OFFSET ?
-    DB-->>API: Vulnerability rows
-    API->>DB: SELECT COUNT(*) FROM vulnerabilities_current
-    DB-->>API: Total count
-    API-->>UI: { data: [...], pagination: { ... } }
+    API->>DB: SELECT filtered rows FROM vulnerabilities_current LIMIT/OFFSET
+    DB-->>API: Row batch
+    API->>DB: SELECT COUNT(*) (same filters)
+    DB-->>API: Total
+    API-->>UI: { data, pagination }
 ```
+
+---
+
+## Legacy vs Rollover Paths
+
+| Aspect | Legacy `vulnerabilities` | Rollover Tables |
+| ------ | ------------------------ | --------------- |
+| Purpose | Early ingestion & export | Current production analytics |
+| Dedupe | Unique per (hostname, cve, import_date) index | Algorithmic unique_key with hostname normalization |
+| History | Implicit (one row per scan) | Explicit snapshots + daily aggregates |
+| Future | To be deprecated | Strategic direction |
+
+---
+
+## Utility Endpoints
+
+- **`GET /health`**: `{ status, version, db, uptime }`
+- **`GET /api/docs/stats`**: Counts routes + approximates function definitions.
+- **Backup**: Returns structured JSON (vulnerabilities legacy + tickets) or combined.
+
+---
+
+## Security & Hardening
+
+| Concern | Current | Planned |
+| ------- | ------- | ------- |
+| File access | `PathValidator` | Central audit logging of rejections |
+| Upload size | 100MB cap | Configurable env var (`HEXTRACKR_MAX_UPLOAD_MB`) |
+| TLS | External termination | Compose example with Caddy / nginx |
+| Input validation | Minimal (mapping layer) | JSON schema (Ajv) enforcement |
+| Logging | Console + stderr | Structured JSON + request IDs |
+
+---
+
+## Planned Enhancements
+
+| Area | Enhancement |
+| ---- | ---------- |
+| Observability | Prometheus metrics (import latency, row counts) |
+| Modularization | Extract rollover & backup modules |
+| Validation | Enforce severity enumeration + CVE format checks |
+| Migration | Retire legacy vulnerabilities pathway |
+| Testing | Playwright + API contract tests for import & pagination |
+
+---
+
+## Summary
+
+The backend favors simplicity (single process, embedded DB) while implementing a robust rollover pipeline for vulnerability lifecycle tracking. Incremental improvements will focus on modularity, observability, and deprecating legacy ingestion paths.

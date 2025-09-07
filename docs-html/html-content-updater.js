@@ -121,12 +121,20 @@ class HtmlContentUpdater {
                     </a>`;
                 }
                 
-                // Convert internal .md links to .html links
+                // Convert internal .md links to hash-based navigation for SPA
                 let fixedHref = href;
                 if (href && href.endsWith('.md')) {
                     // Only transform relative links, not absolute URLs
                     if (!href.startsWith('http://') && !href.startsWith('https://')) {
-                        fixedHref = href.replace(/\.md$/, '.html');
+                        // Convert relative paths to hash-based routing
+                        // Examples:
+                        // '../architecture/rollover-mechanism.md' -> '#architecture/rollover-mechanism'
+                        // './data-model.md' -> '#user-guides/data-model' 
+                        let hashPath = href
+                            .replace(/^\.\.\//, '')  // Remove '../' prefix
+                            .replace(/^\.\//, '')    // Remove './' prefix  
+                            .replace(/\.md$/, '');   // Remove '.md' extension
+                        fixedHref = `#${hashPath}`;
                     }
                 }
                 

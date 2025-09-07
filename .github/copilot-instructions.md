@@ -1,171 +1,214 @@
-# GitHub Copilot Instructions for HexTrackr
+# HexTrackr AI Assistant Instructions (DRAFT)
 
-This file provides guidance to GitHub Copilot when working with the HexTrackr codebase.
+## Project Overview
 
-## Project Context
+HexTrackr is a vulnerability and ticket management system with a monolithic Node.js/Express backend and browser-based frontend. It uses SQLite for persistence and follows a modular JavaScript architecture pattern.
 
-HexTrackr is a vulnerability and ticket management system built with:
+## Memory Systems Integration
 
-- **Backend**: Node.js/Express monolithic server (`server.js`)
-- **Database**: SQLite with rollover architecture (`data/hextrackr.db`)
-- **Frontend**: Modular JavaScript with AG Grid, ApexCharts, Bootstrap 5, Tabler.io
-- **Documentation**: Markdown-first with HTML generation
-- **Testing**: Playwright browser automation
+You have access to two advanced memory systems that work together to provide comprehensive context:
 
-## Current Version: 1.0.4 (September 5, 2025)
+1. **Memento MCP**: Knowledge graph for structured technical information
+   - Stores: Code components, architectural decisions, entity relationships
+   - Optimized for: Technical knowledge, code structure, design patterns
+   - Query via: `semantic_search` with specific entity types
 
-### Recent Achievements
+1. **Persistent AI Memory (PAM)**: Timeline-based memory for conversational context
+   - Stores: Conversation history, git commits, user preferences
+   - Optimized for: Chronological data, conversation continuity
+   - Query via: `search_memories` with type filters
 
-- ✅ Modal layering bug fix with Bootstrap Modal.getInstance()
-- ✅ Working table resizing and card pagination (6-card default)
-- ✅ Version badge synchronization across all components
-- ✅ Enhanced UI Design Specialist agent with Playwright testing
+### MCP Tool Reference
 
-## Unified AI Development Workflow
+- **Tool Documentation**: Check `.runbooks/tools/` for comprehensive MCP server documentation
+- **Available Tools**: FileScopeMCP, Codacy, GitHub, Firecrawl, Context7, and 10+ other servers
+- **Usage Patterns**: Each `.runbooks/tools/{server}-mcp.prompt.md` includes tool lists and best practices
 
-### Your Role in the Ecosystem
+### Memory Access Optimization Protocol
 
-**GitHub Copilot** - Quick Tasks (5-30 minutes):
+Follow this sequence for maximum token efficiency:
 
-- Single-file modifications and bug fixes
-- Code completion and inline improvements  
-- Unit test writing and simple refactoring
-- Small feature additions and optimizations
+1. **Context First**: Use what's in the current conversation window
+2. **Targeted Search**: Use specific 3-5 word queries with type filters
+3. **Progressive Expansion**: Only broaden search if needed after initial results
 
-### Memory System Access
+```
+// EFFICIENT PATTERN
+semantic_search("express route validation", entity_types=["code-component"], limit=3)
 
-You have access to **PAM (Persistent AI Memory)** for session continuity:
-
-- All your interactions are automatically recorded
-- Context is shared with Claude Code (central orchestrator)
-- Previous solutions and patterns are available for reference
-
-### Task Delegation Boundaries
-
-**Stay in your lane for**:
-
-- Quick fixes and code completion
-- Single-function modifications
-- Unit test creation
-- Simple refactoring
-
-**Escalate to Claude Code for**:
-
-- Multi-file architectural changes
-- Complex UI/UX improvements
-- Database schema migrations
-- Cross-system integrations
-- Documentation updates
-
-**Hand off to specialized agents for**:
-
-- `vulnerability-data-processor`: CSV import issues
-- `ui-design-specialist`: UI enhancements needing browser testing
-- `docs-portal-maintainer`: Documentation portal updates
-- `database-schema-manager`: Complex schema changes
-- `cisco-integration-specialist`: API integration work
-
-## Code Conventions
-
-### Security Requirements
-
-- Use PathValidator class for all file operations
-- Never expose sensitive data in logs or responses
-- Validate all user inputs, especially file uploads and CSV data
-- Implement proper error handling without information disclosure
-
-### Database Patterns
-
-- All schema changes must be idempotent ALTER statements
-- Handle nullable columns for schema evolution compatibility
-- **Use sequential processing for vulnerability data** (avoid race conditions)
-- Store complex data as JSON strings with proper parsing/validation
-
-### JavaScript Architecture
-
-- **Modular pattern**: `scripts/shared/` (reusable), `scripts/pages/` (specific), `scripts/utils/` (helpers)
-- **Communication**: Use `window.refreshPageData(type)` for inter-module updates
-- **Error handling**: Consistent patterns with user-friendly messages
-- **Performance**: Lazy loading for large datasets, pagination for card views
-
-### API Conventions
-
-- **Success responses**: JSON arrays/objects or `{ success: true, ...data }`
-- **Error responses**: Status 400/500 with `{ error: "message" }`
-- **Date formats**: ISO `YYYY-MM-DD` for scan dates
-- **Pagination**: Support `page`, `limit`, `search`, and filtering parameters
-
-## Development Commands
-
-### Core Commands
-
-- `npm start` - Production server (Docker only)
-- `npm run dev` - Development server with nodemon
-- `npm run init-db` - Initialize SQLite database
-
-### Quality Assurance  
-
-- `npm run lint:all` - Run all linters
-- `npm run fix:all` - Fix all linting issues
-- `npm run eslint:fix` - Fix JavaScript issues
-- `npm run stylelint:fix` - Fix CSS issues
-
-### Testing & Documentation
-
-- `npm run docs:generate` - Update HTML documentation
-- Docker restart required before Playwright tests
-- Always test in Docker container (port 8080)
-
-## Critical Patterns
-
-### Vulnerability Rollover System
-
-- **Current data**: `vulnerabilities_current` table (deduplicated)
-- **Historical snapshots**: `vulnerability_snapshots` (complete history)
-- **Dedup key**: `normalizeHostname(hostname) + CVE`
-- **Process flow**: CSV → temp file → Papa.parse → `processVulnerabilityRowsWithRollover()`
-
-### File Upload Handling
-
-- 100MB limit enforced by multer
-- Always `unlink()` temporary files after processing
-- Use PathValidator for secure file system operations
-- Store uploads in `uploads/` directory
-
-### Modal Management (Recent Fix)
-
-```javascript
-// Always check for existing modals before opening new ones
-const existingModal = bootstrap.Modal.getInstance(document.getElementById('vulnerabilityModal'));
-if (existingModal) {
-    existingModal.hide();
-}
-// Then open new modal
+// INEFFICIENT PATTERN - AVOID
+read_graph() // Returns everything - token expensive
 ```
 
-## Session Integration
+## Key Architecture Patterns
 
-Your work integrates with the broader AI development ecosystem:
+### Backend Architecture
 
-1. **Context Sharing**: PAM records all your contributions for Claude Code
-2. **Quality Gates**: Your changes contribute to <50 Codacy issues goal
-3. **Testing Integration**: UI changes should consider Playwright test impact
-4. **Documentation Impact**: Code changes may trigger doc updates via other agents
+- Monolithic Express server (`server.js`) handling both API and static file serving
+- SQLite database with runtime schema evolution
+- Core middleware: CORS, compression, JSON/form parsing (100MB limits), security headers
+- File uploads handled via multer in `uploads/` directory
+- PathValidator class for secure file operations
 
-## Version Strategy
+### Frontend Architecture
 
-- **Current**: v1.0.4 (major UI improvements)  
-- **Next**: v1.0.5 (hostname normalization, chart improvements)
-- **Quality gates**: <50 Codacy issues, zero critical vulnerabilities
-- **Release process**: Version sync via `scripts/version-manager.js`
+- Modular pattern with shared components (`scripts/shared/`), page-specific code (`scripts/pages/`), and utilities (`scripts/utils/`)
+- Page initialization flow:
+  1. Load shared components (e.g., `settings-modal.js`)
+  2. Load page-specific code (e.g., `tickets.js`)
+- Inter-module communication via `window.refreshPageData(type)` pattern
 
-## Getting Help
+### Database Schema
 
-When encountering complex issues outside your scope:
+- Located at `data/hextrackr.db`, initialized by `scripts/init-database.js`
+- Key tables: tickets, vulnerabilities, vulnerability_imports
+- Schema evolution happens at runtime with idempotent ALTERs
+- JSON fields stored as strings (e.g., devices in tickets table)
 
-1. Document the issue clearly in code comments
-2. The central Claude Code orchestrator will pick up and address
-3. PAM system ensures no context is lost between sessions
-4. Feel free to suggest architectural improvements in comments
+## Critical Workflows
 
-Remember: You're part of a coordinated AI development team. Focus on your strengths (quick, precise code improvements) while the orchestration layer handles complex planning and cross-system coordination.
+### Development Setup
+
+- **NEVER** run node.js locally for this project, always run in Docker container
+
+### Docker Configuration
+
+- Uses `Dockerfile.node` (not the main `Dockerfile`)
+- Single container setup on port 8080
+- **Important:** Restart Docker container before running Playwright tests
+
+### Data Import Flows
+
+1. CSV Upload:
+   - Multipart form upload → temp file storage → Papa.parse → DB insert → cleanup
+1. JSON Import (client-parsed CSV):
+   - Direct JSON payload → DB insert
+   - Both flows update both vulnerability_imports and vulnerabilities tables
+
+### Integration Points
+
+- ServiceNow ticket integration via configurable settings
+- CSV imports from various vulnerability scanners
+- Backup/restore system for all data types
+- Settings modal provides global data operation hooks
+
+## Project-Specific Conventions
+
+### File Organization
+
+- Frontend modules follow strict shared/pages/utils separation
+- API endpoints grouped by domain (tickets, vulnerabilities, backup)
+- Database initialization split between runtime (server.js) and bootstrap (init-database.js)
+
+### Error Handling
+
+- HTTP 400 for bad input (missing files/data)
+- HTTP 500 for DB/processing errors
+- Success responses always include `{ success: true }` with additional data
+
+### Data Validation
+
+- CSV imports validate required fields per vendor
+- Ticket fields allow schema evolution (nullable new columns)
+- File paths validated through PathValidator class
+
+## Common Pitfalls
+
+- settings-modal.js expects generic `/api/import` but server uses specific endpoints
+- Ticket schema has evolved - some deployments may lack newer columns
+- File uploads must not exceed 100MB limit
+- Remember to unlink temporary files after processing
+- SQLite file requires write permissions in `data/` directory
+
+## Key Files for Context
+
+- `server.js`: Main backend entry point
+- `scripts/init-database.js`: DB schema and initialization
+- `scripts/shared/settings-modal.js`: Global frontend utilities
+- `docs-source/architecture/`: Detailed architecture documentation
+
+## 7-Step Task Execution Protocol
+
+Follow this process for every user request:
+
+### 1. Observe - Gather Context Efficiently
+
+- Check current conversation context first
+- Use targeted semantic searches with specific terms and type filters
+- Limit initial results to 3-5 items to conserve tokens
+- Track sources with [MEMENTO] or [PAM] prefixes
+
+### 2. Plan - Structure Your Approach
+
+- Create a concise checklist of 3-5 specific actions
+- Identify files that need to be changed
+- Store technical concepts as Memento entities with proper types
+
+### 3. Safeguards - Prevent Data Loss
+
+- Create safety snapshots before making changes
+- Document rollback strategies
+- Store conversation state in PAM before major operations
+
+### 4. Execute - Implement With Precision
+
+- Make minimal, focused changes
+- Run Codacy analysis after file edits
+- Work in small, verifiable increments
+
+### 5. Verify - Confirm Success
+
+- Run appropriate tests for the changes made
+- Perform targeted smoke tests
+- Fix any issues before continuing
+
+### 6. Map-Update - Enhance Knowledge
+
+- Add observations to relevant Memento entities
+- Update conversation context in PAM
+- Create reminders for follow-up tasks
+
+### 7. Log - Document Outcomes
+
+- Store structured records in both memory systems
+- Update project documentation
+- Maintain the project roadmap
+
+## Optimized Memory Taxonomy
+
+| Knowledge Type | System | Query Method | Example | When to Use |
+|---------------|--------|--------------|---------|------------|
+| Code structure | Memento | `semantic_search` + type filter | `semantic_search("server endpoints", entity_types=["code-component"])` | Understanding implementation |
+| Design decisions | Memento | `semantic_search` + type filter | `semantic_search("database schema design", entity_types=["decision"])` | Retrieving rationale |
+| User preferences | Memento | `open_nodes` with ID | `open_nodes(["user_lonnie"])` | Personalizing responses |
+| Recent conversations | PAM | `search_memories` with type | `search_memories("vulnerability import", type="conversation")` | Continuing discussions |
+| Git history | PAM | `search_memories` with type | `search_memories("fix ticket schema", type="git-commit")` | Understanding changes |
+| Project timeline | PAM | `get_memories_by_date` | `get_memories_by_date(start="2025-08-01")` | Tracking progress |
+
+## Versioning Standards
+
+### Keep a Changelog
+
+- **Format**: Follow [Keep a Changelog v1.0.0](https://keepachangelog.com/en/1.0.0/) format
+- **File**: `CHANGELOG.md` must be updated for ALL releases
+- **Sections**: Unreleased, Added, Changed, Deprecated, Removed, Fixed, Security
+- **Badges**: [![Keep a Changelog](https://img.shields.io/badge/Keep%20a%20Changelog-v1.0.0-orange)](https://keepachangelog.com/en/1.0.0/)
+
+### Semantic Versioning
+
+- **Standard**: Follow [Semantic Versioning v2.0.0](https://semver.org/spec/v2.0.0.html)
+- **Format**: MAJOR.MINOR.PATCH (e.g., 1.0.2)
+- **Current Version**: 1.0.3 (in package.json)
+- **Rules**:
+  - **MAJOR**: Breaking changes or major architectural updates
+  - **MINOR**: New features and enhancements (backward compatible)  
+  - **PATCH**: Bug fixes and minor improvements
+- **Badges**: [![Semantic Versioning](https://img.shields.io/badge/Semantic%20Versioning-v2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
+
+### Release Process
+
+1. Update CHANGELOG.md with new version section
+2. Update package.json version number
+3. Commit with descriptive message following SemVer
+4. Create Git tag matching version number
+5. Push changes and tags to GitHub

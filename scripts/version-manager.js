@@ -47,7 +47,8 @@ class PathValidator {
 const _VERSION_FILES = [
     "package.json",
     "tickets.html",
-    "vulnerabilities.html"
+    "vulnerabilities.html",
+    "scripts/shared/footer.html"
 ];
 
 function getCurrentVersion() {
@@ -66,7 +67,7 @@ function updateVersion(newVersion) {
     PathValidator.safeWriteFileSync(packagePath, JSON.stringify(packageContent, null, 2) + "\n");
     console.log("✅ Updated package.json");
     
-    // Update HTML files
+    // Update HTML files with version spans
     const htmlFiles = ["tickets.html", "vulnerabilities.html"];
     htmlFiles.forEach(file => {
         const filePath = path.join(__dirname, "..", file);
@@ -78,6 +79,16 @@ function updateVersion(newVersion) {
         PathValidator.safeWriteFileSync(filePath, content);
         console.log(`✅ Updated ${file}`);
     });
+    
+    // Update footer badge URL
+    const footerPath = path.join(__dirname, "..", "scripts", "shared", "footer.html");
+    let footerContent = PathValidator.safeReadFileSync(footerPath, "utf8");
+    footerContent = footerContent.replace(
+        /HexTrackr-v[\d.]+(-blue\?style=flat)/g,
+        `HexTrackr-v${newVersion}$1`
+    );
+    PathValidator.safeWriteFileSync(footerPath, footerContent);
+    console.log("✅ Updated scripts/shared/footer.html");
     
     console.log(`🎉 Version update complete: v${newVersion}`);
 }
