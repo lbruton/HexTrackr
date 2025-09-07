@@ -154,6 +154,11 @@ class WebSocketClient {
             console.log("Progress status:", data);
             this.triggerCallback("progressStatus", data);
         });
+        
+        this.socket.on("progress-complete", (data) => {
+            console.log("Progress complete:", data);
+            this.triggerCallback("progressComplete", data);
+        });
     }
     
     handleProgressUpdate(data) {
