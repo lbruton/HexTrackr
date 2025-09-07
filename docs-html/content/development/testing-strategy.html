@@ -20,7 +20,9 @@
 <li>All tests designed to be idempotent and handle existing data gracefully</li>
 </ul>
 <p><strong>Running Tests</strong>:</p>
-<pre><code class="language-bash"># From inside or outside container
+<pre><code class="language-bash">
+# From inside or outside container
+
 npx playwright test
 </code></pre>
 <h3>Modal Workflow Testing</h3>
@@ -250,10 +252,13 @@ test(&#39;modal transitions use proper Bootstrap integration&#39;, async ({ page
 <h2>Integration with Development Workflow</h2>
 <h3>Pre-commit Testing</h3>
 <p>Tests run automatically as part of the development workflow:</p>
-<pre><code class="language-bash"># Run all tests before commits
+<pre><code class="language-bash">
+# Run all tests before commits
+
 npm run test
 
 # Run specific test suites
+
 npx playwright test --grep &quot;modal&quot;
 npx playwright test --grep &quot;import&quot;
 npx playwright test --grep &quot;responsive&quot;
