@@ -24,6 +24,11 @@ exclude_paths:
     - filescope-tools-demo.js
     - FileScopeMCP-*.json
     - FileScopeMCP-*.html
+    - tests/**
+    - test-results/**
+    - '*.backup*'
+    - dev-docs/**
+    - docs-temp/**
 runtimes:
     - java@17.0.10
     - node@22.2.0

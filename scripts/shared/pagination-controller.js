@@ -58,13 +58,13 @@ class PaginationController {
     }
 
     setPageSize(size) {
-        const validSize = this.availableSizes.includes(parseInt(size)) ? parseInt(size) : this.availableSizes[0];
+        const validSize = this.availableSizes.includes(parseInt(size, 10)) ? parseInt(size, 10) : this.availableSizes[0];
         this.pageSize = validSize;
         this.currentPage = 1; // Reset to first page when changing page size
     }
 
     setCurrentPage(page) {
-        const pageNum = parseInt(page);
+        const pageNum = parseInt(page, 10);
         const maxPage = this.getTotalPages();
         if (pageNum >= 1 && pageNum <= maxPage) {
             this.currentPage = pageNum;
