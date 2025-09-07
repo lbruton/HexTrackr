@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr - Modern Vulnerability Management</title>
+    
+    <!-- Tabler.io CSS Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AG Grid CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-alpine.css">
+    
+    <!-- Modular HexTrackr CSS -->
+    <link rel="stylesheet" href="styles/shared/base.css">
+    <link rel="stylesheet" href="styles/shared/header.css">
+    <link rel="stylesheet" href="styles/pages/vulnerabilities.css">
+    <link rel="stylesheet" href="styles/utils/responsive.css">
+    
+    <!-- Chart.js for mini-charts - using local files -->
+    <!-- Chart.js CSS is embedded in the library -->
+    
+    <style>
+        /* Ultrawide Screen Layout Constraints - Center Content */
+        .page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .page-wrapper {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .page-wrapper .container-xl {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        /* Progressive width constraints for different screen sizes */
+        @media (min-width: 1600px) {
+            .page-wrapper {
+                max-width: 1300px;
+            }
+        }
+        
+        @media (min-width: 2000px) {
+            .page-wrapper {
+                max-width: 1200px;
+            }
+        }
+        
+        @media (min-width: 2560px) {
+            .page-wrapper {
+                max-width: 1400px; /* Allow a bit more room on very large displays */
+            }
+        }
+
+        /* Enhanced HexTrackr Styles for Tabler.io Integration */
+        :root {
+            --hextrackr-primary: #206bc4;
+            --hextrackr-secondary: #6c757d;
+            --hextrackr-success: #2fb344;
+            --hextrackr-warning: #f76707;
+            --hextrackr-danger: #d63384;
+            --hextrackr-info: #0dcaf0;
+        }
+
+        /* VPR Mini-Cards for Device and Vulnerability Cards */
+        .vpr-mini-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-top: auto;
+            padding-top: 1rem;
+        }
+
+        .vpr-mini-card {
+            background: var(--tblr-bg-surface);
+            border: 1px solid var(--tblr-border-color);
+            border-radius: var(--tblr-border-radius);
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            position: relative;
+            min-height: 5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .vpr-mini-card:hover {
+            border-color: var(--hextrackr-primary);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(32, 107, 196, 0.15);
+        }
+
+        .vpr-mini-card.critical {
+            border-left: 3px solid var(--tblr-red);
+        }
+
+        .vpr-mini-card.high {
+            border-left: 3px solid var(--tblr-orange);
+        }
+
+        .vpr-mini-card.medium {
+            border-left: 3px solid var(--tblr-yellow);
+        }
+
+        .vpr-mini-card.low {
+            border-left: 3px solid var(--tblr-green);
+        }
+
+        .vpr-mini-card .vpr-count {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .vpr-mini-card .vpr-label {
+            font-size: 0.75rem;
+            color: var(--tblr-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            margin-bottom: 0.25rem;
+        }
+
+        .vpr-mini-card .vpr-sum {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--hextrackr-primary);
+        }
+
+        /* Card Action Areas */
+        .card-actions {
+            margin-top: auto;
+            padding-top: 1rem;
+        }
+
+        .card-actions .btn {
+            width: 100%;
+        }
+
+        /* Device Card Enhancements */
+        .device-card {
+            transition: all 0.3s ease;
+            border: 1px solid var(--tblr-border-color);
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .device-card .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+
+        .device-card:hover {
+            border-color: var(--hextrackr-primary);
+            box-shadow: 0 4px 12px rgba(32, 107, 196, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .device-hostname {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--hextrackr-primary);
+            margin-bottom: 1rem;
+            min-height: 2.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .device-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--tblr-bg-surface-secondary);
+            border-radius: var(--tblr-border-radius);
+        }
+
+        .device-total-vpr {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--hextrackr-danger);
+        }
+
+        /* Vulnerability Card Enhancements */
+        .vulnerability-card {
+            transition: all 0.3s ease;
+            border: 1px solid var(--tblr-border-color);
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vulnerability-card .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+
+        .vulnerability-card:hover {
+            border-color: var(--hextrackr-primary);
+            box-shadow: 0 4px 12px rgba(32, 107, 196, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .vulnerability-card[style*="cursor: pointer"]:hover {
+            background-color: var(--tblr-bg-surface-secondary);
+        }
+
+        /* Enhanced Modal Styling */
+        .modal-blur {
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-blur .modal-content {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--tblr-border-color);
+            background: linear-gradient(135deg, var(--tblr-bg-surface) 0%, var(--tblr-bg-surface-secondary) 100%);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--tblr-border-color);
+            background: var(--tblr-bg-surface-secondary);
+        }
+
+        .vulnerability-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--tblr-dark);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            min-height: 2.8rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+            overflow: hidden;
+        }
+
+        .vulnerability-cve {
+            font-size: 0.875rem;
+            color: var(--hextrackr-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .vulnerability-cve:hover {
+            color: var(--hextrackr-danger);
+            text-decoration: underline;
+        }
+
+        .vulnerability-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+            padding: 0.75rem;
+            background: var(--tblr-bg-surface-secondary);
+            border-radius: var(--tblr-border-radius);
+            min-height: 4rem;
+        }
+
+        .vulnerability-vpr {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        /* Drag and Drop Enhancements */
+        .sortable-ghost {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+
+        .sortable-chosen {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(32, 107, 196, 0.25);
+        }
+
+        .sortable-drag {
+            transform: rotate(-2deg);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* View Switcher Enhancements */
+        .btn-group .btn-check:checked + .btn-outline-primary {
+            background-color: var(--hextrackr-primary);
+            border-color: var(--hextrackr-primary);
+        }
+
+        /* Chart Enhancements */
+        .mini-chart {
+            height: 40px;
+            width: 100%;
+        }
+
+        /* Animation Utilities */
+        .fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Enhanced Badge Styles */
+        .severity-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+        }
+
+        .severity-critical { background-color: var(--tblr-red); color: white; }
+        .severity-high { background-color: var(--tblr-orange); color: white; }
+        .severity-medium { background-color: var(--tblr-yellow); color: black; }
+        .severity-low { background-color: var(--tblr-green); color: white; }
+
+        /* Loading States */
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Legacy Styles for Existing Components */
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            min-height: 400px;
+        }
+
+        .workspace-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .workspace-header {
+            background: linear-gradient(135deg, var(--hextrackr-primary) 0%, #3b82f6 100%);
+            color: white;
+            padding: 1.5rem;
+            border: none;
+        }
+
+        .workspace-body {
+            padding: 0;
+            min-height: 600px;
+        }
+
+        .view-switcher {
+            background: white;
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .view-btn {
+            background: transparent;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            color: var(--hextrackr-secondary);
+        }
+
+        .view-btn.active {
+            background: var(--hextrackr-primary);
+            color: white;
+            box-shadow: 0 1px 3px rgba(32, 107, 196, 0.3);
+        }
+
+        .ag-theme-alpine {
+            --ag-alpine-active-color: var(--hextrackr-primary);
+            --ag-header-background-color: #f8fafc;
+            --ag-header-foreground-color: #1f2937;
+            --ag-border-color: #e2e8f0;
+        }
+
+        .device-card, .vuln-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .device-card:hover, .vuln-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: var(--hextrackr-primary);
+        }
+
+        .severity-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-critical {
+            background-color: #fef2f2;
+            color: var(--hextrackr-danger);
+            border: 1px solid #fecaca;
+        }
+
+        .severity-high {
+            background-color: #fffbeb;
+            color: var(--hextrackr-warning);
+            border: 1px solid #fed7aa;
+        }
+
+        .severity-medium {
+            background-color: #eff6ff;
+            color: var(--hextrackr-info);
+            border: 1px solid #bfdbfe;
+        }
+
+        .severity-low {
+            background-color: #f0fdf4;
+            color: var(--hextrackr-success);
+            border: 1px solid #bbf7d0;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .progress-modern {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e2e8f0;
+            overflow: hidden;
+        }
+
+        .progress-modern .progress-bar {
+            background: linear-gradient(90deg, var(--hextrackr-primary) 0%, #3b82f6 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Animation delays for staggered entrance effects */
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+        .animate-delay-4 { animation-delay: 0.4s; }
+        .animate-delay-5 { animation-delay: 0.5s; }
+        .animate-delay-6 { animation-delay: 0.6s; }
+
+        /* Fixed height containers */
+        .chart-height { height: 350px; }
+        .grid-height { height: 600px; }
+        .device-grid-height { height: 400px; }
+        .hidden-input { display: none; }
+        .progress-init { width: 0%; }
+
+        /* Custom ApexCharts tooltip styles */
+        .apexcharts-tooltip-custom {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-width: 200px;
+        }
+        
+        .tooltip-date {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1f2937;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .tooltip-series {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+            font-size: 12px;
+        }
+        
+        .tooltip-severity {
+            font-weight: 500;
+            color: #374151;
+            margin: 0 6px;
+            min-width: 50px;
+        }
+        
+        .tooltip-value {
+            font-weight: 600;
+            color: #111827;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header component auto-injected here -->
+    <div id="headerContainer"></div>
+
+    <!-- Tabler.io Page Wrapper -->
+    <div class="page">
+        <div class="page-wrapper">
+            <!-- Page header -->
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <h2 class="page-title">
+                                <i class="fas fa-shield-virus me-2 text-primary"></i>
+                                Vulnerability Management Dashboard
+                            </h2>
+                            <div class="page-pretitle">
+                                Modern security vulnerability tracking and analysis
+                            </div>
+                        </div>
+                        <!-- Header actions removed - functionality moved to user dropdown menu -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Page body -->
+            <div class="page-body">
+                <div class="container-xl">
+                    <!-- Enhanced VPR Statistics Cards with Tabler.io Design -->
+                    <div class="row row-deck row-cards mb-4">
+                        <!-- Critical Severity Card -->
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card card-sm stat-card-enhanced" data-severity="critical" onclick="vulnManager.flipStatCards()">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <span class="bg-red text-white avatar">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </span>
+                                        </div>
+                                        <div class="col">
+                                            <div class="card-front">
+                                                <div class="font-weight-medium h2 mb-1" id="criticalCount">0</div>
+                                                <div class="text-muted small">Critical Vulnerabilities</div>
+                                                <div class="text-red small fw-bold mt-1" id="criticalVPR">0.0 VPR</div>
+                                            </div>
+                                            <div class="card-back">
+                                                <div class="font-weight-medium h2 mb-1" id="criticalTotalVPR">0.0</div>
+                                                <div class="text-muted small">Total VPR Score</div>
+                                                <div class="text-red small fw-bold mt-1" id="criticalAvgVPR">0.0 avg</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="text-red" id="criticalTrend">
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <i class="ti ti-trending-up fs-3"></i>
+                                                    <span class="badge bg-red-lt text-red trend-value">+0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- High Severity Card -->
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card card-sm stat-card-enhanced" data-severity="high" onclick="vulnManager.flipStatCards()">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <span class="bg-orange text-white avatar">
+                                                <i class="fas fa-exclamation"></i>
+                                            </span>
+                                        </div>
+                                        <div class="col">
+                                            <div class="card-front">
+                                                <div class="font-weight-medium h2 mb-1" id="highCount">0</div>
+                                                <div class="text-muted small">High Vulnerabilities</div>
+                                                <div class="text-orange small fw-bold mt-1" id="highVPR">0.0 VPR</div>
+                                            </div>
+                                            <div class="card-back">
+                                                <div class="font-weight-medium h2 mb-1" id="highTotalVPR">0.0</div>
+                                                <div class="text-muted small">Total VPR Score</div>
+                                                <div class="text-orange small fw-bold mt-1" id="highAvgVPR">0.0 avg</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="text-orange" id="highTrend">
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <i class="ti ti-trending-up fs-3"></i>
+                                                    <span class="badge bg-orange-lt text-orange trend-value">+0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Medium Severity Card -->
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card card-sm stat-card-enhanced" data-severity="medium" onclick="vulnManager.flipStatCards()">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <span class="bg-yellow text-white avatar">
+                                                <i class="fas fa-minus"></i>
+                                            </span>
+                                        </div>
+                                        <div class="col">
+                                            <div class="card-front">
+                                                <div class="font-weight-medium h2 mb-1" id="mediumCount">0</div>
+                                                <div class="text-muted small">Medium Vulnerabilities</div>
+                                                <div class="text-yellow small fw-bold mt-1" id="mediumVPR">0.0 VPR</div>
+                                            </div>
+                                            <div class="card-back">
+                                                <div class="font-weight-medium h2 mb-1" id="mediumTotalVPR">0.0</div>
+                                                <div class="text-muted small">Total VPR Score</div>
+                                                <div class="text-yellow small fw-bold mt-1" id="mediumAvgVPR">0.0 avg</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="text-yellow" id="mediumTrend">
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <i class="ti ti-trending-up fs-3"></i>
+                                                    <span class="badge bg-yellow-lt text-yellow trend-value">+0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Low Severity Card -->
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card card-sm stat-card-enhanced" data-severity="low" onclick="vulnManager.flipStatCards()">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <span class="bg-green text-white avatar">
+                                                <i class="fas fa-info"></i>
+                                            </span>
+                                        </div>
+                                        <div class="col">
+                                            <div class="card-front">
+                                                <div class="font-weight-medium h2 mb-1" id="lowCount">0</div>
+                                                <div class="text-muted small">Low Vulnerabilities</div>
+                                                <div class="text-green small fw-bold mt-1" id="lowVPR">0.0 VPR</div>
+                                            </div>
+                                            <div class="card-back">
+                                                <div class="font-weight-medium h2 mb-1" id="lowTotalVPR">0.0</div>
+                                                <div class="text-muted small">Total VPR Score</div>
+                                                <div class="text-green small fw-bold mt-1" id="lowAvgVPR">0.0 avg</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="text-green" id="lowTrend">
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <i class="ti ti-trending-down fs-3"></i>
+                                                    <span class="badge bg-green-lt text-green trend-value">-0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Card Flip Instructions -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-info d-flex align-items-center" role="alert">
+                                <i class="ti ti-info-circle me-2"></i>
+                                <small>Click on any statistics card to flip between vulnerability counts and VPR scores</small>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    
+                    <!-- Historical Chart Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line me-2 text-primary"></i>
+                                Historical VPR Trends (Last 14 Days)
+                            </h3>
+                            <div class="card-actions">
+                                <div class="btn-group" role="group" aria-label="Chart metric switcher">
+                                    <input type="radio" class="btn-check" name="chart-metric" id="chart-count" autocomplete="off">
+                                    <label class="btn btn-outline-primary" for="chart-count" data-metric="count">
+                                        <i class="fas fa-hashtag me-1"></i>Vulnerability Count
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="chart-metric" id="chart-vpr" autocomplete="off" checked>
+                                    <label class="btn btn-outline-primary" for="chart-vpr" data-metric="vpr">
+                                        <i class="fas fa-chart-bar me-1"></i>VPR Score Sum
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="historicalChart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Search and Filters Section -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <!-- First row: Search and primary filters -->
+                                <div class="col-12">
+                                    <div class="d-flex gap-3 align-items-center">
+                                        <!-- Left side: Search input (auto-sizes) -->
+                                        <div class="input-group flex-grow-1">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                            <input type="text" class="form-control" id="searchInput" 
+                                                   placeholder="Search vulnerabilities, CVEs, or hostnames..." 
+                                                   autocomplete="off">
+                                        </div>
+                                        
+                                        <!-- Middle: Severity filter -->
+                                        <div class="flex-shrink-0">
+                                            <select class="form-select severity-filter" id="severityFilter" aria-label="Filter by severity">
+                                                <option value="">All Severities</option>
+                                                <option value="Critical">Critical</option>
+                                                <option value="High">High</option>
+                                                <option value="Medium">Medium</option>
+                                                <option value="Low">Low</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Right side: Action buttons -->
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-outline-success" id="importCsvBtn" title="Import CSV vulnerabilities">
+                                                <i class="fas fa-upload me-1"></i>Import
+                                            </button>
+                                            <button class="btn btn-outline-primary" id="exportBtn">
+                                                <i class="fas fa-download me-1"></i>Export
+                                            </button>
+                                            <button class="btn btn-outline-secondary" id="refreshBtn" title="Refresh data">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Workspace Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-database me-2"></i>
+                                Vulnerability Data Workspace
+                            </h3>
+                            <div class="card-actions">
+                                <div class="btn-group" role="group" aria-label="View switcher">
+                                    <input type="radio" class="btn-check" name="view-options" id="view-table" autocomplete="off" checked>
+                                    <label class="btn btn-outline-primary" for="view-table" data-view="table">
+                                        <i class="fas fa-table me-1"></i>Table
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="view-options" id="view-devices" autocomplete="off">
+                                    <label class="btn btn-outline-primary" for="view-devices" data-view="devices">
+                                        <i class="fas fa-server me-1"></i>Devices
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="view-options" id="view-vulnerabilities" autocomplete="off">
+                                    <label class="btn btn-outline-primary" for="view-vulnerabilities" data-view="vulnerabilities">
+                                        <i class="fas fa-bug me-1"></i>Vulnerabilities
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-2">
+                            <!-- Table View -->
+                            <div id="tableView" class="view-content">
+                                <div id="vulnGrid" class="ag-theme-alpine" style="height: 600px; width: 100%;"></div>
+                            </div>
+                            
+                            <!-- Device Cards View -->
+                            <div id="devicesView" class="view-content d-none">
+                                <div class="p-3">
+                                    <div class="row row-cards" id="deviceCards">
+                                        <!-- Device cards will be populated here -->
+                                    </div>
+                                    <div id="devicePaginationControls" class="d-flex justify-content-center mt-4">
+                                        <!-- Device pagination controls will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Vulnerability Cards View -->
+                            <div id="vulnerabilitiesView" class="view-content d-none">
+                                <div class="p-3">
+                                    <div class="row row-cards" id="vulnerabilityCards">
+                                        <!-- Vulnerability cards will be populated here -->
+                                    </div>
+                                    <div id="vulnerabilityPaginationControls" class="d-flex justify-content-center mt-4">
+                                        <!-- Vulnerability pagination controls will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Device Details Modal with Tabler.io Styling -->
+    <div class="modal modal-blur fade" id="deviceModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-server me-2 text-primary"></i>
+                        Device Security Overview
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- Device Summary Card -->
+                        <div class="col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Device Information
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="deviceInfo" class="space-y-3">
+                                        <!-- Device info will be populated here -->
+                                    </div>
+                                    
+                                    <!-- VPR Summary Mini-Cards -->
+                                    <div class="mt-4">
+                                        <h4 class="h6 mb-3">VPR Risk Breakdown</h4>
+                                        <div class="row g-2" id="deviceVprSummary">
+                                            <!-- VPR mini-cards will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Vulnerabilities Grid -->
+                        <div class="col-lg-8">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-bug me-2"></i>
+                                        Active Vulnerabilities
+                                    </h3>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div id="device-vuln-grid" class="ag-theme-alpine" style="height: 500px; width: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="exportDeviceData">
+                        <i class="fas fa-file-csv me-2"></i>
+                        Export CSV
+                    </button>
+                    <button type="button" class="btn btn-primary" id="generateDeviceReport">
+                        <i class="ti ti-file-text me-2"></i>
+                        Generate Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Vulnerability Details Modal with Tabler.io Styling -->
+    <div class="modal modal-blur fade" id="vulnerabilityModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-bug me-2"></i>
+                        Vulnerability Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Vulnerability Information -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Vulnerability Information
+                                    </h6>
+                                </div>
+                                <div class="card-body" id="vulnerabilityInfo">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- VPR and Risk Summary -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-chart-line me-2"></i>
+                                        Risk Analysis
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row" id="vulnerabilityRiskSummary">
+                                        <!-- Populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Affected Assets -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-server me-2"></i>
+                                        Affected Assets
+                                    </h6>
+                                    <span class="badge bg-secondary" id="affectedAssetsCount">0 assets</span>
+                                </div>
+                                <div class="card-body">
+                                    <div id="vulnerabilityAssetsGrid" style="height: 300px; width: 100%;" class="ag-theme-alpine"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="vulnManager.exportVulnerabilityReport()">
+                        <i class="fas fa-download me-2"></i>
+                        Export Report
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="vulnManager.generateVulnerabilityPDF()">
+                        <i class="fas fa-file-pdf me-2"></i>
+                        Generate PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Vulnerability Modal -->
+    <div class="modal fade" id="editVulnModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2"></i>Edit Vulnerability
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editVulnForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editHostname" class="form-label">Hostname</label>
+                                    <input type="text" class="form-control" id="editHostname" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editIpAddress" class="form-label">IP Address</label>
+                                    <input type="text" class="form-control" id="editIpAddress" 
+                                           pattern="^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                                           title="Please enter a valid IP address">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editSeverity" class="form-label">Severity</label>
+                                    <select class="form-select" id="editSeverity">
+                                        <option value="Critical">Critical</option>
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                        <option value="Info">Info</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editState" class="form-label">State</label>
+                                    <select class="form-select" id="editState">
+                                        <option value="open">Open</option>
+                                        <option value="resolved">Resolved</option>
+                                        <option value="verified">Verified</option>
+                                        <option value="closed">Closed</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="editNotes" rows="4" 
+                                      placeholder="Add any notes or comments about this vulnerability..."></textarea>
+                        </div>
+                        <input type="hidden" id="editVulnId">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveVulnEdit">
+                        <i class="fas fa-save me-2"></i>Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div class="loading-spinner">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <h5 class="mt-3" id="loadingMessage">Processing data...</h5>
+                    <div class="progress-modern mt-3">
+                        <div class="progress-bar progress-init" role="progressbar" id="loadingProgress" aria-label="Loading progress"></div>
+                    </div>
+                    <small class="text-muted" id="loadingDetails">Please wait...</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Selection Modal for CSV Import -->
+    <div class="modal modal-blur fade" id="scanDateModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-alt me-2"></i>Set Scan Date
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">
+                        Please specify the scan date for this vulnerability data. This date will be used for trending analysis.
+                    </p>
+                    <div class="mb-3">
+                        <label for="scanDateInput" class="form-label">Scan Date</label>
+                        <input type="date" class="form-control" id="scanDateInput" required>
+                        <div class="form-text">Choose the date when this vulnerability scan was performed.</div>
+                    </div>
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Tip:</strong> For trending analysis, use the actual scan date from your vulnerability management system.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confirmScanDate">
+                        <i class="fas fa-upload me-1"></i>Import with Date
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Input (Hidden) -->
+    <input type="file" id="csvFileInput" accept=".csv" class="hidden-input">
+
+    <!-- External Libraries -->
+    <!-- Settings Modal Container - Auto-injected by shared/settings-modal.js -->
+    <div id="settingsModalContainer"></div>
+
+    <!-- Shared Footer Container -->
+    <div id="footerContainer"></div>
+
+    <!-- Tabler.io JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    
+    <!-- SortableJS for drag and drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    
+    <!-- AG Grid Community -->
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/dist/ag-grid-community.min.js"></script>
+    
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.44.0/dist/apexcharts.min.js"></script>
+    
+    <!-- PapaParse for CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <!-- JSZip for ZIP file creation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <!-- Security: DOMPurify for XSS protection -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+
+    <!-- HexTrackr Modular JavaScript Architecture -->
+    <script src="scripts/shared/header-loader.js"></script>
+    <script src="scripts/shared/footer-loader.js"></script>
+    <script src="scripts/shared/settings-modal.js"></script>
+    <script src="scripts/shared/ag-grid-responsive-config.js"></script>
+    <script src="scripts/shared/pagination-controller.js"></script>
+    <script src="scripts/shared/vulnerability-data.js"></script>
+    <script src="scripts/shared/device-security-modal.js"></script>
+    <script src="scripts/pages/vulnerability-manager.js"></script>
+    <script src="scripts/pages/vulnerabilities.js"></script>
+
+</body>
+</html>

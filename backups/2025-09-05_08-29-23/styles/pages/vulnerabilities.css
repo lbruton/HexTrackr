@@ -1,0 +1,164 @@
+/* Vulnerabilities Page Specific Styles */
+
+/* VPR severity color scheme */
+.severity-critical {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.severity-high {
+    background-color: #fd7e14 !important;
+    color: white !important;
+}
+
+.severity-medium {
+    background-color: #ffc107 !important;
+    color: black !important;
+}
+
+.severity-low {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+
+/* VPR score styling */
+.vpr-critical { color: #dc3545; font-weight: bold; }
+.vpr-high { color: #fd7e14; font-weight: bold; }
+.vpr-medium { color: #ffc107; font-weight: bold; }
+.vpr-low { color: #28a745; font-weight: bold; }
+
+/* Enhanced Statistics Cards */
+.stat-card-enhanced {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stat-card-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgb(0, 0, 0, 0.1);
+}
+
+.card-back {
+    display: none;
+}
+
+.card-flip-animation {
+    animation: flip-card 0.6s ease-in-out;
+}
+
+@keyframes flip-card {
+    0% { transform: rotateY(0deg); }
+    50% { transform: rotateY(90deg); }
+    100% { transform: rotateY(0deg); }
+}
+
+/* Trend indicators */
+.trend-value {
+    font-size: 0.75rem;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* Chart and grid containers */
+#vulnGrid {
+    height: 600px;
+    min-height: 400px;
+}
+
+#historicalChart {
+    height: 300px;
+}
+
+#device-vuln-grid {
+    height: 500px;
+    width: 100%;
+}
+
+#vulnerabilityAssetsGrid {
+    height: 300px;
+    width: 100%;
+}
+
+.chart-container {
+    height: 350px;
+}
+
+/* Vulnerability stats cards */
+.vulnerability-stats .card-sm {
+    transition: transform 0.2s ease-in-out;
+}
+
+.vulnerability-stats .card-sm:hover {
+    transform: translateY(-2px);
+}
+
+/* Search and filter controls */
+.search-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-container .form-control,
+.search-container .form-select {
+    min-width: 200px;
+}
+
+/* Severity badges */
+.severity-badge {
+    font-size: 0.8em;
+    padding: 0.4em 0.8em;
+    border-radius: 20px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Progress bars for VPR trends */
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* Modal enhancements */
+.modal-xl {
+    max-width: 90%;
+}
+
+.vulnerability-details .card {
+    margin-bottom: 1rem;
+}
+
+.vulnerability-details .card-header {
+    background-color: var(--hextrackr-primary);
+    color: white;
+    font-weight: 600;
+}
+
+/* AG Grid customizations for vulnerabilities */
+.ag-theme-alpine {
+    --ag-font-size: 14px;
+    --ag-row-height: 42px;
+    --ag-header-background-color: var(--hextrackr-primary);
+    --ag-header-foreground-color: white;
+}
+
+/* Export buttons */
+.export-controls .btn {
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Device analysis specific */
+.device-analysis .progress {
+    height: 8px;
+    border-radius: 4px;
+}
+
+.device-analysis .progress-bar {
+    border-radius: 4px;
+}
+
+/* Search and filter layout */
+.severity-filter {
+    min-width: 140px;
+}

@@ -1,0 +1,69 @@
+---
+alwaysApply: true
+---
+
+# HexTrackr Project Architecture Guide
+
+## Project Overview
+HexTrackr is a vulnerability and ticket management system built with Node.js/Express backend and vanilla JavaScript frontend.
+
+## Core Architecture
+
+### Backend Structure
+- **Main Server**: [server.js](mdc:server.js) - Express server with SQLite database
+- **Database Init**: [scripts/init-database.js](mdc:scripts/init-database.js) - Database schema and initialization
+- **Port**: 8080 (Docker only, never run Node.js locally)
+
+### Frontend Structure
+```
+scripts/
+├── pages/          # Page-specific logic
+│   ├── vulnerability-manager.js  # Main vulnerability dashboard
+│   └── tickets-manager.js        # Ticket management
+├── shared/         # Reusable components
+│   ├── settings-modal.js         # Global settings modal
+│   ├── pagination-controller.js  # Table pagination
+│   └── ag-grid-responsive-config.js  # AG Grid configuration
+└── utils/          # Utility functions
+    ├── security.js              # Security utilities
+    └── data-processing.js       # Data transformation
+```
+
+### Database Schema
+- **Location**: `data/hextrackr.db` (SQLite)
+- **Key Tables**: 
+  - `vulnerabilities_current` - Deduplicated current state
+  - `vulnerability_snapshots` - Historical imports
+  - `tickets` - Ticket management with JSON devices field
+
+## Critical Patterns
+
+### Vulnerability Rollover System
+- **Dedup Key**: `normalizeHostname(hostname) + CVE` or fallback to `plugin_id + description`
+- **Process**: CSV → Papa.parse → `processVulnerabilityRowsWithRollover()` → DB
+- **Sequential Processing**: Use loops, not parallel processing to prevent race conditions
+
+### Inter-Module Communication
+```javascript
+// Refresh data across modules
+window.refreshPageData('vulnerabilities');
+window.refreshPageData('tickets');
+```
+
+### File Organization
+- **HTML Pages**: Root level (vulnerabilities.html, tickets.html)
+- **Styles**: Modular CSS in `styles/` with shared/page-specific structure
+- **Scripts**: Organized by function in `scripts/` subdirectories
+- **Documentation**: Markdown in `docs-source/` with HTML generation
+
+## Development Workflow
+- **Docker Only**: Always use `docker-compose up -d` and `docker-compose restart`
+- **Testing**: Use Playwright tests in `tests/` directory
+- **Linting**: ESLint with stylistic rules, run `npm run lint:all`
+- **Documentation**: Generate with `npm run docs:generate`
+
+## Key Dependencies
+- **Backend**: Express, SQLite3, Multer, PapaParse
+- **Frontend**: AG Grid, ApexCharts, Bootstrap 5, Tabler.io
+- **Testing**: Playwright, Jest
+- **Build**: Node.js 18+, Docker

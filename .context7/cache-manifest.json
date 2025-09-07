@@ -1,0 +1,63 @@
+{
+  "cacheVersion": "1.0.0",
+  "lastUpdated": "2025-09-05T19:00:00Z",
+  "source": "Context7 MCP Service",
+  "totalSnippets": 4722,
+  "averageTrustScore": 8.5,
+  "frameworks": [
+    {
+      "name": "Express.js",
+      "libraryId": "/expressjs/express",
+      "filename": "express.md",
+      "codeSnippets": 668,
+      "trustScore": 9.0,
+      "coverage": "Middleware, routing, error handling, Express 4.x features",
+      "keyTopics": ["Migration guides", "Router overhaul", "API updates"]
+    },
+    {
+      "name": "Chart.js", 
+      "libraryId": "/chartjs/chart.js",
+      "filename": "chartjs.md",
+      "codeSnippets": 529,
+      "trustScore": 7.5,
+      "coverage": "Chart configuration, data visualization patterns",
+      "keyTopics": ["Line charts", "animations", "dataset manipulation"]
+    },
+    {
+      "name": "Node SQLite3",
+      "libraryId": "/tryghost/node-sqlite3", 
+      "filename": "sqlite3.md",
+      "codeSnippets": 15,
+      "trustScore": 9.8,
+      "coverage": "Node.js SQLite database operations and API",
+      "keyTopics": ["Database connection", "queries", "SQLCipher support"]
+    },
+    {
+      "name": "AG-Grid",
+      "libraryId": "/ag-grid/ag-grid",
+      "filename": "ag-grid.md", 
+      "codeSnippets": 646,
+      "trustScore": 9.8,
+      "coverage": "JavaScript data grid table configuration",
+      "keyTopics": ["Grid setup", "column definitions", "row data"]
+    },
+    {
+      "name": "ApexCharts",
+      "libraryId": "/apexcharts/apexcharts.js",
+      "filename": "apexcharts.md",
+      "codeSnippets": 1989,
+      "trustScore": 7.2,
+      "coverage": "JavaScript charting library configuration API", 
+      "keyTopics": ["Chart types", "annotations", "responsive design"]
+    },
+    {
+      "name": "Tabler UI",
+      "libraryId": "/tabler/tabler",
+      "filename": "tabler.md",
+      "codeSnippets": 875,
+      "trustScore": 9.8,
+      "coverage": "Dashboard template UI components bootstrap",
+      "keyTopics": ["Layout components", "UI elements", "responsive design"]
+    }
+  ]
+}

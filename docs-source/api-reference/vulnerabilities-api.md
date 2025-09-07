@@ -28,7 +28,9 @@ This API provides endpoints for managing and analyzing vulnerability data. It fe
           "cve": "CVE-2024-0001",
           "severity": "High",
           "vpr_score": 8.6,
-          "last_seen": "2025-08-20"
+          "last_seen": "2025-08-20",
+          "plugin_id": "12345",
+          "plugin_name": "Example Vulnerability Name"
         }
       ],
       "pagination": { "page": 1, "limit": 50, "total": 1234, "pages": 25 }
@@ -100,7 +102,12 @@ The appropriate method depends on your integration needs and client-side capabil
 
 ### POST /api/vulnerabilities/import
 
-- **Description**: Imports vulnerabilities from an uploaded CSV file. This is the primary endpoint for server-side processing of vulnerability scans.
+- **Description**: Imports vulnerabilities from an uploaded CSV file. This is the primary endpoint for server-side processing of vulnerability scans. **Fixed in v1.0.5**: Resolved critical bug where missing `apiBase` property caused 404 errors during CSV upload attempts.
+- **Enhanced Features**:
+  - **Multi-format Support**: Automatically detects and processes various CSV export formats
+  - **Cisco SA Support**: Extracts and processes Cisco Security Advisory identifiers (`cisco-sa-*` patterns)
+  - **CVE Extraction**: Multi-tier CVE identification from various column sources
+  - **Intelligent Parsing**: Handles both direct CVE columns and embedded CVE patterns in vulnerability names
 - **Request Body**: `multipart/form-data`
   - `csvFile` (file, required): The CSV file to import.
   - `vendor` (string, optional): The source of the data (e.g., "cisco").

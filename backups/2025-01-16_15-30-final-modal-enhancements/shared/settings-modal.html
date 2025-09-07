@@ -1,0 +1,466 @@
+<!-- HexTrackr Shared Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-cog me-2"></i>
+                    HexTrackr Settings
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Tab Navigation -->
+                    <div class="col-12">
+                        <ul class="nav nav-tabs nav-fill" id="settingsTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="api-config-tab" data-bs-toggle="tab" data-bs-target="#api-config" type="button" role="tab">
+                                    <i class="fas fa-plug me-2"></i>API Configuration
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="data-management-tab" data-bs-toggle="tab" data-bs-target="#data-management" type="button" role="tab">
+                                    <i class="fas fa-database me-2"></i>Data Management
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="ticket-systems-tab" data-bs-toggle="tab" data-bs-target="#ticket-systems" type="button" role="tab">
+                                    <i class="fas fa-ticket-alt me-2"></i>Ticket Systems
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="system-config-tab" data-bs-toggle="tab" data-bs-target="#system-config" type="button" role="tab">
+                                    <i class="fas fa-cogs me-2"></i>System Configuration
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                        
+                    <!-- Tab Content -->
+                    <div class="col-12">
+                        <div class="tab-content" id="settingsTabContent">
+                            <!-- API Configuration Tab -->
+                            <div class="tab-pane fade show active" id="api-config" role="tabpanel">
+                                <div class="row">
+                                    <!-- Cisco API Configuration -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-network-wired me-2 text-primary"></i>
+                                                    Cisco PSIRT API
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <label for="ciscoClientId" class="form-label">Client ID</label>
+                                                    <input type="text" class="form-control" id="ciscoClientId" placeholder="Enter Cisco PSIRT Client ID">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="ciscoClientSecret" class="form-label">Client Secret</label>
+                                                    <input type="password" class="form-control" id="ciscoClientSecret" placeholder="Enter Client Secret">
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <button type="button" class="btn btn-outline-primary" id="testCiscoConnection">
+                                                        <i class="fas fa-satellite-dish me-2"></i>Test Connection
+                                                    </button>
+                                                    <span class="badge bg-secondary" id="ciscoStatus">Not Configured</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Tenable API Configuration -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-shield-alt me-2 text-success"></i>
+                                                    Tenable API
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <label for="tenableApiKey" class="form-label">Access Key</label>
+                                                    <input type="text" class="form-control" id="tenableApiKey" placeholder="Enter Tenable Access Key">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="tenableSecretKey" class="form-label">Secret Key</label>
+                                                    <input type="password" class="form-control" id="tenableSecretKey" placeholder="Enter Secret Key">
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <button type="button" class="btn btn-outline-success" id="testTenableConnection">
+                                                        <i class="fas fa-satellite-dish me-2"></i>Test Connection
+                                                    </button>
+                                                    <span class="badge bg-secondary" id="tenableStatus">Not Configured</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- API Actions -->
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-download me-2 text-info"></i>
+                                                    Data Synchronization
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row g-2">
+                                                    <div class="col-md-6">
+                                                        <button type="button" class="btn btn-info w-100" id="fetchTenableData">
+                                                            <i class="fas fa-cloud-download-alt me-2"></i>
+                                                            Fetch Tenable Historical Data
+                                                        </button>
+                                                        <small class="text-muted">Retrieves historical VPR score data for trending analysis</small>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <button type="button" class="btn btn-primary w-100" id="fetchCiscoData">
+                                                            <i class="fas fa-cloud-download-alt me-2"></i>
+                                                            Fetch Cisco Security Advisories
+                                                        </button>
+                                                        <small class="text-muted">Downloads latest security advisories from Cisco PSIRT</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Data Management Tab -->
+                            <div class="tab-pane fade" id="data-management" role="tabpanel">
+                                <div class="row">
+                                    <!-- Database Statistics -->
+                                    <div class="col-12 mb-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-chart-bar me-2 text-primary"></i>
+                                                    Database Statistics
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row text-center" id="databaseStats">
+                                                    <div class="col-md-3">
+                                                        <div class="mb-2">
+                                                            <i class="fas fa-ticket-alt text-success fs-2"></i>
+                                                        </div>
+                                                        <div class="text-muted">Tickets</div>
+                                                        <div class="h3 mb-0" id="ticketCount">-</div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="mb-2">
+                                                            <i class="fas fa-shield-virus text-danger fs-2"></i>
+                                                        </div>
+                                                        <div class="text-muted">Vulnerabilities</div>
+                                                        <div class="h3 mb-0" id="vulnCount">-</div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="mb-2">
+                                                            <i class="fas fa-database text-info fs-2"></i>
+                                                        </div>
+                                                        <div class="text-muted">Total Records</div>
+                                                        <div class="h3 mb-0" id="totalCount">-</div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="mb-2">
+                                                            <i class="fas fa-hard-drive text-warning fs-2"></i>
+                                                        </div>
+                                                        <div class="text-muted">Database Size</div>
+                                                        <div class="h3 mb-0" id="dbSize">-</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Module-specific Data Management -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header bg-success-subtle">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-ticket-alt me-2 text-success"></i>
+                                                    Tickets Management
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="d-grid gap-2">
+                                                    <button type="button" class="btn btn-outline-primary" onclick="exportData('tickets')">
+                                                        <i class="fas fa-file-csv me-2"></i>Export Tickets CSV
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-info" onclick="importData('tickets')">
+                                                        <i class="fas fa-upload me-2"></i>Import Tickets CSV
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-warning" onclick="backupData('tickets')">
+                                                        <i class="fas fa-file-archive me-2"></i>Backup Tickets ZIP
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="restoreData('tickets')">
+                                                        <i class="fas fa-file-import me-2"></i>Restore Tickets ZIP
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-danger" onclick="clearData('tickets')">
+                                                        <i class="fas fa-trash me-2"></i>Clear Tickets
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header bg-danger-subtle">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-shield-virus me-2 text-danger"></i>
+                                                    Vulnerabilities Management
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="d-grid gap-2">
+                                                    <button type="button" class="btn btn-outline-primary" onclick="exportData('vulnerabilities')">
+                                                        <i class="fas fa-file-csv me-2"></i>Export Vulnerabilities CSV
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-info" onclick="importData('vulnerabilities')">
+                                                        <i class="fas fa-upload me-2"></i>Import Vulnerabilities CSV
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-warning" onclick="backupData('vulnerabilities')">
+                                                        <i class="fas fa-file-archive me-2"></i>Backup Vulnerabilities ZIP
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="restoreData('vulnerabilities')">
+                                                        <i class="fas fa-file-import me-2"></i>Restore Vulnerabilities ZIP
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-danger" onclick="clearData('vulnerabilities')">
+                                                        <i class="fas fa-trash me-2"></i>Clear Vulnerabilities
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Global Actions -->
+                                    <div class="col-12">
+                                        <div class="card border-warning">
+                                            <div class="card-header bg-warning">
+                                                <h6 class="card-title mb-0 text-dark">
+                                                    <i class="fas fa-globe me-2"></i>
+                                                    Global Data Operations
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="alert alert-warning mb-3">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    <strong>Warning:</strong> Global operations affect all data in the system.
+                                                </div>
+                                                <div class="row g-2">
+                                                    <div class="col-md-3">
+                                                        <button type="button" class="btn btn-success w-100" onclick="exportAllDataAsCSV()">
+                                                            <i class="fas fa-download me-2"></i>Export All Data
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <button type="button" class="btn btn-primary w-100" onclick="restoreFullSystemBackup()">
+                                                            <i class="fas fa-upload me-2"></i>Restore Full System Backup
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <button type="button" class="btn btn-warning w-100" onclick="refreshStats()">
+                                                            <i class="fas fa-sync me-2"></i>Refresh Statistics
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <button type="button" class="btn btn-danger w-100" onclick="clearData('all')">
+                                                            <i class="fas fa-exclamation-triangle me-2"></i>Clear All Data
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Ticket Systems Tab -->
+                            <div class="tab-pane fade" id="ticket-systems" role="tabpanel">
+                                <div class="row">
+                                    <!-- ServiceNow Integration -->
+                                    <div class="col-lg-8 mb-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-snowflake me-2 text-primary"></i>
+                                                    ServiceNow Integration
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="serviceNowEnabled">
+                                                        <label class="form-check-label" for="serviceNowEnabled">
+                                                            <strong>Enable ServiceNow Integration</strong>
+                                                        </label>
+                                                    </div>
+                                                    <small class="text-muted">When enabled, Service Now ticket numbers become clickable links</small>
+                                                </div>
+                                                
+                                                <div class="mb-3" id="serviceNowConfig">
+                                                    <label for="serviceNowInstance" class="form-label">ServiceNow Instance URL</label>
+                                                    <input type="url" class="form-control" id="serviceNowInstance" 
+                                                           placeholder="https://yourorg.service-now.com" 
+                                                           pattern="https://.*\.service-now\.com">
+                                                    <div class="form-text">
+                                                        Enter your organization's ServiceNow instance URL (e.g., https://yourorg.service-now.com)
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label class="form-label">URL Pattern Preview</label>
+                                                    <div class="p-2 bg-light rounded">
+                                                        <code id="urlPatternPreview">
+                                                            Configure your instance URL to see the link pattern
+                                                        </code>
+                                                    </div>
+                                                    <small class="text-muted">
+                                                        Clicking INC/CHG numbers will open ServiceNow with this pattern
+                                                    </small>
+                                                </div>
+                                                
+                                                <div class="d-flex gap-2">
+                                                    <button type="button" class="btn btn-outline-primary" id="testServiceNowLink">
+                                                        <i class="fas fa-external-link-alt me-2"></i>Test Link
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-success" id="saveServiceNowSettings">
+                                                        <i class="fas fa-save me-2"></i>Save Configuration
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Integration Status & Help -->
+                                    <div class="col-lg-4 mb-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-info-circle me-2 text-info"></i>
+                                                    Integration Status
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <i class="fas fa-circle text-secondary me-2"></i>
+                                                        <span>ServiceNow</span>
+                                                        <span class="badge bg-secondary ms-auto" id="serviceNowStatus">Disabled</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <hr>
+                                                
+                                                <h6 class="mb-2">
+                                                    <i class="fas fa-question-circle me-2"></i>How it works
+                                                </h6>
+                                                <ul class="small text-muted mb-0">
+                                                    <li>Configure your ServiceNow instance URL</li>
+                                                    <li>INC/CHG numbers become clickable links</li>
+                                                    <li>Links open ServiceNow incidents directly</li>
+                                                    <li>Works with standard ServiceNow URL patterns</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Future Integrations -->
+                                        <div class="card mt-3">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-plus-circle me-2 text-muted"></i>
+                                                    Future Integrations
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="text-muted small">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <i class="fas fa-circle text-muted me-2"></i>
+                                                        <span>Jira Integration</span>
+                                                        <span class="badge bg-secondary ms-auto">Coming Soon</span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <i class="fas fa-circle text-muted me-2"></i>
+                                                        <span>Remedy Integration</span>
+                                                        <span class="badge bg-secondary ms-auto">Coming Soon</span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fas fa-circle text-muted me-2"></i>
+                                                        <span>Custom ITSM</span>
+                                                        <span class="badge bg-secondary ms-auto">Coming Soon</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- System Configuration Tab -->
+                            <div class="tab-pane fade" id="system-config" role="tabpanel">
+                                <div class="row">
+                                    <!-- Future Features Placeholder -->
+                                    <div class="col-12 mb-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-cogs me-2 text-secondary"></i>
+                                                    System Configuration
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="alert alert-info">
+                                                    <i class="fas fa-info-circle me-2"></i>
+                                                    <strong>Coming Soon:</strong> User/ID Management, SNMP Polling, and additional system configuration options will be available here.
+                                                </div>
+                                                
+                                                <!-- Placeholder cards for future features -->
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="card border-dashed border-secondary">
+                                                            <div class="card-body text-center text-muted">
+                                                                <i class="fas fa-users fs-1 mb-3"></i>
+                                                                <h6>User Management</h6>
+                                                                <p class="small">Configure user accounts, roles, and permissions</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="card border-dashed border-secondary">
+                                                            <div class="card-body text-center text-muted">
+                                                                <i class="fas fa-network-wired fs-1 mb-3"></i>
+                                                                <h6>SNMP Polling</h6>
+                                                                <p class="small">Configure SNMP monitoring and polling intervals</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveSettings">
+                    <i class="fas fa-save me-2"></i>Save Settings
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- External Libraries for Settings Modal -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>

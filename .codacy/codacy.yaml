@@ -1,17 +1,26 @@
 exclude_paths:
+    - node_modules/**
+    - '*.min.js'
+    - '*.min.css'
+    - backups/**
+    - backup/**
+    - depreciated/**
+    - deprecated/**
+    - .*/**
+    - .codacy/**
+    - .playwright-mcp/**
+    - data/**
+    - uploads/**
+    - logs/**
+    - temp/**
+    - docs-html/**
+    - .venv/**
+    - venv/**
     - playwright/**
     - docs-prototype/**
     - docs-source/**
     - roadmaps/**
-    - .rMemory/**
-    - .rMemory/
-    - '**/.rMemory/**'
     - scripts/chart.min.js
-    - node_modules/**
-    - '*.min.js'
-    - uploads/**
-    - .venv/**
-    - temp/**
     - filescope-tools-demo.js
     - FileScopeMCP-*.json
     - FileScopeMCP-*.html

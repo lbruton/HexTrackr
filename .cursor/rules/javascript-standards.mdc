@@ -1,0 +1,98 @@
+---
+globs: *.js
+---
+
+# JavaScript Coding Standards for HexTrackr
+
+## ESLint Configuration
+Follow the project's ESLint configuration in [eslint.config.mjs](mdc:eslint.config.mjs) with these key rules:
+
+### Code Style
+- **Quotes**: Always use double quotes (`"`) for strings
+- **Semicolons**: Always use semicolons at end of statements
+- **Curly Braces**: Always use curly braces for all control structures
+- **Variables**: Use `const` by default, `let` when reassignment needed, never `var`
+- **Equality**: Always use strict equality (`===`) and inequality (`!==`)
+
+### Naming Conventions
+- **Variables/Functions**: camelCase (`vulnerabilityData`, `processImport`)
+- **Classes**: PascalCase (`ModernVulnManager`, `PathValidator`)
+- **Constants**: UPPER_SNAKE_CASE (`MAX_FILE_SIZE`, `API_ENDPOINTS`)
+- **Private Methods**: Prefix with underscore (`_validateInput`, `_processData`)
+
+### Error Handling
+```javascript
+// Always use try-catch for async operations
+try {
+    const result = await processVulnerabilityData(data);
+    return { success: true, data: result };
+} catch (error) {
+    console.error("Error processing data:", error);
+    return { success: false, error: error.message };
+}
+
+// Use specific error types
+if (!filePath || typeof filePath !== "string") {
+    throw new Error("Invalid file path");
+}
+```
+
+### Function Structure
+```javascript
+/**
+ * Process vulnerability data with rollover logic
+ * @param {Array} vulnerabilities - Array of vulnerability objects
+ * @param {Object} options - Processing options
+ * @returns {Promise<Object>} Processing result
+ */
+async function processVulnerabilityData(vulnerabilities, options = {}) {
+    // Input validation
+    if (!Array.isArray(vulnerabilities)) {
+        throw new Error("Vulnerabilities must be an array");
+    }
+    
+    // Process data
+    const results = [];
+    for (const vuln of vulnerabilities) {
+        // Sequential processing to prevent race conditions
+        const processed = await processVulnerabilityRow(vuln);
+        results.push(processed);
+    }
+    
+    return { success: true, data: results };
+}
+```
+
+### Global Variables
+Use proper ESLint global declarations:
+```javascript
+/* global bootstrap, agGrid, ApexCharts, Papa, Sortable, createVulnerabilityGridOptions, PaginationController, VulnerabilityDataManager, window, document, console, setTimeout, FormData, fetch, confirm, localStorage, Blob, URL, btoa, alert */
+```
+
+### Module Patterns
+- **Server-side**: Use CommonJS (`require`/`module.exports`)
+- **Client-side**: Use ES6 classes and modules
+- **Shared utilities**: Export as functions or classes
+
+### Performance Guidelines
+- **Sequential Processing**: Use `for...of` loops instead of `Promise.all()` for database operations
+- **Memory Management**: Always `unlink()` temporary files after processing
+- **Event Listeners**: Remove event listeners in cleanup methods
+- **DOM Queries**: Cache DOM elements when used multiple times
+
+### Security Practices
+- **Input Validation**: Always validate user inputs
+- **Path Security**: Use `PathValidator` class for all file operations
+- **XSS Prevention**: Use `escapeHtml()` function for user-generated content
+- **SQL Injection**: Use parameterized queries, never string concatenation
+
+### Code Organization
+- **File Headers**: Include file overview, version, and author information
+- **JSDoc Comments**: Document all public methods and complex functions
+- **Error Messages**: Use descriptive, user-friendly error messages
+- **Console Logging**: Use appropriate log levels (`console.log`, `console.error`, `console.warn`)
+
+### Browser Compatibility
+- **ES6 Features**: Use modern JavaScript features (ES2022)
+- **Polyfills**: Include necessary polyfills for older browsers
+- **Feature Detection**: Check for feature availability before use

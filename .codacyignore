@@ -1,0 +1,25 @@
+# Dependencies and generated
+node_modules/**
+*.min.js
+*.min.css
+
+# Backups and deprecated code
+backups/**
+backup/**
+depreciated/**
+deprecated/**
+
+# Dot folders (tools, caches, configs)
+.*/**
+.*/
+
+# Data and uploads  
+data/**
+uploads/**
+logs/**
+temp/**
+docs-html/**
+
+# Development environments
+.venv/**
+venv/**

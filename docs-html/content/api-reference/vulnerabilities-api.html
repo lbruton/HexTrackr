@@ -1,8 +1,8 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Vulnerabilities API</h1>
-<p>This API provides endpoints for managing and analyzing vulnerability data. It features a <a href="../architecture/rollover-mechanism.html">rollover architecture</a> for historical trend analysis.</p>
-<p><strong>Data Model</strong>: For detailed information on the vulnerability-related tables, see the <a href="../architecture/data-model.html">Data Model documentation</a>.</p>
+<p>This API provides endpoints for managing and analyzing vulnerability data. It features a <a href="#architecture/rollover-mechanism">rollover architecture</a> for historical trend analysis.</p>
+<p><strong>Data Model</strong>: For detailed information on the vulnerability-related tables, see the <a href="#architecture/data-model">Data Model documentation</a>.</p>
 <hr>
 <h2>Endpoints</h2>
 <h3>GET /api/vulnerabilities</h3>
@@ -27,7 +27,9 @@
       &quot;cve&quot;: &quot;CVE-2024-0001&quot;,
       &quot;severity&quot;: &quot;High&quot;,
       &quot;vpr_score&quot;: 8.6,
-      &quot;last_seen&quot;: &quot;2025-08-20&quot;
+      &quot;last_seen&quot;: &quot;2025-08-20&quot;,
+      &quot;plugin_id&quot;: &quot;12345&quot;,
+      &quot;plugin_name&quot;: &quot;Example Vulnerability Name&quot;
     }
   ],
   &quot;pagination&quot;: { &quot;page&quot;: 1, &quot;limit&quot;: 50, &quot;total&quot;: 1234, &quot;pages&quot;: 25 }
@@ -100,7 +102,14 @@
 <p>The appropriate method depends on your integration needs and client-side capabilities.</p>
 <h3>POST /api/vulnerabilities/import</h3>
 <ul>
-<li><strong>Description</strong>: Imports vulnerabilities from an uploaded CSV file. This is the primary endpoint for server-side processing of vulnerability scans.</li>
+<li><strong>Description</strong>: Imports vulnerabilities from an uploaded CSV file. This is the primary endpoint for server-side processing of vulnerability scans. <strong>Fixed in v1.0.5</strong>: Resolved critical bug where missing <code>apiBase</code> property caused 404 errors during CSV upload attempts.</li>
+<li><strong>Enhanced Features</strong>:<ul>
+<li><strong>Multi-format Support</strong>: Automatically detects and processes various CSV export formats</li>
+<li><strong>Cisco SA Support</strong>: Extracts and processes Cisco Security Advisory identifiers (<code>cisco-sa-*</code> patterns)</li>
+<li><strong>CVE Extraction</strong>: Multi-tier CVE identification from various column sources</li>
+<li><strong>Intelligent Parsing</strong>: Handles both direct CVE columns and embedded CVE patterns in vulnerability names</li>
+</ul>
+</li>
 <li><strong>Request Body</strong>: <code>multipart/form-data</code><ul>
 <li><code>csvFile</code> (file, required): The CSV file to import.</li>
 <li><code>vendor</code> (string, optional): The source of the data (e.g., &quot;cisco&quot;).</li>

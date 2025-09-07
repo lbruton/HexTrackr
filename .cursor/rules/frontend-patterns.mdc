@@ -1,0 +1,485 @@
+---
+globs: *.html,*.css,scripts/**/*.js
+---
+
+# Frontend Patterns for HexTrackr
+
+## HTML Structure
+
+### Page Template
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr - Modern Vulnerability Management</title>
+    
+    <!-- Tabler.io CSS Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AG Grid CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-alpine.css">
+    
+    <!-- Modular HexTrackr CSS -->
+    <link rel="stylesheet" href="styles/shared/base.css">
+    <link rel="stylesheet" href="styles/shared/header.css">
+    <link rel="stylesheet" href="styles/pages/vulnerabilities.css">
+    <link rel="stylesheet" href="styles/utils/responsive.css">
+</head>
+<body>
+    <!-- Page content -->
+    <script src="scripts/shared/settings-modal.js"></script>
+    <script src="scripts/pages/vulnerability-manager.js"></script>
+</body>
+</html>
+```
+
+### Data Attributes for Testing
+```html
+<!-- Use data-testid for test selectors -->
+<button data-testid="import-csv-btn" class="btn btn-primary">
+    Import CSV
+</button>
+
+<div data-testid="vulnerability-grid" class="ag-grid-container">
+    <!-- Grid content -->
+</div>
+
+<div data-testid="import-success" class="alert alert-success" style="display: none;">
+    Import completed successfully
+</div>
+```
+
+## CSS Architecture
+
+### Modular CSS Structure
+```
+styles/
+├── shared/
+│   ├── base.css          # Global styles, variables
+│   └── header.css        # Header/navigation styles
+├── pages/
+│   ├── vulnerabilities.css  # Vulnerability page specific
+│   └── tickets.css          # Tickets page specific
+└── utils/
+    └── responsive.css    # Responsive utilities
+```
+
+### CSS Naming Convention
+```css
+/* Use BEM-like naming for components */
+.vulnerability-card {
+    /* Base component */
+}
+
+.vulnerability-card__header {
+    /* Element */
+}
+
+.vulnerability-card--critical {
+    /* Modifier */
+}
+
+/* Use utility classes for common patterns */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mb-3 {
+    margin-bottom: 1rem;
+}
+```
+
+### Responsive Design
+```css
+/* Mobile-first approach */
+.vulnerability-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+    .vulnerability-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop and up */
+@media (min-width: 1200px) {
+    .vulnerability-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+```
+
+## JavaScript Frontend Patterns
+
+### Class-Based Components
+```javascript
+/**
+ * Modern Vulnerability Management System
+ * @class ModernVulnManager
+ */
+class ModernVulnManager {
+    constructor() {
+        this.currentView = "table";
+        this.gridApi = null;
+        this.chartApi = null;
+        this.dataManager = new VulnerabilityDataManager();
+        this.paginationController = new PaginationController();
+        
+        this.init();
+    }
+    
+    async init() {
+        await this.loadData();
+        this.setupEventListeners();
+        this.initializeComponents();
+    }
+    
+    setupEventListeners() {
+        // Event delegation for better performance
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('[data-action="toggle-view"]')) {
+                this.toggleView(e.target.dataset.view);
+            }
+        });
+    }
+}
+```
+
+### Event Handling Patterns
+```javascript
+// Use event delegation for dynamic content
+document.addEventListener('click', (e) => {
+    // Handle modal actions
+    if (e.target.matches('[data-modal="open"]')) {
+        this.openModal(e.target.dataset.target);
+    }
+    
+    // Handle form submissions
+    if (e.target.matches('[data-form="submit"]')) {
+        e.preventDefault();
+        this.handleFormSubmit(e.target);
+    }
+});
+
+// Debounce search input
+let searchTimeout;
+document.getElementById('search-input').addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        this.performSearch(e.target.value);
+    }, 300);
+});
+```
+
+### Data Management
+```javascript
+// Centralized data management
+class VulnerabilityDataManager {
+    constructor() {
+        this.cache = new Map();
+        this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+    }
+    
+    async fetchData(endpoint, useCache = true) {
+        const cacheKey = endpoint;
+        
+        if (useCache && this.cache.has(cacheKey)) {
+            const cached = this.cache.get(cacheKey);
+            if (Date.now() - cached.timestamp < this.cacheTimeout) {
+                return cached.data;
+            }
+        }
+        
+        try {
+            const response = await fetch(`/api/${endpoint}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.cache.set(cacheKey, {
+                    data: data.data,
+                    timestamp: Date.now()
+                });
+                return data.data;
+            } else {
+                throw new Error(data.error);
+            }
+        } catch (error) {
+            console.error('Data fetch error:', error);
+            throw error;
+        }
+    }
+}
+```
+
+## AG Grid Configuration
+
+### Grid Setup
+```javascript
+// Use responsive configuration
+const gridOptions = {
+    columnDefs: createVulnerabilityGridOptions(),
+    defaultColDef: {
+        sortable: true,
+        filter: true,
+        resizable: true,
+        minWidth: 100
+    },
+    pagination: true,
+    paginationPageSize: 50,
+    rowSelection: 'multiple',
+    onGridReady: (params) => {
+        this.gridApi = params.api;
+        this.columnApi = params.columnApi;
+    },
+    onSelectionChanged: () => {
+        this.updateSelectedCount();
+    }
+};
+
+// Initialize grid
+const gridDiv = document.querySelector('#vulnerability-grid');
+agGrid.createGrid(gridDiv, gridOptions);
+```
+
+### Column Definitions
+```javascript
+function createVulnerabilityGridOptions() {
+    return [
+        {
+            field: 'hostname',
+            headerName: 'Hostname',
+            width: 150,
+            pinned: 'left',
+            cellRenderer: (params) => {
+                return `<span class="hostname-cell">${escapeHtml(params.value)}</span>`;
+            }
+        },
+        {
+            field: 'cve',
+            headerName: 'CVE',
+            width: 120,
+            cellRenderer: (params) => {
+                if (params.value) {
+                    return `<a href="#" class="cve-link" data-cve="${params.value}">${params.value}</a>`;
+                }
+                return 'N/A';
+            }
+        },
+        {
+            field: 'severity',
+            headerName: 'Severity',
+            width: 100,
+            cellRenderer: (params) => {
+                const severity = params.value?.toLowerCase();
+                return `<span class="severity-badge severity-${severity}">${params.value}</span>`;
+            }
+        }
+    ];
+}
+```
+
+## Chart.js Integration
+
+### Chart Configuration
+```javascript
+// Chart configuration for vulnerability trends
+const chartConfig = {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Vulnerabilities',
+            data: [],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        },
+        plugins: {
+            legend: {
+                display: true
+            }
+        }
+    }
+};
+
+// Initialize chart
+const ctx = document.getElementById('vulnerability-chart').getContext('2d');
+const chart = new Chart(ctx, chartConfig);
+```
+
+## Modal Patterns
+
+### Bootstrap Modal Integration
+```javascript
+// Modal management
+class ModalManager {
+    constructor() {
+        this.activeModals = new Set();
+    }
+    
+    openModal(modalId) {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            this.activeModals.add(modalId);
+        }
+    }
+    
+    closeModal(modalId) {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+                this.activeModals.delete(modalId);
+            }
+        }
+    }
+    
+    closeAllModals() {
+        this.activeModals.forEach(modalId => {
+            this.closeModal(modalId);
+        });
+    }
+}
+```
+
+### Dynamic Content Loading
+```javascript
+// Load content into modals dynamically
+async function loadModalContent(modalId, endpoint) {
+    try {
+        const response = await fetch(`/api/${endpoint}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const modalBody = document.querySelector(`#${modalId} .modal-body`);
+            modalBody.innerHTML = renderModalContent(data.data);
+        } else {
+            throw new Error(data.error);
+        }
+    } catch (error) {
+        console.error('Modal content load error:', error);
+        showError('Failed to load content');
+    }
+}
+```
+
+## Performance Optimization
+
+### Lazy Loading
+```javascript
+// Lazy load components when needed
+const loadComponent = async (componentName) => {
+    if (!window.loadedComponents) {
+        window.loadedComponents = new Set();
+    }
+    
+    if (!window.loadedComponents.has(componentName)) {
+        const module = await import(`./components/${componentName}.js`);
+        window.loadedComponents.add(componentName);
+        return module.default;
+    }
+};
+
+// Use intersection observer for lazy loading
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            loadComponent(entry.target.dataset.component);
+            observer.unobserve(entry.target);
+        }
+    });
+});
+```
+
+### Debouncing and Throttling
+```javascript
+// Debounce search input
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Throttle scroll events
+function throttle(func, limit) {
+    let inThrottle;
+    return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
+```
+
+## Error Handling
+
+### User-Friendly Error Messages
+```javascript
+// Centralized error handling
+function handleError(error, context = '') {
+    console.error(`Error in ${context}:`, error);
+    
+    let userMessage = 'An unexpected error occurred';
+    
+    if (error.message.includes('Network')) {
+        userMessage = 'Network error. Please check your connection.';
+    } else if (error.message.includes('Permission')) {
+        userMessage = 'Permission denied. Please contact your administrator.';
+    } else if (error.message.includes('Validation')) {
+        userMessage = 'Invalid data. Please check your input.';
+    }
+    
+    showNotification(userMessage, 'error');
+}
+
+// Show notifications to users
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show`;
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+```
