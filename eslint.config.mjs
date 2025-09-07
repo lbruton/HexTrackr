@@ -60,6 +60,10 @@ export default [
       "test-*.spec.js",
       "**/test-*.spec.js",
       
+      // Jest test directories
+      "__tests__/**",
+      "**/__tests__/**",
+      
       // Documentation build outputs
       "docs-html/**/*.html",
       "docs-html/**/*.css",

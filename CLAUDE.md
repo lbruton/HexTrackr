@@ -150,4 +150,27 @@ ls .playwright-mcp/
 **Data Processing**: Import logic, aggregation, database operations
 **Integration Work**: API connections, external system mapping
 
-For MCP tools, Docker workflows, and GitHub CLI usage, refer to Personal CLAUDE.md.
+## HexTrackr-Specific Agent Usage
+
+### Domain Data Processing
+
+```javascript
+Task(vulnerability-data-processor): "Verify CVE logic against rollover patterns"
+Task(vulnerability-data-processor): "Validate import deduplication using normalizeHostname()"
+```
+
+### Security Integration
+
+```javascript
+Task(cisco-integration-specialist): "Research Cisco PSIRT API v2 for vulnerability enrichment"
+Task(tenable-integration-specialist): "Analyze plugin_id mapping for Tenable.io integration"
+```
+
+### Research Patterns
+
+```javascript
+// HexTrackr repository access via ref.tools
+ref_search_documentation("HexTrackr vulnerability rollover", {ref_src: "private"})
+```
+
+For universal MCP tools, Docker workflows, and GitHub CLI usage, refer to Personal CLAUDE.md.
