@@ -234,6 +234,8 @@ export default [
         Intl: "readonly",
         Blob: "readonly",
         URL: "readonly",
+        requestAnimationFrame: "readonly",
+        cancelAnimationFrame: "readonly",
         // Third-party library globals
         bootstrap: "readonly",
         agGrid: "readonly",
@@ -241,11 +243,14 @@ export default [
         ApexCharts: "readonly",
         Papa: "readonly",
         Sortable: "readonly",
+        io: "readonly", // Socket.io client library
         // Project-specific globals
         createVulnerabilityGridOptions: "readonly",
         PaginationController: "readonly", 
         VulnerabilityDataManager: "readonly",
-        ModernVulnManager: "readonly"
+        ModernVulnManager: "readonly",
+        WebSocketClient: "readonly",
+        ProgressModal: "readonly"
       }
     },
     plugins: {
