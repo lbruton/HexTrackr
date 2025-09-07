@@ -198,6 +198,7 @@
 </ol>
 <h3>Section Ordering Algorithm</h3>
 <pre><code class="language-javascript">// Navigation sections are ordered as follows:
+
 1. Push &quot;overview&quot; first (if exists)
 2. Push &quot;getting-started&quot; second (if exists)
 3. Sort remaining sections alphabetically
@@ -209,19 +210,22 @@
 <ol>
 <li><strong>Create markdown file</strong> in appropriate <code>docs-source/</code> folder:</li>
 </ol>
-<pre><code class="language-bash"># For a new user guide
+<pre><code class="language-bash">
+# For a new user guide
+
 docs-source/user-guides/new-feature.md
 
 # For a new development guide  
+
 docs-source/development/new-process.md
 </code></pre>
-<ol start="2">
+<ol>
 <li><strong>Regenerate HTML content</strong>:</li>
 </ol>
 <pre><code class="language-bash">cd docs-html
 node html-content-updater.js
 </code></pre>
-<ol start="3">
+<ol>
 <li><strong>View in portal</strong>: Navigate to the documentation portal and the new content will appear automatically</li>
 </ol>
 <h3>Creating New Sections</h3>
@@ -230,13 +234,13 @@ node html-content-updater.js
 </ol>
 <pre><code class="language-bash">mkdir docs-source/new-section
 </code></pre>
-<ol start="2">
+<ol>
 <li><strong>Add index file</strong> and content:</li>
 </ol>
 <pre><code class="language-bash">echo &quot;# New Section&quot; &gt; docs-source/new-section/index.md
 echo &quot;# Page 1&quot; &gt; docs-source/new-section/page1.md
 </code></pre>
-<ol start="3">
+<ol>
 <li><strong>Regenerate content</strong> and the new section will appear in alphabetical order</li>
 </ol>
 <h3>Navigation Customization</h3>

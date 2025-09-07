@@ -13,7 +13,7 @@
     <exclude-pattern>.*/scripts/chart.min.js</exclude-pattern>
 
     <!-- Java Rules -->
-    <rule ref="category/java/bestpractices.xml">
+    <rule ref="rulesets/java/quickstart.xml">
         <exclude name="UnusedImports"/>
         <exclude name="JUnitTestsShouldIncludeAssert"/>
     </rule>
@@ -26,29 +26,29 @@
         <exclude name="CallSuperInConstructor"/>
     </rule>
     
-    <rule ref="category/java/design.xml">
+    <rule ref="rulesets/java/design.xml">
         <exclude name="TooManyMethods"/>
         <exclude name="ExcessiveMethodLength"/>
         <exclude name="ExcessiveParameterList"/>
         <exclude name="ExcessiveClassLength"/>
     </rule>
     
-    <rule ref="category/java/errorprone.xml">
+    <rule ref="rulesets/java/errorprone.xml">
         <exclude name="BeanMembersShouldSerialize"/>
         <exclude name="AvoidDuplicateLiterals"/>
     </rule>
     
-    <rule ref="category/java/performance.xml"/>
+    <rule ref="rulesets/java/performance.xml"/>
     
-    <rule ref="category/java/security.xml"/>
+    <rule ref="rulesets/java/security.xml"/>
 
     <!-- JavaScript Rules -->
-    <rule ref="category/ecmascript/bestpractices.xml"/>
-    <rule ref="category/ecmascript/codestyle.xml"/>
-    <rule ref="category/ecmascript/errorprone.xml"/>
+    <rule ref="rulesets/ecmascript/bestpractices.xml"/>
+    <rule ref="rulesets/ecmascript/codestyle.xml"/>
+    <rule ref="rulesets/ecmascript/errorprone.xml"/>
 
     <!-- XML Rules -->
-    <rule ref="category/xml/bestpractices.xml"/>
-    <rule ref="category/xml/errorprone.xml"/>
+    <rule ref="rulesets/xml/bestpractices.xml"/>
+    <rule ref="rulesets/xml/errorprone.xml"/>
 
 </ruleset>

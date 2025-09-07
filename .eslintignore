@@ -1,0 +1,10 @@
+node_modules/**
+backups/**
+.venv/**
+temp/**
+uploads/**
+logs/**
+data/**
+docs-html/**
+*.min.js
+scripts/pages/vulnerability-manager.js

@@ -173,6 +173,19 @@ class DeviceSecurityModal {
                 }
             },
             {
+                headerName: "Last Seen",
+                field: "last_seen",
+                width: 120,
+                cellRenderer: (params) => {
+                    if (params.value && params.value.trim() !== "") {
+                        return new Date(params.value).toLocaleDateString();
+                    } else if (params.data.scan_date && params.data.scan_date.trim() !== "") {
+                        return new Date(params.data.scan_date).toLocaleDateString();
+                    }
+                    return "N/A";
+                }
+            },
+            {
                 headerName: "VPR",
                 field: "vpr_score",
                 width: 80,
@@ -201,7 +214,7 @@ class DeviceSecurityModal {
                     const pluginName = params.data.plugin_name;
                     
                     if (cve && cve.startsWith("CVE-")) {
-                        return `<a href="#" class="text-primary text-decoration-none" onclick="vulnManager.lookupVulnerability('${cve}')">${cve}</a>`;
+                        return `<a href="#" class="text-primary text-decoration-none" onclick="vulnManager.lookupVulnerability('${cve}'); return false;">${cve}</a>`;
                     }
                     
                     // Check for Cisco SA ID in plugin name
@@ -209,7 +222,7 @@ class DeviceSecurityModal {
                         const ciscoSaMatch = pluginName.match(/cisco-sa-([a-zA-Z0-9-]+)/i);
                         if (ciscoSaMatch) {
                             const ciscoId = `cisco-sa-${ciscoSaMatch[1]}`;
-                            return `<a href="#" class="text-warning text-decoration-none" onclick="vulnManager.lookupVulnerability('${ciscoId}')">${ciscoId}</a>`;
+                            return `<a href="#" class="text-warning text-decoration-none" onclick="vulnManager.lookupVulnerability('${ciscoId}'); return false;">${ciscoId}</a>`;
                         }
                     }
                     
@@ -222,11 +235,23 @@ class DeviceSecurityModal {
                 }
             },
             { 
-                headerName: "Vulnerability Name", 
+                headerName: "Vulnerability Description", 
                 field: "plugin_name", 
                 flex: 1,
                 cellRenderer: (params) => {
                     const value = params.value || "-";
+                    
+                    // Make description clickable to open vulnerability details modal
+                    if (value !== "-") {
+                        // Create unique ID for this vulnerability and store data for modal access
+                        const vulnDataId = `device_desc_${params.data.hostname}_${params.data.cve || params.data.plugin_id}_${Date.now()}`;
+                        if (!window.vulnModalData) {
+                            window.vulnModalData = {};
+                        }
+                        window.vulnModalData[vulnDataId] = params.data;
+                        
+                        return `<a href="#" class="text-decoration-none text-dark" style="cursor: pointer;" title="${value}" onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}')">${value}</a>`;
+                    }
                     return `<span title="${value}">${value}</span>`;
                 }
             }
@@ -242,6 +267,7 @@ class DeviceSecurityModal {
             },
             pagination: true,
             paginationPageSize: 25,
+            paginationPageSizeSelector: false, // Remove page size dropdown for fixed-height modal
             animateRows: true,
             onGridReady: (params) => {
                 this.deviceGridApi = params.api;
@@ -267,10 +293,15 @@ class DeviceSecurityModal {
      * Show the device modal
      */
     showModal() {
-        // Close any existing vulnerability modal before opening device modal
+        // Close any existing vulnerability modals before opening device modal
         const existingVulnModal = bootstrap.Modal.getInstance(document.getElementById("vulnerabilityModal"));
         if (existingVulnModal) {
             existingVulnModal.hide();
+        }
+        
+        const existingVulnDetailsModal = bootstrap.Modal.getInstance(document.getElementById("vulnDetailsModal"));
+        if (existingVulnDetailsModal) {
+            existingVulnDetailsModal.hide();
         }
 
         const modal = new bootstrap.Modal(document.getElementById("deviceModal"));
@@ -601,6 +632,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Export for module usage (Node.js environment check)
+/* global module */
 if (typeof window === "undefined" && typeof module !== "undefined" && module.exports) {
     module.exports = DeviceSecurityModal;
 }

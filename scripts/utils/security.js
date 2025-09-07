@@ -18,7 +18,7 @@ function safeSetInnerHTML(element, htmlContent) {
     if (typeof DOMPurify !== "undefined") {
         element.innerHTML = DOMPurify.sanitize(htmlContent);
     } else {
-        console.warn("DOMPurify not available, falling back to textContent"); // eslint-disable-line no-console
+        console.warn("DOMPurify not available, falling back to textContent");  
         element.textContent = htmlContent;
     }
 }
@@ -32,7 +32,7 @@ function escapeHtml(text) {
     if (!text) {
         return "";
     }
-    const div = document.createElement("div"); // eslint-disable-line no-undef
+    const div = document.createElement("div");  
     div.textContent = text;
     return div.innerHTML;
 }
@@ -45,7 +45,7 @@ function escapeHtml(text) {
  * @returns {HTMLElement} - The created element
  */
 function safeCreateElement(tagName, content = "", attributes = {}) {
-    const element = document.createElement(tagName); // eslint-disable-line no-undef
+    const element = document.createElement(tagName);  
     
     if (content) {
         if (typeof DOMPurify !== "undefined") {
@@ -58,7 +58,7 @@ function safeCreateElement(tagName, content = "", attributes = {}) {
     // Set attributes safely
     for (const [key, value] of Object.entries(attributes)) {
         if (key.startsWith("on")) {
-            console.warn(`Skipping event attribute: ${key}`); // eslint-disable-line no-console
+            console.warn(`Skipping event attribute: ${key}`);  
             continue;
         }
         element.setAttribute(key, escapeHtml(value));
@@ -68,7 +68,7 @@ function safeCreateElement(tagName, content = "", attributes = {}) {
 }
 
 // Make functions globally available
-if (typeof window !== "undefined") { // eslint-disable-line no-undef
+if (typeof window !== "undefined") {  
     window.safeSetInnerHTML = safeSetInnerHTML;
     window.escapeHtml = escapeHtml;
     window.safeCreateElement = safeCreateElement;
