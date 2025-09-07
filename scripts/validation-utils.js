@@ -238,7 +238,7 @@ function validateCsvRow(row, rowIndex) {
     return {
         isValid: errors.length === 0,
         errors,
-        validatedData,
+        validatedData
     };
 }
 
