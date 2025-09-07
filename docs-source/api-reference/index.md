@@ -1,6 +1,6 @@
 # API Reference
 
-This section provides detailed documentation for the HexTrackr REST API. Before you begin, please read the [API Overview](./overview.md) for information on general principles, authentication, and error handling.
+This section provides detailed documentation for the HexTrackr REST API endpoints. All endpoints use standard REST conventions with JSON request/response bodies.
 
 ## API Collections
 

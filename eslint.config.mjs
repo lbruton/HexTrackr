@@ -14,6 +14,10 @@ export default [
       ".git/**",
       ".DS_Store",
       
+      // Legacy ESLint configuration (avoid conflicts)
+      ".eslintrc.js",
+      ".eslintrc.json",
+      
       // Python virtual environments (all possible patterns)
       ".venv/**/*",
       "**/.venv/**/*",
@@ -233,7 +237,15 @@ export default [
         // Third-party library globals
         bootstrap: "readonly",
         agGrid: "readonly",
-        DOMPurify: "readonly"
+        DOMPurify: "readonly",
+        ApexCharts: "readonly",
+        Papa: "readonly",
+        Sortable: "readonly",
+        // Project-specific globals
+        createVulnerabilityGridOptions: "readonly",
+        PaginationController: "readonly", 
+        VulnerabilityDataManager: "readonly",
+        ModernVulnManager: "readonly"
       }
     },
     plugins: {

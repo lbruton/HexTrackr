@@ -23,6 +23,7 @@ module.exports = {
         "logs/**/*",
         "data/**/*",
         "docs-html/**/*",
+        "backups/**/*",
         "filescope-tools-demo.js",
         "scripts/chart.min.js",
         "test-charts.js",
@@ -53,6 +54,7 @@ module.exports = {
                 window: "readonly",
                 console: "readonly",
                 alert: "readonly",
+                confirm: "readonly",
                 fetch: "readonly",
                 FormData: "readonly",
                 File: "readonly",
@@ -60,6 +62,10 @@ module.exports = {
                 Blob: "readonly",
                 URL: "readonly",
                 XMLHttpRequest: "readonly",
+                localStorage: "readonly",
+                sessionStorage: "readonly",
+                setTimeout: "readonly",
+                btoa: "readonly",
                 // Chart.js
                 Chart: "readonly",
                 // AG-Grid
@@ -67,7 +73,15 @@ module.exports = {
                 // jsPDF
                 jsPDF: "readonly",
                 // html2canvas
-                html2canvas: "readonly"
+                html2canvas: "readonly",
+                // Bootstrap
+                bootstrap: "readonly",
+                // ApexCharts
+                ApexCharts: "readonly",
+                // Papa Parse
+                Papa: "readonly",
+                // DOMPurify
+                DOMPurify: "readonly"
             }
         },
         {

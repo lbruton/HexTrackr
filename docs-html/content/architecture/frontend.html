@@ -1,6 +1,7 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Frontend Architecture</h1>
+<p><strong>Note:</strong> The HexTrackr frontend is currently undergoing a significant refactoring to a modular, widget-based architecture. This document provides a high-level overview of the current state. For a detailed breakdown of the refactoring plan and the target architecture, please see the <a href="#refactoring">Frontend Refactoring Plan</a>.</p>
 <p>The frontend of HexTrackr is composed of two main pages, each with its own set of JavaScript modules and CSS styles. Shared components, such as the header, footer, and settings modal, are loaded dynamically on each page.</p>
 <h2>Page Architecture</h2>
 <h3><code>tickets.html</code></h3>
@@ -12,67 +13,46 @@
 <h3><code>vulnerabilities.html</code></h3>
 <ul>
 <li><strong>Styling</strong>: Uses the Tabler.io framework, with AG Grid for data tables and ApexCharts for visualizations.</li>
-<li><strong>Core Logic</strong>: Managed by <code>scripts/pages/vulnerability-manager.js</code>, which contains the <code>ModernVulnManager</code> class.</li>
-<li><strong>Functionality</strong>: A comprehensive dashboard for analyzing vulnerability data, with interactive charts, a powerful data grid, and multiple data views.</li>
-</ul>
-<h2>JavaScript Module Layout</h2>
-<ul>
-<li><strong><code>scripts/shared/</code></strong>: Contains modules that are used across multiple pages.<ul>
-<li><code>header-loader.js</code> / <code>footer-loader.js</code>: Dynamically inject the shared header and footer.</li>
-<li><code>settings-modal.js</code>: Manages the complex settings modal, including API configuration and data management tasks.</li>
-<li><code>ag-grid-responsive-config.js</code>: Provides a centralized configuration for the AG Grid component.</li>
+<li><strong>Core Logic</strong>: Refactor in progress from a monolithic <code>ModernVulnManager</code> class (≈2,286 lines as of current commit) toward a modular architecture. Extracted so far: <code>PaginationController</code> (moved to <code>scripts/shared/pagination-controller.js</code>). Planned next extractions: Data fetch/cache manager hardening, chart controller, grid configuration factory, import workflow module. Progress ~12% (1 of 8 planned modules fully separated).</li>
+<li><strong>Critical Bug Fix (v1.0.5)</strong>: Resolved CSV import functionality breakdown caused by missing <code>this.apiBase = &quot;/api&quot;</code> property in ModernVulnManager constructor. This bug caused all CSV upload attempts to fail with 404 errors due to undefined API endpoint URLs.</li>
+<li><strong>Enhanced Features</strong>:<ul>
+<li><strong>Cisco Vulnerability ID Support</strong>: Renamed &quot;CVE&quot; column to &quot;Vulnerability&quot; across all views with support for CVE, Cisco SA, and Plugin ID display</li>
+<li><strong>Intelligent Linking</strong>: CVE identifiers link to CVE.org, Cisco SA identifiers link to cisco.com security advisories</li>
+<li><strong>Enhanced Cell Renderers</strong>: Improved vulnerability identification with appropriate styling for different ID types</li>
 </ul>
 </li>
-<li><strong><code>scripts/pages/</code></strong>: Contains the main logic for each specific page.<ul>
-<li><code>tickets.js</code>: The <code>HexagonTicketsManager</code> class for the tickets page.</li>
-<li><code>vulnerability-manager.js</code>: The <code>ModernVulnManager</code> class for the vulnerabilities dashboard.</li>
-<li><code>vulnerabilities.js</code>: A simple loader script that initializes the <code>ModernVulnManager</code>.</li>
+<li><strong>Functionality</strong>: Comprehensive vulnerability dashboard: interactive severity/time charts, dynamic AG Grid table, device cards with pagination, CSV import (rollover pipeline), export (CSV/HTML), inline filtering and search.</li>
+</ul>
+<h2>Modal Architecture (v1.0.6+)</h2>
+<h3>Universal Aggregation System</h3>
+<p>HexTrackr implements a description-field-based universal aggregation key for consistent modal data relationships:</p>
+<ul>
+<li><p><strong>Vulnerability Modal</strong>: Aggregates all devices affected by a specific vulnerability using the vulnerability description as the grouping key</p>
+<ul>
+<li>Example: CVE-2017-3881 shows all 24 affected devices in a single modal</li>
+<li>Modal displays comprehensive device list with hostnames, IP addresses, and affected services</li>
+</ul>
+</li>
+<li><p><strong>Device Modal</strong>: Aggregates all vulnerabilities affecting a specific device using device hostname as the grouping key  </p>
+<ul>
+<li>Example: grimesnswan03 shows all 12 vulnerabilities affecting that device</li>
+<li>Modal displays complete vulnerability profile for the selected device</li>
 </ul>
 </li>
 </ul>
-<h2>Key Classes and Symbols</h2>
-<h3><code>HexagonTicketsManager</code> (in <code>tickets.js</code>)</h3>
-<p>This class controls all functionality on the <code>tickets.html</code> page.</p>
+<h3>Modal State Management</h3>
 <ul>
-<li><strong>Core Methods</strong>: <code>init()</code>, <code>loadTicketsFromDB()</code>, <code>saveTicketToDB()</code>, <code>deleteTicketFromDB()</code></li>
-<li><strong>Device Management</strong>: <code>addDeviceField()</code>, <code>reverseDeviceOrder()</code>, <code>updateDeviceNumbers()</code>, and drag-and-drop handlers.</li>
-<li><strong>UI Rendering</strong>: <code>renderTickets()</code>, pagination, filtering, and toast notifications.</li>
-<li><strong>Data Migration</strong>: <code>migrateFromLocalStorageIfNeeded()</code> to move legacy data to the database.</li>
+<li><strong>Bootstrap Integration</strong>: Uses proper <code>Modal.getInstance()</code> for clean modal transitions</li>
+<li><strong>Layering Prevention</strong>: Ensures existing modals close before opening new ones</li>
+<li><strong>Workflow</strong>: Vulnerability modal → closes → device modal opens seamlessly</li>
+<li><strong>Data Consistency</strong>: All modal data reflects current aggregated state from database</li>
 </ul>
-<h3><code>ModernVulnManager</code> (in <code>vulnerability-manager.js</code>)</h3>
-<p>This class is the engine for the <code>vulnerabilities.html</code> dashboard.</p>
+<h3>Testing Strategy</h3>
 <ul>
-<li><strong>Initialization</strong>: <code>initializeGrid()</code>, <code>initializeChart()</code></li>
-<li><strong>Data Handling</strong>: <code>loadData()</code>, <code>loadStatistics()</code>, <code>filterData()</code></li>
-<li><strong>User Interaction</strong>: <code>setupEventListeners()</code>, <code>switchView()</code>, <code>lookupCVE()</code></li>
-<li><strong>Data Views</strong>: <code>renderDeviceCards()</code>, <code>renderVulnerabilityCards()</code></li>
-</ul>
-<h3>Settings Modal (in <code>settings-modal.js</code>)</h3>
-<p>This is a shared, self-contained component that exposes global functions for data operations.</p>
-<ul>
-<li><strong>Data Operations</strong>: <code>exportData()</code>, <code>backupData()</code>, <code>importData()</code>, <code>clearData()</code>, <code>restoreData()</code></li>
-<li><strong>ServiceNow Integration</strong>: <code>loadServiceNowSettings()</code>, <code>saveServiceNowSettings()</code>, <code>generateServiceNowUrl()</code></li>
-</ul>
-<h2>Initialization Flow (<code>vulnerabilities.html</code>)</h2>
-<pre><code class="language-mermaid">sequenceDiagram
-    participant Page as vulnerabilities.html
-    participant Loader as vulnerabilities.js
-    participant Manager as vulnerability-manager.js
-    participant API as server.js
-
-    Page-&gt;&gt;Loader: Load script
-    Loader-&gt;&gt;Manager: new ModernVulnManager()
-    Manager-&gt;&gt;Manager: initializeGrid(), initializeChart()
-    Manager-&gt;&gt;API: GET /api/vulnerabilities
-    API--&gt;&gt;Manager: Vulnerability data
-    Manager-&gt;&gt;API: GET /api/vulnerabilities/trends
-    API--&gt;&gt;Manager: Trend data
-    Manager--&gt;&gt;Page: Render grid and chart
-</code></pre>
-<h2>Integration Notes</h2>
-<ul>
-<li>The shared settings modal (<code>settings-modal.js</code>) is designed to be self-sufficient. It can be dropped into any page and will provide its functionality globally.</li>
-<li>Page-specific scripts like <code>tickets.js</code> and <code>vulnerability-manager.js</code> are responsible for their own UI and data management but rely on the shared modal for global settings and data operations.</li>
+<li><strong>Playwright Automation</strong>: Comprehensive browser automation for modal workflow validation</li>
+<li><strong>Aggregation Verification</strong>: Automated testing ensures correct device/vulnerability counts</li>
+<li><strong>Performance Testing</strong>: Validated with 10,000+ record datasets for large-scale deployments</li>
+<li><strong>UI Responsiveness</strong>: Modal interactions tested across different viewport sizes</li>
 </ul>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts

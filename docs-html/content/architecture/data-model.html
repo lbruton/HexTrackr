@@ -1,7 +1,7 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>HexTrackr Data Model</h1>
-<p>This document provides a definitive overview of the HexTrackr database schema. The single source of truth for the schema is the <code>scripts/init-database.js</code> script, which creates and initializes the database. The <code>server.js</code> file also performs idempotent <code>ALTER TABLE</code> operations at runtime to add columns, ensuring backward compatibility.</p>
+<p>This document provides a definitive overview of the HexTrackr database schema. The primary bootstrap is <code>scripts/init-database.js</code>; however, the live schema evolves further at runtime via idempotent <code>ALTER TABLE</code> and index creation logic inside <code>server.js</code> and migration code executed during imports. The authoritative state is therefore the <strong>live SQLite schema</strong> (captured below) rather than the historical <code>schema.sql</code> file (now outdated and retained only for legacy reference).</p>
 <h2>Database Engine</h2>
 <ul>
 <li><strong>Engine</strong>: SQLite 3</li>
@@ -10,274 +10,336 @@
 <hr>
 <h2>Core Tables</h2>
 <h3><code>tickets</code></h3>
-<p>Stores all ticketing information. The schema has evolved from an initial simple structure to accommodate more detailed fields.</p>
+<p>Stores all ticketing information. This table has <strong>indexes for query performance</strong> on dates, status, site codes, and external ticket numbers. It has evolved from a minimal design to a richer structure with relational hooks into <code>sites</code> and <code>locations</code>.</p>
 <table>
 <thead>
 <tr>
 <th>Column</th>
 <th>Type</th>
+<th>Constraints</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody><tr>
 <td><code>id</code></td>
 <td>TEXT</td>
-<td><strong>Primary Key</strong>. A unique identifier for the ticket (e.g., &quot;TICK-123&quot;).</td>
-</tr>
-<tr>
-<td><code>xt_number</code></td>
-<td>TEXT</td>
-<td>A human-readable ticket number (e.g., &quot;XT001&quot;). Can be used as an ID if <code>id</code> is null.</td>
+<td>PK</td>
+<td>Stable unique identifier supplied by UI (string, not auto‑increment).</td>
 </tr>
 <tr>
 <td><code>date_submitted</code></td>
 <td>TEXT</td>
-<td>The date the ticket was submitted (ISO 8601 format).</td>
+<td>NOT NULL</td>
+<td>Submission date (ISO date).</td>
 </tr>
 <tr>
 <td><code>date_due</code></td>
 <td>TEXT</td>
-<td>The required completion date for the ticket (ISO 8601 format).</td>
+<td>NOT NULL</td>
+<td>Due date (ISO date).</td>
 </tr>
 <tr>
 <td><code>hexagon_ticket</code></td>
 <td>TEXT</td>
-<td>The ticket number from the Hexagon system.</td>
+<td>Indexed</td>
+<td>External Hexagon reference.</td>
 </tr>
 <tr>
 <td><code>service_now_ticket</code></td>
 <td>TEXT</td>
-<td>The ticket number from ServiceNow.</td>
+<td>Indexed</td>
+<td>External ServiceNow reference.</td>
 </tr>
 <tr>
 <td><code>location</code></td>
 <td>TEXT</td>
-<td>The primary location or site for the ticket.</td>
+<td>NOT NULL, Indexed</td>
+<td>Human readable location label.</td>
 </tr>
 <tr>
 <td><code>devices</code></td>
 <td>TEXT</td>
-<td>A JSON string representing an array of device hostnames.</td>
+<td></td>
+<td>JSON array (stringified) of device identifiers/hostnames.</td>
 </tr>
 <tr>
 <td><code>supervisor</code></td>
 <td>TEXT</td>
-<td>The name of the responsible supervisor.</td>
+<td></td>
+<td>Supervisor name.</td>
 </tr>
 <tr>
 <td><code>tech</code></td>
 <td>TEXT</td>
-<td>The name of the assigned technician.</td>
+<td></td>
+<td>Assigned technician.</td>
 </tr>
 <tr>
 <td><code>status</code></td>
 <td>TEXT</td>
-<td>The current workflow status (e.g., &quot;Open&quot;, &quot;Overdue&quot;, &quot;Completed&quot;).</td>
+<td>DEFAULT &#39;Open&#39;, Indexed</td>
+<td>Workflow status (Open, Completed, etc.).</td>
 </tr>
 <tr>
 <td><code>notes</code></td>
 <td>TEXT</td>
-<td>Free-form text for additional notes.</td>
+<td></td>
+<td>Free form notes.</td>
 </tr>
 <tr>
 <td><code>attachments</code></td>
 <td>TEXT</td>
-<td>A JSON string representing an array of attached file metadata.</td>
+<td></td>
+<td>JSON array of attachment metadata.</td>
 </tr>
 <tr>
 <td><code>created_at</code></td>
 <td>TEXT</td>
-<td>Timestamp of when the ticket was created.</td>
+<td>NOT NULL</td>
+<td>Creation timestamp (string).</td>
 </tr>
 <tr>
 <td><code>updated_at</code></td>
 <td>TEXT</td>
-<td>Timestamp of the last modification.</td>
+<td>NOT NULL</td>
+<td>Last update timestamp.</td>
 </tr>
 <tr>
 <td><code>site</code></td>
 <td>TEXT</td>
-<td>The broader site or region for the ticket.</td>
+<td>Indexed</td>
+<td>Higher‑level site grouping.</td>
+</tr>
+<tr>
+<td><code>xt_number</code></td>
+<td>TEXT</td>
+<td>Indexed</td>
+<td>Alternate human-friendly number (used when <code>id</code> absent in legacy imports).</td>
 </tr>
 <tr>
 <td><code>site_id</code></td>
 <td>INTEGER</td>
-<td>A foreign key to a potential <code>sites</code> table (not currently implemented).</td>
+<td>FK → <code>sites.id</code>, Indexed</td>
+<td>Optional normalized site reference.</td>
 </tr>
 <tr>
 <td><code>location_id</code></td>
 <td>INTEGER</td>
-<td>A foreign key to a potential <code>locations</code> table (not currently implemented).</td>
+<td>FK → <code>locations.id</code>, Indexed</td>
+<td>Optional normalized location reference.</td>
 </tr>
 </tbody></table>
+<p><strong>Ticket Indexes</strong> (all created automatically): location, status, date_submitted, date_due, hexagon_ticket, service_now_ticket, site, xt_number, site_id, location_id.</p>
 <h3><code>vulnerability_imports</code></h3>
-<p>Tracks each CSV import event, providing an audit trail for all vulnerability data.</p>
+<p>Audit log of each ingested CSV batch.</p>
 <table>
 <thead>
 <tr>
 <th>Column</th>
 <th>Type</th>
+<th>Constraints</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody><tr>
 <td><code>id</code></td>
 <td>INTEGER</td>
-<td><strong>Primary Key</strong>. Auto-incrementing ID for the import batch.</td>
+<td>PK AUTOINCREMENT</td>
+<td>Batch identifier.</td>
 </tr>
 <tr>
 <td><code>filename</code></td>
 <td>TEXT</td>
-<td>The original name of the imported CSV file.</td>
+<td>NOT NULL</td>
+<td>Uploaded filename.</td>
 </tr>
 <tr>
 <td><code>import_date</code></td>
 <td>TEXT</td>
-<td>The timestamp when the import occurred.</td>
+<td>NOT NULL</td>
+<td>Import timestamp (ISO).</td>
 </tr>
 <tr>
 <td><code>row_count</code></td>
 <td>INTEGER</td>
-<td>The total number of rows processed from the file.</td>
+<td>NOT NULL</td>
+<td>Rows parsed (after filtering empties).</td>
 </tr>
 <tr>
 <td><code>vendor</code></td>
 <td>TEXT</td>
-<td>The source of the vulnerability data (e.g., &quot;cisco&quot;, &quot;tenable&quot;).</td>
+<td></td>
+<td>Source label (cisco, tenable, web-import, etc.).</td>
 </tr>
 <tr>
 <td><code>file_size</code></td>
 <td>INTEGER</td>
-<td>The size of the imported file in bytes.</td>
+<td></td>
+<td>Size in bytes.</td>
 </tr>
 <tr>
 <td><code>processing_time</code></td>
 <td>INTEGER</td>
-<td>The time taken to process the import in milliseconds.</td>
+<td></td>
+<td>Milliseconds to process.</td>
 </tr>
 <tr>
 <td><code>raw_headers</code></td>
 <td>TEXT</td>
-<td>A JSON string of the original CSV header row.</td>
+<td></td>
+<td>JSON array of original column names.</td>
 </tr>
 <tr>
 <td><code>created_at</code></td>
 <td>DATETIME</td>
-<td>The timestamp when the import record was created.</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Record creation time.</td>
 </tr>
 </tbody></table>
 <hr>
 <h2>Vulnerability Rollover Architecture</h2>
 <p>HexTrackr uses a &quot;rollover&quot; architecture to manage vulnerability data over time. This allows for accurate daily trending and historical analysis. It consists of three main tables.</p>
 <h3><code>vulnerabilities_current</code></h3>
-<p>This table holds the <strong>current state</strong> of all active vulnerabilities from the most recent scan for each unique vulnerability.</p>
+<p>Current deduplicated state (one row per active unique vulnerability for the most recent scan date it appeared in). Added during rollover processing.</p>
 <table>
 <thead>
 <tr>
 <th>Column</th>
 <th>Type</th>
-<th>Description</th>
+<th>Constraints</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody><tr>
 <td><code>id</code></td>
 <td>INTEGER</td>
-<td><strong>Primary Key</strong>.</td>
-</tr>
-<tr>
-<td><code>unique_key</code></td>
-<td>TEXT</td>
-<td><strong>UNIQUE</strong>. A composite key to deduplicate vulnerabilities (e.g., `hostname</td>
+<td>PK AUTOINCREMENT</td>
+<td></td>
 </tr>
 <tr>
 <td><code>import_id</code></td>
 <td>INTEGER</td>
-<td>Foreign key to <code>vulnerability_imports.id</code>.</td>
+<td>FK → <code>vulnerability_imports.id</code></td>
+<td>Batch that introduced or last updated this row.</td>
 </tr>
 <tr>
 <td><code>scan_date</code></td>
 <td>TEXT</td>
-<td>The date of the scan this vulnerability appeared in.</td>
+<td>NOT NULL</td>
+<td>Date of the scan (YYYY-MM-DD).</td>
 </tr>
 <tr>
 <td><code>hostname</code></td>
 <td>TEXT</td>
-<td>The hostname of the affected asset.</td>
+<td></td>
+<td>Raw hostname (pre-normalization retained).</td>
 </tr>
 <tr>
 <td><code>ip_address</code></td>
 <td>TEXT</td>
-<td>The IP address of the asset.</td>
+<td></td>
+<td>Optional IP (may be blank).</td>
 </tr>
 <tr>
 <td><code>cve</code></td>
 <td>TEXT</td>
-<td>The CVE identifier (e.g., &quot;CVE-2023-12345&quot;).</td>
+<td></td>
+<td>CVE identifier if present.</td>
 </tr>
 <tr>
 <td><code>severity</code></td>
 <td>TEXT</td>
-<td>The severity level (e.g., &quot;Critical&quot;, &quot;High&quot;).</td>
+<td></td>
+<td>Critical/High/Medium/Low (case-insensitive input).</td>
 </tr>
 <tr>
 <td><code>vpr_score</code></td>
 <td>REAL</td>
-<td>The Vulnerability Priority Rating (VPR) score.</td>
+<td></td>
+<td>Vulnerability Priority Rating.</td>
 </tr>
 <tr>
 <td><code>cvss_score</code></td>
 <td>REAL</td>
-<td>The Common Vulnerability Scoring System (CVSS) score.</td>
+<td></td>
+<td>CVSS Base score.</td>
 </tr>
 <tr>
 <td><code>first_seen</code></td>
 <td>TEXT</td>
-<td>The date the vulnerability was first observed.</td>
+<td></td>
+<td>First observed date (fallback to <code>scan_date</code> if missing).</td>
 </tr>
 <tr>
 <td><code>last_seen</code></td>
 <td>TEXT</td>
-<td>The date the vulnerability was last observed.</td>
+<td></td>
+<td>Last observed date (updated each scan presence).</td>
 </tr>
 <tr>
 <td><code>plugin_id</code></td>
 <td>TEXT</td>
-<td>The ID of the scanner plugin that detected the vulnerability.</td>
+<td></td>
+<td>Scanner plugin id.</td>
 </tr>
 <tr>
 <td><code>plugin_name</code></td>
 <td>TEXT</td>
-<td>The name of the scanner plugin.</td>
+<td></td>
+<td>Scanner plugin name.</td>
 </tr>
 <tr>
 <td><code>description</code></td>
 <td>TEXT</td>
-<td>A description of the vulnerability.</td>
+<td></td>
+<td>Short description (duplicate of plugin_name in some feeds).</td>
 </tr>
 <tr>
 <td><code>solution</code></td>
 <td>TEXT</td>
-<td>The recommended solution or remediation.</td>
+<td></td>
+<td>Remediation guidance.</td>
+</tr>
+<tr>
+<td><code>vendor_reference</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Original vendor family string.</td>
 </tr>
 <tr>
 <td><code>vendor</code></td>
 <td>TEXT</td>
-<td>The vendor of the affected product.</td>
+<td></td>
+<td>Normalized vendor (currently mirrors vendor_reference).</td>
 </tr>
 <tr>
 <td><code>vulnerability_date</code></td>
 <td>TEXT</td>
-<td>The date the vulnerability was published.</td>
+<td></td>
+<td>Publication date.</td>
 </tr>
 <tr>
 <td><code>state</code></td>
 <td>TEXT</td>
-<td>The current state of the vulnerability (e.g., &quot;open&quot;).</td>
+<td>DEFAULT &#39;open&#39;</td>
+<td>Logical lifecycle state.</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Insert timestamp.</td>
+</tr>
+<tr>
+<td><code>unique_key</code></td>
+<td>TEXT</td>
+<td>UNIQUE</td>
+<td>Composite key (see Rollover section).</td>
 </tr>
 </tbody></table>
 <h3><code>vulnerability_snapshots</code></h3>
 <p>This table is an append-only log of <strong>all vulnerabilities from every scan</strong>. It serves as the historical record for trend analysis.</p>
-<p><em>This table shares the same schema as <code>vulnerabilities_current</code> but does not have a unique constraint on <code>unique_key</code>, allowing multiple entries for the same vulnerability over time.</em></p>
+<p><em>Shares the same columns as <code>vulnerabilities_current</code> (except <code>unique_key</code> not unique) and acts as an append-only log for every scan ingestion.</em></p>
 <h3><code>vulnerability_daily_totals</code></h3>
 <p>This table stores pre-calculated daily aggregates to power the dashboard charts efficiently.</p>
 <table>
@@ -352,50 +414,275 @@
 <hr>
 <h2>Junction Tables</h2>
 <h3><code>ticket_vulnerabilities</code></h3>
-<p>This table creates a many-to-many relationship between tickets and vulnerabilities.</p>
+<p>Many‑to‑many relationship between tickets and (legacy) <code>vulnerabilities</code> (pre-rollover) or conceptually <code>vulnerabilities_current</code> for future adaptation.</p>
 <table>
 <thead>
 <tr>
 <th>Column</th>
 <th>Type</th>
+<th>Constraints</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody><tr>
 <td><code>id</code></td>
 <td>INTEGER</td>
-<td><strong>Primary Key</strong>.</td>
+<td>PK AUTOINCREMENT</td>
+<td>Link row id.</td>
 </tr>
 <tr>
 <td><code>ticket_id</code></td>
 <td>TEXT</td>
-<td>Foreign key to <code>tickets.id</code>.</td>
+<td>FK → <code>tickets.id</code></td>
+<td>Associated ticket.</td>
 </tr>
 <tr>
 <td><code>vulnerability_id</code></td>
 <td>INTEGER</td>
-<td>Foreign key to <code>vulnerabilities_current.id</code>.</td>
+<td>FK → <code>vulnerabilities.id</code></td>
+<td>Associated vulnerability (legacy table).</td>
 </tr>
 <tr>
 <td><code>relationship_type</code></td>
 <td>TEXT</td>
-<td>The nature of the link (e.g., &quot;remediation&quot;, &quot;investigation&quot;).</td>
+<td>DEFAULT &#39;remediation&#39;</td>
+<td>Relationship semantics.</td>
 </tr>
 <tr>
 <td><code>notes</code></td>
 <td>TEXT</td>
-<td>Notes specific to this ticket-vulnerability link.</td>
+<td></td>
+<td>Free-form link-specific notes.</td>
+</tr>
+</tbody></table>
+<h3><code>sites</code> &amp; <code>locations</code></h3>
+<p>Reference/normalization tables to allow structured site &amp; location taxonomy.</p>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>sites</code></td>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PK AUTOINCREMENT</td>
+<td>Row id.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>code</code></td>
+<td>VARCHAR(50)</td>
+<td>UNIQUE NOT NULL</td>
+<td>Short site code.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>name</code></td>
+<td>VARCHAR(255)</td>
+<td>NOT NULL</td>
+<td>Descriptive name.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Optional details.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Creation time.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last update.</td>
+</tr>
+<tr>
+<td><code>locations</code></td>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PK AUTOINCREMENT</td>
+<td>Row id.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>code</code></td>
+<td>VARCHAR(50)</td>
+<td>UNIQUE NOT NULL</td>
+<td>Location code.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>name</code></td>
+<td>VARCHAR(255)</td>
+<td>NOT NULL</td>
+<td>Descriptive label.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Optional details.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Creation time.</td>
+</tr>
+<tr>
+<td></td>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last update.</td>
 </tr>
 </tbody></table>
 <h2>Indexes</h2>
 <p>To ensure efficient querying, the following indexes are created:</p>
+<h3>Index Inventory</h3>
+<table>
+<thead>
+<tr>
+<th>Purpose</th>
+<th>Index</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Snapshot query by date</td>
+<td><code>idx_snapshots_scan_date</code></td>
+</tr>
+<tr>
+<td>Snapshot query by hostname</td>
+<td><code>idx_snapshots_hostname</code></td>
+</tr>
+<tr>
+<td>Snapshot query by severity</td>
+<td><code>idx_snapshots_severity</code></td>
+</tr>
+<tr>
+<td>Current lookup by unique key</td>
+<td><code>idx_current_unique_key</code></td>
+</tr>
+<tr>
+<td>Current query by scan date</td>
+<td><code>idx_current_scan_date</code></td>
+</tr>
+<tr>
+<td>Tickets filtering</td>
+<td>Multiple (see tickets section)</td>
+</tr>
+<tr>
+<td>Legacy vulnerabilities (pre-rollover)</td>
+<td><code>idx_vulnerabilities_hostname</code>, <code>idx_vulnerabilities_severity</code>, <code>idx_vulnerabilities_cve</code>, <code>idx_vulnerabilities_import</code></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>Note: The legacy <code>vulnerabilities</code> table remains for backward compatibility and some backup/export endpoints. New dashboards use the rollover trio (<code>vulnerability_snapshots</code>, <code>vulnerabilities_current</code>, <code>vulnerability_daily_totals</code>). A future migration will retire or namespace the legacy table.</p>
+</blockquote>
+<hr>
+<h2>Modal Aggregation Architecture (v1.0.6+)</h2>
+<h3>Universal Aggregation Keys</h3>
+<p>The modal system uses strategic field selection for data aggregation:</p>
+<table>
+<thead>
+<tr>
+<th>Modal Type</th>
+<th>Aggregation Key</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Vulnerability Modal</td>
+<td><code>description</code> field</td>
+<td>Groups all devices affected by same vulnerability</td>
+<td>CVE-2017-3881 shows 24 affected devices</td>
+</tr>
+<tr>
+<td>Device Modal</td>
+<td><code>hostname</code> field (normalized)</td>
+<td>Groups all vulnerabilities affecting same device</td>
+<td>grimesnswan03 shows 12 vulnerabilities</td>
+</tr>
+</tbody></table>
+<h3>Data Relationships</h3>
+<p><strong>Vulnerability → Device Aggregation</strong>:</p>
 <ul>
-<li><code>idx_vulnerabilities_hostname</code> on <code>vulnerabilities_current(hostname)</code></li>
-<li><code>idx_vulnerabilities_severity</code> on <code>vulnerabilities_current(severity)</code></li>
-<li><code>idx_vulnerabilities_cve</code> on <code>vulnerabilities_current(cve)</code></li>
-<li><code>idx_snapshots_scan_date</code> on <code>vulnerability_snapshots(scan_date)</code></li>
-<li><code>idx_current_unique_key</code> on <code>vulnerabilities_current(unique_key)</code></li>
+<li>Query: <code>SELECT * FROM vulnerabilities_current WHERE description = ?</code></li>
+<li>Groups by hostname to show unique devices affected</li>
+<li>Displays device count, IP addresses, and affected services</li>
 </ul>
+<p><strong>Device → Vulnerability Aggregation</strong>:</p>
+<ul>
+<li>Query: <code>SELECT * FROM vulnerabilities_current WHERE hostname = ?</code> </li>
+<li>Groups by description/CVE to show unique vulnerabilities</li>
+<li>Displays vulnerability count, severity distribution, and VPR totals</li>
+</ul>
+<h3>Aggregation Benefits</h3>
+<ul>
+<li><strong>Complete Visibility</strong>: Users see full impact scope (all 24 devices for a CVE, all 12 vulnerabilities for a device)</li>
+<li><strong>Data Consistency</strong>: Aggregation keys ensure reliable grouping across different data imports</li>
+<li><strong>Performance</strong>: Indexed fields (<code>description</code>, <code>hostname</code>) enable efficient aggregation queries</li>
+<li><strong>Modal State Management</strong>: Proper Bootstrap integration prevents modal layering issues</li>
+</ul>
+<hr>
+<h2>Unique Key Generation Logic (Summary)</h2>
+<p><code>unique_key = normalize(hostname)|CVE</code> when CVE present; fallback to <code>normalize(hostname)|plugin_id|truncated(description)</code>; final fallback uses description + VPR score. Host normalization collapses domain suffixes and validates IP addresses.</p>
+<hr>
+<h2>Schema Drift Notes</h2>
+<ul>
+<li><code>schema.sql</code> no longer reflects live tables (kept for historical reference only).</li>
+<li>Runtime adds columns (<code>vendor</code>, <code>vulnerability_date</code>, <code>state</code>, <code>import_date</code>, <code>notes</code>) to legacy <code>vulnerabilities</code> table if missing.</li>
+<li>Two UNIQUE indexes (<code>idx_vulnerabilities_unique_scan</code> / <code>_v2</code>) ensure per‑scan dedupe in legacy ingestion path.</li>
+<li>Future work: unify attribute naming (<code>vendor_reference</code> vs <code>vendor</code>).</li>
+</ul>
+<hr>
+<h2>Planned Enhancements</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Planned Change</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Normalization</td>
+<td>Resolve duplication between <code>vendor</code> / <code>vendor_reference</code>.</td>
+</tr>
+<tr>
+<td>Integrity</td>
+<td>Add CHECK constraints for severity enumeration.</td>
+</tr>
+<tr>
+<td>Archival</td>
+<td>Partition snapshots by month (optional) when size grows.</td>
+</tr>
+<tr>
+<td>Migration</td>
+<td>Deprecate legacy <code>vulnerabilities</code> table after full UI refactor.</td>
+</tr>
+<tr>
+<td>Index Tuning</td>
+<td>Add composite index (severity, scan_date) if trend queries increase.</td>
+</tr>
+</tbody></table>
+<hr>
+<p>The above reflects the database as inspected on the current build date. Regenerate this document after structural changes or migration scripts are introduced.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

@@ -1,0 +1,4 @@
+BACKUP MANIFEST - Fri Sep  5 15:08:25 CDT 2025
+Files backed up:
+- vulnerabilities.css (original with fixed height issue)
+Purpose: Fix pagination/scrolling UX issue in vulnerability table

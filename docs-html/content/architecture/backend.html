@@ -1,79 +1,292 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Backend Architecture</h1>
-<p>The backend is a Node.js/Express monolithic server providing REST endpoints, data processing, and SQLite persistence. It also serves the static frontend assets and the documentation portal.</p>
+<p>The backend is a Node.js/Express monolith providing REST endpoints, rollover ingestion, documentation delivery, and SQLite persistence. It serves the static frontend pages (<code>tickets.html</code>, <code>vulnerabilities.html</code>) and the generated documentation portal (<code>/docs-html</code>).</p>
+<hr>
 <h2>Key Characteristics</h2>
 <ul>
-<li><strong>Monolithic Architecture</strong>: A single <code>server.js</code> file (over 1,200 lines) handles all backend concerns, including routing, database interaction, and business logic.</li>
-<li><strong>Dual Purpose</strong>: Acts as both an API server and a static file server for the UI.</li>
-<li><strong>Database</strong>: A single SQLite database file (<code>data/hextrackr.db</code>) with a shared connection pool.</li>
-<li><strong>Security</strong>: Includes a built-in <code>PathValidator</code> class for secure file system operations and sets standard security headers.</li>
+<li><strong>Monolithic File</strong>: <code>server.js</code> (≈1,700+ lines) – routes, DB init, rollover logic, backups, static serving.</li>
+<li><strong>Unified Delivery</strong>: API + static assets + docs from one process.</li>
+<li><strong>Embedded DB</strong>: Single SQLite file (<code>data/hextrackr.db</code>). No external service dependency.</li>
+<li><strong>Security Utilities</strong>: In‑process <code>PathValidator</code> for safe file operations + security headers.</li>
 </ul>
+<hr>
 <h2>Core Components</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>server.js</code></td>
+<td>Main application runtime (all routes + logic)</td>
+</tr>
+<tr>
+<td><code>scripts/init-database.js</code></td>
+<td>Bootstrap base schema &amp; indexes (legacy + foundational tables)</td>
+</tr>
+<tr>
+<td>Rollover Functions</td>
+<td>Sequential import processing &amp; aggregation (<code>processVulnerabilityRowsWithRollover</code>)</td>
+</tr>
+<tr>
+<td><code>PathValidator</code></td>
+<td>Normalizes &amp; validates file paths (defense-in-depth)</td>
+</tr>
+<tr>
+<td>Docs Portal Logic</td>
+<td>Dynamic redirect + stats endpoint (<code>/api/docs/stats</code>)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Middleware &amp; Infrastructure</h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CORS</td>
+<td><code>cors()</code> (open by default)</td>
+</tr>
+<tr>
+<td>Compression</td>
+<td><code>compression()</code></td>
+</tr>
+<tr>
+<td>Parsing</td>
+<td><code>express.json</code> &amp; <code>express.urlencoded</code> (100MB limit)</td>
+</tr>
+<tr>
+<td>Uploads</td>
+<td><code>multer</code> (CSV import; 100MB cap)</td>
+</tr>
+<tr>
+<td>Security Headers</td>
+<td><code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, <code>X-XSS-Protection</code></td>
+</tr>
+<tr>
+<td>Static Assets</td>
+<td><code>express.static</code> (root + <code>docs-html/</code>)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Persistence &amp; Schema Evolution</h2>
 <ul>
-<li><strong><code>server.js</code></strong>: The main entry point. It initializes the Express app, configures middleware, sets up all API routes, and connects to the SQLite database.</li>
-<li><strong><code>scripts/init-database.js</code></strong>: A script responsible for creating the initial database schema, including tables and indexes.</li>
-<li><strong><code>PathValidator</code> Class</strong>: A security utility class within <code>server.js</code> designed to prevent path traversal attacks when accessing the file system.</li>
+<li><strong>Initialization</strong>: If DB missing, runs <code>scripts/init-database.js</code>.</li>
+<li><strong>Runtime Evolution</strong>: Idempotent <code>ALTER TABLE</code> adds new columns (<code>vendor</code>, <code>vulnerability_date</code>, <code>state</code>, <code>import_date</code>, etc.) to legacy tables for backward compatibility.</li>
+<li><strong>Rollover Tables</strong>: Created on startup if absent (<code>vulnerability_snapshots</code>, <code>vulnerabilities_current</code>, <code>vulnerability_daily_totals</code>).</li>
 </ul>
-<h2>Core Middleware</h2>
-<ul>
-<li><strong><code>cors</code></strong>: Enables Cross-Origin Resource Sharing.</li>
-<li><strong><code>compression</code></strong>: Compresses response bodies for better performance.</li>
-<li><strong><code>express.json</code></strong>: Parses incoming JSON requests (limit <code>100mb</code>).</li>
-<li><strong><code>express.urlencoded</code></strong>: Parses URL-encoded data (limit <code>100mb</code>).</li>
-<li><strong><code>multer</code></strong>: Handles <code>multipart/form-data</code> for file uploads, specifically for CSV imports.</li>
-<li><strong>Security Headers</strong>: Sets <code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, and <code>X-XSS-Protection</code> headers on all responses.</li>
-<li><strong><code>express.static</code></strong>: Serves static files (HTML, CSS, JS) from the project root and <code>docs-html</code> directories.</li>
-</ul>
-<h2>Persistence and Data Management</h2>
-<h3>Database</h3>
-<p>The backend uses a file-based SQLite database. For a detailed schema, see the <a href="./data-model.html">Data Model documentation</a>.</p>
-<ul>
-<li><strong>Initialization</strong>: On startup, the server checks if the database file exists. If not, it runs the <code>scripts/init-database.js</code> script to create it.</li>
-<li><strong>Schema Evolution</strong>: The server performs idempotent <code>ALTER TABLE</code> operations on startup to add new columns to the <code>vulnerabilities</code> table, ensuring backward compatibility with older database files.</li>
-</ul>
-<h3>Vulnerability Rollover Architecture</h3>
-<p>A key feature of the backend is the <strong>rollover architecture</strong> for managing vulnerability data. This system processes daily scans to maintain both a current snapshot and a historical trend of vulnerabilities. For a detailed explanation, see the <a href="./rollover-mechanism.html">Vulnerability Rollover Architecture documentation</a>.</p>
-<h2>API Surface</h2>
-<p>The backend exposes a comprehensive REST API. For full request/response details, see the <a href="../api-reference/overview.html">API Reference</a>.</p>
-<ul>
-<li><strong>Tickets</strong>: <code>GET, POST, PUT, DELETE /api/tickets</code>, <code>POST /api/tickets/migrate</code>, <code>POST /api/import/tickets</code></li>
-<li><strong>Reference Data</strong>: <code>GET /api/sites</code>, <code>GET /api/locations</code></li>
-<li><strong>Vulnerabilities</strong>: <code>GET /api/vulnerabilities</code>, <code>GET /api/vulnerabilities/stats</code>, <code>GET /api/vulnerabilities/recent-trends</code>, <code>GET /api/vulnerabilities/trends</code>, <code>POST /api/vulnerabilities/import</code>, <code>POST /api/import/vulnerabilities</code>, <code>DELETE /api/vulnerabilities/clear</code></li>
-<li><strong>Imports</strong>: <code>GET /api/imports</code></li>
-<li><strong>Backup/Restore</strong>: <code>GET /api/backup/stats</code>, <code>GET /api/backup/:type</code>, <code>POST /api/restore</code>, <code>DELETE /api/backup/clear/:type</code></li>
-<li><strong>Internal</strong>: <code>GET /health</code>, <code>GET /api/docs/stats</code></li>
-</ul>
-<h2>Key Business Logic Flows</h2>
-<h3>Vulnerability CSV Import</h3>
+<p>See: <a href="#data-model">Data Model</a> for exhaustive schema &amp; index inventory.</p>
+<hr>
+<h2>Vulnerability Rollover Workflow</h2>
+<p>Purpose: Maintain real‑time deduplicated active set + full historical timeline + fast daily aggregates.</p>
+<h3>CSV Import (Rollover Path)</h3>
 <pre><code class="language-mermaid">sequenceDiagram
     participant User
     participant API as server.js
     participant DB as SQLite
 
-    User-&gt;&gt;API: POST /api/vulnerabilities/import (multipart/form-data)
-    API-&gt;&gt;API: Parse CSV with PapaParse
-    API-&gt;&gt;DB: INSERT into vulnerability_imports
-    API-&gt;&gt;API: Process rows with rollover logic
-    API-&gt;&gt;DB: INSERT into vulnerability_snapshots
-    API-&gt;&gt;DB: INSERT or UPDATE vulnerabilities_current
-    API-&gt;&gt;DB: DELETE stale vulnerabilities
-    API-&gt;&gt;DB: UPDATE vulnerability_daily_totals
-    API--&gt;&gt;User: { success, importId, rowsProcessed, ... }
+    User-&gt;&gt;API: POST /api/vulnerabilities/import (multipart/form-data + scanDate)
+    API-&gt;&gt;API: Parse CSV (PapaParse, filter empty rows)
+    API-&gt;&gt;DB: INSERT vulnerability_imports
+    API-&gt;&gt;DB: UPDATE vulnerabilities_current (mark potentially stale)
+    loop Each row (sequential to prevent race conditions)
+        API-&gt;&gt;API: Map + generate unique_key
+        API-&gt;&gt;DB: INSERT vulnerability_snapshots
+        API-&gt;&gt;DB: INSERT or UPDATE vulnerabilities_current
+    end
+    API-&gt;&gt;DB: DELETE stale rows (not seen in this scan)
+    API-&gt;&gt;DB: INSERT OR REPLACE vulnerability_daily_totals
+    API--&gt;&gt;User: { importId, insertCount, updateCount, removedStale, scanDate }
 </code></pre>
-<h3>Get Paginated Vulnerabilities</h3>
+<h3>Key Safeguards</h3>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Row duplication in batch</td>
+<td>In‑memory <code>Set</code> of processed unique_keys</td>
+</tr>
+<tr>
+<td>Race conditions</td>
+<td>Explicit sequential loop instead of <code>forEach</code> callbacks</td>
+</tr>
+<tr>
+<td>Data drift</td>
+<td>Historical record preserved in snapshots before updates</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td>Indexes on <code>unique_key</code>, <code>scan_date</code>, severities</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>API Surface (High-Level)</h2>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Endpoints (Examples)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Health</td>
+<td><code>GET /health</code></td>
+</tr>
+<tr>
+<td>Vulnerabilities (Current)</td>
+<td><code>GET /api/vulnerabilities</code>, <code>/stats</code>, <code>/recent-trends</code>, <code>/trends</code></td>
+</tr>
+<tr>
+<td>Vulnerability Import</td>
+<td><code>POST /api/vulnerabilities/import</code> (rollover), <code>POST /api/import/vulnerabilities</code> (legacy)</td>
+</tr>
+<tr>
+<td>Tickets</td>
+<td><code>GET/POST/PUT/DELETE /api/tickets</code>, <code>POST /api/tickets/migrate</code>, <code>POST /api/import/tickets</code></td>
+</tr>
+<tr>
+<td>Reference</td>
+<td><code>GET /api/sites</code>, <code>GET /api/locations</code></td>
+</tr>
+<tr>
+<td>Backup/Restore</td>
+<td><code>GET /api/backup/stats</code>, <code>GET /api/backup/all</code>, <code>POST /api/restore</code>, clear endpoints</td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td><code>GET /api/docs/stats</code>, <code>/docs-html</code> SPA shell &amp; hash routing</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Pagination Flow (Current Vulnerabilities)</h2>
 <pre><code class="language-mermaid">sequenceDiagram
-    participant UI as Frontend
+    participant UI
     participant API as server.js
     participant DB as SQLite
-
     UI-&gt;&gt;API: GET /api/vulnerabilities?page=1&amp;limit=50
-    API-&gt;&gt;DB: SELECT * FROM vulnerabilities_current ... LIMIT ? OFFSET ?
-    DB--&gt;&gt;API: Vulnerability rows
-    API-&gt;&gt;DB: SELECT COUNT(*) FROM vulnerabilities_current
-    DB--&gt;&gt;API: Total count
-    API--&gt;&gt;UI: { data: [...], pagination: { ... } }
+    API-&gt;&gt;DB: SELECT filtered rows FROM vulnerabilities_current LIMIT/OFFSET
+    DB--&gt;&gt;API: Row batch
+    API-&gt;&gt;DB: SELECT COUNT(*) (same filters)
+    DB--&gt;&gt;API: Total
+    API--&gt;&gt;UI: { data, pagination }
 </code></pre>
+<hr>
+<h2>Legacy vs Rollover Paths</h2>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Legacy <code>vulnerabilities</code></th>
+<th>Rollover Tables</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Purpose</td>
+<td>Early ingestion &amp; export</td>
+<td>Current production analytics</td>
+</tr>
+<tr>
+<td>Dedupe</td>
+<td>Unique per (hostname, cve, import_date) index</td>
+<td>Algorithmic unique_key with hostname normalization</td>
+</tr>
+<tr>
+<td>History</td>
+<td>Implicit (one row per scan)</td>
+<td>Explicit snapshots + daily aggregates</td>
+</tr>
+<tr>
+<td>Future</td>
+<td>To be deprecated</td>
+<td>Strategic direction</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Utility Endpoints</h2>
+<ul>
+<li><strong><code>GET /health</code></strong>: <code>{ status, version, db, uptime }</code></li>
+<li><strong><code>GET /api/docs/stats</code></strong>: Counts routes + approximates function definitions.</li>
+<li><strong>Backup</strong>: Returns structured JSON (vulnerabilities legacy + tickets) or combined.</li>
+</ul>
+<hr>
+<h2>Security &amp; Hardening</h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Current</th>
+<th>Planned</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>File access</td>
+<td><code>PathValidator</code></td>
+<td>Central audit logging of rejections</td>
+</tr>
+<tr>
+<td>Upload size</td>
+<td>100MB cap</td>
+<td>Configurable env var (<code>HEXTRACKR_MAX_UPLOAD_MB</code>)</td>
+</tr>
+<tr>
+<td>TLS</td>
+<td>External termination</td>
+<td>Compose example with Caddy / nginx</td>
+</tr>
+<tr>
+<td>Input validation</td>
+<td>Minimal (mapping layer)</td>
+<td>JSON schema (Ajv) enforcement</td>
+</tr>
+<tr>
+<td>Logging</td>
+<td>Console + stderr</td>
+<td>Structured JSON + request IDs</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Planned Enhancements</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Enhancement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Observability</td>
+<td>Prometheus metrics (import latency, row counts)</td>
+</tr>
+<tr>
+<td>Modularization</td>
+<td>Extract rollover &amp; backup modules</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Enforce severity enumeration + CVE format checks</td>
+</tr>
+<tr>
+<td>Migration</td>
+<td>Retire legacy vulnerabilities pathway</td>
+</tr>
+<tr>
+<td>Testing</td>
+<td>Playwright + API contract tests for import &amp; pagination</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Summary</h2>
+<p>The backend favors simplicity (single process, embedded DB) while implementing a robust rollover pipeline for vulnerability lifecycle tracking. Incremental improvements will focus on modularity, observability, and deprecating legacy ingestion paths.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

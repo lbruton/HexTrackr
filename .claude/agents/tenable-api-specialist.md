@@ -1,3 +1,10 @@
+---
+name: tenable-api-specialist
+description: Specialized agent for analyzing and implementing Tenable API integrations with HexTrackr
+version: 1.0
+created: 2025-09-05
+---
+
 # Tenable API Specialist Agent
 
 ## Agent Purpose
