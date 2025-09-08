@@ -230,6 +230,7 @@ export default [
         OffscreenCanvas: "readonly",
         Path2D: "readonly",
         Event: "readonly",
+        CustomEvent: "readonly",
         EventTarget: "readonly",
         FormData: "readonly",
         DOMParser: "readonly",
@@ -252,6 +253,10 @@ export default [
         createVulnerabilityGridOptions: "readonly",
         PaginationController: "readonly", 
         VulnerabilityDataManager: "readonly",
+        VulnerabilityStatisticsManager: "readonly",
+        VulnerabilityChartManager: "readonly",
+        VulnerabilityDetailsModal: "readonly",
+        DeviceSecurityModal: "readonly",
         ModernVulnManager: "readonly",
         WebSocketClient: "readonly",
         ProgressModal: "readonly"
