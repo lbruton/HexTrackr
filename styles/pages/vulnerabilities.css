@@ -331,3 +331,35 @@
     border-color: var(--hextrackr-primary);
     box-shadow: 0 0 0 0.2rem rgb(32, 107, 196, 0.25);
 }
+
+/* ApexCharts Tooltip Color Indicators */
+.tooltip-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+    gap: 8px;
+}
+
+.color-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px rgb(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.severity-name {
+    font-size: 13px;
+    color: #4b5563;
+    font-weight: 500;
+    flex: 1;
+}
+
+.severity-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+}
