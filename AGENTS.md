@@ -32,7 +32,7 @@ HexTrackr is a vulnerability and ticket management system with:
 
 ### Database Schema
 
-```
+```text
 data/hextrackr.db
 ├── tickets                    # Ticket data with JSON devices/attachments
 ├── vulnerabilities_current    # Deduplicated current state
@@ -43,7 +43,7 @@ data/hextrackr.db
 
 ### Frontend Structure
 
-```
+```text
 scripts/
 ├── shared/     # Reusable components (modals, settings)
 ├── pages/      # Page-specific logic (vulnerability-manager.js)
