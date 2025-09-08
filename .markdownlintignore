@@ -3,3 +3,27 @@ node_modules/
 uploads/
 data/
 docs-prototype/content/
+
+# All hidden directories and files (system, config, temp)
+.*
+!.markdownlint*
+!.gitignore
+
+# Generated and temporary directories
+backups/
+depreciated/
+dev-docs/
+temp/
+tmp/
+logs/
+
+# Test and coverage directories  
+__tests__/
+coverage/
+test-results/
+
+# Build and output directories
+dist/
+build/
+.vscode/
+.idea/
