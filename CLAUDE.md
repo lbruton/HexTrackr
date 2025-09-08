@@ -1,7 +1,31 @@
-# HexTrackr Project CLAUDE.md
+# HexTrackr Project CLAUDE.md (Context-Optimized)
 
 Project-specific guidance for HexTrackr vulnerability management system.
-For universal tools and workflows, see Personal CLAUDE.md.
+For universal tool discovery patterns, see Personal CLAUDE.md.
+
+## 🔍 HexTrackr-Specific Tool Discovery
+
+**Use Memento semantic search for HexTrackr-specific patterns**:
+
+```javascript
+// HexTrackr refactoring patterns
+mcp__memento__search_nodes({
+  query: "hextrackr refactor module extraction vulnerability statistics",
+  mode: "hybrid", topK: 10
+})
+
+// HexTrackr security patterns  
+mcp__memento__search_nodes({
+  query: "hextrackr security vulnerability rollover deduplication cve",
+  mode: "hybrid", topK: 10
+})
+
+// HexTrackr UI patterns
+mcp__memento__search_nodes({
+  query: "hextrackr ui charts tooltip apex grid responsive",
+  mode: "hybrid", topK: 10
+})
+```
 
 ## Project Overview
 
@@ -144,33 +168,77 @@ ls .playwright-mcp/
 4. SQLite needs write permissions in `data/`
 5. File uploads hard-limited to 100MB
 
-## Agent Boundaries
-
-**UI Changes Only**: CSS, HTML, animations, responsive design
-**Data Processing**: Import logic, aggregation, database operations
-**Integration Work**: API connections, external system mapping
-
-## HexTrackr-Specific Agent Usage
+## 🎯 HexTrackr Agent Discovery Patterns
 
 ### Domain Data Processing
 
 ```javascript
-Task(vulnerability-data-processor): "Verify CVE logic against rollover patterns"
-Task(vulnerability-data-processor): "Validate import deduplication using normalizeHostname()"
+// Instead of hardcoded tools, use semantic search:
+// Search: "vulnerability data processor csv import rollover deduplication"
+// Returns: Patterns for PapaParse, rollover logic, database operations
+
+Task(vulnerability-data-processor): "Use Memento search for 'hextrackr rollover deduplication cve hostname' to verify logic patterns"
 ```
 
 ### Security Integration
 
 ```javascript
-Task(cisco-integration-specialist): "Research Cisco PSIRT API v2 for vulnerability enrichment"
-Task(tenable-integration-specialist): "Analyze plugin_id mapping for Tenable.io integration"
+// Search: "cisco integration specialist tenable security scanner api"
+// Returns: Integration patterns, API mappings, security protocols
+
+Task(cisco-integration-specialist): "Search 'cisco psirt api v2 vulnerability enrichment' for integration patterns"
+Task(tenable-integration-specialist): "Search 'tenable plugin_id mapping io integration' for data mapping"
+```
+
+### UI Design & Testing
+
+```javascript
+// Search: "ui design specialist playwright browser automation testing"  
+// Returns: UI patterns, responsive design, testing workflows
+
+Task(ui-design-specialist): "Search 'hextrackr ui charts responsive ag-grid tooltip' for visual patterns and fixes"
 ```
 
 ### Research Patterns
 
 ```javascript
-// HexTrackr repository access via ref.tools
-ref_search_documentation("HexTrackr vulnerability rollover", {ref_src: "private"})
+// HexTrackr repository access via ref.tools (discovered through semantic search)
+// Search: "ref documentation search private repository" to get ref.tools functions
+// Then: ref_search_documentation("HexTrackr vulnerability rollover", {ref_src: "private"})
 ```
 
-For universal MCP tools, Docker workflows, and GitHub CLI usage, refer to Personal CLAUDE.md.
+## 🔧 Context-Optimized Development Workflow
+
+### Pattern-Based Discovery
+
+Instead of listing every tool, use these discovery patterns:
+
+**For Analysis Tasks**:
+
+```javascript
+// Search: "zen analysis debug architecture hextrackr vulnerability"
+// Get zen analyze, zen debug, zen secaudit for HexTrackr-specific analysis
+```
+
+**For Database Operations**:
+
+```javascript  
+// Search: "database schema sqlite vulnerability rollover deduplication"
+// Get patterns for SQLite operations, schema evolution, data integrity
+```
+
+**For UI Development**:
+
+```javascript
+// Search: "ui playwright testing responsive charts apex grid tabler"
+// Get UI testing patterns, chart fixes, responsive design solutions
+```
+
+**For Security & Integration**:
+
+```javascript
+// Search: "security integration cisco tenable api authentication csv"
+// Get security patterns, API integration guides, data validation
+```
+
+For universal MCP tool discovery patterns and Docker workflows, refer to Personal CLAUDE.md.
