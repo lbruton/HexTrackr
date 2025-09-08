@@ -1,0 +1,12 @@
+# Auto-generated test coverage files
+__tests__/coverage/
+
+# Node modules and vendor content
+node_modules/
+
+# Upload and data directories
+uploads/
+data/
+
+# Documentation prototypes
+docs-prototype/
