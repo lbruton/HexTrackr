@@ -4,8 +4,26 @@ uploads/
 data/
 docs-prototype/content/
 
-# Auto-generated backup manifests
-backups/
+# All hidden directories and files (system, config, temp)
+.*
+!.markdownlint*
+!.gitignore
 
-# Auto-generated test coverage files
-__tests__/coverage/
+# Generated and temporary directories
+backups/
+depreciated/
+dev-docs/
+temp/
+tmp/
+logs/
+
+# Test and coverage directories  
+__tests__/
+coverage/
+test-results/
+
+# Build and output directories
+dist/
+build/
+.vscode/
+.idea/
