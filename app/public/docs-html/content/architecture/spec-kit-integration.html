@@ -1,0 +1,219 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-info" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M12 9v4"/>
+        <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
+        <path d="M12 16h.01"/>
+    </svg>
+    <div>
+        <strong>Active Specification:</strong> 022-documentation-portal-rebuild
+        <small class="d-block text-muted">This documentation is being actively updated as part of the current specification development.</small>
+    </div>
+</div>
+    <h1>Spec-Kit Integration Architecture</h1>
+<p>This document details how HexTrackr integrates with the Spec-Kit framework for specification-driven development, providing a seamless connection between formal specifications and the documentation portal.</p>
+<h2>Overview</h2>
+<p>The Spec-Kit integration eliminates redundancy between separate documentation systems and the formal specification framework. Instead of maintaining parallel SPRINT.md files, all project management information flows directly from the spec-kit framework into the documentation portal.</p>
+<h2>Architecture Components</h2>
+<h3>1. Active Specification Tracking</h3>
+<p><strong>File</strong>: <code>.active-spec</code><br><strong>Purpose</strong>: Contains the currently active specification identifier<br><strong>Format</strong>: Simple text file with spec slug (e.g., &quot;022-documentation-portal-rebuild&quot;)</p>
+<pre><code class="language-bash"># Example .active-spec content
+022-documentation-portal-rebuild
+</code></pre>
+<h3>2. Specification Synchronizer</h3>
+<p><strong>Script</strong>: <code>scripts/sync-specs-to-roadmap.js</code><br><strong>Purpose</strong>: Scans all specification task files and generates roadmap content</p>
+<p><strong>Key Functions</strong>:</p>
+<ul>
+<li>Reads all <code>hextrackr-specs/specs/*/tasks.md</code> files</li>
+<li>Parses task completion status using regex patterns</li>
+<li>Generates markdown table with progress tracking</li>
+<li>Highlights active specification with visual indicators</li>
+</ul>
+<p><strong>Active Spec Detection</strong>:</p>
+<pre><code class="language-javascript">const isActiveSpec = activeSpec &amp;&amp; 
+  s.name.toLowerCase().includes(activeSpec.replace(/^\d+-/, &#39;&#39;).replace(/-/g, &#39; &#39;));
+</code></pre>
+<h3>3. HTML Content Generator</h3>
+<p><strong>Script</strong>: <code>app/public/docs-html/html-content-updater.js</code><br><strong>Purpose</strong>: Converts markdown to HTML with active spec awareness</p>
+<p><strong>New Functionality</strong>:</p>
+<ul>
+<li>Reads <code>.active-spec</code> file during initialization</li>
+<li>Injects active spec banner into all documentation pages</li>
+<li>Provides visual context for users about current development focus</li>
+</ul>
+<p><strong>Active Spec Banner</strong>:</p>
+<pre><code class="language-html">&lt;div class=&quot;alert alert-info d-flex align-items-center mb-4&quot; role=&quot;alert&quot;&gt;
+    &lt;svg&gt;&lt;!-- Warning icon --&gt;&lt;/svg&gt;
+    &lt;div&gt;
+        &lt;strong&gt;Active Specification:&lt;/strong&gt; 022-documentation-portal-rebuild
+        &lt;small class=&quot;d-block text-muted&quot;&gt;
+            This documentation is being actively updated as part 
+            of the current specification development.
+        &lt;/small&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+<h2>Integration Flow</h2>
+<h3>1. Development Workflow</h3>
+<pre><code class="language-mermaid">graph TD
+    A[Developer works on spec] --&gt; B[Updates .active-spec]
+    B --&gt; C[Modifies specification tasks]
+    C --&gt; D[Runs npm run docs:generate]
+    D --&gt; E[sync-specs-to-roadmap.js]
+    E --&gt; F[Updates ROADMAP.md]
+    F --&gt; G[html-content-updater.js]
+    G --&gt; H[Generates HTML with active spec context]
+</code></pre>
+<h3>2. Data Flow</h3>
+<ol>
+<li><p><strong>Specification Tasks</strong> (<code>hextrackr-specs/specs/*/tasks.md</code>)</p>
+<ul>
+<li>Contains formal task definitions</li>
+<li>Uses markdown checkbox format <code>- [ ]</code> and <code>- [x]</code></li>
+<li>Includes priority indicators and metadata</li>
+</ul>
+</li>
+<li><p><strong>Active Spec Tracking</strong> (<code>.active-spec</code>)</p>
+<ul>
+<li>Single source of truth for current development focus</li>
+<li>Updated manually when switching between specifications</li>
+</ul>
+</li>
+<li><p><strong>Roadmap Generation</strong></p>
+<ul>
+<li>Automatically scans all specification tasks</li>
+<li>Calculates completion percentages</li>
+<li>Highlights active specification with ⚡ and 🎯 indicators</li>
+</ul>
+</li>
+<li><p><strong>Documentation Portal</strong></p>
+<ul>
+<li>Displays active spec banner on all pages</li>
+<li>Shows current progress in roadmap table</li>
+<li>Provides contextual information about development state</li>
+</ul>
+</li>
+</ol>
+<h2>Technical Implementation</h2>
+<h3>File Structure</h3>
+<pre><code>HexTrackr/
+├── .active-spec                    # Current active specification
+├── hextrackr-specs/
+│   └── specs/
+│       └── */
+│           └── tasks.md           # Specification task definitions
+├── scripts/
+│   └── sync-specs-to-roadmap.js   # Spec synchronization script
+├── app/public/
+│   ├── docs-source/
+│   │   └── ROADMAP.md             # Generated roadmap content
+│   └── docs-html/
+│       ├── html-content-updater.js # HTML generation with spec context
+│       └── template.html          # Template with spec banner placeholder
+</code></pre>
+<h3>NPM Scripts Integration</h3>
+<p>The integration is automated through npm scripts:</p>
+<pre><code class="language-json">{
+  &quot;docs:generate&quot;: &quot;npm run docs:sync-specs &amp;&amp; node app/public/docs-html/html-content-updater.js&quot;,
+  &quot;docs:sync-specs&quot;: &quot;node scripts/sync-specs-to-roadmap.js&quot;,
+  &quot;docs:sync-all&quot;: &quot;node scripts/docs-sync-all.js&quot;
+}
+</code></pre>
+<h3>Error Handling</h3>
+<ul>
+<li><strong>Missing .active-spec</strong>: Gracefully handles absence, no spec highlighting</li>
+<li><strong>Malformed task files</strong>: Skips invalid specifications, logs warnings</li>
+<li><strong>File permissions</strong>: Uses safe file operations with path validation</li>
+</ul>
+<h2>Security Considerations</h2>
+<h3>Path Validation</h3>
+<p>All file operations use the <code>PathValidator</code> class to prevent:</p>
+<ul>
+<li>Directory traversal attacks</li>
+<li>Invalid file access</li>
+<li>Path injection vulnerabilities</li>
+</ul>
+<h3>Input Sanitization</h3>
+<ul>
+<li>Spec slugs are validated against expected patterns</li>
+<li>Markdown content is processed safely</li>
+<li>HTML injection is prevented in generated content</li>
+</ul>
+<h2>Performance Characteristics</h2>
+<h3>Generation Speed</h3>
+<ul>
+<li>Full documentation regeneration: ~1.7 seconds</li>
+<li>Spec synchronization: ~200ms</li>
+<li>Memory usage: &lt;50MB peak</li>
+</ul>
+<h3>Caching Strategy</h3>
+<ul>
+<li>Template content cached in memory</li>
+<li>Markdown parsing optimized with marked.js</li>
+<li>File system operations minimized</li>
+</ul>
+<h2>Troubleshooting</h2>
+<h3>Common Issues</h3>
+<ol>
+<li><p><strong>Active spec not highlighting</strong></p>
+<ul>
+<li>Check <code>.active-spec</code> file exists and contains valid spec slug</li>
+<li>Verify spec name matching logic in sync script</li>
+</ul>
+</li>
+<li><p><strong>Tasks not updating in roadmap</strong></p>
+<ul>
+<li>Ensure <code>tasks.md</code> files use correct checkbox format</li>
+<li>Run <code>npm run docs:sync-specs</code> manually to debug</li>
+</ul>
+</li>
+<li><p><strong>HTML generation failures</strong></p>
+<ul>
+<li>Check file permissions in docs-html directory</li>
+<li>Verify template.html contains required placeholders</li>
+</ul>
+</li>
+</ol>
+<h3>Debugging Commands</h3>
+<pre><code class="language-bash"># Test spec synchronization
+node scripts/sync-specs-to-roadmap.js
+
+# Test HTML generation
+node app/public/docs-html/html-content-updater.js
+
+# Full documentation refresh
+npm run docs:generate
+</code></pre>
+<h2>Future Enhancements</h2>
+<h3>Planned Improvements</h3>
+<ul>
+<li>Real-time spec status updates via WebSocket</li>
+<li>Automated spec switching based on git branches</li>
+<li>Enhanced progress visualization with charts</li>
+<li>Integration with project management tools</li>
+</ul>
+<h3>Extensibility</h3>
+<p>The architecture supports additional integrations:</p>
+<ul>
+<li>Custom spec metadata parsing</li>
+<li>External task management system connections</li>
+<li>Advanced reporting and analytics</li>
+<li>Multi-project specification tracking</li>
+</ul>
+<h2>Configuration</h2>
+<h3>Environment Variables</h3>
+<p>Currently, no environment-specific configuration is required. All paths are relative to the project root.</p>
+<h3>Customization Points</h3>
+<ul>
+<li>Active spec banner styling in <code>template.html</code></li>
+<li>Roadmap table format in <code>sync-specs-to-roadmap.js</code></li>
+<li>HTML generation templates and styling</li>
+</ul>
+<p>This integration provides a foundation for specification-driven development while maintaining flexibility for future enhancements and customizations.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

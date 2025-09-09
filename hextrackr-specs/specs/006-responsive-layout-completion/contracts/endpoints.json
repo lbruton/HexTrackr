@@ -1,0 +1,42 @@
+{
+  "spec": "006-responsive-layout-completion", 
+  "status": "PENDING",
+  "description": "Responsive layout configuration and viewport management",
+  "endpoints": [
+    {
+      "path": "/api/ui/viewport",
+      "method": "GET",
+      "description": "Get responsive breakpoint configuration",
+      "response": {
+        "schema": {
+          "breakpoints": {
+            "mobile": "number",
+            "tablet": "number", 
+            "desktop": "number"
+          },
+          "current": "string"
+        }
+      }
+    },
+    {
+      "path": "/api/ui/layout/preferences",
+      "method": "POST",
+      "description": "Save user responsive layout preferences", 
+      "request": {
+        "body": {
+          "preferences": {
+            "gridColumns": "number",
+            "cardSize": "string",
+            "tableCompact": "boolean"
+          }
+        }
+      },
+      "response": {
+        "schema": {
+          "saved": "boolean"
+        }
+      }
+    }
+  ],
+  "notes": "Primarily CSS-based enhancement with user preference storage"
+}

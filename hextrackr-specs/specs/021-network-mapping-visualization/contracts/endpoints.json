@@ -1,0 +1,46 @@
+{
+  "spec": "021-network-mapping-visualization",
+  "status": "PROPOSED", 
+  "description": "Network topology visualization and mapping endpoints",
+  "endpoints": [
+    {
+      "path": "/api/network/topology",
+      "method": "GET",
+      "description": "Get network topology data for visualization",
+      "response": {
+        "schema": {
+          "nodes": [
+            {
+              "id": "string",
+              "type": "string",
+              "properties": "object"
+            }
+          ],
+          "edges": [
+            {
+              "source": "string",
+              "target": "string",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "path": "/api/network/map/export",
+      "method": "POST",
+      "description": "Export network map in various formats",
+      "request": {
+        "body": {
+          "format": "string",
+          "options": "object"
+        }
+      },
+      "response": {
+        "schema": {
+          "exportUrl": "string"
+        }
+      }
+    }
+  ]
+}

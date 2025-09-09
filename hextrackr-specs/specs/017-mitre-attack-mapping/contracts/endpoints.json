@@ -1,0 +1,35 @@
+{
+  "spec": "017-mitre-attack-mapping",
+  "status": "PENDING", 
+  "description": "MITRE ATT&CK framework integration for vulnerability threat mapping",
+  "endpoints": [
+    {
+      "path": "/api/mitre/sync",
+      "method": "POST",
+      "description": "Synchronize MITRE ATT&CK framework data",
+      "response": {
+        "schema": {
+          "techniques": "number",
+          "tactics": "number",
+          "lastUpdated": "string"
+        }
+      }
+    },
+    {
+      "path": "/api/vulnerabilities/attack-mapping",
+      "method": "GET",
+      "description": "Get vulnerabilities mapped to ATT&CK techniques", 
+      "response": {
+        "schema": {
+          "mappings": [
+            {
+              "cve": "string",
+              "techniques": ["string"],
+              "tactics": ["string"]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

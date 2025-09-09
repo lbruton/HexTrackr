@@ -88,6 +88,7 @@ class HtmlContentUpdater {
         };
         this.templateContent = null;
         this.marked = null;
+        this.activeSpec = null;
     }
 
     /**
@@ -165,6 +166,23 @@ class HtmlContentUpdater {
     }
 
     /**
+     * Load the active spec information
+     */
+    async loadActiveSpec() {
+        try {
+            const activeSpecPath = path.join(process.cwd(), ".active-spec");
+            const activeSpecContent = await fs.readFile(activeSpecPath, "utf8");
+            this.activeSpec = activeSpecContent.trim();
+            console.log(`✓ Active spec loaded: ${this.activeSpec}`);
+            return this.activeSpec;
+        } catch (error) {
+            console.log("ℹ️ No active spec file found (.active-spec)");
+            this.activeSpec = null;
+            return null;
+        }
+    }
+
+    /**
      * Load the master HTML template
      */
     async loadTemplate() {
@@ -230,6 +248,28 @@ class HtmlContentUpdater {
     }
 
     /**
+     * Generate active spec banner HTML
+     */
+    generateActiveSpecBanner() {
+        if (!this.activeSpec) {
+            return "";
+        }
+
+        return `<div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-info" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M12 9v4"/>
+        <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
+        <path d="M12 16h.01"/>
+    </svg>
+    <div>
+        <strong>Active Specification:</strong> ${this.activeSpec}
+        <small class="d-block text-muted">This documentation is being actively updated as part of the current specification development.</small>
+    </div>
+</div>`;
+    }
+
+    /**
      * Generate a single HTML file from a markdown source using the template.
      */
     async generateHtmlFile(source) {
@@ -240,8 +280,16 @@ class HtmlContentUpdater {
             // Convert markdown to HTML
             const newHtmlContent = this.markdownToHtml(markdownContent);
             
+            // Generate active spec banner
+            const activeSpecBanner = this.generateActiveSpecBanner();
+            
             // Inject content into the template
-            const finalHtml = this.templateContent.replace(
+            let finalHtml = this.templateContent.replace(
+                "<!-- ACTIVE SPEC BANNER WILL BE INJECTED HERE -->",
+                activeSpecBanner
+            );
+            
+            finalHtml = finalHtml.replace(
                 "<!-- CONTENT WILL BE INJECTED HERE -->",
                 newHtmlContent
             );
@@ -359,6 +407,9 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
         try {
             // Initialize marked library first
             await this.initializeMarked();
+            
+            // Load active spec information
+            await this.loadActiveSpec();
             
             // Load the template first
             await this.loadTemplate();
