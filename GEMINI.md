@@ -163,3 +163,97 @@ npx playwright test             # Browser automation
 **Integration Work**: API connections, external system mapping
 
 **Critical**: ALWAYS use Docker containers - never run Node.js locally. Use `docker-compose restart` before Playwright tests.
+
+## MCP Servers
+
+**`memento`**: Ready (11 tools)
+
+- Tools:
+  - add_observations
+  - add_tags
+  - create_entities
+  - create_relations
+  - delete_entities
+  - delete_observations
+  - delete_relations
+  - open_nodes
+  - read_graph
+  - search_nodes
+  - set_importance
+
+**`sequential-thinking`**: Ready (1 tool)
+
+- Tools:
+  - sequentialthinking
+
+**`playwright`**: Ready (21 tools)
+
+- Tools:
+  - browser_click
+  - browser_close
+  - browser_console_messages
+  - browser_drag
+  - browser_evaluate
+  - browser_file_upload
+  - browser_fill_form
+  - browser_handle_dialog
+  - browser_hover
+  - browser_install
+  - browser_navigate
+  - browser_navigate_back
+  - browser_network_requests
+  - browser_press_key
+  - browser_resize
+  - browser_select_option
+  - browser_snapshot
+  - browser_tabs
+  - browser_take_screenshot
+  - browser_type
+  - browser_wait_for
+
+**`zen`**: Ready (16 tools, 17 prompts)
+
+- Tools:
+  - analyze
+  - challenge
+  - chat
+  - codereview
+  - consensus
+  - debug
+  - docgen
+  - listmodels
+  - planner
+  - precommit
+  - refactor
+  - secaudit
+  - testgen
+  - thinkdeep
+  - tracer
+  - version
+
+**`codacy`**: Ready (23 tools)
+
+- Tools:
+  - codacy_cli_analyze
+  - codacy_get_file_clones
+  - codacy_get_file_coverage
+  - codacy_get_file_issues
+  - codacy_get_file_with_analysis
+  - codacy_get_issue
+  - codacy_get_pattern
+  - codacy_get_pull_request_files_coverage
+  - codacy_get_pull_request_git_diff
+  - codacy_get_repository_pull_request
+  - codacy_get_repository_with_analysis
+  - codacy_list_files
+  - codacy_list_organization_repositories
+  - codacy_list_organizations
+  - codacy_list_pull_request_issues
+  - codacy_list_repository_issues
+  - codacy_list_repository_pull_requests
+  - codacy_list_repository_tool_patterns
+  - codacy_list_repository_tools
+  - codacy_list_tools
+  - codacy_search_organization_srm_items
+  - codacy_search_repository_srm_items
+  - codacy_setup_repository

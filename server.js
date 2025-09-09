@@ -1,5 +1,5 @@
 /* eslint-env node */
-/* global __dirname, __filename, require, console, process, setTimeout */
+/* global __dirname, __filename, require, console, process, setTimeout, setInterval */
  
 const express = require("express");
 const path = require("path");
@@ -10,6 +10,9 @@ const multer = require("multer");
 const Papa = require("papaparse");
 const fs = require("fs");
 const rateLimit = require("express-rate-limit");
+const http = require("http");
+const socketIo = require("socket.io");
+const crypto = require("crypto");
 
 // Security utility for path validation
 class PathValidator {
@@ -68,6 +71,175 @@ class PathValidator {
     static safeUnlinkSync(filePath) {
         const validatedPath = this.validatePath(filePath);
         return fs.unlinkSync(validatedPath);
+    }
+}
+
+// Progress tracking for WebSocket-based real-time updates
+class ProgressTracker {
+    constructor(io) {
+        this.io = io;
+        this.sessions = new Map(); // sessionId -> { progress, lastUpdate, metadata }
+        this.eventThrottle = new Map(); // sessionId -> lastEmitTime
+        this.THROTTLE_INTERVAL = 100; // ms - minimum time between progress events
+        this.SESSION_CLEANUP_INTERVAL = 30 * 60 * 1000; // 30 minutes
+        
+        // Auto-cleanup stale sessions
+        setInterval(() => this.cleanupStaleSessions(), this.SESSION_CLEANUP_INTERVAL);
+    }
+    
+    createSession(metadata = {}) {
+        const sessionId = crypto.randomUUID();
+        return this.createSessionWithId(sessionId, metadata);
+    }
+    
+    createSessionWithId(sessionId, metadata = {}) {
+        const session = {
+            id: sessionId,
+            progress: 0,
+            status: "initialized",
+            startTime: Date.now(),
+            lastUpdate: Date.now(),
+            metadata: {
+                operation: "unknown",
+                totalSteps: 0,
+                currentStep: 0,
+                message: "",
+                ...metadata
+            }
+        };
+        
+        this.sessions.set(sessionId, session);
+        console.log(`Progress session created: ${sessionId} for ${metadata.operation || "unknown operation"}`);
+        return sessionId;
+    }
+    
+    updateProgress(sessionId, progress, message = "", additionalData = {}) {
+        if (!this.sessions.has(sessionId)) {
+            console.warn(`Progress update attempted for unknown session: ${sessionId}`);
+            return false;
+        }
+        
+        const session = this.sessions.get(sessionId);
+        const now = Date.now();
+        
+        // Update session data
+        session.progress = Math.max(0, Math.min(100, progress));
+        session.lastUpdate = now;
+        session.metadata.message = message;
+        session.metadata.currentStep = additionalData.currentStep || session.metadata.currentStep;
+        
+        // Add any additional metadata
+        Object.assign(session.metadata, additionalData);
+        
+        // Throttle progress events to prevent spam
+        const lastEmit = this.eventThrottle.get(sessionId) || 0;
+        const shouldEmit = (now - lastEmit) >= this.THROTTLE_INTERVAL || progress >= 100;
+        
+        if (shouldEmit) {
+            this.eventThrottle.set(sessionId, now);
+            
+            // Emit to specific room for this session
+            this.io.to(`progress-${sessionId}`).emit("progress-update", {
+                sessionId,
+                progress: session.progress,
+                message,
+                status: session.status,
+                timestamp: now,
+                metadata: session.metadata
+            });
+            
+            console.log(`Progress ${sessionId}: ${progress}% - ${message}`);
+        }
+        
+        return true;
+    }
+    
+    completeSession(sessionId, message = "Operation completed", finalData = {}) {
+        if (!this.sessions.has(sessionId)) {
+            console.warn(`Completion attempted for unknown session: ${sessionId}`);
+            return false;
+        }
+        
+        const session = this.sessions.get(sessionId);
+        session.progress = 100;
+        session.status = "completed";
+        session.lastUpdate = Date.now();
+        session.metadata.message = message;
+        
+        // Add final data
+        Object.assign(session.metadata, finalData);
+        
+        // Force emit completion event (ignore throttling)
+        this.io.to(`progress-${sessionId}`).emit("progress-complete", {
+            sessionId,
+            progress: 100,
+            message,
+            status: "completed",
+            timestamp: session.lastUpdate,
+            metadata: session.metadata,
+            duration: session.lastUpdate - session.startTime
+        });
+        
+        console.log(`Progress session completed: ${sessionId} - ${message}`);
+        
+        // Schedule session cleanup
+        setTimeout(() => {
+            this.sessions.delete(sessionId);
+            this.eventThrottle.delete(sessionId);
+        }, 5000); // Keep for 5 seconds after completion
+        
+        return true;
+    }
+    
+    errorSession(sessionId, errorMessage, errorData = {}) {
+        if (!this.sessions.has(sessionId)) {
+            console.warn(`Error attempted for unknown session: ${sessionId}`);
+            return false;
+        }
+        
+        const session = this.sessions.get(sessionId);
+        session.status = "error";
+        session.lastUpdate = Date.now();
+        session.metadata.message = errorMessage;
+        session.metadata.error = errorData;
+        
+        // Force emit error event
+        this.io.to(`progress-${sessionId}`).emit("progress-error", {
+            sessionId,
+            progress: session.progress,
+            message: errorMessage,
+            status: "error",
+            timestamp: session.lastUpdate,
+            metadata: session.metadata,
+            error: errorData
+        });
+        
+        console.error(`Progress session error: ${sessionId} - ${errorMessage}`, errorData);
+        
+        // Schedule session cleanup
+        setTimeout(() => {
+            this.sessions.delete(sessionId);
+            this.eventThrottle.delete(sessionId);
+        }, 10000); // Keep for 10 seconds after error
+        
+        return true;
+    }
+    
+    getSession(sessionId) {
+        return this.sessions.get(sessionId) || null;
+    }
+    
+    cleanupStaleSessions() {
+        const now = Date.now();
+        const staleThreshold = 60 * 60 * 1000; // 1 hour
+        
+        for (const [sessionId, session] of this.sessions.entries()) {
+            if (now - session.lastUpdate > staleThreshold) {
+                console.log(`Cleaning up stale progress session: ${sessionId}`);
+                this.sessions.delete(sessionId);
+                this.eventThrottle.delete(sessionId);
+            }
+        }
     }
 }
 
@@ -515,7 +687,7 @@ function _processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, r
 }
 
 // ✅ BULK STAGING LOADER - Session 2 Performance Enhancement
-function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, res, startTime) {
+function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, sessionId, startTime) {
     const loadStart = Date.now();
     console.log(`🚀 BULK LOAD: Starting bulk insert of ${rows.length} rows to staging table`);
     
@@ -533,16 +705,18 @@ function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData
         db.run("BEGIN TRANSACTION", (err) => {
             if (err) {
                 console.error("Error starting transaction:", err);
-                res.status(500).json({ error: "Transaction start failed" });
+                progressTracker.errorSession(sessionId, "Transaction start failed", { error: err });
                 return;
             }
             
             console.log("💾 Transaction started - bulk inserting rows");
+            progressTracker.updateProgress(sessionId, 25, "Inserting rows into staging table...", { currentStep: 2 });
             
             const stmt = db.prepare(stagingInsertSQL);
             let insertedCount = 0;
             let errorCount = 0;
             const errors = [];
+            const totalRows = rows.length;
             
             // Process all rows in the transaction
             rows.forEach((row, index) => {
@@ -574,6 +748,17 @@ function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData
                             errorCount++;
                         } else {
                             insertedCount++;
+                            
+                            // Update progress every 100 rows or on completion
+                            if (insertedCount % 100 === 0 || insertedCount === totalRows) {
+                                const progress = 25 + ((insertedCount / totalRows) * 35); // 25-60% range
+                                progressTracker.updateProgress(sessionId, progress, 
+                                    `Inserted ${insertedCount}/${totalRows} rows to staging table...`, { 
+                                    currentStep: 2, 
+                                    insertedCount,
+                                    totalRows 
+                                });
+                            }
                         }
                     });
                 } catch (error) {
@@ -588,7 +773,7 @@ function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData
                 if (err) {
                     console.error("Error finalizing statement:", err);
                     db.run("ROLLBACK", () => {
-                        res.status(500).json({ error: "Staging insert failed" });
+                        progressTracker.errorSession(sessionId, "Staging insert failed", { error: err, errorCount, errors });
                     });
                     return;
                 }
@@ -597,7 +782,7 @@ function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData
                 db.run("COMMIT", (err) => {
                     if (err) {
                         console.error("Error committing transaction:", err);
-                        res.status(500).json({ error: "Transaction commit failed" });
+                        progressTracker.errorSession(sessionId, "Transaction commit failed", { error: err });
                         return;
                     }
                     
@@ -605,6 +790,15 @@ function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData
                     const rowsPerSecond = insertedCount / (loadTime / 1000);
                     
                     console.log(`✅ BULK LOAD COMPLETE: ${insertedCount}/${rows.length} rows inserted in ${loadTime}ms (${rowsPerSecond.toFixed(1)} rows/sec)`);
+                    
+                    // Update progress: Staging complete, starting final processing
+                    progressTracker.updateProgress(sessionId, 60, 
+                        `Staging complete. Processing ${insertedCount} rows to final tables...`, { 
+                        currentStep: 3, 
+                        insertedToStaging: insertedCount,
+                        loadTime,
+                        rowsPerSecond: parseFloat(rowsPerSecond.toFixed(1))
+                    });
                     
                     // Clean up file immediately after staging
                     try {
@@ -623,7 +817,7 @@ function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData
                         bulkLoadRowsPerSecond: parseFloat(rowsPerSecond.toFixed(1)),
                         insertedToStaging: insertedCount,
                         stagingErrors: errorCount
-                    }, res, startTime);
+                    }, sessionId, startTime); // Pass sessionId instead of res
                 });
             });
         });
@@ -632,7 +826,7 @@ function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData
 
 // ✅ BATCH PROCESSOR - Session 2 Performance Enhancement  
 // Process staging table to final tables in configurable batches
-function processStagingToFinalTables(importId, scanDate, responseData, res, startTime) {
+function processStagingToFinalTables(importId, scanDate, responseData, sessionId, startTime) {
     const _processStart = Date.now(); // Performance tracking (may be used in future metrics)
     const batchSize = 1000; // Process 1000 rows at a time
     const currentDate = scanDate;
@@ -642,10 +836,12 @@ function processStagingToFinalTables(importId, scanDate, responseData, res, star
     
     // Step 1: Mark all active vulnerabilities as potentially stale (grace period)
     const graceStart = Date.now();
+    progressTracker.updateProgress(sessionId, 65, "Preparing existing vulnerabilities for update...", { currentStep: 3 });
+    
     db.run("UPDATE vulnerabilities_current SET lifecycle_state = 'grace_period' WHERE lifecycle_state = 'active'", (err) => {
         if (err) {
             console.error("Error marking vulnerabilities as stale:", err);
-            res.status(500).json({ error: "Failed to prepare for batch processing" });
+            progressTracker.errorSession(sessionId, "Failed to prepare for batch processing", { error: err });
             return;
         }
         
@@ -656,7 +852,7 @@ function processStagingToFinalTables(importId, scanDate, responseData, res, star
             [importId], (err, countResult) => {
             if (err) {
                 console.error("Error counting staging records:", err);
-                res.status(500).json({ error: "Failed to count staging records" });
+                progressTracker.errorSession(sessionId, "Failed to count staging records", { error: err });
                 return;
             }
             
@@ -664,6 +860,13 @@ function processStagingToFinalTables(importId, scanDate, responseData, res, star
             const totalBatches = Math.ceil(totalRows / batchSize);
             
             console.log(`📈 Processing ${totalRows} rows in ${totalBatches} batches`);
+            
+            // Update progress: Starting batch processing
+            progressTracker.updateProgress(sessionId, 70, `Processing ${totalRows} rows in ${totalBatches} batches...`, { 
+                currentStep: 3, 
+                totalRows, 
+                totalBatches 
+            });
             
             // Initialize batch processing stats
             const batchStats = {
@@ -678,21 +881,31 @@ function processStagingToFinalTables(importId, scanDate, responseData, res, star
             };
             
             // Start batch processing
-            processNextBatch(importId, currentDate, batchSize, batchStats, responseData, res, startTime);
+            processNextBatch(importId, currentDate, batchSize, batchStats, responseData, sessionId, startTime);
         });
     });
 }
 
 // Process batches sequentially to maintain data integrity
-function processNextBatch(importId, currentDate, batchSize, batchStats, responseData, res, startTime) {
+function processNextBatch(importId, currentDate, batchSize, batchStats, responseData, sessionId, startTime) {
     if (batchStats.currentBatch >= batchStats.totalBatches) {
         // All batches processed - finalize
-        finalizeBatchProcessing(importId, currentDate, batchStats, responseData, res, startTime);
+        finalizeBatchProcessing(importId, currentDate, batchStats, responseData, sessionId, startTime);
         return;
     }
     
     const batchStart = Date.now();
     batchStats.currentBatch++;
+    
+    // Update progress for this batch
+    const batchProgress = 70 + ((batchStats.currentBatch / batchStats.totalBatches) * 25); // 70-95% range
+    progressTracker.updateProgress(sessionId, batchProgress, 
+        `Processing batch ${batchStats.currentBatch}/${batchStats.totalBatches}...`, { 
+        currentStep: 3, 
+        currentBatch: batchStats.currentBatch,
+        totalBatches: batchStats.totalBatches,
+        processedRows: batchStats.processedRows
+    });
     
     // Get next batch of unprocessed records
     const selectBatchSQL = `
@@ -706,13 +919,13 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
         if (err) {
             console.error("Error selecting batch:", err);
             batchStats.errors++;
-            processNextBatch(importId, currentDate, batchSize, batchStats, responseData, res, startTime);
+            processNextBatch(importId, currentDate, batchSize, batchStats, responseData, sessionId, startTime);
             return;
         }
         
         if (batchRows.length === 0) {
             // No more rows to process
-            finalizeBatchProcessing(importId, currentDate, batchStats, responseData, res, startTime);
+            finalizeBatchProcessing(importId, currentDate, batchStats, responseData, sessionId, startTime);
             return;
         }
         
@@ -724,7 +937,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                 if (txErr) {
                     console.error("Batch transaction error:", txErr);
                     batchStats.errors++;
-                    processNextBatch(importId, currentDate, batchSize, batchStats, responseData, res, startTime);
+                    processNextBatch(importId, currentDate, batchSize, batchStats, responseData, sessionId, startTime);
                     return;
                 }
                 
@@ -862,7 +1075,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                                     
                                     // Process next batch
                                     setTimeout(() => {
-                                        processNextBatch(importId, currentDate, batchSize, batchStats, responseData, res, startTime);
+                                        processNextBatch(importId, currentDate, batchSize, batchStats, responseData, sessionId, startTime);
                                     }, 10); // Small delay to prevent overwhelming the system
                                 });
                             });
@@ -875,8 +1088,16 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
 }
 
 // Finalize batch processing and clean up staging table
-function finalizeBatchProcessing(importId, currentDate, batchStats, responseData, res, startTime) {
+function finalizeBatchProcessing(importId, currentDate, batchStats, responseData, sessionId, startTime) {
     console.log("🏁 FINALIZE: Starting batch processing finalization");
+    
+    // Update progress: Starting finalization
+    progressTracker.updateProgress(sessionId, 95, "Finalizing import and cleaning up...", { 
+        currentStep: 3, 
+        processedRows: batchStats.processedRows,
+        insertedToCurrent: batchStats.insertedToCurrent,
+        updatedInCurrent: batchStats.updatedInCurrent
+    });
     
     // Step 1: Handle vulnerabilities still in grace_period (mark as resolved)
     db.run("UPDATE vulnerabilities_current SET " +
@@ -971,7 +1192,12 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                     };
                     
                     console.log("✅ Enhanced staging import completed:", JSON.stringify(finalResponse, null, 2));
-                    res.json(finalResponse);
+                    
+                    // Complete the progress session with final results
+                    progressTracker.completeSession(sessionId, "CSV import completed successfully", {
+                        ...finalResponse,
+                        totalProcessingTime: Date.now() - startTime
+                    });
                 });
             });
         });
@@ -1524,6 +1750,59 @@ function processTicketRows(csvData, stmt, res) {
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Create HTTP server and Socket.io setup
+const server = http.createServer(app);
+const io = socketIo(server, {
+    cors: {
+        origin: ["http://localhost:8080", "http://127.0.0.1:8080"],
+        methods: ["GET", "POST"],
+        credentials: true
+    },
+    pingTimeout: 60000,
+    pingInterval: 25000
+});
+
+// Initialize progress tracker
+const progressTracker = new ProgressTracker(io);
+
+// Socket.io connection handling
+io.on("connection", (socket) => {
+    console.log(`WebSocket client connected: ${socket.id}`);
+    
+    // Join progress room when client requests to track a session
+    socket.on("join-progress", (sessionId) => {
+        if (sessionId && typeof sessionId === "string") {
+            socket.join(`progress-${sessionId}`);
+            console.log(`Client ${socket.id} joined progress room: ${sessionId}`);
+            
+            // Send current session status if it exists
+            const session = progressTracker.getSession(sessionId);
+            if (session) {
+                socket.emit("progress-status", {
+                    sessionId,
+                    progress: session.progress,
+                    status: session.status,
+                    message: session.metadata.message,
+                    metadata: session.metadata
+                });
+            }
+        }
+    });
+    
+    // Leave progress room
+    socket.on("leave-progress", (sessionId) => {
+        if (sessionId && typeof sessionId === "string") {
+            socket.leave(`progress-${sessionId}`);
+            console.log(`Client ${socket.id} left progress room: ${sessionId}`);
+        }
+    });
+    
+    // Handle disconnection
+    socket.on("disconnect", (reason) => {
+        console.log(`WebSocket client disconnected: ${socket.id} (${reason})`);
+    });
+});
+
 // Database setup
 const dbPath = path.join(__dirname, "data", "hextrackr.db");
 const db = new sqlite3.Database(dbPath);
@@ -1996,8 +2275,42 @@ app.post("/api/vulnerabilities/import-staging", upload.single("csvFile"), (req, 
   const extractedDate = extractScanDateFromFilename(filename);
   const scanDate = req.body.scanDate || extractedDate || new Date().toISOString().split("T")[0];
   
+  // Use frontend sessionId or create new one
+  const frontendSessionId = req.body.sessionId;
+  const sessionId = frontendSessionId ? 
+    progressTracker.createSessionWithId(frontendSessionId, {
+      operation: "csv-import",
+      filename: filename,
+      vendor: vendor,
+      scanDate: scanDate,
+      totalSteps: 3, // 1. Parse CSV, 2. Load to staging, 3. Process to final tables
+      currentStep: 0
+    }) :
+    progressTracker.createSession({
+      operation: "csv-import",
+      filename: filename,
+      vendor: vendor,
+      scanDate: scanDate,
+      totalSteps: 3, // 1. Parse CSV, 2. Load to staging, 3. Process to final tables
+      currentStep: 0
+    });
+  
   console.log("🚀 STAGING IMPORT: Starting high-performance CSV import");
   console.log(`📊 File: ${filename}, Vendor: ${vendor}, Scan Date: ${scanDate}`);
+  console.log(`🔄 Progress Session: ${sessionId}`);
+  
+  // Immediately return session ID to client
+  res.json({
+    success: true,
+    sessionId: sessionId,
+    message: "CSV import started",
+    filename: filename,
+    vendor: vendor,
+    scanDate: scanDate
+  });
+  
+  // Update progress: Starting CSV parsing
+  progressTracker.updateProgress(sessionId, 5, "Parsing CSV file...", { currentStep: 1 });
   
   // Read and parse CSV
   const csvData = PathValidator.safeReadFileSync(req.file.path, "utf8");
@@ -2006,6 +2319,12 @@ app.post("/api/vulnerabilities/import-staging", upload.single("csvFile"), (req, 
     header: true,
     complete: (results) => {
       const rows = results.data.filter(row => Object.values(row).some(val => val && val.trim()));
+      
+      // Update progress: CSV parsing completed
+      progressTracker.updateProgress(sessionId, 15, `Parsed ${rows.length} rows from CSV`, { 
+        currentStep: 1, 
+        rowCount: rows.length 
+      });
       
       console.log(`📈 Parsed ${rows.length} rows from CSV`);
       
@@ -2026,12 +2345,19 @@ app.post("/api/vulnerabilities/import-staging", upload.single("csvFile"), (req, 
         JSON.stringify(results.meta.fields)
       ], function(err) {
         if (err) {
-          res.status(500).json({ error: err.message });
+          progressTracker.errorSession(sessionId, "Failed to create import record: " + err.message, { error: err });
+          console.error("Import record creation failed:", err);
           return;
         }
         
         const importId = this.lastID;
         console.log(`📝 Import record created: ID ${importId}`);
+        
+        // Update progress: Starting bulk load to staging
+        progressTracker.updateProgress(sessionId, 20, "Loading data to staging table...", { 
+          currentStep: 2, 
+          importId: importId 
+        });
         
         // ✅ BULK LOAD TO STAGING TABLE
         bulkLoadToStagingTable(rows, importId, scanDate, req.file.path, {
@@ -2041,11 +2367,12 @@ app.post("/api/vulnerabilities/import-staging", upload.single("csvFile"), (req, 
           vendor,
           scanDate,
           stagingMode: true
-        }, res, startTime);
+        }, sessionId, startTime); // Pass sessionId instead of res
       });
     },
     error: (error) => {
-      res.status(400).json({ error: "CSV parsing failed: " + error.message });
+      progressTracker.errorSession(sessionId, "CSV parsing failed: " + error.message, { error: error });
+      console.error("CSV parsing failed:", error);
     }
   });
 });
@@ -3334,10 +3661,11 @@ app.post("/api/restore", upload.single("file"), async (req, res) => {
     }
 });
 
-app.listen(PORT, "0.0.0.0", () => {
+server.listen(PORT, "0.0.0.0", () => {
   initDb();
   console.log(`🚀 HexTrackr server running on http://localhost:${PORT}`);
   console.log("📊 Database-powered vulnerability management enabled");
+  console.log("🔌 WebSocket progress tracking enabled");
   console.log("Available endpoints:");
   console.log(`  - Tickets: http://localhost:${PORT}/tickets.html`);
   console.log(`  - Vulnerabilities: http://localhost:${PORT}/vulnerabilities.html`);
