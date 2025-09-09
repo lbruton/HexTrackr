@@ -1,4 +1,0 @@
-Created backup manifest
-Files backed up on Fri Sep  5 21:02:37 CDT 2025
-- vulnerability-manager.js
-- vulnerabilities.html

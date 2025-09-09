@@ -7,14 +7,19 @@
       "ignorePatterns": [
         "node_modules/**",
         "backups/**",
+        "depreciated/**",
         ".venv/**",
         "temp/**",
         "uploads/**",
         "logs/**",
         "data/**",
-        "docs-html/**",
-        "*.min.js",
-        "scripts/pages/vulnerability-manager.js"
+        "app/public/docs-html/**",
+        "__tests__/coverage/**",
+        "__tests__/test-results/**",
+        "__tests__/playwright-report/**",
+        "test-results/**",
+        "hextrackr-specs/**",
+        "*.min.js"
       ],
       "globals": {
         "bootstrap": true,
@@ -52,13 +57,18 @@
   "exclude_paths": [
     "node_modules/**",
     "backups/**",
+    "depreciated/**",
     ".venv/**",
     "temp/**",
     "uploads/**",
     "logs/**",
     "data/**",
-    "docs-html/**",
-    "*.min.js",
-    "scripts/pages/vulnerability-manager.js"
+    "app/public/docs-html/**",
+    "__tests__/coverage/**",
+    "__tests__/test-results/**",
+    "__tests__/playwright-report/**",
+    "test-results/**",
+    "hextrackr-specs/**",
+    "*.min.js"
   ]
 }
