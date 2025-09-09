@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "codacy": {
+      "type": "stdio",
+      "command": "/opt/homebrew/bin/codacy-mcp-server",
+      "args": [],
+      "env": {}
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ],
+      "env": {}
+    }
+  }
+}
