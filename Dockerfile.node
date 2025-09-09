@@ -13,18 +13,17 @@ COPY package*.json ./
 RUN npm install
 RUN npm rebuild
 
-# Copy application files (but not node_modules)
-COPY *.html ./
-COPY *.js ./
-COPY *.css ./
+# Copy application files from new structure
+COPY app/public/*.html ./
+COPY app/public/*.js ./
 COPY *.json ./
 COPY eslint.config.mjs ./
 
-# Copy scripts directory
-COPY scripts/ ./scripts/
-
-# Copy documentation portal
-COPY docs-html/ ./docs-html/
+# Copy asset directories
+COPY app/public/scripts/ ./scripts/
+COPY app/public/styles/ ./styles/
+COPY app/public/docs-html/ ./docs-html/
+COPY app/public/docs-source/ ./docs-source/
 
 # Create necessary directories
 RUN mkdir -p ./data/ ./roadmaps/ ./uploads/ ./docs/ ./audit/
