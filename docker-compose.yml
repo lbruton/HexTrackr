@@ -4,10 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile.node
     ports:
-      - "8080:8080"
+      - "8989:8080"  # External port 8989 -> Internal port 8080 (prevents test conflicts)
     volumes:
-      # Mount source files for development but exclude node_modules
-      - .:/app
+      # Mount application files for development but exclude node_modules
+      - ./app/public:/app
       - /app/node_modules
       # Mount database for persistence
       - ./data:/app/data

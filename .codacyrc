@@ -7,6 +7,8 @@
       "ignorePatterns": [
         "node_modules/**",
         "backups/**",
+        "depreciated/**",
+        "dev-docs/**",
         ".venv/**",
         "temp/**",
         "uploads/**",
@@ -52,6 +54,8 @@
   "exclude_paths": [
     "node_modules/**",
     "backups/**",
+    "depreciated/**",
+    "dev-docs/**",
     ".venv/**",
     "temp/**",
     "uploads/**",
