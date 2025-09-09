@@ -3,6 +3,20 @@
 Project-specific guidance for HexTrackr vulnerability management system.
 For universal tools and workflows, see Personal CLAUDE.md.
 
+## 🚨 CRITICAL GIT WORKFLOW - NEVER VIOLATE 🚨
+
+## MAIN BRANCH IS PROTECTED - NEVER WORK IN MAIN
+
+- **ALWAYS** work from the `copilot` branch
+- **NEVER** checkout main branch
+- **NEVER** commit to main branch  
+- **NEVER** merge to main branch
+- The `copilot` branch is our primary development branch
+- All work happens in feature branches off `copilot`
+- Workflow: feature branch → PR → merge to `copilot` → eventual release to main
+
+**Violation of this rule is a MAJOR breach of trust and can cause loss of work**
+
 ## Project Overview
 
 HexTrackr is a vulnerability and ticket management system with:
