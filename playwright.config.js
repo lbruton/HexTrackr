@@ -60,7 +60,7 @@ module.exports = defineConfig({
       use: { 
         ...devices['Desktop Chrome'],
         // Use headed mode for debugging when not in CI
-        headless: !!process.env.CI,
+        headless: true, // Always run headless to avoid screen takeover
       },
     },
     
@@ -68,7 +68,7 @@ module.exports = defineConfig({
       name: 'firefox',
       use: { 
         ...devices['Desktop Firefox'],
-        headless: !!process.env.CI,
+        headless: true, // Always run headless to avoid screen takeover
       },
     },
 
@@ -76,7 +76,7 @@ module.exports = defineConfig({
       name: 'webkit',
       use: { 
         ...devices['Desktop Safari'],
-        headless: !!process.env.CI,
+        headless: true, // Always run headless to avoid screen takeover
       },
     },
 
@@ -85,14 +85,14 @@ module.exports = defineConfig({
       name: 'Mobile Chrome',
       use: { 
         ...devices['Pixel 5'],
-        headless: !!process.env.CI,
+        headless: true, // Always run headless to avoid screen takeover
       },
     },
     {
       name: 'Mobile Safari',
       use: { 
         ...devices['iPhone 12'],
-        headless: !!process.env.CI,
+        headless: true, // Always run headless to avoid screen takeover
       },
     },
   ],

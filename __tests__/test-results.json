@@ -1,0 +1,2594 @@
+{
+  "config": {
+    "configFile": "/Volumes/DATA/GitHub/HexTrackr/playwright.config.js",
+    "rootDir": "/Volumes/DATA/GitHub/HexTrackr/__tests__/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "/Volumes/DATA/GitHub/HexTrackr/__tests__/global-setup.js",
+    "globalTeardown": "/Volumes/DATA/GitHub/HexTrackr/__tests__/global-teardown.js",
+    "globalTimeout": 600000,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "open": "never",
+          "outputFolder": "__tests__/playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "__tests__/test-results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Volumes/DATA/GitHub/HexTrackr/__tests__/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Volumes/DATA/GitHub/HexTrackr/__tests__/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Volumes/DATA/GitHub/HexTrackr/__tests__/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Volumes/DATA/GitHub/HexTrackr/__tests__/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Volumes/DATA/GitHub/HexTrackr/__tests__/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Volumes/DATA/GitHub/HexTrackr/__tests__/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Volumes/DATA/GitHub/HexTrackr/__tests__/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/Volumes/DATA/GitHub/HexTrackr/__tests__/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Volumes/DATA/GitHub/HexTrackr/__tests__/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/Volumes/DATA/GitHub/HexTrackr/__tests__/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 5,
+    "webServer": {
+      "command": "docker-compose up -d",
+      "url": "http://localhost:8080",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "console-debug-test.spec.js",
+      "file": "console-debug-test.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Debug console messages from modal",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "632ee74fba6714a249cb-060df85410df00b79991",
+          "file": "console-debug-test.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "Debug console messages from modal",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "632ee74fba6714a249cb-db4902e1f0715ddf3aec",
+          "file": "console-debug-test.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "Debug console messages from modal",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "632ee74fba6714a249cb-c6b319de8faceba922bb",
+          "file": "console-debug-test.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "Debug console messages from modal",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "Mobile Chrome",
+              "projectName": "Mobile Chrome",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "632ee74fba6714a249cb-0b2a0756dbdda297bf01",
+          "file": "console-debug-test.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "Debug console messages from modal",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "Mobile Safari",
+              "projectName": "Mobile Safari",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "632ee74fba6714a249cb-952a9fcd4a0326160091",
+          "file": "console-debug-test.spec.js",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "debug-aggregation.spec.js",
+      "file": "debug-aggregation.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Debug Aggregation Logic",
+          "file": "debug-aggregation.spec.js",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should debug aggregation logic with console output",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4c1e89140add9e6bae6f-bb66f91fa73940858d16",
+              "file": "debug-aggregation.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should debug aggregation logic with console output",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4c1e89140add9e6bae6f-0b772999399ae889e353",
+              "file": "debug-aggregation.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should debug aggregation logic with console output",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4c1e89140add9e6bae6f-8ee3f896c5d5b2bed848",
+              "file": "debug-aggregation.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should debug aggregation logic with console output",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4c1e89140add9e6bae6f-c3469e8f794ae7367e80",
+              "file": "debug-aggregation.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should debug aggregation logic with console output",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4c1e89140add9e6bae6f-9116bb45bb0951aa41ac",
+              "file": "debug-aggregation.spec.js",
+              "line": 4,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "debug-page-load.spec.js",
+      "file": "debug-page-load.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Debug Page Loading",
+          "file": "debug-page-load.spec.js",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should debug page loading and data presence",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0b246fd701420bc5683a-6b02ac9a740954b6b904",
+              "file": "debug-page-load.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should debug page loading and data presence",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0b246fd701420bc5683a-91fdf901dbc9bfcf02b3",
+              "file": "debug-page-load.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should debug page loading and data presence",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0b246fd701420bc5683a-18e3468d1bd5d6c2ec26",
+              "file": "debug-page-load.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should debug page loading and data presence",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0b246fd701420bc5683a-24b7746a03423802a157",
+              "file": "debug-page-load.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should debug page loading and data presence",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "0b246fd701420bc5683a-e4ea7b71df93f94f1224",
+              "file": "debug-page-load.spec.js",
+              "line": 4,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "dom-inspection.spec.js",
+      "file": "dom-inspection.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "DOM inspection",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "2342e15f374520920dcb-9b13e0f72bf8634996e8",
+          "file": "dom-inspection.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "DOM inspection",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "2342e15f374520920dcb-279e73df737512e888f0",
+          "file": "dom-inspection.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "DOM inspection",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "2342e15f374520920dcb-74bef9d0f48a13e2ce86",
+          "file": "dom-inspection.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "DOM inspection",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "Mobile Chrome",
+              "projectName": "Mobile Chrome",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "2342e15f374520920dcb-396cc900c1c6ba9be8d6",
+          "file": "dom-inspection.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "DOM inspection",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "Mobile Safari",
+              "projectName": "Mobile Safari",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "2342e15f374520920dcb-8007d3b3c20cadf9556d",
+          "file": "dom-inspection.spec.js",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "inspect-vuln-data.spec.js",
+      "file": "inspect-vuln-data.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Inspect vulnerability data structure",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "a46a8ff3170b5bb86275-3e18f1d71931fe59d6f4",
+          "file": "inspect-vuln-data.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "Inspect vulnerability data structure",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "a46a8ff3170b5bb86275-bc48de6f4f0ae9220300",
+          "file": "inspect-vuln-data.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "Inspect vulnerability data structure",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "a46a8ff3170b5bb86275-fbf18bb49b0651ce169c",
+          "file": "inspect-vuln-data.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "Inspect vulnerability data structure",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "Mobile Chrome",
+              "projectName": "Mobile Chrome",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "a46a8ff3170b5bb86275-7b2fd26dc0f144cb698a",
+          "file": "inspect-vuln-data.spec.js",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "Inspect vulnerability data structure",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "Mobile Safari",
+              "projectName": "Mobile Safari",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "a46a8ff3170b5bb86275-6526cf5834642506f15b",
+          "file": "inspect-vuln-data.spec.js",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "modal-aggregation.spec.js",
+      "file": "modal-aggregation.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Modal Aggregation Tests",
+          "file": "modal-aggregation.spec.js",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "vulnerability modal should show all affected devices for same vulnerability",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-ad72730397a7c2d4fecf",
+              "file": "modal-aggregation.spec.js",
+              "line": 17,
+              "column": 5
+            },
+            {
+              "title": "device modal should show all vulnerabilities for same device",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-c34fef5728fd89827791",
+              "file": "modal-aggregation.spec.js",
+              "line": 85,
+              "column": 5
+            },
+            {
+              "title": "verify data consistency between main table and modals",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-28e13a31fd928eacf504",
+              "file": "modal-aggregation.spec.js",
+              "line": 126,
+              "column": 5
+            },
+            {
+              "title": "vulnerability modal should show all affected devices for same vulnerability",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-9ac4ee98369b661424e4",
+              "file": "modal-aggregation.spec.js",
+              "line": 17,
+              "column": 5
+            },
+            {
+              "title": "device modal should show all vulnerabilities for same device",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-16286278365843b0092d",
+              "file": "modal-aggregation.spec.js",
+              "line": 85,
+              "column": 5
+            },
+            {
+              "title": "verify data consistency between main table and modals",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-1698d28f14273ec7bdf9",
+              "file": "modal-aggregation.spec.js",
+              "line": 126,
+              "column": 5
+            },
+            {
+              "title": "vulnerability modal should show all affected devices for same vulnerability",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-f440114d59576696e75d",
+              "file": "modal-aggregation.spec.js",
+              "line": 17,
+              "column": 5
+            },
+            {
+              "title": "device modal should show all vulnerabilities for same device",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-d82a8dd4d46e90fc53da",
+              "file": "modal-aggregation.spec.js",
+              "line": 85,
+              "column": 5
+            },
+            {
+              "title": "verify data consistency between main table and modals",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-fd67ca88c90ed0857612",
+              "file": "modal-aggregation.spec.js",
+              "line": 126,
+              "column": 5
+            },
+            {
+              "title": "vulnerability modal should show all affected devices for same vulnerability",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-eb6e7af038abdd7a94a0",
+              "file": "modal-aggregation.spec.js",
+              "line": 17,
+              "column": 5
+            },
+            {
+              "title": "device modal should show all vulnerabilities for same device",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-8111dabb7921380d57b0",
+              "file": "modal-aggregation.spec.js",
+              "line": 85,
+              "column": 5
+            },
+            {
+              "title": "verify data consistency between main table and modals",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-ab9be5919f881dcf449e",
+              "file": "modal-aggregation.spec.js",
+              "line": 126,
+              "column": 5
+            },
+            {
+              "title": "vulnerability modal should show all affected devices for same vulnerability",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-f8a59780e3533fd4d60f",
+              "file": "modal-aggregation.spec.js",
+              "line": 17,
+              "column": 5
+            },
+            {
+              "title": "device modal should show all vulnerabilities for same device",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-02cb02617b3099256553",
+              "file": "modal-aggregation.spec.js",
+              "line": 85,
+              "column": 5
+            },
+            {
+              "title": "verify data consistency between main table and modals",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7f9093f9392e7fa57cdd-5513cc8e2947ea484bb2",
+              "file": "modal-aggregation.spec.js",
+              "line": 126,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "modal-success-validation.spec.js",
+      "file": "modal-success-validation.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Modal Aggregation Success Validation",
+          "file": "modal-success-validation.spec.js",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "validate vulnerability and device modals are working correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "9d94c1008f6c1aa601bc-9012f2c8924c3d9d7933",
+              "file": "modal-success-validation.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "validate vulnerability and device modals are working correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "9d94c1008f6c1aa601bc-470be6ce8f42a2364c05",
+              "file": "modal-success-validation.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "validate vulnerability and device modals are working correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "9d94c1008f6c1aa601bc-c8f590d2b26f7550a0a8",
+              "file": "modal-success-validation.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "validate vulnerability and device modals are working correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "9d94c1008f6c1aa601bc-871aab7f0168c9020df3",
+              "file": "modal-success-validation.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "validate vulnerability and device modals are working correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "9d94c1008f6c1aa601bc-ed9d2f7acf6332311e4e",
+              "file": "modal-success-validation.spec.js",
+              "line": 4,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "simple-modal-test.spec.js",
+      "file": "simple-modal-test.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Simple Modal Test",
+          "file": "simple-modal-test.spec.js",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should open vulnerability modal from HTML table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "999e5140739b7a25c28b-0f6adb4a0e907b2f03df",
+              "file": "simple-modal-test.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should open vulnerability modal from HTML table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "999e5140739b7a25c28b-ba08425017992d38eeb3",
+              "file": "simple-modal-test.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should open vulnerability modal from HTML table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "999e5140739b7a25c28b-88267655e51578859b05",
+              "file": "simple-modal-test.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should open vulnerability modal from HTML table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "999e5140739b7a25c28b-095f0a4cd07d239c2a61",
+              "file": "simple-modal-test.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should open vulnerability modal from HTML table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "999e5140739b7a25c28b-e9f8102c285e7c9898f1",
+              "file": "simple-modal-test.spec.js",
+              "line": 4,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "vulnerability-import-export.spec.js",
+      "file": "vulnerability-import-export.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "HexTrackr Vulnerability Import/Export Pipeline",
+          "file": "vulnerability-import-export.spec.js",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should import Cisco vulnerabilities CSV correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-01f9b4c6f01a784183f0",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 11,
+              "column": 5
+            },
+            {
+              "title": "should aggregate all affected devices in vulnerability modal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-39608a997368f4ef5c29",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 58,
+              "column": 5
+            },
+            {
+              "title": "should handle different CSV formats correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-9076c700a50d2b0cb03d",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 98,
+              "column": 5
+            },
+            {
+              "title": "should preserve state tracking from CSV",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-568a3f1da925a404a4ee",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 121,
+              "column": 5
+            },
+            {
+              "title": "should export vulnerabilities correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-e3cb917a94b5f1cf8017",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 140,
+              "column": 5
+            },
+            {
+              "title": "should handle cards view correctly after import",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-0036b342beec44c3ef11",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 162,
+              "column": 5
+            },
+            {
+              "title": "should import Cisco vulnerabilities CSV correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-00d1ee5a43dd0fcd9280",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 11,
+              "column": 5
+            },
+            {
+              "title": "should aggregate all affected devices in vulnerability modal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-e427a52fe033e312dbc2",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 58,
+              "column": 5
+            },
+            {
+              "title": "should handle different CSV formats correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-62e392cc71008a3ddb18",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 98,
+              "column": 5
+            },
+            {
+              "title": "should preserve state tracking from CSV",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-22d3c281bade8977d73d",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 121,
+              "column": 5
+            },
+            {
+              "title": "should export vulnerabilities correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-cdf776a2e6c95a44f5f9",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 140,
+              "column": 5
+            },
+            {
+              "title": "should handle cards view correctly after import",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-6accc74e54b091c961d0",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 162,
+              "column": 5
+            },
+            {
+              "title": "should import Cisco vulnerabilities CSV correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-4f6cf4c83d3a1225d1cb",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 11,
+              "column": 5
+            },
+            {
+              "title": "should aggregate all affected devices in vulnerability modal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-cf51543e605bb760f6fa",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 58,
+              "column": 5
+            },
+            {
+              "title": "should handle different CSV formats correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-886407d96e3c4650f9b0",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 98,
+              "column": 5
+            },
+            {
+              "title": "should preserve state tracking from CSV",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-3bf7b2c6ec7e88dad159",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 121,
+              "column": 5
+            },
+            {
+              "title": "should export vulnerabilities correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-bc60f55e5d099f8dc376",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 140,
+              "column": 5
+            },
+            {
+              "title": "should handle cards view correctly after import",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-c314482d3f170c5a83aa",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 162,
+              "column": 5
+            },
+            {
+              "title": "should import Cisco vulnerabilities CSV correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-56d101bf0d53028ddf0b",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 11,
+              "column": 5
+            },
+            {
+              "title": "should aggregate all affected devices in vulnerability modal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-65416b5ded774fa78f35",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 58,
+              "column": 5
+            },
+            {
+              "title": "should handle different CSV formats correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-dadbd6c5ad15b06d1526",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 98,
+              "column": 5
+            },
+            {
+              "title": "should preserve state tracking from CSV",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-2e561992dd8f101f1cb5",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 121,
+              "column": 5
+            },
+            {
+              "title": "should export vulnerabilities correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-434fe9c8ccc393e788ce",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 140,
+              "column": 5
+            },
+            {
+              "title": "should handle cards view correctly after import",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-eed957ff9d0e456dea34",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 162,
+              "column": 5
+            },
+            {
+              "title": "should import Cisco vulnerabilities CSV correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-214994c7de451b97eb49",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 11,
+              "column": 5
+            },
+            {
+              "title": "should aggregate all affected devices in vulnerability modal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-38dce2795adedd20726a",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 58,
+              "column": 5
+            },
+            {
+              "title": "should handle different CSV formats correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-863b35e03e05d6073aae",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 98,
+              "column": 5
+            },
+            {
+              "title": "should preserve state tracking from CSV",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-860a8ba18e8de631387b",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 121,
+              "column": 5
+            },
+            {
+              "title": "should export vulnerabilities correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-d7bd04da655b0727c6cf",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 140,
+              "column": 5
+            },
+            {
+              "title": "should handle cards view correctly after import",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "70ed43288c15eb52d41e-f573e248146a3dbac6d9",
+              "file": "vulnerability-import-export.spec.js",
+              "line": 162,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "vulnerability-modal-aggregation.spec.js",
+      "file": "vulnerability-modal-aggregation.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "HexTrackr Vulnerability Modal Aggregation Tests",
+          "file": "vulnerability-modal-aggregation.spec.js",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should show multiple affected devices in vulnerability modal from table view",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-ee1b073b20872d37d8d4",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 13,
+              "column": 5
+            },
+            {
+              "title": "should show Plugin Name as CVE/Cisco ID, not full description",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-ef898bb77f06535a6489",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 49,
+              "column": 5
+            },
+            {
+              "title": "should show correct aggregation from cards view",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-ea1f891c42911c825bae",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 81,
+              "column": 5
+            },
+            {
+              "title": "should handle vulnerabilities with different matching keys",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-1ab71cb875bec41cd9a9",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 108,
+              "column": 5
+            },
+            {
+              "title": "should show different devices than the launching row",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-983c4343eae8ce326609",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 147,
+              "column": 5
+            },
+            {
+              "title": "should maintain consistency between device count and table rows",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-c29146673e6fd5c120c9",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 182,
+              "column": 5
+            },
+            {
+              "title": "should show multiple affected devices in vulnerability modal from table view",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-e5677fd7f6d4be90c146",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 13,
+              "column": 5
+            },
+            {
+              "title": "should show Plugin Name as CVE/Cisco ID, not full description",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-4a3fd359b450c5f8daba",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 49,
+              "column": 5
+            },
+            {
+              "title": "should show correct aggregation from cards view",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-7f909e5e327d1ca68065",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 81,
+              "column": 5
+            },
+            {
+              "title": "should handle vulnerabilities with different matching keys",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-45cc58805b082c79325f",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 108,
+              "column": 5
+            },
+            {
+              "title": "should show different devices than the launching row",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-cd904520a6a2b48256b5",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 147,
+              "column": 5
+            },
+            {
+              "title": "should maintain consistency between device count and table rows",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-6a6410b649b0f93521ea",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 182,
+              "column": 5
+            },
+            {
+              "title": "should show multiple affected devices in vulnerability modal from table view",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-10870ce9c3d2bd19b181",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 13,
+              "column": 5
+            },
+            {
+              "title": "should show Plugin Name as CVE/Cisco ID, not full description",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-5fc8525e4b597da177e2",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 49,
+              "column": 5
+            },
+            {
+              "title": "should show correct aggregation from cards view",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-76aec611a58eb8c1085f",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 81,
+              "column": 5
+            },
+            {
+              "title": "should handle vulnerabilities with different matching keys",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-5790816b1b7988047072",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 108,
+              "column": 5
+            },
+            {
+              "title": "should show different devices than the launching row",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-d336a982f04b1e941f3b",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 147,
+              "column": 5
+            },
+            {
+              "title": "should maintain consistency between device count and table rows",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-dbb27cbb87890858a743",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 182,
+              "column": 5
+            },
+            {
+              "title": "should show multiple affected devices in vulnerability modal from table view",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-df51c8e463c640f7b8fd",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 13,
+              "column": 5
+            },
+            {
+              "title": "should show Plugin Name as CVE/Cisco ID, not full description",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-9993d03368d5fa5dedae",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 49,
+              "column": 5
+            },
+            {
+              "title": "should show correct aggregation from cards view",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-61e7e7b4802742852494",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 81,
+              "column": 5
+            },
+            {
+              "title": "should handle vulnerabilities with different matching keys",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-4a238a9992e82c1224ee",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 108,
+              "column": 5
+            },
+            {
+              "title": "should show different devices than the launching row",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-57e3cebb2abc718d1b98",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 147,
+              "column": 5
+            },
+            {
+              "title": "should maintain consistency between device count and table rows",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-b0044da9ca1715112e5c",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 182,
+              "column": 5
+            },
+            {
+              "title": "should show multiple affected devices in vulnerability modal from table view",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-b799818ebfe7d573d60d",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 13,
+              "column": 5
+            },
+            {
+              "title": "should show Plugin Name as CVE/Cisco ID, not full description",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-7881b9901d8c85710c41",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 49,
+              "column": 5
+            },
+            {
+              "title": "should show correct aggregation from cards view",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-9f0d04a03529b9c43944",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 81,
+              "column": 5
+            },
+            {
+              "title": "should handle vulnerabilities with different matching keys",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-152491ad851692d361e5",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 108,
+              "column": 5
+            },
+            {
+              "title": "should show different devices than the launching row",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-3ae6a1f9923385d94f24",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 147,
+              "column": 5
+            },
+            {
+              "title": "should maintain consistency between device count and table rows",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de905cdafcc4ede342b-447275dd074138f39169",
+              "file": "vulnerability-modal-aggregation.spec.js",
+              "line": 182,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "working-modal-test.spec.js",
+      "file": "working-modal-test.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Working Modal Test",
+          "file": "working-modal-test.spec.js",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should test modal aggregation with correct selectors",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "05cecf8c3a0fdabed736-1fd9546bd5c1ffab7a10",
+              "file": "working-modal-test.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should test modal aggregation with correct selectors",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "05cecf8c3a0fdabed736-a1e2090be2db6cbf4acf",
+              "file": "working-modal-test.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should test modal aggregation with correct selectors",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "05cecf8c3a0fdabed736-b81003dbfddaf21463d6",
+              "file": "working-modal-test.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should test modal aggregation with correct selectors",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "05cecf8c3a0fdabed736-133da91fb9bf6276b27f",
+              "file": "working-modal-test.spec.js",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "should test modal aggregation with correct selectors",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "05cecf8c3a0fdabed736-47ddfd0d49cb2e3a3ec0",
+              "file": "working-modal-test.spec.js",
+              "line": 4,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-09-09T02:42:23.751Z",
+    "duration": 18.894999999999982,
+    "expected": 0,
+    "skipped": 115,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
