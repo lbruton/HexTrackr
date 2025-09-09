@@ -13,12 +13,23 @@ deprecated/**
 .*/**
 .*/
 
+# Test artifacts
+__tests__/coverage/**
+__tests__/test-results/**
+__tests__/playwright-report/**
+test-results/**
+
 # Data and uploads  
 data/**
 uploads/**
 logs/**
 temp/**
-docs-html/**
+
+# Documentation generated files
+app/public/docs-html/**
+
+# Hextrackr specs (these are documentation)
+hextrackr-specs/**
 
 # Development environments
 .venv/**
