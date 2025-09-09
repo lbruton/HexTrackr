@@ -1,8 +1,8 @@
-# Tasks: JavaScript Module Extraction - UPDATED STATUS
+# Tasks: JavaScript Module Extraction
 
-**Status**: 12 modules extracted (95.1% reduction from 2,429 → 120 lines)
-**Input**: Implementation plan from `plan.md`, current codebase analysis
-**Prerequisites**: spec.md (required), plan.md (required)
+**Input**: Design documents from `/specs/001-javascript-module-extraction/`
+**Prerequisites**: plan.md (required), research.md, data-model.md, contracts/
+**Status**: Near Complete - Module extraction 95% done, testing and bug fixes pending
 
 ## ✅ COMPLETED MODULES (12 extracted)
 
@@ -87,6 +87,57 @@
 - Maintain functionality parity during each extraction
 - Test browser compatibility after each module
 - Update imports/exports as modules are extracted
+
+## Bug Fixes
+
+- [x] B001: Fix vulnerability dashboard cards showing zero values (affects vulnerability-statistics.js)
+  - **Severity**: HIGH
+  - **Impact**: Critical UI regression - dashboard cards display "0" instead of actual vulnerability counts and VPR scores
+  - **Root Cause**: Likely CSS class dependencies or event handling disconnection after VulnerabilityStatisticsManager extraction in v1.0.11
+  - **Fix Estimate**: 2-4 hours
+  - **Testing**: Unit tests for VulnerabilityStatisticsManager + manual dashboard verification + integration testing
+  - **Files**: app/public/scripts/shared/vulnerability-statistics.js, dashboard UI components
+
+- [x] B002: Restore vulnerability stat card flip functionality (affects vulnerability-statistics.js) ✅ **RESOLVED**
+  - **Severity**: HIGH  
+  - **Impact**: Core UI regression - vulnerability/VPR stat cards cannot flip between vulnerability counts and VPR scores
+  - **Root Cause**: `flipStatCards()` method completely missing after modularization - HTML has `onclick="vulnManager.flipStatCards()"` but method doesn't exist
+  - **Fix Estimate**: 3-5 hours (ACTUAL: 2 hours)
+  - **Testing**: Manual verification of all 4 stat cards (Critical/High/Medium/Low) + CSS animation testing ✅ PASSED
+  - **Implementation**: Added flipStatCards() method to VulnerabilityStatisticsManager class with card-front/card-back toggle logic ✅ COMPLETED
+  - **Files**: app/public/scripts/shared/vulnerability-statistics.js (lines 362-404), app/public/scripts/shared/vulnerability-core.js (lines 584-594), app/public/scripts/pages/vulnerabilities.js (lines 96-98, 112-113)
+  - **Resolution**: Method properly toggles display between card-front/card-back with 0.6s CSS animation, all 4 cards flip simultaneously, bidirectional functionality confirmed
+  - **Resolved**: September 9, 2025
+
+- [x] B003: Fix modal launch failures across all views (affects vulnerability-core.js + multiple modules) **CRITICAL** ✅ **RESOLVED**
+  - **Severity**: CRITICAL
+  - **Impact**: **WIDESPREAD UI REGRESSION** - Multiple modal types failing across Table/Device/Vulnerability views after modularization
+  - **Confirmed Failures**:
+    - Table view: Vulnerability description clicks fail to launch VulnerabilityDetailsModal
+    - Device cards: "View Device Details" buttons fail to launch DeviceSecurityModal  
+    - Vulnerability cards: Modal launches failing (needs verification)
+    - **NEW**: Vulnerability details modal only shows 1 device instead of all affected devices
+  - **Root Cause**: **MISSING DATAMANAGER PARAMETER** - vulnerability-core.js line 445 only passes vulnData but not this.dataManager to showVulnerabilityDetails()
+    - **Regression**: Previously fixed in Session HEXTRACKR-MODALDEBUG-20250909-001 but reintroduced during refactoring
+    - **Specific Issue**: showVulnerabilityDetails(vulnData) should be showVulnerabilityDetails(vulnData, this.dataManager)
+    - **Secondary Issues**: Export and report methods in modal also pass null instead of dataManager
+  - **Error Patterns**: Modal opens but getAffectedAssets() method receives null dataManager, fallback to single device only
+  - **Fix Estimate**: 1-2 hours (SIMPLE PARAMETER FIXES) - **ACTUAL**: 1 hour
+  - **Testing**: **COMPREHENSIVE PLAYWRIGHT VALIDATION** completed - all device aggregation working ✅ PASSED
+  - **Files**: app/public/scripts/shared/vulnerability-core.js (line 445), vulnerability-details-modal.js (lines 527, 606)
+  - **Implementation**: Fixed missing dataManager parameter in showVulnerabilityDetails() call and export methods ✅ COMPLETED
+  - **Validation**: Modal now shows all 5 affected devices instead of just 1, proper device aggregation confirmed
+  - **Resolution**: All three parameter fixes implemented - vulnerability modal device aggregation fully restored
+  - **Resolved**: September 9, 2025
+
+<!-- Template for future bugs:
+- [ ] B001: Bug description (affects specific-file.js)
+  - **Severity**: Critical|High|Medium|Low  
+  - **Impact**: User-visible description
+  - **Fix Estimate**: Time estimate
+  - **Testing**: Testing requirements
+  - **Rollback**: Rollback procedure if needed
+-->
 
 ## Expected Final State
 

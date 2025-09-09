@@ -10,9 +10,20 @@ const fs = require("fs/promises");
 const path = require("path");
 
 const SPECS_ROOT = path.join(process.cwd(), "hextrackr-specs", "specs");
-const ROADMAP_PATH = path.join(process.cwd(), "ROADMAP.md");
+const ROADMAP_PATH = path.join(process.cwd(), "app/public/docs-source/ROADMAP.md");
+const ACTIVE_SPEC_PATH = path.join(process.cwd(), ".active-spec");
 const MARK_START = "<!-- AUTO-GENERATED-SPECS-START -->";
 const MARK_END = "<!-- AUTO-GENERATED-SPECS-END -->";
+
+async function readActiveSpec() {
+  try {
+    const content = await fs.readFile(ACTIVE_SPEC_PATH, "utf8");
+    return content.trim();
+  } catch (error) {
+    console.log("ℹ️ No active spec file found (.active-spec)");
+    return null;
+  }
+}
 
 async function listSpecTaskFiles(rootDir) {
   const dirs = await fs.readdir(rootDir, { withFileTypes: true });
@@ -40,6 +51,46 @@ function parseCheckboxStats(md) {
   return { total, done, pct: total ? Math.round((done / total) * 100) : 0 };
 }
 
+function extractPendingTasks(md, limit = 10) {
+  const cleaned = stripCodeBlocks(md);
+  const lines = cleaned.split("\n");
+  const pending = [];
+  
+  for (const line of lines) {
+    const match = line.match(/^\s*-\s*\[\s\]\s+(.+)$/);
+    if (match && pending.length < limit) {
+      let task = match[1].trim();
+      // Clean up task text - remove markdown formatting and extra spaces
+      task = task.replace(/\*\*(.*?)\*\*/g, "$1"); // Remove bold
+      task = task.replace(/\*(.*?)\*/g, "$1"); // Remove italic
+      task = task.replace(/\s+/g, " "); // Normalize spaces
+      
+      // Truncate if too long
+      if (task.length > 80) {
+        task = task.substring(0, 77) + "...";
+      }
+      
+      pending.push(task);
+    }
+  }
+  
+  return pending;
+}
+
+function extractSpecPriority(md) {
+  // Look for priority indicators in the markdown
+  if (md.includes("**HIGH PRIORITY**") || md.includes("Priority: HIGH")) {
+    return "HIGH";
+  }
+  if (md.includes("**MEDIUM PRIORITY**") || md.includes("Priority: MEDIUM")) {
+    return "MEDIUM";
+  }
+  if (md.includes("**LOW PRIORITY**") || md.includes("Priority: LOW")) {
+    return "LOW";
+  }
+  return "NORMAL";
+}
+
 function parseSpecMeta(md, filePath) {
   const metaRE = /^\*\*Spec\*\*:\s*([^\r\n]+)$/m;
   const match = md.match(metaRE);
@@ -54,21 +105,45 @@ async function summariseSpec(filePath) {
   const contents = await fs.readFile(filePath, "utf8");
   const stats = parseCheckboxStats(contents);
   const meta = parseSpecMeta(contents, filePath);
-  return { ...meta, ...stats };
+  const pending = extractPendingTasks(contents);
+  const priority = extractSpecPriority(contents);
+  
+  return { 
+    ...meta, 
+    ...stats, 
+    pending,
+    priority
+  };
 }
 
-function buildMarkdownTable(summaries) {
+function buildMarkdownTable(summaries, activeSpec) {
   const header = [
     "",
     "### Active Specifications",
     "",
-    "| Spec | Title | Progress |",
-    "| ---- | ----- | -------- |"
+    "| Spec | Title | Progress | Priority | Next Tasks |",
+    "| ---- | ----- | -------- | -------- | ---------- |"
   ];
+  
   const rows = summaries.map(s => {
     const progress = `${s.done}/${s.total} (${s.pct}%)`;
-    return `| ${s.id} | ${s.name} | ${progress} |`;
+    const priorityBadge = s.priority === "HIGH" ? "🚨 HIGH" : 
+                         s.priority === "MEDIUM" ? "🟡 MED" :
+                         s.priority === "LOW" ? "🔵 LOW" : "⚪ NORM";
+    
+    let nextTasks = "All tasks completed";
+    if (s.pending.length > 0) {
+      nextTasks = s.pending.map(task => `• ${task}`).join("<br>");
+    }
+    
+    // Check if this is the active spec and highlight it
+    const isActiveSpec = activeSpec && s.name.toLowerCase().includes(activeSpec.replace(/^\d+-/, "").replace(/-/g, " "));
+    const specId = isActiveSpec ? `**⚡ ${s.id}**` : s.id;
+    const specTitle = isActiveSpec ? `**${s.name}** 🎯` : s.name;
+    
+    return `| ${specId} | ${specTitle} | ${progress} | ${priorityBadge} | ${nextTasks} |`;
   });
+  
   return header.concat(rows, "").join("\n");
 }
 
@@ -89,15 +164,27 @@ function spliceSection(original, generated) {
       return;
     }
 
+    const activeSpec = await readActiveSpec();
     const summaries = await Promise.all(taskFiles.map(summariseSpec));
     summaries.sort((a, b) => Number(a.id) - Number(b.id));
 
-    const tableMd = buildMarkdownTable(summaries);
+    const tableMd = buildMarkdownTable(summaries, activeSpec);
     const roadmap = await fs.readFile(ROADMAP_PATH, "utf8").catch(() => "");
     const updated = spliceSection(roadmap, tableMd);
 
     await fs.writeFile(ROADMAP_PATH, updated, "utf8");
+    const totalTasks = summaries.reduce((sum, s) => sum + s.total, 0);
+    const completedTasks = summaries.reduce((sum, s) => sum + s.done, 0);
+    const overallPct = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    
     console.log(`✅ ROADMAP.md updated: ${summaries.length} spec(s) processed.`);
+    console.log(`   Overall progress: ${completedTasks}/${totalTasks} tasks (${overallPct}%)`);
+    
+    // Log pending tasks summary
+    const totalPending = summaries.reduce((sum, s) => sum + s.pending.length, 0);
+    if (totalPending > 0) {
+      console.log(`   Next tasks: ${totalPending} pending across active specs`);
+    }
   } catch (err) {
     console.error("[sync-specs-to-roadmap] Error:", err);
     process.exitCode = 1;

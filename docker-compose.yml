@@ -9,8 +9,11 @@ services:
       # Mount application files for development but exclude node_modules
       - ./app/public:/app
       - /app/node_modules
+      # Mount package.json for version info
+      - ./package.json:/app/package.json
       # Mount database for persistence
       - ./data:/app/data
     environment:
       - NODE_ENV=development
+      - HEXTRACKR_VERSION=1.0.12
     restart: unless-stopped

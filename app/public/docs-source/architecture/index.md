@@ -14,6 +14,7 @@ This section provides a comprehensive overview of the HexTrackr system architect
 - **[Vulnerability Rollover Mechanism](./rollover-mechanism.md)**: A deep dive into the process that manages historical vulnerability data and daily trending.
 - **[Deployment Architecture](./deployment.md)**: Information on how the application is deployed using Docker.
 - **[Refactoring Plan](./refactoring-plan.md)**: Comprehensive modular architecture strategy for server.js complexity reduction.
+- **[Spec-Kit Integration](./spec-kit-integration.md)**: Documentation portal integration with specification-driven development framework.
 
 ## Frameworks and Libraries
 

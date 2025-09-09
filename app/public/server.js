@@ -258,10 +258,9 @@ function mapVulnerabilityRow(row) {
         }
     }
     
-    // Handle multiple CVEs separated by commas - take first one
-    if (cve && cve.includes(",")) {
-        cve = cve.split(",")[0].trim();
-    }
+    // Preserve complete CVE string (Option A Plus approach)
+    // Previously truncated multiple CVEs - now preserving all CVE data
+    // Future enhancement: Add CVE parsing layer when API expansion needed
     
     // Enhanced hostname processing with normalization
     let hostname = row["asset.name"] || row["hostname"] || row["Host"] || "";
@@ -1846,11 +1845,21 @@ app.use((req, res, next) => {
 // Lightweight health check endpoint for container orchestrators and probes
 app.get("/health", (req, res) => {
     try {
+        // Try to read version from package.json, fallback to environment variable
+        let version = "unknown";
+        try {
+            version = require("./package.json").version;
+        } catch (packageError) {
+            version = process.env.HEXTRACKR_VERSION || "unknown";
+            console.log(`Using environment version: ${version} (package.json not found: ${packageError.message})`);
+        }
+        
         // Simple DB file existence check (non-blocking)
         const dbExists = PathValidator.safeExistsSync(dbPath);
-        res.json({ status: "ok", version: require("./package.json").version, db: dbExists, uptime: process.uptime() });
-    } catch (_e) {
-        res.json({ status: "ok", version: "unknown", db: false, uptime: process.uptime() });
+        res.json({ status: "ok", version: version, db: dbExists, uptime: process.uptime() });
+    } catch (error) {
+        console.error("Health endpoint error:", error.message);
+        res.json({ status: "ok", version: process.env.HEXTRACKR_VERSION || "unknown", db: false, uptime: process.uptime() });
     }
 });
 

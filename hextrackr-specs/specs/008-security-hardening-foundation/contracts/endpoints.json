@@ -1,0 +1,69 @@
+{
+  "spec": "008-security-hardening-foundation",
+  "status": "PENDING",
+  "description": "Security policy management and validation endpoints",
+  "endpoints": [
+    {
+      "path": "/api/security/policies",
+      "method": "GET",
+      "description": "Get active security policies and rules",
+      "response": {
+        "schema": {
+          "policies": [
+            {
+              "id": "string",
+              "name": "string",
+              "type": "string",
+              "isActive": "boolean", 
+              "rules": ["object"]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "path": "/api/security/events",
+      "method": "GET",
+      "description": "Get security events and audit trail",
+      "request": {
+        "query": {
+          "severity": "string (optional)",
+          "limit": "number (default: 100)",
+          "since": "string (optional - ISO date)"
+        }
+      },
+      "response": {
+        "schema": {
+          "events": [
+            {
+              "id": "string",
+              "type": "string",
+              "severity": "string",
+              "timestamp": "string",
+              "source": "string",
+              "blocked": "boolean"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "path": "/api/security/validate",
+      "method": "POST",
+      "description": "Validate input against security policies",
+      "request": {
+        "body": {
+          "input": "object",
+          "context": "string"
+        }
+      },
+      "response": {
+        "schema": {
+          "valid": "boolean",
+          "violations": ["object"],
+          "sanitized": "object"
+        }
+      }
+    }
+  ]
+}

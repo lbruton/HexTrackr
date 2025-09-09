@@ -1,0 +1,19 @@
+{
+  "spec": "015-database-schema-standardization",
+  "status": "PENDING",
+  "description": "Database schema validation and migration endpoints",
+  "endpoints": [
+    {
+      "path": "/api/db/schema/validate",
+      "method": "GET",
+      "description": "Validate database schema integrity",
+      "response": {
+        "schema": {
+          "valid": "boolean",
+          "issues": ["string"]
+        }
+      }
+    }
+  ],
+  "notes": "Database optimization - no user-facing API changes"
+}
