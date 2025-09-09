@@ -1,248 +1,234 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
+    <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-info" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M12 9v4"/>
+        <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
+        <path d="M12 16h.01"/>
+    </svg>
+    <div>
+        <strong>Active Specification:</strong> 022-documentation-portal-rebuild
+        <small class="d-block text-muted">This documentation is being actively updated as part of the current specification development.</small>
+    </div>
+</div>
     <h1>HexTrackr Development Roadmap</h1>
 <h2>Overview</h2>
-<p>This roadmap serves as the master checklist for all HexTrackr development tasks, organized by domain and priority level. Each item in the current SPRINT.md must have a corresponding entry in this roadmap to maintain 1-to-1 mapping between planning and execution.</p>
-<p><strong>Current Version</strong>: v1.0.11 (September 2025)<br><strong>Project Start</strong>: September 2025</p>
+<p>This roadmap is dynamically generated from active specifications and reflects the real-time state of HexTrackr development. All tasks are derived from formal specifications that follow the spec-kit framework: spec.md → plan.md → tasks.md → implementation.</p>
+<p><strong>Current Version</strong>: v1.0.12 (September 2025)<br><strong>Project Start</strong>: September 2025<br><strong>Development Framework</strong>: Spec-Kit with Constitutional Compliance</p>
 <hr>
-<h2>🎨 <strong>UI/UX DOMAIN</strong></h2>
-<h3>🚨 <strong>HIGH PRIORITY</strong></h3>
-<h4>Real-Time Progress Tracking ✅ <strong>COMPLETED v1.0.10</strong></h4>
+<h2>📋 <strong>Specification-Driven Development Status</strong></h2>
+<h3>Current Implementation State</h3>
+<p>This roadmap now derives content from active specifications. The development process follows:</p>
+<ol>
+<li><strong>Specifications</strong> (23 total): Business requirements and feature definitions</li>
+<li><strong>Technical Plans</strong>: Implementation strategies derived from specifications  </li>
+<li><strong>Task Lists</strong>: Actionable items broken down from plans</li>
+<li><strong>Implementation</strong>: Code developed according to constitutional principles</li>
+</ol>
+<h3>Legacy Content Migration</h3>
+<p>The previous roadmap contained <strong>82 bullet points</strong> across multiple domains that need to be converted into formal specifications. This conversion happens as development priorities are established:</p>
 <ul>
-<li><input checked="" disabled="" type="checkbox"> <strong>WebSocket Progress Updates</strong>: Fixed CSV import progress modal hanging at 95%<ul>
-<li><input checked="" disabled="" type="checkbox"> Session ID synchronization between frontend/backend</li>
-<li><input checked="" disabled="" type="checkbox"> Progress complete event handling with proper frontend listeners</li>
-<li><input checked="" disabled="" type="checkbox"> Page refresh integration after successful imports</li>
-<li><input checked="" disabled="" type="checkbox"> UI cleanup - hidden hardcoded Current/Total/ETA elements</li>
+<li><strong>✅ Completed</strong>: Items already covered by existing specifications (Spec 001, 022, etc.)</li>
+<li><strong>🔄 In Progress</strong>: Active development items reflected in current task lists</li>
+<li><strong>📋 Planned</strong>: Items that will become specifications when prioritized</li>
 </ul>
-</li>
-</ul>
-<h4>Critical UX Fixes</h4>
+<h3>Domain Organization Reference</h3>
+<p>Previous roadmap domains that will be converted to specifications:</p>
 <ul>
-<li><input disabled="" type="checkbox"> <strong>CVE Link System Overhaul</strong>: Fix critical bug where CVE links open ALL CVEs instead of clicked one</li>
-<li><input disabled="" type="checkbox"> <strong>Modal System Enhancement</strong>: Resolve z-index issues with nested modals</li>
-<li><input disabled="" type="checkbox"> <strong>Responsive Layout Completion</strong>: Fix container layout and AG Grid responsiveness issues</li>
+<li><strong>🎨 UI/UX</strong>: Interface improvements, responsive design, accessibility</li>
+<li><strong>🏗️ Backend/Database</strong>: Performance, architecture, data management  </li>
+<li><strong>🛡️ Security</strong>: Authentication, hardening, compliance</li>
+<li><strong>🔌 Features</strong>: API integrations, analytics, automation</li>
 </ul>
-<h3>🟡 <strong>MEDIUM PRIORITY</strong></h3>
-<h4>UI Framework Modernization</h4>
+<h2>📊 <strong>Development Progress Overview</strong></h2>
+<h3>Current Status</h3>
 <ul>
-<li><input disabled="" type="checkbox"> <strong>Unified Application Framework</strong>: Migrate tickets.html to Tabler.io for consistency</li>
-<li><input disabled="" type="checkbox"> <strong>Dark Mode Implementation</strong>: Complete theme switching with chart compatibility</li>
+<li><strong>Active Specifications</strong>: 23 total (2 with task lists)</li>
+<li><strong>Overall Progress</strong>: 17/71 tasks completed (24%)</li>
+<li><strong>Version</strong>: v1.0.12 </li>
+<li><strong>Last Major Release</strong>: Module extraction architecture (v1.0.11)</li>
 </ul>
-<h4>Progressive Web App Features</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>PWA Implementation</strong>: Offline capability and app-like experience</li>
-<li><input disabled="" type="checkbox"> <strong>Mobile Responsiveness</strong>: Touch-optimized interface for tablet/phone access</li>
-</ul>
-<h3>🔵 <strong>LOW PRIORITY</strong></h3>
-<h4>Advanced UX Enhancements</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>Dashboard Customization</strong>: Drag-drop widget arrangement</li>
-<li><input disabled="" type="checkbox"> <strong>User Preferences</strong>: Persistent view settings and configurations</li>
-<li><input disabled="" type="checkbox"> <strong>Accessibility Improvements</strong>: WCAG 2.1 AA compliance</li>
-</ul>
+<h3>Next Development Priorities</h3>
+<p>Development priorities are determined by active specifications with pending tasks. When specifications are approved and converted to actionable task lists, they will appear in the table below with their current status.</p>
 <hr>
-<h2>🏗️ <strong>BACKEND/DATABASE DOMAIN</strong></h2>
-<h3>🚨 <strong>HIGH PRIORITY</strong> (2)</h3>
-<h4>Performance Optimization ✅ <strong>COMPLETED v1.0.8</strong></h4>
-<ul>
-<li><input checked="" disabled="" type="checkbox"> <strong>CSV Import Performance</strong>: 99%+ improvement (8,022ms → 65ms for 12,542 rows)</li>
-<li><input checked="" disabled="" type="checkbox"> <strong>Vulnerability Rollover Schema</strong>: Enhanced deduplication with confidence scoring</li>
-<li><input checked="" disabled="" type="checkbox"> <strong>Database Transaction Optimization</strong>: Staging table with bulk processing</li>
-</ul>
-<h4>Project Structure Foundation ✅ <strong>COMPLETED v1.0.11</strong> (Sep 8, 2025)</h4>
-<ul>
-<li><input checked="" disabled="" type="checkbox"> <strong>Phase 0: /app/public/ Migration</strong> (Project structure refactor - CRITICAL priority):<ul>
-<li><input checked="" disabled="" type="checkbox"> Root directory cleanup (39 → 33 items) ✅ <strong>COMPLETED</strong></li>
-<li><input checked="" disabled="" type="checkbox"> Docker configuration updates for new structure ✅ <strong>COMPLETED</strong></li>
-<li><input checked="" disabled="" type="checkbox"> Documentation portal path references fixed ✅ <strong>COMPLETED</strong></li>
-<li><input checked="" disabled="" type="checkbox"> Git submodule readiness established ✅ <strong>COMPLETED</strong></li>
-<li><input checked="" disabled="" type="checkbox"> Container-only Node.js execution verified ✅ <strong>COMPLETED</strong></li>
-</ul>
-</li>
-</ul>
-<h4>Core Architecture Refactoring ✅ <strong>COMPLETED v1.0.11</strong></h4>
-<ul>
-<li><input checked="" disabled="" type="checkbox"> <strong>ModernVulnManager Splitting</strong> (2,429 lines → 11 modules): ✅ <strong>COMPLETED</strong><ul>
-<li><input checked="" disabled="" type="checkbox"> <code>vulnerability-data.js</code> (571 lines) → DataManager Widget ✅ <strong>COMPLETED v1.0.11</strong></li>
-<li><input checked="" disabled="" type="checkbox"> <code>vulnerability-grid.js</code> (529 lines) → VulnerabilityDataTable Widget ✅ <strong>COMPLETED v1.0.11</strong></li>
-<li><input checked="" disabled="" type="checkbox"> <code>vulnerability-chart-manager.js</code> (590 lines) → VulnerabilityTrendChart Widget ✅ <strong>COMPLETED v1.0.11</strong></li>
-<li><input checked="" disabled="" type="checkbox"> <code>vulnerability-cards.js</code> (395 lines) → DeviceVulnerabilityCards Widget ✅ <strong>COMPLETED v1.0.11</strong></li>
-<li><input checked="" disabled="" type="checkbox"> <code>vulnerability-statistics.js</code> (364 lines) → VPRStatistics Widget ✅ <strong>COMPLETED v1.0.11</strong></li>
-<li><input checked="" disabled="" type="checkbox"> <code>vulnerability-details-modal.js</code> (935 lines) → VulnerabilityDetailsModal Widget ✅ <strong>COMPLETED v1.0.11</strong></li>
-<li><input checked="" disabled="" type="checkbox"> <code>vulnerability-search.js</code> (348 lines) → VulnerabilitySearch Widget ✅ <strong>COMPLETED v1.0.11</strong></li>
-<li><input checked="" disabled="" type="checkbox"> <code>vulnerability-core.js</code> (338 lines) → VulnerabilityOrchestrator ✅ <strong>COMPLETED v1.0.11</strong></li>
-<li><input checked="" disabled="" type="checkbox"> <strong>Additional specialized modules</strong> → Supporting architecture ✅ <strong>COMPLETED v1.0.11</strong></li>
-</ul>
-</li>
-</ul>
-<h3>🟡 <strong>MEDIUM PRIORITY</strong> (2)</h3>
-<h4>Backend Modularization</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>Route Extraction</strong>: Extract routes/vulnerabilities.js from monolithic server.js</li>
-<li><input disabled="" type="checkbox"> <strong>Database Layer Separation</strong>: Create lib/db.js with async/await patterns</li>
-<li><input disabled="" type="checkbox"> <strong>Controller Architecture</strong>: Implement controllers/vulnerabilityController.js</li>
-<li><input disabled="" type="checkbox"> <strong>Middleware Separation</strong>: Extract authentication, validation, error handling</li>
-<li><input disabled="" type="checkbox"> <strong>Service Layer Implementation</strong>: Business logic separation from route handlers</li>
-<li><input disabled="" type="checkbox"> <strong>Configuration Management</strong>: Centralized config handling</li>
-</ul>
-<h4>Database Schema Standardization</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>Timestamp Standardization</strong>: Consistent datetime columns across all tables</li>
-<li><input disabled="" type="checkbox"> <strong>Index Optimization</strong>: Performance-focused indexing strategy</li>
-<li><input disabled="" type="checkbox"> <strong>Constraint Implementation</strong>: Proper foreign keys and data validation</li>
-<li><input disabled="" type="checkbox"> <strong>Migration Framework</strong>: Structured approach for future schema changes</li>
-</ul>
-<h3>🔵 <strong>LOW PRIORITY</strong> (2)</h3>
-<h4>Advanced Architecture</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>TypeScript Migration</strong>: Gradual conversion starting with utility modules</li>
-<li><input disabled="" type="checkbox"> <strong>API Type Safety</strong>: Strongly typed request/response interfaces</li>
-<li><input disabled="" type="checkbox"> <strong>Database Schema Types</strong>: Type-safe database operations</li>
-<li><input disabled="" type="checkbox"> <strong>Build System Updates</strong>: TypeScript compilation workflow</li>
-</ul>
-<h4>State Management</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>Remove Global State Patterns</strong>: Replace window.vulnModalData with proper state</li>
-<li><input disabled="" type="checkbox"> <strong>Event System Implementation</strong>: Clean inter-module communication</li>
-<li><input disabled="" type="checkbox"> <strong>Data Flow Standardization</strong>: Consistent patterns for updates</li>
-<li><input disabled="" type="checkbox"> <strong>Memory Leak Prevention</strong>: Proper cleanup of listeners and references</li>
-</ul>
-<hr>
-<h2>🛡️ <strong>SECURITY DOMAIN</strong></h2>
-<h3>🚨 <strong>HIGH PRIORITY</strong> (3)</h3>
-<h4>Security Hardening Foundation ✅ <strong>PARTIALLY COMPLETED v1.0.8</strong></h4>
-<ul>
-<li><input checked="" disabled="" type="checkbox"> <strong>XSS Protection</strong>: Fixed AG Grid cell renderer vulnerability</li>
-<li><input checked="" disabled="" type="checkbox"> <strong>CORS Security Hardening</strong>: Restricted to localhost-only origins</li>
-<li><input checked="" disabled="" type="checkbox"> <strong>DoS Protection</strong>: Rate limiting middleware (100 requests/15min)</li>
-</ul>
-<h4>Critical Security Implementation</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>Helmet.js Security Headers</strong>: Comprehensive HTTP security middleware</li>
-<li><input disabled="" type="checkbox"> <strong>Input Validation Framework</strong>: express-validator on all API endpoints</li>
-<li><input disabled="" type="checkbox"> <strong>API Key Authentication</strong>: Secure authentication for third-party integrations</li>
-<li><input disabled="" type="checkbox"> <strong>JWT Authentication System</strong>: User session management with tokens</li>
-</ul>
-<h3>🟡 <strong>MEDIUM PRIORITY</strong> (3)</h3>
-<h4>Authentication &amp; Access Control</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>User Authentication System</strong>: Secure login with session management</li>
-<li><input disabled="" type="checkbox"> <strong>Role-based Access Control</strong>: Admin, User, Read-only roles with permissions</li>
-<li><input disabled="" type="checkbox"> <strong>API Security Enhancement</strong>: Authentication middleware for all endpoints</li>
-<li><input disabled="" type="checkbox"> <strong>Content Security Policy</strong>: Comprehensive CSP implementation</li>
-</ul>
-<h4>Compliance &amp; Auditing</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>Audit Logging</strong>: User action tracking for compliance</li>
-<li><input disabled="" type="checkbox"> <strong>Security Monitoring</strong>: Real-time security event tracking</li>
-<li><input disabled="" type="checkbox"> <strong>Vulnerability Scanning</strong>: Regular security assessments</li>
-</ul>
-<h3>🔵 <strong>LOW PRIORITY</strong> (3)</h3>
-<h4>Advanced Security Features</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>Multi-factor Authentication</strong>: 2FA/MFA implementation</li>
-<li><input disabled="" type="checkbox"> <strong>Single Sign-On Integration</strong>: SAML/OIDC support</li>
-<li><input disabled="" type="checkbox"> <strong>Advanced Threat Protection</strong>: Anomaly detection and response</li>
-</ul>
-<hr>
-<h2>🔌 <strong>FEATURE ENHANCEMENTS DOMAIN</strong></h2>
-<h3>🚨 <strong>HIGH PRIORITY</strong> (4)</h3>
-<h4>KEV Integration 🔄 <strong>PHASE 2A</strong></h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>KEV Data Integration</strong>: Daily CISA KEV CSV sync with vulnerability matching</li>
-<li><input disabled="" type="checkbox"> <strong>Filter UI Implementation</strong>: Add KEV toggle to all vulnerability views</li>
-<li><input disabled="" type="checkbox"> <strong>Priority Boost Logic</strong>: Auto-assign VPR 10.0 for KEV-flagged vulnerabilities</li>
-<li><input disabled="" type="checkbox"> <strong>KEV Dashboard Widget</strong>: Dedicated KEV summary and filtering widget</li>
-</ul>
-<h4>EPSS Scoring Integration</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>EPSS API Integration</strong>: Daily exploit prediction scoring</li>
-<li><input disabled="" type="checkbox"> <strong>EPSS Filter Implementation</strong>: Filter by exploit probability scores</li>
-<li><input disabled="" type="checkbox"> <strong>EPSS Trend Analysis</strong>: Historical EPSS score tracking</li>
-</ul>
-<h3>🟡 <strong>MEDIUM PRIORITY</strong> (4)</h3>
-<h4>API Integrations</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>Cisco API Integration</strong> (User has immediate API access):<ul>
-<li><input disabled="" type="checkbox"> OAuth 2.0 implementation</li>
-<li><input disabled="" type="checkbox"> Talos Intelligence API integration</li>
-<li><input disabled="" type="checkbox"> Security Advisory sync</li>
-<li><input disabled="" type="checkbox"> Risk scoring enhancement with vendor data</li>
-</ul>
-</li>
-<li><input disabled="" type="checkbox"> <strong>Tenable API Integration</strong> (Pending API approval):<ul>
-<li><input disabled="" type="checkbox"> Database schema updates (tenable_uuid, asset_id, scan_id)</li>
-<li><input disabled="" type="checkbox"> API client implementation</li>
-<li><input disabled="" type="checkbox"> Asset correlation with UUID-based matching</li>
-</ul>
-</li>
-</ul>
-<h4>Advanced Analytics</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>MITRE ATT&amp;CK Mapping</strong>: Framework-based vulnerability classification</li>
-<li><input disabled="" type="checkbox"> <strong>Executive Dashboards</strong>: C-level reporting with trend analysis</li>
-<li><input disabled="" type="checkbox"> <strong>Compliance Reporting</strong>: SOC2, ISO27001, NIST report generation</li>
-</ul>
-<h3>🔵 <strong>LOW PRIORITY</strong> (4)</h3>
-<h4>Network Infrastructure Features</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>SNMP Network Polling</strong>: Real-time device status monitoring</li>
-<li><input disabled="" type="checkbox"> <strong>Network Discovery &amp; Mapping</strong>: Automated asset discovery and topology</li>
-<li><input disabled="" type="checkbox"> <strong>Docker Implementation</strong>: Container architecture for SNMP services</li>
-</ul>
-<h4>Advanced Integration</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>Palo Alto Networks Integration</strong>: Prisma Cloud, Cortex, PAN-OS APIs</li>
-<li><input disabled="" type="checkbox"> <strong>Additional Vendor APIs</strong>: Qualys, Rapid7, CrowdStrike integrations</li>
-<li><input disabled="" type="checkbox"> <strong>Ansible Integration</strong>: AWX/Tower connectivity for automated patching</li>
-</ul>
-<h4>Automation Features</h4>
-<ul>
-<li><input disabled="" type="checkbox"> <strong>Multi-tenancy Support</strong>: Organization/site isolation</li>
-<li><input disabled="" type="checkbox"> <strong>Advanced Reporting System</strong>: HTML-based reports with PDF export</li>
-</ul>
-<hr>
-<h2>📊 <strong>PROJECT METRICS &amp; STATUS</strong></h2>
-<h3>Current State</h3>
-<ul>
-<li><strong>Version</strong>: v1.0.11</li>
-<li><strong>Total Records</strong>: 100,570+ (tickets + vulnerabilities)</li>
-<li><strong>Performance</strong>: CSV imports optimized to &lt;2 seconds for 10K+ rows</li>
-<li><strong>Security</strong>: Basic hardening implemented, full framework pending</li>
-<li><strong>Modularization</strong>: Complete - 11 specialized modules extracted with widget architecture</li>
-</ul>
-<h3>Completion Tracking</h3>
-<ul>
-<li><strong>UI/UX</strong>: 15% complete (critical fixes and progress tracking done)</li>
-<li><strong>Backend/Database</strong>: 85% complete (structure, performance, and modularization complete)</li>
-<li><strong>Security</strong>: 25% complete (basic hardening done, authentication pending)</li>
-<li><strong>Feature Enhancements</strong>: 5% complete (planning and research done)</li>
-</ul>
-<h3>Version Planning</h3>
-<ul>
-<li><strong>v1.0.11</strong>: Complete modularization tasks ✅ <strong>COMPLETED</strong></li>
-<li><strong>v1.1.0</strong>: KEV integration and security hardening completion (next SPRINT focus)</li>
-<li><strong>v1.2.0</strong>: API integrations and advanced analytics</li>
-<li><strong>v2.0.0</strong>: Full dashboard platform with widget system</li>
-</ul>
-<hr>
-<h2>Risk Assessment &amp; Mitigation</h2>
-<h3>High-Risk Items</h3>
-<ul>
-<li><strong>Security vulnerabilities</strong>: Authentication system implementation critical</li>
-<li><strong>Performance bottlenecks</strong>: Modularization must maintain current speed</li>
-<li><strong>Data integrity</strong>: API integrations must preserve rollover logic</li>
-</ul>
-<h3>Success Criteria</h3>
-<ul>
-<li>All modules &lt;400 lines for maintainability</li>
-<li>Zero functionality regression during refactoring</li>
-<li>Security audit pass required before v1.1.0</li>
-<li>Performance benchmarks maintained throughout</li>
-</ul>
-<hr>
-<p><strong>Last Updated</strong>: September 8, 2025<br><strong>Next Review</strong>: Upon initiation of v1.1.0 KEV integration and security hardening sprint</p>
+<p><strong>Last Updated</strong>: Dynamically generated from specifications<br><strong>Next Update</strong>: When tasks are completed or specifications are activated</p>
+<!-- AUTO-GENERATED-SPECS-START -->
+
+<h3>Active Specifications</h3>
+<table>
+<thead>
+<tr>
+<th>Spec</th>
+<th>Title</th>
+<th>Progress</th>
+<th>Priority</th>
+<th>Next Tasks</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>000</td>
+<td>Architecture Modularization</td>
+<td>34/34 (100%)</td>
+<td>⚪ NORM</td>
+<td>All tasks completed</td>
+</tr>
+<tr>
+<td>001</td>
+<td>Javascript Module Extraction</td>
+<td>18/23 (78%)</td>
+<td>⚪ NORM</td>
+<td>• T005 [P] Write tests for newly extracted modules (if missing)<br>• T006 [P] Run integration tests on modularized system<br>• T007 [P] Validate all functionality preserved after extractions<br>• B003: Fix modal launch failures across all views (affects vulnerability-core....<br>• B001: Bug description (affects specific-file.js)</td>
+</tr>
+<tr>
+<td>002</td>
+<td>Vulnerability Import</td>
+<td>39/39 (100%)</td>
+<td>⚪ NORM</td>
+<td>All tasks completed</td>
+</tr>
+<tr>
+<td>003</td>
+<td>Ticket Bridging</td>
+<td>56/56 (100%)</td>
+<td>⚪ NORM</td>
+<td>All tasks completed</td>
+</tr>
+<tr>
+<td>004</td>
+<td>Cve Link System Fix</td>
+<td>4/46 (9%)</td>
+<td>⚪ NORM</td>
+<td>• T005 [P] Fix event delegation in vulnerability-grid.js CVE link handlers<br>• T006 [P] Fix event delegation in vulnerability-cards.js CVE link handlers<br>• T007 [P] Fix CVE link handlers in vulnerability search results<br>• T008 Update vulnerability-details-modal.js to handle specific CVE selection<br>• T009 [P] Implement proper event target isolation for CVE clicks<br>• T010 [P] Add CVE ID parameter passing to modal opening methods<br>• T011 Fix modal state to display single CVE instead of all CVEs<br>• T012 [P] Update modal data population to filter by clicked CVE ID<br>• T013 [P] Fix modal title and content to show specific CVE information<br>• T014 Implement proper modal cleanup between different CVE selections</td>
+</tr>
+<tr>
+<td>005</td>
+<td>Modal System Enhancement</td>
+<td>0/54 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Create modal enhancement project structure with CSS and test directories<br>• T002 Research CSS z-index best practices for nested modal systems<br>• T003 [P] Research JavaScript modal state management patterns for layering<br>• T004 [P] E2E test Settings → Device Security nested modal workflow<br>• T005 [P] E2E test Vulnerability Details → CVE Information → External Referenc...<br>• T006 [P] E2E test rapid modal opening/closing scenarios<br>• T007 [P] E2E test modal backdrop click behavior with nested layers<br>• T008 [P] Unit test modal z-index calculation logic<br>• T009 [P] Unit test modal focus management between layers<br>• T010 [P] Visual regression test for modal layering consistency</td>
+</tr>
+<tr>
+<td>006</td>
+<td>Responsive Layout Completion</td>
+<td>0/27 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Audit current responsive breakpoints and identify gaps<br>• T002 [P] Research AG Grid responsive best practices<br>• T003 [P] Create responsive testing framework with device matrix<br>• T004 [P] Visual regression test for mobile viewport (320px-768px)<br>• T005 [P] Visual regression test for tablet viewport (768px-1024px)<br>• T006 [P] Visual regression test for desktop viewport (1024px+)<br>• T007 [P] E2E test touch interactions on vulnerability cards<br>• T008 [P] E2E test AG Grid responsive behavior across breakpoints<br>• T009 [P] Update CSS grid system for proper responsive behavior<br>• T010 [P] Implement mobile-first media queries for all components</td>
+</tr>
+<tr>
+<td>007</td>
+<td>Kev Integration</td>
+<td>0/25 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Research CISA KEV API endpoints and data format<br>• T002 [P] Design KEV database schema extension<br>• T003 [P] Plan automated synchronization strategy<br>• T004 [P] Integration test KEV API data fetching<br>• T005 [P] Unit test KEV data parsing and validation<br>• T006 [P] Integration test vulnerability-KEV correlation<br>• T007 [P] E2E test KEV indicators in vulnerability views<br>• T008 [P] Implement CISA KEV API client in app/public/server.js<br>• T009 [P] Add KEV data parsing and validation<br>• T010 [P] Implement error handling and retry logic</td>
+</tr>
+<tr>
+<td>008</td>
+<td>Security Hardening Foundation</td>
+<td>0/31 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Conduct comprehensive security audit of existing codebase<br>• T002 [P] Identify input validation gaps across all endpoints<br>• T003 [P] Assess current authentication and session management<br>• T004 [P] Security test for SQL injection prevention<br>• T005 [P] Security test for XSS prevention<br>• T006 [P] Security test for CSRF protection<br>• T007 [P] Penetration test for authentication bypass<br>• T008 [P] Security test for file upload validation<br>• T009 [P] Implement express-validator for all API endpoints<br>• T010 [P] Add input sanitization for vulnerability data</td>
+</tr>
+<tr>
+<td>009</td>
+<td>Epss Scoring Integration</td>
+<td>0/23 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Research EPSS API endpoints and data format<br>• T002 [P] Implement EPSS API client in app/public/server.js<br>• T003 [P] Add EPSS data validation and error handling<br>• T004 [P] Implement EPSS score caching and refresh strategy<br>• T005 [P] Integration test EPSS API data fetching<br>• T006 [P] Unit test EPSS score calculations<br>• T007 [P] Integration test CVE-EPSS correlation<br>• T008 [P] E2E test EPSS scores in vulnerability views<br>• T009 Extend vulnerability schema for EPSS scores<br>• T010 [P] Implement EPSS score storage and retrieval</td>
+</tr>
+<tr>
+<td>010</td>
+<td>Backend Modularization</td>
+<td>0/29 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Analyze current server.js structure and dependencies<br>• T002 [P] Design modular backend architecture<br>• T003 [P] Plan service layer interfaces and contracts<br>• T004 [P] API integration tests for all existing endpoints<br>• T005 [P] Unit tests for planned service layer modules<br>• T006 [P] Integration tests for database access layer<br>• T007 [P] Performance tests to ensure no regression<br>• T008 [P] Extract vulnerability service from server.js<br>• T009 [P] Extract ticket service module<br>• T010 [P] Extract import/export service module</td>
+</tr>
+<tr>
+<td>011</td>
+<td>Dark Mode Implementation</td>
+<td>0/30 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Research CSS custom properties for dark mode theming<br>• T002 [P] Design dark mode color palette and variables<br>• T003 [P] Plan theme management state architecture<br>• T004 [P] Visual regression test light mode baseline<br>• T005 [P] Visual regression test dark mode implementation<br>• T006 [P] Accessibility test color contrast compliance<br>• T007 [P] E2E test theme switching functionality<br>• T008 [P] Performance test theme transition smoothness<br>• T009 [P] Create CSS custom properties for color system<br>• T010 [P] Implement theme-aware component styles</td>
+</tr>
+<tr>
+<td>012</td>
+<td>Cisco Api Integration</td>
+<td>0/27 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Research Cisco API authentication requirements<br>• T002 [P] Implement OAuth 2.0 client for Cisco APIs<br>• T003 [P] Add secure token storage and refresh logic<br>• T004 [P] Implement API rate limiting and retry mechanisms<br>• T005 [P] Integration test OAuth authentication flow<br>• T006 [P] Integration test Talos Intelligence API data fetching<br>• T007 [P] Integration test Security Advisory synchronization<br>• T008 [P] E2E test Cisco threat intelligence in vulnerability views<br>• T009 [P] Implement Talos Intelligence API client<br>• T010 [P] Add threat indicator parsing and validation</td>
+</tr>
+<tr>
+<td>013</td>
+<td>Tenable Api Integration</td>
+<td>0/31 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Research Tenable.io and Tenable.sc API authentication<br>• T002 [P] Implement Tenable API key management<br>• T003 [P] Add Tenable instance configuration (cloud vs on-prem)<br>• T004 [P] Implement API connection validation and testing<br>• T005 [P] Integration test Tenable authentication flow<br>• T006 [P] Integration test vulnerability data fetching<br>• T007 [P] Integration test incremental sync process<br>• T008 [P] Performance test large dataset synchronization<br>• T009 [P] Implement Tenable.io API client<br>• T010 [P] Implement Tenable.sc API client (on-premises)</td>
+</tr>
+<tr>
+<td>014</td>
+<td>Pwa Implementation</td>
+<td>0/26 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Create web app manifest.json with HexTrackr branding<br>• T002 [P] Design PWA icons and splash screens<br>• T003 [P] Implement service worker registration and lifecycle<br>• T004 [P] PWA audit test using Lighthouse<br>• T005 [P] Offline functionality test for critical features<br>• T006 [P] Performance test for PWA load times<br>• T007 [P] Installation and update flow testing<br>• T008 Create service worker for resource caching<br>• T009 [P] Implement cache-first strategy for static assets<br>• T010 [P] Implement network-first strategy for dynamic data</td>
+</tr>
+<tr>
+<td>015</td>
+<td>Database Schema Standardization</td>
+<td>0/27 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Analyze current database schema for inconsistencies<br>• T002 [P] Identify normalization opportunities and constraints<br>• T003 [P] Plan index optimization strategy<br>• T004 [P] Design migration rollback procedures<br>• T005 [P] Create data integrity validation tests<br>• T006 [P] Performance benchmark tests for current schema<br>• T007 [P] Migration success/rollback validation tests<br>• T008 [P] Query performance regression tests<br>• T009 [P] Standardize table naming conventions<br>• T010 [P] Normalize vulnerability data relationships</td>
+</tr>
+<tr>
+<td>016</td>
+<td>Typescript Migration</td>
+<td>0/29 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Install TypeScript compiler and development dependencies<br>• T002 [P] Create tsconfig.json with project-specific settings<br>• T003 [P] Configure build process for TypeScript compilation<br>• T004 [P] Set up IDE TypeScript integration and linting<br>• T005 [P] Create type checking validation tests<br>• T006 [P] Ensure existing Jest tests work with TypeScript<br>• T007 [P] Set up TypeScript-aware test configuration<br>• T008 [P] Create type definition validation tests<br>• T009 [P] Create type definitions for vulnerability data structures<br>• T010 [P] Define interfaces for modal components</td>
+</tr>
+<tr>
+<td>017</td>
+<td>Mitre Attack Mapping</td>
+<td>0/27 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Research MITRE ATT&amp;CK dataset structure and APIs<br>• T002 [P] Implement ATT&amp;CK framework data fetching and parsing<br>• T003 [P] Create ATT&amp;CK technique and tactic storage schema<br>• T004 [P] Add ATT&amp;CK framework version management<br>• T005 [P] Integration test ATT&amp;CK data synchronization<br>• T006 [P] Unit test CVE-to-technique mapping algorithms<br>• T007 [P] Integration test ATT&amp;CK technique correlation<br>• T008 [P] E2E test ATT&amp;CK visualization in vulnerability views<br>• T009 [P] Develop CVE-to-technique mapping algorithms<br>• T010 [P] Implement automated mapping based on vulnerability data</td>
+</tr>
+<tr>
+<td>018</td>
+<td>Testing Infrastructure</td>
+<td>0/41 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T1.1.1: Remove debug Playwright tests from <code>__tests__/tests/</code><br>• T1.1.2: Reorganize existing tests into proper categories<br>• T1.1.3: Establish test naming conventions documentation<br>• T1.2.1: Add coverage thresholds to <code>jest.config.js</code><br>• T1.2.2: Configure proper coverage paths<br>• T1.2.3: Set up watch mode configuration<br>• T1.3.1: Enhance <code>playwright.config.js</code> with better error handling<br>• T1.3.2: Improve Docker integration<br>• T1.3.3: Add mobile and cross-browser testing<br>• T2.1.1: Create unit tests for vulnerability-statistics.js</td>
+</tr>
+<tr>
+<td>019</td>
+<td>Cross Page Ticket Integration</td>
+<td>0/26 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Analyze existing ticket creation workflow and data requirements<br>• T002 [P] Design cross-page data transfer architecture<br>• T003 [P] Plan vulnerability card UI enhancements<br>• T004 [P] E2E test vulnerability card to ticket creation workflow<br>• T005 [P] Integration test device data auto-population<br>• T006 [P] E2E test device autocomplete functionality<br>• T007 [P] Validation test data integrity across page transitions<br>• T008 [P] Implement data transfer mechanism using sessionStorage<br>• T009 [P] Create device data serialization and validation<br>• T010 [P] Add error handling for failed data transfers</td>
+</tr>
+<tr>
+<td>020</td>
+<td>Snmp Inventory System</td>
+<td>0/31 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Research SNMP protocol implementation for Node.js<br>• T002 [P] Install and configure net-snmp library dependencies<br>• T003 [P] Design SNMP security and credential management system<br>• T004 [P] Plan network discovery algorithm architecture<br>• T005 [P] Integration test SNMP device polling functionality<br>• T006 [P] Unit test SNMP data parsing and validation<br>• T007 [P] Integration test network device discovery process<br>• T008 [P] Performance test large network discovery scenarios<br>• T009 [P] Implement SNMP client with polling capabilities<br>• T010 [P] Add SNMP v1/v2c/v3 protocol support</td>
+</tr>
+<tr>
+<td>021</td>
+<td>Network Mapping Visualization</td>
+<td>0/31 (0%)</td>
+<td>⚪ NORM</td>
+<td>• T001 Research graph visualization libraries (D3.js, Vis.js, Cytoscape.js)<br>• T002 [P] Design network topology data model and relationships<br>• T003 [P] Plan visualization performance optimization strategy<br>• T004 [P] Create network map UI layout and integration points<br>• T005 [P] Visual regression test network map rendering<br>• T006 [P] Performance test large network visualization<br>• T007 [P] Integration test topology data accuracy<br>• T008 [P] E2E test interactive map features and controls<br>• T009 [P] Implement chosen visualization library integration<br>• T010 [P] Create basic network topology rendering</td>
+</tr>
+<tr>
+<td>022</td>
+<td>Documentation Portal Spec Kit Integration</td>
+<td>40/50 (80%)</td>
+<td>⚪ NORM</td>
+<td>• Update <code>html-content-updater.js</code> to read <code>.active-spec</code> file [INCOMPLETE]<br>• Create active spec badge/banner for documentation header [INCOMPLETE]<br>• Add visual highlight for active spec in ROADMAP section [INCOMPLETE]<br>• Update README with new npm scripts [INCOMPLETE]<br>• Document spec-kit integration in architecture docs [INCOMPLETE]<br>• Create troubleshooting guide for common issues [INCOMPLETE]<br>• Active spec is highlighted prominently [INCOMPLETE]<br>• Active spec displayed in documentation [INCOMPLETE]<br>• Documentation updated [INCOMPLETE]<br>• B001: Bug description (affects specific-file.js)</td>
+</tr>
+</tbody></table>
+<!-- AUTO-GENERATED-SPECS-END -->
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

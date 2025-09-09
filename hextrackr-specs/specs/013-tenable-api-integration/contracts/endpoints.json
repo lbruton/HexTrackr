@@ -1,0 +1,63 @@
+{
+  "spec": "013-tenable-api-integration",
+  "status": "PENDING", 
+  "description": "Direct Tenable.io/Tenable.sc API integration for vulnerability data",
+  "endpoints": [
+    {
+      "path": "/api/tenable/connection",
+      "method": "POST",
+      "description": "Configure Tenable API connection",
+      "request": {
+        "body": {
+          "type": "io|sc",
+          "apiKey": "string",
+          "secretKey": "string", 
+          "endpoint": "string"
+        }
+      },
+      "response": {
+        "schema": {
+          "connected": "boolean",
+          "instanceType": "string",
+          "version": "string"
+        }
+      }
+    },
+    {
+      "path": "/api/tenable/sync",
+      "method": "POST", 
+      "description": "Synchronize vulnerability data from Tenable",
+      "request": {
+        "body": {
+          "incremental": "boolean",
+          "lastSyncTime": "string (optional)"
+        }
+      },
+      "response": {
+        "schema": {
+          "syncId": "string",
+          "status": "string",
+          "vulnerabilitiesProcessed": "number",
+          "assetsProcessed": "number"
+        }
+      }
+    },
+    {
+      "path": "/api/tenable/assets",
+      "method": "GET",
+      "description": "Get asset information from Tenable",
+      "response": {
+        "schema": {
+          "assets": [
+            {
+              "uuid": "string",
+              "hostname": "string", 
+              "ipAddress": "string",
+              "operatingSystem": "string"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

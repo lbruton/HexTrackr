@@ -1,0 +1,33 @@
+{
+  "spec": "011-dark-mode-implementation", 
+  "status": "PENDING",
+  "description": "Dark mode theme preferences",
+  "endpoints": [
+    {
+      "path": "/api/user/theme",
+      "method": "GET",
+      "description": "Get user theme preferences",
+      "response": {
+        "schema": {
+          "theme": "string"
+        }
+      }
+    },
+    {
+      "path": "/api/user/theme",
+      "method": "POST",
+      "description": "Save user theme preference",
+      "request": {
+        "body": {
+          "theme": "string"
+        }
+      },
+      "response": {
+        "schema": {
+          "saved": "boolean"
+        }
+      }
+    }
+  ],
+  "notes": "Primarily CSS-based with user preference storage"
+}

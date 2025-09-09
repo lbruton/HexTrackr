@@ -60,6 +60,13 @@ FileScopeMCP-*.json
 FileScopeMCP-*.html
 FileScopeMCP-*.png
 
+# Test artifacts and coverage reports
+__tests__/coverage/
+__tests__/test-results/
+__tests__/playwright-report/
+__tests__/test-results.json
+**/*.lcov
+
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 .rMemory

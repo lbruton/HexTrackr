@@ -1,0 +1,35 @@
+{
+  "spec": "009-epss-scoring-integration",
+  "status": "PENDING",
+  "description": "EPSS scoring integration for predictive vulnerability analysis",
+  "endpoints": [
+    {
+      "path": "/api/epss/sync",
+      "method": "POST",
+      "description": "Synchronize EPSS scores from API",
+      "response": {
+        "schema": {
+          "syncId": "string",
+          "scoresUpdated": "number",
+          "lastSync": "string"
+        }
+      }
+    },
+    {
+      "path": "/api/vulnerabilities/epss-scored",
+      "method": "GET",
+      "description": "Get vulnerabilities with EPSS scores",
+      "response": {
+        "schema": {
+          "vulnerabilities": [
+            {
+              "cve": "string",
+              "epssScore": "number",
+              "percentile": "number"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

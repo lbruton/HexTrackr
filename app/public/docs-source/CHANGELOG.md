@@ -13,6 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Security Hardening**: JWT authentication, rate limiting, input validation framework
 - **API Integration Planning**: Cisco and Tenable API integration preparation
 
+## [1.0.12] - 2025-09-09
+
+### Completed Tasks
+
+#### Javascript Module Extraction (Spec 001)
+
+- vulnerability-statistics.js (364 lines) - Task 1.2 ✅ COMPLETED
+- vulnerability-data.js (571 lines) - Task 1.1 ✅ COMPLETED
+- vulnerability-chart-manager.js (590 lines) - Task 2.2 ✅ COMPLETED
+- vulnerability-details-modal.js (935 lines) - Task 3.3 ✅ COMPLETED
+- device-security-modal.js (637 lines) - Additional modal ✅ COMPLETED
+- progress-modal.js (649 lines) - Additional modal ✅ COMPLETED
+- settings-modal.js (1,296 lines) - Settings management ✅ COMPLETED
+- ag-grid-responsive-config.js (356 lines) - Grid configuration ✅ COMPLETED
+- vulnerability-search.js (268 lines) - Task 2.1 ✅ COMPLETED (Sept 8)
+- vulnerability-grid.js (195 lines) - Task 3.1 ✅ COMPLETED (Sept 8)
+- vulnerability-cards.js (345 lines) - Task 3.2 ✅ COMPLETED (Sept 8)
+- vulnerability-core.js (571 lines) - T004 ✅ COMPLETED (Sept 8)
+- T001 Extract vulnerability-search.js ✅ COMPLETED
+- T002 Extract vulnerability-grid.js ✅ COMPLETED
+- T003 Extract vulnerability-cards.js ✅ COMPLETED
+- T004 Create vulnerability-core.js ✅ COMPLETED
+
 ## [1.0.11] - 2025-09-08
 
 ### Completed - Sprint T001-T006: JavaScript Modularization Success

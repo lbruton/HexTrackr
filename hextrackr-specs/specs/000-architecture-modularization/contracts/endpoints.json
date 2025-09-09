@@ -1,0 +1,63 @@
+{
+  "spec": "000-architecture-modularization",
+  "status": "IMPLEMENTED",
+  "description": "Module architecture endpoints for widget coordination",
+  "endpoints": [
+    {
+      "path": "/api/modules/status",
+      "method": "GET",
+      "description": "Get module loading status and health",
+      "request": {
+        "query": {
+          "module": "string (optional) - Specific module name"
+        }
+      },
+      "response": {
+        "schema": {
+          "modules": [
+            {
+              "name": "string",
+              "loaded": "boolean",
+              "initialized": "boolean",
+              "error": "string|null"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "path": "/api/modules/reload",
+      "method": "POST",
+      "description": "Hot reload specific modules for development",
+      "request": {
+        "body": {
+          "modules": ["string"] 
+        }
+      },
+      "response": {
+        "schema": {
+          "success": "boolean",
+          "reloaded": ["string"],
+          "errors": ["string"]
+        }
+      }
+    },
+    {
+      "path": "/api/widgets/config",
+      "method": "GET",
+      "description": "Get widget configuration and layout",
+      "response": {
+        "schema": {
+          "widgets": [
+            {
+              "id": "string",
+              "type": "string",
+              "config": "object",
+              "position": "object"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
