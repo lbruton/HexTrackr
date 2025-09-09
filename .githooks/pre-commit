@@ -29,7 +29,7 @@ if [ -n "$STAGED_MD_FILES" ]; then
   # Step 2: Run custom script for remaining issues not handled by markdownlint --fix
   echo "${YELLOW}[pre-commit]${NC} Auto-fixing custom Markdown issues..."
   for file in $STAGED_MD_FILES; do
-    node scripts/fix-markdown.js --file="$file"
+    node app/public/scripts/fix-markdown.js --file="$file"
   done
   
   # Re-stage auto-fixed files
