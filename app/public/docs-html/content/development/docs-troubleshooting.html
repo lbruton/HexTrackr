@@ -1,0 +1,313 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-info" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M12 9v4"/>
+        <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
+        <path d="M12 16h.01"/>
+    </svg>
+    <div>
+        <strong>Active Specification:</strong> 022-documentation-portal-rebuild
+        <small class="d-block text-muted">This documentation is being actively updated as part of the current specification development.</small>
+    </div>
+</div>
+    <h1>Documentation Portal Troubleshooting Guide</h1>
+<p>This guide helps you resolve common issues with the HexTrackr documentation portal and spec-kit integration.</p>
+<h2>Quick Diagnostics</h2>
+<h3>Check System Status</h3>
+<pre><code class="language-bash"># Verify active specification
+cat .active-spec
+
+# Test spec synchronization
+node scripts/sync-specs-to-roadmap.js
+
+# Test HTML generation
+node app/public/docs-html/html-content-updater.js
+
+# Full documentation refresh
+npm run docs:generate
+</code></pre>
+<h2>Common Issues</h2>
+<h3>1. Active Spec Not Displaying</h3>
+<p><strong>Symptoms:</strong></p>
+<ul>
+<li>No active spec banner appears in documentation</li>
+<li>Spec not highlighted in roadmap table</li>
+</ul>
+<p><strong>Causes &amp; Solutions:</strong></p>
+<h4>Missing .active-spec file</h4>
+<pre><code class="language-bash"># Check if file exists
+ls -la .active-spec
+
+# Create if missing
+echo &quot;022-documentation-portal-rebuild&quot; &gt; .active-spec
+</code></pre>
+<h4>Invalid spec format</h4>
+<pre><code class="language-bash"># Check current content
+cat .active-spec
+
+# Should contain only the spec slug, no extra spaces or characters
+# Correct format: &quot;022-documentation-portal-rebuild&quot;
+# Incorrect: &quot; 022-documentation-portal-rebuild \n&quot;
+</code></pre>
+<h4>Spec name mismatch</h4>
+<p>The sync script matches spec names using fuzzy logic. If your spec isn&#39;t highlighting:</p>
+<pre><code class="language-bash"># Check spec directory names
+ls hextrackr-specs/specs/
+
+# Ensure .active-spec matches a directory name
+# Example: .active-spec contains &quot;022-documentation-portal-rebuild&quot;
+# Directory should be: hextrackr-specs/specs/022-documentation-portal-rebuild/
+</code></pre>
+<h3>2. Documentation Not Updating</h3>
+<p><strong>Symptoms:</strong></p>
+<ul>
+<li>Changes to markdown files don&#39;t appear in HTML</li>
+<li>Old content persists after regeneration</li>
+</ul>
+<p><strong>Solutions:</strong></p>
+<h4>Force regeneration</h4>
+<pre><code class="language-bash"># Clear any cached content and regenerate
+rm -rf app/public/docs-html/content/*
+npm run docs:generate
+</code></pre>
+<h4>Check file permissions</h4>
+<pre><code class="language-bash"># Ensure write permissions for docs directory
+chmod -R 755 app/public/docs-html/
+</code></pre>
+<h4>Verify markdown syntax</h4>
+<pre><code class="language-bash"># Test specific file parsing
+node -e &quot;
+const marked = require(&#39;marked&#39;);
+const fs = require(&#39;fs&#39;);
+const content = fs.readFileSync(&#39;path/to/your/file.md&#39;, &#39;utf8&#39;);
+console.log(marked.parse(content));
+&quot;
+</code></pre>
+<h3>3. Spec Tasks Not Syncing to Roadmap</h3>
+<p><strong>Symptoms:</strong></p>
+<ul>
+<li>Roadmap table shows outdated task counts</li>
+<li>Completed tasks still show as pending</li>
+</ul>
+<p><strong>Causes &amp; Solutions:</strong></p>
+<h4>Incorrect checkbox format</h4>
+<p>Tasks must use exact markdown checkbox format:</p>
+<pre><code class="language-markdown"># Correct format
+- [ ] Pending task
+- [x] Completed task
+- [X] Also completed (capital X works)
+
+# Incorrect format (will not be counted)
+- [] Missing space
+- [ ]Extra text before task
+- [v] Wrong character
+</code></pre>
+<h4>Missing tasks.md files</h4>
+<pre><code class="language-bash"># Check if tasks.md exists in spec directory
+ls hextrackr-specs/specs/*/tasks.md
+
+# If missing, tasks won&#39;t be counted
+# Create from template if needed
+</code></pre>
+<h4>Code block interference</h4>
+<p>Tasks inside code blocks are ignored:</p>
+<pre><code class="language-markdown"># These tasks will NOT be counted
+```
+- [ ] Task inside code block
+- [x] Another task in code
+```
+
+# These tasks WILL be counted
+- [ ] Task outside code blocks
+- [x] Completed task
+</code></pre>
+<h3>4. HTML Generation Errors</h3>
+<p><strong>Symptoms:</strong></p>
+<ul>
+<li>Process crashes during generation</li>
+<li>Partial HTML files created</li>
+<li>Permission denied errors</li>
+</ul>
+<p><strong>Solutions:</strong></p>
+<h4>Missing dependencies</h4>
+<pre><code class="language-bash"># Reinstall node modules
+npm install
+
+# Check for missing marked library
+npm list marked
+</code></pre>
+<h4>File system issues</h4>
+<pre><code class="language-bash"># Check disk space
+df -h
+
+# Check directory permissions
+ls -la app/public/docs-html/
+
+# Fix permissions if needed
+sudo chown -R $USER:$USER app/public/docs-html/
+</code></pre>
+<h4>Template issues</h4>
+<pre><code class="language-bash"># Verify template exists
+ls -la app/public/docs-html/template.html
+
+# Check template has required placeholders
+grep &quot;CONTENT WILL BE INJECTED HERE&quot; app/public/docs-html/template.html
+grep &quot;ACTIVE SPEC BANNER&quot; app/public/docs-html/template.html
+</code></pre>
+<h3>5. Performance Issues</h3>
+<p><strong>Symptoms:</strong></p>
+<ul>
+<li>Documentation generation takes &gt;5 seconds</li>
+<li>High memory usage during generation</li>
+<li>Server becomes unresponsive</li>
+</ul>
+<p><strong>Solutions:</strong></p>
+<h4>Reduce concurrent operations</h4>
+<p>The system processes files with small delays to prevent overwhelming:</p>
+<pre><code class="language-javascript">// In html-content-updater.js, increase delay if needed
+await new Promise(resolve =&gt; setTimeout(resolve, 100)); // Increase from 50ms
+</code></pre>
+<h4>Monitor memory usage</h4>
+<pre><code class="language-bash"># Watch memory during generation
+top -p $(pgrep node)
+
+# Or use htop for better visualization
+htop -p $(pgrep node)
+</code></pre>
+<h4>Check for large files</h4>
+<pre><code class="language-bash"># Find large markdown files that might slow processing
+find app/public/docs-source -name &quot;*.md&quot; -size +1M -ls
+</code></pre>
+<h2>Error Codes and Messages</h2>
+<h3>Common Error Messages</h3>
+<h4>&quot;template.html not found&quot;</h4>
+<pre><code class="language-bash"># Verify template location
+ls app/public/docs-html/template.html
+
+# If missing, template is required for generation
+# Check if it was accidentally deleted or moved
+</code></pre>
+<h4>&quot;No tasks.md files found&quot;</h4>
+<pre><code class="language-bash"># Check spec directory structure
+find hextrackr-specs/specs -name &quot;tasks.md&quot;
+
+# Each spec should have a tasks.md file
+# Create missing files from template if needed
+</code></pre>
+<h4>&quot;Path traversal detected&quot;</h4>
+<p>This is a security error from path validation:</p>
+<pre><code class="language-bash"># Check for invalid characters in file paths
+# Avoid: ../../../, absolute paths, special characters
+# Use only relative paths within project directory
+</code></pre>
+<h3>Exit Codes</h3>
+<ul>
+<li><code>0</code>: Success</li>
+<li><code>1</code>: General error (check logs for details)</li>
+<li><code>ENOENT</code>: File not found</li>
+<li><code>EACCES</code>: Permission denied</li>
+<li><code>EMFILE</code>: Too many open files</li>
+</ul>
+<h2>Advanced Debugging</h2>
+<h3>Enable Debug Logging</h3>
+<pre><code class="language-bash"># Set environment variable for verbose output
+DEBUG=docs:* npm run docs:generate
+
+# Or add console.log statements to scripts for detailed tracing
+</code></pre>
+<h3>Manual Step-by-Step Testing</h3>
+<ol>
+<li><strong>Test spec reading:</strong></li>
+</ol>
+<pre><code class="language-bash">node -e &quot;
+const fs = require(&#39;fs&#39;);
+try {
+  const spec = fs.readFileSync(&#39;.active-spec&#39;, &#39;utf8&#39;).trim();
+  console.log(&#39;Active spec:&#39;, spec);
+} catch (e) {
+  console.log(&#39;No active spec:&#39;, e.message);
+}
+&quot;
+</code></pre>
+<ol start="2">
+<li><strong>Test task parsing:</strong></li>
+</ol>
+<pre><code class="language-bash">node -e &quot;
+const fs = require(&#39;fs&#39;);
+const content = fs.readFileSync(&#39;hextrackr-specs/specs/022-documentation-portal-rebuild/tasks.md&#39;, &#39;utf8&#39;);
+const total = (content.match(/^\s*-\s*\[(?: |x|X)\]\s+/gm) || []).length;
+const done = (content.match(/^\s*-\s*\[(?:x|X)\]\s+/gm) || []).length;
+console.log(&#39;Tasks:&#39;, { total, done, pct: Math.round((done / total) * 100) });
+&quot;
+</code></pre>
+<ol start="3">
+<li><strong>Test HTML generation:</strong></li>
+</ol>
+<pre><code class="language-bash">node -e &quot;
+const HtmlContentUpdater = require(&#39;./app/public/docs-html/html-content-updater.js&#39;);
+const updater = new HtmlContentUpdater();
+updater.loadActiveSpec().then(spec =&gt; console.log(&#39;Active spec loaded:&#39;, spec));
+&quot;
+</code></pre>
+<h2>Prevention Tips</h2>
+<h3>Regular Maintenance</h3>
+<pre><code class="language-bash"># Weekly documentation health check
+npm run docs:generate &amp;&amp; echo &#39;Documentation system healthy&#39;
+
+# Monthly cleanup of orphaned files
+find app/public/docs-html/content -name &quot;*.html&quot; -mtime +30 -delete
+</code></pre>
+<h3>Best Practices</h3>
+<ol>
+<li><strong>Always test locally before committing changes</strong></li>
+<li><strong>Keep .active-spec updated when switching specs</strong></li>
+<li><strong>Use proper markdown checkbox format in tasks.md</strong></li>
+<li><strong>Run docs:generate after spec changes</strong></li>
+<li><strong>Monitor file permissions in docs directories</strong></li>
+</ol>
+<h3>Monitoring</h3>
+<pre><code class="language-bash"># Set up periodic checks
+echo &quot;0 */6 * * * cd /path/to/hextrackr &amp;&amp; npm run docs:generate&quot; | crontab -
+
+# Or use systemd timer for more robust monitoring
+</code></pre>
+<h2>Getting Help</h2>
+<p>If you encounter issues not covered in this guide:</p>
+<ol>
+<li><strong>Check recent changes:</strong></li>
+</ol>
+<pre><code class="language-bash">git log --oneline -10 scripts/ app/public/docs-html/
+</code></pre>
+<ol start="2">
+<li><strong>Search existing issues:</strong></li>
+</ol>
+<pre><code class="language-bash"># Look for similar problems in git history
+git log --grep=&quot;docs&quot; --grep=&quot;spec&quot; --grep=&quot;generate&quot;
+</code></pre>
+<ol start="3">
+<li><p><strong>Create detailed bug report with:</strong></p>
+<ul>
+<li>Error messages and stack traces</li>
+<li>System information (<code>node --version</code>, OS, etc.)</li>
+<li>Steps to reproduce</li>
+<li>Expected vs. actual behavior</li>
+<li>Relevant file contents</li>
+</ul>
+</li>
+<li><p><strong>Test in clean environment:</strong></p>
+</li>
+</ol>
+<pre><code class="language-bash"># Clone fresh copy and test
+git clone https://github.com/Lonnie-Bruton/HexTrackr.git hextrackr-test
+cd hextrackr-test
+npm install
+npm run docs:generate
+</code></pre>
+<p>This troubleshooting guide should resolve most common documentation portal issues. Keep this document updated as new issues and solutions are discovered.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

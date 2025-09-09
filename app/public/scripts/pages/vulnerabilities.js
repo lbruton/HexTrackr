@@ -92,6 +92,10 @@ class ModernVulnManager {
     showToast(message, type) {
         return this.coreOrchestrator.showToast(message, type);
     }
+
+    flipStatCards() {
+        return this.coreOrchestrator.flipStatCards();
+    }
 }
 
 // Page-specific refresh function for Settings modal and Progress modal integration
@@ -104,6 +108,9 @@ window.refreshPageData = function(type) {
 
 // Initialize the system
 window.modernVulnManager = new ModernVulnManager();
+
+// Create global alias for HTML onclick handlers
+window.vulnManager = window.modernVulnManager;
 
 // Add event listener for chart metric toggle
 document.addEventListener("DOMContentLoaded", () => {

@@ -16,6 +16,8 @@
     "stylelint:fix": "stylelint '**/*.css' --fix",
     "docs:generate": "npm run docs:sync-specs && node app/public/docs-html/html-content-updater.js",
     "docs:sync-specs": "node scripts/sync-specs-to-roadmap.js",
+    "docs:sync-all": "node scripts/docs-sync-all.js",
+    "docs:update-changelog": "node scripts/update-changelog-from-specs.js",
     "docs:analyze": "node app/public/scripts/generate-architecture-analysis.js && node app/public/docs-html/html-content-updater.js",
     "lint:md": "markdownlint --config .markdownlint.json --ignore-path .markdownlintignore '**/*.md'",
     "lint:md:fix": "node app/public/scripts/fix-markdown.js",

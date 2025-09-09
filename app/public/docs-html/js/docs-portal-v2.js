@@ -112,6 +112,7 @@ class DocumentationPortalV2 {
             "architecture": { title: "Architecture", icon: "fas fa-building" },
             "development": { title: "Development", icon: "fas fa-hammer" },
             "security": { title: "Security", icon: "fas fa-shield-alt" },
+            "white-papers": { title: "White Papers", icon: "fas fa-file-alt" },
             "roadmap": { title: "Roadmap", icon: "fas fa-map" },
             "changelog": { title: "Changelog", icon: "fas fa-list" },
             "sprint": { title: "Current Sprint", icon: "fas fa-running" }
@@ -278,7 +279,8 @@ class DocumentationPortalV2 {
                 "development",
                 "getting-started",
                 "security",
-                "user-guides"
+                "user-guides",
+                "white-papers"
             ];
             
             // Discover each section and its files
@@ -435,7 +437,8 @@ class DocumentationPortalV2 {
                 "development": ["coding-standards", "contributing", "docs-portal-guide"],
                 "getting-started": [], // Only has index.html
                 "security": ["overview", "vulnerability-disclosure"],
-                "user-guides": ["ticket-management", "vulnerability-management"]
+                "user-guides": ["ticket-management", "vulnerability-management"],
+                "white-papers": ["the-three-stooges", "the-vibe-coding-revolution"]
             };
             
             const potentialFiles = knownFilesBySection[section] || [];
