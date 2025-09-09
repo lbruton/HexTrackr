@@ -8,15 +8,18 @@
         "node_modules/**",
         "backups/**",
         "depreciated/**",
-        "dev-docs/**",
         ".venv/**",
         "temp/**",
         "uploads/**",
         "logs/**",
         "data/**",
-        "docs-html/**",
-        "*.min.js",
-        "scripts/pages/vulnerability-manager.js"
+        "app/public/docs-html/**",
+        "__tests__/coverage/**",
+        "__tests__/test-results/**",
+        "__tests__/playwright-report/**",
+        "test-results/**",
+        "hextrackr-specs/**",
+        "*.min.js"
       ],
       "globals": {
         "bootstrap": true,
@@ -55,14 +58,17 @@
     "node_modules/**",
     "backups/**",
     "depreciated/**",
-    "dev-docs/**",
     ".venv/**",
     "temp/**",
     "uploads/**",
     "logs/**",
     "data/**",
-    "docs-html/**",
-    "*.min.js",
-    "scripts/pages/vulnerability-manager.js"
+    "app/public/docs-html/**",
+    "__tests__/coverage/**",
+    "__tests__/test-results/**",
+    "__tests__/playwright-report/**",
+    "test-results/**",
+    "hextrackr-specs/**",
+    "*.min.js"
   ]
 }
