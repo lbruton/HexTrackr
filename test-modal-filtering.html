@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal CVE Filtering Test - T015/T016</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Modal CVE Filtering Test</h1>
+        <p class="text-muted">T015: Modal State Management | T016: CVE-Specific Data Filtering</p>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Scenario</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Test Data:</strong></p>
+                        <ul>
+                            <li>CVE-2024-1234 (affects 3 devices)</li>
+                            <li>CVE-2024-5678 (affects 2 devices)</li>
+                            <li>cisco-sa-20241201-test (affects 1 device)</li>
+                        </ul>
+                        
+                        <p><strong>Expected Behavior:</strong></p>
+                        <ul>
+                            <li>Clicking individual CVE should open modal with ONLY that CVE's data</li>
+                            <li>Modal should show correct device count for each CVE</li>
+                            <li>No memory leaks on modal close/reopen</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test CVE Links</h5>
+                    </div>
+                    <div class="card-body" id="cve-test-area">
+                        <div class="mb-3">
+                            <h6>Single CVE Link:</h6>
+                            <div id="single-cve"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6>Multiple CVE Links:</h6>
+                            <div id="multi-cve"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6>Cisco SA Link:</h6>
+                            <div id="cisco-sa"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6>Test Results:</h6>
+                            <div id="test-results">
+                                <span class="text-muted">Click CVE links above to test modal filtering</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mock vulnerability details modal (simplified for testing) -->
+    <div class="modal fade" id="vulnDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Vulnerability Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="vulnInfo"></div>
+                    <div id="vulnRiskSummary" class="row"></div>
+                    <div id="vuln-affected-assets-grid"></div>
+                    <div>Affected Assets: <span id="affectedAssetsCount">0</span></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock test data
+        const mockVulnerabilities = [
+            {
+                cve: "CVE-2024-1234",
+                hostname: "server-01",
+                description: "Test vulnerability 1234",
+                severity: "High",
+                vpr_score: 7.5,
+                plugin_name: "Test Plugin 1234",
+                first_seen: "2024-01-01",
+                last_seen: "2024-01-15"
+            },
+            {
+                cve: "CVE-2024-1234",
+                hostname: "server-02",
+                description: "Test vulnerability 1234",
+                severity: "High",
+                vpr_score: 7.5,
+                plugin_name: "Test Plugin 1234",
+                first_seen: "2024-01-01",
+                last_seen: "2024-01-15"
+            },
+            {
+                cve: "CVE-2024-1234",
+                hostname: "server-03",
+                description: "Test vulnerability 1234",
+                severity: "High",
+                vpr_score: 7.5,
+                plugin_name: "Test Plugin 1234",
+                first_seen: "2024-01-01",
+                last_seen: "2024-01-15"
+            },
+            {
+                cve: "CVE-2024-5678",
+                hostname: "server-04",
+                description: "Test vulnerability 5678",
+                severity: "Medium",
+                vpr_score: 5.2,
+                plugin_name: "Test Plugin 5678",
+                first_seen: "2024-02-01",
+                last_seen: "2024-02-15"
+            },
+            {
+                cve: "CVE-2024-5678",
+                hostname: "server-05",
+                description: "Test vulnerability 5678",
+                severity: "Medium",
+                vpr_score: 5.2,
+                plugin_name: "Test Plugin 5678",
+                first_seen: "2024-02-01",
+                last_seen: "2024-02-15"
+            },
+            {
+                cve: "",
+                hostname: "server-06",
+                description: "Cisco security advisory test",
+                severity: "Critical",
+                vpr_score: 9.1,
+                plugin_name: "cisco-sa-20241201-test Advisory",
+                first_seen: "2024-12-01",
+                last_seen: "2024-12-01"
+            }
+        ];
+
+        // Mock vulnerability manager
+        window.vulnManager = {
+            dataManager: {
+                vulnerabilities: mockVulnerabilities
+            },
+            
+            showVulnerabilityDetailsByCVE: function(cveId) {
+                const testResults = document.getElementById('test-results');
+                testResults.innerHTML = `
+                    <div class="alert alert-info">
+                        <strong>Testing CVE:</strong> ${cveId}<br>
+                        <strong>Time:</strong> ${new Date().toLocaleTimeString()}<br>
+                        <strong>Action:</strong> showVulnerabilityDetailsByCVE called
+                    </div>
+                `;
+                
+                // Mock modal behavior
+                if (window.vulnDetailsModal) {
+                    window.vulnDetailsModal.showVulnerabilityDetailsByCVE(cveId, this.dataManager);
+                } else {
+                    console.log('Modal would open for CVE:', cveId);
+                    testResults.innerHTML += `<div class="alert alert-warning">Modal not loaded, but would filter by: ${cveId}</div>`;
+                }
+            },
+            
+            showToast: function(message, type) {
+                console.log(`Toast ${type}: ${message}`);
+                const testResults = document.getElementById('test-results');
+                testResults.innerHTML += `<div class="alert alert-${type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'success'}">${message}</div>`;
+            }
+        };
+
+        // Load CVE utilities and modal scripts
+        const scripts = [
+            'app/public/scripts/shared/cve-utilities.js',
+            'app/public/scripts/shared/vulnerability-details-modal.js'
+        ];
+        
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        // Initialize test when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Load scripts sequentially
+                for (const src of scripts) {
+                    await loadScript(src);
+                }
+                
+                console.log('All scripts loaded, initializing test...');
+                
+                // Wait a bit for scripts to initialize
+                setTimeout(() => {
+                    initializeTest();
+                }, 500);
+                
+            } catch (error) {
+                console.error('Failed to load scripts:', error);
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-danger">
+                        Failed to load required scripts. Please run this test from the HexTrackr root directory.
+                    </div>
+                `;
+            }
+        });
+
+        function initializeTest() {
+            // Test single CVE
+            if (typeof CVEUtilities !== 'undefined') {
+                document.getElementById('single-cve').innerHTML = CVEUtilities.createCVELink('CVE-2024-1234');
+                document.getElementById('multi-cve').innerHTML = CVEUtilities.createMultipleCVELinks('CVE-2024-1234, CVE-2024-5678');
+                document.getElementById('cisco-sa').innerHTML = CVEUtilities.createCVELink('cisco-sa-20241201-test');
+                
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-success">
+                        Test environment initialized successfully!<br>
+                        <strong>CVE Utilities:</strong> Loaded<br>
+                        <strong>Modal:</strong> ${window.vulnDetailsModal ? 'Loaded' : 'Not loaded'}<br>
+                        <strong>Mock Data:</strong> ${mockVulnerabilities.length} vulnerabilities
+                    </div>
+                `;
+            } else {
+                document.getElementById('test-results').innerHTML = `
+                    <div class="alert alert-danger">
+                        CVE Utilities not loaded. Cannot run test.
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

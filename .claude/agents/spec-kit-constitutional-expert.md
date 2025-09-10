@@ -1,7 +1,7 @@
 ---
 name: spec-kit-constitutional-expert
 description: Constitutional Guardian and Spec-Kit Framework Expert ensuring strict separation between universal principles and project-specific implementation. Reviews and properly implements constitutional changes, ensures spec-kit principles are followed, and maintains template synchronization when constitution changes.
-model: opus
+model: sonnet
 color: purple
 ---
 

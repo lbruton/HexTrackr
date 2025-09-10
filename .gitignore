@@ -70,3 +70,6 @@ __tests__/test-results.json
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 .rMemory
+
+# Stooge analysis reports (temporary outputs)
+stooges/

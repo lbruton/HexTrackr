@@ -5,7 +5,7 @@ This is the second step in the Spec-Driven Development lifecycle.
 
 Given the implementation details provided as an argument, do this:
 
-1. Run `hextrackr-specs/scripts/setup-plan.sh --json` from the repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. All future file paths must be absolute.
+1. Run `hextrackr-specs/scripts/setup-plan.sh 023 --json` (or appropriate spec number) from the repo root and parse JSON for SPEC_NAME, FEATURE_SPEC, IMPL_PLAN, SPEC_DIR, BRANCH. All future file paths must be absolute. If no spec number is provided in arguments, use the active spec.
 2. Read and analyze the feature specification to understand:
    - The feature requirements and user stories
    - Functional and non-functional requirements

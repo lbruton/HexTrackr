@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Create a new feature with branch, directory structure, and template
-# Usage: ./create-new-feature.sh "feature description"
-#        ./create-new-feature.sh --json "feature description"
+# Create a new specification directory with template (no branch creation)
+# Usage: ./create-new-spec.sh "feature description"
+#        ./create-new-spec.sh --json "feature description"
 
 set -e
 
@@ -29,7 +29,7 @@ fi
 
 # Get repository root
 REPO_ROOT=$(git rev-parse --show-toplevel)
-SPECS_DIR="$REPO_ROOT/specs"
+SPECS_DIR="$REPO_ROOT/hextrackr-specs/specs"
 
 # Create specs directory if it doesn't exist
 mkdir -p "$SPECS_DIR"
@@ -64,19 +64,16 @@ BRANCH_NAME=$(echo "$FEATURE_DESCRIPTION" | \
 # Extract 2-3 meaningful words
 WORDS=$(echo "$BRANCH_NAME" | tr '-' '\n' | grep -v '^$' | head -3 | tr '\n' '-' | sed 's/-$//')
 
-# Final branch name
-BRANCH_NAME="${FEATURE_NUM}-${WORDS}"
+# Spec directory name (no branch creation)
+SPEC_NAME="${FEATURE_NUM}-${WORDS}"
 
-# Create and switch to new branch
-git checkout -b "$BRANCH_NAME"
-
-# Create feature directory
-FEATURE_DIR="$SPECS_DIR/$BRANCH_NAME"
-mkdir -p "$FEATURE_DIR"
+# Create spec directory
+SPEC_DIR="$SPECS_DIR/$SPEC_NAME"
+mkdir -p "$SPEC_DIR"
 
 # Copy template if it exists
 TEMPLATE="$REPO_ROOT/hextrackr-specs/templates/spec-template.md"
-SPEC_FILE="$FEATURE_DIR/spec.md"
+SPEC_FILE="$SPEC_DIR/spec.md"
 
 if [ -f "$TEMPLATE" ]; then
     cp "$TEMPLATE" "$SPEC_FILE"
@@ -85,12 +82,22 @@ else
     touch "$SPEC_FILE"
 fi
 
+# Source common functions to set active spec
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
+
+# Set this as the active spec
+set_active_spec "$REPO_ROOT" "$SPEC_NAME"
+
 if $JSON_MODE; then
-    printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s"}\n' \
-        "$BRANCH_NAME" "$SPEC_FILE" "$FEATURE_NUM"
+    printf '{"SPEC_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s","SPEC_DIR":"%s"}\n' \
+        "$SPEC_NAME" "$SPEC_FILE" "$FEATURE_NUM" "$SPEC_DIR"
 else
     # Output results for the LLM to use (legacy key: value format)
-    echo "BRANCH_NAME: $BRANCH_NAME"
+    echo "SPEC_NAME: $SPEC_NAME"
     echo "SPEC_FILE: $SPEC_FILE"
     echo "FEATURE_NUM: $FEATURE_NUM"
+    echo "SPEC_DIR: $SPEC_DIR"
+    echo ""
+    echo "Active spec set to: $SPEC_NAME"
 fi
