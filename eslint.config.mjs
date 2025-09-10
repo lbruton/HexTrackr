@@ -14,6 +14,10 @@ export default [
       ".git/**",
       ".DS_Store",
       
+      // Claude Code AI configuration
+      ".claude/**",
+      "stooges/**",
+      
       // Legacy ESLint configuration (avoid conflicts)
       ".eslintrc.js",
       ".eslintrc.json",

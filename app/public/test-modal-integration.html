@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shemp's Modal Integration Testing Suite</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- AG Grid -->
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@29.1.0/dist/ag-grid-community.min.js"></script>
+    
+    <style>
+        .test-results {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+        }
+        
+        .memory-chart {
+            height: 200px;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-pass { background-color: #28a745; }
+        .status-fail { background-color: #dc3545; }
+        .status-running { background-color: #ffc107; animation: pulse 1s infinite; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .console-output {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            border-radius: 0.375rem;
+        }
+        
+        .test-section {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .test-section-header {
+            background-color: #f8f9fa;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+        
+        .test-section-content {
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">🔧 Shemp's Modal Integration Testing Suite</h1>
+                <p class="lead">Comprehensive Phase 2 testing for Larry's memory management, Moe's race condition protection, and Curly's performance work.</p>
+                
+                <!-- Control Panel -->
+                <div class="test-section">
+                    <div class="test-section-header">
+                        Control Panel
+                    </div>
+                    <div class="test-section-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button id="runAllTests" class="btn btn-primary btn-lg mb-3">
+                                    🚀 Run All Tests
+                                </button>
+                                <button id="runMemoryTests" class="btn btn-success me-2 mb-2">
+                                    🧠 T046: Memory Tests
+                                </button>
+                                <button id="runPerformanceTests" class="btn btn-warning me-2 mb-2">
+                                    ⚡ T047: Performance Tests
+                                </button>
+                                <button id="runMonitoringTests" class="btn btn-info me-2 mb-2">
+                                    📊 T048: Monitoring Tests
+                                </button>
+                                <button id="clearResults" class="btn btn-secondary mb-2">
+                                    🧹 Clear Results
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="testIterations" class="form-label">Test Iterations:</label>
+                                    <input type="range" class="form-range" id="testIterations" min="10" max="100" value="50">
+                                    <small class="form-text text-muted">Current: <span id="iterationCount">50</span></small>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="performanceThreshold" class="form-label">Performance Threshold (ms):</label>
+                                    <input type="range" class="form-range" id="performanceThreshold" min="100" max="1000" value="500">
+                                    <small class="form-text text-muted">Current: <span id="thresholdValue">500</span>ms</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Test Status Overview -->
+                <div class="test-section">
+                    <div class="test-section-header">
+                        Test Status Overview
+                    </div>
+                    <div class="test-section-content">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <span id="t046Status" class="status-indicator"></span>
+                                        <h6>T046: Memory Leaks</h6>
+                                        <p id="t046Result" class="mb-0">Not Started</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <span id="t047Status" class="status-indicator"></span>
+                                        <h6>T047: Performance</h6>
+                                        <p id="t047Result" class="mb-0">Not Started</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <span id="t048Status" class="status-indicator"></span>
+                                        <h6>T048: Monitoring</h6>
+                                        <p id="t048Result" class="mb-0">Not Started</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <span id="overallStatus" class="status-indicator"></span>
+                                        <h6>Overall</h6>
+                                        <p id="overallResult" class="mb-0">Not Started</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Memory Usage Tracking -->
+                <div class="test-section">
+                    <div class="test-section-header">
+                        Memory Usage Tracking
+                    </div>
+                    <div class="test-section-content">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="memory-chart" id="memoryChart">
+                                    <canvas id="memoryCanvas" width="600" height="150"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Memory Statistics</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>Initial:</strong> <span id="initialMemory">-</span></li>
+                                    <li><strong>Current:</strong> <span id="currentMemory">-</span></li>
+                                    <li><strong>Peak:</strong> <span id="peakMemory">-</span></li>
+                                    <li><strong>Growth:</strong> <span id="memoryGrowth">-</span></li>
+                                </ul>
+                                <div class="progress">
+                                    <div id="memoryProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small class="text-muted">Memory usage relative to 10MB threshold</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Performance Metrics -->
+                <div class="test-section">
+                    <div class="test-section-header">
+                        Performance Metrics
+                    </div>
+                    <div class="test-section-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Modal Operation Times</h6>
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Metric</th>
+                                            <th>Value</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="performanceTable">
+                                        <tr><td>Average Time</td><td id="avgTime">-</td><td id="avgStatus">-</td></tr>
+                                        <tr><td>Max Time</td><td id="maxTime">-</td><td id="maxStatus">-</td></tr>
+                                        <tr><td>P95 Time</td><td id="p95Time">-</td><td id="p95Status">-</td></tr>
+                                        <tr><td>P99 Time</td><td id="p99Time">-</td><td id="p99Status">-</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Error Tracking</h6>
+                                <div class="alert alert-info" id="errorSummary">
+                                    No errors tracked yet.
+                                </div>
+                                <div id="errorDetails" class="small">
+                                    <!-- Error details will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Test Results -->
+                <div class="test-section">
+                    <div class="test-section-header">
+                        Test Results & Console Output
+                    </div>
+                    <div class="test-section-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Test Results</h6>
+                                <div id="testResults" class="test-results">
+                                    <p class="text-muted">Click "Run All Tests" to start comprehensive testing.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Console Output</h6>
+                                <div id="consoleOutput" class="console-output">
+                                    <div>🔧 Shemp's Modal Integration Test Suite ready...</div>
+                                    <div>Heyyy, ready to test those knuckleheads' work!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Modal for Testing -->
+    <div class="modal fade" id="vulnDetailsModal" tabindex="-1" aria-labelledby="vulnDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="vulnDetailsModalLabel">Vulnerability Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="vulnInfo">Test vulnerability info...</div>
+                    <div id="riskSummary">Test risk summary...</div>
+                    <div id="affectedAssetsContainer">
+                        <div id="affectedAssetsGrid" class="ag-theme-alpine" style="height: 400px; width: 100%;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="exportVulnCSV" class="btn btn-success">Export CSV</button>
+                    <button type="button" id="generateVulnReport" class="btn btn-info">Generate Report</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Load Required Scripts -->
+    <script src="scripts/shared/cve-utilities.js"></script>
+    <script src="scripts/shared/toast-manager.js"></script>
+    <script src="scripts/shared/vulnerability-details-modal.js"></script>
+    <script src="scripts/tests/modal-integration-test.js"></script>
+    
+    <script>
+        // Initialize test suite and UI
+        let testSuite = null;
+        let memoryCanvas = null;
+        let memoryCtx = null;
+        let memoryData = [];
+        let isRunningTests = false;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTestSuite();
+            initializeUI();
+            initializeMemoryChart();
+            startMemoryMonitoring();
+        });
+        
+        function initializeTestSuite() {
+            console.log('🔧 Initializing Shemp\'s Test Suite...');
+            
+            try {
+                testSuite = new ModalIntegrationTestSuite();
+                logToConsole('✅ Test suite initialized successfully');
+                logToConsole('Heyyy, ready to validate those knuckleheads\' work!');
+            } catch (error) {
+                logToConsole('❌ Failed to initialize test suite: ' + error.message);
+                console.error('Test suite initialization error:', error);
+            }
+        }
+        
+        function initializeUI() {
+            // Control buttons
+            document.getElementById('runAllTests').addEventListener('click', runAllTests);
+            document.getElementById('runMemoryTests').addEventListener('click', () => runSpecificTest('T046'));
+            document.getElementById('runPerformanceTests').addEventListener('click', () => runSpecificTest('T047'));
+            document.getElementById('runMonitoringTests').addEventListener('click', () => runSpecificTest('T048'));
+            document.getElementById('clearResults').addEventListener('click', clearResults);
+            
+            // Configuration sliders
+            document.getElementById('testIterations').addEventListener('input', function() {
+                document.getElementById('iterationCount').textContent = this.value;
+                if (testSuite) {
+                    testSuite.config.testIterations = parseInt(this.value);
+                }
+            });
+            
+            document.getElementById('performanceThreshold').addEventListener('input', function() {
+                document.getElementById('thresholdValue').textContent = this.value;
+                if (testSuite) {
+                    testSuite.config.performanceThreshold = parseInt(this.value);
+                }
+            });
+        }
+        
+        function initializeMemoryChart() {
+            memoryCanvas = document.getElementById('memoryCanvas');
+            memoryCtx = memoryCanvas.getContext('2d');
+            
+            // Initial chart setup
+            memoryCtx.fillStyle = '#f8f9fa';
+            memoryCtx.fillRect(0, 0, memoryCanvas.width, memoryCanvas.height);
+            memoryCtx.strokeStyle = '#007bff';
+            memoryCtx.lineWidth = 2;
+        }
+        
+        function startMemoryMonitoring() {
+            setInterval(() => {
+                const memory = getCurrentMemoryUsage();
+                if (memory > 0) {
+                    memoryData.push({
+                        timestamp: Date.now(),
+                        memory: memory
+                    });
+                    
+                    // Keep only last 100 data points
+                    if (memoryData.length > 100) {
+                        memoryData.shift();
+                    }
+                    
+                    updateMemoryDisplay(memory);
+                    updateMemoryChart();
+                }
+            }, 1000);
+        }
+        
+        function getCurrentMemoryUsage() {
+            if (performance.memory) {
+                return performance.memory.usedJSHeapSize;
+            }
+            return 0;
+        }
+        
+        function updateMemoryDisplay(currentMemory) {
+            const initialMemory = memoryData.length > 0 ? memoryData[0].memory : currentMemory;
+            const peakMemory = Math.max(...memoryData.map(d => d.memory));
+            const memoryGrowth = currentMemory - initialMemory;
+            
+            document.getElementById('initialMemory').textContent = formatBytes(initialMemory);
+            document.getElementById('currentMemory').textContent = formatBytes(currentMemory);
+            document.getElementById('peakMemory').textContent = formatBytes(peakMemory);
+            document.getElementById('memoryGrowth').textContent = formatBytes(memoryGrowth);
+            
+            // Update progress bar (relative to 10MB threshold)
+            const threshold = 10 * 1024 * 1024; // 10MB
+            const progressPercent = Math.min(100, (memoryGrowth / threshold) * 100);
+            const progressBar = document.getElementById('memoryProgress');
+            progressBar.style.width = progressPercent + '%';
+            
+            if (progressPercent > 80) {
+                progressBar.className = 'progress-bar bg-danger';
+            } else if (progressPercent > 60) {
+                progressBar.className = 'progress-bar bg-warning';
+            } else {
+                progressBar.className = 'progress-bar bg-success';
+            }
+        }
+        
+        function updateMemoryChart() {
+            if (memoryData.length < 2) return;
+            
+            memoryCtx.clearRect(0, 0, memoryCanvas.width, memoryCanvas.height);
+            
+            const width = memoryCanvas.width;
+            const height = memoryCanvas.height;
+            const padding = 10;
+            
+            const minMemory = Math.min(...memoryData.map(d => d.memory));
+            const maxMemory = Math.max(...memoryData.map(d => d.memory));
+            const memoryRange = maxMemory - minMemory || 1;
+            
+            memoryCtx.beginPath();
+            memoryCtx.strokeStyle = '#007bff';
+            memoryCtx.lineWidth = 2;
+            
+            memoryData.forEach((point, index) => {
+                const x = padding + (index / (memoryData.length - 1)) * (width - 2 * padding);
+                const y = height - padding - ((point.memory - minMemory) / memoryRange) * (height - 2 * padding);
+                
+                if (index === 0) {
+                    memoryCtx.moveTo(x, y);
+                } else {
+                    memoryCtx.lineTo(x, y);
+                }
+            });
+            
+            memoryCtx.stroke();
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        async function runAllTests() {
+            if (isRunningTests) {
+                logToConsole('⚠️ Tests already running, please wait...');
+                return;
+            }
+            
+            if (!testSuite) {
+                logToConsole('❌ Test suite not initialized');
+                return;
+            }
+            
+            isRunningTests = true;
+            updateButtonStates(true);
+            
+            logToConsole('🚀 Starting comprehensive Phase 2 testing...');
+            updateTestStatus('overall', 'running', 'Running Tests...');
+            
+            try {
+                const results = await testSuite.runComprehensiveTests();
+                
+                displayTestResults(results);
+                updatePerformanceMetrics(results);
+                updateErrorSummary(results);
+                
+                const overallStatus = results.overallPassed ? 'pass' : 'fail';
+                updateTestStatus('overall', overallStatus, results.overallPassed ? 'All Tests Passed!' : 'Some Tests Failed');
+                
+                logToConsole(`✅ All tests completed: ${results.overallPassed ? 'PASS' : 'FAIL'}`);
+                logToConsole('Heyyy, that\'s a wrap! Test validation complete!');
+                
+            } catch (error) {
+                logToConsole('❌ Test execution failed: ' + error.message);
+                updateTestStatus('overall', 'fail', 'Test Failed');
+                console.error('Test execution error:', error);
+            }
+            
+            isRunningTests = false;
+            updateButtonStates(false);
+        }
+        
+        async function runSpecificTest(taskId) {
+            if (isRunningTests) {
+                logToConsole('⚠️ Tests already running, please wait...');
+                return;
+            }
+            
+            if (!testSuite) {
+                logToConsole('❌ Test suite not initialized');
+                return;
+            }
+            
+            isRunningTests = true;
+            updateButtonStates(true);
+            
+            const taskMap = {
+                'T046': 'testMemoryLeakDetection',
+                'T047': 'testPerformanceValidation', 
+                'T048': 'testErrorTrackingAndMonitoring'
+            };
+            
+            const methodName = taskMap[taskId];
+            if (!methodName) {
+                logToConsole(`❌ Unknown task: ${taskId}`);
+                isRunningTests = false;
+                updateButtonStates(false);
+                return;
+            }
+            
+            logToConsole(`🚀 Running ${taskId} test...`);
+            updateTestStatus(taskId.toLowerCase(), 'running', 'Running...');
+            
+            try {
+                const result = await testSuite[methodName]();
+                
+                const status = result.passed ? 'pass' : 'fail';
+                updateTestStatus(taskId.toLowerCase(), status, result.passed ? 'Passed' : 'Failed');
+                
+                displaySingleTestResult(result);
+                
+                logToConsole(`✅ ${taskId} test completed: ${result.passed ? 'PASS' : 'FAIL'}`);
+                
+            } catch (error) {
+                logToConsole(`❌ ${taskId} test failed: ${error.message}`);
+                updateTestStatus(taskId.toLowerCase(), 'fail', 'Failed');
+                console.error(`${taskId} test error:`, error);
+            }
+            
+            isRunningTests = false;
+            updateButtonStates(false);
+        }
+        
+        function updateTestStatus(testId, status, message) {
+            const statusElement = document.getElementById(`${testId}Status`);
+            const resultElement = document.getElementById(`${testId}Result`);
+            
+            if (statusElement) {
+                statusElement.className = `status-indicator status-${status}`;
+            }
+            
+            if (resultElement) {
+                resultElement.textContent = message;
+            }
+        }
+        
+        function updateButtonStates(disabled) {
+            const buttons = ['runAllTests', 'runMemoryTests', 'runPerformanceTests', 'runMonitoringTests'];
+            buttons.forEach(buttonId => {
+                const button = document.getElementById(buttonId);
+                if (button) {
+                    button.disabled = disabled;
+                }
+            });
+        }
+        
+        function displayTestResults(results) {
+            const resultsDiv = document.getElementById('testResults');
+            let html = `
+                <div class="mb-3">
+                    <h6>Test Summary</h6>
+                    <p><strong>Timestamp:</strong> ${results.timestamp}</p>
+                    <p><strong>Total Duration:</strong> ${results.totalDuration.toFixed(2)}ms</p>
+                    <p><strong>Memory Growth:</strong> ${formatBytes(results.memoryGrowth)}</p>
+                    <p><strong>Overall Result:</strong> 
+                        <span class="badge ${results.overallPassed ? 'bg-success' : 'bg-danger'}">
+                            ${results.overallPassed ? 'PASS' : 'FAIL'}
+                        </span>
+                    </p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>Individual Test Results</h6>
+                    <ul class="list-unstyled">
+            `;
+            
+            Object.entries(results.tests).forEach(([task, result]) => {
+                html += `
+                    <li class="mb-2">
+                        <span class="status-indicator status-${result.passed ? 'pass' : 'fail'}"></span>
+                        <strong>${task}:</strong> ${result.test || 'Test'}
+                        <span class="badge ${result.passed ? 'bg-success' : 'bg-danger'} ms-2">
+                            ${result.passed ? 'PASS' : 'FAIL'}
+                        </span>
+                        ${result.error ? `<br><small class="text-danger">Error: ${result.error}</small>` : ''}
+                    </li>
+                `;
+            });
+            
+            html += '</ul></div>';
+            
+            if (results.recommendations && results.recommendations.length > 0) {
+                html += `
+                    <div class="mb-3">
+                        <h6>Recommendations</h6>
+                        <ul class="list-unstyled">
+                `;
+                results.recommendations.forEach(rec => {
+                    html += `<li class="mb-1">• ${rec}</li>`;
+                });
+                html += '</ul></div>';
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function displaySingleTestResult(result) {
+            const resultsDiv = document.getElementById('testResults');
+            const html = `
+                <div class="mb-3">
+                    <h6>${result.task}: ${result.test || 'Test Result'}</h6>
+                    <p><strong>Status:</strong> 
+                        <span class="badge ${result.passed ? 'bg-success' : 'bg-danger'}">
+                            ${result.passed ? 'PASS' : 'FAIL'}
+                        </span>
+                    </p>
+                    ${result.error ? `<p><strong>Error:</strong> ${result.error}</p>` : ''}
+                    ${result.duration ? `<p><strong>Duration:</strong> ${result.duration.toFixed(2)}ms</p>` : ''}
+                    ${result.memoryGrowth !== undefined ? `<p><strong>Memory Growth:</strong> ${formatBytes(result.memoryGrowth)}</p>` : ''}
+                    ${result.averageTime ? `<p><strong>Average Time:</strong> ${result.averageTime.toFixed(2)}ms</p>` : ''}
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function updatePerformanceMetrics(results) {
+            if (results.tests && results.tests.T047 && results.tests.T047.details) {
+                const perf = results.tests.T047.details;
+                const threshold = testSuite.config.performanceThreshold;
+                
+                document.getElementById('avgTime').textContent = perf.averageTime ? `${perf.averageTime.toFixed(2)}ms` : '-';
+                document.getElementById('maxTime').textContent = perf.maxTime ? `${perf.maxTime.toFixed(2)}ms` : '-';
+                document.getElementById('p95Time').textContent = perf.p95 ? `${perf.p95.toFixed(2)}ms` : '-';
+                document.getElementById('p99Time').textContent = perf.p99 ? `${perf.p99.toFixed(2)}ms` : '-';
+                
+                // Update status indicators
+                document.getElementById('avgStatus').innerHTML = perf.averageTime < threshold ? '<span class="badge bg-success">PASS</span>' : '<span class="badge bg-danger">FAIL</span>';
+                document.getElementById('maxStatus').innerHTML = perf.maxTime < threshold * 2 ? '<span class="badge bg-success">PASS</span>' : '<span class="badge bg-danger">FAIL</span>';
+                document.getElementById('p95Status').innerHTML = perf.p95 < threshold * 1.5 ? '<span class="badge bg-success">PASS</span>' : '<span class="badge bg-danger">FAIL</span>';
+                document.getElementById('p99Status').innerHTML = perf.p99 < threshold * 2 ? '<span class="badge bg-success">PASS</span>' : '<span class="badge bg-danger">FAIL</span>';
+            }
+        }
+        
+        function updateErrorSummary(results) {
+            const errorSummary = document.getElementById('errorSummary');
+            const errorDetails = document.getElementById('errorDetails');
+            
+            const totalErrors = results.errorLog ? results.errorLog.length : 0;
+            
+            if (totalErrors === 0) {
+                errorSummary.className = 'alert alert-success';
+                errorSummary.textContent = 'No errors detected during testing.';
+                errorDetails.innerHTML = '';
+            } else {
+                errorSummary.className = 'alert alert-warning';
+                errorSummary.textContent = `${totalErrors} errors detected during testing.`;
+                
+                let errorHtml = '<ul class="list-unstyled mt-2">';
+                results.errorLog.forEach((error, index) => {
+                    errorHtml += `
+                        <li class="mb-1">
+                            <strong>${error.task || 'Unknown'}:</strong> ${error.error || 'Unknown error'}
+                        </li>
+                    `;
+                });
+                errorHtml += '</ul>';
+                errorDetails.innerHTML = errorHtml;
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '<p class="text-muted">Click "Run All Tests" to start comprehensive testing.</p>';
+            document.getElementById('consoleOutput').innerHTML = '<div>🔧 Shemp\'s Modal Integration Test Suite ready...</div><div>Heyyy, ready to test those knuckleheads\' work!</div>';
+            
+            // Reset status indicators
+            ['t046', 't047', 't048', 'overall'].forEach(testId => {
+                const statusElement = document.getElementById(`${testId}Status`);
+                const resultElement = document.getElementById(`${testId}Result`);
+                
+                if (statusElement) {
+                    statusElement.className = 'status-indicator';
+                }
+                
+                if (resultElement) {
+                    resultElement.textContent = 'Not Started';
+                }
+            });
+            
+            // Reset performance metrics
+            ['avgTime', 'maxTime', 'p95Time', 'p99Time'].forEach(id => {
+                document.getElementById(id).textContent = '-';
+            });
+            
+            ['avgStatus', 'maxStatus', 'p95Status', 'p99Status'].forEach(id => {
+                document.getElementById(id).textContent = '-';
+            });
+            
+            // Reset error summary
+            const errorSummary = document.getElementById('errorSummary');
+            errorSummary.className = 'alert alert-info';
+            errorSummary.textContent = 'No errors tracked yet.';
+            document.getElementById('errorDetails').innerHTML = '';
+            
+            logToConsole('🧹 Results cleared - ready for new tests');
+        }
+        
+        function logToConsole(message) {
+            const consoleOutput = document.getElementById('consoleOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            consoleOutput.appendChild(logEntry);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            
+            console.log(message);
+        }
+        
+        // Override console methods to capture logs
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            const message = args.join(' ');
+            if (message.includes('🔧') || message.includes('✅') || message.includes('❌') || message.includes('⚡') || message.includes('🧠') || message.includes('📊')) {
+                logToConsole(message);
+            }
+        };
+        
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            const message = args.join(' ');
+            logToConsole('❌ ERROR: ' + message);
+        };
+    </script>
+</body>
+</html>

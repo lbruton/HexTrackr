@@ -73,6 +73,10 @@ class ModernVulnManager {
         return this.coreOrchestrator.lookupVulnerability(vulnId, pluginName);
     }
 
+    showVulnerabilityDetailsByCVE(cveId) {
+        return this.coreOrchestrator.showVulnerabilityDetailsByCVE(cveId);
+    }
+
     async exportDeviceReport(hostname) {
         return this.coreOrchestrator.exportDeviceReport(hostname);
     }

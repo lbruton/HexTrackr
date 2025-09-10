@@ -1,0 +1,1045 @@
+openapi: 3.0.3
+info:
+  title: HexTrackr Vulnerability Management API
+  description: |
+    Comprehensive vulnerability management platform API providing centralized security data 
+    from multiple vendors (Cisco, Tenable, Qualys), real-time analytics, and integrated 
+    ticket management for complete vulnerability lifecycle management.
+    
+    **Performance Specifications:**
+    - Import Rate: 5,911+ records/second sustained throughput
+    - API Response: <2s for complex queries
+    - Concurrent Users: 50+ active sessions supported
+    - Dataset Capacity: 100K+ vulnerability records
+    
+    **Security Features:**
+    - Rate limiting: 1000 requests/15 minutes per IP
+    - Input validation on all endpoints
+    - XSS protection with DOMPurify
+    - SQL injection prevention
+    - Path traversal protection via PathValidator
+    
+  version: 1.0.12
+  contact:
+    name: HexTrackr Support
+  license:
+    name: Proprietary
+servers:
+  - url: http://localhost:8989
+    description: Local Development Server
+  - url: http://localhost:8080
+    description: Docker Internal Server
+  - url: https://hextrackr.example.com
+    description: Production Server
+
+security:
+  - RateLimitAuth: []
+
+paths:
+  # Health & Monitoring
+  /health:
+    get:
+      tags:
+        - Health
+      summary: System Health Check
+      description: Returns system health status and basic metrics
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # Vulnerability Management
+  /api/vulnerabilities:
+    get:
+      tags:
+        - Vulnerabilities
+      summary: Retrieve Vulnerabilities
+      description: |
+        Retrieves vulnerability data with pagination, filtering, and search capabilities.
+        Supports complex queries for enterprise-scale vulnerability management.
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of records to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10000
+            default: 1000
+        - name: offset
+          in: query
+          description: Number of records to skip for pagination
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: severity
+          in: query
+          description: Filter by vulnerability severity
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/VulnerabilitySeverity'
+        - name: hostname
+          in: query
+          description: Filter by device hostname (supports partial matching)
+          schema:
+            type: string
+            maxLength: 253
+        - name: cve
+          in: query
+          description: Filter by CVE identifier
+          schema:
+            type: string
+            pattern: '^CVE-\d{4}-\d{4,}$'
+        - name: search
+          in: query
+          description: Full-text search across vulnerability descriptions
+          schema:
+            type: string
+            maxLength: 500
+        - name: dateRange
+          in: query
+          description: Filter by date range (format: YYYY-MM-DD,YYYY-MM-DD)
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}-\d{2},\d{4}-\d{2}-\d{2}$'
+      responses:
+        '200':
+          description: Successful response with vulnerability data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VulnerabilityListResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitResponse'
+
+  /api/vulnerabilities/stats:
+    get:
+      tags:
+        - Vulnerabilities
+      summary: Get Vulnerability Statistics
+      description: Returns aggregated vulnerability statistics by severity and trends
+      responses:
+        '200':
+          description: Vulnerability statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VulnerabilityStatsResponse'
+
+  /api/vulnerabilities/trends:
+    get:
+      tags:
+        - Vulnerabilities
+      summary: Get Historical Trends
+      description: Returns historical vulnerability trend data for analytics
+      parameters:
+        - name: period
+          in: query
+          description: Time period for trend analysis
+          schema:
+            type: string
+            enum: ['7d', '30d', '90d', '1y']
+            default: '30d'
+      responses:
+        '200':
+          description: Historical trend data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VulnerabilityTrendsResponse'
+
+  /api/vulnerabilities/import-staging:
+    post:
+      tags:
+        - Import
+      summary: Import Vulnerability Data
+      description: |
+        Imports vulnerability data from CSV files with real-time progress tracking.
+        Supports multiple vendor formats (Cisco, Tenable, Qualys) with automatic detection.
+        
+        **Performance:** Processes 5,911+ records/second with WebSocket progress updates
+        **File Limits:** 100MB maximum file size, CSV format only
+        **Processing:** Staged processing with deduplication and validation
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                csvFile:
+                  type: string
+                  format: binary
+                  description: CSV file containing vulnerability data
+                vendor:
+                  type: string
+                  enum: ['cisco', 'tenable', 'qualys', 'generic']
+                  default: 'cisco'
+                  description: Vendor format for CSV processing
+                scanDate:
+                  type: string
+                  format: date
+                  description: Scan date for vulnerability data (YYYY-MM-DD)
+                sessionId:
+                  type: string
+                  description: WebSocket session ID for progress tracking
+              required:
+                - csvFile
+      responses:
+        '200':
+          description: Import successfully initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportResponse'
+        '400':
+          description: Invalid file or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: File too large (>100MB)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # Ticket Management
+  /api/tickets:
+    get:
+      tags:
+        - Tickets
+      summary: Retrieve Tickets
+      description: Returns tickets with optional filtering and pagination
+      parameters:
+        - name: status
+          in: query
+          description: Filter by ticket status
+          schema:
+            $ref: '#/components/schemas/TicketStatus'
+        - name: location
+          in: query
+          description: Filter by location
+          schema:
+            type: string
+        - name: assigned_to
+          in: query
+          description: Filter by assigned technician
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of tickets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketListResponse'
+
+    post:
+      tags:
+        - Tickets
+      summary: Create New Ticket
+      description: Creates a new remediation ticket with device correlation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTicketRequest'
+      responses:
+        '201':
+          description: Ticket created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketResponse'
+        '400':
+          description: Invalid ticket data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/tickets/{ticketId}:
+    parameters:
+      - name: ticketId
+        in: path
+        required: true
+        description: Unique ticket identifier
+        schema:
+          type: string
+    
+    put:
+      tags:
+        - Tickets
+      summary: Update Ticket
+      description: Updates an existing ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTicketRequest'
+      responses:
+        '200':
+          description: Ticket updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketResponse'
+        '404':
+          description: Ticket not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Tickets
+      summary: Delete Ticket
+      description: Deletes a ticket and its vulnerability relationships
+      responses:
+        '204':
+          description: Ticket deleted successfully
+        '404':
+          description: Ticket not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # Backup & Export
+  /api/backup/vulnerabilities:
+    get:
+      tags:
+        - Backup
+      summary: Export Vulnerability Data
+      description: Exports vulnerability data in JSON or CSV format
+      parameters:
+        - name: format
+          in: query
+          description: Export format
+          schema:
+            type: string
+            enum: ['json', 'csv']
+            default: 'json'
+        - name: compress
+          in: query
+          description: Compress the export file
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Export file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportResponse'
+            text/csv:
+              schema:
+                type: string
+            application/zip:
+              schema:
+                type: string
+                format: binary
+
+  /api/backup/all:
+    get:
+      tags:
+        - Backup
+      summary: Full System Backup
+      description: Creates a complete backup of all system data
+      responses:
+        '200':
+          description: Backup file
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+
+  /api/restore:
+    post:
+      tags:
+        - Backup
+      summary: Restore from Backup
+      description: Restores system data from a backup file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                backupFile:
+                  type: string
+                  format: binary
+                  description: Backup file to restore from
+      responses:
+        '200':
+          description: Restore completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestoreResponse'
+
+  # Documentation
+  /docs-html:
+    get:
+      tags:
+        - Documentation
+      summary: Documentation Portal
+      description: Returns the main documentation portal page
+      responses:
+        '200':
+          description: Documentation portal HTML
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /api/docs/stats:
+    get:
+      tags:
+        - Documentation
+      summary: Documentation Statistics
+      description: Returns statistics about the documentation system
+      responses:
+        '200':
+          description: Documentation statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocsStatsResponse'
+
+components:
+  securitySchemes:
+    RateLimitAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for rate limiting bypass (optional)
+
+  schemas:
+    # Core Entities
+    Vulnerability:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique vulnerability identifier
+        import_id:
+          type: integer
+          description: Reference to import batch
+        hostname:
+          type: string
+          maxLength: 253
+          description: Normalized device hostname
+        ip_address:
+          type: string
+          pattern: '^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$'
+          description: Device IP address (IPv4 or IPv6)
+        cve:
+          type: string
+          pattern: '^CVE-\d{4}-\d{4,}$'
+          description: CVE identifier
+        severity:
+          $ref: '#/components/schemas/VulnerabilitySeverity'
+        vpr_score:
+          type: number
+          minimum: 0
+          maximum: 10
+          description: Vulnerability Priority Rating (0-10)
+        cvss_score:
+          type: number
+          minimum: 0
+          maximum: 10
+          description: CVSS Base Score (0-10)
+        first_seen:
+          type: string
+          format: date-time
+          description: First detection timestamp
+        last_seen:
+          type: string
+          format: date-time
+          description: Last detection timestamp
+        plugin_id:
+          type: string
+          description: Vendor plugin identifier
+        plugin_name:
+          type: string
+          description: Vulnerability check name
+        description:
+          type: string
+          description: Detailed vulnerability description
+        solution:
+          type: string
+          description: Remediation guidance
+        vendor_reference:
+          type: string
+          description: Vendor-specific reference ID
+        created_at:
+          type: string
+          format: date-time
+          description: Record creation timestamp
+      required:
+        - id
+        - hostname
+        - severity
+
+    VulnerabilitySeverity:
+      type: string
+      enum:
+        - Critical
+        - High
+        - Medium
+        - Low
+        - Info
+      description: Normalized vulnerability severity levels
+
+    Ticket:
+      type: object
+      properties:
+        id:
+          type: string
+          description: User-defined ticket identifier
+        location:
+          type: string
+          description: Site or location identifier
+        devices:
+          type: array
+          items:
+            type: string
+          description: Array of affected device hostnames
+        description:
+          type: string
+          description: Ticket description or summary
+        urgency:
+          $ref: '#/components/schemas/TicketUrgency'
+        category:
+          type: string
+          description: Ticket category or type
+        status:
+          $ref: '#/components/schemas/TicketStatus'
+        assigned_to:
+          type: string
+          description: Assigned technician or team
+        created_date:
+          type: string
+          format: date-time
+          description: Ticket creation timestamp
+        updated_date:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        notes:
+          type: string
+          description: Additional notes or comments
+      required:
+        - id
+        - location
+        - status
+
+    TicketStatus:
+      type: string
+      enum:
+        - Open
+        - In Progress
+        - Pending
+        - Resolved
+        - Closed
+      description: Ticket workflow status
+
+    TicketUrgency:
+      type: string
+      enum:
+        - Critical
+        - High
+        - Medium
+        - Low
+      description: Business priority level
+
+    DeviceSecuritySummary:
+      type: object
+      properties:
+        hostname:
+          type: string
+          description: Device hostname
+        total_vulnerabilities:
+          type: integer
+          description: Total vulnerability count
+        critical_count:
+          type: integer
+          description: Critical severity count
+        high_count:
+          type: integer
+          description: High severity count
+        medium_count:
+          type: integer
+          description: Medium severity count
+        low_count:
+          type: integer
+          description: Low severity count
+        info_count:
+          type: integer
+          description: Info severity count
+        max_vpr_score:
+          type: number
+          description: Highest VPR score
+        max_cvss_score:
+          type: number
+          description: Highest CVSS score
+        latest_scan:
+          type: string
+          format: date-time
+          description: Most recent scan timestamp
+        ip_addresses:
+          type: array
+          items:
+            type: string
+          description: Associated IP addresses
+        unique_cves:
+          type: array
+          items:
+            type: string
+          description: Unique CVE identifiers
+      required:
+        - hostname
+        - total_vulnerabilities
+
+    # Response Schemas
+    VulnerabilityListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vulnerability'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+        filters:
+          $ref: '#/components/schemas/FilterInfo'
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+      required:
+        - data
+        - pagination
+        - meta
+
+    VulnerabilityStatsResponse:
+      type: object
+      properties:
+        total_vulnerabilities:
+          type: integer
+          description: Total vulnerability count
+        by_severity:
+          type: object
+          properties:
+            critical:
+              type: integer
+            high:
+              type: integer
+            medium:
+              type: integer
+            low:
+              type: integer
+            info:
+              type: integer
+        by_status:
+          type: object
+          properties:
+            active:
+              type: integer
+            resolved:
+              type: integer
+        affected_devices:
+          type: integer
+          description: Number of devices with vulnerabilities
+        latest_scan:
+          type: string
+          format: date-time
+          description: Most recent scan timestamp
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    VulnerabilityTrendsResponse:
+      type: object
+      properties:
+        period:
+          type: string
+          description: Time period for trends
+        data_points:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              total:
+                type: integer
+              by_severity:
+                type: object
+                properties:
+                  critical:
+                    type: integer
+                  high:
+                    type: integer
+                  medium:
+                    type: integer
+                  low:
+                    type: integer
+                  info:
+                    type: integer
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    TicketListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ticket'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    ImportResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Import initiation status
+        session_id:
+          type: string
+          description: WebSocket session ID for progress tracking
+        filename:
+          type: string
+          description: Uploaded filename
+        file_size:
+          type: integer
+          description: File size in bytes
+        estimated_records:
+          type: integer
+          description: Estimated number of records to process
+        vendor:
+          type: string
+          description: Selected vendor format
+        message:
+          type: string
+          description: Status message
+      required:
+        - success
+        - session_id
+        - filename
+
+    # Request Schemas
+    CreateTicketRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Ticket identifier
+        location:
+          type: string
+          description: Site location
+        devices:
+          type: array
+          items:
+            type: string
+          description: Affected device hostnames
+        description:
+          type: string
+          description: Ticket description
+        urgency:
+          $ref: '#/components/schemas/TicketUrgency'
+        category:
+          type: string
+          description: Ticket category
+        assigned_to:
+          type: string
+          description: Assigned technician
+        notes:
+          type: string
+          description: Additional notes
+      required:
+        - id
+        - location
+
+    UpdateTicketRequest:
+      type: object
+      properties:
+        location:
+          type: string
+        devices:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+        urgency:
+          $ref: '#/components/schemas/TicketUrgency'
+        category:
+          type: string
+        status:
+          $ref: '#/components/schemas/TicketStatus'
+        assigned_to:
+          type: string
+        notes:
+          type: string
+
+    # Utility Schemas
+    PaginationInfo:
+      type: object
+      properties:
+        offset:
+          type: integer
+          description: Current offset
+        limit:
+          type: integer
+          description: Current limit
+        total:
+          type: integer
+          description: Total record count
+        has_more:
+          type: boolean
+          description: More records available
+      required:
+        - offset
+        - limit
+        - total
+        - has_more
+
+    FilterInfo:
+      type: object
+      properties:
+        severity:
+          type: array
+          items:
+            $ref: '#/components/schemas/VulnerabilitySeverity'
+        hostname:
+          type: string
+        cve:
+          type: string
+        search:
+          type: string
+        date_range:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date
+            end:
+              type: string
+              format: date
+
+    ResponseMetadata:
+      type: object
+      properties:
+        query_time:
+          type: number
+          description: Query execution time in milliseconds
+        cache_hit:
+          type: boolean
+          description: Whether result was served from cache
+        version:
+          type: string
+          description: API version
+        timestamp:
+          type: string
+          format: date-time
+          description: Response generation timestamp
+      required:
+        - query_time
+        - version
+        - timestamp
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        version:
+          type: string
+        uptime:
+          type: number
+          description: Server uptime in seconds
+        database:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [connected, disconnected, readonly]
+            record_count:
+              type: integer
+            last_import:
+              type: string
+              format: date-time
+        memory_usage:
+          type: object
+          properties:
+            used:
+              type: number
+              description: Used memory in MB
+            total:
+              type: number
+              description: Total memory in MB
+            percentage:
+              type: number
+              description: Memory usage percentage
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Error code
+            message:
+              type: string
+              description: Human-readable error message
+            details:
+              type: string
+              description: Additional error details
+            timestamp:
+              type: string
+              format: date-time
+          required:
+            - code
+            - message
+            - timestamp
+
+    RateLimitResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum: [RATE_LIMIT_EXCEEDED]
+            message:
+              type: string
+            retry_after:
+              type: integer
+              description: Seconds until rate limit resets
+            limit:
+              type: integer
+              description: Rate limit threshold
+            remaining:
+              type: integer
+              description: Remaining requests in window
+
+    ExportResponse:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: Generated filename
+        size:
+          type: integer
+          description: File size in bytes
+        record_count:
+          type: integer
+          description: Number of exported records
+        format:
+          type: string
+          enum: [json, csv]
+        compressed:
+          type: boolean
+          description: Whether file is compressed
+        download_url:
+          type: string
+          description: Temporary download URL
+
+    RestoreResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        restored_records:
+          type: object
+          properties:
+            vulnerabilities:
+              type: integer
+            tickets:
+              type: integer
+            imports:
+              type: integer
+        errors:
+          type: array
+          items:
+            type: string
+        duration:
+          type: number
+          description: Restore duration in seconds
+
+    DocsStatsResponse:
+      type: object
+      properties:
+        total_pages:
+          type: integer
+        last_updated:
+          type: string
+          format: date-time
+        active_spec:
+          type: string
+        build_time:
+          type: number
+          description: Last build time in seconds
+
+    TicketResponse:
+      allOf:
+        - $ref: '#/components/schemas/Ticket'
+        - type: object
+          properties:
+            vulnerability_count:
+              type: integer
+              description: Number of linked vulnerabilities
+            related_vulnerabilities:
+              type: array
+              items:
+                $ref: '#/components/schemas/Vulnerability'
+
+tags:
+  - name: Health
+    description: System health and monitoring endpoints
+  - name: Vulnerabilities
+    description: Vulnerability data management and analytics
+  - name: Tickets
+    description: Remediation ticket management
+  - name: Import
+    description: CSV data import and processing
+  - name: Backup
+    description: Data backup, export, and restore operations
+  - name: Documentation
+    description: Documentation portal and system information
