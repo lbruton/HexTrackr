@@ -37,12 +37,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     versionSpan.textContent = window.HexTrackrConfig.version;
                 }
                 
-                // Update version badge if available
-                const versionBadge = footerContainer.querySelector("img[alt=\"HexTrackr Version\"]");
-                if (versionBadge && window.HexTrackrConfig && window.HexTrackrConfig.version) {
-                    const newSrc = versionBadge.src.replace(/v[\d.]+/, `v${window.HexTrackrConfig.version}`);
-                    versionBadge.src = newSrc;
-                }
+                // Fetch version from CHANGELOG and update badge
+                fetchVersionFromChangelog(footerContainer);
             })
             .catch(error => {
                 console.warn("Failed to load shared footer:", error);
@@ -50,6 +46,50 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     }
 });
+
+/**
+ * Fetches the current version from CHANGELOG.html and updates the version badge
+ * @param {Element} footerContainer - The footer container element
+ */
+function fetchVersionFromChangelog(footerContainer) {
+    // Fetch the CHANGELOG HTML
+    fetch("/docs-html/content/CHANGELOG.html")
+        .then(response => response.text())
+        .then(html => {
+            // Parse HTML to find version pattern [x.x.x]
+            // Look for the first version that's not "Unreleased"
+            const versionMatch = html.match(/\[(\d+\.\d+\.\d+)\]/);
+            
+            if (versionMatch && versionMatch[1]) {
+                const version = versionMatch[1];
+                
+                // Update the version badge
+                const versionBadge = footerContainer.querySelector("img[alt=\"HexTrackr Version\"]");
+                if (versionBadge) {
+                    // Replace the version in the badge URL
+                    const newSrc = versionBadge.src.replace(/HexTrackr-v[\d.]+/, `HexTrackr-v${version}`);
+                    versionBadge.src = newSrc;
+                    
+                    // Also update the parent link title
+                    const versionLink = versionBadge.closest("a");
+                    if (versionLink) {
+                        versionLink.title = `View Changelog - v${version}`;
+                    }
+                }
+                
+                // Also update fallback footer version if needed
+                const fallbackBadge = footerContainer.querySelector(".fallback-version-badge");
+                if (fallbackBadge) {
+                    const newSrc = fallbackBadge.src.replace(/HexTrackr-v[\d.]+/, `HexTrackr-v${version}`);
+                    fallbackBadge.src = newSrc;
+                }
+            }
+        })
+        .catch(error => {
+            // Silently fail - keep default version if CHANGELOG fetch fails
+            console.debug("Could not fetch version from CHANGELOG:", error);
+        });
+}
 
 /**
  * Creates a safe fallback footer using DOM methods with badges
@@ -175,4 +215,7 @@ function createFallbackFooter(container) {
     
     container.innerHTML = "";
     container.appendChild(footer);
+    
+    // Fetch and update version from CHANGELOG
+    fetchVersionFromChangelog(container);
 }

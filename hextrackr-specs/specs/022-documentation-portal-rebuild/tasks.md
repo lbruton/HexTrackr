@@ -33,10 +33,10 @@
 
 ### 3.1 Add Active Spec Display
 
-- [ ] Update `html-content-updater.js` to read `.active-spec` file **[INCOMPLETE]**
-- [ ] Create active spec badge/banner for documentation header **[INCOMPLETE]**
+- [x] Update `html-content-updater.js` to read `.active-spec` file
+- [x] Create active spec badge/banner for documentation header
 - [x] Calculate and display task completion percentage
-- [ ] Add visual highlight for active spec in ROADMAP section **[INCOMPLETE]**
+- [x] Add visual highlight for active spec in ROADMAP section
 
 ### 3.2 Integrate Spec Status
 
@@ -74,7 +74,7 @@
 
 - [x] SPRINT.md no longer appears in documentation
 - [x] ROADMAP.md shows current spec tasks
-- [ ] Active spec is highlighted prominently **[INCOMPLETE]**
+- [x] Active spec is highlighted prominently
 - [x] All existing documentation pages still work
 - [x] Navigation remains functional
 - [x] Generation completes without errors
@@ -90,7 +90,7 @@
 
 - [x] SPRINT.md removed from documentation portal
 - [x] Spec tasks integrated into ROADMAP.md
-- [ ] Active spec displayed in documentation **[INCOMPLETE]**
+- [x] Active spec displayed in documentation
 - [x] Automation scripts working
 - [x] No regression in existing functionality
 - [ ] Documentation updated **[INCOMPLETE]**
@@ -109,13 +109,18 @@
 |------------|---------------|-------------|
 | Phase 1: Remove SPRINT.md | 2 hours | ✅ 2 hours |
 | Phase 2: Spec Synchronizer | 1 day | ✅ 1 day |
-| Phase 3: Generator Enhancement | 1 day | ❌ 70% complete |
+| Phase 3: Generator Enhancement | 1 day | ✅ 90% complete |
 | Phase 4: Automation & Testing | 1 day | ✅ 1.5 days |
-| **Total** | **3-4 days** | ✅ **85% complete** |
+| **Total** | **3-4 days** | ✅ **90% complete** |
 
 ## Bug Fixes
 
-*No active bugs for this specification*
+- [x] B001: Footer version badge showing v0.0.0 (fixed with dynamic CHANGELOG fetch)
+  - **Severity**: Low
+  - **Impact**: Version badge hardcoded to v0.0.0 after app migration
+  - **Fix Estimate**: 30 minutes  
+  - **Testing**: Browser validation shows correct v1.0.12
+  - **Resolution**: Footer now fetches version from CHANGELOG.html dynamically
 
 <!-- Template for future bugs:
 - [ ] B001: Bug description (affects specific-file.js)
