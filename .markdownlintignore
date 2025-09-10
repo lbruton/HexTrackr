@@ -9,6 +9,9 @@ docs-prototype/content/
 !.markdownlint*
 !.gitignore
 
+# Stooge analysis reports (temporary outputs)
+stooges/
+
 # Generated and temporary directories
 backups/
 depreciated/

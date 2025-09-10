@@ -155,35 +155,22 @@ function createVulnerabilityGridOptions(componentContext) {
                 const cve = params.value;
                 const pluginName = params.data.plugin_name;
                 
-                // Handle multiple CVEs - create individual links for EACH CVE
-                if (cve && (cve.includes("CVE-") || cve.includes("cisco-sa-"))) {
-                    // Check if CVEUtilities is available
-                    if (typeof CVEUtilities !== "undefined" && CVEUtilities.parseCVEString) {
-                        // Parse the CVE string to get individual CVEs
-                        const cveIds = CVEUtilities.parseCVEString(cve);
-                        
-                        if (cveIds.length > 0) {
-                            // Create individual links for each CVE with proper onclick isolation
-                            return cveIds.map(cveId => {
-                                const escaped = cveId.replace(/'/g, "\\'");
-                                return `<a href="#" class="text-decoration-none" 
-                                        onclick="event.preventDefault(); event.stopPropagation(); vulnManager.lookupVulnerability('${escaped}'); return false;">${cveId}</a>`;
-                            }).join(", ");
-                        }
-                    } else {
-                        // Fallback for single CVE (backward compatibility)
-                        if (cve.startsWith("CVE-")) {
-                            return `<a href="#" class="text-decoration-none" onclick="event.preventDefault(); vulnManager.lookupVulnerability('${cve}'); return false;">${cve}</a>`;
-                        }
-                    }
+                // Simple single CVE handling (records are now split during import)
+                if (cve && cve.startsWith("CVE-")) {
+                    return `<a href="#" class="text-decoration-none" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${cve}'); return false;">${cve}</a>`;
                 }
                 
-                // Check for Cisco SA ID in plugin name
+                // Check for Cisco SA ID
+                if (cve && cve.startsWith("cisco-sa-")) {
+                    return `<a href="#" class="text-decoration-none text-warning" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${cve}'); return false;">${cve}</a>`;
+                }
+                
+                // Check for Cisco SA ID in plugin name (fallback)
                 if (pluginName && typeof pluginName === "string") {
                     const ciscoSaMatch = pluginName.match(/cisco-sa-([a-zA-Z0-9-]+)/i);
                     if (ciscoSaMatch) {
                         const ciscoId = `cisco-sa-${ciscoSaMatch[1]}`;
-                        return `<a href="#" class="text-decoration-none text-warning" onclick="vulnManager.lookupVulnerability('${ciscoId}')">${ciscoId}</a>`;
+                        return `<a href="#" class="text-decoration-none text-warning" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${ciscoId}'); return false;">${ciscoId}</a>`;
                     }
                 }
                 

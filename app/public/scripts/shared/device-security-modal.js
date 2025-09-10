@@ -572,7 +572,7 @@ class DeviceSecurityModal {
                                     <td>${vuln.first_seen ? new Date(vuln.first_seen).toLocaleDateString() : "N/A"}</td>
                                     <td><span class="severity-badge severity-${this.getVprSeverityClass(vuln.vpr_score || 0)}">${(vuln.vpr_score || 0).toFixed(1)}</span></td>
                                     <td><span class="severity-badge severity-${(vuln.severity || "Low").toLowerCase()}">${vuln.severity || "Low"}</span></td>
-                                    <td>${vuln.cve || `Plugin ${vuln.plugin_id}`}</td>
+                                    <td>${vuln.cve && (vuln.cve.includes("CVE-") || vuln.cve.includes("cisco-sa-")) && typeof CVEUtilities !== "undefined" ? CVEUtilities.createMultipleCVELinks(vuln.cve, {cssClass: "vulnerability-cve text-decoration-none"}) : (vuln.cve || `Plugin ${vuln.plugin_id}`)}</td>
                                     <td>${vuln.plugin_name || "N/A"}</td>
                                     <td>${vuln.port || "N/A"}</td>
                                 </tr>

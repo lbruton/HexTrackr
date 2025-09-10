@@ -243,32 +243,6 @@ class ProgressTracker {
     }
 }
 
-// Security: CVE validation and sanitization function
-function validateAndSanitizeCVE(cveString) {
-    if (!cveString) {return "";}
-    
-    // Handle multiple CVEs (comma or space separated)
-    const cvePattern = /CVE-\d{4}-\d{4,}/gi;
-    const ciscoPattern = /cisco-sa-\d{8}-\w+/gi;
-    
-    // Extract all valid CVE/Cisco IDs from the string
-    const cveMatches = cveString.match(cvePattern) || [];
-    const ciscoMatches = cveString.match(ciscoPattern) || [];
-    
-    // Combine and deduplicate
-    const allMatches = [...new Set([...cveMatches, ...ciscoMatches])];
-    
-    if (allMatches.length === 0) {
-        // Log suspicious input for security audit
-        if (cveString.includes("<") || cveString.includes(">") || cveString.includes("script")) {
-            console.warn(`[SECURITY] Potential XSS attempt blocked in CVE field: ${cveString.substring(0, 50)}...`);
-        }
-        return "";
-    }
-    
-    // Return validated CVEs as comma-separated string
-    return allMatches.join(", ");
-}
 
 // Vulnerability processing helper functions
 function mapVulnerabilityRow(row) {
@@ -284,13 +258,6 @@ function mapVulnerabilityRow(row) {
             cve = ciscoMatch ? ciscoMatch[1] : "";
         }
     }
-    
-    // SECURITY FIX: Validate and sanitize CVE string to prevent injection attacks
-    cve = validateAndSanitizeCVE(cve);
-    
-    // Preserve complete CVE string (Option A Plus approach)
-    // Previously truncated multiple CVEs - now preserving all CVE data
-    // Future enhancement: Add CVE parsing layer when API expansion needed
     
     // Enhanced hostname processing with normalization
     let hostname = row["asset.name"] || row["hostname"] || row["Host"] || "";
@@ -308,36 +275,85 @@ function mapVulnerabilityRow(row) {
     const description = row["definition.description"] || row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "";
     
     // Plugin name contains the full vulnerability name/description for matching and display
-    // The front-end will extract CVE/Cisco SA for the Vulnerability column display
     const pluginName = row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "";
     
-    return {
-        assetId: row["asset.id"] || row["asset_id"] || row["Asset ID"] || "",
-        hostname: hostname,
-        ipAddress: ipAddress, 
-        cve: cve,
-        severity: row["severity"] || row["Severity"] || "",
-        vprScore: row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"] ? parseFloat(row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"]) : null,
-        cvssScore: row["cvss_score"] || row["CVSS Score"] ? parseFloat(row["cvss_score"] || row["CVSS Score"]) : null,
-        vendor: normalizeVendor(row["definition.family"] || row["vendor"] || row["Vendor"] || ""),
-        pluginName: pluginName,
-        description: description,
-        solution: row["solution"] || row["Solution"] || "",
-        state: row["state"] || row["State"] || "ACTIVE",
-        firstSeen: row["first_seen"] || row["First Seen"] || "",
-        lastSeen: row["last_seen"] || row["Last Seen"] || "",
-        pluginId: row["definition.id"] || row["plugin_id"] || row["Plugin ID"] || "",
-        pluginPublished: row["definition.plugin_published"] || row["definition.plugin_updated"] || row["definition.vulnerability_published"] || row["vulnerability_date"] || row["plugin_published"] || ""
-    };
+    // Parse multiple CVEs and create separate records for each
+    const cvePattern = /CVE-\d{4}-\d{4,}/gi;
+    const ciscoPattern = /cisco-sa-[\w-]+/gi;
+    
+    const cveMatches = (cve || "").match(cvePattern) || [];
+    const ciscoMatches = (cve || "").match(ciscoPattern) || [];
+    const allCVEs = [...cveMatches, ...ciscoMatches];
+    
+    // If no CVEs found, create single record with empty CVE
+    if (allCVEs.length === 0) {
+        return [{
+            assetId: row["asset.id"] || row["asset_id"] || row["Asset ID"] || "",
+            hostname: hostname,
+            ipAddress: ipAddress, 
+            cve: "",
+            severity: row["severity"] || row["Severity"] || "",
+            vprScore: row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"] ? parseFloat(row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"]) : null,
+            cvssScore: row["cvss_score"] || row["CVSS Score"] ? parseFloat(row["cvss_score"] || row["CVSS Score"]) : null,
+            vendor: normalizeVendor(row["definition.family"] || row["vendor"] || row["Vendor"] || ""),
+            pluginName: pluginName,
+            description: description,
+            solution: row["solution"] || row["Solution"] || "",
+            state: row["state"] || row["State"] || "ACTIVE",
+            firstSeen: row["first_seen"] || row["First Seen"] || "",
+            lastSeen: row["last_seen"] || row["Last Seen"] || "",
+            pluginId: row["definition.id"] || row["plugin_id"] || row["Plugin ID"] || "",
+            pluginPublished: row["definition.plugin_published"] || row["definition.plugin_updated"] || row["definition.vulnerability_published"] || row["vulnerability_date"] || row["plugin_published"] || ""
+        }];
+    }
+    
+    // Create separate record for each CVE
+    return allCVEs.map(individualCVE => {
+        // Augment description with CVE if not already present
+        let augmentedDescription = description;
+        if (description && !description.includes(individualCVE)) {
+            augmentedDescription = `${description} (${individualCVE})`;
+        }
+        
+        return {
+            assetId: row["asset.id"] || row["asset_id"] || row["Asset ID"] || "",
+            hostname: hostname,
+            ipAddress: ipAddress, 
+            cve: individualCVE,
+            severity: row["severity"] || row["Severity"] || "",
+            vprScore: row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"] ? parseFloat(row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"]) : null,
+            cvssScore: row["cvss_score"] || row["CVSS Score"] ? parseFloat(row["cvss_score"] || row["CVSS Score"]) : null,
+            vendor: normalizeVendor(row["definition.family"] || row["vendor"] || row["Vendor"] || ""),
+            pluginName: pluginName,
+            description: augmentedDescription,
+            solution: row["solution"] || row["Solution"] || "",
+            state: row["state"] || row["State"] || "ACTIVE",
+            firstSeen: row["first_seen"] || row["First Seen"] || "",
+            lastSeen: row["last_seen"] || row["Last Seen"] || "",
+            pluginId: row["definition.id"] || row["plugin_id"] || row["Plugin ID"] || "",
+            pluginPublished: row["definition.plugin_published"] || row["definition.plugin_updated"] || row["definition.vulnerability_published"] || row["vulnerability_date"] || row["plugin_published"] || ""
+        };
+    });
 }
 
 function _processVulnerabilityRows(rows, stmt, importId, filePath, responseData, res, scanDate) {
     let processed = 0;
     const importDate = scanDate || new Date().toISOString().split("T")[0];
     
+    let totalRecords = 0;
+    const allMappedRecords = [];
+    
+    // First pass: map all rows and count total records
     rows.forEach(row => {
-        const mapped = mapVulnerabilityRow(row);
-        
+        const mappedArray = mapVulnerabilityRow(row);
+        allMappedRecords.push(...mappedArray);
+        totalRecords += mappedArray.length;
+    });
+    
+    console.log(`Processing ${rows.length} CSV rows → ${totalRecords} vulnerability records`);
+    
+    // Second pass: insert all records
+    allMappedRecords.forEach(mapped => {
         stmt.run([
             importId,
             mapped.hostname,
@@ -358,16 +374,17 @@ function _processVulnerabilityRows(rows, stmt, importId, filePath, responseData,
             importDate
         ], (err) => {
             if (err) {
-                console.error("Row insert error:", err);
+                console.error("Record insert error:", err);
             }
             processed++;
             
-            if (processed === rows.length) {
+            if (processed === totalRecords) {
                 stmt.finalize();
                 PathValidator.safeUnlinkSync(filePath);
                 res.json({
                     ...responseData,
-                    rowsProcessed: processed
+                    rowsProcessed: rows.length,
+                    recordsCreated: processed
                 });
             }
         });
@@ -573,103 +590,130 @@ function _processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, r
             }
 
             const row = rows[index];
-            const mapped = mapVulnerabilityRow(row);
-            const uniqueKey = generateEnhancedUniqueKey(mapped);
+            const mappedArray = mapVulnerabilityRow(row);
             
-            // Use the current scan date for last_seen to indicate this vulnerability is present in current scan
-            mapped.lastSeen = currentDate;
+            // Process each vulnerability record (split from multi-CVE rows)
+            let pendingOperations = 0;
+            let completedOperations = 0;
             
-            // Skip duplicates within the same batch
-            if (processedKeys.has(uniqueKey)) {
-                processNextRow(index + 1); // Continue to next row
+            if (mappedArray.length === 0) {
+                processNextRow(index + 1);
                 return;
             }
-            processedKeys.add(uniqueKey);
             
-            // Insert into snapshots (historical record)
-            db.run("INSERT INTO vulnerability_snapshots " +
-                "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
-                " first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
-                " vendor_reference, vendor, vulnerability_date, state, unique_key)" +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-                importId,
-                currentDate,
-                mapped.hostname,
-                mapped.ipAddress,
-                mapped.cve,
-                mapped.severity,
-                mapped.vprScore,
-                mapped.cvssScore,
-                mapped.firstSeen,
-                mapped.lastSeen,
-                mapped.pluginId,
-                mapped.pluginName,
-                mapped.description,
-                mapped.solution,
-                mapped.vendor,
-                mapped.vendor,
-                mapped.pluginPublished,
-                mapped.state,
-                uniqueKey
-            ], (err) => {
-                if (err) {
-                    console.error("Snapshot insert error:", err);
-                }
+            // Process each mapped vulnerability from this row
+            for (const mapped of mappedArray) {
+                const uniqueKey = generateEnhancedUniqueKey(mapped);
                 
-                // Check if this vulnerability already exists in current table
-                db.get("SELECT id, first_seen FROM vulnerabilities_current WHERE unique_key = ?", 
-                    [uniqueKey], (err, existingRow) => {
+                // Use the current scan date for last_seen to indicate this vulnerability is present in current scan
+                mapped.lastSeen = currentDate;
+                
+                // Skip duplicates within the same batch
+                if (processedKeys.has(uniqueKey)) {
+                    continue;
+                }
+                processedKeys.add(uniqueKey);
+                pendingOperations++;
+                
+                // Insert into snapshots (historical record)
+                db.run("INSERT INTO vulnerability_snapshots " +
+                    "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
+                    " first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
+                    " vendor_reference, vendor, vulnerability_date, state, unique_key)" +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                    importId,
+                    currentDate,
+                    mapped.hostname,
+                    mapped.ipAddress,
+                    mapped.cve,
+                    mapped.severity,
+                    mapped.vprScore,
+                    mapped.cvssScore,
+                    mapped.firstSeen,
+                    mapped.lastSeen,
+                    mapped.pluginId,
+                    mapped.pluginName,
+                    mapped.description,
+                    mapped.solution,
+                    mapped.vendor,
+                    mapped.vendor,
+                    mapped.pluginPublished,
+                    mapped.state,
+                    uniqueKey
+                ], (err) => {
                     if (err) {
-                        console.error("Error checking existing vulnerability:", err);
-                        processNextRow(index + 1); // Continue to next row
-                        return;
+                        console.error("Snapshot insert error:", err);
                     }
                     
-                    if (existingRow) {
-                        // Update existing vulnerability - preserve first_seen, update last_seen and other fields
-                        db.run("UPDATE vulnerabilities_current SET " +
-                            "import_id = ?, scan_date = ?, hostname = ?, ip_address = ?, cve = ?, " +
-                            "severity = ?, vpr_score = ?, cvss_score = ?, last_seen = ?, " +
-                            "plugin_id = ?, plugin_name = ?, description = ?, solution = ?, " +
-                            "vendor_reference = ?, vendor = ?, vulnerability_date = ?, state = ? " +
-                            "WHERE unique_key = ?", [
-                            importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
-                            mapped.severity, mapped.vprScore, mapped.cvssScore, mapped.lastSeen,
-                            mapped.pluginId, mapped.pluginName, mapped.description, mapped.solution,
-                            mapped.vendor, mapped.vendor, mapped.pluginPublished, mapped.state,
-                            uniqueKey
-                        ], (err) => {
-                            if (err) {
-                                console.error("Current table update error:", err);
-                            } else {
-                                updateCount++;
+                    // Check if this vulnerability already exists in current table
+                    db.get("SELECT id, first_seen FROM vulnerabilities_current WHERE unique_key = ?", 
+                        [uniqueKey], (err, existingRow) => {
+                        if (err) {
+                            console.error("Error checking existing vulnerability:", err);
+                            completedOperations++;
+                            if (completedOperations === pendingOperations) {
+                                processNextRow(index + 1);
                             }
-                            processNextRow(index + 1); // Continue to next row
-                        });
-                    } else {
-                        // Insert new vulnerability
-                        db.run("INSERT INTO vulnerabilities_current " +
-                            "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
-                             "first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
-                             "vendor_reference, vendor, vulnerability_date, state, unique_key)" +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-                            importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
-                            mapped.severity, mapped.vprScore, mapped.cvssScore,
-                            mapped.firstSeen || currentDate, // Use current date as first_seen if not provided
-                            mapped.lastSeen, mapped.pluginId, mapped.pluginName, mapped.description,
-                            mapped.solution, mapped.vendor, mapped.vendor, mapped.pluginPublished,
-                            mapped.state, uniqueKey
-                        ], (err) => {
-                            if (err) {
-                                console.error("Current table insert error:", err);
-                            } else {
-                                insertCount++;
-                            }
-                            processNextRow(index + 1); // Continue to next row
-                        });
-                    }
+                            return;
+                        }
+                        
+                        if (existingRow) {
+                            // Update existing vulnerability - preserve first_seen, update last_seen and other fields
+                            db.run("UPDATE vulnerabilities_current SET " +
+                                "import_id = ?, scan_date = ?, hostname = ?, ip_address = ?, cve = ?, " +
+                                "severity = ?, vpr_score = ?, cvss_score = ?, last_seen = ?, " +
+                                "plugin_id = ?, plugin_name = ?, description = ?, solution = ?, " +
+                                "vendor_reference = ?, vendor = ?, vulnerability_date = ?, state = ? " +
+                                "WHERE unique_key = ?", [
+                                importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
+                                mapped.severity, mapped.vprScore, mapped.cvssScore, mapped.lastSeen,
+                                mapped.pluginId, mapped.pluginName, mapped.description, mapped.solution,
+                                mapped.vendor, mapped.vendor, mapped.pluginPublished, mapped.state,
+                                uniqueKey
+                            ], (err) => {
+                                if (err) {
+                                    console.error("Current table update error:", err);
+                                } else {
+                                    updateCount++;
+                                }
+                                completedOperations++;
+                                if (completedOperations === pendingOperations) {
+                                    processNextRow(index + 1);
+                                }
+                            });
+                        } else {
+                            // Insert new vulnerability
+                            db.run("INSERT INTO vulnerabilities_current " +
+                                "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
+                                 "first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
+                                 "vendor_reference, vendor, vulnerability_date, state, unique_key)" +
+                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                                importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
+                                mapped.severity, mapped.vprScore, mapped.cvssScore,
+                                mapped.firstSeen || currentDate, // Use current date as first_seen if not provided
+                                mapped.lastSeen, mapped.pluginId, mapped.pluginName, mapped.description,
+                                mapped.solution, mapped.vendor, mapped.vendor, mapped.pluginPublished,
+                                mapped.state, uniqueKey
+                            ], (err) => {
+                                if (err) {
+                                    console.error("Current table insert error:", err);
+                                } else {
+                                    insertCount++;
+                                }
+                                completedOperations++;
+                                if (completedOperations === pendingOperations) {
+                                    processNextRow(index + 1);
+                                }
+                            });
+                        }
+                    });
                 });
-            });
+            }
+            
+            // If no operations were queued (all duplicates), continue immediately
+            if (pendingOperations === 0) {
+                processNextRow(index + 1);
+            }
         }
 
         // Start processing from the first row
@@ -700,6 +744,7 @@ function _processVulnerabilityRowsWithRollover(rows, stmt, importId, filePath, r
                     const finalResponse = {
                         ...responseData,
                         rowsProcessed: rows.length,
+                        recordsCreated: insertCount + updateCount, // Total vulnerability records processed
                         insertCount,
                         updateCount,
                         scanDate: currentDate,
@@ -747,54 +792,74 @@ function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData
             const errors = [];
             const totalRows = rows.length;
             
-            // Process all rows in the transaction
+            // Process all rows in the transaction, handling multi-CVE splitting
+            let totalRecordsToInsert = 0;
+            const allMappedRecords = [];
+            
+            // First pass: calculate total records and prepare all mapped data
             rows.forEach((row, index) => {
                 try {
-                    // Map CSV row to staging table structure
-                    const mapped = mapVulnerabilityRow(row);
+                    const mappedArray = mapVulnerabilityRow(row);
+                    totalRecordsToInsert += mappedArray.length;
                     
-                    stmt.run([
-                        importId,
-                        mapped.hostname,
-                        mapped.ipAddress,
-                        mapped.cve,
-                        mapped.severity,
-                        mapped.vprScore,
-                        mapped.cvssScore,
-                        mapped.pluginId,
-                        mapped.pluginName,
-                        mapped.description,
-                        mapped.solution,
-                        mapped.vendor,
-                        mapped.vendor,
-                        mapped.pluginPublished,
-                        mapped.state,
-                        JSON.stringify(row) // Store raw CSV row for flexibility
-                    ], function(err) {
-                        if (err) {
-                            console.error(`Row ${index + 1} insert error:`, err);
-                            errors.push(`Row ${index + 1}: ${err.message}`);
-                            errorCount++;
-                        } else {
-                            insertedCount++;
-                            
-                            // Update progress every 100 rows or on completion
-                            if (insertedCount % 100 === 0 || insertedCount === totalRows) {
-                                const progress = 25 + ((insertedCount / totalRows) * 35); // 25-60% range
-                                progressTracker.updateProgress(sessionId, progress, 
-                                    `Inserted ${insertedCount}/${totalRows} rows to staging table...`, { 
-                                    currentStep: 2, 
-                                    insertedCount,
-                                    totalRows 
-                                });
-                            }
-                        }
+                    // Store each mapped record with source row reference
+                    mappedArray.forEach(mapped => {
+                        allMappedRecords.push({
+                            mapped,
+                            sourceRowIndex: index,
+                            rawRow: row
+                        });
                     });
                 } catch (error) {
                     console.error(`Row ${index + 1} mapping error:`, error);
                     errors.push(`Row ${index + 1}: ${error.message}`);
                     errorCount++;
                 }
+            });
+            
+            console.log(`📊 CSV Processing: ${rows.length} rows → ${totalRecordsToInsert} vulnerability records`);
+            
+            // Second pass: insert all mapped records
+            allMappedRecords.forEach((record, recordIndex) => {
+                const { mapped, sourceRowIndex, rawRow } = record;
+                
+                stmt.run([
+                    importId,
+                    mapped.hostname,
+                    mapped.ipAddress,
+                    mapped.cve,
+                    mapped.severity,
+                    mapped.vprScore,
+                    mapped.cvssScore,
+                    mapped.pluginId,
+                    mapped.pluginName,
+                    mapped.description,
+                    mapped.solution,
+                    mapped.vendor,
+                    mapped.vendor,
+                    mapped.pluginPublished,
+                    mapped.state,
+                    JSON.stringify(rawRow) // Store raw CSV row for flexibility
+                ], function(err) {
+                    if (err) {
+                        console.error(`Record ${recordIndex + 1} (from row ${sourceRowIndex + 1}) insert error:`, err);
+                        errors.push(`Record ${recordIndex + 1} (row ${sourceRowIndex + 1}): ${err.message}`);
+                        errorCount++;
+                    } else {
+                        insertedCount++;
+                        
+                        // Update progress every 100 records or on completion
+                        if (insertedCount % 100 === 0 || insertedCount === totalRecordsToInsert) {
+                            const progress = 25 + ((insertedCount / totalRecordsToInsert) * 35); // 25-60% range
+                            progressTracker.updateProgress(sessionId, progress, 
+                                `Inserted ${insertedCount}/${totalRecordsToInsert} records to staging table...`, { 
+                                    currentStep: 2, 
+                                    insertedCount,
+                                    totalRows 
+                                });
+                        }
+                    }
+                });
             });
             
             // Finalize the prepared statement and commit transaction
@@ -818,11 +883,11 @@ function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData
                     const loadTime = Date.now() - loadStart;
                     const rowsPerSecond = insertedCount / (loadTime / 1000);
                     
-                    console.log(`✅ BULK LOAD COMPLETE: ${insertedCount}/${rows.length} rows inserted in ${loadTime}ms (${rowsPerSecond.toFixed(1)} rows/sec)`);
+                    console.log(`✅ BULK LOAD COMPLETE: ${insertedCount} records from ${rows.length} CSV rows inserted in ${loadTime}ms (${rowsPerSecond.toFixed(1)} records/sec)`);
                     
                     // Update progress: Staging complete, starting final processing
                     progressTracker.updateProgress(sessionId, 60, 
-                        `Staging complete. Processing ${insertedCount} rows to final tables...`, { 
+                        `Staging complete. Processing ${insertedCount} records to final tables...`, { 
                         currentStep: 3, 
                         insertedToStaging: insertedCount,
                         loadTime,
@@ -1315,155 +1380,182 @@ function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, fil
             }
             
             const row = rows[index];
-            const mapped = mapVulnerabilityRow(row);
+            const mappedArray = mapVulnerabilityRow(row);
             
-            // Generate both enhanced and legacy keys for transition
-            const enhancedKey = generateEnhancedUniqueKey(mapped);
-            const legacyKey = generateUniqueKey(mapped);
-            const confidence = calculateDeduplicationConfidence(enhancedKey);
-            const tier = getDeduplicationTier(enhancedKey);
+            // Process each vulnerability record (split from multi-CVE rows)
+            let pendingOperations = 0;
+            let completedOperations = 0;
             
-            // Use enhanced key as primary, legacy as fallback during transition
-            mapped.lastSeen = currentDate;
-            
-            // Skip duplicates within same batch (check both key types)
-            if (processedKeys.has(enhancedKey) || legacyProcessedKeys.has(legacyKey)) {
-                stats.duplicate_skipped++;
+            if (mappedArray.length === 0) {
                 processNextRow(index + 1);
                 return;
             }
-            processedKeys.add(enhancedKey);
-            legacyProcessedKeys.add(legacyKey);
             
-            // Track which deduplication method was used
-            if (enhancedKey !== legacyKey) {
-                stats.enhanced_dedup_used++;
-            } else {
-                stats.legacy_dedup_used++;
-            }
-            
-            // Insert into snapshots (historical record) with enhanced fields
-            const snapshotStart = Date.now();
-            perfStats.dbOperations++;
-            db.run("INSERT INTO vulnerability_snapshots " +
-                "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
-                " first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
-                " vendor_reference, vendor, vulnerability_date, state, unique_key, " +
-                " enhanced_unique_key, confidence_score, dedup_tier)" +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-                importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
-                mapped.severity, mapped.vprScore, mapped.cvssScore, mapped.firstSeen,
-                currentDate, mapped.pluginId, mapped.pluginName, mapped.description,
-                mapped.solution, mapped.vendor, mapped.vendor, mapped.pluginPublished,
-                mapped.state, legacyKey, enhancedKey, confidence, tier
-            ], (err) => {
-                const snapshotTime = Date.now() - snapshotStart;
-                perfStats.totalDbTime += snapshotTime;
-                perfStats.snapshotInserts++;
+            // Process each mapped vulnerability from this row
+            for (const mapped of mappedArray) {
+                // Generate both enhanced and legacy keys for transition
+                const enhancedKey = generateEnhancedUniqueKey(mapped);
+                const legacyKey = generateUniqueKey(mapped);
+                const confidence = calculateDeduplicationConfidence(enhancedKey);
+                const tier = getDeduplicationTier(enhancedKey);
                 
-                if (err) {
-                    console.error("Snapshot insert error:", err);
+                // Use enhanced key as primary, legacy as fallback during transition
+                mapped.lastSeen = currentDate;
+                
+                // Skip duplicates within same batch (check both key types)
+                if (processedKeys.has(enhancedKey) || legacyProcessedKeys.has(legacyKey)) {
+                    stats.duplicate_skipped++;
+                    continue;
+                }
+                processedKeys.add(enhancedKey);
+                legacyProcessedKeys.add(legacyKey);
+                pendingOperations++;
+                
+                // Track which deduplication method was used
+                if (enhancedKey !== legacyKey) {
+                    stats.enhanced_dedup_used++;
+                } else {
+                    stats.legacy_dedup_used++;
                 }
                 
-                // Check existing vulnerability state using both keys during transition
-                const checkStart = Date.now();
+                // Insert into snapshots (historical record) with enhanced fields
+                const snapshotStart = Date.now();
                 perfStats.dbOperations++;
-                const checkQuery = `
-                    SELECT id, first_seen, lifecycle_state, resolved_date, unique_key, enhanced_unique_key 
-                    FROM vulnerabilities_current 
-                    WHERE unique_key = ? OR enhanced_unique_key = ? OR enhanced_unique_key = ? OR unique_key = ?
-                `;
-                
-                db.get(checkQuery, [legacyKey, enhancedKey, legacyKey, enhancedKey], (err, existingRow) => {
-                    const checkTime = Date.now() - checkStart;
-                    perfStats.totalDbTime += checkTime;
-                    perfStats.currentChecks++;
+                db.run("INSERT INTO vulnerability_snapshots " +
+                    "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
+                    " first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
+                    " vendor_reference, vendor, vulnerability_date, state, unique_key, " +
+                    " enhanced_unique_key, confidence_score, dedup_tier)" +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                    importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
+                    mapped.severity, mapped.vprScore, mapped.cvssScore, mapped.firstSeen,
+                    currentDate, mapped.pluginId, mapped.pluginName, mapped.description,
+                    mapped.solution, mapped.vendor, mapped.vendor, mapped.pluginPublished,
+                    mapped.state, legacyKey, enhancedKey, confidence, tier
+                ], (err) => {
+                    const snapshotTime = Date.now() - snapshotStart;
+                    perfStats.totalDbTime += snapshotTime;
+                    perfStats.snapshotInserts++;
                     
                     if (err) {
-                        console.error("Error checking existing vulnerability:", err);
-                        processNextRow(index + 1);
-                        return;
+                        console.error("Snapshot insert error:", err);
                     }
                     
-                    if (existingRow) {
-                        // Determine lifecycle transition
-                        let newState = "active";
-                        const resolutionReason = null;
+                    // Check existing vulnerability state using both keys during transition
+                    const checkStart = Date.now();
+                    perfStats.dbOperations++;
+                    const checkQuery = `
+                        SELECT id, first_seen, lifecycle_state, resolved_date, unique_key, enhanced_unique_key 
+                        FROM vulnerabilities_current 
+                        WHERE unique_key = ? OR enhanced_unique_key = ? OR enhanced_unique_key = ? OR unique_key = ?
+                    `;
+                    
+                    db.get(checkQuery, [legacyKey, enhancedKey, legacyKey, enhancedKey], (err, existingRow) => {
+                        const checkTime = Date.now() - checkStart;
+                        perfStats.totalDbTime += checkTime;
+                        perfStats.currentChecks++;
                         
-                        if (existingRow.lifecycle_state === "resolved") {
-                            newState = "reopened";
-                            stats.reopened++;
-                        } else {
-                            stats.updated++;
+                        if (err) {
+                            console.error("Error checking existing vulnerability:", err);
+                            completedOperations++;
+                            if (completedOperations === pendingOperations) {
+                                // Complete row timing
+                                const totalRowTime = Date.now() - rowStart;
+                                perfStats.avgRowTime = ((perfStats.avgRowTime * (perfStats.processedRows - 1)) + totalRowTime) / perfStats.processedRows;
+                                processNextRow(index + 1);
+                            }
+                            return;
                         }
                         
-                        // Update existing vulnerability with enhanced fields
-                        const updateStart = Date.now();
-                        perfStats.dbOperations++;
-                        db.run("UPDATE vulnerabilities_current SET " +
-                            "import_id = ?, scan_date = ?, hostname = ?, ip_address = ?, cve = ?, " +
-                            "severity = ?, vpr_score = ?, cvss_score = ?, last_seen = ?, " +
-                            "plugin_id = ?, plugin_name = ?, description = ?, solution = ?, " +
-                            "vendor_reference = ?, vendor = ?, vulnerability_date = ?, state = ?, " +
-                            "lifecycle_state = ?, resolved_date = ?, resolution_reason = ?, " +
-                            "enhanced_unique_key = ?, confidence_score = ?, dedup_tier = ? " +
-                            "WHERE id = ?", [
-                            importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
-                            mapped.severity, mapped.vprScore, mapped.cvssScore, currentDate,
-                            mapped.pluginId, mapped.pluginName, mapped.description, mapped.solution,
-                            mapped.vendor, mapped.vendor, mapped.pluginPublished, mapped.state,
-                            newState, null, resolutionReason, enhancedKey, confidence, tier, existingRow.id
-                        ], (err) => {
-                            const updateTime = Date.now() - updateStart;
-                            perfStats.totalDbTime += updateTime;
-                            perfStats.currentUpdates++;
+                        if (existingRow) {
+                            // Determine lifecycle transition
+                            let newState = "active";
+                            const resolutionReason = null;
                             
-                            if (err) {
-                                console.error("Current table update error:", err);
-                            }
-                            
-                            // ✅ PERFORMANCE: Complete row timing
-                            const totalRowTime = Date.now() - rowStart;
-                            perfStats.avgRowTime = ((perfStats.avgRowTime * (perfStats.processedRows - 1)) + totalRowTime) / perfStats.processedRows;
-                            
-                            processNextRow(index + 1);
-                        });
-                    } else {
-                        // Insert new vulnerability with enhanced fields
-                        const insertStart = Date.now();
-                        perfStats.dbOperations++;
-                        db.run("INSERT INTO vulnerabilities_current " +
-                            "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
-                             "first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
-                             "vendor_reference, vendor, vulnerability_date, state, unique_key, " +
-                             "lifecycle_state, enhanced_unique_key, confidence_score, dedup_tier)" +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-                            importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
-                            mapped.severity, mapped.vprScore, mapped.cvssScore,
-                            mapped.firstSeen || currentDate, currentDate, mapped.pluginId,
-                            mapped.pluginName, mapped.description, mapped.solution, mapped.vendor,
-                            mapped.vendor, mapped.pluginPublished, mapped.state, legacyKey,
-                            "active", enhancedKey, confidence, tier
-                        ], (err) => {
-                            const insertTime = Date.now() - insertStart;
-                            perfStats.totalDbTime += insertTime;
-                            perfStats.currentInserts++;
-                            
-                            if (err) {
-                                console.error("Current table insert error:", err);
+                            if (existingRow.lifecycle_state === "resolved") {
+                                newState = "reopened";
+                                stats.reopened++;
                             } else {
-                                stats.inserted++;
+                                stats.updated++;
                             }
                             
-                            // ✅ PERFORMANCE: Complete row timing
-                            const totalRowTime = Date.now() - rowStart;
-                            perfStats.avgRowTime = ((perfStats.avgRowTime * (perfStats.processedRows - 1)) + totalRowTime) / perfStats.processedRows;
-                            
-                            processNextRow(index + 1);
-                        });
-                    }
+                            // Update existing vulnerability with enhanced fields
+                            const updateStart = Date.now();
+                            perfStats.dbOperations++;
+                            db.run("UPDATE vulnerabilities_current SET " +
+                                "import_id = ?, scan_date = ?, hostname = ?, ip_address = ?, cve = ?, " +
+                                "severity = ?, vpr_score = ?, cvss_score = ?, last_seen = ?, " +
+                                "plugin_id = ?, plugin_name = ?, description = ?, solution = ?, " +
+                                "vendor_reference = ?, vendor = ?, vulnerability_date = ?, state = ?, " +
+                                "lifecycle_state = ?, resolved_date = ?, resolution_reason = ?, " +
+                                "enhanced_unique_key = ?, confidence_score = ?, dedup_tier = ? " +
+                                "WHERE id = ?", [
+                                importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
+                                mapped.severity, mapped.vprScore, mapped.cvssScore, currentDate,
+                                mapped.pluginId, mapped.pluginName, mapped.description, mapped.solution,
+                                mapped.vendor, mapped.vendor, mapped.pluginPublished, mapped.state,
+                                newState, null, resolutionReason, enhancedKey, confidence, tier, existingRow.id
+                            ], (err) => {
+                                const updateTime = Date.now() - updateStart;
+                                perfStats.totalDbTime += updateTime;
+                                perfStats.currentUpdates++;
+                                
+                                if (err) {
+                                    console.error("Current table update error:", err);
+                                }
+                                
+                                completedOperations++;
+                                if (completedOperations === pendingOperations) {
+                                    // Complete row timing
+                                    const totalRowTime = Date.now() - rowStart;
+                                    perfStats.avgRowTime = ((perfStats.avgRowTime * (perfStats.processedRows - 1)) + totalRowTime) / perfStats.processedRows;
+                                    processNextRow(index + 1);
+                                }
+                            });
+                        } else {
+                            // Insert new vulnerability with enhanced fields
+                            const insertStart = Date.now();
+                            perfStats.dbOperations++;
+                            db.run("INSERT INTO vulnerabilities_current " +
+                                "(import_id, scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, " +
+                                 "first_seen, last_seen, plugin_id, plugin_name, description, solution, " +
+                                 "vendor_reference, vendor, vulnerability_date, state, unique_key, " +
+                                 "lifecycle_state, enhanced_unique_key, confidence_score, dedup_tier)" +
+                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                                importId, currentDate, mapped.hostname, mapped.ipAddress, mapped.cve,
+                                mapped.severity, mapped.vprScore, mapped.cvssScore,
+                                mapped.firstSeen || currentDate, currentDate, mapped.pluginId,
+                                mapped.pluginName, mapped.description, mapped.solution, mapped.vendor,
+                                mapped.vendor, mapped.pluginPublished, mapped.state, legacyKey,
+                                "active", enhancedKey, confidence, tier
+                            ], (err) => {
+                                const insertTime = Date.now() - insertStart;
+                                perfStats.totalDbTime += insertTime;
+                                perfStats.currentInserts++;
+                                
+                                if (err) {
+                                    console.error("Current table insert error:", err);
+                                } else {
+                                    stats.inserted++;
+                                }
+                                
+                                completedOperations++;
+                                if (completedOperations === pendingOperations) {
+                                    // Complete row timing
+                                    const totalRowTime = Date.now() - rowStart;
+                                    perfStats.avgRowTime = ((perfStats.avgRowTime * (perfStats.processedRows - 1)) + totalRowTime) / perfStats.processedRows;
+                                    processNextRow(index + 1);
+                                }
+                            });
+                        }
                 });
             });
+            }
+            
+            // If no operations were queued (all duplicates), continue immediately
+            if (pendingOperations === 0) {
+                processNextRow(index + 1);
+            }
         }
         
         // Start processing from the first row
@@ -1517,6 +1609,7 @@ function processVulnerabilityRowsWithEnhancedLifecycle(rows, stmt, importId, fil
                     const finalResponse = {
                         ...responseData,
                         rowsProcessed: rows.length,
+                        recordsCreated: stats.inserted + stats.updated + stats.reopened, // Total vulnerability records processed
                         ...stats,
                         resolvedCount,
                         scanDate: currentDate,
