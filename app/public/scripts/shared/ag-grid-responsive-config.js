@@ -155,23 +155,25 @@ function createVulnerabilityGridOptions(componentContext) {
                 const cve = params.value;
                 const pluginName = params.data.plugin_name;
                 
-                // Handle multiple CVEs using CVE utilities
+                // Handle multiple CVEs - create individual links for EACH CVE
                 if (cve && (cve.includes("CVE-") || cve.includes("cisco-sa-"))) {
                     // Check if CVEUtilities is available
-                    if (typeof CVEUtilities !== "undefined" && CVEUtilities.createMultipleCVELinks) {
-                        // Use CVE utilities to create individual links for each CVE
-                        return CVEUtilities.createMultipleCVELinks(cve, {
-                            cssClass: "text-decoration-none",
-                            clickHandler: (cveId) => {
-                                if (window.vulnManager) {
-                                    window.vulnManager.lookupVulnerability(cveId);
-                                }
-                            }
-                        });
+                    if (typeof CVEUtilities !== "undefined" && CVEUtilities.parseCVEString) {
+                        // Parse the CVE string to get individual CVEs
+                        const cveIds = CVEUtilities.parseCVEString(cve);
+                        
+                        if (cveIds.length > 0) {
+                            // Create individual links for each CVE with proper onclick isolation
+                            return cveIds.map(cveId => {
+                                const escaped = cveId.replace(/'/g, "\\'");
+                                return `<a href="#" class="text-decoration-none" 
+                                        onclick="event.preventDefault(); event.stopPropagation(); vulnManager.lookupVulnerability('${escaped}'); return false;">${cveId}</a>`;
+                            }).join(", ");
+                        }
                     } else {
                         // Fallback for single CVE (backward compatibility)
                         if (cve.startsWith("CVE-")) {
-                            return `<a href="#" class="text-decoration-none" onclick="vulnManager.lookupVulnerability('${cve}')">${cve}</a>`;
+                            return `<a href="#" class="text-decoration-none" onclick="event.preventDefault(); vulnManager.lookupVulnerability('${cve}'); return false;">${cve}</a>`;
                         }
                     }
                 }
