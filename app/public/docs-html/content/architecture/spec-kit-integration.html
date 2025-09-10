@@ -19,7 +19,9 @@
 <h2>Architecture Components</h2>
 <h3>1. Active Specification Tracking</h3>
 <p><strong>File</strong>: <code>.active-spec</code><br><strong>Purpose</strong>: Contains the currently active specification identifier<br><strong>Format</strong>: Simple text file with spec slug (e.g., &quot;022-documentation-portal-rebuild&quot;)</p>
-<pre><code class="language-bash"># Example .active-spec content
+<pre><code class="language-bash">
+# Example .active-spec content
+
 022-documentation-portal-rebuild
 </code></pre>
 <h3>2. Specification Synchronizer</h3>
@@ -177,13 +179,17 @@
 </li>
 </ol>
 <h3>Debugging Commands</h3>
-<pre><code class="language-bash"># Test spec synchronization
+<pre><code class="language-bash">
+# Test spec synchronization
+
 node scripts/sync-specs-to-roadmap.js
 
 # Test HTML generation
+
 node app/public/docs-html/html-content-updater.js
 
 # Full documentation refresh
+
 npm run docs:generate
 </code></pre>
 <h2>Future Enhancements</h2>

@@ -155,8 +155,25 @@ function createVulnerabilityGridOptions(componentContext) {
                 const cve = params.value;
                 const pluginName = params.data.plugin_name;
                 
-                if (cve && cve.startsWith("CVE-")) {
-                    return `<a href="#" class="text-decoration-none" onclick="vulnManager.lookupVulnerability('${cve}')">${cve}</a>`;
+                // Handle multiple CVEs using CVE utilities
+                if (cve && (cve.includes("CVE-") || cve.includes("cisco-sa-"))) {
+                    // Check if CVEUtilities is available
+                    if (typeof CVEUtilities !== "undefined" && CVEUtilities.createMultipleCVELinks) {
+                        // Use CVE utilities to create individual links for each CVE
+                        return CVEUtilities.createMultipleCVELinks(cve, {
+                            cssClass: "text-decoration-none",
+                            clickHandler: (cveId) => {
+                                if (window.vulnManager) {
+                                    window.vulnManager.lookupVulnerability(cveId);
+                                }
+                            }
+                        });
+                    } else {
+                        // Fallback for single CVE (backward compatibility)
+                        if (cve.startsWith("CVE-")) {
+                            return `<a href="#" class="text-decoration-none" onclick="vulnManager.lookupVulnerability('${cve}')">${cve}</a>`;
+                        }
+                    }
                 }
                 
                 // Check for Cisco SA ID in plugin name
