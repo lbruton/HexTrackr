@@ -19,7 +19,7 @@ async function readActiveSpec() {
   try {
     const content = await fs.readFile(ACTIVE_SPEC_PATH, "utf8");
     return content.trim();
-  } catch (error) {
+  } catch (_error) {
     console.log("ℹ️ No active spec file found (.active-spec)");
     return null;
   }
@@ -77,10 +77,13 @@ function extractPendingTasks(md, limit = 10) {
   return pending;
 }
 
-function extractSpecPriority(md) {
-  // Look for priority indicators in the markdown
+function extractSpecPriority(md, specId) {
+  // Look for explicit priority indicators in the markdown
   if (md.includes("**HIGH PRIORITY**") || md.includes("Priority: HIGH")) {
     return "HIGH";
+  }
+  if (md.includes("**CRITICAL**") || md.includes("Priority: CRITICAL")) {
+    return "CRITICAL";
   }
   if (md.includes("**MEDIUM PRIORITY**") || md.includes("Priority: MEDIUM")) {
     return "MEDIUM";
@@ -88,6 +91,36 @@ function extractSpecPriority(md) {
   if (md.includes("**LOW PRIORITY**") || md.includes("Priority: LOW")) {
     return "LOW";
   }
+  
+  // Auto-detect priority based on spec content and ID
+  const lowerMd = md.toLowerCase();
+  const specNum = parseInt(specId);
+  
+  // Critical priority for security specs
+  if (specNum === 8 || lowerMd.includes("security hardening") || lowerMd.includes("authentication")) {
+    return "CRITICAL";
+  }
+  
+  // High priority for active bugs, security features, and critical integrations
+  if (specNum === 4 || specNum === 7 || 
+      lowerMd.includes("cve link") || lowerMd.includes("kev integration") ||
+      lowerMd.includes("vulnerability") && lowerMd.includes("critical")) {
+    return "HIGH";
+  }
+  
+  // Medium priority for API integrations and important features
+  if ((specNum >= 12 && specNum <= 13) || specNum === 9 ||
+      lowerMd.includes("api integration") || lowerMd.includes("cisco") || 
+      lowerMd.includes("tenable") || lowerMd.includes("epss")) {
+    return "MEDIUM";
+  }
+  
+  // Low priority for nice-to-have features
+  if (specNum === 11 || specNum === 14 ||
+      lowerMd.includes("dark mode") || lowerMd.includes("pwa")) {
+    return "LOW";
+  }
+  
   return "NORMAL";
 }
 
@@ -106,7 +139,7 @@ async function summariseSpec(filePath) {
   const stats = parseCheckboxStats(contents);
   const meta = parseSpecMeta(contents, filePath);
   const pending = extractPendingTasks(contents);
-  const priority = extractSpecPriority(contents);
+  const priority = extractSpecPriority(contents, meta.id);
   
   return { 
     ...meta, 
@@ -127,7 +160,8 @@ function buildMarkdownTable(summaries, activeSpec) {
   
   const rows = summaries.map(s => {
     const progress = `${s.done}/${s.total} (${s.pct}%)`;
-    const priorityBadge = s.priority === "HIGH" ? "🚨 HIGH" : 
+    const priorityBadge = s.priority === "CRITICAL" ? "🔴 CRIT" :
+                         s.priority === "HIGH" ? "🟠 HIGH" : 
                          s.priority === "MEDIUM" ? "🟡 MED" :
                          s.priority === "LOW" ? "🔵 LOW" : "⚪ NORM";
     
