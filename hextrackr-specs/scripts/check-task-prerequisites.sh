@@ -1,14 +1,31 @@
 #!/usr/bin/env bash
 # Check that implementation plan exists and find optional design documents
-# Usage: ./check-task-prerequisites.sh [--json]
+# Usage: ./check-task-prerequisites.sh [spec-name-or-number] [--json]
+#        ./check-task-prerequisites.sh 023 --json
+#        ./check-task-prerequisites.sh --json  (uses active spec)
 
 set -e
 
+# Parse arguments
+SPEC_ARG=""
 JSON_MODE=false
+
 for arg in "$@"; do
     case "$arg" in
-        --json) JSON_MODE=true ;;
-        --help|-h) echo "Usage: $0 [--json]"; exit 0 ;;
+        --json) 
+            JSON_MODE=true 
+            ;;
+        --help|-h) 
+            echo "Usage: $0 [spec-name-or-number] [--json]"
+            echo "  spec-name-or-number: e.g., '023' or '023-enhance-vulnerability'"
+            echo "  --json: Output in JSON format"
+            echo ""
+            echo "If no spec is provided, uses the active spec from .active-spec"
+            exit 0 
+            ;;
+        *)
+            SPEC_ARG="$arg" 
+            ;;
     esac
 done
 
@@ -16,22 +33,25 @@ done
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
-# Get all paths
-eval $(get_feature_paths)
+# Get repository root
+REPO_ROOT=$(get_repo_root)
 
-# Check if on feature branch
-check_feature_branch "$CURRENT_BRANCH" || exit 1
+# Get spec paths (handles spec number or name)
+if ! eval $(get_spec_paths "$SPEC_ARG"); then
+    exit 1
+fi
 
-# Check if feature directory exists
-if [[ ! -d "$FEATURE_DIR" ]]; then
-    echo "ERROR: Feature directory not found: $FEATURE_DIR"
-    echo "Run /specify first to create the feature structure."
+# Check if spec directory exists
+if [[ ! -d "$SPEC_DIR" ]]; then
+    echo "ERROR: Spec directory not found: $SPEC_DIR"
+    echo "Available specs:" >&2
+    list_specs "$REPO_ROOT" >&2
     exit 1
 fi
 
 # Check for implementation plan (required)
 if [[ ! -f "$IMPL_PLAN" ]]; then
-    echo "ERROR: plan.md not found in $FEATURE_DIR"
+    echo "ERROR: plan.md not found in $SPEC_DIR"
     echo "Run /plan first to create the plan."
     exit 1
 fi
@@ -46,10 +66,11 @@ if $JSON_MODE; then
     # join array into JSON
     json_docs=$(printf '"%s",' "${docs[@]}")
     json_docs="[${json_docs%,}]"
-    printf '{"FEATURE_DIR":"%s","AVAILABLE_DOCS":%s}\n' "$FEATURE_DIR" "$json_docs"
+    printf '{"SPEC_NAME":"%s","SPEC_DIR":"%s","AVAILABLE_DOCS":%s}\n' "$SPEC_NAME" "$SPEC_DIR" "$json_docs"
 else
     # List available design documents (optional)
-    echo "FEATURE_DIR:$FEATURE_DIR"
+    echo "SPEC_NAME: $SPEC_NAME"
+    echo "SPEC_DIR: $SPEC_DIR"
     echo "AVAILABLE_DOCS:"
 
     # Use common check functions
