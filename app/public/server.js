@@ -243,6 +243,33 @@ class ProgressTracker {
     }
 }
 
+// Security: CVE validation and sanitization function
+function validateAndSanitizeCVE(cveString) {
+    if (!cveString) {return "";}
+    
+    // Handle multiple CVEs (comma or space separated)
+    const cvePattern = /CVE-\d{4}-\d{4,}/gi;
+    const ciscoPattern = /cisco-sa-\d{8}-\w+/gi;
+    
+    // Extract all valid CVE/Cisco IDs from the string
+    const cveMatches = cveString.match(cvePattern) || [];
+    const ciscoMatches = cveString.match(ciscoPattern) || [];
+    
+    // Combine and deduplicate
+    const allMatches = [...new Set([...cveMatches, ...ciscoMatches])];
+    
+    if (allMatches.length === 0) {
+        // Log suspicious input for security audit
+        if (cveString.includes("<") || cveString.includes(">") || cveString.includes("script")) {
+            console.warn(`[SECURITY] Potential XSS attempt blocked in CVE field: ${cveString.substring(0, 50)}...`);
+        }
+        return "";
+    }
+    
+    // Return validated CVEs as comma-separated string
+    return allMatches.join(", ");
+}
+
 // Vulnerability processing helper functions
 function mapVulnerabilityRow(row) {
     // CVE extraction logic - try direct field first, then extract from name
@@ -257,6 +284,9 @@ function mapVulnerabilityRow(row) {
             cve = ciscoMatch ? ciscoMatch[1] : "";
         }
     }
+    
+    // SECURITY FIX: Validate and sanitize CVE string to prevent injection attacks
+    cve = validateAndSanitizeCVE(cve);
     
     // Preserve complete CVE string (Option A Plus approach)
     // Previously truncated multiple CVEs - now preserving all CVE data
