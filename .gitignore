@@ -17,6 +17,9 @@ data/*.sqlite
 logs/
 *.log
 
+# Agent logs (preserved locally but not committed)
+/hextrackr-specs/data/agentlogs/
+
 # Temporary files
 tmp/
 temp/

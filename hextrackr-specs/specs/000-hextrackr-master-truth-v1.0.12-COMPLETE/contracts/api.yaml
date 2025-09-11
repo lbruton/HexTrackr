@@ -1,0 +1,641 @@
+openapi: 3.0.0
+info:
+  title: HexTrackr Vulnerability Management API
+  description: API for vulnerability management, CSV import, ticket orchestration, and analytics
+  version: 1.0.12
+  contact:
+    name: HexTrackr Team
+    email: support@hextrackr.local
+
+servers:
+  - url: http://localhost:8989/api
+    description: Development server
+  - url: http://hextrackr:8080/api
+    description: Docker internal
+
+paths:
+  /import:
+    post:
+      summary: Import vulnerability CSV file
+      description: Process CSV file up to 100MB with 25,000+ records
+      tags:
+        - Import
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file (Tenable, Cisco, or Qualys format)
+              required:
+                - file
+      responses:
+        '200':
+          description: Import started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportSession'
+        '400':
+          description: Invalid file format or size
+        '429':
+          description: Rate limit exceeded
+
+  /import/progress/{sessionId}:
+    get:
+      summary: Get import progress
+      description: Real-time progress via WebSocket or polling
+      tags:
+        - Import
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Progress information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportProgress'
+
+  /vulnerabilities:
+    get:
+      summary: List vulnerabilities
+      description: Retrieve vulnerabilities with filtering and pagination
+      tags:
+        - Vulnerabilities
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+            maximum: 1000
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [Critical, High, Medium, Low, Info]
+        - name: state
+          in: query
+          schema:
+            type: string
+            enum: [active, fixed, resurfaced]
+        - name: hostname
+          in: query
+          schema:
+            type: string
+        - name: cve
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of vulnerabilities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Vulnerability'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /vulnerabilities/{id}:
+    get:
+      summary: Get vulnerability details
+      tags:
+        - Vulnerabilities
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vulnerability details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vulnerability'
+
+  /devices:
+    get:
+      summary: List devices
+      description: Retrieve devices with vulnerability counts and scores
+      tags:
+        - Devices
+      parameters:
+        - name: criticality
+          in: query
+          schema:
+            type: string
+            enum: [Critical, High, Medium, Low]
+        - name: minScore
+          in: query
+          schema:
+            type: number
+            minimum: 0
+            maximum: 100
+      responses:
+        '200':
+          description: List of devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+
+  /dashboard/stats:
+    get:
+      summary: Get dashboard statistics
+      description: Analytics data with <200ms response time
+      tags:
+        - Dashboard
+      responses:
+        '200':
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardStats'
+
+  /dashboard/trends:
+    get:
+      summary: Get vulnerability trends
+      description: Historical trend data for charts
+      tags:
+        - Dashboard
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [week, month, quarter, year]
+            default: month
+      responses:
+        '200':
+          description: Trend data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrendData'
+
+  /tickets:
+    post:
+      summary: Create remediation ticket
+      description: Create ticket for vulnerability remediation
+      tags:
+        - Tickets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketCreate'
+      responses:
+        '201':
+          description: Ticket created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+    
+    get:
+      summary: List tickets
+      tags:
+        - Tickets
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, in_progress, resolved, closed]
+      responses:
+        '200':
+          description: List of tickets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ticket'
+
+  /tickets/{id}:
+    get:
+      summary: Get ticket details
+      tags:
+        - Tickets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ticket details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+    
+    patch:
+      summary: Update ticket
+      tags:
+        - Tickets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketUpdate'
+      responses:
+        '200':
+          description: Ticket updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+
+  /tickets/{id}/markdown:
+    get:
+      summary: Generate ticket markdown
+      tags:
+        - Tickets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Markdown documentation
+          content:
+            text/markdown:
+              schema:
+                type: string
+
+  /tickets/{id}/export:
+    get:
+      summary: Export ticket package
+      description: Generate ZIP with documentation
+      tags:
+        - Tickets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: ZIP package
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+
+  /backup:
+    post:
+      summary: Create database backup
+      tags:
+        - System
+      responses:
+        '200':
+          description: Backup created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  filename:
+                    type: string
+                  size:
+                    type: integer
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /restore:
+    post:
+      summary: Restore from backup
+      tags:
+        - System
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                backup:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Restore completed
+
+  /health:
+    get:
+      summary: Health check
+      tags:
+        - System
+      responses:
+        '200':
+          description: System healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy]
+                  version:
+                    type: string
+                  uptime:
+                    type: integer
+
+components:
+  schemas:
+    Vulnerability:
+      type: object
+      properties:
+        id:
+          type: integer
+        hostname:
+          type: string
+        ipAddress:
+          type: string
+        cve:
+          type: string
+        title:
+          type: string
+        severity:
+          type: string
+          enum: [Critical, High, Medium, Low, Info]
+        cvssScore:
+          type: number
+          minimum: 0
+          maximum: 10
+        pluginId:
+          type: string
+        port:
+          type: integer
+        protocol:
+          type: string
+        description:
+          type: string
+        solution:
+          type: string
+        firstSeen:
+          type: string
+          format: date-time
+        lastSeen:
+          type: string
+          format: date-time
+        state:
+          type: string
+          enum: [active, fixed, resurfaced]
+        vendor:
+          type: string
+        confidenceScore:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    Device:
+      type: object
+      properties:
+        id:
+          type: integer
+        hostname:
+          type: string
+        ipAddress:
+          type: string
+        location:
+          type: string
+        deviceType:
+          type: string
+        operatingSystem:
+          type: string
+        criticality:
+          type: string
+        vulnerabilityCount:
+          type: integer
+        criticalCount:
+          type: integer
+        highCount:
+          type: integer
+        securityScore:
+          type: number
+          minimum: 0
+          maximum: 100
+        lastScanDate:
+          type: string
+          format: date-time
+
+    Ticket:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        servicenowId:
+          type: string
+        hexagonId:
+          type: string
+        status:
+          type: string
+          enum: [open, in_progress, resolved, closed]
+        priority:
+          type: string
+          enum: [P1, P2, P3, P4]
+        assignee:
+          type: string
+        deviceList:
+          type: array
+          items:
+            type: string
+        vulnerabilityList:
+          type: array
+          items:
+            type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TicketCreate:
+      type: object
+      required:
+        - title
+        - deviceList
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        priority:
+          type: string
+          enum: [P1, P2, P3, P4]
+        deviceList:
+          type: array
+          items:
+            type: string
+        vulnerabilityList:
+          type: array
+          items:
+            type: integer
+
+    TicketUpdate:
+      type: object
+      properties:
+        servicenowId:
+          type: string
+        hexagonId:
+          type: string
+        status:
+          type: string
+          enum: [open, in_progress, resolved, closed]
+        assignee:
+          type: string
+
+    ImportSession:
+      type: object
+      properties:
+        id:
+          type: integer
+        sessionId:
+          type: string
+        filename:
+          type: string
+        fileSize:
+          type: integer
+        vendor:
+          type: string
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        recordCount:
+          type: integer
+        processedCount:
+          type: integer
+        duplicateCount:
+          type: integer
+        errorCount:
+          type: integer
+
+    ImportProgress:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        progress:
+          type: number
+          minimum: 0
+          maximum: 100
+        processedCount:
+          type: integer
+        totalCount:
+          type: integer
+        throughput:
+          type: number
+        status:
+          type: string
+        message:
+          type: string
+
+    DashboardStats:
+      type: object
+      properties:
+        totalVulnerabilities:
+          type: integer
+        criticalCount:
+          type: integer
+        highCount:
+          type: integer
+        mediumCount:
+          type: integer
+        lowCount:
+          type: integer
+        infoCount:
+          type: integer
+        activeCount:
+          type: integer
+        fixedCount:
+          type: integer
+        resurfacedCount:
+          type: integer
+        totalDevices:
+          type: integer
+        averageScore:
+          type: number
+
+    TrendData:
+      type: object
+      properties:
+        labels:
+          type: array
+          items:
+            type: string
+        datasets:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              data:
+                type: array
+                items:
+                  type: number
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Future authentication implementation
+
+security:
+  - ApiKey: []

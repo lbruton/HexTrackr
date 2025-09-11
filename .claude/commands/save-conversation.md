@@ -1,42 +1,58 @@
-# Save Conversation Command
+Save current conversation highlights to Memento with auto-generated session ID: $ARGUMENTS
 
-Saves the current conversation to Memento memory system for future reference.
+**Action**: Create a focused Memento entity with unique session ID capturing the essential outcomes of this conversation.
 
-## Usage
-Type `/save-conversation` to preserve this entire conversation in the knowledge graph.
+**Focus Areas:**
+- Key decisions and solutions discussed
+- Technical patterns or approaches identified
+- Problems solved and methods used
+- Workflow improvements discovered
+- Project-specific insights with proper classification
 
-## What It Does
-1. Creates a conversation entity with timestamp
-2. Captures key insights and decisions from this session
-3. Links to related project entities
-4. Preserves context for future sessions
+**Entity Details:**
+- **Classification**: Use PROJECT:DOMAIN:TYPE pattern (e.g., HEXTRACKR:DEVELOPMENT:SESSION)
+- **Name**: Descriptive title based on main topic and context
+- **Observations**: Actionable outcomes and key learnings (not full transcripts)
+- **Relations**: Link to current project and related technical concepts
 
-## Example Implementation
+**Session ID Generation:**
 ```javascript
-await mcp__memento__create_entities({
-  entities: [{
-    name: `HEXTRACKR:CONVERSATION:${new Date().toISOString()}`,
-    entityType: "PROJECT:SESSION:CONVERSATION",
-    observations: [
-      "Summary of key topics discussed",
-      "Decisions made",
-      "Problems solved",
-      "Next steps identified"
-    ]
-  }]
-});
+// Auto-generate session ID: PROJECT-KEYWORD-YYYYMMDD-NNN
+const generateSessionID = (keyword, project = "HEXTRACKR") => {
+  const date = new Date().toISOString().slice(0,10).replace(/-/g, "");
+  const sequence = "001"; // Increment based on daily count
+  return `${project}-${keyword.toUpperCase()}-${date}-${sequence}`;
+};
 
-// Link to current work
-await mcp__memento__create_relations({
-  relations: [{
-    from: `HEXTRACKR:CONVERSATION:${timestamp}`,
-    to: "HEXTRACKR:FEATURE:CurrentFeature",
-    relationType: "DISCUSSES"
-  }]
-});
+// Example: "HEXTRACKR-AUTH-20250907-001"
 ```
 
-## Constitutional Compliance
-- **Article VI**: Knowledge Management - Preserves institutional knowledge
-- **Article I**: Links conversations to specifications when applicable
-- **Article V**: Documents decisions and rationale
+**Memory Tools:**
+```javascript
+mcp__memento__create_entities([{
+  name: "Session: [GENERATED_SESSION_ID]",
+  entityType: "PROJECT:DEVELOPMENT:SESSION", 
+  observations: [
+    "SESSION_ID: [GENERATED_SESSION_ID]",
+    "key outcomes", 
+    "important decisions", 
+    "technical insights"
+  ]
+}])
+```
+
+**Instructions**: 
+1. **Generate Session ID**: Create unique ID using PROJECT-KEYWORD-DATE-SEQUENCE format
+2. **Extract Key Content**: Save valuable outcomes, decisions, and insights (we just need to preserve the full session context not full transcripts)
+3. **Apply Classification**: Use PROJECT:DEVELOPMENT:SESSION entity type
+4. **Include Session ID**: Add session ID as first observation for easy recall
+5. **Return Session ID**: Display generated session ID to user after saving
+
+**Output After Saving:**
+```
+✅ Conversation saved successfully!
+📋 Session ID: [GENERATED_SESSION_ID]
+🔍 Use: /recall-conversation id:[SESSION_ID] to retrieve this conversation
+```
+
+Now process the conversation, generate session ID, and create the Memento entity with these guidelines.
