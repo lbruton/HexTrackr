@@ -257,3 +257,5 @@ Before ANY code changes:
 
 ---
 *HexTrackr follows spec-kit methodology. See constitution for detailed rules.*
+
+- Project Documentation lives in /app/public/docs-source/ and the ref.tools MCP
