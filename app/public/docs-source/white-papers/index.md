@@ -14,14 +14,6 @@ A comprehensive white paper documenting the revolutionary transformation from sy
 
 *Key Topics: Vibe coding methodology, natural language programming, domain expert development, enterprise tool creation*
 
-#### [Three Stooges Methodology](#white-papers/the-three-stooges)
-
-## Personality-Driven AI Agent Analysis
-
-Explores the breakthrough discovery that personality-driven AI agents produce 3x richer analysis than traditional domain-expert agents through cognitive diversity.
-
-*Key Topics: AI agent personalities, cognitive diversity, parallel analysis, context management*
-
 ---
 
 ## Research Areas

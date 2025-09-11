@@ -9,9 +9,12 @@
 All development work must derive from properly structured specifications and task breakdowns:
 
 - Implementation requires active .active-spec with pending tasks in tasks.md
+- Tasks MUST include test creation BEFORE implementation tasks
+- Test scenarios in quickstart.md MUST be written before coding begins
 - Complex fixes must be routed through appropriate spec integration
 - Simple fixes (<10 lines, single file) may use TodoWrite directly
 - **Constitutional Violation**: Arbitrary code changes without spec backing
+- **Constitutional Violation**: Implementation without prior test definition
 
 **Quality Gate**: Before ANY implementation, verify:
 
@@ -198,6 +201,35 @@ User Request
 ```
 
 **Critical Success Factor**: >95% intent detection accuracy required
+
+### Article XI: Test-Driven Specification
+
+**Testing becomes constitutional law, not optional practice**
+
+Mandatory test-first development requirements:
+
+- **Every spec MUST include quickstart.md** with comprehensive test scenarios
+- **Test scenarios MUST be written BEFORE implementation** begins  
+- **Playwright E2E tests MUST pass** before marking any spec complete
+- **Performance benchmarks MUST be established** and continuously validated
+- **Regression tests MUST prevent** breaking existing functionality
+- **Tasks.md MUST include test creation tasks** BEFORE implementation tasks
+
+Quality Gates:
+
+- No code without tests (test-first, not test-later)
+- No deployment without passing test suite
+- No spec completion without test verification
+- No performance degradation without justification
+
+Test Priority Hierarchy:
+
+1. User workflow tests (Playwright E2E)
+2. Integration tests (API and data flow)
+3. Unit tests (component isolation)
+4. Performance tests (benchmark validation)
+
+**Constitutional Integration**: Article XI enforces quality through mandatory testing, making TDD a constitutional requirement rather than a best practice. This article works with Article I (Task-First) to ensure tests are tasks, and tasks include tests.
 
 ## Governance & Amendments
 
