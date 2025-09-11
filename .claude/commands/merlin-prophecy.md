@@ -28,37 +28,46 @@ Task(
   subagent_type: "merlin",
   description: "Prophesy documentation drift",
   prompt: `
+    TOOLS AVAILABLE:
+    - Use merlin-truth-tools.js for prophetic wisdom and pattern recognition
+    - Use agent-logger.js for mystical prophecy logs
+    
+    MISSION:
     Divine future documentation drift for timeframe: ${timeframe}
+    Channel your ancient wisdom to peer through time's veil.
     
     PHASE 1: HISTORICAL DIVINATION
+    "Consulting the ancient scrolls of memory..."
     1. Query Memento for past audit records:
        mcp__memento__search_nodes({
          query: "HEXTRACKR:DOCS:AUDIT DOCUMENTATION:AUDIT",
          mode: "hybrid",
          topK: 20
        })
-    2. Analyze git history for code change patterns:
+    2. Use merlin-truth-tools.js to analyze git history for code change patterns:
        - Files with highest change frequency
        - Recent refactoring areas
        - New feature development zones
     3. Calculate drift velocity per documentation area
     
     PHASE 2: PATTERN RECOGNITION
-    1. Identify cyclical patterns:
+    "The patterns reveal themselves to those with wisdom..."
+    1. Use your prophetic powers to identify cyclical patterns:
        - Sprint-based documentation decay
        - Feature release impacts
        - Seasonal development patterns
-    2. Detect drift accelerators:
+    2. Detect drift accelerators through ancient knowledge:
        - Rapid development areas
        - Experimental features
        - API evolution zones
-    3. Find stability anchors:
+    3. Find stability anchors with mystical insight:
        - Rarely changing documentation
        - Well-maintained sections
        - Auto-generated docs
     
     PHASE 3: RISK CALCULATION
-    For each documentation file:
+    "The threads of fate weave a complex tapestry..."
+    Use merlin-truth-tools.js for each documentation file:
     
     Risk Score = (Change Frequency × Impact × Time Since Update) / Maintenance Factor
     
@@ -69,10 +78,11 @@ Task(
     - Maintenance Factor: How well maintained (0.5 to 2.0)
     
     PHASE 4: PROPHECY GENERATION
-    1. Rank documentation by drift risk
-    2. Identify critical drift points
-    3. Suggest preventive actions
-    4. Calculate confidence levels
+    "The future reveals its secrets..."
+    1. Rank documentation by drift risk with ancient wisdom
+    2. Identify critical drift points through prophetic sight
+    3. Suggest preventive actions using mystical guidance
+    4. Calculate confidence levels with accumulated knowledge
     
     PHASE 5: MYSTICAL VISUALIZATION
     Create drift timeline showing:
@@ -81,7 +91,7 @@ Task(
     - Recommended update schedule
     - Resource allocation suggestions
     
-    Store prophecy in Memento:
+    Store prophecy in Memento with prophetic insight:
     mcp__memento__create_entities({
       entities: [{
         name: "HEXTRACKR:DOCS:PROPHECY:[timestamp]",
@@ -90,7 +100,7 @@ Task(
       }]
     })
     
-    Save full prophecy to MERLIN_PROPHECY_[timestamp].md
+    Save full prophecy to timestamped file with mystical wisdom.
   `
 )
 ```

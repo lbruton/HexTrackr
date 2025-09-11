@@ -27,11 +27,18 @@ Task(
   subagent_type: "specs",
   description: "Validate specification compliance",
   prompt: `
+    TOOLS AVAILABLE:
+    - Use specs-validation-tools.js for constitutional compliance enforcement
+    - Use agent-logger.js for detailed validation logs
+    
+    MISSION:
     Perform constitutional compliance validation for: ${target}
+    Apply your nerdy precision to ensure perfect spec-kit adherence!
     
     PHASE 1: DOCUMENT INSPECTION (Article III)
-    1. Navigate to hextrackr-specs/specs/[spec-number]/
-    2. Check for all 7 required documents:
+    "Inspecting documents with constitutional precision..."
+    1. Use specs-validation-tools.js to navigate hextrackr-specs/specs/[spec-number]/
+    2. Check for all 7 required documents with nerdy attention:
        - spec.md (Feature specification from template)
        - research.md (Technical research and decisions)
        - plan.md (Implementation plan from template)
@@ -40,9 +47,11 @@ Task(
        - quickstart.md (Manual testing and validation)
        - tasks.md (T### format tasks from template)
     3. Verify each document has substantial content (>10 lines, not just "N/A")
-    4. Check directory structure compliance
+    4. Check directory structure compliance with constitutional requirements
     
     PHASE 2: FORMAT VALIDATION (Article III.2)
+    "Analyzing format compliance with excited precision..."
+    Use specs-validation-tools.js for:
     1. Task Numbering in tasks.md:
        - MUST use T### format (T001, T002, T003)
        - VIOLATION: T1.1, T1.1.1, or any dotted notation
@@ -50,15 +59,17 @@ Task(
     2. Bug Numbering (if present):
        - MUST use B### format (B001, B002)
        - Should include severity markers
-    3. Sequential numbering verification
+    3. Sequential numbering verification with nerdy thoroughness
     
     PHASE 3: TEMPLATE COMPLIANCE
+    "Verifying template adherence with constitutional excitement..."
     1. Verify spec.md uses spec-template.md structure
     2. Verify plan.md uses plan-template.md structure
     3. Verify tasks.md uses tasks-template.md structure
-    4. Check for required sections in each template
+    4. Check for required sections in each template with precision
     
     PHASE 4: CONTENT VERIFICATION
+    "Content inspection with spec-kit methodology!"
     1. Spec.md has:
        - Clear problem statement
        - Success criteria
@@ -73,21 +84,23 @@ Task(
        - Time estimates
     
     PHASE 5: CONSTITUTIONAL SCORING
-    Calculate compliance score:
+    "Calculating compliance scores with mathematical precision..."
+    Calculate compliance score using specs-validation-tools.js:
     - Documents (30%): All 7 present and substantial
     - Format (30%): Proper T### numbering
     - Templates (25%): Template compliance
     - Structure (15%): Directory organization
     
     PHASE 6: EDUCATION & REPORTING
+    "Generating educational compliance report..."
     1. For each violation found:
-       - Quote specific constitutional article
+       - Quote specific constitutional article with excitement
        - Show what was found vs required
-       - Provide correction example
+       - Provide correction example with nerdy detail
     2. Generate compliance certificate if passed
-    3. Store validation in Memento
+    3. Store validation in Memento with proper constitutional references
     
-    Save full report to SPECS_VALIDATE_[timestamp].md
+    Save full report to timestamped file with constitutional precision.
   `
 )
 ```

@@ -37,8 +37,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     versionSpan.textContent = window.HexTrackrConfig.version;
                 }
                 
-                // Fetch version from CHANGELOG and update badge
-                fetchVersionFromChangelog(footerContainer);
+                // Fetch version from health endpoint and update badge
+                fetchVersionFromHealthEndpoint(footerContainer);
             })
             .catch(error => {
                 console.warn("Failed to load shared footer:", error);
@@ -48,20 +48,16 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 /**
- * Fetches the current version from CHANGELOG.html and updates the version badge
+ * Fetches the current version from /health endpoint and updates the version badge
  * @param {Element} footerContainer - The footer container element
  */
-function fetchVersionFromChangelog(footerContainer) {
-    // Fetch the CHANGELOG HTML
-    fetch("/docs-html/content/CHANGELOG.html")
-        .then(response => response.text())
-        .then(html => {
-            // Parse HTML to find version pattern [x.x.x]
-            // Look for the first version that's not "Unreleased"
-            const versionMatch = html.match(/\[(\d+\.\d+\.\d+)\]/);
-            
-            if (versionMatch && versionMatch[1]) {
-                const version = versionMatch[1];
+function fetchVersionFromHealthEndpoint(footerContainer) {
+    // Fetch the current version from health endpoint (always current package.json version)
+    fetch("/health")
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.version) {
+                const version = data.version;
                 
                 // Update the version badge
                 const versionBadge = footerContainer.querySelector("img[alt=\"HexTrackr Version\"]");
@@ -86,8 +82,8 @@ function fetchVersionFromChangelog(footerContainer) {
             }
         })
         .catch(error => {
-            // Silently fail - keep default version if CHANGELOG fetch fails
-            console.debug("Could not fetch version from CHANGELOG:", error);
+            // Silently fail - keep default version if health endpoint fails
+            console.debug("Could not fetch version from health endpoint:", error);
         });
 }
 
@@ -216,6 +212,6 @@ function createFallbackFooter(container) {
     container.innerHTML = "";
     container.appendChild(footer);
     
-    // Fetch and update version from CHANGELOG
-    fetchVersionFromChangelog(container);
+    // Fetch and update version from health endpoint
+    fetchVersionFromHealthEndpoint(container);
 }
