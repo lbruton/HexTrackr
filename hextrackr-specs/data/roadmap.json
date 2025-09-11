@@ -1,0 +1,26 @@
+{
+  "generated": "2025-09-10T23:19:04.566Z",
+  "version": "1.0.12",
+  "totalSpecs": 1,
+  "activeSpecs": 0,
+  "completedSpecs": 1,
+  "specs": [
+    {
+      "id": "000-hextrackr-master-truth-v1.0.12-COMPLETE",
+      "title": "HexTrackr Master",
+      "status": "complete",
+      "priority": "baseline",
+      "tasks": {
+        "total": 30,
+        "completed": 28,
+        "percentage": 93
+      },
+      "nextTasks": [
+        "✅ Docker Environment Configuration [P]",
+        "✅ Database Schema Creation [P]",
+        "✅ Express.js Server Setup"
+      ],
+      "isBaseline": true
+    }
+  ]
+}
