@@ -5,14 +5,6 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Next Sprint - KEV Integration and Security Hardening (v1.1.0)
-
-- **KEV Integration**: Daily CISA KEV CSV sync with vulnerability matching and priority boost logic
-- **Security Hardening**: JWT authentication, rate limiting, input validation framework
-- **API Integration Planning**: Cisco and Tenable API integration preparation
-
 ## [1.0.12](https://github.com/Lonnie-Bruton/HexTrackr/releases/tag/v1.0.12) - 2025-09-09
 
 ### Completed Tasks

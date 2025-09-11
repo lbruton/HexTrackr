@@ -44,6 +44,16 @@ function stripCodeBlocks(md) {
 
 function parseCheckboxStats(md) {
   const cleaned = stripCodeBlocks(md);
+  
+  // Check for HexTrackr task format first: ### T0XX: [status symbol]
+  const hexTrackrTasks = cleaned.match(/^\s*###\s+T\d+:\s*[✅🔄🆕]/gm) || [];
+  if (hexTrackrTasks.length > 0) {
+    const total = hexTrackrTasks.length;
+    const done = (cleaned.match(/^\s*###\s+T\d+:\s*✅/gm) || []).length;
+    return { total, done, pct: total ? Math.round((done / total) * 100) : 0 };
+  }
+  
+  // Fallback to checkbox format for other specs
   const taskRE = /^\s*-\s*\[(?: |x|X)\]\s+/gm;
   const doneRE = /^\s*-\s*\[(?:x|X)\]\s+/gm;
   const total = (cleaned.match(taskRE) || []).length;
@@ -57,13 +67,20 @@ function extractPendingTasks(md, limit = 10) {
   const pending = [];
   
   for (const line of lines) {
-    const match = line.match(/^\s*-\s*\[\s\]\s+(.+)$/);
-    if (match && pending.length < limit) {
-      let task = match[1].trim();
+    // Handle standard markdown checkbox format: - [ ] Task
+    const checkboxMatch = line.match(/^\s*-\s*\[\s\]\s+(.+)$/);
+    
+    // Handle HexTrackr task format: ### T0XX: 🔄 Task Description
+    const hexTrackrMatch = line.match(/^\s*###\s+T\d+:\s*🔄\s+(.+)$/);
+    
+    if ((checkboxMatch || hexTrackrMatch) && pending.length < limit) {
+      let task = checkboxMatch ? checkboxMatch[1].trim() : hexTrackrMatch[1].trim();
+      
       // Clean up task text - remove markdown formatting and extra spaces
       task = task.replace(/\*\*(.*?)\*\*/g, "$1"); // Remove bold
       task = task.replace(/\*(.*?)\*/g, "$1"); // Remove italic
       task = task.replace(/\s+/g, " "); // Normalize spaces
+      task = task.replace(/\[P\]/g, ""); // Remove parallel markers
       
       // Truncate if too long
       if (task.length > 80) {
@@ -125,6 +142,18 @@ function extractSpecPriority(md, specId) {
 }
 
 function parseSpecMeta(md, filePath) {
+  // Try to extract from title line: # Implementation Tasks: [Title]
+  const titleMatch = md.match(/^#\s+Implementation Tasks:\s*(.+)$/m);
+  if (titleMatch) {
+    const fullTitle = titleMatch[1].trim();
+    const dirName = path.basename(path.dirname(filePath));
+    const parts = dirName.split("-");
+    const id = parts[0] || "???";
+    const name = fullTitle;
+    return { id, name };
+  }
+  
+  // Fallback to original logic for other spec formats
   const metaRE = /^\*\*Spec\*\*:\s*([^\r\n]+)$/m;
   const match = md.match(metaRE);
   const slug = match ? match[1].trim() : path.basename(path.dirname(filePath));

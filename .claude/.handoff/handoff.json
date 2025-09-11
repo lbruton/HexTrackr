@@ -1,80 +1,56 @@
 {
-  "handoff_id": "HEXTRACKR-HANDOFF-20250110-002",
-  "timestamp": "2025-01-10T23:35:00Z",
+  "handoff_id": "HEXTRACKR-HANDOFF-20250110-003",
+  "timestamp": "2025-01-10T23:55:00Z",
   "project": "HexTrackr",
   "branch": "copilot",
-  "session_context": "Agent Architecture Restoration - Fixed fundamental violation where agents were implemented as Node.js scripts instead of Claude AI configurations",
+  "session_context": "Agent Execution Crisis - Discovered agents are broken and providing advice instead of executing",
   "critical_discovery": {
-    "issue": "Agents were incorrectly implemented as Node.js executable scripts",
-    "root_cause": "Misunderstanding of Claude Code architecture - agents are AI personality configurations, not programs",
-    "contributing_factor": "Missing README-STOOGES.md documentation led to confusion"
+    "issue": "ALL agents are non-functional - they advise instead of execute",
+    "example": "Uhura provided git checkpoint recommendations instead of executing git commands",
+    "impact": "Entire agent system compromised - no agents can execute tasks",
+    "root_cause": "Task tool launching agents in advisory mode not execution mode"
   },
   "fixes_completed": {
-    "deleted_scripts": [
-      "hextrackr-specs/agents/atlas/atlas.js (7,881 bytes)",
-      "hextrackr-specs/agents/doc/doc.js (12,015 bytes)",
-      "hextrackr-specs/agents/drjackson/drjackson.js (18,578 bytes)",
-      "hextrackr-specs/agents/uhura/uhura.js (13,209 bytes)",
-      "hextrackr-specs/agents/worf/worf.js (26,267 bytes)",
-      "hextrackr-specs/agents/shared/memento-client.js"
+    "handoff_commands": [
+      "recall-handoff.md - Fixed to use keyword mode for exact ID matching",
+      "save-handoff.md - Fixed to use keyword mode for ID collision detection"
     ],
-    "commands_fixed": [
-      "/security-team - Now uses Task tool to orchestrate DrJackson, Worf, Uhura",
-      "/generatedocs-quick - Uses Task tool to launch Doc agent",
-      "/uhura-sync - Complete rewrite with Task tool orchestration",
-      "/uhura-preflight - Fixed to use Task tool properly",
-      "/uhura-translate - Updated with proper Task tool usage"
-    ],
-    "agents_updated": [
-      "All 11 agents now have proper YAML frontmatter",
-      "Constitutional Requirements (Article X) added to all agents",
-      "Personality-specific log templates added",
-      "MCP tool hierarchy established (primary vs restricted)"
-    ]
+    "handoff_structure": "Restructured to single handoff.json + Memento for history",
+    "git_checkpoint": "Commit 6168b70 - fix(commands): Update handoff commands to use keyword search mode"
   },
   "active_files": [
-    ".claude/agents/larry.md:23",
-    ".claude/agents/moe.md:23",
-    ".claude/agents/curly.md:16",
-    ".claude/agents/shemp.md:16",
-    ".claude/agents/atlas.md:16",
-    ".claude/agents/doc.md:16",
-    ".claude/agents/worf.md:10",
-    ".claude/agents/drjackson.md:10",
-    ".claude/agents/uhura.md:18",
-    ".claude/agents/merlin.md:16",
-    ".claude/agents/specs.md:16",
-    ".claude/agents/README-AGENTS.md:1"
+    ".claude/commands/recall-handoff.md:18",
+    ".claude/commands/save-handoff.md:10",
+    ".claude/.handoff/handoff.json:1"
   ],
   "key_decisions": [
-    "Agents are Claude AI configurations with personalities, not executable scripts",
-    "Commands use Task tool to orchestrate agents, not run programs",
-    "All agents must have Constitutional Requirements for MCP tool usage",
-    "Personalities must be preserved while adding technical requirements",
-    "Created comprehensive README-AGENTS.md to prevent future violations"
+    "Handoff system uses single backup file (handoff.json) not versioned files",
+    "Memento stores all historical handoffs permanently",
+    "Keyword mode for exact ID searches, semantic for research",
+    "Agents must execute not advise - fundamental architecture principle"
   ],
-  "architectural_pattern": {
-    "correct_flow": "/commands/*.md → Task tool → /agents/*.md",
-    "explanation": "Commands are prompts that use Task tool to launch Claude agents with specific personalities"
-  },
+  "constitutional_violations": [
+    "Article X: Agents not using MCP tools as required",
+    "Article V: Agent inheritance broken - not executing per design",
+    "Article II: Git workflow violated initially (fixed)"
+  ],
   "next_steps": [
-    "Monitor for any remaining script references in the codebase",
-    "Ensure all new agents follow the documented structure",
-    "Test agent orchestration with various commands",
-    "Consider creating agent validation script to check compliance"
+    "Fix Task tool to launch agents in execution mode",
+    "Verify all agents follow Constitutional Article X",
+    "Test agent execution with simple tasks",
+    "Handle remaining uncommitted changes from previous sessions"
   ],
   "tools_used": [
-    "Task (for launching agents)",
-    "mcp__memento__create_entities (saving discoveries)",
-    "Read/Write/Edit (updating configurations)",
-    "Bash (checking file structures)",
-    "TodoWrite (tracking progress)"
+    "mcp__memento__search_nodes",
+    "mcp__memento__create_entities",
+    "Task (revealed the bug)",
+    "Bash (git operations)",
+    "Read/Write/Edit"
   ],
   "important_notes": [
-    "Deleted 77KB of erroneous Node.js implementations",
-    "The missing README-STOOGES.md contributed to the confusion",
-    "New README-AGENTS.md explicitly prevents future violations",
-    "All agents maintain their unique personalities while following technical requirements",
-    "Constitutional Article X compliance is now mandatory for all agents"
+    "User frustrated - agents have been broken all night",
+    "Deep context recovery needed from Memento and white papers",
+    "Manual workaround required for all agent tasks",
+    "Other uncommitted changes remain from previous sessions"
   ]
 }

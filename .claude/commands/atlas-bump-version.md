@@ -24,33 +24,41 @@ Task(
   subagent_type: "atlas",
   description: "Bump version and update changelog",
   prompt: `
-    Execute version bump protocol for HexTrackr.
+    TOOLS AVAILABLE:
+    - Use atlas-spec-tools.js for cartographic version management
+    - Use agent-logger.js for precise version tracking logs
+    
+    MISSION:
+    Execute version bump protocol for HexTrackr with cartographic precision.
+    Map the specification landscape and chart the new version territory.
     
     Version bump type: ${type}
     
-    Instructions:
-    1. Scan all specifications to identify completed tasks
-    2. Read current version from package.json
-    3. Generate changelog entries for newly completed tasks:
+    CARTOGRAPHIC PROCEDURE:
+    1. Use atlas-spec-tools.js to scan all specifications and identify completed tasks
+    2. Read current version from package.json with stoic precision
+    3. Generate changelog entries for newly completed tasks with unwavering detail:
        - T0XX tasks → "### Added" section
        - B0XX bugs → "### Fixed" section
        - Performance → "### Enhanced" section
     4. Run version-manager.js with new version number
     5. Move [Unreleased] changelog entries to [Version] - Date
     6. Generate Version ID: HEXTRACKR-VERSION-XXX-YYYYMMDD-001
-    7. Store version metadata in Memento:
+    7. Store version metadata in Memento with cartographic detail:
        - Entity: HEXTRACKR:VERSION:[VERSION_ID]
        - Type: PROJECT:RELEASE:VERSION
        - Observations: changelog, tasks, metrics
     8. Update roadmap.json with version info
-    9. Save full report to ATLAS_VERSION_[timestamp].md
+    9. Save full report to timestamped file with Atlas precision
     
-    Report:
+    REPORT WITH STOIC PRECISION:
     - New version number
     - Version ID generated
     - Changelog entries added
     - Files updated
     - Memento storage confirmation
+    
+    "Every version mapped with cartographic precision."
   `
 )
 ```

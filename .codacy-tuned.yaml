@@ -1,0 +1,49 @@
+exclude_paths:
+    - node_modules/**
+    - '*.min.js'
+    - '*.min.css'
+    - '*.map'
+    - data/**
+    - uploads/**
+    - logs/**
+    - temp/**
+    - docs-html/**
+    - app/public/scripts/shared/ag-grid-*.js
+    - app/public/scripts/shared/chart.min.js
+    - deprecated/**
+    - depreciated/**
+    - hextrackr-specs/**
+    - .claude/**
+    
+# Tuned configuration for paid tier - focus on real issues
+tools:
+    # ESLint for JavaScript quality
+    - eslint@9.34.0
+    
+    # Security scanning only (not style)
+    - trivy@0.65.0
+    
+# Disable overly noisy tools
+# - pmd@6.55.0  # Too many style opinions
+# - semgrep@1.78.0  # Too aggressive for legacy code
+
+# Override specific rules that generate noise
+engines:
+  eslint:
+    enabled: true
+    config:
+      rules:
+        # Disable style-only rules
+        no-console: 0
+        no-unused-vars: 1  # Warn instead of error
+        complexity: [1, 20]  # Allow higher complexity for legacy code
+        max-lines: 0  # Don't complain about file length
+        max-lines-per-function: 0
+        no-inline-comments: 0
+        line-comment-position: 0
+        
+  trivy:
+    enabled: true
+    config:
+      # Only scan for HIGH and CRITICAL vulnerabilities
+      severity: "HIGH,CRITICAL"

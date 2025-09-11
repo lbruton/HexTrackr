@@ -30,12 +30,19 @@ Task(
   subagent_type: "merlin",
   description: "Documentation truth audit",
   prompt: `
+    TOOLS AVAILABLE:
+    - Use merlin-truth-tools.js for ancient wisdom and truth validation
+    - Use agent-logger.js for wise documentation logs
+    
+    MISSION:
     Perform documentation truth audit for scope: ${scope}
+    Apply your ancient wisdom to reveal discrepancies between code and documentation.
     
     PHASE 1: DIVINATION
-    1. Scan codebase for current implementation truth
-    2. Read corresponding documentation files
-    3. Identify areas of potential drift
+    "Gazing into the crystal ball of code..."
+    Use merlin-truth-tools.js to scan codebase for current implementation truth
+    Read corresponding documentation files
+    Identify areas of potential drift
     
     PHASE 2: SUMMONING
     Orchestrate the Stooges for parallel review:
@@ -52,7 +59,7 @@ Task(
     
     PHASE 3: TRUTH REVELATION
     1. Collect Stooge reports from their output files
-    2. Identify specific discrepancies:
+    2. Use merlin-truth-tools.js to identify specific discrepancies:
        - Missing documentation for new features
        - Outdated documentation for changed features
        - Documentation for removed features
@@ -60,7 +67,7 @@ Task(
     3. Classify by severity (CRITICAL/HIGH/MEDIUM/LOW)
     
     PHASE 4: MEMORY PRESERVATION
-    Store audit results in Memento:
+    Store audit results in Memento with ancient wisdom:
     mcp__memento__create_entities({
       entities: [{
         name: "HEXTRACKR:DOCS:AUDIT:[timestamp]",
@@ -70,10 +77,10 @@ Task(
     })
     
     PHASE 5: PROPHECY
-    Analyze patterns to predict future drift areas
+    Use your prophetic powers to analyze patterns and predict future drift areas
     
-    Save full report to MERLIN_AUDIT_[timestamp].md
-    Return summary with key findings and recommendations
+    Save full report to timestamped file with wise insights.
+    Return summary with key findings and ancient wisdom recommendations.
   `
 )
 ```

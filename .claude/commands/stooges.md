@@ -56,7 +56,16 @@ Claude Code executes:
 Task(
   subagent_type: "larry",
   description: "Analyze server architecture", 
-  prompt: "analyze server.js architecture using any tools needed"
+  prompt: `
+    TOOLS AVAILABLE:
+    - Use stooges-research-tools.js for parallel analysis with your brothers
+    - Use agent-logger.js for wild-haired research logs
+    
+    MISSION:
+    Analyze server.js architecture using any tools needed.
+    Apply your wild-haired enthusiasm and frontend security focus.
+    Soitenly find those architectural patterns!
+  `
 )
 ```
 
