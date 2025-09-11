@@ -4,10 +4,17 @@ Create comprehensive handoff package with unique handoff ID: $ARGUMENTS
 
 **Step 1: Generate Handoff ID**
 ```javascript
+// Check existing handoffs for today using keyword search
+mcp__memento__search_nodes({
+  query: "HANDOFF_ID HEXTRACKR-HANDOFF-[TODAY_DATE]",
+  mode: "keyword",  // Direct keyword match for ID checking
+  topK: 10
+})
+
 // Auto-generate handoff ID: PROJECT-HANDOFF-YYYYMMDD-NNN
 const generateHandoffID = (project = "HEXTRACKR") => {
   const date = new Date().toISOString().slice(0,10).replace(/-/g, "");
-  const sequence = "001"; // Increment based on daily count
+  const sequence = "001"; // Increment based on daily count from search
   return `${project}-HANDOFF-${date}-${sequence}`;
 };
 // Example: "HEXTRACKR-HANDOFF-20250907-001"
@@ -28,9 +35,10 @@ mcp__memento__create_entities([{
 }])
 ```
 
-**Step 3: Create Local Handoff File (Optional)**
+**Step 3: Create/Update Local Backup File**
 - Ensure `.claude/.handoff/` directory exists in project root
-- Generate ID-based JSON file: `[HANDOFF_ID].json`
+- Overwrite single backup file: `handoff.json`
+- This serves as current session backup (Memento stores history)
 - Include session state data:
   - Handoff ID for cross-reference
   - Current task context and objectives
@@ -59,8 +67,9 @@ mcp__memento__create_entities([{
 ```
 ✅ Handoff package created successfully!
 📋 Handoff ID: [GENERATED_HANDOFF_ID]
-🔍 Use: /recall-handoff id:[HANDOFF_ID] to retrieve this handoff
-📁 JSON file: .claude/.handoff/[HANDOFF_ID].json (if created)
+🔍 Use: /recall-handoff id:[HANDOFF_ID] to retrieve from history
+📁 Current backup: .claude/.handoff/handoff.json (overwritten)
+💾 Historical record saved to Memento knowledge graph
 ```
 
 **Instructions**: If $ARGUMENTS provided, use as handoff focus or recipient context. Generate handoff ID, create Memento entity with standardized format, and optionally create JSON file for detailed session state.
