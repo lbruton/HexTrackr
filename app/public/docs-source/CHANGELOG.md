@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Security Hardening**: JWT authentication, rate limiting, input validation framework
 - **API Integration Planning**: Cisco and Tenable API integration preparation
 
-## [1.0.12] - 2025-09-09
+## [1.0.12](https://github.com/Lonnie-Bruton/HexTrackr/releases/tag/v1.0.12) - 2025-09-09
 
 ### Completed Tasks
 
@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - T003 Extract vulnerability-cards.js ✅ COMPLETED
 - T004 Create vulnerability-core.js ✅ COMPLETED
 
-## [1.0.11] - 2025-09-08
+## [1.0.11] - 2025-09-08 (Pre-Release)
 
 ### Completed - Sprint T001-T006: JavaScript Modularization Success
 
