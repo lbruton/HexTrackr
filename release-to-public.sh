@@ -43,6 +43,26 @@ fi
 echo -e "${YELLOW}Releasing version: $VERSION${NC}"
 echo ""
 
+# Step 0: Security Team Pre-flight Check
+echo "🔐 Step 0: Security Team Pre-flight Check..."
+echo ""
+
+# Dr. Jackson - Formatting and Linting
+echo "📚 Dr. Jackson performing linguistic analysis..."
+cd "$DEV_REPO"
+node hextrackr-specs/agents/drjackson/drjackson.js fix
+echo ""
+
+# Worf - Security Scan
+echo "⚔️ Worf conducting security sweep..."
+node hextrackr-specs/agents/worf/worf.js enforce
+if [ $? -ne 0 ]; then
+    echo -e "${RED}❌ Security check failed! Worf has blocked the release.${NC}"
+    echo "Fix the vulnerabilities and try again."
+    exit 1
+fi
+echo ""
+
 # Step 1: Sync files
 echo "📁 Step 1: Syncing files..."
 rsync -av --delete \
