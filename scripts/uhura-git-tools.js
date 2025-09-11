@@ -9,8 +9,8 @@
  */
 
 const { execSync } = require("child_process");
-const fs = require("fs").promises;
-const path = require("path");
+const _fs = require("fs").promises;
+const _path = require("path");
 const { AgentLogger } = require("./agent-logger.js");
 
 class UhuraGitTools {
@@ -52,7 +52,7 @@ class UhuraGitTools {
             
             // Create commit with diplomatic message
             const commitCmd = `git commit -m "${commitMessage.replace(/"/g, "\\\"")}"`;
-            const commitResult = execSync(commitCmd, { encoding: "utf8" });
+            const _commitResult = execSync(commitCmd, { encoding: "utf8" });
             
             // Get commit hash
             const commitHash = execSync("git rev-parse HEAD", { encoding: "utf8" }).trim();
@@ -74,7 +74,7 @@ class UhuraGitTools {
                 logPath: result.logPath
             };
             
-        } catch (error) {
+        } catch (_error) {
             this.logger.log(`Checkpoint failed: ${error.message}`, "ERROR");
             await this.logger.finalizeLog("FAILED", `Transmission interrupted: ${error.message}`);
             throw error;
@@ -104,7 +104,7 @@ class UhuraGitTools {
                 try {
                     execSync(`git pull origin ${currentBranch}`, { stdio: "pipe" });
                     this.logger.log("Synchronized with remote transmissions");
-                } catch (pullError) {
+                } catch (_pullError) {
                     this.logger.log("Merge conflict detected - manual resolution required", "WARN");
                     throw new Error("Subspace interference detected. Manual conflict resolution required.");
                 }
@@ -133,7 +133,7 @@ class UhuraGitTools {
                 logPath: result.logPath
             };
             
-        } catch (error) {
+        } catch (_error) {
             this.logger.log(`Sync failed: ${error.message}`, "ERROR");
             await this.logger.finalizeLog("FAILED", `Communication disrupted: ${error.message}`);
             throw error;
@@ -188,7 +188,7 @@ class UhuraGitTools {
                     logPath: result.logPath
                 };
                 
-            } catch (ghError) {
+            } catch (_ghError) {
                 // Fallback: provide manual instructions
                 this.logger.log("GitHub CLI not available. Providing manual instructions.", "WARN");
                 
@@ -211,7 +211,7 @@ class UhuraGitTools {
                 };
             }
             
-        } catch (error) {
+        } catch (_error) {
             this.logger.log(`PR creation failed: ${error.message}`, "ERROR");
             await this.logger.finalizeLog("FAILED", `Diplomatic mission failed: ${error.message}`);
             throw error;
@@ -233,7 +233,7 @@ class UhuraGitTools {
                 unstaged: unstaged ? unstaged.split("\n") : [],
                 raw: status
             };
-        } catch (error) {
+        } catch (_error) {
             return { hasChanges: false, staged: [], unstaged: [], raw: "" };
         }
     }
@@ -252,7 +252,7 @@ class UhuraGitTools {
         try {
             execSync(`git show-ref --verify --quiet refs/remotes/origin/${branch}`, { stdio: "pipe" });
             return true;
-        } catch (error) {
+        } catch (_error) {
             return false;
         }
     }
