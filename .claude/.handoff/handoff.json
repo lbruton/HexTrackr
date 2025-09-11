@@ -1,0 +1,80 @@
+{
+  "handoff_id": "HEXTRACKR-HANDOFF-20250110-002",
+  "timestamp": "2025-01-10T23:35:00Z",
+  "project": "HexTrackr",
+  "branch": "copilot",
+  "session_context": "Agent Architecture Restoration - Fixed fundamental violation where agents were implemented as Node.js scripts instead of Claude AI configurations",
+  "critical_discovery": {
+    "issue": "Agents were incorrectly implemented as Node.js executable scripts",
+    "root_cause": "Misunderstanding of Claude Code architecture - agents are AI personality configurations, not programs",
+    "contributing_factor": "Missing README-STOOGES.md documentation led to confusion"
+  },
+  "fixes_completed": {
+    "deleted_scripts": [
+      "hextrackr-specs/agents/atlas/atlas.js (7,881 bytes)",
+      "hextrackr-specs/agents/doc/doc.js (12,015 bytes)",
+      "hextrackr-specs/agents/drjackson/drjackson.js (18,578 bytes)",
+      "hextrackr-specs/agents/uhura/uhura.js (13,209 bytes)",
+      "hextrackr-specs/agents/worf/worf.js (26,267 bytes)",
+      "hextrackr-specs/agents/shared/memento-client.js"
+    ],
+    "commands_fixed": [
+      "/security-team - Now uses Task tool to orchestrate DrJackson, Worf, Uhura",
+      "/generatedocs-quick - Uses Task tool to launch Doc agent",
+      "/uhura-sync - Complete rewrite with Task tool orchestration",
+      "/uhura-preflight - Fixed to use Task tool properly",
+      "/uhura-translate - Updated with proper Task tool usage"
+    ],
+    "agents_updated": [
+      "All 11 agents now have proper YAML frontmatter",
+      "Constitutional Requirements (Article X) added to all agents",
+      "Personality-specific log templates added",
+      "MCP tool hierarchy established (primary vs restricted)"
+    ]
+  },
+  "active_files": [
+    ".claude/agents/larry.md:23",
+    ".claude/agents/moe.md:23",
+    ".claude/agents/curly.md:16",
+    ".claude/agents/shemp.md:16",
+    ".claude/agents/atlas.md:16",
+    ".claude/agents/doc.md:16",
+    ".claude/agents/worf.md:10",
+    ".claude/agents/drjackson.md:10",
+    ".claude/agents/uhura.md:18",
+    ".claude/agents/merlin.md:16",
+    ".claude/agents/specs.md:16",
+    ".claude/agents/README-AGENTS.md:1"
+  ],
+  "key_decisions": [
+    "Agents are Claude AI configurations with personalities, not executable scripts",
+    "Commands use Task tool to orchestrate agents, not run programs",
+    "All agents must have Constitutional Requirements for MCP tool usage",
+    "Personalities must be preserved while adding technical requirements",
+    "Created comprehensive README-AGENTS.md to prevent future violations"
+  ],
+  "architectural_pattern": {
+    "correct_flow": "/commands/*.md → Task tool → /agents/*.md",
+    "explanation": "Commands are prompts that use Task tool to launch Claude agents with specific personalities"
+  },
+  "next_steps": [
+    "Monitor for any remaining script references in the codebase",
+    "Ensure all new agents follow the documented structure",
+    "Test agent orchestration with various commands",
+    "Consider creating agent validation script to check compliance"
+  ],
+  "tools_used": [
+    "Task (for launching agents)",
+    "mcp__memento__create_entities (saving discoveries)",
+    "Read/Write/Edit (updating configurations)",
+    "Bash (checking file structures)",
+    "TodoWrite (tracking progress)"
+  ],
+  "important_notes": [
+    "Deleted 77KB of erroneous Node.js implementations",
+    "The missing README-STOOGES.md contributed to the confusion",
+    "New README-AGENTS.md explicitly prevents future violations",
+    "All agents maintain their unique personalities while following technical requirements",
+    "Constitutional Article X compliance is now mandatory for all agents"
+  ]
+}
