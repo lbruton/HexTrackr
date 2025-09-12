@@ -32,11 +32,11 @@ The most reliable and consistent way to run HexTrackr is by using Docker. This m
 
 1. **Access HexTrackr**
 
-    The application will be available at `http://localhost:8080`.
+    The application will be available at `http://localhost:8989`.
 
-    - **Tickets Management**: `http://localhost:8080/tickets.html`
-    - **Vulnerabilities Management**: `http://localhost:8080/vulnerabilities.html`
-    - **Documentation Portal**: `http://localhost:8080/docs-html/`
+    - **Tickets Management**: `http://localhost:8989/tickets.html`
+    - **Vulnerabilities Management**: `http://localhost:8989/vulnerabilities.html`
+    - **Documentation Portal**: `http://localhost:8989/docs-html/`
 
 1. **Stopping the Application**
 

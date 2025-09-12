@@ -14,6 +14,22 @@ A comprehensive white paper documenting the revolutionary transformation from sy
 
 *Key Topics: Vibe coding methodology, natural language programming, domain expert development, enterprise tool creation*
 
+#### [The Evolution of Spec-Kit](#white-papers/evolution-of-spec-kit)
+
+**From Single-Agent Execution to Personality-Driven Cognitive Symphony**
+
+This paper documents the evolution of GitHub's Spec-Kit framework into a comprehensive cognitive ecosystem featuring personality-driven agents, institutional memory, and automated context preservation. Learn how we transformed specifications from executable to alive.
+
+*Key Topics: 4-phase workflow, Three Stooges framework, Athena memory system, hook automation, cognitive diversity*
+
+#### [The Three Stooges Technical Paper](#white-papers/the-three-stooges)
+
+**Cognitive Diversity Through Personality-Driven Multi-Agent Systems**
+
+An in-depth technical analysis of how personality archetypes and humor enhance multi-agent system effectiveness, featuring the Three Stooges framework that achieves 3x richer insights through parallel cognitive processing.
+
+*Key Topics: Parallel agent processing, cognitive diversity patterns, personality-driven development, humor as compression*
+
 ---
 
 ## Research Areas

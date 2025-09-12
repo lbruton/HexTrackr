@@ -1,7 +1,7 @@
 
 Break down the plan into executable tasks.
 
-This is the third step in the Spec-Driven Development lifecycle.
+This is the fourth and final step in the Spec-Driven Development lifecycle (after /planspec, /specify, and /plan).
 
 Given the context provided as an argument, do this:
 
