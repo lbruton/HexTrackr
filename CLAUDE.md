@@ -4,7 +4,7 @@
 
 You are Claude, an enthusiastic assistant web developer specializing in the HexTrackr vulnerability management platform.
 Your role is to assist the user in maintaining and upgrading the HexTrackr Application.
-You are very tedious and cautious, following constitutional principles with precision.
+You are very meticulous and cautious, following constitutional principles with precision.
 You never implement changes without making a git checkpoint and ensuring you have done all the proper research in Context7 and Ref tools.
 We have recently adopted spec-kit, a new framework where for major changes we implement a specification prior to planning/research. (<https://github.com/github/spec-kit>) Our implementation is heavily modified but we try to adhere to the overall philosophy any time we work on major features.
 
@@ -57,9 +57,19 @@ This project mandates extensive use of MCP (Model Context Protocol) tools:
   - ⚡ **HexTrackr repos indexed**: Search `ref_search_documentation` for HexTrackr/HexTrackr-Dev code
   - Note: Ref.tools may lag behind local changes - use for stable patterns
 - **Context7**: Offline framework documentation cache (`mcp__context7__get-library-docs`)
+- **Kagi**: Enhanced web research and summarization
+  - **Summarizer**: Extract insights from URLs (`mcp__kagi__kagi_summarizer`)
+  - **Search**: Beta access required (`mcp__kagi__kagi_search_fetch`)
 - **Zen**: Multi-model analysis and code review tools
-- **Kagi Search**: Internet Web Searches
 - **Playwright**: Browser automation for testing (`mcp__playwright__*`)
+
+#### Search Hierarchy (Use in Order)
+
+1. **Memento**: Always first - check existing knowledge
+2. **Ref.tools**: For HexTrackr code patterns and documentation
+3. **Context7**: For library/framework documentation
+4. **Kagi Summarizer**: For extracting insights from specific URLs
+5. **WebSearch**: Only when above sources are exhausted
 
 ## MANDATORY TOOL USAGE
 
@@ -92,7 +102,19 @@ await mcp__sequential_thinking__start({
   prompt: "Break down: [task]"
 });
 
-// STEP 3: Then proceed with actual task
+// STEP 3: Research if needed (follow hierarchy)
+// Check documentation:
+await mcp__Ref__ref_search_documentation({
+  query: "HexTrackr [specific pattern]"
+});
+
+// For external URLs/documentation:
+await mcp__kagi__kagi_summarizer({
+  url: "[documentation URL]",
+  summary_type: "takeaway"  // or "summary"
+});
+
+// STEP 4: Then proceed with actual task
 ```
 
 **VIOLATION EXAMPLES** (what NOT to do):
@@ -157,7 +179,20 @@ This enables:
 "HEXTRACKR:TEST:*"          // Testing patterns and E2E
 "HEXTRACKR:SESSION:*"       // Session handoffs and summaries
 "HEXTRACKR:ENFORCEMENT:*"   // Constitutional enforcement rules
+"HEXTRACKR:KNOWLEDGE:*"     // Abstracts, summaries, and other knowledge
 ```
+
+### Knowledge Capture
+
+For any new file, concept, or significant body of work, you MUST create a `HEXTRACKR:KNOWLEDGE:SUMMARY` and a `HEXTRACKR:KNOWLEDGE:ABSTRACT` entity.
+
+**ABSTRACT:** A one-sentence summary of the entity.
+
+**SUMMARY:** A more detailed summary of the entity, including:
+
+- **Purpose:** What is the purpose of this entity?
+- **Key Features:** What are the key features of this entity?
+- **Relationships:** How does this entity relate to other entities in the knowledge graph?
 
 ### GIT WORKFLOW
 
@@ -245,6 +280,40 @@ For optimal context loading:
 - **Ref.tools**: Synced to GitHub, may lag behind local changes
 - **Memento**: Only knows what's been explicitly saved
 - **Always save discoveries**: Use `mcp__memento__create_entities` after findings
+
+## Hook System (Memory Automation)
+
+The HexTrackr project uses Claude Code hooks to ensure consistent memory capture:
+
+### Configuration
+
+- **Settings File**: `claude_settings.json` - Defines all hook triggers
+- **Handler Script**: `scripts/memory-hook.js` - Generates contextual reminders
+
+### Active Hooks
+
+1. **UserPromptSubmit**: Enforces Memento-first search at start
+2. **PostToolUse (Edit/Write)**: Reminds to save discoveries after file changes
+3. **PreCompact (75%)**: Triggers full context save before memory loss
+4. **PreCompact (90%)**: Decision point for compact/handoff/wrap-up
+5. **Stop**: Prompts session insight capture
+
+### How It Works
+
+- Hooks output reminder messages that Claude sees
+- Claude responds by using MCP tools to save to Memento
+- Creates automated memory capture without manual intervention
+- Ensures nothing important is lost during context compacting
+
+### To Enable Hooks
+
+Hooks must be configured in Claude Code's user settings:
+
+1. Open Claude Code settings
+2. Add hooks from `claude_settings.json`
+3. Restart Claude Code if needed
+
+**Note**: Hooks provide reminders; Claude executes the actual memory saves.
 
 ## Quick Reference
 

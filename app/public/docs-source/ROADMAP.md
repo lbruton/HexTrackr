@@ -67,5 +67,8 @@ Development priorities are determined by active specifications with pending task
 | Spec | Title | Progress | Priority | Next Tasks |
 | ---- | ----- | -------- | -------- | ---------- |
 | 000 | HexTrackr Master - Vulnerability Management Platform | 28/30 (93%) | 🔴 CRIT | • Playwright E2E Tests<br>• Load Testing Suite |
+| 001 | E2e Playwright Test Suite | 21/58 (36%) | 🔴 CRIT | • T014 Create authentication helper at `__tests__/utils/auth.js` with `loginAs(...<br>• T015  Create performance measurement utility at`**tests**/utils/performance....<br>• T016  Create WebSocket monitor at `__tests__/utils/websocket-monitor.js` for ...<br>• T017  Create screenshot utility at `__tests__/utils/screenshots.js` for failu...<br>• T018  Create data validation helpers at `__tests__/utils/validators.js` for C...<br>• T019  Create CSV upload test at `__tests__/tests/vulnerability-import/csv-upl...<br>• T020  Create WebSocket progress test at`**tests**/tests/vulnerability-import...<br>• T021  Create vendor detection test at `__tests__/tests/vulnerability-import/v...<br>• T022  Create deduplication test at`**tests**/tests/vulnerability-import/dedu...<br>• T023  Create table performance test at `**tests**/tests/vulnerability-import/... |
+| 003 | Remove Statistics Card | 12/12 (100%) | ⚪ NORM | All tasks completed |
+| 004 | Ag Grid Table Overflow Fix | 28/28 (100%) | 🟠 HIGH | All tasks completed |
 
 <!-- AUTO-GENERATED-SPECS-END -->
