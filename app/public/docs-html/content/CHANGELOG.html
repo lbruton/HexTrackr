@@ -8,7 +8,7 @@
         <path d="M12 16h.01"/>
     </svg>
     <div>
-        <strong>Active Specification:</strong> 000-hextrackr-master-truth-v1.0.12-COMPLETE
+        <strong>Active Specification:</strong> 004
         <small class="d-block text-muted">This documentation is being actively updated as part of the current specification development.</small>
     </div>
 </div>
@@ -21,12 +21,21 @@
                         <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
                              alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
                     </a>.</p>
-<h2>[Unreleased]</h2>
-<h3>Next Sprint - KEV Integration and Security Hardening (v1.1.0)</h3>
+<h2>[1.0.13] - 2025-01-12</h2>
+<h3>Fixed</h3>
+<h4>AG-Grid Table Container Overflow (Spec 004)</h4>
 <ul>
-<li><strong>KEV Integration</strong>: Daily CISA KEV CSV sync with vulnerability matching and priority boost logic</li>
-<li><strong>Security Hardening</strong>: JWT authentication, rate limiting, input validation framework</li>
-<li><strong>API Integration Planning</strong>: Cisco and Tenable API integration preparation</li>
+<li>Fixed AG-Grid table overflow causing excessive white space in Vulnerability Data Workspace</li>
+<li>Removed problematic grid-height-manager.js calculations and vulnerability-table-fix.css</li>
+<li>Implemented clean flexbox solution for natural container sizing:<ul>
+<li><code>.card-body.p-2</code> uses <code>display: flex</code> with consistent minimum height</li>
+<li><code>.view-content</code> with <code>flex-grow: 1</code> for proper space distribution  </li>
+<li><code>#vulnGrid</code> with <code>height: 100%; flex-grow: 1</code> for natural expansion</li>
+</ul>
+</li>
+<li>Table now properly expands for 10, 25, 50, 200 items without overflow or excessive padding</li>
+<li><strong>Engineering Insight</strong>: Simple CSS flexbox approach solved what complex JavaScript calculations could not</li>
+<li><strong>Lesson Learned</strong>: Elegant solutions often emerge from removing complexity rather than adding it</li>
 </ul>
 <h2><a href="https://github.com/Lonnie-Bruton/HexTrackr/releases/tag/v1.0.12">1.0.12</a> - 2025-09-09</h2>
 <h3>Completed Tasks</h3>

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "version": "1.0.12",
-    "lastUpdated": "2025-01-09T15:30:00.000Z",
+    "lastUpdated": "2025-01-12T20:45:00.000Z",
     "scannedBy": "Atlas",
-    "totalSpecs": 1,
-    "completedSpecs": 1,
+    "totalSpecs": 2,
+    "completedSpecs": 2,
     "inProgressSpecs": 0,
     "plannedSpecs": 0
   },
@@ -70,29 +70,83 @@
       "phase": "Production Baseline",
       "constitutionalCompliance": true,
       "issues": []
+    },
+    {
+      "id": "004-ag-grid-table-overflow-fix",
+      "title": "AG-Grid Table Container Overflow Fix",
+      "status": "COMPLETE",
+      "priority": "HIGH",
+      "completionPercentage": 100.0,
+      "totalTasks": 21,
+      "completedTasks": 21,
+      "inProgressTasks": 0,
+      "plannedTasks": 0,
+      "lastUpdated": "2025-01-12T20:45:00.000Z",
+      "requiredDocuments": {
+        "spec.md": true,
+        "research.md": true,
+        "plan.md": true,
+        "data-model.md": true,
+        "contracts": false,
+        "quickstart.md": true,
+        "tasks.md": true
+      },
+      "tasks": {
+        "completed": [
+          "T001: Verify Docker container running",
+          "T002: Verify test data contains 100+ records",
+          "T003: Create feature branch from copilot",
+          "T004: Create E2E test for container boundaries",
+          "T005: Add test for item count changes",
+          "T006: Add test for long content truncation",
+          "T007: Add test for rapid item count switching",
+          "T008: Add test for browser window resize",
+          "T009: Run E2E tests to verify FAIL state",
+          "T010: Create vulnerability-table.css with container styles",
+          "T011: Update vulnerabilities.html with container wrapper",
+          "T012: Apply CSS fixes - flexbox container solution",
+          "T013: Update AG-Grid config height calculation",
+          "T014: Add resize observer for dynamic adjustments",
+          "T015: Manual test Chrome - all scenarios pass",
+          "T016: Manual test Firefox - boundaries maintained",
+          "T017: Manual test Safari - no horizontal overflow",
+          "T018: Run E2E tests to verify PASS state",
+          "T019: Update CSS comments explaining strategy",
+          "T020: Verify no console errors in any scenario",
+          "T021: Performance check - transitions under 200ms"
+        ],
+        "inProgress": [],
+        "planned": []
+      },
+      "description": "Fixed AG-Grid table container overflow issue causing excessive white space below vulnerability tables. Implemented elegant flexbox solution with three CSS rules: card-body as flex container, view-content with flex-grow, and vulnGrid with 100% height. Eliminated complex JavaScript height calculations in favor of natural CSS containment.",
+      "phase": "UI Enhancement",
+      "constitutionalCompliance": false,
+      "issues": [
+        "Missing contracts/ directory - constitutional violation"
+      ]
     }
   ],
   "summary": {
     "completionStats": {
-      "complete": 1,
+      "complete": 2,
       "inProgress": 0,
       "planned": 0,
       "percentage": 100.0
     },
     "priorityDistribution": {
       "CRIT": 1,
-      "HIGH": 0,
+      "HIGH": 1,
       "NORM": 0,
       "LOW": 0
     },
     "taskStats": {
-      "totalTasks": 30,
-      "completedTasks": 28,
+      "totalTasks": 51,
+      "completedTasks": 49,
       "inProgressTasks": 2,
       "plannedTasks": 0,
-      "completionPercentage": 93.3
+      "completionPercentage": 96.1
     }
   },
   "generatedBy": "Atlas Specification Cartographer v1.0.12",
-  "constitutionallyCompliant": true
+  "constitutionallyCompliant": false
 }

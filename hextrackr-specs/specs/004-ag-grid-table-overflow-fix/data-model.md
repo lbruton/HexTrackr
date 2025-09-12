@@ -5,7 +5,31 @@
 
 ## Overview
 
-This is a display-only fix that requires no database changes or new data entities. The data model consists of display configuration and CSS properties.
+**REALITY UPDATE**: This was a display-only fix solved with 3 simple flexbox CSS rules.
+
+**ACTUAL SOLUTION** (implemented by Gemini):
+
+```css
+.card-body.p-2 {
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+}
+
+.view-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#vulnGrid {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+}
+```
+
+The complex data model below was over-engineered. Simple flexbox eliminated all complexity.
 
 ## Display Components
 
