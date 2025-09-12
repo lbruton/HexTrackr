@@ -20,7 +20,6 @@
     <link rel="stylesheet" href="styles/shared/header.css">
     <link rel="stylesheet" href="styles/pages/vulnerabilities.css">
     <link rel="stylesheet" href="styles/utils/responsive.css">
-    <link rel="stylesheet" href="css/vulnerability-table.css">
     
     <!-- Chart.js for mini-charts - using local files -->
     <!-- Chart.js CSS is embedded in the library -->
@@ -817,12 +816,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body p-2">
+                        <div class="card-body" style="padding: 1rem; overflow: visible;">
                             <!-- Table View -->
                             <div id="tableView" class="view-content">
-                                <div class="ag-grid-container-wrapper" id="vulnGridWrapper">
-                                    <div id="vulnGrid" class="ag-theme-alpine"></div>
-                                </div>
+                                <div id="vulnGrid" class="ag-theme-alpine" style="width: 100%;"></div>
                             </div>
                             
                             <!-- Device Cards View -->
