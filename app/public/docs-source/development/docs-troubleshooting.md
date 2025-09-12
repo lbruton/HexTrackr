@@ -230,18 +230,17 @@ ls -la app/public/docs-html/
 sudo chown -R $USER:$USER app/public/docs-html/
 ```
 
-#### Template issues
+#### HTML Generation Script issues
 
 ```bash
 
-# Verify template exists
+# Verify the HTML generator script exists
 
-ls -la app/public/docs-html/template.html
+ls -la app/public/docs-html/html-content-updater.js
 
-# Check template has required placeholders
+# Check if the script has proper permissions
 
-grep "CONTENT WILL BE INJECTED HERE" app/public/docs-html/template.html
-grep "ACTIVE SPEC BANNER" app/public/docs-html/template.html
+ls -l app/public/docs-html/html-content-updater.js
 ```
 
 ### 5. Performance Issues
@@ -289,15 +288,15 @@ find app/public/docs-source -name "*.md" -size +1M -ls
 
 ### Common Error Messages
 
-#### "template.html not found"
+#### "html-content-updater.js not found"
 
 ```bash
 
-# Verify template location
+# Verify HTML generator script location
 
-ls app/public/docs-html/template.html
+ls app/public/docs-html/html-content-updater.js
 
-# If missing, template is required for generation
+# If missing, the script is required for generation
 
 # Check if it was accidentally deleted or moved
 

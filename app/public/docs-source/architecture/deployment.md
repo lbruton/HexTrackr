@@ -31,7 +31,7 @@ HexTrackr runs as a single process inside one container (monolith pattern). No s
 | Process Model | Single node process started via `node server.js` |
 | Persistence | Bind-mounted `data/` directory for the SQLite file |
 | Health Probe | `GET /health` (returns JSON with status, version, uptime) |
-| Port | 8080 (container & host) |
+| Port | 8080 (internal container), 8989 (external host mapping) |
 | Logging | Stdout/stderr (structured JSON not yet implemented) |
 
 ---
@@ -42,7 +42,7 @@ HexTrackr runs as a single process inside one container (monolith pattern). No s
 
 | Service | Purpose | Key Config |
 | ------- | ------- | ---------- |
-| `hextrackr` | Runs the monolithic app | Port 8080, bind mounts for code & DB |
+| `hextrackr` | Runs the monolithic app | Port 8989:8080 mapping, bind mounts for code & DB |
 
 ### Notable Compose Settings
 
@@ -50,7 +50,7 @@ HexTrackr runs as a single process inside one container (monolith pattern). No s
   - `.:/app` (live‑reload style development inside container)
   - `./data:/app/data` (persists SQLite across restarts)
 - `environment`:
-  - `NODE_ENV=development` (current default; production overrides recommended)
+  - `NODE_ENV` is not set by default (undefined); can be overridden for production
 - `restart: unless-stopped` ensures resilience to host reboots.
 
 ---
@@ -62,7 +62,7 @@ Responsibilities:
 1. Set up Node runtime
 2. Copy `package.json` / install dependencies
 3. Copy application source (including docs, scripts, styles)
-4. Expose port 8080
+4. Expose port 8080 (internal container port)
 5. Define default command (`node server.js`)
 
 ### Build Context Notes
@@ -89,8 +89,8 @@ Current minimal set (implicit defaults):
 
 | Variable | Default | Purpose |
 | -------- | ------- | ------- |
-| `PORT` | 8080 | External listening port |
-| `NODE_ENV` | development | Influences Express behavior/perf hints |
+| `PORT` | 8080 | Internal container listening port |
+| `NODE_ENV` | undefined | Not set by default in docker-compose.yml |
 
 Planned / Recommended additions (future hardening):
 
@@ -125,7 +125,7 @@ Planned / Recommended additions (future hardening):
 
 1. Clone repository
 2. Run `docker compose up --build`
-3. Access app at `http://localhost:8080`
+3. Access app at `http://localhost:8989` (Docker maps 8989→8080)
 4. Load tickets (`/tickets.html`) or vulnerabilities (`/vulnerabilities.html`)
 5. Import CSV via UI or API (`POST /api/vulnerabilities/import`)
 
@@ -166,9 +166,9 @@ Add a cron (external) to snapshot `data/` daily.
 
 ---
 
-## Known Gaps (Tracked for v1.0.5)
+## Known Gaps
 
-- No `.dockerignore` (inflated build context)
+- `.dockerignore` file exists and is properly configured
 - No production multi‑stage image
 - No automated vulnerability scan in pipeline
 - No TLS termination example
