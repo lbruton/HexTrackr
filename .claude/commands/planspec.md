@@ -14,28 +14,21 @@ When user provides a rough idea, engage in dialogue to understand:
 4. **Constraints**: Any technical or business limitations?
 5. **Dependencies**: What existing features does this touch?
 
-## Phase 2: Research Context
-Before proposing approaches:
-1. Search Memento for similar features: `HEXTRACKR:SPEC:*`
-2. Look for related implementations in codebase
-3. Check for architectural patterns that apply
-4. Identify potential risks or conflicts
-
-## Phase 3: Explore Approaches
+## Phase 2: Explore Approaches
 Discuss potential solutions:
 - Present 2-3 different approaches if applicable
 - Highlight trade-offs of each approach
 - Consider edge cases and error scenarios
 - Discuss integration with existing features
 
-## Phase 4: Refine Requirements
+## Phase 3: Refine Requirements
 Work with user to clarify:
 - Specific metrics (e.g., "fast" → "<500ms response time")
 - Scale expectations (e.g., "many users" → "50+ concurrent")
 - Deployment details (e.g., "web app" → "Docker on port 8989")
 - Technology constraints from current stack
 
-## Phase 5: Generate Specification Prompt
+## Phase 4: Generate Specification Prompt
 Output a polished, detailed prompt for `/specify` that includes:
 - Clear problem statement
 - Concrete success criteria
@@ -51,10 +44,9 @@ Claude: Let me help you refine this idea. First, which table is having overflow 
 
 User: The AG-Grid vulnerability table - it scrolls horizontally on some screens
 
-Claude: I see. Let me research the current implementation...
-[Searches Memento and analyzes code]
+Claude: I see. Let me understand the current situation better...
 
-Currently, the AG-Grid is in a container with 15px padding. The overflow happens when:
+Based on what you've described, the overflow issue likely occurs when:
 - Viewport width is between 1024-1400px
 - More than 25 items are displayed
 
@@ -86,7 +78,7 @@ Would you like me to refine this further or shall we proceed to /specify?
 
 ## Key Principles:
 - **Ask, don't assume** - Get specific details from user
-- **Research first** - Check what exists before proposing
+- **Dialogue over research** - Focus on understanding user needs through conversation
 - **Concrete over vague** - Transform general ideas into specific requirements
 - **Validate understanding** - Confirm interpretation before proceeding
 

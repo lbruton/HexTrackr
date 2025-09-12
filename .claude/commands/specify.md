@@ -5,11 +5,6 @@ This is the second step in the Spec-Driven Development lifecycle (after /planspe
 
 Given the feature description provided as an argument (typically from /planspec output), do this:
 
-## Pre-Specification Phase
-1. Search Memento for similar specifications: `mcp__memento__search_nodes` with query "HEXTRACKR:SPEC:* [feature keywords]"
-2. Extract patterns and quality examples from existing specs
-3. Note any architectural patterns or constraints from similar features
-
 ## Specification Creation
 1. Run the script `hextrackr-specs/scripts/create-new-spec.sh --json "$ARGUMENTS"` from repo root and parse its JSON output for SPEC_NAME and SPEC_FILE. All file paths must be absolute.
 2. Load `hextrackr-specs/templates/spec-template.md` to understand required sections.
@@ -25,7 +20,7 @@ Given the feature description provided as an argument (typically from /planspec 
 - Every "scale" mention must have numbers (e.g., "100k records")
 - Every "user" mention must identify who (e.g., "network administrators")
 - Include "Context from Existing System" section if relevant
-- Reference similar features found in Memento search
+- Reference existing system components that will be affected
 
 ## Post-Specification
 1. Save to Memento: Create entity "HEXTRACKR:SPEC:[number]:[name]" with key observations
