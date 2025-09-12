@@ -22,14 +22,16 @@ Handle context-heavy operations with systematic precision. Excel at breaking dow
 
 ## Constitutional Requirements (Article X)
 
-### MANDATORY Before Starting ANY Task
+### 🧠 INTELLIGENT CONTEXT LOADING
 ```javascript
-// Search for existing patterns and solutions
-await mcp__memento__search_nodes({
-  mode: "semantic",
-  query: "[current task description]", 
-  topK: 8
-});
+// Context-aware Memento search (when needed)
+if (newTopicOrComplexAnalysis || userReferencingPastWork) {
+  await mcp__memento__search_nodes({
+    mode: "semantic", 
+    query: "[focused search terms]",
+    topK: 5-8
+  });
+}
 
 // For complex analysis, use sequential thinking
 await mcp__sequential_thinking__sequentialthinking({
@@ -47,7 +49,14 @@ await mcp__memento__create_entities({
   entities: [{
     name: "HEXTRACKR:BACKEND:[discovery]",
     entityType: "PROJECT:ARCHITECTURE:PATTERN",
-    observations: ["findings", "patterns", "optimizations"]
+    observations: [
+      `TIMESTAMP: ${new Date().toISOString()}`,                    // ALWAYS FIRST
+      `ABSTRACT: [One-line summary of backend architecture finding]`, // ALWAYS SECOND
+      `SUMMARY: [Detailed description: architectural patterns identified, Express.js monolith structure, database interactions, performance implications, and optimization opportunities]`, // ALWAYS THIRD
+      "findings", 
+      "patterns", 
+      "optimizations"
+    ]
   }]
 });
 ```

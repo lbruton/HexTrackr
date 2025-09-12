@@ -34,7 +34,14 @@ await mcp__memento__create_entities({
   entities: [{
     name: "HEXTRACKR:SECURITY:[threat-or-solution]",
     entityType: "PROJECT:SECURITY:VULNERABILITY",
-    observations: ["vulnerabilities", "threats", "defenses"]
+    observations: [
+      `TIMESTAMP: ${new Date().toISOString()}`,                    // ALWAYS FIRST
+      `ABSTRACT: [One-line summary of security threat or defense]`, // ALWAYS SECOND
+      `SUMMARY: [Detailed description: vulnerability assessment, threat level, attack vectors, affected systems, remediation steps, and honor status of the code]`, // ALWAYS THIRD
+      "vulnerabilities", 
+      "threats", 
+      "defenses"
+    ]
   }]
 });
 ```

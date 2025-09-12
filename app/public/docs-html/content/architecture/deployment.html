@@ -58,7 +58,7 @@
 </tr>
 <tr>
 <td>Port</td>
-<td>8080 (container &amp; host)</td>
+<td>8080 (internal container), 8989 (external host mapping)</td>
 </tr>
 <tr>
 <td>Logging</td>
@@ -79,7 +79,7 @@
 <tbody><tr>
 <td><code>hextrackr</code></td>
 <td>Runs the monolithic app</td>
-<td>Port 8080, bind mounts for code &amp; DB</td>
+<td>Port 8989:8080 mapping, bind mounts for code &amp; DB</td>
 </tr>
 </tbody></table>
 <h3>Notable Compose Settings</h3>
@@ -90,7 +90,7 @@
 </ul>
 </li>
 <li><code>environment</code>:<ul>
-<li><code>NODE_ENV=development</code> (current default; production overrides recommended)</li>
+<li><code>NODE_ENV</code> is not set by default (undefined); can be overridden for production</li>
 </ul>
 </li>
 <li><code>restart: unless-stopped</code> ensures resilience to host reboots.</li>
@@ -102,7 +102,7 @@
 <li>Set up Node runtime</li>
 <li>Copy <code>package.json</code> / install dependencies</li>
 <li>Copy application source (including docs, scripts, styles)</li>
-<li>Expose port 8080</li>
+<li>Expose port 8080 (internal container port)</li>
 <li>Define default command (<code>node server.js</code>)</li>
 </ol>
 <h3>Build Context Notes</h3>
@@ -160,12 +160,12 @@
 <tbody><tr>
 <td><code>PORT</code></td>
 <td>8080</td>
-<td>External listening port</td>
+<td>Internal container listening port</td>
 </tr>
 <tr>
 <td><code>NODE_ENV</code></td>
-<td>development</td>
-<td>Influences Express behavior/perf hints</td>
+<td>undefined</td>
+<td>Not set by default in docker-compose.yml</td>
 </tr>
 </tbody></table>
 <p>Planned / Recommended additions (future hardening):</p>
@@ -225,7 +225,7 @@
 <ol>
 <li>Clone repository</li>
 <li>Run <code>docker compose up --build</code></li>
-<li>Access app at <code>http://localhost:8080</code></li>
+<li>Access app at <code>http://localhost:8989</code> (Docker maps 8989→8080)</li>
 <li>Load tickets (<code>/tickets.html</code>) or vulnerabilities (<code>/vulnerabilities.html</code>)</li>
 <li>Import CSV via UI or API (<code>POST /api/vulnerabilities/import</code>)</li>
 </ol>
@@ -313,9 +313,9 @@
 </tbody></table>
 <p>Add a cron (external) to snapshot <code>data/</code> daily.</p>
 <hr>
-<h2>Known Gaps (Tracked for v1.0.5)</h2>
+<h2>Known Gaps</h2>
 <ul>
-<li>No <code>.dockerignore</code> (inflated build context)</li>
+<li><code>.dockerignore</code> file exists and is properly configured</li>
 <li>No production multi‑stage image</li>
 <li>No automated vulnerability scan in pipeline</li>
 <li>No TLS termination example</li>

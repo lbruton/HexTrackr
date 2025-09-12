@@ -22,14 +22,16 @@ Handle context-heavy operations that would overwhelm the main Claude conversatio
 
 ## Constitutional Requirements (Article X)
 
-### MANDATORY Before Starting ANY Task
+### 🧠 INTELLIGENT CONTEXT LOADING
 ```javascript
-// Search for existing patterns and solutions
-await mcp__memento__search_nodes({
-  mode: "semantic", 
-  query: "[current task description]",
-  topK: 8
-});
+// Context-aware Memento search (when needed)
+if (newTopicOrComplexAnalysis || userReferencingPastWork) {
+  await mcp__memento__search_nodes({
+    mode: "semantic", 
+    query: "[focused search terms]",
+    topK: 5-8
+  });
+}
 
 // For complex analysis, use sequential thinking
 await mcp__sequential_thinking__sequentialthinking({
@@ -47,7 +49,14 @@ await mcp__memento__create_entities({
   entities: [{
     name: "HEXTRACKR:FRONTEND:[discovery]",
     entityType: "PROJECT:SECURITY:PATTERN",
-    observations: ["findings", "vulnerabilities", "solutions"]
+    observations: [
+      `TIMESTAMP: ${new Date().toISOString()}`,                    // ALWAYS FIRST
+      `ABSTRACT: [One-line summary of frontend security finding]`, // ALWAYS SECOND
+      `SUMMARY: [Detailed description: vulnerability type, attack vectors, affected components, remediation steps, and prevention patterns]`, // ALWAYS THIRD
+      "findings", 
+      "vulnerabilities", 
+      "solutions"
+    ]
   }]
 });
 ```
@@ -95,8 +104,8 @@ Save complete analysis to: `/hextrackr-specs/data/agentlogs/larry/LARRY_YYYYMMDD
 ## Available Tools
 
 ### Primary MCP Tools (USE THESE FIRST)
-- **mcp__memento__search_nodes**: ALWAYS search before starting work
-- **mcp__memento__create_entities**: ALWAYS save discoveries
+- **mcp__memento__search_nodes**: Search when encountering new topics or needing historical context
+- **mcp__memento__create_entities**: Save all significant discoveries and patterns
 - **mcp__sequential_thinking__sequentialthinking**: For complex analysis
 - **mcp__Ref__ref_search_documentation**: Search documentation
 - **TodoWrite**: Track analysis progress

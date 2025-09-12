@@ -1,0 +1,200 @@
+{
+  "generated": "2025-09-12T18:27:04.786Z",
+  "activeSpec": "001",
+  "sections": {
+    "api-reference": {
+      "title": "Api Reference",
+      "icon": "fas fa-code",
+      "indexFile": "api-reference/index",
+      "children": {
+        "backup-api": {
+          "file": "api-reference/backup-api",
+          "title": "Backup Api",
+          "path": "api-reference/backup-api.html"
+        },
+        "tickets-api": {
+          "file": "api-reference/tickets-api",
+          "title": "Tickets Api",
+          "path": "api-reference/tickets-api.html"
+        },
+        "vulnerabilities-api": {
+          "file": "api-reference/vulnerabilities-api",
+          "title": "Vulnerabilities Api",
+          "path": "api-reference/vulnerabilities-api.html"
+        }
+      }
+    },
+    "architecture": {
+      "title": "Architecture",
+      "icon": "fas fa-building",
+      "indexFile": "architecture/index",
+      "children": {
+        "backend": {
+          "file": "architecture/backend",
+          "title": "Backend",
+          "path": "architecture/backend.html"
+        },
+        "data-model": {
+          "file": "architecture/data-model",
+          "title": "Data Model",
+          "path": "architecture/data-model.html"
+        },
+        "database": {
+          "file": "architecture/database",
+          "title": "Database",
+          "path": "architecture/database.html"
+        },
+        "deployment": {
+          "file": "architecture/deployment",
+          "title": "Deployment",
+          "path": "architecture/deployment.html"
+        },
+        "frameworks": {
+          "file": "architecture/frameworks",
+          "title": "Frameworks",
+          "path": "architecture/frameworks.html"
+        },
+        "frontend": {
+          "file": "architecture/frontend",
+          "title": "Frontend",
+          "path": "architecture/frontend.html"
+        },
+        "refactoring-plan": {
+          "file": "architecture/refactoring-plan",
+          "title": "Refactoring Plan",
+          "path": "architecture/refactoring-plan.html"
+        },
+        "rollover-mechanism": {
+          "file": "architecture/rollover-mechanism",
+          "title": "Rollover Mechanism",
+          "path": "architecture/rollover-mechanism.html"
+        },
+        "spec-kit-integration": {
+          "file": "architecture/spec-kit-integration",
+          "title": "Spec Kit Integration",
+          "path": "architecture/spec-kit-integration.html"
+        }
+      }
+    },
+    "development": {
+      "title": "Development",
+      "icon": "fas fa-hammer",
+      "indexFile": "development/index",
+      "children": {
+        "coding-standards": {
+          "file": "development/coding-standards",
+          "title": "Coding Standards",
+          "path": "development/coding-standards.html"
+        },
+        "contributing": {
+          "file": "development/contributing",
+          "title": "Contributing",
+          "path": "development/contributing.html"
+        },
+        "docs-portal-guide": {
+          "file": "development/docs-portal-guide",
+          "title": "Docs Portal Guide",
+          "path": "development/docs-portal-guide.html"
+        },
+        "docs-troubleshooting": {
+          "file": "development/docs-troubleshooting",
+          "title": "Docs Troubleshooting",
+          "path": "development/docs-troubleshooting.html"
+        },
+        "testing-strategy": {
+          "file": "development/testing-strategy",
+          "title": "Testing Strategy",
+          "path": "development/testing-strategy.html"
+        }
+      }
+    },
+    "getting-started": {
+      "title": "Getting Started",
+      "icon": "fas fa-rocket",
+      "indexFile": "getting-started/index",
+      "children": {}
+    },
+    "security": {
+      "title": "Security",
+      "icon": "fas fa-shield-alt",
+      "indexFile": "security/index",
+      "children": {
+        "audit": {
+          "file": "security/audit",
+          "title": "Audit",
+          "path": "security/audit.html"
+        },
+        "overview": {
+          "file": "security/overview",
+          "title": "Overview",
+          "path": "security/overview.html"
+        },
+        "vulnerability-disclosure": {
+          "file": "security/vulnerability-disclosure",
+          "title": "Vulnerability Disclosure",
+          "path": "security/vulnerability-disclosure.html"
+        }
+      }
+    },
+    "user-guides": {
+      "title": "User Guides",
+      "icon": "fas fa-users",
+      "indexFile": "user-guides/index",
+      "children": {
+        "ticket-management": {
+          "file": "user-guides/ticket-management",
+          "title": "Ticket Management",
+          "path": "user-guides/ticket-management.html"
+        },
+        "vulnerability-management": {
+          "file": "user-guides/vulnerability-management",
+          "title": "Vulnerability Management",
+          "path": "user-guides/vulnerability-management.html"
+        }
+      }
+    },
+    "white-papers": {
+      "title": "White Papers",
+      "icon": "fas fa-file-alt",
+      "indexFile": "white-papers/index",
+      "children": {
+        "evolution-of-spec-kit": {
+          "file": "white-papers/evolution-of-spec-kit",
+          "title": "Evolution Of Spec Kit",
+          "path": "white-papers/evolution-of-spec-kit.html"
+        },
+        "the-three-stooges": {
+          "file": "white-papers/the-three-stooges",
+          "title": "The Three Stooges",
+          "path": "white-papers/the-three-stooges.html"
+        },
+        "the-vibe-coding-revolution": {
+          "file": "white-papers/the-vibe-coding-revolution",
+          "title": "The Vibe Coding Revolution",
+          "path": "white-papers/the-vibe-coding-revolution.html"
+        }
+      }
+    }
+  },
+  "specialFiles": {
+    "changelog": {
+      "file": "CHANGELOG",
+      "title": "Changelog",
+      "type": "special",
+      "path": "CHANGELOG.html"
+    },
+    "roadmap": {
+      "file": "ROADMAP",
+      "title": "Roadmap",
+      "type": "special",
+      "path": "ROADMAP.html"
+    },
+    "overview": {
+      "file": "overview",
+      "title": "Overview",
+      "type": "special",
+      "path": "overview.html"
+    }
+  },
+  "totalFiles": 36
+}

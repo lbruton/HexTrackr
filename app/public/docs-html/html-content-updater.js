@@ -312,6 +312,100 @@ class HtmlContentUpdater {
     }
 
     /**
+     * Generate content manifest for dynamic navigation
+     */
+    async generateContentManifest(sources) {
+        const manifest = {
+            generated: new Date().toISOString(),
+            activeSpec: this.activeSpec,
+            sections: {},
+            specialFiles: {},
+            totalFiles: sources.length
+        };
+
+        // Process regular sectioned files
+        for (const source of sources) {
+            const parts = source.relativePath.split("/");
+            
+            // Handle root-level special files
+            if (parts.length === 1) {
+                const fileName = parts[0].replace(".md", "");
+                const upperFileName = fileName.toUpperCase();
+                
+                // Special root files (CHANGELOG, ROADMAP, etc.)
+                if (["CHANGELOG", "ROADMAP", "SPRINT", "OVERVIEW"].includes(upperFileName)) {
+                    manifest.specialFiles[fileName.toLowerCase()] = {
+                        file: fileName,
+                        title: this.sanitizeTitle(fileName),
+                        type: "special",
+                        path: `${fileName}.html`
+                    };
+                }
+                continue;
+            }
+
+            // Handle sectioned files
+            const sectionName = parts[0];
+            const fileName = parts[1].replace(".md", "");
+            
+            if (!manifest.sections[sectionName]) {
+                manifest.sections[sectionName] = {
+                    title: this.sanitizeTitle(sectionName),
+                    icon: this.getSectionIcon(sectionName),
+                    indexFile: `${sectionName}/index`,
+                    children: {}
+                };
+            }
+
+            // Skip index files as they're handled at section level
+            if (fileName !== "index") {
+                manifest.sections[sectionName].children[fileName] = {
+                    file: `${sectionName}/${fileName}`,
+                    title: this.sanitizeTitle(fileName),
+                    path: `${sectionName}/${fileName}.html`
+                };
+            }
+        }
+
+        // Write manifest file
+        const manifestPath = path.join(process.cwd(), "app", "public", "docs-html", "content-manifest.json");
+        await PathValidator.safeWriteFile(manifestPath, JSON.stringify(manifest, null, 2));
+        
+        console.log(`📝 Content manifest generated: ${Object.keys(manifest.sections).length} sections, ${manifest.totalFiles} total files`);
+        return manifest;
+    }
+
+    /**
+     * Sanitize filename to proper title (kebab-case to Title Case)
+     */
+    sanitizeTitle(filename) {
+        return filename
+            .split("-")
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(" ");
+    }
+
+    /**
+     * Get appropriate icon for section
+     */
+    getSectionIcon(sectionName) {
+        const iconMap = {
+            "overview": "fas fa-home",
+            "getting-started": "fas fa-rocket",
+            "user-guides": "fas fa-users",
+            "api-reference": "fas fa-code",
+            "architecture": "fas fa-building",
+            "development": "fas fa-hammer",
+            "security": "fas fa-shield-alt",
+            "white-papers": "fas fa-file-alt",
+            "roadmap": "fas fa-map",
+            "changelog": "fas fa-list",
+            "sprint": "fas fa-running"
+        };
+        return iconMap[sectionName] || "fas fa-file-alt";
+    }
+
+    /**
      * Generate update report.
      */
     async generateUpdateReport(generatedFiles) {
@@ -437,6 +531,9 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
             
             // Clean up deleted files
             await this.cleanupDeletedFiles(generatedFiles);
+            
+            // Generate content manifest for dynamic navigation
+            await this.generateContentManifest(sources);
             
             // Generate summary report
             await this.generateUpdateReport(generatedFiles);

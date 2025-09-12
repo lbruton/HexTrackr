@@ -34,16 +34,12 @@ class GeminiTools {
     /**
      * Execute Gemini CLI with proper error handling
      */
-    async executeGemini(prompt, files = []) {
+    async executeGemini(prompt) {
         try {
-            // Build command with -p flag for prompt
-            let command = `gemini -p "${prompt.replace(/"/g, "\\\"")}"`;
+            // Simple command - Gemini reads files on demand from project root
+            const command = `gemini -p "${prompt.replace(/"/g, "\\\"")}"`;
             
-            // Add files if provided
-            if (files.length > 0) {
-                const fileArgs = files.map(f => `"${f}"`).join(" ");
-                command += ` ${fileArgs}`;
-            }
+            // Run from project root so Gemini can access all files
 
             console.log("🔮 Invoking Gemini for validation...");
             const { stdout, stderr } = await execAsync(command, {
@@ -161,6 +157,122 @@ class GeminiTools {
 
         const result = await this.executeGemini(prompt);
         return this.parseEscalation(result);
+    }
+
+    /**
+     * Comprehensive documentation audit with focused approach
+     */
+    async auditDocumentation(scope = "api") {
+        console.log(`🔍 Starting focused documentation audit: ${scope}...`);
+        
+        let auditPrompt = "";
+        
+        if (scope === "api") {
+            auditPrompt = `Audit HexTrackr API documentation for accuracy.
+
+Read the file: app/public/docs-source/api-reference/vulnerabilities-api.md
+Compare it with routes in: app/public/server.js
+
+Check if documented API endpoints actually exist in the Express server.
+Look for POST, GET, PUT, DELETE routes that match the documentation.
+
+For each inaccuracy found, report:
+- File: vulnerabilities-api.md
+- Section: [endpoint section]
+- Issue: [brief description]
+- Severity: CRITICAL/HIGH/MEDIUM/LOW
+- Current Text: [documented endpoint]
+- Should Be: [actual endpoint in server.js]`;
+        
+        } else if (scope === "database") {
+            auditPrompt = `Audit HexTrackr database documentation for accuracy.
+
+Read the file: app/public/docs-source/architecture/database.md
+Check the documented table schemas against the actual database structure.
+
+You can check the init file: app/public/scripts/init-database.js
+Look for CREATE TABLE statements and column definitions.
+
+Report any missing columns, incorrect data types, or wrong table names.`;
+        
+        } else if (scope === "ports") {
+            auditPrompt = `Audit HexTrackr port configuration documentation.
+
+Read files mentioning ports in: app/public/docs-source/
+Compare with: docker-compose.yml
+
+Check if documented ports match actual Docker configuration.
+Look for port 8080 vs 8989 discrepancies.`;
+        
+        } else {
+            auditPrompt = `Quick audit of HexTrackr documentation files in app/public/docs-source/
+
+Focus on obvious inaccuracies like:
+1. Wrong file paths 
+2. Missing API endpoints
+3. Incorrect port numbers
+4. Outdated dependency references
+
+Check 3-5 documentation files and report major issues only.`;
+        }
+
+        const result = await this.executeGemini(auditPrompt);
+        await this.saveLog("audit", scope, result);
+        return this.parseAuditFindings(result);
+    }
+
+    /**
+     * Parse audit findings into structured format
+     */
+    parseAuditFindings(result) {
+        const findings = {
+            summary: {
+                total: 0,
+                critical: 0,
+                high: 0,
+                medium: 0,
+                low: 0
+            },
+            issues: [],
+            raw: result
+        };
+
+        const lines = result.split("\n");
+        let currentIssue = {};
+        
+        for (const line of lines) {
+            const trimmed = line.trim();
+            
+            if (trimmed.startsWith("File:")) {
+                if (currentIssue.file) {
+                    findings.issues.push(currentIssue);
+                    findings.summary.total++;
+                    findings.summary[currentIssue.severity?.toLowerCase()] = 
+                        (findings.summary[currentIssue.severity?.toLowerCase()] || 0) + 1;
+                }
+                currentIssue = { file: trimmed.substring(5).trim() };
+            } else if (trimmed.startsWith("Section:")) {
+                currentIssue.section = trimmed.substring(8).trim();
+            } else if (trimmed.startsWith("Issue:")) {
+                currentIssue.issue = trimmed.substring(6).trim();
+            } else if (trimmed.startsWith("Severity:")) {
+                currentIssue.severity = trimmed.substring(9).trim();
+            } else if (trimmed.startsWith("Current Text:")) {
+                currentIssue.currentText = trimmed.substring(13).trim();
+            } else if (trimmed.startsWith("Should Be:")) {
+                currentIssue.shouldBe = trimmed.substring(10).trim();
+            }
+        }
+
+        // Don't forget the last issue
+        if (currentIssue.file) {
+            findings.issues.push(currentIssue);
+            findings.summary.total++;
+            findings.summary[currentIssue.severity?.toLowerCase()] = 
+                (findings.summary[currentIssue.severity?.toLowerCase()] || 0) + 1;
+        }
+
+        return findings;
     }
 
     /**
@@ -335,6 +447,13 @@ ${content}
                     console.log(JSON.stringify(securityResult, null, 2));
                     break;
                 
+                case "audit":
+                    const scope = args[0] || "api";
+                    console.log(`🔍 Auditing scope: ${scope}`);
+                    const auditResult = await gemini.auditDocumentation(scope);
+                    console.log(JSON.stringify(auditResult, null, 2));
+                    break;
+                
                 case "consensus":
                     const topic = args[0] || "general validation";
                     const files = args.slice(1);
@@ -361,6 +480,8 @@ Gemini Tools - "Zen Light" Free Validation
 
 Usage:
   gemini-tools validate [files...]      - Security validation
+  gemini-tools audit [scope]           - Documentation accuracy audit
+    - Scopes: api, database, ports, quick (default: api)
   gemini-tools consensus <topic> [files...] - Quick consensus
   gemini-tools review <changes> [files...] - Code review
   gemini-tools escalate <findings>     - Check if Zen needed

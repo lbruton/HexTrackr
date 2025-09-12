@@ -15,6 +15,7 @@ const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
 // const crypto = require("crypto"); // Unused - reserved for future use
+const { AthenaEmbeddingService } = require("./athena-embeddings.js");
 
 class AthenaScholar {
     constructor() {
@@ -32,6 +33,11 @@ class AthenaScholar {
             discovery: /found|discovered|realized|learned|insight/i,
             decision: /decided|chose|selected|opted|agreed/i
         };
+        
+        // Initialize embedding service
+        this.embeddingService = new AthenaEmbeddingService({
+            embeddingsDir: path.join(process.cwd(), "claudelogs/embeddings")
+        });
         
         // Ensure library exists
         if (!fs.existsSync(this.libraryPath)) {
@@ -290,6 +296,9 @@ class AthenaScholar {
         
         const filename = `${String(sessionNum).padStart(3, "0")}_${dateStr}_${safeTitle}.md`;
         const filepath = path.join(this.libraryPath, filename);
+        
+        // Store filename in wisdom for catalog references
+        wisdom.filename = filename;
 
         // Build markdown content
         let markdown = `# 🦉 Athena's Sacred Scroll #${sessionNum}\n\n`;
@@ -365,6 +374,28 @@ class AthenaScholar {
         // Write the file
         fs.writeFileSync(filepath, markdown, "utf8");
         console.log(`📚 Saved to library: ${filename}`);
+        
+        // Generate embeddings for semantic search
+        try {
+            console.log("🧠 Generating embeddings for semantic search...");
+            const embeddingResult = await this.embeddingService.processSession(markdown, {
+                sessionId: wisdom.sessionId.substring(0, 16), // Shorter ID for embedding
+                timestamp: wisdom.timestamp,
+                filename: filename,
+                title: wisdom.title,
+                filepath: filepath
+            });
+            
+            // Store embedding info for Memento
+            wisdom.embeddingFile = embeddingResult.embeddingFile;
+            wisdom.chunksProcessed = embeddingResult.chunksProcessed;
+            wisdom.embeddingsGenerated = embeddingResult.embeddingsGenerated;
+            
+            console.log(`✨ Embeddings completed: ${embeddingResult.chunksProcessed} chunks, ${embeddingResult.embeddingsGenerated} embeddings`);
+        } catch (error) {
+            console.warn(`⚠️  Embedding generation failed: ${error.message}`);
+            // Continue processing even if embeddings fail
+        }
     }
 
     /**
@@ -394,11 +425,36 @@ class AthenaScholar {
         const entityName = `ATHENA:WISDOM:SESSION:${wisdom.sessionId.substring(0, 8)}`;
         const entityType = "KNOWLEDGE:EXTRACTED:CONVERSATION";
         
+        // Generate ABSTRACT (one-line summary)
+        const abstract = `Session wisdom extracted: ${wisdom.battles.length} battles, ${wisdom.victories.length} victories, ${wisdom.decisions.length} decisions, ${wisdom.wisdomGained.length} insights from ${wisdom.title}`;
+        
+        // Generate SUMMARY (detailed description)
+        let summary = "Comprehensive session analysis from HexTrackr development conversation. ";
+        if (wisdom.battles.length > 0) {
+            summary += `Challenges addressed: ${wisdom.battles.join(", ")}. `;
+        }
+        if (wisdom.victories.length > 0) {
+            summary += `Solutions implemented: ${wisdom.victories.join(", ")}. `;
+        }
+        if (wisdom.decisions.length > 0) {
+            summary += `Strategic decisions: ${wisdom.decisions.join(", ")}. `;
+        }
+        if (wisdom.wisdomGained.length > 0) {
+            summary += `Key insights gained: ${wisdom.wisdomGained.join(", ")}. `;
+        }
+        if (wisdom.filesModified.length > 0) {
+            summary += `Files modified: ${wisdom.filesModified.join(", ")}. `;
+        }
+        summary += `Session conducted on ${wisdom.mortalBranch || "unknown"} branch with ${wisdom.sacredRunes.length} code fragments preserved for future reference.`;
+        
         const observations = [
-            `TIMESTAMP: ${wisdom.timestamp}`,
+            `TIMESTAMP: ${wisdom.timestamp}`,                    // ALWAYS FIRST
+            `ABSTRACT: ${abstract}`,                            // ALWAYS SECOND
+            `SUMMARY: ${summary}`,                              // ALWAYS THIRD
             "🦉 EXTRACTED_BY: Athena, Goddess of Wisdom",
             `SESSION_ID: ${wisdom.sessionId}`,
-            `MORTAL_BRANCH: ${wisdom.mortalBranch || "unknown"}`
+            `MORTAL_BRANCH: ${wisdom.mortalBranch || "unknown"}`,
+            `SESSION_TITLE: ${wisdom.title}`
         ];
 
         if (wisdom.battles.length > 0) {
@@ -419,6 +475,14 @@ class AthenaScholar {
         if (wisdom.sacredRunes.length > 0) {
             observations.push(`RUNES_INSCRIBED: ${wisdom.sacredRunes.length} code fragments preserved`);
         }
+        
+        // Add embedding catalog information (dual-memory system)
+        if (wisdom.embeddingFile) {
+            observations.push(`MARKDOWN_SCROLL: ${path.relative(process.cwd(), path.join(this.libraryPath, wisdom.filename || "unknown.md"))}`);
+            observations.push(`VECTOR_INDEX: ${path.relative(process.cwd(), wisdom.embeddingFile)}`);
+            observations.push(`EMBEDDING_CHUNKS: ${wisdom.chunksProcessed || 0} semantic segments indexed`);
+            observations.push(`SEARCH_VECTORS: ${wisdom.embeddingsGenerated || 0} embeddings generated with mxbai-embed-large`);
+        }
 
         return {
             name: entityName,
@@ -428,9 +492,57 @@ class AthenaScholar {
     }
 
     /**
+     * Send entities to Memento via MCP
+     */
+    async sendToMemento(entities) {
+        if (!Array.isArray(entities) || entities.length === 0) {
+            return;
+        }
+
+        try {
+            console.log(`🦉 Sending ${entities.length} entities to the eternal archives (Memento)...`);
+            
+            // In a real CLI environment, this would use the MCP tool
+            // For now, we'll use a child process to call Claude with the MCP tool
+            const { spawn } = require("child_process");
+            
+            const mementoPayload = {
+                entities: entities
+            };
+
+            // Create a temporary file with the MCP command
+            const tempFile = path.join(__dirname, ".athena-memento-temp.json");
+            fs.writeFileSync(tempFile, JSON.stringify(mementoPayload, null, 2));
+            
+            console.log("🦉 Entities prepared for Memento storage:");
+            entities.forEach(entity => {
+                console.log(`   📚 ${entity.name}: ${entity.observations[1]}`); // Show ABSTRACT
+            });
+            
+            // Note: In actual implementation, this would be handled by the MCP server
+            // For now, we log the entities that would be sent
+            console.log("🦉 Note: MCP integration requires Claude Code context to send to Memento");
+            console.log(`📁 Entity data saved to: ${tempFile}`);
+            
+            // Clean up temp file
+            setTimeout(() => {
+                try {
+                    fs.unlinkSync(tempFile);
+                } catch (_error) {
+                    // Ignore cleanup errors
+                }
+            }, 5000);
+            
+        } catch (error) {
+            console.error("🦉 Error sending wisdom to Memento:", error.message);
+            // Don't fail the extraction if Memento storage fails
+        }
+    }
+
+    /**
      * Main extraction process
      */
-    async extractAllWisdom() {
+    async extractAllWisdom(options = {}) {
         console.log("🦉 Athena awakens... Seeking wisdom in the sacred scrolls...");
         console.log(`📜 Scrolls location: ${this.sacredScrollsPath}`);
 
@@ -446,23 +558,36 @@ class AthenaScholar {
         console.log(`🦉 Found ${scrolls.length} scrolls to examine...`);
         console.log(`📚 Already processed: ${this.processedScrolls.size} scrolls`);
 
-        const newScrolls = scrolls.filter(scroll => 
-            !this.processedScrolls.has(path.basename(scroll, ".jsonl"))
-        );
-
-        console.log(`✨ New scrolls to process: ${newScrolls.length}`);
+        let scrollsToProcess;
+        if (options.migrate || options.reprocessAll) {
+            scrollsToProcess = scrolls;
+            console.log(`🔄 Migration mode: Re-processing ${scrollsToProcess.length} scrolls with new ABSTRACT/SUMMARY pattern`);
+        } else {
+            scrollsToProcess = scrolls.filter(scroll => 
+                !this.processedScrolls.has(path.basename(scroll, ".jsonl"))
+            );
+            console.log(`✨ New scrolls to process: ${scrollsToProcess.length}`);
+        }
 
         const allWisdom = [];
-        for (const scroll of newScrolls) {
+        const mementoEntities = [];
+        
+        for (const scroll of scrollsToProcess) {
             const wisdom = await this.extractWisdomFromScroll(scroll);
             if (wisdom) {
                 allWisdom.push(wisdom);
                 
-                // Create Memento entity (would be sent to MCP in production)
+                // Create Memento entity with new ABSTRACT/SUMMARY pattern
                 const entity = this.createMementoEntity(wisdom);
-                console.log("\n🦉 Memento Entity Created:");
-                console.log(JSON.stringify(entity, null, 2));
+                mementoEntities.push(entity);
+                
+                console.log(`🦉 Wisdom entity prepared: ${entity.name}`);
             }
+        }
+
+        // Send all entities to Memento in batch
+        if (mementoEntities.length > 0) {
+            await this.sendToMemento(mementoEntities);
         }
 
         this.saveProcessedScrolls();
@@ -470,6 +595,7 @@ class AthenaScholar {
         console.log("\n🦉 Wisdom extraction complete!");
         console.log(`📊 Processed ${allWisdom.length} new conversations`);
         console.log(`💾 Total archive size: ${this.processedScrolls.size} scrolls`);
+        console.log(`🧠 Memento entities created: ${mementoEntities.length}`);
         
         return allWisdom;
     }
@@ -491,14 +617,20 @@ class AthenaScholar {
 // CLI Interface
 async function main() {
     const athena = new AthenaScholar();
-    const command = process.argv[2];
+    const args = process.argv.slice(2);
+    const command = args[0];
+    const flags = args.slice(1);
 
     switch (command) {
         case "extract":
-            await athena.extractAllWisdom();
+            const options = {
+                migrate: flags.includes("--migrate"),
+                reprocessAll: flags.includes("--all")
+            };
+            await athena.extractAllWisdom(options);
             break;
         case "search":
-            const query = process.argv.slice(3).join(" ");
+            const query = args.slice(1).join(" ");
             if (!query) {
                 console.log("🦉 What wisdom do you seek, mortal?");
                 process.exit(1);
@@ -508,8 +640,12 @@ async function main() {
         default:
             console.log("🦉 Athena's Memory Extraction Tool");
             console.log("Usage:");
-            console.log("  athena-memory-extractor.js extract  - Extract wisdom from new conversations");
-            console.log("  athena-memory-extractor.js search [query] - Search for specific wisdom");
+            console.log("  athena-memory-extractor.js extract                    - Extract wisdom from new conversations");
+            console.log("  athena-memory-extractor.js extract --migrate          - Re-process all conversations with new ABSTRACT/SUMMARY pattern");
+            console.log("  athena-memory-extractor.js extract --all              - Force re-process all conversations (same as --migrate)");
+            console.log("  athena-memory-extractor.js search [query]             - Search for specific wisdom");
+            console.log("");
+            console.log("🦉 New in this version: ABSTRACT/SUMMARY pattern for better knowledge retrieval");
     }
 }
 

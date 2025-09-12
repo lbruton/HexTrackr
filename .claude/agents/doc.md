@@ -79,6 +79,9 @@ await mcp__memento__create_entities({
     name: "HEXTRACKR:DOCS:GENERATION_" + timestamp,
     entityType: "PROJECT:DOCUMENTATION:EXECUTION",
     observations: [
+      `TIMESTAMP: ${new Date().toISOString()}`,                    // ALWAYS FIRST
+      `ABSTRACT: [One-line summary of documentation generation result]`, // ALWAYS SECOND
+      `SUMMARY: [Detailed description: HTML files generated, validation status, execution time, scripts run, and output locations verified]`, // ALWAYS THIRD
       "Generated X HTML files",
       "Validation status: success/failure",
       "Execution time: Xs"

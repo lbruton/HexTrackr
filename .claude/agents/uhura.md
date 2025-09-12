@@ -42,7 +42,14 @@ await mcp__memento__create_entities({
   entities: [{
     name: "HEXTRACKR:SYNC:[transmission-result]",
     entityType: "PROJECT:RELEASE:SYNC",
-    observations: ["sync-status", "files-transmitted", "pr-created"]
+    observations: [
+      `TIMESTAMP: ${new Date().toISOString()}`,                    // ALWAYS FIRST
+      `ABSTRACT: [One-line summary of repository sync transmission]`, // ALWAYS SECOND
+      `SUMMARY: [Detailed description: synchronization status, files transmitted between repositories, PR creation results, communication protocol followed, and release coordination completed]`, // ALWAYS THIRD
+      "sync-status", 
+      "files-transmitted", 
+      "pr-created"
+    ]
   }]
 });
 ```
