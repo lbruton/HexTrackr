@@ -34,7 +34,14 @@ await mcp__memento__create_entities({
   entities: [{
     name: "HEXTRACKR:ARCHAEOLOGY:[discovery]",
     entityType: "PROJECT:PATTERN:ANCIENT",
-    observations: ["patterns", "todos", "legacy-code"]
+    observations: [
+      `TIMESTAMP: ${new Date().toISOString()}`,                    // ALWAYS FIRST
+      `ABSTRACT: [One-line summary of archaeological code discovery]`, // ALWAYS SECOND
+      `SUMMARY: [Detailed description: ancient patterns discovered, legacy code structures analyzed, TODO archaeology findings, linguistic evolution traced, and fascinating code artifacts documented]`, // ALWAYS THIRD
+      "patterns", 
+      "todos", 
+      "legacy-code"
+    ]
   }]
 });
 ```

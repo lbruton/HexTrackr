@@ -88,6 +88,18 @@ The `/security-team` command orchestrates all three in sequence:
 2. Worf - Security enforcement
 3. Uhura - Repository synchronization (if release mode)
 
+## Validation Team
+
+### External CLI Agents
+- **GEMINI**: Free Validation System ("Zen Light" - $0 daily validation)
+- **CODEX**: GPT-5 Code Generation Specialist (targeted solutions)
+
+### How They Work
+1. **Gemini**: Uses Google's CLI for free validation, security checks, consensus
+2. **Codex**: Uses OpenAI's CLI for GPT-5 code generation and debugging
+3. Both integrate with existing HexTrackr workflow and save to Memento
+4. Part of three-tier validation: Gemini (free) → Codex (targeted) → Zen (comprehensive)
+
 ## Documentation Team
 
 ### Core Members

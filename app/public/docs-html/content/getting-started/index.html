@@ -35,11 +35,11 @@ cd HexTrackr
 </code></pre>
 </li>
 <li><p><strong>Access HexTrackr</strong></p>
-<p> The application will be available at <code>http://localhost:8080</code>.</p>
+<p> The application will be available at <code>http://localhost:8989</code>.</p>
 <ul>
-<li><strong>Tickets Management</strong>: <code>http://localhost:8080/tickets.html</code></li>
-<li><strong>Vulnerabilities Management</strong>: <code>http://localhost:8080/vulnerabilities.html</code></li>
-<li><strong>Documentation Portal</strong>: <code>http://localhost:8080/docs-html/</code></li>
+<li><strong>Tickets Management</strong>: <code>http://localhost:8989/tickets.html</code></li>
+<li><strong>Vulnerabilities Management</strong>: <code>http://localhost:8989/vulnerabilities.html</code></li>
+<li><strong>Documentation Portal</strong>: <code>http://localhost:8989/docs-html/</code></li>
 </ul>
 </li>
 <li><p><strong>Stopping the Application</strong></p>
@@ -75,7 +75,8 @@ cd HexTrackr
 <li><p><strong>Start the Development Server</strong></p>
 <pre><code class="language-bash">node server.js
 </code></pre>
-<p> The server will start, and you can access the application at <code>http://localhost:8080</code>.</p>
+<p> The server will start on port 8080 internally. When running locally without Docker, access the application at <code>http://localhost:8080</code>.</p>
+<p> <strong>Note</strong>: When using Docker, the application is accessible at <code>http://localhost:8989</code> due to port mapping.</p>
 </li>
 </ol>
 <h3>Development Scripts</h3>

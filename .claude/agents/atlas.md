@@ -41,7 +41,9 @@ await mcp__memento__create_entities({
     name: "HEXTRACKR:ROADMAP:[discovery]",
     entityType: "PROJECT:SPECIFICATION:METADATA",
     observations: [
-      `TIMESTAMP: ${new Date().toISOString()}`,  // ALWAYS FIRST
+      `TIMESTAMP: ${new Date().toISOString()}`,                    // ALWAYS FIRST
+      `ABSTRACT: [One-line summary of roadmap/specification finding]`, // ALWAYS SECOND
+      `SUMMARY: [Detailed description: specification status analyzed, version history updated, progress metrics extracted, roadmap changes made, and cartographic precision maintained]`, // ALWAYS THIRD
       "findings", 
       "patterns", 
       "decisions"

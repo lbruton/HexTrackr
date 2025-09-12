@@ -40,7 +40,14 @@ await mcp__memento__create_entities({
   entities: [{
     name: "HEXTRACKR:META:[synthesis]",
     entityType: "PROJECT:ANALYSIS:AGGREGATE",
-    observations: ["combined-findings", "cross-references", "synthesis"]
+    observations: [
+      `TIMESTAMP: ${new Date().toISOString()}`,                    // ALWAYS FIRST
+      `ABSTRACT: [One-line summary of meta-analysis synthesis]`,  // ALWAYS SECOND
+      `SUMMARY: [Detailed description: sources analyzed, cross-references found, combined findings synthesized, and comprehensive insights aggregated from multiple research operations]`, // ALWAYS THIRD
+      "combined-findings", 
+      "cross-references", 
+      "synthesis"
+    ]
   }]
 });
 ```

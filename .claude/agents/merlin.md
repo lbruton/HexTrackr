@@ -40,7 +40,14 @@ await mcp__memento__create_entities({
   entities: [{
     name: "HEXTRACKR:DOCS:TRUTH:[revelation]",
     entityType: "PROJECT:DOCUMENTATION:AUDIT",
-    observations: ["discrepancies", "truths-revealed", "prophecies"]
+    observations: [
+      `TIMESTAMP: ${new Date().toISOString()}`,                    // ALWAYS FIRST
+      `ABSTRACT: [One-line summary of documentation truth revealed]`, // ALWAYS SECOND
+      `SUMMARY: [Detailed description: discrepancies found between code and documentation, truth levels assessed, illusions dispelled, and prophecies for future drift]`, // ALWAYS THIRD
+      "discrepancies", 
+      "truths-revealed", 
+      "prophecies"
+    ]
   }]
 });
 ```

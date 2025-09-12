@@ -40,7 +40,14 @@ await mcp__memento__create_entities({
   entities: [{
     name: "HEXTRACKR:COMPLIANCE:[audit-result]",
     entityType: "PROJECT:CONSTITUTIONAL:AUDIT",
-    observations: ["violations", "article-compliance", "education-needed"]
+    observations: [
+      `TIMESTAMP: ${new Date().toISOString()}`,                    // ALWAYS FIRST
+      `ABSTRACT: [One-line summary of constitutional compliance audit]`, // ALWAYS SECOND
+      `SUMMARY: [Detailed description: constitutional articles checked, violations identified, compliance status assessed, educational guidance provided, and spec-kit methodology enforced]`, // ALWAYS THIRD
+      "violations", 
+      "article-compliance", 
+      "education-needed"
+    ]
   }]
 });
 ```

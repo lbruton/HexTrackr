@@ -40,7 +40,14 @@ await mcp__memento__create_entities({
   entities: [{
     name: "HEXTRACKR:CREATIVE:[discovery]",
     entityType: "PROJECT:SOLUTION:PATTERN",
-    observations: ["findings", "patterns", "creative-solutions"]
+    observations: [
+      `TIMESTAMP: ${new Date().toISOString()}`,                    // ALWAYS FIRST
+      `ABSTRACT: [One-line summary of creative solution discovered]`, // ALWAYS SECOND
+      `SUMMARY: [Detailed description: unconventional approach taken, unexpected connections found, creative patterns identified, and innovative solutions proposed]`, // ALWAYS THIRD
+      "findings", 
+      "patterns", 
+      "creative-solutions"
+    ]
   }]
 });
 ```
