@@ -10,12 +10,13 @@ This API provides endpoints for managing and analyzing vulnerability data. It fe
 
 ### GET /api/vulnerabilities
 
-- **Description**: Retrieves a paginated list of current vulnerabilities.
+- **Description**: Retrieves a paginated list of active vulnerabilities. Automatically filters by lifecycle_state IN ('active', 'reopened') to exclude resolved vulnerabilities.
 - **Query Parameters**:
   - `page` (number, optional, default: 1): The page number to retrieve.
   - `limit` (number, optional, default: 50): The number of items per page.
   - `search` (string, optional): A search term to filter by hostname, CVE, or plugin name.
   - `severity` (string, optional): Filter by severity (`Critical`, `High`, `Medium`, `Low`).
+- **Note**: This endpoint only returns active and reopened vulnerabilities. Use `/api/vulnerabilities/resolved` for resolved vulnerabilities.
 - **Response**: `200 OK`
 
     ```json
@@ -89,20 +90,52 @@ This API provides endpoints for managing and analyzing vulnerability data. It fe
     ]
     ```
 
+### GET /api/vulnerabilities/resolved
+
+- **Description**: Retrieves a paginated list of resolved vulnerabilities (lifecycle_state = 'resolved').
+- **Query Parameters**:
+  - `page` (number, optional, default: 1): The page number to retrieve.
+  - `limit` (number, optional, default: 50): The number of items per page.
+  - `search` (string, optional): A search term to filter by hostname, CVE, or plugin name.
+- **Response**: `200 OK`
+
+    ```json
+    {
+      "data": [
+        {
+          "id": 15,
+          "hostname": "server-01",
+          "cve": "CVE-2023-1234",
+          "severity": "High",
+          "lifecycle_state": "resolved",
+          "resolved_date": "2025-08-15",
+          "last_seen": "2025-08-10"
+        }
+      ],
+      "pagination": { "page": 1, "limit": 50, "total": 45, "pages": 1 }
+    }
+    ```
+
 ---
 
 ## Data Import & History
 
-HexTrackr provides two distinct methods for importing vulnerability data:
+HexTrackr provides three distinct methods for importing vulnerability data:
 
-1. **CSV File Upload** (`/api/vulnerabilities/import`): For direct upload of CSV files that are parsed on the server.
-2. **JSON Payload** (`/api/import/vulnerabilities`): For pre-processed data that has already been parsed into JSON format on the client.
+1. **CSV File Upload** (`/api/vulnerabilities/import`): Server-side CSV parsing - upload raw CSV files and let the server handle all parsing logic.
+2. **Staging Import** (`/api/vulnerabilities/import-staging`): Server-side staged import with enhanced performance for large datasets.
+3. **JSON Payload** (`/api/import/vulnerabilities`): Client-side CSV parsing - parse CSV into JSON on the frontend before sending to server.
+
+**Key Differences:**
+
+- **Server-side parsing** (`/import`): Upload CSV directly, server handles format detection and parsing
+- **Client-side parsing** (`/api/import/vulnerabilities`): Frontend parses CSV to JSON, then sends structured data
 
 The appropriate method depends on your integration needs and client-side capabilities.
 
 ### POST /api/vulnerabilities/import
 
-- **Description**: Imports vulnerabilities from an uploaded CSV file. This is the primary endpoint for server-side processing of vulnerability scans. **Fixed in v1.0.5**: Resolved critical bug where missing `apiBase` property caused 404 errors during CSV upload attempts.
+- **Description**: Imports vulnerabilities from an uploaded CSV file. This is the primary endpoint for server-side processing of vulnerability scans.
 - **Enhanced Features**:
   - **Multi-format Support**: Automatically detects and processes various CSV export formats
   - **Cisco SA Support**: Extracts and processes Cisco Security Advisory identifiers (`cisco-sa-*` patterns)
@@ -123,6 +156,34 @@ The appropriate method depends on your integration needs and client-side capabil
   "insertCount": 200,
   "updateCount": 50,
   "removedStale": 10
+}
+```
+
+### POST /api/vulnerabilities/import-staging
+
+- **Description**: Enhanced staging import endpoint for vulnerability data with performance optimizations and advanced processing features.
+- **Request Body**: `multipart/form-data`
+  - `csvFile` (file, required): The CSV file to import.
+  - `vendor` (string, optional): The source of the data (e.g., "cisco", "tenable").
+  - `scanDate` (string, optional): The date of the scan in `YYYY-MM-DD` format. Auto-extracted from filename if not provided.
+- **Enhanced Features**:
+  - **Staging Table Processing**: Uses temporary staging table for improved performance on large datasets
+  - **Filename Date Extraction**: Automatically extracts scan dates from common filename patterns
+  - **Enhanced Performance Monitoring**: Detailed timing and processing statistics
+- **Response**: `200 OK`
+
+```json
+{
+  "success": true,
+  "importId": 12,
+  "stagingRowsProcessed": 10000,
+  "finalRowsInserted": 9850,
+  "filename": "cisco_scan_2025-08-20.csv",
+  "processingTime": 2340,
+  "performance": {
+    "stagingTime": 1200,
+    "processingTime": 1140
+  }
 }
 ```
 
