@@ -20,7 +20,7 @@ HexTrackr uses Playwright for comprehensive browser automation testing, providin
 **Prerequisites**:
 
 - Docker container must be restarted before running tests: `docker-compose restart`
-- Tests expect `http://localhost:8080` and clean container state
+- Tests expect `http://localhost:8989` when using Docker (external port mapping)
 - All tests designed to be idempotent and handle existing data gracefully
 
 **Running Tests**:

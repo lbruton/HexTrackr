@@ -4,7 +4,7 @@ This guide explains how the HexTrackr Documentation Portal v2.0 works and how to
 
 ## Overview
 
-The Documentation Portal v2.0 (`docs-portal-v2.js`) is a modern, auto-discovering documentation system built with:
+The Documentation Portal v2.0 is a modern, auto-discovering single-page application (SPA) built with:
 
 - **Tabler.io**: Primary UI framework (built on Bootstrap foundation)
 - **Bootstrap Collapse**: Collapsible navigation components (via Tabler.io)
@@ -21,17 +21,17 @@ The Documentation Portal v2.0 (`docs-portal-v2.js`) is a modern, auto-discoverin
 - **Caching**: Faster content loading with browser cache
 - **Responsive Design**: Works on all screen sizes
 - **Breadcrumb Navigation**: Shows current location
-- **Hash Routing**: Bookmarkable URLs
+- **Hash Routing**: Bookmarkable URLs using hash-based navigation (#section/page)
 
 ### File Structure
 
 ```text
 docs-html/
-├── index.html              # Main portal HTML
-├── template.html           # Master template for content
-├── html-content-updater.js # Markdown to HTML converter
+├── index.html              # Main portal HTML (Single Page Application)
+├── html-content-updater.js # Markdown to HTML converter (generates content)
 ├── js/
-│   └── docs-portal-v2.js   # Portal JavaScript (this file)
+│   ├── docs-portal-v2.js   # Portal JavaScript (navigation & routing)
+│   └── roadmap-table-sorter.js # Roadmap table sorting functionality
 └── content/                # Generated HTML content
     ├── OVERVIEW.html       # Overview page
     ├── ROADMAP.html        # Roadmap page
@@ -243,8 +243,10 @@ docs-source/development/new-process.md
 1. **Regenerate HTML content**:
 
 ```bash
-cd docs-html
+cd app/public/docs-html
 node html-content-updater.js
+# Or from project root:
+npm run docs:generate
 ```
 
 1. **View in portal**: Navigate to the documentation portal and the new content will appear automatically
@@ -327,8 +329,8 @@ The portal includes comprehensive error handling:
 
 1. **Content not appearing**:
    - Verify markdown files exist in `docs-source/`
-   - Run content generator: `node docs-html/html-content-updater.js`
-   - Check generation report: `logs/docs-source/html-update-report.md`
+   - Run content generator: `node app/public/docs-html/html-content-updater.js`
+   - Check console output for generation errors
 
 1. **Navigation order incorrect**:
    - Special sections have fixed ordering (Overview, Getting Started, then alphabetical)

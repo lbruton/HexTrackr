@@ -13,7 +13,7 @@ This page documents the frameworks and libraries used across HexTrackr, what the
 
 - Purpose: Layout, components, and page structure for the dashboard, modals, buttons, and forms.
 - Where:
-  - `vulnerabilities.html` (primary UI), `tickets.html` (loaded, migration tracked in roadmap), `docs-prototype/index.html` (docs SPA)
+  - `vulnerabilities.html` (primary UI), `tickets.html` (loaded, migration tracked in roadmap), `docs-html/index.html` (docs SPA)
   - CDN: `@tabler/core@1.0.0-beta17` CSS/JS
 - Notes: Used with shared header/footer and settings modal.
 
@@ -26,7 +26,7 @@ This page documents the frameworks and libraries used across HexTrackr, what the
 ### Font Awesome
 
 - Purpose: Icons across UI and docs.
-- Where: `tickets.html`, `vulnerabilities.html`, `docs-prototype/index.html`
+- Where: `tickets.html`, `vulnerabilities.html`, `docs-html/index.html`
 
 ## Data Grid & Charts
 
@@ -50,6 +50,7 @@ This page documents the frameworks and libraries used across HexTrackr, what the
 ### Chart.js
 
 - Purpose: Mini inline charts on cards.
+- Note: Coexists with ApexCharts; future consolidation planned.
 - Where:
   - `vulnerabilities.html` (`scripts/chart.min.js`)
   - File: `scripts/chart.min.js` (vendored, ignored by linters)
@@ -59,12 +60,12 @@ This page documents the frameworks and libraries used across HexTrackr, what the
 ### PrismJS (runtime highlighting)
 
 - Purpose: Client-side code syntax highlighting in docs portal.
-- Where: `docs-prototype/index.html`, `docs-prototype/js/docs-tabler.js` (`Prism.highlightAllUnder(...)`)
+- Where: `docs-html/index.html`, `docs-html/js/docs-tabler.js` (`Prism.highlightAllUnder(...)`)
 
 ### marked + highlight.js (build-time)
 
 - Purpose: Markdown → HTML conversion for docs generation.
-- Where: `docs-prototype/html-content-updater.js` (uses `marked` with `highlight.js`)
+- Where: `docs-html/html-content-updater.js` (uses `marked` with `highlight.js`)
 
 ## File, CSV, PDF & Excel Tooling
 
@@ -100,10 +101,11 @@ This page documents the frameworks and libraries used across HexTrackr, what the
 - Purpose: Database for server-backed features and future migrations.
 - Where: `server.js`, `data/hextrackr.db`, `scripts/init-db-production.sql`
 
-### multer, compression, cors, dotenv
+### multer, compression, cors
 
-- Purpose: Upload handling, response compression, CORS headers, environment config.
+- Purpose: Upload handling, response compression, CORS headers.
 - Where: `server.js` (respective imports and middleware usage)
+- Note: `dotenv` is not currently used in the project
 
 ## Developer Tooling (not shipped to users)
 
@@ -128,7 +130,7 @@ This page documents the frameworks and libraries used across HexTrackr, what the
 - PapaParse: 5.4.1 (CDN + npm), JSZip: 3.10.1 (CDN + npm)
 - XLSX (SheetJS): 0.18.5 (CDN)
 - jsPDF: 2.5.1 + AutoTable 3.5.31 (CDN)
-- Express: ^4.18.2, sqlite3: ^5.1.6, multer: ^2.0.2, cors: ^2.8.5, compression: ^1.7.4, dotenv: ^17.2.1
+- Express: ^4.18.2, sqlite3: ^5.1.6, multer: ^2.0.2, cors: ^2.8.5, compression: ^1.7.4
 
 ---
 
