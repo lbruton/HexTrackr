@@ -262,12 +262,6 @@ function createVulnerabilityGridOptions(componentContext) {
         skipHeaderOnAutoSize: false,
         
         onGridReady: (params) => {
-            // Store API reference for container height management
-            componentContext.gridApi = params.api;
-            componentContext.columnApi = params.columnApi;
-            
-            // Note: Height management simplified - let AG-Grid domLayout: 'autoHeight' handle sizing
-            
             // Responsive column management on resize
             window.addEventListener("resize", debounce(() => {
                 if (componentContext.gridApi) {
@@ -351,9 +345,6 @@ function createVulnerabilityGridOptions(componentContext) {
         api.setColumnsVisible(columnsToShow, true);
         api.setColumnsVisible(columnsToHide, false);
     }
-
-    // Note: Container height management functions removed
-    // AG-Grid domLayout: 'autoHeight' now handles all height management automatically
 
     return gridOptions;
 }

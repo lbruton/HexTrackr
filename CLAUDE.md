@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # HexTrackr Project Configuration
 
 ## 🏛️ CONSTITUTIONAL AUTHORITY (SUPREME LAW)
@@ -121,6 +125,68 @@ ls hextrackr-specs/specs/[spec-number]/
 
 **NO EXCEPTIONS**: Create all files even if minimal. Use "N/A" for empty sections.
 
+## 🛠️ Development Commands
+
+### Essential Docker Commands
+
+```bash
+# Start development environment (REQUIRED - never run Node.js directly)
+docker-compose up -d        # Start on port 8989 (external) → 8080 (internal)
+docker-compose restart      # MANDATORY before running Playwright tests
+docker-compose logs -f      # View server logs
+```
+
+### Testing Commands
+
+```bash
+# Unit and Integration Tests (Jest)
+npm test                    # Run all Jest tests
+npm run test:unit          # Run unit tests only
+npm run test:integration   # Run integration tests only
+npm run test:coverage      # Generate coverage report
+
+# End-to-End Tests (Playwright)
+npm run test:e2e           # Run Playwright tests (requires docker-compose restart first)
+npm run test:all           # Run both Jest and Playwright tests
+```
+
+### Code Quality and Linting
+
+```bash
+# JavaScript/ESLint
+npm run eslint             # Check JavaScript code quality
+npm run eslint:fix         # Fix ESLint issues automatically
+
+# CSS/Stylelint  
+npm run stylelint          # Check CSS code quality
+npm run stylelint:fix      # Fix Stylelint issues automatically
+
+# Markdown
+npm run lint:md            # Check markdown files
+npm run lint:md:fix        # Fix markdown issues
+
+# All linting
+npm run lint:all           # Run all linters
+npm run fix:all            # Fix all auto-fixable issues
+```
+
+### Documentation Commands
+
+```bash
+# Generate documentation
+npm run docs:generate      # Update HTML documentation from specs
+npm run docs:sync-specs    # Sync specs to roadmap
+npm run docs:analyze       # Generate architecture analysis
+```
+
+### Database Commands
+
+```bash
+npm run init-db            # Initialize SQLite database (if needed)
+```
+
+**CRITICAL**: Always use Docker for development. Node.js commands should only be run inside the container or via npm scripts.
+
 ## 🎯 Project-Specific Memory Patterns
 
 ### Memory Namespace for HexTrackr
@@ -215,6 +281,28 @@ Mark sections "N/A" but file MUST exist.
 - **Pages**: `scripts/pages/` - Page logic
 - **Utils**: `scripts/utils/` - Utilities
 
+### Testing Architecture
+
+**Jest Configuration (jest.config.js)**
+
+- **Node Environment**: Unit tests (`__tests__/unit/`) and integration tests (`__tests__/integration/`)
+- **JSDOM Environment**: Frontend tests (`__tests__/shared/`, `__tests__/pages/`)
+- **Coverage**: Automatic collection with HTML reports in `__tests__/coverage/`
+
+**Playwright Configuration (playwright.config.js)**
+
+- **Base URL**: <http://localhost:8080> (internal container port)
+- **Test Location**: `__tests__/tests/` directory
+- **Browsers**: Chromium, Firefox, WebKit (all headless)
+- **Auto-start**: Runs `docker-compose up -d` before tests
+- **Reports**: HTML reports in `__tests__/playwright-report/`
+
+**Test Execution Order**
+
+1. **CRITICAL**: Run `docker-compose restart` before Playwright tests
+2. Unit/Integration tests can run without Docker restart
+3. E2E tests require running application on port 8080
+
 ### Performance Targets
 
 - Table loads: <500ms
@@ -255,7 +343,34 @@ Before ANY code changes:
 - Implement without tasks
 - Forget to save to Memento
 
+## 📋 Additional Context
+
+### Important Project Files
+
+- **Constitution**: `hextrackr-specs/memory/constitution.md` - Supreme law governing all development
+- **Active Spec**: `.active-spec` - Current working specification number
+- **Copilot Instructions**: `.github/copilot-instructions.md` - Extended AI assistant guidance
+- **Templates**: `hextrackr-specs/templates/` - Spec, plan, and task templates
+- **Scripts**: `hextrackr-specs/scripts/` - Automation for spec-kit workflow
+
+### Port Configuration
+
+- **External Access**: <http://localhost:8989> (Docker host mapping)
+- **Internal Container**: <http://localhost:8080> (application server)
+- **Playwright Tests**: Use internal port 8080
+- **Development Access**: Use external port 8989
+
+### MCP Tool Integration
+
+This project mandates extensive use of MCP (Model Context Protocol) tools:
+
+- **Memento**: Semantic search and knowledge graph (`mcp__memento__search_nodes`)
+- **Sequential Thinking**: Complex problem analysis (`mcp__sequential_thinking__sequentialthinking`)
+- **Ref Tools**: Documentation and pattern search (`mcp__Ref__ref_search_documentation`)
+- **Context7**: Offline framework documentation cache
+- **Zen**: Multi-model analysis and code review tools
+
+**MANDATORY**: Always search Memento before starting any task, save discoveries after completing work.
+
 ---
 *HexTrackr follows spec-kit methodology. See constitution for detailed rules.*
-
-- Project Documentation lives in /app/public/docs-source/ and the ref.tools MCP

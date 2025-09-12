@@ -5,6 +5,22 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.13] - 2025-01-12
+
+### Fixed
+
+#### AG-Grid Table Container Overflow (Spec 004)
+
+- Fixed AG-Grid table overflow causing excessive white space in Vulnerability Data Workspace
+- Removed problematic grid-height-manager.js calculations and vulnerability-table-fix.css
+- Implemented clean flexbox solution for natural container sizing:
+  - `.card-body.p-2` uses `display: flex` with consistent minimum height
+  - `.view-content` with `flex-grow: 1` for proper space distribution  
+  - `#vulnGrid` with `height: 100%; flex-grow: 1` for natural expansion
+- Table now properly expands for 10, 25, 50, 200 items without overflow or excessive padding
+- **Engineering Insight**: Simple CSS flexbox approach solved what complex JavaScript calculations could not
+- **Lesson Learned**: Elegant solutions often emerge from removing complexity rather than adding it
+
 ## [1.0.12](https://github.com/Lonnie-Bruton/HexTrackr/releases/tag/v1.0.12) - 2025-09-09
 
 ### Completed Tasks
