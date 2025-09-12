@@ -76,3 +76,11 @@ __tests__/test-results.json
 
 # Stooge analysis reports (temporary outputs)
 stooges/
+
+# Athena's Library of Sacred Scrolls
+# Keep the directory structure but not the actual conversation logs
+claudelogs/sessions/*.md
+!claudelogs/sessions/.gitkeep
+
+# Athena tracking file (preserve to avoid reprocessing)
+# scripts/.athena-processed-scrolls.json

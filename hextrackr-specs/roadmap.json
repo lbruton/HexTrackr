@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "1.0.13",
-    "lastUpdated": "2025-01-12T20:45:00.000Z",
+    "lastUpdated": "2025-09-12T13:57:39.392Z",
     "scannedBy": "Atlas",
     "totalSpecs": 2,
     "completedSpecs": 2,
@@ -32,7 +32,7 @@
       "tasks": {
         "completed": [
           "T001: Docker Environment Configuration",
-          "T002: Database Schema Creation", 
+          "T002: Database Schema Creation",
           "T003: Express.js Server Setup",
           "T004: Vulnerability Entity Model",
           "T005: Device Entity Model",
@@ -76,7 +76,7 @@
       "title": "AG-Grid Table Container Overflow Fix",
       "status": "COMPLETE",
       "priority": "HIGH",
-      "completionPercentage": 100.0,
+      "completionPercentage": 100,
       "totalTasks": 21,
       "completedTasks": 21,
       "inProgressTasks": 0,
@@ -131,7 +131,7 @@
       "complete": 2,
       "inProgress": 0,
       "planned": 0,
-      "percentage": 100.0
+      "percentage": 100
     },
     "priorityDistribution": {
       "CRIT": 1,
