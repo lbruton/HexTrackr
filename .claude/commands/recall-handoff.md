@@ -12,10 +12,10 @@ Recall a specific development handoff by ID: $ARGUMENTS
 
 **Memory Tools:**
 ```javascript
-// Primary recall by handoff ID - use keyword for exact match
+// Primary recall by handoff ID
 mcp__memento__search_nodes({
   query: "HANDOFF_ID [SPECIFIED_ID] PROJECT:DEVELOPMENT:HANDOFF",
-  mode: "keyword",        // Direct keyword matching for exact IDs
+  mode: "semantic",        // Semantic matching for better recall
   topK: 5
 })
 
@@ -24,8 +24,8 @@ mcp__memento__open_nodes({
   names: ["Found Handoff Entity Name"]
 })
 
-// Fallback: Check current session backup if not in Memento
-// Look for .claude/.handoff/handoff.json (current session only)
+// Check for JSON file if needed
+// Look for .claude/.handoff/[HANDOFF_ID].json
 ```
 
 **Search Strategies:**
@@ -59,7 +59,7 @@ mcp__memento__open_nodes({
 
 💡 Notes: [Additional context and important details]
 
-📁 Backup File: .claude/.handoff/handoff.json (current session only)
+📁 JSON File: .claude/.handoff/[HANDOFF_ID].json (if available)
 ```
 
 **Continuation Workflow:**

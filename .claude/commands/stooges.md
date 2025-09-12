@@ -11,25 +11,25 @@ Execute parallel research operations using Three Stooges context router agents t
 - Role: Wild-haired parallel execution worker
 - Tools: ALL available (zen, ref, memento, grep, bash, etc.)
 - Approach: Deep, thorough research
-- Output: `/hextrackr-specs/data/agentlogs/larry/LARRY_[timestamp].md`
+- Output: `LARRY_[timestamp].md`
 
 **MOE** - General Purpose Context Router  
 - Role: Bossy, organized parallel execution worker
 - Tools: ALL available (zen, ref, memento, grep, bash, etc.)
 - Approach: Systematic, methodical research
-- Output: `/hextrackr-specs/data/agentlogs/moe/MOE_[timestamp].md`
+- Output: `MOE_[timestamp].md`
 
 **CURLY** - General Purpose Context Router
 - Role: Creative, energetic parallel execution worker
 - Tools: ALL available (zen, ref, memento, grep, bash, etc.)
 - Approach: Experimental, pattern-seeking research
-- Output: `/hextrackr-specs/data/agentlogs/curly/CURLY_[timestamp].md`
+- Output: `CURLY_[timestamp].md`
 
 **SHEMP** - Overflow Context Router
 - Role: Reliable backup and meta-analysis specialist
 - Tools: ALL available + cross-stooge aggregation
 - Approach: Overflow handling and result synthesis
-- Output: `/hextrackr-specs/data/agentlogs/shemp/SHEMP_[timestamp].md`
+- Output: `SHEMP_[timestamp].md`
 
 ## Execution
 
@@ -56,26 +56,17 @@ Claude Code executes:
 Task(
   subagent_type: "larry",
   description: "Analyze server architecture", 
-  prompt: `
-    TOOLS AVAILABLE:
-    - Use stooges-research-tools.js for parallel analysis with your brothers
-    - Use agent-logger.js for wild-haired research logs
-    
-    MISSION:
-    Analyze server.js architecture using any tools needed.
-    Apply your wild-haired enthusiasm and frontend security focus.
-    Soitenly find those architectural patterns!
-  `
+  prompt: "analyze server.js architecture using any tools needed"
 )
 ```
 
-Larry chooses tools (might use zen:analyze + grep + ref), writes full results to `/hextrackr-specs/data/agentlogs/larry/LARRY_20250109T160000.md`, returns:
+Larry chooses tools (might use zen:analyze + grep + ref), writes full results to `LARRY_20250109T160000.md`, returns:
 ```
 ✅ LARRY Research Complete
 • Server is 2000+ line monolith with clear module boundaries
 • PathValidator and ProgressTracker ready for extraction  
 • Recommended modular monolith approach over microservices
-Full: /hextrackr-specs/data/agentlogs/larry/LARRY_20250109T160000.md
+Full: ./LARRY_20250109T160000.md
 ```
 
 ### Multiple Stooges  
@@ -91,4 +82,4 @@ All work simultaneously, return separate summaries + files.
 ### Overflow Handling
 Input: `/stooges shemp "synthesize previous stooge research on auth"`
 
-Shemp reads previous LARRY/MOE/CURLY files, creates meta-analysis in `/hextrackr-specs/data/agentlogs/shemp/SHEMP_[timestamp].md`
+Shemp reads previous LARRY/MOE/CURLY files, creates meta-analysis in `SHEMP_[timestamp].md`

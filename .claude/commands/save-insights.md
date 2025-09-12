@@ -21,7 +21,12 @@ Extract and save high-value insights to Memento with PROJECT:DOMAIN:TYPE classif
 mcp__memento__create_entities([{
   name: "Specific Insight Title",
   entityType: "PROJECT:DOMAIN:TYPE",
-  observations: ["actionable knowledge", "implementation details", "best practices"]
+  observations: [
+    `TIMESTAMP: ${new Date().toISOString()}`,  // ALWAYS FIRST
+    "actionable knowledge", 
+    "implementation details", 
+    "best practices"
+  ]
 }])
 
 mcp__memento__create_relations([{
@@ -32,6 +37,8 @@ mcp__memento__create_relations([{
 ```
 
 **Selection Criteria**: Save only insights with broad applicability or significant project impact. Avoid session-specific details - focus on reusable knowledge.
+
+**⚠️ TIMESTAMP REQUIREMENT**: Every Memento entity MUST include ISO 8601 timestamp as FIRST observation for conflict resolution and temporal tracking.
 
 **Instructions**: If $ARGUMENTS provided, use as insight category or specific focus area. Create entity capturing the gems worth preserving for future development work.
 

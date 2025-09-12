@@ -1,26 +1,75 @@
 {
-  "generated": "2025-09-10T23:19:04.566Z",
+  "generated": "2025-09-12T13:54:14.249Z",
   "version": "1.0.12",
-  "totalSpecs": 1,
-  "activeSpecs": 0,
-  "completedSpecs": 1,
+  "totalSpecs": 4,
+  "activeSpecs": 2,
+  "completedSpecs": 2,
+  "archivedSpecs": 0,
+  "totalTasks": 110,
+  "completedTasks": 94,
+  "overallProgress": 85,
   "specs": [
     {
       "id": "000-hextrackr-master-truth-v1.0.12-COMPLETE",
-      "title": "HexTrackr Master",
+      "title": "Feature Specification: HexTrackr Master - Vulnerability Management Platform",
       "status": "complete",
-      "priority": "baseline",
+      "priority": "normal",
       "tasks": {
-        "total": 30,
-        "completed": 28,
-        "percentage": 93
+        "total": 33,
+        "completed": 33,
+        "percentage": 100
+      },
+      "nextTasks": [],
+      "lastScanned": "2025-09-12T13:54:14.247Z",
+      "isBaseline": true
+    },
+    {
+      "id": "001-e2e-playwright-test-suite",
+      "title": "Feature Specification: End-to-End Testing Suite with Playwright",
+      "status": "active",
+      "priority": "normal",
+      "tasks": {
+        "total": 22,
+        "completed": 21,
+        "percentage": 95
       },
       "nextTasks": [
-        "✅ Docker Environment Configuration [P]",
-        "✅ Database Schema Creation [P]",
-        "✅ Express.js Server Setup"
+        "T001-T007 (Setup) → T008-T013 (Fixtures) → T014-T018 (Utilities) → T019-T045 (Tests) → T046-T050 (CI/CD)"
       ],
-      "isBaseline": true
+      "lastScanned": "2025-09-12T13:54:14.248Z",
+      "isBaseline": false
+    },
+    {
+      "id": "003-remove-statistics-card",
+      "title": "Feature Specification: Remove Statistics Card Flip Instruction Banner",
+      "status": "complete",
+      "priority": "normal",
+      "tasks": {
+        "total": 12,
+        "completed": 12,
+        "percentage": 100
+      },
+      "nextTasks": [],
+      "lastScanned": "2025-09-12T13:54:14.248Z",
+      "isBaseline": false
+    },
+    {
+      "id": "004-ag-grid-table-overflow-fix",
+      "title": "Feature Specification: AG-Grid Table Container Overflow Fix",
+      "status": "active",
+      "priority": "normal",
+      "tasks": {
+        "total": 43,
+        "completed": 28,
+        "percentage": 65
+      },
+      "nextTasks": [
+        "T001 --> T004",
+        "T001 --> T005",
+        "T001 --> T006"
+      ],
+      "lastScanned": "2025-09-12T13:54:14.249Z",
+      "isBaseline": false
     }
   ]
 }

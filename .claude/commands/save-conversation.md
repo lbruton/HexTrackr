@@ -33,6 +33,7 @@ mcp__memento__create_entities([{
   name: "Session: [GENERATED_SESSION_ID]",
   entityType: "PROJECT:DEVELOPMENT:SESSION", 
   observations: [
+    `TIMESTAMP: ${new Date().toISOString()}`,  // ALWAYS FIRST
     "SESSION_ID: [GENERATED_SESSION_ID]",
     "key outcomes", 
     "important decisions", 
@@ -43,10 +44,13 @@ mcp__memento__create_entities([{
 
 **Instructions**: 
 1. **Generate Session ID**: Create unique ID using PROJECT-KEYWORD-DATE-SEQUENCE format
-2. **Extract Key Content**: Save valuable outcomes, decisions, and insights (we just need to preserve the full session context not full transcripts)
-3. **Apply Classification**: Use PROJECT:DEVELOPMENT:SESSION entity type
-4. **Include Session ID**: Add session ID as first observation for easy recall
-5. **Return Session ID**: Display generated session ID to user after saving
+2. **Add Timestamp**: Include ISO 8601 timestamp as FIRST observation (required for conflict resolution)
+3. **Extract Key Content**: Save valuable outcomes, decisions, and insights (we just need to preserve the full session context not full transcripts)
+4. **Apply Classification**: Use PROJECT:DEVELOPMENT:SESSION entity type
+5. **Include Session ID**: Add session ID as second observation for easy recall
+6. **Return Session ID**: Display generated session ID to user after saving
+
+**⚠️ TIMESTAMP REQUIREMENT**: Every Memento entity MUST include ISO 8601 timestamp as FIRST observation for temporal tracking and conflict resolution.
 
 **Output After Saving:**
 ```

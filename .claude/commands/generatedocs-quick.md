@@ -18,39 +18,41 @@ Fast HTML regeneration for documentation updates when comprehensive testing is u
 
 ## Execution
 
-Launch Doc agent in quick mode to regenerate HTML from existing markdown:
+Launch Doc agent with this actionable checklist:
 
 ```javascript
 Task(
   subagent_type: "doc",
-  description: "Quick HTML documentation regeneration",
+  description: "Quick HTML regeneration",
   prompt: `
-    Perform quick documentation HTML regeneration (skip Atlas updates):
+    Doc's Quick HTML Generation Checklist:
     
-    1. SKIP ROADMAP UPDATE: Do not modify roadmap.json or ROADMAP.md
-       - Use existing ROADMAP.md content as-is
-       - Preserve current specification table between AUTO-GENERATED markers
+    ✓ Step 1: DETECT new markdown files
+       - Compare app/public/docs-source/**/*.md vs app/public/docs-html/content/**/*.html
+       - List any new or modified .md files found
     
-    2. HTML GENERATION: Execute html-content-updater.js as a tool
-       - cd /app/public/docs-html
-       - node html-content-updater.js
-       - Monitor for errors in output
+    ✓ Step 2: GENERATE HTML
+       - Run: npm run docs:generate
+       - Confirm: "Generated X files in Y seconds"
     
-    3. QUICK VALIDATION: Basic health checks only
-       - Verify HTML files generated successfully
-       - Check portal accessibility: curl http://localhost:8989/docs-html
-       - Confirm no JavaScript errors in generation
-       ${target ? `- Verify ${target} content was updated` : ''}
+    ✓ Step 3: RESTART Docker
+       - Run: docker-compose restart
+       - Wait: 3 seconds for container ready
     
-    4. REPORT: Quick summary
-       - Generation completed in ~15 seconds
-       - Number of files updated
-       - Any errors encountered
+    ✓ Step 4: VERIFY navigation
+       - Check: curl http://localhost:8989/docs-html/content/white-papers/index.html
+       - Confirm: All white papers listed in navigation
+       - Confirm: New content accessible via menu
     
-    Skip Playwright browser testing for speed.
-    This is a quick regeneration, not a full validation.
+    ✓ Step 5: REPORT results
+       - New files detected: [list]
+       - HTML generated: [count] files
+       - Docker restarted: ✅
+       - Navigation verified: ✅
+       - Portal URL: http://localhost:8989/docs-html
     
-    Save brief report to: /hextrackr-specs/data/agentlogs/doc/DOC_QUICK_[timestamp].md
+    Total time target: <30 seconds
+    Save report: /hextrackr-specs/data/agentlogs/doc/DOC_QUICK_[timestamp].md
   `
 )
 ```
