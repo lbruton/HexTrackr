@@ -1,0 +1,18 @@
+/**
+ * Dark Theme Styles - HexTrackr Dark Mode Implementation
+ * HexTrackr Vulnerability Management Platform
+ * 
+ * CSS custom properties and dark theme overrides for Tabler.io integration
+ * Following TDD approach - styles will be added after tests are written
+ * 
+ * @version 1.0.0
+ * @author HexTrackr Development Team
+ */
+
+/* TODO: Dark theme implementation will be added in Phase 3.3 after tests are written and failing */
+
+/* Placeholder for dark theme validation */
+[data-bs-theme="dark"] {
+  /* Dark theme styles will be implemented here */
+  --bs-body-bg: #1a1a1a; /* Temporary placeholder for testing */
+}
