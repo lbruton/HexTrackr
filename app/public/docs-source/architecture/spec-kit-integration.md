@@ -119,8 +119,7 @@ HexTrackr/
 │   ├── docs-source/
 │   │   └── ROADMAP.md             # Generated roadmap content
 │   └── docs-html/
-│       ├── html-content-updater.js # HTML generation with spec context
-│       └── template.html          # Template with spec banner placeholder
+│       └── html-content-updater.js # HTML generation with spec context
 ```
 
 ### NPM Scripts Integration
@@ -130,8 +129,7 @@ The integration is automated through npm scripts:
 ```json
 {
   "docs:generate": "npm run docs:sync-specs && node app/public/docs-html/html-content-updater.js",
-  "docs:sync-specs": "node scripts/sync-specs-to-roadmap.js",
-  "docs:sync-all": "node scripts/docs-sync-all.js"
+  "docs:sync-specs": "node scripts/sync-specs-to-roadmap.js"
 }
 ```
 
@@ -185,7 +183,7 @@ All file operations use the `PathValidator` class to prevent:
 
 1. **HTML generation failures**
    - Check file permissions in docs-html directory
-   - Verify template.html contains required placeholders
+   - Verify html-content-updater.js generates content correctly
 
 ### Debugging Commands
 
@@ -230,8 +228,8 @@ Currently, no environment-specific configuration is required. All paths are rela
 
 ### Customization Points
 
-- Active spec banner styling in `template.html`
+- Active spec banner styling in generated HTML
 - Roadmap table format in `sync-specs-to-roadmap.js`
-- HTML generation templates and styling
+- HTML generation logic in `html-content-updater.js`
 
 This integration provides a foundation for specification-driven development while maintaining flexibility for future enhancements and customizations.
