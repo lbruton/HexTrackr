@@ -84,8 +84,11 @@ Current deduplicated state (one row per active unique vulnerability for the most
 | `vendor_reference` | TEXT |  | Original vendor family string. |
 | `vendor` | TEXT |  | Normalized vendor (currently mirrors vendor_reference). |
 | `vulnerability_date` | TEXT |  | Publication date. |
-| `state` | TEXT | DEFAULT 'open' | Logical lifecycle state. |
+| `state` | TEXT | DEFAULT 'open' | Physical state (open/closed). |
+| `lifecycle_state` | TEXT |  | Logical state (active/resolved/reopened). |
+| `resolved_date` | TEXT |  | Date when marked as resolved. |
 | `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Insert timestamp. |
+| `updated_at` | DATETIME |  | Last update timestamp. |
 | `unique_key` | TEXT | UNIQUE | Composite key (see Rollover section). |
 
 ### `vulnerability_snapshots`
@@ -112,6 +115,10 @@ This table stores pre-calculated daily aggregates to power the dashboard charts 
 | `low_total_vpr` | REAL | Sum of VPR scores for Low vulnerabilities. |
 | `total_vulnerabilities` | INTEGER | The sum of all vulnerability counts for the day. |
 | `total_vpr` | REAL | The sum of all VPR scores for the day. |
+| `resolved_count` | INTEGER | Count of vulnerabilities marked resolved this day. |
+| `reopened_count` | INTEGER | Count of previously resolved vulnerabilities that reappeared. |
+| `created_at` | DATETIME | Record creation timestamp. |
+| `updated_at` | DATETIME | Last update timestamp. |
 
 ---
 
@@ -125,7 +132,7 @@ Many‑to‑many relationship between tickets and (legacy) `vulnerabilities` (pr
 | --- | --- | --- | --- |
 | `id` | INTEGER | PK AUTOINCREMENT | Link row id. |
 | `ticket_id` | TEXT | FK to `tickets.id` | Associated ticket. |
-| `vulnerability_id` | INTEGER | FK to `vulnerabilities.id` | Associated vulnerability (legacy table). |
+| `vulnerability_id` | INTEGER | FK | Associated vulnerability (references vulnerabilities.id for legacy compatibility). |
 | `relationship_type` | TEXT | DEFAULT 'remediation' | Relationship semantics. |
 | `notes` | TEXT |  | Free-form link-specific notes. |
 
@@ -164,7 +171,7 @@ To ensure efficient querying, the following indexes are created:
 | Tickets filtering | Multiple (see tickets section) |
 | Legacy vulnerabilities (pre-rollover) | `idx_vulnerabilities_hostname`, `idx_vulnerabilities_severity`, `idx_vulnerabilities_cve`, `idx_vulnerabilities_import` |
 
-> Note: The legacy `vulnerabilities` table remains for backward compatibility and some backup/export endpoints. New dashboards use the rollover trio (`vulnerability_snapshots`, `vulnerabilities_current`, `vulnerability_daily_totals`). A future migration will retire or namespace the legacy table.
+> Note: The legacy `vulnerabilities` table remains ONLY for backup/export endpoints (`/api/backup/vulnerabilities`, `/api/backup/all`). All imports and dashboards use the rollover trio (`vulnerability_snapshots`, `vulnerabilities_current`, `vulnerability_daily_totals`). The `POST /api/import/vulnerabilities` endpoint for legacy imports has been removed.
 
 ---
 

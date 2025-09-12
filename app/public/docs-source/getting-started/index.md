@@ -86,7 +86,9 @@ For developers who want to work on the HexTrackr source code directly.
     node server.js
     ```
 
-    The server will start, and you can access the application at `http://localhost:8080`.
+    The server will start on port 8080 internally. When running locally without Docker, access the application at `http://localhost:8080`.
+
+    **Note**: When using Docker, the application is accessible at `http://localhost:8989` due to port mapping.
 
 ### Development Scripts
 
