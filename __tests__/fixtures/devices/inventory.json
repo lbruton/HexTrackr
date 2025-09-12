@@ -1,0 +1,500 @@
+{
+  "devices": [
+    {
+      "id": "dev-001",
+      "hostname": "fw-prod-01",
+      "displayName": "Production Firewall Primary",
+      "type": "firewall",
+      "vendor": "Cisco",
+      "model": "ASA 5525-X",
+      "firmwareVersion": "9.16.4",
+      "ipAddress": "10.0.0.1",
+      "macAddress": "00:1B:44:11:3A:B7",
+      "location": "DC1-Rack-A1",
+      "environment": "production",
+      "criticality": "critical",
+      "owner": "Network Team",
+      "lastSeen": "2025-01-11T10:30:00Z",
+      "status": "online",
+      "tags": ["perimeter", "critical-infrastructure", "pci-scope"],
+      "vulnerabilityCount": {
+        "critical": 2,
+        "high": 5,
+        "medium": 12,
+        "low": 8
+      },
+      "compliance": {
+        "pciDss": true,
+        "hipaa": false,
+        "sox": true
+      },
+      "notes": "Primary edge firewall for production traffic"
+    },
+    {
+      "id": "dev-002",
+      "hostname": "fw-prod-02",
+      "displayName": "Production Firewall Secondary",
+      "type": "firewall",
+      "vendor": "Cisco",
+      "model": "ASA 5525-X",
+      "firmwareVersion": "9.16.4",
+      "ipAddress": "10.0.0.2",
+      "macAddress": "00:1B:44:11:3A:B8",
+      "location": "DC1-Rack-A2",
+      "environment": "production",
+      "criticality": "critical",
+      "owner": "Network Team",
+      "lastSeen": "2025-01-11T10:30:00Z",
+      "status": "online",
+      "tags": ["perimeter", "critical-infrastructure", "pci-scope", "ha-secondary"],
+      "vulnerabilityCount": {
+        "critical": 2,
+        "high": 5,
+        "medium": 12,
+        "low": 8
+      },
+      "compliance": {
+        "pciDss": true,
+        "hipaa": false,
+        "sox": true
+      },
+      "notes": "Secondary edge firewall (HA pair with fw-prod-01)"
+    },
+    {
+      "id": "dev-003",
+      "hostname": "sw-core-01",
+      "displayName": "Core Switch Stack 1",
+      "type": "switch",
+      "vendor": "Cisco",
+      "model": "Catalyst 9500-48Y4C",
+      "firmwareVersion": "17.6.5",
+      "ipAddress": "10.0.1.1",
+      "macAddress": "00:D7:8F:FF:48:91",
+      "location": "DC1-Rack-B1",
+      "environment": "production",
+      "criticality": "critical",
+      "owner": "Network Team",
+      "lastSeen": "2025-01-11T10:35:00Z",
+      "status": "online",
+      "tags": ["core-infrastructure", "high-availability"],
+      "vulnerabilityCount": {
+        "critical": 0,
+        "high": 3,
+        "medium": 7,
+        "low": 15
+      },
+      "compliance": {
+        "pciDss": true,
+        "hipaa": true,
+        "sox": true
+      },
+      "notes": "Primary core switch for data center"
+    },
+    {
+      "id": "dev-004",
+      "hostname": "srv-web-01",
+      "displayName": "Web Server 1",
+      "type": "server",
+      "vendor": "Dell",
+      "model": "PowerEdge R740",
+      "osVersion": "Ubuntu 22.04.3 LTS",
+      "ipAddress": "10.0.2.10",
+      "macAddress": "D4:AE:52:BF:C4:1A",
+      "location": "DC1-Rack-C3",
+      "environment": "production",
+      "criticality": "high",
+      "owner": "Application Team",
+      "lastSeen": "2025-01-11T10:40:00Z",
+      "status": "online",
+      "tags": ["web-tier", "public-facing", "load-balanced"],
+      "vulnerabilityCount": {
+        "critical": 1,
+        "high": 8,
+        "medium": 22,
+        "low": 45
+      },
+      "compliance": {
+        "pciDss": true,
+        "hipaa": false,
+        "sox": false
+      },
+      "services": ["nginx", "nodejs", "redis"],
+      "notes": "Primary web server for customer portal"
+    },
+    {
+      "id": "dev-005",
+      "hostname": "srv-db-01",
+      "displayName": "Database Server Primary",
+      "type": "server",
+      "vendor": "HPE",
+      "model": "ProLiant DL380 Gen10",
+      "osVersion": "RHEL 8.7",
+      "ipAddress": "10.0.3.10",
+      "macAddress": "94:40:C9:1E:BB:42",
+      "location": "DC1-Rack-D1",
+      "environment": "production",
+      "criticality": "critical",
+      "owner": "Database Team",
+      "lastSeen": "2025-01-11T10:45:00Z",
+      "status": "online",
+      "tags": ["database", "critical-data", "encrypted", "pci-scope"],
+      "vulnerabilityCount": {
+        "critical": 0,
+        "high": 2,
+        "medium": 5,
+        "low": 12
+      },
+      "compliance": {
+        "pciDss": true,
+        "hipaa": true,
+        "sox": true
+      },
+      "services": ["postgresql", "redis", "backup-agent"],
+      "notes": "Primary database server - contains sensitive customer data"
+    },
+    {
+      "id": "dev-006",
+      "hostname": "lb-prod-01",
+      "displayName": "Load Balancer Primary",
+      "type": "loadbalancer",
+      "vendor": "F5",
+      "model": "BIG-IP i5800",
+      "firmwareVersion": "16.1.4.1",
+      "ipAddress": "10.0.0.10",
+      "macAddress": "00:23:E9:EA:49:01",
+      "location": "DC1-Rack-A3",
+      "environment": "production",
+      "criticality": "critical",
+      "owner": "Network Team",
+      "lastSeen": "2025-01-11T10:50:00Z",
+      "status": "online",
+      "tags": ["load-balancer", "critical-infrastructure", "ssl-termination"],
+      "vulnerabilityCount": {
+        "critical": 1,
+        "high": 4,
+        "medium": 8,
+        "low": 3
+      },
+      "compliance": {
+        "pciDss": true,
+        "hipaa": false,
+        "sox": true
+      },
+      "notes": "Primary load balancer for all production web traffic"
+    },
+    {
+      "id": "dev-007",
+      "hostname": "vpn-gw-01",
+      "displayName": "VPN Gateway",
+      "type": "vpn",
+      "vendor": "Fortinet",
+      "model": "FortiGate 200F",
+      "firmwareVersion": "7.4.1",
+      "ipAddress": "10.0.0.20",
+      "macAddress": "00:09:0F:AA:00:01",
+      "location": "DC1-Rack-A4",
+      "environment": "production",
+      "criticality": "high",
+      "owner": "Security Team",
+      "lastSeen": "2025-01-11T10:55:00Z",
+      "status": "online",
+      "tags": ["remote-access", "vpn", "mfa-enabled"],
+      "vulnerabilityCount": {
+        "critical": 0,
+        "high": 1,
+        "medium": 4,
+        "low": 7
+      },
+      "compliance": {
+        "pciDss": false,
+        "hipaa": true,
+        "sox": false
+      },
+      "notes": "Remote access VPN for employees"
+    },
+    {
+      "id": "dev-008",
+      "hostname": "ids-prod-01",
+      "displayName": "Intrusion Detection System",
+      "type": "ids",
+      "vendor": "Snort",
+      "model": "Virtual Appliance",
+      "firmwareVersion": "3.1.70.0",
+      "ipAddress": "10.0.0.30",
+      "macAddress": "00:50:56:A5:6B:77",
+      "location": "DC1-Virtual",
+      "environment": "production",
+      "criticality": "high",
+      "owner": "Security Team",
+      "lastSeen": "2025-01-11T11:00:00Z",
+      "status": "online",
+      "tags": ["security", "monitoring", "ids/ips"],
+      "vulnerabilityCount": {
+        "critical": 0,
+        "high": 0,
+        "medium": 2,
+        "low": 5
+      },
+      "compliance": {
+        "pciDss": true,
+        "hipaa": true,
+        "sox": true
+      },
+      "notes": "Network intrusion detection system"
+    },
+    {
+      "id": "dev-009",
+      "hostname": "rt-branch-01",
+      "displayName": "Branch Office Router",
+      "type": "router",
+      "vendor": "Cisco",
+      "model": "ISR 4331",
+      "firmwareVersion": "16.12.8",
+      "ipAddress": "192.168.1.1",
+      "macAddress": "00:A2:EE:11:FC:88",
+      "location": "Branch-NYC",
+      "environment": "production",
+      "criticality": "medium",
+      "owner": "Network Team",
+      "lastSeen": "2025-01-11T11:05:00Z",
+      "status": "online",
+      "tags": ["branch-office", "wan", "mpls"],
+      "vulnerabilityCount": {
+        "critical": 0,
+        "high": 2,
+        "medium": 6,
+        "low": 10
+      },
+      "compliance": {
+        "pciDss": false,
+        "hipaa": false,
+        "sox": false
+      },
+      "notes": "Branch office WAN router - NYC location"
+    },
+    {
+      "id": "dev-010",
+      "hostname": "srv-dev-01",
+      "displayName": "Development Server",
+      "type": "server",
+      "vendor": "VMware",
+      "model": "Virtual Machine",
+      "osVersion": "CentOS 8.5",
+      "ipAddress": "172.16.0.10",
+      "macAddress": "00:50:56:A1:23:45",
+      "location": "DC1-Virtual",
+      "environment": "development",
+      "criticality": "low",
+      "owner": "Development Team",
+      "lastSeen": "2025-01-11T11:10:00Z",
+      "status": "online",
+      "tags": ["development", "non-production", "test-environment"],
+      "vulnerabilityCount": {
+        "critical": 5,
+        "high": 15,
+        "medium": 30,
+        "low": 50
+      },
+      "compliance": {
+        "pciDss": false,
+        "hipaa": false,
+        "sox": false
+      },
+      "services": ["docker", "jenkins", "gitlab"],
+      "notes": "Development and testing server - not for production use"
+    },
+    {
+      "id": "dev-011",
+      "hostname": "waf-prod-01",
+      "displayName": "Web Application Firewall",
+      "type": "waf",
+      "vendor": "Cloudflare",
+      "model": "Enterprise WAF",
+      "firmwareVersion": "2024.1.0",
+      "ipAddress": "10.0.0.40",
+      "macAddress": "N/A",
+      "location": "Cloud",
+      "environment": "production",
+      "criticality": "critical",
+      "owner": "Security Team",
+      "lastSeen": "2025-01-11T11:15:00Z",
+      "status": "online",
+      "tags": ["waf", "cloud", "ddos-protection", "critical-infrastructure"],
+      "vulnerabilityCount": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 2
+      },
+      "compliance": {
+        "pciDss": true,
+        "hipaa": false,
+        "sox": true
+      },
+      "notes": "Cloud-based WAF protecting all public-facing applications"
+    },
+    {
+      "id": "dev-012",
+      "hostname": "storage-nas-01",
+      "displayName": "Network Attached Storage",
+      "type": "storage",
+      "vendor": "NetApp",
+      "model": "FAS8200",
+      "firmwareVersion": "ONTAP 9.13.1",
+      "ipAddress": "10.0.4.10",
+      "macAddress": "00:A0:98:4B:CD:EF",
+      "location": "DC1-Rack-E1",
+      "environment": "production",
+      "criticality": "high",
+      "owner": "Storage Team",
+      "lastSeen": "2025-01-11T11:20:00Z",
+      "status": "online",
+      "tags": ["storage", "backup", "critical-data", "encrypted"],
+      "vulnerabilityCount": {
+        "critical": 0,
+        "high": 1,
+        "medium": 3,
+        "low": 8
+      },
+      "compliance": {
+        "pciDss": true,
+        "hipaa": true,
+        "sox": true
+      },
+      "notes": "Primary NAS for file shares and backup storage"
+    }
+  ],
+  "deviceTypes": {
+    "firewall": {
+      "count": 2,
+      "criticalityDistribution": {
+        "critical": 2,
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      }
+    },
+    "switch": {
+      "count": 1,
+      "criticalityDistribution": {
+        "critical": 1,
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      }
+    },
+    "server": {
+      "count": 3,
+      "criticalityDistribution": {
+        "critical": 1,
+        "high": 1,
+        "medium": 0,
+        "low": 1
+      }
+    },
+    "loadbalancer": {
+      "count": 1,
+      "criticalityDistribution": {
+        "critical": 1,
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      }
+    },
+    "router": {
+      "count": 1,
+      "criticalityDistribution": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0
+      }
+    },
+    "vpn": {
+      "count": 1,
+      "criticalityDistribution": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0
+      }
+    },
+    "ids": {
+      "count": 1,
+      "criticalityDistribution": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0
+      }
+    },
+    "waf": {
+      "count": 1,
+      "criticalityDistribution": {
+        "critical": 1,
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      }
+    },
+    "storage": {
+      "count": 1,
+      "criticalityDistribution": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0
+      }
+    }
+  },
+  "testScenarios": {
+    "vulnerabilityScenarios": [
+      {
+        "name": "Critical Infrastructure Devices",
+        "devices": ["fw-prod-01", "fw-prod-02", "sw-core-01", "srv-db-01", "lb-prod-01"],
+        "expectedCriticality": "critical",
+        "expectedCompliance": ["pciDss", "sox"]
+      },
+      {
+        "name": "Public-Facing Devices",
+        "devices": ["srv-web-01", "lb-prod-01", "waf-prod-01"],
+        "expectedTags": ["public-facing", "load-balanced"],
+        "expectedHighVulnerabilities": true
+      },
+      {
+        "name": "Development Environment",
+        "devices": ["srv-dev-01"],
+        "expectedEnvironment": "development",
+        "expectedCriticality": "low",
+        "allowHighVulnerabilities": true
+      }
+    ],
+    "networkSegments": {
+      "production": {
+        "subnet": "10.0.0.0/16",
+        "deviceCount": 8,
+        "criticalDevices": 6
+      },
+      "branch": {
+        "subnet": "192.168.0.0/16",
+        "deviceCount": 1,
+        "criticalDevices": 0
+      },
+      "development": {
+        "subnet": "172.16.0.0/16",
+        "deviceCount": 1,
+        "criticalDevices": 0
+      }
+    }
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2025-01-11",
+    "totalDevices": 12,
+    "criticalDevices": 6,
+    "totalVulnerabilities": 452,
+    "purpose": "E2E Test Device Fixtures",
+    "environment": "test",
+    "note": "These are test fixtures representing a typical enterprise network"
+  }
+}
