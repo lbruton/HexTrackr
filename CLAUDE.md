@@ -111,9 +111,36 @@ await mcp__sequential_thinking__start({
 
 ```javascript
 await mcp__memento__create_entities({
-  entities: [{...}]
+  entities: [{
+    name: "HEXTRACKR:[CATEGORY]:[DESCRIPTION]",
+    entityType: "PROJECT:[TYPE]:[SUBTYPE]",
+    observations: [
+      `TIMESTAMP: ${new Date().toISOString()}`,  // ALWAYS FIRST
+      "VERSION: 1.0.13",  // Current version if relevant
+      "STATUS: Complete",  // Current status
+      // ... other observations
+    ]
+  }]
 });
 ```
+
+### ⚠️ TIMESTAMP STANDARDIZATION ⚠️
+
+**CRITICAL**: Every Memento entity MUST have ISO 8601 timestamp as FIRST observation:
+
+```javascript
+observations: [
+  `TIMESTAMP: ${new Date().toISOString()}`,  // 2025-09-12T14:30:45.123Z
+  // ... rest of observations
+]
+```
+
+This enables:
+
+- Conflict resolution (newer timestamp wins)
+- Temporal queries and sorting
+- Audit trail tracking
+- Session reconstruction
 
 ### MEMENTO MEMORY NAMESPACE
 
