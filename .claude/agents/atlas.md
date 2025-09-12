@@ -35,16 +35,34 @@ await mcp__sequential_thinking__sequentialthinking({
 
 ### MANDATORY After Discoveries/Changes
 ```javascript
-// Save all discoveries to Memento
+// Save all discoveries to Memento with timestamp
 await mcp__memento__create_entities({
   entities: [{
     name: "HEXTRACKR:ROADMAP:[discovery]",
     entityType: "PROJECT:SPECIFICATION:METADATA",
-    observations: ["findings", "patterns", "decisions"]
+    observations: [
+      `TIMESTAMP: ${new Date().toISOString()}`,  // ALWAYS FIRST
+      "findings", 
+      "patterns", 
+      "decisions"
+    ]
   }]
 });
 ```
 
+
+### ⚠️ TIMESTAMP REQUIREMENT ⚠️
+
+**CRITICAL**: Every Memento entity MUST include ISO 8601 timestamp as FIRST observation:
+
+```javascript
+observations: [
+  `TIMESTAMP: ${new Date().toISOString()}`,  // ALWAYS FIRST (e.g., 2025-09-12T14:30:45.123Z)
+  // ... rest of observations
+]
+```
+
+This enables conflict resolution, temporal queries, and audit trails.
 ## Available Tools
 
 ### Primary MCP Tools (USE THESE FIRST)
@@ -167,6 +185,7 @@ Keep summary responses under 400 tokens to preserve context.
        name: "HEXTRACKR:VERSION:[VERSION_ID]",
        entityType: "PROJECT:RELEASE:VERSION",
        observations: [
+         `TIMESTAMP: ${new Date().toISOString()}`,  // ALWAYS FIRST
          "Version: [X.X.X]",
          "Release Date: [ISO]",
          "Completed Tasks: [list]",
