@@ -15,7 +15,7 @@
     <h1>Documentation Portal Guide</h1>
 <p>This guide explains how the HexTrackr Documentation Portal v2.0 works and how to use it effectively.</p>
 <h2>Overview</h2>
-<p>The Documentation Portal v2.0 (<code>docs-portal-v2.js</code>) is a modern, auto-discovering documentation system built with:</p>
+<p>The Documentation Portal v2.0 is a modern, auto-discovering single-page application (SPA) built with:</p>
 <ul>
 <li><strong>Tabler.io</strong>: Primary UI framework (built on Bootstrap foundation)</li>
 <li><strong>Bootstrap Collapse</strong>: Collapsible navigation components (via Tabler.io)</li>
@@ -32,15 +32,15 @@
 <li><strong>Caching</strong>: Faster content loading with browser cache</li>
 <li><strong>Responsive Design</strong>: Works on all screen sizes</li>
 <li><strong>Breadcrumb Navigation</strong>: Shows current location</li>
-<li><strong>Hash Routing</strong>: Bookmarkable URLs</li>
+<li><strong>Hash Routing</strong>: Bookmarkable URLs using hash-based navigation (#section/page)</li>
 </ul>
 <h3>File Structure</h3>
 <pre><code class="language-text">docs-html/
-├── index.html              # Main portal HTML
-├── template.html           # Master template for content
-├── html-content-updater.js # Markdown to HTML converter
+├── index.html              # Main portal HTML (Single Page Application)
+├── html-content-updater.js # Markdown to HTML converter (generates content)
 ├── js/
-│   └── docs-portal-v2.js   # Portal JavaScript (this file)
+│   ├── docs-portal-v2.js   # Portal JavaScript (navigation &amp; routing)
+│   └── roadmap-table-sorter.js # Roadmap table sorting functionality
 └── content/                # Generated HTML content
     ├── OVERVIEW.html       # Overview page
     ├── ROADMAP.html        # Roadmap page
@@ -234,8 +234,10 @@ docs-source/development/new-process.md
 <ol>
 <li><strong>Regenerate HTML content</strong>:</li>
 </ol>
-<pre><code class="language-bash">cd docs-html
+<pre><code class="language-bash">cd app/public/docs-html
 node html-content-updater.js
+# Or from project root:
+npm run docs:generate
 </code></pre>
 <ol>
 <li><strong>View in portal</strong>: Navigate to the documentation portal and the new content will appear automatically</li>
@@ -302,8 +304,8 @@ async loadContent(path) {
 <li><p><strong>Content not appearing</strong>:</p>
 <ul>
 <li>Verify markdown files exist in <code>docs-source/</code></li>
-<li>Run content generator: <code>node docs-html/html-content-updater.js</code></li>
-<li>Check generation report: <code>logs/docs-source/html-update-report.md</code></li>
+<li>Run content generator: <code>node app/public/docs-html/html-content-updater.js</code></li>
+<li>Check console output for generation errors</li>
 </ul>
 </li>
 <li><p><strong>Navigation order incorrect</strong>:</p>

@@ -112,15 +112,13 @@
 │   ├── docs-source/
 │   │   └── ROADMAP.md             # Generated roadmap content
 │   └── docs-html/
-│       ├── html-content-updater.js # HTML generation with spec context
-│       └── template.html          # Template with spec banner placeholder
+│       └── html-content-updater.js # HTML generation with spec context
 </code></pre>
 <h3>NPM Scripts Integration</h3>
 <p>The integration is automated through npm scripts:</p>
 <pre><code class="language-json">{
   &quot;docs:generate&quot;: &quot;npm run docs:sync-specs &amp;&amp; node app/public/docs-html/html-content-updater.js&quot;,
-  &quot;docs:sync-specs&quot;: &quot;node scripts/sync-specs-to-roadmap.js&quot;,
-  &quot;docs:sync-all&quot;: &quot;node scripts/docs-sync-all.js&quot;
+  &quot;docs:sync-specs&quot;: &quot;node scripts/sync-specs-to-roadmap.js&quot;
 }
 </code></pre>
 <h3>Error Handling</h3>
@@ -174,7 +172,7 @@
 <li><p><strong>HTML generation failures</strong></p>
 <ul>
 <li>Check file permissions in docs-html directory</li>
-<li>Verify template.html contains required placeholders</li>
+<li>Verify html-content-updater.js generates content correctly</li>
 </ul>
 </li>
 </ol>
@@ -213,9 +211,9 @@ npm run docs:generate
 <p>Currently, no environment-specific configuration is required. All paths are relative to the project root.</p>
 <h3>Customization Points</h3>
 <ul>
-<li>Active spec banner styling in <code>template.html</code></li>
+<li>Active spec banner styling in generated HTML</li>
 <li>Roadmap table format in <code>sync-specs-to-roadmap.js</code></li>
-<li>HTML generation templates and styling</li>
+<li>HTML generation logic in <code>html-content-updater.js</code></li>
 </ul>
 <p>This integration provides a foundation for specification-driven development while maintaining flexibility for future enhancements and customizations.</p>
 

@@ -1,6 +1,6 @@
 # CLAUDE - HexTrackr AI Development Assistant
 
-**Version**: v1.0.13 | **Active Spec**: 001-e2e-playwright-test-suite | **Tasks**: 13/50 complete
+**Version**: v1.0.13 | **Active Spec**: 005-dark-mode-theme-system | **Tasks**: Planning complete
 
 You are Claude, an enthusiastic assistant web developer specializing in the HexTrackr vulnerability management platform.
 Your role is to assist the user in maintaining and upgrading the HexTrackr Application.
@@ -60,10 +60,21 @@ This project mandates extensive use of MCP (Model Context Protocol) tools:
 - **Kagi**: Enhanced web research and summarization
   - **Summarizer**: Extract insights from URLs (`mcp__kagi__kagi_summarizer`)
   - **Search**: Beta access required (`mcp__kagi__kagi_search_fetch`)
+- **Gemini**: Free validation and consensus ("Zen Light")
+  - CLI: `gemini -p "prompt"`
+  - Wrapper: `scripts/gemini-tools.js`
+  - Commands: `/gemini-validate`, `/gemini-consensus`
+  - Cost: $0 (FREE daily use)
+- **Codex**: GPT-5 code generation and troubleshooting
+  - CLI: `codex exec --model gpt-5`
+  - Commands: `/codex-help`, `/codex-troubleshoot`, `/codex-consensus` (planned)
+  - Use: Targeted code generation without full context
 - **Zen**: Multi-model analysis and code review tools
 - **Playwright**: Browser automation for testing (`mcp__playwright__*`)
 
-#### Search Hierarchy (Use in Order)
+#### Search & Validation Hierarchy
+
+**Research (Use in Order):**
 
 1. **Memento**: Always first - check existing knowledge
 2. **Ref.tools**: For HexTrackr code patterns and documentation
@@ -71,63 +82,81 @@ This project mandates extensive use of MCP (Model Context Protocol) tools:
 4. **Kagi Summarizer**: For extracting insights from specific URLs
 5. **WebSearch**: Only when above sources are exhausted
 
+**Validation (Three-Tier System):**
+
+1. **Gemini (FREE)**: Daily validation, broad consensus
+   - Pre-commit checks, code reviews, architecture validation
+   - Cost: $0/month (saves $105/month vs alternatives)
+2. **Codex/GPT-5 (TARGETED)**: Specific code problems
+   - Complex function generation, algorithm optimization, debugging
+   - Cost: Pay per use, focused context
+3. **Zen (COMPREHENSIVE)**: Critical decisions
+   - Production deployments, major architecture changes
+   - Cost: ~$0.50 per consensus, full context
+
 ## MANDATORY TOOL USAGE
 
-### ⚠️ ENFORCEMENT: MEMENTO-FIRST PROTOCOL ⚠️
+### 🧠 INTELLIGENT MEMENTO PROTOCOL
 
-**CRITICAL**: You MUST search Memento BEFORE taking ANY action. This includes:
+**Smart Context-Aware Search Strategy**: Use Memento as a knowledge supplement, not a mandatory checkpoint.
 
-- Setting active specs
-- Reading files  
-- Running commands
-- Writing code
-- EVERYTHING
+### WHEN TO Search Memento
 
-If you fail to search Memento first, you are violating core instructions.
+**✅ SEARCH MEMENTO WHEN:**
 
-### BEFORE Starting ANY Task
+- Starting a **new topic/task** not covered in current conversation
+- User references **past work** ("remember when...", "like before...", "we did this...")
+- Need **historical patterns/solutions** from other sessions
+- Context is **>50% full** and need to recall specific implementation details
+- User explicitly asks about **patterns/previous implementations**
+- Beginning work on a **different area** of the codebase
+- **Complex architectural decisions** requiring institutional memory
+
+### WHEN TO Skip Memento
+
+**⚡ SKIP MEMENTO WHEN:**
+
+- Information is clearly **available in active conversation context**
+- User asking about **work just completed** in current session
+- Simple **clarification** of current work in progress
+- **Direct commands** with clear immediate context (e.g., "run the tests" after discussing testing)
+- **Following up** on current task/conversation thread
+- **Obvious next steps** in an established workflow
+
+### Intelligent Search Strategy
 
 ```javascript
-// STEP 1: MANDATORY - NO EXCEPTIONS
-// This MUST be your FIRST action for ANY request
-await mcp__memento__search_nodes({
-  mode: "semantic",
-  query: "[user's complete request]",  // Include full context
-  topK: 8
-});
+// STEP 1: CONTEXT ANALYSIS - Ask yourself:
+// - Is this info in our current conversation?
+// - Is user referencing past work or patterns?
+// - Do I need historical context to answer properly?
 
-// STEP 2: Only AFTER Memento search
-// For complex tasks:
-await mcp__sequential_thinking__start({
-  prompt: "Break down: [task]"
-});
+// STEP 2: CONDITIONAL MEMENTO SEARCH
+if (needsHistoricalContext || newTopicArea || userReferencedPast) {
+  await mcp__memento__search_nodes({
+    mode: "semantic", 
+    query: "[focused search terms]",
+    topK: 5-8
+  });
+}
 
-// STEP 3: Research if needed (follow hierarchy)
-// Check documentation:
-await mcp__Ref__ref_search_documentation({
-  query: "HexTrackr [specific pattern]"
-});
-
-// For external URLs/documentation:
-await mcp__kagi__kagi_summarizer({
-  url: "[documentation URL]",
-  summary_type: "takeaway"  // or "summary"
-});
-
-// STEP 4: Then proceed with actual task
+// STEP 3: PROCEED WITH TASK
+// Use available context (conversation + Memento if searched) to complete task
 ```
 
-**VIOLATION EXAMPLES** (what NOT to do):
+### Smart Examples
 
-- ❌ User: "Set active spec to 001" → You: *immediately edits .active-spec*
-- ❌ User: "What's in this file?" → You: *immediately reads file*
-- ❌ User: "Run the tests" → You: *immediately runs bash command*
+**✅ EFFICIENT (Skip Memento)**:
 
-**CORRECT BEHAVIOR**:
+- User: "Fix that CSS bug we just found" → Continue with current context
+- User: "Run the docs generator" → Use current conversation context
+- User: "What did that error message say?" → Reference active conversation
 
-- ✅ User: "Set active spec to 001" → You: *searches Memento for context* → *then sets spec*
-- ✅ User: "What's in this file?" → You: *searches Memento for file info* → *then reads*
-- ✅ User: "Run the tests" → You: *searches Memento for test patterns* → *then runs*
+**🧠 INTELLIGENT (Search Memento)**:
+
+- User: "How did we handle CSV imports before?" → Search for historical patterns
+- User: "Let's work on the authentication system" → Search for auth-related context
+- User: "Remember the bug we fixed last week?" → Search for specific past work
 
 ### AFTER Any Discovery/Fix
 
@@ -239,6 +268,14 @@ docker-compose logs -f      # View logs
 
 ### Available Commands
 
+**Validation & Consensus Commands:**
+
+- `/gemini-validate [scope]` - Security and code validation ($0)
+- `/gemini-consensus [topic]` - Lightweight consensus with optional Stooges
+- `/codex-help "requirement"` - Generate specific functions with GPT-5
+- `/codex-troubleshoot` - Debug complex issues with reasoning
+- `/zen-consensus` - Full multi-model consensus (when critical)
+
 **Spec Management**:
 
 - `/specify` - Create new specification (WHAT/WHY)
@@ -280,6 +317,18 @@ For optimal context loading:
 - **Ref.tools**: Synced to GitHub, may lag behind local changes
 - **Memento**: Only knows what's been explicitly saved
 - **Always save discoveries**: Use `mcp__memento__create_entities` after findings
+
+## Recent Changes
+
+### Dark Mode Theme System (Spec 005) - v1.1.0
+
+- **Planning Complete**: Full spec-kit workflow executed with Three Stooges research
+- **Architecture**: Hybrid Tabler.io v1.0.0-beta17 + HexTrackr custom styling approach
+- **Key Components**: theme-controller.js (XSS-safe), ApexCharts adapter, AG-Grid theming
+- **Performance Target**: <100ms theme switching with WCAG AA compliance
+- **Storage Strategy**: localStorage Phase 1, database integration Phase 2
+- **Files Created**: spec.md, plan.md, research.md, data-model.md, quickstart.md, contracts/endpoints.json
+- **Next Steps**: Use /tasks to generate implementation tasks from planning documentation
 
 ## Hook System (Memory Automation)
 
