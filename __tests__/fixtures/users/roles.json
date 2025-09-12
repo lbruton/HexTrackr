@@ -1,0 +1,315 @@
+{
+  "roles": {
+    "securityAnalyst": {
+      "id": "user-001",
+      "username": "sarah.analyst",
+      "email": "sarah.analyst@hextrackr.test",
+      "firstName": "Sarah",
+      "lastName": "Johnson",
+      "role": "securityAnalyst",
+      "displayName": "Security Analyst",
+      "permissions": [
+        "vulnerabilities.view",
+        "vulnerabilities.import",
+        "vulnerabilities.export",
+        "vulnerabilities.analyze",
+        "reports.view",
+        "reports.generate",
+        "dashboard.view"
+      ],
+      "department": "Security Operations",
+      "avatar": "/assets/avatars/analyst.png",
+      "preferences": {
+        "defaultView": "vulnerabilities",
+        "tablePageSize": 25,
+        "autoRefresh": true,
+        "refreshInterval": 30000,
+        "theme": "light",
+        "notifications": {
+          "critical": true,
+          "high": true,
+          "medium": false,
+          "low": false
+        }
+      },
+      "testCredentials": {
+        "password": "SecureTest123!",
+        "mfaEnabled": false,
+        "sessionTimeout": 3600
+      }
+    },
+    "networkAdmin": {
+      "id": "user-002",
+      "username": "mike.admin",
+      "email": "mike.admin@hextrackr.test",
+      "firstName": "Michael",
+      "lastName": "Chen",
+      "role": "networkAdmin",
+      "displayName": "Network Administrator",
+      "permissions": [
+        "vulnerabilities.view",
+        "vulnerabilities.edit",
+        "vulnerabilities.delete",
+        "tickets.create",
+        "tickets.edit",
+        "tickets.assign",
+        "tickets.close",
+        "devices.manage",
+        "integrations.configure",
+        "reports.view",
+        "reports.generate",
+        "dashboard.view"
+      ],
+      "department": "Network Operations",
+      "avatar": "/assets/avatars/admin.png",
+      "preferences": {
+        "defaultView": "tickets",
+        "tablePageSize": 50,
+        "autoRefresh": true,
+        "refreshInterval": 60000,
+        "theme": "dark",
+        "notifications": {
+          "critical": true,
+          "high": true,
+          "medium": true,
+          "low": false,
+          "ticketAssigned": true,
+          "ticketUpdated": true
+        }
+      },
+      "testCredentials": {
+        "password": "AdminTest456!",
+        "mfaEnabled": true,
+        "mfaSecret": "JBSWY3DPEHPK3PXP",
+        "sessionTimeout": 7200
+      }
+    },
+    "manager": {
+      "id": "user-003",
+      "username": "lisa.manager",
+      "email": "lisa.manager@hextrackr.test",
+      "firstName": "Lisa",
+      "lastName": "Rodriguez",
+      "role": "manager",
+      "displayName": "IT Manager",
+      "permissions": [
+        "vulnerabilities.view",
+        "tickets.view",
+        "reports.view",
+        "reports.generate",
+        "reports.schedule",
+        "dashboard.view",
+        "dashboard.customize",
+        "metrics.view",
+        "metrics.export",
+        "team.view",
+        "audit.view"
+      ],
+      "department": "IT Management",
+      "avatar": "/assets/avatars/manager.png",
+      "preferences": {
+        "defaultView": "dashboard",
+        "tablePageSize": 100,
+        "autoRefresh": false,
+        "refreshInterval": 300000,
+        "theme": "light",
+        "dashboardLayout": "executive",
+        "reportFormat": "pdf",
+        "notifications": {
+          "critical": true,
+          "high": true,
+          "medium": false,
+          "low": false,
+          "weeklyReport": true,
+          "monthlyReport": true
+        }
+      },
+      "testCredentials": {
+        "password": "ManagerTest789!",
+        "mfaEnabled": false,
+        "sessionTimeout": 10800
+      }
+    },
+    "complianceOfficer": {
+      "id": "user-004",
+      "username": "david.compliance",
+      "email": "david.compliance@hextrackr.test",
+      "firstName": "David",
+      "lastName": "Thompson",
+      "role": "complianceOfficer",
+      "displayName": "Compliance Officer",
+      "permissions": [
+        "vulnerabilities.view",
+        "vulnerabilities.audit",
+        "tickets.view",
+        "tickets.audit",
+        "reports.view",
+        "reports.generate",
+        "reports.compliance",
+        "dashboard.view",
+        "audit.view",
+        "audit.export",
+        "compliance.view",
+        "compliance.reports",
+        "compliance.attestation",
+        "policies.view",
+        "policies.enforce"
+      ],
+      "department": "Compliance & Risk",
+      "avatar": "/assets/avatars/compliance.png",
+      "preferences": {
+        "defaultView": "compliance",
+        "tablePageSize": 200,
+        "autoRefresh": false,
+        "refreshInterval": 600000,
+        "theme": "light",
+        "auditTrail": true,
+        "dataRetention": 365,
+        "notifications": {
+          "critical": true,
+          "high": true,
+          "medium": true,
+          "low": true,
+          "complianceViolation": true,
+          "auditRequired": true,
+          "policyUpdate": true
+        }
+      },
+      "testCredentials": {
+        "password": "ComplianceTest101!",
+        "mfaEnabled": true,
+        "mfaSecret": "KVKFKRCPNZQUYMLX",
+        "sessionTimeout": 3600,
+        "requirePasswordChange": false
+      }
+    },
+    "readOnlyUser": {
+      "id": "user-005",
+      "username": "viewer.readonly",
+      "email": "viewer@hextrackr.test",
+      "firstName": "Test",
+      "lastName": "Viewer",
+      "role": "readOnlyUser",
+      "displayName": "Read-Only User",
+      "permissions": [
+        "vulnerabilities.view",
+        "tickets.view",
+        "reports.view",
+        "dashboard.view"
+      ],
+      "department": "General",
+      "avatar": "/assets/avatars/default.png",
+      "preferences": {
+        "defaultView": "dashboard",
+        "tablePageSize": 25,
+        "autoRefresh": false,
+        "theme": "light",
+        "notifications": {
+          "critical": false,
+          "high": false,
+          "medium": false,
+          "low": false
+        }
+      },
+      "testCredentials": {
+        "password": "ViewerTest111!",
+        "mfaEnabled": false,
+        "sessionTimeout": 1800
+      }
+    },
+    "superAdmin": {
+      "id": "user-000",
+      "username": "admin",
+      "email": "admin@hextrackr.test",
+      "firstName": "System",
+      "lastName": "Administrator",
+      "role": "superAdmin",
+      "displayName": "Super Administrator",
+      "permissions": ["*"],
+      "department": "System",
+      "avatar": "/assets/avatars/admin.png",
+      "preferences": {
+        "defaultView": "admin",
+        "tablePageSize": 100,
+        "autoRefresh": true,
+        "refreshInterval": 10000,
+        "theme": "dark",
+        "debugMode": true,
+        "notifications": {
+          "all": true,
+          "system": true,
+          "errors": true
+        }
+      },
+      "testCredentials": {
+        "password": "SuperAdmin999!",
+        "mfaEnabled": true,
+        "mfaSecret": "GEZDGNBVGY3TQOJQ",
+        "sessionTimeout": 14400,
+        "requirePasswordChange": false,
+        "apiKey": "test-api-key-super-admin-2024"
+      }
+    }
+  },
+  "testScenarios": {
+    "loginScenarios": [
+      {
+        "name": "Valid Security Analyst Login",
+        "user": "securityAnalyst",
+        "expectedLandingPage": "/vulnerabilities.html",
+        "expectedMenuItems": ["Vulnerabilities", "Reports", "Dashboard"]
+      },
+      {
+        "name": "Valid Network Admin Login",
+        "user": "networkAdmin",
+        "expectedLandingPage": "/tickets.html",
+        "expectedMenuItems": ["Vulnerabilities", "Tickets", "Devices", "Reports", "Dashboard"]
+      },
+      {
+        "name": "Valid Manager Login",
+        "user": "manager",
+        "expectedLandingPage": "/dashboard.html",
+        "expectedMenuItems": ["Dashboard", "Reports", "Metrics", "Team"]
+      },
+      {
+        "name": "Valid Compliance Officer Login",
+        "user": "complianceOfficer",
+        "expectedLandingPage": "/compliance.html",
+        "expectedMenuItems": ["Compliance", "Audit", "Reports", "Policies"]
+      }
+    ],
+    "permissionScenarios": [
+      {
+        "name": "Security Analyst Cannot Delete",
+        "user": "securityAnalyst",
+        "action": "delete vulnerability",
+        "expectedResult": "denied"
+      },
+      {
+        "name": "Network Admin Can Create Tickets",
+        "user": "networkAdmin",
+        "action": "create ticket",
+        "expectedResult": "allowed"
+      },
+      {
+        "name": "Manager Cannot Edit Vulnerabilities",
+        "user": "manager",
+        "action": "edit vulnerability",
+        "expectedResult": "denied"
+      },
+      {
+        "name": "Read-Only User Cannot Modify",
+        "user": "readOnlyUser",
+        "action": "any modification",
+        "expectedResult": "denied"
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2025-01-11",
+    "purpose": "E2E Test User Fixtures",
+    "environment": "test",
+    "note": "These are test fixtures only. Do not use in production."
+  }
+}
