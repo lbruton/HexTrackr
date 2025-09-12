@@ -266,16 +266,13 @@ function createVulnerabilityGridOptions(componentContext) {
             componentContext.gridApi = params.api;
             componentContext.columnApi = params.columnApi;
             
-            // Initialize container height management
-            initializeContainerHeightManagement(params.api);
+            // Note: Height management simplified - let AG-Grid domLayout: 'autoHeight' handle sizing
             
             // Responsive column management on resize
             window.addEventListener("resize", debounce(() => {
                 if (componentContext.gridApi) {
                     // Update column visibility based on screen size
                     updateColumnVisibility(params.api);
-                    // Update container height for new viewport
-                    updateContainerHeight(params.api);
                 }
             }, 200));
             
@@ -355,98 +352,8 @@ function createVulnerabilityGridOptions(componentContext) {
         api.setColumnsVisible(columnsToHide, false);
     }
 
-    /**
-     * Initialize container height management system
-     * Sets up the container wrapper for dynamic height based on pagination
-     */
-    function initializeContainerHeightManagement(api) {
-        const wrapper = document.getElementById("vulnGridWrapper");
-        if (!wrapper) {
-            console.warn("AG-Grid container wrapper not found. Height management disabled.");
-            return;
-        }
-
-        // Set up pagination change listener for height adjustments
-        api.addEventListener("paginationChanged", () => {
-            updateContainerHeight(api);
-        });
-
-        // Set up data change listener for height adjustments
-        api.addEventListener("rowDataUpdated", () => {
-            updateContainerHeight(api);
-        });
-
-        // Initial height calculation
-        setTimeout(() => updateContainerHeight(api), 100);
-
-        // Set up ResizeObserver for container size changes
-        if (window.ResizeObserver) {
-            const resizeObserver = new ResizeObserver(debounce(() => {
-                updateContainerHeight(api);
-            }, 100));
-            
-            resizeObserver.observe(wrapper);
-            
-            // Store observer for cleanup
-            wrapper._resizeObserver = resizeObserver;
-        }
-    }
-
-    /**
-     * Update container height based on current pagination and data
-     * Implements the dynamic height requirements from spec 004
-     */
-    function updateContainerHeight(api) {
-        const wrapper = document.getElementById("vulnGridWrapper");
-        if (!wrapper || !api) {
-            return;
-        }
-
-        try {
-            // Get current pagination info
-            const pageSize = api.paginationGetPageSize();
-            const totalRows = api.getDisplayedRowCount();
-            const currentRows = Math.min(pageSize, totalRows);
-
-            // Calculate appropriate height class based on row count
-            let heightClass = "height-small";
-            
-            if (currentRows <= 25) {
-                heightClass = "height-small";
-            } else if (currentRows <= 50) {
-                heightClass = "height-medium";
-            } else {
-                heightClass = "height-large";
-            }
-
-            // Remove existing height classes
-            wrapper.classList.remove("height-small", "height-medium", "height-large");
-            
-            // Add appropriate height class with transition
-            wrapper.classList.add(heightClass);
-
-            // Enable large dataset optimizations for 100+ rows
-            if (currentRows >= 100) {
-                wrapper.classList.add("large-dataset");
-                
-                // Re-enable transitions after a brief delay
-                setTimeout(() => {
-                    wrapper.classList.add("transition-enabled");
-                }, 50);
-            } else {
-                wrapper.classList.remove("large-dataset", "transition-enabled");
-            }
-
-            // Debug info in development
-            if (wrapper.classList.contains("debug")) {
-                wrapper.setAttribute("data-rows", currentRows);
-                wrapper.setAttribute("data-height-class", heightClass);
-            }
-
-        } catch (error) {
-            console.warn("Error updating container height:", error);
-        }
-    }
+    // Note: Container height management functions removed
+    // AG-Grid domLayout: 'autoHeight' now handles all height management automatically
 
     return gridOptions;
 }
