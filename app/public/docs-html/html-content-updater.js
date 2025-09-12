@@ -175,7 +175,7 @@ class HtmlContentUpdater {
             this.activeSpec = activeSpecContent.trim();
             console.log(`✓ Active spec loaded: ${this.activeSpec}`);
             return this.activeSpec;
-        } catch (error) {
+        } catch (_error) {
             console.log("ℹ️ No active spec file found (.active-spec)");
             this.activeSpec = null;
             return null;
