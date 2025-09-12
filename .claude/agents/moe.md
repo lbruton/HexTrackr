@@ -52,6 +52,19 @@ await mcp__memento__create_entities({
 });
 ```
 
+
+### ⚠️ TIMESTAMP REQUIREMENT ⚠️
+
+**CRITICAL**: Every Memento entity MUST include ISO 8601 timestamp as FIRST observation:
+
+```javascript
+observations: [
+  `TIMESTAMP: ${new Date().toISOString()}`,  // ALWAYS FIRST (e.g., 2025-09-12T14:30:45.123Z)
+  // ... rest of observations
+]
+```
+
+This enables conflict resolution, temporal queries, and audit trails.
 ### MANDATORY Log File Format
 Save complete analysis to: `/hextrackr-specs/data/agentlogs/moe/MOE_YYYYMMDDTHHMMSS.md`
 
