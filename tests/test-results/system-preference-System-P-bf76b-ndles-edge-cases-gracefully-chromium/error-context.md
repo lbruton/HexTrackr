@@ -1,0 +1,483 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - heading " HexTrackr" [level=1] [ref=e5]:
+        - link " HexTrackr" [ref=e6] [cursor=pointer]:
+          - /url: /tickets.html
+          - generic [ref=e7] [cursor=pointer]: 
+          - text: HexTrackr
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - link "Enable dark mode" [ref=e10] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e11] [cursor=pointer]: 
+          - text: 
+        - generic [ref=e12]:
+          - link "Open user menu" [ref=e13] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e15] [cursor=pointer]:
+              - generic [ref=e16] [cursor=pointer]: HexTrackr User
+              - generic [ref=e17] [cursor=pointer]: Manager
+          - text:      
+      - list [ref=e20]:
+        - listitem [ref=e21]:
+          - link " Tickets" [ref=e22] [cursor=pointer]:
+            - /url: /tickets.html
+            - generic [ref=e24] [cursor=pointer]: 
+            - generic [ref=e25] [cursor=pointer]: Tickets
+        - listitem [ref=e26]:
+          - link " Vulnerabilities" [ref=e27] [cursor=pointer]:
+            - /url: /vulnerabilities.html
+            - generic [ref=e29] [cursor=pointer]: 
+            - generic [ref=e30] [cursor=pointer]: Vulnerabilities
+        - listitem [ref=e31]:
+          - link " Documentation" [ref=e32] [cursor=pointer]:
+            - /url: /docs-html/
+            - generic [ref=e34] [cursor=pointer]: 
+            - generic [ref=e35] [cursor=pointer]: Documentation
+  - generic [ref=e37]:
+    - generic [ref=e41]:
+      - heading " Vulnerability Management Dashboard" [level=2] [ref=e42]:
+        - generic [ref=e43]: 
+        - text: Vulnerability Management Dashboard
+      - generic [ref=e44]: Modern security vulnerability tracking and analysis
+    - generic [ref=e45]:
+      - generic [ref=e47]:
+        - generic [ref=e51] [cursor=pointer]:
+          - generic [ref=e54] [cursor=pointer]: 
+          - generic [ref=e56] [cursor=pointer]:
+            - generic [ref=e57] [cursor=pointer]: "54"
+            - generic [ref=e58] [cursor=pointer]: Critical Vulnerabilities
+            - generic [ref=e59] [cursor=pointer]: 170.2 VPR
+          - generic [ref=e63] [cursor=pointer]: +0%
+        - generic [ref=e67] [cursor=pointer]:
+          - generic [ref=e70] [cursor=pointer]: "!"
+          - generic [ref=e72] [cursor=pointer]:
+            - generic [ref=e73] [cursor=pointer]: "3797"
+            - generic [ref=e74] [cursor=pointer]: High Vulnerabilities
+            - generic [ref=e75] [cursor=pointer]: 20065.7 VPR
+          - generic [ref=e79] [cursor=pointer]: +0%
+        - generic [ref=e83] [cursor=pointer]:
+          - generic [ref=e86] [cursor=pointer]: 
+          - generic [ref=e88] [cursor=pointer]:
+            - generic [ref=e89] [cursor=pointer]: "7287"
+            - generic [ref=e90] [cursor=pointer]: Medium Vulnerabilities
+            - generic [ref=e91] [cursor=pointer]: 34099.4 VPR
+          - generic [ref=e95] [cursor=pointer]: +0%
+        - generic [ref=e99] [cursor=pointer]:
+          - generic [ref=e102] [cursor=pointer]: 
+          - generic [ref=e104] [cursor=pointer]:
+            - generic [ref=e105] [cursor=pointer]: "3362"
+            - generic [ref=e106] [cursor=pointer]: Low Vulnerabilities
+            - generic [ref=e107] [cursor=pointer]: 1529.8 VPR
+          - generic [ref=e111] [cursor=pointer]: "-0%"
+      - generic [ref=e112]:
+        - generic [ref=e113]:
+          - heading " Historical VPR Trends (Last 14 Days)" [level=3] [ref=e114]:
+            - generic [ref=e115]: 
+            - text: Historical VPR Trends (Last 14 Days)
+          - group "Chart metric switcher" [ref=e117]:
+            - radio "# Vulnerability Count"
+            - generic [ref=e118] [cursor=pointer]:
+              - generic [ref=e119] [cursor=pointer]: "#"
+              - text: Vulnerability Count
+            - radio " VPR Score Sum" [checked]
+            - generic [ref=e120] [cursor=pointer]:
+              - generic [ref=e121] [cursor=pointer]: 
+              - text: VPR Score Sum
+        - generic [ref=e124]:
+          - img [ref=e125]:
+            - generic [ref=e127]:
+              - generic [ref=e130] [cursor=pointer]: Critical
+              - generic [ref=e133] [cursor=pointer]: High
+              - generic [ref=e136] [cursor=pointer]: Medium
+              - generic [ref=e139] [cursor=pointer]: Low
+            - generic [ref=e140]: Vulnerability VPR Score Trends Over Time
+            - generic [ref=e141]: Showing data points only for actual vulnerability scans
+            - generic [ref=e142]:
+              - generic [ref=e143]:
+                - generic [ref=e145]: "34099.40"
+                - generic [ref=e147]: "30689.46"
+                - generic [ref=e149]: "27279.52"
+                - generic [ref=e151]: "23869.58"
+                - generic [ref=e153]: "20459.64"
+                - generic [ref=e155]: "17049.70"
+                - generic [ref=e157]: "13639.76"
+                - generic [ref=e159]: "10229.82"
+                - generic [ref=e161]: "6819.88"
+                - generic [ref=e163]: "3409.94"
+                - generic [ref=e165]: "0.00"
+              - generic [ref=e167]: Cumulative VPR Score Total
+            - generic [ref=e191]:
+              - generic [ref=e193]: Aug 29
+              - generic [ref=e195]: Aug 30
+              - generic [ref=e197]: Aug 31
+              - generic [ref=e199]: Sep 01
+              - generic [ref=e201]: Sep 02
+              - generic [ref=e203]: Sep 03
+              - generic [ref=e205]: Sep 04
+              - generic [ref=e207]: Sep 05
+              - generic [ref=e209]: Sep 06
+              - generic [ref=e211]: Sep 07
+              - generic [ref=e213]: Sep 08
+              - generic [ref=e215]: Sep 09
+              - generic [ref=e217]: Sep 10
+              - generic [ref=e219]: Sep 11
+          - generic [ref=e220]:
+            - generic "Zoom In" [ref=e221] [cursor=pointer]:
+              - img
+            - generic "Zoom Out" [ref=e222] [cursor=pointer]:
+              - img
+            - generic "Selection Zoom" [ref=e223] [cursor=pointer]:
+              - img
+            - generic "Panning" [ref=e224] [cursor=pointer]:
+              - img
+            - generic "Reset Zoom" [ref=e225] [cursor=pointer]:
+              - img
+            - generic "Menu" [ref=e226] [cursor=pointer]:
+              - img
+      - generic [ref=e231]:
+        - generic [ref=e232]:
+          - generic [ref=e234]: 
+          - textbox "Search vulnerabilities, CVEs, or hostnames..." [ref=e235]
+        - combobox "Filter by severity" [ref=e237]:
+          - option "All Severities" [selected]
+          - option "Critical"
+          - option "High"
+          - option "Medium"
+          - option "Low"
+        - generic [ref=e238]:
+          - button " Import" [ref=e239] [cursor=pointer]:
+            - generic [ref=e240] [cursor=pointer]: 
+            - text: Import
+          - button " Export" [ref=e241] [cursor=pointer]:
+            - generic [ref=e242] [cursor=pointer]: 
+            - text: Export
+          - button "" [ref=e243] [cursor=pointer]:
+            - generic [ref=e244] [cursor=pointer]: 
+      - generic [ref=e245]:
+        - generic [ref=e246]:
+          - heading " Vulnerability Data Workspace" [level=3] [ref=e247]:
+            - generic [ref=e248]: 
+            - text: Vulnerability Data Workspace
+          - group "View switcher" [ref=e250]:
+            - radio " Table" [checked]
+            - generic [ref=e251] [cursor=pointer]:
+              - generic [ref=e252] [cursor=pointer]: 
+              - text: Table
+            - radio " Devices"
+            - generic [ref=e253] [cursor=pointer]:
+              - generic [ref=e254] [cursor=pointer]: 
+              - text: Devices
+            - radio " Vulnerabilities"
+            - generic [ref=e255] [cursor=pointer]:
+              - generic [ref=e256] [cursor=pointer]: 
+              - text: Vulnerabilities
+        - generic [ref=e259]:
+          - treegrid [ref=e260]:
+            - rowgroup [ref=e261]:
+              - row "Last Seen Severity VPR Hostname IP Address Vendor Vulnerability Vulnerability Description" [ref=e262]:
+                - columnheader "Last Seen" [ref=e263]:
+                  - text: 
+                  - generic [ref=e265]: 
+                  - generic [ref=e266] [cursor=pointer]: Last Seen
+                  - text: 
+                  - generic:    
+                - columnheader "Severity" [ref=e267]:
+                  - text: 
+                  - generic [ref=e269]: 
+                  - generic [ref=e270] [cursor=pointer]: Severity
+                  - text: 
+                  - generic:    
+                - columnheader "VPR" [ref=e271]:
+                  - text: 
+                  - generic [ref=e273]: 
+                  - generic [ref=e274] [cursor=pointer]: VPR
+                  - text: 
+                  - generic:    
+                - columnheader "Hostname" [ref=e275]:
+                  - text: 
+                  - generic [ref=e277]: 
+                  - generic [ref=e278] [cursor=pointer]: Hostname
+                  - text: 
+                  - generic:    
+                - columnheader "IP Address" [ref=e279]:
+                  - text: 
+                  - generic [ref=e281]: 
+                  - generic [ref=e282] [cursor=pointer]: IP Address
+                  - text: 
+                  - generic:    
+                - columnheader "Vendor" [ref=e283]:
+                  - text: 
+                  - generic [ref=e285]: 
+                  - generic [ref=e286] [cursor=pointer]: Vendor
+                  - text: 
+                  - generic:    
+                - columnheader "Vulnerability" [ref=e287]:
+                  - text: 
+                  - generic [ref=e289]: 
+                  - generic [ref=e290] [cursor=pointer]: Vulnerability
+                  - text: 
+                  - generic:    
+                - columnheader "Vulnerability Description" [ref=e291]:
+                  - text: 
+                  - generic [ref=e293]: 
+                  - generic [ref=e294] [cursor=pointer]: Vulnerability Description
+                  - text: 
+                  - generic:    
+            - rowgroup [ref=e295]:
+              - row "Press SPACE to select this row." [ref=e296]:
+                - gridcell "9/11/2025" [ref=e297]:
+                  - generic [ref=e298]: 9/11/2025
+                - gridcell "Critical" [ref=e299]:
+                  - generic [ref=e301]: Critical
+                - gridcell "7.4" [ref=e302]:
+                  - generic [ref=e304]: "7.4"
+                - gridcell "grimesnswan03" [ref=e305]:
+                  - link "grimesnswan03" [ref=e307] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "10.96.89.6" [ref=e308]:
+                  - code [ref=e310]: 10.96.89.6
+                - gridcell "CISCO" [ref=e311]
+                - gridcell "CVE-2017-3881" [ref=e312]:
+                  - link "CVE-2017-3881" [ref=e314] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e315]:
+                  - link "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e317] [cursor=pointer]:
+                    - /url: "#"
+              - row "Press SPACE to select this row." [ref=e318]:
+                - gridcell "9/11/2025" [ref=e319]:
+                  - generic [ref=e320]: 9/11/2025
+                - gridcell "Critical" [ref=e321]:
+                  - generic [ref=e323]: Critical
+                - gridcell "7.4" [ref=e324]:
+                  - generic [ref=e326]: "7.4"
+                - gridcell "fallsnswan02" [ref=e327]:
+                  - link "fallsnswan02" [ref=e329] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "10.96.88.5" [ref=e330]:
+                  - code [ref=e332]: 10.96.88.5
+                - gridcell "CISCO" [ref=e333]
+                - gridcell "CVE-2017-3881" [ref=e334]:
+                  - link "CVE-2017-3881" [ref=e336] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e337]:
+                  - link "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e339] [cursor=pointer]:
+                    - /url: "#"
+              - row "Press SPACE to select this row." [ref=e340]:
+                - gridcell "9/11/2025" [ref=e341]:
+                  - generic [ref=e342]: 9/11/2025
+                - gridcell "Critical" [ref=e343]:
+                  - generic [ref=e345]: Critical
+                - gridcell "7.4" [ref=e346]:
+                  - generic [ref=e348]: "7.4"
+                - gridcell "houstnnswan63" [ref=e349]:
+                  - link "houstnnswan63" [ref=e351] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "10.95.97.163" [ref=e352]:
+                  - code [ref=e354]: 10.95.97.163
+                - gridcell "CISCO" [ref=e355]
+                - gridcell "CVE-2017-3881" [ref=e356]:
+                  - link "CVE-2017-3881" [ref=e358] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e359]:
+                  - link "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e361] [cursor=pointer]:
+                    - /url: "#"
+              - row "Press SPACE to select this row." [ref=e362]:
+                - gridcell "9/11/2025" [ref=e363]:
+                  - generic [ref=e364]: 9/11/2025
+                - gridcell "Critical" [ref=e365]:
+                  - generic [ref=e367]: Critical
+                - gridcell "7.4" [ref=e368]:
+                  - generic [ref=e370]: "7.4"
+                - gridcell "springnswan05" [ref=e371]:
+                  - link "springnswan05" [ref=e373] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "10.95.11.105" [ref=e374]:
+                  - code [ref=e376]: 10.95.11.105
+                - gridcell "CISCO" [ref=e377]
+                - gridcell "CVE-2017-3881" [ref=e378]:
+                  - link "CVE-2017-3881" [ref=e380] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e381]:
+                  - link "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e383] [cursor=pointer]:
+                    - /url: "#"
+              - row "Press SPACE to select this row." [ref=e384]:
+                - gridcell "9/11/2025" [ref=e385]:
+                  - generic [ref=e386]: 9/11/2025
+                - gridcell "Critical" [ref=e387]:
+                  - generic [ref=e389]: Critical
+                - gridcell "7.4" [ref=e390]:
+                  - generic [ref=e392]: "7.4"
+                - gridcell "monteznswan01" [ref=e393]:
+                  - link "monteznswan01" [ref=e395] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "10.95.242.101" [ref=e396]:
+                  - code [ref=e398]: 10.95.242.101
+                - gridcell "CISCO" [ref=e399]
+                - gridcell "CVE-2017-3881" [ref=e400]:
+                  - link "CVE-2017-3881" [ref=e402] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e403]:
+                  - link "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e405] [cursor=pointer]:
+                    - /url: "#"
+              - row "Press SPACE to select this row." [ref=e406]:
+                - gridcell "9/11/2025" [ref=e407]:
+                  - generic [ref=e408]: 9/11/2025
+                - gridcell "Critical" [ref=e409]:
+                  - generic [ref=e411]: Critical
+                - gridcell "7.4" [ref=e412]:
+                  - generic [ref=e414]: "7.4"
+                - gridcell "galenanswan38" [ref=e415]:
+                  - link "galenanswan38" [ref=e417] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "10.95.83.138" [ref=e418]:
+                  - code [ref=e420]: 10.95.83.138
+                - gridcell "CISCO" [ref=e421]
+                - gridcell "CVE-2017-3881" [ref=e422]:
+                  - link "CVE-2017-3881" [ref=e424] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e425]:
+                  - link "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e427] [cursor=pointer]:
+                    - /url: "#"
+              - row "Press SPACE to select this row." [ref=e428]:
+                - gridcell "9/11/2025" [ref=e429]:
+                  - generic [ref=e430]: 9/11/2025
+                - gridcell "Critical" [ref=e431]:
+                  - generic [ref=e433]: Critical
+                - gridcell "7.4" [ref=e434]:
+                  - generic [ref=e436]: "7.4"
+                - gridcell "grimesnswan02" [ref=e437]:
+                  - link "grimesnswan02" [ref=e439] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "10.96.89.5" [ref=e440]:
+                  - code [ref=e442]: 10.96.89.5
+                - gridcell "CISCO" [ref=e443]
+                - gridcell "CVE-2017-3881" [ref=e444]:
+                  - link "CVE-2017-3881" [ref=e446] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e447]:
+                  - link "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e449] [cursor=pointer]:
+                    - /url: "#"
+              - row "Press SPACE to select this row." [ref=e450]:
+                - gridcell "9/11/2025" [ref=e451]:
+                  - generic [ref=e452]: 9/11/2025
+                - gridcell "Critical" [ref=e453]:
+                  - generic [ref=e455]: Critical
+                - gridcell "7.4" [ref=e456]:
+                  - generic [ref=e458]: "7.4"
+                - gridcell "elpasonswan03" [ref=e459]:
+                  - link "elpasonswan03" [ref=e461] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "10.96.67.103" [ref=e462]:
+                  - code [ref=e464]: 10.96.67.103
+                - gridcell "CISCO" [ref=e465]
+                - gridcell "CVE-2017-3881" [ref=e466]:
+                  - link "CVE-2017-3881" [ref=e468] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e469]:
+                  - link "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e471] [cursor=pointer]:
+                    - /url: "#"
+              - row "Press SPACE to select this row." [ref=e472]:
+                - gridcell "9/11/2025" [ref=e473]:
+                  - generic [ref=e474]: 9/11/2025
+                - gridcell "Critical" [ref=e475]:
+                  - generic [ref=e477]: Critical
+                - gridcell "7.4" [ref=e478]:
+                  - generic [ref=e480]: "7.4"
+                - gridcell "fallsnswan03" [ref=e481]:
+                  - link "fallsnswan03" [ref=e483] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "10.96.88.6" [ref=e484]:
+                  - code [ref=e486]: 10.96.88.6
+                - gridcell "CISCO" [ref=e487]
+                - gridcell "CVE-2017-3881" [ref=e488]:
+                  - link "CVE-2017-3881" [ref=e490] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e491]:
+                  - link "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e493] [cursor=pointer]:
+                    - /url: "#"
+              - row "Press SPACE to select this row." [ref=e494]:
+                - gridcell "9/11/2025" [ref=e495]:
+                  - generic [ref=e496]: 9/11/2025
+                - gridcell "Critical" [ref=e497]:
+                  - generic [ref=e499]: Critical
+                - gridcell "7.4" [ref=e500]:
+                  - generic [ref=e502]: "7.4"
+                - gridcell "houstnnswan51" [ref=e503]:
+                  - link "houstnnswan51" [ref=e505] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "10.95.97.151" [ref=e506]:
+                  - code [ref=e508]: 10.95.97.151
+                - gridcell "CISCO" [ref=e509]
+                - gridcell "CVE-2017-3881" [ref=e510]:
+                  - link "CVE-2017-3881" [ref=e512] [cursor=pointer]:
+                    - /url: "#"
+                - gridcell "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e513]:
+                  - link "Cisco IOS Cluster Management Protocol Telnet Option Handling RCE (cisco-sa-20170317-cmp)" [ref=e515] [cursor=pointer]:
+                    - /url: "#"
+          - generic [ref=e516]:
+            - generic [ref=e517]:
+              - generic [ref=e518]: "Page Size:"
+              - combobox "Page Size" [ref=e519]:
+                - generic [ref=e520]: "10"
+                - generic [ref=e521] [cursor=pointer]: 
+            - status [ref=e522]:
+              - generic [ref=e523]: "1"
+              - generic [ref=e524]: to
+              - generic [ref=e525]: "10"
+              - generic [ref=e526]: of
+              - generic [ref=e527]: 10,000
+            - button "First Page" [disabled] [ref=e528]: 
+            - button "Previous Page" [disabled] [ref=e529]: 
+            - status [ref=e530]:
+              - generic [ref=e531]: Page
+              - generic [ref=e532]: "1"
+              - generic [ref=e533]: of
+              - generic [ref=e534]: 1,000
+            - button "Next Page" [ref=e535] [cursor=pointer]: 
+            - button "Last Page" [ref=e536] [cursor=pointer]: 
+  - text:                     
+  - generic:                                                  
+  - contentinfo [ref=e538]:
+    - generic [ref=e541]:
+      - list [ref=e542]:
+        - listitem [ref=e543]:
+          - link "HexTrackr Version" [ref=e544] [cursor=pointer]:
+            - /url: /docs-html/#CHANGELOG
+            - img "HexTrackr Version" [ref=e545] [cursor=pointer]
+        - listitem [ref=e546]:
+          - text: ·
+          - link "Documentation" [ref=e547] [cursor=pointer]:
+            - /url: /docs-html/
+            - img "Documentation" [ref=e548] [cursor=pointer]
+        - listitem [ref=e549]:
+          - text: ·
+          - link "GitHub Repository" [ref=e550] [cursor=pointer]:
+            - /url: https://github.com/Lonnie-Bruton/HexTrackr
+            - img "GitHub Repository" [ref=e551] [cursor=pointer]
+        - listitem [ref=e552]:
+          - text: ·
+          - link "Codacy Grade A" [ref=e553] [cursor=pointer]:
+            - /url: https://app.codacy.com?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
+            - img "Codacy Grade A" [ref=e554] [cursor=pointer]
+      - list [ref=e555]:
+        - listitem [ref=e556]:
+          - img "SQLite Database" [ref=e557]
+        - listitem [ref=e558]:
+          - text: ·
+          - img "Express.js Backend" [ref=e559]
+        - listitem [ref=e560]:
+          - text: ·
+          - img "Tabler UI Framework" [ref=e561]
+        - listitem [ref=e562]:
+          - text: ·
+          - link "Coded with Vibes" [ref=e563] [cursor=pointer]:
+            - /url: https://www.reddit.com/r/vibecoding
+            - img "Coded with Vibes" [ref=e564] [cursor=pointer]
+  - img
+  - generic:     
+```

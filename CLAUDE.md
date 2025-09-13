@@ -1,23 +1,5 @@
 # CLAUDE - HexTrackr AI Development Assistant
 
-**Version**: v1.0.13 | **Branch**: 005-dark-mode-theme-system | **Callsign**: Hannibal
-
-🎯 You are Claude, channeling the strategic brilliance of Colonel John "Hannibal" Smith from The A-Team. You're the master strategist who loves it when a plan comes together. As Assistant Lead for HexTrackr operations, you direct specialist teams while maintaining tactical overview.
-
-## Your Command Style
-
-You approach every problem as a mission requiring the perfect plan. You speak with calm confidence, always have Plans B and C ready, and habitually save your tactical assessments to Memento. You see patterns where others see chaos.
-
-**Your Signature**: "I love it when a plan comes together!"
-
-**Your Language**:
-
-- Tasks are "missions" or "operations"
-- Bugs are "hostile elements" to neutralize
-- Subagents are "specialists" or "the team"
-- Git commits are "operational checkpoints"
-- Successful fixes are when "the plan comes together"
-
 ## Project Structure
 
 ### Backend
@@ -28,187 +10,296 @@ You approach every problem as a mission requiring the perfect plan. You speak wi
 
 ### Frontend
 
-- **Shared**: `scripts/shared/` - Reusable components
-- **Pages**: `scripts/pages/` - Page logic
-- **Utils**: `scripts/utils/` - Utilities
+- **Scripts**: `app/public/scripts/` - JavaScript modules
+  - `shared/` - Reusable components
+  - `pages/` - Page-specific logic
+  - `utils/` - Utility functions
+- **Styles**: `app/public/styles/` - CSS architecture
+  - `shared/` - Global styles (base.css, dark-theme.css, header.css)
+  - `pages/` - Page-specific styles
+  - `utils/` - Responsive utilities
+- **Vendor**: `app/public/vendor/` - Third-party libraries
+- **Uploads**: `app/public/uploads/` - File upload storage
+- **Docs**: `app/public/docs-html/` - Documentation system
+
+### Testing
+
+- **Unit/Integration**: `__tests__/` - Jest test suites
+- **E2E**: Playwright tests with coverage reports
+- **Fixtures**: `__tests__/fixtures/` - Test data
 
 ### Development Environment
 
-- **Docker**: Use `docker-compose up -d` to start (port 8989)
-- **Access**: <http://localhost:8989>
+- **Docker**: Use `docker-compose up -d` to start
+- **Main App**: <http://localhost:8989> (port 8989)
+- **WebSocket**: Socket.io server (port 8988)
 - **Node.js**: Run through Docker, not directly
+
+## Workflow Recommendations
+
+**CORE PRINCIPLE**: Use Sequential Thinking (`mcp__sequential-thinking__sequentialthinking`) as your default problem-solving approach. This ensures systematic, revisable thinking for any task beyond simple operations.
+
+### 1. Start with Planning
+
+**ALWAYS use Sequential Thinking as your default approach** for any task requiring analysis, planning, or multiple steps:
+
+- **Sequential Thinking** (`mcp__sequential-thinking__sequentialthinking`)
+  - Break down complex problems into manageable steps
+  - Maintain context across multiple operations
+  - Essential for architecture decisions, debugging, feature implementation
+  - Use for ANY task more complex than a simple file edit or single command
+  - Allows revision of previous thoughts as understanding evolves
+
+### 2. Gather Context
+
+Check Memento → Ref → Context7
+
+#### Available Tools
+
+- **Ref Tools** - GitHub Repository Search
+  - **Search**: `mcp__Ref__ref_search_documentation` (pre-indexed repos)
+  - **Read**: `mcp__Ref__ref_read_url` (content as markdown)
+  - Pre-indexed GitHub repositories (fast, no rate limits)
+  - Excellent for code patterns and implementation examples
+
+- **Memento** - Knowledge Graph & Memory System
+  - **Search**: `mcp__memento__search_nodes` (semantic/keyword/hybrid modes)
+  - **Create**: `mcp__memento__create_entities` (with observations)
+  - **Relations**: `mcp__memento__create_relations` (link entities)
+  - **Add Info**: `mcp__memento__add_observations` (timestamped updates)
+  - **Retrieve**: `mcp__memento__open_nodes` (full entity details)
+  - **Browse**: `mcp__memento__read_graph` (entire knowledge graph)
+  - **Organize**: `mcp__memento__set_importance`, `mcp__memento__add_tags`
+  - **Cleanup**: `mcp__memento__delete_entities`, `mcp__memento__delete_relations`
+
+  Search modes: semantic (faster exploration) → keyword (precise) → hybrid (comprehensive)
+
+- **Context7** (`mcp__context7__resolve-library-id`, `mcp__context7__get-library-docs`)
+  - Framework and library documentation
+
+### 3. Research if Needed
+
+Context7 → Brave Search → WebSearch (in order)
+
+#### Search Tools
+
+- **Brave Search** - Pro AI Web Search
+  - **Web**: `mcp__brave-search__brave_web_search` (general search + AI summarizer)
+  - **Local**: `mcp__brave-search__brave_local_search` (businesses, places - Pro AI only)
+  - **Images**: `mcp__brave-search__brave_image_search` (visual content)
+  - **News**: `mcp__brave-search__brave_news_search` (current events)
+  - **Videos**: `mcp__brave-search__brave_video_search` (video content)
+  - **Summarizer**: `mcp__brave-search__brave_summarizer` (AI content synthesis - Pro AI)
+  - Pro AI tier with enhanced features and summarization
+
+- **WebSearch** (`WebSearch`)
+  - Fallback when Brave Search unavailable
+
+### 4. Deep Analysis
+
+Use Zen tools for code review and architecture:
+
+#### Zen Tools Suite
+
+- **thinkdeep** (`mcp__zen__thinkdeep`): Multi-stage investigation and reasoning
+- **analyze** (`mcp__zen__analyze`): Code architecture and performance analysis
+- **consensus** (`mcp__zen__consensus`): Multi-model consensus building
+- **codereview** (`mcp__zen__codereview`): Systematic code quality assessment
+- **debug** (`mcp__zen__debug`): Root cause analysis
+- **refactor** (`mcp__zen__refactor`): Code improvement opportunities
+- **secaudit** (`mcp__zen__secaudit`): Security vulnerability assessment
+- **precommit** (`mcp__zen__precommit`): Git changes validation
+- **docgen** (`mcp__zen__docgen`): Code documentation generation
+- **tracer** (`mcp__zen__tracer`): Code tracing and flow analysis
+- **testgen** (`mcp__zen__testgen`): Test suite generation
+- **planner** (`mcp__zen__planner`): Interactive sequential planning
+
+For complete tool reference: `/Users/lbruton/.claude/dev-docs/MCP_TOOLS.md`
+
+### 5. Test Everything
+
+Comprehensive testing with Jest, Playwright, and linting:
+
+#### Validation Commands
+
+```bash
+
+# Code Quality
+npm run eslint          # JavaScript linting
+npm run stylelint       # CSS linting
+npm run lint:all        # All linters
+npm run fix:all         # Auto-fix issues
+npm run lint:md         # Markdown linting
+
+# Security & Audit
+npm run security:check  # Security audit
+npm run audit           # npm audit
+```
+
+#### Testing Tools
+
+- **Playwright** - E2E Browser Automation
+  - **Navigation**: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_navigate_back`
+  - **Interaction**: `mcp__playwright__browser_click`, `mcp__playwright__browser_type`, `mcp__playwright__browser_fill_form`
+  - **Analysis**: `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_take_screenshot`
+  - **Evaluation**: `mcp__playwright__browser_evaluate`, `mcp__playwright__browser_network_requests`
+  - **Utility**: `mcp__playwright__browser_wait_for`, `mcp__playwright__browser_tabs`
+
+- **Codacy** - Static Code Analysis & Quality Metrics
+  - **Analysis**: `mcp__codacy__codacy_cli_analyze` (local quality analysis)
+  - **Repository**: `mcp__codacy__codacy_get_repository_with_analysis` (quality metrics)
+  - **Issues**: `mcp__codacy__codacy_list_repository_issues` (code quality issues)
+  - **Files**: `mcp__codacy__codacy_list_files`, `mcp__codacy__codacy_get_file_issues`
+  - **Security**: `mcp__codacy__codacy_search_repository_srm_items` (security findings)
+  - **Tools**: `mcp__codacy__codacy_list_tools`, `mcp__codacy__codacy_get_pattern`
+
+- **ESLint** - JavaScript code quality (npm run eslint)
+- **Stylelint** - CSS code quality (npm run stylelint)
+
+### 6. Save Discoveries
+
+Always capture insights to Memento using the appropriate entity creation and relation tools.
+
+## Key Technologies
+
+### Core Stack
+
+- **Express.js** - Web server framework
+- **Socket.io** - WebSocket for real-time updates
+- **SQLite3** - Database with direct SQL access
+- **AG-Grid Community** - Advanced data tables
+- **Tabler Core** - UI design system
+
+### Frontend Libraries
+
+- **Chart.js** & **ApexCharts** - Data visualizations
+- **DOMPurify** - XSS protection
+- **Marked** - Markdown parsing
+- **SortableJS** - Drag & drop
+- **JSZip** - File compression
+
+### Security & Performance
+
+- **Express Rate Limit** - API throttling
+- **Compression** - Response compression
+- **CORS** - Cross-origin requests
+- **Multer** - File uploads (50MB limit)
+
+## API Architecture
+
+### Core Endpoints
+
+```javascript
+// Vulnerability Management
+GET    /api/vulnerabilities        // List vulnerabilities
+GET    /api/vulnerabilities/stats  // Statistics dashboard
+POST   /api/vulnerabilities/import // CSV import
+DELETE /api/vulnerabilities/clear  // Clear all data
+
+// Ticket Operations
+GET    /api/tickets               // List tickets
+POST   /api/tickets              // Create ticket
+PUT    /api/tickets/:id          // Update ticket
+DELETE /api/tickets/:id          // Delete ticket
+
+// Data Management
+GET    /api/backup/all           // Export all data
+POST   /api/restore              // Import data
+GET    /api/imports              // Import history
+GET    /health                   // Health check
+```
+
+### Database Schema
+
+- **vulnerabilities** - CVE data with severity, status, devices
+- **tickets** - Support tickets with priority, assignments
+- **vulnerability_imports** - Import history and metadata
+- **ticket_vulnerabilities** - Junction table for relationships
 
 ## Git Workflow
 
 - **Working Branch**: `copilot` (avoid working on main directly)
 - **Create checkpoints**: Before major changes
-- **Current Branch**: 005-dark-mode-theme-system
+- **Commit often**: Small, focused commits with clear messages
 
-## MCP Tool Hierarchy
+## Development Patterns
 
-### 1️⃣ Planning & Problem Solving
+### Error Handling
 
-- **Sequential Thinking** (`mcp__sequential_thinking__sequentialthinking`)
-  - Use for: Breaking down complex problems, planning implementation steps
-  - Multi-step reasoning with revision capabilities
+- Try-catch blocks with detailed error messages
+- Socket.io progress updates for long operations
+- Graceful fallbacks for missing data
 
-### 2️⃣ Context Gathering
+### Security Practices
 
-- **Ref Tools** (`mcp__Ref__ref_search_documentation`)
-  - HexTrackr code patterns and documentation
-  - Note: May lag behind local changes
-- **Memento** (`mcp__memento__search_nodes`)
-  - Search past work and institutional memory
-  - Save discoveries with `mcp__memento__create_entities`
-- **Athena** (`/athena`)
-  - Session log extraction and wisdom preservation
-  - Semantic search across conversation archives
+- Input validation with DOMPurify
+- SQL parameterized queries (no injection)
+- File upload restrictions and validation
+- Rate limiting on API endpoints
 
-### 3️⃣ Research & Documentation
+### Real-time Updates
 
-- **Context7** (`mcp__context7__get-library-docs`)
-  - Framework and library documentation
-- **Kagi Search** (`mcp__kagi__kagi_search_fetch`)
-  - Enhanced web research
-- **Kagi Summarizer** (`mcp__kagi__kagi_summarizer`)
-  - Extract insights from URLs
-- **WebSearch** (`WebSearch`)
-  - Last resort when other sources exhausted
+- Socket.io for import progress
+- WebSocket events: `progress`, `complete`, `error`
+- Client-side progress bars and status updates
 
-### 4️⃣ Deep Analysis & Review
+## Quick Reference
 
-- **Zen Tools** Suite:
-  - **thinkdeep**: Multi-stage investigation and reasoning
-  - **analyze**: Code architecture and performance analysis
-  - **consensus**: Multi-model consensus building
-  - **codereview**: Systematic code quality assessment
-  - **debug**: Root cause analysis
-  - **refactor**: Code improvement opportunities
-  - **secaudit**: Security vulnerability assessment
+### Common Commands
 
-### 5️⃣ Testing & Validation
+```bash
+# Development Environment
+docker-compose up -d        # Start containers
+docker-compose logs -f      # View logs
+docker-compose down         # Stop containers
 
-- **Playwright** (`mcp__playwright__*`)
-  - Browser automation for E2E testing
-  - Visual regression testing
-  - UI interaction testing
+# Database
+npm run init-db            # Initialize database
+node app/public/scripts/init-database.js
 
-## Memento Memory System
+# Documentation
+npm run docs:generate      # Update documentation
 
-### Namespace Structure
 
-```javascript
-"HEXTRACKR:VULNERABILITY:*"  // Vulnerability management
-"HEXTRACKR:TICKET:*"         // Ticket integration
-"HEXTRACKR:IMPORT:*"         // CSV/data import
-"HEXTRACKR:UI:*"            // UI/frontend patterns
-"HEXTRACKR:API:*"           // API endpoints
-"HEXTRACKR:BUG:*"           // Bug fixes
-"HEXTRACKR:TEST:*"          // Testing patterns
-"HEXTRACKR:SESSION:*"       // Session handoffs
-"HEXTRACKR:KNOWLEDGE:*"     // Insights and discoveries
+# Development Scripts
+npm run dev               # Start with nodemon
+npm start                # Production start
 ```
 
-### Saving Pattern
+### File Structure
 
-```javascript
-await mcp__memento__create_entities({
-  entities: [{
-    name: "HEXTRACKR:[CATEGORY]:[DESCRIPTION]",
-    entityType: "PROJECT:[TYPE]:[SUBTYPE]",
-    observations: [
-      `TIMESTAMP: ${new Date().toISOString()}`,  // ALWAYS FIRST
-      "ABSTRACT: One-line summary",              // ALWAYS SECOND
-      "SUMMARY: Detailed description",           // ALWAYS THIRD
-      // ... additional observations
-    ]
-  }]
-});
+```
+/app/public/
+├── server.js              # Express server (port 8989)
+├── *.html                 # Main pages (vulnerabilities, tickets)
+├── scripts/
+│   ├── shared/            # Reusable components
+│   ├── pages/             # Page-specific logic
+│   ├── utils/             # Utility functions
+│   └── init-database.js   # Database setup
+├── styles/
+│   ├── shared/            # Global CSS + dark theme
+│   ├── pages/             # Page-specific styles
+│   └── utils/             # Responsive utilities
+├── vendor/                # Third-party libraries
+├── uploads/               # File upload storage
+└── docs-html/             # Documentation system
+
+/data/
+└── hextrackr.db          # SQLite database
+
+/__tests__/
+├── unit/                 # Jest unit tests
+├── integration/          # Integration tests
+├── fixtures/             # Test data
+└── playwright-report/    # E2E test reports
 ```
 
-### Smart Search Strategy
+### Important Notes
 
-**Search Memento when:**
-
-- Starting new topic/task
-- User references past work
-- Need historical patterns
-- Complex architectural decisions
-
-**Skip Memento when:**
-
-- Info in current conversation
-- Simple clarifications
-- Direct commands with context
-- Following up current task
-
-## Available Commands
-
-### Memory Management
-
-- `/save-handoff` - Save session state for continuation
-- `/save-conversation` - Preserve important dialogue
-- `/save-insights` - Capture discoveries
-- `/recall-handoff` - Retrieve recent handoffs
-- `/recall-insights` - Find past discoveries
-- `/recall-conversation` - Access past dialogues
-
-### Special Tools
-
-- `/athena` - Session log management (Goddess of Wisdom)
-
-## Current Systems
-
-### Theme System (v1.0.13)
-
-- **ThemeController**: 1,866 lines, enterprise-grade
-  - Cross-tab synchronization
-  - Progressive storage fallback
-  - 300ms debouncing
-  - XSS protection
-- **ChartThemeAdapter**: ApexCharts/AG-Grid integration
-- **WCAG Validator**: Contrast ratio validation
-- **Accessibility Announcer**: Screen reader support
-- **Dark Theme CSS**: 80+ CSS custom properties
-
-### Security Standards
-
-- XSS prevention throughout
-- Input validation and sanitization
-- No secrets in repository
-- OWASP best practices
-
-### Accessibility Standards
-
-- WCAG 2.1 AA compliance
-- ARIA live regions
-- 4.5:1 contrast (normal text)
-- 3:1 contrast (large text)
-- Reduced motion support
-
-## Testing
-
-- **Unit**: `npm test`
-- **E2E**: `npx playwright test`
-- **Docs**: `npm run docs:generate`
-- **Clean State**: Docker restart before tests
-
-## Workflow Recommendations
-
-1. **Start with Planning**: Use Sequential Thinking for complex tasks
-2. **Gather Context**: Check Memento → Ref → Athena for existing patterns
-3. **Research if Needed**: Context7 → Kagi → WebSearch (in order)
-4. **Deep Analysis**: Use Zen tools for code review and architecture
-5. **Test Everything**: Playwright for UI, npm test for units
-6. **Save Discoveries**: Always capture insights to Memento
-
-## Context Warnings
-
-Simple notifications at context thresholds (configured in `.claude/hooks.json`):
-
-- **75% Context**: "Good checkpoint opportunity if switching topics"
-- **90% Context**: "Consider /save-handoff, /save-insights, or let it compress"
-
-Trust Athena for complete history recovery. No complex automation needed.
-
-This configuration emphasizes tool usage while maintaining simplicity and natural workflow.
+- **WebSocket**: Socket.io runs on port 8988
+- **Main App**: Express server on port 8989
+- **Dark Mode**: CSS variables in `styles/shared/dark-theme.css`
+- **File Limits**: 50MB upload limit via Multer
+- **Branch Strategy**: Use `copilot` branch, never work on `main`
+- **Docker First**: Always use Docker for development
