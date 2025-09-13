@@ -99,6 +99,6 @@ The project includes several scripts in the `package.json` to aid development:
 - `npm run init-db`: Initializes or re-initializes the database.
 - `npm run lint:all`: Runs all code quality checks (ESLint for JS, Stylelint for CSS, Markdownlint for docs).
 - `npm run fix:all`: Attempts to automatically fix all code quality issues.
-- `npm run docs:generate`: **Regenerates the complete HTML documentation portal with spec-kit integration**.
+- `npm run docs:generate`: **Regenerates the complete HTML documentation portal**.
 - `npm run docs:sync-specs`: Syncs specification tasks to the roadmap (part of docs:generate).
 - `npm run docs:sync-all`: Comprehensive documentation synchronization across all sources.
