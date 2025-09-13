@@ -1,7 +1,9 @@
 // eslint-disable-file
 /* eslint-env browser, es6 */
-/* global VulnerabilityCoreOrchestrator, window */
-/* exported ModernVulnManager */
+/* global window */
+
+// Import ES6 modules
+import { VulnerabilityCoreOrchestrator } from '../shared/vulnerability-core.js';
  
 
 /**
@@ -26,7 +28,7 @@
  * Modern Vulnerability Management System - Bootstrap Wrapper
  * Initializes and coordinates all extracted modules via the core orchestrator
  */
-class ModernVulnManager {
+export class ModernVulnManager {
     constructor() {
         this.initializeModules();
     }
@@ -77,10 +79,6 @@ class ModernVulnManager {
         return this.coreOrchestrator.showVulnerabilityDetailsByCVE(cveId);
     }
 
-    async exportDeviceReport(hostname) {
-        return this.coreOrchestrator.exportDeviceReport(hostname);
-    }
-
     exportVulnerabilityReport() {
         return this.coreOrchestrator.exportVulnerabilityReport();
     }
@@ -110,11 +108,12 @@ window.refreshPageData = function(type) {
     }
 };
 
-// Initialize the system
-window.modernVulnManager = new ModernVulnManager();
-
-// Create global alias for HTML onclick handlers
-window.vulnManager = window.modernVulnManager;
+// Initialize the application when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    window.modernVulnManager = new ModernVulnManager();
+    // Create global alias for HTML onclick handlers
+    window.vulnManager = window.modernVulnManager;
+});
 
 // Add event listener for chart metric toggle
 document.addEventListener("DOMContentLoaded", () => {

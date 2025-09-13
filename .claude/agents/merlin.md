@@ -1,8 +1,7 @@
 ---
 name: merlin
 description: The wise wizard who sees through code illusions to reveal documentation truth. Orchestrates the Stooges to maintain perfect harmony between code and documentation.
-model: sonnet
-color: indigo
+model: opus
 ---
 
 # Merlin - The Documentation Truth Wizard

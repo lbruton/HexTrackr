@@ -82,18 +82,6 @@ This project mandates extensive use of MCP (Model Context Protocol) tools:
 4. **Kagi Summarizer**: For extracting insights from specific URLs
 5. **WebSearch**: Only when above sources are exhausted
 
-**Validation (Three-Tier System):**
-
-1. **Gemini (FREE)**: Daily validation, broad consensus
-   - Pre-commit checks, code reviews, architecture validation
-   - Cost: $0/month (saves $105/month vs alternatives)
-2. **Codex/GPT-5 (TARGETED)**: Specific code problems
-   - Complex function generation, algorithm optimization, debugging
-   - Cost: Pay per use, focused context
-3. **Zen (COMPREHENSIVE)**: Critical decisions
-   - Production deployments, major architecture changes
-   - Cost: ~$0.50 per consensus, full context
-
 ## MANDATORY TOOL USAGE
 
 ### 🧠 INTELLIGENT MEMENTO PROTOCOL
@@ -268,40 +256,12 @@ docker-compose logs -f      # View logs
 
 ### Available Commands
 
-**Validation & Consensus Commands:**
-
-- `/gemini-validate [scope]` - Security and code validation ($0)
-- `/gemini-consensus [topic]` - Lightweight consensus with optional Stooges
-- `/codex-help "requirement"` - Generate specific functions with GPT-5
-- `/codex-troubleshoot` - Debug complex issues with reasoning
-- `/zen-consensus` - Full multi-model consensus (when critical)
-
 **Spec Management**:
 
 - `/specify` - Create new specification (WHAT/WHY)
 - `/plan` - Generate technical plan from spec
 - `/tasks` - Create actionable tasks from plan
 - `/specs-validate` - Check constitutional compliance
-
-**Agent Orchestration**:
-
-- `/stooges [larry|moe|curly|all] "task"` - Parallel analysis
-- `/security-team` - Worf-led security audit
-- `/generatedocs` - Full documentation pipeline
-- `/merlin-audit` - Truth verification
-
-**Memory & Context**:
-
-- `/save-handoff` - Save session state
-- `/recall-handoff` - Restore previous session
-- `/save-conversation` - Archive chat
-- `/recall-conversation` - Load archived chat
-
-**Version Management**:
-
-- `/atlas-bump-version` - Increment version
-- `/atlas-list-versions` - Show version history
-- `/uhura-sync` - Git operations
 
 ## Startup Sequence
 
@@ -319,16 +279,6 @@ For optimal context loading:
 - **Always save discoveries**: Use `mcp__memento__create_entities` after findings
 
 ## Recent Changes
-
-### Dark Mode Theme System (Spec 005) - v1.1.0
-
-- **Planning Complete**: Full spec-kit workflow executed with Three Stooges research
-- **Architecture**: Hybrid Tabler.io v1.0.0-beta17 + HexTrackr custom styling approach
-- **Key Components**: theme-controller.js (XSS-safe), ApexCharts adapter, AG-Grid theming
-- **Performance Target**: <100ms theme switching with WCAG AA compliance
-- **Storage Strategy**: localStorage Phase 1, database integration Phase 2
-- **Files Created**: spec.md, plan.md, research.md, data-model.md, quickstart.md, contracts/endpoints.json
-- **Next Steps**: Use /tasks to generate implementation tasks from planning documentation
 
 ## Hook System (Memory Automation)
 

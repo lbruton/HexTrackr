@@ -6,20 +6,22 @@
     <title>HexTrackr - Modern Vulnerability Management</title>
     
     <!-- Tabler.io CSS Framework -->
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    <link href="/vendor/tabler/css/tabler.min.css" rel="stylesheet">
     
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- AG Grid CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-alpine.css">
+    <link rel="stylesheet" href="/vendor/ag-grid/ag-theme-quartz.css">
     
     <!-- Modular HexTrackr CSS -->
     <link rel="stylesheet" href="styles/shared/base.css">
     <link rel="stylesheet" href="styles/shared/header.css">
     <link rel="stylesheet" href="styles/pages/vulnerabilities.css">
     <link rel="stylesheet" href="styles/utils/responsive.css">
+    
+    <!-- Dark Theme Support - T032 -->
+    <link rel="stylesheet" href="styles/shared/dark-theme.css">
     
     <!-- Chart.js for mini-charts - using local files -->
     <!-- Chart.js CSS is embedded in the library -->
@@ -408,8 +410,8 @@
             box-shadow: 0 1px 3px rgba(32, 107, 196, 0.3);
         }
 
-        .ag-theme-alpine {
-            --ag-alpine-active-color: var(--hextrackr-primary);
+        .ag-theme-quartz {
+            --ag-active-color: var(--hextrackr-primary);
             --ag-header-background-color: #f8fafc;
             --ag-header-foreground-color: #1f2937;
             --ag-border-color: #e2e8f0;
@@ -741,7 +743,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div id="historicalChart" style="height: 300px;"></div>
+                            <div id="vulnerability-chart" style="height: 450px;"></div>
                         </div>
                     </div>
 
@@ -820,7 +822,7 @@
                         <div class="card-body p-2">
                             <!-- Table View -->
                             <div id="tableView" class="view-content">
-                                <div id="vulnGrid" class="ag-theme-alpine" style="width: 100%;"></div>
+                                <div id="vulnGrid" class="ag-theme-quartz" style="width: 100%;"></div>
                             </div>
                             
                             <!-- Device Cards View -->
@@ -901,7 +903,7 @@
                                     </h3>
                                 </div>
                                 <div class="card-body p-0">
-                                    <div id="device-vuln-grid" class="ag-theme-alpine" style="height: 500px; width: 100%;"></div>
+                                    <div id="device-vuln-grid" class="ag-theme-quartz" style="height: 500px; width: 100%;"></div>
                                 </div>
                             </div>
                         </div>
@@ -975,7 +977,7 @@
                                     </div>
                                 </div>
                                 <div class="card-body">
-                                    <div id="vuln-affected-assets-grid" class="ag-theme-alpine" style="height: 500px; width: 100%;"></div>
+                                    <div id="vuln-affected-assets-grid" class="ag-theme-quartz" style="height: 500px; width: 100%;"></div>
                                 </div>
                             </div>
                         </div>
@@ -1056,7 +1058,7 @@
                                     <span class="badge bg-secondary" id="affectedAssetsCount">0 assets</span>
                                 </div>
                                 <div class="card-body">
-                                    <div id="vulnerabilityAssetsGrid" style="height: 300px; width: 100%;" class="ag-theme-alpine"></div>
+                                    <div id="vulnerabilityAssetsGrid" style="height: 300px; width: 100%;" class="ag-theme-quartz"></div>
                                 </div>
                             </div>
                         </div>
@@ -1218,16 +1220,16 @@
     <div id="footerContainer"></div>
 
     <!-- Tabler.io JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    <script src="/vendor/tabler/js/tabler.min.js"></script>
     
     <!-- SortableJS for drag and drop -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="/vendor/sortablejs/Sortable.min.js"></script>
     
     <!-- AG Grid Community -->
-    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/dist/ag-grid-community.min.js"></script>
+    <script src="/vendor/ag-grid/ag-grid-community.min.js"></script>
     
     <!-- ApexCharts -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.44.0/dist/apexcharts.min.js"></script>
+    <script src="/vendor/apexcharts/apexcharts.min.js"></script>
     
     <!-- PapaParse for CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -1236,12 +1238,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <!-- Security: DOMPurify for XSS protection -->
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+    <script src="/vendor/dompurify/purify.min.js"></script>
 
     <!-- Socket.io for real-time progress tracking -->
-    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script src="/vendor/socket.io/socket.io.min.js"></script>
 
     <!-- HexTrackr Modular JavaScript Architecture -->
+    <!-- Core Utilities (loaded first) -->
     <script src="scripts/shared/config-loader.js"></script>
     <script src="scripts/shared/header-loader.js"></script>
     <script src="scripts/shared/footer-loader.js"></script>
@@ -1250,18 +1253,25 @@
     <script src="scripts/shared/progress-modal.js"></script>
     <script src="scripts/shared/toast-manager.js"></script>
     <script src="scripts/shared/cve-utilities.js"></script>
+    
+    <!-- Theme and Grid Utilities (dependencies for modules) -->
+    <script src="scripts/utils/chart-theme-adapter.js"></script>
     <script src="scripts/shared/ag-grid-responsive-config.js"></script>
     <script src="scripts/shared/pagination-controller.js"></script>
+    
+    <!-- Data and UI Components -->
     <script src="scripts/shared/vulnerability-data.js"></script>
     <script src="scripts/shared/vulnerability-statistics.js"></script>
-    <script src="scripts/shared/device-security-modal.js"></script>
-    <script src="scripts/shared/vulnerability-details-modal.js"></script>
-    <script src="scripts/shared/vulnerability-chart-manager.js"></script>
     <script src="scripts/shared/vulnerability-search.js"></script>
     <script src="scripts/shared/vulnerability-grid.js"></script>
     <script src="scripts/shared/vulnerability-cards.js"></script>
-    <script src="scripts/shared/vulnerability-core.js"></script>
-    <script src="scripts/pages/vulnerabilities.js"></script>
+    <script src="scripts/shared/device-security-modal.js"></script>
+    <script src="scripts/shared/vulnerability-details-modal.js"></script>
+    
+    <!-- Module Scripts (loaded last, in dependency order) -->
+    <script type="module" src="scripts/shared/vulnerability-chart-manager.js"></script>
+    <script type="module" src="scripts/shared/vulnerability-core.js"></script>
+    <script type="module" src="scripts/pages/vulnerabilities.js"></script>
 
 </body>
 </html>
