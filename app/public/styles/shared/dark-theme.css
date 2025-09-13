@@ -13,14 +13,24 @@
  */
 
 /* Theme Application via Document Element */
-[data-bs-theme="dark"],
-:root.theme-dark {
+[data-bs-theme="dark"] .vulnerability-title {
+    color: var(--bs-emphasis-color) !important;
+}
+
+[data-bs-theme="dark"] .ag-theme-quartz .text-dark {
+    color: var(--ag-foreground-color) !important;
+}
+
+[data-bs-theme="dark"] .ag-theme-quartz {
     /* ===========================================
      * CORE THEME COLORS - Tabler.io v1.0.0-beta17
      * =========================================== */
     
     /* Body and Page Background */
     --bs-body-bg: #0f172a;                    /* Dark slate background */
+
+    /* HexTrackr-specific theme variables */
+    --hextrackr-primary-shadow: rgb(59, 130, 246, 0.2);  /* Blue shadow for dark mode */
     --bs-body-color: #e2e8f0;                 /* Light gray text */
     --bs-body-bg-secondary: #1e293b;          /* Secondary dark background */
     --bs-body-secondary-bg: #1e293b;          /* Bootstrap secondary background */
