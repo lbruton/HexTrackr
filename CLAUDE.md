@@ -202,4 +202,13 @@ await mcp__memento__create_entities({
 5. **Test Everything**: Playwright for UI, npm test for units
 6. **Save Discoveries**: Always capture insights to Memento
 
+## Context Warnings
+
+Simple notifications at context thresholds (configured in `.claude/hooks.json`):
+
+- **75% Context**: "Good checkpoint opportunity if switching topics"
+- **90% Context**: "Consider /save-handoff, /save-insights, or let it compress"
+
+Trust Athena for complete history recovery. No complex automation needed.
+
 This configuration emphasizes tool usage while maintaining simplicity and natural workflow.
