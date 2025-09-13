@@ -48,11 +48,20 @@
 
 ## Phase 3.1: Setup
 
-- [ ] T001 Create feature branch `005-dark-mode-theme-system` from `copilot`
-- [ ] T002 [P] Create `app/public/scripts/shared/theme-controller.js` file structure
-- [ ] T003 [P] Create `app/public/scripts/utils/chart-theme-adapter.js` file structure  
-- [ ] T004 [P] Create `app/public/styles/shared/dark-theme.css` file structure
-- [ ] T005 Validate existing security.js utilities for XSS-safe DOM manipulation
+- [x] T001 Create feature branch `005-dark-mode-theme-system` from `copilot`
+- [x] T002 [P] Create `app/public/scripts/shared/theme-controller.js` file structure
+- [x] T003 [P] Create `app/public/scripts/utils/chart-theme-adapter.js` file structure  
+- [x] T004 [P] Create `app/public/styles/shared/dark-theme.css` file structure
+- [x] T005 Validate existing security.js utilities for XSS-safe DOM manipulation
+
+## Phase 3.1.5: Gotcha Resolution ⚠️ MUST COMPLETE BEFORE 3.2
+
+**Based on Three Stooges + Zen Consensus Analysis**
+
+- [x] T005a Fix localStorage private browsing compatibility (try/catch with sessionStorage fallback)
+- [x] T005b Fix hardcoded ApexCharts theme in `vulnerability-chart-manager.js:366`
+- [x] T005c Add AG-Grid dark variant imports (`ag-theme-alpine-dark.css`)
+- [x] T005d Validate fixes work across browsers and private browsing modes
 
 ## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 
@@ -60,77 +69,77 @@
 
 ### Contract Tests (API Endpoints - Phase 2 Future)
 
-- [ ] T006 [P] Contract test GET /api/preferences/theme in `tests/contract/theme-preferences-get.spec.js`
-- [ ] T007 [P] Contract test POST /api/preferences/theme in `tests/contract/theme-preferences-post.spec.js`
-- [ ] T008 [P] Contract test GET /api/preferences/theme/system in `tests/contract/system-detection.spec.js`
+- [x] T006 [P] Contract test GET /api/preferences/theme in `tests/contract/theme-preferences-get.spec.js`
+- [x] T007 [P] Contract test POST /api/preferences/theme in `tests/contract/theme-preferences-post.spec.js`
+- [x] T008 [P] Contract test GET /api/preferences/theme/system in `tests/contract/system-detection.spec.js`
 
 ### Integration Tests (E2E Theme Functionality)
 
-- [ ] T009 [P] Theme toggle functionality test in `tests/e2e/theme-toggle.spec.js`
-- [ ] T010 [P] Theme persistence across browser sessions test in `tests/e2e/theme-persistence.spec.js`
-- [ ] T011 [P] System preference detection test in `tests/e2e/system-preference.spec.js`
-- [ ] T012 [P] ApexCharts theme adaptation test in `tests/e2e/charts-theming.spec.js`
-- [ ] T013 [P] AG-Grid dark mode styling test in `tests/e2e/grid-theming.spec.js`
-- [ ] T014 [P] Cross-tab theme synchronization test in `tests/e2e/cross-tab-sync.spec.js`
-- [ ] T015 [P] VPR badge contrast validation test in `tests/e2e/vpr-badges.spec.js`
-- [ ] T016 [P] Print theme override test in `tests/e2e/print-styling.spec.js`
+- [x] T009 [P] Theme toggle functionality test in `tests/e2e/theme-toggle.spec.js`
+- [x] T010 [P] Theme persistence across browser sessions test in `tests/e2e/theme-persistence.spec.js`
+- [x] T011 [P] System preference detection test in `tests/e2e/system-preference.spec.js`
+- [x] T012 [P] ApexCharts theme adaptation test in `tests/e2e/charts-theming.spec.js`
+- [x] T013 [P] AG-Grid dark mode styling test in `tests/e2e/grid-theming.spec.js`
+- [x] T014 [P] Cross-tab theme synchronization test in `tests/e2e/cross-tab-sync.spec.js`
+- [x] T015 [P] VPR badge contrast validation test in `tests/e2e/vpr-badges.spec.js`
+- [x] T016 [P] Print theme override test in `tests/e2e/print-styling.spec.js`
 
 ### Component Tests (Client-Side Interfaces)
 
-- [ ] T017 [P] ThemeController interface test in `tests/unit/theme-controller.test.js`
-- [ ] T018 [P] ApexChartsThemeAdapter interface test in `tests/unit/chart-theme-adapter.test.js`
-- [ ] T019 [P] localStorage persistence layer test in `tests/unit/theme-storage.test.js`
+- [x] T017 [P] ThemeController interface test in `tests/unit/theme-controller.test.js`
+- [x] T018 [P] ApexChartsThemeAdapter interface test in `tests/unit/chart-theme-adapter.test.js`
+- [x] T019 [P] localStorage persistence layer test in `tests/unit/theme-storage.test.js`
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
 
 ### Theme Management Core
 
-- [ ] T020 [P] ThemePreference entity localStorage schema in `app/public/scripts/shared/theme-controller.js`
-- [ ] T021 [P] SystemPreference detection logic in `app/public/scripts/shared/theme-controller.js`
-- [ ] T022 [P] ThemeState management in `app/public/scripts/shared/theme-controller.js`
-- [ ] T023 Theme toggle UI button in header navigation (`app/public/scripts/shared/header.js`)
-- [ ] T024 CSS custom properties dark theme palette in `app/public/styles/shared/dark-theme.css`
+- [x] T020 [P] ThemePreference entity localStorage schema in `app/public/scripts/shared/theme-controller.js`
+- [x] T021 [P] SystemPreference detection logic in `app/public/scripts/shared/theme-controller.js`
+- [x] T022 [P] ThemeState management in `app/public/scripts/shared/theme-controller.js`
+- [x] T023 Theme toggle UI button in header navigation (`app/public/scripts/shared/header.js`)
+- [x] T024 CSS custom properties dark theme palette in `app/public/styles/shared/dark-theme.css`
 
 ### Component Adapters  
 
-- [ ] T025 [P] ApexCharts theme adapter core logic in `app/public/scripts/utils/chart-theme-adapter.js`
-- [ ] T026 [P] AG-Grid theme class switching logic in `app/public/scripts/utils/chart-theme-adapter.js`
-- [ ] T027 Dashboard ApexCharts integration in `app/public/scripts/pages/dashboard.js`
-- [ ] T028 Vulnerability Manager AG-Grid integration in `app/public/scripts/pages/vulnerability-manager.js`
+- [x] T025 [P] ApexCharts theme adapter core logic in `app/public/scripts/utils/chart-theme-adapter.js`
+- [x] T026 [P] AG-Grid theme class switching logic in `app/public/scripts/utils/chart-theme-adapter.js`
+- [x] T027 Dashboard ApexCharts integration in `app/public/scripts/shared/vulnerability-chart-manager.js` (Modified for theme integration)
+- [x] T028 Vulnerability Manager AG-Grid integration in `app/public/scripts/shared/vulnerability-grid.js`
 
 ### Security & Validation
 
-- [ ] T029 Theme value validation using existing security patterns
-- [ ] T030 XSS-safe DOM manipulation for theme attribute updates
-- [ ] T031 Input sanitization for theme preferences
+- [x] T029 Theme value validation using existing security patterns
+- [x] T030 XSS-safe DOM manipulation for theme attribute updates
+- [x] T031 Input sanitization for theme preferences
 
 ## Phase 3.4: Integration
 
 ### Component Theme Integration
 
-- [ ] T032 Integrate theme controller into `app/public/vulnerabilities.html`
-- [ ] T033 Integrate theme controller into `app/public/tickets.html`
-- [ ] T034 Integrate theme controller into `app/public/dashboard.html`
-- [ ] T035 VPR severity badge dark mode styling in `app/public/styles/shared/base.css`
+- [x] T032 Integrate theme controller into `app/public/vulnerabilities.html`
+- [x] T033 Integrate theme controller into `app/public/tickets.html`
+- [ ] T034 Integrate theme controller into `app/public/dashboard.html` (File doesn't exist - SKIPPED)
+- [x] T035 VPR severity badge dark mode styling in `app/public/styles/pages/vulnerabilities.css`
 
 ### Cross-Browser & Performance
 
-- [ ] T036 Debounced theme switching (300ms) to prevent performance issues
-- [ ] T037 CSS `contain` property for chart redraw isolation
-- [ ] T038 Event listener cleanup for memory leak prevention
-- [ ] T039 Browser compatibility detection for CSS custom properties
+- [x] T036 Debounced theme switching (300ms) to prevent performance issues
+- [x] T037 CSS `contain` property for chart redraw isolation
+- [x] T038 Event listener cleanup for memory leak prevention
+- [x] T039 Browser compatibility detection for CSS custom properties
 
 ### Persistence & Synchronization
 
-- [ ] T040 localStorage quota handling and error recovery
-- [ ] T041 Cross-tab synchronization via storage events
-- [ ] T042 System preference change detection via media query listeners
+- [x] T040 localStorage quota handling and error recovery
+- [x] T041 Cross-tab synchronization via storage events
+- [x] T042 System preference change detection via media query listeners
 
 ## Phase 3.5: Polish
 
 ### Accessibility & Standards
 
-- [ ] T043 [P] WCAG AA contrast ratio validation for all dark mode elements
+- [x] T043 [P] WCAG AA contrast ratio validation for all dark mode elements
 - [ ] T044 [P] Screen reader announcements for theme changes
 - [ ] T045 [P] Keyboard navigation support for theme toggle
 - [ ] T046 [P] High contrast mode compatibility testing
