@@ -4,10 +4,15 @@ import '../utils/security.js';
 // Import WCAG contrast validation utilities - T043
 import { validateColorCombination, generateAccessibilityReport } from '../utils/wcag-contrast-validator.js';
 
+// Import AccessibilityAnnouncer for T044 - Screen reader announcements
+import { accessibilityAnnouncer } from '../utils/accessibility-announcer.js';
+
+// ChartThemeAdapter for T028 - AG-Grid and ApexCharts theme integration (available as window.ChartThemeAdapter)
+
 // Constants for theme management
 const THEME_KEY = 'hextrackr-theme';
-const THEME_VALUES = ['light', 'dark', 'system'];
-const DEFAULT_THEME = 'system';
+const THEME_VALUES = ['light', 'dark'];
+const DEFAULT_THEME = 'light';
 
 /**
  * ThemeController class for managing dark/light theme switching in HexTrackr.
@@ -86,11 +91,19 @@ export class ThemeController {
       lastSyncTime: null
     };
     
+    // T028: Initialize ChartThemeAdapter for AG-Grid and ApexCharts theme management
+    try {
+      this.chartThemeAdapter = new window.ChartThemeAdapter();
+    } catch (error) {
+      console.warn('ChartThemeAdapter initialization failed:', error);
+      this.chartThemeAdapter = null;
+    }
+    
     // Initialize cross-tab synchronization
     this.initCrossTabSync();
     
-    // Initialize system preference change listener
-    this.initSystemListener();
+    // System preference synchronization disabled - toggle is now the sole control
+    // this.initSystemListener();
   }
 
   /**
@@ -277,9 +290,8 @@ export class ThemeController {
 
       // Validate event data
       if (!event.newValue) {
-        console.log('Theme cleared in another tab - applying system preference');
-        const systemTheme = this.detectSystemPreference() || DEFAULT_THEME;
-        this.applyCrossTabTheme(systemTheme, 'cross-tab-clear');
+        console.log('Theme cleared in another tab - applying light default');
+        this.applyCrossTabTheme('light', 'cross-tab-clear');
         return;
       }
 
@@ -354,6 +366,14 @@ export class ThemeController {
 
       // Apply theme to DOM without updating storage (to avoid event loop)
       this.applyTheme(validatedTheme);
+      
+      // T044: Announce cross-tab theme change to screen readers
+      try {
+        const previousTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+        accessibilityAnnouncer.announceThemeChange(validatedTheme, previousTheme, source);
+      } catch (announcementError) {
+        console.warn('Cross-tab screen reader announcement failed:', announcementError);
+      }
       
       // Notify listeners of the cross-tab change
       this.notifyListeners(validatedTheme, source);
@@ -550,8 +570,8 @@ export class ThemeController {
       }
       
       if (!storedData) {
-        // No stored theme, fallback to system preference
-        return this.detectSystemPreference() || DEFAULT_THEME;
+        // No stored theme, use light as default (no system preference fallback)
+        return 'light';
       }
 
       // T031: Safely parse and validate stored theme data
@@ -561,30 +581,30 @@ export class ThemeController {
       } catch (parseError) {
         // If JSON parsing fails, treat as legacy simple string
         const legacyTheme = this.validateTheme(storedData);
-        return legacyTheme || this.detectSystemPreference() || DEFAULT_THEME;
+        return legacyTheme || 'light';
       }
 
       // T031: Validate the parsed theme data structure
       if (!themeData || typeof themeData !== 'object') {
-        console.warn('Invalid theme data structure, using fallback');
-        return this.detectSystemPreference() || DEFAULT_THEME;
+        console.warn('Invalid theme data structure, using light default');
+        return 'light';
       }
 
       // T031: Sanitize and validate the theme value from storage
       const storedTheme = themeData.theme;
       const sanitizedTheme = this.validateTheme(storedTheme);
       
-      if (sanitizedTheme && ['light', 'dark', 'system'].includes(sanitizedTheme)) {
+      if (sanitizedTheme && ['light', 'dark'].includes(sanitizedTheme)) {
         return sanitizedTheme;
       }
 
-      // Invalid stored theme, fallback to system preference
-      console.warn(`Invalid stored theme '${storedTheme}', using fallback`);
-      return this.detectSystemPreference() || DEFAULT_THEME;
+      // Invalid stored theme, use light default
+      console.warn(`Invalid stored theme '${storedTheme}', using light default`);
+      return 'light';
     } catch (error) {
       console.error('Error retrieving theme:', error);
       // T031: Secure fallback on any error
-      return this.detectSystemPreference() || DEFAULT_THEME;
+      return 'light';
     }
   }
 
@@ -652,6 +672,27 @@ export class ThemeController {
       
       // T021: Apply theme to document and notify listeners - T029 using sanitized values
       this.applyTheme(sanitizedTheme);
+      
+      // Dispatch a custom event to signal that the initial theme has been applied
+      if (source === 'initial') {
+        document.dispatchEvent(new CustomEvent('themeInitialized', { detail: { theme: sanitizedTheme } }));
+      }
+      
+      // T044: Announce theme change to screen readers
+      try {
+        const previousTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+        accessibilityAnnouncer.announceThemeChange(sanitizedTheme, previousTheme, validatedSource);
+        
+        // Generate accessibility report and announce compliance status
+        const accessibilityReport = this.generateThemeAccessibilityReport(sanitizedTheme);
+        if (accessibilityReport && accessibilityReport.summary) {
+          accessibilityAnnouncer.announceAccessibilityStatus(accessibilityReport, sanitizedTheme);
+        }
+      } catch (announcementError) {
+        console.warn('Screen reader announcement failed:', announcementError);
+        // Don't fail the theme change if announcements fail
+      }
+      
       this.notifyListeners(sanitizedTheme, validatedSource);
       return true;
     } catch (error) {
@@ -830,8 +871,16 @@ export class ThemeController {
         
         // Only apply if the generated class name is in our whitelist
         if (validClassNames.includes(newClassName)) {
+          // Apply theme classes to html element for HexTrackr styles
           document.documentElement.classList.remove('theme-light', 'theme-dark');
           document.documentElement.classList.add(newClassName);
+          
+          // Apply theme classes to body element for Tabler.io compatibility
+          // T023: Fix theme toggle visibility by ensuring body has correct class for Tabler CSS rules
+          if (document.body) {
+            document.body.classList.remove('theme-light', 'theme-dark');
+            document.body.classList.add(newClassName);
+          }
         } else {
           console.warn(`Invalid theme class name '${newClassName}', skipping class update`);
         }
@@ -839,6 +888,15 @@ export class ThemeController {
         // T039: Apply legacy fallback for browsers without CSS custom properties
         if (!this.cssCustomPropertiesSupported) {
           this.applyLegacyTheme(sanitizedTheme);
+        }
+
+        // T028: Update AG-Grid and ApexCharts themes after DOM changes
+        if (this.chartThemeAdapter) {
+          try {
+            this.chartThemeAdapter.updateAllComponents(sanitizedTheme);
+          } catch (chartError) {
+            console.warn('Error updating chart/grid themes:', chartError);
+          }
         }
       }
     } catch (error) {
@@ -849,6 +907,12 @@ export class ThemeController {
           document.documentElement.setAttribute('data-bs-theme', 'light');
           document.documentElement.classList.remove('theme-light', 'theme-dark');
           document.documentElement.classList.add('theme-light');
+          
+          // Also apply to body for Tabler.io compatibility
+          if (document.body) {
+            document.body.classList.remove('theme-light', 'theme-dark');
+            document.body.classList.add('theme-light');
+          }
         }
       } catch (fallbackError) {
         console.error('Error applying fallback theme:', fallbackError);
@@ -1739,7 +1803,7 @@ export class ThemeController {
   isThemeAccessible() {
     try {
       const currentTheme = this.getTheme();
-      const resolvedTheme = currentTheme === 'system' ? this.detectSystemPreference() || 'light' : currentTheme;
+      const resolvedTheme = currentTheme === 'system' ? 'light' : currentTheme;
       
       if (resolvedTheme === 'light') {
         // Assume light theme is accessible (system defaults)
@@ -1764,7 +1828,7 @@ export class ThemeController {
   logAccessibilityReport(verbose = false) {
     try {
       const currentTheme = this.getTheme();
-      const resolvedTheme = currentTheme === 'system' ? this.detectSystemPreference() || 'light' : currentTheme;
+      const resolvedTheme = currentTheme === 'system' ? 'light' : currentTheme;
       
       console.group('🎨 HexTrackr Theme Accessibility Report');
       console.log('Current theme:', currentTheme, resolvedTheme !== currentTheme ? `(resolved: ${resolvedTheme})` : '');

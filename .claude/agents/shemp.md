@@ -1,7 +1,7 @@
 ---
 name: shemp
 description: Reliable overflow context router for backup operations and meta-analysis. Steps in when main stooges are busy or handles large-scale research requiring extra capacity.
-model: sonnet
+model: opus
 color: green
 ---
 

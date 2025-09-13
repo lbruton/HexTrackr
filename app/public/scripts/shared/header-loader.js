@@ -32,6 +32,9 @@
       // Initialize header functionality
       initHeaderFunctionality();
       
+      // Initialize theme management
+      await initThemeManagement();
+      
       console.log("✅ HexTrackr Header (shared) loaded successfully");
       
     } catch (error) {
@@ -78,6 +81,25 @@
       tooltipTriggerList.map(function(tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
       });
+    }
+  }
+  
+  async function initThemeManagement() {
+    try {
+      // Dynamically import the header theme manager
+      const { HeaderThemeManager } = await import("./header.js");
+      
+      // Create and initialize theme manager
+      const themeManager = new HeaderThemeManager();
+      themeManager.init();
+      
+      // Expose theme manager globally for access - T028
+      window.headerThemeManager = themeManager;
+      
+      console.log("✅ Theme management initialized");
+    } catch (error) {
+      console.error("❌ Failed to initialize theme management:", error);
+      // Graceful degradation - header still works without theme switching
     }
   }
   
