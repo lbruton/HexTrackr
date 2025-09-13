@@ -53,9 +53,6 @@ The ticket list can be quickly filtered to find what you need.
 HexTrackr provides several options for exporting your ticket data.
 
 - **Quick Exports**: Use the `CSV`, `Excel`, `JSON`, `PDF`, and `HTML` buttons at the top of the page to quickly export the currently filtered list of tickets.
-- **Advanced Data Management**: For more comprehensive backup and restore operations, please see the following guides:
-  - [Importing and Exporting Data](./data-import-export.md)
-  - [Backing Up and Restoring Data](./backup-restore.md)
 
 ## ServiceNow Integration
 
