@@ -1,6 +1,5 @@
 {
-  "generated": "2025-09-12T18:27:04.786Z",
-  "activeSpec": "001",
+  "generated": "2025-09-13T23:29:52.957Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -68,11 +67,6 @@
           "file": "architecture/rollover-mechanism",
           "title": "Rollover Mechanism",
           "path": "architecture/rollover-mechanism.html"
-        },
-        "spec-kit-integration": {
-          "file": "architecture/spec-kit-integration",
-          "title": "Spec Kit Integration",
-          "path": "architecture/spec-kit-integration.html"
         }
       }
     },
@@ -196,5 +190,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 36
+  "totalFiles": 35
 }

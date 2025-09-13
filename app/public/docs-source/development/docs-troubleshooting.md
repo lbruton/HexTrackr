@@ -1,103 +1,39 @@
 # Documentation Portal Troubleshooting Guide
 
-This guide helps you resolve common issues with the HexTrackr documentation portal and spec-kit integration.
+This guide helps you resolve common issues with the HexTrackr documentation portal.
 
 ## Quick Diagnostics
 
 ### Check System Status
 
 ```bash
-
-# Verify active specification
-
-cat .active-spec
-
-# Test spec synchronization
-
-node scripts/sync-specs-to-roadmap.js
-
 # Test HTML generation
-
 node app/public/docs-html/html-content-updater.js
 
 # Full documentation refresh
-
 npm run docs:generate
+
+# Check documentation file structure
+ls -la app/public/docs-source/
+ls -la app/public/docs-html/content/
 ```
 
 ## Common Issues
 
-### 1. Active Spec Not Displaying
+### 1. Documentation Not Updating
 
-## Symptoms
+**Symptoms:**
 
-- No active spec banner appears in documentation
-- Spec not highlighted in roadmap table
+- Changes to markdown files don't appear in the HTML documentation
+- Stale content shown in browser
+- Documentation pages show outdated information
 
-## Causes & Solutions
-
-#### Missing .active-spec file
-
-```bash
-
-# Check if file exists
-
-ls -la .active-spec
-
-# Create if missing
-
-echo "022-documentation-portal-rebuild" > .active-spec
-```
-
-#### Invalid spec format
-
-```bash
-
-# Check current content
-
-cat .active-spec
-
-# Should contain only the spec slug, no extra spaces or characters
-
-# Correct format: "022-documentation-portal-rebuild"
-
-# Incorrect: " 022-documentation-portal-rebuild \n"
-
-```
-
-#### Spec name mismatch
-
-The sync script matches spec names using fuzzy logic. If your spec isn't highlighting:
-
-```bash
-
-# Check spec directory names
-
-ls hextrackr-specs/specs/
-
-# Ensure .active-spec matches a directory name
-
-# Example: .active-spec contains "022-documentation-portal-rebuild"
-
-# Directory should be: hextrackr-specs/specs/022-documentation-portal-rebuild/
-
-```
-
-### 2. Documentation Not Updating
-
-## Symptoms: (2)
-
-- Changes to markdown files don't appear in HTML
-- Old content persists after regeneration
-
-## Solutions
+**Solutions:**
 
 #### Force regeneration
 
 ```bash
-
-# Clear any cached content and regenerate
-
+# Clean regeneration
 rm -rf app/public/docs-html/content/*
 npm run docs:generate
 ```
@@ -105,183 +41,134 @@ npm run docs:generate
 #### Check file permissions
 
 ```bash
-
-# Ensure write permissions for docs directory
-
+# Ensure write permissions
 chmod -R 755 app/public/docs-html/
+chmod -R 644 app/public/docs-html/content/*.html
 ```
 
 #### Verify markdown syntax
 
 ```bash
+# Run markdown linter
+npm run lint:md
 
-# Test specific file parsing
-
-node -e "
-const marked = require('marked');
-const fs = require('fs');
-const content = fs.readFileSync('path/to/your/file.md', 'utf8');
-console.log(marked.parse(content));
-"
+# Check specific file syntax
+npx markdownlint app/public/docs-source/**/*.md
 ```
 
-### 3. Spec Tasks Not Syncing to Roadmap
+### 2. HTML Generation Errors
 
-## Symptoms: (3)
+**Symptoms:**
 
-- Roadmap table shows outdated task counts
-- Completed tasks still show as pending
+- HTML content updater fails to run
+- Missing HTML files in content directory
+- Broken links in documentation navigation
+- Console errors in browser
 
-## Causes & Solutions: (2)
-
-#### Incorrect checkbox format
-
-Tasks must use exact markdown checkbox format:
-
-```markdown
-
-# Correct format
-
-- [ ] Pending task
-- [x] Completed task
-- [X] Also completed (capital X works)
-
-# Incorrect format (will not be counted)
-
-- [] Missing space
-- [ ]Extra text before task
-- [v] Wrong character
-
-```
-
-#### Missing tasks.md files
-
-```bash
-
-# Check if tasks.md exists in spec directory
-
-ls hextrackr-specs/specs/*/tasks.md
-
-# If missing, tasks won't be counted
-
-# Create from template if needed
-
-```
-
-#### Code block interference
-
-Tasks inside code blocks are ignored:
-
-````markdown
-
-# These tasks will NOT be counted
-
-```
-
-- [ ] Task inside code block
-- [x] Another task in code
-
-```
-
-# These tasks WILL be counted
-
-- [ ] Task outside code blocks
-- [x] Completed task
-
-````
-
-### 4. HTML Generation Errors
-
-## Symptoms: (4)
-
-- Process crashes during generation
-- Partial HTML files created
-- Permission denied errors
-
-## Solutions: (2)
+**Solutions:**
 
 #### Missing dependencies
 
 ```bash
-
-# Reinstall node modules
-
+# Install missing packages
 npm install
 
-# Check for missing marked library
+# Verify marked library
+node -e "console.log(require('marked'))"
 
-npm list marked
+# Check dotenv
+node -e "console.log(require('dotenv'))"
 ```
 
 #### File system issues
 
 ```bash
-
 # Check disk space
-
 df -h
 
-# Check directory permissions
+# Verify directory structure
+mkdir -p app/public/docs-html/content
+mkdir -p logs/docs-source
 
-ls -la app/public/docs-html/
-
-# Fix permissions if needed
-
-sudo chown -R $USER:$USER app/public/docs-html/
+# Check file ownership
+chown -R $(whoami) app/public/docs-html/
 ```
 
 #### HTML Generation Script issues
 
 ```bash
+# Run with debug output
+DEBUG=1 node app/public/docs-html/html-content-updater.js
 
-# Verify the HTML generator script exists
-
-ls -la app/public/docs-html/html-content-updater.js
-
-# Check if the script has proper permissions
-
-ls -l app/public/docs-html/html-content-updater.js
+# Test template loading
+node -e "const fs = require('fs'); console.log(fs.readFileSync('app/public/docs-html/template.html', 'utf8'))"
 ```
 
-### 5. Performance Issues
+### 3. Performance Issues
 
-## Symptoms: (5)
+**Symptoms:**
 
-- Documentation generation takes >5 seconds
-- High memory usage during generation
-- Server becomes unresponsive
+- Slow documentation generation
+- Browser freezing when loading documentation
+- High memory usage during HTML generation
 
-## Solutions: (3)
+**Solutions:**
 
 #### Reduce concurrent operations
 
-The system processes files with small delays to prevent overwhelming:
-
-```javascript
-// In html-content-updater.js, increase delay if needed
-await new Promise(resolve => setTimeout(resolve, 100)); // Increase from 50ms
+```bash
+# Process files individually instead of batch
+node app/public/docs-html/html-content-updater.js --single-thread
 ```
 
 #### Monitor memory usage
 
 ```bash
+# Check memory during generation
+top -p $(pgrep -f html-content-updater)
 
-# Watch memory during generation
-
-top -p $(pgrep node)
-
-# Or use htop for better visualization
-
-htop -p $(pgrep node)
+# Memory usage analysis
+node --max-old-space-size=512 app/public/docs-html/html-content-updater.js
 ```
 
 #### Check for large files
 
 ```bash
+# Find large markdown files
+find app/public/docs-source/ -name "*.md" -size +1M
 
-# Find large markdown files that might slow processing
+# Check image sizes
+find app/public/docs-source/ -name "*.png" -o -name "*.jpg" -size +5M
+```
 
-find app/public/docs-source -name "*.md" -size +1M -ls
+### 4. Navigation and Linking Issues
+
+**Symptoms:**
+
+- Broken internal links
+- Missing pages in navigation
+- 404 errors for documentation pages
+
+**Solutions:**
+
+#### Check link format
+
+```bash
+# Verify relative link format
+grep -r "\.md)" app/public/docs-source/ | grep -v "http"
+
+# Check for absolute paths
+grep -r "file://" app/public/docs-source/
+```
+
+#### Validate navigation structure
+
+```bash
+# Test navigation JSON generation
+node -e "
+const updater = require('./app/public/docs-html/html-content-updater.js');
+// Test navigation discovery logic
+"
 ```
 
 ## Error Codes and Messages
@@ -290,104 +177,74 @@ find app/public/docs-source -name "*.md" -size +1M -ls
 
 #### "html-content-updater.js not found"
 
+**Cause**: Script path incorrect or file missing
+**Solution**:
+
 ```bash
+# Verify file exists
+ls -la app/public/docs-html/html-content-updater.js
 
-# Verify HTML generator script location
-
-ls app/public/docs-html/html-content-updater.js
-
-# If missing, the script is required for generation
-
-# Check if it was accidentally deleted or moved
-
+# Run from project root
+cd /path/to/hextrackr && node app/public/docs-html/html-content-updater.js
 ```
 
-#### "No tasks.md files found"
+#### "Cannot read property 'replace' of undefined"
+
+**Cause**: Template file corrupt or missing
+**Solution**:
 
 ```bash
+# Check template file
+cat app/public/docs-html/template.html
 
-# Check spec directory structure
-
-find hextrackr-specs/specs -name "tasks.md"
-
-# Each spec should have a tasks.md file
-
-# Create missing files from template if needed
-
+# Restore template if needed
+git checkout app/public/docs-html/template.html
 ```
 
 #### "Path traversal detected"
 
-This is a security error from path validation:
-
-```bash
-
-# Check for invalid characters in file paths
-
-# Avoid: ../../../, absolute paths, special characters
-
-# Use only relative paths within project directory
-
-```
+**Cause**: Invalid file paths in markdown content
+**Solution**: Review and fix file path references in markdown files
 
 ### Exit Codes
 
-- `0`: Success
-- `1`: General error (check logs for details)
-- `ENOENT`: File not found
-- `EACCES`: Permission denied
-- `EMFILE`: Too many open files
+- **0**: Success
+- **1**: General error (check logs)
+- **2**: File system permission error
+- **3**: Template or configuration error
 
 ## Advanced Debugging
 
 ### Enable Debug Logging
 
 ```bash
+# Enable verbose output
+export DEBUG=docs:*
+npm run docs:generate
 
-# Set environment variable for verbose output
-
-DEBUG=docs:* npm run docs:generate
-
-# Or add console.log statements to scripts for detailed tracing
-
+# Log to file
+npm run docs:generate > docs-debug.log 2>&1
 ```
 
 ### Manual Step-by-Step Testing
 
-1. **Test spec reading:**
-
-```bash
-node -e "
+```javascript
+// Test template loading
 const fs = require('fs');
-try {
-  const spec = fs.readFileSync('.active-spec', 'utf8').trim();
-  console.log('Active spec:', spec);
-} catch (e) {
-  console.log('No active spec:', e.message);
-}
-"
-```
+const template = fs.readFileSync('app/public/docs-html/template.html', 'utf8');
+console.log('Template loaded:', template.length, 'characters');
 
-1. **Test task parsing:**
+// Test markdown parsing
+const { marked } = require('marked');
+const markdown = '# Test\n\nThis is a test.';
+const html = marked.parse(markdown);
+console.log('Parsed HTML:', html);
 
-```bash
-node -e "
-const fs = require('fs');
-const content = fs.readFileSync('hextrackr-specs/specs/022-documentation-portal-rebuild/tasks.md', 'utf8');
-const total = (content.match(/^\s*-\s*\[(?: |x|X)\]\s+/gm) || []).length;
-const done = (content.match(/^\s*-\s*\[(?:x|X)\]\s+/gm) || []).length;
-console.log('Tasks:', { total, done, pct: Math.round((done / total) * 100) });
-"
-```
-
-1. **Test HTML generation:**
-
-```bash
-node -e "
-const HtmlContentUpdater = require('./app/public/docs-html/html-content-updater.js');
-const updater = new HtmlContentUpdater();
-updater.loadActiveSpec().then(spec => console.log('Active spec loaded:', spec));
-"
+// Test file discovery
+const path = require('path');
+const glob = require('glob');
+const files = glob.sync('app/public/docs-source/**/*.md');
+console.log('Found markdown files:', files.length);
 ```
 
 ## Prevention Tips
@@ -395,72 +252,47 @@ updater.loadActiveSpec().then(spec => console.log('Active spec loaded:', spec));
 ### Regular Maintenance
 
 ```bash
+# Weekly maintenance routine
+npm run lint:all
+npm run docs:generate
+npm test
 
-# Weekly documentation health check
-
-npm run docs:generate && echo 'Documentation system healthy'
-
-# Monthly cleanup of orphaned files
-
-find app/public/docs-html/content -name "*.html" -mtime +30 -delete
+# Check for broken links
+npm run docs:validate-links
 ```
 
 ### Best Practices
 
-1. **Always test locally before committing changes**
-2. **Keep .active-spec updated when switching specs**
-3. **Use proper markdown checkbox format in tasks.md**
-4. **Run docs:generate after spec changes**
-5. **Monitor file permissions in docs directories**
+- Always test documentation changes locally before committing
+- Use relative links for internal documentation references
+- Keep markdown files under 1MB for optimal performance
+- Validate markdown syntax with linting tools
 
 ### Monitoring
 
 ```bash
+# Monitor documentation build times
+time npm run docs:generate
 
-# Set up periodic checks
+# Check generated file sizes
+du -sh app/public/docs-html/content/
 
-echo "0 */6 * * * cd /path/to/hextrackr && npm run docs:generate" | crontab -
-
-# Or use systemd timer for more robust monitoring
-
+# Validate HTML output
+html5validator app/public/docs-html/content/*.html
 ```
 
 ## Getting Help
 
-If you encounter issues not covered in this guide:
+If you continue experiencing issues:
 
-1. **Check recent changes:**
+1. **Check logs**: Review `logs/docs-source/html-update-report.md` for detailed error information
+2. **Validate environment**: Ensure Node.js version compatibility and all dependencies are installed
+3. **File permissions**: Verify read/write access to documentation directories
+4. **Clean rebuild**: Delete `app/public/docs-html/content/` and regenerate from scratch
 
-```bash
-git log --oneline -10 scripts/ app/public/docs-html/
-```
+For persistent issues, create a bug report with:
 
-1. **Search existing issues:**
-
-```bash
-
-# Look for similar problems in git history
-
-git log --grep="docs" --grep="spec" --grep="generate"
-```
-
-1. **Create detailed bug report with:**
-   - Error messages and stack traces
-   - System information (`node --version`, OS, etc.)
-   - Steps to reproduce
-   - Expected vs. actual behavior
-   - Relevant file contents
-
-1. **Test in clean environment:**
-
-```bash
-
-# Clone fresh copy and test
-
-git clone https://github.com/Lonnie-Bruton/HexTrackr.git hextrackr-test
-cd hextrackr-test
-npm install
-npm run docs:generate
-```
-
-This troubleshooting guide should resolve most common documentation portal issues. Keep this document updated as new issues and solutions are discovered.
+- Error messages and stack traces
+- Environment details (Node.js version, OS)
+- Steps to reproduce the issue
+- Documentation generation logs
