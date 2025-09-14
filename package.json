@@ -16,7 +16,7 @@
     "docs:generate": "node app/public/docs-html/html-content-updater.js",
     "docs:analyze": "node app/public/scripts/generate-architecture-analysis.js && node app/public/docs-html/html-content-updater.js",
     "lint:md": "markdownlint --config .markdownlint.json --ignore-path .markdownlintignore '**/*.md'",
-    "lint:md:fix": "node app/public/scripts/fix-markdown.js",
+    "lint:md:fix": "node scripts/fix-markdown.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -36,6 +36,7 @@
     "security:full": "npm run lockfile:check && npm run security:check"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@tabler/core": "^1.0.0-beta17",
     "ag-grid-community": "^33.3.2",
     "apexcharts": "^3.44.0",

@@ -19,7 +19,7 @@ const fs = require("fs").promises;
 const fsSync = require("fs");
 const path = require("path");
 const readline = require("readline");
-const crypto = require("crypto");
+// const crypto = require("crypto"); // Unused
 require("dotenv").config();
 
 class AthenaUnifiedExtractor {
@@ -306,7 +306,7 @@ class AthenaUnifiedExtractor {
 
         markdown += "## Chronological Timeline\n\n";
 
-        allEntries.forEach((entry, index) => {
+        allEntries.forEach((entry, _index) => {
             const time = entry._timestamp.toISOString().substr(11, 8);
 
             markdown += `### ${time} - ${entry._type.toUpperCase()}\n\n`;
@@ -485,7 +485,7 @@ class AthenaUnifiedExtractor {
                 // Clean up temp file
                 try {
                     await fs.unlink(tempFile);
-                } catch (cleanupError) {
+                } catch (_cleanupError) {
                     // Ignore cleanup errors
                 }
             }

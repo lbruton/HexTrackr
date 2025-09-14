@@ -1,9 +1,11 @@
 # athena search
 
-Invokes the athena subagent and instructs it to **search** for a topic. 
+Directly executes the athena search script for consistent, deep project knowledge queries.
 
-**DO NOT** DO NOT CHANGE, MODIFY, EMBELISH, ALTER, OR DO ANYTHING BUT PASS THE PROMPT TO ATHENA. 
+**EXECUTION**: Run `node agent-tools/athena-semantic-search.js search "$ARGUMENTS"` where $ARGUMENTS is the user's search query.
 
-**PROMPT** Search [PASS ARGUMENT FROM USER]. 
+**OUTPUT**: Display semantic search results including abstracts, summaries, entities, keywords, and contextual metadata.
 
-**LOG**  Log all output from athena and then save the output to /logs/agentlogs/ATHENA_EXT_YYYYMMDDHHMMSS.md
+**LOG**: Save all output to /logs/agentlogs/ATHENA_SEARCH_YYYYMMDDHHMMSS.md with timestamp.
+
+**USAGE**: Provides Gemini-powered semantic search across 173+ archives with structured abstracts, entity extraction, and problem-solution mapping for enhanced relevance.
