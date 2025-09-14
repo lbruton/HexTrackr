@@ -1,0 +1,51 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Security Implementation</h1>
+<p>This document provides a detailed overview of the security features implemented in HexTrackr.</p>
+<hr>
+<h2>PathValidator Class</h2>
+<p>The <code>PathValidator</code> class is a critical security component that prevents directory traversal attacks. It ensures that file paths are validated and normalized before being used by the application.</p>
+<h3>Usage</h3>
+<pre><code class="language-javascript">const validator = new PathValidator(&#39;/path/to/base/directory&#39;);
+const safePath = validator.validate(userInput);
+</code></pre>
+<hr>
+<h2>Rate Limiting</h2>
+<p>Rate limiting is applied to all API endpoints to prevent abuse and ensure service availability.</p>
+<ul>
+<li><strong>Default Limit</strong>: 100 requests per 15 minutes</li>
+<li><strong>Configuration</strong>: The rate limit is configurable via environment variables.</li>
+</ul>
+<hr>
+<h2>CORS Configuration</h2>
+<p>Cross-Origin Resource Sharing (CORS) is configured to restrict access to the API from unauthorized domains.</p>
+<ul>
+<li><strong>Allowed Origins</strong>: The list of allowed origins is configurable via environment variables.</li>
+<li><strong>Default</strong>: By default, all origins are allowed.</li>
+</ul>
+<hr>
+<h2>Input Validation</h2>
+<p>All user input is validated and sanitized to prevent common web application vulnerabilities.</p>
+<ul>
+<li><strong>Server-side</strong>: The server validates all incoming data for correct type, format, and length.</li>
+<li><strong>Client-side</strong>: The client-side application uses DOMPurify to sanitize user input and prevent XSS attacks.</li>
+</ul>
+<hr>
+<h2>File Upload Security</h2>
+<p>File uploads are secured with the following measures:</p>
+<ul>
+<li><strong>Size Limit</strong>: A 100MB size limit is enforced on all file uploads.</li>
+<li><strong>Type Validation</strong>: Only specific file types (e.g., CSV, ZIP) are allowed.</li>
+<li><strong>Path Restrictions</strong>: Uploaded files are stored in a secure, non-executable directory.</li>
+</ul>
+<hr>
+<h2>XSS Protection</h2>
+<p>HexTrackr uses DOMPurify on the client-side to sanitize HTML and prevent Cross-Site Scripting (XSS) attacks.</p>
+<hr>
+<h2>SQL Injection Prevention</h2>
+<p>All database queries are executed using parameterized statements to prevent SQL injection attacks.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

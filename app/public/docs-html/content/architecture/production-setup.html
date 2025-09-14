@@ -1,0 +1,29 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Production Setup</h1>
+<p>This document provides a guide to setting up a production environment for the HexTrackr application.</p>
+<hr>
+<h2>Requirements</h2>
+<ul>
+<li>A server with Docker and Docker Compose installed.</li>
+<li>A domain name for the application.</li>
+<li>An SSL/TLS certificate for the domain.</li>
+</ul>
+<hr>
+<h2>Configuration</h2>
+<ol>
+<li><strong>Clone the repository</strong>: Clone the HexTrackr repository to your server.</li>
+<li><strong>Create a <code>.env</code> file</strong>: Create a <code>.env</code> file in the root of the repository and configure the environment variables.</li>
+<li><strong>Configure nginx</strong>: Configure nginx as a reverse proxy to route traffic to the application and WebSocket servers.</li>
+<li><strong>Configure SSL/TLS</strong>: Configure nginx to use your SSL/TLS certificate.</li>
+</ol>
+<hr>
+<h2>Deployment</h2>
+<p>To deploy the application, run the following command:</p>
+<pre><code class="language-bash">docker-compose up -d
+</code></pre>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

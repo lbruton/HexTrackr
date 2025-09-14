@@ -4,12 +4,14 @@
  * This module provides responsive AG Grid configuration for vulnerability management.
  * Extracted from inline JavaScript for better code organization and maintainability.
  * 
- * @fileoverview AG Grid responsive configuration utilities
+ * @fileoverview AG Grid responsive configuration utilities with v33 theming support
  * @author HexTrackr Development Team
- * @version 1.0.0
+ * @version 2.0.0 - AG-Grid v33 Quartz theme integration
  */
 
 /* global window, setTimeout, clearTimeout, module */
+
+// AG-Grid theme available as agGrid.themeQuartz global
 
 /**
  * Debounce function to limit the rate at which a function gets called.
@@ -27,13 +29,15 @@ function debounce(func, delay) {
     };
 }
 
+
 /**
  * Creates and returns the complete AG Grid configuration object.
  * @param {object} componentContext - The "this" context of the calling component (e.g., ModernVulnManager)
  *                                    to access its methods and properties like `gridApi`.
+ * @param {boolean} isDarkMode - Whether to use dark mode theme (optional)
  * @returns {GridOptions} A complete AG Grid `gridOptions` object.
  */
-function createVulnerabilityGridOptions(componentContext) {
+function createVulnerabilityGridOptions(componentContext, isDarkMode = false) {
     // Column definitions with optimized responsive width management
     const isDesktop = window.innerWidth >= 1200;
     const isMobile = window.innerWidth < 768;
@@ -187,18 +191,12 @@ function createVulnerabilityGridOptions(componentContext) {
             field: "plugin_name",
             sortable: true,
             filter: true,
-            width: 350,
-            minWidth: 200,
-            maxWidth: 600,
+            flex: 1, // Allow this column to grow to fill available space
+            minWidth: 250,
             resizable: true,
-            wrapText: false,
-            autoHeight: false,
+            wrapText: true, // Enable text wrapping
+            autoHeight: true, // Allow row height to adjust to content
             cellClass: "ag-cell-wrap-text",
-            cellStyle: {
-                "white-space": "nowrap",
-                "overflow": "hidden",
-                "text-overflow": "ellipsis"
-            },
             cellRenderer: (params) => {
                 const value = params.value || "-";
                 
@@ -220,7 +218,52 @@ function createVulnerabilityGridOptions(componentContext) {
         }
     ];
 
+    // Create proper AG-Grid v33 Quartz theme configuration based on dark mode
+    let quartzTheme = null;
+    if (typeof window.agGrid !== "undefined" && window.agGrid.themeQuartz) {
+        if (isDarkMode) {
+            // Dark mode Quartz theme - matching AG-Grid Theme Builder
+            quartzTheme = window.agGrid.themeQuartz.withParams({
+                backgroundColor: "#1f2836",
+                foregroundColor: "#e9ecef", 
+                chromeBackgroundColor: {
+                    ref: "foregroundColor",
+                    mix: 0.07,
+                    onto: "backgroundColor"
+                },
+                headerBackgroundColor: "#2d3748",
+                headerTextColor: "#f7fafc",
+                oddRowBackgroundColor: "rgba(255, 255, 255, 0.02)",
+                rowBorder: false,
+                headerRowBorder: false,
+                columnBorder: false,
+                borderColor: "#4a5568",
+                selectedRowBackgroundColor: "#3182ce",
+                rowHoverColor: "rgba(49, 130, 206, 0.1)",
+                rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+            });
+        } else {
+            // Light mode Quartz theme - matching AG-Grid Theme Builder  
+            quartzTheme = window.agGrid.themeQuartz.withParams({
+                backgroundColor: "#ffffff",
+                foregroundColor: "#2d3748",
+                chromeBackgroundColor: "#f7fafc",
+                headerBackgroundColor: "#edf2f7",
+                headerTextColor: "#2d3748",
+                oddRowBackgroundColor: "rgba(0, 0, 0, 0.02)",
+                rowBorder: false,
+                headerRowBorder: false,
+                columnBorder: false,
+                borderColor: "#e2e8f0",
+                selectedRowBackgroundColor: "#3182ce",
+                rowHoverColor: "rgba(49, 130, 206, 0.1)",
+                rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+            });
+        }
+    }
+
     const gridOptions = {
+        theme: quartzTheme, // AG-Grid v33 proper Quartz theme configuration
         columnDefs: columnDefs,
         rowData: [],
         defaultColDef: {
