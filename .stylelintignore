@@ -4,9 +4,20 @@ __tests__/coverage/
 # Node modules and vendor content
 node_modules/
 
+# Vendor files (third-party CSS that shouldn't be modified)
+app/public/vendor/**/*.css
+**/vendor/**/*.css
+
 # Upload and data directories
 uploads/
 data/
 
 # Documentation prototypes
 docs-prototype/
+
+# Generated CSS
+**/*.min.css
+
+# Build output
+dist/**
+build/**
