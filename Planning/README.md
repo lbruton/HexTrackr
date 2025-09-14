@@ -222,6 +222,61 @@ Phase 1: CSS Foundation (Claude) → Phase 2: Component Updates (Codex) → Phas
 - [ ] Test accessibility compliance per research findings
 ```
 
+## Validation Best Practices
+
+*Lessons learned from real implementation failures*
+
+### Critical Validation Points
+
+Based on analysis of recent bugs and implementation failures, these validation checkpoints prevent major issues:
+
+#### Environment & State Validation
+
+- [ ] **Both Themes Tested**: If UI changes, verify both light and dark modes work
+- [ ] **CSS Variable Scoping**: Ensure variables are defined at appropriate scope levels
+- [ ] **Framework Integration**: Test that custom code works with Bootstrap/Tabler overrides
+- [ ] **Build Process**: Verify development and production builds work identically
+
+#### Research Phase Validation
+
+- [ ] **Assumption Testing**: Actually test every assumption, don't just theorize
+- [ ] **Codebase Review**: Agents must read actual code, not assume implementations
+- [ ] **Edge Case Analysis**: Consider all supported states (themes, browsers, devices)
+- [ ] **Integration Points**: Verify how changes affect existing components
+
+#### Implementation Validation
+
+- [ ] **Success Criteria Mapping**: Each task directly addresses a specific S001 criterion
+- [ ] **Regression Testing**: Test areas that might be affected by changes
+- [ ] **Multi-Environment Testing**: Validate across all supported configurations
+- [ ] **Documentation Accuracy**: Ensure documentation matches actual implementation
+
+### Common Failure Patterns to Avoid
+
+#### "Tunnel Vision" Research
+
+**Problem**: Agents focus only on the specific area being changed
+**Example**: Dark mode research that ignores light mode impact
+**Prevention**: Always include "What could this break?" in research scope
+
+#### CSS Scoping Assumptions
+
+**Problem**: Assuming variables are globally available when they're scoped
+**Example**: `--hextrackr-surface-1` defined only in `[data-bs-theme="dark"]`
+**Prevention**: Validate variable definitions across all theme states
+
+#### Framework Override Conflicts
+
+**Problem**: Custom CSS gets overridden by framework specificity
+**Example**: Bootstrap modal styles overriding custom surface hierarchy
+**Prevention**: Test CSS specificity and use appropriate selectors
+
+#### Theme Transition Gaps
+
+**Problem**: Components work in one theme but break during theme switching
+**Example**: Modals created without theme attributes in JavaScript
+**Prevention**: Test theme switching with components in all states
+
 ## Best Practices
 
 ### Specification Phase

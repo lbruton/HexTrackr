@@ -9,6 +9,14 @@
 
 [Clear description of the problem being solved. What specific issue or opportunity are we addressing?]
 
+## Current State Check
+
+*Brief review of how things work now - helps researchers understand the foundation*
+
+- **Current implementation**: [How does this area currently work, if applicable?]
+- **Key files/systems involved**: [What code, components, or systems are affected?]
+- **Known quirks or constraints**: [Any architectural patterns, limitations, or gotchas?]
+
 ## Current Issues
 
 - **Issue 1**: [Describe specific problem]
@@ -74,6 +82,14 @@
 - **Assumption 1**: [Technical/business assumption - needs validation in R00X]
 - **Assumption 2**: [Framework/tool assumption - needs research]
 - **Dependency 1**: [External dependency or prerequisite]
+
+## Context for Research Phase
+
+*Key technical details researchers need to know before starting analysis*
+
+- **Architecture patterns**: [What patterns, frameworks, or conventions are in use?]
+- **Testing requirements**: [How should solutions be validated? Docker? Both themes?]
+- **Critical constraints**: [What must researchers keep in mind during analysis?]
 
 ## Next Steps
 

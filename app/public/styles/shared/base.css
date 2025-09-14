@@ -14,6 +14,26 @@ body {
     --hextrackr-warning: #f76707;
     --hextrackr-danger: #d63384;
     --hextrackr-info: #0dcaf0;
+
+    /* Light Mode Surface Hierarchy System - Fixes T001 modal bug */
+    --hextrackr-surface-base: #ffffff;        /* Page background */
+    --hextrackr-surface-1: #ffffff;           /* Cards - low elevation */
+    --hextrackr-surface-2: #f8f9fa;           /* Tables - medium elevation */
+    --hextrackr-surface-3: #f5f5f5;           /* Modal sections - higher elevation */
+    --hextrackr-surface-4: #ffffff;           /* Modal container */
+
+    /* Border Definition System - Light theme */
+    --hextrackr-border-subtle: rgb(0, 0, 0, 0.08);   /* Subtle element borders */
+    --hextrackr-border-muted: rgb(0, 0, 0, 0.12);    /* Muted element borders */
+    --hextrackr-border-strong: rgb(0, 0, 0, 0.16);   /* Strong element borders */
+
+    /* Enhanced Shadow System - Light theme */
+    --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.1);    /* Small shadows */
+    --hextrackr-shadow-md: 0 4px 12px rgb(0, 0, 0, 0.15);  /* Medium shadows */
+    --hextrackr-shadow-lg: 0 8px 24px rgb(0, 0, 0, 0.2);   /* Large shadows */
+
+    /* Theme-specific shadows */
+    --hextrackr-primary-shadow: rgb(32, 107, 196, 0.15);   /* Blue shadow for light mode */
 }
 
 /* Base gradient for HexTrackr branding */
