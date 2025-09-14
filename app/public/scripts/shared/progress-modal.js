@@ -258,11 +258,20 @@ class ProgressModal {
             onCancel = null,
             initialMessage = "Starting process..."
         } = options;
-        
+
+        // Add theme detection
+        const currentTheme = document.documentElement.getAttribute("data-bs-theme") || "light";
+        const modalElement = document.getElementById("progressModal");
+
+        // Propagate theme
+        if (modalElement) {
+            modalElement.setAttribute("data-bs-theme", currentTheme);
+        }
+
         // Update modal content
         document.getElementById("progressModalTitle").textContent = title;
         document.getElementById("progressMessage").textContent = initialMessage;
-        
+
         // Configure cancel functionality
         const cancelBtn = document.getElementById("progressCancelBtn");
         if (allowCancel && onCancel) {
@@ -271,20 +280,20 @@ class ProgressModal {
         } else {
             cancelBtn.style.display = "none";
         }
-        
+
         // Reset state
         this.resetProgressState();
-        
+
         // Join WebSocket room if sessionId provided
         if (sessionId && this.websocketClient && this.websocketClient.isSocketConnected()) {
             this.currentSessionId = sessionId;
             this.websocketClient.joinProgressRoom(sessionId);
         }
-        
+
         // Show modal
         this.isVisible = true;
         this.bsModal.show();
-        
+
         console.log("Progress modal shown with session:", sessionId);
     }
     
