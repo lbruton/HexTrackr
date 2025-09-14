@@ -37,13 +37,13 @@
 
 ## Workflow Recommendations
 
-**CORE PRINCIPLE**: Use Sequential Thinking (`mcp__sequential-thinking__sequentialthinking`) as your default problem-solving approach. This ensures systematic, revisable thinking for any task beyond simple operations.
+**CORE PRINCIPLE**: Use Sequential Thinking (`sequential-thinking`) as your default problem-solving approach. This ensures systematic, revisable thinking for any task beyond simple operations.
 
 ### 1. Start with Planning
 
 **ALWAYS use Sequential Thinking as your default approach** for any task requiring analysis, planning, or multiple steps:
 
-- **Sequential Thinking** (`mcp__sequential-thinking__sequentialthinking`)
+- **Sequential Thinking** (`sequential-thinking`)
   - Break down complex problems into manageable steps
   - Maintain context across multiple operations
   - Essential for architecture decisions, debugging, feature implementation
