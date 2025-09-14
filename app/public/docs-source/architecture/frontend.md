@@ -4,6 +4,12 @@
 
 The frontend of HexTrackr is composed of two main pages, each with its own set of JavaScript modules and CSS styles. Shared components, such as the header, footer, and settings modal, are loaded dynamically on each page.
 
+For more detailed information on the frontend architecture, see the following documents:
+
+- [CSS Architecture](./css-architecture.md)
+- [JavaScript Module System](./javascript-modules.md)
+- [Accessibility](./accessibility.md)
+
 ## Page Architecture
 
 ### `tickets.html`

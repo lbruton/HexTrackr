@@ -1,0 +1,305 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Configuration Documentation</h1>
+<p>Complete guide to all configurable aspects of HexTrackr, including environment variables, runtime settings, and security parameters.</p>
+<hr>
+<h2>Environment Configuration</h2>
+<h3>Core Server Settings</h3>
+<h4>Application Server</h4>
+<pre><code class="language-bash"># Primary application server configuration
+PORT=8989                          # HTTP server port (default: 8989)
+HOST=0.0.0.0                      # Server bind address (default: 0.0.0.0)
+NODE_ENV=production               # Environment mode (development|production|test)
+PROCESS_TITLE=hextrackr-server    # Process title for monitoring
+</code></pre>
+<h4>Database Configuration</h4>
+<pre><code class="language-bash"># SQLite database settings
+DB_PATH=./data/hextrackr.db       # Database file location
+DB_TIMEOUT=30000                  # Query timeout in milliseconds
+DB_BUSY_TIMEOUT=10000             # Busy timeout for locked database
+DB_WAL_MODE=true                  # Enable Write-Ahead Logging for performance
+DB_PRAGMA_SYNCHRONOUS=NORMAL      # Synchronous mode (OFF|NORMAL|FULL|EXTRA)
+DB_PRAGMA_CACHE_SIZE=10000        # Cache size in pages (-10000 = 10MB)
+</code></pre>
+<h4>WebSocket Server</h4>
+<pre><code class="language-bash"># Real-time communication settings
+WEBSOCKET_PORT=8988               # WebSocket server port
+WS_PING_INTERVAL=25000           # Ping interval in milliseconds
+WS_PING_TIMEOUT=20000            # Ping timeout in milliseconds
+WS_MAX_CONNECTIONS=100           # Maximum concurrent WebSocket connections
+WS_COMPRESSION=true              # Enable WebSocket compression
+</code></pre>
+<hr>
+<h3>Security Configuration</h3>
+<h4>Rate Limiting</h4>
+<pre><code class="language-bash"># API rate limiting configuration
+RATE_LIMIT_WINDOW_MS=900000      # Rate limit window (15 minutes in ms)
+RATE_LIMIT_MAX_REQUESTS=100      # Max requests per window per IP
+RATE_LIMIT_SKIP_SUCCESSFUL_REQUESTS=false  # Count successful requests
+RATE_LIMIT_SKIP_FAILED_REQUESTS=false      # Count failed requests
+RATE_LIMIT_HEADERS=true          # Include rate limit headers in responses
+</code></pre>
+<h4>CORS Settings</h4>
+<pre><code class="language-bash"># Cross-Origin Resource Sharing
+CORS_ORIGIN=*                    # Allowed origins (* for all, or specific URLs)
+CORS_METHODS=GET,POST,PUT,DELETE,OPTIONS  # Allowed HTTP methods
+CORS_ALLOWED_HEADERS=Content-Type,Authorization,X-Requested-With  # Allowed headers
+CORS_CREDENTIALS=false           # Allow credentials (cookies, auth headers)
+CORS_MAX_AGE=86400              # Preflight cache time in seconds
+</code></pre>
+<h4>File Upload Security</h4>
+<pre><code class="language-bash"># File upload restrictions
+MAX_UPLOAD_SIZE=52428800         # Maximum file size (50MB in bytes)
+UPLOAD_DIR=./app/public/uploads  # Upload directory path
+ALLOWED_EXTENSIONS=csv,json,xlsx # Comma-separated allowed file extensions
+UPLOAD_CLEANUP_AGE=86400000     # Auto-cleanup age in milliseconds (24 hours)
+UPLOAD_VIRUS_SCAN=false         # Enable virus scanning (requires ClamAV)
+</code></pre>
+<h4>Session Management</h4>
+<pre><code class="language-bash"># Session configuration
+SESSION_SECRET=&lt;auto-generated&gt;   # Session encryption key (auto-generated if missing)
+SESSION_NAME=hextrackr.sid       # Session cookie name
+SESSION_COOKIE_MAX_AGE=86400000  # Cookie expiration (24 hours in ms)
+SESSION_COOKIE_SECURE=false      # Secure cookie flag (true for HTTPS only)
+SESSION_COOKIE_HTTP_ONLY=true    # HTTP-only cookie flag
+SESSION_COOKIE_SAME_SITE=lax     # SameSite cookie attribute
+</code></pre>
+<hr>
+<h3>Application Features</h3>
+<h4>Data Processing</h4>
+<pre><code class="language-bash"># CSV import and processing
+CSV_CHUNK_SIZE=1000              # Rows processed per batch
+CSV_MAX_COLUMNS=50               # Maximum columns per CSV
+CSV_SKIP_EMPTY_LINES=true        # Skip empty lines during import
+CSV_TRIM_WHITESPACE=true         # Trim whitespace from values
+CSV_VALIDATE_HEADERS=true        # Validate expected column headers
+</code></pre>
+<h4>Vulnerability Management</h4>
+<pre><code class="language-bash"># Vulnerability data handling
+VULN_CACHE_TTL=300000           # Cache TTL in milliseconds (5 minutes)
+VULN_BATCH_SIZE=100             # Batch size for bulk operations
+VULN_AUTO_CLEANUP_DAYS=365      # Auto-cleanup resolved vulnerabilities (days)
+VULN_ENABLE_ROLLOVER=true       # Enable rollover table architecture
+VULN_ROLLOVER_RETENTION_DAYS=90 # Historical data retention period
+</code></pre>
+<h4>Ticket Management</h4>
+<pre><code class="language-bash"># Support ticket configuration
+TICKET_AUTO_ASSIGN=false        # Auto-assign tickets to users
+TICKET_DEFAULT_PRIORITY=Medium  # Default priority (Low|Medium|High|Critical)
+TICKET_AUTO_CLOSE_DAYS=30      # Auto-close resolved tickets after N days
+TICKET_ENABLE_EMAIL_NOTIFICATIONS=false  # Email notifications (requires SMTP)
+</code></pre>
+<hr>
+<h3>Performance Tuning</h3>
+<h4>Caching Configuration</h4>
+<pre><code class="language-bash"># Application caching settings
+CACHE_ENABLED=true              # Enable application-level caching
+CACHE_DEFAULT_TTL=300000        # Default cache TTL in milliseconds
+CACHE_MAX_SIZE=100              # Maximum cache entries
+CACHE_CHECK_PERIOD=60000        # Cache cleanup interval in milliseconds
+</code></pre>
+<h4>Response Compression</h4>
+<pre><code class="language-bash"># HTTP compression settings
+COMPRESSION_ENABLED=true        # Enable response compression
+COMPRESSION_LEVEL=6             # Compression level (1-9, higher = more compression)
+COMPRESSION_THRESHOLD=1024      # Minimum response size to compress (bytes)
+COMPRESSION_FILTER=text/*,application/json,application/javascript  # MIME types
+</code></pre>
+<h4>Static Asset Serving</h4>
+<pre><code class="language-bash"># Static file configuration
+STATIC_CACHE_MAX_AGE=86400000   # Cache-Control max-age for static assets
+STATIC_ETAG=true                # Enable ETag headers
+STATIC_LAST_MODIFIED=true       # Enable Last-Modified headers
+STATIC_INDEX=false              # Disable directory indexing
+</code></pre>
+<hr>
+<h3>Monitoring &amp; Logging</h3>
+<h4>Application Logging</h4>
+<pre><code class="language-bash"># Logging configuration
+LOG_LEVEL=info                  # Logging level (error|warn|info|debug|trace)
+LOG_FORMAT=combined             # Log format (combined|common|dev|short|tiny)
+LOG_DESTINATION=console         # Log destination (console|file|syslog)
+LOG_FILE_PATH=./logs/hextrackr.log  # Log file path (if LOG_DESTINATION=file)
+LOG_FILE_MAX_SIZE=10485760      # Log file max size in bytes (10MB)
+LOG_FILE_MAX_FILES=5            # Number of log files to retain
+</code></pre>
+<h4>Health Check Configuration</h4>
+<pre><code class="language-bash"># Health monitoring settings
+HEALTH_CHECK_ENABLED=true       # Enable /health endpoint
+HEALTH_CHECK_DB=true           # Include database connectivity check
+HEALTH_CHECK_WEBSOCKET=true    # Include WebSocket server check
+HEALTH_CHECK_DISK_SPACE=true   # Include disk space check
+HEALTH_CHECK_MEMORY=true       # Include memory usage check
+</code></pre>
+<h4>Metrics Collection</h4>
+<pre><code class="language-bash"># Performance metrics
+METRICS_ENABLED=false          # Enable metrics collection
+METRICS_ENDPOINT=/metrics      # Metrics endpoint path
+METRICS_INCLUDE_DEFAULT=true   # Include default Node.js metrics
+METRICS_INCLUDE_HTTP=true      # Include HTTP request metrics
+</code></pre>
+<hr>
+<h3>Documentation Portal</h3>
+<h4>Documentation Generation</h4>
+<pre><code class="language-bash"># Documentation system configuration
+DOCS_ENABLED=true              # Enable documentation portal
+DOCS_AUTO_REFRESH=true         # Auto-refresh docs on markdown changes
+DOCS_BUILD_ON_START=false      # Build documentation on server startup
+DOCS_SOURCE_DIR=./app/public/docs-source    # Documentation source directory
+DOCS_OUTPUT_DIR=./app/public/docs-html      # Generated documentation output
+DOCS_TEMPLATE_PATH=./app/public/docs-html/template.html  # HTML template
+</code></pre>
+<h4>Content Management</h4>
+<pre><code class="language-bash"># Documentation content settings
+DOCS_ENABLE_SEARCH=true        # Enable documentation search
+DOCS_ENABLE_TOC=true          # Enable table of contents generation
+DOCS_SYNTAX_HIGHLIGHTING=true  # Enable code syntax highlighting
+DOCS_MERMAID_DIAGRAMS=true    # Enable Mermaid diagram rendering
+DOCS_MATH_RENDERING=false     # Enable MathJax/KaTeX rendering
+</code></pre>
+<hr>
+<h3>Development Settings</h3>
+<h4>Development Mode Features</h4>
+<pre><code class="language-bash"># Development-only configuration
+DEV_AUTO_RELOAD=true           # Enable auto-reload on file changes
+DEV_DETAILED_ERRORS=true       # Show detailed error messages
+DEV_CORS_RELAXED=true          # Relaxed CORS for development
+DEV_CACHE_DISABLED=true        # Disable caching in development
+DEV_MOCK_DATA=false            # Use mock data instead of database
+</code></pre>
+<h4>Debug Configuration</h4>
+<pre><code class="language-bash"># Debugging settings
+DEBUG_SQL_QUERIES=false        # Log SQL queries to console
+DEBUG_WEBSOCKET_EVENTS=false   # Log WebSocket events
+DEBUG_REQUEST_TIMING=false     # Log request processing times
+DEBUG_MEMORY_USAGE=false       # Log memory usage periodically
+</code></pre>
+<hr>
+<h2>Runtime Configuration</h2>
+<h3>Application-Level Settings</h3>
+<p>These settings can be modified through the settings modal or configuration files:</p>
+<h4>UI Preferences</h4>
+<ul>
+<li><strong>Theme</strong>: <code>light</code> | <code>dark</code> | <code>auto</code> (follows system preference)</li>
+<li><strong>Grid Page Size</strong>: <code>25</code> | <code>50</code> | <code>100</code> | <code>200</code> rows per page</li>
+<li><strong>Chart Type Preferences</strong>: Default chart types for different data views</li>
+<li><strong>Auto-refresh Interval</strong>: Dashboard refresh rate in seconds</li>
+</ul>
+<h4>Data Display Settings</h4>
+<ul>
+<li><strong>Date Format</strong>: ISO 8601, US format, European format</li>
+<li><strong>Number Format</strong>: Decimal places, thousands separator</li>
+<li><strong>Timezone</strong>: UTC, Local, or specific timezone</li>
+<li><strong>Language</strong>: Currently English only, prepared for i18n</li>
+</ul>
+<h4>Export Settings</h4>
+<ul>
+<li><strong>CSV Delimiter</strong>: Comma, semicolon, tab</li>
+<li><strong>Include Headers</strong>: Boolean flag for CSV exports</li>
+<li><strong>Date Range</strong>: Default date ranges for exports</li>
+<li><strong>File Naming</strong>: Template for exported file names</li>
+</ul>
+<hr>
+<h2>Security Hardening Options</h2>
+<h3>Additional Security Headers</h3>
+<pre><code class="language-bash"># Security header configuration
+SECURITY_HSTS_ENABLED=true                    # HTTP Strict Transport Security
+SECURITY_HSTS_MAX_AGE=31536000               # HSTS max age in seconds
+SECURITY_CONTENT_TYPE_NOSNIFF=true           # X-Content-Type-Options: nosniff
+SECURITY_FRAME_OPTIONS=DENY                  # X-Frame-Options setting
+SECURITY_XSS_PROTECTION=1; mode=block        # X-XSS-Protection header
+SECURITY_REFERRER_POLICY=strict-origin-when-cross-origin  # Referrer-Policy
+</code></pre>
+<h3>Input Validation</h3>
+<pre><code class="language-bash"># Input validation settings
+VALIDATION_MAX_STRING_LENGTH=1000            # Maximum string field length
+VALIDATION_MAX_ARRAY_SIZE=100               # Maximum array size
+VALIDATION_SANITIZE_HTML=true               # Enable HTML sanitization
+VALIDATION_STRICT_JSON=true                 # Strict JSON parsing
+</code></pre>
+<h3>Audit Logging</h3>
+<pre><code class="language-bash"># Security audit logging
+AUDIT_LOG_ENABLED=false                     # Enable security audit logging
+AUDIT_LOG_FAILED_LOGINS=true               # Log failed authentication attempts
+AUDIT_LOG_FILE_UPLOADS=true                # Log file upload activities
+AUDIT_LOG_DATA_EXPORTS=true                # Log data export activities
+AUDIT_LOG_ADMIN_ACTIONS=true               # Log administrative actions
+</code></pre>
+<hr>
+<h2>Configuration Management</h2>
+<h3>Environment File Priority</h3>
+<ol>
+<li>Command line arguments (highest priority)</li>
+<li><code>.env.local</code> file</li>
+<li><code>.env.production</code> or <code>.env.development</code> (based on NODE_ENV)</li>
+<li><code>.env</code> file</li>
+<li>Default values (lowest priority)</li>
+</ol>
+<h3>Configuration Validation</h3>
+<p>All configuration values are validated at startup:</p>
+<ul>
+<li><strong>Type checking</strong>: Ensures correct data types</li>
+<li><strong>Range validation</strong>: Checks numeric ranges and limits</li>
+<li><strong>Format validation</strong>: Validates formats (URLs, file paths, etc.)</li>
+<li><strong>Dependency validation</strong>: Ensures compatible option combinations</li>
+</ul>
+<h3>Hot Reload Support</h3>
+<p>Some configuration changes can be applied without restart:</p>
+<ul>
+<li>Log level changes</li>
+<li>Cache TTL adjustments</li>
+<li>Rate limit modifications</li>
+<li>Feature flag toggles</li>
+</ul>
+<h3>Configuration Backup</h3>
+<pre><code class="language-bash"># Generate current configuration dump
+npm run config:dump &gt; config-backup.json
+
+# Validate configuration file
+npm run config:validate
+
+# Show configuration with sources
+npm run config:show
+</code></pre>
+<hr>
+<h2>Production Deployment Settings</h2>
+<h3>Recommended Production Values</h3>
+<pre><code class="language-bash">NODE_ENV=production
+LOG_LEVEL=warn
+COMPRESSION_ENABLED=true
+STATIC_CACHE_MAX_AGE=2592000000    # 30 days
+CORS_ORIGIN=https://yourdomain.com
+SESSION_COOKIE_SECURE=true
+SECURITY_HSTS_ENABLED=true
+DB_WAL_MODE=true
+CACHE_ENABLED=true
+</code></pre>
+<h3>Docker Environment</h3>
+<pre><code class="language-yaml"># docker-compose.yml environment variables
+environment:
+  - NODE_ENV=production
+  - PORT=8989
+  - WEBSOCKET_PORT=8988
+  - DB_PATH=/data/hextrackr.db
+  - UPLOAD_DIR=/data/uploads
+  - LOG_DESTINATION=console
+</code></pre>
+<h3>Kubernetes ConfigMap Example</h3>
+<pre><code class="language-yaml">apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hextrackr-config
+data:
+  NODE_ENV: &quot;production&quot;
+  PORT: &quot;8989&quot;
+  WEBSOCKET_PORT: &quot;8988&quot;
+  LOG_LEVEL: &quot;warn&quot;
+  COMPRESSION_ENABLED: &quot;true&quot;
+  CACHE_ENABLED: &quot;true&quot;
+</code></pre>
+<p>This configuration documentation provides complete transparency about all configurable aspects of HexTrackr, essential for security reviews and operational deployment planning.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
