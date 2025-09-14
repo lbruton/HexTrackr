@@ -259,7 +259,7 @@ class DeviceSecurityModal {
 
         // Detect current theme for v33 theming
         const currentTheme = this.detectCurrentTheme();
-        const isDarkMode = currentTheme === "dark";
+        const _isDarkMode = currentTheme === "dark";  // Prefixed with _ to indicate intentionally unused
 
         const deviceGridOptions = {
             theme: window.agGridThemeManager ? window.agGridThemeManager.getCurrentTheme() : null, // AG-Grid v33 theme configuration
@@ -312,18 +312,27 @@ class DeviceSecurityModal {
      * Show the device modal
      */
     showModal() {
+        // Add theme detection
+        const currentTheme = document.documentElement.getAttribute("data-bs-theme") || "light";
+        const modalElement = document.getElementById("deviceModal");
+
+        // Propagate theme to modal
+        if (modalElement) {
+            modalElement.setAttribute("data-bs-theme", currentTheme);
+        }
+
         // Close any existing vulnerability modals before opening device modal
         const existingVulnModal = bootstrap.Modal.getInstance(document.getElementById("vulnerabilityModal"));
         if (existingVulnModal) {
             existingVulnModal.hide();
         }
-        
+
         const existingVulnDetailsModal = bootstrap.Modal.getInstance(document.getElementById("vulnDetailsModal"));
         if (existingVulnDetailsModal) {
             existingVulnDetailsModal.hide();
         }
 
-        const modal = new bootstrap.Modal(document.getElementById("deviceModal"));
+        const modal = new bootstrap.Modal(modalElement);
         modal.show();
     }
 

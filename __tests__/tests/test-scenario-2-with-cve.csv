@@ -1,4 +1,0 @@
-asset.display_ipv4_address,asset.id,asset.name,definition.cve,definition.family,definition.id,definition.name,severity,definition.vpr.score,definition.cvss_score,definition.plugin_published
-192.168.1.100,test-asset-001,server01,CVE-2025-20155,CISCO,235488,Cisco IOS XE Software Bootstrap Program Command Injection Vulnerability,High,8.5,7.2,2024-08-01
-192.168.1.101,test-asset-002,server02,CVE-2025-20156,CISCO,235489,Cisco IOS XE Configuration Management Issues,Medium,6.2,5.3,2024-07-15
-192.168.1.102,test-asset-003,server03,CVE-2024-12345,MICROSOFT,12345,Windows Server Critical Update Required,Critical,9.1,8.8,2024-08-20
