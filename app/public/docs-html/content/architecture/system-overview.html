@@ -1,0 +1,24 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>System Overview</h1>
+<p>This document provides a high-level overview of the HexTrackr system architecture.</p>
+<hr>
+<h2>Architecture Diagram</h2>
+<pre><code class="language-mermaid">graph TD
+    A[Users] --&gt; B(nginx Reverse Proxy);
+    B --&gt; C{Application Server (Port 8989)};
+    C --&gt; E(SQLite Database);
+</code></pre>
+<hr>
+<h2>Components</h2>
+<ul>
+<li><strong>nginx Reverse Proxy</strong>: The single entry point for all traffic. It routes requests to the appropriate server and handles SSL/TLS termination.</li>
+<li><strong>Application Server</strong>: A Node.js/Express server that provides the REST API and serves the frontend application.</li>
+<li><strong>WebSocket Server</strong>: A Socket.io server that provides real-time communication with clients.</li>
+<li><strong>SQLite Database</strong>: A file-based database that stores all application data.</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

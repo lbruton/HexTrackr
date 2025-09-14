@@ -1,0 +1,744 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Complete API Reference</h1>
+<p>Comprehensive documentation of all HexTrackr API endpoints with detailed request/response examples, error handling, and integration guidelines.</p>
+<hr>
+<h2>API Overview</h2>
+<p><strong>Base URL</strong>: <code>http://localhost:8989</code><br><strong>Content-Type</strong>: <code>application/json</code> (unless specified otherwise)<br><strong>Rate Limiting</strong>: 100 requests per 15-minute window per IP<br><strong>WebSocket</strong>: <code>ws://localhost:8988</code> for real-time updates</p>
+<hr>
+<h2>Authentication &amp; Security</h2>
+<h3>Current State</h3>
+<ul>
+<li><strong>Authentication</strong>: Not implemented (open API)</li>
+<li><strong>Authorization</strong>: Not implemented</li>
+<li><strong>Security Headers</strong>: Enabled (HSTS, XSS Protection, Content-Type Options)</li>
+<li><strong>CORS</strong>: Configurable (default: all origins)</li>
+<li><strong>Rate Limiting</strong>: IP-based with configurable thresholds</li>
+</ul>
+<h3>Planned Security Features</h3>
+<ul>
+<li>JWT-based authentication</li>
+<li>Role-based access control (RBAC)</li>
+<li>API key authentication for integrations</li>
+<li>OAuth 2.0 support</li>
+</ul>
+<hr>
+<h2>Health &amp; Status</h2>
+<h3>GET /health</h3>
+<p>System health check and status information.</p>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">GET /health HTTP/1.1
+Host: localhost:8989
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;healthy&quot;,
+  &quot;version&quot;: &quot;1.0.13&quot;,
+  &quot;database&quot;: {
+    &quot;status&quot;: &quot;connected&quot;,
+    &quot;tables&quot;: [&quot;vulnerabilities&quot;, &quot;tickets&quot;, &quot;vulnerability_imports&quot;],
+    &quot;lastBackup&quot;: &quot;2025-01-12T10:30:00Z&quot;
+  },
+  &quot;websocket&quot;: {
+    &quot;status&quot;: &quot;running&quot;,
+    &quot;port&quot;: 8988,
+    &quot;connections&quot;: 3
+  },
+  &quot;uptime&quot;: &quot;2d 4h 15m 32s&quot;,
+  &quot;memory&quot;: {
+    &quot;used&quot;: &quot;156.2 MB&quot;,
+    &quot;total&quot;: &quot;512 MB&quot;
+  },
+  &quot;disk&quot;: {
+    &quot;available&quot;: &quot;15.2 GB&quot;,
+    &quot;database_size&quot;: &quot;42.3 MB&quot;
+  }
+}
+</code></pre>
+<hr>
+<h2>Vulnerability Management API</h2>
+<h3>GET /api/vulnerabilities</h3>
+<p>Retrieve paginated list of active vulnerabilities.</p>
+<p><strong>Query Parameters</strong>:</p>
+<ul>
+<li><code>page</code> (integer, optional): Page number (default: 1)</li>
+<li><code>limit</code> (integer, optional): Items per page (default: 50, max: 200)</li>
+<li><code>search</code> (string, optional): Search term for hostname, CVE, or plugin name</li>
+<li><code>severity</code> (string, optional): Filter by severity (<code>Critical</code>, <code>High</code>, <code>Medium</code>, <code>Low</code>)</li>
+<li><code>lifecycle_state</code> (string, optional): Filter by state (<code>active</code>, <code>reopened</code>, <code>resolved</code>)</li>
+<li><code>host</code> (string, optional): Filter by specific hostname</li>
+<li><code>date_range</code> (string, optional): Format &quot;YYYY-MM-DD,YYYY-MM-DD&quot;</li>
+</ul>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">GET /api/vulnerabilities?page=1&amp;limit=25&amp;severity=Critical&amp;search=SSH HTTP/1.1
+Host: localhost:8989
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: 1245,
+      &quot;import_id&quot;: 42,
+      &quot;hostname&quot;: &quot;web-server-01.corp.local&quot;,
+      &quot;ip_address&quot;: &quot;10.0.1.15&quot;,
+      &quot;cve&quot;: &quot;CVE-2024-0001&quot;,
+      &quot;severity&quot;: &quot;Critical&quot;,
+      &quot;vpr_score&quot;: 9.2,
+      &quot;cvss_base_score&quot;: 9.8,
+      &quot;cvss_temporal_score&quot;: 8.7,
+      &quot;plugin_id&quot;: &quot;12345&quot;,
+      &quot;plugin_name&quot;: &quot;OpenSSH Remote Code Execution&quot;,
+      &quot;description&quot;: &quot;Remote code execution vulnerability in OpenSSH server&quot;,
+      &quot;solution&quot;: &quot;Update OpenSSH to version 9.6 or later&quot;,
+      &quot;first_seen&quot;: &quot;2025-01-10T08:30:00Z&quot;,
+      &quot;last_seen&quot;: &quot;2025-01-12T14:20:00Z&quot;,
+      &quot;lifecycle_state&quot;: &quot;active&quot;,
+      &quot;scan_date&quot;: &quot;2025-01-12T14:20:00Z&quot;,
+      &quot;vendor&quot;: &quot;tenable&quot;,
+      &quot;port&quot;: 22,
+      &quot;protocol&quot;: &quot;TCP&quot;,
+      &quot;exploit_available&quot;: true,
+      &quot;patch_publication_date&quot;: &quot;2025-01-08T00:00:00Z&quot;,
+      &quot;vulnerability_publication_date&quot;: &quot;2025-01-05T00:00:00Z&quot;,
+      &quot;tags&quot;: [&quot;ssh&quot;, &quot;rce&quot;, &quot;critical-infrastructure&quot;]
+    }
+  ],
+  &quot;pagination&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 25,
+    &quot;total&quot;: 1847,
+    &quot;pages&quot;: 74,
+    &quot;has_next&quot;: true,
+    &quot;has_prev&quot;: false
+  },
+  &quot;filters_applied&quot;: {
+    &quot;severity&quot;: &quot;Critical&quot;,
+    &quot;search&quot;: &quot;SSH&quot;,
+    &quot;active_filters_count&quot;: 2
+  },
+  &quot;meta&quot;: {
+    &quot;query_time&quot;: &quot;0.045s&quot;,
+    &quot;cache_hit&quot;: false,
+    &quot;total_without_filters&quot;: 5234
+  }
+}
+</code></pre>
+<h3>GET /api/vulnerabilities/stats</h3>
+<p>Aggregate vulnerability statistics and metrics.</p>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">GET /api/vulnerabilities/stats HTTP/1.1
+Host: localhost:8989
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;by_severity&quot;: [
+    {
+      &quot;severity&quot;: &quot;Critical&quot;,
+      &quot;count&quot;: 89,
+      &quot;percentage&quot;: 4.2,
+      &quot;avg_vpr_score&quot;: 9.1,
+      &quot;avg_age_days&quot;: 12.5
+    },
+    {
+      &quot;severity&quot;: &quot;High&quot;,
+      &quot;count&quot;: 342,
+      &quot;percentage&quot;: 16.3,
+      &quot;avg_vpr_score&quot;: 7.8,
+      &quot;avg_age_days&quot;: 28.3
+    },
+    {
+      &quot;severity&quot;: &quot;Medium&quot;,
+      &quot;count&quot;: 1108,
+      &quot;percentage&quot;: 52.7,
+      &quot;avg_vpr_score&quot;: 5.2,
+      &quot;avg_age_days&quot;: 45.2
+    },
+    {
+      &quot;severity&quot;: &quot;Low&quot;,
+      &quot;count&quot;: 563,
+      &quot;percentage&quot;: 26.8,
+      &quot;avg_vpr_score&quot;: 2.1,
+      &quot;avg_age_days&quot;: 67.8
+    }
+  ],
+  &quot;totals&quot;: {
+    &quot;active_vulnerabilities&quot;: 2102,
+    &quot;resolved_last_30_days&quot;: 456,
+    &quot;newly_discovered_last_7_days&quot;: 78,
+    &quot;unique_hosts&quot;: 245,
+    &quot;unique_cves&quot;: 1847
+  },
+  &quot;trends&quot;: {
+    &quot;total_change_7_days&quot;: +23,
+    &quot;critical_change_7_days&quot;: +5,
+    &quot;resolution_rate_30_days&quot;: 0.178
+  },
+  &quot;top_vulnerability_families&quot;: [
+    {
+      &quot;family&quot;: &quot;Web Application Vulnerabilities&quot;,
+      &quot;count&quot;: 423,
+      &quot;percentage&quot;: 20.1
+    },
+    {
+      &quot;family&quot;: &quot;Operating System Vulnerabilities&quot;,
+      &quot;count&quot;: 389,
+      &quot;percentage&quot;: 18.5
+    }
+  ]
+}
+</code></pre>
+<h3>GET /api/vulnerabilities/trends</h3>
+<p>Historical vulnerability trends and analytics.</p>
+<p><strong>Query Parameters</strong>:</p>
+<ul>
+<li><code>period</code> (string, optional): Time period (<code>7d</code>, <code>30d</code>, <code>90d</code>, <code>1y</code>) (default: 30d)</li>
+<li><code>granularity</code> (string, optional): Data granularity (<code>daily</code>, <code>weekly</code>, <code>monthly</code>) (default: daily)</li>
+</ul>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">GET /api/vulnerabilities/trends?period=30d&amp;granularity=daily HTTP/1.1
+Host: localhost:8989
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;period&quot;: &quot;30d&quot;,
+  &quot;granularity&quot;: &quot;daily&quot;,
+  &quot;data_points&quot;: 30,
+  &quot;trends&quot;: [
+    {
+      &quot;date&quot;: &quot;2025-01-12&quot;,
+      &quot;total_active&quot;: 2102,
+      &quot;new_discoveries&quot;: 12,
+      &quot;resolved&quot;: 8,
+      &quot;critical&quot;: 89,
+      &quot;high&quot;: 342,
+      &quot;medium&quot;: 1108,
+      &quot;low&quot;: 563,
+      &quot;net_change&quot;: +4
+    }
+  ],
+  &quot;summary&quot;: {
+    &quot;avg_daily_discoveries&quot;: 14.2,
+    &quot;avg_daily_resolutions&quot;: 11.8,
+    &quot;peak_vulnerabilities&quot;: {
+      &quot;date&quot;: &quot;2025-01-03&quot;,
+      &quot;count&quot;: 2156
+    },
+    &quot;best_resolution_day&quot;: {
+      &quot;date&quot;: &quot;2025-01-08&quot;,
+      &quot;resolved&quot;: 34
+    }
+  }
+}
+</code></pre>
+<h3>POST /api/vulnerabilities/import</h3>
+<p>Import vulnerability data from CSV file with rollover processing.</p>
+<p><strong>Content-Type</strong>: <code>multipart/form-data</code></p>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">POST /api/vulnerabilities/import HTTP/1.1
+Host: localhost:8989
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name=&quot;csvFile&quot;; filename=&quot;vulnerabilities_2025-01-12.csv&quot;
+Content-Type: text/csv
+
+hostname,cve,severity,vpr_score,plugin_id,plugin_name
+web-server-01,CVE-2024-0001,Critical,9.2,12345,&quot;OpenSSH RCE&quot;
+------WebKitFormBoundary
+Content-Disposition: form-data; name=&quot;vendor&quot;
+
+tenable
+------WebKitFormBoundary
+Content-Disposition: form-data; name=&quot;scanDate&quot;
+
+2025-01-12T14:20:00Z
+------WebKitFormBoundary--
+</code></pre>
+<p><strong>Success Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;import_id&quot;: 47,
+  &quot;processing_stats&quot;: {
+    &quot;total_rows_processed&quot;: 1847,
+    &quot;new_vulnerabilities&quot;: 78,
+    &quot;updated_vulnerabilities&quot;: 234,
+    &quot;resolved_vulnerabilities&quot;: 45,
+    &quot;skipped_duplicates&quot;: 12,
+    &quot;processing_time_ms&quot;: 3420
+  },
+  &quot;scan_metadata&quot;: {
+    &quot;scan_date&quot;: &quot;2025-01-12T14:20:00Z&quot;,
+    &quot;vendor&quot;: &quot;tenable&quot;,
+    &quot;filename&quot;: &quot;vulnerabilities_2025-01-12.csv&quot;,
+    &quot;file_size&quot;: 2048576
+  },
+  &quot;data_quality&quot;: {
+    &quot;valid_cves&quot;: 1835,
+    &quot;invalid_cves&quot;: 12,
+    &quot;missing_fields&quot;: 0,
+    &quot;data_quality_score&quot;: 0.993
+  },
+  &quot;rollover_results&quot;: {
+    &quot;snapshot_created&quot;: true,
+    &quot;current_table_updated&quot;: true,
+    &quot;daily_totals_updated&quot;: true,
+    &quot;stale_entries_removed&quot;: 23
+  }
+}
+</code></pre>
+<p><strong>Error Response</strong> <code>400 Bad Request</code>:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;INVALID_CSV_FORMAT&quot;,
+    &quot;message&quot;: &quot;CSV file contains invalid format or missing required columns&quot;,
+    &quot;details&quot;: {
+      &quot;required_columns&quot;: [&quot;hostname&quot;, &quot;cve&quot;, &quot;severity&quot;],
+      &quot;missing_columns&quot;: [&quot;hostname&quot;],
+      &quot;invalid_rows&quot;: [3, 7, 12],
+      &quot;line_errors&quot;: [
+        {
+          &quot;line&quot;: 3,
+          &quot;error&quot;: &quot;Missing hostname field&quot;
+        }
+      ]
+    }
+  }
+}
+</code></pre>
+<h3>DELETE /api/vulnerabilities/clear</h3>
+<p>Clear all vulnerability data (admin operation).</p>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">DELETE /api/vulnerabilities/clear HTTP/1.1
+Host: localhost:8989
+Content-Type: application/json
+
+{
+  &quot;confirm&quot;: true,
+  &quot;backup_before_clear&quot;: true
+}
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;All vulnerability data cleared successfully&quot;,
+  &quot;backup_created&quot;: {
+    &quot;backup_id&quot;: &quot;backup_2025-01-12_10-30-45&quot;,
+    &quot;records_backed_up&quot;: 2102,
+    &quot;backup_size_bytes&quot;: 15728640
+  },
+  &quot;cleared_tables&quot;: [
+    &quot;vulnerabilities&quot;,
+    &quot;vulnerability_snapshots&quot;,
+    &quot;vulnerabilities_current&quot;,
+    &quot;vulnerability_daily_totals&quot;
+  ]
+}
+</code></pre>
+<hr>
+<h2>Ticket Management API</h2>
+<h3>GET /api/tickets</h3>
+<p>Retrieve tickets with filtering and pagination.</p>
+<p><strong>Query Parameters</strong>:</p>
+<ul>
+<li><code>page</code> (integer, optional): Page number (default: 1)</li>
+<li><code>limit</code> (integer, optional): Items per page (default: 50)</li>
+<li><code>status</code> (string, optional): Filter by status (<code>Open</code>, <code>In Progress</code>, <code>Resolved</code>, <code>Closed</code>)</li>
+<li><code>urgency</code> (string, optional): Filter by urgency (<code>Low</code>, <code>Medium</code>, <code>High</code>, <code>Critical</code>)</li>
+<li><code>assigned_to</code> (string, optional): Filter by assignee</li>
+<li><code>location</code> (string, optional): Filter by location</li>
+<li><code>created_after</code> (string, optional): ISO date string</li>
+<li><code>created_before</code> (string, optional): ISO date string</li>
+</ul>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">GET /api/tickets?status=Open&amp;urgency=High&amp;page=1&amp;limit=25 HTTP/1.1
+Host: localhost:8989
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: &quot;TKT-2025-0234&quot;,
+      &quot;location&quot;: &quot;Data Center 1 - Rack A3&quot;,
+      &quot;devices&quot;: [
+        &quot;web-server-01.corp.local&quot;,
+        &quot;db-server-02.corp.local&quot;
+      ],
+      &quot;description&quot;: &quot;Critical SSH vulnerabilities requiring immediate patching&quot;,
+      &quot;urgency&quot;: &quot;High&quot;,
+      &quot;category&quot;: &quot;Security&quot;,
+      &quot;status&quot;: &quot;Open&quot;,
+      &quot;assigned_to&quot;: &quot;john.doe@company.com&quot;,
+      &quot;created_date&quot;: &quot;2025-01-12T09:15:00Z&quot;,
+      &quot;updated_date&quot;: &quot;2025-01-12T14:30:00Z&quot;,
+      &quot;notes&quot;: &quot;Coordinated with security team. Maintenance window scheduled for tonight.&quot;,
+      &quot;related_vulnerabilities&quot;: [
+        &quot;CVE-2024-0001&quot;,
+        &quot;CVE-2024-0002&quot;
+      ],
+      &quot;estimated_resolution&quot;: &quot;2025-01-13T02:00:00Z&quot;,
+      &quot;priority_score&quot;: 8.5,
+      &quot;tags&quot;: [&quot;ssh&quot;, &quot;critical&quot;, &quot;infrastructure&quot;]
+    }
+  ],
+  &quot;pagination&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 25,
+    &quot;total&quot;: 127,
+    &quot;pages&quot;: 6,
+    &quot;has_next&quot;: true,
+    &quot;has_prev&quot;: false
+  },
+  &quot;summary&quot;: {
+    &quot;total_open&quot;: 45,
+    &quot;total_in_progress&quot;: 23,
+    &quot;total_high_urgency&quot;: 12,
+    &quot;avg_resolution_time_hours&quot;: 18.5
+  }
+}
+</code></pre>
+<h3>POST /api/tickets</h3>
+<p>Create a new support ticket.</p>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">POST /api/tickets HTTP/1.1
+Host: localhost:8989
+Content-Type: application/json
+
+{
+  &quot;location&quot;: &quot;Data Center 1 - Rack A3&quot;,
+  &quot;devices&quot;: [
+    &quot;web-server-01.corp.local&quot;,
+    &quot;db-server-02.corp.local&quot;
+  ],
+  &quot;description&quot;: &quot;Critical SSH vulnerabilities requiring immediate patching&quot;,
+  &quot;urgency&quot;: &quot;High&quot;,
+  &quot;category&quot;: &quot;Security&quot;,
+  &quot;assigned_to&quot;: &quot;john.doe@company.com&quot;,
+  &quot;related_vulnerabilities&quot;: [
+    &quot;CVE-2024-0001&quot;,
+    &quot;CVE-2024-0002&quot;
+  ],
+  &quot;estimated_resolution&quot;: &quot;2025-01-13T02:00:00Z&quot;,
+  &quot;tags&quot;: [&quot;ssh&quot;, &quot;critical&quot;, &quot;infrastructure&quot;]
+}
+</code></pre>
+<p><strong>Response</strong> <code>201 Created</code>:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;ticket&quot;: {
+    &quot;id&quot;: &quot;TKT-2025-0235&quot;,
+    &quot;location&quot;: &quot;Data Center 1 - Rack A3&quot;,
+    &quot;devices&quot;: [
+      &quot;web-server-01.corp.local&quot;,
+      &quot;db-server-02.corp.local&quot;
+    ],
+    &quot;description&quot;: &quot;Critical SSH vulnerabilities requiring immediate patching&quot;,
+    &quot;urgency&quot;: &quot;High&quot;,
+    &quot;category&quot;: &quot;Security&quot;,
+    &quot;status&quot;: &quot;Open&quot;,
+    &quot;assigned_to&quot;: &quot;john.doe@company.com&quot;,
+    &quot;created_date&quot;: &quot;2025-01-12T15:45:00Z&quot;,
+    &quot;updated_date&quot;: &quot;2025-01-12T15:45:00Z&quot;,
+    &quot;notes&quot;: &quot;&quot;,
+    &quot;related_vulnerabilities&quot;: [
+      &quot;CVE-2024-0001&quot;,
+      &quot;CVE-2024-0002&quot;
+    ],
+    &quot;estimated_resolution&quot;: &quot;2025-01-13T02:00:00Z&quot;,
+    &quot;priority_score&quot;: 8.5,
+    &quot;tags&quot;: [&quot;ssh&quot;, &quot;critical&quot;, &quot;infrastructure&quot;]
+  }
+}
+</code></pre>
+<h3>PUT /api/tickets/:id</h3>
+<p>Update an existing ticket.</p>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">PUT /api/tickets/TKT-2025-0234 HTTP/1.1
+Host: localhost:8989
+Content-Type: application/json
+
+{
+  &quot;status&quot;: &quot;In Progress&quot;,
+  &quot;notes&quot;: &quot;Started patching process. Web-server-01 completed successfully.&quot;,
+  &quot;assigned_to&quot;: &quot;jane.smith@company.com&quot;
+}
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;ticket&quot;: {
+    &quot;id&quot;: &quot;TKT-2025-0234&quot;,
+    &quot;status&quot;: &quot;In Progress&quot;,
+    &quot;notes&quot;: &quot;Started patching process. Web-server-01 completed successfully.&quot;,
+    &quot;assigned_to&quot;: &quot;jane.smith@company.com&quot;,
+    &quot;updated_date&quot;: &quot;2025-01-12T16:20:00Z&quot;
+  }
+}
+</code></pre>
+<h3>DELETE /api/tickets/:id</h3>
+<p>Delete a ticket (soft delete).</p>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">DELETE /api/tickets/TKT-2025-0234 HTTP/1.1
+Host: localhost:8989
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Ticket TKT-2025-0234 deleted successfully&quot;,
+  &quot;deleted_at&quot;: &quot;2025-01-12T16:25:00Z&quot;
+}
+</code></pre>
+<hr>
+<h2>Backup &amp; Restore API</h2>
+<h3>GET /api/backup/all</h3>
+<p>Export complete database backup.</p>
+<p><strong>Query Parameters</strong>:</p>
+<ul>
+<li><code>format</code> (string, optional): Export format (<code>json</code>, <code>csv</code>) (default: json)</li>
+<li><code>include_resolved</code> (boolean, optional): Include resolved vulnerabilities (default: false)</li>
+<li><code>compress</code> (boolean, optional): Compress response (default: true)</li>
+</ul>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">GET /api/backup/all?format=json&amp;compress=true HTTP/1.1
+Host: localhost:8989
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;backup_metadata&quot;: {
+    &quot;backup_id&quot;: &quot;backup_2025-01-12_16-30-00&quot;,
+    &quot;created_at&quot;: &quot;2025-01-12T16:30:00Z&quot;,
+    &quot;version&quot;: &quot;1.0.13&quot;,
+    &quot;format&quot;: &quot;json&quot;,
+    &quot;compressed&quot;: true,
+    &quot;total_records&quot;: 2229
+  },
+  &quot;data&quot;: {
+    &quot;vulnerabilities&quot;: [
+      {
+        &quot;id&quot;: 1245,
+        &quot;hostname&quot;: &quot;web-server-01.corp.local&quot;,
+        &quot;cve&quot;: &quot;CVE-2024-0001&quot;
+      }
+    ],
+    &quot;tickets&quot;: [
+      {
+        &quot;id&quot;: &quot;TKT-2025-0234&quot;,
+        &quot;location&quot;: &quot;Data Center 1&quot;,
+        &quot;status&quot;: &quot;Open&quot;
+      }
+    ],
+    &quot;vulnerability_imports&quot;: [
+      {
+        &quot;id&quot;: 47,
+        &quot;filename&quot;: &quot;vulnerabilities_2025-01-12.csv&quot;,
+        &quot;import_date&quot;: &quot;2025-01-12T14:20:00Z&quot;
+      }
+    ]
+  }
+}
+</code></pre>
+<h3>POST /api/restore</h3>
+<p>Restore data from backup file.</p>
+<p><strong>Content-Type</strong>: <code>multipart/form-data</code></p>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">POST /api/restore HTTP/1.1
+Host: localhost:8989
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name=&quot;file&quot;; filename=&quot;backup_2025-01-12.json&quot;
+Content-Type: application/json
+
+{backup data}
+------WebKitFormBoundary
+Content-Disposition: form-data; name=&quot;options&quot;
+
+{
+  &quot;clear_existing&quot;: true,
+  &quot;validate_data&quot;: true,
+  &quot;create_backup_before_restore&quot;: true
+}
+------WebKitFormBoundary--
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;restore_id&quot;: &quot;restore_2025-01-12_16-45-00&quot;,
+  &quot;backup_created&quot;: {
+    &quot;backup_id&quot;: &quot;pre_restore_backup_2025-01-12_16-44-30&quot;,
+    &quot;records_backed_up&quot;: 2102
+  },
+  &quot;restoration_stats&quot;: {
+    &quot;vulnerabilities_restored&quot;: 1847,
+    &quot;tickets_restored&quot;: 234,
+    &quot;imports_restored&quot;: 45,
+    &quot;total_records&quot;: 2126,
+    &quot;validation_errors&quot;: 0,
+    &quot;processing_time_ms&quot;: 5420
+  },
+  &quot;warnings&quot;: []
+}
+</code></pre>
+<hr>
+<h2>Reference Data API</h2>
+<h3>GET /api/sites</h3>
+<p>List all available sites/locations.</p>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;sites&quot;: [
+    {
+      &quot;id&quot;: &quot;DC1&quot;,
+      &quot;name&quot;: &quot;Data Center 1&quot;,
+      &quot;location&quot;: &quot;New York, NY&quot;,
+      &quot;active_devices&quot;: 45,
+      &quot;total_vulnerabilities&quot;: 234
+    },
+    {
+      &quot;id&quot;: &quot;DC2&quot;,
+      &quot;name&quot;: &quot;Data Center 2&quot;,
+      &quot;location&quot;: &quot;San Francisco, CA&quot;,
+      &quot;active_devices&quot;: 67,
+      &quot;total_vulnerabilities&quot;: 189
+    }
+  ]
+}
+</code></pre>
+<h3>GET /api/locations</h3>
+<p>List all device locations within sites.</p>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;locations&quot;: [
+    {
+      &quot;site_id&quot;: &quot;DC1&quot;,
+      &quot;location&quot;: &quot;Rack A1&quot;,
+      &quot;device_count&quot;: 8,
+      &quot;vulnerability_count&quot;: 23
+    },
+    {
+      &quot;site_id&quot;: &quot;DC1&quot;,
+      &quot;location&quot;: &quot;Rack A2&quot;,
+      &quot;device_count&quot;: 6,
+      &quot;vulnerability_count&quot;: 31
+    }
+  ]
+}
+</code></pre>
+<hr>
+<h2>WebSocket API</h2>
+<h3>Connection</h3>
+<p>Connect to WebSocket server for real-time updates.</p>
+<p><strong>Connection</strong>:</p>
+<pre><code class="language-javascript">const socket = io(&#39;ws://localhost:8988&#39;);
+</code></pre>
+<h3>Events</h3>
+<h4>Progress Updates</h4>
+<p>Real-time progress for long-running operations.</p>
+<p><strong>Event</strong>: <code>import_progress</code></p>
+<pre><code class="language-json">{
+  &quot;session_id&quot;: &quot;session_12345&quot;,
+  &quot;operation&quot;: &quot;vulnerability_import&quot;,
+  &quot;progress&quot;: 0.65,
+  &quot;current_step&quot;: &quot;Processing CSV data&quot;,
+  &quot;processed_rows&quot;: 1200,
+  &quot;total_rows&quot;: 1847,
+  &quot;eta_seconds&quot;: 45,
+  &quot;status&quot;: &quot;processing&quot;
+}
+</code></pre>
+<h4>Import Complete</h4>
+<p>Notification when import operations finish.</p>
+<p><strong>Event</strong>: <code>import_complete</code></p>
+<pre><code class="language-json">{
+  &quot;session_id&quot;: &quot;session_12345&quot;,
+  &quot;operation&quot;: &quot;vulnerability_import&quot;,
+  &quot;success&quot;: true,
+  &quot;import_id&quot;: 47,
+  &quot;total_processed&quot;: 1847,
+  &quot;processing_time_ms&quot;: 3420,
+  &quot;summary&quot;: {
+    &quot;new&quot;: 78,
+    &quot;updated&quot;: 234,
+    &quot;resolved&quot;: 45
+  }
+}
+</code></pre>
+<h4>Data Updates</h4>
+<p>Broadcast when vulnerability or ticket data changes.</p>
+<p><strong>Event</strong>: <code>data_updated</code></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;vulnerabilities&quot;,
+  &quot;action&quot;: &quot;created&quot;,
+  &quot;count&quot;: 12,
+  &quot;affected_hosts&quot;: [&quot;web-server-01&quot;, &quot;db-server-02&quot;],
+  &quot;timestamp&quot;: &quot;2025-01-12T16:50:00Z&quot;
+}
+</code></pre>
+<h4>System Alerts</h4>
+<p>Critical system notifications.</p>
+<p><strong>Event</strong>: <code>system_alert</code></p>
+<pre><code class="language-json">{
+  &quot;level&quot;: &quot;warning&quot;,
+  &quot;message&quot;: &quot;Database backup recommended - last backup was 7 days ago&quot;,
+  &quot;category&quot;: &quot;maintenance&quot;,
+  &quot;action_required&quot;: false,
+  &quot;timestamp&quot;: &quot;2025-01-12T16:55:00Z&quot;
+}
+</code></pre>
+<hr>
+<h2>Error Handling</h2>
+<h3>Standard Error Format</h3>
+<p>All API endpoints return errors in consistent format:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;ERROR_CODE&quot;,
+    &quot;message&quot;: &quot;Human readable error message&quot;,
+    &quot;details&quot;: {
+      &quot;field&quot;: &quot;specific field that caused error&quot;,
+      &quot;received&quot;: &quot;invalid_value&quot;,
+      &quot;expected&quot;: &quot;valid_format&quot;
+    },
+    &quot;request_id&quot;: &quot;req_12345&quot;,
+    &quot;timestamp&quot;: &quot;2025-01-12T17:00:00Z&quot;
+  }
+}
+</code></pre>
+<h3>Common Error Codes</h3>
+<h4>400 Bad Request</h4>
+<ul>
+<li><code>INVALID_REQUEST_FORMAT</code>: Request body format invalid</li>
+<li><code>MISSING_REQUIRED_FIELD</code>: Required field missing</li>
+<li><code>INVALID_FIELD_VALUE</code>: Field value doesn&#39;t meet validation requirements</li>
+<li><code>INVALID_CSV_FORMAT</code>: CSV file format errors</li>
+<li><code>FILE_TOO_LARGE</code>: Uploaded file exceeds size limit</li>
+</ul>
+<h4>429 Too Many Requests</h4>
+<ul>
+<li><code>RATE_LIMIT_EXCEEDED</code>: IP has exceeded rate limit</li>
+</ul>
+<pre><code class="language-json">{
+  &quot;success&quot;: false,
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;RATE_LIMIT_EXCEEDED&quot;,
+    &quot;message&quot;: &quot;Rate limit exceeded. Try again in 15 minutes.&quot;,
+    &quot;details&quot;: {
+      &quot;limit&quot;: 100,
+      &quot;window_minutes&quot;: 15,
+      &quot;reset_time&quot;: &quot;2025-01-12T17:15:00Z&quot;
+    }
+  }
+}
+</code></pre>
+<h4>500 Internal Server Error</h4>
+<ul>
+<li><code>DATABASE_ERROR</code>: Database operation failed</li>
+<li><code>PROCESSING_ERROR</code>: Data processing error</li>
+<li><code>WEBSOCKET_ERROR</code>: WebSocket communication error</li>
+</ul>
+<hr>
+<p>This comprehensive API reference provides complete technical specifications for integrating with HexTrackr, suitable for security review and development planning.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
