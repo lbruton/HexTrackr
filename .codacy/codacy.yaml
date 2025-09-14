@@ -25,13 +25,7 @@ exclude_paths:
     - backup/**
     - depreciated/**
     - deprecated/**
-    - docs-html/**
-    - docs-prototype/**
-    - docs-source/**
-    - docs-temp/**
-    - roadmaps/**
     - temp/**
-    - uploads/**
     - .venv/**
     - venv/**
     - playwright/**
@@ -39,9 +33,8 @@ exclude_paths:
     - FileScopeMCP-*.json
     - FileScopeMCP-*.html
     - scripts/chart.min.js
-    - app/public/uploads/**
-    - app/public/docs-html/**
-    - app/public/vendor/**/*.min.js
+    - app/public/vendor/**
+    - roadmaps/**
 runtimes:
     - java@17.0.10
     - node@22.2.0
