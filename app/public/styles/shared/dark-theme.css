@@ -26,14 +26,9 @@
      * CORE THEME COLORS - Tabler.io v1.0.0-beta17
      * =========================================== */
     
-    /* Body and Page Background */
-    --bs-body-bg: #0f172a;                    /* Dark slate background */
-
     /* HexTrackr-specific theme variables */
     --hextrackr-primary-shadow: rgb(59, 130, 246, 0.2);  /* Blue shadow for dark mode */
     --bs-body-color: #e2e8f0;                 /* Light gray text */
-    --bs-body-bg-secondary: #1e293b;          /* Secondary dark background */
-    --bs-body-secondary-bg: #1e293b;          /* Bootstrap secondary background */
     
     /* Text Colors */
     --bs-body-color-rgb: 226, 232, 240;       /* Body color RGB values */
@@ -41,18 +36,47 @@
     --bs-emphasis-color-rgb: 248, 250, 252;
     --bs-secondary-color: #94a3b8;            /* Secondary text - lightened for 4.5:1 contrast */
     --bs-secondary-color-rgb: 148, 163, 184;
-    --bs-tertiary-color: #64748b;             /* Tertiary text - lightened for better readability */
-    --bs-tertiary-color-rgb: 100, 116, 139;
+    --bs-tertiary-color: #94a3b8;             /* Tertiary text - lightened to match secondary for WCAG AA compliance */
+    --bs-tertiary-color-rgb: 148, 163, 184;
     
     /* ===========================================
      * COMPONENT COLORS
      * =========================================== */
     
+    /* ===========================================
+     * SURFACE HIERARCHY SYSTEM - P001
+     * =========================================== */
+
+    /* Surface Hierarchy - Balanced for visual comfort */
+    --hextrackr-surface-base: #0f172a;        /* Page background - darkest */
+    --hextrackr-surface-1: #1a2332;          /* Cards - low elevation */
+    --hextrackr-surface-2: #253241;          /* Tables - medium elevation */
+    --hextrackr-surface-3: #2f3f50;          /* Modal sections - higher elevation */
+    --hextrackr-surface-4: #526880;          /* Modal container - balanced 2.7:1 contrast */
+
+    /* Border Definition System - Enhanced for WCAG AA compliance */
+    --hextrackr-border-subtle: rgb(255, 255, 255, 0.15);   /* Subtle element borders - increased opacity */
+    --hextrackr-border-muted: rgb(255, 255, 255, 0.20);    /* Muted element borders - increased opacity */
+    --hextrackr-border-strong: rgb(255, 255, 255, 0.25);   /* Strong element borders - increased opacity */
+
+    /* Enhanced Shadow System (Optimized for Dark Mode) */
+    --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.3);    /* Small shadows */
+    --hextrackr-shadow-md: 0 4px 12px rgb(0, 0, 0, 0.4);   /* Medium shadows */
+    --hextrackr-shadow-lg: 0 8px 24px rgb(0, 0, 0, 0.5);   /* Large shadows */
+
+    /* Bootstrap/Tabler Component Surface Mapping */
+    --bs-body-bg: var(--hextrackr-surface-base);       /* Page background */
+    --bs-body-bg-secondary: var(--hextrackr-surface-1); /* Secondary backgrounds */
+    --bs-body-secondary-bg: var(--hextrackr-surface-1); /* Bootstrap secondary bg */
+
     /* Cards and Panels */
-    --bs-card-bg: #1e293b;                    /* Card background */
-    --bs-card-border-color: #334155;          /* Card borders */
-    --bs-card-cap-bg: #0f172a;                /* Card header/footer background */
-    
+    --bs-card-bg: var(--hextrackr-surface-1);          /* Card background */
+    --bs-card-border-color: var(--hextrackr-border-subtle); /* Card borders */
+    --bs-card-cap-bg: var(--hextrackr-surface-base);   /* Card header/footer background */
+
+    /* Tables */
+    --bs-table-bg: var(--hextrackr-surface-2);         /* Table background */
+
     /* Navigation and Headers */
     --bs-navbar-bg: #0f172a;                  /* Navigation background */
     --bs-navbar-brand-color: #f8fafc;         /* Brand text color */
@@ -171,23 +195,23 @@
      * =========================================== */
     
     /* Grid Background and Structure */
-    --ag-background-color: #1e293b;           /* Main grid background */
+    --ag-background-color: var(--hextrackr-surface-1);  /* Main grid background */
     --ag-foreground-color: #e2e8f0;           /* Text color */
-    --ag-border-color: #374151;               /* Grid borders */
-    --ag-secondary-border-color: #4b5563;     /* Secondary borders */
+    --ag-border-color: var(--hextrackr-border-subtle);  /* Grid borders */
+    --ag-secondary-border-color: var(--hextrackr-border-muted); /* Secondary borders */
     
     /* Headers */
-    --ag-header-background-color: #0f172a;    /* Header background */
+    --ag-header-background-color: var(--hextrackr-surface-2); /* Header background */
     --ag-header-foreground-color: #f8fafc;    /* Header text */
-    --ag-header-cell-hover-background-color: #374151; /* Header hover */
-    --ag-header-cell-moving-background-color: #475569; /* Moving header */
+    --ag-header-cell-hover-background-color: var(--hextrackr-surface-3); /* Header hover */
+    --ag-header-cell-moving-background-color: var(--hextrackr-surface-3); /* Moving header */
     
     /* Rows and Cells */
-    --ag-row-background-color: #1e293b;       /* Row background */
-    --ag-odd-row-background-color: #1a202c;   /* Alternate row color */
+    --ag-row-background-color: transparent;              /* Row background */
+    --ag-odd-row-background-color: rgb(255, 255, 255, 0.02); /* Alternate row color */
     --ag-row-hover-color: rgb(59, 130, 246, 0.1); /* Row hover */
     --ag-selected-row-background-color: rgb(59, 130, 246, 0.2); /* Selected row */
-    --ag-cell-horizontal-border: #374151;     /* Cell borders */
+    --ag-cell-horizontal-border: var(--hextrackr-border-subtle); /* Cell borders */
     
     /* Interactive Elements */
     --ag-range-selection-background-color: rgb(59, 130, 246, 0.2);
@@ -198,14 +222,14 @@
      * =========================================== */
     
     /* Modal */
-    --bs-modal-bg: #1e293b;                   /* Modal background */
-    --bs-modal-border-color: #374151;         /* Modal border */
-    --bs-modal-header-bg: #0f172a;            /* Modal header */
-    --bs-modal-footer-bg: #0f172a;            /* Modal footer */
+    --bs-modal-bg: var(--hextrackr-surface-3);         /* Modal background */
+    --bs-modal-border-color: var(--hextrackr-border-muted); /* Modal border */
+    --bs-modal-header-bg: var(--hextrackr-surface-2);  /* Modal header */
+    --bs-modal-footer-bg: var(--hextrackr-surface-2);  /* Modal footer */
     
     /* Dropdown */
-    --bs-dropdown-bg: #1e293b;                /* Dropdown background */
-    --bs-dropdown-border-color: #374151;      /* Dropdown border */
+    --bs-dropdown-bg: var(--hextrackr-surface-4);      /* Dropdown background */
+    --bs-dropdown-border-color: var(--hextrackr-border-muted); /* Dropdown border */
     --bs-dropdown-link-color: #e2e8f0;        /* Dropdown link text */
     --bs-dropdown-link-hover-color: #f8fafc;  /* Dropdown link hover text */
     --bs-dropdown-link-hover-bg: #374151;     /* Dropdown link hover background */
@@ -222,6 +246,65 @@
     --bs-print-body-bg: #ffffff;
     --bs-print-body-color: #000000;
     --bs-print-border-color: #dee2e6;
+}
+
+/* ===========================================
+ * MODAL DARK MODE FIXES - T001
+ * Resolves visual separation issues identified in R001
+ * =========================================== */
+
+/* Modal Content - Balanced visual separation
+ * Contrast Decision: 2.7:1 ratio (#526880) chosen over WCAG 3.0:1 ratio (#5c7895)
+ * Rationale: User feedback indicated 3.0:1 made tabs appear "too bright"
+ * Balance: Maintains accessibility while providing visual comfort in dark theme
+ * Testing: Verified across Settings, Device Security, and Vulnerability Details modals
+ */
+[data-bs-theme="dark"] .modal-content {
+    background-color: #526880 !important;  /* surface-4 balanced 2.7:1 contrast for visual comfort */
+    border: 1px solid rgb(255, 255, 255, 0.25) !important;
+    box-shadow: 0 8px 24px rgb(0, 0, 0, 0.5) !important;
+    color: var(--bs-body-color);
+}
+
+/* Modal Header & Footer - Secondary elevation */
+[data-bs-theme="dark"] .modal-header {
+    background-color: #2f3f50 !important;  /* surface-3 */
+    border-bottom: 1px solid rgb(255, 255, 255, 0.20) !important;
+    color: var(--bs-emphasis-color);
+}
+
+[data-bs-theme="dark"] .modal-footer {
+    background-color: #2f3f50 !important;  /* surface-3 */
+    border-top: 1px solid rgb(255, 255, 255, 0.20) !important;
+    color: var(--bs-body-color);
+}
+
+/* Cards within Modals - Lower hierarchy */
+[data-bs-theme="dark"] .modal-body .card {
+    background-color: #253241 !important;  /* surface-2 */
+    border: 1px solid rgb(255, 255, 255, 0.15) !important;
+    color: var(--bs-body-color);
+}
+
+/* Modal Title */
+[data-bs-theme="dark"] .modal-title {
+    color: var(--bs-emphasis-color);
+}
+
+/* Close Button Enhancement */
+[data-bs-theme="dark"] .modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 0.8;
+}
+
+[data-bs-theme="dark"] .modal-header .btn-close:hover {
+    opacity: 1;
+}
+
+/* Modal Backdrop Enhancement */
+[data-bs-theme="dark"] .modal-backdrop {
+    background-color: #000000;
+    opacity: 0.6 !important;
 }
 
 /* Print media query to override dark theme */
