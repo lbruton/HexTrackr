@@ -1,207 +1,6 @@
-# HexTrackr Project Configuration
+# CLAUDE - HexTrackr AI Development Assistant
 
-## 🏛️ CONSTITUTIONAL AUTHORITY (SUPREME LAW)
-
-**THIS CONSTITUTION IS THE SUPREME LAW OF HEXTRACKR**
-
-- **SOURCE OF TRUTH**: `hextrackr-specs/memory/constitution.md`
-- **AMENDMENTS**: `hextrackr-specs/memory/constitution_update_checklist.md`
-- **ENFORCEMENT**: ALL instructions below derive from and must comply with the Constitution
-- **VIOLATIONS**: Any conflict with Constitution makes the instruction VOID
-- **COMPLIANCE MANDATE**: Every AI assistant MUST enforce constitutional principles
-
-### Constitutional Articles Summary
-
-**Article I: Task-First Implementation**
-
-- NEVER implement without spec-derived tasks
-- All work must trace to formal specifications
-- Quality gate: Verify active spec and pending tasks before ANY implementation
-
-**Article II: Git Checkpoint Enforcement**
-
-- CRITICAL: Main branch is protected - constitutional git workflow mandatory
-- ALWAYS work from `copilot` branch (NEVER main)
-- Mandatory git checkpoints before major changes
-
-**Article III: Spec-Kit Workflow Compliance**
-
-- ALWAYS follow spec.md → plan.md → tasks.md → implementation flow
-- No arbitrary changes: All modifications must trace back to specifications
-- Planning Phase BEFORE Implementation Phase
-
-**Article IV: Per-Spec Bug Management**
-
-- Bugs belong with related specs, not separate tracking systems
-- Simple fixes: TodoWrite + immediate fix with git checkpoint
-- Complex fixes: Add to appropriate spec tasks.md
-
-**Article V: Constitutional Inheritance**
-
-- All agents and workflows must align with HexTrackr Constitution
-- Every component enforces constitutional principles
-- Quality gates validate constitutional adherence
-
-**Article VII: Production Reality Integration (EXPERIMENTAL)**
-
-- Bidirectional feedback from operational experience to specification evolution
-- Performance monitoring validates specification assumptions
-- Production incidents inform specification improvements
-
-**Article X: MCP Tool Usage Mandate**
-
-- MANDATORY tool usage for all operations
-- BEFORE any task: Search Memento semantic mode for existing patterns
-- AFTER discoveries: Save insights to Memento with proper namespacing
-
----
-
-## 🧠 MANDATORY TOOL USAGE (Constitutional Article X)
-
-### BEFORE Starting ANY Task
-
-```javascript
-// NON-NEGOTIABLE: Search first
-await mcp__memento__search_nodes({
-  mode: "semantic",
-  query: "[task description]",
-  topK: 8
-});
-
-// For complex tasks:
-await mcp__sequential_thinking__start({
-  prompt: "Break down: [task]"
-});
-```
-
-### AFTER Any Discovery/Fix
-
-```javascript
-await mcp__memento__create_entities({
-  entities: [{...}]
-});
-```
-
-## 🔴 CONSTITUTIONAL VIOLATIONS TO AVOID
-
-- Starting work without Memento search (Article X)
-- Not saving discoveries to Memento (Article X)
-- Skipping Sequential Thinking for complex tasks (Article X)
-- Creating specs without all 7 documents (Article III)
-- Using wrong task numbering (T1.1.1 vs T001) (Article III)
-- Working on main branch (Article II)
-- Implementing without spec-derived tasks (Article I)
-
-## 🎯 SPEC-KIT FRAMEWORK (Constitutional Article III)
-
-### Phase 0: Research
-
-- `spec.md` - Feature specification from template
-- `research.md` - Technical decisions, library choices, architecture patterns
-
-### Phase 1: Planning  
-
-- `plan.md` - Implementation plan from template
-- `data-model.md` - Entities, fields, relationships, validation rules
-- `contracts/` - API specifications (OpenAPI/JSON format)
-- `quickstart.md` - Manual testing steps, validation checklist
-
-### Phase 2: Tasks
-
-- `tasks.md` - T001 format (NOT T1.1.1), [P] for parallel tasks
-
-### CONSTITUTIONAL ENFORCEMENT
-
-```bash
-# Article I Quality Gate: Verify ALL 7 documents exist before proceeding:
-ls hextrackr-specs/specs/[spec-number]/
-# MUST show: spec.md, research.md, plan.md, data-model.md,
-#           contracts/, quickstart.md, tasks.md
-```
-
-**NO EXCEPTIONS**: Create all files even if minimal. Use "N/A" for empty sections.
-
-## 🎯 Project-Specific Memory Patterns
-
-### Memory Namespace for HexTrackr
-
-```javascript
-// Use these prefixes for Memento entities:
-"HEXTRACKR:VULNERABILITY:*"  // Vulnerability management features
-"HEXTRACKR:TICKET:*"         // Ticket integration patterns
-"HEXTRACKR:IMPORT:*"         // CSV/data import solutions
-"HEXTRACKR:UI:*"            // UI/frontend patterns
-"HEXTRACKR:API:*"           // API endpoint patterns
-"HEXTRACKR:BUG:*"           // Bug fixes and solutions
-```
-
-## 📁 Project Structure
-
-### Active Specification System
-
-```bash
-# ALWAYS check current context
-cat .active-spec
-
-# View pending tasks
-cat hextrackr-specs/specs/$(cat .active-spec)/tasks.md
-```
-
-### Git Workflow (CRITICAL)
-
-- **Working Branch**: `copilot` (NEVER main)
-- **Feature Branches**: Create from `copilot`
-- **Protected**: main branch - NO direct access
-
-### Docker-First Development
-
-```bash
-docker-compose up -d        # Start (port 8989)
-docker-compose restart      # Before tests
-docker-compose logs -f      # View logs
-```
-
-## 🔧 Spec-Kit Implementation
-
-### Templates Location
-
-- **Specifications**: `hextrackr-specs/templates/spec-template.md`
-- **Plans**: `hextrackr-specs/templates/plan-template.md`
-- **Tasks**: `hextrackr-specs/templates/tasks-template.md`
-
-### MANDATORY Documents per Spec (ALL REQUIRED)
-
-**Phase 0 (Research):**
-
-1. `spec.md` - Requirements (from template)
-2. `research.md` - Technical decisions and research findings
-
-**Phase 1 (Planning):**
-3. `plan.md` - Implementation plan (from template)
-4. `data-model.md` - Entity definitions and relationships
-5. `contracts/` - API specifications (OpenAPI/JSON format)
-6. `quickstart.md` - Manual validation and testing guide
-
-**Phase 2 (Tasks):**
-7. `tasks.md` - T001 format tasks with [P] markers (from template)
-
-**CRITICAL**: ALL documents are mandatory. Create even if minimal content.
-Mark sections "N/A" but file MUST exist.
-
-### Script Automation (MUST USE)
-
-```bash
-# Create new feature
-./hextrackr-specs/scripts/create-new-feature.sh "feature description"
-
-# Check prerequisites
-./hextrackr-specs/scripts/check-task-prerequisites.sh
-
-# Update agent context
-./hextrackr-specs/scripts/update-agent-context.sh
-```
-
-## 🏗️ Architecture Details
+## Project Structure
 
 ### Backend
 
@@ -211,51 +10,296 @@ Mark sections "N/A" but file MUST exist.
 
 ### Frontend
 
-- **Shared**: `scripts/shared/` - Reusable components
-- **Pages**: `scripts/pages/` - Page logic
-- **Utils**: `scripts/utils/` - Utilities
+- **Scripts**: `app/public/scripts/` - JavaScript modules
+  - `shared/` - Reusable components
+  - `pages/` - Page-specific logic
+  - `utils/` - Utility functions
+- **Styles**: `app/public/styles/` - CSS architecture
+  - `shared/` - Global styles (base.css, dark-theme.css, header.css)
+  - `pages/` - Page-specific styles
+  - `utils/` - Responsive utilities
+- **Vendor**: `app/public/vendor/` - Third-party libraries
+- **Uploads**: `app/public/uploads/` - File upload storage
+- **Docs**: `app/public/docs-html/` - Documentation system
 
-### Performance Targets
+### Testing
 
-- Table loads: <500ms
-- Chart renders: <200ms
-- Page transitions: <100ms
+- **Unit/Integration**: `__tests__/` - Jest test suites
+- **E2E**: Playwright tests with coverage reports
+- **Fixtures**: `__tests__/fixtures/` - Test data
 
-## 🐛 Bug Classification
+### Development Environment
 
-- **Simple**: <10 lines, single file → Direct fix
-- **Complex**: Multi-file → Add to spec tasks.md
-- **Format**: B001, B002 with severity
+- **Docker**: Use `docker-compose up -d` to start
+- **Main App**: <http://localhost:8989> (port 8989)
+- **WebSocket**: Socket.io server (port 8988)
+- **Node.js**: Run through Docker, not directly
 
-## ✅ Pre-Implementation Checklist
+## Workflow Recommendations
 
-### Document Verification
+**CORE PRINCIPLE**: Use Sequential Thinking (`mcp__sequential-thinking__sequentialthinking`) as your default problem-solving approach. This ensures systematic, revisable thinking for any task beyond simple operations.
 
-Before marking ANY spec complete, verify ALL files exist:
+### 1. Start with Planning
+
+**ALWAYS use Sequential Thinking as your default approach** for any task requiring analysis, planning, or multiple steps:
+
+- **Sequential Thinking** (`mcp__sequential-thinking__sequentialthinking`)
+  - Break down complex problems into manageable steps
+  - Maintain context across multiple operations
+  - Essential for architecture decisions, debugging, feature implementation
+  - Use for ANY task more complex than a simple file edit or single command
+  - Allows revision of previous thoughts as understanding evolves
+
+### 2. Gather Context
+
+Check Memento → Ref → Context7
+
+#### Available Tools
+
+- **Ref Tools** - GitHub Repository Search
+  - **Search**: `mcp__Ref__ref_search_documentation` (pre-indexed repos)
+  - **Read**: `mcp__Ref__ref_read_url` (content as markdown)
+  - Pre-indexed GitHub repositories (fast, no rate limits)
+  - Excellent for code patterns and implementation examples
+
+- **Memento** - Knowledge Graph & Memory System
+  - **Search**: `mcp__memento__search_nodes` (semantic/keyword/hybrid modes)
+  - **Create**: `mcp__memento__create_entities` (with observations)
+  - **Relations**: `mcp__memento__create_relations` (link entities)
+  - **Add Info**: `mcp__memento__add_observations` (timestamped updates)
+  - **Retrieve**: `mcp__memento__open_nodes` (full entity details)
+  - **Browse**: `mcp__memento__read_graph` (entire knowledge graph)
+  - **Organize**: `mcp__memento__set_importance`, `mcp__memento__add_tags`
+  - **Cleanup**: `mcp__memento__delete_entities`, `mcp__memento__delete_relations`
+
+  Search modes: semantic (faster exploration) → keyword (precise) → hybrid (comprehensive)
+
+- **Context7** (`mcp__context7__resolve-library-id`, `mcp__context7__get-library-docs`)
+  - Framework and library documentation
+
+### 3. Research if Needed
+
+Context7 → Brave Search → WebSearch (in order)
+
+#### Search Tools
+
+- **Brave Search** - Pro AI Web Search
+  - **Web**: `mcp__brave-search__brave_web_search` (general search + AI summarizer)
+  - **Local**: `mcp__brave-search__brave_local_search` (businesses, places - Pro AI only)
+  - **Images**: `mcp__brave-search__brave_image_search` (visual content)
+  - **News**: `mcp__brave-search__brave_news_search` (current events)
+  - **Videos**: `mcp__brave-search__brave_video_search` (video content)
+  - **Summarizer**: `mcp__brave-search__brave_summarizer` (AI content synthesis - Pro AI)
+  - Pro AI tier with enhanced features and summarization
+
+- **WebSearch** (`WebSearch`)
+  - Fallback when Brave Search unavailable
+
+### 4. Deep Analysis
+
+Use Zen tools for code review and architecture:
+
+#### Zen Tools Suite
+
+- **thinkdeep** (`mcp__zen__thinkdeep`): Multi-stage investigation and reasoning
+- **analyze** (`mcp__zen__analyze`): Code architecture and performance analysis
+- **consensus** (`mcp__zen__consensus`): Multi-model consensus building
+- **codereview** (`mcp__zen__codereview`): Systematic code quality assessment
+- **debug** (`mcp__zen__debug`): Root cause analysis
+- **refactor** (`mcp__zen__refactor`): Code improvement opportunities
+- **secaudit** (`mcp__zen__secaudit`): Security vulnerability assessment
+- **precommit** (`mcp__zen__precommit`): Git changes validation
+- **docgen** (`mcp__zen__docgen`): Code documentation generation
+- **tracer** (`mcp__zen__tracer`): Code tracing and flow analysis
+- **testgen** (`mcp__zen__testgen`): Test suite generation
+- **planner** (`mcp__zen__planner`): Interactive sequential planning
+
+For complete tool reference: `/Users/lbruton/.claude/dev-docs/MCP_TOOLS.md`
+
+### 5. Test Everything
+
+Comprehensive testing with Jest, Playwright, and linting:
+
+#### Validation Commands
 
 ```bash
-ls -la hextrackr-specs/specs/[spec-number]/
-# MUST show: spec.md, research.md, plan.md, data-model.md, 
-#           contracts/, quickstart.md, tasks.md
+
+# Code Quality
+npm run eslint          # JavaScript linting
+npm run stylelint       # CSS linting
+npm run lint:all        # All linters
+npm run fix:all         # Auto-fix issues
+npm run lint:md         # Markdown linting
+
+# Security & Audit
+npm run security:check  # Security audit
+npm run audit           # npm audit
 ```
 
-Before ANY code changes:
+#### Testing Tools
 
-1. [ ] Active spec exists and is set
-2. [ ] Tasks.md has pending tasks
-3. [ ] Template was used for documents
-4. [ ] Git on correct branch (copilot/feature)
-5. [ ] Docker running
+- **Playwright** - E2E Browser Automation
+  - **Navigation**: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_navigate_back`
+  - **Interaction**: `mcp__playwright__browser_click`, `mcp__playwright__browser_type`, `mcp__playwright__browser_fill_form`
+  - **Analysis**: `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_take_screenshot`
+  - **Evaluation**: `mcp__playwright__browser_evaluate`, `mcp__playwright__browser_network_requests`
+  - **Utility**: `mcp__playwright__browser_wait_for`, `mcp__playwright__browser_tabs`
 
-## 🚫 Never Do
+- **Codacy** - Static Code Analysis & Quality Metrics
+  - **Analysis**: `mcp__codacy__codacy_cli_analyze` (local quality analysis)
+  - **Repository**: `mcp__codacy__codacy_get_repository_with_analysis` (quality metrics)
+  - **Issues**: `mcp__codacy__codacy_list_repository_issues` (code quality issues)
+  - **Files**: `mcp__codacy__codacy_list_files`, `mcp__codacy__codacy_get_file_issues`
+  - **Security**: `mcp__codacy__codacy_search_repository_srm_items` (security findings)
+  - **Tools**: `mcp__codacy__codacy_list_tools`, `mcp__codacy__codacy_get_pattern`
 
-- Work on main branch
-- Run Node.js directly (use Docker)
-- Skip templates
-- Implement without tasks
-- Forget to save to Memento
+- **ESLint** - JavaScript code quality (npm run eslint)
+- **Stylelint** - CSS code quality (npm run stylelint)
 
----
-*HexTrackr follows spec-kit methodology. See constitution for detailed rules.*
+### 6. Save Discoveries
 
-- Project Documentation lives in /app/public/docs-source/ and the ref.tools MCP
+Always capture insights to Memento using the appropriate entity creation and relation tools.
+
+## Key Technologies
+
+### Core Stack
+
+- **Express.js** - Web server framework
+- **Socket.io** - WebSocket for real-time updates
+- **SQLite3** - Database with direct SQL access
+- **AG-Grid Community** - Advanced data tables
+- **Tabler Core** - UI design system
+
+### Frontend Libraries
+
+- **Chart.js** & **ApexCharts** - Data visualizations
+- **DOMPurify** - XSS protection
+- **Marked** - Markdown parsing
+- **SortableJS** - Drag & drop
+- **JSZip** - File compression
+
+### Security & Performance
+
+- **Express Rate Limit** - API throttling
+- **Compression** - Response compression
+- **CORS** - Cross-origin requests
+- **Multer** - File uploads (50MB limit)
+
+## API Architecture
+
+### Core Endpoints
+
+```javascript
+// Vulnerability Management
+GET    /api/vulnerabilities        // List vulnerabilities
+GET    /api/vulnerabilities/stats  // Statistics dashboard
+POST   /api/vulnerabilities/import // CSV import
+DELETE /api/vulnerabilities/clear  // Clear all data
+
+// Ticket Operations
+GET    /api/tickets               // List tickets
+POST   /api/tickets              // Create ticket
+PUT    /api/tickets/:id          // Update ticket
+DELETE /api/tickets/:id          // Delete ticket
+
+// Data Management
+GET    /api/backup/all           // Export all data
+POST   /api/restore              // Import data
+GET    /api/imports              // Import history
+GET    /health                   // Health check
+```
+
+### Database Schema
+
+- **vulnerabilities** - CVE data with severity, status, devices
+- **tickets** - Support tickets with priority, assignments
+- **vulnerability_imports** - Import history and metadata
+- **ticket_vulnerabilities** - Junction table for relationships
+
+## Git Workflow
+
+- **Working Branch**: `copilot` (avoid working on main directly)
+- **Create checkpoints**: Before major changes
+- **Commit often**: Small, focused commits with clear messages
+
+## Development Patterns
+
+### Error Handling
+
+- Try-catch blocks with detailed error messages
+- Socket.io progress updates for long operations
+- Graceful fallbacks for missing data
+
+### Security Practices
+
+- Input validation with DOMPurify
+- SQL parameterized queries (no injection)
+- File upload restrictions and validation
+- Rate limiting on API endpoints
+
+### Real-time Updates
+
+- Socket.io for import progress
+- WebSocket events: `progress`, `complete`, `error`
+- Client-side progress bars and status updates
+
+## Quick Reference
+
+### Common Commands
+
+```bash
+# Development Environment
+docker-compose up -d        # Start containers
+docker-compose logs -f      # View logs
+docker-compose down         # Stop containers
+
+# Database
+npm run init-db            # Initialize database
+node app/public/scripts/init-database.js
+
+# Documentation
+npm run docs:generate      # Update documentation
+
+
+# Development Scripts
+npm run dev               # Start with nodemon
+npm start                # Production start
+```
+
+### File Structure
+
+```
+/app/public/
+├── server.js              # Express server (port 8989)
+├── *.html                 # Main pages (vulnerabilities, tickets)
+├── scripts/
+│   ├── shared/            # Reusable components
+│   ├── pages/             # Page-specific logic
+│   ├── utils/             # Utility functions
+│   └── init-database.js   # Database setup
+├── styles/
+│   ├── shared/            # Global CSS + dark theme
+│   ├── pages/             # Page-specific styles
+│   └── utils/             # Responsive utilities
+├── vendor/                # Third-party libraries
+├── uploads/               # File upload storage
+└── docs-html/             # Documentation system
+
+/data/
+└── hextrackr.db          # SQLite database
+
+/__tests__/
+├── unit/                 # Jest unit tests
+├── integration/          # Integration tests
+├── fixtures/             # Test data
+└── playwright-report/    # E2E test reports
+```
+
+### Important Notes
+
+- **WebSocket**: Socket.io runs on port 8988
+- **Main App**: Express server on port 8989
+- **Dark Mode**: CSS variables in `styles/shared/dark-theme.css`
+- **File Limits**: 50MB upload limit via Multer
+- **Branch Strategy**: Use `copilot` branch, never work on `main`
+- **Docker First**: Always use Docker for development

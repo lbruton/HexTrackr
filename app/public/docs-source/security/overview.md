@@ -1,7 +1,7 @@
 # Security Overview
 
 <!-- markdownlint-disable-next-line MD013 -->
-HexTrackr is designed with security in mind. This document provides an overview of the security measures in place.
+HexTrackr is designed with security in mind. This document provides an overview of the security measures in place. For a detailed breakdown of the security implementation, see the [Security Implementation](./security-implementation.md) documentation.
 
 ## Data Security
 

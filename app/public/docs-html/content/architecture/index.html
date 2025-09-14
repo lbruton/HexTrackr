@@ -1,21 +1,13 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-info" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-        <path d="M12 9v4"/>
-        <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
-        <path d="M12 16h.01"/>
-    </svg>
-    <div>
-        <strong>Active Specification:</strong> 000-hextrackr-master-truth-v1.0.12-COMPLETE
-        <small class="d-block text-muted">This documentation is being actively updated as part of the current specification development.</small>
-    </div>
-</div>
     <h1>System Architecture</h1>
 <p>This section provides a comprehensive overview of the HexTrackr system architecture, from the high-level components to the underlying data structures.</p>
 <h2>Core Architecture Documents</h2>
 <ul>
+<li><strong><a href="#system-overview">System Overview</a></strong>: A high-level overview of the system architecture.</li>
+<li><strong><a href="#component-integration">Component Integration</a></strong>: How the different components of the system work together.</li>
+<li><strong><a href="#data-flow">Data Flow</a></strong>: The data flow through the system.</li>
+<li><strong><a href="#technology-stack">Technology Stack</a></strong>: The technologies used in the project.</li>
 <li><strong><a href="#backend">Backend Architecture</a></strong>: A detailed look at the Node.js/Express server, its middleware, and its core logic.</li>
 <li><strong><a href="#frontend">Frontend Architecture</a></strong>: An explanation of the client-side architecture, including the different pages and JavaScript modules.</li>
 <li><strong><a href="#database">Database Architecture</a></strong>: A high-level overview of the SQLite database, including data flow diagrams.</li>
@@ -23,14 +15,10 @@
 </ul>
 <h2>Key Architectural Concepts</h2>
 <ul>
-<li><strong><a href="#rollover-mechanism">Vulnerability Rollover Mechanism</a></strong>: A deep dive into the process that manages historical vulnerability data and daily trending.</li>
 <li><strong><a href="#deployment">Deployment Architecture</a></strong>: Information on how the application is deployed using Docker.</li>
-<li><strong><a href="#refactoring-plan">Refactoring Plan</a></strong>: Comprehensive modular architecture strategy for server.js complexity reduction.</li>
-<li><strong><a href="#spec-kit-integration">Spec-Kit Integration</a></strong>: Documentation portal integration with specification-driven development framework.</li>
-</ul>
-<h2>Frameworks and Libraries</h2>
-<ul>
-<li><strong><a href="#frameworks">Frameworks</a></strong>: A list of the key frameworks and libraries used in the project and where they are used.</li>
+<li><strong><a href="#docker-guide">Docker Guide</a></strong>: A guide to the Docker configuration.</li>
+<li><strong><a href="#production-setup">Production Setup</a></strong>: A guide to setting up a production environment.</li>
+<li><strong><a href="#monitoring">Monitoring</a></strong>: A guide to monitoring the application.</li>
 </ul>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts

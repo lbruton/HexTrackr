@@ -5,6 +5,56 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.13] - 2025-01-12
+
+### Added
+
+#### Dark Mode Theme System (Spec 005)
+
+- **Complete Dark/Light Theme Implementation**: Full theme switching system with accessibility focus
+  - System preference detection using `prefers-color-scheme` media query
+  - Manual theme toggle with persistent localStorage storage (sessionStorage fallback for private browsing)
+  - Smooth CSS transitions between light and dark themes
+  - WCAG AA compliance with automated contrast ratio validation
+  - Screen reader announcements for theme changes via accessibility API
+  - Cross-tab synchronization of theme preferences
+- **Component Integration**: Seamless theming across all UI components
+  - AG-Grid theme integration with custom dark/light variants
+  - ApexCharts automatic theme adaptation
+  - Tabler framework theme variables override system
+  - Modal and overlay components with theme-aware styling
+- **Developer Features**: Comprehensive theme development tools
+  - Theme validation utilities with contrast checking
+  - Debugging tools for theme state management
+  - Performance optimizations for theme switching
+  - Extensible architecture for future theme variants
+
+### Fixed
+
+#### Card Border Consistency (Dark Mode)
+
+- **Card Border Styling**: Fixed inconsistent border appearance between device cards and vulnerability cards in dark mode
+  - Resolved thick white borders on device cards that didn't match the thin dark borders on vulnerability cards
+  - Updated `.device-card, .vuln-card` CSS rule in `vulnerabilities.html` to use theme-aware CSS variables
+  - Changed hard-coded values to CSS variables for proper theme adaptation:
+    - `background: white` → `background: var(--tblr-bg-surface)`
+    - `border: 1px solid #e2e8f0` → `border: 1px solid var(--tblr-border-color)`
+  - Both card types now display consistent borders across light and dark themes
+  - **Engineering Insight**: Hard-coded CSS values prevented proper theme adaptation despite external stylesheet rules
+  - **Resolution Method**: Systematic investigation using sequential thinking and disciplined Memento documentation
+
+#### AG-Grid Table Container Overflow (Spec 004)
+
+- Fixed AG-Grid table overflow causing excessive white space in Vulnerability Data Workspace
+- Removed problematic grid-height-manager.js calculations and vulnerability-table-fix.css
+- Implemented clean flexbox solution for natural container sizing:
+  - `.card-body.p-2` uses `display: flex` with consistent minimum height
+  - `.view-content` with `flex-grow: 1` for proper space distribution
+  - `#vulnGrid` with `height: 100%; flex-grow: 1` for natural expansion
+- Table now properly expands for 10, 25, 50, 200 items without overflow or excessive padding
+- **Engineering Insight**: Simple CSS flexbox approach solved what complex JavaScript calculations could not
+- **Lesson Learned**: Elegant solutions often emerge from removing complexity rather than adding it
+
 ## [1.0.12](https://github.com/Lonnie-Bruton/HexTrackr/releases/tag/v1.0.12) - 2025-09-09
 
 ### Completed Tasks
@@ -153,12 +203,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical Documentation
 
 - **Architecture Documentation**: Comprehensive refactoring strategy documentation
-  - **Modular Architecture Plan**: Detailed server.js refactoring roadmap in `docs-source/architecture/refactoring-plan.md`
+  - **Modular Architecture Plan**: Detailed server.js refactoring roadmap in `/dev-docs/architecture/refactoring-plan.md`
     - 4-week implementation timeline with weekly milestones
     - Service layer extraction strategy with complexity targets
     - Risk mitigation and success metrics for architectural transition
   - **Development Workflow**: Enhanced development documentation with quality improvements section
-    - Updated `docs-source/development/index.md` with code quality standards
+    - Updated `/dev-docs/development/index.md` with code quality standards
     - Documented recent quality improvement achievements and methodologies
     - Integrated quality assurance practices with development best practices
 

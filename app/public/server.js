@@ -1,3 +1,7 @@
+/**
+ * HexTrackr Express Server - Main backend application server
+ * Handles API endpoints, vulnerability data management, file uploads, and serves the frontend
+ */
 /* eslint-env node */
 /* global __dirname, __filename, require, console, process, setTimeout, setInterval */
  

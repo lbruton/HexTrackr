@@ -1,0 +1,6 @@
+CVE,Device,Severity,VPR,Description
+CVE-2024-0001,fw-prod-01,High,7.5,SSL Certificate Vulnerability
+CVE-2024-0002,sw-core-01,Critical,9.8,Remote Code Execution
+CVE-2024-0003,srv-web-01,Medium,5.3,Information Disclosure
+CVE-2024-0004,fw-prod-01,Low,2.1,Minor Configuration Issue
+CVE-2024-0005,srv-db-01,Critical,9.9,Database Authentication Bypass

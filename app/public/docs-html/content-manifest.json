@@ -1,0 +1,219 @@
+{
+  "generated": "2025-09-14T01:51:27.371Z",
+  "sections": {
+    "api-reference": {
+      "title": "Api Reference",
+      "icon": "fas fa-code",
+      "indexFile": "api-reference/index",
+      "children": {
+        "backup-api": {
+          "file": "api-reference/backup-api",
+          "title": "Backup Api",
+          "path": "api-reference/backup-api.html"
+        },
+        "complete-reference": {
+          "file": "api-reference/complete-reference",
+          "title": "Complete Reference",
+          "path": "api-reference/complete-reference.html"
+        },
+        "tickets-api": {
+          "file": "api-reference/tickets-api",
+          "title": "Tickets Api",
+          "path": "api-reference/tickets-api.html"
+        },
+        "vulnerabilities-api": {
+          "file": "api-reference/vulnerabilities-api",
+          "title": "Vulnerabilities Api",
+          "path": "api-reference/vulnerabilities-api.html"
+        },
+        "websocket-api": {
+          "file": "api-reference/websocket-api",
+          "title": "Websocket Api",
+          "path": "api-reference/websocket-api.html"
+        }
+      }
+    },
+    "architecture": {
+      "title": "Architecture",
+      "icon": "fas fa-building",
+      "indexFile": "architecture/index",
+      "children": {
+        "accessibility": {
+          "file": "architecture/accessibility",
+          "title": "Accessibility",
+          "path": "architecture/accessibility.html"
+        },
+        "backend": {
+          "file": "architecture/backend",
+          "title": "Backend",
+          "path": "architecture/backend.html"
+        },
+        "component-integration": {
+          "file": "architecture/component-integration",
+          "title": "Component Integration",
+          "path": "architecture/component-integration.html"
+        },
+        "data-flow": {
+          "file": "architecture/data-flow",
+          "title": "Data Flow",
+          "path": "architecture/data-flow.html"
+        },
+        "data-lifecycle": {
+          "file": "architecture/data-lifecycle",
+          "title": "Data Lifecycle",
+          "path": "architecture/data-lifecycle.html"
+        },
+        "data-model": {
+          "file": "architecture/data-model",
+          "title": "Data Model",
+          "path": "architecture/data-model.html"
+        },
+        "database": {
+          "file": "architecture/database",
+          "title": "Database",
+          "path": "architecture/database.html"
+        },
+        "deployment": {
+          "file": "architecture/deployment",
+          "title": "Deployment",
+          "path": "architecture/deployment.html"
+        },
+        "docker-guide": {
+          "file": "architecture/docker-guide",
+          "title": "Docker Guide",
+          "path": "architecture/docker-guide.html"
+        },
+        "frontend": {
+          "file": "architecture/frontend",
+          "title": "Frontend",
+          "path": "architecture/frontend.html"
+        },
+        "monitoring": {
+          "file": "architecture/monitoring",
+          "title": "Monitoring",
+          "path": "architecture/monitoring.html"
+        },
+        "production-setup": {
+          "file": "architecture/production-setup",
+          "title": "Production Setup",
+          "path": "architecture/production-setup.html"
+        },
+        "system-overview": {
+          "file": "architecture/system-overview",
+          "title": "System Overview",
+          "path": "architecture/system-overview.html"
+        },
+        "technology-stack": {
+          "file": "architecture/technology-stack",
+          "title": "Technology Stack",
+          "path": "architecture/technology-stack.html"
+        }
+      }
+    },
+    "getting-started": {
+      "title": "Getting Started",
+      "icon": "fas fa-rocket",
+      "indexFile": "getting-started/index",
+      "children": {}
+    },
+    "operations": {
+      "title": "Operations",
+      "icon": "fas fa-file-alt",
+      "indexFile": "operations/index",
+      "children": {
+        "deployment-guide": {
+          "file": "operations/deployment-guide",
+          "title": "Deployment Guide",
+          "path": "operations/deployment-guide.html"
+        }
+      }
+    },
+    "security": {
+      "title": "Security",
+      "icon": "fas fa-shield-alt",
+      "indexFile": "security/index",
+      "children": {
+        "configuration": {
+          "file": "security/configuration",
+          "title": "Configuration",
+          "path": "security/configuration.html"
+        },
+        "implementation": {
+          "file": "security/implementation",
+          "title": "Implementation",
+          "path": "security/implementation.html"
+        },
+        "overview": {
+          "file": "security/overview",
+          "title": "Overview",
+          "path": "security/overview.html"
+        },
+        "security-implementation": {
+          "file": "security/security-implementation",
+          "title": "Security Implementation",
+          "path": "security/security-implementation.html"
+        }
+      }
+    },
+    "technical-reference": {
+      "title": "Technical Reference",
+      "icon": "fas fa-file-alt",
+      "indexFile": "technical-reference/index",
+      "children": {
+        "configuration": {
+          "file": "technical-reference/configuration",
+          "title": "Configuration",
+          "path": "technical-reference/configuration.html"
+        },
+        "dependencies": {
+          "file": "technical-reference/dependencies",
+          "title": "Dependencies",
+          "path": "technical-reference/dependencies.html"
+        },
+        "modules-catalog": {
+          "file": "technical-reference/modules-catalog",
+          "title": "Modules Catalog",
+          "path": "technical-reference/modules-catalog.html"
+        }
+      }
+    },
+    "user-guides": {
+      "title": "User Guides",
+      "icon": "fas fa-users",
+      "indexFile": "user-guides/index",
+      "children": {
+        "ticket-management": {
+          "file": "user-guides/ticket-management",
+          "title": "Ticket Management",
+          "path": "user-guides/ticket-management.html"
+        },
+        "vulnerability-management": {
+          "file": "user-guides/vulnerability-management",
+          "title": "Vulnerability Management",
+          "path": "user-guides/vulnerability-management.html"
+        }
+      }
+    }
+  },
+  "specialFiles": {
+    "changelog": {
+      "file": "CHANGELOG",
+      "title": "Changelog",
+      "type": "special",
+      "path": "CHANGELOG.html"
+    },
+    "roadmap": {
+      "file": "ROADMAP",
+      "title": "Roadmap",
+      "type": "special",
+      "path": "ROADMAP.html"
+    },
+    "overview": {
+      "file": "overview",
+      "title": "Overview",
+      "type": "special",
+      "path": "overview.html"
+    }
+  },
+  "totalFiles": 38
+}

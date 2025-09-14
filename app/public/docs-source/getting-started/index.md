@@ -32,11 +32,11 @@ The most reliable and consistent way to run HexTrackr is by using Docker. This m
 
 1. **Access HexTrackr**
 
-    The application will be available at `http://localhost:8080`.
+    The application will be available at `http://localhost:8989`.
 
-    - **Tickets Management**: `http://localhost:8080/tickets.html`
-    - **Vulnerabilities Management**: `http://localhost:8080/vulnerabilities.html`
-    - **Documentation Portal**: `http://localhost:8080/docs-html/`
+    - **Tickets Management**: `http://localhost:8989/tickets.html`
+    - **Vulnerabilities Management**: `http://localhost:8989/vulnerabilities.html`
+    - **Documentation Portal**: `http://localhost:8989/docs-html/`
 
 1. **Stopping the Application**
 
@@ -86,7 +86,9 @@ For developers who want to work on the HexTrackr source code directly.
     node server.js
     ```
 
-    The server will start, and you can access the application at `http://localhost:8080`.
+    The server will start on port 8080 internally. When running locally without Docker, access the application at `http://localhost:8080`.
+
+    **Note**: When using Docker, the application is accessible at `http://localhost:8989` due to port mapping.
 
 ### Development Scripts
 
@@ -97,6 +99,6 @@ The project includes several scripts in the `package.json` to aid development:
 - `npm run init-db`: Initializes or re-initializes the database.
 - `npm run lint:all`: Runs all code quality checks (ESLint for JS, Stylelint for CSS, Markdownlint for docs).
 - `npm run fix:all`: Attempts to automatically fix all code quality issues.
-- `npm run docs:generate`: **Regenerates the complete HTML documentation portal with spec-kit integration**.
+- `npm run docs:generate`: **Regenerates the complete HTML documentation portal**.
 - `npm run docs:sync-specs`: Syncs specification tasks to the roadmap (part of docs:generate).
 - `npm run docs:sync-all`: Comprehensive documentation synchronization across all sources.
