@@ -2,6 +2,15 @@
 
 *Research Phase: HOW to implement*
 
+## Research Approach
+
+*Systematic approach to ensure thorough analysis*
+
+- [ ] **Review S00X spec**: Read the complete specification and context for research phase
+- [ ] **Check Memento**: Search for related context, lessons learned, and historical insights
+- [ ] **Validate assumptions**: Check actual code/files - don't assume implementations exist
+- [ ] **Consider edge cases**: Test ideas in all relevant states (e.g., both themes, all environments)
+
 ## Technical Analysis
 
 [Detailed technical investigation of the problem and potential solutions. Include research findings from expert agents, code analysis, and technical exploration.]
