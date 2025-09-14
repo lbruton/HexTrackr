@@ -1,34 +1,47 @@
 exclude_paths:
+    - __tests__/**
+    - agent-tools/**
+    - data/**
+    - dev-docs/**
+    - logs/**
     - node_modules/**
+    - scripts/**
+    - test-results/**
+    - tests/**
+    - .github/**
+    - .githooks/**
+    - .codacy/**
+    - .claude/**
+    - .context7/**
+    - .cursor/**
+    - .playwright-mcp/**
     - '*.min.js'
     - '*.min.css'
+    - '*.map'
+    - '**/*.test.js'
+    - '**/*.spec.js'
+    - '*.backup*'
     - backups/**
     - backup/**
     - depreciated/**
     - deprecated/**
-    - .*/**
-    - .codacy/**
-    - .playwright-mcp/**
-    - data/**
-    - uploads/**
-    - logs/**
-    - temp/**
     - docs-html/**
+    - docs-prototype/**
+    - docs-source/**
+    - docs-temp/**
+    - roadmaps/**
+    - temp/**
+    - uploads/**
     - .venv/**
     - venv/**
     - playwright/**
-    - docs-prototype/**
-    - docs-source/**
-    - roadmaps/**
-    - scripts/chart.min.js
     - filescope-tools-demo.js
     - FileScopeMCP-*.json
     - FileScopeMCP-*.html
-    - tests/**
-    - test-results/**
-    - '*.backup*'
-    - dev-docs/**
-    - docs-temp/**
+    - scripts/chart.min.js
+    - app/public/uploads/**
+    - app/public/docs-html/**
+    - app/public/vendor/**/*.min.js
 runtimes:
     - java@17.0.10
     - node@22.2.0
