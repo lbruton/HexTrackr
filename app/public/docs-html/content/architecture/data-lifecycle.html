@@ -1,0 +1,30 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Data Lifecycle and Rollover Mechanism</h1>
+<p>This document describes the data lifecycle in HexTrackr and the rollover mechanism that manages it.</p>
+<hr>
+<h2>Overview</h2>
+<p>HexTrackr uses a rollover mechanism to manage vulnerability data over time. This allows for historical trend analysis while keeping the current vulnerability data set clean and up-to-date.</p>
+<hr>
+<h2>Staging Tables</h2>
+<p>When new vulnerability data is imported, it is first loaded into a staging table. This allows for data validation and processing before it is moved into the production tables.</p>
+<ul>
+<li><code>vulnerabilities_staging</code>: Used for staging new vulnerability data.</li>
+</ul>
+<hr>
+<h2>Rollover Process</h2>
+<p>The rollover process is triggered after a successful data import into the staging tables.</p>
+<ol>
+<li><strong>Data Validation</strong>: Data in the staging tables is validated for correctness and completeness.</li>
+<li><strong>Data Archiving</strong>: Existing data in the production tables is archived to historical tables.</li>
+<li><strong>Data Promotion</strong>: New data from the staging tables is promoted to the production tables.</li>
+<li><strong>Staging Cleanup</strong>: The staging tables are cleared.</li>
+</ol>
+<hr>
+<h2>Data Retention</h2>
+<p>Historical data is retained indefinitely to allow for long-term trend analysis.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

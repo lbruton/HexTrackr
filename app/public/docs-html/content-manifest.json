@@ -1,5 +1,5 @@
 {
-  "generated": "2025-09-13T23:29:52.957Z",
+  "generated": "2025-09-14T01:51:27.371Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -11,6 +11,11 @@
           "title": "Backup Api",
           "path": "api-reference/backup-api.html"
         },
+        "complete-reference": {
+          "file": "api-reference/complete-reference",
+          "title": "Complete Reference",
+          "path": "api-reference/complete-reference.html"
+        },
         "tickets-api": {
           "file": "api-reference/tickets-api",
           "title": "Tickets Api",
@@ -20,6 +25,11 @@
           "file": "api-reference/vulnerabilities-api",
           "title": "Vulnerabilities Api",
           "path": "api-reference/vulnerabilities-api.html"
+        },
+        "websocket-api": {
+          "file": "api-reference/websocket-api",
+          "title": "Websocket Api",
+          "path": "api-reference/websocket-api.html"
         }
       }
     },
@@ -28,10 +38,30 @@
       "icon": "fas fa-building",
       "indexFile": "architecture/index",
       "children": {
+        "accessibility": {
+          "file": "architecture/accessibility",
+          "title": "Accessibility",
+          "path": "architecture/accessibility.html"
+        },
         "backend": {
           "file": "architecture/backend",
           "title": "Backend",
           "path": "architecture/backend.html"
+        },
+        "component-integration": {
+          "file": "architecture/component-integration",
+          "title": "Component Integration",
+          "path": "architecture/component-integration.html"
+        },
+        "data-flow": {
+          "file": "architecture/data-flow",
+          "title": "Data Flow",
+          "path": "architecture/data-flow.html"
+        },
+        "data-lifecycle": {
+          "file": "architecture/data-lifecycle",
+          "title": "Data Lifecycle",
+          "path": "architecture/data-lifecycle.html"
         },
         "data-model": {
           "file": "architecture/data-model",
@@ -48,57 +78,35 @@
           "title": "Deployment",
           "path": "architecture/deployment.html"
         },
-        "frameworks": {
-          "file": "architecture/frameworks",
-          "title": "Frameworks",
-          "path": "architecture/frameworks.html"
+        "docker-guide": {
+          "file": "architecture/docker-guide",
+          "title": "Docker Guide",
+          "path": "architecture/docker-guide.html"
         },
         "frontend": {
           "file": "architecture/frontend",
           "title": "Frontend",
           "path": "architecture/frontend.html"
         },
-        "refactoring-plan": {
-          "file": "architecture/refactoring-plan",
-          "title": "Refactoring Plan",
-          "path": "architecture/refactoring-plan.html"
+        "monitoring": {
+          "file": "architecture/monitoring",
+          "title": "Monitoring",
+          "path": "architecture/monitoring.html"
         },
-        "rollover-mechanism": {
-          "file": "architecture/rollover-mechanism",
-          "title": "Rollover Mechanism",
-          "path": "architecture/rollover-mechanism.html"
-        }
-      }
-    },
-    "development": {
-      "title": "Development",
-      "icon": "fas fa-hammer",
-      "indexFile": "development/index",
-      "children": {
-        "coding-standards": {
-          "file": "development/coding-standards",
-          "title": "Coding Standards",
-          "path": "development/coding-standards.html"
+        "production-setup": {
+          "file": "architecture/production-setup",
+          "title": "Production Setup",
+          "path": "architecture/production-setup.html"
         },
-        "contributing": {
-          "file": "development/contributing",
-          "title": "Contributing",
-          "path": "development/contributing.html"
+        "system-overview": {
+          "file": "architecture/system-overview",
+          "title": "System Overview",
+          "path": "architecture/system-overview.html"
         },
-        "docs-portal-guide": {
-          "file": "development/docs-portal-guide",
-          "title": "Docs Portal Guide",
-          "path": "development/docs-portal-guide.html"
-        },
-        "docs-troubleshooting": {
-          "file": "development/docs-troubleshooting",
-          "title": "Docs Troubleshooting",
-          "path": "development/docs-troubleshooting.html"
-        },
-        "testing-strategy": {
-          "file": "development/testing-strategy",
-          "title": "Testing Strategy",
-          "path": "development/testing-strategy.html"
+        "technology-stack": {
+          "file": "architecture/technology-stack",
+          "title": "Technology Stack",
+          "path": "architecture/technology-stack.html"
         }
       }
     },
@@ -108,25 +116,64 @@
       "indexFile": "getting-started/index",
       "children": {}
     },
+    "operations": {
+      "title": "Operations",
+      "icon": "fas fa-file-alt",
+      "indexFile": "operations/index",
+      "children": {
+        "deployment-guide": {
+          "file": "operations/deployment-guide",
+          "title": "Deployment Guide",
+          "path": "operations/deployment-guide.html"
+        }
+      }
+    },
     "security": {
       "title": "Security",
       "icon": "fas fa-shield-alt",
       "indexFile": "security/index",
       "children": {
-        "audit": {
-          "file": "security/audit",
-          "title": "Audit",
-          "path": "security/audit.html"
+        "configuration": {
+          "file": "security/configuration",
+          "title": "Configuration",
+          "path": "security/configuration.html"
+        },
+        "implementation": {
+          "file": "security/implementation",
+          "title": "Implementation",
+          "path": "security/implementation.html"
         },
         "overview": {
           "file": "security/overview",
           "title": "Overview",
           "path": "security/overview.html"
         },
-        "vulnerability-disclosure": {
-          "file": "security/vulnerability-disclosure",
-          "title": "Vulnerability Disclosure",
-          "path": "security/vulnerability-disclosure.html"
+        "security-implementation": {
+          "file": "security/security-implementation",
+          "title": "Security Implementation",
+          "path": "security/security-implementation.html"
+        }
+      }
+    },
+    "technical-reference": {
+      "title": "Technical Reference",
+      "icon": "fas fa-file-alt",
+      "indexFile": "technical-reference/index",
+      "children": {
+        "configuration": {
+          "file": "technical-reference/configuration",
+          "title": "Configuration",
+          "path": "technical-reference/configuration.html"
+        },
+        "dependencies": {
+          "file": "technical-reference/dependencies",
+          "title": "Dependencies",
+          "path": "technical-reference/dependencies.html"
+        },
+        "modules-catalog": {
+          "file": "technical-reference/modules-catalog",
+          "title": "Modules Catalog",
+          "path": "technical-reference/modules-catalog.html"
         }
       }
     },
@@ -144,28 +191,6 @@
           "file": "user-guides/vulnerability-management",
           "title": "Vulnerability Management",
           "path": "user-guides/vulnerability-management.html"
-        }
-      }
-    },
-    "white-papers": {
-      "title": "White Papers",
-      "icon": "fas fa-file-alt",
-      "indexFile": "white-papers/index",
-      "children": {
-        "evolution-of-spec-kit": {
-          "file": "white-papers/evolution-of-spec-kit",
-          "title": "Evolution Of Spec Kit",
-          "path": "white-papers/evolution-of-spec-kit.html"
-        },
-        "the-three-stooges": {
-          "file": "white-papers/the-three-stooges",
-          "title": "The Three Stooges",
-          "path": "white-papers/the-three-stooges.html"
-        },
-        "the-vibe-coding-revolution": {
-          "file": "white-papers/the-vibe-coding-revolution",
-          "title": "The Vibe Coding Revolution",
-          "path": "white-papers/the-vibe-coding-revolution.html"
         }
       }
     }
@@ -190,5 +215,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 35
+  "totalFiles": 38
 }

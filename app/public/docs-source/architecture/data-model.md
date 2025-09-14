@@ -60,6 +60,8 @@ Audit log of each ingested CSV batch.
 
 HexTrackr uses a "rollover" architecture to manage vulnerability data over time. This allows for accurate daily trending and historical analysis. It consists of three main tables.
 
+For a more detailed explanation of the rollover process, see the [Data Lifecycle and Rollover Mechanism](./data-lifecycle.md) documentation.
+
 ### `vulnerabilities_current`
 
 Current deduplicated state (one row per active unique vulnerability for the most recent scan date it appeared in). Added during rollover processing.
@@ -171,7 +173,7 @@ To ensure efficient querying, the following indexes are created:
 | Tickets filtering | Multiple (see tickets section) |
 | Legacy vulnerabilities (pre-rollover) | `idx_vulnerabilities_hostname`, `idx_vulnerabilities_severity`, `idx_vulnerabilities_cve`, `idx_vulnerabilities_import` |
 
-> Note: The legacy `vulnerabilities` table remains ONLY for backup/export endpoints (`/api/backup/vulnerabilities`, `/api/backup/all`). All imports and dashboards use the rollover trio (`vulnerability_snapshots`, `vulnerabilities_current`, `vulnerability_daily_totals`). The `POST /api/import/vulnerabilities` endpoint for legacy imports has been removed.
+> Note: The legacy `vulnerabilities` table remains ONLY for backup/export endpoints (`/api/backup/vulnerabilities`, `/api/backup/all`). All imports and dashboards use the rollover trio (`vulnerability_snapshots`, `vulnerabilities_current`, `vulnerability_daily_totals`).
 
 ---
 

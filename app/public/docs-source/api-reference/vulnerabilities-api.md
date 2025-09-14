@@ -118,6 +118,64 @@ This API provides endpoints for managing and analyzing vulnerability data. It fe
 
 ---
 
+## System Management
+
+### GET /health
+
+- **Description**: Health check endpoint that provides system status information including version, database availability, and uptime.
+- **Response**: `200 OK`
+
+    ```json
+    {
+      "status": "ok",
+      "version": "1.0.0",
+      "db": true,
+      "uptime": 3600.5
+    }
+    ```
+
+### GET /api/sites
+
+- **Description**: Retrieves all sites from the database, ordered alphabetically by name.
+- **Response**: `200 OK`
+
+    ```json
+    [
+      {
+        "id": 1,
+        "name": "Main Office",
+        "created_at": "2025-08-01T10:00:00.000Z"
+      },
+      {
+        "id": 2,
+        "name": "Branch Office",
+        "created_at": "2025-08-02T14:30:00.000Z"
+      }
+    ]
+    ```
+
+### GET /api/locations
+
+- **Description**: Retrieves all locations from the database, ordered alphabetically by name.
+- **Response**: `200 OK`
+
+    ```json
+    [
+      {
+        "id": 1,
+        "name": "Building A",
+        "created_at": "2025-08-01T10:00:00.000Z"
+      },
+      {
+        "id": 2,
+        "name": "Building B",
+        "created_at": "2025-08-02T14:30:00.000Z"
+      }
+    ]
+    ```
+
+---
+
 ## Data Import & History
 
 HexTrackr provides three distinct methods for importing vulnerability data:
@@ -213,8 +271,28 @@ The appropriate method depends on your integration needs and client-side capabil
 
 ### GET /api/imports
 
--   **Description**: Retrieves the history of all vulnerability import events.
--   **Response**: `200 OK` - An array of import records.
+-   **Description**: Retrieves the history of all vulnerability import events from the `vulnerability_imports` table.
+-   **Note**: The `vulnerability_count` field is a calculated value representing the number of vulnerabilities associated with each import.
+-   **Response**: `200 OK`
+
+    ```json
+    [
+      {
+        "id": 7,
+        "filename": "export.csv",
+        "import_date": "2025-08-20T10:30:00.000Z",
+        "rows_processed": 250,
+        "status": "completed"
+      },
+      {
+        "id": 6,
+        "filename": "cisco_scan_2025-08-19.csv",
+        "import_date": "2025-08-19T14:15:00.000Z",
+        "rows_processed": 1200,
+        "status": "completed"
+      }
+    ]
+    ```
 
 ---
 
