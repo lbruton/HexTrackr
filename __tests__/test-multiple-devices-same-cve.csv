@@ -1,6 +1,0 @@
-hostname,cve,plugin_name,severity,description,first_detected,last_seen,state,vendor
-device-web-01.company.local,CVE-2024-9999,Critical Web Server Vulnerability,Critical,Remote code execution vulnerability in web server,2024-09-01T10:00:00Z,2024-09-09T10:00:00Z,ACTIVE,Apache
-device-web-02.company.local,CVE-2024-9999,Critical Web Server Vulnerability,Critical,Remote code execution vulnerability in web server,2024-09-01T10:00:00Z,2024-09-09T10:00:00Z,ACTIVE,Apache
-device-web-03.company.local,CVE-2024-9999,Critical Web Server Vulnerability,Critical,Remote code execution vulnerability in web server,2024-09-01T10:00:00Z,2024-09-09T10:00:00Z,ACTIVE,Apache
-device-db-01.company.local,CVE-2024-9999,Critical Web Server Vulnerability,Critical,Remote code execution vulnerability in web server,2024-09-01T10:00:00Z,2024-09-09T10:00:00Z,ACTIVE,Apache
-device-api-01.company.local,CVE-2024-9999,Critical Web Server Vulnerability,Critical,Remote code execution vulnerability in web server,2024-09-01T10:00:00Z,2024-09-09T10:00:00Z,ACTIVE,Apache

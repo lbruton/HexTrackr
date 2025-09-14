@@ -14,10 +14,6 @@ export default [
       ".git/**",
       ".DS_Store",
       
-      // Claude Code AI configuration
-      ".claude/**",
-      "stooges/**",
-      
       // Legacy ESLint configuration (avoid conflicts)
       ".eslintrc.js",
       ".eslintrc.json",
@@ -63,10 +59,6 @@ export default [
       "**/test-*.js",
       "test-*.spec.js",
       "**/test-*.spec.js",
-      
-      // Jest test directories
-      "__tests__/**",
-      "**/__tests__/**",
       
       // Documentation build outputs
       "docs-html/**/*.html",
@@ -135,34 +127,33 @@ export default [
   {
     // Configuration for Node.js scripts - specific patterns first
     files: [
-      "app/public/server.js",
-      "app/public/docs-html/html-content-updater.js",
-      "app/public/scripts/docs-mapping-analyzer.js",
-      "app/public/scripts/docs-repair-generator.js",
-      "app/public/scripts/fix-markdown.js",
-      "app/public/scripts/generate-roadmap-portal.js",
-      "app/public/scripts/init-database.js",
-      "app/public/scripts/fix-truncated-cves.js",
-      "app/public/scripts/memory-local.js",
-      "app/public/scripts/memory-wrapper-manager.js",
-      "app/public/scripts/memento-launcher.js",
-      "app/public/scripts/claude-integration.js",
-      "app/public/scripts/claude-opus-scribe.js",
-      "app/public/scripts/ollama-detector.js",
-      "app/public/scripts/test-memento-claude.js",
-      "app/public/scripts/test-ollama-embedding.js",
-      "app/public/scripts/memory-importer.js",
-      "app/public/scripts/claude-integration.js",
-      "app/public/scripts/temp-scaffold-docs.js",
-      "app/public/scripts/validation-utils.js",
-      "app/public/scripts/version-manager.js",
-      ".rMemory/core/ollama-embedding-proxy.js",
-      ".rMemory/tools/*.js",
-      "filescope-tools-demo.js",
-      "generate-hextrackr-diagram.js",
-      "import-cisco-csv.js",
-      "test-charts.js",
-      "test-charts.spec.js"
+      "server.js",
+      "docs-html/html-content-updater.js", 
+  "scripts/docs-mapping-analyzer.js",
+  "scripts/docs-repair-generator.js", 
+      "scripts/fix-markdown.js",
+      "scripts/generate-roadmap-portal.js",
+      "scripts/init-database.js",
+      "scripts/memory-local.js",
+      "scripts/memory-wrapper-manager.js",
+      "scripts/memento-launcher.js",
+      "scripts/claude-integration.js",
+      "scripts/claude-opus-scribe.js",
+      "scripts/ollama-detector.js",
+      "scripts/test-memento-claude.js",
+      "scripts/test-ollama-embedding.js",
+      "scripts/memory-importer.js",
+      "scripts/claude-integration.js",
+      "scripts/temp-scaffold-docs.js",
+      "scripts/validation-utils.js", 
+      "scripts/version-manager.js",
+  ".rMemory/core/ollama-embedding-proxy.js",
+  ".rMemory/tools/*.js",
+  "filescope-tools-demo.js",
+  "generate-hextrackr-diagram.js",
+  "import-cisco-csv.js",
+  "test-charts.js",
+  "test-charts.spec.js"
     ],
     languageOptions: {
       ecmaVersion: 2022,
@@ -205,13 +196,13 @@ export default [
   {
     // Configuration for browser scripts - specific patterns
     files: [
-      "app/public/scripts/pages/*.js",
-      "app/public/scripts/shared/*.js",
-      "app/public/scripts/utils/*.js"
+      "scripts/pages/*.js", 
+      "scripts/shared/*.js",
+      "scripts/utils/*.js"
     ],
     languageOptions: {
       ecmaVersion: 2022,
-      sourceType: "module",
+      sourceType: "script",
       globals: {
         // Browser environment globals
         window: "readonly",
@@ -235,7 +226,6 @@ export default [
         OffscreenCanvas: "readonly",
         Path2D: "readonly",
         Event: "readonly",
-        CustomEvent: "readonly",
         EventTarget: "readonly",
         FormData: "readonly",
         DOMParser: "readonly",
@@ -244,8 +234,6 @@ export default [
         Intl: "readonly",
         Blob: "readonly",
         URL: "readonly",
-        requestAnimationFrame: "readonly",
-        cancelAnimationFrame: "readonly",
         // Third-party library globals
         bootstrap: "readonly",
         agGrid: "readonly",
@@ -253,18 +241,11 @@ export default [
         ApexCharts: "readonly",
         Papa: "readonly",
         Sortable: "readonly",
-        io: "readonly", // Socket.io client library
         // Project-specific globals
         createVulnerabilityGridOptions: "readonly",
         PaginationController: "readonly", 
         VulnerabilityDataManager: "readonly",
-        VulnerabilityStatisticsManager: "readonly",
-        VulnerabilityChartManager: "readonly",
-        VulnerabilityDetailsModal: "readonly",
-        DeviceSecurityModal: "readonly",
-        ModernVulnManager: "readonly",
-        WebSocketClient: "readonly",
-        ProgressModal: "readonly"
+        ModernVulnManager: "readonly"
       }
     },
     plugins: {
@@ -285,7 +266,7 @@ export default [
   },
   {
     // Configuration for documentation browser files
-    files: ["app/public/docs-html/js/*.js"],
+    files: ["docs-html/js/*.js"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "script",
@@ -298,48 +279,6 @@ export default [
         bootstrap: "readonly",
         Prism: "readonly",
         marked: "readonly"
-      }
-    },
-    plugins: {
-      '@stylistic': stylistic
-    },
-    rules: {
-      "@stylistic/quotes": ["error", "double"],
-      "@stylistic/semi": ["error", "always"],
-      "curly": ["error", "all"],
-      "no-lone-blocks": "error",
-      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
-      "no-console": "off",
-      "eqeqeq": ["error", "always"],
-      "no-var": "error",
-      "prefer-const": "error"
-    }
-  },
-  {
-    // Configuration for test files with ES modules
-    files: ["tests/**/*.js", "**/*.spec.js"],
-    languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: "module",
-      globals: {
-        // Node.js test environment globals
-        require: "readonly",
-        module: "readonly",
-        exports: "readonly",
-        __dirname: "readonly",
-        __filename: "readonly",
-        process: "readonly",
-        console: "readonly",
-        Buffer: "readonly",
-        global: "readonly",
-        // Playwright test globals
-        test: "readonly",
-        expect: "readonly",
-        describe: "readonly",
-        beforeEach: "readonly",
-        afterEach: "readonly",
-        beforeAll: "readonly",
-        afterAll: "readonly"
       }
     },
     plugins: {

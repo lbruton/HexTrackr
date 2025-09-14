@@ -130,7 +130,14 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
         });
         
         // Refresh stats when modal is shown
-        this.modal.addEventListener("shown.bs.modal", refreshStats);
+        this.modal.addEventListener("shown.bs.modal", () => {
+            // Add theme detection and propagation
+            const currentTheme = document.documentElement.getAttribute("data-bs-theme") || "light";
+            if (this.modal) {
+                this.modal.setAttribute("data-bs-theme", currentTheme);
+            }
+            refreshStats();
+        });
         
         // API test buttons
         document.getElementById("testCiscoConnection")?.addEventListener("click", testCiscoConnection);
