@@ -166,11 +166,6 @@
             padding: 1.5rem;
         }
 
-        .device-card:hover {
-            border-color: var(--hextrackr-primary);
-            box-shadow: 0 4px 12px rgba(32, 107, 196, 0.15);
-            transform: translateY(-2px);
-        }
 
         .device-hostname {
             font-size: 1.1rem;
@@ -214,15 +209,7 @@
             padding: 1.5rem;
         }
 
-        .vulnerability-card:hover {
-            border-color: var(--hextrackr-primary);
-            box-shadow: 0 4px 12px rgba(32, 107, 196, 0.15);
-            transform: translateY(-2px);
-        }
 
-        .vulnerability-card[style*="cursor: pointer"]:hover {
-            background-color: var(--tblr-bg-surface-secondary);
-        }
 
         /* Enhanced Modal Styling */
         .modal-blur {
@@ -418,17 +405,12 @@
         }
 
         .device-card, .vuln-card {
-            background: white;
+            background: var(--tblr-bg-surface);
             border-radius: 8px;
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
             margin-bottom: 1rem;
             transition: all 0.2s ease;
-            border: 1px solid #e2e8f0;
-        }
-
-        .device-card:hover, .vuln-card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            border-color: var(--hextrackr-primary);
+            border: 1px solid var(--tblr-border-color);
         }
 
         .severity-badge {

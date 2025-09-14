@@ -1,8 +1,9 @@
 /* Vulnerabilities Page Specific Styles */
 
-/* Unified Card Hover Effects - Theme-aware colors */
+/* Unified Card Hover Effects - Theme-aware colors with background change */
 .device-card:hover,
 .vulnerability-card:hover {
+    background-color: var(--tblr-bg-surface-secondary);
     border-color: var(--hextrackr-primary);
     box-shadow: 0 4px 12px var(--hextrackr-primary-shadow, rgb(32, 107, 196, 0.15));
     transform: translateY(-2px);

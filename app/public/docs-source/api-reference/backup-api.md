@@ -39,6 +39,7 @@ This API provides endpoints for data export, backup, restore, and clearing opera
 ### GET /api/backup/vulnerabilities
 
 - **Description**: Exports up to 10,000 vulnerabilities as a JSON object.
+- **DEPRECATED**: This endpoint uses an outdated database schema and will be removed in a future version.
 - **Response**: `200 OK`
 
 ```json

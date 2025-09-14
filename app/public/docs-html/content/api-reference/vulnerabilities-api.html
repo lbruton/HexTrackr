@@ -124,6 +124,62 @@
 </li>
 </ul>
 <hr>
+<h2>System Management</h2>
+<h3>GET /health</h3>
+<ul>
+<li><p><strong>Description</strong>: Health check endpoint that provides system status information including version, database availability, and uptime.</p>
+</li>
+<li><p><strong>Response</strong>: <code>200 OK</code></p>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;db&quot;: true,
+  &quot;uptime&quot;: 3600.5
+}
+</code></pre>
+</li>
+</ul>
+<h3>GET /api/sites</h3>
+<ul>
+<li><p><strong>Description</strong>: Retrieves all sites from the database, ordered alphabetically by name.</p>
+</li>
+<li><p><strong>Response</strong>: <code>200 OK</code></p>
+<pre><code class="language-json">[
+  {
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;Main Office&quot;,
+    &quot;created_at&quot;: &quot;2025-08-01T10:00:00.000Z&quot;
+  },
+  {
+    &quot;id&quot;: 2,
+    &quot;name&quot;: &quot;Branch Office&quot;,
+    &quot;created_at&quot;: &quot;2025-08-02T14:30:00.000Z&quot;
+  }
+]
+</code></pre>
+</li>
+</ul>
+<h3>GET /api/locations</h3>
+<ul>
+<li><p><strong>Description</strong>: Retrieves all locations from the database, ordered alphabetically by name.</p>
+</li>
+<li><p><strong>Response</strong>: <code>200 OK</code></p>
+<pre><code class="language-json">[
+  {
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;Building A&quot;,
+    &quot;created_at&quot;: &quot;2025-08-01T10:00:00.000Z&quot;
+  },
+  {
+    &quot;id&quot;: 2,
+    &quot;name&quot;: &quot;Building B&quot;,
+    &quot;created_at&quot;: &quot;2025-08-02T14:30:00.000Z&quot;
+  }
+]
+</code></pre>
+</li>
+</ul>
+<hr>
 <h2>Data Import &amp; History</h2>
 <p>HexTrackr provides three distinct methods for importing vulnerability data:</p>
 <ol>
@@ -220,8 +276,28 @@
 
 ### GET /api/imports
 
--   **Description**: Retrieves the history of all vulnerability import events.
--   **Response**: `200 OK` - An array of import records.
+-   **Description**: Retrieves the history of all vulnerability import events from the `vulnerability_imports` table.
+-   **Note**: The `vulnerability_count` field is a calculated value representing the number of vulnerabilities associated with each import.
+-   **Response**: `200 OK`
+
+    ```json
+    [
+      {
+        &quot;id&quot;: 7,
+        &quot;filename&quot;: &quot;export.csv&quot;,
+        &quot;import_date&quot;: &quot;2025-08-20T10:30:00.000Z&quot;,
+        &quot;rows_processed&quot;: 250,
+        &quot;status&quot;: &quot;completed&quot;
+      },
+      {
+        &quot;id&quot;: 6,
+        &quot;filename&quot;: &quot;cisco_scan_2025-08-19.csv&quot;,
+        &quot;import_date&quot;: &quot;2025-08-19T14:15:00.000Z&quot;,
+        &quot;rows_processed&quot;: 1200,
+        &quot;status&quot;: &quot;completed&quot;
+      }
+    ]
+    ```
 
 ---
 

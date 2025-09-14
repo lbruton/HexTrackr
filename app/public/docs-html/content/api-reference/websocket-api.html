@@ -1,0 +1,84 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>WebSocket API</h1>
+<p>This documentation outlines the WebSocket/Socket.io implementation for real-time communication in HexTrackr. The WebSocket server runs on port <strong>8080</strong>, on the same port as the main application.</p>
+<hr>
+<h2>Server Configuration</h2>
+<ul>
+<li><strong>Port</strong>: 8988</li>
+<li><strong>Library</strong>: Socket.io</li>
+</ul>
+<p>The server provides real-time updates for long-running processes such as data imports and exports.</p>
+<hr>
+<h2>Event Types</h2>
+<p>The server emits the following events to the client:</p>
+<h3><code>progress-update</code></h3>
+<ul>
+<li><p><strong>Description</strong>: Sent periodically during a data import process to provide updates on the progress.</p>
+</li>
+<li><p><strong>Data Structure</strong>:</p>
+<pre><code class="language-json">{
+  &quot;processed&quot;: 100,
+  &quot;total&quot;: 1000,
+  &quot;percentage&quot;: 10
+}
+</code></pre>
+</li>
+</ul>
+<h3><code>progress-complete</code></h3>
+<ul>
+<li><p><strong>Description</strong>: Sent when a data import process has successfully completed.</p>
+</li>
+<li><p><strong>Data Structure</strong>:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Import completed successfully.&quot;
+}
+</code></pre>
+</li>
+</ul>
+<h3><code>progress-error</code></h3>
+<ul>
+<li><p><strong>Description</strong>: Sent when an error occurs during a data import process.</p>
+</li>
+<li><p><strong>Data Structure</strong>:</p>
+<pre><code class="language-json">{
+  &quot;error&quot;: &quot;An error occurred during the import process.&quot;
+}
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2>Client Integration</h2>
+<p>Clients can connect to the WebSocket server to receive real-time updates.</p>
+<h3>Connection</h3>
+<pre><code class="language-javascript">const socket = io(&#39;http://localhost:8988&#39;);
+
+socket.on(&#39;connect&#39;, () =&gt; {
+  console.log(&#39;Connected to WebSocket server&#39;);
+});
+</code></pre>
+<h3>Event Handling</h3>
+<pre><code class="language-javascript">socket.on(&#39;progress&#39;, (data) =&gt; {
+  console.log(`Import progress: ${data.percentage}%`);
+});
+
+socket.on(&#39;complete&#39;, (data) =&gt; {
+  console.log(data.message);
+});
+
+socket.on(&#39;error&#39;, (data) =&gt; {
+  console.error(data.error);
+});
+</code></pre>
+<hr>
+<h2>Security Considerations</h2>
+<ul>
+<li>The WebSocket server is intended for local network use and does not implement authentication or encryption.</li>
+<li>It is recommended to run the WebSocket server behind a firewall and restrict access to trusted clients.</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

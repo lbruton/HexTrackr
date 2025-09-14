@@ -205,6 +205,22 @@ This enables accurate tracking of vulnerability remediation and regression.
 
 ---
 
+## Staging Tables
+
+HexTrackr uses staging tables to process new data before it is moved into the production tables. This allows for data validation and transformation without affecting the live data.
+
+- `vulnerabilities_staging`: Used for staging new vulnerability data.
+
+For more information on the data lifecycle, see the [Data Lifecycle and Rollover Mechanism](./data-lifecycle.md) documentation.
+
+---
+
+## Database Migrations
+
+Database migrations are handled automatically by the application. For more information on the migration process, see the [Database Migrations](../development/database-migrations.md) documentation.
+
+---
+
 ## Data Integrity &amp; Future Enhancements
 
 | Area | Current | Planned |

@@ -168,6 +168,15 @@
 </tr>
 </tbody></table>
 <hr>
+<h2>Real-time Communication (WebSocket)</h2>
+<p>In addition to the REST API, HexTrackr utilizes a WebSocket server for real-time communication with clients.</p>
+<ul>
+<li><strong>Port</strong>: 8080</li>
+<li><strong>Library</strong>: Socket.io</li>
+</ul>
+<p>The WebSocket server is primarily used to provide real-time feedback on long-running processes, such as data imports. It emits events to the client to indicate progress, completion, or errors.</p>
+<p>For more details, see the <a href="#api-reference/websocket-api">WebSocket API documentation</a>.</p>
+<hr>
 <h2>Pagination Flow (Current Vulnerabilities)</h2>
 <pre><code class="language-mermaid">sequenceDiagram
     participant UI
