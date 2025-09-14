@@ -14,17 +14,20 @@
 
 const DataGenerator = require('../data-generator');
 
+// Shared configuration: Authentic Tenable Plugin ID ranges
+const PLUGIN_ID_RANGES = {
+  'Critical': [100000, 999999],  // High plugin IDs for critical vulns
+  'High': [50000, 99999],        // Mid-range for high severity  
+  'Medium': [20000, 49999],      // Lower mid-range
+  'Low': [10000, 19999]          // Lowest range for info/low
+};
+
 class TenableGenerator extends DataGenerator {
   constructor(seed = 12345) {
     super(seed);
     
     // Authentic Tenable Plugin ID ranges
-    this.pluginRanges = {
-      'Critical': [100000, 999999],  // High plugin IDs for critical vulns
-      'High': [50000, 99999],        // Mid-range for high severity  
-      'Medium': [20000, 49999],      // Lower mid-range
-      'Low': [10000, 19999]          // Lowest range for info/low
-    };
+    this.pluginRanges = PLUGIN_ID_RANGES;
     
     // Tenable-specific vulnerability categories with authentic naming
     this.tenableVulnTypes = [
