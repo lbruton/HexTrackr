@@ -55,7 +55,7 @@ class AthenaStatusIndicator {
                 const stats = await fs.stat(this.processedFile);
                 this.lastExtractionTime = stats.mtime;
             }
-        } catch (error) {
+        } catch (_error) {
             // No processed state means everything is unprocessed
             this.processedHours = new Set();
         }
@@ -88,7 +88,7 @@ class AthenaStatusIndicator {
                     });
                 }
             }
-        } catch (error) {
+        } catch (_error) {
             // Chat directory not accessible
         }
 
@@ -109,7 +109,7 @@ class AthenaStatusIndicator {
                     });
                 }
             }
-        } catch (error) {
+        } catch (_error) {
             // Todo directory not accessible
         }
 
@@ -130,7 +130,7 @@ class AthenaStatusIndicator {
                     });
                 }
             }
-        } catch (error) {
+        } catch (_error) {
             // Shell directory not accessible
         }
 
@@ -154,7 +154,7 @@ class AthenaStatusIndicator {
                     count++;
                 }
             }
-        } catch (error) {
+        } catch (_error) {
             // Error reading file
         }
         return count;

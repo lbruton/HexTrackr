@@ -5,7 +5,44 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.13] - 2025-01-12
+## [Unreleased] - v1.0.14 (Security Critical)
+
+### Added
+
+#### Architecture Review System
+
+- **Comprehensive Architecture Assessment**: Complete technical review using 5 specialized expert agents
+  - Node.js backend architecture analysis (3,809-line monolithic server assessment)
+  - SQLite database schema and performance evaluation (15 tables, 31 indexes)
+  - OWASP Top 10 security vulnerability assessment
+  - JavaScript frontend architecture review (17,951 lines across 46 files)
+  - WebSocket real-time communication analysis (Socket.io implementation)
+- **Expert Agent System**: 138+ specialized domain expert agents for technical analysis
+- **Roadmap Management**: Enhanced project planning with semantic versioning and changelog automation
+
+### Security
+
+#### Critical Security Vulnerabilities (Identified for v1.0.14)
+
+- **Authentication System Required**: No authentication/authorization system currently implemented
+  - All API endpoints publicly accessible
+  - User session management missing
+  - Role-based access controls needed
+- **CSRF Protection Missing**: Cross-site request forgery vulnerabilities identified
+  - Token-based CSRF prevention required
+  - Form handling security needed
+- **Security Headers Incomplete**: Missing critical security headers
+  - Content Security Policy (CSP) implementation needed
+  - HTTP Strict Transport Security (HSTS) required
+  - Enhanced security header suite needed
+- **Database Integrity Issues**: Foreign key constraint violations found
+  - Database integrity checks required
+  - Foreign key enforcement disabled
+- **WebSocket Security Gaps**: Real-time communication lacks security controls
+  - Session-based authentication needed for WebSocket connections
+  - Room access authorization missing
+
+## [1.0.13] - 2025-09-13
 
 ### Added
 

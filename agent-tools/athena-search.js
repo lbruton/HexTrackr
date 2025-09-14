@@ -155,7 +155,7 @@ class AthenaSearch {
                             metadata: chunk.metadata
                         });
                     }
-                } catch (error) {
+                } catch (_error) {
                     console.log(`🔍 Warning: Error calculating similarity for ${file.filename} chunk ${chunk.chunkIndex}`);
                 }
             }

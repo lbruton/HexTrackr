@@ -341,7 +341,7 @@ class AthenaEmbedder {
 
                     totalChunks += embeddingData.totalChunks || 0;
                     totalEmbeddings += embeddingData.successfulEmbeddings || 0;
-                } catch (error) {
+                } catch (_error) {
                     console.log(`Warning: Could not read ${file}`);
                 }
             }
