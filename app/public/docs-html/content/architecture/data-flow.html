@@ -1,0 +1,23 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Data Flow</h1>
+<p>This document describes the data flow through the HexTrackr system.</p>
+<hr>
+<h2>Request Lifecycle</h2>
+<ol>
+<li>A request is sent from the client to the nginx reverse proxy.</li>
+<li>The reverse proxy routes the request to the appropriate server (application or WebSocket).</li>
+<li>The server processes the request and interacts with the database if necessary.</li>
+<li>The server sends a response back to the client.</li>
+</ol>
+<hr>
+<h2>Data Processing</h2>
+<ul>
+<li><strong>Data Imports</strong>: New data is first loaded into a staging table for validation and processing before being moved to the production tables.</li>
+<li><strong>Data Exports</strong>: Data is exported directly from the production tables.</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

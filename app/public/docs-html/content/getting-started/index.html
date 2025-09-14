@@ -1,17 +1,5 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-info" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-        <path d="M12 9v4"/>
-        <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
-        <path d="M12 16h.01"/>
-    </svg>
-    <div>
-        <strong>Active Specification:</strong> 000-hextrackr-master-truth-v1.0.12-COMPLETE
-        <small class="d-block text-muted">This documentation is being actively updated as part of the current specification development.</small>
-    </div>
-</div>
     <h1>Getting Started with HexTrackr</h1>
 <p>This guide provides everything you need to get HexTrackr up and running, whether for a production-like environment using Docker or for local development.</p>
 <hr>
@@ -35,11 +23,11 @@ cd HexTrackr
 </code></pre>
 </li>
 <li><p><strong>Access HexTrackr</strong></p>
-<p> The application will be available at <code>http://localhost:8080</code>.</p>
+<p> The application will be available at <code>http://localhost:8989</code>.</p>
 <ul>
-<li><strong>Tickets Management</strong>: <code>http://localhost:8080/tickets.html</code></li>
-<li><strong>Vulnerabilities Management</strong>: <code>http://localhost:8080/vulnerabilities.html</code></li>
-<li><strong>Documentation Portal</strong>: <code>http://localhost:8080/docs-html/</code></li>
+<li><strong>Tickets Management</strong>: <code>http://localhost:8989/tickets.html</code></li>
+<li><strong>Vulnerabilities Management</strong>: <code>http://localhost:8989/vulnerabilities.html</code></li>
+<li><strong>Documentation Portal</strong>: <code>http://localhost:8989/docs-html/</code></li>
 </ul>
 </li>
 <li><p><strong>Stopping the Application</strong></p>
@@ -75,7 +63,8 @@ cd HexTrackr
 <li><p><strong>Start the Development Server</strong></p>
 <pre><code class="language-bash">node server.js
 </code></pre>
-<p> The server will start, and you can access the application at <code>http://localhost:8080</code>.</p>
+<p> The server will start on port 8080 internally. When running locally without Docker, access the application at <code>http://localhost:8080</code>.</p>
+<p> <strong>Note</strong>: When using Docker, the application is accessible at <code>http://localhost:8989</code> due to port mapping.</p>
 </li>
 </ol>
 <h3>Development Scripts</h3>
@@ -86,7 +75,7 @@ cd HexTrackr
 <li><code>npm run init-db</code>: Initializes or re-initializes the database.</li>
 <li><code>npm run lint:all</code>: Runs all code quality checks (ESLint for JS, Stylelint for CSS, Markdownlint for docs).</li>
 <li><code>npm run fix:all</code>: Attempts to automatically fix all code quality issues.</li>
-<li><code>npm run docs:generate</code>: <strong>Regenerates the complete HTML documentation portal with spec-kit integration</strong>.</li>
+<li><code>npm run docs:generate</code>: <strong>Regenerates the complete HTML documentation portal</strong>.</li>
 <li><code>npm run docs:sync-specs</code>: Syncs specification tasks to the roadmap (part of docs:generate).</li>
 <li><code>npm run docs:sync-all</code>: Comprehensive documentation synchronization across all sources.</li>
 </ul>

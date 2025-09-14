@@ -1,0 +1,178 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, copilot]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 2 * * *' # Daily at 2 AM UTC
+  workflow_dispatch:
+    inputs:
+      test-suite:
+        description: 'Test suite to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - smoke
+          - regression
+          - performance
+          - contracts
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+        shard: [1, 2, 3, 4] # Run tests in 4 parallel shards
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+      
+      - name: Start Docker services
+        run: |
+          docker-compose up -d
+          sleep 10 # Wait for services to be ready
+          docker-compose ps
+      
+      - name: Check HexTrackr health
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:8989/health; then
+              echo "HexTrackr is ready"
+              break
+            fi
+            echo "Waiting for HexTrackr... ($i/30)"
+            sleep 2
+          done
+      
+      - name: Initialize database
+        run: |
+          docker-compose exec -T hextrackr node /app/public/scripts/init-database.js
+          docker-compose exec -T hextrackr npm run seed:test
+      
+      - name: Run E2E tests
+        env:
+          BROWSER: ${{ matrix.browser }}
+          SHARD: ${{ matrix.shard }}
+          TOTAL_SHARDS: 4
+          TEST_SUITE: ${{ github.event.inputs.test-suite || 'all' }}
+        run: |
+          npx playwright test \
+            --project=${{ matrix.browser }} \
+            --shard=${{ matrix.shard }}/4 \
+            --reporter=html,json,junit \
+            --output=test-results/
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.browser }}-shard-${{ matrix.shard }}
+          path: test-results/
+          retention-days: 30
+      
+      - name: Upload screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.browser }}-shard-${{ matrix.shard }}
+          path: tests/e2e/screenshots/
+          retention-days: 7
+      
+      - name: Upload trace files
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: traces-${{ matrix.browser }}-shard-${{ matrix.shard }}
+          path: test-results/trace.zip
+          retention-days: 7
+      
+      - name: Stop Docker services
+        if: always()
+        run: docker-compose down -v
+
+  merge-reports:
+    needs: e2e-tests
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          path: all-results/
+      
+      - name: Merge test reports
+        run: |
+          npx playwright merge-reports --reporter=html,github all-results/
+      
+      - name: Upload merged report
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+      
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: daun/playwright-report-comment@v3
+        with:
+          report-file: playwright-report/index.html
+
+  performance-analysis:
+    needs: e2e-tests
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          path: all-results/
+      
+      - name: Analyze performance metrics
+        run: |
+          node tests/e2e/scripts/analyze-performance.js all-results/
+      
+      - name: Upload performance report
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-report
+          path: performance-report.json
+          retention-days: 90
+      
+      - name: Check performance thresholds
+        run: |
+          node tests/e2e/scripts/check-thresholds.js performance-report.json
