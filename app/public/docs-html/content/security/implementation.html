@@ -1,0 +1,671 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Security Implementation</h1>
+<p>Comprehensive documentation of all security measures, controls, and implementations in HexTrackr for corporate security review and compliance assessment.</p>
+<hr>
+<h2>Security Architecture Overview</h2>
+<p>HexTrackr implements a defense-in-depth security strategy with multiple layers of protection:</p>
+<ul>
+<li><strong>Network Security</strong>: Rate limiting, CORS, security headers</li>
+<li><strong>Input Validation</strong>: Comprehensive data sanitization and validation</li>
+<li><strong>File Security</strong>: Upload restrictions and path traversal prevention</li>
+<li><strong>Data Protection</strong>: SQL injection prevention and secure data handling</li>
+<li><strong>Session Management</strong>: Secure session handling (prepared for authentication)</li>
+<li><strong>Application Security</strong>: XSS protection and secure coding practices</li>
+</ul>
+<hr>
+<h2>Input Validation and Sanitization</h2>
+<h3>PathValidator Security Class</h3>
+<p><strong>Location</strong>: <code>app/public/server.js</code> (lines 22-79)</p>
+<p>The <code>PathValidator</code> class provides comprehensive protection against path traversal attacks and ensures safe file operations.</p>
+<p><strong>Core Security Features</strong>:</p>
+<pre><code class="language-javascript">class PathValidator {
+  static validatePath(filePath) {
+    // 1. Basic validation
+    if (!filePath || typeof filePath !== &quot;string&quot;) {
+      throw new Error(&quot;Invalid file path&quot;);
+    }
+
+    // 2. Path normalization
+    const normalizedPath = path.normalize(filePath);
+
+    // 3. Path traversal detection
+    if (normalizedPath.includes(&quot;../&quot;) || normalizedPath.includes(&quot;..\\&quot;)) {
+      throw new Error(&quot;Path traversal detected&quot;);
+    }
+
+    // 4. Component validation
+    const pathComponents = normalizedPath.split(path.sep);
+    for (const component of pathComponents) {
+      if (component === &quot;..&quot; || (component === &quot;.&quot; &amp;&amp; pathComponents.length &gt; 1)) {
+        throw new Error(&quot;Invalid path component&quot;);
+      }
+    }
+
+    return normalizedPath;
+  }
+}
+</code></pre>
+<p><strong>Protected Operations</strong>:</p>
+<ul>
+<li><code>safeReadFileSync()</code>: Safe file reading with path validation</li>
+<li><code>safeWriteFileSync()</code>: Secure file writing operations</li>
+<li><code>safeReaddirSync()</code>: Directory listing with validation</li>
+<li><code>safeStatSync()</code>: File status checking</li>
+<li><code>safeExistsSync()</code>: File existence checking with error handling</li>
+<li><code>safeUnlinkSync()</code>: Secure file deletion</li>
+</ul>
+<p><strong>Security Benefits</strong>:</p>
+<ul>
+<li>Prevents directory traversal attacks (../, ..\)</li>
+<li>Validates all path components</li>
+<li>Handles edge cases and malformed paths</li>
+<li>Consistent error handling across all file operations</li>
+<li>Performance optimized for frequent validation</li>
+</ul>
+<h3>SQL Injection Prevention</h3>
+<p><strong>Implementation</strong>: Parameterized queries throughout the application</p>
+<p><strong>Example Secure Query Pattern</strong>:</p>
+<pre><code class="language-javascript">// Secure parameterized query
+const stmt = db.prepare(`
+  SELECT * FROM vulnerabilities
+  WHERE hostname = ? AND severity = ? AND scan_date &gt; ?
+`);
+const results = stmt.all(hostname, severity, dateThreshold);
+</code></pre>
+<p><strong>Protection Mechanisms</strong>:</p>
+<ul>
+<li>All database queries use parameterized statements</li>
+<li>No dynamic SQL construction with user input</li>
+<li>Input validation before database operations</li>
+<li>Type checking for numeric parameters</li>
+<li>Length limits on string parameters</li>
+</ul>
+<p><strong>Vulnerable Operations Secured</strong>:</p>
+<ul>
+<li>Vulnerability search and filtering</li>
+<li>Ticket CRUD operations</li>
+<li>Data import processing</li>
+<li>Statistics and reporting queries</li>
+<li>Backup and restore operations</li>
+</ul>
+<h3>XSS Protection</h3>
+<p><strong>Primary Defense</strong>: DOMPurify library integration</p>
+<p><strong>Implementation</strong>:</p>
+<pre><code class="language-javascript">// Client-side XSS protection
+import DOMPurify from &#39;dompurify&#39;;
+
+// Sanitize all user-generated content
+function sanitizeHTML(dirty) {
+  return DOMPurify.sanitize(dirty, {
+    ALLOWED_TAGS: [&#39;b&#39;, &#39;i&#39;, &#39;em&#39;, &#39;strong&#39;, &#39;p&#39;, &#39;br&#39;],
+    ALLOWED_ATTR: [&#39;class&#39;],
+    FORBID_TAGS: [&#39;script&#39;, &#39;object&#39;, &#39;embed&#39;, &#39;link&#39;],
+    FORBID_ATTR: [&#39;onerror&#39;, &#39;onload&#39;, &#39;onclick&#39;]
+  });
+}
+</code></pre>
+<p><strong>Additional XSS Protections</strong>:</p>
+<ul>
+<li>Content Security Policy (CSP) headers</li>
+<li>X-XSS-Protection header enabled</li>
+<li>Input validation and encoding</li>
+<li>Template escaping in HTML generation</li>
+<li>Sanitization of user-provided data before storage</li>
+</ul>
+<hr>
+<h2>Network Security</h2>
+<h3>Rate Limiting</h3>
+<p><strong>Implementation</strong>: Express Rate Limit middleware</p>
+<p><strong>Configuration</strong>:</p>
+<pre><code class="language-javascript">const rateLimit = require(&quot;express-rate-limit&quot;);
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: {
+    error: &quot;Too many requests from this IP, please try again later.&quot;,
+    retryAfter: &quot;15 minutes&quot;
+  },
+  standardHeaders: true, // Return rate limit info in headers
+  legacyHeaders: false,
+  handler: (req, res) =&gt; {
+    res.status(429).json({
+      success: false,
+      error: {
+        code: &quot;RATE_LIMIT_EXCEEDED&quot;,
+        message: &quot;Rate limit exceeded. Try again later.&quot;
+      }
+    });
+  }
+});
+
+// Apply to all API routes
+app.use(&quot;/api/&quot;, limiter);
+</code></pre>
+<p><strong>Rate Limiting Strategy</strong>:</p>
+<ul>
+<li><strong>Window</strong>: 15-minute sliding window</li>
+<li><strong>Limit</strong>: 100 requests per IP per window</li>
+<li><strong>Scope</strong>: Applied to all <code>/api/</code> endpoints</li>
+<li><strong>Headers</strong>: Provides rate limit information to clients</li>
+<li><strong>Bypass</strong>: No bypass mechanism (prevents abuse)</li>
+<li><strong>Storage</strong>: In-memory storage (resets on restart)</li>
+</ul>
+<h3>CORS Configuration</h3>
+<p><strong>Implementation</strong>: Configurable Cross-Origin Resource Sharing</p>
+<p><strong>Default Configuration</strong>:</p>
+<pre><code class="language-javascript">const cors = require(&quot;cors&quot;);
+
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || &quot;*&quot;,
+  methods: [&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;],
+  allowedHeaders: [
+    &quot;Content-Type&quot;,
+    &quot;Authorization&quot;,
+    &quot;X-Requested-With&quot;,
+    &quot;Accept&quot;,
+    &quot;Origin&quot;
+  ],
+  credentials: false, // No credentials by default
+  maxAge: 86400 // 24 hours preflight cache
+};
+
+app.use(cors(corsOptions));
+</code></pre>
+<p><strong>Production Recommendations</strong>:</p>
+<pre><code class="language-javascript">// Production CORS settings
+const productionCors = {
+  origin: &quot;https://hextrackr.yourdomain.com&quot;,
+  credentials: false,
+  methods: [&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;],
+  allowedHeaders: [&quot;Content-Type&quot;, &quot;X-Requested-With&quot;]
+};
+</code></pre>
+<h3>Security Headers</h3>
+<p><strong>Implementation</strong>: Custom security header middleware</p>
+<pre><code class="language-javascript">// Security headers middleware
+app.use((req, res, next) =&gt; {
+  // HTTP Strict Transport Security
+  res.setHeader(
+    &quot;Strict-Transport-Security&quot;,
+    &quot;max-age=31536000; includeSubDomains&quot;
+  );
+
+  // Prevent MIME type sniffing
+  res.setHeader(&quot;X-Content-Type-Options&quot;, &quot;nosniff&quot;);
+
+  // Clickjacking protection
+  res.setHeader(&quot;X-Frame-Options&quot;, &quot;DENY&quot;);
+
+  // XSS protection
+  res.setHeader(&quot;X-XSS-Protection&quot;, &quot;1; mode=block&quot;);
+
+  // Referrer policy
+  res.setHeader(
+    &quot;Referrer-Policy&quot;,
+    &quot;strict-origin-when-cross-origin&quot;
+  );
+
+  // Content Security Policy (development - adjust for production)
+  res.setHeader(
+    &quot;Content-Security-Policy&quot;,
+    &quot;default-src &#39;self&#39;; script-src &#39;self&#39; &#39;unsafe-inline&#39; &#39;unsafe-eval&#39;; style-src &#39;self&#39; &#39;unsafe-inline&#39;; img-src &#39;self&#39; data: https:; font-src &#39;self&#39; https:;&quot;
+  );
+
+  next();
+});
+</code></pre>
+<hr>
+<h2>File Upload Security</h2>
+<h3>Upload Restrictions</h3>
+<p><strong>Configuration</strong>:</p>
+<pre><code class="language-javascript">const multer = require(&quot;multer&quot;);
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) =&gt; {
+    // Validate upload directory exists and is writable
+    const uploadDir = process.env.UPLOAD_DIR || &quot;./app/public/uploads&quot;;
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) =&gt; {
+    // Generate secure filename with timestamp
+    const timestamp = Date.now();
+    const sanitizedName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, &#39;_&#39;);
+    cb(null, `${timestamp}-${sanitizedName}`);
+  }
+});
+
+const fileFilter = (req, file, cb) =&gt; {
+  // Allowed MIME types
+  const allowedMimes = [
+    &#39;text/csv&#39;,
+    &#39;application/json&#39;,
+    &#39;application/vnd.ms-excel&#39;,
+    &#39;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&#39;
+  ];
+
+  // Allowed file extensions
+  const allowedExtensions = [&#39;.csv&#39;, &#39;.json&#39;, &#39;.xls&#39;, &#39;.xlsx&#39;];
+  const fileExtension = path.extname(file.originalname).toLowerCase();
+
+  if (allowedMimes.includes(file.mimetype) &amp;&amp; allowedExtensions.includes(fileExtension)) {
+    cb(null, true);
+  } else {
+    cb(new Error(`File type not allowed. Allowed types: ${allowedExtensions.join(&#39;, &#39;)}`), false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB limit
+    files: 1, // Single file upload only
+    fields: 5, // Limit form fields
+    fieldSize: 1024 * 1024, // 1MB per field
+    headerPairs: 2000 // Limit header pairs
+  },
+  fileFilter: fileFilter
+});
+</code></pre>
+<p><strong>Security Controls</strong>:</p>
+<ul>
+<li><strong>File Size</strong>: 50MB maximum per file</li>
+<li><strong>File Types</strong>: CSV, JSON, XLS, XLSX only</li>
+<li><strong>MIME Type Validation</strong>: Double validation (MIME + extension)</li>
+<li><strong>Filename Sanitization</strong>: Remove special characters</li>
+<li><strong>Upload Directory</strong>: Isolated from executable directories</li>
+<li><strong>Temporary Storage</strong>: Files moved after validation</li>
+<li><strong>Cleanup</strong>: Automatic cleanup of old uploads</li>
+</ul>
+<h3>File Processing Security</h3>
+<p><strong>CSV Processing with PapaParse</strong>:</p>
+<pre><code class="language-javascript">const Papa = require(&quot;papaparse&quot;);
+
+function parseCSVSecurely(fileContent, options = {}) {
+  const secureConfig = {
+    header: true,
+    skipEmptyLines: true,
+    transformHeader: (header) =&gt; {
+      // Sanitize column headers
+      return header.trim().replace(/[^a-zA-Z0-9_-]/g, &#39;_&#39;);
+    },
+    transform: (value, field) =&gt; {
+      // Sanitize field values
+      if (typeof value === &#39;string&#39;) {
+        return value.trim().substring(0, 1000); // Limit field length
+      }
+      return value;
+    },
+    error: (error, file, inputElem, reason) =&gt; {
+      console.error(&#39;CSV parsing error:&#39;, error, reason);
+    },
+    // Security limits
+    worker: false, // Disable web workers
+    download: false, // No external downloads
+    delimiter: &#39;&#39;, // Auto-detect delimiter
+    chunkSize: 1024 * 1024, // 1MB chunks
+    ...options
+  };
+
+  return Papa.parse(fileContent, secureConfig);
+}
+</code></pre>
+<hr>
+<h2>Session Management</h2>
+<h3>Current State (Stateless)</h3>
+<p>HexTrackr currently operates in a stateless mode without user authentication. However, the foundation is prepared for secure session management.</p>
+<h3>Prepared Session Configuration</h3>
+<pre><code class="language-javascript">const session = require(&#39;express-session&#39;);
+const SQLiteStore = require(&#39;connect-sqlite3&#39;)(session);
+
+const sessionConfig = {
+  secret: process.env.SESSION_SECRET || &#39;auto-generated-secret&#39;,
+  name: &#39;hextrackr.sid&#39;,
+  store: new SQLiteStore({
+    db: &#39;sessions.db&#39;,
+    dir: &#39;./data&#39;,
+    table: &#39;sessions&#39;
+  }),
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === &#39;production&#39;, // HTTPS only in production
+    httpOnly: true, // Prevent XSS access to cookies
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: &#39;strict&#39; // CSRF protection
+  },
+  genid: () =&gt; {
+    return require(&#39;crypto&#39;).randomBytes(32).toString(&#39;hex&#39;);
+  }
+};
+</code></pre>
+<h3>Future Authentication Framework</h3>
+<p><strong>Planned Authentication Methods</strong>:</p>
+<ol>
+<li><strong>Local Authentication</strong>: Username/password with bcrypt hashing</li>
+<li><strong>JWT Tokens</strong>: Stateless authentication for API access</li>
+<li><strong>OAuth 2.0</strong>: Integration with enterprise identity providers</li>
+<li><strong>API Keys</strong>: Service-to-service authentication</li>
+</ol>
+<p><strong>Password Security (When Implemented)</strong>:</p>
+<ul>
+<li>bcrypt with minimum 12 rounds</li>
+<li>Password complexity requirements</li>
+<li>Account lockout after failed attempts</li>
+<li>Password history prevention</li>
+<li>Secure password reset flow</li>
+</ul>
+<hr>
+<h2>Data Protection</h2>
+<h3>Database Security</h3>
+<p><strong>SQLite Configuration</strong>:</p>
+<pre><code class="language-javascript">const sqlite3 = require(&#39;sqlite3&#39;).verbose();
+
+// Secure database connection
+const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) =&gt; {
+  if (err) {
+    console.error(&#39;Database connection error:&#39;, err);
+    process.exit(1);
+  }
+});
+
+// Enable WAL mode for better concurrency and recovery
+db.exec(&#39;PRAGMA journal_mode=WAL&#39;);
+
+// Set secure pragma settings
+db.exec(&#39;PRAGMA foreign_keys=ON&#39;); // Enforce foreign key constraints
+db.exec(&#39;PRAGMA secure_delete=ON&#39;); // Securely delete data
+db.exec(&#39;PRAGMA temp_store=MEMORY&#39;); // Store temporary data in memory
+</code></pre>
+<p><strong>Sensitive Data Handling</strong>:</p>
+<ul>
+<li>No passwords or secrets stored in database</li>
+<li>Input validation before database operations</li>
+<li>Prepared statements for all queries</li>
+<li>Database file permissions restricted (600)</li>
+<li>Regular backup with integrity checks</li>
+</ul>
+<h3>Data Sanitization</h3>
+<p><strong>Input Sanitization Functions</strong>:</p>
+<pre><code class="language-javascript">// Comprehensive input sanitization
+function sanitizeInput(input, type = &#39;string&#39;) {
+  if (input === null || input === undefined) {
+    return null;
+  }
+
+  switch (type) {
+    case &#39;string&#39;:
+      return String(input)
+        .trim()
+        .substring(0, 1000) // Limit length
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, &#39;&#39;); // Remove control chars
+
+    case &#39;number&#39;:
+      const num = parseFloat(input);
+      return isNaN(num) ? 0 : Math.max(-999999, Math.min(999999, num));
+
+    case &#39;boolean&#39;:
+      return Boolean(input);
+
+    case &#39;date&#39;:
+      const date = new Date(input);
+      return isNaN(date.getTime()) ? null : date.toISOString();
+
+    case &#39;cve&#39;:
+      // CVE format validation
+      const cveRegex = /^CVE-\d{4}-\d{4,}$/;
+      return cveRegex.test(input) ? input : null;
+
+    case &#39;severity&#39;:
+      const validSeverities = [&#39;Low&#39;, &#39;Medium&#39;, &#39;High&#39;, &#39;Critical&#39;];
+      return validSeverities.includes(input) ? input : &#39;Medium&#39;;
+
+    default:
+      return sanitizeInput(input, &#39;string&#39;);
+  }
+}
+</code></pre>
+<hr>
+<h2>Application Security Features</h2>
+<h3>Progress Tracking Security</h3>
+<p><strong>WebSocket Session Management</strong>:</p>
+<pre><code class="language-javascript">class ProgressTracker {
+  constructor(io) {
+    this.io = io;
+    this.sessions = new Map();
+    this.THROTTLE_INTERVAL = 100; // Prevent spam
+    this.SESSION_CLEANUP_INTERVAL = 30 * 60 * 1000; // 30 minutes
+  }
+
+  createSession(metadata = {}) {
+    const sessionId = crypto.randomUUID();
+    const session = {
+      id: sessionId,
+      progress: 0,
+      lastUpdate: Date.now(),
+      metadata: this.sanitizeMetadata(metadata),
+      ipAddress: this.getClientIP(), // Track origin
+      createdAt: Date.now()
+    };
+
+    this.sessions.set(sessionId, session);
+    return sessionId;
+  }
+
+  sanitizeMetadata(metadata) {
+    // Sanitize all metadata fields
+    const sanitized = {};
+    for (const [key, value] of Object.entries(metadata)) {
+      if (typeof key === &#39;string&#39; &amp;&amp; key.length &lt;= 50) {
+        sanitized[key] = sanitizeInput(value, &#39;string&#39;);
+      }
+    }
+    return sanitized;
+  }
+}
+</code></pre>
+<h3>Error Handling Security</h3>
+<p><strong>Secure Error Responses</strong>:</p>
+<pre><code class="language-javascript">// Error handler that doesn&#39;t leak sensitive information
+function secureErrorHandler(err, req, res, next) {
+  // Log full error internally
+  console.error(&#39;Application Error:&#39;, {
+    error: err.message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+    ip: req.ip,
+    userAgent: req.get(&#39;User-Agent&#39;),
+    timestamp: new Date().toISOString()
+  });
+
+  // Generic error response for clients
+  const isDevelopment = process.env.NODE_ENV === &#39;development&#39;;
+
+  res.status(err.status || 500).json({
+    success: false,
+    error: {
+      code: err.code || &#39;INTERNAL_ERROR&#39;,
+      message: isDevelopment ? err.message : &#39;An error occurred&#39;,
+      ...(isDevelopment &amp;&amp; { stack: err.stack }),
+      timestamp: new Date().toISOString(),
+      requestId: req.id || &#39;unknown&#39;
+    }
+  });
+}
+</code></pre>
+<hr>
+<h2>Security Monitoring and Logging</h2>
+<h3>Security Event Logging</h3>
+<p><strong>Audit Log Implementation</strong>:</p>
+<pre><code class="language-javascript">class SecurityAuditLogger {
+  constructor(logFile = &#39;./logs/security.log&#39;) {
+    this.logFile = logFile;
+    this.logLevel = process.env.AUDIT_LOG_LEVEL || &#39;info&#39;;
+  }
+
+  log(level, event, details = {}) {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      level: level,
+      event: event,
+      details: details,
+      ip: details.ip || &#39;unknown&#39;,
+      userAgent: details.userAgent || &#39;unknown&#39;
+    };
+
+    // Log to file and/or external service
+    console.log(`SECURITY: ${JSON.stringify(logEntry)}`);
+
+    // Critical events should trigger alerts
+    if (level === &#39;critical&#39;) {
+      this.triggerAlert(logEntry);
+    }
+  }
+
+  logFileUpload(req, file, success) {
+    this.log(&#39;info&#39;, &#39;FILE_UPLOAD&#39;, {
+      filename: file.originalname,
+      size: file.size,
+      mimetype: file.mimetype,
+      success: success,
+      ip: req.ip,
+      userAgent: req.get(&#39;User-Agent&#39;)
+    });
+  }
+
+  logRateLimitExceeded(req) {
+    this.log(&#39;warning&#39;, &#39;RATE_LIMIT_EXCEEDED&#39;, {
+      ip: req.ip,
+      url: req.url,
+      method: req.method,
+      userAgent: req.get(&#39;User-Agent&#39;)
+    });
+  }
+}
+</code></pre>
+<h3>Intrusion Detection Patterns</h3>
+<p><strong>Suspicious Activity Detection</strong>:</p>
+<ul>
+<li>Multiple file upload failures from same IP</li>
+<li>Rapid API requests beyond normal usage</li>
+<li>Path traversal attempts in file operations</li>
+<li>Malformed requests or invalid parameters</li>
+<li>Large file uploads outside business hours</li>
+<li>WebSocket connection abuse patterns</li>
+</ul>
+<hr>
+<h2>Compliance and Standards</h2>
+<h3>Security Standards Alignment</h3>
+<p><strong>OWASP Top 10 Compliance</strong>:</p>
+<ol>
+<li><strong>A01 Broken Access Control</strong>: Prepared authentication framework</li>
+<li><strong>A02 Cryptographic Failures</strong>: Secure defaults, HTTPS enforcement</li>
+<li><strong>A03 Injection</strong>: Parameterized queries, input validation</li>
+<li><strong>A04 Insecure Design</strong>: Security-first architecture</li>
+<li><strong>A05 Security Misconfiguration</strong>: Secure defaults, hardening guide</li>
+<li><strong>A06 Vulnerable Components</strong>: Dependency scanning, regular updates</li>
+<li><strong>A07 Identification Failures</strong>: Prepared session management</li>
+<li><strong>A08 Software Integrity</strong>: Secure deployment, verification</li>
+<li><strong>A09 Security Logging</strong>: Comprehensive audit logging</li>
+<li><strong>A10 Server-Side Request Forgery</strong>: Input validation, URL restrictions</li>
+</ol>
+<h3>Data Privacy Compliance</h3>
+<p><strong>GDPR Readiness</strong>:</p>
+<ul>
+<li>Data minimization principles applied</li>
+<li>Right to data portability (export features)</li>
+<li>Right to erasure (delete functionality)</li>
+<li>Data processing transparency</li>
+<li>Security by design implementation</li>
+</ul>
+<p><strong>CCPA Compliance</strong>:</p>
+<ul>
+<li>Consumer rights framework ready</li>
+<li>Data collection transparency</li>
+<li>Secure data handling practices</li>
+</ul>
+<hr>
+<h2>Security Testing and Validation</h2>
+<h3>Automated Security Testing</h3>
+<p><strong>Security Test Suite</strong>:</p>
+<pre><code class="language-bash"># Run security tests
+npm run security:test
+
+# Includes:
+# - SQL injection testing
+# - XSS payload testing
+# - Path traversal testing
+# - File upload security testing
+# - Rate limiting validation
+# - CORS configuration testing
+</code></pre>
+<h3>Penetration Testing Checklist</h3>
+<p><strong>Network Security</strong>:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Port scanning and service enumeration</li>
+<li><input disabled="" type="checkbox"> Rate limiting bypass attempts</li>
+<li><input disabled="" type="checkbox"> CORS misconfiguration testing</li>
+<li><input disabled="" type="checkbox"> SSL/TLS configuration validation</li>
+</ul>
+<p><strong>Application Security</strong>:</p>
+<ul>
+<li><input disabled="" type="checkbox"> SQL injection testing (automated + manual)</li>
+<li><input disabled="" type="checkbox"> XSS payload injection testing</li>
+<li><input disabled="" type="checkbox"> File upload security testing</li>
+<li><input disabled="" type="checkbox"> Path traversal vulnerability testing</li>
+<li><input disabled="" type="checkbox"> Business logic security testing</li>
+</ul>
+<p><strong>Infrastructure Security</strong>:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Docker container security scanning</li>
+<li><input disabled="" type="checkbox"> Dependency vulnerability scanning</li>
+<li><input disabled="" type="checkbox"> Configuration security review</li>
+<li><input disabled="" type="checkbox"> Access control validation</li>
+</ul>
+<hr>
+<h2>Security Configuration Checklist</h2>
+<h3>Production Deployment Security</h3>
+<p><strong>Required Environment Variables</strong>:</p>
+<pre><code class="language-bash"># Security configuration
+NODE_ENV=production
+CORS_ORIGIN=https://yourdomain.com
+SESSION_COOKIE_SECURE=true
+RATE_LIMIT_MAX_REQUESTS=100
+MAX_UPLOAD_SIZE=52428800
+LOG_LEVEL=warn
+
+# Generate secure session secret
+SESSION_SECRET=$(openssl rand -hex 32)
+</code></pre>
+<p><strong>File Permissions</strong>:</p>
+<pre><code class="language-bash"># Database file
+chmod 600 /path/to/hextrackr.db
+
+# Configuration files
+chmod 600 /path/to/.env
+
+# Upload directory
+chmod 755 /path/to/uploads
+chown www-data:www-data /path/to/uploads
+
+# Application directory
+chmod -R 755 /path/to/app
+chown -R www-data:www-data /path/to/app
+</code></pre>
+<p><strong>Network Security</strong>:</p>
+<pre><code class="language-bash"># Firewall configuration
+ufw allow 8989/tcp  # HTTP API
+ufw allow 8988/tcp  # WebSocket
+ufw enable
+
+# Reverse proxy recommended for HTTPS termination
+# Direct internet exposure not recommended
+</code></pre>
+<p>This comprehensive security implementation documentation provides complete visibility into all security measures for corporate review and compliance assessment.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

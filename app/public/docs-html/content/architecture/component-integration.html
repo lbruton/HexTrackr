@@ -1,0 +1,30 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Component Integration</h1>
+<p>This document describes how the different components of the HexTrackr system work together.</p>
+<hr>
+<h2>API and WebSocket Integration</h2>
+<ul>
+<li>The REST API provides the primary interface for interacting with the application.</li>
+<li>The WebSocket server provides real-time updates to clients for long-running processes such as data imports.</li>
+</ul>
+<hr>
+<h2>Security Integration</h2>
+<ul>
+<li>The <code>PathValidator</code> class is used to prevent directory traversal attacks.</li>
+<li>Rate limiting is applied to all API endpoints to prevent abuse.</li>
+<li>CORS is configured to restrict access to the API from unauthorized domains.</li>
+<li>Input validation and sanitization are used to prevent XSS and other injection attacks.</li>
+</ul>
+<hr>
+<h2>Database Integration</h2>
+<ul>
+<li>The application uses a SQLite database to store all data.</li>
+<li>The database is initialized automatically when the application starts for the first time.</li>
+<li>Database migrations are handled automatically by the application.</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

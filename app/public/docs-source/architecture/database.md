@@ -29,6 +29,11 @@ erDiagram
         TEXT filename
         TEXT import_date
         INTEGER row_count
+        TEXT vendor
+        INTEGER file_size
+        INTEGER processing_time
+        TEXT raw_headers
+        DATETIME created_at
     }
 
     vulnerability_snapshots {
@@ -36,20 +41,48 @@ erDiagram
         INTEGER import_id FK
         TEXT scan_date
         TEXT hostname
+        TEXT ip_address
         TEXT cve
         TEXT severity
         REAL vpr_score
+        REAL cvss_score
+        TEXT first_seen
+        TEXT last_seen
+        TEXT plugin_id
+        TEXT plugin_name
+        TEXT description
+        TEXT solution
+        TEXT vendor_reference
+        TEXT vulnerability_date
+        TEXT state
         TEXT unique_key
     }
 
     vulnerabilities_current {
         INTEGER id PK
-        TEXT unique_key UK
+        INTEGER import_id FK
+        TEXT scan_date
         TEXT hostname
+        TEXT ip_address
         TEXT cve
         TEXT severity
         REAL vpr_score
+        REAL cvss_score
+        TEXT first_seen
         TEXT last_seen
+        TEXT plugin_id
+        TEXT plugin_name
+        TEXT description
+        TEXT solution
+        TEXT vendor_reference
+        TEXT vendor
+        TEXT vulnerability_date
+        TEXT state
+        TEXT unique_key UK
+        TEXT lifecycle_state
+        TEXT resolved_date
+        DATETIME created_at
+        DATETIME updated_at
     }
 
     vulnerability_daily_totals {
@@ -65,6 +98,10 @@ erDiagram
         REAL low_total_vpr
         INTEGER total_vulnerabilities
         REAL total_vpr
+        INTEGER resolved_count
+        INTEGER reopened_count
+        DATETIME created_at
+        DATETIME updated_at
     }
 
     sites {
@@ -81,9 +118,23 @@ erDiagram
 
     tickets {
         TEXT id PK
-        TEXT xt_number
         TEXT date_submitted
+        TEXT date_due
+        TEXT hexagon_ticket
+        TEXT service_now_ticket
+        TEXT location
+        TEXT devices
+        TEXT supervisor
+        TEXT tech
         TEXT status
+        TEXT notes
+        TEXT attachments
+        TEXT site
+        TEXT xt_number
+        INTEGER site_id FK
+        INTEGER location_id FK
+        TEXT created_at
+        TEXT updated_at
     }
 
     ticket_vulnerabilities {
@@ -134,13 +185,25 @@ sequenceDiagram
 
 ## Legacy Table Notice
 
-The original `vulnerabilities` table (pre-rollover) remains in the database to support existing backup endpoints (`/api/backup/vulnerabilities`, `/api/backup/all`) and legacy imports (`POST /api/import/vulnerabilities`). New analytics and UI panels rely exclusively on the rollover trio:
+The original `vulnerabilities` table remains in the database to support existing backup endpoints (`/api/backup/vulnerabilities`, `/api/backup/all`). This table is used ONLY for exports - all new imports and analytics use the rollover architecture. New analytics and UI panels rely exclusively on the rollover trio:
 
 - `vulnerability_snapshots` (historical log)
 - `vulnerabilities_current` (deduplicated active set)
 - `vulnerability_daily_totals` (aggregated trends)
 
 Migration plan (tracked in roadmap) will eventually deprecate the legacy ingestion path and unify export logic on the rollover schema.
+
+---
+
+## Lifecycle State Management
+
+The `vulnerabilities_current` table uses a `lifecycle_state` column to track vulnerability status:
+
+- **active**: Currently detected vulnerability
+- **resolved**: Vulnerability no longer detected (marked with resolved_date)
+- **reopened**: Previously resolved vulnerability that reappeared
+
+This enables accurate tracking of vulnerability remediation and regression.
 
 ---
 
@@ -153,6 +216,22 @@ Migration plan (tracked in roadmap) will eventually deprecate the legacy ingesti
 | vulnerability_daily_totals | scan_date (UNIQUE) | Idempotent aggregates |
 | tickets | multiple (location, status, date_submitted, date_due, external refs) | UI filtering & reporting |
 | sites / locations | code (UNIQUE) | Lookup by code |
+
+---
+
+## Staging Tables
+
+HexTrackr uses staging tables to process new data before it is moved into the production tables. This allows for data validation and transformation without affecting the live data.
+
+- `vulnerabilities_staging`: Used for staging new vulnerability data.
+
+For more information on the data lifecycle, see the [Data Lifecycle and Rollover Mechanism](./data-lifecycle.md) documentation.
+
+---
+
+## Database Migrations
+
+Database migrations are handled automatically by the application. For more information on the migration process, see the [Database Migrations](../development/database-migrations.md) documentation.
 
 ---
 

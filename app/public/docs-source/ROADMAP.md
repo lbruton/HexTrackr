@@ -2,11 +2,10 @@
 
 ## Overview
 
-This roadmap is dynamically generated from active specifications and reflects the real-time state of HexTrackr development. All tasks are derived from formal specifications that follow the spec-kit framework: spec.md → plan.md → tasks.md → implementation.
+This roadmap reflects the real-time state of HexTrackr development and consolidation achievements.
 
-**Current Version**: v1.0.12 (September 2025)  
-**Project Start**: September 2025  
-**Development Framework**: Spec-Kit with Constitutional Compliance
+**Current Version**: v1.0.12 (September 2025)
+**Project Start**: September 2025
 
 ---
 
@@ -16,7 +15,7 @@ This roadmap is dynamically generated from active specifications and reflects th
 
 **HexTrackr v1.0.12 CONSOLIDATION COMPLETE** - A major milestone has been achieved! The platform has consolidated from 24 specifications down to 1 complete baseline specification, with 23 specifications successfully archived after implementation.
 
-Development follows the spec-kit constitutional framework:
+Development follows a structured approach:
 
 1. **Specifications** (1 active, 23 archived): Business requirements and feature definitions
 2. **Technical Plans**: Implementation strategies derived from specifications  
@@ -56,16 +55,3 @@ Previous roadmap domains that will be converted to specifications:
 Development priorities are determined by active specifications with pending tasks. When specifications are approved and converted to actionable task lists, they will appear in the table below with their current status.
 
 ---
-
-**Last Updated**: Dynamically generated from specifications  
-**Next Update**: When tasks are completed or specifications are activated
-
-<!-- AUTO-GENERATED-SPECS-START -->
-
-### Active Specifications
-
-| Spec | Title | Progress | Priority | Next Tasks |
-| ---- | ----- | -------- | -------- | ---------- |
-| 000 | HexTrackr Master - Vulnerability Management Platform | 28/30 (93%) | 🔴 CRIT | • Playwright E2E Tests<br>• Load Testing Suite |
-
-<!-- AUTO-GENERATED-SPECS-END -->

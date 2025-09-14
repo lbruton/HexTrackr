@@ -1,17 +1,5 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-info" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-        <path d="M12 9v4"/>
-        <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
-        <path d="M12 16h.01"/>
-    </svg>
-    <div>
-        <strong>Active Specification:</strong> 000-hextrackr-master-truth-v1.0.12-COMPLETE
-        <small class="d-block text-muted">This documentation is being actively updated as part of the current specification development.</small>
-    </div>
-</div>
     <h1>Vulnerabilities API</h1>
 <p>This API provides endpoints for managing and analyzing vulnerability data. It features a <a href="#architecture/rollover-mechanism">rollover architecture</a> for historical trend analysis.</p>
 <p><strong>Data Model</strong>: For detailed information on the vulnerability-related tables, see the <a href="#architecture/data-model">Data Model documentation</a>.</p>
@@ -19,7 +7,7 @@
 <h2>Endpoints</h2>
 <h3>GET /api/vulnerabilities</h3>
 <ul>
-<li><p><strong>Description</strong>: Retrieves a paginated list of current vulnerabilities.</p>
+<li><p><strong>Description</strong>: Retrieves a paginated list of active vulnerabilities. Automatically filters by lifecycle_state IN (&#39;active&#39;, &#39;reopened&#39;) to exclude resolved vulnerabilities.</p>
 </li>
 <li><p><strong>Query Parameters</strong>:</p>
 <ul>
@@ -28,6 +16,8 @@
 <li><code>search</code> (string, optional): A search term to filter by hostname, CVE, or plugin name.</li>
 <li><code>severity</code> (string, optional): Filter by severity (<code>Critical</code>, <code>High</code>, <code>Medium</code>, <code>Low</code>).</li>
 </ul>
+</li>
+<li><p><strong>Note</strong>: This endpoint only returns active and reopened vulnerabilities. Use <code>/api/vulnerabilities/resolved</code> for resolved vulnerabilities.</p>
 </li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
 <pre><code class="language-json">{
@@ -104,17 +94,108 @@
 </code></pre>
 </li>
 </ul>
+<h3>GET /api/vulnerabilities/resolved</h3>
+<ul>
+<li><p><strong>Description</strong>: Retrieves a paginated list of resolved vulnerabilities (lifecycle_state = &#39;resolved&#39;).</p>
+</li>
+<li><p><strong>Query Parameters</strong>:</p>
+<ul>
+<li><code>page</code> (number, optional, default: 1): The page number to retrieve.</li>
+<li><code>limit</code> (number, optional, default: 50): The number of items per page.</li>
+<li><code>search</code> (string, optional): A search term to filter by hostname, CVE, or plugin name.</li>
+</ul>
+</li>
+<li><p><strong>Response</strong>: <code>200 OK</code></p>
+<pre><code class="language-json">{
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: 15,
+      &quot;hostname&quot;: &quot;server-01&quot;,
+      &quot;cve&quot;: &quot;CVE-2023-1234&quot;,
+      &quot;severity&quot;: &quot;High&quot;,
+      &quot;lifecycle_state&quot;: &quot;resolved&quot;,
+      &quot;resolved_date&quot;: &quot;2025-08-15&quot;,
+      &quot;last_seen&quot;: &quot;2025-08-10&quot;
+    }
+  ],
+  &quot;pagination&quot;: { &quot;page&quot;: 1, &quot;limit&quot;: 50, &quot;total&quot;: 45, &quot;pages&quot;: 1 }
+}
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2>System Management</h2>
+<h3>GET /health</h3>
+<ul>
+<li><p><strong>Description</strong>: Health check endpoint that provides system status information including version, database availability, and uptime.</p>
+</li>
+<li><p><strong>Response</strong>: <code>200 OK</code></p>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;db&quot;: true,
+  &quot;uptime&quot;: 3600.5
+}
+</code></pre>
+</li>
+</ul>
+<h3>GET /api/sites</h3>
+<ul>
+<li><p><strong>Description</strong>: Retrieves all sites from the database, ordered alphabetically by name.</p>
+</li>
+<li><p><strong>Response</strong>: <code>200 OK</code></p>
+<pre><code class="language-json">[
+  {
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;Main Office&quot;,
+    &quot;created_at&quot;: &quot;2025-08-01T10:00:00.000Z&quot;
+  },
+  {
+    &quot;id&quot;: 2,
+    &quot;name&quot;: &quot;Branch Office&quot;,
+    &quot;created_at&quot;: &quot;2025-08-02T14:30:00.000Z&quot;
+  }
+]
+</code></pre>
+</li>
+</ul>
+<h3>GET /api/locations</h3>
+<ul>
+<li><p><strong>Description</strong>: Retrieves all locations from the database, ordered alphabetically by name.</p>
+</li>
+<li><p><strong>Response</strong>: <code>200 OK</code></p>
+<pre><code class="language-json">[
+  {
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;Building A&quot;,
+    &quot;created_at&quot;: &quot;2025-08-01T10:00:00.000Z&quot;
+  },
+  {
+    &quot;id&quot;: 2,
+    &quot;name&quot;: &quot;Building B&quot;,
+    &quot;created_at&quot;: &quot;2025-08-02T14:30:00.000Z&quot;
+  }
+]
+</code></pre>
+</li>
+</ul>
 <hr>
 <h2>Data Import &amp; History</h2>
-<p>HexTrackr provides two distinct methods for importing vulnerability data:</p>
+<p>HexTrackr provides three distinct methods for importing vulnerability data:</p>
 <ol>
-<li><strong>CSV File Upload</strong> (<code>/api/vulnerabilities/import</code>): For direct upload of CSV files that are parsed on the server.</li>
-<li><strong>JSON Payload</strong> (<code>/api/import/vulnerabilities</code>): For pre-processed data that has already been parsed into JSON format on the client.</li>
+<li><strong>CSV File Upload</strong> (<code>/api/vulnerabilities/import</code>): Server-side CSV parsing - upload raw CSV files and let the server handle all parsing logic.</li>
+<li><strong>Staging Import</strong> (<code>/api/vulnerabilities/import-staging</code>): Server-side staged import with enhanced performance for large datasets.</li>
+<li><strong>JSON Payload</strong> (<code>/api/import/vulnerabilities</code>): Client-side CSV parsing - parse CSV into JSON on the frontend before sending to server.</li>
 </ol>
+<p><strong>Key Differences:</strong></p>
+<ul>
+<li><strong>Server-side parsing</strong> (<code>/import</code>): Upload CSV directly, server handles format detection and parsing</li>
+<li><strong>Client-side parsing</strong> (<code>/api/import/vulnerabilities</code>): Frontend parses CSV to JSON, then sends structured data</li>
+</ul>
 <p>The appropriate method depends on your integration needs and client-side capabilities.</p>
 <h3>POST /api/vulnerabilities/import</h3>
 <ul>
-<li><strong>Description</strong>: Imports vulnerabilities from an uploaded CSV file. This is the primary endpoint for server-side processing of vulnerability scans. <strong>Fixed in v1.0.5</strong>: Resolved critical bug where missing <code>apiBase</code> property caused 404 errors during CSV upload attempts.</li>
+<li><strong>Description</strong>: Imports vulnerabilities from an uploaded CSV file. This is the primary endpoint for server-side processing of vulnerability scans.</li>
 <li><strong>Enhanced Features</strong>:<ul>
 <li><strong>Multi-format Support</strong>: Automatically detects and processes various CSV export formats</li>
 <li><strong>Cisco SA Support</strong>: Extracts and processes Cisco Security Advisory identifiers (<code>cisco-sa-*</code> patterns)</li>
@@ -138,6 +219,36 @@
   &quot;insertCount&quot;: 200,
   &quot;updateCount&quot;: 50,
   &quot;removedStale&quot;: 10
+}
+</code></pre>
+<h3>POST /api/vulnerabilities/import-staging</h3>
+<ul>
+<li><strong>Description</strong>: Enhanced staging import endpoint for vulnerability data with performance optimizations and advanced processing features.</li>
+<li><strong>Request Body</strong>: <code>multipart/form-data</code><ul>
+<li><code>csvFile</code> (file, required): The CSV file to import.</li>
+<li><code>vendor</code> (string, optional): The source of the data (e.g., &quot;cisco&quot;, &quot;tenable&quot;).</li>
+<li><code>scanDate</code> (string, optional): The date of the scan in <code>YYYY-MM-DD</code> format. Auto-extracted from filename if not provided.</li>
+</ul>
+</li>
+<li><strong>Enhanced Features</strong>:<ul>
+<li><strong>Staging Table Processing</strong>: Uses temporary staging table for improved performance on large datasets</li>
+<li><strong>Filename Date Extraction</strong>: Automatically extracts scan dates from common filename patterns</li>
+<li><strong>Enhanced Performance Monitoring</strong>: Detailed timing and processing statistics</li>
+</ul>
+</li>
+<li><strong>Response</strong>: <code>200 OK</code></li>
+</ul>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;importId&quot;: 12,
+  &quot;stagingRowsProcessed&quot;: 10000,
+  &quot;finalRowsInserted&quot;: 9850,
+  &quot;filename&quot;: &quot;cisco_scan_2025-08-20.csv&quot;,
+  &quot;processingTime&quot;: 2340,
+  &quot;performance&quot;: {
+    &quot;stagingTime&quot;: 1200,
+    &quot;processingTime&quot;: 1140
+  }
 }
 </code></pre>
 <h3>POST /api/import/vulnerabilities</h3>
@@ -165,8 +276,28 @@
 
 ### GET /api/imports
 
--   **Description**: Retrieves the history of all vulnerability import events.
--   **Response**: `200 OK` - An array of import records.
+-   **Description**: Retrieves the history of all vulnerability import events from the `vulnerability_imports` table.
+-   **Note**: The `vulnerability_count` field is a calculated value representing the number of vulnerabilities associated with each import.
+-   **Response**: `200 OK`
+
+    ```json
+    [
+      {
+        &quot;id&quot;: 7,
+        &quot;filename&quot;: &quot;export.csv&quot;,
+        &quot;import_date&quot;: &quot;2025-08-20T10:30:00.000Z&quot;,
+        &quot;rows_processed&quot;: 250,
+        &quot;status&quot;: &quot;completed&quot;
+      },
+      {
+        &quot;id&quot;: 6,
+        &quot;filename&quot;: &quot;cisco_scan_2025-08-19.csv&quot;,
+        &quot;import_date&quot;: &quot;2025-08-19T14:15:00.000Z&quot;,
+        &quot;rows_processed&quot;: 1200,
+        &quot;status&quot;: &quot;completed&quot;
+      }
+    ]
+    ```
 
 ---
 

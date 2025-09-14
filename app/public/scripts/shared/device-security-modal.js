@@ -257,7 +257,12 @@ class DeviceSecurityModal {
             }
         ];
 
+        // Detect current theme for v33 theming
+        const currentTheme = this.detectCurrentTheme();
+        const isDarkMode = currentTheme === "dark";
+
         const deviceGridOptions = {
+            theme: window.agGridThemeManager ? window.agGridThemeManager.getCurrentTheme() : null, // AG-Grid v33 theme configuration
             columnDefs: deviceColumnDefs,
             rowData: device.vulnerabilities,
             defaultColDef: {
@@ -271,10 +276,24 @@ class DeviceSecurityModal {
             animateRows: true,
             onGridReady: (params) => {
                 this.deviceGridApi = params.api;
+                
+                // Register grid with AGGridThemeManager for dynamic theme updates
+                if (window.agGridThemeManager) {
+                    window.agGridThemeManager.registerGrid("deviceSecurityModal", this.deviceGridApi, deviceGridDiv);
+                }
             }
         };
 
-        this.deviceGrid = new agGrid.Grid(deviceGridDiv, deviceGridOptions);
+        this.deviceGrid = agGrid.createGrid(deviceGridDiv, deviceGridOptions);
+    }
+
+
+    /**
+     * Detect current theme from DOM
+     * @returns {string} 'dark' or 'light'
+     */
+    detectCurrentTheme() {
+        return document.documentElement.getAttribute("data-bs-theme") === "dark" ? "dark" : "light";
     }
 
     /**
