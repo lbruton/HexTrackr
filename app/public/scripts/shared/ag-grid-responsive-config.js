@@ -310,13 +310,17 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false) {
                 if (componentContext.gridApi) {
                     // Update column visibility based on screen size
                     updateColumnVisibility(params.api);
+                    // Ensure columns fill available width after resize
+                    params.api.sizeColumnsToFit();
                 }
             }, 200));
-            
-            // Set initial column visibility
+
+            // Set initial column visibility and sizing
             setTimeout(() => {
                 if (componentContext.gridApi) {
                     updateColumnVisibility(params.api);
+                    // Ensure columns fill available width on initial load
+                    params.api.sizeColumnsToFit();
                 }
             }, 100);
         },
@@ -332,6 +336,8 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false) {
             if (componentContext.gridApi) {
                 // Update column visibility based on screen size
                 updateColumnVisibility(params.api);
+                // Ensure columns fill available width when data is first rendered
+                params.api.sizeColumnsToFit();
             }
         },
 
@@ -339,6 +345,8 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false) {
             // Update column visibility when grid container changes size
             if (params.api) {
                 updateColumnVisibility(params.api);
+                // Ensure columns fill available width when grid size changes
+                params.api.sizeColumnsToFit();
             }
         },
 

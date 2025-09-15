@@ -15,13 +15,49 @@ The backend is a Node.js/Express monolith providing REST endpoints, rollover ing
 
 ## Core Components
 
-| Component | Purpose |
-| --------- | ------- |
-| `server.js` | Main application runtime (all routes + logic) |
-| `scripts/init-database.js` | Bootstrap base schema & indexes (legacy + foundational tables) |
-| Rollover Functions | Sequential import processing & aggregation (`processVulnerabilityRowsWithRollover`) |
-| `PathValidator` | Normalizes & validates file paths (defense-in-depth) |
-| Docs Portal Logic | Dynamic redirect + stats endpoint (`/api/docs/stats`) |
+| Component | Purpose | Location |
+| --------- | ------- | -------- |
+| `server.js` | Main application runtime (all routes + logic) | Root level |
+| `scripts/init-database.js` | Bootstrap base schema & indexes (legacy + foundational tables) | `/scripts/` |
+| **ProgressTracker** | WebSocket session management & progress tracking | `server.js:82-200` |
+| **PathValidator** | Security-hardened file operations with traversal protection | `server.js:22-79` |
+| Rollover Functions | Sequential import processing & enhanced deduplication | `server.js:500-800` |
+| Rate Limiting | IP-based request throttling (100 req/15min) | Express middleware |
+| Docs Portal Logic | Dynamic redirect + stats endpoint (`/api/docs/stats`) | `server.js:1200+` |
+
+### PathValidator Security Class
+
+```javascript
+class PathValidator {
+  static validatePath(filePath) {
+    // Path normalization
+    const normalizedPath = path.normalize(filePath);
+
+    // Traversal attack prevention
+    if (normalizedPath.includes("../") || normalizedPath.includes("..\\")) {
+      throw new Error("Path traversal detected");
+    }
+
+    // Component validation
+    const pathComponents = normalizedPath.split(path.sep);
+    for (const component of pathComponents) {
+      if (component === ".." || (component === "." && pathComponents.length > 1)) {
+        throw new Error("Invalid path component");
+      }
+    }
+
+    return normalizedPath;
+  }
+}
+```
+
+**Security Features**:
+
+- Path normalization before validation
+- Directory traversal attack prevention
+- Component-level validation
+- Safe file operation wrappers
+- Exception-based error handling
 
 ---
 
@@ -74,14 +110,57 @@ sequenceDiagram
     API-->>User: { importId, insertCount, updateCount, removedStale, scanDate }
 ```
 
+### Enhanced Deduplication System
+
+HexTrackr implements a sophisticated 4-tier unique key generation strategy:
+
+**Tier 1: Asset ID + Plugin ID** (Highest Reliability)
+
+```javascript
+if (mapped.assetId && mapped.pluginId) {
+  return `asset:${mapped.assetId}|plugin:${mapped.pluginId}`;
+}
+```
+
+**Tier 2: CVE + Hostname/IP** (CVE-based)
+
+```javascript
+if (mapped.cve && mapped.cve.trim()) {
+  const hostIdentifier = normalizedIP || normalizedHostname;
+  return `cve:${mapped.cve.trim()}|host:${hostIdentifier}`;
+}
+```
+
+**Tier 3: Plugin ID + Hostname/IP + Vendor** (User-requested approach)
+
+```javascript
+if (mapped.pluginId && mapped.pluginId.trim()) {
+  const hostIdentifier = normalizedIP || normalizedHostname;
+  const vendor = mapped.vendor || "unknown";
+  return `plugin:${mapped.pluginId.trim()}|host:${hostIdentifier}|vendor:${vendor}`;
+}
+```
+
+**Tier 4: Description Hash + Hostname/IP** (Fallback)
+
+```javascript
+const descriptionHash = createDescriptionHash(mapped.description);
+const hostIdentifier = normalizedIP || normalizedHostname;
+return `desc:${descriptionHash}|host:${hostIdentifier}`;
+```
+
 ### Key Safeguards
 
 | Risk | Mitigation |
 | ---- | ---------- |
 | Row duplication in batch | In‑memory `Set` of processed unique_keys |
-| Race conditions | Explicit sequential loop instead of `forEach` callbacks |
+| Race conditions | Explicit sequential loop with `processNextRow(index)` pattern |
 | Data drift | Historical record preserved in snapshots before updates |
 | Performance | Indexes on `unique_key`, `scan_date`, severities |
+| **Key conflicts** | **4-tier unique key generation with reliability scoring** |
+| **Memory leaks** | **Session-based processing with automatic cleanup** |
+| **Hostname variations** | **Hostname normalization (domain stripping, case insensitive)** |
+| **IP address formats** | **IP normalization and validation** |
 
 ---
 
@@ -101,12 +180,69 @@ sequenceDiagram
 
 ## Real-time Communication (WebSocket)
 
-In addition to the REST API, HexTrackr utilizes a WebSocket server for real-time communication with clients.
+### ProgressTracker Architecture
 
-- **Port**: 8080
-- **Library**: Socket.io
+HexTrackr implements a sophisticated WebSocket-based progress tracking system through the `ProgressTracker` class:
 
-The WebSocket server is primarily used to provide real-time feedback on long-running processes, such as data imports. It emits events to the client to indicate progress, completion, or errors.
+- **Port**: 8988 (separate from REST API)
+- **Library**: Socket.io with enhanced session management
+- **Session Management**: UUID-based sessions with metadata tracking
+- **Throttling**: 100ms minimum interval between progress events
+- **Auto-cleanup**: 30-minute session timeout with automatic garbage collection
+
+### ProgressTracker Features
+
+```javascript
+class ProgressTracker {
+  constructor(io) {
+    this.sessions = new Map();
+    this.eventThrottle = new Map();
+    this.THROTTLE_INTERVAL = 100;
+    this.SESSION_CLEANUP_INTERVAL = 30 * 60 * 1000;
+  }
+}
+```
+
+**Key Capabilities**:
+
+- Session-based progress tracking with unique identifiers
+- Throttled event emission to prevent client overload
+- Metadata persistence for operation context
+- Automatic session cleanup for memory management
+- Error handling with graceful degradation
+
+### WebSocket Events
+
+| Event Type | Purpose | Throttled |
+|------------|---------|----------|
+| `import_progress` | CSV import progress updates | Yes (100ms) |
+| `import_complete` | Import operation completion | No |
+| `import_error` | Import operation errors | No |
+| `session_created` | New session establishment | No |
+| `session_cleanup` | Session removal notification | No |
+
+### Session Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant ProgressTracker
+    participant Import as Import Process
+
+    Client->>ProgressTracker: Connect to WebSocket
+    ProgressTracker->>ProgressTracker: createSession(metadata)
+    ProgressTracker-->>Client: session_created event
+
+    Import->>ProgressTracker: updateProgress(sessionId, progress)
+    ProgressTracker->>ProgressTracker: throttleCheck()
+    alt Progress not throttled
+        ProgressTracker-->>Client: import_progress event
+    end
+
+    Import->>ProgressTracker: completeSession(sessionId)
+    ProgressTracker-->>Client: import_complete event
+    ProgressTracker->>ProgressTracker: cleanup(sessionId)
+```
 
 For more details, see the [WebSocket API documentation](../api-reference/websocket-api.md).
 
@@ -150,25 +286,110 @@ sequenceDiagram
 
 ## Security & Hardening
 
-| Concern | Current | Planned |
-| ------- | ------- | ------- |
-| File access | `PathValidator` | Central audit logging of rejections |
-| Upload size | 100MB cap | Configurable env var (`HEXTRACKR_MAX_UPLOAD_MB`) |
-| TLS | External termination | Compose example with Caddy / nginx |
-| Input validation | Minimal (mapping layer) | JSON schema (Ajv) enforcement |
-| Logging | Console + stderr | Structured JSON + request IDs |
+### Current Security Implementations
+
+| Concern | Implementation | Details |
+| ------- | -------------- | ------- |
+| **Path Traversal** | `PathValidator` class | Comprehensive path validation and safe file operations |
+| **Rate Limiting** | Express rate limit middleware | 100 requests per 15-minute window per IP |
+| **Upload Security** | Multer with size limits | 50MB cap with file type validation |
+| **XSS Prevention** | Security headers | `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection` |
+| **SQL Injection** | Parameterized queries | All database operations use prepared statements |
+| **CORS Protection** | Configurable CORS | Default: all origins (configurable for production) |
+| **Input Sanitization** | DOMPurify integration | Client-side XSS prevention |
+
+### PathValidator Security Features
+
+```javascript
+// Safe file operations with built-in validation
+PathValidator.safeReadFileSync(filePath, options)
+PathValidator.safeWriteFileSync(filePath, data, options)
+PathValidator.safeReaddirSync(dirPath, options)
+PathValidator.safeStatSync(filePath)
+PathValidator.safeExistsSync(filePath)
+PathValidator.safeUnlinkSync(filePath)
+```
+
+**Protection Mechanisms**:
+
+- Path normalization before validation
+- Directory traversal detection (`../`, `..\\`)
+- Component-level path validation
+- Exception-based error handling
+- Graceful fallbacks for invalid paths
+
+### Rate Limiting Configuration
+
+```javascript
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP',
+  standardHeaders: true,
+  legacyHeaders: false
+});
+```
+
+### Future Security Enhancements
+
+| Concern | Planned |
+| ------- | ------- |
+| Authentication | JWT-based authentication with role-based access control |
+| API Security | API key authentication for external integrations |
+| Audit Logging | Central audit logging of security events and rejections |
+| TLS | Built-in HTTPS support with automatic certificate management |
+| Input Validation | JSON schema (Ajv) enforcement for all API endpoints |
+| Structured Logging | Structured JSON logging with request IDs and correlation |
+| Vulnerability Scanning | Automated dependency vulnerability scanning |
+| Secret Management | Environment-based secret management with rotation |
 
 ---
 
 ## Planned Enhancements
 
-| Area | Enhancement |
-| ---- | ---------- |
-| Observability | Prometheus metrics (import latency, row counts) |
-| Modularization | Extract rollover & backup modules |
-| Validation | Enforce severity enumeration + CVE format checks |
-| Migration | Retire legacy vulnerabilities pathway |
-| Testing | Playwright + API contract tests for import & pagination |
+### Observability & Monitoring
+
+| Area | Enhancement | Priority |
+| ---- | ---------- | -------- |
+| **Metrics** | Prometheus metrics (import latency, row counts, session tracking) | High |
+| **Tracing** | OpenTelemetry integration for distributed tracing | Medium |
+| **Health Checks** | Enhanced health endpoints with dependency checking | High |
+| **Performance** | APM integration for bottleneck identification | Medium |
+
+### Architecture & Modularity
+
+| Area | Enhancement | Priority |
+| ---- | ---------- | -------- |
+| **Modularization** | Extract ProgressTracker, PathValidator, and rollover modules | High |
+| **Microservices** | Split WebSocket server into separate service | Medium |
+| **Database** | PostgreSQL migration for scalability | Low |
+| **Caching** | Redis integration for session and data caching | Medium |
+
+### Data Quality & Validation
+
+| Area | Enhancement | Priority |
+| ---- | ---------- | -------- |
+| **Schema Validation** | JSON schema (Ajv) enforcement for all API endpoints | High |
+| **CVE Validation** | Real-time CVE format and existence validation | Medium |
+| **Severity Normalization** | Automatic severity enumeration mapping | High |
+| **Data Quality Scoring** | Automated data quality metrics and reporting | Medium |
+
+### Legacy Migration
+
+| Area | Enhancement | Priority |
+| ---- | ---------- | -------- |
+| **Legacy Deprecation** | Retire legacy vulnerabilities table and endpoints | High |
+| **Data Migration** | Automated migration from legacy to rollover architecture | High |
+| **API Versioning** | Implement API versioning for backward compatibility | Medium |
+
+### Testing & Quality Assurance
+
+| Area | Enhancement | Priority |
+| ---- | ---------- | -------- |
+| **E2E Testing** | Playwright integration tests for all major workflows | High |
+| **API Contract Testing** | OpenAPI-based contract validation | High |
+| **Load Testing** | Automated performance testing with realistic data volumes | Medium |
+| **Security Testing** | Automated security scanning and penetration testing | High |
 
 ---
 

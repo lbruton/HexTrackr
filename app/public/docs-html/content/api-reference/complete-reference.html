@@ -736,6 +736,255 @@ Content-Disposition: form-data; name=&quot;options&quot;
 <li><code>WEBSOCKET_ERROR</code>: WebSocket communication error</li>
 </ul>
 <hr>
+<h2>Additional API Endpoints</h2>
+<h3>GET /api/vulnerabilities/resolved</h3>
+<p>Retrieve resolved vulnerabilities with pagination.</p>
+<p><strong>Query Parameters</strong>:</p>
+<ul>
+<li><code>page</code> (integer, optional): Page number (default: 1)</li>
+<li><code>limit</code> (integer, optional): Items per page (default: 50)</li>
+<li><code>resolved_after</code> (string, optional): ISO date string</li>
+<li><code>resolved_before</code> (string, optional): ISO date string</li>
+</ul>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">GET /api/vulnerabilities/resolved?page=1&amp;limit=25 HTTP/1.1
+Host: localhost:8989
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: 1156,
+      &quot;hostname&quot;: &quot;web-server-03.corp.local&quot;,
+      &quot;cve&quot;: &quot;CVE-2024-0003&quot;,
+      &quot;severity&quot;: &quot;High&quot;,
+      &quot;lifecycle_state&quot;: &quot;resolved&quot;,
+      &quot;resolved_date&quot;: &quot;2025-01-10T14:30:00Z&quot;,
+      &quot;resolution_time_hours&quot;: 72.5
+    }
+  ],
+  &quot;pagination&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 25,
+    &quot;total&quot;: 456,
+    &quot;pages&quot;: 19
+  }
+}
+</code></pre>
+<h3>GET /api/vulnerabilities/recent-trends</h3>
+<p>Get recent vulnerability trend analysis (current vs previous period).</p>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;current_period&quot;: {
+    &quot;total&quot;: 2102,
+    &quot;critical&quot;: 89,
+    &quot;high&quot;: 342,
+    &quot;date_range&quot;: &quot;2025-01-06 to 2025-01-12&quot;
+  },
+  &quot;previous_period&quot;: {
+    &quot;total&quot;: 2079,
+    &quot;critical&quot;: 84,
+    &quot;high&quot;: 339,
+    &quot;date_range&quot;: &quot;2024-12-30 to 2025-01-05&quot;
+  },
+  &quot;changes&quot;: {
+    &quot;total_change&quot;: +23,
+    &quot;critical_change&quot;: +5,
+    &quot;high_change&quot;: +3,
+    &quot;trend&quot;: &quot;increasing&quot;
+  }
+}
+</code></pre>
+<h3>POST /api/vulnerabilities/import-staging</h3>
+<p>Import vulnerabilities to staging table for preview/validation.</p>
+<p><strong>Content-Type</strong>: <code>multipart/form-data</code></p>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;staging_id&quot;: &quot;staging_12345&quot;,
+  &quot;preview_stats&quot;: {
+    &quot;total_rows&quot;: 1847,
+    &quot;valid_rows&quot;: 1835,
+    &quot;invalid_rows&quot;: 12,
+    &quot;estimated_new&quot;: 78,
+    &quot;estimated_updates&quot;: 234
+  }
+}
+</code></pre>
+<h3>GET /api/imports</h3>
+<p>List import history with metadata.</p>
+<p><strong>Query Parameters</strong>:</p>
+<ul>
+<li><code>page</code> (integer, optional): Page number (default: 1)</li>
+<li><code>limit</code> (integer, optional): Items per page (default: 20)</li>
+<li><code>vendor</code> (string, optional): Filter by vendor</li>
+</ul>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;imports&quot;: [
+    {
+      &quot;id&quot;: 47,
+      &quot;filename&quot;: &quot;vulnerabilities_2025-01-12.csv&quot;,
+      &quot;vendor&quot;: &quot;tenable&quot;,
+      &quot;import_date&quot;: &quot;2025-01-12T14:20:00Z&quot;,
+      &quot;row_count&quot;: 1847,
+      &quot;processing_time&quot;: 3420,
+      &quot;file_size&quot;: 2048576,
+      &quot;status&quot;: &quot;completed&quot;
+    }
+  ],
+  &quot;pagination&quot;: {
+    &quot;page&quot;: 1,
+    &quot;limit&quot;: 20,
+    &quot;total&quot;: 47
+  }
+}
+</code></pre>
+<h3>POST /api/tickets/migrate</h3>
+<p>Migrate tickets from external systems.</p>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">POST /api/tickets/migrate HTTP/1.1
+Host: localhost:8989
+Content-Type: application/json
+
+{
+  &quot;tickets&quot;: [
+    {
+      &quot;external_id&quot;: &quot;SN-12345&quot;,
+      &quot;system&quot;: &quot;servicenow&quot;,
+      &quot;location&quot;: &quot;Data Center 1&quot;,
+      &quot;status&quot;: &quot;Open&quot;
+    }
+  ],
+  &quot;migration_options&quot;: {
+    &quot;update_existing&quot;: true,
+    &quot;preserve_ids&quot;: false
+  }
+}
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;migration_stats&quot;: {
+    &quot;total_processed&quot;: 25,
+    &quot;created&quot;: 18,
+    &quot;updated&quot;: 7,
+    &quot;skipped&quot;: 0,
+    &quot;errors&quot;: 0
+  }
+}
+</code></pre>
+<h3>DELETE /api/backup/clear/:type</h3>
+<p>Clear specific data types (vulnerabilities, tickets, imports).</p>
+<p><strong>Path Parameters</strong>:</p>
+<ul>
+<li><code>type</code> (string): Data type to clear (<code>vulnerabilities</code>, <code>tickets</code>, <code>imports</code>)</li>
+</ul>
+<p><strong>Request</strong>:</p>
+<pre><code class="language-http">DELETE /api/backup/clear/vulnerabilities HTTP/1.1
+Host: localhost:8989
+Content-Type: application/json
+
+{
+  &quot;confirm&quot;: true,
+  &quot;backup_before_clear&quot;: true
+}
+</code></pre>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;type&quot;: &quot;vulnerabilities&quot;,
+  &quot;records_cleared&quot;: 2102,
+  &quot;backup_created&quot;: &quot;backup_2025-01-12_17-15-30&quot;
+}
+</code></pre>
+<h3>GET /api/backup/stats</h3>
+<p>Get backup and database statistics.</p>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;database&quot;: {
+    &quot;vulnerabilities&quot;: 2102,
+    &quot;tickets&quot;: 234,
+    &quot;imports&quot;: 47,
+    &quot;total_size_mb&quot;: 42.3
+  },
+  &quot;last_backup&quot;: {
+    &quot;date&quot;: &quot;2025-01-12T10:30:00Z&quot;,
+    &quot;size_mb&quot;: 38.7,
+    &quot;type&quot;: &quot;automatic&quot;
+  },
+  &quot;recommendations&quot;: [
+    &quot;Consider backup - last backup was 7 hours ago&quot;
+  ]
+}
+</code></pre>
+<h3>GET /api/docs/stats</h3>
+<p>Documentation system statistics and health.</p>
+<p><strong>Response</strong> <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;documentation&quot;: {
+    &quot;total_files&quot;: 45,
+    &quot;total_size_kb&quot;: 1024,
+    &quot;last_updated&quot;: &quot;2025-01-12T16:00:00Z&quot;,
+    &quot;api_endpoints_documented&quot;: 32,
+    &quot;coverage_percentage&quot;: 95.8
+  },
+  &quot;health&quot;: {
+    &quot;broken_links&quot;: 0,
+    &quot;outdated_content&quot;: 2,
+    &quot;missing_examples&quot;: 1
+  }
+}
+</code></pre>
+<hr>
+<h2>Development and Testing Endpoints</h2>
+<h3>GET /docs-html</h3>
+<p>Serve documentation portal (HTML interface).</p>
+<h3>GET /docs-html/:section.html</h3>
+<p>Serve specific documentation sections.</p>
+<p><strong>Path Parameters</strong>:</p>
+<ul>
+<li><code>section</code> (string): Documentation section name</li>
+</ul>
+<hr>
+<h2>File Upload Specifications</h2>
+<h3>CSV Import Format</h3>
+<p><strong>Supported Columns</strong> (case-insensitive):</p>
+<ul>
+<li><code>hostname</code> (required): Device hostname or FQDN</li>
+<li><code>ip_address</code> (optional): Device IP address</li>
+<li><code>cve</code> (optional): CVE identifier</li>
+<li><code>severity</code> (required): Critical, High, Medium, Low</li>
+<li><code>vpr_score</code> (optional): Vulnerability Priority Rating (0-10)</li>
+<li><code>cvss_score</code> (optional): CVSS Base Score (0-10)</li>
+<li><code>plugin_id</code> (optional): Scanner plugin identifier</li>
+<li><code>plugin_name</code> (optional): Scanner plugin name</li>
+<li><code>description</code> (optional): Vulnerability description</li>
+<li><code>solution</code> (optional): Remediation guidance</li>
+<li><code>first_seen</code> (optional): ISO date string</li>
+<li><code>last_seen</code> (optional): ISO date string</li>
+</ul>
+<p><strong>File Constraints</strong>:</p>
+<ul>
+<li>Maximum file size: 50MB</li>
+<li>Supported formats: CSV, TXT</li>
+<li>Encoding: UTF-8</li>
+<li>Maximum rows: 100,000 per import</li>
+</ul>
+<h3>Backup/Restore Format</h3>
+<p><strong>Supported Formats</strong>:</p>
+<ul>
+<li>JSON: Complete structured export</li>
+<li>CSV: Individual table exports</li>
+<li>ZIP: Compressed multi-table exports</li>
+</ul>
+<p><strong>Restore Options</strong>:</p>
+<ul>
+<li><code>clear_existing</code>: Remove existing data before restore</li>
+<li><code>validate_data</code>: Validate data integrity during restore</li>
+<li><code>create_backup_before_restore</code>: Safety backup before operation</li>
+</ul>
+<hr>
 <p>This comprehensive API reference provides complete technical specifications for integrating with HexTrackr, suitable for security review and development planning.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts

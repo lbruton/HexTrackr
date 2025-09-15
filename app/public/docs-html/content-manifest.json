@@ -1,5 +1,5 @@
 {
-  "generated": "2025-09-14T23:03:22.456Z",
+  "generated": "2025-09-15T01:11:49.239Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -38,30 +38,10 @@
       "icon": "fas fa-building",
       "indexFile": "architecture/index",
       "children": {
-        "accessibility": {
-          "file": "architecture/accessibility",
-          "title": "Accessibility",
-          "path": "architecture/accessibility.html"
-        },
         "backend": {
           "file": "architecture/backend",
           "title": "Backend",
           "path": "architecture/backend.html"
-        },
-        "component-integration": {
-          "file": "architecture/component-integration",
-          "title": "Component Integration",
-          "path": "architecture/component-integration.html"
-        },
-        "data-flow": {
-          "file": "architecture/data-flow",
-          "title": "Data Flow",
-          "path": "architecture/data-flow.html"
-        },
-        "data-lifecycle": {
-          "file": "architecture/data-lifecycle",
-          "title": "Data Lifecycle",
-          "path": "architecture/data-lifecycle.html"
         },
         "data-model": {
           "file": "architecture/data-model",
@@ -73,35 +53,10 @@
           "title": "Database",
           "path": "architecture/database.html"
         },
-        "deployment": {
-          "file": "architecture/deployment",
-          "title": "Deployment",
-          "path": "architecture/deployment.html"
-        },
-        "docker-guide": {
-          "file": "architecture/docker-guide",
-          "title": "Docker Guide",
-          "path": "architecture/docker-guide.html"
-        },
         "frontend": {
           "file": "architecture/frontend",
           "title": "Frontend",
           "path": "architecture/frontend.html"
-        },
-        "monitoring": {
-          "file": "architecture/monitoring",
-          "title": "Monitoring",
-          "path": "architecture/monitoring.html"
-        },
-        "production-setup": {
-          "file": "architecture/production-setup",
-          "title": "Production Setup",
-          "path": "architecture/production-setup.html"
-        },
-        "system-overview": {
-          "file": "architecture/system-overview",
-          "title": "System Overview",
-          "path": "architecture/system-overview.html"
         },
         "technology-stack": {
           "file": "architecture/technology-stack",
@@ -116,15 +71,20 @@
       "indexFile": "getting-started/index",
       "children": {}
     },
-    "operations": {
-      "title": "Operations",
+    "references": {
+      "title": "References",
       "icon": "fas fa-file-alt",
-      "indexFile": "operations/index",
+      "indexFile": "references/index",
       "children": {
-        "deployment-guide": {
-          "file": "operations/deployment-guide",
-          "title": "Deployment Guide",
-          "path": "operations/deployment-guide.html"
+        "function-reference": {
+          "file": "references/function-reference",
+          "title": "Function Reference",
+          "path": "references/function-reference.html"
+        },
+        "websocket-reference": {
+          "file": "references/websocket-reference",
+          "title": "Websocket Reference",
+          "path": "references/websocket-reference.html"
         }
       }
     },
@@ -215,5 +175,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 38
+  "totalFiles": 30
 }
