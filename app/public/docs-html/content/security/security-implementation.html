@@ -6,10 +6,8 @@
 <h2>PathValidator Class</h2>
 <p>The <code>PathValidator</code> class is a critical security component that prevents directory traversal attacks. It ensures that file paths are validated and normalized before being used by the application.</p>
 <h3>Usage</h3>
-<pre><code class="language-javascript">const validator = new PathValidator(&#39;/path/to/base/directory&#39;);
-const safePath = validator.validate(userInput);
-</code></pre>
-<hr>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> validator = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PathValidator</span>(<span class="hljs-string">&#x27;/path/to/base/directory&#x27;</span>);
+<span class="hljs-keyword">const</span> safePath = validator.<span class="hljs-title function_">validate</span>(userInput);</code></pre><hr>
 <h2>Rate Limiting</h2>
 <p>Rate limiting is applied to all API endpoints to prevent abuse and ensure service availability.</p>
 <ul>

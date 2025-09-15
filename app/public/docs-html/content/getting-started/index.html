@@ -13,15 +13,11 @@
 <h3>Running the Application</h3>
 <ol>
 <li><p><strong>Clone the Repository</strong></p>
-<pre><code class="language-bash">git clone https://github.com/Lonnie-Bruton/HexTrackr.git
-cd HexTrackr
-</code></pre>
-</li>
+<pre><code class="language-bash">git <span class="hljs-built_in">clone</span> https://github.com/Lonnie-Bruton/HexTrackr.git
+<span class="hljs-built_in">cd</span> HexTrackr</code></pre></li>
 <li><p><strong>Start the Services</strong></p>
 <p> Use Docker Compose to build the image and run the application in detached mode.</p>
-<pre><code class="language-bash">docker-compose up -d --build
-</code></pre>
-</li>
+<pre><code class="language-bash">docker-compose up -d --build</code></pre></li>
 <li><p><strong>Access HexTrackr</strong></p>
 <p> The application will be available at <code>http://localhost:8989</code>.</p>
 <ul>
@@ -31,9 +27,7 @@ cd HexTrackr
 </ul>
 </li>
 <li><p><strong>Stopping the Application</strong></p>
-<pre><code class="language-bash">docker-compose down
-</code></pre>
-</li>
+<pre><code class="language-bash">docker-compose down</code></pre></li>
 </ol>
 <hr>
 <h2>Local Development Setup (Without Docker)</h2>
@@ -46,24 +40,16 @@ cd HexTrackr
 <h3>Setup Instructions</h3>
 <ol>
 <li><p><strong>Clone the Repository</strong> (if you haven&#39;t already)</p>
-<pre><code class="language-bash">git clone https://github.com/Lonnie-Bruton/HexTrackr.git
-cd HexTrackr
-</code></pre>
-</li>
+<pre><code class="language-bash">git <span class="hljs-built_in">clone</span> https://github.com/Lonnie-Bruton/HexTrackr.git
+<span class="hljs-built_in">cd</span> HexTrackr</code></pre></li>
 <li><p><strong>Install Dependencies</strong></p>
 <p> Install the required Node.js packages.</p>
-<pre><code class="language-bash">npm install
-</code></pre>
-</li>
+<pre><code class="language-bash">npm install</code></pre></li>
 <li><p><strong>Initialize the Database</strong></p>
 <p> This script creates the <code>hextrackr.db</code> SQLite file in the <code>data/</code> directory and sets up the necessary tables.</p>
-<pre><code class="language-bash">node scripts/init-database.js
-</code></pre>
-</li>
+<pre><code class="language-bash">node scripts/init-database.js</code></pre></li>
 <li><p><strong>Start the Development Server</strong></p>
-<pre><code class="language-bash">node server.js
-</code></pre>
-<p> The server will start on port 8080 internally. When running locally without Docker, access the application at <code>http://localhost:8080</code>.</p>
+<pre><code class="language-bash">node server.js</code></pre><p> The server will start on port 8080 internally. When running locally without Docker, access the application at <code>http://localhost:8080</code>.</p>
 <p> <strong>Note</strong>: When using Docker, the application is accessible at <code>http://localhost:8989</code> due to port mapping.</p>
 </li>
 </ol>

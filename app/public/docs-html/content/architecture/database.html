@@ -11,7 +11,7 @@
 <hr>
 <h2>Entity Relationship Diagram (Current)</h2>
 <p>The diagram below reflects the active tables used by the rollover ingestion pipeline and ticketing system. The legacy <code>vulnerabilities</code> table still exists (for backup/export compatibility) but is not part of the primary analytics path.</p>
-<pre><code class="language-mermaid">erDiagram
+<div class="mermaid">erDiagram
     vulnerability_imports ||--o{ vulnerability_snapshots : batches
     vulnerability_imports ||--o{ vulnerabilities_current : source
     vulnerability_imports ||--o{ vulnerability_daily_totals : aggregates
@@ -137,13 +137,11 @@
         INTEGER id PK
         TEXT ticket_id FK
         INTEGER vulnerability_id FK
-    }
-</code></pre>
-<hr>
+    }</div><hr>
 <h2>Data Flows</h2>
 <h3>Vulnerability CSV Import (Rollover Pipeline)</h3>
 <p>This flow shows how a CSV file upload is processed and stored in the database using the rollover architecture.</p>
-<pre><code class="language-mermaid">sequenceDiagram
+<div class="mermaid">sequenceDiagram
     participant User
     participant API as POST /api/vulnerabilities/import
     participant DB as SQLite
@@ -154,11 +152,9 @@
     API-&gt;&gt;DB: UPSERT logic in vulnerabilities_current (implemented as SELECT + conditional INSERT/UPDATE in code)
     API-&gt;&gt;DB: DELETE stale rows from vulnerabilities_current
     API-&gt;&gt;DB: INSERT OR REPLACE vulnerability_daily_totals (aggregates)
-    API--&gt;&gt;User: { success, importId, ... }
-</code></pre>
-<h3>Ticket Creation / Update</h3>
+    API--&gt;&gt;User: { success, importId, ... }</div><h3>Ticket Creation / Update</h3>
 <p>This flow shows the simple process of creating a new ticket.</p>
-<pre><code class="language-mermaid">sequenceDiagram
+<div class="mermaid">sequenceDiagram
     participant User
     participant API as POST /api/tickets
     participant DB as SQLite
@@ -197,10 +193,10 @@ This enables accurate tracking of vulnerability remediation and regression.
 
 | Table | Index | Purpose |
 | ----- | ----- | ------- |
-| vulnerability_snapshots | scan_date, hostname, severity | Historical filtering &amp; trends |
-| vulnerabilities_current | unique_key, scan_date | Fast dedupe lookups &amp; date filtering |
+| vulnerability_snapshots | scan_date, hostname, severity | Historical filtering & trends |
+| vulnerabilities_current | unique_key, scan_date | Fast dedupe lookups & date filtering |
 | vulnerability_daily_totals | scan_date (UNIQUE) | Idempotent aggregates |
-| tickets | multiple (location, status, date_submitted, date_due, external refs) | UI filtering &amp; reporting |
+| tickets | multiple (location, status, date_submitted, date_due, external refs) | UI filtering & reporting |
 | sites / locations | code (UNIQUE) | Lookup by code |
 
 ---
@@ -221,7 +217,7 @@ Database migrations are handled automatically by the application. For more infor
 
 ---
 
-## Data Integrity &amp; Future Enhancements
+## Data Integrity & Future Enhancements
 
 | Area | Current | Planned |
 | ---- | ------- | ------- |
@@ -232,9 +228,7 @@ Database migrations are handled automatically by the application. For more infor
 
 ---
 
-This document reflects the schema as of the current release cycle. Re-run architecture analysis after structural migrations or table additions.
-</code></pre>
-
+This document reflects the schema as of the current release cycle. Re-run architecture analysis after structural migrations or table additions.</div>
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
              fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->

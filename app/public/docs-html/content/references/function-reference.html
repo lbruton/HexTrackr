@@ -6,76 +6,42 @@
 <h2>Backend Functions (server.js)</h2>
 <h3>Security &amp; Validation</h3>
 <h4>PathValidator Class</h4>
-<pre><code class="language-javascript">PathValidator.validatePath(filePath: string): string
-</code></pre>
-<p><strong>Purpose</strong>: Validates file paths against traversal attacks and malformed paths<br><strong>Parameters</strong>: <code>filePath</code> - Path to validate<br><strong>Returns</strong>: Normalized, validated path<br><strong>Throws</strong>: Error on invalid paths or traversal attempts<br><strong>Location</strong>: <code>server.js:23-44</code></p>
-<pre><code class="language-javascript">PathValidator.safeReadFileSync(filePath: string, options?: string): string
-</code></pre>
-<p><strong>Purpose</strong>: Safely read files with path validation<br><strong>Parameters</strong>: <code>filePath</code> - File to read, <code>options</code> - Encoding options<br><strong>Returns</strong>: File contents<br><strong>Location</strong>: <code>server.js:46-49</code></p>
-<pre><code class="language-javascript">PathValidator.safeWriteFileSync(filePath: string, data: any, options?: string): void
-</code></pre>
-<p><strong>Purpose</strong>: Safely write files with path validation<br><strong>Parameters</strong>: <code>filePath</code> - Target file, <code>data</code> - Content to write<br><strong>Location</strong>: <code>server.js:51-54</code></p>
-<pre><code class="language-javascript">PathValidator.safeExistsSync(filePath: string): boolean
-</code></pre>
-<p><strong>Purpose</strong>: Check file existence with path validation<br><strong>Parameters</strong>: <code>filePath</code> - File to check<br><strong>Returns</strong>: True if file exists and path is valid<br><strong>Location</strong>: <code>server.js:66-73</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">validatePath</span>(<span class="hljs-attr">filePath</span>: string): string</code></pre><p><strong>Purpose</strong>: Validates file paths against traversal attacks and malformed paths<br><strong>Parameters</strong>: <code>filePath</code> - Path to validate<br><strong>Returns</strong>: Normalized, validated path<br><strong>Throws</strong>: Error on invalid paths or traversal attempts<br><strong>Location</strong>: <code>server.js:23-44</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeReadFileSync</span>(<span class="hljs-attr">filePath</span>: string, options?: string): string</code></pre><p><strong>Purpose</strong>: Safely read files with path validation<br><strong>Parameters</strong>: <code>filePath</code> - File to read, <code>options</code> - Encoding options<br><strong>Returns</strong>: File contents<br><strong>Location</strong>: <code>server.js:46-49</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeWriteFileSync</span>(<span class="hljs-attr">filePath</span>: string, <span class="hljs-attr">data</span>: any, options?: string): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Safely write files with path validation<br><strong>Parameters</strong>: <code>filePath</code> - Target file, <code>data</code> - Content to write<br><strong>Location</strong>: <code>server.js:51-54</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeExistsSync</span>(<span class="hljs-attr">filePath</span>: string): boolean</code></pre><p><strong>Purpose</strong>: Check file existence with path validation<br><strong>Parameters</strong>: <code>filePath</code> - File to check<br><strong>Returns</strong>: True if file exists and path is valid<br><strong>Location</strong>: <code>server.js:66-73</code></p>
 <h3>Progress Tracking</h3>
 <h4>ProgressTracker Class</h4>
-<pre><code class="language-javascript">ProgressTracker.createSession(metadata?: object): string
-</code></pre>
-<p><strong>Purpose</strong>: Create new progress tracking session<br><strong>Parameters</strong>: <code>metadata</code> - Optional session metadata<br><strong>Returns</strong>: Session UUID<br><strong>Location</strong>: <code>server.js:94-97</code></p>
-<pre><code class="language-javascript">ProgressTracker.updateProgress(sessionId: string, progress: number, metadata?: object): void
-</code></pre>
-<p><strong>Purpose</strong>: Update session progress with throttling<br><strong>Parameters</strong>: <code>sessionId</code> - Session identifier, <code>progress</code> - Progress value (0-1), <code>metadata</code> - Additional data<br><strong>Location</strong>: <code>server.js:130-150</code></p>
-<pre><code class="language-javascript">ProgressTracker.completeSession(sessionId: string, result?: object): void
-</code></pre>
-<p><strong>Purpose</strong>: Mark session as complete and emit completion event<br><strong>Parameters</strong>: <code>sessionId</code> - Session identifier, <code>result</code> - Final result data<br><strong>Location</strong>: <code>server.js:165-180</code></p>
-<pre><code class="language-javascript">ProgressTracker.cleanupStaleSessions(): void
-</code></pre>
-<p><strong>Purpose</strong>: Remove sessions older than cleanup interval<br><strong>Location</strong>: <code>server.js:200-220</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">ProgressTracker</span>.<span class="hljs-title function_">createSession</span>(metadata?: object): string</code></pre><p><strong>Purpose</strong>: Create new progress tracking session<br><strong>Parameters</strong>: <code>metadata</code> - Optional session metadata<br><strong>Returns</strong>: Session UUID<br><strong>Location</strong>: <code>server.js:94-97</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">ProgressTracker</span>.<span class="hljs-title function_">updateProgress</span>(<span class="hljs-attr">sessionId</span>: string, <span class="hljs-attr">progress</span>: number, metadata?: object): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Update session progress with throttling<br><strong>Parameters</strong>: <code>sessionId</code> - Session identifier, <code>progress</code> - Progress value (0-1), <code>metadata</code> - Additional data<br><strong>Location</strong>: <code>server.js:130-150</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">ProgressTracker</span>.<span class="hljs-title function_">completeSession</span>(<span class="hljs-attr">sessionId</span>: string, result?: object): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Mark session as complete and emit completion event<br><strong>Parameters</strong>: <code>sessionId</code> - Session identifier, <code>result</code> - Final result data<br><strong>Location</strong>: <code>server.js:165-180</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">ProgressTracker</span>.<span class="hljs-title function_">cleanupStaleSessions</span>(): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Remove sessions older than cleanup interval<br><strong>Location</strong>: <code>server.js:200-220</code></p>
 <h3>Vulnerability Processing</h3>
 <h4>Data Normalization</h4>
-<pre><code class="language-javascript">normalizeHostname(hostname: string): string
-</code></pre>
-<p><strong>Purpose</strong>: Normalize hostname by removing domain suffixes and standardizing case<br><strong>Parameters</strong>: <code>hostname</code> - Raw hostname from CSV<br><strong>Returns</strong>: Normalized hostname<br><strong>Example</strong>: <code>&quot;web01.corp.local&quot;</code> → <code>&quot;web01&quot;</code><br><strong>Location</strong>: <code>server.js:350-365</code></p>
-<pre><code class="language-javascript">normalizeIPAddress(ipAddress: string): string
-</code></pre>
-<p><strong>Purpose</strong>: Validate and normalize IP addresses<br><strong>Parameters</strong>: <code>ipAddress</code> - Raw IP address<br><strong>Returns</strong>: Normalized IP or null if invalid<br><strong>Location</strong>: <code>server.js:367-380</code></p>
-<pre><code class="language-javascript">createDescriptionHash(description: string): string
-</code></pre>
-<p><strong>Purpose</strong>: Generate consistent hash for vulnerability descriptions<br><strong>Parameters</strong>: <code>description</code> - Vulnerability description text<br><strong>Returns</strong>: SHA-256 hash (first 12 characters)<br><strong>Location</strong>: <code>server.js:382-390</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">normalizeHostname</span>(<span class="hljs-attr">hostname</span>: string): string</code></pre><p><strong>Purpose</strong>: Normalize hostname by removing domain suffixes and standardizing case<br><strong>Parameters</strong>: <code>hostname</code> - Raw hostname from CSV<br><strong>Returns</strong>: Normalized hostname<br><strong>Example</strong>: <code>&quot;web01.corp.local&quot;</code> → <code>&quot;web01&quot;</code><br><strong>Location</strong>: <code>server.js:350-365</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">normalizeIPAddress</span>(<span class="hljs-attr">ipAddress</span>: string): string</code></pre><p><strong>Purpose</strong>: Validate and normalize IP addresses<br><strong>Parameters</strong>: <code>ipAddress</code> - Raw IP address<br><strong>Returns</strong>: Normalized IP or null if invalid<br><strong>Location</strong>: <code>server.js:367-380</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">createDescriptionHash</span>(<span class="hljs-attr">description</span>: string): string</code></pre><p><strong>Purpose</strong>: Generate consistent hash for vulnerability descriptions<br><strong>Parameters</strong>: <code>description</code> - Vulnerability description text<br><strong>Returns</strong>: SHA-256 hash (first 12 characters)<br><strong>Location</strong>: <code>server.js:382-390</code></p>
 <h4>Enhanced Deduplication</h4>
-<pre><code class="language-javascript">generateEnhancedUniqueKey(mapped: VulnerabilityData): string
-</code></pre>
-<p><strong>Purpose</strong>: Generate unique key using 4-tier strategy for deduplication<br><strong>Parameters</strong>: <code>mapped</code> - Processed vulnerability data object<br><strong>Returns</strong>: Unique key string with tier prefix<br><strong>Algorithm</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">generateEnhancedUniqueKey</span>(<span class="hljs-attr">mapped</span>: <span class="hljs-title class_">VulnerabilityData</span>): string</code></pre><p><strong>Purpose</strong>: Generate unique key using 4-tier strategy for deduplication<br><strong>Parameters</strong>: <code>mapped</code> - Processed vulnerability data object<br><strong>Returns</strong>: Unique key string with tier prefix<br><strong>Algorithm</strong>:</p>
 <ol>
 <li><code>asset:${assetId}|plugin:${pluginId}</code> (highest reliability)</li>
 <li><code>cve:${cve}|host:${hostIdentifier}</code> (CVE-based)</li>
 <li><code>plugin:${pluginId}|host:${hostIdentifier}|vendor:${vendor}</code> (plugin-based)</li>
 <li><code>desc:${descriptionHash}|host:${hostIdentifier}</code> (fallback)<br><strong>Location</strong>: <code>server.js:507-533</code></li>
 </ol>
-<pre><code class="language-javascript">getUniqueKeyReliability(uniqueKey: string): number
-</code></pre>
-<p><strong>Purpose</strong>: Score unique key reliability for conflict resolution<br><strong>Parameters</strong>: <code>uniqueKey</code> - Generated unique key<br><strong>Returns</strong>: Reliability score (1-5, lower is better)<br><strong>Location</strong>: <code>server.js:495-504</code></p>
-<pre><code class="language-javascript">generateUniqueKey(mapped: VulnerabilityData): string
-</code></pre>
-<p><strong>Purpose</strong>: Legacy unique key generation (maintained for compatibility)<br><strong>Parameters</strong>: <code>mapped</code> - Vulnerability data object<br><strong>Returns</strong>: Legacy format unique key<br><strong>Status</strong>: Deprecated, use <code>generateEnhancedUniqueKey</code><br><strong>Location</strong>: <code>server.js:536-557</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getUniqueKeyReliability</span>(<span class="hljs-attr">uniqueKey</span>: string): number</code></pre><p><strong>Purpose</strong>: Score unique key reliability for conflict resolution<br><strong>Parameters</strong>: <code>uniqueKey</code> - Generated unique key<br><strong>Returns</strong>: Reliability score (1-5, lower is better)<br><strong>Location</strong>: <code>server.js:495-504</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">generateUniqueKey</span>(<span class="hljs-attr">mapped</span>: <span class="hljs-title class_">VulnerabilityData</span>): string</code></pre><p><strong>Purpose</strong>: Legacy unique key generation (maintained for compatibility)<br><strong>Parameters</strong>: <code>mapped</code> - Vulnerability data object<br><strong>Returns</strong>: Legacy format unique key<br><strong>Status</strong>: Deprecated, use <code>generateEnhancedUniqueKey</code><br><strong>Location</strong>: <code>server.js:536-557</code></p>
 <h4>Data Mapping</h4>
-<pre><code class="language-javascript">mapVulnerabilityRow(row: object): VulnerabilityData[]
-</code></pre>
-<p><strong>Purpose</strong>: Transform CSV row into standardized vulnerability objects<br><strong>Parameters</strong>: <code>row</code> - Raw CSV row object<br><strong>Returns</strong>: Array of vulnerability objects (handles multi-CVE rows)<br><strong>Features</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">mapVulnerabilityRow</span>(<span class="hljs-attr">row</span>: object): <span class="hljs-title class_">VulnerabilityData</span>[]</code></pre><p><strong>Purpose</strong>: Transform CSV row into standardized vulnerability objects<br><strong>Parameters</strong>: <code>row</code> - Raw CSV row object<br><strong>Returns</strong>: Array of vulnerability objects (handles multi-CVE rows)<br><strong>Features</strong>:</p>
 <ul>
 <li>Multi-CVE splitting on comma/semicolon</li>
 <li>Field normalization and validation</li>
 <li>Severity standardization</li>
 <li>Vendor-specific field mapping<br><strong>Location</strong>: <code>server.js:1100-1200</code></li>
 </ul>
-<pre><code class="language-javascript">mapColumnName(columnName: string): string
-</code></pre>
-<p><strong>Purpose</strong>: Map vendor-specific column names to standard fields<br><strong>Parameters</strong>: <code>columnName</code> - Original column header<br><strong>Returns</strong>: Standardized field name<br><strong>Mappings</strong>: Handles Tenable, Cisco, Qualys, and generic formats<br><strong>Location</strong>: <code>server.js:1050-1100</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">mapColumnName</span>(<span class="hljs-attr">columnName</span>: string): string</code></pre><p><strong>Purpose</strong>: Map vendor-specific column names to standard fields<br><strong>Parameters</strong>: <code>columnName</code> - Original column header<br><strong>Returns</strong>: Standardized field name<br><strong>Mappings</strong>: Handles Tenable, Cisco, Qualys, and generic formats<br><strong>Location</strong>: <code>server.js:1050-1100</code></p>
 <h4>Rollover Processing</h4>
-<pre><code class="language-javascript">_processVulnerabilityRowsWithRollover(rows: object[], stmt: Statement, importId: number, filePath: string, responseData: object, res: Response, scanDate?: string): void
-</code></pre>
-<p><strong>Purpose</strong>: Process vulnerability import with rollover architecture<br><strong>Parameters</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">_processVulnerabilityRowsWithRollover</span>(<span class="hljs-attr">rows</span>: object[], <span class="hljs-attr">stmt</span>: <span class="hljs-title class_">Statement</span>, <span class="hljs-attr">importId</span>: number, <span class="hljs-attr">filePath</span>: string, <span class="hljs-attr">responseData</span>: object, <span class="hljs-attr">res</span>: <span class="hljs-title class_">Response</span>, scanDate?: string): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Process vulnerability import with rollover architecture<br><strong>Parameters</strong>:</p>
 <ul>
 <li><code>rows</code> - Parsed CSV rows</li>
 <li><code>stmt</code> - Database statement (legacy)</li>
@@ -89,12 +55,8 @@
 <li>Stale vulnerability cleanup</li>
 <li>Daily totals aggregation<br><strong>Location</strong>: <code>server.js:559-800</code></li>
 </ul>
-<pre><code class="language-javascript">processNextRow(index: number): void
-</code></pre>
-<p><strong>Purpose</strong>: Sequential row processing within rollover function<br><strong>Parameters</strong>: <code>index</code> - Current row index<br><strong>Features</strong>: Prevents race conditions in async database operations<br><strong>Location</strong>: <code>server.js:586-700</code></p>
-<pre><code class="language-javascript">finalizeBatch(): void
-</code></pre>
-<p><strong>Purpose</strong>: Complete import batch processing and update daily totals<br><strong>Features</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">processNextRow</span>(<span class="hljs-attr">index</span>: number): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Sequential row processing within rollover function<br><strong>Parameters</strong>: <code>index</code> - Current row index<br><strong>Features</strong>: Prevents race conditions in async database operations<br><strong>Location</strong>: <code>server.js:586-700</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">finalizeBatch</span>(): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Complete import batch processing and update daily totals<br><strong>Features</strong>:</p>
 <ul>
 <li>Remove stale vulnerabilities not seen in current scan</li>
 <li>Update vulnerability_daily_totals table</li>
@@ -102,155 +64,99 @@
 </ul>
 <h3>Database Operations</h3>
 <h4>Table Management</h4>
-<pre><code class="language-javascript">ensureRolloverTablesExist(): void
-</code></pre>
-<p><strong>Purpose</strong>: Create rollover tables if they don&#39;t exist (idempotent)<br><strong>Tables Created</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">ensureRolloverTablesExist</span>(): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Create rollover tables if they don&#39;t exist (idempotent)<br><strong>Tables Created</strong>:</p>
 <ul>
 <li><code>vulnerabilities_current</code></li>
 <li><code>vulnerability_snapshots</code></li>
 <li><code>vulnerability_daily_totals</code><br><strong>Location</strong>: <code>server.js:200-300</code></li>
 </ul>
-<pre><code class="language-javascript">addMissingColumns(): void
-</code></pre>
-<p><strong>Purpose</strong>: Add new columns to existing tables for backward compatibility<br><strong>Features</strong>: Idempotent ALTER TABLE operations<br><strong>Location</strong>: <code>server.js:150-200</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">addMissingColumns</span>(): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Add new columns to existing tables for backward compatibility<br><strong>Features</strong>: Idempotent ALTER TABLE operations<br><strong>Location</strong>: <code>server.js:150-200</code></p>
 <h4>Data Queries</h4>
-<pre><code class="language-javascript">getVulnerabilityStats(): Promise&lt;object&gt;
-</code></pre>
-<p><strong>Purpose</strong>: Calculate comprehensive vulnerability statistics<br><strong>Returns</strong>: Object with severity distributions, totals, and trends<br><strong>Queries</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getVulnerabilityStats</span>(): <span class="hljs-title class_">Promise</span>&lt;object&gt;</code></pre><p><strong>Purpose</strong>: Calculate comprehensive vulnerability statistics<br><strong>Returns</strong>: Object with severity distributions, totals, and trends<br><strong>Queries</strong>:</p>
 <ul>
 <li>Severity breakdowns with percentages</li>
 <li>Active vs resolved counts</li>
 <li>Unique host and CVE counts</li>
 <li>Temporal trend calculations<br><strong>Location</strong>: <code>server.js:900-950</code></li>
 </ul>
-<pre><code class="language-javascript">getVulnerabilityTrends(startDate?: string, endDate?: string): Promise&lt;object&gt;
-</code></pre>
-<p><strong>Purpose</strong>: Generate historical trend data<br><strong>Parameters</strong>: Optional date range filters<br><strong>Returns</strong>: Time-series data for charting<br><strong>Location</strong>: <code>server.js:950-1000</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getVulnerabilityTrends</span>(startDate?: string, endDate?: string): <span class="hljs-title class_">Promise</span>&lt;object&gt;</code></pre><p><strong>Purpose</strong>: Generate historical trend data<br><strong>Parameters</strong>: Optional date range filters<br><strong>Returns</strong>: Time-series data for charting<br><strong>Location</strong>: <code>server.js:950-1000</code></p>
 <hr>
 <h2>Frontend Functions</h2>
 <h3>Core Orchestrator</h3>
 <h4>VulnerabilityCoreOrchestrator</h4>
-<pre><code class="language-javascript">VulnerabilityCoreOrchestrator.initializeAllModules(parentManager: ModernVulnManager): Promise&lt;void&gt;
-</code></pre>
-<p><strong>Purpose</strong>: Initialize and wire all specialized manager modules<br><strong>Parameters</strong>: <code>parentManager</code> - Main page manager instance<br><strong>Features</strong>: Creates all manager instances and establishes communication<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-core.js:50-100</code></p>
-<pre><code class="language-javascript">VulnerabilityCoreOrchestrator.switchView(view: string): void
-</code></pre>
-<p><strong>Purpose</strong>: Coordinate view changes across all modules<br><strong>Parameters</strong>: <code>view</code> - Target view (&#39;grid&#39;, &#39;cards&#39;, &#39;charts&#39;)<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-core.js:150-180</code></p>
-<pre><code class="language-javascript">VulnerabilityCoreOrchestrator.loadData(): Promise&lt;void&gt;
-</code></pre>
-<p><strong>Purpose</strong>: Orchestrate data loading across all modules<br><strong>Features</strong>: Coordinates data fetching, processing, and UI updates<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-core.js:200-250</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">VulnerabilityCoreOrchestrator</span>.<span class="hljs-title function_">initializeAllModules</span>(<span class="hljs-attr">parentManager</span>: <span class="hljs-title class_">ModernVulnManager</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-keyword">void</span>&gt;</code></pre><p><strong>Purpose</strong>: Initialize and wire all specialized manager modules<br><strong>Parameters</strong>: <code>parentManager</code> - Main page manager instance<br><strong>Features</strong>: Creates all manager instances and establishes communication<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-core.js:50-100</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">VulnerabilityCoreOrchestrator</span>.<span class="hljs-title function_">switchView</span>(<span class="hljs-attr">view</span>: string): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Coordinate view changes across all modules<br><strong>Parameters</strong>: <code>view</code> - Target view (&#39;grid&#39;, &#39;cards&#39;, &#39;charts&#39;)<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-core.js:150-180</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">VulnerabilityCoreOrchestrator</span>.<span class="hljs-title function_">loadData</span>(): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-keyword">void</span>&gt;</code></pre><p><strong>Purpose</strong>: Orchestrate data loading across all modules<br><strong>Features</strong>: Coordinates data fetching, processing, and UI updates<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-core.js:200-250</code></p>
 <h3>Data Management</h3>
 <h4>VulnerabilityDataManager</h4>
-<pre><code class="language-javascript">VulnerabilityDataManager.fetchVulnerabilities(params: object): Promise&lt;VulnerabilityResponse&gt;
-</code></pre>
-<p><strong>Purpose</strong>: Fetch vulnerability data with caching and error handling<br><strong>Parameters</strong>: <code>params</code> - Query parameters (page, limit, filters)<br><strong>Returns</strong>: Promise resolving to vulnerability data and pagination info<br><strong>Features</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title class_">VulnerabilityDataManager</span>.<span class="hljs-title function_">fetchVulnerabilities</span>(<span class="hljs-attr">params</span>: object): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">VulnerabilityResponse</span>&gt;</code></pre><p><strong>Purpose</strong>: Fetch vulnerability data with caching and error handling<br><strong>Parameters</strong>: <code>params</code> - Query parameters (page, limit, filters)<br><strong>Returns</strong>: Promise resolving to vulnerability data and pagination info<br><strong>Features</strong>:</p>
 <ul>
 <li>Intelligent caching with TTL</li>
 <li>Request deduplication</li>
 <li>Error retry logic<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-data.js:50-100</code></li>
 </ul>
-<pre><code class="language-javascript">VulnerabilityDataManager.importCSV(file: File, options: object): Promise&lt;ImportResult&gt;
-</code></pre>
-<p><strong>Purpose</strong>: Handle CSV file import with progress tracking<br><strong>Parameters</strong>: <code>file</code> - File object, <code>options</code> - Import configuration<br><strong>Returns</strong>: Promise resolving to import results<br><strong>Features</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title class_">VulnerabilityDataManager</span>.<span class="hljs-title function_">importCSV</span>(<span class="hljs-attr">file</span>: <span class="hljs-title class_">File</span>, <span class="hljs-attr">options</span>: object): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">ImportResult</span>&gt;</code></pre><p><strong>Purpose</strong>: Handle CSV file import with progress tracking<br><strong>Parameters</strong>: <code>file</code> - File object, <code>options</code> - Import configuration<br><strong>Returns</strong>: Promise resolving to import results<br><strong>Features</strong>:</p>
 <ul>
 <li>WebSocket progress updates</li>
 <li>File validation</li>
 <li>Error handling and recovery<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-data.js:200-300</code></li>
 </ul>
-<pre><code class="language-javascript">VulnerabilityDataManager.clearCache(): void
-</code></pre>
-<p><strong>Purpose</strong>: Clear cached data and force refresh<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-data.js:350-370</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">VulnerabilityDataManager</span>.<span class="hljs-title function_">clearCache</span>(): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Clear cached data and force refresh<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-data.js:350-370</code></p>
 <h3>Chart Management</h3>
 <h4>VulnerabilityChartManager</h4>
-<pre><code class="language-javascript">VulnerabilityChartManager.initializeCharts(): Promise&lt;void&gt;
-</code></pre>
-<p><strong>Purpose</strong>: Initialize ApexCharts with theme-aware configuration<br><strong>Features</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title class_">VulnerabilityChartManager</span>.<span class="hljs-title function_">initializeCharts</span>(): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-keyword">void</span>&gt;</code></pre><p><strong>Purpose</strong>: Initialize ApexCharts with theme-aware configuration<br><strong>Features</strong>:</p>
 <ul>
 <li>Multi-layer initialization strategy</li>
 <li>Theme detection and application</li>
 <li>Fallback handling for theme loading issues<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-chart-manager.js:100-150</code></li>
 </ul>
-<pre><code class="language-javascript">VulnerabilityChartManager.updateCharts(data: VulnerabilityData): void
-</code></pre>
-<p><strong>Purpose</strong>: Update all charts with new data<br><strong>Parameters</strong>: <code>data</code> - New vulnerability dataset<br><strong>Features</strong>: Smooth transitions and performance optimization<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-chart-manager.js:300-400</code></p>
-<pre><code class="language-javascript">VulnerabilityChartManager.applyTheme(theme: string): void
-</code></pre>
-<p><strong>Purpose</strong>: Apply theme changes to all chart instances<br><strong>Parameters</strong>: <code>theme</code> - Theme identifier (&#39;light&#39;, &#39;dark&#39;)<br><strong>Features</strong>: Dynamic theme switching without recreation<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-chart-manager.js:500-600</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">VulnerabilityChartManager</span>.<span class="hljs-title function_">updateCharts</span>(<span class="hljs-attr">data</span>: <span class="hljs-title class_">VulnerabilityData</span>): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Update all charts with new data<br><strong>Parameters</strong>: <code>data</code> - New vulnerability dataset<br><strong>Features</strong>: Smooth transitions and performance optimization<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-chart-manager.js:300-400</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">VulnerabilityChartManager</span>.<span class="hljs-title function_">applyTheme</span>(<span class="hljs-attr">theme</span>: string): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Apply theme changes to all chart instances<br><strong>Parameters</strong>: <code>theme</code> - Theme identifier (&#39;light&#39;, &#39;dark&#39;)<br><strong>Features</strong>: Dynamic theme switching without recreation<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-chart-manager.js:500-600</code></p>
 <h3>WebSocket Communication</h3>
 <h4>WebSocketClient</h4>
-<pre><code class="language-javascript">WebSocketClient.connect(): Promise&lt;boolean&gt;
-</code></pre>
-<p><strong>Purpose</strong>: Establish WebSocket connection with retry logic<br><strong>Returns</strong>: Promise resolving to connection success<br><strong>Features</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title class_">WebSocketClient</span>.<span class="hljs-title function_">connect</span>(): <span class="hljs-title class_">Promise</span>&lt;boolean&gt;</code></pre><p><strong>Purpose</strong>: Establish WebSocket connection with retry logic<br><strong>Returns</strong>: Promise resolving to connection success<br><strong>Features</strong>:</p>
 <ul>
 <li>Automatic reconnection with exponential backoff</li>
 <li>Connection timeout handling</li>
 <li>Transport fallback (WebSocket → polling)<br><strong>Location</strong>: <code>/scripts/shared/websocket-client.js:41-89</code></li>
 </ul>
-<pre><code class="language-javascript">WebSocketClient.subscribe(eventType: string, callback: Function): void
-</code></pre>
-<p><strong>Purpose</strong>: Subscribe to WebSocket events with callback registration<br><strong>Parameters</strong>: <code>eventType</code> - Event name, <code>callback</code> - Handler function<br><strong>Location</strong>: <code>/scripts/shared/websocket-client.js:150-170</code></p>
-<pre><code class="language-javascript">WebSocketClient.handleProgressUpdate(data: ProgressData): void
-</code></pre>
-<p><strong>Purpose</strong>: Process progress updates with throttling<br><strong>Parameters</strong>: <code>data</code> - Progress update data<br><strong>Features</strong>: Client-side throttling to prevent UI overload<br><strong>Location</strong>: <code>/scripts/shared/websocket-client.js:200-250</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">WebSocketClient</span>.<span class="hljs-title function_">subscribe</span>(<span class="hljs-attr">eventType</span>: string, <span class="hljs-attr">callback</span>: <span class="hljs-title class_">Function</span>): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Subscribe to WebSocket events with callback registration<br><strong>Parameters</strong>: <code>eventType</code> - Event name, <code>callback</code> - Handler function<br><strong>Location</strong>: <code>/scripts/shared/websocket-client.js:150-170</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">WebSocketClient</span>.<span class="hljs-title function_">handleProgressUpdate</span>(<span class="hljs-attr">data</span>: <span class="hljs-title class_">ProgressData</span>): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Process progress updates with throttling<br><strong>Parameters</strong>: <code>data</code> - Progress update data<br><strong>Features</strong>: Client-side throttling to prevent UI overload<br><strong>Location</strong>: <code>/scripts/shared/websocket-client.js:200-250</code></p>
 <h3>Grid Management</h3>
 <h4>VulnerabilityGridManager</h4>
-<pre><code class="language-javascript">VulnerabilityGridManager.initializeGrid(): void
-</code></pre>
-<p><strong>Purpose</strong>: Configure and initialize AG-Grid with custom renderers<br><strong>Features</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title class_">VulnerabilityGridManager</span>.<span class="hljs-title function_">initializeGrid</span>(): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Configure and initialize AG-Grid with custom renderers<br><strong>Features</strong>:</p>
 <ul>
 <li>Virtual scrolling for performance</li>
 <li>Custom cell renderers for CVE links</li>
 <li>Responsive column configuration<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-grid.js:50-150</code></li>
 </ul>
-<pre><code class="language-javascript">VulnerabilityGridManager.updateGridData(data: VulnerabilityData[]): void
-</code></pre>
-<p><strong>Purpose</strong>: Update grid with new dataset<br><strong>Parameters</strong>: <code>data</code> - Array of vulnerability objects<br><strong>Features</strong>: Efficient data updates without full re-render<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-grid.js:200-250</code></p>
-<pre><code class="language-javascript">VulnerabilityGridManager.exportToCsv(): void
-</code></pre>
-<p><strong>Purpose</strong>: Export current grid data to CSV format<br><strong>Features</strong>: Respects current filters and sorting<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-grid.js:400-450</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">VulnerabilityGridManager</span>.<span class="hljs-title function_">updateGridData</span>(<span class="hljs-attr">data</span>: <span class="hljs-title class_">VulnerabilityData</span>[]): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Update grid with new dataset<br><strong>Parameters</strong>: <code>data</code> - Array of vulnerability objects<br><strong>Features</strong>: Efficient data updates without full re-render<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-grid.js:200-250</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">VulnerabilityGridManager</span>.<span class="hljs-title function_">exportToCsv</span>(): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Export current grid data to CSV format<br><strong>Features</strong>: Respects current filters and sorting<br><strong>Location</strong>: <code>/scripts/shared/vulnerability-grid.js:400-450</code></p>
 <h3>Theme Management</h3>
 <h4>ThemeController</h4>
-<pre><code class="language-javascript">ThemeController.setTheme(theme: string): void
-</code></pre>
-<p><strong>Purpose</strong>: Apply theme across all UI components<br><strong>Parameters</strong>: <code>theme</code> - Theme identifier<br><strong>Features</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title class_">ThemeController</span>.<span class="hljs-title function_">setTheme</span>(<span class="hljs-attr">theme</span>: string): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Apply theme across all UI components<br><strong>Parameters</strong>: <code>theme</code> - Theme identifier<br><strong>Features</strong>:</p>
 <ul>
 <li>Cross-tab synchronization</li>
 <li>Component notification system</li>
 <li>WCAG compliance validation<br><strong>Location</strong>: <code>/scripts/shared/theme-controller.js:100-150</code></li>
 </ul>
-<pre><code class="language-javascript">ThemeController.getTheme(): string
-</code></pre>
-<p><strong>Purpose</strong>: Get current theme setting<br><strong>Returns</strong>: Current theme identifier<br><strong>Location</strong>: <code>/scripts/shared/theme-controller.js:50-70</code></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">ThemeController</span>.<span class="hljs-title function_">getTheme</span>(): string</code></pre><p><strong>Purpose</strong>: Get current theme setting<br><strong>Returns</strong>: Current theme identifier<br><strong>Location</strong>: <code>/scripts/shared/theme-controller.js:50-70</code></p>
 <h3>Security Functions</h3>
 <h4>Security Utilities</h4>
-<pre><code class="language-javascript">sanitizeInput(input: string): string
-</code></pre>
-<p><strong>Purpose</strong>: Sanitize user input for XSS prevention<br><strong>Parameters</strong>: <code>input</code> - User-provided string<br><strong>Returns</strong>: Sanitized string safe for DOM insertion<br><strong>Features</strong>: Uses DOMPurify for comprehensive sanitization<br><strong>Location</strong>: <code>/scripts/utils/security.js:20-30</code></p>
-<pre><code class="language-javascript">validateCVE(cveId: string): boolean
-</code></pre>
-<p><strong>Purpose</strong>: Validate CVE identifier format<br><strong>Parameters</strong>: <code>cveId</code> - CVE identifier string<br><strong>Returns</strong>: True if valid CVE format<br><strong>Pattern</strong>: <code>CVE-YYYY-NNNN</code> format validation<br><strong>Location</strong>: <code>/scripts/shared/cve-utilities.js:10-25</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">sanitizeInput</span>(<span class="hljs-attr">input</span>: string): string</code></pre><p><strong>Purpose</strong>: Sanitize user input for XSS prevention<br><strong>Parameters</strong>: <code>input</code> - User-provided string<br><strong>Returns</strong>: Sanitized string safe for DOM insertion<br><strong>Features</strong>: Uses DOMPurify for comprehensive sanitization<br><strong>Location</strong>: <code>/scripts/utils/security.js:20-30</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">validateCVE</span>(<span class="hljs-attr">cveId</span>: string): boolean</code></pre><p><strong>Purpose</strong>: Validate CVE identifier format<br><strong>Parameters</strong>: <code>cveId</code> - CVE identifier string<br><strong>Returns</strong>: True if valid CVE format<br><strong>Pattern</strong>: <code>CVE-YYYY-NNNN</code> format validation<br><strong>Location</strong>: <code>/scripts/shared/cve-utilities.js:10-25</code></p>
 <hr>
 <h2>Utility Functions</h2>
 <h3>Data Processing</h3>
-<pre><code class="language-javascript">debounce(func: Function, delay: number): Function
-</code></pre>
-<p><strong>Purpose</strong>: Create debounced function for performance optimization<br><strong>Parameters</strong>: <code>func</code> - Function to debounce, <code>delay</code> - Delay in milliseconds<br><strong>Returns</strong>: Debounced function wrapper<br><strong>Usage</strong>: Search input handling, resize events<br><strong>Location</strong>: <code>/scripts/utils/performance.js:10-25</code></p>
-<pre><code class="language-javascript">formatDate(date: Date, format: string): string
-</code></pre>
-<p><strong>Purpose</strong>: Format dates for display<br><strong>Parameters</strong>: <code>date</code> - Date object, <code>format</code> - Format string<br><strong>Returns</strong>: Formatted date string<br><strong>Location</strong>: <code>/scripts/utils/formatting.js:30-50</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">debounce</span>(<span class="hljs-attr">func</span>: <span class="hljs-title class_">Function</span>, <span class="hljs-attr">delay</span>: number): <span class="hljs-title class_">Function</span></code></pre><p><strong>Purpose</strong>: Create debounced function for performance optimization<br><strong>Parameters</strong>: <code>func</code> - Function to debounce, <code>delay</code> - Delay in milliseconds<br><strong>Returns</strong>: Debounced function wrapper<br><strong>Usage</strong>: Search input handling, resize events<br><strong>Location</strong>: <code>/scripts/utils/performance.js:10-25</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">formatDate</span>(<span class="hljs-attr">date</span>: <span class="hljs-title class_">Date</span>, <span class="hljs-attr">format</span>: string): string</code></pre><p><strong>Purpose</strong>: Format dates for display<br><strong>Parameters</strong>: <code>date</code> - Date object, <code>format</code> - Format string<br><strong>Returns</strong>: Formatted date string<br><strong>Location</strong>: <code>/scripts/utils/formatting.js:30-50</code></p>
 <h3>Accessibility</h3>
-<pre><code class="language-javascript">announceToScreenReader(message: string, priority: string): void
-</code></pre>
-<p><strong>Purpose</strong>: Announce messages to screen readers<br><strong>Parameters</strong>: <code>message</code> - Text to announce, <code>priority</code> - Announcement priority<br><strong>Features</strong>: ARIA live region management<br><strong>Location</strong>: <code>/scripts/utils/accessibility-announcer.js:20-40</code></p>
-<pre><code class="language-javascript">validateContrast(foreground: string, background: string): boolean
-</code></pre>
-<p><strong>Purpose</strong>: Validate color contrast for WCAG compliance<br><strong>Parameters</strong>: <code>foreground</code> - Foreground color, <code>background</code> - Background color<br><strong>Returns</strong>: True if contrast meets WCAG AA standards<br><strong>Location</strong>: <code>/scripts/utils/wcag-contrast-validator.js:10-30</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">announceToScreenReader</span>(<span class="hljs-attr">message</span>: string, <span class="hljs-attr">priority</span>: string): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Announce messages to screen readers<br><strong>Parameters</strong>: <code>message</code> - Text to announce, <code>priority</code> - Announcement priority<br><strong>Features</strong>: ARIA live region management<br><strong>Location</strong>: <code>/scripts/utils/accessibility-announcer.js:20-40</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">validateContrast</span>(<span class="hljs-attr">foreground</span>: string, <span class="hljs-attr">background</span>: string): boolean</code></pre><p><strong>Purpose</strong>: Validate color contrast for WCAG compliance<br><strong>Parameters</strong>: <code>foreground</code> - Foreground color, <code>background</code> - Background color<br><strong>Returns</strong>: True if contrast meets WCAG AA standards<br><strong>Location</strong>: <code>/scripts/utils/wcag-contrast-validator.js:10-30</code></p>
 <hr>
 <h2>Database Functions (init-database.js)</h2>
 <h3>Schema Creation</h3>
-<pre><code class="language-javascript">createTablesIfNotExists(): void
-</code></pre>
-<p><strong>Purpose</strong>: Create initial database schema with indexes<br><strong>Tables</strong>: tickets, vulnerability_imports, vulnerabilities, ticket_vulnerabilities<br><strong>Features</strong>: Idempotent table creation with proper indexes<br><strong>Location</strong>: <code>/scripts/init-database.js:19-87</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">createTablesIfNotExists</span>(): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Create initial database schema with indexes<br><strong>Tables</strong>: tickets, vulnerability_imports, vulnerabilities, ticket_vulnerabilities<br><strong>Features</strong>: Idempotent table creation with proper indexes<br><strong>Location</strong>: <code>/scripts/init-database.js:19-87</code></p>
 <hr>
 <h2>Performance Considerations</h2>
 <h3>Function Optimization</h3>
@@ -293,17 +199,15 @@
 <hr>
 <h2>Error Handling Patterns</h2>
 <h3>Consistent Error Handling</h3>
-<pre><code class="language-javascript">// Standard error handling pattern used throughout
-try {
-    const result = await riskyOperation();
-    return { success: true, data: result };
-} catch (error) {
-    console.error(&#39;Operation failed:&#39;, error);
-    this.showErrorToast(error.message);
-    return { success: false, error: error.message };
-}
-</code></pre>
-<h3>Recovery Strategies</h3>
+<pre><code class="language-javascript"><span class="hljs-comment">// Standard error handling pattern used throughout</span>
+<span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> <span class="hljs-title function_">riskyOperation</span>();
+    <span class="hljs-keyword">return</span> { <span class="hljs-attr">success</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">data</span>: result };
+} <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Operation failed:&#x27;</span>, error);
+    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">showErrorToast</span>(error.<span class="hljs-property">message</span>);
+    <span class="hljs-keyword">return</span> { <span class="hljs-attr">success</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">error</span>: error.<span class="hljs-property">message</span> };
+}</code></pre><h3>Recovery Strategies</h3>
 <p>Functions implement multiple recovery strategies:</p>
 <ol>
 <li><strong>Retry Logic</strong>: Automatic retry for transient failures</li>

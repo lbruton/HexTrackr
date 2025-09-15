@@ -1203,6 +1203,35 @@ class DocumentationPortalV2 {
             Prism.highlightAllUnder(contentArea);
         }
 
+        // Initialize Mermaid diagrams
+        if (window.mermaid) {
+            // Configure Mermaid to match theme
+            const isDarkMode = document.documentElement.getAttribute("data-bs-theme") === "dark";
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: isDarkMode ? "dark" : "default",
+                themeVariables: {
+                    primaryColor: "#206bc4",
+                    primaryTextColor: isDarkMode ? "#e2e8f0" : "#212529",
+                    primaryBorderColor: "#206bc4",
+                    lineColor: isDarkMode ? "#475569" : "#dee2e6",
+                    secondaryColor: isDarkMode ? "#2a3f54" : "#f8f9fa",
+                    tertiaryColor: isDarkMode ? "#1e293b" : "#ffffff",
+                    background: isDarkMode ? "#1e293b" : "#ffffff",
+                    mainBkg: isDarkMode ? "#2a3f54" : "#f8f9fa",
+                    secondBkg: isDarkMode ? "#1e293b" : "#ffffff",
+                    darkMode: isDarkMode
+                }
+            });
+
+            // Find and render all mermaid diagrams
+            const mermaidElements = contentArea.querySelectorAll(".mermaid");
+            if (mermaidElements.length > 0) {
+                console.log(`🎨 Rendering ${mermaidElements.length} Mermaid diagrams`);
+                mermaid.run({ nodes: Array.from(mermaidElements) });
+            }
+        }
+
         // Convert HTML tables to AG-Grid for consistent styling
         if (window.DocumentationTableConverter) {
             const tableConverter = new window.DocumentationTableConverter();
@@ -1211,10 +1240,10 @@ class DocumentationPortalV2 {
             // Store converter instance for theme updates
             this.tableConverter = tableConverter;
         }
-        
+
         // Scroll to top
         contentArea.scrollTo(0, 0);
-        
+
         // Update page title
         const sectionTitle = this.getSectionTitle(section);
         document.title = `HexTrackr - Documentation | ${sectionTitle}`;

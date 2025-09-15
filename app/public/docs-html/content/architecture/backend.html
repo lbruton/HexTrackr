@@ -57,29 +57,27 @@
 </tr>
 </tbody></table>
 <h3>PathValidator Security Class</h3>
-<pre><code class="language-javascript">class PathValidator {
-  static validatePath(filePath) {
-    // Path normalization
-    const normalizedPath = path.normalize(filePath);
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">PathValidator</span> {
+  <span class="hljs-keyword">static</span> <span class="hljs-title function_">validatePath</span>(<span class="hljs-params">filePath</span>) {
+    <span class="hljs-comment">// Path normalization</span>
+    <span class="hljs-keyword">const</span> normalizedPath = path.<span class="hljs-title function_">normalize</span>(filePath);
 
-    // Traversal attack prevention
-    if (normalizedPath.includes(&quot;../&quot;) || normalizedPath.includes(&quot;..\\&quot;)) {
-      throw new Error(&quot;Path traversal detected&quot;);
+    <span class="hljs-comment">// Traversal attack prevention</span>
+    <span class="hljs-keyword">if</span> (normalizedPath.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&quot;../&quot;</span>) || normalizedPath.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&quot;..\\&quot;</span>)) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Path traversal detected&quot;</span>);
     }
 
-    // Component validation
-    const pathComponents = normalizedPath.split(path.sep);
-    for (const component of pathComponents) {
-      if (component === &quot;..&quot; || (component === &quot;.&quot; &amp;&amp; pathComponents.length &gt; 1)) {
-        throw new Error(&quot;Invalid path component&quot;);
+    <span class="hljs-comment">// Component validation</span>
+    <span class="hljs-keyword">const</span> pathComponents = normalizedPath.<span class="hljs-title function_">split</span>(path.<span class="hljs-property">sep</span>);
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> component <span class="hljs-keyword">of</span> pathComponents) {
+      <span class="hljs-keyword">if</span> (component === <span class="hljs-string">&quot;..&quot;</span> || (component === <span class="hljs-string">&quot;.&quot;</span> &amp;&amp; pathComponents.<span class="hljs-property">length</span> &gt; <span class="hljs-number">1</span>)) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Invalid path component&quot;</span>);
       }
     }
 
-    return normalizedPath;
+    <span class="hljs-keyword">return</span> normalizedPath;
   }
-}
-</code></pre>
-<p><strong>Security Features</strong>:</p>
+}</code></pre><p><strong>Security Features</strong>:</p>
 <ul>
 <li>Path normalization before validation</li>
 <li>Directory traversal attack prevention</li>
@@ -133,7 +131,7 @@
 <h2>Vulnerability Rollover Workflow</h2>
 <p>Purpose: Maintain real‑time deduplicated active set + full historical timeline + fast daily aggregates.</p>
 <h3>CSV Import (Rollover Path)</h3>
-<pre><code class="language-mermaid">sequenceDiagram
+<div class="mermaid">sequenceDiagram
     participant User
     participant API as server.js
     participant DB as SQLite
@@ -149,34 +147,24 @@
     end
     API-&gt;&gt;DB: DELETE stale rows (not seen in this scan)
     API-&gt;&gt;DB: INSERT OR REPLACE vulnerability_daily_totals
-    API--&gt;&gt;User: { importId, insertCount, updateCount, removedStale, scanDate }
-</code></pre>
-<h3>Enhanced Deduplication System</h3>
+    API--&gt;&gt;User: { importId, insertCount, updateCount, removedStale, scanDate }</div><h3>Enhanced Deduplication System</h3>
 <p>HexTrackr implements a sophisticated 4-tier unique key generation strategy:</p>
 <p><strong>Tier 1: Asset ID + Plugin ID</strong> (Highest Reliability)</p>
-<pre><code class="language-javascript">if (mapped.assetId &amp;&amp; mapped.pluginId) {
-  return `asset:${mapped.assetId}|plugin:${mapped.pluginId}`;
-}
-</code></pre>
-<p><strong>Tier 2: CVE + Hostname/IP</strong> (CVE-based)</p>
-<pre><code class="language-javascript">if (mapped.cve &amp;&amp; mapped.cve.trim()) {
-  const hostIdentifier = normalizedIP || normalizedHostname;
-  return `cve:${mapped.cve.trim()}|host:${hostIdentifier}`;
-}
-</code></pre>
-<p><strong>Tier 3: Plugin ID + Hostname/IP + Vendor</strong> (User-requested approach)</p>
-<pre><code class="language-javascript">if (mapped.pluginId &amp;&amp; mapped.pluginId.trim()) {
-  const hostIdentifier = normalizedIP || normalizedHostname;
-  const vendor = mapped.vendor || &quot;unknown&quot;;
-  return `plugin:${mapped.pluginId.trim()}|host:${hostIdentifier}|vendor:${vendor}`;
-}
-</code></pre>
-<p><strong>Tier 4: Description Hash + Hostname/IP</strong> (Fallback)</p>
-<pre><code class="language-javascript">const descriptionHash = createDescriptionHash(mapped.description);
-const hostIdentifier = normalizedIP || normalizedHostname;
-return `desc:${descriptionHash}|host:${hostIdentifier}`;
-</code></pre>
-<h3>Key Safeguards</h3>
+<pre><code class="language-javascript"><span class="hljs-keyword">if</span> (mapped.<span class="hljs-property">assetId</span> &amp;&amp; mapped.<span class="hljs-property">pluginId</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`asset:<span class="hljs-subst">${mapped.assetId}</span>|plugin:<span class="hljs-subst">${mapped.pluginId}</span>`</span>;
+}</code></pre><p><strong>Tier 2: CVE + Hostname/IP</strong> (CVE-based)</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">if</span> (mapped.<span class="hljs-property">cve</span> &amp;&amp; mapped.<span class="hljs-property">cve</span>.<span class="hljs-title function_">trim</span>()) {
+  <span class="hljs-keyword">const</span> hostIdentifier = normalizedIP || normalizedHostname;
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`cve:<span class="hljs-subst">${mapped.cve.trim()}</span>|host:<span class="hljs-subst">${hostIdentifier}</span>`</span>;
+}</code></pre><p><strong>Tier 3: Plugin ID + Hostname/IP + Vendor</strong> (User-requested approach)</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">if</span> (mapped.<span class="hljs-property">pluginId</span> &amp;&amp; mapped.<span class="hljs-property">pluginId</span>.<span class="hljs-title function_">trim</span>()) {
+  <span class="hljs-keyword">const</span> hostIdentifier = normalizedIP || normalizedHostname;
+  <span class="hljs-keyword">const</span> vendor = mapped.<span class="hljs-property">vendor</span> || <span class="hljs-string">&quot;unknown&quot;</span>;
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`plugin:<span class="hljs-subst">${mapped.pluginId.trim()}</span>|host:<span class="hljs-subst">${hostIdentifier}</span>|vendor:<span class="hljs-subst">${vendor}</span>`</span>;
+}</code></pre><p><strong>Tier 4: Description Hash + Hostname/IP</strong> (Fallback)</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> descriptionHash = <span class="hljs-title function_">createDescriptionHash</span>(mapped.<span class="hljs-property">description</span>);
+<span class="hljs-keyword">const</span> hostIdentifier = normalizedIP || normalizedHostname;
+<span class="hljs-keyword">return</span> <span class="hljs-string">`desc:<span class="hljs-subst">${descriptionHash}</span>|host:<span class="hljs-subst">${hostIdentifier}</span>`</span>;</code></pre><h3>Key Safeguards</h3>
 <table>
 <thead>
 <tr>
@@ -267,16 +255,14 @@ return `desc:${descriptionHash}|host:${hostIdentifier}`;
 <li><strong>Auto-cleanup</strong>: 30-minute session timeout with automatic garbage collection</li>
 </ul>
 <h3>ProgressTracker Features</h3>
-<pre><code class="language-javascript">class ProgressTracker {
-  constructor(io) {
-    this.sessions = new Map();
-    this.eventThrottle = new Map();
-    this.THROTTLE_INTERVAL = 100;
-    this.SESSION_CLEANUP_INTERVAL = 30 * 60 * 1000;
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ProgressTracker</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">io</span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">sessions</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">eventThrottle</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">THROTTLE_INTERVAL</span> = <span class="hljs-number">100</span>;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">SESSION_CLEANUP_INTERVAL</span> = <span class="hljs-number">30</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>;
   }
-}
-</code></pre>
-<p><strong>Key Capabilities</strong>:</p>
+}</code></pre><p><strong>Key Capabilities</strong>:</p>
 <ul>
 <li>Session-based progress tracking with unique identifiers</li>
 <li>Throttled event emission to prevent client overload</li>
@@ -320,7 +306,7 @@ return `desc:${descriptionHash}|host:${hostIdentifier}`;
 </tr>
 </tbody></table>
 <h3>Session Lifecycle</h3>
-<pre><code class="language-mermaid">sequenceDiagram
+<div class="mermaid">sequenceDiagram
     participant Client
     participant ProgressTracker
     participant Import as Import Process
@@ -337,23 +323,19 @@ return `desc:${descriptionHash}|host:${hostIdentifier}`;
 
     Import-&gt;&gt;ProgressTracker: completeSession(sessionId)
     ProgressTracker--&gt;&gt;Client: import_complete event
-    ProgressTracker-&gt;&gt;ProgressTracker: cleanup(sessionId)
-</code></pre>
-<p>For more details, see the <a href="#api-reference/websocket-api">WebSocket API documentation</a>.</p>
+    ProgressTracker-&gt;&gt;ProgressTracker: cleanup(sessionId)</div><p>For more details, see the <a href="#api-reference/websocket-api">WebSocket API documentation</a>.</p>
 <hr>
 <h2>Pagination Flow (Current Vulnerabilities)</h2>
-<pre><code class="language-mermaid">sequenceDiagram
+<div class="mermaid">sequenceDiagram
     participant UI
     participant API as server.js
     participant DB as SQLite
-    UI-&gt;&gt;API: GET /api/vulnerabilities?page=1&amp;limit=50
+    UI-&gt;&gt;API: GET /api/vulnerabilities?page=1&limit=50
     API-&gt;&gt;DB: SELECT filtered rows FROM vulnerabilities_current LIMIT/OFFSET
     DB--&gt;&gt;API: Row batch
     API-&gt;&gt;DB: SELECT COUNT(*) (same filters)
     DB--&gt;&gt;API: Total
-    API--&gt;&gt;UI: { data, pagination }
-</code></pre>
-<hr>
+    API--&gt;&gt;UI: { data, pagination }</div><hr>
 <h2>Legacy vs Rollover Paths</h2>
 <table>
 <thead>
@@ -439,15 +421,13 @@ return `desc:${descriptionHash}|host:${hostIdentifier}`;
 </tr>
 </tbody></table>
 <h3>PathValidator Security Features</h3>
-<pre><code class="language-javascript">// Safe file operations with built-in validation
-PathValidator.safeReadFileSync(filePath, options)
-PathValidator.safeWriteFileSync(filePath, data, options)
-PathValidator.safeReaddirSync(dirPath, options)
-PathValidator.safeStatSync(filePath)
-PathValidator.safeExistsSync(filePath)
-PathValidator.safeUnlinkSync(filePath)
-</code></pre>
-<p><strong>Protection Mechanisms</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Safe file operations with built-in validation</span>
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeReadFileSync</span>(filePath, options)
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeWriteFileSync</span>(filePath, data, options)
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeReaddirSync</span>(dirPath, options)
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeStatSync</span>(filePath)
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeExistsSync</span>(filePath)
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeUnlinkSync</span>(filePath)</code></pre><p><strong>Protection Mechanisms</strong>:</p>
 <ul>
 <li>Path normalization before validation</li>
 <li>Directory traversal detection (<code>../</code>, <code>..\\</code>)</li>
@@ -456,15 +436,13 @@ PathValidator.safeUnlinkSync(filePath)
 <li>Graceful fallbacks for invalid paths</li>
 </ul>
 <h3>Rate Limiting Configuration</h3>
-<pre><code class="language-javascript">const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: &#39;Too many requests from this IP&#39;,
-  standardHeaders: true,
-  legacyHeaders: false
-});
-</code></pre>
-<h3>Future Security Enhancements</h3>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> limiter = <span class="hljs-title function_">rateLimit</span>({
+  <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>, <span class="hljs-comment">// 15 minutes</span>
+  <span class="hljs-attr">max</span>: <span class="hljs-number">100</span>, <span class="hljs-comment">// Limit each IP to 100 requests per windowMs</span>
+  <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Too many requests from this IP&#x27;</span>,
+  <span class="hljs-attr">standardHeaders</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">legacyHeaders</span>: <span class="hljs-literal">false</span>
+});</code></pre><h3>Future Security Enhancements</h3>
 <table>
 <thead>
 <tr>
