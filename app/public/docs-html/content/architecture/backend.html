@@ -17,29 +17,76 @@
 <tr>
 <th>Component</th>
 <th>Purpose</th>
+<th>Location</th>
 </tr>
 </thead>
 <tbody><tr>
 <td><code>server.js</code></td>
 <td>Main application runtime (all routes + logic)</td>
+<td>Root level</td>
 </tr>
 <tr>
 <td><code>scripts/init-database.js</code></td>
 <td>Bootstrap base schema &amp; indexes (legacy + foundational tables)</td>
+<td><code>/scripts/</code></td>
+</tr>
+<tr>
+<td><strong>ProgressTracker</strong></td>
+<td>WebSocket session management &amp; progress tracking</td>
+<td><code>server.js:82-200</code></td>
+</tr>
+<tr>
+<td><strong>PathValidator</strong></td>
+<td>Security-hardened file operations with traversal protection</td>
+<td><code>server.js:22-79</code></td>
 </tr>
 <tr>
 <td>Rollover Functions</td>
-<td>Sequential import processing &amp; aggregation (<code>processVulnerabilityRowsWithRollover</code>)</td>
+<td>Sequential import processing &amp; enhanced deduplication</td>
+<td><code>server.js:500-800</code></td>
 </tr>
 <tr>
-<td><code>PathValidator</code></td>
-<td>Normalizes &amp; validates file paths (defense-in-depth)</td>
+<td>Rate Limiting</td>
+<td>IP-based request throttling (100 req/15min)</td>
+<td>Express middleware</td>
 </tr>
 <tr>
 <td>Docs Portal Logic</td>
 <td>Dynamic redirect + stats endpoint (<code>/api/docs/stats</code>)</td>
+<td><code>server.js:1200+</code></td>
 </tr>
 </tbody></table>
+<h3>PathValidator Security Class</h3>
+<pre><code class="language-javascript">class PathValidator {
+  static validatePath(filePath) {
+    // Path normalization
+    const normalizedPath = path.normalize(filePath);
+
+    // Traversal attack prevention
+    if (normalizedPath.includes(&quot;../&quot;) || normalizedPath.includes(&quot;..\\&quot;)) {
+      throw new Error(&quot;Path traversal detected&quot;);
+    }
+
+    // Component validation
+    const pathComponents = normalizedPath.split(path.sep);
+    for (const component of pathComponents) {
+      if (component === &quot;..&quot; || (component === &quot;.&quot; &amp;&amp; pathComponents.length &gt; 1)) {
+        throw new Error(&quot;Invalid path component&quot;);
+      }
+    }
+
+    return normalizedPath;
+  }
+}
+</code></pre>
+<p><strong>Security Features</strong>:</p>
+<ul>
+<li>Path normalization before validation</li>
+<li>Directory traversal attack prevention</li>
+<li>Component-level validation</li>
+<li>Safe file operation wrappers</li>
+<li>Exception-based error handling</li>
+</ul>
 <hr>
 <h2>Middleware &amp; Infrastructure</h2>
 <table>
@@ -104,6 +151,31 @@
     API-&gt;&gt;DB: INSERT OR REPLACE vulnerability_daily_totals
     API--&gt;&gt;User: { importId, insertCount, updateCount, removedStale, scanDate }
 </code></pre>
+<h3>Enhanced Deduplication System</h3>
+<p>HexTrackr implements a sophisticated 4-tier unique key generation strategy:</p>
+<p><strong>Tier 1: Asset ID + Plugin ID</strong> (Highest Reliability)</p>
+<pre><code class="language-javascript">if (mapped.assetId &amp;&amp; mapped.pluginId) {
+  return `asset:${mapped.assetId}|plugin:${mapped.pluginId}`;
+}
+</code></pre>
+<p><strong>Tier 2: CVE + Hostname/IP</strong> (CVE-based)</p>
+<pre><code class="language-javascript">if (mapped.cve &amp;&amp; mapped.cve.trim()) {
+  const hostIdentifier = normalizedIP || normalizedHostname;
+  return `cve:${mapped.cve.trim()}|host:${hostIdentifier}`;
+}
+</code></pre>
+<p><strong>Tier 3: Plugin ID + Hostname/IP + Vendor</strong> (User-requested approach)</p>
+<pre><code class="language-javascript">if (mapped.pluginId &amp;&amp; mapped.pluginId.trim()) {
+  const hostIdentifier = normalizedIP || normalizedHostname;
+  const vendor = mapped.vendor || &quot;unknown&quot;;
+  return `plugin:${mapped.pluginId.trim()}|host:${hostIdentifier}|vendor:${vendor}`;
+}
+</code></pre>
+<p><strong>Tier 4: Description Hash + Hostname/IP</strong> (Fallback)</p>
+<pre><code class="language-javascript">const descriptionHash = createDescriptionHash(mapped.description);
+const hostIdentifier = normalizedIP || normalizedHostname;
+return `desc:${descriptionHash}|host:${hostIdentifier}`;
+</code></pre>
 <h3>Key Safeguards</h3>
 <table>
 <thead>
@@ -118,7 +190,7 @@
 </tr>
 <tr>
 <td>Race conditions</td>
-<td>Explicit sequential loop instead of <code>forEach</code> callbacks</td>
+<td>Explicit sequential loop with <code>processNextRow(index)</code> pattern</td>
 </tr>
 <tr>
 <td>Data drift</td>
@@ -127,6 +199,22 @@
 <tr>
 <td>Performance</td>
 <td>Indexes on <code>unique_key</code>, <code>scan_date</code>, severities</td>
+</tr>
+<tr>
+<td><strong>Key conflicts</strong></td>
+<td><strong>4-tier unique key generation with reliability scoring</strong></td>
+</tr>
+<tr>
+<td><strong>Memory leaks</strong></td>
+<td><strong>Session-based processing with automatic cleanup</strong></td>
+</tr>
+<tr>
+<td><strong>Hostname variations</strong></td>
+<td><strong>Hostname normalization (domain stripping, case insensitive)</strong></td>
+</tr>
+<tr>
+<td><strong>IP address formats</strong></td>
+<td><strong>IP normalization and validation</strong></td>
 </tr>
 </tbody></table>
 <hr>
@@ -169,12 +257,88 @@
 </tbody></table>
 <hr>
 <h2>Real-time Communication (WebSocket)</h2>
-<p>In addition to the REST API, HexTrackr utilizes a WebSocket server for real-time communication with clients.</p>
+<h3>ProgressTracker Architecture</h3>
+<p>HexTrackr implements a sophisticated WebSocket-based progress tracking system through the <code>ProgressTracker</code> class:</p>
 <ul>
-<li><strong>Port</strong>: 8080</li>
-<li><strong>Library</strong>: Socket.io</li>
+<li><strong>Port</strong>: 8988 (separate from REST API)</li>
+<li><strong>Library</strong>: Socket.io with enhanced session management</li>
+<li><strong>Session Management</strong>: UUID-based sessions with metadata tracking</li>
+<li><strong>Throttling</strong>: 100ms minimum interval between progress events</li>
+<li><strong>Auto-cleanup</strong>: 30-minute session timeout with automatic garbage collection</li>
 </ul>
-<p>The WebSocket server is primarily used to provide real-time feedback on long-running processes, such as data imports. It emits events to the client to indicate progress, completion, or errors.</p>
+<h3>ProgressTracker Features</h3>
+<pre><code class="language-javascript">class ProgressTracker {
+  constructor(io) {
+    this.sessions = new Map();
+    this.eventThrottle = new Map();
+    this.THROTTLE_INTERVAL = 100;
+    this.SESSION_CLEANUP_INTERVAL = 30 * 60 * 1000;
+  }
+}
+</code></pre>
+<p><strong>Key Capabilities</strong>:</p>
+<ul>
+<li>Session-based progress tracking with unique identifiers</li>
+<li>Throttled event emission to prevent client overload</li>
+<li>Metadata persistence for operation context</li>
+<li>Automatic session cleanup for memory management</li>
+<li>Error handling with graceful degradation</li>
+</ul>
+<h3>WebSocket Events</h3>
+<table>
+<thead>
+<tr>
+<th>Event Type</th>
+<th>Purpose</th>
+<th>Throttled</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>import_progress</code></td>
+<td>CSV import progress updates</td>
+<td>Yes (100ms)</td>
+</tr>
+<tr>
+<td><code>import_complete</code></td>
+<td>Import operation completion</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>import_error</code></td>
+<td>Import operation errors</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>session_created</code></td>
+<td>New session establishment</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>session_cleanup</code></td>
+<td>Session removal notification</td>
+<td>No</td>
+</tr>
+</tbody></table>
+<h3>Session Lifecycle</h3>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant Client
+    participant ProgressTracker
+    participant Import as Import Process
+
+    Client-&gt;&gt;ProgressTracker: Connect to WebSocket
+    ProgressTracker-&gt;&gt;ProgressTracker: createSession(metadata)
+    ProgressTracker--&gt;&gt;Client: session_created event
+
+    Import-&gt;&gt;ProgressTracker: updateProgress(sessionId, progress)
+    ProgressTracker-&gt;&gt;ProgressTracker: throttleCheck()
+    alt Progress not throttled
+        ProgressTracker--&gt;&gt;Client: import_progress event
+    end
+
+    Import-&gt;&gt;ProgressTracker: completeSession(sessionId)
+    ProgressTracker--&gt;&gt;Client: import_complete event
+    ProgressTracker-&gt;&gt;ProgressTracker: cleanup(sessionId)
+</code></pre>
 <p>For more details, see the <a href="#api-reference/websocket-api">WebSocket API documentation</a>.</p>
 <hr>
 <h2>Pagination Flow (Current Vulnerabilities)</h2>
@@ -229,68 +393,263 @@
 </ul>
 <hr>
 <h2>Security &amp; Hardening</h2>
+<h3>Current Security Implementations</h3>
 <table>
 <thead>
 <tr>
 <th>Concern</th>
-<th>Current</th>
+<th>Implementation</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Path Traversal</strong></td>
+<td><code>PathValidator</code> class</td>
+<td>Comprehensive path validation and safe file operations</td>
+</tr>
+<tr>
+<td><strong>Rate Limiting</strong></td>
+<td>Express rate limit middleware</td>
+<td>100 requests per 15-minute window per IP</td>
+</tr>
+<tr>
+<td><strong>Upload Security</strong></td>
+<td>Multer with size limits</td>
+<td>50MB cap with file type validation</td>
+</tr>
+<tr>
+<td><strong>XSS Prevention</strong></td>
+<td>Security headers</td>
+<td><code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, <code>X-XSS-Protection</code></td>
+</tr>
+<tr>
+<td><strong>SQL Injection</strong></td>
+<td>Parameterized queries</td>
+<td>All database operations use prepared statements</td>
+</tr>
+<tr>
+<td><strong>CORS Protection</strong></td>
+<td>Configurable CORS</td>
+<td>Default: all origins (configurable for production)</td>
+</tr>
+<tr>
+<td><strong>Input Sanitization</strong></td>
+<td>DOMPurify integration</td>
+<td>Client-side XSS prevention</td>
+</tr>
+</tbody></table>
+<h3>PathValidator Security Features</h3>
+<pre><code class="language-javascript">// Safe file operations with built-in validation
+PathValidator.safeReadFileSync(filePath, options)
+PathValidator.safeWriteFileSync(filePath, data, options)
+PathValidator.safeReaddirSync(dirPath, options)
+PathValidator.safeStatSync(filePath)
+PathValidator.safeExistsSync(filePath)
+PathValidator.safeUnlinkSync(filePath)
+</code></pre>
+<p><strong>Protection Mechanisms</strong>:</p>
+<ul>
+<li>Path normalization before validation</li>
+<li>Directory traversal detection (<code>../</code>, <code>..\\</code>)</li>
+<li>Component-level path validation</li>
+<li>Exception-based error handling</li>
+<li>Graceful fallbacks for invalid paths</li>
+</ul>
+<h3>Rate Limiting Configuration</h3>
+<pre><code class="language-javascript">const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: &#39;Too many requests from this IP&#39;,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+</code></pre>
+<h3>Future Security Enhancements</h3>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
 <th>Planned</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>File access</td>
-<td><code>PathValidator</code></td>
-<td>Central audit logging of rejections</td>
+<td>Authentication</td>
+<td>JWT-based authentication with role-based access control</td>
 </tr>
 <tr>
-<td>Upload size</td>
-<td>100MB cap</td>
-<td>Configurable env var (<code>HEXTRACKR_MAX_UPLOAD_MB</code>)</td>
+<td>API Security</td>
+<td>API key authentication for external integrations</td>
+</tr>
+<tr>
+<td>Audit Logging</td>
+<td>Central audit logging of security events and rejections</td>
 </tr>
 <tr>
 <td>TLS</td>
-<td>External termination</td>
-<td>Compose example with Caddy / nginx</td>
+<td>Built-in HTTPS support with automatic certificate management</td>
 </tr>
 <tr>
-<td>Input validation</td>
-<td>Minimal (mapping layer)</td>
-<td>JSON schema (Ajv) enforcement</td>
+<td>Input Validation</td>
+<td>JSON schema (Ajv) enforcement for all API endpoints</td>
 </tr>
 <tr>
-<td>Logging</td>
-<td>Console + stderr</td>
-<td>Structured JSON + request IDs</td>
+<td>Structured Logging</td>
+<td>Structured JSON logging with request IDs and correlation</td>
+</tr>
+<tr>
+<td>Vulnerability Scanning</td>
+<td>Automated dependency vulnerability scanning</td>
+</tr>
+<tr>
+<td>Secret Management</td>
+<td>Environment-based secret management with rotation</td>
 </tr>
 </tbody></table>
 <hr>
 <h2>Planned Enhancements</h2>
+<h3>Observability &amp; Monitoring</h3>
 <table>
 <thead>
 <tr>
 <th>Area</th>
 <th>Enhancement</th>
+<th>Priority</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Observability</td>
-<td>Prometheus metrics (import latency, row counts)</td>
+<td><strong>Metrics</strong></td>
+<td>Prometheus metrics (import latency, row counts, session tracking)</td>
+<td>High</td>
 </tr>
 <tr>
-<td>Modularization</td>
-<td>Extract rollover &amp; backup modules</td>
+<td><strong>Tracing</strong></td>
+<td>OpenTelemetry integration for distributed tracing</td>
+<td>Medium</td>
 </tr>
 <tr>
-<td>Validation</td>
-<td>Enforce severity enumeration + CVE format checks</td>
+<td><strong>Health Checks</strong></td>
+<td>Enhanced health endpoints with dependency checking</td>
+<td>High</td>
 </tr>
 <tr>
-<td>Migration</td>
-<td>Retire legacy vulnerabilities pathway</td>
+<td><strong>Performance</strong></td>
+<td>APM integration for bottleneck identification</td>
+<td>Medium</td>
+</tr>
+</tbody></table>
+<h3>Architecture &amp; Modularity</h3>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Enhancement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Modularization</strong></td>
+<td>Extract ProgressTracker, PathValidator, and rollover modules</td>
+<td>High</td>
 </tr>
 <tr>
-<td>Testing</td>
-<td>Playwright + API contract tests for import &amp; pagination</td>
+<td><strong>Microservices</strong></td>
+<td>Split WebSocket server into separate service</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Database</strong></td>
+<td>PostgreSQL migration for scalability</td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Caching</strong></td>
+<td>Redis integration for session and data caching</td>
+<td>Medium</td>
+</tr>
+</tbody></table>
+<h3>Data Quality &amp; Validation</h3>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Enhancement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Schema Validation</strong></td>
+<td>JSON schema (Ajv) enforcement for all API endpoints</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>CVE Validation</strong></td>
+<td>Real-time CVE format and existence validation</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Severity Normalization</strong></td>
+<td>Automatic severity enumeration mapping</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Data Quality Scoring</strong></td>
+<td>Automated data quality metrics and reporting</td>
+<td>Medium</td>
+</tr>
+</tbody></table>
+<h3>Legacy Migration</h3>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Enhancement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Legacy Deprecation</strong></td>
+<td>Retire legacy vulnerabilities table and endpoints</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Data Migration</strong></td>
+<td>Automated migration from legacy to rollover architecture</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>API Versioning</strong></td>
+<td>Implement API versioning for backward compatibility</td>
+<td>Medium</td>
+</tr>
+</tbody></table>
+<h3>Testing &amp; Quality Assurance</h3>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Enhancement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>E2E Testing</strong></td>
+<td>Playwright integration tests for all major workflows</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>API Contract Testing</strong></td>
+<td>OpenAPI-based contract validation</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Load Testing</strong></td>
+<td>Automated performance testing with realistic data volumes</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Security Testing</strong></td>
+<td>Automated security scanning and penetration testing</td>
+<td>High</td>
 </tr>
 </tbody></table>
 <hr>

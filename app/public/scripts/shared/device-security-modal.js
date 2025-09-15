@@ -276,10 +276,29 @@ class DeviceSecurityModal {
             animateRows: true,
             onGridReady: (params) => {
                 this.deviceGridApi = params.api;
-                
+
                 // Register grid with AGGridThemeManager for dynamic theme updates
                 if (window.agGridThemeManager) {
                     window.agGridThemeManager.registerGrid("deviceSecurityModal", this.deviceGridApi, deviceGridDiv);
+                }
+
+                // Ensure columns fill available width in modal
+                setTimeout(() => {
+                    if (params.api) {
+                        params.api.sizeColumnsToFit();
+                    }
+                }, 100);
+            },
+            onGridSizeChanged: (params) => {
+                // Resize columns when modal grid size changes
+                if (params.api) {
+                    params.api.sizeColumnsToFit();
+                }
+            },
+            onFirstDataRendered: (params) => {
+                // Ensure columns fill available width when data loads
+                if (params.api) {
+                    params.api.sizeColumnsToFit();
                 }
             }
         };
