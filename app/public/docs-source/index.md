@@ -9,6 +9,8 @@ Welcome to the HexTrackr documentation portal. This comprehensive guide covers e
 - **[Architecture](architecture/index.md)**: A deep dive into the system's architecture.
 - **[API Reference](api-reference/index.md)**: Complete reference for the HexTrackr REST API.
 - **[Security](security/index.md)**: Security-related documentation.
+- **[References](references/index.md)**: Function and WebSocket API reference documentation.
+- **[Technical Reference](technical-reference/index.md)**: Module catalog, configuration, and dependencies.
 
 ## 🏷️ Standards & Compliance
 

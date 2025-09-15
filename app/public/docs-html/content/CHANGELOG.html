@@ -9,23 +9,9 @@
                         <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
                              alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
                     </a>.</p>
-<h2>[Unreleased] - v1.0.14 (Security Critical)</h2>
-<h3>Added</h3>
-<h4>Architecture Review System</h4>
-<ul>
-<li><strong>Comprehensive Architecture Assessment</strong>: Complete technical review using 5 specialized expert agents<ul>
-<li>Node.js backend architecture analysis (3,809-line monolithic server assessment)</li>
-<li>SQLite database schema and performance evaluation (15 tables, 31 indexes)</li>
-<li>OWASP Top 10 security vulnerability assessment</li>
-<li>JavaScript frontend architecture review (17,951 lines across 46 files)</li>
-<li>WebSocket real-time communication analysis (Socket.io implementation)</li>
-</ul>
-</li>
-<li><strong>Expert Agent System</strong>: 138+ specialized domain expert agents for technical analysis</li>
-<li><strong>Roadmap Management</strong>: Enhanced project planning with semantic versioning and changelog automation</li>
-</ul>
+<h2>[Unreleased] - v1.0.15 (Security Critical)</h2>
 <h3>Security</h3>
-<h4>Critical Security Vulnerabilities (Identified for v1.0.14)</h4>
+<h4>Critical Security Vulnerabilities (Identified for v1.0.15)</h4>
 <ul>
 <li><strong>Authentication System Required</strong>: No authentication/authorization system currently implemented<ul>
 <li>All API endpoints publicly accessible</li>
@@ -52,6 +38,106 @@
 <li><strong>WebSocket Security Gaps</strong>: Real-time communication lacks security controls<ul>
 <li>Session-based authentication needed for WebSocket connections</li>
 <li>Room access authorization missing</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.14] - 2025-09-14</h2>
+<h3>Added</h3>
+<h4>Documentation Portal Enhancements</h4>
+<ul>
+<li><strong>AG-Grid Community Integration</strong>: Advanced data tables for interactive documentation<ul>
+<li>Interactive table converter for markdown tables to AG-Grid format</li>
+<li>Roadmap table sorting functionality with real-time filtering</li>
+<li>Responsive AG-Grid tables optimized for mobile devices</li>
+<li>Dark mode AG-Grid theme integration with proper color schemes</li>
+</ul>
+</li>
+<li><strong>Enhanced Navigation System</strong>: Improved user experience and accessibility<ul>
+<li>Back-to-top button with smooth scroll behavior and visual feedback</li>
+<li>Enhanced breadcrumb navigation system with proper spacing</li>
+<li>Loading spinner for content transitions</li>
+<li>Responsive documentation layout with mobile optimization</li>
+</ul>
+</li>
+<li><strong>UI/UX Improvements</strong>: Professional navigation and interaction patterns<ul>
+<li>Enhanced navigation with visual feedback and hover effects</li>
+<li>Improved sub-navigation styling with transform animations</li>
+<li>Avatar styling enhancements in navigation components</li>
+<li>Collapse icon rotation animations for expandable sections</li>
+</ul>
+</li>
+</ul>
+<h4>Architecture Review System</h4>
+<ul>
+<li><strong>Comprehensive Architecture Assessment</strong>: Complete technical review using 5 specialized expert agents<ul>
+<li>Node.js backend architecture analysis (3,809-line monolithic server assessment)</li>
+<li>SQLite database schema and performance evaluation (15 tables, 31 indexes)</li>
+<li>OWASP Top 10 security vulnerability assessment</li>
+<li>JavaScript frontend architecture review (17,951 lines across 46 files)</li>
+<li>WebSocket real-time communication analysis (Socket.io implementation)</li>
+</ul>
+</li>
+<li><strong>Expert Agent System</strong>: 138+ specialized domain expert agents for technical analysis</li>
+<li><strong>Roadmap Management</strong>: Enhanced project planning with semantic versioning and changelog automation</li>
+</ul>
+<h3>Fixed</h3>
+<h4>Dark Mode Accessibility Critical Fixes (WCAG Compliance)</h4>
+<ul>
+<li><strong>Navigation Contrast Violation Resolution</strong>: Fixed critical WCAG AA compliance issue<ul>
+<li><strong>Root Cause</strong>: Selected navigation items had white text on white background (1:1 contrast ratio)</li>
+<li><strong>Solution</strong>: Implemented proper dark mode color hierarchy using HexTrackr surface variables<ul>
+<li>Active states: <code>#2a3f54</code> background with <code>#e2e8f0</code> text (high contrast)</li>
+<li>Hover states: <code>#1e293b</code> background with consistent readable text</li>
+<li>Sub-navigation: <code>#94a3b8</code> muted text with <code>#243447</code> hover background</li>
+</ul>
+</li>
+<li><strong>Impact</strong>: Ensures accessibility compliance for visually impaired users</li>
+<li><strong>Validation</strong>: Tested across documentation portal, tickets, and vulnerabilities pages</li>
+</ul>
+</li>
+</ul>
+<h4>Documentation Portal Specific Fixes</h4>
+<ul>
+<li><strong>Header Spacing Issue Resolution</strong>: Eliminated unwanted space above documentation portal header<ul>
+<li><strong>Root Cause</strong>: CSS rule <code>.navbar { margin-top: 1rem; }</code> in docs-tabler.css pushing header down</li>
+<li><strong>Solution</strong>: Commented out problematic CSS rule (lines 13-17 in docs-tabler.css)</li>
+<li><strong>Impact</strong>: Documentation portal header now aligns consistently with tickets/vulnerabilities pages</li>
+<li><strong>Method</strong>: Systematic investigation using sequential thinking and user feedback</li>
+</ul>
+</li>
+<li><strong>Breadcrumb and Layout Improvements</strong>: Enhanced documentation page structure<ul>
+<li>Fixed breadcrumb spacing to prevent cramped appearance above menu items</li>
+<li>Resolved page header positioning conflicts</li>
+<li>Enhanced documentation content area scroll behavior</li>
+<li>Improved loading spinner visibility and positioning</li>
+</ul>
+</li>
+</ul>
+<h4>Modal and Component Accessibility Fixes</h4>
+<ul>
+<li><strong>Modal Contrast Improvements</strong>: Enhanced readability across light and dark themes<ul>
+<li>Improved modal contrast and text readability</li>
+<li>Fixed table styling in both light and dark modes with proper variable usage</li>
+<li>Enhanced blockquote styling with theme-aware background colors</li>
+<li>Resolved loading spinner visibility issues in modal contexts</li>
+</ul>
+</li>
+</ul>
+<h3>Changed</h3>
+<h4>CSS Architecture Improvements</h4>
+<ul>
+<li><strong>Modularized Documentation CSS</strong>: Created dedicated docs-tabler.css for portal-specific styling<ul>
+<li>Separated documentation portal styles from main application CSS</li>
+<li>Enhanced table styling with proper Bootstrap variable integration</li>
+<li>Improved dark mode table support with enhanced border and background colors</li>
+<li>Streamlined navigation styling with consistent active states</li>
+</ul>
+</li>
+<li><strong>Theme System Enhancements</strong>: Better CSS variable usage for consistency<ul>
+<li>Standardized HexTrackr surface hierarchy variables across components</li>
+<li>Enhanced CSS custom property usage for maintainable theming</li>
+<li>Improved color consistency between documentation portal and main application</li>
+<li>Better separation of concerns between shared and page-specific styles</li>
 </ul>
 </li>
 </ul>

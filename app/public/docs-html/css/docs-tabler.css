@@ -10,9 +10,11 @@ body {
 }
 
 /* Add spacing above navigation and body cards */
+/* Removed .navbar margin-top rule to eliminate unwanted space above header
 .navbar {
   margin-top: 1rem;
 }
+*/
 
 .page-body {
   margin-top: 1rem;
