@@ -96,3 +96,15 @@ After Athena has extracted knowledge from our conversations, I can then build on
 * **Adding Source Linking:** I can add a `source` field to the observations that links back to the specific part of the conversation where the information was extracted from.
 * **Creating Relationships:** I can create relationships between the entities created by Athena to build a more complete and interconnected knowledge graph.
 * **Creating Abstracts and Summaries:** I can create `ABSTRACT` and `SUMMARY` observations for each session to provide a quick overview of the key takeaways.
+
+## Project-Specific Insights (Reconstructed from Memento Audit - 2025-09-15)
+
+This section contains high-level insights about the HexTrackr project's architecture, workflow, and patterns, derived from a full audit of the Memento knowledge base.
+
+* **Development Methodology:** The project operates on a highly structured, specification-driven methodology called **S-R-P-T (Specification -> Research -> Planning -> Task)**. All significant work must originate from a formal specification. This is a constitutional requirement.
+* **Knowledge Management:** **Memento is the single source of truth.** The "Memento-First" protocol is a critical, mandatory principle. The **Athena** agent is a key component, responsible for extracting and preserving knowledge from all development conversations, shell history, and todo lists. The reliability of Athena's logging process is crucial, as evidenced by the gap in daily summaries prior to September 7th, 2025.
+* **AI Agent Architecture:** The project utilizes a **personality-driven, multi-agent architecture**. I am one of these agents. Other key agents include a lead strategist ("Hannibal"), a research team ("The Three Stooges"), a documentation truth wizard ("Merlin"), a security officer ("Worf"), and a roadmap cartographer ("Atlas"). Collaboration between agents is essential.
+* **Runtime Environment:** **Docker is the primary and ONLY supported runtime environment.** The application is designed to run within a Docker container, and local execution is discouraged as it has previously led to critical bugs.
+* **Technology Stack:** The application is an **Express.js monolith** with a **SQLite database** and a vanilla JavaScript frontend. Key frontend libraries include **AG-Grid** for tables and **ApexCharts** for visualizations. **Socket.IO** is used for real-time communication.
+* **Testing:** There is a strong emphasis on **automated testing**. The framework includes **Jest** for unit tests and **Playwright** for end-to-end tests. Test-Driven Development (TDD) is a constitutionally mandated practice.
+* **Git Workflow:** All development must be done on the `copilot` branch or feature branches derived from it. The `main` branch is strictly for production releases. Direct commits to `main` are a critical violation of project protocol.

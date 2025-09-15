@@ -6,175 +6,135 @@
 <h2>Environment Configuration</h2>
 <h3>Core Server Settings</h3>
 <h4>Application Server</h4>
-<pre><code class="language-bash"># Primary application server configuration
-PORT=8989                          # HTTP server port (default: 8989)
-HOST=0.0.0.0                      # Server bind address (default: 0.0.0.0)
-NODE_ENV=production               # Environment mode (development|production|test)
-PROCESS_TITLE=hextrackr-server    # Process title for monitoring
-</code></pre>
-<h4>Database Configuration</h4>
-<pre><code class="language-bash"># SQLite database settings
-DB_PATH=./data/hextrackr.db       # Database file location
-DB_TIMEOUT=30000                  # Query timeout in milliseconds
-DB_BUSY_TIMEOUT=10000             # Busy timeout for locked database
-DB_WAL_MODE=true                  # Enable Write-Ahead Logging for performance
-DB_PRAGMA_SYNCHRONOUS=NORMAL      # Synchronous mode (OFF|NORMAL|FULL|EXTRA)
-DB_PRAGMA_CACHE_SIZE=10000        # Cache size in pages (-10000 = 10MB)
-</code></pre>
-<h4>WebSocket Server</h4>
-<pre><code class="language-bash"># Real-time communication settings
-WEBSOCKET_PORT=8988               # WebSocket server port
-WS_PING_INTERVAL=25000           # Ping interval in milliseconds
-WS_PING_TIMEOUT=20000            # Ping timeout in milliseconds
-WS_MAX_CONNECTIONS=100           # Maximum concurrent WebSocket connections
-WS_COMPRESSION=true              # Enable WebSocket compression
-</code></pre>
-<hr>
+<pre><code class="language-bash"><span class="hljs-comment"># Primary application server configuration</span>
+PORT=8989                          <span class="hljs-comment"># HTTP server port (default: 8989)</span>
+HOST=0.0.0.0                      <span class="hljs-comment"># Server bind address (default: 0.0.0.0)</span>
+NODE_ENV=production               <span class="hljs-comment"># Environment mode (development|production|test)</span>
+PROCESS_TITLE=hextrackr-server    <span class="hljs-comment"># Process title for monitoring</span></code></pre><h4>Database Configuration</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># SQLite database settings</span>
+DB_PATH=./data/hextrackr.db       <span class="hljs-comment"># Database file location</span>
+DB_TIMEOUT=30000                  <span class="hljs-comment"># Query timeout in milliseconds</span>
+DB_BUSY_TIMEOUT=10000             <span class="hljs-comment"># Busy timeout for locked database</span>
+DB_WAL_MODE=<span class="hljs-literal">true</span>                  <span class="hljs-comment"># Enable Write-Ahead Logging for performance</span>
+DB_PRAGMA_SYNCHRONOUS=NORMAL      <span class="hljs-comment"># Synchronous mode (OFF|NORMAL|FULL|EXTRA)</span>
+DB_PRAGMA_CACHE_SIZE=10000        <span class="hljs-comment"># Cache size in pages (-10000 = 10MB)</span></code></pre><h4>WebSocket Server</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Real-time communication settings</span>
+WEBSOCKET_PORT=8988               <span class="hljs-comment"># WebSocket server port</span>
+WS_PING_INTERVAL=25000           <span class="hljs-comment"># Ping interval in milliseconds</span>
+WS_PING_TIMEOUT=20000            <span class="hljs-comment"># Ping timeout in milliseconds</span>
+WS_MAX_CONNECTIONS=100           <span class="hljs-comment"># Maximum concurrent WebSocket connections</span>
+WS_COMPRESSION=<span class="hljs-literal">true</span>              <span class="hljs-comment"># Enable WebSocket compression</span></code></pre><hr>
 <h3>Security Configuration</h3>
 <h4>Rate Limiting</h4>
-<pre><code class="language-bash"># API rate limiting configuration
-RATE_LIMIT_WINDOW_MS=900000      # Rate limit window (15 minutes in ms)
-RATE_LIMIT_MAX_REQUESTS=100      # Max requests per window per IP
-RATE_LIMIT_SKIP_SUCCESSFUL_REQUESTS=false  # Count successful requests
-RATE_LIMIT_SKIP_FAILED_REQUESTS=false      # Count failed requests
-RATE_LIMIT_HEADERS=true          # Include rate limit headers in responses
-</code></pre>
-<h4>CORS Settings</h4>
-<pre><code class="language-bash"># Cross-Origin Resource Sharing
-CORS_ORIGIN=*                    # Allowed origins (* for all, or specific URLs)
-CORS_METHODS=GET,POST,PUT,DELETE,OPTIONS  # Allowed HTTP methods
-CORS_ALLOWED_HEADERS=Content-Type,Authorization,X-Requested-With  # Allowed headers
-CORS_CREDENTIALS=false           # Allow credentials (cookies, auth headers)
-CORS_MAX_AGE=86400              # Preflight cache time in seconds
-</code></pre>
-<h4>File Upload Security</h4>
-<pre><code class="language-bash"># File upload restrictions
-MAX_UPLOAD_SIZE=52428800         # Maximum file size (50MB in bytes)
-UPLOAD_DIR=./app/public/uploads  # Upload directory path
-ALLOWED_EXTENSIONS=csv,json,xlsx # Comma-separated allowed file extensions
-UPLOAD_CLEANUP_AGE=86400000     # Auto-cleanup age in milliseconds (24 hours)
-UPLOAD_VIRUS_SCAN=false         # Enable virus scanning (requires ClamAV)
-</code></pre>
-<h4>Session Management</h4>
-<pre><code class="language-bash"># Session configuration
-SESSION_SECRET=&lt;auto-generated&gt;   # Session encryption key (auto-generated if missing)
-SESSION_NAME=hextrackr.sid       # Session cookie name
-SESSION_COOKIE_MAX_AGE=86400000  # Cookie expiration (24 hours in ms)
-SESSION_COOKIE_SECURE=false      # Secure cookie flag (true for HTTPS only)
-SESSION_COOKIE_HTTP_ONLY=true    # HTTP-only cookie flag
-SESSION_COOKIE_SAME_SITE=lax     # SameSite cookie attribute
-</code></pre>
-<hr>
+<pre><code class="language-bash"><span class="hljs-comment"># API rate limiting configuration</span>
+RATE_LIMIT_WINDOW_MS=900000      <span class="hljs-comment"># Rate limit window (15 minutes in ms)</span>
+RATE_LIMIT_MAX_REQUESTS=100      <span class="hljs-comment"># Max requests per window per IP</span>
+RATE_LIMIT_SKIP_SUCCESSFUL_REQUESTS=<span class="hljs-literal">false</span>  <span class="hljs-comment"># Count successful requests</span>
+RATE_LIMIT_SKIP_FAILED_REQUESTS=<span class="hljs-literal">false</span>      <span class="hljs-comment"># Count failed requests</span>
+RATE_LIMIT_HEADERS=<span class="hljs-literal">true</span>          <span class="hljs-comment"># Include rate limit headers in responses</span></code></pre><h4>CORS Settings</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Cross-Origin Resource Sharing</span>
+CORS_ORIGIN=*                    <span class="hljs-comment"># Allowed origins (* for all, or specific URLs)</span>
+CORS_METHODS=GET,POST,PUT,DELETE,OPTIONS  <span class="hljs-comment"># Allowed HTTP methods</span>
+CORS_ALLOWED_HEADERS=Content-Type,Authorization,X-Requested-With  <span class="hljs-comment"># Allowed headers</span>
+CORS_CREDENTIALS=<span class="hljs-literal">false</span>           <span class="hljs-comment"># Allow credentials (cookies, auth headers)</span>
+CORS_MAX_AGE=86400              <span class="hljs-comment"># Preflight cache time in seconds</span></code></pre><h4>File Upload Security</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># File upload restrictions</span>
+MAX_UPLOAD_SIZE=52428800         <span class="hljs-comment"># Maximum file size (50MB in bytes)</span>
+UPLOAD_DIR=./app/public/uploads  <span class="hljs-comment"># Upload directory path</span>
+ALLOWED_EXTENSIONS=csv,json,xlsx <span class="hljs-comment"># Comma-separated allowed file extensions</span>
+UPLOAD_CLEANUP_AGE=86400000     <span class="hljs-comment"># Auto-cleanup age in milliseconds (24 hours)</span>
+UPLOAD_VIRUS_SCAN=<span class="hljs-literal">false</span>         <span class="hljs-comment"># Enable virus scanning (requires ClamAV)</span></code></pre><h4>Session Management</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Session configuration</span>
+SESSION_SECRET=&lt;auto-generated&gt;   <span class="hljs-comment"># Session encryption key (auto-generated if missing)</span>
+SESSION_NAME=hextrackr.sid       <span class="hljs-comment"># Session cookie name</span>
+SESSION_COOKIE_MAX_AGE=86400000  <span class="hljs-comment"># Cookie expiration (24 hours in ms)</span>
+SESSION_COOKIE_SECURE=<span class="hljs-literal">false</span>      <span class="hljs-comment"># Secure cookie flag (true for HTTPS only)</span>
+SESSION_COOKIE_HTTP_ONLY=<span class="hljs-literal">true</span>    <span class="hljs-comment"># HTTP-only cookie flag</span>
+SESSION_COOKIE_SAME_SITE=lax     <span class="hljs-comment"># SameSite cookie attribute</span></code></pre><hr>
 <h3>Application Features</h3>
 <h4>Data Processing</h4>
-<pre><code class="language-bash"># CSV import and processing
-CSV_CHUNK_SIZE=1000              # Rows processed per batch
-CSV_MAX_COLUMNS=50               # Maximum columns per CSV
-CSV_SKIP_EMPTY_LINES=true        # Skip empty lines during import
-CSV_TRIM_WHITESPACE=true         # Trim whitespace from values
-CSV_VALIDATE_HEADERS=true        # Validate expected column headers
-</code></pre>
-<h4>Vulnerability Management</h4>
-<pre><code class="language-bash"># Vulnerability data handling
-VULN_CACHE_TTL=300000           # Cache TTL in milliseconds (5 minutes)
-VULN_BATCH_SIZE=100             # Batch size for bulk operations
-VULN_AUTO_CLEANUP_DAYS=365      # Auto-cleanup resolved vulnerabilities (days)
-VULN_ENABLE_ROLLOVER=true       # Enable rollover table architecture
-VULN_ROLLOVER_RETENTION_DAYS=90 # Historical data retention period
-</code></pre>
-<h4>Ticket Management</h4>
-<pre><code class="language-bash"># Support ticket configuration
-TICKET_AUTO_ASSIGN=false        # Auto-assign tickets to users
-TICKET_DEFAULT_PRIORITY=Medium  # Default priority (Low|Medium|High|Critical)
-TICKET_AUTO_CLOSE_DAYS=30      # Auto-close resolved tickets after N days
-TICKET_ENABLE_EMAIL_NOTIFICATIONS=false  # Email notifications (requires SMTP)
-</code></pre>
-<hr>
+<pre><code class="language-bash"><span class="hljs-comment"># CSV import and processing</span>
+CSV_CHUNK_SIZE=1000              <span class="hljs-comment"># Rows processed per batch</span>
+CSV_MAX_COLUMNS=50               <span class="hljs-comment"># Maximum columns per CSV</span>
+CSV_SKIP_EMPTY_LINES=<span class="hljs-literal">true</span>        <span class="hljs-comment"># Skip empty lines during import</span>
+CSV_TRIM_WHITESPACE=<span class="hljs-literal">true</span>         <span class="hljs-comment"># Trim whitespace from values</span>
+CSV_VALIDATE_HEADERS=<span class="hljs-literal">true</span>        <span class="hljs-comment"># Validate expected column headers</span></code></pre><h4>Vulnerability Management</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Vulnerability data handling</span>
+VULN_CACHE_TTL=300000           <span class="hljs-comment"># Cache TTL in milliseconds (5 minutes)</span>
+VULN_BATCH_SIZE=100             <span class="hljs-comment"># Batch size for bulk operations</span>
+VULN_AUTO_CLEANUP_DAYS=365      <span class="hljs-comment"># Auto-cleanup resolved vulnerabilities (days)</span>
+VULN_ENABLE_ROLLOVER=<span class="hljs-literal">true</span>       <span class="hljs-comment"># Enable rollover table architecture</span>
+VULN_ROLLOVER_RETENTION_DAYS=90 <span class="hljs-comment"># Historical data retention period</span></code></pre><h4>Ticket Management</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Support ticket configuration</span>
+TICKET_AUTO_ASSIGN=<span class="hljs-literal">false</span>        <span class="hljs-comment"># Auto-assign tickets to users</span>
+TICKET_DEFAULT_PRIORITY=Medium  <span class="hljs-comment"># Default priority (Low|Medium|High|Critical)</span>
+TICKET_AUTO_CLOSE_DAYS=30      <span class="hljs-comment"># Auto-close resolved tickets after N days</span>
+TICKET_ENABLE_EMAIL_NOTIFICATIONS=<span class="hljs-literal">false</span>  <span class="hljs-comment"># Email notifications (requires SMTP)</span></code></pre><hr>
 <h3>Performance Tuning</h3>
 <h4>Caching Configuration</h4>
-<pre><code class="language-bash"># Application caching settings
-CACHE_ENABLED=true              # Enable application-level caching
-CACHE_DEFAULT_TTL=300000        # Default cache TTL in milliseconds
-CACHE_MAX_SIZE=100              # Maximum cache entries
-CACHE_CHECK_PERIOD=60000        # Cache cleanup interval in milliseconds
-</code></pre>
-<h4>Response Compression</h4>
-<pre><code class="language-bash"># HTTP compression settings
-COMPRESSION_ENABLED=true        # Enable response compression
-COMPRESSION_LEVEL=6             # Compression level (1-9, higher = more compression)
-COMPRESSION_THRESHOLD=1024      # Minimum response size to compress (bytes)
-COMPRESSION_FILTER=text/*,application/json,application/javascript  # MIME types
-</code></pre>
-<h4>Static Asset Serving</h4>
-<pre><code class="language-bash"># Static file configuration
-STATIC_CACHE_MAX_AGE=86400000   # Cache-Control max-age for static assets
-STATIC_ETAG=true                # Enable ETag headers
-STATIC_LAST_MODIFIED=true       # Enable Last-Modified headers
-STATIC_INDEX=false              # Disable directory indexing
-</code></pre>
-<hr>
+<pre><code class="language-bash"><span class="hljs-comment"># Application caching settings</span>
+CACHE_ENABLED=<span class="hljs-literal">true</span>              <span class="hljs-comment"># Enable application-level caching</span>
+CACHE_DEFAULT_TTL=300000        <span class="hljs-comment"># Default cache TTL in milliseconds</span>
+CACHE_MAX_SIZE=100              <span class="hljs-comment"># Maximum cache entries</span>
+CACHE_CHECK_PERIOD=60000        <span class="hljs-comment"># Cache cleanup interval in milliseconds</span></code></pre><h4>Response Compression</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># HTTP compression settings</span>
+COMPRESSION_ENABLED=<span class="hljs-literal">true</span>        <span class="hljs-comment"># Enable response compression</span>
+COMPRESSION_LEVEL=6             <span class="hljs-comment"># Compression level (1-9, higher = more compression)</span>
+COMPRESSION_THRESHOLD=1024      <span class="hljs-comment"># Minimum response size to compress (bytes)</span>
+COMPRESSION_FILTER=text/*,application/json,application/javascript  <span class="hljs-comment"># MIME types</span></code></pre><h4>Static Asset Serving</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Static file configuration</span>
+STATIC_CACHE_MAX_AGE=86400000   <span class="hljs-comment"># Cache-Control max-age for static assets</span>
+STATIC_ETAG=<span class="hljs-literal">true</span>                <span class="hljs-comment"># Enable ETag headers</span>
+STATIC_LAST_MODIFIED=<span class="hljs-literal">true</span>       <span class="hljs-comment"># Enable Last-Modified headers</span>
+STATIC_INDEX=<span class="hljs-literal">false</span>              <span class="hljs-comment"># Disable directory indexing</span></code></pre><hr>
 <h3>Monitoring &amp; Logging</h3>
 <h4>Application Logging</h4>
-<pre><code class="language-bash"># Logging configuration
-LOG_LEVEL=info                  # Logging level (error|warn|info|debug|trace)
-LOG_FORMAT=combined             # Log format (combined|common|dev|short|tiny)
-LOG_DESTINATION=console         # Log destination (console|file|syslog)
-LOG_FILE_PATH=./logs/hextrackr.log  # Log file path (if LOG_DESTINATION=file)
-LOG_FILE_MAX_SIZE=10485760      # Log file max size in bytes (10MB)
-LOG_FILE_MAX_FILES=5            # Number of log files to retain
-</code></pre>
-<h4>Health Check Configuration</h4>
-<pre><code class="language-bash"># Health monitoring settings
-HEALTH_CHECK_ENABLED=true       # Enable /health endpoint
-HEALTH_CHECK_DB=true           # Include database connectivity check
-HEALTH_CHECK_WEBSOCKET=true    # Include WebSocket server check
-HEALTH_CHECK_DISK_SPACE=true   # Include disk space check
-HEALTH_CHECK_MEMORY=true       # Include memory usage check
-</code></pre>
-<h4>Metrics Collection</h4>
-<pre><code class="language-bash"># Performance metrics
-METRICS_ENABLED=false          # Enable metrics collection
-METRICS_ENDPOINT=/metrics      # Metrics endpoint path
-METRICS_INCLUDE_DEFAULT=true   # Include default Node.js metrics
-METRICS_INCLUDE_HTTP=true      # Include HTTP request metrics
-</code></pre>
-<hr>
+<pre><code class="language-bash"><span class="hljs-comment"># Logging configuration</span>
+LOG_LEVEL=info                  <span class="hljs-comment"># Logging level (error|warn|info|debug|trace)</span>
+LOG_FORMAT=combined             <span class="hljs-comment"># Log format (combined|common|dev|short|tiny)</span>
+LOG_DESTINATION=console         <span class="hljs-comment"># Log destination (console|file|syslog)</span>
+LOG_FILE_PATH=./logs/hextrackr.log  <span class="hljs-comment"># Log file path (if LOG_DESTINATION=file)</span>
+LOG_FILE_MAX_SIZE=10485760      <span class="hljs-comment"># Log file max size in bytes (10MB)</span>
+LOG_FILE_MAX_FILES=5            <span class="hljs-comment"># Number of log files to retain</span></code></pre><h4>Health Check Configuration</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Health monitoring settings</span>
+HEALTH_CHECK_ENABLED=<span class="hljs-literal">true</span>       <span class="hljs-comment"># Enable /health endpoint</span>
+HEALTH_CHECK_DB=<span class="hljs-literal">true</span>           <span class="hljs-comment"># Include database connectivity check</span>
+HEALTH_CHECK_WEBSOCKET=<span class="hljs-literal">true</span>    <span class="hljs-comment"># Include WebSocket server check</span>
+HEALTH_CHECK_DISK_SPACE=<span class="hljs-literal">true</span>   <span class="hljs-comment"># Include disk space check</span>
+HEALTH_CHECK_MEMORY=<span class="hljs-literal">true</span>       <span class="hljs-comment"># Include memory usage check</span></code></pre><h4>Metrics Collection</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Performance metrics</span>
+METRICS_ENABLED=<span class="hljs-literal">false</span>          <span class="hljs-comment"># Enable metrics collection</span>
+METRICS_ENDPOINT=/metrics      <span class="hljs-comment"># Metrics endpoint path</span>
+METRICS_INCLUDE_DEFAULT=<span class="hljs-literal">true</span>   <span class="hljs-comment"># Include default Node.js metrics</span>
+METRICS_INCLUDE_HTTP=<span class="hljs-literal">true</span>      <span class="hljs-comment"># Include HTTP request metrics</span></code></pre><hr>
 <h3>Documentation Portal</h3>
 <h4>Documentation Generation</h4>
-<pre><code class="language-bash"># Documentation system configuration
-DOCS_ENABLED=true              # Enable documentation portal
-DOCS_AUTO_REFRESH=true         # Auto-refresh docs on markdown changes
-DOCS_BUILD_ON_START=false      # Build documentation on server startup
-DOCS_SOURCE_DIR=./app/public/docs-source    # Documentation source directory
-DOCS_OUTPUT_DIR=./app/public/docs-html      # Generated documentation output
-DOCS_TEMPLATE_PATH=./app/public/docs-html/template.html  # HTML template
-</code></pre>
-<h4>Content Management</h4>
-<pre><code class="language-bash"># Documentation content settings
-DOCS_ENABLE_SEARCH=true        # Enable documentation search
-DOCS_ENABLE_TOC=true          # Enable table of contents generation
-DOCS_SYNTAX_HIGHLIGHTING=true  # Enable code syntax highlighting
-DOCS_MERMAID_DIAGRAMS=true    # Enable Mermaid diagram rendering
-DOCS_MATH_RENDERING=false     # Enable MathJax/KaTeX rendering
-</code></pre>
-<hr>
+<pre><code class="language-bash"><span class="hljs-comment"># Documentation system configuration</span>
+DOCS_ENABLED=<span class="hljs-literal">true</span>              <span class="hljs-comment"># Enable documentation portal</span>
+DOCS_AUTO_REFRESH=<span class="hljs-literal">true</span>         <span class="hljs-comment"># Auto-refresh docs on markdown changes</span>
+DOCS_BUILD_ON_START=<span class="hljs-literal">false</span>      <span class="hljs-comment"># Build documentation on server startup</span>
+DOCS_SOURCE_DIR=./app/public/docs-source    <span class="hljs-comment"># Documentation source directory</span>
+DOCS_OUTPUT_DIR=./app/public/docs-html      <span class="hljs-comment"># Generated documentation output</span>
+DOCS_TEMPLATE_PATH=./app/public/docs-html/template.html  <span class="hljs-comment"># HTML template</span></code></pre><h4>Content Management</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Documentation content settings</span>
+DOCS_ENABLE_SEARCH=<span class="hljs-literal">true</span>        <span class="hljs-comment"># Enable documentation search</span>
+DOCS_ENABLE_TOC=<span class="hljs-literal">true</span>          <span class="hljs-comment"># Enable table of contents generation</span>
+DOCS_SYNTAX_HIGHLIGHTING=<span class="hljs-literal">true</span>  <span class="hljs-comment"># Enable code syntax highlighting</span>
+DOCS_MERMAID_DIAGRAMS=<span class="hljs-literal">true</span>    <span class="hljs-comment"># Enable Mermaid diagram rendering</span>
+DOCS_MATH_RENDERING=<span class="hljs-literal">false</span>     <span class="hljs-comment"># Enable MathJax/KaTeX rendering</span></code></pre><hr>
 <h3>Development Settings</h3>
 <h4>Development Mode Features</h4>
-<pre><code class="language-bash"># Development-only configuration
-DEV_AUTO_RELOAD=true           # Enable auto-reload on file changes
-DEV_DETAILED_ERRORS=true       # Show detailed error messages
-DEV_CORS_RELAXED=true          # Relaxed CORS for development
-DEV_CACHE_DISABLED=true        # Disable caching in development
-DEV_MOCK_DATA=false            # Use mock data instead of database
-</code></pre>
-<h4>Debug Configuration</h4>
-<pre><code class="language-bash"># Debugging settings
-DEBUG_SQL_QUERIES=false        # Log SQL queries to console
-DEBUG_WEBSOCKET_EVENTS=false   # Log WebSocket events
-DEBUG_REQUEST_TIMING=false     # Log request processing times
-DEBUG_MEMORY_USAGE=false       # Log memory usage periodically
-</code></pre>
-<hr>
+<pre><code class="language-bash"><span class="hljs-comment"># Development-only configuration</span>
+DEV_AUTO_RELOAD=<span class="hljs-literal">true</span>           <span class="hljs-comment"># Enable auto-reload on file changes</span>
+DEV_DETAILED_ERRORS=<span class="hljs-literal">true</span>       <span class="hljs-comment"># Show detailed error messages</span>
+DEV_CORS_RELAXED=<span class="hljs-literal">true</span>          <span class="hljs-comment"># Relaxed CORS for development</span>
+DEV_CACHE_DISABLED=<span class="hljs-literal">true</span>        <span class="hljs-comment"># Disable caching in development</span>
+DEV_MOCK_DATA=<span class="hljs-literal">false</span>            <span class="hljs-comment"># Use mock data instead of database</span></code></pre><h4>Debug Configuration</h4>
+<pre><code class="language-bash"><span class="hljs-comment"># Debugging settings</span>
+DEBUG_SQL_QUERIES=<span class="hljs-literal">false</span>        <span class="hljs-comment"># Log SQL queries to console</span>
+DEBUG_WEBSOCKET_EVENTS=<span class="hljs-literal">false</span>   <span class="hljs-comment"># Log WebSocket events</span>
+DEBUG_REQUEST_TIMING=<span class="hljs-literal">false</span>     <span class="hljs-comment"># Log request processing times</span>
+DEBUG_MEMORY_USAGE=<span class="hljs-literal">false</span>       <span class="hljs-comment"># Log memory usage periodically</span></code></pre><hr>
 <h2>Runtime Configuration</h2>
 <h3>Application-Level Settings</h3>
 <p>These settings can be modified through the settings modal or configuration files:</p>
@@ -202,30 +162,24 @@ DEBUG_MEMORY_USAGE=false       # Log memory usage periodically
 <hr>
 <h2>Security Hardening Options</h2>
 <h3>Additional Security Headers</h3>
-<pre><code class="language-bash"># Security header configuration
-SECURITY_HSTS_ENABLED=true                    # HTTP Strict Transport Security
-SECURITY_HSTS_MAX_AGE=31536000               # HSTS max age in seconds
-SECURITY_CONTENT_TYPE_NOSNIFF=true           # X-Content-Type-Options: nosniff
-SECURITY_FRAME_OPTIONS=DENY                  # X-Frame-Options setting
-SECURITY_XSS_PROTECTION=1; mode=block        # X-XSS-Protection header
-SECURITY_REFERRER_POLICY=strict-origin-when-cross-origin  # Referrer-Policy
-</code></pre>
-<h3>Input Validation</h3>
-<pre><code class="language-bash"># Input validation settings
-VALIDATION_MAX_STRING_LENGTH=1000            # Maximum string field length
-VALIDATION_MAX_ARRAY_SIZE=100               # Maximum array size
-VALIDATION_SANITIZE_HTML=true               # Enable HTML sanitization
-VALIDATION_STRICT_JSON=true                 # Strict JSON parsing
-</code></pre>
-<h3>Audit Logging</h3>
-<pre><code class="language-bash"># Security audit logging
-AUDIT_LOG_ENABLED=false                     # Enable security audit logging
-AUDIT_LOG_FAILED_LOGINS=true               # Log failed authentication attempts
-AUDIT_LOG_FILE_UPLOADS=true                # Log file upload activities
-AUDIT_LOG_DATA_EXPORTS=true                # Log data export activities
-AUDIT_LOG_ADMIN_ACTIONS=true               # Log administrative actions
-</code></pre>
-<hr>
+<pre><code class="language-bash"><span class="hljs-comment"># Security header configuration</span>
+SECURITY_HSTS_ENABLED=<span class="hljs-literal">true</span>                    <span class="hljs-comment"># HTTP Strict Transport Security</span>
+SECURITY_HSTS_MAX_AGE=31536000               <span class="hljs-comment"># HSTS max age in seconds</span>
+SECURITY_CONTENT_TYPE_NOSNIFF=<span class="hljs-literal">true</span>           <span class="hljs-comment"># X-Content-Type-Options: nosniff</span>
+SECURITY_FRAME_OPTIONS=DENY                  <span class="hljs-comment"># X-Frame-Options setting</span>
+SECURITY_XSS_PROTECTION=1; mode=block        <span class="hljs-comment"># X-XSS-Protection header</span>
+SECURITY_REFERRER_POLICY=strict-origin-when-cross-origin  <span class="hljs-comment"># Referrer-Policy</span></code></pre><h3>Input Validation</h3>
+<pre><code class="language-bash"><span class="hljs-comment"># Input validation settings</span>
+VALIDATION_MAX_STRING_LENGTH=1000            <span class="hljs-comment"># Maximum string field length</span>
+VALIDATION_MAX_ARRAY_SIZE=100               <span class="hljs-comment"># Maximum array size</span>
+VALIDATION_SANITIZE_HTML=<span class="hljs-literal">true</span>               <span class="hljs-comment"># Enable HTML sanitization</span>
+VALIDATION_STRICT_JSON=<span class="hljs-literal">true</span>                 <span class="hljs-comment"># Strict JSON parsing</span></code></pre><h3>Audit Logging</h3>
+<pre><code class="language-bash"><span class="hljs-comment"># Security audit logging</span>
+AUDIT_LOG_ENABLED=<span class="hljs-literal">false</span>                     <span class="hljs-comment"># Enable security audit logging</span>
+AUDIT_LOG_FAILED_LOGINS=<span class="hljs-literal">true</span>               <span class="hljs-comment"># Log failed authentication attempts</span>
+AUDIT_LOG_FILE_UPLOADS=<span class="hljs-literal">true</span>                <span class="hljs-comment"># Log file upload activities</span>
+AUDIT_LOG_DATA_EXPORTS=<span class="hljs-literal">true</span>                <span class="hljs-comment"># Log data export activities</span>
+AUDIT_LOG_ADMIN_ACTIONS=<span class="hljs-literal">true</span>               <span class="hljs-comment"># Log administrative actions</span></code></pre><hr>
 <h2>Configuration Management</h2>
 <h3>Environment File Priority</h3>
 <ol>
@@ -252,52 +206,44 @@ AUDIT_LOG_ADMIN_ACTIONS=true               # Log administrative actions
 <li>Feature flag toggles</li>
 </ul>
 <h3>Configuration Backup</h3>
-<pre><code class="language-bash"># Generate current configuration dump
+<pre><code class="language-bash"><span class="hljs-comment"># Generate current configuration dump</span>
 npm run config:dump &gt; config-backup.json
 
-# Validate configuration file
+<span class="hljs-comment"># Validate configuration file</span>
 npm run config:validate
 
-# Show configuration with sources
-npm run config:show
-</code></pre>
-<hr>
+<span class="hljs-comment"># Show configuration with sources</span>
+npm run config:show</code></pre><hr>
 <h2>Production Deployment Settings</h2>
 <h3>Recommended Production Values</h3>
 <pre><code class="language-bash">NODE_ENV=production
 LOG_LEVEL=warn
-COMPRESSION_ENABLED=true
-STATIC_CACHE_MAX_AGE=2592000000    # 30 days
+COMPRESSION_ENABLED=<span class="hljs-literal">true</span>
+STATIC_CACHE_MAX_AGE=2592000000    <span class="hljs-comment"># 30 days</span>
 CORS_ORIGIN=https://yourdomain.com
-SESSION_COOKIE_SECURE=true
-SECURITY_HSTS_ENABLED=true
-DB_WAL_MODE=true
-CACHE_ENABLED=true
-</code></pre>
-<h3>Docker Environment</h3>
-<pre><code class="language-yaml"># docker-compose.yml environment variables
-environment:
-  - NODE_ENV=production
-  - PORT=8989
-  - WEBSOCKET_PORT=8988
-  - DB_PATH=/data/hextrackr.db
-  - UPLOAD_DIR=/data/uploads
-  - LOG_DESTINATION=console
-</code></pre>
-<h3>Kubernetes ConfigMap Example</h3>
-<pre><code class="language-yaml">apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: hextrackr-config
-data:
-  NODE_ENV: &quot;production&quot;
-  PORT: &quot;8989&quot;
-  WEBSOCKET_PORT: &quot;8988&quot;
-  LOG_LEVEL: &quot;warn&quot;
-  COMPRESSION_ENABLED: &quot;true&quot;
-  CACHE_ENABLED: &quot;true&quot;
-</code></pre>
-<p>This configuration documentation provides complete transparency about all configurable aspects of HexTrackr, essential for security reviews and operational deployment planning.</p>
+SESSION_COOKIE_SECURE=<span class="hljs-literal">true</span>
+SECURITY_HSTS_ENABLED=<span class="hljs-literal">true</span>
+DB_WAL_MODE=<span class="hljs-literal">true</span>
+CACHE_ENABLED=<span class="hljs-literal">true</span></code></pre><h3>Docker Environment</h3>
+<pre><code class="language-yaml"><span class="hljs-comment"># docker-compose.yml environment variables</span>
+<span class="hljs-attr">environment:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">NODE_ENV=production</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">PORT=8989</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">WEBSOCKET_PORT=8988</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">DB_PATH=/data/hextrackr.db</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">UPLOAD_DIR=/data/uploads</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">LOG_DESTINATION=console</span></code></pre><h3>Kubernetes ConfigMap Example</h3>
+<pre><code class="language-yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ConfigMap</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">hextrackr-config</span>
+<span class="hljs-attr">data:</span>
+  <span class="hljs-attr">NODE_ENV:</span> <span class="hljs-string">&quot;production&quot;</span>
+  <span class="hljs-attr">PORT:</span> <span class="hljs-string">&quot;8989&quot;</span>
+  <span class="hljs-attr">WEBSOCKET_PORT:</span> <span class="hljs-string">&quot;8988&quot;</span>
+  <span class="hljs-attr">LOG_LEVEL:</span> <span class="hljs-string">&quot;warn&quot;</span>
+  <span class="hljs-attr">COMPRESSION_ENABLED:</span> <span class="hljs-string">&quot;true&quot;</span>
+  <span class="hljs-attr">CACHE_ENABLED:</span> <span class="hljs-string">&quot;true&quot;</span></code></pre><p>This configuration documentation provides complete transparency about all configurable aspects of HexTrackr, essential for security reviews and operational deployment planning.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

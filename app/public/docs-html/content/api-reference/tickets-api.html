@@ -11,28 +11,26 @@
 <li><strong>Query Parameters</strong>: None</li>
 <li><strong>Response</strong>: <code>200 OK</code><ul>
 <li><p><strong>Note</strong>: The <code>devices</code> and <code>attachments</code> fields are returned as JSON strings.</p>
-<pre><code class="language-json">[
-  {
-    &quot;id&quot;: &quot;TICK-123&quot;,
-    &quot;xt_number&quot;: &quot;XT001&quot;,
-    &quot;date_submitted&quot;: &quot;2025-08-20T12:00:00.000Z&quot;,
-    &quot;date_due&quot;: &quot;2025-08-30T12:00:00.000Z&quot;,
-    &quot;hexagon_ticket&quot;: &quot;HX-456&quot;,
-    &quot;service_now_ticket&quot;: &quot;INC0000123&quot;,
-    &quot;location&quot;: &quot;HQ-1&quot;,
-    &quot;devices&quot;: &quot;[\&quot;Device 1\&quot;,\&quot;Device 2\&quot;]&quot;,
-    &quot;supervisor&quot;: &quot;Jane Doe&quot;,
-    &quot;tech&quot;: &quot;John Smith&quot;,
-    &quot;status&quot;: &quot;Open&quot;,
-    &quot;notes&quot;: &quot;Initial ticket creation.&quot;,
-    &quot;attachments&quot;: &quot;[]&quot;,
-    &quot;created_at&quot;: &quot;2025-08-20T12:00:00.000Z&quot;,
-    &quot;updated_at&quot;: &quot;2025-08-20T12:00:00.000Z&quot;,
-    &quot;site&quot;: &quot;HQ&quot;
-  }
-]
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;TICK-123&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;xt_number&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;XT001&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;date_submitted&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-20T12:00:00.000Z&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;date_due&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-30T12:00:00.000Z&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;hexagon_ticket&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;HX-456&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;service_now_ticket&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;INC0000123&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;location&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;HQ-1&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;devices&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;[\&quot;Device 1\&quot;,\&quot;Device 2\&quot;]&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;supervisor&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Jane Doe&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;tech&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;John Smith&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Open&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;notes&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Initial ticket creation.&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;attachments&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;[]&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;created_at&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-20T12:00:00.000Z&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;updated_at&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-20T12:00:00.000Z&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;site&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;HQ&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">]</span></code></pre></li>
 </ul>
 </li>
 </ul>
@@ -41,34 +39,30 @@
 <li><p><strong>Description</strong>: Creates a new ticket. The server expects camelCase keys in the request body and maps them to snake_case for the database.</p>
 </li>
 <li><p><strong>Request Body</strong>: <code>application/json</code></p>
-<pre><code class="language-json">{
-  &quot;id&quot;: &quot;TICK-124&quot;,
-  &quot;xt_number&quot;: &quot;XT002&quot;,
-  &quot;dateSubmitted&quot;: &quot;2025-08-21T10:00:00.000Z&quot;,
-  &quot;dateDue&quot;: &quot;2025-08-31T10:00:00.000Z&quot;,
-  &quot;hexagonTicket&quot;: &quot;HX-457&quot;,
-  &quot;serviceNowTicket&quot;: &quot;INC0000124&quot;,
-  &quot;location&quot;: &quot;HQ-2&quot;,
-  &quot;devices&quot;: [&quot;Device 3&quot;, &quot;Device 4&quot;],
-  &quot;supervisor&quot;: &quot;John Doe&quot;,
-  &quot;tech&quot;: &quot;Jane Smith&quot;,
-  &quot;status&quot;: &quot;Open&quot;,
-  &quot;notes&quot;: &quot;This is a new ticket.&quot;,
-  &quot;attachments&quot;: [],
-  &quot;createdAt&quot;: &quot;2025-08-21T10:00:00.000Z&quot;,
-  &quot;updatedAt&quot;: &quot;2025-08-21T10:00:00.000Z&quot;,
-  &quot;site&quot;: &quot;HQ&quot;
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;TICK-124&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;xt_number&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;XT002&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;dateSubmitted&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-21T10:00:00.000Z&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;dateDue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-31T10:00:00.000Z&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;hexagonTicket&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;HX-457&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;serviceNowTicket&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;INC0000124&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;location&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;HQ-2&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;devices&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;Device 3&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;Device 4&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;supervisor&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;John Doe&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;tech&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Jane Smith&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Open&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;notes&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;This is a new ticket.&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;attachments&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;createdAt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-21T10:00:00.000Z&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;updatedAt&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-21T10:00:00.000Z&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;site&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;HQ&quot;</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">{
-  &quot;success&quot;: true,
-  &quot;id&quot;: &quot;TICK-124&quot;,
-  &quot;message&quot;: &quot;Ticket saved successfully&quot;
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;success&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;TICK-124&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Ticket saved successfully&quot;</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 <h3>PUT /api/tickets/:id</h3>
 <ul>
@@ -82,13 +76,11 @@
 <li><p><strong>Request Body</strong>: <code>application/json</code> (Same shape as <code>POST /api/tickets</code>)</p>
 </li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">{
-  &quot;success&quot;: true,
-  &quot;id&quot;: &quot;TICK-123&quot;,
-  &quot;message&quot;: &quot;Ticket updated successfully&quot;
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;success&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;TICK-123&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Ticket updated successfully&quot;</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 <h3>DELETE /api/tickets/:id</h3>
 <ul>
@@ -100,12 +92,10 @@
 </ul>
 </li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">{
-  &quot;success&quot;: true,
-  &quot;deleted&quot;: 1
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;success&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;deleted&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 <hr>
 <h2>Data Import Endpoints</h2>
@@ -114,34 +104,30 @@
 <li><p><strong>Description</strong>: Imports a batch of tickets from a JSON array. This is typically used after parsing a CSV file on the frontend. The operation performs an <code>INSERT OR REPLACE</code> into the database.</p>
 </li>
 <li><p><strong>Request Body</strong>: <code>application/json</code></p>
-<pre><code class="language-json">{
-  &quot;data&quot;: [
-    {
-      &quot;id&quot;: &quot;ticket_1&quot;,
-      &quot;xt_number&quot;: &quot;XT001&quot;,
-      &quot;date_submitted&quot;: &quot;2025-08-20&quot;,
-      &quot;date_due&quot;: &quot;2025-08-30&quot;,
-      &quot;hexagon_ticket&quot;: &quot;HX-456&quot;,
-      &quot;service_now_ticket&quot;: &quot;INC0000123&quot;,
-      &quot;location&quot;: &quot;HQ-1&quot;,
-      &quot;devices&quot;: &quot;[\&quot;Device 1\&quot;]&quot;,
-      &quot;supervisor&quot;: &quot;Jane&quot;,
-      &quot;tech&quot;: &quot;John&quot;,
-      &quot;status&quot;: &quot;Open&quot;,
-      &quot;notes&quot;: &quot;Notes from import.&quot;
-    }
-  ]
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ticket_1&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;xt_number&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;XT001&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;date_submitted&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-20&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;date_due&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-30&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;hexagon_ticket&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;HX-456&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;service_now_ticket&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;INC0000123&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;location&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;HQ-1&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;devices&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;[\&quot;Device 1\&quot;]&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;supervisor&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Jane&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;tech&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;John&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Open&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;notes&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Notes from import.&quot;</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">{
-  &quot;success&quot;: true,
-  &quot;imported&quot;: 1,
-  &quot;total&quot;: 1
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;success&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;imported&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;total&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 <h3>POST /api/tickets/migrate</h3>
 <ul>
@@ -150,30 +136,26 @@
 <li><p><strong>Note</strong>: The schema for this endpoint is different from the standard ticket format and should only be used for migrating legacy data.</p>
 </li>
 <li><p><strong>Request Body</strong>: <code>application/json</code></p>
-<pre><code class="language-json">{
-  &quot;tickets&quot;: [
-    {
-      &quot;id&quot;: &quot;legacy-1&quot;,
-      &quot;start_date&quot;: &quot;2025-08-01&quot;,
-      &quot;end_date&quot;: &quot;2025-08-05&quot;,
-      &quot;primary_number&quot;: &quot;PR-1&quot;,
-      &quot;incident_number&quot;: &quot;INC-1&quot;,
-      &quot;site_code&quot;: &quot;HQ&quot;,
-      &quot;affected_devices&quot;: [&quot;DEV-1&quot;],
-      &quot;assignee&quot;: &quot;Tech&quot;,
-      &quot;status&quot;: &quot;Open&quot;
-    }
-  ]
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;tickets&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;legacy-1&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;start_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-01&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;end_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-05&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;primary_number&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;PR-1&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;incident_number&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;INC-1&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;site_code&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;HQ&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;affected_devices&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;DEV-1&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;assignee&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Tech&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Open&quot;</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">{
-  &quot;success&quot;: true,
-  &quot;message&quot;: &quot;Migration completed: 1 tickets migrated, 0 errors&quot;
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;success&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Migration completed: 1 tickets migrated, 0 errors&quot;</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 <hr>
 <h2>Reference Data Endpoints</h2>
@@ -191,17 +173,13 @@
 <h2>Error Responses</h2>
 <ul>
 <li><p><strong><code>400 Bad Request</code></strong>: The request body is missing or contains invalid data.</p>
-<pre><code class="language-json">{
-  &quot;error&quot;: &quot;No data provided&quot;
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;error&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;No data provided&quot;</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 <li><p><strong><code>500 Internal Server Error</code></strong>: An error occurred during a database operation.</p>
-<pre><code class="language-json">{
-  &quot;error&quot;: &quot;Failed to save ticket&quot;
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;error&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Failed to save ticket&quot;</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts

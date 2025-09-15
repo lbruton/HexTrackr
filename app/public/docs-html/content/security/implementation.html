@@ -19,34 +19,32 @@
 <p><strong>Location</strong>: <code>app/public/server.js</code> (lines 22-79)</p>
 <p>The <code>PathValidator</code> class provides comprehensive protection against path traversal attacks and ensures safe file operations.</p>
 <p><strong>Core Security Features</strong>:</p>
-<pre><code class="language-javascript">class PathValidator {
-  static validatePath(filePath) {
-    // 1. Basic validation
-    if (!filePath || typeof filePath !== &quot;string&quot;) {
-      throw new Error(&quot;Invalid file path&quot;);
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">PathValidator</span> {
+  <span class="hljs-keyword">static</span> <span class="hljs-title function_">validatePath</span>(<span class="hljs-params">filePath</span>) {
+    <span class="hljs-comment">// 1. Basic validation</span>
+    <span class="hljs-keyword">if</span> (!filePath || <span class="hljs-keyword">typeof</span> filePath !== <span class="hljs-string">&quot;string&quot;</span>) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Invalid file path&quot;</span>);
     }
 
-    // 2. Path normalization
-    const normalizedPath = path.normalize(filePath);
+    <span class="hljs-comment">// 2. Path normalization</span>
+    <span class="hljs-keyword">const</span> normalizedPath = path.<span class="hljs-title function_">normalize</span>(filePath);
 
-    // 3. Path traversal detection
-    if (normalizedPath.includes(&quot;../&quot;) || normalizedPath.includes(&quot;..\\&quot;)) {
-      throw new Error(&quot;Path traversal detected&quot;);
+    <span class="hljs-comment">// 3. Path traversal detection</span>
+    <span class="hljs-keyword">if</span> (normalizedPath.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&quot;../&quot;</span>) || normalizedPath.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&quot;..\\&quot;</span>)) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Path traversal detected&quot;</span>);
     }
 
-    // 4. Component validation
-    const pathComponents = normalizedPath.split(path.sep);
-    for (const component of pathComponents) {
-      if (component === &quot;..&quot; || (component === &quot;.&quot; &amp;&amp; pathComponents.length &gt; 1)) {
-        throw new Error(&quot;Invalid path component&quot;);
+    <span class="hljs-comment">// 4. Component validation</span>
+    <span class="hljs-keyword">const</span> pathComponents = normalizedPath.<span class="hljs-title function_">split</span>(path.<span class="hljs-property">sep</span>);
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> component <span class="hljs-keyword">of</span> pathComponents) {
+      <span class="hljs-keyword">if</span> (component === <span class="hljs-string">&quot;..&quot;</span> || (component === <span class="hljs-string">&quot;.&quot;</span> &amp;&amp; pathComponents.<span class="hljs-property">length</span> &gt; <span class="hljs-number">1</span>)) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Invalid path component&quot;</span>);
       }
     }
 
-    return normalizedPath;
+    <span class="hljs-keyword">return</span> normalizedPath;
   }
-}
-</code></pre>
-<p><strong>Protected Operations</strong>:</p>
+}</code></pre><p><strong>Protected Operations</strong>:</p>
 <ul>
 <li><code>safeReadFileSync()</code>: Safe file reading with path validation</li>
 <li><code>safeWriteFileSync()</code>: Secure file writing operations</li>
@@ -66,14 +64,12 @@
 <h3>SQL Injection Prevention</h3>
 <p><strong>Implementation</strong>: Parameterized queries throughout the application</p>
 <p><strong>Example Secure Query Pattern</strong>:</p>
-<pre><code class="language-javascript">// Secure parameterized query
-const stmt = db.prepare(`
+<pre><code class="language-javascript"><span class="hljs-comment">// Secure parameterized query</span>
+<span class="hljs-keyword">const</span> stmt = db.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">`
   SELECT * FROM vulnerabilities
   WHERE hostname = ? AND severity = ? AND scan_date &gt; ?
-`);
-const results = stmt.all(hostname, severity, dateThreshold);
-</code></pre>
-<p><strong>Protection Mechanisms</strong>:</p>
+`</span>);
+<span class="hljs-keyword">const</span> results = stmt.<span class="hljs-title function_">all</span>(hostname, severity, dateThreshold);</code></pre><p><strong>Protection Mechanisms</strong>:</p>
 <ul>
 <li>All database queries use parameterized statements</li>
 <li>No dynamic SQL construction with user input</li>
@@ -92,20 +88,18 @@ const results = stmt.all(hostname, severity, dateThreshold);
 <h3>XSS Protection</h3>
 <p><strong>Primary Defense</strong>: DOMPurify library integration</p>
 <p><strong>Implementation</strong>:</p>
-<pre><code class="language-javascript">// Client-side XSS protection
-import DOMPurify from &#39;dompurify&#39;;
+<pre><code class="language-javascript"><span class="hljs-comment">// Client-side XSS protection</span>
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">DOMPurify</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;dompurify&#x27;</span>;
 
-// Sanitize all user-generated content
-function sanitizeHTML(dirty) {
-  return DOMPurify.sanitize(dirty, {
-    ALLOWED_TAGS: [&#39;b&#39;, &#39;i&#39;, &#39;em&#39;, &#39;strong&#39;, &#39;p&#39;, &#39;br&#39;],
-    ALLOWED_ATTR: [&#39;class&#39;],
-    FORBID_TAGS: [&#39;script&#39;, &#39;object&#39;, &#39;embed&#39;, &#39;link&#39;],
-    FORBID_ATTR: [&#39;onerror&#39;, &#39;onload&#39;, &#39;onclick&#39;]
+<span class="hljs-comment">// Sanitize all user-generated content</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">sanitizeHTML</span>(<span class="hljs-params">dirty</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-title class_">DOMPurify</span>.<span class="hljs-title function_">sanitize</span>(dirty, {
+    <span class="hljs-attr">ALLOWED_TAGS</span>: [<span class="hljs-string">&#x27;b&#x27;</span>, <span class="hljs-string">&#x27;i&#x27;</span>, <span class="hljs-string">&#x27;em&#x27;</span>, <span class="hljs-string">&#x27;strong&#x27;</span>, <span class="hljs-string">&#x27;p&#x27;</span>, <span class="hljs-string">&#x27;br&#x27;</span>],
+    <span class="hljs-attr">ALLOWED_ATTR</span>: [<span class="hljs-string">&#x27;class&#x27;</span>],
+    <span class="hljs-attr">FORBID_TAGS</span>: [<span class="hljs-string">&#x27;script&#x27;</span>, <span class="hljs-string">&#x27;object&#x27;</span>, <span class="hljs-string">&#x27;embed&#x27;</span>, <span class="hljs-string">&#x27;link&#x27;</span>],
+    <span class="hljs-attr">FORBID_ATTR</span>: [<span class="hljs-string">&#x27;onerror&#x27;</span>, <span class="hljs-string">&#x27;onload&#x27;</span>, <span class="hljs-string">&#x27;onclick&#x27;</span>]
   });
-}
-</code></pre>
-<p><strong>Additional XSS Protections</strong>:</p>
+}</code></pre><p><strong>Additional XSS Protections</strong>:</p>
 <ul>
 <li>Content Security Policy (CSP) headers</li>
 <li>X-XSS-Protection header enabled</li>
@@ -118,32 +112,30 @@ function sanitizeHTML(dirty) {
 <h3>Rate Limiting</h3>
 <p><strong>Implementation</strong>: Express Rate Limit middleware</p>
 <p><strong>Configuration</strong>:</p>
-<pre><code class="language-javascript">const rateLimit = require(&quot;express-rate-limit&quot;);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> rateLimit = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;express-rate-limit&quot;</span>);
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: {
-    error: &quot;Too many requests from this IP, please try again later.&quot;,
-    retryAfter: &quot;15 minutes&quot;
+<span class="hljs-keyword">const</span> limiter = <span class="hljs-title function_">rateLimit</span>({
+  <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>, <span class="hljs-comment">// 15 minutes</span>
+  <span class="hljs-attr">max</span>: <span class="hljs-number">100</span>, <span class="hljs-comment">// Limit each IP to 100 requests per windowMs</span>
+  <span class="hljs-attr">message</span>: {
+    <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Too many requests from this IP, please try again later.&quot;</span>,
+    <span class="hljs-attr">retryAfter</span>: <span class="hljs-string">&quot;15 minutes&quot;</span>
   },
-  standardHeaders: true, // Return rate limit info in headers
-  legacyHeaders: false,
-  handler: (req, res) =&gt; {
-    res.status(429).json({
-      success: false,
-      error: {
-        code: &quot;RATE_LIMIT_EXCEEDED&quot;,
-        message: &quot;Rate limit exceeded. Try again later.&quot;
+  <span class="hljs-attr">standardHeaders</span>: <span class="hljs-literal">true</span>, <span class="hljs-comment">// Return rate limit info in headers</span>
+  <span class="hljs-attr">legacyHeaders</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">handler</span>: <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    res.<span class="hljs-title function_">status</span>(<span class="hljs-number">429</span>).<span class="hljs-title function_">json</span>({
+      <span class="hljs-attr">success</span>: <span class="hljs-literal">false</span>,
+      <span class="hljs-attr">error</span>: {
+        <span class="hljs-attr">code</span>: <span class="hljs-string">&quot;RATE_LIMIT_EXCEEDED&quot;</span>,
+        <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Rate limit exceeded. Try again later.&quot;</span>
       }
     });
   }
 });
 
-// Apply to all API routes
-app.use(&quot;/api/&quot;, limiter);
-</code></pre>
-<p><strong>Rate Limiting Strategy</strong>:</p>
+<span class="hljs-comment">// Apply to all API routes</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/&quot;</span>, limiter);</code></pre><p><strong>Rate Limiting Strategy</strong>:</p>
 <ul>
 <li><strong>Window</strong>: 15-minute sliding window</li>
 <li><strong>Limit</strong>: 100 requests per IP per window</li>
@@ -155,120 +147,112 @@ app.use(&quot;/api/&quot;, limiter);
 <h3>CORS Configuration</h3>
 <p><strong>Implementation</strong>: Configurable Cross-Origin Resource Sharing</p>
 <p><strong>Default Configuration</strong>:</p>
-<pre><code class="language-javascript">const cors = require(&quot;cors&quot;);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> cors = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;cors&quot;</span>);
 
-const corsOptions = {
-  origin: process.env.CORS_ORIGIN || &quot;*&quot;,
-  methods: [&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;],
-  allowedHeaders: [
-    &quot;Content-Type&quot;,
-    &quot;Authorization&quot;,
-    &quot;X-Requested-With&quot;,
-    &quot;Accept&quot;,
-    &quot;Origin&quot;
+<span class="hljs-keyword">const</span> corsOptions = {
+  <span class="hljs-attr">origin</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CORS_ORIGIN</span> || <span class="hljs-string">&quot;*&quot;</span>,
+  <span class="hljs-attr">methods</span>: [<span class="hljs-string">&quot;GET&quot;</span>, <span class="hljs-string">&quot;POST&quot;</span>, <span class="hljs-string">&quot;PUT&quot;</span>, <span class="hljs-string">&quot;DELETE&quot;</span>, <span class="hljs-string">&quot;OPTIONS&quot;</span>],
+  <span class="hljs-attr">allowedHeaders</span>: [
+    <span class="hljs-string">&quot;Content-Type&quot;</span>,
+    <span class="hljs-string">&quot;Authorization&quot;</span>,
+    <span class="hljs-string">&quot;X-Requested-With&quot;</span>,
+    <span class="hljs-string">&quot;Accept&quot;</span>,
+    <span class="hljs-string">&quot;Origin&quot;</span>
   ],
-  credentials: false, // No credentials by default
-  maxAge: 86400 // 24 hours preflight cache
+  <span class="hljs-attr">credentials</span>: <span class="hljs-literal">false</span>, <span class="hljs-comment">// No credentials by default</span>
+  <span class="hljs-attr">maxAge</span>: <span class="hljs-number">86400</span> <span class="hljs-comment">// 24 hours preflight cache</span>
 };
 
-app.use(cors(corsOptions));
-</code></pre>
-<p><strong>Production Recommendations</strong>:</p>
-<pre><code class="language-javascript">// Production CORS settings
-const productionCors = {
-  origin: &quot;https://hextrackr.yourdomain.com&quot;,
-  credentials: false,
-  methods: [&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;],
-  allowedHeaders: [&quot;Content-Type&quot;, &quot;X-Requested-With&quot;]
-};
-</code></pre>
-<h3>Security Headers</h3>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">cors</span>(corsOptions));</code></pre><p><strong>Production Recommendations</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Production CORS settings</span>
+<span class="hljs-keyword">const</span> productionCors = {
+  <span class="hljs-attr">origin</span>: <span class="hljs-string">&quot;https://hextrackr.yourdomain.com&quot;</span>,
+  <span class="hljs-attr">credentials</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">methods</span>: [<span class="hljs-string">&quot;GET&quot;</span>, <span class="hljs-string">&quot;POST&quot;</span>, <span class="hljs-string">&quot;PUT&quot;</span>, <span class="hljs-string">&quot;DELETE&quot;</span>],
+  <span class="hljs-attr">allowedHeaders</span>: [<span class="hljs-string">&quot;Content-Type&quot;</span>, <span class="hljs-string">&quot;X-Requested-With&quot;</span>]
+};</code></pre><h3>Security Headers</h3>
 <p><strong>Implementation</strong>: Custom security header middleware</p>
-<pre><code class="language-javascript">// Security headers middleware
-app.use((req, res, next) =&gt; {
-  // HTTP Strict Transport Security
-  res.setHeader(
-    &quot;Strict-Transport-Security&quot;,
-    &quot;max-age=31536000; includeSubDomains&quot;
+<pre><code class="language-javascript"><span class="hljs-comment">// Security headers middleware</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-comment">// HTTP Strict Transport Security</span>
+  res.<span class="hljs-title function_">setHeader</span>(
+    <span class="hljs-string">&quot;Strict-Transport-Security&quot;</span>,
+    <span class="hljs-string">&quot;max-age=31536000; includeSubDomains&quot;</span>
   );
 
-  // Prevent MIME type sniffing
-  res.setHeader(&quot;X-Content-Type-Options&quot;, &quot;nosniff&quot;);
+  <span class="hljs-comment">// Prevent MIME type sniffing</span>
+  res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&quot;X-Content-Type-Options&quot;</span>, <span class="hljs-string">&quot;nosniff&quot;</span>);
 
-  // Clickjacking protection
-  res.setHeader(&quot;X-Frame-Options&quot;, &quot;DENY&quot;);
+  <span class="hljs-comment">// Clickjacking protection</span>
+  res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&quot;X-Frame-Options&quot;</span>, <span class="hljs-string">&quot;DENY&quot;</span>);
 
-  // XSS protection
-  res.setHeader(&quot;X-XSS-Protection&quot;, &quot;1; mode=block&quot;);
+  <span class="hljs-comment">// XSS protection</span>
+  res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&quot;X-XSS-Protection&quot;</span>, <span class="hljs-string">&quot;1; mode=block&quot;</span>);
 
-  // Referrer policy
-  res.setHeader(
-    &quot;Referrer-Policy&quot;,
-    &quot;strict-origin-when-cross-origin&quot;
+  <span class="hljs-comment">// Referrer policy</span>
+  res.<span class="hljs-title function_">setHeader</span>(
+    <span class="hljs-string">&quot;Referrer-Policy&quot;</span>,
+    <span class="hljs-string">&quot;strict-origin-when-cross-origin&quot;</span>
   );
 
-  // Content Security Policy (development - adjust for production)
-  res.setHeader(
-    &quot;Content-Security-Policy&quot;,
-    &quot;default-src &#39;self&#39;; script-src &#39;self&#39; &#39;unsafe-inline&#39; &#39;unsafe-eval&#39;; style-src &#39;self&#39; &#39;unsafe-inline&#39;; img-src &#39;self&#39; data: https:; font-src &#39;self&#39; https:;&quot;
+  <span class="hljs-comment">// Content Security Policy (development - adjust for production)</span>
+  res.<span class="hljs-title function_">setHeader</span>(
+    <span class="hljs-string">&quot;Content-Security-Policy&quot;</span>,
+    <span class="hljs-string">&quot;default-src &#x27;self&#x27;; script-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; &#x27;unsafe-eval&#x27;; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;; img-src &#x27;self&#x27; data: https:; font-src &#x27;self&#x27; https:;&quot;</span>
   );
 
-  next();
-});
-</code></pre>
-<hr>
+  <span class="hljs-title function_">next</span>();
+});</code></pre><hr>
 <h2>File Upload Security</h2>
 <h3>Upload Restrictions</h3>
 <p><strong>Configuration</strong>:</p>
-<pre><code class="language-javascript">const multer = require(&quot;multer&quot;);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> multer = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;multer&quot;</span>);
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) =&gt; {
-    // Validate upload directory exists and is writable
-    const uploadDir = process.env.UPLOAD_DIR || &quot;./app/public/uploads&quot;;
-    cb(null, uploadDir);
+<span class="hljs-keyword">const</span> storage = multer.<span class="hljs-title function_">diskStorage</span>({
+  <span class="hljs-attr">destination</span>: <span class="hljs-function">(<span class="hljs-params">req, file, cb</span>) =&gt;</span> {
+    <span class="hljs-comment">// Validate upload directory exists and is writable</span>
+    <span class="hljs-keyword">const</span> uploadDir = process.<span class="hljs-property">env</span>.<span class="hljs-property">UPLOAD_DIR</span> || <span class="hljs-string">&quot;./app/public/uploads&quot;</span>;
+    <span class="hljs-title function_">cb</span>(<span class="hljs-literal">null</span>, uploadDir);
   },
-  filename: (req, file, cb) =&gt; {
-    // Generate secure filename with timestamp
-    const timestamp = Date.now();
-    const sanitizedName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, &#39;_&#39;);
-    cb(null, `${timestamp}-${sanitizedName}`);
+  <span class="hljs-attr">filename</span>: <span class="hljs-function">(<span class="hljs-params">req, file, cb</span>) =&gt;</span> {
+    <span class="hljs-comment">// Generate secure filename with timestamp</span>
+    <span class="hljs-keyword">const</span> timestamp = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>();
+    <span class="hljs-keyword">const</span> sanitizedName = file.<span class="hljs-property">originalname</span>.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/[^a-zA-Z0-9.-]/g</span>, <span class="hljs-string">&#x27;_&#x27;</span>);
+    <span class="hljs-title function_">cb</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">`<span class="hljs-subst">${timestamp}</span>-<span class="hljs-subst">${sanitizedName}</span>`</span>);
   }
 });
 
-const fileFilter = (req, file, cb) =&gt; {
-  // Allowed MIME types
-  const allowedMimes = [
-    &#39;text/csv&#39;,
-    &#39;application/json&#39;,
-    &#39;application/vnd.ms-excel&#39;,
-    &#39;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&#39;
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">fileFilter</span> = (<span class="hljs-params">req, file, cb</span>) =&gt; {
+  <span class="hljs-comment">// Allowed MIME types</span>
+  <span class="hljs-keyword">const</span> allowedMimes = [
+    <span class="hljs-string">&#x27;text/csv&#x27;</span>,
+    <span class="hljs-string">&#x27;application/json&#x27;</span>,
+    <span class="hljs-string">&#x27;application/vnd.ms-excel&#x27;</span>,
+    <span class="hljs-string">&#x27;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&#x27;</span>
   ];
 
-  // Allowed file extensions
-  const allowedExtensions = [&#39;.csv&#39;, &#39;.json&#39;, &#39;.xls&#39;, &#39;.xlsx&#39;];
-  const fileExtension = path.extname(file.originalname).toLowerCase();
+  <span class="hljs-comment">// Allowed file extensions</span>
+  <span class="hljs-keyword">const</span> allowedExtensions = [<span class="hljs-string">&#x27;.csv&#x27;</span>, <span class="hljs-string">&#x27;.json&#x27;</span>, <span class="hljs-string">&#x27;.xls&#x27;</span>, <span class="hljs-string">&#x27;.xlsx&#x27;</span>];
+  <span class="hljs-keyword">const</span> fileExtension = path.<span class="hljs-title function_">extname</span>(file.<span class="hljs-property">originalname</span>).<span class="hljs-title function_">toLowerCase</span>();
 
-  if (allowedMimes.includes(file.mimetype) &amp;&amp; allowedExtensions.includes(fileExtension)) {
-    cb(null, true);
-  } else {
-    cb(new Error(`File type not allowed. Allowed types: ${allowedExtensions.join(&#39;, &#39;)}`), false);
+  <span class="hljs-keyword">if</span> (allowedMimes.<span class="hljs-title function_">includes</span>(file.<span class="hljs-property">mimetype</span>) &amp;&amp; allowedExtensions.<span class="hljs-title function_">includes</span>(fileExtension)) {
+    <span class="hljs-title function_">cb</span>(<span class="hljs-literal">null</span>, <span class="hljs-literal">true</span>);
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-title function_">cb</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`File type not allowed. Allowed types: <span class="hljs-subst">${allowedExtensions.join(<span class="hljs-string">&#x27;, &#x27;</span>)}</span>`</span>), <span class="hljs-literal">false</span>);
   }
 };
 
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit
-    files: 1, // Single file upload only
-    fields: 5, // Limit form fields
-    fieldSize: 1024 * 1024, // 1MB per field
-    headerPairs: 2000 // Limit header pairs
+<span class="hljs-keyword">const</span> upload = <span class="hljs-title function_">multer</span>({
+  <span class="hljs-attr">storage</span>: storage,
+  <span class="hljs-attr">limits</span>: {
+    <span class="hljs-attr">fileSize</span>: <span class="hljs-number">50</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>, <span class="hljs-comment">// 50MB limit</span>
+    <span class="hljs-attr">files</span>: <span class="hljs-number">1</span>, <span class="hljs-comment">// Single file upload only</span>
+    <span class="hljs-attr">fields</span>: <span class="hljs-number">5</span>, <span class="hljs-comment">// Limit form fields</span>
+    <span class="hljs-attr">fieldSize</span>: <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>, <span class="hljs-comment">// 1MB per field</span>
+    <span class="hljs-attr">headerPairs</span>: <span class="hljs-number">2000</span> <span class="hljs-comment">// Limit header pairs</span>
   },
-  fileFilter: fileFilter
-});
-</code></pre>
-<p><strong>Security Controls</strong>:</p>
+  <span class="hljs-attr">fileFilter</span>: fileFilter
+});</code></pre><p><strong>Security Controls</strong>:</p>
 <ul>
 <li><strong>File Size</strong>: 50MB maximum per file</li>
 <li><strong>File Types</strong>: CSV, JSON, XLS, XLSX only</li>
@@ -280,67 +264,63 @@ const upload = multer({
 </ul>
 <h3>File Processing Security</h3>
 <p><strong>CSV Processing with PapaParse</strong>:</p>
-<pre><code class="language-javascript">const Papa = require(&quot;papaparse&quot;);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">Papa</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;papaparse&quot;</span>);
 
-function parseCSVSecurely(fileContent, options = {}) {
-  const secureConfig = {
-    header: true,
-    skipEmptyLines: true,
-    transformHeader: (header) =&gt; {
-      // Sanitize column headers
-      return header.trim().replace(/[^a-zA-Z0-9_-]/g, &#39;_&#39;);
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">parseCSVSecurely</span>(<span class="hljs-params">fileContent, options = {}</span>) {
+  <span class="hljs-keyword">const</span> secureConfig = {
+    <span class="hljs-attr">header</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">skipEmptyLines</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">transformHeader</span>: <span class="hljs-function">(<span class="hljs-params">header</span>) =&gt;</span> {
+      <span class="hljs-comment">// Sanitize column headers</span>
+      <span class="hljs-keyword">return</span> header.<span class="hljs-title function_">trim</span>().<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/[^a-zA-Z0-9_-]/g</span>, <span class="hljs-string">&#x27;_&#x27;</span>);
     },
-    transform: (value, field) =&gt; {
-      // Sanitize field values
-      if (typeof value === &#39;string&#39;) {
-        return value.trim().substring(0, 1000); // Limit field length
+    <span class="hljs-attr">transform</span>: <span class="hljs-function">(<span class="hljs-params">value, field</span>) =&gt;</span> {
+      <span class="hljs-comment">// Sanitize field values</span>
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> value === <span class="hljs-string">&#x27;string&#x27;</span>) {
+        <span class="hljs-keyword">return</span> value.<span class="hljs-title function_">trim</span>().<span class="hljs-title function_">substring</span>(<span class="hljs-number">0</span>, <span class="hljs-number">1000</span>); <span class="hljs-comment">// Limit field length</span>
       }
-      return value;
+      <span class="hljs-keyword">return</span> value;
     },
-    error: (error, file, inputElem, reason) =&gt; {
-      console.error(&#39;CSV parsing error:&#39;, error, reason);
+    <span class="hljs-attr">error</span>: <span class="hljs-function">(<span class="hljs-params">error, file, inputElem, reason</span>) =&gt;</span> {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;CSV parsing error:&#x27;</span>, error, reason);
     },
-    // Security limits
-    worker: false, // Disable web workers
-    download: false, // No external downloads
-    delimiter: &#39;&#39;, // Auto-detect delimiter
-    chunkSize: 1024 * 1024, // 1MB chunks
+    <span class="hljs-comment">// Security limits</span>
+    <span class="hljs-attr">worker</span>: <span class="hljs-literal">false</span>, <span class="hljs-comment">// Disable web workers</span>
+    <span class="hljs-attr">download</span>: <span class="hljs-literal">false</span>, <span class="hljs-comment">// No external downloads</span>
+    <span class="hljs-attr">delimiter</span>: <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-comment">// Auto-detect delimiter</span>
+    <span class="hljs-attr">chunkSize</span>: <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>, <span class="hljs-comment">// 1MB chunks</span>
     ...options
   };
 
-  return Papa.parse(fileContent, secureConfig);
-}
-</code></pre>
-<hr>
+  <span class="hljs-keyword">return</span> <span class="hljs-title class_">Papa</span>.<span class="hljs-title function_">parse</span>(fileContent, secureConfig);
+}</code></pre><hr>
 <h2>Session Management</h2>
 <h3>Current State (Stateless)</h3>
 <p>HexTrackr currently operates in a stateless mode without user authentication. However, the foundation is prepared for secure session management.</p>
 <h3>Prepared Session Configuration</h3>
-<pre><code class="language-javascript">const session = require(&#39;express-session&#39;);
-const SQLiteStore = require(&#39;connect-sqlite3&#39;)(session);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> session = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express-session&#x27;</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">SQLiteStore</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;connect-sqlite3&#x27;</span>)(session);
 
-const sessionConfig = {
-  secret: process.env.SESSION_SECRET || &#39;auto-generated-secret&#39;,
-  name: &#39;hextrackr.sid&#39;,
-  store: new SQLiteStore({
-    db: &#39;sessions.db&#39;,
-    dir: &#39;./data&#39;,
-    table: &#39;sessions&#39;
+<span class="hljs-keyword">const</span> sessionConfig = {
+  <span class="hljs-attr">secret</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">SESSION_SECRET</span> || <span class="hljs-string">&#x27;auto-generated-secret&#x27;</span>,
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;hextrackr.sid&#x27;</span>,
+  <span class="hljs-attr">store</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">SQLiteStore</span>({
+    <span class="hljs-attr">db</span>: <span class="hljs-string">&#x27;sessions.db&#x27;</span>,
+    <span class="hljs-attr">dir</span>: <span class="hljs-string">&#x27;./data&#x27;</span>,
+    <span class="hljs-attr">table</span>: <span class="hljs-string">&#x27;sessions&#x27;</span>
   }),
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === &#39;production&#39;, // HTTPS only in production
-    httpOnly: true, // Prevent XSS access to cookies
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: &#39;strict&#39; // CSRF protection
+  <span class="hljs-attr">resave</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">saveUninitialized</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">cookie</span>: {
+    <span class="hljs-attr">secure</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> === <span class="hljs-string">&#x27;production&#x27;</span>, <span class="hljs-comment">// HTTPS only in production</span>
+    <span class="hljs-attr">httpOnly</span>: <span class="hljs-literal">true</span>, <span class="hljs-comment">// Prevent XSS access to cookies</span>
+    <span class="hljs-attr">maxAge</span>: <span class="hljs-number">24</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>, <span class="hljs-comment">// 24 hours</span>
+    <span class="hljs-attr">sameSite</span>: <span class="hljs-string">&#x27;strict&#x27;</span> <span class="hljs-comment">// CSRF protection</span>
   },
-  genid: () =&gt; {
-    return require(&#39;crypto&#39;).randomBytes(32).toString(&#39;hex&#39;);
+  <span class="hljs-attr">genid</span>: <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;crypto&#x27;</span>).<span class="hljs-title function_">randomBytes</span>(<span class="hljs-number">32</span>).<span class="hljs-title function_">toString</span>(<span class="hljs-string">&#x27;hex&#x27;</span>);
   }
-};
-</code></pre>
-<h3>Future Authentication Framework</h3>
+};</code></pre><h3>Future Authentication Framework</h3>
 <p><strong>Planned Authentication Methods</strong>:</p>
 <ol>
 <li><strong>Local Authentication</strong>: Username/password with bcrypt hashing</li>
@@ -360,25 +340,23 @@ const sessionConfig = {
 <h2>Data Protection</h2>
 <h3>Database Security</h3>
 <p><strong>SQLite Configuration</strong>:</p>
-<pre><code class="language-javascript">const sqlite3 = require(&#39;sqlite3&#39;).verbose();
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> sqlite3 = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;sqlite3&#x27;</span>).<span class="hljs-title function_">verbose</span>();
 
-// Secure database connection
-const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) =&gt; {
-  if (err) {
-    console.error(&#39;Database connection error:&#39;, err);
-    process.exit(1);
+<span class="hljs-comment">// Secure database connection</span>
+<span class="hljs-keyword">const</span> db = <span class="hljs-keyword">new</span> sqlite3.<span class="hljs-title class_">Database</span>(dbPath, sqlite3.<span class="hljs-property">OPEN_READWRITE</span> | sqlite3.<span class="hljs-property">OPEN_CREATE</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Database connection error:&#x27;</span>, err);
+    process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>);
   }
 });
 
-// Enable WAL mode for better concurrency and recovery
-db.exec(&#39;PRAGMA journal_mode=WAL&#39;);
+<span class="hljs-comment">// Enable WAL mode for better concurrency and recovery</span>
+db.<span class="hljs-title function_">exec</span>(<span class="hljs-string">&#x27;PRAGMA journal_mode=WAL&#x27;</span>);
 
-// Set secure pragma settings
-db.exec(&#39;PRAGMA foreign_keys=ON&#39;); // Enforce foreign key constraints
-db.exec(&#39;PRAGMA secure_delete=ON&#39;); // Securely delete data
-db.exec(&#39;PRAGMA temp_store=MEMORY&#39;); // Store temporary data in memory
-</code></pre>
-<p><strong>Sensitive Data Handling</strong>:</p>
+<span class="hljs-comment">// Set secure pragma settings</span>
+db.<span class="hljs-title function_">exec</span>(<span class="hljs-string">&#x27;PRAGMA foreign_keys=ON&#x27;</span>); <span class="hljs-comment">// Enforce foreign key constraints</span>
+db.<span class="hljs-title function_">exec</span>(<span class="hljs-string">&#x27;PRAGMA secure_delete=ON&#x27;</span>); <span class="hljs-comment">// Securely delete data</span>
+db.<span class="hljs-title function_">exec</span>(<span class="hljs-string">&#x27;PRAGMA temp_store=MEMORY&#x27;</span>); <span class="hljs-comment">// Store temporary data in memory</span></code></pre><p><strong>Sensitive Data Handling</strong>:</p>
 <ul>
 <li>No passwords or secrets stored in database</li>
 <li>Input validation before database operations</li>
@@ -388,164 +366,156 @@ db.exec(&#39;PRAGMA temp_store=MEMORY&#39;); // Store temporary data in memory
 </ul>
 <h3>Data Sanitization</h3>
 <p><strong>Input Sanitization Functions</strong>:</p>
-<pre><code class="language-javascript">// Comprehensive input sanitization
-function sanitizeInput(input, type = &#39;string&#39;) {
-  if (input === null || input === undefined) {
-    return null;
+<pre><code class="language-javascript"><span class="hljs-comment">// Comprehensive input sanitization</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">sanitizeInput</span>(<span class="hljs-params">input, type = <span class="hljs-string">&#x27;string&#x27;</span></span>) {
+  <span class="hljs-keyword">if</span> (input === <span class="hljs-literal">null</span> || input === <span class="hljs-literal">undefined</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
   }
 
-  switch (type) {
-    case &#39;string&#39;:
-      return String(input)
-        .trim()
-        .substring(0, 1000) // Limit length
-        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, &#39;&#39;); // Remove control chars
+  <span class="hljs-keyword">switch</span> (type) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;string&#x27;</span>:
+      <span class="hljs-keyword">return</span> <span class="hljs-title class_">String</span>(input)
+        .<span class="hljs-title function_">trim</span>()
+        .<span class="hljs-title function_">substring</span>(<span class="hljs-number">0</span>, <span class="hljs-number">1000</span>) <span class="hljs-comment">// Limit length</span>
+        .<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g</span>, <span class="hljs-string">&#x27;&#x27;</span>); <span class="hljs-comment">// Remove control chars</span>
 
-    case &#39;number&#39;:
-      const num = parseFloat(input);
-      return isNaN(num) ? 0 : Math.max(-999999, Math.min(999999, num));
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;number&#x27;</span>:
+      <span class="hljs-keyword">const</span> num = <span class="hljs-built_in">parseFloat</span>(input);
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">isNaN</span>(num) ? <span class="hljs-number">0</span> : <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">max</span>(-<span class="hljs-number">999999</span>, <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">min</span>(<span class="hljs-number">999999</span>, num));
 
-    case &#39;boolean&#39;:
-      return Boolean(input);
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;boolean&#x27;</span>:
+      <span class="hljs-keyword">return</span> <span class="hljs-title class_">Boolean</span>(input);
 
-    case &#39;date&#39;:
-      const date = new Date(input);
-      return isNaN(date.getTime()) ? null : date.toISOString();
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;date&#x27;</span>:
+      <span class="hljs-keyword">const</span> date = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>(input);
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">isNaN</span>(date.<span class="hljs-title function_">getTime</span>()) ? <span class="hljs-literal">null</span> : date.<span class="hljs-title function_">toISOString</span>();
 
-    case &#39;cve&#39;:
-      // CVE format validation
-      const cveRegex = /^CVE-\d{4}-\d{4,}$/;
-      return cveRegex.test(input) ? input : null;
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;cve&#x27;</span>:
+      <span class="hljs-comment">// CVE format validation</span>
+      <span class="hljs-keyword">const</span> cveRegex = <span class="hljs-regexp">/^CVE-\d{4}-\d{4,}$/</span>;
+      <span class="hljs-keyword">return</span> cveRegex.<span class="hljs-title function_">test</span>(input) ? input : <span class="hljs-literal">null</span>;
 
-    case &#39;severity&#39;:
-      const validSeverities = [&#39;Low&#39;, &#39;Medium&#39;, &#39;High&#39;, &#39;Critical&#39;];
-      return validSeverities.includes(input) ? input : &#39;Medium&#39;;
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;severity&#x27;</span>:
+      <span class="hljs-keyword">const</span> validSeverities = [<span class="hljs-string">&#x27;Low&#x27;</span>, <span class="hljs-string">&#x27;Medium&#x27;</span>, <span class="hljs-string">&#x27;High&#x27;</span>, <span class="hljs-string">&#x27;Critical&#x27;</span>];
+      <span class="hljs-keyword">return</span> validSeverities.<span class="hljs-title function_">includes</span>(input) ? input : <span class="hljs-string">&#x27;Medium&#x27;</span>;
 
-    default:
-      return sanitizeInput(input, &#39;string&#39;);
+    <span class="hljs-attr">default</span>:
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">sanitizeInput</span>(input, <span class="hljs-string">&#x27;string&#x27;</span>);
   }
-}
-</code></pre>
-<hr>
+}</code></pre><hr>
 <h2>Application Security Features</h2>
 <h3>Progress Tracking Security</h3>
 <p><strong>WebSocket Session Management</strong>:</p>
-<pre><code class="language-javascript">class ProgressTracker {
-  constructor(io) {
-    this.io = io;
-    this.sessions = new Map();
-    this.THROTTLE_INTERVAL = 100; // Prevent spam
-    this.SESSION_CLEANUP_INTERVAL = 30 * 60 * 1000; // 30 minutes
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ProgressTracker</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">io</span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">io</span> = io;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">sessions</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">THROTTLE_INTERVAL</span> = <span class="hljs-number">100</span>; <span class="hljs-comment">// Prevent spam</span>
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">SESSION_CLEANUP_INTERVAL</span> = <span class="hljs-number">30</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>; <span class="hljs-comment">// 30 minutes</span>
   }
 
-  createSession(metadata = {}) {
-    const sessionId = crypto.randomUUID();
-    const session = {
-      id: sessionId,
-      progress: 0,
-      lastUpdate: Date.now(),
-      metadata: this.sanitizeMetadata(metadata),
-      ipAddress: this.getClientIP(), // Track origin
-      createdAt: Date.now()
+  <span class="hljs-title function_">createSession</span>(<span class="hljs-params">metadata = {}</span>) {
+    <span class="hljs-keyword">const</span> sessionId = crypto.<span class="hljs-title function_">randomUUID</span>();
+    <span class="hljs-keyword">const</span> session = {
+      <span class="hljs-attr">id</span>: sessionId,
+      <span class="hljs-attr">progress</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">lastUpdate</span>: <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>(),
+      <span class="hljs-attr">metadata</span>: <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">sanitizeMetadata</span>(metadata),
+      <span class="hljs-attr">ipAddress</span>: <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getClientIP</span>(), <span class="hljs-comment">// Track origin</span>
+      <span class="hljs-attr">createdAt</span>: <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>()
     };
 
-    this.sessions.set(sessionId, session);
-    return sessionId;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">sessions</span>.<span class="hljs-title function_">set</span>(sessionId, session);
+    <span class="hljs-keyword">return</span> sessionId;
   }
 
-  sanitizeMetadata(metadata) {
-    // Sanitize all metadata fields
-    const sanitized = {};
-    for (const [key, value] of Object.entries(metadata)) {
-      if (typeof key === &#39;string&#39; &amp;&amp; key.length &lt;= 50) {
-        sanitized[key] = sanitizeInput(value, &#39;string&#39;);
+  <span class="hljs-title function_">sanitizeMetadata</span>(<span class="hljs-params">metadata</span>) {
+    <span class="hljs-comment">// Sanitize all metadata fields</span>
+    <span class="hljs-keyword">const</span> sanitized = {};
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> [key, value] <span class="hljs-keyword">of</span> <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">entries</span>(metadata)) {
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> key === <span class="hljs-string">&#x27;string&#x27;</span> &amp;&amp; key.<span class="hljs-property">length</span> &lt;= <span class="hljs-number">50</span>) {
+        sanitized[key] = <span class="hljs-title function_">sanitizeInput</span>(value, <span class="hljs-string">&#x27;string&#x27;</span>);
       }
     }
-    return sanitized;
+    <span class="hljs-keyword">return</span> sanitized;
   }
-}
-</code></pre>
-<h3>Error Handling Security</h3>
+}</code></pre><h3>Error Handling Security</h3>
 <p><strong>Secure Error Responses</strong>:</p>
-<pre><code class="language-javascript">// Error handler that doesn&#39;t leak sensitive information
-function secureErrorHandler(err, req, res, next) {
-  // Log full error internally
-  console.error(&#39;Application Error:&#39;, {
-    error: err.message,
-    stack: err.stack,
-    url: req.url,
-    method: req.method,
-    ip: req.ip,
-    userAgent: req.get(&#39;User-Agent&#39;),
-    timestamp: new Date().toISOString()
+<pre><code class="language-javascript"><span class="hljs-comment">// Error handler that doesn&#x27;t leak sensitive information</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">secureErrorHandler</span>(<span class="hljs-params">err, req, res, next</span>) {
+  <span class="hljs-comment">// Log full error internally</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Application Error:&#x27;</span>, {
+    <span class="hljs-attr">error</span>: err.<span class="hljs-property">message</span>,
+    <span class="hljs-attr">stack</span>: err.<span class="hljs-property">stack</span>,
+    <span class="hljs-attr">url</span>: req.<span class="hljs-property">url</span>,
+    <span class="hljs-attr">method</span>: req.<span class="hljs-property">method</span>,
+    <span class="hljs-attr">ip</span>: req.<span class="hljs-property">ip</span>,
+    <span class="hljs-attr">userAgent</span>: req.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;User-Agent&#x27;</span>),
+    <span class="hljs-attr">timestamp</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>()
   });
 
-  // Generic error response for clients
-  const isDevelopment = process.env.NODE_ENV === &#39;development&#39;;
+  <span class="hljs-comment">// Generic error response for clients</span>
+  <span class="hljs-keyword">const</span> isDevelopment = process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> === <span class="hljs-string">&#x27;development&#x27;</span>;
 
-  res.status(err.status || 500).json({
-    success: false,
-    error: {
-      code: err.code || &#39;INTERNAL_ERROR&#39;,
-      message: isDevelopment ? err.message : &#39;An error occurred&#39;,
-      ...(isDevelopment &amp;&amp; { stack: err.stack }),
-      timestamp: new Date().toISOString(),
-      requestId: req.id || &#39;unknown&#39;
+  res.<span class="hljs-title function_">status</span>(err.<span class="hljs-property">status</span> || <span class="hljs-number">500</span>).<span class="hljs-title function_">json</span>({
+    <span class="hljs-attr">success</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">error</span>: {
+      <span class="hljs-attr">code</span>: err.<span class="hljs-property">code</span> || <span class="hljs-string">&#x27;INTERNAL_ERROR&#x27;</span>,
+      <span class="hljs-attr">message</span>: isDevelopment ? err.<span class="hljs-property">message</span> : <span class="hljs-string">&#x27;An error occurred&#x27;</span>,
+      ...(isDevelopment &amp;&amp; { <span class="hljs-attr">stack</span>: err.<span class="hljs-property">stack</span> }),
+      <span class="hljs-attr">timestamp</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>(),
+      <span class="hljs-attr">requestId</span>: req.<span class="hljs-property">id</span> || <span class="hljs-string">&#x27;unknown&#x27;</span>
     }
   });
-}
-</code></pre>
-<hr>
+}</code></pre><hr>
 <h2>Security Monitoring and Logging</h2>
 <h3>Security Event Logging</h3>
 <p><strong>Audit Log Implementation</strong>:</p>
-<pre><code class="language-javascript">class SecurityAuditLogger {
-  constructor(logFile = &#39;./logs/security.log&#39;) {
-    this.logFile = logFile;
-    this.logLevel = process.env.AUDIT_LOG_LEVEL || &#39;info&#39;;
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">SecurityAuditLogger</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">logFile = <span class="hljs-string">&#x27;./logs/security.log&#x27;</span></span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">logFile</span> = logFile;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">logLevel</span> = process.<span class="hljs-property">env</span>.<span class="hljs-property">AUDIT_LOG_LEVEL</span> || <span class="hljs-string">&#x27;info&#x27;</span>;
   }
 
-  log(level, event, details = {}) {
-    const logEntry = {
-      timestamp: new Date().toISOString(),
-      level: level,
-      event: event,
-      details: details,
-      ip: details.ip || &#39;unknown&#39;,
-      userAgent: details.userAgent || &#39;unknown&#39;
+  <span class="hljs-title function_">log</span>(<span class="hljs-params">level, event, details = {}</span>) {
+    <span class="hljs-keyword">const</span> logEntry = {
+      <span class="hljs-attr">timestamp</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>(),
+      <span class="hljs-attr">level</span>: level,
+      <span class="hljs-attr">event</span>: event,
+      <span class="hljs-attr">details</span>: details,
+      <span class="hljs-attr">ip</span>: details.<span class="hljs-property">ip</span> || <span class="hljs-string">&#x27;unknown&#x27;</span>,
+      <span class="hljs-attr">userAgent</span>: details.<span class="hljs-property">userAgent</span> || <span class="hljs-string">&#x27;unknown&#x27;</span>
     };
 
-    // Log to file and/or external service
-    console.log(`SECURITY: ${JSON.stringify(logEntry)}`);
+    <span class="hljs-comment">// Log to file and/or external service</span>
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`SECURITY: <span class="hljs-subst">${<span class="hljs-built_in">JSON</span>.stringify(logEntry)}</span>`</span>);
 
-    // Critical events should trigger alerts
-    if (level === &#39;critical&#39;) {
-      this.triggerAlert(logEntry);
+    <span class="hljs-comment">// Critical events should trigger alerts</span>
+    <span class="hljs-keyword">if</span> (level === <span class="hljs-string">&#x27;critical&#x27;</span>) {
+      <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">triggerAlert</span>(logEntry);
     }
   }
 
-  logFileUpload(req, file, success) {
-    this.log(&#39;info&#39;, &#39;FILE_UPLOAD&#39;, {
-      filename: file.originalname,
-      size: file.size,
-      mimetype: file.mimetype,
-      success: success,
-      ip: req.ip,
-      userAgent: req.get(&#39;User-Agent&#39;)
+  <span class="hljs-title function_">logFileUpload</span>(<span class="hljs-params">req, file, success</span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;info&#x27;</span>, <span class="hljs-string">&#x27;FILE_UPLOAD&#x27;</span>, {
+      <span class="hljs-attr">filename</span>: file.<span class="hljs-property">originalname</span>,
+      <span class="hljs-attr">size</span>: file.<span class="hljs-property">size</span>,
+      <span class="hljs-attr">mimetype</span>: file.<span class="hljs-property">mimetype</span>,
+      <span class="hljs-attr">success</span>: success,
+      <span class="hljs-attr">ip</span>: req.<span class="hljs-property">ip</span>,
+      <span class="hljs-attr">userAgent</span>: req.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;User-Agent&#x27;</span>)
     });
   }
 
-  logRateLimitExceeded(req) {
-    this.log(&#39;warning&#39;, &#39;RATE_LIMIT_EXCEEDED&#39;, {
-      ip: req.ip,
-      url: req.url,
-      method: req.method,
-      userAgent: req.get(&#39;User-Agent&#39;)
+  <span class="hljs-title function_">logRateLimitExceeded</span>(<span class="hljs-params">req</span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;warning&#x27;</span>, <span class="hljs-string">&#x27;RATE_LIMIT_EXCEEDED&#x27;</span>, {
+      <span class="hljs-attr">ip</span>: req.<span class="hljs-property">ip</span>,
+      <span class="hljs-attr">url</span>: req.<span class="hljs-property">url</span>,
+      <span class="hljs-attr">method</span>: req.<span class="hljs-property">method</span>,
+      <span class="hljs-attr">userAgent</span>: req.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;User-Agent&#x27;</span>)
     });
   }
-}
-</code></pre>
-<h3>Intrusion Detection Patterns</h3>
+}</code></pre><h3>Intrusion Detection Patterns</h3>
 <p><strong>Suspicious Activity Detection</strong>:</p>
 <ul>
 <li>Multiple file upload failures from same IP</li>
@@ -590,18 +560,16 @@ function secureErrorHandler(err, req, res, next) {
 <h2>Security Testing and Validation</h2>
 <h3>Automated Security Testing</h3>
 <p><strong>Security Test Suite</strong>:</p>
-<pre><code class="language-bash"># Run security tests
-npm run security:test
+<pre><code class="language-bash"><span class="hljs-comment"># Run security tests</span>
+npm run security:<span class="hljs-built_in">test</span>
 
-# Includes:
-# - SQL injection testing
-# - XSS payload testing
-# - Path traversal testing
-# - File upload security testing
-# - Rate limiting validation
-# - CORS configuration testing
-</code></pre>
-<h3>Penetration Testing Checklist</h3>
+<span class="hljs-comment"># Includes:</span>
+<span class="hljs-comment"># - SQL injection testing</span>
+<span class="hljs-comment"># - XSS payload testing</span>
+<span class="hljs-comment"># - Path traversal testing</span>
+<span class="hljs-comment"># - File upload security testing</span>
+<span class="hljs-comment"># - Rate limiting validation</span>
+<span class="hljs-comment"># - CORS configuration testing</span></code></pre><h3>Penetration Testing Checklist</h3>
 <p><strong>Network Security</strong>:</p>
 <ul>
 <li><input disabled="" type="checkbox"> Port scanning and service enumeration</li>
@@ -628,42 +596,36 @@ npm run security:test
 <h2>Security Configuration Checklist</h2>
 <h3>Production Deployment Security</h3>
 <p><strong>Required Environment Variables</strong>:</p>
-<pre><code class="language-bash"># Security configuration
+<pre><code class="language-bash"><span class="hljs-comment"># Security configuration</span>
 NODE_ENV=production
 CORS_ORIGIN=https://yourdomain.com
-SESSION_COOKIE_SECURE=true
+SESSION_COOKIE_SECURE=<span class="hljs-literal">true</span>
 RATE_LIMIT_MAX_REQUESTS=100
 MAX_UPLOAD_SIZE=52428800
 LOG_LEVEL=warn
 
-# Generate secure session secret
-SESSION_SECRET=$(openssl rand -hex 32)
-</code></pre>
-<p><strong>File Permissions</strong>:</p>
-<pre><code class="language-bash"># Database file
-chmod 600 /path/to/hextrackr.db
+<span class="hljs-comment"># Generate secure session secret</span>
+SESSION_SECRET=$(openssl rand -hex 32)</code></pre><p><strong>File Permissions</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Database file</span>
+<span class="hljs-built_in">chmod</span> 600 /path/to/hextrackr.db
 
-# Configuration files
-chmod 600 /path/to/.env
+<span class="hljs-comment"># Configuration files</span>
+<span class="hljs-built_in">chmod</span> 600 /path/to/.env
 
-# Upload directory
-chmod 755 /path/to/uploads
-chown www-data:www-data /path/to/uploads
+<span class="hljs-comment"># Upload directory</span>
+<span class="hljs-built_in">chmod</span> 755 /path/to/uploads
+<span class="hljs-built_in">chown</span> www-data:www-data /path/to/uploads
 
-# Application directory
-chmod -R 755 /path/to/app
-chown -R www-data:www-data /path/to/app
-</code></pre>
-<p><strong>Network Security</strong>:</p>
-<pre><code class="language-bash"># Firewall configuration
-ufw allow 8989/tcp  # HTTP API
-ufw allow 8988/tcp  # WebSocket
-ufw enable
+<span class="hljs-comment"># Application directory</span>
+<span class="hljs-built_in">chmod</span> -R 755 /path/to/app
+<span class="hljs-built_in">chown</span> -R www-data:www-data /path/to/app</code></pre><p><strong>Network Security</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Firewall configuration</span>
+ufw allow 8989/tcp  <span class="hljs-comment"># HTTP API</span>
+ufw allow 8988/tcp  <span class="hljs-comment"># WebSocket</span>
+ufw <span class="hljs-built_in">enable</span>
 
-# Reverse proxy recommended for HTTPS termination
-# Direct internet exposure not recommended
-</code></pre>
-<p>This comprehensive security implementation documentation provides complete visibility into all security measures for corporate review and compliance assessment.</p>
+<span class="hljs-comment"># Reverse proxy recommended for HTTPS termination</span>
+<span class="hljs-comment"># Direct internet exposure not recommended</span></code></pre><p>This comprehensive security implementation documentation provides complete visibility into all security measures for corporate review and compliance assessment.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
