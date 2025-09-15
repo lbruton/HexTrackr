@@ -50,6 +50,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved sub-navigation styling with transform animations
   - Avatar styling enhancements in navigation components
   - Collapse icon rotation animations for expandable sections
+- **Mermaid Diagram Support**: Interactive diagram rendering for documentation
+  - Client-side Mermaid.js integration for rendering diagrams from markdown
+  - Theme-aware diagram rendering with automatic dark/light mode switching
+  - Custom CSS styling for consistent diagram appearance across themes
+  - Support for flowcharts, sequence diagrams, state diagrams, and more
+  - Foundation for future network topology and vulnerability mapping features
 
 #### Architecture Review System
 

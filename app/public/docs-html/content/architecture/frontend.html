@@ -4,7 +4,7 @@
 <p>The HexTrackr frontend employs a sophisticated <strong>modular orchestrator pattern</strong> that provides clean separation of concerns, event-driven communication, and maintainable code organization. The architecture has evolved from a monolithic structure to a fully modular system coordinated by the <code>VulnerabilityCoreOrchestrator</code>.</p>
 <hr>
 <h2>Architecture Overview</h2>
-<pre><code class="language-mermaid">graph TD
+<div class="mermaid">graph TD
     A[ModernVulnManager] --&gt; B[VulnerabilityCoreOrchestrator]
 
     B --&gt; C[VulnerabilityDataManager]
@@ -25,29 +25,25 @@
     G --&gt; O[AG-Grid]
 
     style B fill:#e1f5fe
-    style A fill:#f3e5f5
-</code></pre>
-<hr>
+    style A fill:#f3e5f5</div><hr>
 <h2>Core Orchestrator Pattern</h2>
 <h3>VulnerabilityCoreOrchestrator</h3>
 <p>The central coordination hub that manages all specialized modules and their interactions:</p>
-<pre><code class="language-javascript">export class VulnerabilityCoreOrchestrator {
-    constructor() {
-        this.managers = new Map();
-        this.eventBus = new EventTarget();
-        this.initialized = false;
+<pre><code class="language-javascript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityCoreOrchestrator</span> {
+    <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">managers</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">eventBus</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">EventTarget</span>();
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">initialized</span> = <span class="hljs-literal">false</span>;
     }
 
-    async initializeAllModules(parentManager) {
-        // Create and wire all specialized managers
-        this.dataManager = new VulnerabilityDataManager(this);
-        this.statisticsManager = new VulnerabilityStatisticsManager(this);
-        this.chartManager = new VulnerabilityChartManager(this);
-        // ... other managers
+    <span class="hljs-keyword">async</span> <span class="hljs-title function_">initializeAllModules</span>(<span class="hljs-params">parentManager</span>) {
+        <span class="hljs-comment">// Create and wire all specialized managers</span>
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">dataManager</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">VulnerabilityDataManager</span>(<span class="hljs-variable language_">this</span>);
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">statisticsManager</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">VulnerabilityStatisticsManager</span>(<span class="hljs-variable language_">this</span>);
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">chartManager</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">VulnerabilityChartManager</span>(<span class="hljs-variable language_">this</span>);
+        <span class="hljs-comment">// ... other managers</span>
     }
-}
-</code></pre>
-<p><strong>Key Responsibilities</strong>:</p>
+}</code></pre><p><strong>Key Responsibilities</strong>:</p>
 <ul>
 <li>Module lifecycle management</li>
 <li>Inter-module communication coordination</li>
@@ -67,12 +63,10 @@
 <li>Error handling for network operations</li>
 </ul>
 <p><strong>Key Methods</strong>:</p>
-<pre><code class="language-javascript">async fetchVulnerabilities(params)
-async fetchStatistics()
-async importCSV(file, options)
-clearCache()
-</code></pre>
-<h3>2. VulnerabilityStatisticsManager</h3>
+<pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-title function_">fetchVulnerabilities</span>(params)
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">fetchStatistics</span>()
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">importCSV</span>(file, options)
+<span class="hljs-title function_">clearCache</span>()</code></pre><h3>2. VulnerabilityStatisticsManager</h3>
 <p><strong>Location</strong>: <code>/scripts/shared/vulnerability-statistics.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
@@ -105,27 +99,25 @@ clearCache()
 <li>VPR score distributions (histograms)</li>
 </ul>
 <p><strong>Theme Integration</strong>:</p>
-<pre><code class="language-javascript">// Sophisticated theme-aware initialization
-async initializeCharts() {
-    // Approach 1: Immediate initialization
-    if (window.headerThemeManager?.getThemeController) {
-        const theme = window.headerThemeManager.getThemeController().getTheme();
-        this.createChartsWithTheme(theme);
-        return;
+<pre><code class="language-javascript"><span class="hljs-comment">// Sophisticated theme-aware initialization</span>
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">initializeCharts</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-comment">// Approach 1: Immediate initialization</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">window</span>.<span class="hljs-property">headerThemeManager</span>?.<span class="hljs-property">getThemeController</span>) {
+        <span class="hljs-keyword">const</span> theme = <span class="hljs-variable language_">window</span>.<span class="hljs-property">headerThemeManager</span>.<span class="hljs-title function_">getThemeController</span>().<span class="hljs-title function_">getTheme</span>();
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">createChartsWithTheme</span>(theme);
+        <span class="hljs-keyword">return</span>;
     }
 
-    // Approach 2: Event-based initialization
-    window.addEventListener(&#39;themeInitialized&#39;, (event) =&gt; {
-        this.createChartsWithTheme(event.detail.theme);
+    <span class="hljs-comment">// Approach 2: Event-based initialization</span>
+    <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;themeInitialized&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">createChartsWithTheme</span>(event.<span class="hljs-property">detail</span>.<span class="hljs-property">theme</span>);
     });
 
-    // Approach 3: Fallback with timeout
-    setTimeout(() =&gt; {
-        this.createChartsWithTheme(&#39;light&#39;);
-    }, 500);
-}
-</code></pre>
-<h3>4. VulnerabilitySearchManager</h3>
+    <span class="hljs-comment">// Approach 3: Fallback with timeout</span>
+    <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">createChartsWithTheme</span>(<span class="hljs-string">&#x27;light&#x27;</span>);
+    }, <span class="hljs-number">500</span>);
+}</code></pre><h3>4. VulnerabilitySearchManager</h3>
 <p><strong>Location</strong>: <code>/scripts/shared/vulnerability-search.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
@@ -163,19 +155,17 @@ async initializeCharts() {
 <h2>Real-time Communication</h2>
 <h3>WebSocketClient Architecture</h3>
 <p><strong>Location</strong>: <code>/scripts/shared/websocket-client.js</code></p>
-<pre><code class="language-javascript">class WebSocketClient {
-    constructor() {
-        this.socket = null;
-        this.isConnected = false;
-        this.reconnectAttempts = 0;
-        this.maxReconnectAttempts = 5;
-        this.heartbeatInterval = null;
-        this.eventCallbacks = new Map();
-        this.progressThrottleTimers = new Map();
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">WebSocketClient</span> {
+    <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">socket</span> = <span class="hljs-literal">null</span>;
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">isConnected</span> = <span class="hljs-literal">false</span>;
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">reconnectAttempts</span> = <span class="hljs-number">0</span>;
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">maxReconnectAttempts</span> = <span class="hljs-number">5</span>;
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">heartbeatInterval</span> = <span class="hljs-literal">null</span>;
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">eventCallbacks</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">progressThrottleTimers</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
     }
-}
-</code></pre>
-<p><strong>Key Features</strong>:</p>
+}</code></pre><p><strong>Key Features</strong>:</p>
 <ul>
 <li>Automatic reconnection with exponential backoff</li>
 <li>Heartbeat monitoring for connection health</li>
@@ -202,23 +192,21 @@ async initializeCharts() {
 <li><strong>Component Awareness</strong>: All UI components respect theme settings</li>
 </ul>
 <p><strong>Chart Theme Adaptation</strong>:</p>
-<pre><code class="language-javascript">// Dynamic theme application for charts
-applyThemeToChart(chartInstance, theme) {
-    const themeConfig = this.getChartThemeConfig(theme);
-    chartInstance.updateOptions({
-        theme: {
-            mode: theme,
-            palette: themeConfig.palette
+<pre><code class="language-javascript"><span class="hljs-comment">// Dynamic theme application for charts</span>
+<span class="hljs-title function_">applyThemeToChart</span>(<span class="hljs-params">chartInstance, theme</span>) {
+    <span class="hljs-keyword">const</span> themeConfig = <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getChartThemeConfig</span>(theme);
+    chartInstance.<span class="hljs-title function_">updateOptions</span>({
+        <span class="hljs-attr">theme</span>: {
+            <span class="hljs-attr">mode</span>: theme,
+            <span class="hljs-attr">palette</span>: themeConfig.<span class="hljs-property">palette</span>
         },
-        colors: themeConfig.colors,
-        stroke: {
-            ...chartOptions.stroke,
-            ...(themeConfig.stroke?.colors ? { colors: themeConfig.stroke.colors } : {})
+        <span class="hljs-attr">colors</span>: themeConfig.<span class="hljs-property">colors</span>,
+        <span class="hljs-attr">stroke</span>: {
+            ...chartOptions.<span class="hljs-property">stroke</span>,
+            ...(themeConfig.<span class="hljs-property">stroke</span>?.<span class="hljs-property">colors</span> ? { <span class="hljs-attr">colors</span>: themeConfig.<span class="hljs-property">stroke</span>.<span class="hljs-property">colors</span> } : {})
         }
     });
-}
-</code></pre>
-<hr>
+}</code></pre><hr>
 <h2>Modal System Architecture</h2>
 <h3>Modal Management</h3>
 <p><strong>Location</strong>: <code>/scripts/shared/</code> (various modal files)</p>
@@ -243,24 +231,22 @@ applyThemeToChart(chartInstance, theme) {
 <h2>Page-Specific Architecture</h2>
 <h3>Vulnerabilities Page (<code>vulnerabilities.html</code>)</h3>
 <p><strong>Main Controller</strong>: <code>/scripts/pages/vulnerabilities.js</code></p>
-<pre><code class="language-javascript">export class ModernVulnManager {
-    constructor() {
-        this.initializeModules();
+<pre><code class="language-javascript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ModernVulnManager</span> {
+    <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">initializeModules</span>();
     }
 
-    async initializeModules() {
-        // Delegate to orchestrator
-        this.coreOrchestrator = new VulnerabilityCoreOrchestrator();
-        await this.coreOrchestrator.initializeAllModules(this);
+    <span class="hljs-keyword">async</span> <span class="hljs-title function_">initializeModules</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-comment">// Delegate to orchestrator</span>
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">coreOrchestrator</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">VulnerabilityCoreOrchestrator</span>();
+        <span class="hljs-keyword">await</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">coreOrchestrator</span>.<span class="hljs-title function_">initializeAllModules</span>(<span class="hljs-variable language_">this</span>);
 
-        // Get module references for delegation
-        this.dataManager = this.coreOrchestrator.dataManager;
-        this.statisticsManager = this.coreOrchestrator.statisticsManager;
-        // ... other managers
+        <span class="hljs-comment">// Get module references for delegation</span>
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">dataManager</span> = <span class="hljs-variable language_">this</span>.<span class="hljs-property">coreOrchestrator</span>.<span class="hljs-property">dataManager</span>;
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">statisticsManager</span> = <span class="hljs-variable language_">this</span>.<span class="hljs-property">coreOrchestrator</span>.<span class="hljs-property">statisticsManager</span>;
+        <span class="hljs-comment">// ... other managers</span>
     }
-}
-</code></pre>
-<p><strong>Page Features</strong>:</p>
+}</code></pre><p><strong>Page Features</strong>:</p>
 <ul>
 <li>Real-time vulnerability dashboard</li>
 <li>Interactive severity and temporal charts</li>
@@ -301,7 +287,7 @@ applyThemeToChart(chartInstance, theme) {
 <hr>
 <h2>Event-Driven Communication</h2>
 <h3>Event Flow Architecture</h3>
-<pre><code class="language-mermaid">sequenceDiagram
+<div class="mermaid">sequenceDiagram
     participant User
     participant Grid as GridManager
     participant Orch as Orchestrator
@@ -313,9 +299,7 @@ applyThemeToChart(chartInstance, theme) {
     Orch-&gt;&gt;Data: fetchVulnerabilities(filters)
     Data-&gt;&gt;Orch: dataUpdated event
     Orch-&gt;&gt;Chart: updateCharts(newData)
-    Orch-&gt;&gt;Grid: updateGrid(newData)
-</code></pre>
-<p><strong>Event Types</strong>:</p>
+    Orch-&gt;&gt;Grid: updateGrid(newData)</div><p><strong>Event Types</strong>:</p>
 <ul>
 <li><code>dataUpdated</code> - New data available</li>
 <li><code>filterChanged</code> - Search/filter modifications</li>
@@ -349,23 +333,21 @@ applyThemeToChart(chartInstance, theme) {
 <hr>
 <h2>Error Handling &amp; Recovery</h2>
 <h3>Graceful Degradation</h3>
-<pre><code class="language-javascript">// Example error handling in orchestrator
-async handleModuleError(moduleName, error) {
-    console.error(`Module ${moduleName} error:`, error);
+<pre><code class="language-javascript"><span class="hljs-comment">// Example error handling in orchestrator</span>
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">handleModuleError</span>(<span class="hljs-params">moduleName, error</span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">`Module <span class="hljs-subst">${moduleName}</span> error:`</span>, error);
 
-    // Attempt recovery
-    if (this.canRecover(moduleName, error)) {
-        await this.recoverModule(moduleName);
-    } else {
-        // Fallback to basic functionality
-        this.enableFallbackMode(moduleName);
+    <span class="hljs-comment">// Attempt recovery</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-title function_">canRecover</span>(moduleName, error)) {
+        <span class="hljs-keyword">await</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">recoverModule</span>(moduleName);
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-comment">// Fallback to basic functionality</span>
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">enableFallbackMode</span>(moduleName);
     }
 
-    // Notify user if necessary
-    this.showErrorToast(moduleName, error);
-}
-</code></pre>
-<p><strong>Error Recovery Features</strong>:</p>
+    <span class="hljs-comment">// Notify user if necessary</span>
+    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">showErrorToast</span>(moduleName, error);
+}</code></pre><p><strong>Error Recovery Features</strong>:</p>
 <ul>
 <li>Module-level error isolation</li>
 <li>Automatic recovery attempts</li>

@@ -24,18 +24,16 @@
 <li>Integration with AG-Grid and ApexCharts theming</li>
 </ul>
 <p><strong>Public API</strong>:</p>
-<pre><code class="language-javascript">class ThemeController {
-  constructor()                          // Initialize theme system
-  getCurrentTheme()                      // Get current theme (&#39;light&#39; or &#39;dark&#39;)
-  setTheme(theme)                       // Set specific theme
-  toggleTheme()                         // Toggle between themes
-  addThemeChangeListener(callback)      // Register for theme change events
-  removeThemeChangeListener(callback)   // Unregister listener
-  applyTheme(theme)                     // Apply theme to DOM
-  validateContrastCompliance()          // Check WCAG compliance
-}
-</code></pre>
-<p><strong>Dependencies</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ThemeController</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>)                          <span class="hljs-comment">// Initialize theme system</span>
+  <span class="hljs-title function_">getCurrentTheme</span>()                      <span class="hljs-comment">// Get current theme (&#x27;light&#x27; or &#x27;dark&#x27;)</span>
+  <span class="hljs-title function_">setTheme</span>(theme)                       <span class="hljs-comment">// Set specific theme</span>
+  <span class="hljs-title function_">toggleTheme</span>()                         <span class="hljs-comment">// Toggle between themes</span>
+  <span class="hljs-title function_">addThemeChangeListener</span>(callback)      <span class="hljs-comment">// Register for theme change events</span>
+  <span class="hljs-title function_">removeThemeChangeListener</span>(callback)   <span class="hljs-comment">// Unregister listener</span>
+  <span class="hljs-title function_">applyTheme</span>(theme)                     <span class="hljs-comment">// Apply theme to DOM</span>
+  <span class="hljs-title function_">validateContrastCompliance</span>()          <span class="hljs-comment">// Check WCAG compliance</span>
+}</code></pre><p><strong>Dependencies</strong>:</p>
 <ul>
 <li><code>../utils/security.js</code></li>
 <li><code>../utils/wcag-contrast-validator.js</code></li>
@@ -59,15 +57,13 @@
 <li>Error boundary handling</li>
 </ul>
 <p><strong>Public API</strong>:</p>
-<pre><code class="language-javascript">class VulnerabilityCore {
-  constructor(config)                   // Initialize with configuration
-  initialize()                         // Start all subsystems
-  destroy()                            // Clean shutdown
-  getModule(name)                      // Access specific module
-  broadcast(event, data)               // Send events to all modules
-}
-</code></pre>
-<h4><code>vulnerability-data.js</code> (571 lines)</h4>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityCore</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">config</span>)                   <span class="hljs-comment">// Initialize with configuration</span>
+  <span class="hljs-title function_">initialize</span>()                         <span class="hljs-comment">// Start all subsystems</span>
+  <span class="hljs-title function_">destroy</span>()                            <span class="hljs-comment">// Clean shutdown</span>
+  <span class="hljs-title function_">getModule</span>(name)                      <span class="hljs-comment">// Access specific module</span>
+  <span class="hljs-title function_">broadcast</span>(event, data)               <span class="hljs-comment">// Send events to all modules</span>
+}</code></pre><h4><code>vulnerability-data.js</code> (571 lines)</h4>
 <p><strong>Purpose</strong>: Central data management and caching layer</p>
 <p><strong>Key Features</strong>:</p>
 <ul>
@@ -78,15 +74,13 @@
 <li>WebSocket integration for real-time updates</li>
 </ul>
 <p><strong>Public API</strong>:</p>
-<pre><code class="language-javascript">class VulnerabilityData {
-  async fetchVulnerabilities(options)   // Get vulnerability data
-  async getStatistics()                 // Fetch dashboard stats
-  invalidateCache(key)                  // Clear specific cache
-  subscribeToUpdates(callback)          // Real-time notifications
-  getFromCache(key)                     // Retrieve cached data
-}
-</code></pre>
-<h4><code>vulnerability-statistics.js</code> (364 lines)</h4>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityData</span> {
+  <span class="hljs-keyword">async</span> <span class="hljs-title function_">fetchVulnerabilities</span>(options)   <span class="hljs-comment">// Get vulnerability data</span>
+  <span class="hljs-keyword">async</span> <span class="hljs-title function_">getStatistics</span>()                 <span class="hljs-comment">// Fetch dashboard stats</span>
+  <span class="hljs-title function_">invalidateCache</span>(key)                  <span class="hljs-comment">// Clear specific cache</span>
+  <span class="hljs-title function_">subscribeToUpdates</span>(callback)          <span class="hljs-comment">// Real-time notifications</span>
+  <span class="hljs-title function_">getFromCache</span>(key)                     <span class="hljs-comment">// Retrieve cached data</span>
+}</code></pre><h4><code>vulnerability-statistics.js</code> (364 lines)</h4>
 <p><strong>Purpose</strong>: VPR calculations and metrics generation</p>
 <p><strong>Key Features</strong>:</p>
 <ul>
@@ -96,14 +90,12 @@
 <li>Performance optimized aggregations</li>
 </ul>
 <p><strong>Public API</strong>:</p>
-<pre><code class="language-javascript">class VulnerabilityStatistics {
-  calculateVPRDistribution(data)        // VPR score analysis
-  generateTrendData(timeRange)          // Historical trends
-  computeSeverityMetrics(vulnerabilities) // Severity breakdowns
-  calculateRiskScore(vulnerability)     // Individual risk scoring
-}
-</code></pre>
-<hr>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityStatistics</span> {
+  <span class="hljs-title function_">calculateVPRDistribution</span>(data)        <span class="hljs-comment">// VPR score analysis</span>
+  <span class="hljs-title function_">generateTrendData</span>(timeRange)          <span class="hljs-comment">// Historical trends</span>
+  <span class="hljs-title function_">computeSeverityMetrics</span>(vulnerabilities) <span class="hljs-comment">// Severity breakdowns</span>
+  <span class="hljs-title function_">calculateRiskScore</span>(vulnerability)     <span class="hljs-comment">// Individual risk scoring</span>
+}</code></pre><hr>
 <h3>User Interface Components</h3>
 <h4><code>vulnerability-grid.js</code> (195 lines)</h4>
 <p><strong>Purpose</strong>: AG Grid table interface management</p>
@@ -116,15 +108,13 @@
 <li>Responsive design adaptations</li>
 </ul>
 <p><strong>Public API</strong>:</p>
-<pre><code class="language-javascript">class VulnerabilityGrid {
-  initialize(containerId, options)      // Create grid instance
-  updateData(data)                      // Refresh grid data
-  exportToCsv(filename)                 // Export functionality
-  applyFilters(filterModel)             // Apply filtering
-  destroy()                             // Cleanup resources
-}
-</code></pre>
-<h4><code>vulnerability-cards.js</code> (345 lines)</h4>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityGrid</span> {
+  <span class="hljs-title function_">initialize</span>(containerId, options)      <span class="hljs-comment">// Create grid instance</span>
+  <span class="hljs-title function_">updateData</span>(data)                      <span class="hljs-comment">// Refresh grid data</span>
+  <span class="hljs-title function_">exportToCsv</span>(filename)                 <span class="hljs-comment">// Export functionality</span>
+  <span class="hljs-title function_">applyFilters</span>(filterModel)             <span class="hljs-comment">// Apply filtering</span>
+  <span class="hljs-title function_">destroy</span>()                             <span class="hljs-comment">// Cleanup resources</span>
+}</code></pre><h4><code>vulnerability-cards.js</code> (345 lines)</h4>
 <p><strong>Purpose</strong>: Card-based responsive layouts for mobile/tablet views</p>
 <p><strong>Key Features</strong>:</p>
 <ul>
@@ -134,14 +124,12 @@
 <li>Custom card templates</li>
 </ul>
 <p><strong>Public API</strong>:</p>
-<pre><code class="language-javascript">class VulnerabilityCards {
-  render(container, data, template)     // Render card layout
-  updateCard(id, data)                  // Update individual card
-  applyFilters(criteria)                // Filter visible cards
-  setTemplate(templateName)             // Switch card template
-}
-</code></pre>
-<h4><code>vulnerability-search.js</code> (348 lines)</h4>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityCards</span> {
+  <span class="hljs-title function_">render</span>(container, data, template)     <span class="hljs-comment">// Render card layout</span>
+  <span class="hljs-title function_">updateCard</span>(id, data)                  <span class="hljs-comment">// Update individual card</span>
+  <span class="hljs-title function_">applyFilters</span>(criteria)                <span class="hljs-comment">// Filter visible cards</span>
+  <span class="hljs-title function_">setTemplate</span>(templateName)             <span class="hljs-comment">// Switch card template</span>
+}</code></pre><h4><code>vulnerability-search.js</code> (348 lines)</h4>
 <p><strong>Purpose</strong>: Advanced search and filtering functionality</p>
 <p><strong>Key Features</strong>:</p>
 <ul>
@@ -151,15 +139,13 @@
 <li>Export filtered results</li>
 </ul>
 <p><strong>Public API</strong>:</p>
-<pre><code class="language-javascript">class VulnerabilitySearch {
-  initialize(searchInput, filterContainer) // Setup search UI
-  performSearch(query, filters)         // Execute search
-  saveSearchProfile(name, criteria)     // Save search preset
-  loadSearchProfile(name)               // Load saved search
-  getSearchHistory()                    // Retrieve search history
-}
-</code></pre>
-<hr>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilitySearch</span> {
+  <span class="hljs-title function_">initialize</span>(searchInput, filterContainer) <span class="hljs-comment">// Setup search UI</span>
+  <span class="hljs-title function_">performSearch</span>(query, filters)         <span class="hljs-comment">// Execute search</span>
+  <span class="hljs-title function_">saveSearchProfile</span>(name, criteria)     <span class="hljs-comment">// Save search preset</span>
+  <span class="hljs-title function_">loadSearchProfile</span>(name)               <span class="hljs-comment">// Load saved search</span>
+  <span class="hljs-title function_">getSearchHistory</span>()                    <span class="hljs-comment">// Retrieve search history</span>
+}</code></pre><hr>
 <h3>Visualization Components</h3>
 <h4><code>vulnerability-chart-manager.js</code> (590 lines)</h4>
 <p><strong>Purpose</strong>: ApexCharts visualization management</p>
@@ -172,15 +158,13 @@
 <li>Export capabilities (PNG, SVG, PDF)</li>
 </ul>
 <p><strong>Public API</strong>:</p>
-<pre><code class="language-javascript">class VulnerabilityChartManager {
-  createChart(type, container, options) // Create new chart
-  updateChart(chartId, data)            // Update existing chart
-  setTheme(theme)                       // Apply theme colors
-  exportChart(chartId, format)          // Export chart
-  destroyChart(chartId)                 // Clean up chart
-}
-</code></pre>
-<hr>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityChartManager</span> {
+  <span class="hljs-title function_">createChart</span>(type, container, options) <span class="hljs-comment">// Create new chart</span>
+  <span class="hljs-title function_">updateChart</span>(chartId, data)            <span class="hljs-comment">// Update existing chart</span>
+  <span class="hljs-title function_">setTheme</span>(theme)                       <span class="hljs-comment">// Apply theme colors</span>
+  <span class="hljs-title function_">exportChart</span>(chartId, format)          <span class="hljs-comment">// Export chart</span>
+  <span class="hljs-title function_">destroyChart</span>(chartId)                 <span class="hljs-comment">// Clean up chart</span>
+}</code></pre><hr>
 <h3>Modal Systems</h3>
 <h4><code>vulnerability-details-modal.js</code> (935 lines)</h4>
 <p><strong>Purpose</strong>: Comprehensive modal system for vulnerability details</p>
@@ -193,15 +177,13 @@
 <li>Action buttons for ticket creation</li>
 </ul>
 <p><strong>Public API</strong>:</p>
-<pre><code class="language-javascript">class VulnerabilityDetailsModal {
-  show(vulnerabilityId)                 // Display modal with data
-  hide()                                // Close modal
-  switchTab(tabName)                    // Navigate between tabs
-  loadRelatedData(type)                 // Load additional information
-  createTicket(vulnerabilityData)       // Generate support ticket
-}
-</code></pre>
-<h4><code>device-security-modal.js</code> (637 lines)</h4>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityDetailsModal</span> {
+  <span class="hljs-title function_">show</span>(vulnerabilityId)                 <span class="hljs-comment">// Display modal with data</span>
+  <span class="hljs-title function_">hide</span>()                                <span class="hljs-comment">// Close modal</span>
+  <span class="hljs-title function_">switchTab</span>(tabName)                    <span class="hljs-comment">// Navigate between tabs</span>
+  <span class="hljs-title function_">loadRelatedData</span>(type)                 <span class="hljs-comment">// Load additional information</span>
+  <span class="hljs-title function_">createTicket</span>(vulnerabilityData)       <span class="hljs-comment">// Generate support ticket</span>
+}</code></pre><h4><code>device-security-modal.js</code> (637 lines)</h4>
 <p><strong>Purpose</strong>: Device-specific security information modal</p>
 <p><strong>Key Features</strong>:</p>
 <ul>
@@ -280,16 +262,14 @@
 <li>Connection state management</li>
 </ul>
 <p><strong>Public API</strong>:</p>
-<pre><code class="language-javascript">class WebSocketClient {
-  connect(url, options)                 // Establish connection
-  disconnect()                          // Close connection
-  send(event, data)                     // Send message
-  on(event, callback)                   // Register event handler
-  off(event, callback)                  // Unregister handler
-  getConnectionState()                  // Get current state
-}
-</code></pre>
-<hr>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">WebSocketClient</span> {
+  <span class="hljs-title function_">connect</span>(url, options)                 <span class="hljs-comment">// Establish connection</span>
+  <span class="hljs-title function_">disconnect</span>()                          <span class="hljs-comment">// Close connection</span>
+  <span class="hljs-title function_">send</span>(event, data)                     <span class="hljs-comment">// Send message</span>
+  <span class="hljs-title function_">on</span>(event, callback)                   <span class="hljs-comment">// Register event handler</span>
+  <span class="hljs-title function_">off</span>(event, callback)                  <span class="hljs-comment">// Unregister handler</span>
+  <span class="hljs-title function_">getConnectionState</span>()                  <span class="hljs-comment">// Get current state</span>
+}</code></pre><hr>
 <h2>Page-Specific Modules (<code>/scripts/pages/</code>)</h2>
 <h3><code>tickets.js</code> (Ticket Management System)</h3>
 <p><strong>Purpose</strong>: Complete ticket management functionality</p>
@@ -329,25 +309,21 @@
 <h2>Module Integration Patterns</h2>
 <h3>Event-Driven Architecture</h3>
 <p>All modules communicate through a centralized event system:</p>
-<pre><code class="language-javascript">// Event emission
-VulnerabilityCore.broadcast(&#39;dataUpdated&#39;, { type: &#39;vulnerabilities&#39;, data: newData });
+<pre><code class="language-javascript"><span class="hljs-comment">// Event emission</span>
+<span class="hljs-title class_">VulnerabilityCore</span>.<span class="hljs-title function_">broadcast</span>(<span class="hljs-string">&#x27;dataUpdated&#x27;</span>, { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;vulnerabilities&#x27;</span>, <span class="hljs-attr">data</span>: newData });
 
-// Event listening
-module.on(&#39;dataUpdated&#39;, (event) =&gt; {
-  if (event.type === &#39;vulnerabilities&#39;) {
-    this.refresh(event.data);
+<span class="hljs-comment">// Event listening</span>
+<span class="hljs-variable language_">module</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;dataUpdated&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (event.<span class="hljs-property">type</span> === <span class="hljs-string">&#x27;vulnerabilities&#x27;</span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">refresh</span>(event.<span class="hljs-property">data</span>);
   }
-});
-</code></pre>
-<h3>Dependency Injection</h3>
+});</code></pre><h3>Dependency Injection</h3>
 <p>Modules receive dependencies through constructor injection:</p>
-<pre><code class="language-javascript">const chartManager = new VulnerabilityChartManager({
-  themeController: this.themeController,
-  dataManager: this.dataManager,
-  containerSelector: &#39;#charts-container&#39;
-});
-</code></pre>
-<h3>Lifecycle Management</h3>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> chartManager = <span class="hljs-keyword">new</span> <span class="hljs-title class_">VulnerabilityChartManager</span>({
+  <span class="hljs-attr">themeController</span>: <span class="hljs-variable language_">this</span>.<span class="hljs-property">themeController</span>,
+  <span class="hljs-attr">dataManager</span>: <span class="hljs-variable language_">this</span>.<span class="hljs-property">dataManager</span>,
+  <span class="hljs-attr">containerSelector</span>: <span class="hljs-string">&#x27;#charts-container&#x27;</span>
+});</code></pre><h3>Lifecycle Management</h3>
 <p>All modules follow a consistent lifecycle:</p>
 <ol>
 <li><strong>Initialize</strong>: Setup DOM, event listeners, initial state</li>
@@ -389,7 +365,7 @@ module.on(&#39;dataUpdated&#39;, (event) =&gt; {
 <p>Test files located in <code>__tests__/modules/</code> with corresponding module structure.</p>
 <hr>
 <h2>Module Dependencies Graph</h2>
-<pre><code class="language-mermaid">graph TB
+<div class="mermaid">graph TB
     Core[vulnerability-core.js] --&gt; Data[vulnerability-data.js]
     Core --&gt; Stats[vulnerability-statistics.js]
     Core --&gt; Grid[vulnerability-grid.js]
@@ -409,9 +385,7 @@ module.on(&#39;dataUpdated&#39;, (event) =&gt; {
     Theme --&gt; A11y[accessibility-announcer.js]
 
     Search --&gt; CVE[cve-utilities.js]
-    Stats --&gt; CVE
-</code></pre>
-<p>This modular architecture ensures maintainability, testability, and scalability while providing clear separation of concerns and well-defined interfaces between components.</p>
+    Stats --&gt; CVE</div><p>This modular architecture ensures maintainability, testability, and scalability while providing clear separation of concerns and well-defined interfaces between components.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

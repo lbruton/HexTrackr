@@ -17,61 +17,51 @@
 <li><p><strong>Description</strong>: Sent periodically during a data import process to provide updates on the progress.</p>
 </li>
 <li><p><strong>Data Structure</strong>:</p>
-<pre><code class="language-json">{
-  &quot;processed&quot;: 100,
-  &quot;total&quot;: 1000,
-  &quot;percentage&quot;: 10
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;processed&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">100</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;total&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1000</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;percentage&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">10</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 <h3><code>progress-complete</code></h3>
 <ul>
 <li><p><strong>Description</strong>: Sent when a data import process has successfully completed.</p>
 </li>
 <li><p><strong>Data Structure</strong>:</p>
-<pre><code class="language-json">{
-  &quot;success&quot;: true,
-  &quot;message&quot;: &quot;Import completed successfully.&quot;
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;success&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Import completed successfully.&quot;</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 <h3><code>progress-error</code></h3>
 <ul>
 <li><p><strong>Description</strong>: Sent when an error occurs during a data import process.</p>
 </li>
 <li><p><strong>Data Structure</strong>:</p>
-<pre><code class="language-json">{
-  &quot;error&quot;: &quot;An error occurred during the import process.&quot;
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;error&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;An error occurred during the import process.&quot;</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 <hr>
 <h2>Client Integration</h2>
 <p>Clients can connect to the WebSocket server to receive real-time updates.</p>
 <h3>Connection</h3>
-<pre><code class="language-javascript">const socket = io(&#39;http://localhost:8988&#39;);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> socket = <span class="hljs-title function_">io</span>(<span class="hljs-string">&#x27;http://localhost:8988&#x27;</span>);
 
-socket.on(&#39;connect&#39;, () =&gt; {
-  console.log(&#39;Connected to WebSocket server&#39;);
-});
-</code></pre>
-<h3>Event Handling</h3>
-<pre><code class="language-javascript">socket.on(&#39;progress&#39;, (data) =&gt; {
-  console.log(`Import progress: ${data.percentage}%`);
+socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;connect&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Connected to WebSocket server&#x27;</span>);
+});</code></pre><h3>Event Handling</h3>
+<pre><code class="language-javascript">socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;progress&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Import progress: <span class="hljs-subst">${data.percentage}</span>%`</span>);
 });
 
-socket.on(&#39;complete&#39;, (data) =&gt; {
-  console.log(data.message);
+socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;complete&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data.<span class="hljs-property">message</span>);
 });
 
-socket.on(&#39;error&#39;, (data) =&gt; {
-  console.error(data.error);
-});
-</code></pre>
-<hr>
+socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(data.<span class="hljs-property">error</span>);
+});</code></pre><hr>
 <h2>Security Considerations</h2>
 <ul>
 <li>The WebSocket server is intended for local network use and does not implement authentication or encryption.</li>
