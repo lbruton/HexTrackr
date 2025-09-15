@@ -97,7 +97,8 @@ class HtmlContentUpdater {
         const { marked } = await import("marked");
         this.marked = marked;
         
-        // Create custom renderer
+        // Create custom renderer with context binding
+        const self = this;
         const renderer = {
             link(token) {
                 // Handle both old and new marked.js API formats
@@ -132,12 +133,22 @@ class HtmlContentUpdater {
                         // './data-model.md' -> '#user-guides/data-model'
                         // '/content/getting-started/index.md' -> '#getting-started/index'
                         // 'getting-started/index.md' -> '#getting-started/index'
-                        const hashPath = href
-                            .replace(/^\/content\//, "")  // Remove '/content/' prefix
-                            .replace(/^\.\.\//, "")      // Remove '../' prefix
-                            .replace(/^\.\//, "")        // Remove './' prefix
-                            .replace(/^\//, "")          // Remove leading '/'
-                            .replace(/\.md$/, "");       // Remove '.md' extension
+                        // Handle relative links (./) with section context first
+                        let hashPath;
+                        if (href.startsWith("./") && self.currentSection) {
+                            hashPath = href
+                                .replace(/^\.\//, "")        // Remove './' prefix
+                                .replace(/\.md$/, "");       // Remove '.md' extension
+                            hashPath = `${self.currentSection}/${hashPath}`;
+                        } else {
+                            hashPath = href
+                                .replace(/^\/content\//, "")  // Remove '/content/' prefix
+                                .replace(/^\.\.\//, "")      // Remove '../' prefix
+                                .replace(/^\.\//, "")        // Remove './' prefix
+                                .replace(/^\//, "")          // Remove leading '/'
+                                .replace(/\.md$/, "");       // Remove '.md' extension
+                        }
+
                         fixedHref = `#${hashPath}`;
                     }
                 }
@@ -229,8 +240,12 @@ class HtmlContentUpdater {
 
     /**
      * Convert markdown to HTML content.
+     * @param {string} markdownContent - The markdown content to convert
+     * @param {string} [currentSection] - The current section context for relative links
      */
-    markdownToHtml(markdownContent) {
+    markdownToHtml(markdownContent, currentSection = null) {
+        // Store the current section for the link renderer
+        this.currentSection = currentSection;
         return this.marked.parse(markdownContent);
     }
 
@@ -243,8 +258,12 @@ class HtmlContentUpdater {
             // Read markdown content
             const markdownContent = await PathValidator.safeReadFile(source.mdPath, "utf8");
             
+            // Extract section from the source path for link context
+            const pathParts = source.relativePath.split("/");
+            const currentSection = pathParts.length > 1 ? pathParts[0] : null;
+
             // Convert markdown to HTML
-            const newHtmlContent = this.markdownToHtml(markdownContent);
+            const newHtmlContent = this.markdownToHtml(markdownContent, currentSection);
 
             // Inject content into the template
             const finalHtml = this.templateContent.replace(

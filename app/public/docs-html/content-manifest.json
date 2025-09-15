@@ -1,5 +1,5 @@
 {
-  "generated": "2025-09-15T01:11:49.239Z",
+  "generated": "2025-09-15T04:03:17.926Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -175,5 +175,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 30
+  "totalFiles": 32
 }
