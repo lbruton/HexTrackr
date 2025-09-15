@@ -903,4 +903,315 @@ All API endpoints return errors in consistent format:
 
 ---
 
+## Additional API Endpoints
+
+### GET /api/vulnerabilities/resolved
+
+Retrieve resolved vulnerabilities with pagination.
+
+**Query Parameters**:
+
+- `page` (integer, optional): Page number (default: 1)
+- `limit` (integer, optional): Items per page (default: 50)
+- `resolved_after` (string, optional): ISO date string
+- `resolved_before` (string, optional): ISO date string
+
+**Request**:
+
+```http
+GET /api/vulnerabilities/resolved?page=1&limit=25 HTTP/1.1
+Host: localhost:8989
+```
+
+**Response** `200 OK`:
+
+```json
+{
+  "data": [
+    {
+      "id": 1156,
+      "hostname": "web-server-03.corp.local",
+      "cve": "CVE-2024-0003",
+      "severity": "High",
+      "lifecycle_state": "resolved",
+      "resolved_date": "2025-01-10T14:30:00Z",
+      "resolution_time_hours": 72.5
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 25,
+    "total": 456,
+    "pages": 19
+  }
+}
+```
+
+### GET /api/vulnerabilities/recent-trends
+
+Get recent vulnerability trend analysis (current vs previous period).
+
+**Response** `200 OK`:
+
+```json
+{
+  "current_period": {
+    "total": 2102,
+    "critical": 89,
+    "high": 342,
+    "date_range": "2025-01-06 to 2025-01-12"
+  },
+  "previous_period": {
+    "total": 2079,
+    "critical": 84,
+    "high": 339,
+    "date_range": "2024-12-30 to 2025-01-05"
+  },
+  "changes": {
+    "total_change": +23,
+    "critical_change": +5,
+    "high_change": +3,
+    "trend": "increasing"
+  }
+}
+```
+
+### POST /api/vulnerabilities/import-staging
+
+Import vulnerabilities to staging table for preview/validation.
+
+**Content-Type**: `multipart/form-data`
+
+**Response** `200 OK`:
+
+```json
+{
+  "success": true,
+  "staging_id": "staging_12345",
+  "preview_stats": {
+    "total_rows": 1847,
+    "valid_rows": 1835,
+    "invalid_rows": 12,
+    "estimated_new": 78,
+    "estimated_updates": 234
+  }
+}
+```
+
+### GET /api/imports
+
+List import history with metadata.
+
+**Query Parameters**:
+
+- `page` (integer, optional): Page number (default: 1)
+- `limit` (integer, optional): Items per page (default: 20)
+- `vendor` (string, optional): Filter by vendor
+
+**Response** `200 OK`:
+
+```json
+{
+  "imports": [
+    {
+      "id": 47,
+      "filename": "vulnerabilities_2025-01-12.csv",
+      "vendor": "tenable",
+      "import_date": "2025-01-12T14:20:00Z",
+      "row_count": 1847,
+      "processing_time": 3420,
+      "file_size": 2048576,
+      "status": "completed"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 47
+  }
+}
+```
+
+### POST /api/tickets/migrate
+
+Migrate tickets from external systems.
+
+**Request**:
+
+```http
+POST /api/tickets/migrate HTTP/1.1
+Host: localhost:8989
+Content-Type: application/json
+
+{
+  "tickets": [
+    {
+      "external_id": "SN-12345",
+      "system": "servicenow",
+      "location": "Data Center 1",
+      "status": "Open"
+    }
+  ],
+  "migration_options": {
+    "update_existing": true,
+    "preserve_ids": false
+  }
+}
+```
+
+**Response** `200 OK`:
+
+```json
+{
+  "success": true,
+  "migration_stats": {
+    "total_processed": 25,
+    "created": 18,
+    "updated": 7,
+    "skipped": 0,
+    "errors": 0
+  }
+}
+```
+
+### DELETE /api/backup/clear/:type
+
+Clear specific data types (vulnerabilities, tickets, imports).
+
+**Path Parameters**:
+
+- `type` (string): Data type to clear (`vulnerabilities`, `tickets`, `imports`)
+
+**Request**:
+
+```http
+DELETE /api/backup/clear/vulnerabilities HTTP/1.1
+Host: localhost:8989
+Content-Type: application/json
+
+{
+  "confirm": true,
+  "backup_before_clear": true
+}
+```
+
+**Response** `200 OK`:
+
+```json
+{
+  "success": true,
+  "type": "vulnerabilities",
+  "records_cleared": 2102,
+  "backup_created": "backup_2025-01-12_17-15-30"
+}
+```
+
+### GET /api/backup/stats
+
+Get backup and database statistics.
+
+**Response** `200 OK`:
+
+```json
+{
+  "database": {
+    "vulnerabilities": 2102,
+    "tickets": 234,
+    "imports": 47,
+    "total_size_mb": 42.3
+  },
+  "last_backup": {
+    "date": "2025-01-12T10:30:00Z",
+    "size_mb": 38.7,
+    "type": "automatic"
+  },
+  "recommendations": [
+    "Consider backup - last backup was 7 hours ago"
+  ]
+}
+```
+
+### GET /api/docs/stats
+
+Documentation system statistics and health.
+
+**Response** `200 OK`:
+
+```json
+{
+  "documentation": {
+    "total_files": 45,
+    "total_size_kb": 1024,
+    "last_updated": "2025-01-12T16:00:00Z",
+    "api_endpoints_documented": 32,
+    "coverage_percentage": 95.8
+  },
+  "health": {
+    "broken_links": 0,
+    "outdated_content": 2,
+    "missing_examples": 1
+  }
+}
+```
+
+---
+
+## Development and Testing Endpoints
+
+### GET /docs-html
+
+Serve documentation portal (HTML interface).
+
+### GET /docs-html/:section.html
+
+Serve specific documentation sections.
+
+**Path Parameters**:
+
+- `section` (string): Documentation section name
+
+---
+
+## File Upload Specifications
+
+### CSV Import Format
+
+**Supported Columns** (case-insensitive):
+
+- `hostname` (required): Device hostname or FQDN
+- `ip_address` (optional): Device IP address
+- `cve` (optional): CVE identifier
+- `severity` (required): Critical, High, Medium, Low
+- `vpr_score` (optional): Vulnerability Priority Rating (0-10)
+- `cvss_score` (optional): CVSS Base Score (0-10)
+- `plugin_id` (optional): Scanner plugin identifier
+- `plugin_name` (optional): Scanner plugin name
+- `description` (optional): Vulnerability description
+- `solution` (optional): Remediation guidance
+- `first_seen` (optional): ISO date string
+- `last_seen` (optional): ISO date string
+
+**File Constraints**:
+
+- Maximum file size: 50MB
+- Supported formats: CSV, TXT
+- Encoding: UTF-8
+- Maximum rows: 100,000 per import
+
+### Backup/Restore Format
+
+**Supported Formats**:
+
+- JSON: Complete structured export
+- CSV: Individual table exports
+- ZIP: Compressed multi-table exports
+
+**Restore Options**:
+
+- `clear_existing`: Remove existing data before restore
+- `validate_data`: Validate data integrity during restore
+- `create_backup_before_restore`: Safety backup before operation
+
+---
+
 This comprehensive API reference provides complete technical specifications for integrating with HexTrackr, suitable for security review and development planning.

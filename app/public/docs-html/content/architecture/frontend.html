@@ -1,65 +1,455 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Frontend Architecture</h1>
-<p><strong>Note:</strong> The HexTrackr frontend is currently undergoing a significant refactoring to a modular, widget-based architecture. This document provides a high-level overview of the current state. For a detailed breakdown of the refactoring plan and the target architecture, please see the <a href="#refactoring">Frontend Refactoring Plan</a>.</p>
-<p>The frontend of HexTrackr is composed of two main pages, each with its own set of JavaScript modules and CSS styles. Shared components, such as the header, footer, and settings modal, are loaded dynamically on each page.</p>
-<p>For more detailed information on the frontend architecture, see the following documents:</p>
+<p>The HexTrackr frontend employs a sophisticated <strong>modular orchestrator pattern</strong> that provides clean separation of concerns, event-driven communication, and maintainable code organization. The architecture has evolved from a monolithic structure to a fully modular system coordinated by the <code>VulnerabilityCoreOrchestrator</code>.</p>
+<hr>
+<h2>Architecture Overview</h2>
+<pre><code class="language-mermaid">graph TD
+    A[ModernVulnManager] --&gt; B[VulnerabilityCoreOrchestrator]
+
+    B --&gt; C[VulnerabilityDataManager]
+    B --&gt; D[VulnerabilityStatisticsManager]
+    B --&gt; E[VulnerabilityChartManager]
+    B --&gt; F[VulnerabilitySearchManager]
+    B --&gt; G[VulnerabilityGridManager]
+    B --&gt; H[VulnerabilityCardsManager]
+
+    B --&gt; I[WebSocketClient]
+    B --&gt; J[ThemeController]
+    B --&gt; K[ToastManager]
+
+    C --&gt; L[API Endpoints]
+    I --&gt; M[Socket.io Server]
+
+    E --&gt; N[ApexCharts]
+    G --&gt; O[AG-Grid]
+
+    style B fill:#e1f5fe
+    style A fill:#f3e5f5
+</code></pre>
+<hr>
+<h2>Core Orchestrator Pattern</h2>
+<h3>VulnerabilityCoreOrchestrator</h3>
+<p>The central coordination hub that manages all specialized modules and their interactions:</p>
+<pre><code class="language-javascript">export class VulnerabilityCoreOrchestrator {
+    constructor() {
+        this.managers = new Map();
+        this.eventBus = new EventTarget();
+        this.initialized = false;
+    }
+
+    async initializeAllModules(parentManager) {
+        // Create and wire all specialized managers
+        this.dataManager = new VulnerabilityDataManager(this);
+        this.statisticsManager = new VulnerabilityStatisticsManager(this);
+        this.chartManager = new VulnerabilityChartManager(this);
+        // ... other managers
+    }
+}
+</code></pre>
+<p><strong>Key Responsibilities</strong>:</p>
 <ul>
-<li><a href="#css-architecture">CSS Architecture</a></li>
-<li><a href="#javascript-modules">JavaScript Module System</a></li>
-<li><a href="#accessibility">Accessibility</a></li>
+<li>Module lifecycle management</li>
+<li>Inter-module communication coordination</li>
+<li>Event-driven architecture implementation</li>
+<li>State synchronization across modules</li>
+<li>Error handling and recovery</li>
 </ul>
-<h2>Page Architecture</h2>
-<h3><code>tickets.html</code></h3>
+<hr>
+<h2>Specialized Manager Modules</h2>
+<h3>1. VulnerabilityDataManager</h3>
+<p><strong>Location</strong>: <code>/scripts/shared/vulnerability-data.js</code></p>
+<p><strong>Responsibilities</strong>:</p>
 <ul>
-<li><strong>Styling</strong>: Uses a combination of Bootstrap 5 and Tabler.io for its UI components.</li>
-<li><strong>Core Logic</strong>: Managed by <code>scripts/pages/tickets.js</code>, which contains the <code>HexagonTicketsManager</code> class.</li>
-<li><strong>Functionality</strong>: Provides full CRUD operations for tickets, including filtering, pagination, and data export.</li>
+<li>API communication and data fetching</li>
+<li>Data caching and invalidation</li>
+<li>Response transformation and normalization</li>
+<li>Error handling for network operations</li>
 </ul>
-<h3><code>vulnerabilities.html</code></h3>
+<p><strong>Key Methods</strong>:</p>
+<pre><code class="language-javascript">async fetchVulnerabilities(params)
+async fetchStatistics()
+async importCSV(file, options)
+clearCache()
+</code></pre>
+<h3>2. VulnerabilityStatisticsManager</h3>
+<p><strong>Location</strong>: <code>/scripts/shared/vulnerability-statistics.js</code></p>
+<p><strong>Responsibilities</strong>:</p>
 <ul>
-<li><strong>Styling</strong>: Uses the Tabler.io framework, with AG Grid for data tables and ApexCharts for visualizations.</li>
-<li><strong>Core Logic</strong>: Refactor in progress from a monolithic <code>ModernVulnManager</code> class (≈2,286 lines as of current commit) toward a modular architecture. Extracted so far: <code>PaginationController</code> (moved to <code>scripts/shared/pagination-controller.js</code>). Planned next extractions: Data fetch/cache manager hardening, chart controller, grid configuration factory, import workflow module. Progress ~12% (1 of 8 planned modules fully separated).</li>
-<li><strong>Critical Bug Fix (v1.0.5)</strong>: Resolved CSV import functionality breakdown caused by missing <code>this.apiBase = &quot;/api&quot;</code> property in ModernVulnManager constructor. This bug caused all CSV upload attempts to fail with 404 errors due to undefined API endpoint URLs.</li>
-<li><strong>Enhanced Features</strong>:<ul>
-<li><strong>Cisco Vulnerability ID Support</strong>: Renamed &quot;CVE&quot; column to &quot;Vulnerability&quot; across all views with support for CVE, Cisco SA, and Plugin ID display</li>
-<li><strong>Intelligent Linking</strong>: CVE identifiers link to CVE.org, Cisco SA identifiers link to cisco.com security advisories</li>
-<li><strong>Enhanced Cell Renderers</strong>: Improved vulnerability identification with appropriate styling for different ID types</li>
+<li>Statistical calculations and aggregations</li>
+<li>Trend analysis and metric computation</li>
+<li>Performance optimization for large datasets</li>
+<li>Real-time statistics updates</li>
 </ul>
-</li>
-<li><strong>Functionality</strong>: Comprehensive vulnerability dashboard: interactive severity/time charts, dynamic AG Grid table, device cards with pagination, CSV import (rollover pipeline), export (CSV/HTML), inline filtering and search.</li>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li>Severity distribution calculations</li>
+<li>Temporal trend analysis</li>
+<li>Device impact metrics</li>
+<li>Performance-optimized aggregations</li>
 </ul>
-<h2>Modal Architecture (v1.0.6+)</h2>
+<h3>3. VulnerabilityChartManager</h3>
+<p><strong>Location</strong>: <code>/scripts/shared/vulnerability-chart-manager.js</code></p>
+<p><strong>Responsibilities</strong>:</p>
+<ul>
+<li>ApexCharts integration and management</li>
+<li>Theme-aware chart configuration</li>
+<li>Real-time chart updates</li>
+<li>Chart lifecycle management</li>
+</ul>
+<p><strong>Chart Types</strong>:</p>
+<ul>
+<li>Severity distribution (donut charts)</li>
+<li>Temporal trends (line charts)</li>
+<li>Device impact analysis (bar charts)</li>
+<li>VPR score distributions (histograms)</li>
+</ul>
+<p><strong>Theme Integration</strong>:</p>
+<pre><code class="language-javascript">// Sophisticated theme-aware initialization
+async initializeCharts() {
+    // Approach 1: Immediate initialization
+    if (window.headerThemeManager?.getThemeController) {
+        const theme = window.headerThemeManager.getThemeController().getTheme();
+        this.createChartsWithTheme(theme);
+        return;
+    }
+
+    // Approach 2: Event-based initialization
+    window.addEventListener(&#39;themeInitialized&#39;, (event) =&gt; {
+        this.createChartsWithTheme(event.detail.theme);
+    });
+
+    // Approach 3: Fallback with timeout
+    setTimeout(() =&gt; {
+        this.createChartsWithTheme(&#39;light&#39;);
+    }, 500);
+}
+</code></pre>
+<h3>4. VulnerabilitySearchManager</h3>
+<p><strong>Location</strong>: <code>/scripts/shared/vulnerability-search.js</code></p>
+<p><strong>Responsibilities</strong>:</p>
+<ul>
+<li>Search functionality implementation</li>
+<li>Filter management and application</li>
+<li>CVE lookup and validation</li>
+<li>Search optimization and indexing</li>
+</ul>
+<h3>5. VulnerabilityGridManager</h3>
+<p><strong>Location</strong>: <code>/scripts/shared/vulnerability-grid.js</code></p>
+<p><strong>Responsibilities</strong>:</p>
+<ul>
+<li>AG-Grid configuration and management</li>
+<li>Column definitions and cell renderers</li>
+<li>Pagination and virtual scrolling</li>
+<li>Export functionality</li>
+</ul>
+<p><strong>AG-Grid Features</strong>:</p>
+<ul>
+<li>Virtual scrolling for performance</li>
+<li>Custom cell renderers for CVE links</li>
+<li>Responsive column management</li>
+<li>Advanced filtering and sorting</li>
+</ul>
+<h3>6. VulnerabilityCardsManager</h3>
+<p><strong>Location</strong>: <code>/scripts/shared/vulnerability-cards.js</code></p>
+<p><strong>Responsibilities</strong>:</p>
+<ul>
+<li>Card-based view rendering</li>
+<li>Pagination for card layouts</li>
+<li>Device grouping and organization</li>
+<li>Interactive card actions</li>
+</ul>
+<hr>
+<h2>Real-time Communication</h2>
+<h3>WebSocketClient Architecture</h3>
+<p><strong>Location</strong>: <code>/scripts/shared/websocket-client.js</code></p>
+<pre><code class="language-javascript">class WebSocketClient {
+    constructor() {
+        this.socket = null;
+        this.isConnected = false;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+        this.heartbeatInterval = null;
+        this.eventCallbacks = new Map();
+        this.progressThrottleTimers = new Map();
+    }
+}
+</code></pre>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li>Automatic reconnection with exponential backoff</li>
+<li>Heartbeat monitoring for connection health</li>
+<li>Progress event throttling (100ms minimum interval)</li>
+<li>Event callback management</li>
+<li>Connection timeout handling</li>
+</ul>
+<p><strong>Real-time Events</strong>:</p>
+<ul>
+<li>Import progress tracking</li>
+<li>Data update notifications</li>
+<li>System alerts and warnings</li>
+<li>Connection status changes</li>
+</ul>
+<hr>
+<h2>Theme System Integration</h2>
+<h3>ThemeController Integration</h3>
+<p><strong>Location</strong>: <code>/scripts/shared/theme-controller.js</code></p>
+<p>The frontend integrates with a sophisticated theme system providing:</p>
+<ul>
+<li><strong>Dark/Light Mode</strong>: Complete theme switching</li>
+<li><strong>WCAG Compliance</strong>: AA-level accessibility standards</li>
+<li><strong>Cross-tab Synchronization</strong>: Theme state shared across browser tabs</li>
+<li><strong>Component Awareness</strong>: All UI components respect theme settings</li>
+</ul>
+<p><strong>Chart Theme Adaptation</strong>:</p>
+<pre><code class="language-javascript">// Dynamic theme application for charts
+applyThemeToChart(chartInstance, theme) {
+    const themeConfig = this.getChartThemeConfig(theme);
+    chartInstance.updateOptions({
+        theme: {
+            mode: theme,
+            palette: themeConfig.palette
+        },
+        colors: themeConfig.colors,
+        stroke: {
+            ...chartOptions.stroke,
+            ...(themeConfig.stroke?.colors ? { colors: themeConfig.stroke.colors } : {})
+        }
+    });
+}
+</code></pre>
+<hr>
+<h2>Modal System Architecture</h2>
+<h3>Modal Management</h3>
+<p><strong>Location</strong>: <code>/scripts/shared/</code> (various modal files)</p>
+<p><strong>Available Modals</strong>:</p>
+<ul>
+<li><code>vulnerability-details-modal.js</code> - Vulnerability information display</li>
+<li><code>device-security-modal.js</code> - Device-specific security details</li>
+<li><code>settings-modal.js</code> - Application configuration</li>
+<li><code>progress-modal.js</code> - Import progress tracking</li>
+</ul>
+<p><strong>Modal Features</strong>:</p>
+<ul>
+<li>Bootstrap 5 integration</li>
+<li>Proper modal lifecycle management</li>
+<li>State preservation during navigation</li>
+<li>Accessibility compliance</li>
+</ul>
 <h3>Universal Aggregation System</h3>
-<p>HexTrackr implements a description-field-based universal aggregation key for consistent modal data relationships:</p>
+<p>HexTrackr implements description-field-based aggregation for consistent modal relationships:</p>
+<p><strong>Vulnerability Modals</strong>: Aggregate all devices affected by specific vulnerabilities<br><strong>Device Modals</strong>: Aggregate all vulnerabilities affecting specific devices</p>
+<hr>
+<h2>Page-Specific Architecture</h2>
+<h3>Vulnerabilities Page (<code>vulnerabilities.html</code>)</h3>
+<p><strong>Main Controller</strong>: <code>/scripts/pages/vulnerabilities.js</code></p>
+<pre><code class="language-javascript">export class ModernVulnManager {
+    constructor() {
+        this.initializeModules();
+    }
+
+    async initializeModules() {
+        // Delegate to orchestrator
+        this.coreOrchestrator = new VulnerabilityCoreOrchestrator();
+        await this.coreOrchestrator.initializeAllModules(this);
+
+        // Get module references for delegation
+        this.dataManager = this.coreOrchestrator.dataManager;
+        this.statisticsManager = this.coreOrchestrator.statisticsManager;
+        // ... other managers
+    }
+}
+</code></pre>
+<p><strong>Page Features</strong>:</p>
 <ul>
-<li><p><strong>Vulnerability Modal</strong>: Aggregates all devices affected by a specific vulnerability using the vulnerability description as the grouping key</p>
+<li>Real-time vulnerability dashboard</li>
+<li>Interactive severity and temporal charts</li>
+<li>Dynamic AG-Grid with virtual scrolling</li>
+<li>CSV import with progress tracking</li>
+<li>Multiple export formats (CSV, HTML, PDF)</li>
+<li>Advanced search and filtering</li>
+</ul>
+<h3>Tickets Page (<code>tickets.html</code>)</h3>
+<p><strong>Main Controller</strong>: <code>/scripts/pages/tickets.js</code></p>
+<p><strong>Features</strong>:</p>
 <ul>
-<li>Example: CVE-2017-3881 shows all 24 affected devices in a single modal</li>
-<li>Modal displays comprehensive device list with hostnames, IP addresses, and affected services</li>
+<li>Complete CRUD operations for tickets</li>
+<li>Device assignment and tracking</li>
+<li>ServiceNow/Hexagon integration</li>
+<li>Bulk operations and reporting</li>
+<li>Audit trail management</li>
 </ul>
-</li>
-<li><p><strong>Device Modal</strong>: Aggregates all vulnerabilities affecting a specific device using device hostname as the grouping key  </p>
+<hr>
+<h2>Shared Infrastructure</h2>
+<h3>Utility Modules</h3>
+<p><strong>Location</strong>: <code>/scripts/utils/</code></p>
 <ul>
-<li>Example: grimesnswan03 shows all 12 vulnerabilities affecting that device</li>
-<li>Modal displays complete vulnerability profile for the selected device</li>
+<li><code>accessibility-announcer.js</code> - Screen reader support</li>
+<li><code>security.js</code> - XSS prevention and input sanitization</li>
+<li><code>theme-contrast-tester.js</code> - WCAG compliance validation</li>
+<li><code>wcag-contrast-validator.js</code> - Color contrast validation</li>
 </ul>
-</li>
-</ul>
-<h3>Modal State Management</h3>
+<h3>Shared Components</h3>
+<p><strong>Location</strong>: <code>/scripts/shared/</code></p>
 <ul>
-<li><strong>Bootstrap Integration</strong>: Uses proper <code>Modal.getInstance()</code> for clean modal transitions</li>
-<li><strong>Layering Prevention</strong>: Ensures existing modals close before opening new ones</li>
-<li><strong>Workflow</strong>: Vulnerability modal → closes → device modal opens seamlessly</li>
-<li><strong>Data Consistency</strong>: All modal data reflects current aggregated state from database</li>
+<li><code>header-loader.js</code> - Dynamic header management</li>
+<li><code>footer-loader.js</code> - Footer content loading</li>
+<li><code>toast-manager.js</code> - Notification system</li>
+<li><code>config-loader.js</code> - Configuration management</li>
+<li><code>cve-utilities.js</code> - CVE validation and formatting</li>
 </ul>
-<h3>Testing Strategy</h3>
+<hr>
+<h2>Event-Driven Communication</h2>
+<h3>Event Flow Architecture</h3>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant User
+    participant Grid as GridManager
+    participant Orch as Orchestrator
+    participant Data as DataManager
+    participant Chart as ChartManager
+
+    User-&gt;&gt;Grid: Filter Change
+    Grid-&gt;&gt;Orch: filterChanged event
+    Orch-&gt;&gt;Data: fetchVulnerabilities(filters)
+    Data-&gt;&gt;Orch: dataUpdated event
+    Orch-&gt;&gt;Chart: updateCharts(newData)
+    Orch-&gt;&gt;Grid: updateGrid(newData)
+</code></pre>
+<p><strong>Event Types</strong>:</p>
 <ul>
-<li><strong>Playwright Automation</strong>: Comprehensive browser automation for modal workflow validation</li>
-<li><strong>Aggregation Verification</strong>: Automated testing ensures correct device/vulnerability counts</li>
-<li><strong>Performance Testing</strong>: Validated with 10,000+ record datasets for large-scale deployments</li>
-<li><strong>UI Responsiveness</strong>: Modal interactions tested across different viewport sizes</li>
+<li><code>dataUpdated</code> - New data available</li>
+<li><code>filterChanged</code> - Search/filter modifications</li>
+<li><code>themeChanged</code> - Theme switch events</li>
+<li><code>importProgress</code> - CSV import updates</li>
+<li><code>exportComplete</code> - Export operation finished</li>
 </ul>
+<hr>
+<h2>Performance Optimizations</h2>
+<h3>Data Management</h3>
+<ul>
+<li><strong>Caching Strategy</strong>: Intelligent cache invalidation</li>
+<li><strong>Virtual Scrolling</strong>: AG-Grid virtualization for large datasets</li>
+<li><strong>Lazy Loading</strong>: Progressive data loading</li>
+<li><strong>Debounced Operations</strong>: Search and filter debouncing</li>
+</ul>
+<h3>Rendering Optimizations</h3>
+<ul>
+<li><strong>Chart Throttling</strong>: Progress update throttling (100ms)</li>
+<li><strong>DOM Optimization</strong>: Minimal DOM manipulation</li>
+<li><strong>Event Delegation</strong>: Efficient event handling</li>
+<li><strong>Memory Management</strong>: Proper cleanup and disposal</li>
+</ul>
+<h3>Network Optimization</h3>
+<ul>
+<li><strong>Request Batching</strong>: Combined API requests</li>
+<li><strong>Response Compression</strong>: Gzip/deflate support</li>
+<li><strong>Connection Pooling</strong>: WebSocket connection reuse</li>
+<li><strong>Progressive Enhancement</strong>: Graceful degradation</li>
+</ul>
+<hr>
+<h2>Error Handling &amp; Recovery</h2>
+<h3>Graceful Degradation</h3>
+<pre><code class="language-javascript">// Example error handling in orchestrator
+async handleModuleError(moduleName, error) {
+    console.error(`Module ${moduleName} error:`, error);
+
+    // Attempt recovery
+    if (this.canRecover(moduleName, error)) {
+        await this.recoverModule(moduleName);
+    } else {
+        // Fallback to basic functionality
+        this.enableFallbackMode(moduleName);
+    }
+
+    // Notify user if necessary
+    this.showErrorToast(moduleName, error);
+}
+</code></pre>
+<p><strong>Error Recovery Features</strong>:</p>
+<ul>
+<li>Module-level error isolation</li>
+<li>Automatic recovery attempts</li>
+<li>Fallback functionality modes</li>
+<li>User notification system</li>
+<li>Error logging and reporting</li>
+</ul>
+<hr>
+<h2>Development &amp; Testing</h2>
+<h3>Module Testing Strategy</h3>
+<ul>
+<li><strong>Unit Tests</strong>: Individual manager testing</li>
+<li><strong>Integration Tests</strong>: Orchestrator communication testing</li>
+<li><strong>E2E Tests</strong>: Playwright automation for workflows</li>
+<li><strong>Performance Tests</strong>: Load testing with large datasets</li>
+</ul>
+<h3>Development Tools</h3>
+<ul>
+<li><strong>ES6 Modules</strong>: Native module system</li>
+<li><strong>Hot Reloading</strong>: Development server support</li>
+<li><strong>Source Maps</strong>: Debugging support</li>
+<li><strong>Code Splitting</strong>: Optimized loading</li>
+</ul>
+<hr>
+<h2>Future Enhancements</h2>
+<h3>Planned Improvements</h3>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Enhancement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>State Management</strong></td>
+<td>Implement Redux-like state management</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Component System</strong></td>
+<td>Web Components migration</td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>PWA Features</strong></td>
+<td>Service worker and offline support</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Micro-frontends</strong></td>
+<td>Module federation implementation</td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Performance</strong></td>
+<td>Further bundle optimization</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Testing</strong></td>
+<td>Increased test coverage to 90%+</td>
+<td>High</td>
+</tr>
+</tbody></table>
+<h3>Architecture Evolution</h3>
+<ul>
+<li><strong>TypeScript Migration</strong>: Gradual TypeScript adoption</li>
+<li><strong>Framework Integration</strong>: Consider React/Vue integration</li>
+<li><strong>API Standardization</strong>: GraphQL implementation</li>
+<li><strong>Real-time Enhancements</strong>: Enhanced WebSocket features</li>
+</ul>
+<hr>
+<h2>Summary</h2>
+<p>The HexTrackr frontend demonstrates a mature, modular architecture that prioritizes:</p>
+<ul>
+<li><strong>Separation of Concerns</strong>: Each module has distinct responsibilities</li>
+<li><strong>Event-Driven Communication</strong>: Loose coupling between components</li>
+<li><strong>Performance</strong>: Optimized for large datasets and real-time updates</li>
+<li><strong>Maintainability</strong>: Clean, testable, and extensible code structure</li>
+<li><strong>Accessibility</strong>: WCAG AA compliance throughout</li>
+<li><strong>Theme Integration</strong>: Comprehensive dark/light mode support</li>
+</ul>
+<p>This architecture provides a solid foundation for future enhancements while maintaining excellent performance and user experience.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
