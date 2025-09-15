@@ -159,20 +159,34 @@ class HtmlContentUpdater {
             }
         };
         
+        // Add code block handler for Mermaid diagrams
+        renderer.code = function(token) {
+            const code = typeof token === "string" ? token : token.text;
+            const lang = arguments.length > 1 ? arguments[1] : token.lang;
+
+            // Handle Mermaid diagrams specially
+            if (lang === "mermaid") {
+                // Return a div with class="mermaid" for client-side rendering
+                return `<div class="mermaid">${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>`;
+            }
+
+            // Default code block handling with syntax highlighting
+            try {
+                const hljs = require("highlight.js");
+                const language = hljs.getLanguage(lang) ? lang : "plaintext";
+                const highlighted = hljs.highlight(code, { language }).value;
+                return `<pre><code class="language-${lang}">${highlighted}</code></pre>`;
+            } catch (_e) {
+                // Fallback to plain text if highlighting fails
+                return `<pre><code class="language-${lang}">${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>`;
+            }
+        };
+
         // Configure marked options with custom renderer
         this.marked.setOptions({
             breaks: true,
             gfm: true,
-            sanitize: false,
-            highlight: function(code, lang) {
-                try {
-                    const hljs = require("highlight.js");
-                    const language = hljs.getLanguage(lang) ? lang : "plaintext";
-                    return hljs.highlight(code, { language }).value;
-                } catch (_e) {
-                    return code; // Fallback to plain text if highlighting fails
-                }
-            }
+            sanitize: false
         });
 
         // Use marked.use() to set the renderer for newer versions

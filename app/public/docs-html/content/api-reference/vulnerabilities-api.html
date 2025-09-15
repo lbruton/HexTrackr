@@ -20,56 +20,50 @@
 <li><p><strong>Note</strong>: This endpoint only returns active and reopened vulnerabilities. Use <code>/api/vulnerabilities/resolved</code> for resolved vulnerabilities.</p>
 </li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">{
-  &quot;data&quot;: [
-    {
-      &quot;id&quot;: 10,
-      &quot;import_id&quot;: 3,
-      &quot;hostname&quot;: &quot;host-1&quot;,
-      &quot;cve&quot;: &quot;CVE-2024-0001&quot;,
-      &quot;severity&quot;: &quot;High&quot;,
-      &quot;vpr_score&quot;: 8.6,
-      &quot;last_seen&quot;: &quot;2025-08-20&quot;,
-      &quot;plugin_id&quot;: &quot;12345&quot;,
-      &quot;plugin_name&quot;: &quot;Example Vulnerability Name&quot;
-    }
-  ],
-  &quot;pagination&quot;: { &quot;page&quot;: 1, &quot;limit&quot;: 50, &quot;total&quot;: 1234, &quot;pages&quot;: 25 }
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">10</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;import_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;hostname&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;host-1&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;cve&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;CVE-2024-0001&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;severity&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;High&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;vpr_score&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">8.6</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;last_seen&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-20&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;plugin_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;12345&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;plugin_name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Example Vulnerability Name&quot;</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;pagination&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;page&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;limit&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">50</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;total&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1234</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;pages&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">25</span> <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 <h3>GET /api/vulnerabilities/stats</h3>
 <ul>
 <li><p><strong>Description</strong>: Retrieves aggregated statistics for current vulnerabilities, grouped by severity.</p>
 </li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">[
-  {
-    &quot;severity&quot;: &quot;Critical&quot;,
-    &quot;count&quot;: 12,
-    &quot;total_vpr&quot;: 100.1,
-    &quot;avg_vpr&quot;: 8.34,
-    &quot;earliest&quot;: &quot;2025-08-01&quot;,
-    &quot;latest&quot;: &quot;2025-08-20&quot;
-  }
-]
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;severity&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Critical&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;count&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">12</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;total_vpr&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">100.1</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;avg_vpr&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">8.34</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;earliest&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-01&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;latest&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-20&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">]</span></code></pre></li>
 </ul>
 <h3>GET /api/vulnerabilities/recent-trends</h3>
 <ul>
 <li><p><strong>Description</strong>: Retrieves statistics for the most recent scan date and compares them with the previous day to show trends.</p>
 </li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">{
-  &quot;Critical&quot;: {
-    &quot;current&quot;: { &quot;count&quot;: 12, &quot;total_vpr&quot;: 115.8 },
-    &quot;trend&quot;: { &quot;count_change&quot;: 2, &quot;vpr_change&quot;: 10.2 }
-  }
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;Critical&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;current&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;count&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">12</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;total_vpr&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">115.8</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;trend&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;count_change&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;vpr_change&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">10.2</span> <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 <h3>GET /api/vulnerabilities/trends</h3>
 <ul>
@@ -82,17 +76,15 @@
 </ul>
 </li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">[
-  {
-    &quot;date&quot;: &quot;2025-08-20&quot;,
-    &quot;Critical&quot;: { &quot;count&quot;: 12, &quot;total_vpr&quot;: 115.8 },
-    &quot;High&quot;: { &quot;count&quot;: 85, &quot;total_vpr&quot;: 722.5 },
-    &quot;Medium&quot;: { &quot;count&quot;: 210, &quot;total_vpr&quot;: 1050.0 },
-    &quot;Low&quot;: { &quot;count&quot;: 50, &quot;total_vpr&quot;: 50.0 }
-  }
-]
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-20&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;Critical&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;count&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">12</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;total_vpr&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">115.8</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;High&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;count&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">85</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;total_vpr&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">722.5</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;Medium&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;count&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">210</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;total_vpr&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1050.0</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;Low&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;count&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">50</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;total_vpr&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">50.0</span> <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">]</span></code></pre></li>
 </ul>
 <h3>GET /api/vulnerabilities/resolved</h3>
 <ul>
@@ -106,22 +98,20 @@
 </ul>
 </li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">{
-  &quot;data&quot;: [
-    {
-      &quot;id&quot;: 15,
-      &quot;hostname&quot;: &quot;server-01&quot;,
-      &quot;cve&quot;: &quot;CVE-2023-1234&quot;,
-      &quot;severity&quot;: &quot;High&quot;,
-      &quot;lifecycle_state&quot;: &quot;resolved&quot;,
-      &quot;resolved_date&quot;: &quot;2025-08-15&quot;,
-      &quot;last_seen&quot;: &quot;2025-08-10&quot;
-    }
-  ],
-  &quot;pagination&quot;: { &quot;page&quot;: 1, &quot;limit&quot;: 50, &quot;total&quot;: 45, &quot;pages&quot;: 1 }
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">15</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;hostname&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;server-01&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;cve&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;CVE-2023-1234&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;severity&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;High&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;lifecycle_state&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;resolved&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;resolved_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-15&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;last_seen&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-10&quot;</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;pagination&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;page&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;limit&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">50</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;total&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">45</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;pages&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span> <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 <hr>
 <h2>System Management</h2>
@@ -130,54 +120,48 @@
 <li><p><strong>Description</strong>: Health check endpoint that provides system status information including version, database availability, and uptime.</p>
 </li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">{
-  &quot;status&quot;: &quot;ok&quot;,
-  &quot;version&quot;: &quot;1.0.0&quot;,
-  &quot;db&quot;: true,
-  &quot;uptime&quot;: 3600.5
-}
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ok&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1.0.0&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;db&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;uptime&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">3600.5</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
 </ul>
 <h3>GET /api/sites</h3>
 <ul>
 <li><p><strong>Description</strong>: Retrieves all sites from the database, ordered alphabetically by name.</p>
 </li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">[
-  {
-    &quot;id&quot;: 1,
-    &quot;name&quot;: &quot;Main Office&quot;,
-    &quot;created_at&quot;: &quot;2025-08-01T10:00:00.000Z&quot;
-  },
-  {
-    &quot;id&quot;: 2,
-    &quot;name&quot;: &quot;Branch Office&quot;,
-    &quot;created_at&quot;: &quot;2025-08-02T14:30:00.000Z&quot;
-  }
-]
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Main Office&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;created_at&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-01T10:00:00.000Z&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Branch Office&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;created_at&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-02T14:30:00.000Z&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">]</span></code></pre></li>
 </ul>
 <h3>GET /api/locations</h3>
 <ul>
 <li><p><strong>Description</strong>: Retrieves all locations from the database, ordered alphabetically by name.</p>
 </li>
 <li><p><strong>Response</strong>: <code>200 OK</code></p>
-<pre><code class="language-json">[
-  {
-    &quot;id&quot;: 1,
-    &quot;name&quot;: &quot;Building A&quot;,
-    &quot;created_at&quot;: &quot;2025-08-01T10:00:00.000Z&quot;
-  },
-  {
-    &quot;id&quot;: 2,
-    &quot;name&quot;: &quot;Building B&quot;,
-    &quot;created_at&quot;: &quot;2025-08-02T14:30:00.000Z&quot;
-  }
-]
-</code></pre>
-</li>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Building A&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;created_at&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-01T10:00:00.000Z&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Building B&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;created_at&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-02T14:30:00.000Z&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">]</span></code></pre></li>
 </ul>
 <hr>
 <h2>Data Import &amp; History</h2>
@@ -211,17 +195,15 @@
 </li>
 <li><strong>Response</strong>: <code>200 OK</code></li>
 </ul>
-<pre><code class="language-json">{
-  &quot;success&quot;: true,
-  &quot;importId&quot;: 7,
-  &quot;rowsProcessed&quot;: 250,
-  &quot;filename&quot;: &quot;export.csv&quot;,
-  &quot;insertCount&quot;: 200,
-  &quot;updateCount&quot;: 50,
-  &quot;removedStale&quot;: 10
-}
-</code></pre>
-<h3>POST /api/vulnerabilities/import-staging</h3>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;success&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;importId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;rowsProcessed&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">250</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;filename&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;export.csv&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;insertCount&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">200</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;updateCount&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">50</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;removedStale&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">10</span>
+<span class="hljs-punctuation">}</span></code></pre><h3>POST /api/vulnerabilities/import-staging</h3>
 <ul>
 <li><strong>Description</strong>: Enhanced staging import endpoint for vulnerability data with performance optimizations and advanced processing features.</li>
 <li><strong>Request Body</strong>: <code>multipart/form-data</code><ul>
@@ -238,65 +220,63 @@
 </li>
 <li><strong>Response</strong>: <code>200 OK</code></li>
 </ul>
-<pre><code class="language-json">{
-  &quot;success&quot;: true,
-  &quot;importId&quot;: 12,
-  &quot;stagingRowsProcessed&quot;: 10000,
-  &quot;finalRowsInserted&quot;: 9850,
-  &quot;filename&quot;: &quot;cisco_scan_2025-08-20.csv&quot;,
-  &quot;processingTime&quot;: 2340,
-  &quot;performance&quot;: {
-    &quot;stagingTime&quot;: 1200,
-    &quot;processingTime&quot;: 1140
-  }
-}
-</code></pre>
-<h3>POST /api/import/vulnerabilities</h3>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;success&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;importId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">12</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;stagingRowsProcessed&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">10000</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;finalRowsInserted&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">9850</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;filename&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;cisco_scan_2025-08-20.csv&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;processingTime&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2340</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;performance&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;stagingTime&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1200</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;processingTime&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1140</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre><h3>POST /api/import/vulnerabilities</h3>
 <ul>
 <li><strong>Description</strong>: Imports vulnerabilities from a JSON array. This endpoint is intended for use when a CSV file is parsed on the frontend before being sent to the server.</li>
 <li><strong>Request Body</strong>: <code>application/json</code></li>
 </ul>
-<pre><code class="language-json">    {
-      &quot;data&quot;: [
-        { &quot;hostname&quot;: &quot;host-1&quot;, &quot;cve&quot;: &quot;CVE-2024-0001&quot;, &quot;severity&quot;: &quot;High&quot; }
-      ]
-    }
+<pre><code class="language-json">    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;data&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+        <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;hostname&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;host-1&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;cve&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;CVE-2024-0001&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;severity&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;High&quot;</span> <span class="hljs-punctuation">}</span>
+      <span class="hljs-punctuation">]</span>
+    <span class="hljs-punctuation">}</span>
     ```
 
--   **Response**: `200 OK`
+-   **Response**<span class="hljs-punctuation">:</span> `<span class="hljs-number">200</span> OK`
 
     ```json
-    {
-      &quot;success&quot;: true,
-      &quot;imported&quot;: 1,
-      &quot;total&quot;: 1,
-      &quot;importId&quot;: 8
-    }
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;success&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;imported&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;total&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;importId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">8</span>
+    <span class="hljs-punctuation">}</span>
     ```
 
 ### GET /api/imports
 
--   **Description**: Retrieves the history of all vulnerability import events from the `vulnerability_imports` table.
--   **Note**: The `vulnerability_count` field is a calculated value representing the number of vulnerabilities associated with each import.
--   **Response**: `200 OK`
+-   **Description**<span class="hljs-punctuation">:</span> Retrieves the history of all vulnerability import events from the `vulnerability_imports` table.
+-   **Note**<span class="hljs-punctuation">:</span> The `vulnerability_count` field is a calculated value representing the number of vulnerabilities associated with each import.
+-   **Response**<span class="hljs-punctuation">:</span> `<span class="hljs-number">200</span> OK`
 
     ```json
-    [
-      {
-        &quot;id&quot;: 7,
-        &quot;filename&quot;: &quot;export.csv&quot;,
-        &quot;import_date&quot;: &quot;2025-08-20T10:30:00.000Z&quot;,
-        &quot;rows_processed&quot;: 250,
-        &quot;status&quot;: &quot;completed&quot;
-      },
-      {
-        &quot;id&quot;: 6,
-        &quot;filename&quot;: &quot;cisco_scan_2025-08-19.csv&quot;,
-        &quot;import_date&quot;: &quot;2025-08-19T14:15:00.000Z&quot;,
-        &quot;rows_processed&quot;: 1200,
-        &quot;status&quot;: &quot;completed&quot;
-      }
-    ]
+    <span class="hljs-punctuation">[</span>
+      <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">7</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;filename&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;export.csv&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;import_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-20T10:30:00.000Z&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;rows_processed&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">250</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;completed&quot;</span>
+      <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">6</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;filename&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;cisco_scan_2025-08-19.csv&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;import_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-08-19T14:15:00.000Z&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;rows_processed&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1200</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;completed&quot;</span>
+      <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">]</span>
     ```
 
 ---
@@ -305,18 +285,16 @@
 
 ### DELETE /api/vulnerabilities/clear
 
--   **Description**: Deletes all vulnerability-related data from the database. This includes the current state, historical snapshots, daily totals, import history, and links between tickets and vulnerabilities.
--   **Warning**: This is a destructive operation and cannot be undone.
--   **Response**: `200 OK`
+-   **Description**<span class="hljs-punctuation">:</span> Deletes all vulnerability-related data from the database. This includes the current state<span class="hljs-punctuation">,</span> historical snapshots<span class="hljs-punctuation">,</span> daily totals<span class="hljs-punctuation">,</span> import history<span class="hljs-punctuation">,</span> and links between tickets and vulnerabilities.
+-   **Warning**<span class="hljs-punctuation">:</span> This is a destructive operation and cannot be undone.
+-   **Response**<span class="hljs-punctuation">:</span> `<span class="hljs-number">200</span> OK`
 
     ```json
-    {
-      &quot;success&quot;: true,
-      &quot;message&quot;: &quot;All vulnerability data cleared from rollover architecture&quot;
-    }
-    ```
-</code></pre>
-
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;success&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;All vulnerability data cleared from rollover architecture&quot;</span>
+    <span class="hljs-punctuation">}</span>
+    ```</code></pre>
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
              fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->

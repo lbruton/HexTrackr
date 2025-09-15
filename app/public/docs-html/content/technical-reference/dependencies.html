@@ -96,12 +96,10 @@
 <li><strong>Major updates</strong>: Evaluated quarterly with thorough testing</li>
 </ul>
 <h3>Dependency Validation</h3>
-<pre><code class="language-bash"># Security check commands
-npm run security:check    # Full security audit
-npm run lockfile:check   # Lockfile validation
-npm audit --audit-level=moderate  # Vulnerability scan
-</code></pre>
-<h3>License Compliance</h3>
+<pre><code class="language-bash"><span class="hljs-comment"># Security check commands</span>
+npm run security:check    <span class="hljs-comment"># Full security audit</span>
+npm run lockfile:check   <span class="hljs-comment"># Lockfile validation</span>
+npm audit --audit-level=moderate  <span class="hljs-comment"># Vulnerability scan</span></code></pre><h3>License Compliance</h3>
 <p>All dependencies use permissive licenses compatible with commercial use:</p>
 <ul>
 <li><strong>MIT</strong>: 85% of dependencies</li>
@@ -131,48 +129,34 @@ npm audit --audit-level=moderate  # Vulnerability scan
 <hr>
 <h2>Environment Variables</h2>
 <h3>Database Configuration</h3>
-<pre><code class="language-bash"># Database settings
-DB_PATH=./data/hextrackr.db          # SQLite database file location
-DB_TIMEOUT=30000                     # Query timeout in milliseconds
-</code></pre>
-<h3>Server Configuration</h3>
-<pre><code class="language-bash"># Server settings
-PORT=8989                           # HTTP server port
-HOST=0.0.0.0                       # Bind address
-NODE_ENV=production                 # Environment mode
-</code></pre>
-<h3>WebSocket Configuration</h3>
-<pre><code class="language-bash"># WebSocket settings
-WEBSOCKET_PORT=8988                 # WebSocket server port
-WS_PING_INTERVAL=25000             # Ping interval in milliseconds
-WS_PING_TIMEOUT=20000              # Ping timeout in milliseconds
-</code></pre>
-<h3>Upload Configuration</h3>
-<pre><code class="language-bash"># File upload settings
-MAX_UPLOAD_SIZE=52428800           # 50MB in bytes
-UPLOAD_DIR=./app/public/uploads    # Upload directory
-ALLOWED_EXTENSIONS=csv,json        # Comma-separated file extensions
-</code></pre>
-<h3>Security Configuration</h3>
-<pre><code class="language-bash"># Security settings
-RATE_LIMIT_WINDOW=15               # Rate limit window in minutes
-RATE_LIMIT_MAX=100                 # Max requests per window
-CORS_ORIGIN=*                      # CORS allowed origins
-SESSION_SECRET=&lt;generated&gt;         # Session encryption key
-</code></pre>
-<h3>Documentation Configuration</h3>
-<pre><code class="language-bash"># Documentation settings
-DOCS_AUTO_REFRESH=true             # Auto-refresh documentation
-DOCS_BUILD_ON_START=false          # Build docs on server start
-</code></pre>
-<h3>Feature Flags</h3>
-<pre><code class="language-bash"># Feature toggles
-ENABLE_WEBSOCKETS=true             # Enable WebSocket support
-ENABLE_FILE_UPLOAD=true            # Enable CSV upload functionality
-ENABLE_BACKUP_RESTORE=true         # Enable backup/restore features
-ENABLE_DOCS_PORTAL=true            # Enable documentation portal
-</code></pre>
-<hr>
+<pre><code class="language-bash"><span class="hljs-comment"># Database settings</span>
+DB_PATH=./data/hextrackr.db          <span class="hljs-comment"># SQLite database file location</span>
+DB_TIMEOUT=30000                     <span class="hljs-comment"># Query timeout in milliseconds</span></code></pre><h3>Server Configuration</h3>
+<pre><code class="language-bash"><span class="hljs-comment"># Server settings</span>
+PORT=8989                           <span class="hljs-comment"># HTTP server port</span>
+HOST=0.0.0.0                       <span class="hljs-comment"># Bind address</span>
+NODE_ENV=production                 <span class="hljs-comment"># Environment mode</span></code></pre><h3>WebSocket Configuration</h3>
+<pre><code class="language-bash"><span class="hljs-comment"># WebSocket settings</span>
+WEBSOCKET_PORT=8988                 <span class="hljs-comment"># WebSocket server port</span>
+WS_PING_INTERVAL=25000             <span class="hljs-comment"># Ping interval in milliseconds</span>
+WS_PING_TIMEOUT=20000              <span class="hljs-comment"># Ping timeout in milliseconds</span></code></pre><h3>Upload Configuration</h3>
+<pre><code class="language-bash"><span class="hljs-comment"># File upload settings</span>
+MAX_UPLOAD_SIZE=52428800           <span class="hljs-comment"># 50MB in bytes</span>
+UPLOAD_DIR=./app/public/uploads    <span class="hljs-comment"># Upload directory</span>
+ALLOWED_EXTENSIONS=csv,json        <span class="hljs-comment"># Comma-separated file extensions</span></code></pre><h3>Security Configuration</h3>
+<pre><code class="language-bash"><span class="hljs-comment"># Security settings</span>
+RATE_LIMIT_WINDOW=15               <span class="hljs-comment"># Rate limit window in minutes</span>
+RATE_LIMIT_MAX=100                 <span class="hljs-comment"># Max requests per window</span>
+CORS_ORIGIN=*                      <span class="hljs-comment"># CORS allowed origins</span>
+SESSION_SECRET=&lt;generated&gt;         <span class="hljs-comment"># Session encryption key</span></code></pre><h3>Documentation Configuration</h3>
+<pre><code class="language-bash"><span class="hljs-comment"># Documentation settings</span>
+DOCS_AUTO_REFRESH=<span class="hljs-literal">true</span>             <span class="hljs-comment"># Auto-refresh documentation</span>
+DOCS_BUILD_ON_START=<span class="hljs-literal">false</span>          <span class="hljs-comment"># Build docs on server start</span></code></pre><h3>Feature Flags</h3>
+<pre><code class="language-bash"><span class="hljs-comment"># Feature toggles</span>
+ENABLE_WEBSOCKETS=<span class="hljs-literal">true</span>             <span class="hljs-comment"># Enable WebSocket support</span>
+ENABLE_FILE_UPLOAD=<span class="hljs-literal">true</span>            <span class="hljs-comment"># Enable CSV upload functionality</span>
+ENABLE_BACKUP_RESTORE=<span class="hljs-literal">true</span>         <span class="hljs-comment"># Enable backup/restore features</span>
+ENABLE_DOCS_PORTAL=<span class="hljs-literal">true</span>            <span class="hljs-comment"># Enable documentation portal</span></code></pre><hr>
 <h2>Dependency Update Log</h2>
 <h3>Recent Updates (Last 30 Days)</h3>
 <ul>
