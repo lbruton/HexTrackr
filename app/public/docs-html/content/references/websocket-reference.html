@@ -1,0 +1,526 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>WebSocket Reference</h1>
+<p>Complete reference for HexTrackr&#39;s real-time WebSocket communication system, including session management, event types, and client integration patterns.</p>
+<hr>
+<h2>Connection Overview</h2>
+<p><strong>Server</strong>: <code>ws://localhost:8988</code><br><strong>Protocol</strong>: Socket.io v4+<br><strong>Transport</strong>: WebSocket with polling fallback<br><strong>Session Management</strong>: UUID-based with automatic cleanup<br><strong>Throttling</strong>: 100ms minimum interval between progress events</p>
+<hr>
+<h2>Server Architecture (ProgressTracker)</h2>
+<h3>Class Definition</h3>
+<pre><code class="language-javascript">class ProgressTracker {
+    constructor(io) {
+        this.io = io;                           // Socket.io server instance
+        this.sessions = new Map();              // sessionId -&gt; session data
+        this.eventThrottle = new Map();         // sessionId -&gt; lastEmitTime
+        this.THROTTLE_INTERVAL = 100;          // ms between progress events
+        this.SESSION_CLEANUP_INTERVAL = 30 * 60 * 1000; // 30 minutes
+    }
+}
+</code></pre>
+<h3>Session Data Structure</h3>
+<pre><code class="language-javascript">const session = {
+    id: &quot;uuid-v4-string&quot;,
+    progress: 0.0,                    // 0.0 to 1.0
+    lastUpdate: Date.now(),           // timestamp
+    metadata: {
+        operation: &quot;vulnerability_import&quot;,
+        filename: &quot;scan_data.csv&quot;,
+        totalRows: 1500,
+        processedRows: 750,
+        startTime: &quot;2025-01-12T10:30:00Z&quot;,
+        estimatedCompletion: &quot;2025-01-12T10:35:00Z&quot;
+    },
+    status: &quot;processing&quot;,             // processing, completed, error, cancelled
+    result: null                      // final result when completed
+};
+</code></pre>
+<hr>
+<h2>Server-Side API</h2>
+<h3>Session Management</h3>
+<h4>createSession(metadata?)</h4>
+<pre><code class="language-javascript">createSession(metadata = {})
+</code></pre>
+<p><strong>Purpose</strong>: Create new progress tracking session<br><strong>Parameters</strong>: <code>metadata</code> - Optional session metadata object<br><strong>Returns</strong>: Session UUID string<br><strong>Side Effects</strong>: Emits <code>session_created</code> event to all clients</p>
+<h4>createSessionWithId(sessionId, metadata?)</h4>
+<pre><code class="language-javascript">createSessionWithId(sessionId, metadata = {})
+</code></pre>
+<p><strong>Purpose</strong>: Create session with specific ID (for deterministic testing)<br><strong>Parameters</strong>: <code>sessionId</code> - Specific UUID, <code>metadata</code> - Session metadata<br><strong>Returns</strong>: Session object</p>
+<h4>updateProgress(sessionId, progress, metadata?)</h4>
+<pre><code class="language-javascript">updateProgress(sessionId, progress, metadata = {})
+</code></pre>
+<p><strong>Purpose</strong>: Update session progress with throttling<br><strong>Parameters</strong>:</p>
+<ul>
+<li><code>sessionId</code> - Session UUID</li>
+<li><code>progress</code> - Progress value (0.0 to 1.0)</li>
+<li><code>metadata</code> - Additional progress metadata<br><strong>Throttling</strong>: Enforces 100ms minimum interval between events<br><strong>Side Effects</strong>: Emits <code>import_progress</code> event if not throttled</li>
+</ul>
+<h4>completeSession(sessionId, result?)</h4>
+<pre><code class="language-javascript">completeSession(sessionId, result = {})
+</code></pre>
+<p><strong>Purpose</strong>: Mark session as completed<br><strong>Parameters</strong>: <code>sessionId</code> - Session UUID, <code>result</code> - Final result data<br><strong>Side Effects</strong>: Emits <code>import_complete</code> event, schedules cleanup</p>
+<h4>errorSession(sessionId, error)</h4>
+<pre><code class="language-javascript">errorSession(sessionId, error)
+</code></pre>
+<p><strong>Purpose</strong>: Mark session as failed<br><strong>Parameters</strong>: <code>sessionId</code> - Session UUID, <code>error</code> - Error details<br><strong>Side Effects</strong>: Emits <code>import_error</code> event, schedules cleanup</p>
+<h4>cancelSession(sessionId)</h4>
+<pre><code class="language-javascript">cancelSession(sessionId, reason?)
+</code></pre>
+<p><strong>Purpose</strong>: Cancel active session<br><strong>Parameters</strong>: <code>sessionId</code> - Session UUID, <code>reason</code> - Optional cancellation reason<br><strong>Side Effects</strong>: Emits <code>import_cancelled</code> event, immediate cleanup</p>
+<h3>Cleanup Operations</h3>
+<h4>cleanupStaleSessions()</h4>
+<pre><code class="language-javascript">cleanupStaleSessions()
+</code></pre>
+<p><strong>Purpose</strong>: Remove sessions older than cleanup interval<br><strong>Frequency</strong>: Automatic every 30 minutes<br><strong>Criteria</strong>: Sessions with lastUpdate &gt; 30 minutes ago</p>
+<h4>cleanup(sessionId)</h4>
+<pre><code class="language-javascript">cleanup(sessionId)
+</code></pre>
+<p><strong>Purpose</strong>: Remove specific session and its throttle data<br><strong>Parameters</strong>: <code>sessionId</code> - Session UUID to remove</p>
+<hr>
+<h2>Event Types</h2>
+<h3>1. session_created</h3>
+<p><strong>Trigger</strong>: New session creation<br><strong>Payload</strong>:</p>
+<pre><code class="language-javascript">{
+    sessionId: &quot;uuid-string&quot;,
+    metadata: {
+        operation: &quot;vulnerability_import&quot;,
+        filename: &quot;data.csv&quot;,
+        // ... other metadata
+    },
+    timestamp: &quot;2025-01-12T10:30:00.123Z&quot;
+}
+</code></pre>
+<h3>2. import_progress</h3>
+<p><strong>Trigger</strong>: Progress updates (throttled to 100ms intervals)<br><strong>Payload</strong>:</p>
+<pre><code class="language-javascript">{
+    sessionId: &quot;uuid-string&quot;,
+    operation: &quot;vulnerability_import&quot;,
+    progress: 0.65,                    // 0.0 to 1.0
+    current_step: &quot;Processing CSV data&quot;,
+    processed_rows: 975,
+    total_rows: 1500,
+    eta_seconds: 45,
+    status: &quot;processing&quot;,
+    metadata: {
+        filename: &quot;vulnerability_scan.csv&quot;,
+        vendor: &quot;tenable&quot;,
+        scan_date: &quot;2025-01-12&quot;,
+        processing_speed: &quot;65 rows/sec&quot;
+    },
+    timestamp: &quot;2025-01-12T10:32:15.456Z&quot;
+}
+</code></pre>
+<h3>3. import_complete</h3>
+<p><strong>Trigger</strong>: Session completion<br><strong>Payload</strong>:</p>
+<pre><code class="language-javascript">{
+    sessionId: &quot;uuid-string&quot;,
+    operation: &quot;vulnerability_import&quot;,
+    success: true,
+    import_id: 47,
+    total_processed: 1500,
+    processing_time_ms: 4250,
+    summary: {
+        new_vulnerabilities: 78,
+        updated_vulnerabilities: 234,
+        resolved_vulnerabilities: 45,
+        skipped_duplicates: 12,
+        validation_errors: 0
+    },
+    performance: {
+        rows_per_second: 353,
+        peak_memory_mb: 156,
+        database_operations: 2847
+    },
+    timestamp: &quot;2025-01-12T10:34:15.789Z&quot;
+}
+</code></pre>
+<h3>4. import_error</h3>
+<p><strong>Trigger</strong>: Session failure or critical error<br><strong>Payload</strong>:</p>
+<pre><code class="language-javascript">{
+    sessionId: &quot;uuid-string&quot;,
+    operation: &quot;vulnerability_import&quot;,
+    success: false,
+    error: {
+        code: &quot;CSV_PARSING_ERROR&quot;,
+        message: &quot;Invalid CSV format detected&quot;,
+        details: {
+            line_number: 157,
+            column: &quot;severity&quot;,
+            received_value: &quot;SUPER_CRITICAL&quot;,
+            expected_values: [&quot;Critical&quot;, &quot;High&quot;, &quot;Medium&quot;, &quot;Low&quot;]
+        },
+        recovery_suggestions: [
+            &quot;Check CSV format against template&quot;,
+            &quot;Validate severity values&quot;,
+            &quot;Try importing smaller batches&quot;
+        ]
+    },
+    partial_results: {
+        processed_rows: 156,
+        successful_imports: 145,
+        failed_rows: 11
+    },
+    timestamp: &quot;2025-01-12T10:32:45.321Z&quot;
+}
+</code></pre>
+<h3>5. import_cancelled</h3>
+<p><strong>Trigger</strong>: Session cancellation (user or system initiated)<br><strong>Payload</strong>:</p>
+<pre><code class="language-javascript">{
+    sessionId: &quot;uuid-string&quot;,
+    operation: &quot;vulnerability_import&quot;,
+    cancelled: true,
+    reason: &quot;user_requested&quot;,
+    partial_results: {
+        processed_rows: 523,
+        completion_percentage: 0.349
+    },
+    cleanup_performed: true,
+    timestamp: &quot;2025-01-12T10:33:30.654Z&quot;
+}
+</code></pre>
+<h3>6. data_updated</h3>
+<p><strong>Trigger</strong>: Significant data changes that affect multiple clients<br><strong>Payload</strong>:</p>
+<pre><code class="language-javascript">{
+    type: &quot;vulnerabilities&quot;,
+    action: &quot;bulk_update&quot;,           // created, updated, deleted, bulk_update
+    count: 78,
+    affected_entities: {
+        hosts: [&quot;web-server-01&quot;, &quot;db-server-02&quot;, &quot;app-server-03&quot;],
+        severity_changes: {
+            new_critical: 5,
+            resolved_high: 12
+        }
+    },
+    source: {
+        import_id: 47,
+        operation: &quot;csv_import&quot;
+    },
+    timestamp: &quot;2025-01-12T10:34:16.000Z&quot;
+}
+</code></pre>
+<h3>7. system_alert</h3>
+<p><strong>Trigger</strong>: System-wide notifications and alerts<br><strong>Payload</strong>:</p>
+<pre><code class="language-javascript">{
+    level: &quot;warning&quot;,               // info, warning, error, critical
+    category: &quot;maintenance&quot;,        // maintenance, security, performance, system
+    message: &quot;Database backup recommended - last backup was 7 days ago&quot;,
+    action_required: false,
+    action_details: {
+        description: &quot;Run backup operation&quot;,
+        endpoint: &quot;/api/backup/all&quot;,
+        estimated_time: &quot;2-3 minutes&quot;
+    },
+    auto_dismiss: 30000,           // auto-dismiss after 30 seconds
+    priority: &quot;medium&quot;,
+    timestamp: &quot;2025-01-12T10:35:00.000Z&quot;
+}
+</code></pre>
+<h3>8. heartbeat</h3>
+<p><strong>Trigger</strong>: Regular connection health checks<br><strong>Frequency</strong>: Every 30 seconds<br><strong>Payload</strong>:</p>
+<pre><code class="language-javascript">{
+    server_time: &quot;2025-01-12T10:35:00.000Z&quot;,
+    active_sessions: 3,
+    server_uptime: &quot;2d 4h 15m 32s&quot;,
+    memory_usage: {
+        used_mb: 156,
+        available_mb: 356
+    }
+}
+</code></pre>
+<hr>
+<h2>Client-Side Integration</h2>
+<h3>WebSocketClient Class</h3>
+<pre><code class="language-javascript">class WebSocketClient {
+    constructor() {
+        this.socket = null;
+        this.isConnected = false;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+        this.reconnectDelay = 1000;
+        this.heartbeatInterval = null;
+        this.eventCallbacks = new Map();
+
+        this.config = {
+            host: window.location.hostname || &quot;localhost&quot;,
+            port: &quot;8988&quot;,
+            autoReconnect: true,
+            heartbeatInterval: 30000,
+            progressThrottle: 100
+        };
+    }
+}
+</code></pre>
+<h3>Connection Management</h3>
+<h4>connect()</h4>
+<pre><code class="language-javascript">async connect(): Promise&lt;boolean&gt;
+</code></pre>
+<p><strong>Purpose</strong>: Establish WebSocket connection with retry logic<br><strong>Returns</strong>: Promise resolving to connection success<br><strong>Features</strong>:</p>
+<ul>
+<li>10-second connection timeout</li>
+<li>Transport fallback (WebSocket → polling)</li>
+<li>Automatic event listener setup</li>
+<li>Error handling and recovery</li>
+</ul>
+<p><strong>Example</strong>:</p>
+<pre><code class="language-javascript">const wsClient = new WebSocketClient();
+try {
+    await wsClient.connect();
+    console.log(&#39;WebSocket connected successfully&#39;);
+} catch (error) {
+    console.error(&#39;Connection failed:&#39;, error);
+}
+</code></pre>
+<h4>disconnect()</h4>
+<pre><code class="language-javascript">disconnect(): void
+</code></pre>
+<p><strong>Purpose</strong>: Gracefully close WebSocket connection<br><strong>Features</strong>: Cleanup event listeners and stop heartbeat</p>
+<h3>Event Subscription</h3>
+<h4>subscribe(eventType, callback)</h4>
+<pre><code class="language-javascript">subscribe(eventType: string, callback: Function): void
+</code></pre>
+<p><strong>Purpose</strong>: Subscribe to specific event types<br><strong>Parameters</strong>: <code>eventType</code> - Event name, <code>callback</code> - Handler function</p>
+<p><strong>Example</strong>:</p>
+<pre><code class="language-javascript">wsClient.subscribe(&#39;import_progress&#39;, (data) =&gt; {
+    updateProgressBar(data.progress);
+    updateStatus(data.current_step);
+    updateETA(data.eta_seconds);
+});
+</code></pre>
+<h4>unsubscribe(eventType, callback?)</h4>
+<pre><code class="language-javascript">unsubscribe(eventType: string, callback?: Function): void
+</code></pre>
+<p><strong>Purpose</strong>: Remove event subscriptions<br><strong>Parameters</strong>: <code>eventType</code> - Event name, <code>callback</code> - Specific handler (optional)</p>
+<h3>Progress Tracking Integration</h3>
+<h4>trackImportProgress(sessionId)</h4>
+<pre><code class="language-javascript">trackImportProgress(sessionId: string): void
+</code></pre>
+<p><strong>Purpose</strong>: Set up progress tracking for specific session<br><strong>Features</strong>: Automatic UI updates and error handling</p>
+<p><strong>Example</strong>:</p>
+<pre><code class="language-javascript">// Start import and track progress
+const response = await fetch(&#39;/api/vulnerabilities/import&#39;, {
+    method: &#39;POST&#39;,
+    body: formData
+});
+
+const result = await response.json();
+if (result.sessionId) {
+    wsClient.trackImportProgress(result.sessionId);
+}
+</code></pre>
+<h3>Reconnection Logic</h3>
+<h4>attemptReconnection()</h4>
+<pre><code class="language-javascript">attemptReconnection(): void
+</code></pre>
+<p><strong>Purpose</strong>: Handle automatic reconnection with exponential backoff<br><strong>Strategy</strong>:</p>
+<ol>
+<li>Wait <code>reconnectDelay</code> milliseconds</li>
+<li>Attempt connection</li>
+<li>On failure, double delay (max 30 seconds)</li>
+<li>Retry up to <code>maxReconnectAttempts</code> times</li>
+</ol>
+<h3>Client-Side Throttling</h3>
+<h4>handleProgressUpdate(data)</h4>
+<pre><code class="language-javascript">handleProgressUpdate(data: ProgressData): void
+</code></pre>
+<p><strong>Purpose</strong>: Additional client-side throttling for UI updates<br><strong>Features</strong>: Prevents UI overload during rapid progress updates</p>
+<hr>
+<h2>Integration Patterns</h2>
+<h3>CSV Import with Progress Tracking</h3>
+<pre><code class="language-javascript">// Complete CSV import workflow with WebSocket progress
+async function importCSVWithProgress(file, options = {}) {
+    // 1. Connect to WebSocket
+    await wsClient.connect();
+
+    // 2. Set up progress handlers
+    wsClient.subscribe(&#39;import_progress&#39;, handleProgressUpdate);
+    wsClient.subscribe(&#39;import_complete&#39;, handleImportComplete);
+    wsClient.subscribe(&#39;import_error&#39;, handleImportError);
+
+    // 3. Start import
+    const formData = new FormData();
+    formData.append(&#39;csvFile&#39;, file);
+    formData.append(&#39;vendor&#39;, options.vendor || &#39;generic&#39;);
+
+    const response = await fetch(&#39;/api/vulnerabilities/import&#39;, {
+        method: &#39;POST&#39;,
+        body: formData
+    });
+
+    const result = await response.json();
+    return result;
+}
+
+function handleProgressUpdate(data) {
+    const percentage = Math.round(data.progress * 100);
+    updateProgressBar(percentage);
+    updateStatusText(data.current_step);
+
+    if (data.eta_seconds) {
+        updateETA(data.eta_seconds);
+    }
+}
+
+function handleImportComplete(data) {
+    showSuccessMessage(&#39;Import completed successfully!&#39;);
+    updateDataGrid(); // Refresh UI with new data
+    wsClient.unsubscribe(&#39;import_progress&#39;, handleProgressUpdate);
+}
+
+function handleImportError(data) {
+    showErrorMessage(data.error.message);
+    if (data.error.recovery_suggestions) {
+        showRecoverySuggestions(data.error.recovery_suggestions);
+    }
+}
+</code></pre>
+<h3>Real-time Data Updates</h3>
+<pre><code class="language-javascript">// Monitor data changes across the application
+wsClient.subscribe(&#39;data_updated&#39;, (data) =&gt; {
+    switch (data.type) {
+        case &#39;vulnerabilities&#39;:
+            if (data.action === &#39;bulk_update&#39;) {
+                // Refresh vulnerability dashboard
+                refreshVulnerabilityCharts();
+                updateStatistics();
+            }
+            break;
+
+        case &#39;tickets&#39;:
+            // Update ticket counts
+            updateTicketSummary();
+            break;
+    }
+});
+</code></pre>
+<h3>System Monitoring</h3>
+<pre><code class="language-javascript">// Handle system alerts and maintenance notifications
+wsClient.subscribe(&#39;system_alert&#39;, (alert) =&gt; {
+    const toast = createToast(alert.level, alert.message);
+
+    if (alert.action_required) {
+        toast.addAction(&#39;Take Action&#39;, () =&gt; {
+            // Handle required action
+            performMaintenanceAction(alert.action_details);
+        });
+    }
+
+    if (alert.auto_dismiss) {
+        setTimeout(() =&gt; toast.dismiss(), alert.auto_dismiss);
+    }
+
+    showToast(toast);
+});
+</code></pre>
+<hr>
+<h2>Error Handling &amp; Recovery</h2>
+<h3>Connection Errors</h3>
+<table>
+<thead>
+<tr>
+<th>Error Type</th>
+<th>Recovery Strategy</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Connection Timeout</strong></td>
+<td>Automatic retry with exponential backoff</td>
+</tr>
+<tr>
+<td><strong>Transport Failure</strong></td>
+<td>Fallback to polling transport</td>
+</tr>
+<tr>
+<td><strong>Authentication Error</strong></td>
+<td>Refresh credentials and reconnect</td>
+</tr>
+<tr>
+<td><strong>Server Unavailable</strong></td>
+<td>Queue events for replay after reconnection</td>
+</tr>
+</tbody></table>
+<h3>Session Errors</h3>
+<table>
+<thead>
+<tr>
+<th>Error Code</th>
+<th>Description</th>
+<th>Recovery</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SESSION_NOT_FOUND</code></td>
+<td>Session expired or invalid</td>
+<td>Create new session</td>
+</tr>
+<tr>
+<td><code>SESSION_CANCELLED</code></td>
+<td>Session was cancelled</td>
+<td>Display cancellation message</td>
+</tr>
+<tr>
+<td><code>RATE_LIMIT_EXCEEDED</code></td>
+<td>Too many progress updates</td>
+<td>Client-side throttling</td>
+</tr>
+<tr>
+<td><code>SERVER_OVERLOAD</code></td>
+<td>Server under heavy load</td>
+<td>Implement backoff strategy</td>
+</tr>
+</tbody></table>
+<h3>Graceful Degradation</h3>
+<p>When WebSocket connection fails:</p>
+<ol>
+<li><strong>Polling Fallback</strong>: Switch to HTTP polling for critical updates</li>
+<li><strong>Local State Management</strong>: Maintain UI state without real-time updates</li>
+<li><strong>Manual Refresh</strong>: Provide manual refresh options</li>
+<li><strong>Status Indicators</strong>: Clear connection status display</li>
+</ol>
+<hr>
+<h2>Performance Considerations</h2>
+<h3>Server-Side Optimizations</h3>
+<ul>
+<li><strong>Session Throttling</strong>: 100ms minimum between progress events</li>
+<li><strong>Memory Management</strong>: Automatic cleanup of stale sessions</li>
+<li><strong>Connection Pooling</strong>: Efficient Socket.io connection handling</li>
+<li><strong>Event Batching</strong>: Combine related events when possible</li>
+</ul>
+<h3>Client-Side Optimizations</h3>
+<ul>
+<li><strong>UI Throttling</strong>: Additional throttling for DOM updates</li>
+<li><strong>Event Deduplication</strong>: Ignore duplicate progress events</li>
+<li><strong>Memory Cleanup</strong>: Proper event listener cleanup</li>
+<li><strong>Selective Updates</strong>: Update only changed UI elements</li>
+</ul>
+<h3>Monitoring Metrics</h3>
+<p>Track these metrics for performance optimization:</p>
+<ul>
+<li>Active session count</li>
+<li>Event emission rate</li>
+<li>Connection success rate</li>
+<li>Reconnection frequency</li>
+<li>Memory usage trends</li>
+</ul>
+<hr>
+<h2>Security Considerations</h2>
+<h3>Connection Security</h3>
+<ul>
+<li><strong>Origin Validation</strong>: Verify client origins in production</li>
+<li><strong>Rate Limiting</strong>: Prevent WebSocket abuse</li>
+<li><strong>Authentication</strong>: Implement session-based auth for sensitive operations</li>
+<li><strong>Input Validation</strong>: Validate all client-sent data</li>
+</ul>
+<h3>Session Security</h3>
+<ul>
+<li><strong>UUID Generation</strong>: Cryptographically secure session IDs</li>
+<li><strong>Session Expiration</strong>: Automatic cleanup prevents accumulation</li>
+<li><strong>Data Sanitization</strong>: Clean all user-provided metadata</li>
+<li><strong>Access Control</strong>: Validate client permissions for operations</li>
+</ul>
+<hr>
+<p>This WebSocket reference provides complete integration guidance for HexTrackr&#39;s real-time communication system, enabling robust progress tracking and system monitoring.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

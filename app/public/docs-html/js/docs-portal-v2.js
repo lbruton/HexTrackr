@@ -72,14 +72,15 @@ class DocumentationPortalV2 {
             console.log("📝 Duplicate DocumentationPortalV2 instance prevented");
             return window.docsPortalInstance;
         }
-        
+
         this.currentSection = "index";
         this.navigationStructure = null;
         this.contentCache = new Map();
-        
+        this.storageKey = "hextrackr-docs-navigation-state";
+
         // Mark this instance as the singleton
         window.docsPortalInstance = this;
-        
+
         this.init();
     }
 
@@ -94,7 +95,20 @@ class DocumentationPortalV2 {
         const hash = window.location.hash.substring(1);
         const initialSection = hash || "overview";
         await this.loadSection(initialSection);
-        
+
+        // Restore navigation state if no hash is present and we have saved state
+        if (!hash) {
+            const savedState = this.restoreNavigationState();
+            if (savedState && savedState.expandedSection) {
+                // Restore the expanded menu
+                const expandedElement = document.querySelector(savedState.expandedSection);
+                if (expandedElement) {
+                    const bsCollapse = new bootstrap.Collapse(expandedElement, { toggle: false });
+                    bsCollapse.show();
+                }
+            }
+        }
+
         console.log("✅ Documentation Portal v2.0 ready");
     }
 
@@ -658,17 +672,16 @@ class DocumentationPortalV2 {
             const sectionFile = section.file;
 
             html += `
-                <a class="list-group-item list-group-item-action d-flex align-items-center${hasChildren ? " collapsed" : ""}" 
-                   href="#${sectionFile}" 
+                <a class="list-group-item list-group-item-action d-flex align-items-center${hasChildren ? " collapsed" : ""}"
+                   href="#${sectionFile}"
                    data-section="${sectionFile}"
-                   ${hasChildren ? `data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false"` : ""}
-                   style="border-left: 3px solid transparent; transition: all 0.2s ease;">
+                   ${hasChildren ? `data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false"` : ""}>
                     <div class="d-flex align-items-center w-100">
-                        <span class="avatar avatar-xs bg-primary-lt me-3" style="flex-shrink: 0;">
+                        <span class="avatar avatar-xs bg-primary-lt me-3">
                             <i class="${section.icon}"></i>
                         </span>
                         <span class="flex-fill text-body fw-medium">${section.title}</span>
-                        ${hasChildren ? "<i class=\"fas fa-chevron-down collapse-icon ms-2 text-muted\" style=\"transition: transform 0.2s ease;\"></i>" : ""}
+                        ${hasChildren ? "<i class=\"fas fa-chevron-down collapse-icon ms-2 text-muted\"></i>" : ""}
                     </div>
                 </a>
                 ${hasChildren ? this.renderSubNavigation(section.children, collapseId) : ""}
@@ -676,9 +689,6 @@ class DocumentationPortalV2 {
         }
 
         navContainer.innerHTML = html;
-        
-        // Add custom styling for active states and hover effects
-        this.addNavigationStyling();
     }
 
     /**
@@ -732,11 +742,10 @@ class DocumentationPortalV2 {
         
         for (const [_key, child] of Object.entries(children)) {
             html += `
-                <a class="list-group-item list-group-item-action d-flex align-items-center ps-5" 
-                   href="#${child.file}" 
-                   data-section="${child.file}"
-                   style="border-left: 3px solid transparent; transition: all 0.2s ease; font-size: 0.9rem;">
-                    <span class="avatar avatar-xs bg-secondary-lt me-3" style="flex-shrink: 0;">
+                <a class="list-group-item list-group-item-action d-flex align-items-center ps-5 sub-nav-item"
+                   href="#${child.file}"
+                   data-section="${child.file}">
+                    <span class="avatar avatar-xs bg-secondary-lt me-3">
                         <i class="fas fa-file-alt"></i>
                     </span>
                     <span class="text-body">${child.title}</span>
@@ -755,10 +764,32 @@ class DocumentationPortalV2 {
         // Navigation clicks
         document.getElementById("docsNavigation").addEventListener("click", (e) => {
             const link = e.target.closest("a[data-section]");
-            if (link && !link.hasAttribute("data-bs-toggle")) {
-                e.preventDefault();
+            if (link) {
                 const section = link.dataset.section;
-                this.loadSection(section);
+
+                // For main sections with Bootstrap toggle, manage exclusive expansion
+                if (link.hasAttribute("data-bs-toggle")) {
+                    const targetCollapse = link.getAttribute("data-bs-target");
+
+                    // Close all other expanded menus first
+                    this.collapseOtherMenus(targetCollapse);
+
+                    // Save the navigation state
+                    this.saveNavigationState(targetCollapse, section);
+
+                    // Don't prevent default - let Bootstrap handle the collapse toggle
+                    this.loadSection(section);
+                } else {
+                    // For sub-navigation items, prevent default and load section
+                    e.preventDefault();
+                    this.loadSection(section);
+
+                    // Save state with parent collapse if it exists
+                    const parentCollapse = link.closest(".collapse");
+                    if (parentCollapse) {
+                        this.saveNavigationState(`#${parentCollapse.id}`, section);
+                    }
+                }
             }
         });
 
@@ -772,10 +803,10 @@ class DocumentationPortalV2 {
 
         // Back to top button
         const backToTop = document.getElementById("backToTop");
-        const contentArea = document.getElementById("contentArea");
-        
-        contentArea.addEventListener("scroll", () => {
-            if (contentArea.scrollTop > 300) {
+
+        // Use window scroll for natural page scrolling
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > 300) {
                 backToTop.classList.add("show");
             } else {
                 backToTop.classList.remove("show");
@@ -783,7 +814,7 @@ class DocumentationPortalV2 {
         });
 
         backToTop.addEventListener("click", () => {
-            contentArea.scrollTo({ top: 0, behavior: "smooth" });
+            window.scrollTo({ top: 0, behavior: "smooth" });
         });
 
         // Search keyboard shortcut
@@ -791,6 +822,80 @@ class DocumentationPortalV2 {
             if ((e.ctrlKey || e.metaKey) && e.key === "k") {
                 e.preventDefault();
                 this.openSearch();
+            }
+        });
+    }
+
+    /**
+     * Save navigation state to localStorage
+     * @param {string} expandedSection - The currently expanded section ID
+     * @param {string} activeSection - The currently active section
+     */
+    saveNavigationState(expandedSection, activeSection) {
+        try {
+            const state = {
+                expandedSection,
+                activeSection,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(this.storageKey, JSON.stringify(state));
+            console.log(`💾 Navigation state saved: expanded=${expandedSection}, active=${activeSection}`);
+        } catch (error) {
+            console.warn("⚠️ Could not save navigation state to localStorage:", error);
+        }
+    }
+
+    /**
+     * Restore navigation state from localStorage
+     * @returns {object|null} - The saved state or null if none exists
+     */
+    restoreNavigationState() {
+        try {
+            const saved = localStorage.getItem(this.storageKey);
+            if (saved) {
+                const state = JSON.parse(saved);
+                // Only restore if state is less than 24 hours old
+                if (Date.now() - state.timestamp < 24 * 60 * 60 * 1000) {
+                    console.log(`🔄 Navigation state restored: expanded=${state.expandedSection}, active=${state.activeSection}`);
+                    return state;
+                }
+            }
+        } catch (error) {
+            console.warn("⚠️ Could not restore navigation state from localStorage:", error);
+        }
+        return null;
+    }
+
+    /**
+     * Clear navigation state from localStorage
+     */
+    clearNavigationState() {
+        try {
+            localStorage.removeItem(this.storageKey);
+            console.log("🗑️ Navigation state cleared");
+        } catch (error) {
+            console.warn("⚠️ Could not clear navigation state:", error);
+        }
+    }
+
+    /**
+     * Collapse all other expanded menus except the target
+     * @param {string} currentTarget - The collapse target ID to keep open
+     */
+    collapseOtherMenus(currentTarget) {
+        // Find all collapse elements that are currently expanded
+        const allCollapses = document.querySelectorAll(".collapse.show");
+
+        allCollapses.forEach(collapse => {
+            const collapseId = `#${collapse.id}`;
+
+            // Don't collapse the current target
+            if (collapseId !== currentTarget) {
+                // Use Bootstrap's collapse API to hide the menu
+                const bsCollapse = new bootstrap.Collapse(collapse, { toggle: false });
+                bsCollapse.hide();
+
+                console.log(`🔄 Auto-collapsed menu: ${collapseId}`);
             }
         });
     }
@@ -1092,10 +1197,19 @@ class DocumentationPortalV2 {
     renderContent(content, section) {
         const contentArea = document.getElementById("contentArea");
         contentArea.innerHTML = content;
-        
+
         // Apply syntax highlighting
         if (window.Prism) {
             Prism.highlightAllUnder(contentArea);
+        }
+
+        // Convert HTML tables to AG-Grid for consistent styling
+        if (window.DocumentationTableConverter) {
+            const tableConverter = new window.DocumentationTableConverter();
+            tableConverter.init();
+
+            // Store converter instance for theme updates
+            this.tableConverter = tableConverter;
         }
         
         // Scroll to top
@@ -1123,22 +1237,45 @@ class DocumentationPortalV2 {
      * Update active navigation state
      */
     updateActiveNavigation(section) {
-        // Remove all active states
-        document.querySelectorAll(".docs-nav .nav-link").forEach(link => {
+        // Remove all active states from list-group items
+        document.querySelectorAll(".list-group-item-action").forEach(link => {
             link.classList.remove("active");
         });
-        
+
+        // Note: Don't close all collapses here, let the menu click handler manage exclusive expansion
+
         // Add active state to current section
         const activeLink = document.querySelector(`[data-section="${section}"]`);
         if (activeLink) {
             activeLink.classList.add("active");
-            
-            // Expand parent if it's a child section
-            const collapse = activeLink.closest(".collapse");
-            if (collapse) {
-                const bsCollapse = new bootstrap.Collapse(collapse, { toggle: false });
+
+            // Check if this is a child section (inside a collapse)
+            const parentCollapse = activeLink.closest(".collapse");
+            if (parentCollapse) {
+                // This is a child section, ensure its parent is expanded
+                const bsCollapse = new bootstrap.Collapse(parentCollapse, { toggle: false });
                 bsCollapse.show();
+
+                // Also mark the parent menu item as active/expanded
+                const parentLink = document.querySelector(`[data-bs-target="#${parentCollapse.id}"]`);
+                if (parentLink) {
+                    parentLink.setAttribute("aria-expanded", "true");
+                    parentLink.classList.remove("collapsed");
+                }
+            } else {
+                // This is a main section, check if it has a dropdown and should be expanded
+                const nextElement = activeLink.nextElementSibling;
+                if (nextElement && nextElement.classList.contains("collapse")) {
+                    const bsCollapse = new bootstrap.Collapse(nextElement, { toggle: false });
+                    bsCollapse.show();
+
+                    // Update the parent link's aria state
+                    activeLink.setAttribute("aria-expanded", "true");
+                    activeLink.classList.remove("collapsed");
+                }
             }
+
+            console.log(`🎯 Navigation updated for section: ${section}`);
         }
     }
 
