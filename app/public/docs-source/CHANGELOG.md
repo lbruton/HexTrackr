@@ -5,24 +5,11 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - v1.0.14 (Security Critical)
-
-### Added
-
-#### Architecture Review System
-
-- **Comprehensive Architecture Assessment**: Complete technical review using 5 specialized expert agents
-  - Node.js backend architecture analysis (3,809-line monolithic server assessment)
-  - SQLite database schema and performance evaluation (15 tables, 31 indexes)
-  - OWASP Top 10 security vulnerability assessment
-  - JavaScript frontend architecture review (17,951 lines across 46 files)
-  - WebSocket real-time communication analysis (Socket.io implementation)
-- **Expert Agent System**: 138+ specialized domain expert agents for technical analysis
-- **Roadmap Management**: Enhanced project planning with semantic versioning and changelog automation
+## [Unreleased] - v1.0.15 (Security Critical)
 
 ### Security
 
-#### Critical Security Vulnerabilities (Identified for v1.0.14)
+#### Critical Security Vulnerabilities (Identified for v1.0.15)
 
 - **Authentication System Required**: No authentication/authorization system currently implemented
   - All API endpoints publicly accessible
@@ -41,6 +28,88 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **WebSocket Security Gaps**: Real-time communication lacks security controls
   - Session-based authentication needed for WebSocket connections
   - Room access authorization missing
+
+## [1.0.14] - 2025-09-14
+
+### Added
+
+#### Documentation Portal Enhancements
+
+- **AG-Grid Community Integration**: Advanced data tables for interactive documentation
+  - Interactive table converter for markdown tables to AG-Grid format
+  - Roadmap table sorting functionality with real-time filtering
+  - Responsive AG-Grid tables optimized for mobile devices
+  - Dark mode AG-Grid theme integration with proper color schemes
+- **Enhanced Navigation System**: Improved user experience and accessibility
+  - Back-to-top button with smooth scroll behavior and visual feedback
+  - Enhanced breadcrumb navigation system with proper spacing
+  - Loading spinner for content transitions
+  - Responsive documentation layout with mobile optimization
+- **UI/UX Improvements**: Professional navigation and interaction patterns
+  - Enhanced navigation with visual feedback and hover effects
+  - Improved sub-navigation styling with transform animations
+  - Avatar styling enhancements in navigation components
+  - Collapse icon rotation animations for expandable sections
+
+#### Architecture Review System
+
+- **Comprehensive Architecture Assessment**: Complete technical review using 5 specialized expert agents
+  - Node.js backend architecture analysis (3,809-line monolithic server assessment)
+  - SQLite database schema and performance evaluation (15 tables, 31 indexes)
+  - OWASP Top 10 security vulnerability assessment
+  - JavaScript frontend architecture review (17,951 lines across 46 files)
+  - WebSocket real-time communication analysis (Socket.io implementation)
+- **Expert Agent System**: 138+ specialized domain expert agents for technical analysis
+- **Roadmap Management**: Enhanced project planning with semantic versioning and changelog automation
+
+### Fixed
+
+#### Dark Mode Accessibility Critical Fixes (WCAG Compliance)
+
+- **Navigation Contrast Violation Resolution**: Fixed critical WCAG AA compliance issue
+  - **Root Cause**: Selected navigation items had white text on white background (1:1 contrast ratio)
+  - **Solution**: Implemented proper dark mode color hierarchy using HexTrackr surface variables
+    - Active states: `#2a3f54` background with `#e2e8f0` text (high contrast)
+    - Hover states: `#1e293b` background with consistent readable text
+    - Sub-navigation: `#94a3b8` muted text with `#243447` hover background
+  - **Impact**: Ensures accessibility compliance for visually impaired users
+  - **Validation**: Tested across documentation portal, tickets, and vulnerabilities pages
+
+#### Documentation Portal Specific Fixes
+
+- **Header Spacing Issue Resolution**: Eliminated unwanted space above documentation portal header
+  - **Root Cause**: CSS rule `.navbar { margin-top: 1rem; }` in docs-tabler.css pushing header down
+  - **Solution**: Commented out problematic CSS rule (lines 13-17 in docs-tabler.css)
+  - **Impact**: Documentation portal header now aligns consistently with tickets/vulnerabilities pages
+  - **Method**: Systematic investigation using sequential thinking and user feedback
+- **Breadcrumb and Layout Improvements**: Enhanced documentation page structure
+  - Fixed breadcrumb spacing to prevent cramped appearance above menu items
+  - Resolved page header positioning conflicts
+  - Enhanced documentation content area scroll behavior
+  - Improved loading spinner visibility and positioning
+
+#### Modal and Component Accessibility Fixes
+
+- **Modal Contrast Improvements**: Enhanced readability across light and dark themes
+  - Improved modal contrast and text readability
+  - Fixed table styling in both light and dark modes with proper variable usage
+  - Enhanced blockquote styling with theme-aware background colors
+  - Resolved loading spinner visibility issues in modal contexts
+
+### Changed
+
+#### CSS Architecture Improvements
+
+- **Modularized Documentation CSS**: Created dedicated docs-tabler.css for portal-specific styling
+  - Separated documentation portal styles from main application CSS
+  - Enhanced table styling with proper Bootstrap variable integration
+  - Improved dark mode table support with enhanced border and background colors
+  - Streamlined navigation styling with consistent active states
+- **Theme System Enhancements**: Better CSS variable usage for consistency
+  - Standardized HexTrackr surface hierarchy variables across components
+  - Enhanced CSS custom property usage for maintainable theming
+  - Improved color consistency between documentation portal and main application
+  - Better separation of concerns between shared and page-specific styles
 
 ## [1.0.13] - 2025-09-13
 
