@@ -4,21 +4,19 @@
 <p>This section provides a comprehensive overview of the HexTrackr system architecture, from the high-level components to the underlying data structures.</p>
 <h2>Core Architecture Documents</h2>
 <ul>
-<li><strong><a href="#system-overview">System Overview</a></strong>: A high-level overview of the system architecture.</li>
-<li><strong><a href="#component-integration">Component Integration</a></strong>: How the different components of the system work together.</li>
-<li><strong><a href="#data-flow">Data Flow</a></strong>: The data flow through the system.</li>
-<li><strong><a href="#technology-stack">Technology Stack</a></strong>: The technologies used in the project.</li>
-<li><strong><a href="#backend">Backend Architecture</a></strong>: A detailed look at the Node.js/Express server, its middleware, and its core logic.</li>
-<li><strong><a href="#frontend">Frontend Architecture</a></strong>: An explanation of the client-side architecture, including the different pages and JavaScript modules.</li>
-<li><strong><a href="#database">Database Architecture</a></strong>: A high-level overview of the SQLite database, including data flow diagrams.</li>
-<li><strong><a href="#data-model">Data Model</a></strong>: The definitive guide to the database schema, including detailed descriptions of all tables and columns.</li>
+<li><strong><a href="#architecture/technology-stack">Technology Stack</a></strong>: The technologies used in the project.</li>
+<li><strong><a href="#architecture/backend">Backend Architecture</a></strong>: A detailed look at the Node.js/Express server, its middleware, and its core logic.</li>
+<li><strong><a href="#architecture/frontend">Frontend Architecture</a></strong>: An explanation of the client-side architecture, including the different pages and JavaScript modules.</li>
+<li><strong><a href="#architecture/database">Database Architecture</a></strong>: A high-level overview of the SQLite database, including data flow diagrams.</li>
+<li><strong><a href="#architecture/data-model">Data Model</a></strong>: The definitive guide to the database schema, including detailed descriptions of all tables and columns.</li>
 </ul>
-<h2>Key Architectural Concepts</h2>
+<h2>Implementation Architecture</h2>
+<p>The HexTrackr system follows a modular architecture pattern with clear separation of concerns:</p>
 <ul>
-<li><strong><a href="#deployment">Deployment Architecture</a></strong>: Information on how the application is deployed using Docker.</li>
-<li><strong><a href="#docker-guide">Docker Guide</a></strong>: A guide to the Docker configuration.</li>
-<li><strong><a href="#production-setup">Production Setup</a></strong>: A guide to setting up a production environment.</li>
-<li><strong><a href="#monitoring">Monitoring</a></strong>: A guide to monitoring the application.</li>
+<li><strong>Backend</strong>: Node.js/Express server with middleware-based request processing</li>
+<li><strong>Frontend</strong>: Modular JavaScript architecture with specialized page managers</li>
+<li><strong>Database</strong>: SQLite with normalized schema and vulnerability rollover system</li>
+<li><strong>Real-time</strong>: WebSocket integration for live progress updates and notifications</li>
 </ul>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts

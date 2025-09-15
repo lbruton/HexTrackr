@@ -128,7 +128,7 @@
 <li><strong>Runtime Evolution</strong>: Idempotent <code>ALTER TABLE</code> adds new columns (<code>vendor</code>, <code>vulnerability_date</code>, <code>state</code>, <code>import_date</code>, etc.) to legacy tables for backward compatibility.</li>
 <li><strong>Rollover Tables</strong>: Created on startup if absent (<code>vulnerability_snapshots</code>, <code>vulnerabilities_current</code>, <code>vulnerability_daily_totals</code>).</li>
 </ul>
-<p>See: <a href="#data-model">Data Model</a> for exhaustive schema &amp; index inventory.</p>
+<p>See: <a href="#architecture/data-model">Data Model</a> for exhaustive schema &amp; index inventory.</p>
 <hr>
 <h2>Vulnerability Rollover Workflow</h2>
 <p>Purpose: Maintain real‑time deduplicated active set + full historical timeline + fast daily aggregates.</p>
