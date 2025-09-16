@@ -17,13 +17,13 @@ Stores all ticketing information. This table has **indexes for query performance
 
 | Column | Type | Constraints | Description |
 | --- | --- | --- | --- |
-| `id` | TEXT | PK | Stable unique identifier supplied by UI (string, not auto‑increment). |
+| `id` | TEXT | PK | Stable unique identifier supplied by UI (string, not auto-increment). |
 | `date_submitted` | TEXT | NOT NULL | Submission date (ISO date). |
 | `date_due` | TEXT | NOT NULL | Due date (ISO date). |
 | `hexagon_ticket` | TEXT | Indexed | External Hexagon reference. |
 | `service_now_ticket` | TEXT | Indexed | External ServiceNow reference. |
 | `location` | TEXT | NOT NULL, Indexed | Human readable location label. |
-| `devices` | TEXT |  | JSON array (stringified) of device identifiers/hostnames. |
+| `devices` | TEXT |  | Semicolon-delimited device names preserving boot order (imports accept JSON arrays and are normalised). |
 | `supervisor` | TEXT |  | Supervisor name. |
 | `tech` | TEXT |  | Assigned technician. |
 | `status` | TEXT | DEFAULT 'Open', Indexed | Workflow status (Open, Completed, etc.). |
@@ -31,7 +31,7 @@ Stores all ticketing information. This table has **indexes for query performance
 | `attachments` | TEXT |  | JSON array of attachment metadata. |
 | `created_at` | TEXT | NOT NULL | Creation timestamp (string). |
 | `updated_at` | TEXT | NOT NULL | Last update timestamp. |
-| `site` | TEXT | Indexed | Higher‑level site grouping. |
+| `site` | TEXT | Indexed | Higher-level site grouping. |
 | `xt_number` | TEXT | Indexed | Alternate human-friendly number (used when `id` absent in legacy imports). |
 | `site_id` | INTEGER | FK to `sites.id`, Indexed | Optional normalized site reference. |
 | `location_id` | INTEGER | FK to `locations.id`, Indexed | Optional normalized location reference. |
@@ -60,7 +60,7 @@ Audit log of each ingested CSV batch.
 
 HexTrackr uses a "rollover" architecture to manage vulnerability data over time. This allows for accurate daily trending and historical analysis. It consists of three main tables.
 
-For a more detailed explanation of the rollover process, see the [Data Lifecycle and Rollover Mechanism](./data-lifecycle.md) documentation.
+For a detailed walkthrough of the rollover process, see [Backend Architecture](./backend.md#vulnerability-rollover-workflow).
 
 ### `vulnerabilities_current`
 
@@ -128,7 +128,7 @@ This table stores pre-calculated daily aggregates to power the dashboard charts 
 
 ### `ticket_vulnerabilities`
 
-Many‑to‑many relationship between tickets and (legacy) `vulnerabilities` (pre-rollover) or conceptually `vulnerabilities_current` for future adaptation.
+Many-to-many relationship between tickets and (legacy) `vulnerabilities` (pre-rollover) or conceptually `vulnerabilities_current` for future adaptation.
 
 | Column | Type | Constraints | Description |
 | --- | --- | --- | --- |
@@ -190,13 +190,13 @@ The modal system uses strategic field selection for data aggregation:
 
 ### Data Relationships
 
-**Vulnerability → Device Aggregation**:
+**Vulnerability -> Device Aggregation**:
 
 - Query: `SELECT * FROM vulnerabilities_current WHERE description = ?`
 - Groups by hostname to show unique devices affected
 - Displays device count, IP addresses, and affected services
 
-**Device → Vulnerability Aggregation**:
+**Device -> Vulnerability Aggregation**:
 
 - Query: `SELECT * FROM vulnerabilities_current WHERE hostname = ?`
 - Groups by description/CVE to show unique vulnerabilities
@@ -221,7 +221,7 @@ The modal system uses strategic field selection for data aggregation:
 
 - `schema.sql` no longer reflects live tables (kept for historical reference only).
 - Runtime adds columns (`vendor`, `vulnerability_date`, `state`, `import_date`, `notes`) to legacy `vulnerabilities` table if missing.
-- Two UNIQUE indexes (`idx_vulnerabilities_unique_scan` / `_v2`) ensure per‑scan dedupe in legacy ingestion path.
+- Two UNIQUE indexes (`idx_vulnerabilities_unique_scan` / `_v2`) ensure per-scan dedupe in legacy ingestion path.
 - Future work: unify attribute naming (`vendor_reference` vs `vendor`).
 
 ---

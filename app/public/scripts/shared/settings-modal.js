@@ -899,7 +899,32 @@ function generateServiceNowUrl(ticketNumber) {
         }
 
         const baseUrl = settings.instanceUrl.replace(/\/$/, "");
-        return `${baseUrl}/nav_to.do?uri=incident_list.do?sysparm_query=number=${ticketNumber}`;
+        
+        // Detect ticket type based on prefix
+        const ticketUpper = ticketNumber.toUpperCase();
+        let tableUrl = "";
+        
+        if (ticketUpper.startsWith("CHG")) {
+            // Change Request
+            tableUrl = `change_request.do?sysparm_query=number=${ticketNumber}`;
+        } else if (ticketUpper.startsWith("INC")) {
+            // Incident
+            tableUrl = `incident.do?sysparm_query=number=${ticketNumber}`;
+        } else if (ticketUpper.startsWith("REQ")) {
+            // Request
+            tableUrl = `sc_request.do?sysparm_query=number=${ticketNumber}`;
+        } else if (ticketUpper.startsWith("PRB")) {
+            // Problem
+            tableUrl = `problem.do?sysparm_query=number=${ticketNumber}`;
+        } else if (ticketUpper.startsWith("TASK")) {
+            // Task
+            tableUrl = `sc_task.do?sysparm_query=number=${ticketNumber}`;
+        } else {
+            // Default fallback - try to search across all tables
+            tableUrl = `text_search_exact_match.do?sysparm_search=${ticketNumber}`;
+        }
+        
+        return `${baseUrl}/nav_to.do?uri=${encodeURIComponent(tableUrl)}`;
     } catch (error) {
         console.error("Error generating ServiceNow URL:", error);
         return null;

@@ -1,8 +1,8 @@
 # Vulnerabilities API
 
-This API provides endpoints for managing and analyzing vulnerability data. It features a [rollover architecture](../architecture/rollover-mechanism.md) for historical trend analysis.
+HexTrackr exposes a set of REST endpoints for reporting, trending, and importing vulnerability data. The API operates on the rollover pipeline described in [Database Architecture](../architecture/database.md) and surfaces both the deduplicated current state (`vulnerabilities_current`) and supporting metadata.
 
-**Data Model**: For detailed information on the vulnerability-related tables, see the [Data Model documentation](../architecture/data-model.md).
+**Related reading**: [Data Model](../architecture/data-model.md) for table layouts and column notes.
 
 ---
 
@@ -10,111 +10,157 @@ This API provides endpoints for managing and analyzing vulnerability data. It fe
 
 ### GET /api/vulnerabilities
 
-- **Description**: Retrieves a paginated list of active vulnerabilities. Automatically filters by lifecycle_state IN ('active', 'reopened') to exclude resolved vulnerabilities.
+- **Description**: Returns active and reopened vulnerabilities ordered by VPR score. Resolved rows are excluded automatically (`lifecycle_state IN ('active','reopened')`).
 - **Query Parameters**:
-  - `page` (number, optional, default: 1): The page number to retrieve.
-  - `limit` (number, optional, default: 50): The number of items per page.
-  - `search` (string, optional): A search term to filter by hostname, CVE, or plugin name.
-  - `severity` (string, optional): Filter by severity (`Critical`, `High`, `Medium`, `Low`).
-- **Note**: This endpoint only returns active and reopened vulnerabilities. Use `/api/vulnerabilities/resolved` for resolved vulnerabilities.
+  - `page` (number, default `1`)
+  - `limit` (number, default `50`)
+  - `search` (string): case-insensitive substring match against hostname, CVE, or plugin name
+  - `severity` (string): one of `Critical`, `High`, `Medium`, `Low`
 - **Response**: `200 OK`
 
-    ```json
+```json
+{
+  "data": [
     {
-      "data": [
-        {
-          "id": 10,
-          "import_id": 3,
-          "hostname": "host-1",
-          "cve": "CVE-2024-0001",
-          "severity": "High",
-          "vpr_score": 8.6,
-          "last_seen": "2025-08-20",
-          "plugin_id": "12345",
-          "plugin_name": "Example Vulnerability Name"
-        }
-      ],
-      "pagination": { "page": 1, "limit": 50, "total": 1234, "pages": 25 }
+      "id": 42,
+      "import_id": 9,
+      "scan_date": "2025-08-20",
+      "hostname": "core-switch-01",
+      "ip_address": "10.0.10.5",
+      "cve": "CVE-2024-0001",
+      "severity": "High",
+      "vpr_score": 8.6,
+      "cvss_score": 9.0,
+      "plugin_id": "12345",
+      "plugin_name": "Example Vulnerability Name",
+      "description": "Example Vulnerability Name (CVE-2024-0001)",
+      "solution": "Update firmware to version 18.5",
+      "state": "ACTIVE",
+      "lifecycle_state": "active",
+      "first_seen": "2025-08-10",
+      "last_seen": "2025-08-20"
     }
-    ```
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "total": 312,
+    "pages": 7
+  }
+}
+```
 
 ### GET /api/vulnerabilities/stats
 
-- **Description**: Retrieves aggregated statistics for current vulnerabilities, grouped by severity.
+- **Description**: Aggregated metrics derived from `vulnerabilities_current` grouped by severity.
 - **Response**: `200 OK`
 
-    ```json
-    [
-      {
-        "severity": "Critical",
-        "count": 12,
-        "total_vpr": 100.1,
-        "avg_vpr": 8.34,
-        "earliest": "2025-08-01",
-        "latest": "2025-08-20"
-      }
-    ]
-    ```
+```json
+[
+  {
+    "severity": "Critical",
+    "count": 12,
+    "total_vpr": 100.1,
+    "avg_vpr": 8.34,
+    "earliest": "2025-08-01",
+    "latest": "2025-08-20"
+  }
+]
+```
 
 ### GET /api/vulnerabilities/recent-trends
 
-- **Description**: Retrieves statistics for the most recent scan date and compares them with the previous day to show trends.
+- **Description**: Compares the most recent daily totals with the previous day to highlight deltas. Uses `vulnerability_daily_totals`.
 - **Response**: `200 OK`
 
-    ```json
-    {
-      "Critical": {
-        "current": { "count": 12, "total_vpr": 115.8 },
-        "trend": { "count_change": 2, "vpr_change": 10.2 }
-      }
-    }
-    ```
+```json
+{
+  "Critical": {
+    "current": { "count": 12, "total_vpr": 115.8 },
+    "trend": { "count_change": 2, "vpr_change": 10.2 }
+  },
+  "High": {
+    "current": { "count": 40, "total_vpr": 320.1 },
+    "trend": { "count_change": -5, "vpr_change": -34.5 }
+  }
+}
+```
 
 ### GET /api/vulnerabilities/trends
 
-- **Description**: Provides historical data on vulnerability counts and VPR scores, aggregated by day and severity.
-- **Query Parameters**:
-  - `startDate` (string, optional): Start date in `YYYY-MM-DD` format.
-  - `endDate` (string, optional): End date in `YYYY-MM-DD` format.
+- **Description**: Historical trend series for each severity with optional start/end date filters. Defaults to the last 14 days.
+- **Query Parameters**: `startDate`, `endDate` (`YYYY-MM-DD`)
 - **Response**: `200 OK`
 
-    ```json
-    [
-      {
-        "date": "2025-08-20",
-        "Critical": { "count": 12, "total_vpr": 115.8 },
-        "High": { "count": 85, "total_vpr": 722.5 },
-        "Medium": { "count": 210, "total_vpr": 1050.0 },
-        "Low": { "count": 50, "total_vpr": 50.0 }
-      }
-    ]
-    ```
+```json
+[
+  {
+    "date": "2025-08-20",
+    "Critical": { "count": 12, "total_vpr": 115.8 },
+    "High": { "count": 85, "total_vpr": 722.5 },
+    "Medium": { "count": 210, "total_vpr": 1050.0 },
+    "Low": { "count": 50, "total_vpr": 50.0 }
+  }
+]
+```
 
 ### GET /api/vulnerabilities/resolved
 
-- **Description**: Retrieves a paginated list of resolved vulnerabilities (lifecycle_state = 'resolved').
-- **Query Parameters**:
-  - `page` (number, optional, default: 1): The page number to retrieve.
-  - `limit` (number, optional, default: 50): The number of items per page.
-  - `search` (string, optional): A search term to filter by hostname, CVE, or plugin name.
+- **Description**: Paginated access to resolved vulnerabilities (`lifecycle_state = 'resolved'`). Useful for audits and verification workflows.
 - **Response**: `200 OK`
 
-    ```json
+```json
+{
+  "data": [
     {
-      "data": [
-        {
-          "id": 15,
-          "hostname": "server-01",
-          "cve": "CVE-2023-1234",
-          "severity": "High",
-          "lifecycle_state": "resolved",
-          "resolved_date": "2025-08-15",
-          "last_seen": "2025-08-10"
-        }
-      ],
-      "pagination": { "page": 1, "limit": 50, "total": 45, "pages": 1 }
+      "id": 15,
+      "hostname": "server-01",
+      "cve": "CVE-2023-1234",
+      "severity": "High",
+      "lifecycle_state": "resolved",
+      "resolved_date": "2025-08-15",
+      "last_seen": "2025-08-10",
+      "resolution_reason": "No longer detected in latest scan"
     }
-    ```
+  ],
+  "pagination": { "page": 1, "limit": 50, "total": 45, "pages": 1 }
+}
+```
+
+### GET /api/imports
+
+- **Description**: Returns import history from `vulnerability_imports` with derived vulnerability counts.
+- **Response**: `200 OK`
+
+```json
+[
+  {
+    "id": 12,
+    "filename": "cisco_scan_2025-08-20.csv",
+    "import_date": "2025-08-20T15:04:00.000Z",
+    "row_count": 9850,
+    "vendor": "cisco",
+    "file_size": 1048576,
+    "processing_time": 2340,
+    "raw_headers": "[\"asset.name\",\"definition.cve\"]",
+    "created_at": "2025-08-20T15:04:00.000Z",
+    "vulnerability_count": 9850
+  }
+]
+```
+
+### DELETE /api/vulnerabilities/clear
+
+- **Description**: Removes all rollover data (current, snapshots, daily totals, staging, import history). Also clears many-to-many ticket links.
+- **Warning**: Irreversible destructive operation.
+- **Response**: `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "All vulnerability data cleared from rollover architecture"
+}
+```
 
 ---
 
@@ -122,191 +168,147 @@ This API provides endpoints for managing and analyzing vulnerability data. It fe
 
 ### GET /health
 
-- **Description**: Health check endpoint that provides system status information including version, database availability, and uptime.
+- **Description**: Lightweight health probe that reports application version, database availability, and uptime.
 - **Response**: `200 OK`
 
-    ```json
-    {
-      "status": "ok",
-      "version": "1.0.0",
-      "db": true,
-      "uptime": 3600.5
-    }
-    ```
+```json
+{
+  "status": "ok",
+  "version": "1.2.0",
+  "db": true,
+  "uptime": 8645.32
+}
+```
 
 ### GET /api/sites
 
-- **Description**: Retrieves all sites from the database, ordered alphabetically by name.
+- **Description**: Lists known sites used for ticket context.
 - **Response**: `200 OK`
 
-    ```json
-    [
-      {
-        "id": 1,
-        "name": "Main Office",
-        "created_at": "2025-08-01T10:00:00.000Z"
-      },
-      {
-        "id": 2,
-        "name": "Branch Office",
-        "created_at": "2025-08-02T14:30:00.000Z"
-      }
-    ]
-    ```
+```json
+[
+  {
+    "id": 1,
+    "code": "HQ",
+    "name": "Main Campus",
+    "description": "Primary operations center",
+    "created_at": "2025-08-01T10:00:00.000Z",
+    "updated_at": "2025-08-01T10:00:00.000Z"
+  }
+]
+```
 
 ### GET /api/locations
 
-- **Description**: Retrieves all locations from the database, ordered alphabetically by name.
+- **Description**: Lists normalized locations associated with tickets.
 - **Response**: `200 OK`
 
-    ```json
-    [
-      {
-        "id": 1,
-        "name": "Building A",
-        "created_at": "2025-08-01T10:00:00.000Z"
-      },
-      {
-        "id": 2,
-        "name": "Building B",
-        "created_at": "2025-08-02T14:30:00.000Z"
-      }
-    ]
-    ```
+```json
+[
+  {
+    "id": 3,
+    "code": "HQ-WEST",
+    "name": "Building A",
+    "description": "West wing",
+    "created_at": "2025-08-01T10:00:00.000Z",
+    "updated_at": "2025-08-01T10:00:00.000Z"
+  }
+]
+```
 
 ---
 
 ## Data Import & History
 
-HexTrackr provides three distinct methods for importing vulnerability data:
-
-1. **CSV File Upload** (`/api/vulnerabilities/import`): Server-side CSV parsing - upload raw CSV files and let the server handle all parsing logic.
-2. **Staging Import** (`/api/vulnerabilities/import-staging`): Server-side staged import with enhanced performance for large datasets.
-3. **JSON Payload** (`/api/import/vulnerabilities`): Client-side CSV parsing - parse CSV into JSON on the frontend before sending to server.
-
-**Key Differences:**
-
-- **Server-side parsing** (`/import`): Upload CSV directly, server handles format detection and parsing
-- **Client-side parsing** (`/api/import/vulnerabilities`): Frontend parses CSV to JSON, then sends structured data
-
-The appropriate method depends on your integration needs and client-side capabilities.
+HexTrackr supports three ingestion paths. All flows normalise hostname/IP data, split multi-CVE rows, and update lifecycle states automatically.
 
 ### POST /api/vulnerabilities/import
 
-- **Description**: Imports vulnerabilities from an uploaded CSV file. This is the primary endpoint for server-side processing of vulnerability scans.
-- **Enhanced Features**:
-  - **Multi-format Support**: Automatically detects and processes various CSV export formats
-  - **Cisco SA Support**: Extracts and processes Cisco Security Advisory identifiers (`cisco-sa-*` patterns)
-  - **CVE Extraction**: Multi-tier CVE identification from various column sources
-  - **Intelligent Parsing**: Handles both direct CVE columns and embedded CVE patterns in vulnerability names
-- **Request Body**: `multipart/form-data`
-  - `csvFile` (file, required): The CSV file to import.
-  - `vendor` (string, optional): The source of the data (e.g., "cisco").
-  - `scanDate` (string, optional): The date of the scan in `YYYY-MM-DD` format. Defaults to the current date.
-- **Response**: `200 OK`
-
-```json
-{
-  "success": true,
-  "importId": 7,
-  "rowsProcessed": 250,
-  "filename": "export.csv",
-  "insertCount": 200,
-  "updateCount": 50,
-  "removedStale": 10
-}
-```
-
-### POST /api/vulnerabilities/import-staging
-
-- **Description**: Enhanced staging import endpoint for vulnerability data with performance optimizations and advanced processing features.
-- **Request Body**: `multipart/form-data`
-  - `csvFile` (file, required): The CSV file to import.
-  - `vendor` (string, optional): The source of the data (e.g., "cisco", "tenable").
-  - `scanDate` (string, optional): The date of the scan in `YYYY-MM-DD` format. Auto-extracted from filename if not provided.
-- **Enhanced Features**:
-  - **Staging Table Processing**: Uses temporary staging table for improved performance on large datasets
-  - **Filename Date Extraction**: Automatically extracts scan dates from common filename patterns
-  - **Enhanced Performance Monitoring**: Detailed timing and processing statistics
+- **Use case**: Standard CSV uploads from the dashboard.
+- **Form fields**: `csvFile` (required), optional `vendor`, `scanDate`.
+- **Processing**: Parses CSV via PapaParse, maps rows, updates rollover tables sequentially, and recalculates daily totals.
 - **Response**: `200 OK`
 
 ```json
 {
   "success": true,
   "importId": 12,
-  "stagingRowsProcessed": 10000,
-  "finalRowsInserted": 9850,
-  "filename": "cisco_scan_2025-08-20.csv",
-  "processingTime": 2340,
-  "performance": {
-    "stagingTime": 1200,
-    "processingTime": 1140
+  "filename": "export.csv",
+  "rowsProcessed": 250,
+  "recordsCreated": 250,
+  "inserted": 200,
+  "updated": 30,
+  "reopened": 20,
+  "resolvedCount": 10,
+  "scanDate": "2025-08-20",
+  "rolloverComplete": true,
+  "enhancedLifecycle": true,
+  "performanceMetrics": {
+    "totalImportTimeMs": 2340,
+    "rowsPerSecond": 106.8,
+    "memoryDeltaMB": 12,
+    "dbOperations": {
+      "total": 1800,
+      "snapshotInserts": 250,
+      "currentChecks": 250,
+      "currentUpdates": 200,
+      "currentInserts": 50,
+      "avgTimeMs": 1.5
+    },
+    "avgRowTimeMs": 0.9
   }
+}
+```
+
+### POST /api/vulnerabilities/import-staging
+
+- **Use case**: High-volume CSV uploads that need progress feedback.
+- **Form fields**: `csvFile` (required), optional `vendor`, `scanDate`, `sessionId`.
+- **Behavior**:
+  - Immediately returns `{ success, sessionId }`.
+  - Streams Socket.io events (`progress-update`, `progress-error`, `progress-complete`) in the room `progress-{sessionId}` managed by `ProgressTracker`.
+  - Bulk loads data into `vulnerability_staging` before promoting to final tables.
+
+```json
+{
+  "success": true,
+  "sessionId": "1f4bba9b-3f8c-4d13-8cb8-4dedc1b7a9a2",
+  "message": "CSV import started",
+  "filename": "scan.csv",
+  "vendor": "cisco",
+  "scanDate": "2025-08-20"
 }
 ```
 
 ### POST /api/import/vulnerabilities
 
-- **Description**: Imports vulnerabilities from a JSON array. This endpoint is intended for use when a CSV file is parsed on the frontend before being sent to the server.
-- **Request Body**: `application/json`
+- **Use case**: Automated integrations that pre-parse CSV to JSON.
+- **Request Body**: `{ "data": VulnerabilityRow[] }`
+- **Response**: `200 OK`
 
 ```json
-    {
-      "data": [
-        { "hostname": "host-1", "cve": "CVE-2024-0001", "severity": "High" }
-      ]
-    }
-    ```
+{
+  "success": true,
+  "imported": 1,
+  "total": 1,
+  "errors": []
+}
+```
 
--   **Response**: `200 OK`
-
-    ```json
-    {
-      "success": true,
-      "imported": 1,
-      "total": 1,
-      "importId": 8
-    }
-    ```
-
-### GET /api/imports
-
--   **Description**: Retrieves the history of all vulnerability import events from the `vulnerability_imports` table.
--   **Note**: The `vulnerability_count` field is a calculated value representing the number of vulnerabilities associated with each import.
--   **Response**: `200 OK`
-
-    ```json
-    [
-      {
-        "id": 7,
-        "filename": "export.csv",
-        "import_date": "2025-08-20T10:30:00.000Z",
-        "rows_processed": 250,
-        "status": "completed"
-      },
-      {
-        "id": 6,
-        "filename": "cisco_scan_2025-08-19.csv",
-        "import_date": "2025-08-19T14:15:00.000Z",
-        "rows_processed": 1200,
-        "status": "completed"
-      }
-    ]
-    ```
+- **Supported fields**: `hostname`, `ip_address`, `cve`, `severity`, `vpr_score`, `cvss_score`, `plugin_id`, `plugin_name`, `description`, `solution`, `vendor`, `state`.
 
 ---
 
-## Data Deletion
+## Error Handling
 
-### DELETE /api/vulnerabilities/clear
+Typical error formats follow Express conventions:
 
--   **Description**: Deletes all vulnerability-related data from the database. This includes the current state, historical snapshots, daily totals, import history, and links between tickets and vulnerabilities.
--   **Warning**: This is a destructive operation and cannot be undone.
--   **Response**: `200 OK`
+```json
+{
+  "error": "CSV parsing failed: Unexpected column count"
+}
+```
 
-    ```json
-    {
-      "success": true,
-      "message": "All vulnerability data cleared from rollover architecture"
-    }
-    ```
+- `400 Bad Request`: invalid payloads or missing files
+- `409 Conflict`: conflicts raised during import mode checks
+- `500 Internal Server Error`: database or file-processing failures

@@ -13,19 +13,19 @@ The Tickets API provides CRUD operations for managing tickets. For general API i
 - **Description**: Retrieves a list of all tickets, ordered by creation date in descending order.
 - **Query Parameters**: None
 - **Response**: `200 OK`
-  - **Note**: The `devices` and `attachments` fields are returned as JSON strings.
+  - **Note**: Devices are persisted as a semicolon-delimited string (preserving boot order). Attachments remain a JSON string that the frontend parses into objects.
 
     ```json
     [
       {
         "id": "TICK-123",
-        "xt_number": "XT001",
-        "date_submitted": "2025-08-20T12:00:00.000Z",
-        "date_due": "2025-08-30T12:00:00.000Z",
+        "xt_number": "0103",
+        "date_submitted": "2025-08-20",
+        "date_due": "2025-08-30",
         "hexagon_ticket": "HX-456",
         "service_now_ticket": "INC0000123",
         "location": "HQ-1",
-        "devices": "[\"Device 1\",\"Device 2\"]",
+        "devices": "Device 1;Device 2",
         "supervisor": "Jane Doe",
         "tech": "John Smith",
         "status": "Open",
@@ -40,19 +40,19 @@ The Tickets API provides CRUD operations for managing tickets. For general API i
 
 ### POST /api/tickets
 
-- **Description**: Creates a new ticket. The server expects camelCase keys in the request body and maps them to snake_case for the database.
+- **Description**: Creates a new ticket. The UI sends camelCase keys; the API also accepts legacy snake_case fields for backwards compatibility.
 - **Request Body**: `application/json`
 
     ```json
     {
       "id": "TICK-124",
-      "xt_number": "XT002",
-      "dateSubmitted": "2025-08-21T10:00:00.000Z",
-      "dateDue": "2025-08-31T10:00:00.000Z",
+      "xtNumber": "0104",
+      "dateSubmitted": "2025-08-21",
+      "dateDue": "2025-08-31",
       "hexagonTicket": "HX-457",
       "serviceNowTicket": "INC0000124",
       "location": "HQ-2",
-      "devices": ["Device 3", "Device 4"],
+      "devices": "Device 3;Device 4",
       "supervisor": "John Doe",
       "tech": "Jane Smith",
       "status": "Open",
@@ -63,6 +63,8 @@ The Tickets API provides CRUD operations for managing tickets. For general API i
       "site": "HQ"
     }
     ```
+
+- **Device Formats**: `devices` may be a semicolon string or an array. Arrays are joined into an ordered semicolon string to preserve the boot/reboot sequence.
 
 - **Response**: `200 OK`
 
@@ -110,7 +112,7 @@ The Tickets API provides CRUD operations for managing tickets. For general API i
 
 ### POST /api/import/tickets
 
-- **Description**: Imports a batch of tickets from a JSON array. This is typically used after parsing a CSV file on the frontend. The operation performs an `INSERT OR REPLACE` into the database.
+- **Description**: Imports a batch of tickets from a JSON array. The tickets UI uses PapaParse to convert CSV files into this structure before calling the endpoint. Rows are upserted (`INSERT OR REPLACE`).
 - **Request Body**: `application/json`
 
     ```json
@@ -118,17 +120,18 @@ The Tickets API provides CRUD operations for managing tickets. For general API i
       "data": [
         {
           "id": "ticket_1",
-          "xt_number": "XT001",
+          "xt_number": "0105",
           "date_submitted": "2025-08-20",
           "date_due": "2025-08-30",
           "hexagon_ticket": "HX-456",
           "service_now_ticket": "INC0000123",
           "location": "HQ-1",
-          "devices": "[\"Device 1\"]",
+          "devices": "Device 1;Device 2",
           "supervisor": "Jane",
           "tech": "John",
           "status": "Open",
-          "notes": "Notes from import."
+          "notes": "Notes from import.",
+          "attachments": "[]"
         }
       ]
     }
@@ -144,24 +147,28 @@ The Tickets API provides CRUD operations for managing tickets. For general API i
     }
     ```
 
+- **Device Compatibility**: The importer accepts semicolon strings, comma-separated strings, or JSON arrays. Commas and arrays are normalized server-side to Semicolon strings.
+
 ### POST /api/tickets/migrate
 
-- **Description**: A legacy endpoint to bulk migrate tickets from an old `localStorage` format. It performs an `INSERT OR REPLACE` operation.
-- **Note**: The schema for this endpoint is different from the standard ticket format and should only be used for migrating legacy data.
+- **Description**: Bulk import endpoint used by the CSV workflow. Supports `append`, `replace`, and `check` (default) modes and mirrors the structure used by the UI.
 - **Request Body**: `application/json`
 
     ```json
     {
+      "mode": "append",
       "tickets": [
         {
           "id": "legacy-1",
-          "start_date": "2025-08-01",
-          "end_date": "2025-08-05",
-          "primary_number": "PR-1",
-          "incident_number": "INC-1",
-          "site_code": "HQ",
-          "affected_devices": ["DEV-1"],
-          "assignee": "Tech",
+          "xtNumber": "0106",
+          "dateSubmitted": "2025-08-01",
+          "dateDue": "2025-08-05",
+          "hexagonTicket": "PR-1",
+          "serviceNowTicket": "INC-1",
+          "site": "HQ",
+          "location": "HQ-WEST",
+          "devices": ["DEV-1", "DEV-2"],
+          "supervisor": "Tech Lead",
           "status": "Open"
         }
       ]
@@ -176,6 +183,11 @@ The Tickets API provides CRUD operations for managing tickets. For general API i
       "message": "Migration completed: 1 tickets migrated, 0 errors"
     }
     ```
+
+- **Mode Behavior**:
+  - `append`: keeps existing records and upserts incoming tickets.
+  - `replace`: clears the `tickets` table before inserting new rows.
+  - `check`: validates payload without clearing existing data and upserts rows.
 
 ---
 
