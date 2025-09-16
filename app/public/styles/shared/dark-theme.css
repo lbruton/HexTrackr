@@ -182,7 +182,13 @@
     --chart-color-6: #06b6d4;                 /* Cyan */
     --chart-color-7: #84cc16;                 /* Lime green */
     --chart-color-8: #f97316;                 /* Orange */
-    
+
+    /* Vulnerability Chart Specific Colors - Severity Mapping */
+    --chart-vuln-critical-color: #dc2626;     /* Critical: Red */
+    --chart-vuln-high-color: #ea580c;         /* High: Orange */
+    --chart-vuln-medium-color: #2563eb;       /* Medium: Blue */
+    --chart-vuln-low-color: #16a34a;          /* Low: Green */
+
     /* Chart Background and Grid */
     --chart-background: #1e293b;              /* Chart background */
     --chart-grid-color: #374151;              /* Grid lines */
