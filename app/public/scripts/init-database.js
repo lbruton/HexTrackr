@@ -17,19 +17,26 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 // Create tables
 db.serialize(() => {
-  // Tickets table - mirrors localStorage structure
+  // Tickets table - modern schema for vulnerability management
   db.run(`CREATE TABLE IF NOT EXISTS tickets (
     id TEXT PRIMARY KEY,
+    xt_number TEXT UNIQUE,
+    date_submitted TEXT,
+    date_due TEXT,
+    hexagon_ticket TEXT,
+    service_now_ticket TEXT,
     location TEXT NOT NULL,
-    devices TEXT, -- JSON array of devices
-    description TEXT,
-    urgency TEXT,
-    category TEXT,
+    devices TEXT, -- JSON array or semicolon-delimited string
+    supervisor TEXT, -- semicolon-delimited string for multiple supervisors
+    tech TEXT,
     status TEXT DEFAULT 'Open',
-    assigned_to TEXT,
-    created_date TEXT,
-    updated_date TEXT,
-    notes TEXT
+    notes TEXT,
+    attachments TEXT, -- JSON array
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    site TEXT,
+    site_id TEXT,
+    location_id TEXT
   )`);
 
   // Vulnerability imports - raw CSV data with metadata

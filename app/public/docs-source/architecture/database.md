@@ -158,14 +158,16 @@ sequenceDiagram
     participant API as POST /api/vulnerabilities/import
     participant DB as SQLite
 
-    User->>API: Upload csvFile
+    User->>API: Upload csvFile (+ optional scanDate)
     API->>DB: INSERT into vulnerability_imports
     API->>DB: INSERT into vulnerability_snapshots (append-only)
     API->>DB: UPSERT logic in vulnerabilities_current (implemented as SELECT + conditional INSERT/UPDATE in code)
     API->>DB: DELETE stale rows from vulnerabilities_current
     API->>DB: INSERT OR REPLACE vulnerability_daily_totals (aggregates)
-    API-->>User: { success, importId, ... }
+    API-->>User: { success, importId, scanDate, performanceMetrics }
 ```
+
+> **Staging fast-path**: `POST /api/vulnerabilities/import-staging` executes the same workflow but bulk loads into `vulnerability_staging` first and streams session progress through Socket.io.
 
 ### Ticket Creation / Update
 
