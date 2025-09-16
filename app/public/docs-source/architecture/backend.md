@@ -6,10 +6,10 @@ The backend is a Node.js/Express monolith providing REST endpoints, rollover ing
 
 ## Key Characteristics
 
-- **Monolithic File**: `server.js` (≈1,700+ lines) – routes, DB init, rollover logic, backups, static serving.
+- **Monolithic File**: `server.js` (~3,800+ lines) - routes, DB init, rollover logic, backups, static serving.
 - **Unified Delivery**: API + static assets + docs from one process.
 - **Embedded DB**: Single SQLite file (`data/hextrackr.db`). No external service dependency.
-- **Security Utilities**: In‑process `PathValidator` for safe file operations + security headers.
+- **Security Utilities**: In-process `PathValidator` for safe file operations + security headers.
 
 ---
 
@@ -17,13 +17,13 @@ The backend is a Node.js/Express monolith providing REST endpoints, rollover ing
 
 | Component | Purpose | Location |
 | --------- | ------- | -------- |
-| `server.js` | Main application runtime (all routes + logic) | Root level |
+| `server.js` | Main application runtime (all routes + logic) | project root |
 | `scripts/init-database.js` | Bootstrap base schema & indexes (legacy + foundational tables) | `/scripts/` |
-| **ProgressTracker** | WebSocket session management & progress tracking | `server.js:82-200` |
-| **PathValidator** | Security-hardened file operations with traversal protection | `server.js:22-79` |
-| Rollover Functions | Sequential import processing & enhanced deduplication | `server.js:500-800` |
+| **ProgressTracker** | WebSocket session management & progress tracking | `server.js` top-level (~ lines 20-220) |
+| **PathValidator** | Security-hardened file operations with traversal protection | `server.js` top-level (~ lines 30-120) |
+| Rollover Pipeline | Sequential import processing & enhanced deduplication | `server.js` (~ lines 700-1900) |
 | Rate Limiting | IP-based request throttling (100 req/15min) | Express middleware |
-| Docs Portal Logic | Dynamic redirect + stats endpoint (`/api/docs/stats`) | `server.js:1200+` |
+| Docs Portal Logic | Dynamic redirect + stats endpoint (`/api/docs/stats`) | `server.js` (~ lines 2680-2790) |
 
 ### PathValidator Security Class
 
@@ -68,7 +68,7 @@ class PathValidator {
 | CORS | `cors()` (open by default) |
 | Compression | `compression()` |
 | Parsing | `express.json` & `express.urlencoded` (100MB limit) |
-| Uploads | `multer` (CSV import; 100MB cap) |
+| Uploads | `multer` (CSV import; 100 MB cap) |
 | Security Headers | `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection` |
 | Static Assets | `express.static` (root + `docs-html/`) |
 
@@ -86,7 +86,7 @@ See: [Data Model](./data-model.md) for exhaustive schema & index inventory.
 
 ## Vulnerability Rollover Workflow
 
-Purpose: Maintain real‑time deduplicated active set + full historical timeline + fast daily aggregates.
+Purpose: Maintain real-time deduplicated active set + full historical timeline + fast daily aggregates.
 
 ### CSV Import (Rollover Path)
 
@@ -96,7 +96,7 @@ sequenceDiagram
     participant API as server.js
     participant DB as SQLite
 
-    User->>API: POST /api/vulnerabilities/import (multipart/form-data + scanDate)
+    User->>API: POST /api/vulnerabilities/import (multipart/form-data + optional scanDate)
     API->>API: Parse CSV (PapaParse, filter empty rows)
     API->>DB: INSERT vulnerability_imports
     API->>DB: UPDATE vulnerabilities_current (mark potentially stale)
@@ -107,8 +107,10 @@ sequenceDiagram
     end
     API->>DB: DELETE stale rows (not seen in this scan)
     API->>DB: INSERT OR REPLACE vulnerability_daily_totals
-    API-->>User: { importId, insertCount, updateCount, removedStale, scanDate }
+    API-->>User: { importId, insertCount, updateCount, removedStale, scanDate, performanceMetrics }
 ```
+
+> **Staging importer**: `POST /api/vulnerabilities/import-staging` follows the same steps but first bulk loads data into `vulnerability_staging` and streams `ProgressTracker` events (`progress-update`, `progress-complete`, `progress-error`).
 
 ### Enhanced Deduplication System
 
@@ -153,7 +155,7 @@ return `desc:${descriptionHash}|host:${hostIdentifier}`;
 
 | Risk | Mitigation |
 | ---- | ---------- |
-| Row duplication in batch | In‑memory `Set` of processed unique_keys |
+| Row duplication in batch | In-memory `Set` of processed unique_keys |
 | Race conditions | Explicit sequential loop with `processNextRow(index)` pattern |
 | Data drift | Historical record preserved in snapshots before updates |
 | Performance | Indexes on `unique_key`, `scan_date`, severities |
@@ -170,7 +172,7 @@ return `desc:${descriptionHash}|host:${hostIdentifier}`;
 | ------ | -------------------- |
 | Health | `GET /health` |
 | Vulnerabilities (Current) | `GET /api/vulnerabilities`, `/stats`, `/recent-trends`, `/trends` |
-| Vulnerability Import | `POST /api/vulnerabilities/import` (rollover), `POST /api/import/vulnerabilities` (legacy) |
+| Vulnerability Import | `POST /api/vulnerabilities/import` (rollover), `POST /api/vulnerabilities/import-staging` (staged), `POST /api/import/vulnerabilities` (JSON) |
 | Tickets | `GET/POST/PUT/DELETE /api/tickets`, `POST /api/tickets/migrate`, `POST /api/import/tickets` |
 | Reference | `GET /api/sites`, `GET /api/locations` |
 | Backup/Restore | `GET /api/backup/stats`, `GET /api/backup/all`, `POST /api/restore`, clear endpoints |

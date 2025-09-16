@@ -1,93 +1,165 @@
 # WebSocket API
 
-This documentation outlines the WebSocket/Socket.io implementation for real-time communication in HexTrackr. The WebSocket server runs on port **8080**, on the same port as the main application.
+HexTrackr uses Socket.io on the main Express server (default port `8989`) to stream long-running operation progress. WebSocket integration is optional—the UI falls back to manual polling when a socket connection is unavailable.
 
 ---
 
 ## Server Configuration
 
-- **Port**: 8988
-- **Library**: Socket.io
+- **Port**: shares the Express HTTP server (`http://localhost:8989`)
+- **Library**: `socket.io`
+- **Transports**: `polling` upgradeable to `websocket`
+- **Rooms**: per-session namespace `progress-{sessionId}`
+- **Throttle**: minimum 100 ms between `progress-update` events
 
-The server provides real-time updates for long-running processes such as data imports and exports.
+The server registers listeners in `server.js` and manages state through `ProgressTracker`.
+
+### ProgressTracker Session Model
+
+```json
+{
+  "id": "uuid",
+  "progress": 45,
+  "status": "processing",
+  "startTime": 1724190482000,
+  "lastUpdate": 1724190491000,
+  "metadata": {
+    "operation": "csv-import",
+    "filename": "scan.csv",
+    "scanDate": "2025-08-20",
+    "totalSteps": 3,
+    "currentStep": 2,
+    "message": "Loading data to staging table..."
+  }
+}
+```
+
+Sessions are created via `ProgressTracker.createSession()` (or `createSessionWithId` when the client supplies its own UUID). They emit progress to the associated room and are cleaned up automatically after completion or after one hour of inactivity.
 
 ---
 
-## Event Types
+## Event Reference
 
-The server emits the following events to the client:
+| Event | Direction | Description |
+| ----- | --------- | ----------- |
+| `progress-update` | server → client | Throttled incremental updates. Includes `progress`, `message`, `status`, and `metadata`. |
+| `progress-status` | server → client | Snapshot sent immediately after joining a room so reconnecting clients can resume display. |
+| `progress-complete` | server → client | Signals successful completion. Contains final metadata and duration. |
+| `progress-error` | server → client | Signals a fatal error with additional context under `error`. |
+| `join-progress` | client → server | Subscribes the socket to a progress room (`progress-{sessionId}`). |
+| `leave-progress` | client → server | Unsubscribes from a room when no longer needed. |
 
-### `progress-update`
+### Event Payloads
 
-- **Description**: Sent periodically during a data import process to provide updates on the progress.
-- **Data Structure**:
+#### `progress-update`
 
-    ```json
-    {
-      "processed": 100,
-      "total": 1000,
-      "percentage": 10
-    }
-    ```
+```json
+{
+  "sessionId": "1f4bba9b-3f8c-4d13-8cb8-4dedc1b7a9a2",
+  "progress": 60,
+  "message": "Staging complete. Processing 9850 records to final tables...",
+  "status": "processing",
+  "timestamp": 1724190493000,
+  "metadata": {
+    "operation": "csv-import",
+    "currentStep": 3,
+    "insertedToStaging": 9850
+  }
+}
+```
 
-### `progress-complete`
+#### `progress-complete`
 
-- **Description**: Sent when a data import process has successfully completed.
-- **Data Structure**:
+```json
+{
+  "sessionId": "1f4bba9b-3f8c-4d13-8cb8-4dedc1b7a9a2",
+  "progress": 100,
+  "message": "Import completed successfully",
+  "status": "completed",
+  "timestamp": 1724190525000,
+  "metadata": {
+    "operation": "csv-import",
+    "duration": 42350,
+    "recordsCreated": 9850
+  }
+}
+```
 
-    ```json
-    {
-      "success": true,
-      "message": "Import completed successfully."
-    }
-    ```
+#### `progress-error`
 
-### `progress-error`
-
-- **Description**: Sent when an error occurs during a data import process.
-- **Data Structure**:
-
-    ```json
-    {
-      "error": "An error occurred during the import process."
-    }
-    ```
+```json
+{
+  "sessionId": "1f4bba9b-3f8c-4d13-8cb8-4dedc1b7a9a2",
+  "progress": 45,
+  "message": "Failed to prepare for batch processing",
+  "status": "error",
+  "timestamp": 1724190508000,
+  "metadata": {
+    "operation": "csv-import",
+    "currentStep": 3,
+    "message": "Failed to prepare for batch processing"
+  },
+  "error": {
+    "code": "SQLITE_BUSY",
+    "detail": "database is locked"
+  }
+}
+```
 
 ---
 
 ## Client Integration
 
-Clients can connect to the WebSocket server to receive real-time updates.
+`app/public/scripts/shared/websocket-client.js` wraps Socket.io and exposes a resilient API used by the Progress Modal.
 
-### Connection
-
-```javascript
-const socket = io('http://localhost:8988');
-
-socket.on('connect', () => {
-  console.log('Connected to WebSocket server');
-});
-```
-
-### Event Handling
+### Connection Lifecycle
 
 ```javascript
-socket.on('progress', (data) => {
-  console.log(`Import progress: ${data.percentage}%`);
-});
+import WebSocketClient from './scripts/shared/websocket-client.js';
 
-socket.on('complete', (data) => {
-  console.log(data.message);
-});
+const client = new WebSocketClient();
+await client.connect();
 
-socket.on('error', (data) => {
-  console.error(data.error);
-});
+client.on('progress', (payload) => updateProgressUI(payload));
+client.on('progressComplete', (payload) => handleComplete(payload));
+client.on('progressStatus', (payload) => hydrateFromSnapshot(payload));
+client.on('progressError', (payload) => showError(payload));
+client.on('connectionFailed', () => enableManualFallback());
 ```
+
+#### Debug Logging
+
+Set `localStorage.hextrackr_debug = "true"` to enable verbose console output inside the client wrapper. Logging automatically disables when the value is removed.
+
+### Joining Rooms
+
+```javascript
+const sessionId = '1f4bba9b-3f8c-4d13-8cb8-4dedc1b7a9a2';
+client.emit('join-progress', sessionId);
+```
+
+The Progress Modal automatically joins when the staging importer returns a session ID and calls `leave-progress` when the modal closes.
+
+### Reconnection & Fallback
+
+- Automatic retries use exponential backoff up to five attempts.
+- The Progress Modal listens for the `connectionFailed` callback. When triggered, it displays a warning and continues with manual UI updates provided by HTTP responses.
+- Heartbeats (`ping`/`pong`) run every 30 s to detect broken connections.
+
+---
+
+## Manual Mode (No WebSocket)
+
+If Socket.io is unavailable the UI still works:
+
+1. The `WebSocketClient` rejects the connection and emits `connectionFailed`.
+2. `progress-modal.js` switches to manual mode and updates progress via standard UI callbacks.
+3. Import workflows continue unaffected—the WebSocket stream only enhances user feedback.
 
 ---
 
 ## Security Considerations
 
-- The WebSocket server is intended for local network use and does not implement authentication or encryption.
-- It is recommended to run the WebSocket server behind a firewall and restrict access to trusted clients.
+- WebSocket access is limited to local development origins (`http://localhost:8080`, `http://127.0.0.1:8080`). Adjust the CORS list in `server.js` for other environments.
+- Room names embed the session identifier; treat session IDs as opaque GUIDs.
+- No authentication layer is implemented. Deploy behind a trusted network segment or add your own gateway.

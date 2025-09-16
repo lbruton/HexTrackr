@@ -20,7 +20,10 @@ class WebSocketClient {
         this.reconnectDelay = 1000;
         this.heartbeatInterval = null;
         this.eventCallbacks = new Map();
-        
+
+        // Check if debug mode is enabled (can be set via localStorage)
+        this.debugMode = localStorage.getItem("hextrackr_debug") === "true";
+
         this.config = {
             host: window.location.hostname || "localhost",
             port: window.location.port || "8080",
@@ -33,7 +36,16 @@ class WebSocketClient {
         this.lastProgressUpdate = {};
         this.progressThrottleTimers = new Map();
     }
-    
+
+    /**
+     * Debug logging method - only logs when debug mode is enabled
+     */
+    debug(...args) {
+        if (this.debugMode) {
+            console.log("[WebSocket]", ...args);
+        }
+    }
+
     /**
      * Connect to WebSocket server
      * @returns {Promise<boolean>} Connection success
@@ -46,13 +58,15 @@ class WebSocketClient {
                 }
                 
                 const url = `http://${this.config.host}:${this.config.port}`;
-                console.log("Connecting to WebSocket server:", url);
+                this.debug("Connecting to WebSocket server:", url);
                 
                 this.socket = io(url, {
-                    transports: ["websocket", "polling"],
+                    transports: ["polling", "websocket"],
                     upgrade: true,
+                    upgradeTimeout: 10000,
                     autoConnect: true,
-                    reconnection: false
+                    reconnection: false,
+                    forceNew: true
                 });
                 
                 this.setupEventListeners();
@@ -69,7 +83,7 @@ class WebSocketClient {
                     this.isConnected = true;
                     this.reconnectAttempts = 0;
                     this.reconnectDelay = 1000;
-                    console.log("WebSocket connected successfully");
+                    this.debug("WebSocket connected successfully");
                     this.startHeartbeat();
                     resolve(true);
                 });
@@ -103,7 +117,7 @@ class WebSocketClient {
     
     attemptReconnection() {
         const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1), 30000);
-        console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+        this.debug(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
         
         window.setTimeout(() => {
             this.connect();
@@ -131,7 +145,7 @@ class WebSocketClient {
         }
         
         this.socket.on("disconnect", (reason) => {
-            console.log("WebSocket disconnected:", reason);
+            this.debug("WebSocket disconnected:", reason);
             this.isConnected = false;
             this.stopHeartbeat();
             
@@ -143,7 +157,7 @@ class WebSocketClient {
         });
         
         this.socket.on("pong", () => {
-            console.log("Heartbeat pong received");
+            this.debug("Heartbeat pong received");
         });
         
         this.socket.on("progress-update", (data) => {
@@ -151,12 +165,12 @@ class WebSocketClient {
         });
         
         this.socket.on("progress-status", (data) => {
-            console.log("Progress status:", data);
+            this.debug("Progress status:", data);
             this.triggerCallback("progressStatus", data);
         });
         
         this.socket.on("progress-complete", (data) => {
-            console.log("Progress complete:", data);
+            this.debug("Progress complete:", data);
             this.triggerCallback("progressComplete", data);
         });
     }
@@ -217,20 +231,20 @@ class WebSocketClient {
     
     joinProgressRoom(sessionId) {
         if (this.isConnected && this.socket) {
-            console.log("Joining progress room:", sessionId);
+            this.debug("Joining progress room:", sessionId);
             this.socket.emit("join-progress", sessionId);
         }
     }
     
     leaveProgressRoom(sessionId) {
         if (this.isConnected && this.socket) {
-            console.log("Leaving progress room:", sessionId);
+            this.debug("Leaving progress room:", sessionId);
             this.socket.emit("leave-progress", sessionId);
         }
     }
     
     disconnect() {
-        console.log("Disconnecting WebSocket client");
+        this.debug("Disconnecting WebSocket client");
         this.config.autoReconnect = false;
         this.stopHeartbeat();
         

@@ -70,6 +70,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+#### Vulnerability VPR Aggregation (Totals & Trends)
+
+- Fixed inflated per‑severity VPR totals caused by multi‑CVE split rows each carrying the full VPR score
+  - Root Cause: Daily totals used `SUM(vpr_score)` over `vulnerabilities_current`, multiplying VPR when a single plugin row listed multiple CVEs
+  - Solution: Enhanced daily totals now aggregate VPR by a deduplicated key and sum once per vulnerability entity per host
+    - Aggregation key preference: `plugin_id + host` → fallback `plugin_name + host` → fallback `host + description`
+    - Counts remain row-based (each CVE row counts); only VPR totals are deduplicated
+  - Impact: Stat cards and trend chart now align; Medium spike resolved without altering per‑row VPR in tables
+  - Files: `app/public/server.js` (calculateAndStoreDailyTotalsEnhanced)
+
+#### Trend Badge Wiring and Casing
+
+- Fixed trend badges (+/−%) stuck at 0% due to trends not being wired and key casing mismatch
+  - Wire: Orchestrator now sets trends on `VulnerabilityStatisticsManager` before UI update
+  - Casing: Use capitalized severity keys from `/recent-trends` and robust fallback to data manager trends
+  - Files: `app/public/scripts/shared/vulnerability-core.js`, `app/public/scripts/shared/vulnerability-statistics.js`
+
 #### Dark Mode Accessibility Critical Fixes (WCAG Compliance)
 
 - **Navigation Contrast Violation Resolution**: Fixed critical WCAG AA compliance issue
