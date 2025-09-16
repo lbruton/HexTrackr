@@ -18,14 +18,6 @@ const http = require("http");
 const socketIo = require("socket.io");
 const crypto = require("crypto");
 
-// Debug mode configuration
-const DEBUG_MODE = process.env.NODE_ENV === "development" && process.env.DEBUG !== "false";
-const debugLog = (...args) => {
-    if (DEBUG_MODE) {
-        console.log("[HexTrackr]", ...args);
-    }
-};
-
 // Security utility for path validation
 class PathValidator {
     static validatePath(filePath) {
@@ -1726,196 +1718,117 @@ function calculateAndStoreDailyTotals(scanDate, callback) {
 
 // Enhanced daily totals calculation with lifecycle states
 function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
-    // Calculate row-based counts from active vulnerabilities (excluding resolved)
-    const countsQuery = `
+    // Calculate totals from active vulnerabilities only (excluding resolved)
+    const totalsQuery = `
         SELECT 
-            LOWER(severity) as severity,
+            severity,
             COUNT(*) as count,
+            COALESCE(SUM(vpr_score), 0) as total_vpr,
             COUNT(CASE WHEN lifecycle_state = 'reopened' THEN 1 END) as reopened_count
         FROM vulnerabilities_current 
         WHERE scan_date = ? AND lifecycle_state IN ('active', 'reopened')
-        GROUP BY LOWER(severity)
-    `;
-
-    // Calculate VPR totals using a de-duplicated aggregator key that ignores CVE splits
-    // Prefer plugin_id + host; fallback to plugin_name + host; final fallback host + description snippet
-    const dedupVprQuery = `
-        WITH agg AS (
-            SELECT 
-                CASE 
-                    WHEN plugin_id IS NOT NULL AND plugin_id != '' THEN 'pid:' || plugin_id || '|host:' || LOWER(hostname)
-                    WHEN plugin_name IS NOT NULL AND plugin_name != '' THEN 'pname:' || LOWER(plugin_name) || '|host:' || LOWER(hostname)
-                    ELSE 'host:' || LOWER(hostname) || '|desc:' || LOWER(COALESCE(plugin_name, description, ''))
-                END AS agg_key,
-                LOWER(severity) AS severity,
-                MAX(COALESCE(vpr_score, 0)) AS vpr_one
-            FROM vulnerabilities_current
-            WHERE scan_date = ? AND lifecycle_state IN ('active','reopened')
-            GROUP BY agg_key, LOWER(severity)
-        )
-        SELECT severity, SUM(vpr_one) AS total_vpr
-        FROM agg
         GROUP BY severity
     `;
-
-    db.all(countsQuery, [scanDate], (err, countRows) => {
+    
+    db.all(totalsQuery, [scanDate], (err, results) => {
         if (err) {
-            console.error("Error calculating daily counts:", err);
+            console.error("Error calculating enhanced daily totals:", err);
             callback();
             return;
         }
-
-        db.all(dedupVprQuery, [scanDate], (vErr, vprRows) => {
-            if (vErr) {
-                console.error("Error calculating deduplicated VPR totals:", vErr);
-                callback();
-                return;
-            }
-
-            // Get resolved count for the day
-            db.get("SELECT COUNT(*) as resolved_count FROM vulnerabilities_current WHERE resolved_date = ?", [scanDate], (rErr, resolvedResult) => {
-                if (rErr) {
-                    console.error("Error fetching resolved count:", rErr);
+        
+        // Get resolved count for the day
+        db.get("SELECT COUNT(*) as resolved_count FROM vulnerabilities_current WHERE resolved_date = ?", 
+            [scanDate], (err, resolvedResult) => {
+            
+            const resolvedCount = resolvedResult ? resolvedResult.resolved_count : 0;
+            
+            const totals = {
+                critical_count: 0, critical_total_vpr: 0,
+                high_count: 0, high_total_vpr: 0,
+                medium_count: 0, medium_total_vpr: 0,
+                low_count: 0, low_total_vpr: 0,
+                total_vulnerabilities: 0, total_vpr: 0,
+                resolved_count: resolvedCount,
+                reopened_count: 0
+            };
+            
+            results.forEach(row => {
+                const severity = row.severity.toLowerCase();
+                if (severity === "critical") {
+                    totals.critical_count = row.count;
+                    totals.critical_total_vpr = row.total_vpr;
+                } else if (severity === "high") {
+                    totals.high_count = row.count;
+                    totals.high_total_vpr = row.total_vpr;
+                } else if (severity === "medium") {
+                    totals.medium_count = row.count;
+                    totals.medium_total_vpr = row.total_vpr;
+                } else if (severity === "low") {
+                    totals.low_count = row.count;
+                    totals.low_total_vpr = row.total_vpr;
                 }
-
-                const resolvedCount = resolvedResult ? resolvedResult.resolved_count : 0;
-
-                const totals = {
-                    critical_count: 0, critical_total_vpr: 0,
-                    high_count: 0, high_total_vpr: 0,
-                    medium_count: 0, medium_total_vpr: 0,
-                    low_count: 0, low_total_vpr: 0,
-                    total_vulnerabilities: 0, total_vpr: 0,
-                    resolved_count: resolvedCount,
-                    reopened_count: 0
-                };
-
-                // Fill counts (row-based)
-                countRows.forEach(row => {
-                    const sev = (row.severity || "").toLowerCase();
-                    if (sev === "critical") { totals.critical_count = row.count; }
-                    else if (sev === "high") { totals.high_count = row.count; }
-                    else if (sev === "medium") { totals.medium_count = row.count; }
-                    else if (sev === "low") { totals.low_count = row.count; }
-                    totals.total_vulnerabilities += row.count;
-                    totals.reopened_count += row.reopened_count || 0;
-                });
-
-                // Fill deduplicated VPR totals
-                vprRows.forEach(row => {
-                    const sev = (row.severity || "").toLowerCase();
-                    const val = row.total_vpr || 0;
-                    if (sev === "critical") { totals.critical_total_vpr = val; }
-                    else if (sev === "high") { totals.high_total_vpr = val; }
-                    else if (sev === "medium") { totals.medium_total_vpr = val; }
-                    else if (sev === "low") { totals.low_total_vpr = val; }
-                    totals.total_vpr += val;
-                });
-
-                // Store enhanced daily totals (counts row-based, VPR deduped)
-                db.run(`INSERT OR REPLACE INTO vulnerability_daily_totals 
-                    (scan_date, critical_count, critical_total_vpr, high_count, high_total_vpr,
-                     medium_count, medium_total_vpr, low_count, low_total_vpr, 
-                     total_vulnerabilities, total_vpr, resolved_count, reopened_count)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-                    scanDate,
-                    totals.critical_count, totals.critical_total_vpr,
-                    totals.high_count, totals.high_total_vpr,
-                    totals.medium_count, totals.medium_total_vpr,
-                    totals.low_count, totals.low_total_vpr,
-                    totals.total_vulnerabilities, totals.total_vpr,
-                    totals.resolved_count, totals.reopened_count
-                ], (wErr) => {
-                    if (wErr) {
-                        console.error("Error storing enhanced daily totals:", wErr);
-                    } else {
-                        console.log(`Enhanced daily totals updated (deduped VPR) for ${scanDate}`);
-                    }
-                    callback();
-                });
+                totals.total_vulnerabilities += row.count;
+                totals.total_vpr += row.total_vpr;
+                totals.reopened_count += row.reopened_count || 0;
+            });
+            
+            // Store enhanced daily totals
+            db.run(`INSERT OR REPLACE INTO vulnerability_daily_totals 
+                (scan_date, critical_count, critical_total_vpr, high_count, high_total_vpr,
+                 medium_count, medium_total_vpr, low_count, low_total_vpr, 
+                 total_vulnerabilities, total_vpr, resolved_count, reopened_count)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+                scanDate,
+                totals.critical_count, totals.critical_total_vpr,
+                totals.high_count, totals.high_total_vpr,
+                totals.medium_count, totals.medium_total_vpr,
+                totals.low_count, totals.low_total_vpr,
+                totals.total_vulnerabilities, totals.total_vpr,
+                totals.resolved_count, totals.reopened_count
+            ], (err) => {
+                if (err) {
+                    console.error("Error storing enhanced daily totals:", err);
+                } else {
+                    console.log(`Enhanced daily totals updated for ${scanDate}`);
+                }
+                callback();
             });
         });
     });
 }
 
 // Ticket processing helper functions
-function mapTicketRow(row, index, nextXtNumber) {
+function mapTicketRow(row, index) {
     const now = new Date().toISOString();
-    // Use provided XT number, or generate next sequential one
-    const xtNumber = row.xt_number || row["XT Number"] || row["XT#"] || String(nextXtNumber).padStart(4, "0");
+    const xtNumber = row.xt_number || row["XT Number"] || `XT${String(index + 1).padStart(3, "0")}`;
     const ticketId = row.id || `ticket_${Date.now()}_${index}`;
-    
-    // Helper function to clean CSV values
-    const cleanCSVValue = (value) => {
-        if (!value) {return "";}
-        // Remove surrounding quotes if present
-        let cleaned = String(value).trim();
-        if (cleaned.startsWith("\"") && cleaned.endsWith("\"")) {
-            cleaned = cleaned.slice(1, -1);
-        }
-        // Replace double quotes with single quotes
-        cleaned = cleaned.replace(/""/g, "\"");
-        return cleaned;
-    };
-    
-    // Parse devices field - handle multiple formats for maximum compatibility
-    let devicesValue = cleanCSVValue(row.devices || row["Devices"]);
-    if (devicesValue) {
-        // Check if it's a JSON array string
-        if (devicesValue.startsWith("[") && devicesValue.endsWith("]")) {
-            try {
-                const parsed = JSON.parse(devicesValue);
-                if (Array.isArray(parsed)) {
-                    // Convert JSON array to semicolon-separated string, preserving order
-                    devicesValue = parsed.join(";");
-                }
-            } catch (_e) {
-                // Not valid JSON, keep as is
-            }
-        } else if (devicesValue.includes(",") && !devicesValue.includes(";")) {
-            // Convert comma-separated to semicolon-separated
-            devicesValue = devicesValue.split(",").map(d => d.trim()).filter(d => d).join(";");
-        }
-        // If already semicolon-separated or single device, keep as is
-    }
     
     return {
         id: ticketId,
         xtNumber,
-        dateSubmitted: cleanCSVValue(row.date_submitted || row["Date Submitted"]),
-        dateDue: cleanCSVValue(row.date_due || row["Date Due"]),
-        hexagonTicket: cleanCSVValue(row.hexagon_ticket || row["Hexagon Ticket"] || row["Hexagon Ticket #"]),
-        serviceNowTicket: cleanCSVValue(row.service_now_ticket || row["ServiceNow Ticket"] || row["Service Now #"]),
-        location: cleanCSVValue(row.location || row["Location"]),
-        devices: devicesValue,
-        supervisor: cleanCSVValue(row.supervisor || row["Supervisor"]),
-        tech: cleanCSVValue(row.tech || row["Tech"]),
-        status: cleanCSVValue(row.status || row["Status"]) || "Open",
-        notes: cleanCSVValue(row.notes || row["Notes"]),
-        attachments: row.attachments || "[]",
+        dateSubmitted: row.date_submitted || row["Date Submitted"] || "",
+        dateDue: row.date_due || row["Date Due"] || "",
+        hexagonTicket: row.hexagon_ticket || row["Hexagon Ticket"] || "",
+        serviceNowTicket: row.service_now_ticket || row["ServiceNow Ticket"] || "",
+        location: row.location || row["Location"] || "",
+        devices: row.devices || row["Devices"] || "",
+        supervisor: row.supervisor || row["Supervisor"] || "",
+        tech: row.tech || row["Tech"] || "",
+        status: row.status || row["Status"] || "Open",
+        notes: row.notes || row["Notes"] || "",
         createdAt: row.created_at || now,
-        updatedAt: now,
-        site: cleanCSVValue(row.site || row["Site"]),
-        siteId: row.site_id || null,
-        locationId: row.location_id || null
+        updatedAt: now
     };
 }
 
 function processTicketRows(csvData, stmt, res) {
     let imported = 0;
     const errors = [];
-
-    // Get the current max XT number from database
-    db.get("SELECT MAX(CAST(xt_number AS INTEGER)) as maxNum FROM tickets WHERE xt_number GLOB '[0-9]*'", (err, result) => {
-        let nextXtNumber = (result && result.maxNum) ? result.maxNum + 1 : 1;
-
-        csvData.forEach((row, index) => {
-            try {
-                const mapped = mapTicketRow(row, index, nextXtNumber);
-                // Increment for next ticket if this one didn't have an XT number
-                if (!row.xt_number && !row["XT Number"] && !row["XT#"]) {
-                    nextXtNumber++;
-                }
+    
+    csvData.forEach((row, index) => {
+        try {
+            const mapped = mapTicketRow(row, index);
             
             stmt.run([
                 mapped.id,
@@ -1930,12 +1843,8 @@ function processTicketRows(csvData, stmt, res) {
                 mapped.tech,
                 mapped.status,
                 mapped.notes,
-                mapped.attachments,
                 mapped.createdAt,
-                mapped.updatedAt,
-                mapped.site,
-                mapped.siteId,
-                mapped.locationId
+                mapped.updatedAt
             ], (err) => {
                 if (err) {
                     console.error(`Error importing ticket row ${index + 1}:`, err);
@@ -1944,29 +1853,28 @@ function processTicketRows(csvData, stmt, res) {
                     imported++;
                 }
             });
-            } catch (error) {
-                errors.push(`Row ${index + 1}: ${error.message}`);
-            }
-        });
-
-        stmt.finalize((err) => {
-            if (err) {
-                console.error("Error finalizing ticket import:", err);
-                return res.status(500).json({ error: "Import failed" });
-            }
-
-            res.json({
-                success: true,
-                imported: imported,
-                total: csvData.length,
-                errors: errors.length > 0 ? errors : undefined
-            });
+        } catch (error) {
+            errors.push(`Row ${index + 1}: ${error.message}`);
+        }
+    });
+    
+    stmt.finalize((err) => {
+        if (err) {
+            console.error("Error finalizing ticket import:", err);
+            return res.status(500).json({ error: "Import failed" });
+        }
+        
+        res.json({
+            success: true,
+            imported: imported,
+            total: csvData.length,
+            errors: errors.length > 0 ? errors : undefined
         });
     });
 }
 
 const app = express();
-const PORT = process.env.PORT || 8989;
+const PORT = process.env.PORT || 8080;
 
 // Create HTTP server and Socket.io setup
 const server = http.createServer(app);
@@ -1985,13 +1893,13 @@ const progressTracker = new ProgressTracker(io);
 
 // Socket.io connection handling
 io.on("connection", (socket) => {
-    debugLog(`WebSocket client connected: ${socket.id}`);
+    console.log(`WebSocket client connected: ${socket.id}`);
     
     // Join progress room when client requests to track a session
     socket.on("join-progress", (sessionId) => {
         if (sessionId && typeof sessionId === "string") {
             socket.join(`progress-${sessionId}`);
-            debugLog(`Client ${socket.id} joined progress room: ${sessionId}`);
+            console.log(`Client ${socket.id} joined progress room: ${sessionId}`);
             
             // Send current session status if it exists
             const session = progressTracker.getSession(sessionId);
@@ -2011,13 +1919,13 @@ io.on("connection", (socket) => {
     socket.on("leave-progress", (sessionId) => {
         if (sessionId && typeof sessionId === "string") {
             socket.leave(`progress-${sessionId}`);
-            debugLog(`Client ${socket.id} left progress room: ${sessionId}`);
+            console.log(`Client ${socket.id} left progress room: ${sessionId}`);
         }
     });
     
     // Handle disconnection
     socket.on("disconnect", (reason) => {
-        debugLog(`WebSocket client disconnected: ${socket.id} (${reason})`);
+        console.log(`WebSocket client disconnected: ${socket.id} (${reason})`);
     });
 });
 
@@ -2778,11 +2686,6 @@ app.use("/docs-html", express.static(path.join(__dirname, "docs-html"), {
   lastModified: true
 }));
 
-// Handle source map requests to avoid 404 errors in console
-app.get("*.map", (req, res) => {
-  res.status(204).end(); // Return 204 No Content for source maps
-});
-
 // Serve static files from current directory
 app.use(express.static(__dirname, {
   maxAge: "1m", // Short cache for development
@@ -3147,33 +3050,6 @@ const initDb = () => {
       }
     });
 
-    // Create sites and locations normalization tables if they don't exist
-    db.run(`CREATE TABLE IF NOT EXISTS sites (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      code VARCHAR(50) UNIQUE NOT NULL,
-      name VARCHAR(255) NOT NULL,
-      description TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`, (err) => {
-      if (err) {
-        console.error("Error creating sites table:", err.message);
-      }
-    });
-
-    db.run(`CREATE TABLE IF NOT EXISTS locations (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      code VARCHAR(50) UNIQUE NOT NULL,
-      name VARCHAR(255) NOT NULL,
-      description TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`, (err) => {
-      if (err) {
-        console.error("Error creating locations table:", err.message);
-      }
-    });
-
     db.run("CREATE INDEX IF NOT EXISTS idx_current_lifecycle_scan ON vulnerabilities_current (lifecycle_state, scan_date)", (err) => {
       if (err) {
         console.error("Error creating current lifecycle_scan index:", err.message);
@@ -3501,12 +3377,10 @@ app.post("/api/tickets", (req, res) => {
     
     const params = [
         ticket.id, ticket.dateSubmitted, ticket.dateDue, ticket.hexagonTicket,
-        ticket.serviceNowTicket, ticket.location, 
-        // Store devices as semicolon-separated string, not JSON
-        Array.isArray(ticket.devices) ? ticket.devices.join(";") : ticket.devices,
+        ticket.serviceNowTicket, ticket.location, JSON.stringify(ticket.devices),
         ticket.supervisor, ticket.tech, ticket.status, ticket.notes,
         JSON.stringify(ticket.attachments || []), ticket.createdAt, ticket.updatedAt,
-        ticket.site, ticket.xtNumber || ticket.xt_number, ticket.site_id, ticket.location_id
+        ticket.site, ticket.xt_number, ticket.site_id, ticket.location_id
     ];
     
     db.run(sql, params, function(err) {
@@ -3530,24 +3404,11 @@ app.put("/api/tickets/:id", (req, res) => {
         WHERE id = ?`;
     
     const params = [
-        ticket.dateSubmitted || ticket.date_submitted,
-        ticket.dateDue || ticket.date_due,
-        ticket.hexagonTicket || ticket.hexagon_ticket,
-        ticket.serviceNowTicket || ticket.service_now_ticket,
-        ticket.location,
-        // Store devices as semicolon-separated string, not JSON
-        Array.isArray(ticket.devices) ? ticket.devices.join(";") : ticket.devices,
-        ticket.supervisor,
-        ticket.tech,
-        ticket.status,
-        ticket.notes,
-        JSON.stringify(ticket.attachments || []),
-        ticket.updatedAt || ticket.updated_at || new Date().toISOString(),
-        ticket.site,
-        ticket.xtNumber || ticket.xt_number,
-        ticket.site_id,
-        ticket.location_id,
-        ticketId
+        ticket.dateSubmitted, ticket.dateDue, ticket.hexagonTicket,
+        ticket.serviceNowTicket, ticket.location, JSON.stringify(ticket.devices),
+        ticket.supervisor, ticket.tech, ticket.status, ticket.notes,
+        JSON.stringify(ticket.attachments || []), ticket.updatedAt,
+        ticket.site, ticket.xt_number, ticket.site_id, ticket.location_id, ticketId
     ];
     
     db.run(sql, params, function(err) {
@@ -3575,54 +3436,29 @@ app.delete("/api/tickets/:id", (req, res) => {
 
 app.post("/api/tickets/migrate", (req, res) => {
     const tickets = req.body.tickets || [];
-    const mode = req.body.mode || "check";
-
+    
     if (!Array.isArray(tickets) || tickets.length === 0) {
         return res.json({ success: true, message: "No tickets to migrate" });
     }
-
-    // Clear existing data if mode is "replace"
-    if (mode === "replace") {
-        db.run("DELETE FROM tickets", (err) => {
-            if (err) {
-                console.error("Error clearing tickets:", err);
-                return res.status(500).json({ error: "Failed to clear existing tickets" });
-            }
-            console.log("Cleared existing tickets for replacement import");
-        });
-    }
-
+    
     const sql = `INSERT OR REPLACE INTO tickets (
-        id, date_submitted, date_due, hexagon_ticket, service_now_ticket, location,
-        devices, supervisor, tech, status, notes, attachments, created_at, updated_at,
-        site, xt_number, site_id, location_id
+        id, start_date, end_date, primary_number, incident_number, site_code,
+        affected_devices, assignee, notes, status, priority, linked_cves,
+        created_at, updated_at, display_site_code, ticket_number, site_id, location_id
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
+    
     let successCount = 0;
     let errorCount = 0;
-
+    
     tickets.forEach(ticket => {
         const params = [
-            ticket.id || `ticket_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            ticket.dateSubmitted || new Date().toISOString().split("T")[0],
-            ticket.dateDue || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-            ticket.hexagonTicket || "",
-            ticket.serviceNowTicket || "",
-            ticket.location || "",
-            JSON.stringify(ticket.devices || []),
-            ticket.supervisor || "",
-            ticket.tech || "",
-            ticket.status || "Open",
-            ticket.notes || "",
-            JSON.stringify(ticket.attachments || []),
-            ticket.createdAt || new Date().toISOString(),
-            ticket.updatedAt || new Date().toISOString(),
-            ticket.site || "",
-            ticket.xtNumber || "",
-            ticket.site_id || null,
-            ticket.location_id || null
+            ticket.id, ticket.start_date, ticket.end_date, ticket.primary_number,
+            ticket.incident_number, ticket.site_code, JSON.stringify(ticket.affected_devices || []),
+            ticket.assignee, ticket.notes, ticket.status, ticket.priority,
+            JSON.stringify(ticket.linked_cves || []), ticket.created_at, ticket.updated_at,
+            ticket.display_site_code, ticket.ticket_number, ticket.site_id, ticket.location_id
         ];
-
+        
         db.run(sql, params, function(err) {
             if (err) {
                 console.error("Error migrating ticket:", err);
@@ -3632,88 +3468,17 @@ app.post("/api/tickets/migrate", (req, res) => {
             }
         });
     });
-
+    
     // Give the database operations time to complete
     setTimeout(() => {
-        res.json({
-            success: true,
+        res.json({ 
+            success: true, 
             message: `Migration completed: ${successCount} tickets migrated, ${errorCount} errors`
         });
     }, 1000);
 });
 
 // JSON-based CSV import endpoints for frontend upload
-// Unified import endpoint for settings modal (handles FormData)
-app.post("/api/import", upload.single("file"), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
-    }
-    
-    const type = req.body.type || "tickets";
-    const filePath = req.file.path;
-    
-    try {
-        const fileContent = fs.readFileSync(filePath, "utf8");
-        let data;
-        
-        // Parse based on file type
-        if (req.file.originalname.toLowerCase().endsWith(".json")) {
-            data = JSON.parse(fileContent);
-        } else if (req.file.originalname.toLowerCase().endsWith(".csv")) {
-            // Use PapaParse for CSV parsing
-            const parseResult = Papa.parse(fileContent, {
-                header: true,
-                skipEmptyLines: true,
-                transformHeader: (header) => header.trim()
-            });
-            data = parseResult.data;
-        } else {
-            throw new Error("Unsupported file format. Please use CSV or JSON.");
-        }
-        
-        // Clean up uploaded file
-        fs.unlinkSync(filePath);
-        
-        // Route to appropriate handler based on type
-        if (type === "tickets") {
-            // Process tickets import
-            if (!Array.isArray(data) || data.length === 0) {
-                return res.status(400).json({ error: "No valid ticket data found" });
-            }
-            
-            // Prepare insert statement with UPSERT
-            const stmt = db.prepare(`
-                INSERT OR REPLACE INTO tickets (
-                    id, xt_number, date_submitted, date_due, hexagon_ticket,
-                    service_now_ticket, location, devices, supervisor, tech,
-                    status, notes, attachments, created_at, updated_at,
-                    site, site_id, location_id
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `);
-            
-            processTicketRows(data, stmt, res);
-        } else if (type === "vulnerabilities") {
-            // Forward to existing vulnerability import logic
-            req.body.data = data;
-            return app._router.handle(req, res, () => {
-                res.status(404).json({ error: "Handler not found" });
-            });
-        } else {
-            res.status(400).json({ error: `Unknown import type: ${type}` });
-        }
-    } catch (error) {
-        // Clean up file on error
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-        }
-        console.error("Import error:", error);
-        res.status(500).json({ 
-            error: "Import failed", 
-            message: error.message 
-        });
-    }
-});
-
 app.post("/api/import/tickets", (req, res) => {
     const csvData = req.body.data || [];
     
@@ -3724,11 +3489,10 @@ app.post("/api/import/tickets", (req, res) => {
     // Prepare insert statement with UPSERT (INSERT OR REPLACE)
     const stmt = db.prepare(`
         INSERT OR REPLACE INTO tickets (
-            id, xt_number, date_submitted, date_due, hexagon_ticket,
+            id, xt_number, date_submitted, date_due, hexagon_ticket, 
             service_now_ticket, location, devices, supervisor, tech,
-            status, notes, attachments, created_at, updated_at,
-            site, site_id, location_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            status, notes, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     
     processTicketRows(csvData, stmt, res);
@@ -3927,60 +3691,30 @@ app.post("/api/restore", upload.single("file"), async (req, res) => {
                     
                     // Insert tickets data
                     const ticketValues = ticketsData.data.map(ticket => {
-                        // Handle devices field - ensure it's a semicolon-separated string
-                        let devicesStr = "";
-                        if (typeof ticket.devices === "string") {
-                            devicesStr = ticket.devices;
-                        } else if (Array.isArray(ticket.devices)) {
-                            // Join array with semicolons, not JSON
-                            devicesStr = ticket.devices.join(";");
-                        } else if (ticket.devices) {
-                            devicesStr = String(ticket.devices);
-                        }
-                        
-                        // Handle attachments field - ensure it's a string
-                        let attachmentsStr = "";
-                        if (typeof ticket.attachments === "string") {
-                            attachmentsStr = ticket.attachments;
-                        } else if (Array.isArray(ticket.attachments)) {
-                            attachmentsStr = JSON.stringify(ticket.attachments);
-                        } else if (ticket.attachments) {
-                            attachmentsStr = JSON.stringify(ticket.attachments);
-                        }
-                        
-                        // Generate ticket ID if not present
-                        const ticketId = ticket.id || `ticket_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-                        
                         return [
-                            ticketId,
                             ticket.xt_number || "",
                             ticket.date_submitted || "",
                             ticket.date_due || "",
                             ticket.hexagon_ticket || "",
                             ticket.service_now_ticket || "",
                             ticket.location || "",
-                            devicesStr,
+                            ticket.devices || "",
                             ticket.supervisor || "",
                             ticket.tech || "",
                             ticket.status || "",
                             ticket.notes || "",
-                            attachmentsStr,
                             ticket.created_at || new Date().toISOString(),
-                            ticket.updated_at || new Date().toISOString(),
-                            ticket.site || "",
-                            ticket.site_id || null,
-                            ticket.location_id || null
+                            ticket.updated_at || new Date().toISOString()
                         ];
                     });
                     
                     for (const values of ticketValues) {
                         await new Promise((resolve, reject) => {
                             db.run(`
-                                INSERT OR REPLACE INTO tickets 
-                                (id, xt_number, date_submitted, date_due, hexagon_ticket, service_now_ticket, 
-                                location, devices, supervisor, tech, status, notes, attachments, created_at, updated_at,
-                                site, site_id, location_id)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                INSERT INTO tickets 
+                                (xt_number, date_submitted, date_due, hexagon_ticket, service_now_ticket, 
+                                location, devices, supervisor, tech, status, notes, created_at, updated_at)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             `, values, function(err) {
                                 if (err) {reject(err);}
                                 else {resolve();}
