@@ -89,52 +89,17 @@ class HexagonTicketsManager {
             // PMD-disable-next-line GlobalVariable
             status = "Overdue";
             // Update the status in the database asynchronously
-            this.updateTicketStatusToOverdue(rawTicket.id, rawTicket);
+            this.updateTicketStatusToOverdue(rawTicket.id);
         }
         
         // Don't mark completed or closed tickets as overdue
         const isActiveOverdue = isOverdue && status !== "Completed" && status !== "Closed";
         
-        // Devices are stored as semicolon-separated strings in the database
-        // But might come as JSON arrays from old exports - normalize them
-        let devices = rawTicket.devices || "";
-        if (Array.isArray(devices)) {
-            // If somehow we got an array, join it back to semicolon-separated
-            devices = devices.join(";");
-        } else if (typeof devices === "string" && devices.startsWith("[") && devices.endsWith("]")) {
-            // Check if it's a JSON array string (from old exports)
-            try {
-                const parsed = JSON.parse(devices);
-                if (Array.isArray(parsed)) {
-                    // Convert to semicolon-separated, preserving boot order
-                    devices = parsed.join(";");
-                }
-            } catch (_e) {
-                // Not valid JSON, keep as is
-            }
-        }
-        
-        // Parse attachments field - handle both JSON and plain text
-        let attachments = [];
-        if (rawTicket.attachments) {
-            if (typeof rawTicket.attachments === "string") {
-                try {
-                    // Try to parse as JSON first
-                    attachments = JSON.parse(rawTicket.attachments);
-                } catch (_e) {
-                    // If not JSON, treat as empty array
-                    attachments = [];
-                }
-            } else if (Array.isArray(rawTicket.attachments)) {
-                attachments = rawTicket.attachments;
-            }
-        }
-        
         return {
             ...rawTicket,
             status: status, // Use the potentially updated status
-            devices: devices,
-            attachments: attachments,
+            devices: typeof rawTicket.devices === "string" ? JSON.parse(rawTicket.devices) : rawTicket.devices || [],
+            attachments: typeof rawTicket.attachments === "string" ? JSON.parse(rawTicket.attachments) : rawTicket.attachments || [],
             xtNumber: rawTicket.xt_number || rawTicket.xtNumber,
             dateSubmitted: rawTicket.date_submitted || rawTicket.dateSubmitted,
             dateDue: rawTicket.date_due || rawTicket.dateDue,
@@ -206,24 +171,14 @@ class HexagonTicketsManager {
     }
 
     // Method to update ticket status to "Overdue" in the database
-    async updateTicketStatusToOverdue(ticketId, ticketData) {
+    async updateTicketStatusToOverdue(ticketId) {
         try {
-            // If ticketData is provided, use it; otherwise try to find the ticket
-            const ticket = ticketData || this.tickets.find(t => t.id === ticketId);
-            if (!ticket) {
-                console.error(`Ticket ${ticketId} not found for status update`);
-                return;
-            }
-
-            // Update the status to Overdue
-            const updatedTicket = { ...ticket, status: "Overdue" };
-
             const response = await fetch(`/api/tickets/${ticketId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(updatedTicket)
+                body: JSON.stringify({ status: "Overdue" })
             });
 
             if (response.ok) {
@@ -489,22 +444,26 @@ class HexagonTicketsManager {
 
     /**
      * Generate the next XT number for new tickets
-     * @returns {string} Next XT number as 4-digit string (e.g., "0018")
+     * @returns {string} Next XT number (e.g., "XT018")
      */
     generateNextXtNumber() {
-        // Get all existing XT numbers (now stored as 4-digit numbers)
+        // Get all existing XT numbers
         const xtNumbers = this.tickets
             .map(ticket => ticket.xtNumber || ticket.xt_number)
-            .filter(xt => xt && /^\d{4}$/.test(xt)) // Match 4-digit numbers
-            .map(xt => parseInt(xt, 10))
+            .filter(xt => xt && xt.startsWith("XT"))
+            .map(xt => {
+                // Extract the numeric part
+                const match = xt.match(/XT(\d+)/);
+                return match ? parseInt(match[1], 10) : 0;
+            })
             .filter(num => !isNaN(num));
 
         // Find the highest number
         const maxNumber = xtNumbers.length > 0 ? Math.max(...xtNumbers) : 0;
-
-        // Generate next number with zero padding (4 digits)
+        
+        // Generate next number with zero padding (3 digits)
         const nextNumber = maxNumber + 1;
-        return nextNumber.toString().padStart(4, "0");
+        return `XT${nextNumber.toString().padStart(3, "0")}`;
     }
 
     /**
@@ -775,24 +734,15 @@ class HexagonTicketsManager {
                 devices.push(input.value.trim());
             }
         });
-        // Return as semicolon-separated string for database storage
-        return devices.join(";");
+        return devices;
     }
 
     setDevices(devices) {
         const container = document.getElementById("devicesContainer");
         container.innerHTML = "";
         
-        // Handle both string and array inputs
-        let deviceList;
-        if (typeof devices === "string") {
-            // Split semicolon-separated string
-            deviceList = devices ? devices.split(";").map(d => d.trim()) : [""];
-        } else if (Array.isArray(devices)) {
-            deviceList = devices.length === 0 ? [""] : devices;
-        } else {
-            deviceList = [""];
-        }
+        // Use local variable to avoid parameter modification
+        const deviceList = devices.length === 0 ? [""] : devices;
         
         deviceList.forEach((device) => {
             const deviceEntry = document.createElement("div");
@@ -955,19 +905,19 @@ class HexagonTicketsManager {
     }
 
     async saveTicket() {
-        // Validate required fields: Date Due and Status
-        const dateDue = document.getElementById("dateDue").value.trim();
-        const status = document.getElementById("status").value.trim();
-
-        if (!dateDue) {
-            alert("Date Due is required.");
-            document.getElementById("dateDue").focus();
+        // Validate that both site and location are required
+        const site = document.getElementById("site").value.trim();
+        const location = document.getElementById("location").value.trim();
+        
+        if (!site) {
+            alert("Site is required.");
+            document.getElementById("site").focus();
             return;
         }
-
-        if (!status) {
-            alert("Status is required.");
-            document.getElementById("status").focus();
+        
+        if (!location) {
+            alert("Location is required.");
+            document.getElementById("location").focus();
             return;
         }
 
@@ -1153,13 +1103,13 @@ class HexagonTicketsManager {
                     <td class="text-center"><strong>${displayXtNumber}</strong></td>
                     <td class="text-center">${escapeHtml(this.formatDate(ticket.dateSubmitted))}</td>
                     <td class="text-center">${escapeHtml(this.formatDate(ticket.dateDue))}</td>
-                    <td class="text-center">${ticket.hexagonTicket ? `<strong>${this.highlightSearch(ticket.hexagonTicket)}</strong>` : ""}
-                    <td class="text-center">${this.createServiceNowDisplay(ticket.serviceNowTicket) || ""}</td>
+                    <td class="text-center"><strong>${this.highlightSearch(ticket.hexagonTicket)}</strong></td>
+                    <td class="text-center">${this.createServiceNowDisplay(ticket.serviceNowTicket)}</td>
                     <td class="text-center">${this.createSiteChip(ticket.site || "")}</td>
                     <td class="text-center">${this.createLocationChip(ticket.location || "")}</td>
                     <td class="text-center">
                         <div class="devices-list">
-                            ${this.createDeviceChips(ticket.devices)}
+                            ${ticket.devices.map(device => `<span class="device-tag enhanced">${this.highlightSearch(device)}</span>`).join("")}
                         </div>
                     </td>
                     <td class="text-center">
@@ -1297,54 +1247,6 @@ class HexagonTicketsManager {
         return `<span class="site-chip ${colorClass}">${this.highlightSearch(site)}</span>`;
     }
 
-    // Helper function to create device chips
-    createDeviceChips(devicesText) {
-        if (!devicesText) {return "";}
-        
-        let devices = [];
-        
-        // Handle different formats
-        if (typeof devicesText === "string") {
-            // Check if it's a JSON array string first
-            if (devicesText.startsWith("[") && devicesText.endsWith("]")) {
-                try {
-                    const parsed = JSON.parse(devicesText);
-                    if (Array.isArray(parsed)) {
-                        devices = parsed;
-                    }
-                } catch (_e) {
-                    // Not valid JSON, process as regular string
-                    devicesText = devicesText.slice(1, -1); // Remove brackets
-                }
-            }
-            
-            // If not already parsed as JSON array
-            if (devices.length === 0) {
-                // First split by semicolon
-                const semiColonParts = devicesText.split(";").map(d => d.trim()).filter(d => d);
-                
-                // Then check each part - if it contains spaces and no special indicators, split it
-                semiColonParts.forEach(part => {
-                    // If the part looks like multiple devices separated by spaces (e.g., "DEVICE1 DEVICE2")
-                    // and doesn't contain commas or other separators, split by space
-                    if (part.includes(" ") && !part.includes(",") && !part.includes("ALL")) {
-                        // Split by space for multiple devices
-                        devices.push(...part.split(" ").map(d => d.trim()).filter(d => d));
-                    } else {
-                        // Keep as single device
-                        devices.push(part);
-                    }
-                });
-            }
-        } else if (Array.isArray(devicesText)) {
-            devices = devicesText;
-        }
-        
-        return devices.map(device => {
-            return `<span class="device-tag enhanced">${this.highlightSearch(device)}</span>`;
-        }).join("");
-    }
-
     // Helper function to create supervisor chips
     createSupervisorChips(supervisorText) {
         if (!supervisorText) {return "N/A";}
@@ -1379,7 +1281,7 @@ class HexagonTicketsManager {
 
     // Helper function to create ServiceNow ticket display (clickable if enabled)
     createServiceNowDisplay(serviceNowTicket) {
-        if (!serviceNowTicket) {return "";}
+        if (!serviceNowTicket) {return this.highlightSearch("N/A");}
         
         // Check if ServiceNow integration is enabled (from shared settings modal)
         const isEnabled = window.isServiceNowEnabled && window.isServiceNowEnabled();
@@ -1415,15 +1317,15 @@ class HexagonTicketsManager {
         const locationFilter = document.getElementById("locationFilter").value;
 
         return this.tickets.filter(ticket => {
-            const matchesSearch = !searchTerm ||
+            const matchesSearch = !searchTerm || 
                 (ticket.xtNumber && ticket.xtNumber.toLowerCase().includes(searchTerm)) ||
-                (ticket.hexagonTicket || "").toLowerCase().includes(searchTerm) ||
-                (ticket.serviceNowTicket || "").toLowerCase().includes(searchTerm) ||
-                (ticket.location || "").toLowerCase().includes(searchTerm) ||
+                ticket.hexagonTicket.toLowerCase().includes(searchTerm) ||
+                ticket.serviceNowTicket.toLowerCase().includes(searchTerm) ||
+                ticket.location.toLowerCase().includes(searchTerm) ||
                 (ticket.site && ticket.site.toLowerCase().includes(searchTerm)) ||
-                (ticket.supervisor || "").toLowerCase().includes(searchTerm) ||
-                (ticket.tech || "").toLowerCase().includes(searchTerm) ||
-                (ticket.devices || []).some(device => device.toLowerCase().includes(searchTerm));
+                ticket.supervisor.toLowerCase().includes(searchTerm) ||
+                ticket.tech.toLowerCase().includes(searchTerm) ||
+                ticket.devices.some(device => device.toLowerCase().includes(searchTerm));
 
             const matchesStatus = !statusFilter || ticket.status === statusFilter;
             const matchesLocation = !locationFilter || ticket.location === locationFilter;
@@ -1628,9 +1530,7 @@ class HexagonTicketsManager {
         yPosition += lineHeight + 5;
 
         doc.setFont("helvetica", "normal");
-        // Split semicolon-separated devices for display
-        const deviceList = ticket.devices ? ticket.devices.split(";").map(d => d.trim()).filter(d => d) : [];
-        deviceList.forEach((device, index) => {
+        ticket.devices.forEach((device, index) => {
             doc.text(`${index + 1}. ${device}`, 30, yPosition);
             yPosition += lineHeight;
         });
@@ -1779,7 +1679,7 @@ class HexagonTicketsManager {
             yPosition += splitInstructionText.length * lineHeight + sectionSpacing;
 
             // Devices section
-            if (ticket.devices && ticket.devices.trim()) {
+            if (ticket.devices && ticket.devices.length > 0) {
                 doc.setFontSize(14);
                 doc.setFont("helvetica", "bold");
                 doc.text("Devices to be Updated:", margin, yPosition);
@@ -1790,9 +1690,7 @@ class HexagonTicketsManager {
                 doc.text("The following devices will be updated and rebooted:", margin, yPosition);
                 yPosition += lineHeight + 3;
 
-                // Split semicolon-separated devices for display
-                const deviceList = ticket.devices.split(";").map(d => d.trim()).filter(d => d);
-                deviceList.forEach((device, index) => {
+                ticket.devices.forEach((device, index) => {
                     doc.text(`${index + 1}. ${device}`, margin + 5, yPosition);
                     yPosition += lineHeight;
                 });
@@ -1852,53 +1750,33 @@ class HexagonTicketsManager {
             // Add shared documentation files (uploaded via "Attach Documentation")
             if (this.sharedDocumentation && this.sharedDocumentation.length > 0) {
                 this.sharedDocumentation.forEach((doc_file) => {
-                    try {
-                        // Check if doc has required data
-                        if (!doc_file.content || !doc_file.name) {
-                            console.warn("Skipping invalid documentation file");
-                            return;
-                        }
-                        
-                        // Convert base64 back to blob
-                        const base64Data = doc_file.content.split(",")[1];
-                        const binaryString = atob(base64Data);
-                        const bytes = new Uint8Array(binaryString.length);
-                        for (let i = 0; i < binaryString.length; i++) {
-                            bytes[i] = binaryString.charCodeAt(i);
-                        }
-                        zip.file(doc_file.name, bytes);
-                    } catch (error) {
-                        console.error("Error processing documentation file:", error);
+                    // Convert base64 back to blob
+                    const base64Data = doc_file.content.split(",")[1];
+                    const binaryString = atob(base64Data);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
                     }
+                    zip.file(doc_file.name, bytes);
                 });
             }
 
             // Add attached files to zip
             if (ticket.attachments && ticket.attachments.length > 0) {
                 ticket.attachments.forEach((attachment, index) => {
-                    try {
-                        // Check if attachment has required data
-                        if (!attachment.data || !attachment.name) {
-                            console.warn(`Skipping invalid attachment at index ${index}`);
-                            return;
-                        }
-                        
-                        // Convert base64 back to blob
-                        const base64Data = attachment.data.split(",")[1];
-                        const binaryString = atob(base64Data);
-                        const bytes = new Uint8Array(binaryString.length);
-                        for (let i = 0; i < binaryString.length; i++) {
-                            bytes[i] = binaryString.charCodeAt(i);
-                        }
-                    
-                        // Rename file to match the base filename pattern
-                        const fileExt = attachment.name.split(".").pop();
-                        const newFileName = `${baseFilename}_attachment_${index + 1}.${fileExt}`;
-                        
-                        zip.file(newFileName, bytes);
-                    } catch (error) {
-                        console.error(`Error processing attachment ${index}:`, error);
+                    // Convert base64 back to blob
+                    const base64Data = attachment.data.split(",")[1];
+                    const binaryString = atob(base64Data);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
                     }
+                    
+                    // Rename file to match the base filename pattern
+                    const fileExt = attachment.name.split(".").pop();
+                    const newFileName = `${baseFilename}_attachment_${index + 1}.${fileExt}`;
+                    
+                    zip.file(newFileName, bytes);
                 });
             }
 
@@ -1948,52 +1826,19 @@ class HexagonTicketsManager {
         }
     }
 
-    // Helper function to format devices for export
-    formatDevicesForExport(devices) {
-        if (!devices) {return "";}
-        
-        // If it's already a string
-        if (typeof devices === "string") {
-            // Check if it's a JSON array string
-            if (devices.startsWith("[") && devices.endsWith("]")) {
-                try {
-                    const parsed = JSON.parse(devices);
-                    if (Array.isArray(parsed)) {
-                        // Convert to semicolon-separated, preserving order
-                        return parsed.join(";");
-                    }
-                } catch (_e) {
-                    // Not valid JSON, return as is
-                    return devices;
-                }
-            }
-            // Already semicolon or comma separated, return as is
-            return devices;
-        }
-        
-        // If it's an array, join with semicolons
-        if (Array.isArray(devices)) {
-            return devices.join(";");
-        }
-        
-        return "";
-    }
-    
     exportCSV(tickets) {
-        const headers = ["XT#", "Date Submitted", "Date Due", "Hexagon Ticket #", "Service Now #", "Site", "Location", "Devices", "Supervisor", "Tech", "Status", "Notes"];
+        const headers = ["Date Submitted", "Date Due", "Hexagon Ticket #", "Service Now #", "Location", "Devices", "Supervisor", "Tech", "Status", "Notes"];
         const csvContent = [
             headers.join(","),
             ...tickets.map(ticket => [
-                ticket.xtNumber || ticket.xt_number || "",
                 ticket.dateSubmitted,
                 ticket.dateDue,
-                `"${ticket.hexagonTicket || ""}"`,
+                `"${ticket.hexagonTicket}"`,
                 `"${ticket.serviceNowTicket || ""}"`,
-                `"${ticket.site || ""}"`,
-                `"${ticket.location || ""}"`,
-                `"${this.formatDevicesForExport(ticket.devices)}"`,
-                `"${ticket.supervisor || ""}"`,
-                `"${ticket.tech || ""}"`,
+                `"${ticket.location}"`,
+                `"${ticket.devices.join("; ")}"`,
+                `"${ticket.supervisor}"`,
+                `"${ticket.tech}"`,
                 `"${ticket.status}"`,
                 `"${ticket.notes || ""}"`
             ].join(","))
@@ -2004,16 +1849,14 @@ class HexagonTicketsManager {
 
     exportExcel(tickets) {
         const ws = XLSX.utils.json_to_sheet(tickets.map(ticket => ({
-            "XT#": ticket.xtNumber || ticket.xt_number || "",
             "Date Submitted": ticket.dateSubmitted,
             "Date Due": ticket.dateDue,
-            "Hexagon Ticket #": ticket.hexagonTicket || "",
-            "Service Now #": ticket.serviceNowTicket || "",
-            "Site": ticket.site || "",
-            "Location": ticket.location || "",
-            "Devices": this.formatDevicesForExport(ticket.devices),
-            "Supervisor": ticket.supervisor || "",
-            "Tech": ticket.tech || "",
+            "Hexagon Ticket #": ticket.hexagonTicket,
+            "Service Now #": ticket.serviceNowTicket,
+            "Location": ticket.location,
+            "Devices": ticket.devices.join("; "),
+            "Supervisor": ticket.supervisor,
+            "Tech": ticket.tech,
             "Status": ticket.status,
             "Notes": ticket.notes || ""
         })));
@@ -2040,26 +1883,24 @@ class HexagonTicketsManager {
         doc.text(`Total Tickets: ${tickets.length}`, 14, 40);
 
         const tableData = tickets.map(ticket => [
-            ticket.xtNumber || ticket.xt_number || "",
             this.formatDate(ticket.dateSubmitted),
             this.formatDate(ticket.dateDue),
-            ticket.hexagonTicket || "",
-            ticket.serviceNowTicket || "",
-            ticket.site || "",
-            ticket.location || "",
-            typeof ticket.devices === "string" ? ticket.devices : ticket.devices.join(", "),
-            ticket.supervisor || "",
-            ticket.tech || "",
+            ticket.hexagonTicket,
+            ticket.serviceNowTicket || "N/A",
+            ticket.location,
+            ticket.devices.join(", "),
+            ticket.supervisor,
+            ticket.tech,
             ticket.status
         ]);
 
         doc.autoTable({
-            head: [["XT#", "Date Submitted", "Date Due", "Hexagon #", "Service Now #", "Site", "Location", "Devices", "Supervisor", "Tech", "Status"]],
+            head: [["Date Submitted", "Date Due", "Hexagon #", "Service Now #", "Location", "Devices", "Supervisor", "Tech", "Status"]],
             body: tableData,
             startY: 50,
-            styles: { fontSize: 7 },
+            styles: { fontSize: 8 },
             columnStyles: {
-                7: { cellWidth: 35 }  // Devices column
+                5: { cellWidth: 40 }
             }
         });
 
@@ -2089,12 +1930,10 @@ class HexagonTicketsManager {
                 <table>
                     <thead>
                         <tr>
-                            <th>XT#</th>
                             <th>Date Submitted</th>
                             <th>Date Due</th>
                             <th>Hexagon Ticket #</th>
                             <th>Service Now #</th>
-                            <th>Site</th>
                             <th>Location</th>
                             <th>Devices</th>
                             <th>Supervisor</th>
@@ -2105,16 +1944,14 @@ class HexagonTicketsManager {
                     <tbody>
                         ${tickets.map(ticket => `
                             <tr>
-                                <td>${ticket.xtNumber || ticket.xt_number || ""}</td>
                                 <td>${this.formatDate(ticket.dateSubmitted)}</td>
                                 <td>${this.formatDate(ticket.dateDue)}</td>
-                                <td>${ticket.hexagonTicket || ""}</td>
-                                <td>${ticket.serviceNowTicket || ""}</td>
-                                <td>${ticket.site || ""}</td>
-                                <td>${ticket.location || ""}</td>
-                                <td>${typeof ticket.devices === "string" ? ticket.devices : ticket.devices.join(", ")}</td>
-                                <td>${ticket.supervisor || ""}</td>
-                                <td>${ticket.tech || ""}</td>
+                                <td>${ticket.hexagonTicket}</td>
+                                <td>${ticket.serviceNowTicket || "N/A"}</td>
+                                <td>${ticket.location}</td>
+                                <td>${ticket.devices.join(", ")}</td>
+                                <td>${ticket.supervisor}</td>
+                                <td>${ticket.tech}</td>
                                 <td>${ticket.status}</td>
                             </tr>
                         `).join("")}
@@ -2201,12 +2038,10 @@ class HexagonTicketsManager {
         markdown += `918-732-4822 with service now ticket number [${ticket.serviceNowTicket || "SERVICE NOW TICKET"}] to coordinate Netops to apply security\n`;
         markdown += "updates and reboot the equipment.\n\n";
         
-        // Handle devices - split semicolon-separated string into array for display
-        if (ticket.devices && ticket.devices.trim()) {
+        if (ticket.devices && ticket.devices.length > 0) {
             markdown += "**Devices to be Updated:**\n";
             markdown += "The following devices will be updated and rebooted:\n\n";
-            const deviceList = ticket.devices.split(";").map(d => d.trim()).filter(d => d);
-            deviceList.forEach((device, index) => {
+            ticket.devices.forEach((device, index) => {
                 markdown += `${index + 1}. ${device}\n`;
             });
             markdown += "\n";
@@ -2376,147 +2211,119 @@ class HexagonTicketsManager {
         });
     }
 
-    // Parse CSV text to tickets array using PapaParse
+    // Parse CSV text to tickets array
     parseCsvToTickets(csvText) {
-        // Use PapaParse for robust CSV parsing that handles multi-line fields and complex quoting
-        const parseResult = Papa.parse(csvText, {
-            header: true,
-            skipEmptyLines: true,
-            transformHeader: (header) => header.trim(),
-            transform: (value) => value ? value.trim() : ""
-        });
+        const lines = csvText.split("\n").filter(line => line.trim());
+        if (lines.length < 2) {return [];}
 
-        if (parseResult.errors.length > 0) {
-            console.warn("CSV parsing warnings:", parseResult.errors);
-        }
-
+        const headers = lines[0].split(",").map(h => h.trim().replace(/"/g, ""));
         const tickets = [];
 
-        parseResult.data.forEach(row => {
-            // Skip empty rows
-            if (!Object.values(row).some(val => val && val.trim())) {
-                return;
-            }
+        for (let i = 1; i < lines.length; i++) {
+            const values = this.parseCsvLine(lines[i]);
+            if (values.length === headers.length) {
+                const ticket = {};
+                
+                headers.forEach((header, index) => {
+                    const value = values[index].trim().replace(/"/g, "");
+                    
+                    // Map CSV headers to ticket properties
+                    switch (header.toLowerCase()) {
+                        case "date submitted":
+                        case "datesubmitted":
+                            ticket.dateSubmitted = value;
+                            break;
+                        case "date due":
+                        case "datedue":
+                            ticket.dateDue = value;
+                            break;
+                        case "hexagon ticket":
+                        case "hexagon ticket #":
+                        case "hexagonticket":
+                            ticket.hexagonTicket = value;
+                            break;
+                        case "service now #":
+                        case "servicenow ticket":
+                        case "servicenow ticket #":
+                        case "servicenowticket":
+                            ticket.serviceNowTicket = value;
+                            break;
+                        case "location":
+                        case "site/group":
+                            ticket.location = value;
+                            break;
+                        case "devices":
+                            ticket.devices = value ? value.split(";").map(d => d.trim()).filter(d => d) : [];
+                            break;
+                        case "supervisor":
+                            ticket.supervisor = value;
+                            break;
+                        case "tech":
+                        case "technician":
+                            ticket.tech = value;
+                            break;
+                        case "status":
+                            ticket.status = value;
+                            break;
+                        case "notes":
+                            ticket.notes = value;
+                            break;
+                    }
+                });
 
-            const ticket = {};
+                // Set defaults for missing fields
+                ticket.dateSubmitted = ticket.dateSubmitted || new Date().toISOString().split("T")[0];
+                ticket.dateDue = ticket.dateDue || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+                ticket.hexagonTicket = ticket.hexagonTicket || "";
+                ticket.serviceNowTicket = ticket.serviceNowTicket || "";
+                ticket.devices = ticket.devices || [];
+                ticket.supervisor = ticket.supervisor || "";
+                ticket.tech = ticket.tech || "";
+                ticket.status = ticket.status || "Open";
+                ticket.notes = ticket.notes || "";
 
-            // Map CSV headers to ticket properties with flexible header matching
-            Object.keys(row).forEach(header => {
-                const value = row[header] || "";
+                // Generate ID and timestamps using cryptographically secure random
+                const randomBytes = new Uint8Array(9);
+                window.crypto.getRandomValues(randomBytes);
+                const randomString = Array.from(randomBytes, byte => byte.toString(36).padStart(2, "0")).join("").substr(0, 9);
+                ticket.id = Date.now().toString() + randomString;
+                ticket.createdAt = new Date().toISOString();
+                ticket.updatedAt = new Date().toISOString();
 
-                switch (header.toLowerCase()) {
-                    case "date submitted":
-                    case "datesubmitted":
-                        ticket.dateSubmitted = value;
-                        break;
-                    case "date due":
-                    case "datedue":
-                        ticket.dateDue = value;
-                        break;
-                    case "hexagon ticket":
-                    case "hexagon ticket #":
-                    case "hexagonticket":
-                        ticket.hexagonTicket = value;
-                        break;
-                    case "service now #":
-                    case "servicenow ticket":
-                    case "servicenow ticket #":
-                    case "servicenowticket":
-                        ticket.serviceNowTicket = value;
-                        break;
-                    case "location":
-                    case "site/group":
-                        ticket.location = value;
-                        break;
-                    case "site":
-                        ticket.site = value;
-                        break;
-                    case "devices":
-                        // Split devices by semicolon and clean up whitespace
-                        ticket.devices = value ? value.split(";").map(d => d.trim()).filter(d => d) : [];
-                        break;
-                    case "supervisor":
-                        // Keep supervisor field as-is (may contain semicolon-separated names)
-                        ticket.supervisor = value;
-                        break;
-                    case "tech":
-                    case "technician":
-                        ticket.tech = value;
-                        break;
-                    case "status":
-                        ticket.status = value;
-                        break;
-                    case "notes":
-                        // Notes field may contain line breaks - PapaParse handles this correctly
-                        ticket.notes = value;
-                        break;
-                    case "xt #":
-                    case "xt number":
-                    case "xtnumber":
-                        ticket.xtNumber = value;
-                        break;
+                // Only require location (consistent with form validation)
+                if (ticket.location && ticket.location.trim()) {
+                    tickets.push(ticket);
+                } else {
+                    console.log("Skipping ticket with missing location:", ticket);
                 }
-            });
-
-            // Set defaults for missing fields
-            ticket.dateSubmitted = ticket.dateSubmitted || new Date().toISOString().split("T")[0];
-            ticket.dateDue = ticket.dateDue || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-            ticket.hexagonTicket = ticket.hexagonTicket || "";
-            ticket.serviceNowTicket = ticket.serviceNowTicket || "";
-            ticket.devices = ticket.devices || [];
-            ticket.supervisor = ticket.supervisor || "";
-            ticket.tech = ticket.tech || "";
-            ticket.status = ticket.status || "Open";
-            ticket.notes = ticket.notes || "";
-            ticket.site = ticket.site || "";
-            ticket.location = ticket.location || "";
-
-            // Generate XT number if not present (this requires access to existing tickets to get next number)
-            if (!ticket.xtNumber) {
-                // We'll need to defer this until after all tickets are parsed, so for now mark it as needing generation
-                ticket._needsXtNumber = true;
             }
-
-            // Generate ID and timestamps using cryptographically secure random
-            const randomBytes = new Uint8Array(9);
-            window.crypto.getRandomValues(randomBytes);
-            const randomString = Array.from(randomBytes, byte => byte.toString(36).padStart(2, "0")).join("").substr(0, 9);
-            ticket.id = Date.now().toString() + randomString;
-            ticket.createdAt = new Date().toISOString();
-            ticket.updatedAt = new Date().toISOString();
-
-            // Only require location (consistent with form validation)
-            if (ticket.location && ticket.location.trim()) {
-                tickets.push(ticket);
-            } else {
-                console.log("Skipping ticket with missing location:", ticket);
-            }
-        });
-
-        // Generate XT numbers for tickets that need them
-        let nextXtCounter = 1;
-        // First, find the highest existing XT number from both imported tickets and existing tickets
-        const existingXtNumbers = [
-            ...this.tickets.map(t => t.xtNumber || t.xt_number).filter(xt => xt && /^\d{4}$/.test(xt)),
-            ...tickets.map(t => t.xtNumber).filter(xt => xt && /^\d{4}$/.test(xt))
-        ].map(xt => parseInt(xt, 10)).filter(num => !isNaN(num));
-
-        if (existingXtNumbers.length > 0) {
-            nextXtCounter = Math.max(...existingXtNumbers) + 1;
         }
-
-        // Assign XT numbers to tickets that need them
-        tickets.forEach(ticket => {
-            if (ticket._needsXtNumber) {
-                ticket.xtNumber = nextXtCounter.toString().padStart(4, "0");
-                nextXtCounter++;
-                delete ticket._needsXtNumber; // Clean up the temporary flag
-            }
-        });
 
         return tickets;
     }
 
+    // Parse CSV line handling quoted values
+    parseCsvLine(line) {
+        const values = [];
+        let current = "";
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            
+            if (char === "\"") {
+                inQuotes = !inQuotes;
+            } else if (char === "," && !inQuotes) {
+                values.push(current);
+                current = "";
+            } else {
+                current += char;
+            }
+        }
+        
+        values.push(current);
+        return values;
+    }
 
     // Table sorting functionality
     sortTable(column) {
@@ -2595,8 +2402,7 @@ window.downloadBundleFromView = function() {
     if (window.ticketManager) {window.ticketManager.downloadBundleFromView();}
 };
 
-// Renamed to avoid conflict with settings-modal.js exportData function
-window.exportTicketsTableData = function(format) {
+window.exportData = function(format) {
     if (window.ticketManager) {window.ticketManager.exportData(format);}
 };
 
