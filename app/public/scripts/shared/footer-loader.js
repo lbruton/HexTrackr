@@ -36,9 +36,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (versionSpan && window.HexTrackrConfig && window.HexTrackrConfig.version) {
                     versionSpan.textContent = window.HexTrackrConfig.version;
                 }
-                
-                // Fetch version from health endpoint and update badge
-                fetchVersionFromHealthEndpoint(footerContainer);
             })
             .catch(error => {
                 console.warn("Failed to load shared footer:", error);
@@ -46,46 +43,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     }
 });
-
-/**
- * Fetches the current version from /health endpoint and updates the version badge
- * @param {Element} footerContainer - The footer container element
- */
-function fetchVersionFromHealthEndpoint(footerContainer) {
-    // Fetch the current version from health endpoint (always current package.json version)
-    fetch("/health")
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.version) {
-                const version = data.version;
-                
-                // Update the version badge
-                const versionBadge = footerContainer.querySelector("img[alt=\"HexTrackr Version\"]");
-                if (versionBadge) {
-                    // Replace the version in the badge URL
-                    const newSrc = versionBadge.src.replace(/HexTrackr-v[\d.]+/, `HexTrackr-v${version}`);
-                    versionBadge.src = newSrc;
-                    
-                    // Also update the parent link title
-                    const versionLink = versionBadge.closest("a");
-                    if (versionLink) {
-                        versionLink.title = `View Changelog - v${version}`;
-                    }
-                }
-                
-                // Also update fallback footer version if needed
-                const fallbackBadge = footerContainer.querySelector(".fallback-version-badge");
-                if (fallbackBadge) {
-                    const newSrc = fallbackBadge.src.replace(/HexTrackr-v[\d.]+/, `HexTrackr-v${version}`);
-                    fallbackBadge.src = newSrc;
-                }
-            }
-        })
-        .catch(error => {
-            // Silently fail - keep default version if health endpoint fails
-            console.debug("Could not fetch version from health endpoint:", error);
-        });
-}
 
 /**
  * Creates a safe fallback footer using DOM methods with badges
@@ -208,10 +165,7 @@ function createFallbackFooter(container) {
     row.appendChild(col);
     containerXl.appendChild(row);
     footer.appendChild(containerXl);
-    
+
     container.innerHTML = "";
     container.appendChild(footer);
-    
-    // Fetch and update version from health endpoint
-    fetchVersionFromHealthEndpoint(container);
 }
