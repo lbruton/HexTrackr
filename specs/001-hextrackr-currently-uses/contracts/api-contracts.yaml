@@ -1,0 +1,329 @@
+openapi: 3.0.3
+info:
+  title: HexTrackr API - Modularized
+  description: API contracts for modularized HexTrackr backend
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8989/api
+    description: Local development server
+
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy]
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /tickets:
+    get:
+      tags:
+        - Tickets
+      summary: List all tickets
+      operationId: getTickets
+      responses:
+        '200':
+          description: List of tickets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Ticket'
+
+    post:
+      tags:
+        - Tickets
+      summary: Create a new ticket
+      operationId: createTicket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketInput'
+      responses:
+        '200':
+          description: Ticket created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  ticketId:
+                    type: integer
+
+  /tickets/{id}:
+    put:
+      tags:
+        - Tickets
+      summary: Update a ticket
+      operationId: updateTicket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketInput'
+      responses:
+        '200':
+          description: Ticket updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+    delete:
+      tags:
+        - Tickets
+      summary: Delete a ticket
+      operationId: deleteTicket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ticket deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
+  /vulnerabilities:
+    get:
+      tags:
+        - Vulnerabilities
+      summary: List vulnerabilities
+      operationId: getVulnerabilities
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: List of vulnerabilities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Vulnerability'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+
+  /vulnerabilities/stats:
+    get:
+      tags:
+        - Vulnerabilities
+      summary: Get vulnerability statistics
+      operationId: getVulnerabilityStats
+      responses:
+        '200':
+          description: Vulnerability statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      critical:
+                        type: integer
+                      high:
+                        type: integer
+                      medium:
+                        type: integer
+                      low:
+                        type: integer
+                      info:
+                        type: integer
+
+  /vulnerabilities/import:
+    post:
+      tags:
+        - Vulnerabilities
+      summary: Import vulnerabilities from CSV
+      operationId: importVulnerabilities
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                csvFile:
+                  type: string
+                  format: binary
+                importName:
+                  type: string
+      responses:
+        '200':
+          description: Import completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  inserted:
+                    type: integer
+                  updated:
+                    type: integer
+                  errors:
+                    type: integer
+
+components:
+  schemas:
+    Ticket:
+      type: object
+      required:
+        - id
+        - title
+        - status
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [open, in_progress, resolved, closed]
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+        devices:
+          type: array
+          items:
+            type: object
+            properties:
+              hostname:
+                type: string
+              ip_address:
+                type: string
+              location:
+                type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TicketInput:
+      type: object
+      required:
+        - title
+        - status
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [open, in_progress, resolved, closed]
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+        devices:
+          type: array
+          items:
+            type: object
+
+    Vulnerability:
+      type: object
+      required:
+        - id
+        - title
+        - severity
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        cve_id:
+          type: string
+        severity:
+          type: string
+          enum: [info, low, medium, high, critical]
+        cvss_score:
+          type: number
+        hostname:
+          type: string
+        ip_address:
+          type: string
+        port:
+          type: integer
+        protocol:
+          type: string
+        service_name:
+          type: string
+        state:
+          type: string
+        first_seen:
+          type: string
+          format: date-time
+        last_seen:
+          type: string
+          format: date-time
