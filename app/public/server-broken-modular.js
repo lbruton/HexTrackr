@@ -1,0 +1,182 @@
+/**
+ * HexTrackr Express Server - Modular backend application server
+ * Refactored from monolithic 3,800-line server.js to use extracted modules
+ * Handles API endpoints, vulnerability data management, file uploads, and serves the frontend
+ */
+/* eslint-env node */
+/* global __dirname, __filename, require, console, process */
+
+// Core dependencies
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
+const compression = require("compression");
+const rateLimit = require("express-rate-limit");
+const multer = require("multer");
+const http = require("http");
+const socketIo = require("socket.io");
+const sqlite3 = require("sqlite3").verbose();
+
+// Configuration modules
+const { config: dbConfig, getEnvironmentConfig } = require("../config/database");
+const middlewareConfig = require("../config/middleware");
+const { getSocketOptions } = require("../config/websocket");
+
+// Utility modules
+const PathValidator = require("../utils/PathValidator");
+const ProgressTracker = require("../utils/ProgressTracker");
+const helpers = require("../utils/helpers");
+
+// Service modules
+const DatabaseService = require("../services/databaseService");
+
+// Route modules
+// Import controllers that need initialization
+const vulnerabilityController = require("../controllers/vulnerabilityController");
+const ticketController = require("../controllers/ticketController");
+const backupController = require("../controllers/backupController");
+
+// Import route modules
+const vulnerabilityRoutes = require("../routes/vulnerabilities");
+const ticketRoutes = require("../routes/tickets");
+const importRoutes = require("../routes/imports");
+const backupRoutes = require("../routes/backup");
+const docsRoutes = require("../routes/docs");
+
+// Initialize Express app and server
+const app = express();
+const PORT = process.env.PORT || 8080;
+const server = http.createServer(app);
+
+// Initialize Socket.io with configuration
+const io = socketIo(server, getSocketOptions());
+
+// Initialize progress tracker with WebSocket support
+const progressTracker = new ProgressTracker(io);
+
+// Database initialization
+const dbPath = path.join(__dirname, dbConfig.path.relative);
+const db = new sqlite3.Database(dbPath);
+const databaseService = new DatabaseService(dbPath);
+
+// Configure multer for file uploads
+const upload = multer(middlewareConfig.upload);
+
+// Initialize database and controllers
+async function initDb() {
+    await databaseService.initialize();
+
+    // Initialize controllers that have initialize methods
+    vulnerabilityController.initialize(db, progressTracker);
+    ticketController.initialize(db);
+    backupController.initialize(db);
+    // Note: importController and docsController don't have initialize methods
+
+    console.log("✅ Database and controllers initialized successfully");
+}
+
+// Setup WebSocket event handlers
+io.on("connection", (socket) => {
+    console.log("📡 Client connected:", socket.id);
+
+    socket.on("disconnect", () => {
+        console.log("📡 Client disconnected:", socket.id);
+    });
+});
+
+// Apply middleware configuration
+app.use(cors(middlewareConfig.cors));
+app.use("/api/", rateLimit(middlewareConfig.rateLimit));
+app.use(compression());
+app.use(express.json(middlewareConfig.bodyParser.json));
+app.use(express.urlencoded(middlewareConfig.bodyParser.urlencoded));
+
+// Apply security headers
+app.use((req, res, next) => {
+    Object.entries(middlewareConfig.security.headers).forEach(([header, value]) => {
+        res.setHeader(header, value);
+    });
+    next();
+});
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+    res.json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
+// Mount route modules (order matters to avoid conflicts)
+app.use("/api/docs", docsRoutes);
+app.use("/api/backup", backupRoutes);
+app.use("/api/vulnerabilities", vulnerabilityRoutes);
+app.use("/api/imports", importRoutes);
+app.use("/api/tickets", ticketRoutes);
+
+// Legacy simple routes that don't need full extraction
+app.get("/api/sites", (req, res) => {
+    db.all("SELECT DISTINCT hostname FROM vulnerabilities ORDER BY hostname", [], (err, rows) => {
+        if (err) {return res.status(500).json({ error: err.message });}
+        res.json(rows.map(row => ({ name: row.hostname })));
+    });
+});
+
+app.get("/api/locations", (req, res) => {
+    db.all("SELECT DISTINCT ip_address FROM vulnerabilities WHERE ip_address != '' ORDER BY ip_address", [], (err, rows) => {
+        if (err) {return res.status(500).json({ error: err.message });}
+        res.json(rows.map(row => ({ name: row.ip_address })));
+    });
+});
+
+// Static file serving
+app.use("/docs-html", express.static(path.join(__dirname, "docs-html"), {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith(".html")) {
+            res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        }
+    }
+}));
+
+app.use(express.static(path.join(__dirname), {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith(".html")) {
+            res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        }
+    }
+}));
+
+// Default route
+app.get("/", (req, res) => {
+    res.redirect("/vulnerabilities.html");
+});
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+    console.error("Unhandled error:", error);
+    res.status(500).json({
+        success: false,
+        error: "Internal server error",
+        details: process.env.NODE_ENV === "development" ? error.message : undefined
+    });
+});
+
+// Start server with proper initialization order
+async function startServer() {
+    // Initialize database and controllers BEFORE accepting requests
+    await initDb();
+
+    // Now start listening for requests
+    server.listen(PORT, "0.0.0.0", () => {
+        console.log(`🚀 HexTrackr server running on http://localhost:${PORT}`);
+        console.log("📊 Database-powered vulnerability management enabled");
+        console.log("🔌 WebSocket progress tracking enabled");
+        console.log("Available endpoints:");
+        console.log(`  - Tickets: http://localhost:${PORT}/tickets.html`);
+        console.log(`  - Vulnerabilities: http://localhost:${PORT}/vulnerabilities.html`);
+        console.log(`  - API: http://localhost:${PORT}/api/vulnerabilities`);
+    });
+}
+
+// Start the server
+startServer().catch(error => {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+});
