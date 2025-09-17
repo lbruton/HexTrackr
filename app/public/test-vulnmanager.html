@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VulnManager Test</title>
+</head>
+<body>
+    <h1>Testing VulnManager Initialization</h1>
+    <button onclick="testVulnManager()">Test vulnManager</button>
+    <button onclick="testExportData()">Test exportData</button>
+    <div id="output"></div>
+
+    <script>
+        function testVulnManager() {
+            const output = document.getElementById('output');
+            if (typeof vulnManager !== 'undefined') {
+                output.innerHTML += '<p style="color:green">✓ vulnManager is defined</p>';
+                output.innerHTML += '<p>Type: ' + typeof vulnManager + '</p>';
+                output.innerHTML += '<p>Has exportVulnerabilityReport: ' + (typeof vulnManager.exportVulnerabilityReport === 'function') + '</p>';
+            } else {
+                output.innerHTML += '<p style="color:red">✗ vulnManager is NOT defined</p>';
+            }
+
+            if (typeof modernVulnManager !== 'undefined') {
+                output.innerHTML += '<p style="color:green">✓ modernVulnManager is defined</p>';
+            } else {
+                output.innerHTML += '<p style="color:red">✗ modernVulnManager is NOT defined</p>';
+            }
+        }
+
+        function testExportData() {
+            const output = document.getElementById('output');
+            if (typeof exportData !== 'undefined') {
+                output.innerHTML += '<p style="color:green">✓ exportData is defined</p>';
+            } else {
+                output.innerHTML += '<p style="color:red">✗ exportData is NOT defined</p>';
+            }
+
+            if (typeof ticketManager !== 'undefined') {
+                output.innerHTML += '<p style="color:green">✓ ticketManager is defined</p>';
+            } else {
+                output.innerHTML += '<p style="color:red">✗ ticketManager is NOT defined</p>';
+            }
+        }
+
+        // Check on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('Checking globals after load...');
+                console.log('vulnManager:', typeof window.vulnManager);
+                console.log('modernVulnManager:', typeof window.modernVulnManager);
+                console.log('exportData:', typeof window.exportData);
+                console.log('ticketManager:', typeof window.ticketManager);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

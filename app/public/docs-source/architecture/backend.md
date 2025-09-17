@@ -1,15 +1,16 @@
 # Backend Architecture
 
-The backend is a Node.js/Express monolith providing REST endpoints, rollover ingestion, documentation delivery, and SQLite persistence. It serves the static frontend pages (`tickets.html`, `vulnerabilities.html`) and the generated documentation portal (`/docs-html`).
+The backend is a modular Node.js/Express application providing REST endpoints, rollover ingestion, documentation delivery, and SQLite persistence. It serves the static frontend pages (`tickets.html`, `vulnerabilities.html`) and the generated documentation portal (`/docs-html`).
 
 ---
 
 ## Key Characteristics
 
-- **Monolithic File**: `server.js` (~3,800+ lines) - routes, DB init, rollover logic, backups, static serving.
+- **Modular Architecture**: `server.js` (~205 lines) orchestrates modular components across multiple directories.
+- **Separation of Concerns**: Controllers, services, routes, and configuration are cleanly separated.
 - **Unified Delivery**: API + static assets + docs from one process.
 - **Embedded DB**: Single SQLite file (`data/hextrackr.db`). No external service dependency.
-- **Security Utilities**: In-process `PathValidator` for safe file operations + security headers.
+- **Security Utilities**: Extracted `PathValidator` class for safe file operations + security headers.
 
 ---
 
@@ -17,13 +18,24 @@ The backend is a Node.js/Express monolith providing REST endpoints, rollover ing
 
 | Component | Purpose | Location |
 | --------- | ------- | -------- |
-| `server.js` | Main application runtime (all routes + logic) | project root |
-| `scripts/init-database.js` | Bootstrap base schema & indexes (legacy + foundational tables) | `/scripts/` |
-| **ProgressTracker** | WebSocket session management & progress tracking | `server.js` top-level (~ lines 20-220) |
-| **PathValidator** | Security-hardened file operations with traversal protection | `server.js` top-level (~ lines 30-120) |
-| Rollover Pipeline | Sequential import processing & enhanced deduplication | `server.js` (~ lines 700-1900) |
+| `server.js` | Main application runtime (orchestration + initialization) | `/app/public/` |
+| **Controllers** | Business logic with singleton pattern | `/app/controllers/` |
+| **Services** | Data access and business services | `/app/services/` |
+| **Routes** | Express route definitions | `/app/routes/` |
+| **Configuration** | Database, middleware, websocket configs | `/app/config/` |
+| **Utilities** | PathValidator, ProgressTracker, helpers | `/app/utils/` |
+| `init-database.js` | Bootstrap base schema & indexes | `/app/public/scripts/` |
 | Rate Limiting | IP-based request throttling (100 req/15min) | Express middleware |
-| Docs Portal Logic | Dynamic redirect + stats endpoint (`/api/docs/stats`) | `server.js` (~ lines 2680-2790) |
+
+### Module Organization
+
+| Directory | Contents |
+| --------- | -------- |
+| `/app/controllers/` | `vulnerabilityController.js`, `ticketController.js`, `backupController.js`, `importController.js`, `docsController.js` |
+| `/app/services/` | `databaseService.js`, `vulnerabilityService.js`, `vulnerabilityStatsService.js`, `ticketService.js` |
+| `/app/routes/` | `vulnerabilities.js`, `tickets.js`, `backup.js`, `imports.js`, `docs.js` |
+| `/app/config/` | `database.js`, `middleware.js`, `websocket.js` |
+| `/app/utils/` | `PathValidator.js`, `ProgressTracker.js`, `helpers.js` |
 
 ### PathValidator Security Class
 

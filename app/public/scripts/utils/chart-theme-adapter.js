@@ -225,17 +225,17 @@ class ChartThemeAdapter {
       
       const cssVars = {
         // Chart-specific colors
-        chartBackground: computedStyle.getPropertyValue("--chart-background").trim() || 
+        chartBackground: computedStyle.getPropertyValue("--chart-background").trim() ||
                         (theme === "dark" ? "#1e293b" : "#ffffff"),
-        chartGridColor: computedStyle.getPropertyValue("--chart-grid-color").trim() || 
+        chartGridColor: computedStyle.getPropertyValue("--chart-grid-color").trim() ||
                        (theme === "dark" ? "#374151" : "#e5e7eb"),
-        chartTextColor: computedStyle.getPropertyValue("--chart-text-color").trim() || 
+        chartTextColor: computedStyle.getPropertyValue("--chart-text-color").trim() ||
                        (theme === "dark" ? "#9ca3af" : "#6b7280"),
-        chartTitleColor: computedStyle.getPropertyValue("--chart-title-color").trim() || 
+        chartTitleColor: computedStyle.getPropertyValue("--chart-title-color").trim() ||
                         (theme === "dark" ? "#f9fafb" : "#111827"),
-        chartAxisColor: computedStyle.getPropertyValue("--chart-axis-color").trim() || 
+        chartAxisColor: computedStyle.getPropertyValue("--chart-axis-color").trim() ||
                        (theme === "dark" ? "#6b7280" : "#9ca3af"),
-        
+
         // Chart color palette
         chartColor1: computedStyle.getPropertyValue("--chart-color-1").trim() || "#3b82f6",
         chartColor2: computedStyle.getPropertyValue("--chart-color-2").trim() || "#10b981",
@@ -244,7 +244,13 @@ class ChartThemeAdapter {
         chartColor5: computedStyle.getPropertyValue("--chart-color-5").trim() || "#8b5cf6",
         chartColor6: computedStyle.getPropertyValue("--chart-color-6").trim() || "#06b6d4",
         chartColor7: computedStyle.getPropertyValue("--chart-color-7").trim() || "#84cc16",
-        chartColor8: computedStyle.getPropertyValue("--chart-color-8").trim() || "#f97316"
+        chartColor8: computedStyle.getPropertyValue("--chart-color-8").trim() || "#f97316",
+
+        // Vulnerability-specific colors - S002
+        vulnCriticalColor: computedStyle.getPropertyValue("--chart-vuln-critical-color").trim() || "#dc2626",
+        vulnHighColor: computedStyle.getPropertyValue("--chart-vuln-high-color").trim() || "#ea580c",
+        vulnMediumColor: computedStyle.getPropertyValue("--chart-vuln-medium-color").trim() || "#2563eb",
+        vulnLowColor: computedStyle.getPropertyValue("--chart-vuln-low-color").trim() || "#16a34a"
       };
       
       // Restore original theme
@@ -292,13 +298,13 @@ class ChartThemeAdapter {
 
   /**
    * Fallback CSS variables when extraction fails
-   * 
+   *
    * @param {string} theme - Theme name
    * @returns {Object} Fallback CSS variables
    */
   getFallbackCSSVariables(theme) {
     const isDark = theme === "dark";
-    
+
     return {
       chartBackground: isDark ? "#1e293b" : "#ffffff",
       chartGridColor: isDark ? "#374151" : "#e5e7eb",
@@ -312,8 +318,28 @@ class ChartThemeAdapter {
       chartColor5: "#8b5cf6",
       chartColor6: "#06b6d4",
       chartColor7: "#84cc16",
-      chartColor8: "#f97316"
+      chartColor8: "#f97316",
+      // Vulnerability-specific fallback colors - S002
+      vulnCriticalColor: "#dc2626",
+      vulnHighColor: "#ea580c",
+      vulnMediumColor: "#2563eb",
+      vulnLowColor: "#16a34a"
     };
+  }
+
+  /**
+   * Get vulnerability-specific chart colors - S002
+   * @param {string} theme - Theme name ('light' | 'dark')
+   * @returns {Array} Array of vulnerability severity colors [critical, high, medium, low]
+   */
+  getVulnerabilityColors(theme = "light") {
+    const cssVars = this.getCSSVariables(theme);
+    return [
+      cssVars.vulnCriticalColor,
+      cssVars.vulnHighColor,
+      cssVars.vulnMediumColor,
+      cssVars.vulnLowColor
+    ];
   }
 
   /**
@@ -339,13 +365,46 @@ class ChartThemeAdapter {
 
       // Get theme configuration
       const themeConfig = this.getThemeConfig(theme);
-      
-      // Update chart with new theme options
-      await chartInstance.updateOptions(themeConfig, false, true);
-      
+
+      // CRITICAL FIX: Preserve vulnerability-specific colors for vulnerability charts
+      // Check if this is a vulnerability chart by looking for vulnerability series names
+      if (chartInstance.w && chartInstance.w.config && chartInstance.w.config.series) {
+        const seriesNames = chartInstance.w.config.series.map(s => s.name);
+        const isVulnerabilityChart = seriesNames.includes("Critical") &&
+                                   seriesNames.includes("High") &&
+                                   seriesNames.includes("Medium") &&
+                                   seriesNames.includes("Low");
+
+        if (isVulnerabilityChart) {
+          // Get vulnerability-specific colors from CSS variables
+          const cssVars = this.getCSSVariables(theme);
+          const vulnerabilityColors = [
+            cssVars.vulnCriticalColor,
+            cssVars.vulnHighColor,
+            cssVars.vulnMediumColor,
+            cssVars.vulnLowColor
+          ];
+
+          // Create modified theme config that preserves vulnerability colors
+          const vulnerabilityThemeConfig = {
+            ...themeConfig,
+            colors: vulnerabilityColors
+          };
+
+          // Update chart with vulnerability-specific theme options
+          await chartInstance.updateOptions(vulnerabilityThemeConfig, false, true);
+        } else {
+          // Update chart with standard theme options for non-vulnerability charts
+          await chartInstance.updateOptions(themeConfig, false, true);
+        }
+      } else {
+        // Fallback: update with standard theme options
+        await chartInstance.updateOptions(themeConfig, false, true);
+      }
+
       // Update current theme
       this.currentTheme = theme;
-      
+
       return true;
     } catch (error) {
       console.error(`Error updating chart theme to ${theme}:`, error);
