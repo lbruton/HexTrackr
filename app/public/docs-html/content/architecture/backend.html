@@ -1,14 +1,15 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Backend Architecture</h1>
-<p>The backend is a Node.js/Express monolith providing REST endpoints, rollover ingestion, documentation delivery, and SQLite persistence. It serves the static frontend pages (<code>tickets.html</code>, <code>vulnerabilities.html</code>) and the generated documentation portal (<code>/docs-html</code>).</p>
+<p>The backend is a modular Node.js/Express application providing REST endpoints, rollover ingestion, documentation delivery, and SQLite persistence. It serves the static frontend pages (<code>tickets.html</code>, <code>vulnerabilities.html</code>) and the generated documentation portal (<code>/docs-html</code>).</p>
 <hr>
 <h2>Key Characteristics</h2>
 <ul>
-<li><strong>Monolithic File</strong>: <code>server.js</code> (≈1,700+ lines) – routes, DB init, rollover logic, backups, static serving.</li>
+<li><strong>Modular Architecture</strong>: <code>server.js</code> (~205 lines) orchestrates modular components across multiple directories.</li>
+<li><strong>Separation of Concerns</strong>: Controllers, services, routes, and configuration are cleanly separated.</li>
 <li><strong>Unified Delivery</strong>: API + static assets + docs from one process.</li>
 <li><strong>Embedded DB</strong>: Single SQLite file (<code>data/hextrackr.db</code>). No external service dependency.</li>
-<li><strong>Security Utilities</strong>: In‑process <code>PathValidator</code> for safe file operations + security headers.</li>
+<li><strong>Security Utilities</strong>: Extracted <code>PathValidator</code> class for safe file operations + security headers.</li>
 </ul>
 <hr>
 <h2>Core Components</h2>
@@ -22,38 +23,72 @@
 </thead>
 <tbody><tr>
 <td><code>server.js</code></td>
-<td>Main application runtime (all routes + logic)</td>
-<td>Root level</td>
+<td>Main application runtime (orchestration + initialization)</td>
+<td><code>/app/public/</code></td>
 </tr>
 <tr>
-<td><code>scripts/init-database.js</code></td>
-<td>Bootstrap base schema &amp; indexes (legacy + foundational tables)</td>
-<td><code>/scripts/</code></td>
+<td><strong>Controllers</strong></td>
+<td>Business logic with singleton pattern</td>
+<td><code>/app/controllers/</code></td>
 </tr>
 <tr>
-<td><strong>ProgressTracker</strong></td>
-<td>WebSocket session management &amp; progress tracking</td>
-<td><code>server.js:82-200</code></td>
+<td><strong>Services</strong></td>
+<td>Data access and business services</td>
+<td><code>/app/services/</code></td>
 </tr>
 <tr>
-<td><strong>PathValidator</strong></td>
-<td>Security-hardened file operations with traversal protection</td>
-<td><code>server.js:22-79</code></td>
+<td><strong>Routes</strong></td>
+<td>Express route definitions</td>
+<td><code>/app/routes/</code></td>
 </tr>
 <tr>
-<td>Rollover Functions</td>
-<td>Sequential import processing &amp; enhanced deduplication</td>
-<td><code>server.js:500-800</code></td>
+<td><strong>Configuration</strong></td>
+<td>Database, middleware, websocket configs</td>
+<td><code>/app/config/</code></td>
+</tr>
+<tr>
+<td><strong>Utilities</strong></td>
+<td>PathValidator, ProgressTracker, helpers</td>
+<td><code>/app/utils/</code></td>
+</tr>
+<tr>
+<td><code>init-database.js</code></td>
+<td>Bootstrap base schema &amp; indexes</td>
+<td><code>/app/public/scripts/</code></td>
 </tr>
 <tr>
 <td>Rate Limiting</td>
 <td>IP-based request throttling (100 req/15min)</td>
 <td>Express middleware</td>
 </tr>
+</tbody></table>
+<h3>Module Organization</h3>
+<table>
+<thead>
 <tr>
-<td>Docs Portal Logic</td>
-<td>Dynamic redirect + stats endpoint (<code>/api/docs/stats</code>)</td>
-<td><code>server.js:1200+</code></td>
+<th>Directory</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/app/controllers/</code></td>
+<td><code>vulnerabilityController.js</code>, <code>ticketController.js</code>, <code>backupController.js</code>, <code>importController.js</code>, <code>docsController.js</code></td>
+</tr>
+<tr>
+<td><code>/app/services/</code></td>
+<td><code>databaseService.js</code>, <code>vulnerabilityService.js</code>, <code>vulnerabilityStatsService.js</code>, <code>ticketService.js</code></td>
+</tr>
+<tr>
+<td><code>/app/routes/</code></td>
+<td><code>vulnerabilities.js</code>, <code>tickets.js</code>, <code>backup.js</code>, <code>imports.js</code>, <code>docs.js</code></td>
+</tr>
+<tr>
+<td><code>/app/config/</code></td>
+<td><code>database.js</code>, <code>middleware.js</code>, <code>websocket.js</code></td>
+</tr>
+<tr>
+<td><code>/app/utils/</code></td>
+<td><code>PathValidator.js</code>, <code>ProgressTracker.js</code>, <code>helpers.js</code></td>
 </tr>
 </tbody></table>
 <h3>PathValidator Security Class</h3>
@@ -108,7 +143,7 @@
 </tr>
 <tr>
 <td>Uploads</td>
-<td><code>multer</code> (CSV import; 100MB cap)</td>
+<td><code>multer</code> (CSV import; 100 MB cap)</td>
 </tr>
 <tr>
 <td>Security Headers</td>
@@ -129,14 +164,14 @@
 <p>See: <a href="#architecture/data-model">Data Model</a> for exhaustive schema &amp; index inventory.</p>
 <hr>
 <h2>Vulnerability Rollover Workflow</h2>
-<p>Purpose: Maintain real‑time deduplicated active set + full historical timeline + fast daily aggregates.</p>
+<p>Purpose: Maintain real-time deduplicated active set + full historical timeline + fast daily aggregates.</p>
 <h3>CSV Import (Rollover Path)</h3>
 <div class="mermaid">sequenceDiagram
     participant User
     participant API as server.js
     participant DB as SQLite
 
-    User-&gt;&gt;API: POST /api/vulnerabilities/import (multipart/form-data + scanDate)
+    User-&gt;&gt;API: POST /api/vulnerabilities/import (multipart/form-data + optional scanDate)
     API-&gt;&gt;API: Parse CSV (PapaParse, filter empty rows)
     API-&gt;&gt;DB: INSERT vulnerability_imports
     API-&gt;&gt;DB: UPDATE vulnerabilities_current (mark potentially stale)
@@ -147,7 +182,10 @@
     end
     API-&gt;&gt;DB: DELETE stale rows (not seen in this scan)
     API-&gt;&gt;DB: INSERT OR REPLACE vulnerability_daily_totals
-    API--&gt;&gt;User: { importId, insertCount, updateCount, removedStale, scanDate }</div><h3>Enhanced Deduplication System</h3>
+    API--&gt;&gt;User: { importId, insertCount, updateCount, removedStale, scanDate, performanceMetrics }</div><blockquote>
+<p><strong>Staging importer</strong>: <code>POST /api/vulnerabilities/import-staging</code> follows the same steps but first bulk loads data into <code>vulnerability_staging</code> and streams <code>ProgressTracker</code> events (<code>progress-update</code>, <code>progress-complete</code>, <code>progress-error</code>).</p>
+</blockquote>
+<h3>Enhanced Deduplication System</h3>
 <p>HexTrackr implements a sophisticated 4-tier unique key generation strategy:</p>
 <p><strong>Tier 1: Asset ID + Plugin ID</strong> (Highest Reliability)</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">if</span> (mapped.<span class="hljs-property">assetId</span> &amp;&amp; mapped.<span class="hljs-property">pluginId</span>) {
@@ -174,7 +212,7 @@
 </thead>
 <tbody><tr>
 <td>Row duplication in batch</td>
-<td>In‑memory <code>Set</code> of processed unique_keys</td>
+<td>In-memory <code>Set</code> of processed unique_keys</td>
 </tr>
 <tr>
 <td>Race conditions</td>
@@ -224,7 +262,7 @@
 </tr>
 <tr>
 <td>Vulnerability Import</td>
-<td><code>POST /api/vulnerabilities/import</code> (rollover), <code>POST /api/import/vulnerabilities</code> (legacy)</td>
+<td><code>POST /api/vulnerabilities/import</code> (rollover), <code>POST /api/vulnerabilities/import-staging</code> (staged), <code>POST /api/import/vulnerabilities</code> (JSON)</td>
 </tr>
 <tr>
 <td>Tickets</td>

@@ -1,460 +1,150 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>WebSocket Reference</h1>
-<p>Complete reference for HexTrackr&#39;s real-time WebSocket communication system, including session management, event types, and client integration patterns.</p>
+<p>This reference complements the <a href="#api-reference/websocket-api">WebSocket API</a> by documenting the low-level classes and events used inside HexTrackr. The implementation lives in <code>server.js</code> (backend) and <code>app/public/scripts/shared/websocket-client.js</code> (frontend).</p>
 <hr>
-<h2>Connection Overview</h2>
-<p><strong>Server</strong>: <code>ws://localhost:8988</code><br><strong>Protocol</strong>: Socket.io v4+<br><strong>Transport</strong>: WebSocket with polling fallback<br><strong>Session Management</strong>: UUID-based with automatic cleanup<br><strong>Throttling</strong>: 100ms minimum interval between progress events</p>
-<hr>
-<h2>Server Architecture (ProgressTracker)</h2>
-<h3>Class Definition</h3>
-<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ProgressTracker</span> {
-    <span class="hljs-title function_">constructor</span>(<span class="hljs-params">io</span>) {
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">io</span> = io;                           <span class="hljs-comment">// Socket.io server instance</span>
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">sessions</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();              <span class="hljs-comment">// sessionId -&gt; session data</span>
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">eventThrottle</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();         <span class="hljs-comment">// sessionId -&gt; lastEmitTime</span>
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">THROTTLE_INTERVAL</span> = <span class="hljs-number">100</span>;          <span class="hljs-comment">// ms between progress events</span>
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">SESSION_CLEANUP_INTERVAL</span> = <span class="hljs-number">30</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>; <span class="hljs-comment">// 30 minutes</span>
-    }
-}</code></pre><h3>Session Data Structure</h3>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> session = {
-    <span class="hljs-attr">id</span>: <span class="hljs-string">&quot;uuid-v4-string&quot;</span>,
-    <span class="hljs-attr">progress</span>: <span class="hljs-number">0.0</span>,                    <span class="hljs-comment">// 0.0 to 1.0</span>
-    <span class="hljs-attr">lastUpdate</span>: <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>(),           <span class="hljs-comment">// timestamp</span>
-    <span class="hljs-attr">metadata</span>: {
-        <span class="hljs-attr">operation</span>: <span class="hljs-string">&quot;vulnerability_import&quot;</span>,
-        <span class="hljs-attr">filename</span>: <span class="hljs-string">&quot;scan_data.csv&quot;</span>,
-        <span class="hljs-attr">totalRows</span>: <span class="hljs-number">1500</span>,
-        <span class="hljs-attr">processedRows</span>: <span class="hljs-number">750</span>,
-        <span class="hljs-attr">startTime</span>: <span class="hljs-string">&quot;2025-01-12T10:30:00Z&quot;</span>,
-        <span class="hljs-attr">estimatedCompletion</span>: <span class="hljs-string">&quot;2025-01-12T10:35:00Z&quot;</span>
-    },
-    <span class="hljs-attr">status</span>: <span class="hljs-string">&quot;processing&quot;</span>,             <span class="hljs-comment">// processing, completed, error, cancelled</span>
-    <span class="hljs-attr">result</span>: <span class="hljs-literal">null</span>                      <span class="hljs-comment">// final result when completed</span>
-};</code></pre><hr>
-<h2>Server-Side API</h2>
-<h3>Session Management</h3>
-<h4>createSession(metadata?)</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">createSession</span>(metadata = {})</code></pre><p><strong>Purpose</strong>: Create new progress tracking session<br><strong>Parameters</strong>: <code>metadata</code> - Optional session metadata object<br><strong>Returns</strong>: Session UUID string<br><strong>Side Effects</strong>: Emits <code>session_created</code> event to all clients</p>
-<h4>createSessionWithId(sessionId, metadata?)</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">createSessionWithId</span>(sessionId, metadata = {})</code></pre><p><strong>Purpose</strong>: Create session with specific ID (for deterministic testing)<br><strong>Parameters</strong>: <code>sessionId</code> - Specific UUID, <code>metadata</code> - Session metadata<br><strong>Returns</strong>: Session object</p>
-<h4>updateProgress(sessionId, progress, metadata?)</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">updateProgress</span>(sessionId, progress, metadata = {})</code></pre><p><strong>Purpose</strong>: Update session progress with throttling<br><strong>Parameters</strong>:</p>
-<ul>
-<li><code>sessionId</code> - Session UUID</li>
-<li><code>progress</code> - Progress value (0.0 to 1.0)</li>
-<li><code>metadata</code> - Additional progress metadata<br><strong>Throttling</strong>: Enforces 100ms minimum interval between events<br><strong>Side Effects</strong>: Emits <code>import_progress</code> event if not throttled</li>
+<h2>ProgressTracker (server.js)</h2>
+<p>The <code>ProgressTracker</code> class encapsulates session lifecycle management for long-running operations (CSV imports, backups, restores).</p>
+<h3>Constructor</h3>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> tracker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ProgressTracker</span>(io);</code></pre><ul>
+<li><code>io</code>: Socket.io server instance.</li>
+<li>Initialises throttling (<code>THROTTLE_INTERVAL = 100 ms</code>) and a hourly cleanup timer.</li>
 </ul>
-<h4>completeSession(sessionId, result?)</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">completeSession</span>(sessionId, result = {})</code></pre><p><strong>Purpose</strong>: Mark session as completed<br><strong>Parameters</strong>: <code>sessionId</code> - Session UUID, <code>result</code> - Final result data<br><strong>Side Effects</strong>: Emits <code>import_complete</code> event, schedules cleanup</p>
-<h4>errorSession(sessionId, error)</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">errorSession</span>(sessionId, error)</code></pre><p><strong>Purpose</strong>: Mark session as failed<br><strong>Parameters</strong>: <code>sessionId</code> - Session UUID, <code>error</code> - Error details<br><strong>Side Effects</strong>: Emits <code>import_error</code> event, schedules cleanup</p>
-<h4>cancelSession(sessionId)</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">cancelSession</span>(sessionId, reason?)</code></pre><p><strong>Purpose</strong>: Cancel active session<br><strong>Parameters</strong>: <code>sessionId</code> - Session UUID, <code>reason</code> - Optional cancellation reason<br><strong>Side Effects</strong>: Emits <code>import_cancelled</code> event, immediate cleanup</p>
-<h3>Cleanup Operations</h3>
-<h4>cleanupStaleSessions()</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">cleanupStaleSessions</span>()</code></pre><p><strong>Purpose</strong>: Remove sessions older than cleanup interval<br><strong>Frequency</strong>: Automatic every 30 minutes<br><strong>Criteria</strong>: Sessions with lastUpdate &gt; 30 minutes ago</p>
-<h4>cleanup(sessionId)</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">cleanup</span>(sessionId)</code></pre><p><strong>Purpose</strong>: Remove specific session and its throttle data<br><strong>Parameters</strong>: <code>sessionId</code> - Session UUID to remove</p>
-<hr>
-<h2>Event Types</h2>
-<h3>1. session_created</h3>
-<p><strong>Trigger</strong>: New session creation<br><strong>Payload</strong>:</p>
-<pre><code class="language-javascript">{
-    <span class="hljs-attr">sessionId</span>: <span class="hljs-string">&quot;uuid-string&quot;</span>,
-    <span class="hljs-attr">metadata</span>: {
-        <span class="hljs-attr">operation</span>: <span class="hljs-string">&quot;vulnerability_import&quot;</span>,
-        <span class="hljs-attr">filename</span>: <span class="hljs-string">&quot;data.csv&quot;</span>,
-        <span class="hljs-comment">// ... other metadata</span>
-    },
-    <span class="hljs-attr">timestamp</span>: <span class="hljs-string">&quot;2025-01-12T10:30:00.123Z&quot;</span>
-}</code></pre><h3>2. import_progress</h3>
-<p><strong>Trigger</strong>: Progress updates (throttled to 100ms intervals)<br><strong>Payload</strong>:</p>
-<pre><code class="language-javascript">{
-    <span class="hljs-attr">sessionId</span>: <span class="hljs-string">&quot;uuid-string&quot;</span>,
-    <span class="hljs-attr">operation</span>: <span class="hljs-string">&quot;vulnerability_import&quot;</span>,
-    <span class="hljs-attr">progress</span>: <span class="hljs-number">0.65</span>,                    <span class="hljs-comment">// 0.0 to 1.0</span>
-    <span class="hljs-attr">current_step</span>: <span class="hljs-string">&quot;Processing CSV data&quot;</span>,
-    <span class="hljs-attr">processed_rows</span>: <span class="hljs-number">975</span>,
-    <span class="hljs-attr">total_rows</span>: <span class="hljs-number">1500</span>,
-    <span class="hljs-attr">eta_seconds</span>: <span class="hljs-number">45</span>,
-    <span class="hljs-attr">status</span>: <span class="hljs-string">&quot;processing&quot;</span>,
-    <span class="hljs-attr">metadata</span>: {
-        <span class="hljs-attr">filename</span>: <span class="hljs-string">&quot;vulnerability_scan.csv&quot;</span>,
-        <span class="hljs-attr">vendor</span>: <span class="hljs-string">&quot;tenable&quot;</span>,
-        <span class="hljs-attr">scan_date</span>: <span class="hljs-string">&quot;2025-01-12&quot;</span>,
-        <span class="hljs-attr">processing_speed</span>: <span class="hljs-string">&quot;65 rows/sec&quot;</span>
-    },
-    <span class="hljs-attr">timestamp</span>: <span class="hljs-string">&quot;2025-01-12T10:32:15.456Z&quot;</span>
-}</code></pre><h3>3. import_complete</h3>
-<p><strong>Trigger</strong>: Session completion<br><strong>Payload</strong>:</p>
-<pre><code class="language-javascript">{
-    <span class="hljs-attr">sessionId</span>: <span class="hljs-string">&quot;uuid-string&quot;</span>,
-    <span class="hljs-attr">operation</span>: <span class="hljs-string">&quot;vulnerability_import&quot;</span>,
-    <span class="hljs-attr">success</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attr">import_id</span>: <span class="hljs-number">47</span>,
-    <span class="hljs-attr">total_processed</span>: <span class="hljs-number">1500</span>,
-    <span class="hljs-attr">processing_time_ms</span>: <span class="hljs-number">4250</span>,
-    <span class="hljs-attr">summary</span>: {
-        <span class="hljs-attr">new_vulnerabilities</span>: <span class="hljs-number">78</span>,
-        <span class="hljs-attr">updated_vulnerabilities</span>: <span class="hljs-number">234</span>,
-        <span class="hljs-attr">resolved_vulnerabilities</span>: <span class="hljs-number">45</span>,
-        <span class="hljs-attr">skipped_duplicates</span>: <span class="hljs-number">12</span>,
-        <span class="hljs-attr">validation_errors</span>: <span class="hljs-number">0</span>
-    },
-    <span class="hljs-attr">performance</span>: {
-        <span class="hljs-attr">rows_per_second</span>: <span class="hljs-number">353</span>,
-        <span class="hljs-attr">peak_memory_mb</span>: <span class="hljs-number">156</span>,
-        <span class="hljs-attr">database_operations</span>: <span class="hljs-number">2847</span>
-    },
-    <span class="hljs-attr">timestamp</span>: <span class="hljs-string">&quot;2025-01-12T10:34:15.789Z&quot;</span>
-}</code></pre><h3>4. import_error</h3>
-<p><strong>Trigger</strong>: Session failure or critical error<br><strong>Payload</strong>:</p>
-<pre><code class="language-javascript">{
-    <span class="hljs-attr">sessionId</span>: <span class="hljs-string">&quot;uuid-string&quot;</span>,
-    <span class="hljs-attr">operation</span>: <span class="hljs-string">&quot;vulnerability_import&quot;</span>,
-    <span class="hljs-attr">success</span>: <span class="hljs-literal">false</span>,
-    <span class="hljs-attr">error</span>: {
-        <span class="hljs-attr">code</span>: <span class="hljs-string">&quot;CSV_PARSING_ERROR&quot;</span>,
-        <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Invalid CSV format detected&quot;</span>,
-        <span class="hljs-attr">details</span>: {
-            <span class="hljs-attr">line_number</span>: <span class="hljs-number">157</span>,
-            <span class="hljs-attr">column</span>: <span class="hljs-string">&quot;severity&quot;</span>,
-            <span class="hljs-attr">received_value</span>: <span class="hljs-string">&quot;SUPER_CRITICAL&quot;</span>,
-            <span class="hljs-attr">expected_values</span>: [<span class="hljs-string">&quot;Critical&quot;</span>, <span class="hljs-string">&quot;High&quot;</span>, <span class="hljs-string">&quot;Medium&quot;</span>, <span class="hljs-string">&quot;Low&quot;</span>]
-        },
-        <span class="hljs-attr">recovery_suggestions</span>: [
-            <span class="hljs-string">&quot;Check CSV format against template&quot;</span>,
-            <span class="hljs-string">&quot;Validate severity values&quot;</span>,
-            <span class="hljs-string">&quot;Try importing smaller batches&quot;</span>
-        ]
-    },
-    <span class="hljs-attr">partial_results</span>: {
-        <span class="hljs-attr">processed_rows</span>: <span class="hljs-number">156</span>,
-        <span class="hljs-attr">successful_imports</span>: <span class="hljs-number">145</span>,
-        <span class="hljs-attr">failed_rows</span>: <span class="hljs-number">11</span>
-    },
-    <span class="hljs-attr">timestamp</span>: <span class="hljs-string">&quot;2025-01-12T10:32:45.321Z&quot;</span>
-}</code></pre><h3>5. import_cancelled</h3>
-<p><strong>Trigger</strong>: Session cancellation (user or system initiated)<br><strong>Payload</strong>:</p>
-<pre><code class="language-javascript">{
-    <span class="hljs-attr">sessionId</span>: <span class="hljs-string">&quot;uuid-string&quot;</span>,
-    <span class="hljs-attr">operation</span>: <span class="hljs-string">&quot;vulnerability_import&quot;</span>,
-    <span class="hljs-attr">cancelled</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attr">reason</span>: <span class="hljs-string">&quot;user_requested&quot;</span>,
-    <span class="hljs-attr">partial_results</span>: {
-        <span class="hljs-attr">processed_rows</span>: <span class="hljs-number">523</span>,
-        <span class="hljs-attr">completion_percentage</span>: <span class="hljs-number">0.349</span>
-    },
-    <span class="hljs-attr">cleanup_performed</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attr">timestamp</span>: <span class="hljs-string">&quot;2025-01-12T10:33:30.654Z&quot;</span>
-}</code></pre><h3>6. data_updated</h3>
-<p><strong>Trigger</strong>: Significant data changes that affect multiple clients<br><strong>Payload</strong>:</p>
-<pre><code class="language-javascript">{
-    <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;vulnerabilities&quot;</span>,
-    <span class="hljs-attr">action</span>: <span class="hljs-string">&quot;bulk_update&quot;</span>,           <span class="hljs-comment">// created, updated, deleted, bulk_update</span>
-    <span class="hljs-attr">count</span>: <span class="hljs-number">78</span>,
-    <span class="hljs-attr">affected_entities</span>: {
-        <span class="hljs-attr">hosts</span>: [<span class="hljs-string">&quot;web-server-01&quot;</span>, <span class="hljs-string">&quot;db-server-02&quot;</span>, <span class="hljs-string">&quot;app-server-03&quot;</span>],
-        <span class="hljs-attr">severity_changes</span>: {
-            <span class="hljs-attr">new_critical</span>: <span class="hljs-number">5</span>,
-            <span class="hljs-attr">resolved_high</span>: <span class="hljs-number">12</span>
-        }
-    },
-    <span class="hljs-attr">source</span>: {
-        <span class="hljs-attr">import_id</span>: <span class="hljs-number">47</span>,
-        <span class="hljs-attr">operation</span>: <span class="hljs-string">&quot;csv_import&quot;</span>
-    },
-    <span class="hljs-attr">timestamp</span>: <span class="hljs-string">&quot;2025-01-12T10:34:16.000Z&quot;</span>
-}</code></pre><h3>7. system_alert</h3>
-<p><strong>Trigger</strong>: System-wide notifications and alerts<br><strong>Payload</strong>:</p>
-<pre><code class="language-javascript">{
-    <span class="hljs-attr">level</span>: <span class="hljs-string">&quot;warning&quot;</span>,               <span class="hljs-comment">// info, warning, error, critical</span>
-    <span class="hljs-attr">category</span>: <span class="hljs-string">&quot;maintenance&quot;</span>,        <span class="hljs-comment">// maintenance, security, performance, system</span>
-    <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Database backup recommended - last backup was 7 days ago&quot;</span>,
-    <span class="hljs-attr">action_required</span>: <span class="hljs-literal">false</span>,
-    <span class="hljs-attr">action_details</span>: {
-        <span class="hljs-attr">description</span>: <span class="hljs-string">&quot;Run backup operation&quot;</span>,
-        <span class="hljs-attr">endpoint</span>: <span class="hljs-string">&quot;/api/backup/all&quot;</span>,
-        <span class="hljs-attr">estimated_time</span>: <span class="hljs-string">&quot;2-3 minutes&quot;</span>
-    },
-    <span class="hljs-attr">auto_dismiss</span>: <span class="hljs-number">30000</span>,           <span class="hljs-comment">// auto-dismiss after 30 seconds</span>
-    <span class="hljs-attr">priority</span>: <span class="hljs-string">&quot;medium&quot;</span>,
-    <span class="hljs-attr">timestamp</span>: <span class="hljs-string">&quot;2025-01-12T10:35:00.000Z&quot;</span>
-}</code></pre><h3>8. heartbeat</h3>
-<p><strong>Trigger</strong>: Regular connection health checks<br><strong>Frequency</strong>: Every 30 seconds<br><strong>Payload</strong>:</p>
-<pre><code class="language-javascript">{
-    <span class="hljs-attr">server_time</span>: <span class="hljs-string">&quot;2025-01-12T10:35:00.000Z&quot;</span>,
-    <span class="hljs-attr">active_sessions</span>: <span class="hljs-number">3</span>,
-    <span class="hljs-attr">server_uptime</span>: <span class="hljs-string">&quot;2d 4h 15m 32s&quot;</span>,
-    <span class="hljs-attr">memory_usage</span>: {
-        <span class="hljs-attr">used_mb</span>: <span class="hljs-number">156</span>,
-        <span class="hljs-attr">available_mb</span>: <span class="hljs-number">356</span>
-    }
-}</code></pre><hr>
-<h2>Client-Side Integration</h2>
-<h3>WebSocketClient Class</h3>
-<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">WebSocketClient</span> {
-    <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">socket</span> = <span class="hljs-literal">null</span>;
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">isConnected</span> = <span class="hljs-literal">false</span>;
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">reconnectAttempts</span> = <span class="hljs-number">0</span>;
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">maxReconnectAttempts</span> = <span class="hljs-number">5</span>;
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">reconnectDelay</span> = <span class="hljs-number">1000</span>;
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">heartbeatInterval</span> = <span class="hljs-literal">null</span>;
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">eventCallbacks</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
-
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">config</span> = {
-            <span class="hljs-attr">host</span>: <span class="hljs-variable language_">window</span>.<span class="hljs-property">location</span>.<span class="hljs-property">hostname</span> || <span class="hljs-string">&quot;localhost&quot;</span>,
-            <span class="hljs-attr">port</span>: <span class="hljs-string">&quot;8988&quot;</span>,
-            <span class="hljs-attr">autoReconnect</span>: <span class="hljs-literal">true</span>,
-            <span class="hljs-attr">heartbeatInterval</span>: <span class="hljs-number">30000</span>,
-            <span class="hljs-attr">progressThrottle</span>: <span class="hljs-number">100</span>
-        };
-    }
-}</code></pre><h3>Connection Management</h3>
-<h4>connect()</h4>
-<pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-title function_">connect</span>(): <span class="hljs-title class_">Promise</span>&lt;boolean&gt;</code></pre><p><strong>Purpose</strong>: Establish WebSocket connection with retry logic<br><strong>Returns</strong>: Promise resolving to connection success<br><strong>Features</strong>:</p>
-<ul>
-<li>10-second connection timeout</li>
-<li>Transport fallback (WebSocket → polling)</li>
-<li>Automatic event listener setup</li>
-<li>Error handling and recovery</li>
+<h3>createSession(metadata?)</h3>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> sessionId = tracker.<span class="hljs-title function_">createSession</span>({ <span class="hljs-attr">operation</span>: <span class="hljs-string">&#x27;csv-import&#x27;</span> });</code></pre><ul>
+<li>Generates a UUID v4 and stores <code>{ progress, status, metadata }</code>.</li>
+<li>Returns the <code>sessionId</code> string.</li>
+<li>Emits nothing immediately-the client joins via <code>join-progress</code> to receive state.</li>
 </ul>
-<p><strong>Example</strong>:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> wsClient = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WebSocketClient</span>();
-<span class="hljs-keyword">try</span> {
-    <span class="hljs-keyword">await</span> wsClient.<span class="hljs-title function_">connect</span>();
-    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;WebSocket connected successfully&#x27;</span>);
-} <span class="hljs-keyword">catch</span> (error) {
-    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Connection failed:&#x27;</span>, error);
-}</code></pre><h4>disconnect()</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">disconnect</span>(): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Gracefully close WebSocket connection<br><strong>Features</strong>: Cleanup event listeners and stop heartbeat</p>
-<h3>Event Subscription</h3>
-<h4>subscribe(eventType, callback)</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">subscribe</span>(<span class="hljs-attr">eventType</span>: string, <span class="hljs-attr">callback</span>: <span class="hljs-title class_">Function</span>): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Subscribe to specific event types<br><strong>Parameters</strong>: <code>eventType</code> - Event name, <code>callback</code> - Handler function</p>
-<p><strong>Example</strong>:</p>
-<pre><code class="language-javascript">wsClient.<span class="hljs-title function_">subscribe</span>(<span class="hljs-string">&#x27;import_progress&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
-    <span class="hljs-title function_">updateProgressBar</span>(data.<span class="hljs-property">progress</span>);
-    <span class="hljs-title function_">updateStatus</span>(data.<span class="hljs-property">current_step</span>);
-    <span class="hljs-title function_">updateETA</span>(data.<span class="hljs-property">eta_seconds</span>);
-});</code></pre><h4>unsubscribe(eventType, callback?)</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">unsubscribe</span>(<span class="hljs-attr">eventType</span>: string, callback?: <span class="hljs-title class_">Function</span>): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Remove event subscriptions<br><strong>Parameters</strong>: <code>eventType</code> - Event name, <code>callback</code> - Specific handler (optional)</p>
-<h3>Progress Tracking Integration</h3>
-<h4>trackImportProgress(sessionId)</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">trackImportProgress</span>(<span class="hljs-attr">sessionId</span>: string): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Set up progress tracking for specific session<br><strong>Features</strong>: Automatic UI updates and error handling</p>
-<p><strong>Example</strong>:</p>
-<pre><code class="language-javascript"><span class="hljs-comment">// Start import and track progress</span>
-<span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/vulnerabilities/import&#x27;</span>, {
-    <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;POST&#x27;</span>,
-    <span class="hljs-attr">body</span>: formData
-});
-
-<span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();
-<span class="hljs-keyword">if</span> (result.<span class="hljs-property">sessionId</span>) {
-    wsClient.<span class="hljs-title function_">trackImportProgress</span>(result.<span class="hljs-property">sessionId</span>);
-}</code></pre><h3>Reconnection Logic</h3>
-<h4>attemptReconnection()</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">attemptReconnection</span>(): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Handle automatic reconnection with exponential backoff<br><strong>Strategy</strong>:</p>
-<ol>
-<li>Wait <code>reconnectDelay</code> milliseconds</li>
-<li>Attempt connection</li>
-<li>On failure, double delay (max 30 seconds)</li>
-<li>Retry up to <code>maxReconnectAttempts</code> times</li>
-</ol>
-<h3>Client-Side Throttling</h3>
-<h4>handleProgressUpdate(data)</h4>
-<pre><code class="language-javascript"><span class="hljs-title function_">handleProgressUpdate</span>(<span class="hljs-attr">data</span>: <span class="hljs-title class_">ProgressData</span>): <span class="hljs-keyword">void</span></code></pre><p><strong>Purpose</strong>: Additional client-side throttling for UI updates<br><strong>Features</strong>: Prevents UI overload during rapid progress updates</p>
+<h3>createSessionWithId(sessionId, metadata?)</h3>
+<pre><code class="language-javascript">tracker.<span class="hljs-title function_">createSessionWithId</span>(frontendId, { <span class="hljs-attr">operation</span>: <span class="hljs-string">&#x27;csv-import&#x27;</span> });</code></pre><ul>
+<li>Uses a caller-supplied identifier (the staging importer forwards the ID returned by the frontend).</li>
+<li>Overwrites any existing state with the same ID.</li>
+</ul>
+<h3>updateProgress(sessionId, progress, message?, metadata?)</h3>
+<pre><code class="language-javascript">tracker.<span class="hljs-title function_">updateProgress</span>(sessionId, <span class="hljs-number">60</span>, <span class="hljs-string">&#x27;Processing batch 3/10&#x27;</span>, { <span class="hljs-attr">currentStep</span>: <span class="hljs-number">3</span> });</code></pre><ul>
+<li>Clamps <code>progress</code> to the <code>0-100</code> range.</li>
+<li>Merges <code>metadata</code> into the stored session data.</li>
+<li>Emits a throttled <code>progress-update</code> event to room <code>progress-{sessionId}</code>.</li>
+</ul>
+<h3>completeSession(sessionId, message?, metadata?)</h3>
+<pre><code class="language-javascript">tracker.<span class="hljs-title function_">completeSession</span>(sessionId, <span class="hljs-string">&#x27;Import completed successfully&#x27;</span>);</code></pre><ul>
+<li>Sets status to <code>completed</code> and progress to <code>100</code>.</li>
+<li>Emits <code>progress-complete</code> (no throttling) to the room.</li>
+<li>Schedules cleanup five seconds later.</li>
+</ul>
+<h3>errorSession(sessionId, message, details?)</h3>
+<pre><code class="language-javascript">tracker.<span class="hljs-title function_">errorSession</span>(sessionId, <span class="hljs-string">&#x27;Failed to prepare for batch processing&#x27;</span>, { <span class="hljs-attr">code</span>: <span class="hljs-string">&#x27;SQLITE_BUSY&#x27;</span> });</code></pre><ul>
+<li>Sets status to <code>error</code> and stores the supplied details.</li>
+<li>Emits <code>progress-error</code> immediately.</li>
+<li>Schedules cleanup ten seconds later.</li>
+</ul>
+<h3>getSession(sessionId)</h3>
+<p>Returns the current session object or <code>null</code> if not found. Used when new connections join a room to emit <code>progress-status</code>.</p>
+<h3>cleanupStaleSessions()</h3>
+<p>Runs hourly to remove sessions where <code>lastUpdate</code> is older than one hour.</p>
 <hr>
-<h2>Integration Patterns</h2>
-<h3>CSV Import with Progress Tracking</h3>
-<pre><code class="language-javascript"><span class="hljs-comment">// Complete CSV import workflow with WebSocket progress</span>
-<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">importCSVWithProgress</span>(<span class="hljs-params">file, options = {}</span>) {
-    <span class="hljs-comment">// 1. Connect to WebSocket</span>
-    <span class="hljs-keyword">await</span> wsClient.<span class="hljs-title function_">connect</span>();
-
-    <span class="hljs-comment">// 2. Set up progress handlers</span>
-    wsClient.<span class="hljs-title function_">subscribe</span>(<span class="hljs-string">&#x27;import_progress&#x27;</span>, handleProgressUpdate);
-    wsClient.<span class="hljs-title function_">subscribe</span>(<span class="hljs-string">&#x27;import_complete&#x27;</span>, handleImportComplete);
-    wsClient.<span class="hljs-title function_">subscribe</span>(<span class="hljs-string">&#x27;import_error&#x27;</span>, handleImportError);
-
-    <span class="hljs-comment">// 3. Start import</span>
-    <span class="hljs-keyword">const</span> formData = <span class="hljs-keyword">new</span> <span class="hljs-title class_">FormData</span>();
-    formData.<span class="hljs-title function_">append</span>(<span class="hljs-string">&#x27;csvFile&#x27;</span>, file);
-    formData.<span class="hljs-title function_">append</span>(<span class="hljs-string">&#x27;vendor&#x27;</span>, options.<span class="hljs-property">vendor</span> || <span class="hljs-string">&#x27;generic&#x27;</span>);
-
-    <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/vulnerabilities/import&#x27;</span>, {
-        <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;POST&#x27;</span>,
-        <span class="hljs-attr">body</span>: formData
-    });
-
-    <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();
-    <span class="hljs-keyword">return</span> result;
-}
-
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">handleProgressUpdate</span>(<span class="hljs-params">data</span>) {
-    <span class="hljs-keyword">const</span> percentage = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">round</span>(data.<span class="hljs-property">progress</span> * <span class="hljs-number">100</span>);
-    <span class="hljs-title function_">updateProgressBar</span>(percentage);
-    <span class="hljs-title function_">updateStatusText</span>(data.<span class="hljs-property">current_step</span>);
-
-    <span class="hljs-keyword">if</span> (data.<span class="hljs-property">eta_seconds</span>) {
-        <span class="hljs-title function_">updateETA</span>(data.<span class="hljs-property">eta_seconds</span>);
-    }
-}
-
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">handleImportComplete</span>(<span class="hljs-params">data</span>) {
-    <span class="hljs-title function_">showSuccessMessage</span>(<span class="hljs-string">&#x27;Import completed successfully!&#x27;</span>);
-    <span class="hljs-title function_">updateDataGrid</span>(); <span class="hljs-comment">// Refresh UI with new data</span>
-    wsClient.<span class="hljs-title function_">unsubscribe</span>(<span class="hljs-string">&#x27;import_progress&#x27;</span>, handleProgressUpdate);
-}
-
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">handleImportError</span>(<span class="hljs-params">data</span>) {
-    <span class="hljs-title function_">showErrorMessage</span>(data.<span class="hljs-property">error</span>.<span class="hljs-property">message</span>);
-    <span class="hljs-keyword">if</span> (data.<span class="hljs-property">error</span>.<span class="hljs-property">recovery_suggestions</span>) {
-        <span class="hljs-title function_">showRecoverySuggestions</span>(data.<span class="hljs-property">error</span>.<span class="hljs-property">recovery_suggestions</span>);
-    }
-}</code></pre><h3>Real-time Data Updates</h3>
-<pre><code class="language-javascript"><span class="hljs-comment">// Monitor data changes across the application</span>
-wsClient.<span class="hljs-title function_">subscribe</span>(<span class="hljs-string">&#x27;data_updated&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
-    <span class="hljs-keyword">switch</span> (data.<span class="hljs-property">type</span>) {
-        <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;vulnerabilities&#x27;</span>:
-            <span class="hljs-keyword">if</span> (data.<span class="hljs-property">action</span> === <span class="hljs-string">&#x27;bulk_update&#x27;</span>) {
-                <span class="hljs-comment">// Refresh vulnerability dashboard</span>
-                <span class="hljs-title function_">refreshVulnerabilityCharts</span>();
-                <span class="hljs-title function_">updateStatistics</span>();
-            }
-            <span class="hljs-keyword">break</span>;
-
-        <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;tickets&#x27;</span>:
-            <span class="hljs-comment">// Update ticket counts</span>
-            <span class="hljs-title function_">updateTicketSummary</span>();
-            <span class="hljs-keyword">break</span>;
-    }
-});</code></pre><h3>System Monitoring</h3>
-<pre><code class="language-javascript"><span class="hljs-comment">// Handle system alerts and maintenance notifications</span>
-wsClient.<span class="hljs-title function_">subscribe</span>(<span class="hljs-string">&#x27;system_alert&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">alert</span>) =&gt;</span> {
-    <span class="hljs-keyword">const</span> toast = <span class="hljs-title function_">createToast</span>(alert.<span class="hljs-property">level</span>, alert.<span class="hljs-property">message</span>);
-
-    <span class="hljs-keyword">if</span> (alert.<span class="hljs-property">action_required</span>) {
-        toast.<span class="hljs-title function_">addAction</span>(<span class="hljs-string">&#x27;Take Action&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
-            <span class="hljs-comment">// Handle required action</span>
-            <span class="hljs-title function_">performMaintenanceAction</span>(alert.<span class="hljs-property">action_details</span>);
-        });
-    }
-
-    <span class="hljs-keyword">if</span> (alert.<span class="hljs-property">auto_dismiss</span>) {
-        <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> toast.<span class="hljs-title function_">dismiss</span>(), alert.<span class="hljs-property">auto_dismiss</span>);
-    }
-
-    <span class="hljs-title function_">showToast</span>(toast);
-});</code></pre><hr>
-<h2>Error Handling &amp; Recovery</h2>
-<h3>Connection Errors</h3>
+<h2>Socket Handlers (server.js)</h2>
+<pre><code class="language-javascript">io.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;connection&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">socket</span>) =&gt;</span> {
+  socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;join-progress&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">sessionId</span>) =&gt;</span> { ... });
+  socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;leave-progress&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">sessionId</span>) =&gt;</span> { ... });
+  socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;disconnect&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">reason</span>) =&gt;</span> { ... });
+});</code></pre><ul>
+<li><strong>join-progress</strong>: adds the socket to <code>progress-{sessionId}</code> and emits <code>progress-status</code> if a session already exists.</li>
+<li><strong>leave-progress</strong>: removes the socket from the room.</li>
+<li><strong>disconnect</strong>: debug logs only (no cleanup required-the session timer handles it).</li>
+</ul>
+<hr>
+<h2>Event Payloads</h2>
+<p>See the API document for canonical payload examples. For convenience:</p>
 <table>
 <thead>
 <tr>
-<th>Error Type</th>
-<th>Recovery Strategy</th>
+<th>Event</th>
+<th>When Emitted</th>
+<th>Key Fields</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><strong>Connection Timeout</strong></td>
-<td>Automatic retry with exponential backoff</td>
+<td><code>progress-status</code></td>
+<td>Client joins a room with an existing session</td>
+<td><code>sessionId</code>, <code>progress</code>, <code>status</code>, <code>metadata</code></td>
 </tr>
 <tr>
-<td><strong>Transport Failure</strong></td>
-<td>Fallback to polling transport</td>
+<td><code>progress-update</code></td>
+<td>Tracker receives <code>updateProgress</code> (throttled)</td>
+<td><code>sessionId</code>, <code>progress</code>, <code>message</code>, <code>metadata</code>, <code>timestamp</code></td>
 </tr>
 <tr>
-<td><strong>Authentication Error</strong></td>
-<td>Refresh credentials and reconnect</td>
+<td><code>progress-complete</code></td>
+<td>Tracker finishes a session</td>
+<td><code>sessionId</code>, <code>message</code>, <code>metadata</code>, <code>duration</code></td>
 </tr>
 <tr>
-<td><strong>Server Unavailable</strong></td>
-<td>Queue events for replay after reconnection</td>
+<td><code>progress-error</code></td>
+<td>Tracker marks a session as failed</td>
+<td><code>sessionId</code>, <code>message</code>, <code>metadata</code>, <code>error</code></td>
 </tr>
 </tbody></table>
-<h3>Session Errors</h3>
+<p>All events are sent to room <code>progress-{sessionId}</code> only.</p>
+<hr>
+<h2>WebSocketClient (frontend)</h2>
+<p><code>scripts/shared/websocket-client.js</code> wraps Socket.io and exposes an event emitter style API.</p>
+<h3>Instantiation</h3>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> client = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WebSocketClient</span>();
+<span class="hljs-keyword">await</span> client.<span class="hljs-title function_">connect</span>();</code></pre><ul>
+<li>Auto-detects host/port from <code>window.location</code>.</li>
+<li>Attempts WebSocket first with polling fallback.</li>
+<li>Retries up to five times with exponential backoff.</li>
+</ul>
+<h3>Debugging</h3>
+<p>Enable verbose console output with:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">setItem</span>(<span class="hljs-string">&#x27;hextrackr_debug&#x27;</span>, <span class="hljs-string">&#x27;true&#x27;</span>);</code></pre><p>Remove the key to disable logging.</p>
+<h3>Events Exposed by WebSocketClient</h3>
 <table>
 <thead>
 <tr>
-<th>Error Code</th>
+<th>Event</th>
 <th>Description</th>
-<th>Recovery</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>SESSION_NOT_FOUND</code></td>
-<td>Session expired or invalid</td>
-<td>Create new session</td>
+<td><code>progress</code></td>
+<td>Forwarded <code>progress-update</code> payloads.</td>
 </tr>
 <tr>
-<td><code>SESSION_CANCELLED</code></td>
-<td>Session was cancelled</td>
-<td>Display cancellation message</td>
+<td><code>progressStatus</code></td>
+<td>Forwarded <code>progress-status</code> payloads.</td>
 </tr>
 <tr>
-<td><code>RATE_LIMIT_EXCEEDED</code></td>
-<td>Too many progress updates</td>
-<td>Client-side throttling</td>
+<td><code>progressComplete</code></td>
+<td>Forwarded <code>progress-complete</code> payloads.</td>
 </tr>
 <tr>
-<td><code>SERVER_OVERLOAD</code></td>
-<td>Server under heavy load</td>
-<td>Implement backoff strategy</td>
+<td><code>progressError</code></td>
+<td>Forwarded <code>progress-error</code> payloads.</td>
+</tr>
+<tr>
+<td><code>connectionFailed</code></td>
+<td>Fired after all reconnection attempts fail.</td>
+</tr>
+<tr>
+<td><code>disconnect</code></td>
+<td>Fired when Socket.io disconnects (reason included).</td>
 </tr>
 </tbody></table>
-<h3>Graceful Degradation</h3>
-<p>When WebSocket connection fails:</p>
-<ol>
-<li><strong>Polling Fallback</strong>: Switch to HTTP polling for critical updates</li>
-<li><strong>Local State Management</strong>: Maintain UI state without real-time updates</li>
-<li><strong>Manual Refresh</strong>: Provide manual refresh options</li>
-<li><strong>Status Indicators</strong>: Clear connection status display</li>
-</ol>
+<h3>Room Management Helpers</h3>
+<p>The client automatically emits <code>join-progress</code> when the Progress Modal opens and <code>leave-progress</code> when it closes. Custom integrations can call:</p>
+<pre><code class="language-javascript">client.<span class="hljs-title function_">emit</span>(<span class="hljs-string">&#x27;join-progress&#x27;</span>, sessionId);
+client.<span class="hljs-title function_">emit</span>(<span class="hljs-string">&#x27;leave-progress&#x27;</span>, sessionId);</code></pre><h3>Manual Fallback</h3>
+<p>When <code>connectionFailed</code> fires, consumers should revert to manual updates. The Progress Modal already implements this behaviour by hiding live status indicators and relying on HTTP responses to advance progress.</p>
 <hr>
-<h2>Performance Considerations</h2>
-<h3>Server-Side Optimizations</h3>
+<h2>Error Handling Tips</h2>
 <ul>
-<li><strong>Session Throttling</strong>: 100ms minimum between progress events</li>
-<li><strong>Memory Management</strong>: Automatic cleanup of stale sessions</li>
-<li><strong>Connection Pooling</strong>: Efficient Socket.io connection handling</li>
-<li><strong>Event Batching</strong>: Combine related events when possible</li>
+<li>Watch for <code>progress-error</code> payloads - they include the underlying SQLite or validation error details.</li>
+<li>If a client reconnects mid-import, call <code>join-progress</code> again to receive the last known snapshot via <code>progress-status</code>.</li>
+<li>When running in environments without WebSocket support, the importer still works: only the real-time UX is affected.</li>
 </ul>
-<h3>Client-Side Optimizations</h3>
-<ul>
-<li><strong>UI Throttling</strong>: Additional throttling for DOM updates</li>
-<li><strong>Event Deduplication</strong>: Ignore duplicate progress events</li>
-<li><strong>Memory Cleanup</strong>: Proper event listener cleanup</li>
-<li><strong>Selective Updates</strong>: Update only changed UI elements</li>
-</ul>
-<h3>Monitoring Metrics</h3>
-<p>Track these metrics for performance optimization:</p>
-<ul>
-<li>Active session count</li>
-<li>Event emission rate</li>
-<li>Connection success rate</li>
-<li>Reconnection frequency</li>
-<li>Memory usage trends</li>
-</ul>
-<hr>
-<h2>Security Considerations</h2>
-<h3>Connection Security</h3>
-<ul>
-<li><strong>Origin Validation</strong>: Verify client origins in production</li>
-<li><strong>Rate Limiting</strong>: Prevent WebSocket abuse</li>
-<li><strong>Authentication</strong>: Implement session-based auth for sensitive operations</li>
-<li><strong>Input Validation</strong>: Validate all client-sent data</li>
-</ul>
-<h3>Session Security</h3>
-<ul>
-<li><strong>UUID Generation</strong>: Cryptographically secure session IDs</li>
-<li><strong>Session Expiration</strong>: Automatic cleanup prevents accumulation</li>
-<li><strong>Data Sanitization</strong>: Clean all user-provided metadata</li>
-<li><strong>Access Control</strong>: Validate client permissions for operations</li>
-</ul>
-<hr>
-<p>This WebSocket reference provides complete integration guidance for HexTrackr&#39;s real-time communication system, enabling robust progress tracking and system monitoring.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
