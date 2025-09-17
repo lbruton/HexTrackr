@@ -24,7 +24,7 @@
 <td><code>id</code></td>
 <td>TEXT</td>
 <td>PK</td>
-<td>Stable unique identifier supplied by UI (string, not auto‑increment).</td>
+<td>Stable unique identifier supplied by UI (string, not auto-increment).</td>
 </tr>
 <tr>
 <td><code>date_submitted</code></td>
@@ -60,7 +60,7 @@
 <td><code>devices</code></td>
 <td>TEXT</td>
 <td></td>
-<td>JSON array (stringified) of device identifiers/hostnames.</td>
+<td>Semicolon-delimited device names preserving boot order (imports accept JSON arrays and are normalised).</td>
 </tr>
 <tr>
 <td><code>supervisor</code></td>
@@ -108,7 +108,7 @@
 <td><code>site</code></td>
 <td>TEXT</td>
 <td>Indexed</td>
-<td>Higher‑level site grouping.</td>
+<td>Higher-level site grouping.</td>
 </tr>
 <tr>
 <td><code>xt_number</code></td>
@@ -199,7 +199,7 @@
 <hr>
 <h2>Vulnerability Rollover Architecture</h2>
 <p>HexTrackr uses a &quot;rollover&quot; architecture to manage vulnerability data over time. This allows for accurate daily trending and historical analysis. It consists of three main tables.</p>
-<p>For a more detailed explanation of the rollover process, see the <a href="#architecture/data-lifecycle">Data Lifecycle and Rollover Mechanism</a> documentation.</p>
+<p>For a detailed walkthrough of the rollover process, see <a href="./backend.md#vulnerability-rollover-workflow">Backend Architecture</a>.</p>
 <h3><code>vulnerabilities_current</code></h3>
 <p>Current deduplicated state (one row per active unique vulnerability for the most recent scan date it appeared in). Added during rollover processing.</p>
 <table>
@@ -453,7 +453,7 @@
 <hr>
 <h2>Junction Tables</h2>
 <h3><code>ticket_vulnerabilities</code></h3>
-<p>Many‑to‑many relationship between tickets and (legacy) <code>vulnerabilities</code> (pre-rollover) or conceptually <code>vulnerabilities_current</code> for future adaptation.</p>
+<p>Many-to-many relationship between tickets and (legacy) <code>vulnerabilities</code> (pre-rollover) or conceptually <code>vulnerabilities_current</code> for future adaptation.</p>
 <table>
 <thead>
 <tr>
@@ -660,13 +660,13 @@
 </tr>
 </tbody></table>
 <h3>Data Relationships</h3>
-<p><strong>Vulnerability → Device Aggregation</strong>:</p>
+<p><strong>Vulnerability -&gt; Device Aggregation</strong>:</p>
 <ul>
 <li>Query: <code>SELECT * FROM vulnerabilities_current WHERE description = ?</code></li>
 <li>Groups by hostname to show unique devices affected</li>
 <li>Displays device count, IP addresses, and affected services</li>
 </ul>
-<p><strong>Device → Vulnerability Aggregation</strong>:</p>
+<p><strong>Device -&gt; Vulnerability Aggregation</strong>:</p>
 <ul>
 <li>Query: <code>SELECT * FROM vulnerabilities_current WHERE hostname = ?</code></li>
 <li>Groups by description/CVE to show unique vulnerabilities</li>
@@ -687,7 +687,7 @@
 <ul>
 <li><code>schema.sql</code> no longer reflects live tables (kept for historical reference only).</li>
 <li>Runtime adds columns (<code>vendor</code>, <code>vulnerability_date</code>, <code>state</code>, <code>import_date</code>, <code>notes</code>) to legacy <code>vulnerabilities</code> table if missing.</li>
-<li>Two UNIQUE indexes (<code>idx_vulnerabilities_unique_scan</code> / <code>_v2</code>) ensure per‑scan dedupe in legacy ingestion path.</li>
+<li>Two UNIQUE indexes (<code>idx_vulnerabilities_unique_scan</code> / <code>_v2</code>) ensure per-scan dedupe in legacy ingestion path.</li>
 <li>Future work: unify attribute naming (<code>vendor_reference</code> vs <code>vendor</code>).</li>
 </ul>
 <hr>

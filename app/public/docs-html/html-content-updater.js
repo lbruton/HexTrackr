@@ -195,6 +195,34 @@ class HtmlContentUpdater {
 
 
     /**
+     * Update footer version badge to match package.json version
+     */
+    async updateFooterVersion() {
+        try {
+            // Read current version from package.json
+            const packagePath = path.join(process.cwd(), "app", "public", "package.json");
+            const packageContent = JSON.parse(await fs.readFile(packagePath, "utf8"));
+            const currentVersion = packageContent.version;
+
+            // Update footer.html badge
+            const footerPath = path.join(process.cwd(), "app", "public", "scripts", "shared", "footer.html");
+            let footerContent = await fs.readFile(footerPath, "utf8");
+            const updatedContent = footerContent.replace(
+                /HexTrackr-v[\d.]+(-blue\?style=flat)/g,
+                `HexTrackr-v${currentVersion}$1`
+            );
+
+            if (footerContent !== updatedContent) {
+                await fs.writeFile(footerPath, updatedContent);
+                console.log(`✅ Updated footer version badge to v${currentVersion}`);
+            }
+        } catch (error) {
+            console.warn("⚠️  Could not update footer version:", error.message);
+            // Non-fatal - continue with HTML generation
+        }
+    }
+
+    /**
      * Load the master HTML template
      */
     async loadTemplate() {
@@ -487,10 +515,13 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
      */
     async run() {
         console.log("🚀 Starting HTML generation from markdown sources...");
-        
+
         try {
             // Initialize marked library first
             await this.initializeMarked();
+
+            // Update footer version to match package.json
+            await this.updateFooterVersion();
 
             // Load the template first
             await this.loadTemplate();
