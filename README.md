@@ -83,33 +83,6 @@ HexTrackr is actively used in production for daily network operations. Current v
 
 While HexTrackr serves perfectly as a personal toolkit today, the goal is to grow it into a full-featured platform that any network operations team can deploy. Each feature is being built with scalability in mind, but without sacrificing the simplicity that makes it useful right now.
 
-## 🤝 Contributing
-
-Found a bug? Have a feature idea? Contributions are welcome!
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Follow the S-R-P-T methodology (see `/Planning/WORKFLOW.md`)
-4. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-5. Push to the branch (`git push origin feature/AmazingFeature`)
-6. Open a Pull Request
-
-### Development Setup
-
-```bash
-# Install dependencies
-npm install
-
-# Run linters
-npm run lint:all
-
-# Run tests
-docker-compose restart && npx playwright test
-
-# Generate documentation
-npm run docs:generate
-```
-
 ## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
