@@ -19,7 +19,7 @@
 <li>Make your changes and click <strong>Save Ticket</strong>.</li>
 </ol>
 <h2>Device Management</h2>
-<p>The ticket modal includes a powerful interface for managing a list of devices associated with a ticket.</p>
+<p>The ticket modal includes a powerful interface for managing a list of devices associated with a ticket. Devices are stored in the database as a semicolon-delimited string so the boot/order sequence is preserved exactly as entered.</p>
 <ul>
 <li><strong>Adding Devices</strong>: Click the <strong>+</strong> button on any device row to add a new device entry below it. The system will attempt to &quot;smart increment&quot; the device name based on the previous entry (e.g., <code>host01</code> will suggest <code>host02</code>).</li>
 <li><strong>Removing Devices</strong>: Click the <strong>-</strong> button to remove a device entry.</li>
@@ -29,15 +29,17 @@
 <li><strong>Reverse Order</strong>: Click the <strong>Reverse</strong> button to instantly invert the entire order of the device list.</li>
 </ul>
 </li>
+<li><strong>Persistence Note</strong>: CSV imports can provide comma-separated lists or JSON arrays; the importer normalizes everything into the same semicolon format used by the UI.</li>
 </ul>
 <h2>Viewing and Exporting a Single Ticket</h2>
 <p>From the main ticket list, you can view a ticket&#39;s details or download a bundle of its information.</p>
 <ul>
 <li><strong>View Ticket</strong>: Click the <strong>View</strong> (eye) icon to see a clean, markdown-formatted version of the ticket&#39;s details in a modal.</li>
 <li><strong>Download Bundle</strong>: Click the <strong>Download Bundle</strong> (download icon) to get a <code>.zip</code> archive containing:<ul>
-<li>The ticket details in <strong>PDF</strong> format.</li>
+<li>The ticket details in <strong>PDF</strong> format (generated with jsPDF using the same content as the modal).</li>
 <li>The ticket details in <strong>Markdown</strong> format.</li>
-<li>Any other attached documentation.</li>
+<li>Any shared documentation uploaded during the session.</li>
+<li>File attachments stored with the record. The bundler renames files to match the XT number and sanitizes file names to avoid path traversal.</li>
 </ul>
 </li>
 </ul>
@@ -48,13 +50,21 @@
 <li><strong>Status Filter</strong>: Use the dropdown to show tickets with a specific status (e.g., &quot;Open&quot;, &quot;Overdue&quot;).</li>
 <li><strong>Location Filter</strong>: This dropdown is dynamically populated with all unique locations from the tickets in the database, allowing you to easily filter by a specific location.</li>
 </ul>
-<h2>Data Export and Backup</h2>
-<p>HexTrackr provides several options for exporting your ticket data.</p>
+<h2>Importing Ticket Data</h2>
 <ul>
-<li><strong>Quick Exports</strong>: Use the <code>CSV</code>, <code>Excel</code>, <code>JSON</code>, <code>PDF</code>, and <code>HTML</code> buttons at the top of the page to quickly export the currently filtered list of tickets.</li>
+<li><strong>CSV Import Button</strong>: Selecting <strong>Import CSV</strong> opens a file picker and routes the file through PapaParse in the browser. The parser trims whitespace, normalizes device lists (arrays, commas, or semicolons), and generates XT numbers when the column is missing.</li>
+<li><strong>Mode Selection</strong>: When the database already contains tickets, the importer prompts for <strong>Replace All Data</strong> (clears the table before importing) or <strong>Add to Existing Data</strong> (upsert into the current dataset). Both options call <code>POST /api/tickets/migrate</code> with a <code>mode</code> flag.</li>
+<li><strong>Error Handling</strong>: Invalid rows surface as toast notifications and are logged in the browser console for troubleshooting. The migration endpoint responds with counts for migrated and failed rows.</li>
+</ul>
+<h2>Data Export and Backup</h2>
+<p>Use the export toolbar to download the currently filtered dataset.</p>
+<ul>
+<li><strong>Quick Exports</strong>: <code>CSV</code>, <code>Excel</code>, <code>JSON</code>, <code>PDF</code>, and <code>HTML</code> buttons delegate to <code>exportTicketsTableData(format)</code>. Devices are converted back to semicolon strings, and attachments are omitted for compact output.</li>
+<li><strong>Local Backup</strong>: The CSV export mirrors the schema expected by the importer, making round-trips lossless. JSON exports include the camelCase keys consumed by the REST API so automated tooling can feed them directly into <code>POST /api/tickets</code>.</li>
+<li><strong>Error Feedback</strong>: Export actions surface toast notifications for missing data or generation errors (for example, attempting to export when no rows match the current filters).</li>
 </ul>
 <h2>ServiceNow Integration</h2>
-<p>If ServiceNow integration is configured in the settings, all ServiceNow ticket numbers in the list will become clickable links that open directly to the corresponding ticket in your ServiceNow instance.</p>
+<p>If ServiceNow integration is configured in the settings, all ServiceNow ticket numbers in the list become clickable links that open directly to the corresponding ticket in your ServiceNow instance.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

@@ -5,29 +5,46 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - v1.0.15 (Security Critical)
+## [1.0.15] - 2025-09-17
 
-### Security
+### Changed
 
-#### Critical Security Vulnerabilities (Identified for v1.0.15)
+#### Backend Modularization Complete
 
-- **Authentication System Required**: No authentication/authorization system currently implemented
-  - All API endpoints publicly accessible
-  - User session management missing
-  - Role-based access controls needed
-- **CSRF Protection Missing**: Cross-site request forgery vulnerabilities identified
-  - Token-based CSRF prevention required
-  - Form handling security needed
-- **Security Headers Incomplete**: Missing critical security headers
-  - Content Security Policy (CSP) implementation needed
-  - HTTP Strict Transport Security (HSTS) required
-  - Enhanced security header suite needed
-- **Database Integrity Issues**: Foreign key constraint violations found
-  - Database integrity checks required
-  - Foreign key enforcement disabled
-- **WebSocket Security Gaps**: Real-time communication lacks security controls
-  - Session-based authentication needed for WebSocket connections
-  - Room access authorization missing
+- **Monolithic Refactor Achievement**: Successfully modularized 3,805-line monolithic server.js
+  - Reduced main server.js to ~205 lines (94.6% reduction)
+  - Extracted into 5 controllers, 4 services, 5 routes, 3 config modules, and 3 utilities
+  - Implemented singleton pattern for controllers with dependency injection
+  - Maintained 100% backward compatibility with all existing APIs
+- **Module Organization**:
+  - `/app/controllers/` - Business logic with singleton pattern (5 controllers)
+  - `/app/services/` - Data access layer (4 services)
+  - `/app/routes/` - Express route definitions (5 route modules)
+  - `/app/config/` - Configuration modules (database, middleware, websocket)
+  - `/app/utils/` - Utility classes (PathValidator, ProgressTracker, helpers)
+- **Critical Initialization Sequence**: Established proper dependency injection order
+  - Database initialization → Controller initialization → Route imports → Server start
+  - Fixed initialization timing issues that caused "Controller not initialized" errors
+
+### Added
+
+- **Documentation Updates**:
+  - Module dependency diagram with ASCII visualization
+  - Migration rollback procedure for emergency recovery
+  - Updated CLAUDE.md with modular patterns and initialization sequence
+  - Comprehensive architecture documentation reflecting new structure
+
+### Fixed
+
+- **Controller Reference Pattern**: Fixed class vs instance pattern in all route files
+- **Route Mounting**: Corrected path concatenation issues (e.g., /api/imports/imports)
+- **File Name Case Sensitivity**: Standardized on lowercase controller filenames
+
+### Technical Debt Resolved
+
+- **T053 Backend Modularization**: Completed full extraction from monolithic architecture
+- **Maintainability**: Improved code organization from single 3,805-line file to 15+ focused modules
+- **Testability**: Enabled unit testing through dependency injection and service separation
 
 ## [1.0.14] - 2025-09-14
 
