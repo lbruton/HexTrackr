@@ -6,8 +6,8 @@ services:
     ports:
       - "8989:8080"  # External port 8989 -> Internal port 8080 (prevents test conflicts)
     volumes:
-      # Mount application files for development but exclude node_modules
-      - ./app/public:/app
+      # Mount entire application for modular architecture
+      - ./app:/app
       - /app/node_modules
       # Mount package.json for version info
       - ./package.json:/app/package.json

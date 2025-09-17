@@ -43,14 +43,18 @@ npm run roadmap        # Generate roadmap portal
 
 ## Architecture Overview
 
-### Monolithic Express Backend
+### Modular Express Backend
 
-- **Single server file**: `app/public/server.js` (~3,800 lines) handles ALL functionality:
-  - RESTful API endpoints (`/api/*`)
-  - File uploads via Multer
-  - Static file serving
-  - WebSocket support (planned for port 8988)
-  - Database operations (SQLite)
+- **Main server file**: `app/public/server.js` (~205 lines) orchestrates the application:
+  - Module initialization and dependency injection
+  - Route mounting and middleware configuration
+  - Static file serving and WebSocket setup
+- **Module structure**:
+  - `/app/controllers/` - Business logic controllers (singleton pattern)
+  - `/app/services/` - Data access and business services
+  - `/app/routes/` - Express route definitions
+  - `/app/config/` - Configuration modules (database, middleware, websocket)
+  - `/app/utils/` - Utility classes (PathValidator, ProgressTracker, helpers)
 - **Security**: Custom `PathValidator` class for all file operations
 - **Port mapping**: External 8989 → Internal 8080 (Docker)
 
@@ -85,19 +89,6 @@ scripts/
 - Key tables: `tickets`, `vulnerabilities`, `vulnerability_imports`, `vulnerability_snapshots`
 - JSON columns stored as text (e.g., devices in tickets)
 
-## Critical Development Patterns
-
-### S-R-P-T Planning Methodology
-
-The project uses a unique planning system in `Planning/`:
-
-1. **S-files** (Specification): WHAT and WHY - requirements
-2. **R-files** (Research): HOW to approach - multi-agent analysis
-3. **P-files** (Planning): HOW to implement - technical plan
-4. **T-files** (Tasks): DO - execution with TodoWrite
-
-Example: `S001-dark-mode.md` → `R001-dark-mode-analysis.md` → `P001-dark-mode-plan.md` → `T001-dark-mode-tasks.md`
-
 ### JavaScript Module Pattern
 
 ```javascript
@@ -111,6 +102,57 @@ class ModernVulnManager {
         await this.loadData();
         this.setupEventListeners();
     }
+}
+```
+
+### Controller Singleton Pattern
+
+```javascript
+// Controllers use static initialization with singleton pattern
+class VulnerabilityController {
+    static initialize(database, progressTracker) {
+        if (!VulnerabilityController.instance) {
+            VulnerabilityController.instance = new VulnerabilityController();
+        }
+        VulnerabilityController.instance.db = database;
+        VulnerabilityController.instance.progressTracker = progressTracker;
+        return VulnerabilityController.instance;
+    }
+
+    static getInstance() {
+        if (!VulnerabilityController.instance) {
+            throw new Error("Controller not initialized. Call initialize() first.");
+        }
+        return VulnerabilityController.instance;
+    }
+
+    // Static methods for routes
+    static async getStats(req, res) {
+        const controller = VulnerabilityController.getInstance();
+        // ... handle request
+    }
+}
+```
+
+### Module Initialization Sequence
+
+```javascript
+// CRITICAL: Order matters for proper dependency injection
+async function startServer() {
+    // 1. Initialize database
+    await initDb();
+
+    // 2. Initialize controllers with dependencies
+    VulnerabilityController.initialize(db, progressTracker);
+
+    // 3. NOW import routes (after controllers ready)
+    const vulnerabilityRoutes = require("../routes/vulnerabilities");
+
+    // 4. Mount routes
+    app.use("/api/vulnerabilities", vulnerabilityRoutes);
+
+    // 5. Start listening
+    server.listen(PORT);
 }
 ```
 

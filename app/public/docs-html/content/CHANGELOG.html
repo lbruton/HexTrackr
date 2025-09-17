@@ -9,37 +9,52 @@
                         <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
                              alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
                     </a>.</p>
-<h2>[Unreleased] - v1.0.15 (Security Critical)</h2>
-<h3>Security</h3>
-<h4>Critical Security Vulnerabilities (Identified for v1.0.15)</h4>
+<h2>[1.0.15] - 2025-09-17</h2>
+<h3>Changed</h3>
+<h4>Backend Modularization Complete</h4>
 <ul>
-<li><strong>Authentication System Required</strong>: No authentication/authorization system currently implemented<ul>
-<li>All API endpoints publicly accessible</li>
-<li>User session management missing</li>
-<li>Role-based access controls needed</li>
+<li><strong>Monolithic Refactor Achievement</strong>: Successfully modularized 3,805-line monolithic server.js<ul>
+<li>Reduced main server.js to ~205 lines (94.6% reduction)</li>
+<li>Extracted into 5 controllers, 4 services, 5 routes, 3 config modules, and 3 utilities</li>
+<li>Implemented singleton pattern for controllers with dependency injection</li>
+<li>Maintained 100% backward compatibility with all existing APIs</li>
 </ul>
 </li>
-<li><strong>CSRF Protection Missing</strong>: Cross-site request forgery vulnerabilities identified<ul>
-<li>Token-based CSRF prevention required</li>
-<li>Form handling security needed</li>
+<li><strong>Module Organization</strong>:<ul>
+<li><code>/app/controllers/</code> - Business logic with singleton pattern (5 controllers)</li>
+<li><code>/app/services/</code> - Data access layer (4 services)</li>
+<li><code>/app/routes/</code> - Express route definitions (5 route modules)</li>
+<li><code>/app/config/</code> - Configuration modules (database, middleware, websocket)</li>
+<li><code>/app/utils/</code> - Utility classes (PathValidator, ProgressTracker, helpers)</li>
 </ul>
 </li>
-<li><strong>Security Headers Incomplete</strong>: Missing critical security headers<ul>
-<li>Content Security Policy (CSP) implementation needed</li>
-<li>HTTP Strict Transport Security (HSTS) required</li>
-<li>Enhanced security header suite needed</li>
+<li><strong>Critical Initialization Sequence</strong>: Established proper dependency injection order<ul>
+<li>Database initialization → Controller initialization → Route imports → Server start</li>
+<li>Fixed initialization timing issues that caused &quot;Controller not initialized&quot; errors</li>
 </ul>
 </li>
-<li><strong>Database Integrity Issues</strong>: Foreign key constraint violations found<ul>
-<li>Database integrity checks required</li>
-<li>Foreign key enforcement disabled</li>
+</ul>
+<h3>Added</h3>
+<ul>
+<li><strong>Documentation Updates</strong>:<ul>
+<li>Module dependency diagram with ASCII visualization</li>
+<li>Migration rollback procedure for emergency recovery</li>
+<li>Updated CLAUDE.md with modular patterns and initialization sequence</li>
+<li>Comprehensive architecture documentation reflecting new structure</li>
 </ul>
 </li>
-<li><strong>WebSocket Security Gaps</strong>: Real-time communication lacks security controls<ul>
-<li>Session-based authentication needed for WebSocket connections</li>
-<li>Room access authorization missing</li>
 </ul>
-</li>
+<h3>Fixed</h3>
+<ul>
+<li><strong>Controller Reference Pattern</strong>: Fixed class vs instance pattern in all route files</li>
+<li><strong>Route Mounting</strong>: Corrected path concatenation issues (e.g., /api/imports/imports)</li>
+<li><strong>File Name Case Sensitivity</strong>: Standardized on lowercase controller filenames</li>
+</ul>
+<h3>Technical Debt Resolved</h3>
+<ul>
+<li><strong>T053 Backend Modularization</strong>: Completed full extraction from monolithic architecture</li>
+<li><strong>Maintainability</strong>: Improved code organization from single 3,805-line file to 15+ focused modules</li>
+<li><strong>Testability</strong>: Enabled unit testing through dependency injection and service separation</li>
 </ul>
 <h2>[1.0.14] - 2025-09-14</h2>
 <h3>Added</h3>
@@ -66,6 +81,14 @@
 <li>Collapse icon rotation animations for expandable sections</li>
 </ul>
 </li>
+<li><strong>Mermaid Diagram Support</strong>: Interactive diagram rendering for documentation<ul>
+<li>Client-side Mermaid.js integration for rendering diagrams from markdown</li>
+<li>Theme-aware diagram rendering with automatic dark/light mode switching</li>
+<li>Custom CSS styling for consistent diagram appearance across themes</li>
+<li>Support for flowcharts, sequence diagrams, state diagrams, and more</li>
+<li>Foundation for future network topology and vulnerability mapping features</li>
+</ul>
+</li>
 </ul>
 <h4>Architecture Review System</h4>
 <ul>
@@ -81,6 +104,29 @@
 <li><strong>Roadmap Management</strong>: Enhanced project planning with semantic versioning and changelog automation</li>
 </ul>
 <h3>Fixed</h3>
+<h4>Vulnerability VPR Aggregation (Totals &amp; Trends)</h4>
+<ul>
+<li>Fixed inflated per‑severity VPR totals caused by multi‑CVE split rows each carrying the full VPR score<ul>
+<li>Root Cause: Daily totals used <code>SUM(vpr_score)</code> over <code>vulnerabilities_current</code>, multiplying VPR when a single plugin row listed multiple CVEs</li>
+<li>Solution: Enhanced daily totals now aggregate VPR by a deduplicated key and sum once per vulnerability entity per host<ul>
+<li>Aggregation key preference: <code>plugin_id + host</code> → fallback <code>plugin_name + host</code> → fallback <code>host + description</code></li>
+<li>Counts remain row-based (each CVE row counts); only VPR totals are deduplicated</li>
+</ul>
+</li>
+<li>Impact: Stat cards and trend chart now align; Medium spike resolved without altering per‑row VPR in tables</li>
+<li>Files: <code>app/public/server.js</code> (calculateAndStoreDailyTotalsEnhanced)</li>
+</ul>
+</li>
+</ul>
+<h4>Trend Badge Wiring and Casing</h4>
+<ul>
+<li>Fixed trend badges (+/−%) stuck at 0% due to trends not being wired and key casing mismatch<ul>
+<li>Wire: Orchestrator now sets trends on <code>VulnerabilityStatisticsManager</code> before UI update</li>
+<li>Casing: Use capitalized severity keys from <code>/recent-trends</code> and robust fallback to data manager trends</li>
+<li>Files: <code>app/public/scripts/shared/vulnerability-core.js</code>, <code>app/public/scripts/shared/vulnerability-statistics.js</code></li>
+</ul>
+</li>
+</ul>
 <h4>Dark Mode Accessibility Critical Fixes (WCAG Compliance)</h4>
 <ul>
 <li><strong>Navigation Contrast Violation Resolution</strong>: Fixed critical WCAG AA compliance issue<ul>
