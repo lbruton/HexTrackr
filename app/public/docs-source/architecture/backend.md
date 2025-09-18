@@ -102,6 +102,7 @@ class VulnerabilityController {
 ```
 
 **Characteristics:**
+
 - Static `initialize()` method for dependency injection
 - Static `getInstance()` method for retrieving singleton
 - All route methods are static
@@ -112,6 +113,7 @@ class VulnerabilityController {
 Two controllers (`ImportController`, `DocsController`) use different patterns:
 
 **ImportController (Functional exports):**
+
 ```javascript
 let progressTracker = null;
 
@@ -131,6 +133,7 @@ module.exports = {
 ```
 
 **DocsController (Instance-based):**
+
 ```javascript
 class DocsController {
     constructor() {

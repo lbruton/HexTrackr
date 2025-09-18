@@ -5,6 +5,7 @@ The Import API provides endpoints for importing vulnerability and ticket data fr
 ## Overview
 
 The import system handles:
+
 - CSV vulnerability imports from security scanners (Tenable, Qualys, etc.)
 - JSON-based vulnerability and ticket imports
 - High-performance staging imports for large datasets
@@ -22,9 +23,11 @@ Standard vulnerability CSV import with enhanced lifecycle management. Processes 
 #### Request
 
 **Headers:**
+
 - `Content-Type: multipart/form-data`
 
 **Body (multipart/form-data):**
+
 - `csvFile` (file, required) - CSV file containing vulnerability data
 - `vendor` (string, optional) - Vendor name (auto-extracted from filename if not provided)
 - `scanDate` (string, optional) - Scan date in YYYY-MM-DD format (auto-extracted if not provided)
@@ -68,9 +71,11 @@ High-performance vulnerability import using staging table for batch processing. 
 #### Request
 
 **Headers:**
+
 - `Content-Type: multipart/form-data`
 
 **Body (multipart/form-data):**
+
 - `csvFile` (file, required) - CSV file containing vulnerability data
 - `vendor` (string, optional) - Vendor name (auto-extracted from filename if not provided)
 - `scanDate` (string, optional) - Scan date in YYYY-MM-DD format (auto-extracted if not provided)
@@ -133,9 +138,11 @@ JSON-based vulnerability import for frontend data restoration and programmatic i
 #### Request
 
 **Headers:**
+
 - `Content-Type: application/json`
 
 **Body:**
+
 ```json
 {
   "vulnerabilities": [
@@ -182,9 +189,11 @@ JSON-based ticket import for backup restoration and bulk ticket creation.
 #### Request
 
 **Headers:**
+
 - `Content-Type: application/json`
 
 **Body:**
+
 ```json
 {
   "tickets": [
@@ -272,6 +281,7 @@ Check the progress of an ongoing import operation.
 #### Request
 
 **Path Parameters:**
+
 - `sessionId` (string, required) - Session ID from import response
 
 #### Response
@@ -303,14 +313,17 @@ Check the progress of an ongoing import operation.
 The import system automatically detects and maps columns from various security scanner formats:
 
 ### Tenable/Nessus
+
 - Required columns: `Plugin ID`, `Plugin Name`, `Severity`, `Host`, `Port`
 - Optional: `CVE`, `CVSS`, `Solution`, `Synopsis`, `Description`
 
 ### Qualys
+
 - Required columns: `QID`, `Title`, `Severity`, `IP`, `Port`
 - Optional: `CVE ID`, `CVSS Score`, `Solution`, `Threat`, `Impact`
 
 ### Generic Format
+
 - Required columns: `vulnerability_id`, `title`, `severity`, `host`
 - Optional: `cve`, `cvss`, `port`, `remediation`, `description`
 
@@ -328,6 +341,7 @@ All endpoints return consistent error responses:
 ```
 
 Common error codes:
+
 - `NO_FILE`: No file uploaded
 - `INVALID_FORMAT`: File format not supported
 - `PARSE_ERROR`: CSV parsing failed
@@ -337,12 +351,14 @@ Common error codes:
 ## Performance Considerations
 
 ### Standard Import (`/api/vulnerabilities/import`)
+
 - Best for: Small to medium files (< 10,000 rows)
 - Processing: Row-by-row with immediate deduplication
 - Memory usage: Moderate
 - Speed: ~500-1000 rows/second
 
 ### Staging Import (`/api/vulnerabilities/import-staging`)
+
 - Best for: Large files (> 10,000 rows)
 - Processing: Batch processing via staging table
 - Memory usage: Optimized for large datasets
@@ -364,6 +380,7 @@ ws.on('message', (data) => {
 ```
 
 Progress updates include:
+
 - Current progress percentage
 - Processing step details
 - Estimated time remaining
@@ -372,6 +389,7 @@ Progress updates include:
 ## Rate Limiting
 
 Import endpoints are subject to rate limiting:
+
 - 10 imports per hour per IP address
 - Maximum 3 concurrent imports
 

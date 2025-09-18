@@ -15,9 +15,11 @@ This document serves as the single source of truth for all HexTrackr subagents. 
 ## Technology Stack
 
 ### Frontend (Vanilla JavaScript)
+
 ```
 CRITICAL: This is NOT a React application!
 ```
+
 - **Core**: Vanilla JavaScript with ES6 modules
 - **CSS Framework**: Tabler.io (Bootstrap-based)
 - **Data Tables**: AG-Grid Community Edition
@@ -27,6 +29,7 @@ CRITICAL: This is NOT a React application!
 - **Sanitization**: DOMPurify for XSS prevention
 
 ### Backend (Node.js/Express)
+
 - **Server**: Express 4.18.2 (modularized to 205 lines)
 - **Database**: SQLite3 with runtime schema evolution
 - **File Uploads**: Multer
@@ -39,6 +42,7 @@ CRITICAL: This is NOT a React application!
 ## Architecture Patterns
 
 ### Frontend Architecture
+
 ```
 scripts/
 ├── shared/          # Reusable components (loaded first)
@@ -53,6 +57,7 @@ scripts/
 ```
 
 ### Module Pattern (Frontend)
+
 ```javascript
 // All page managers follow this pattern
 export class ModernVulnManager {
@@ -68,6 +73,7 @@ export class ModernVulnManager {
 ```
 
 ### Backend Module Structure
+
 ```
 app/
 ├── controllers/     # Business logic (singleton pattern)
@@ -79,6 +85,7 @@ app/
 ```
 
 ### Controller Patterns (Backend)
+
 ```javascript
 // Singleton pattern (3 controllers use this)
 class VulnerabilityController {
@@ -111,6 +118,7 @@ module.exports = {
 ## CSS Architecture
 
 ### Surface Hierarchy (Dark Mode)
+
 ```css
 :root {
     /* Elevation-based surfaces */
@@ -123,6 +131,7 @@ module.exports = {
 ```
 
 ### VPR Severity Colors
+
 ```css
 :root {
     /* Single source of truth for vulnerability colors */
@@ -136,6 +145,7 @@ module.exports = {
 ## Critical Patterns
 
 ### Module Initialization Sequence (Backend)
+
 ```javascript
 // CRITICAL: Order matters for dependency injection!
 async function startServer() {
@@ -158,6 +168,7 @@ async function startServer() {
 ```
 
 ### File Security Pattern
+
 ```javascript
 // ALWAYS use PathValidator for file operations
 const { PathValidator } = require("../utils/PathValidator");
@@ -167,6 +178,7 @@ const content = PathValidator.safeReadFileSync(validatedPath);
 ```
 
 ### Theme Integration (Frontend)
+
 ```javascript
 // AG-Grid requires both CSS class AND API call
 const currentTheme = localStorage.getItem("theme") || "light";
@@ -181,6 +193,7 @@ gridApi.setGridTheme(currentTheme === "dark"
 ```
 
 ### WebSocket Progress Tracking
+
 ```javascript
 // Import operations use WebSocket for real-time progress
 this.websocketClient = new WebSocketClient();
@@ -192,6 +205,7 @@ this.websocketClient.on("importProgress", (data) => {
 ## API Patterns
 
 ### Consistent Error Handling
+
 ```javascript
 try {
     const result = await operation();
@@ -207,6 +221,7 @@ try {
 ```
 
 ### Import Pipeline
+
 ```
 Upload (Multer) → Parse (PapaParse) → Stage (SQLite) →
 Process (mapVulnerabilityRow) → Batch Insert → WebSocket Updates
@@ -215,6 +230,7 @@ Process (mapVulnerabilityRow) → Batch Insert → WebSocket Updates
 ## Database Schema
 
 ### Runtime Evolution Pattern
+
 ```javascript
 // Schema changes use idempotent ALTER TABLE statements
 const migrations = [
@@ -233,6 +249,7 @@ migrations.forEach(sql => {
 ```
 
 ### Key Tables
+
 - `tickets` - Maintenance ticket tracking
 - `vulnerabilities` - Vulnerability records with VPR scores
 - `vulnerability_imports` - Import session metadata
@@ -241,6 +258,7 @@ migrations.forEach(sql => {
 ## Testing Requirements
 
 ### Environment Setup
+
 ```bash
 # ALWAYS use Docker for testing
 docker-compose up -d
@@ -252,6 +270,7 @@ docker-compose restart  # Required before Playwright tests
 ```
 
 ### Test Patterns
+
 ```javascript
 // Contract tests for all API endpoints
 describe("GET /api/vulnerabilities", () => {
@@ -266,6 +285,7 @@ describe("GET /api/vulnerabilities", () => {
 ## Common Operations
 
 ### Adding a New Feature
+
 1. Create specification: `/specify [feature description]`
 2. Generate plan: `/plan`
 3. Create tasks: `/tasks`
@@ -274,12 +294,14 @@ describe("GET /api/vulnerabilities", () => {
 6. Update documentation: `npm run docs:generate`
 
 ### Updating Styles
+
 1. Use CSS variables for consistency
 2. Support both light and dark themes
 3. Test with `docker-compose up`
 4. Check WCAG compliance for colors
 
 ### Adding API Endpoints
+
 1. Create controller method (singleton pattern)
 2. Add service layer function
 3. Define route in routes file
@@ -289,18 +311,21 @@ describe("GET /api/vulnerabilities", () => {
 ## Performance Requirements
 
 ### Response Times
+
 - Page loads: < 2 seconds
 - API responses: < 500ms
 - Database queries: < 100ms
 - WebSocket messages: < 50ms
 
 ### Processing Benchmarks
+
 - CSV imports: 1000+ rows/second
 - Batch operations: 100+ concurrent items
 - Search operations: < 200ms
 - Export streaming: Start within 1 second
 
 ### Resource Constraints
+
 - Memory usage: < 512MB normal operation
 - CPU usage: < 80% standard load
 - Database monitoring at 80% capacity
@@ -309,6 +334,7 @@ describe("GET /api/vulnerabilities", () => {
 ## Constitutional Compliance
 
 ### Development Framework (Article I)
+
 - ✅ Context accuracy before work begins
 - ✅ Memento for session recording
 - ✅ Documentation updates required
@@ -318,11 +344,13 @@ describe("GET /api/vulnerabilities", () => {
 - ✅ Protected branches use PRs
 
 ### Spec-Kit Framework (Article II)
+
 - ✅ Follow /specify → /plan → /tasks workflow
 - ✅ No implementation without specification
 - ✅ Test-first development mandatory
 
 ### Code Quality Standards
+
 - **Quotes**: Always double quotes ("")
 - **Semicolons**: Always required
 - **Variables**: const default, let when needed, never var
@@ -345,12 +373,14 @@ describe("GET /api/vulnerabilities", () => {
 ## Project Files Quick Reference
 
 ### Core Entry Points
+
 - `app/public/server.js` - Main backend server (205 lines)
 - `app/public/vulnerabilities.html` - Vulnerability dashboard
 - `app/public/tickets.html` - Ticket management
 - `app/public/scripts/pages/vulnerabilities.js` - Frontend orchestrator
 
 ### Configuration Files
+
 - `CLAUDE.md` - AI assistant instructions
 - `.specify/memory/constitution.md` - Project constitution
 - `.specify/memory/spec-kit.md` - Spec-Kit methodology
@@ -358,6 +388,7 @@ describe("GET /api/vulnerabilities", () => {
 - `package.json` - Dependencies and scripts
 
 ### Documentation
+
 - `app/public/docs-source/` - Markdown documentation
 - `app/public/docs-html/` - Generated HTML docs
 - `specs/` - Feature specifications
@@ -365,6 +396,7 @@ describe("GET /api/vulnerabilities", () => {
 ## Agent Communication Patterns
 
 ### Cross-Component Updates
+
 ```javascript
 // Use global refresh function for data updates
 window.refreshPageData("vulnerabilities");
@@ -376,6 +408,7 @@ window.settingsModal.onDataOperation = async (operation) => {
 ```
 
 ### Event-Driven Updates
+
 ```javascript
 // Components extend EventTarget for communication
 class VulnerabilityChartManager extends EventTarget {
