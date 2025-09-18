@@ -17,6 +17,10 @@ const crypto = require("crypto");
  * progressTracker.completeSession(sessionId, "Import completed");
  */
 class ProgressTracker {
+    /**
+     * Creates an instance of ProgressTracker.
+     * @param {object} io - The socket.io instance.
+     */
     constructor(io) {
         this.io = io;
         this.sessions = new Map(); // sessionId -> { progress, lastUpdate, metadata }

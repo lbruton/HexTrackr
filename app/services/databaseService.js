@@ -18,6 +18,10 @@ const path = require("path");
 const fs = require("fs");
 
 class DatabaseService {
+    /**
+     * Creates an instance of DatabaseService.
+     * @param {string} dbPath - The path to the SQLite database file.
+     */
     constructor(dbPath) {
         this.dbPath = dbPath || path.join(__dirname, "..", "public", "data", "hextrackr.db");
         this.db = null;

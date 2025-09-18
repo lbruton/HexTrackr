@@ -23,3 +23,11 @@ Follow the Conventional Commits pattern already used (`feat:`, `fix:`, `refactor
 ## Security & Configuration Tips
 
 HexTrackr reads environment variables through `dotenv`; store secrets in a local `.env` and never commit it. Rate limiting, upload validation, and socket settings live in `app/config/`—touch these in coordinated changes and document toggles in `dev-docs/architecture`. When working with SQLite backups, keep exports inside `data/backups/` and purge them before publishing a branch.
+
+### Memento Session Context (Memento MCP is our primary knowledge graph)
+  - **THEN** search for strategic context using semantic search (5-10x faster, 80% less tokens)
+  - Use natural language queries WITH DATES like "sessions from today 2025-09-16" or "latest work this week"
+  - All saved entities have `TIMESTAMP` as their FIRST observation in ISO 8601 format
+  - Recent sessions are saved with pattern: `Session: HEXTRACKR-[TOPIC]-[DATE]-001`
+  - Check `ABSTRACT` and `SUMMARY` observations for quick context on previous work
+  - **IMPORTANT**: Include today's date in your search queries for finding the most recent work

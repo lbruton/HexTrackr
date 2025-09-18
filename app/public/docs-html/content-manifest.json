@@ -1,40 +1,30 @@
 {
-  "generated": "2025-09-18T04:47:05.683Z",
+  "generated": "2025-09-18T14:38:54.134Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
       "icon": "fas fa-code",
       "indexFile": "api-reference/index",
       "children": {
-        "backup-api": {
-          "file": "api-reference/backup-api",
-          "title": "Backup Api",
-          "path": "api-reference/backup-api.html"
+        "backend-api": {
+          "file": "api-reference/backend-api",
+          "title": "Backend Api",
+          "path": "api-reference/backend-api.html"
         },
-        "complete-reference": {
-          "file": "api-reference/complete-reference",
-          "title": "Complete Reference",
-          "path": "api-reference/complete-reference.html"
+        "frontend-api": {
+          "file": "api-reference/frontend-api",
+          "title": "Frontend Api",
+          "path": "api-reference/frontend-api.html"
         },
-        "imports-api": {
-          "file": "api-reference/imports-api",
-          "title": "Imports Api",
-          "path": "api-reference/imports-api.html"
+        "middleware-config": {
+          "file": "api-reference/middleware-config",
+          "title": "Middleware Config",
+          "path": "api-reference/middleware-config.html"
         },
-        "tickets-api": {
-          "file": "api-reference/tickets-api",
-          "title": "Tickets Api",
-          "path": "api-reference/tickets-api.html"
-        },
-        "vulnerabilities-api": {
-          "file": "api-reference/vulnerabilities-api",
-          "title": "Vulnerabilities Api",
-          "path": "api-reference/vulnerabilities-api.html"
-        },
-        "websocket-api": {
-          "file": "api-reference/websocket-api",
-          "title": "Websocket Api",
-          "path": "api-reference/websocket-api.html"
+        "utilities": {
+          "file": "api-reference/utilities",
+          "title": "Utilities",
+          "path": "api-reference/utilities.html"
         }
       }
     },
@@ -70,102 +60,47 @@
         }
       }
     },
-    "getting-started": {
-      "title": "Getting Started",
-      "icon": "fas fa-rocket",
-      "indexFile": "getting-started/index",
-      "children": {}
-    },
-    "references": {
-      "title": "References",
+    "guides": {
+      "title": "Guides",
       "icon": "fas fa-file-alt",
-      "indexFile": "references/index",
+      "indexFile": "guides/index",
       "children": {
-        "function-reference": {
-          "file": "references/function-reference",
-          "title": "Function Reference",
-          "path": "references/function-reference.html"
+        "getting-started": {
+          "file": "guides/getting-started",
+          "title": "Getting Started",
+          "path": "guides/getting-started.html"
         },
-        "websocket-reference": {
-          "file": "references/websocket-reference",
-          "title": "Websocket Reference",
-          "path": "references/websocket-reference.html"
+        "user-guide": {
+          "file": "guides/user-guide",
+          "title": "User Guide",
+          "path": "guides/user-guide.html"
         }
       }
     },
-    "security": {
-      "title": "Security",
-      "icon": "fas fa-shield-alt",
-      "indexFile": "security/index",
-      "children": {
-        "configuration": {
-          "file": "security/configuration",
-          "title": "Configuration",
-          "path": "security/configuration.html"
-        },
-        "implementation": {
-          "file": "security/implementation",
-          "title": "Implementation",
-          "path": "security/implementation.html"
-        },
-        "overview": {
-          "file": "security/overview",
-          "title": "Overview",
-          "path": "security/overview.html"
-        },
-        "security-implementation": {
-          "file": "security/security-implementation",
-          "title": "Security Implementation",
-          "path": "security/security-implementation.html"
-        }
-      }
-    },
-    "technical-reference": {
-      "title": "Technical Reference",
+    "reference": {
+      "title": "Reference",
       "icon": "fas fa-file-alt",
-      "indexFile": "technical-reference/index",
+      "indexFile": "reference/index",
       "children": {
-        "configuration": {
-          "file": "technical-reference/configuration",
-          "title": "Configuration",
-          "path": "technical-reference/configuration.html"
+        "performance": {
+          "file": "reference/performance",
+          "title": "Performance",
+          "path": "reference/performance.html"
         },
-        "dependencies": {
-          "file": "technical-reference/dependencies",
-          "title": "Dependencies",
-          "path": "technical-reference/dependencies.html"
+        "security": {
+          "file": "reference/security",
+          "title": "Security",
+          "path": "reference/security.html"
         },
-        "middleware-config": {
-          "file": "technical-reference/middleware-config",
-          "title": "Middleware Config",
-          "path": "technical-reference/middleware-config.html"
+        "troubleshooting": {
+          "file": "reference/troubleshooting",
+          "title": "Troubleshooting",
+          "path": "reference/troubleshooting.html"
         },
-        "modules-catalog": {
-          "file": "technical-reference/modules-catalog",
-          "title": "Modules Catalog",
-          "path": "technical-reference/modules-catalog.html"
-        },
-        "service-layer": {
-          "file": "technical-reference/service-layer",
-          "title": "Service Layer",
-          "path": "technical-reference/service-layer.html"
-        }
-      }
-    },
-    "user-guides": {
-      "title": "User Guides",
-      "icon": "fas fa-users",
-      "indexFile": "user-guides/index",
-      "children": {
-        "ticket-management": {
-          "file": "user-guides/ticket-management",
-          "title": "Ticket Management",
-          "path": "user-guides/ticket-management.html"
-        },
-        "vulnerability-management": {
-          "file": "user-guides/vulnerability-management",
-          "title": "Vulnerability Management",
-          "path": "user-guides/vulnerability-management.html"
+        "websocket": {
+          "file": "reference/websocket",
+          "title": "Websocket",
+          "path": "reference/websocket.html"
         }
       }
     }
@@ -190,5 +125,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 35
+  "totalFiles": 23
 }

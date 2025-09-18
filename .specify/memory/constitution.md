@@ -10,19 +10,37 @@
  
     - Work SHALL NOT begin until relevant context is gathered and confirmed accurate.
 
- ### Section II: Memory Guidance
+ ### Section II: Memory Guidance (via Memento MCP - See Article III Section I)
    
-    -  Significant sessions SHALL be recorded to Memento.
-    -  Summaries and outcomes SHALL be stored for future recall.
-    -  Insights and Critical project discoveries SHALL be stored in memento for future recall. 
+    - Significant sessions SHALL be recorded to Memento MCP knowledge graph
+    - Summaries and outcomes SHALL be stored for future recall
+    - Insights and critical project discoveries SHALL be stored in Memento for future recall
+   - All memory operations SHALL follow Memento MCP requirements defined in Article III Section I 
 
- ### Section III: Documentation 
+ ### Section III: Documentation Pipeline & Standards
 
-    - All new features, and changes to the codebase SHALL be accurately updated and documented (app/public/docs-source/)
-    - Context7 SHALL be used to fetch and store authoritative framework documentation.
-    - Developers SHALL NOT proceed using stale or unverified references.
-   - Documentation SHALL be regenerated after significant changes (`npm run docs:generate`)
-   - Public documentation SHALL match current implementation
+   - All files in /app/ directory SHALL maintain 100% JSDoc comment coverage
+   - JSDoc comments SHALL be the single source of truth for all documentation
+   - All JavaScript functions SHALL include complete JSDoc comments with:
+     - @description - Clear explanation of function purpose
+     - @param - All parameters with types and descriptions
+     - @returns - Return value type and description
+     - @throws - Exceptions that may be thrown
+     - @example - Usage examples for public APIs
+     - @since - Version when feature was added
+     - @module - Module identification for organization
+   - Documentation pipeline SHALL follow this workflow:
+     1. Maintain JSDoc comments during development (continuous)
+     2. Generate technical documentation via `npm run docs:dev`
+     3. Review technical docs and extract public content
+     4. Generate public markdown in app/public/docs-source/
+     5. Generate HTML portal via `npm run docs:generate`
+   - Technical documentation SHALL reside in app/dev-docs-html/
+   - Public documentation SHALL reside in app/public/docs-source/ (markdown) and app/public/docs-html/ (HTML)
+   - Context7 SHALL be used to verify framework documentation accuracy
+   - Documentation SHALL be regenerated after every feature completion
+   - All NPM Scripts SHALL be documented in NPMGUIDE.md
+   - JSDoc coverage reports SHALL be reviewed weekly
 
  ### Section IV: Code Quality and Linting
 
@@ -65,13 +83,41 @@
 
 ## Article III: MCP Tool Usage
 
-### Section I: Claude-Dev Mode
+### Section I: Memento
+   - Memento MCP SHALL be used as the primary knowledge graph for the project
+   - All Searches SHALL be Semantic
+   - Entities SHALL Use PROJECT:DOMAIN:TYPE
+   - Entities SHALL Contain TIMESTAMP:YYYYMMDDHHMMSS
+   - Entities SHALL Contain an ABSTRACT and SUMMARY
 
-   - Web searches SHALL be completed using the brave-search MCP if available and should use the summerizer option to get the best results.
+### Section II: Context 7
    - Context7 SHALL be used for all code changes to ensure full framework compatability.
+   - All Framework SHALL be downloaded in markdown format to the /dev-docs/frameworks/ folder
+
+### Section III: Brave Search
+   - Web searches SHALL be completed using the brave-search MCP if available and should use the summerizer option to get the best results.
+
+### Section IV: Codacy
    - All code must pass Codacy Quality Checks
 
-## Article IV: Performance Requirements
+### Section V: Playwright
+   - Playwright Testing SHALL be performed before and after any UI changes.
+
+### Section VI: Sequential Thinking
+   - All complex tasks SHALL be broken down with Sequential Thinking 
+
+### Section VII: Zen
+   - If Available, Zen tools may be used at the users request only.
+
+## Artivle IV: Gemini CLI Tools
+   - Gemini CLI may be used for coplext tasks at the users request only. 
+   - All tools SHALL be documented in GEMINICLITOOLS.md
+
+## Article V: Codex CLI Tools
+   - Codex CLI Tools may be used for complext tasks at the users request only. 
+   - All tools SHALL be documented in CODEXCLITOOLS.md
+
+## Article V: Performance Requirements
 
 ### Section I: Response Time Standards
 

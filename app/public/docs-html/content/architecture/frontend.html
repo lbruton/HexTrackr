@@ -1,10 +1,8 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>Frontend Architecture</h1>
-<p>The HexTrackr frontend employs a sophisticated <strong>modular orchestrator pattern</strong> that provides clean separation of concerns, event-driven communication, and maintainable code organization. The architecture has evolved from a monolithic structure to a fully modular system coordinated by the <code>VulnerabilityCoreOrchestrator</code>.</p>
+    <h1>Frontend Architecture</h1><p>The HexTrackr frontend employs a sophisticated <strong>modular orchestrator pattern</strong> that provides clean separation of concerns, event-driven communication, and maintainable code organization. The architecture has evolved from a monolithic structure to a fully modular system coordinated by the <code>VulnerabilityCoreOrchestrator</code>.</p>
 <hr>
-<h2>Architecture Overview</h2>
-<div class="mermaid">graph TD
+<h2>Architecture Overview</h2><div class="mermaid">graph TD
     A[ModernVulnManager] --&gt; B[VulnerabilityCoreOrchestrator]
 
     B --&gt; C[VulnerabilityDataManager]
@@ -26,9 +24,7 @@
 
     style B fill:#e1f5fe
     style A fill:#f3e5f5</div><hr>
-<h2>Core Orchestrator Pattern</h2>
-<h3>VulnerabilityCoreOrchestrator</h3>
-<p>The central coordination hub that manages all specialized modules and their interactions:</p>
+<h2>Core Orchestrator Pattern</h2><h3>VulnerabilityCoreOrchestrator</h3><p>The central coordination hub that manages all specialized modules and their interactions:</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityCoreOrchestrator</span> {
     <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
         <span class="hljs-variable language_">this</span>.<span class="hljs-property">managers</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
@@ -52,9 +48,7 @@
 <li>Error handling and recovery</li>
 </ul>
 <hr>
-<h2>Specialized Manager Modules</h2>
-<h3>1. VulnerabilityDataManager</h3>
-<p><strong>Location</strong>: <code>/scripts/shared/vulnerability-data.js</code></p>
+<h2>Specialized Manager Modules</h2><h3>1. VulnerabilityDataManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-data.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>API communication and data fetching</li>
@@ -66,8 +60,7 @@
 <pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-title function_">fetchVulnerabilities</span>(params)
 <span class="hljs-keyword">async</span> <span class="hljs-title function_">fetchStatistics</span>()
 <span class="hljs-keyword">async</span> <span class="hljs-title function_">importCSV</span>(file, options)
-<span class="hljs-title function_">clearCache</span>()</code></pre><h3>2. VulnerabilityStatisticsManager</h3>
-<p><strong>Location</strong>: <code>/scripts/shared/vulnerability-statistics.js</code></p>
+<span class="hljs-title function_">clearCache</span>()</code></pre><h3>2. VulnerabilityStatisticsManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-statistics.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>Statistical calculations and aggregations</li>
@@ -82,8 +75,7 @@
 <li>Device impact metrics</li>
 <li>Performance-optimized aggregations</li>
 </ul>
-<h3>3. VulnerabilityChartManager</h3>
-<p><strong>Location</strong>: <code>/scripts/shared/vulnerability-chart-manager.js</code></p>
+<h3>3. VulnerabilityChartManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-chart-manager.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>ApexCharts integration and management</li>
@@ -117,8 +109,7 @@
     <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> {
         <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">createChartsWithTheme</span>(<span class="hljs-string">&#x27;light&#x27;</span>);
     }, <span class="hljs-number">500</span>);
-}</code></pre><h3>4. VulnerabilitySearchManager</h3>
-<p><strong>Location</strong>: <code>/scripts/shared/vulnerability-search.js</code></p>
+}</code></pre><h3>4. VulnerabilitySearchManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-search.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>Search functionality implementation</li>
@@ -126,8 +117,7 @@
 <li>CVE lookup and validation</li>
 <li>Search optimization and indexing</li>
 </ul>
-<h3>5. VulnerabilityGridManager</h3>
-<p><strong>Location</strong>: <code>/scripts/shared/vulnerability-grid.js</code></p>
+<h3>5. VulnerabilityGridManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-grid.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>AG-Grid configuration and management</li>
@@ -142,8 +132,7 @@
 <li>Responsive column management</li>
 <li>Advanced filtering and sorting</li>
 </ul>
-<h3>6. VulnerabilityCardsManager</h3>
-<p><strong>Location</strong>: <code>/scripts/shared/vulnerability-cards.js</code></p>
+<h3>6. VulnerabilityCardsManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-cards.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>Card-based view rendering</li>
@@ -152,9 +141,7 @@
 <li>Interactive card actions</li>
 </ul>
 <hr>
-<h2>Real-time Communication</h2>
-<h3>WebSocketClient Architecture</h3>
-<p><strong>Location</strong>: <code>/scripts/shared/websocket-client.js</code></p>
+<h2>Real-time Communication</h2><h3>WebSocketClient Architecture</h3><p><strong>Location</strong>: <code>/scripts/shared/websocket-client.js</code></p>
 <pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">WebSocketClient</span> {
     <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
         <span class="hljs-variable language_">this</span>.<span class="hljs-property">socket</span> = <span class="hljs-literal">null</span>;
@@ -181,9 +168,7 @@
 <li>Connection status changes</li>
 </ul>
 <hr>
-<h2>Theme System Integration</h2>
-<h3>ThemeController Integration</h3>
-<p><strong>Location</strong>: <code>/scripts/shared/theme-controller.js</code></p>
+<h2>Theme System Integration</h2><h3>ThemeController Integration</h3><p><strong>Location</strong>: <code>/scripts/shared/theme-controller.js</code></p>
 <p>The frontend integrates with a sophisticated theme system providing:</p>
 <ul>
 <li><strong>Dark/Light Mode</strong>: Complete theme switching</li>
@@ -207,9 +192,7 @@
         }
     });
 }</code></pre><hr>
-<h2>Modal System Architecture</h2>
-<h3>Modal Management</h3>
-<p><strong>Location</strong>: <code>/scripts/shared/</code> (various modal files)</p>
+<h2>Modal System Architecture</h2><h3>Modal Management</h3><p><strong>Location</strong>: <code>/scripts/shared/</code> (various modal files)</p>
 <p><strong>Available Modals</strong>:</p>
 <ul>
 <li><code>vulnerability-details-modal.js</code> - Vulnerability information display</li>
@@ -224,13 +207,10 @@
 <li>State preservation during navigation</li>
 <li>Accessibility compliance</li>
 </ul>
-<h3>Universal Aggregation System</h3>
-<p>HexTrackr implements description-field-based aggregation for consistent modal relationships:</p>
+<h3>Universal Aggregation System</h3><p>HexTrackr implements description-field-based aggregation for consistent modal relationships:</p>
 <p><strong>Vulnerability Modals</strong>: Aggregate all devices affected by specific vulnerabilities<br><strong>Device Modals</strong>: Aggregate all vulnerabilities affecting specific devices</p>
 <hr>
-<h2>Page-Specific Architecture</h2>
-<h3>Vulnerabilities Page (<code>vulnerabilities.html</code>)</h3>
-<p><strong>Main Controller</strong>: <code>/scripts/pages/vulnerabilities.js</code></p>
+<h2>Page-Specific Architecture</h2><h3>Vulnerabilities Page (`vulnerabilities.html`)</h3><p><strong>Main Controller</strong>: <code>/scripts/pages/vulnerabilities.js</code></p>
 <pre><code class="language-javascript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ModernVulnManager</span> {
     <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
         <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">initializeModules</span>();
@@ -255,8 +235,7 @@
 <li>Multiple export formats (CSV, HTML, PDF)</li>
 <li>Advanced search and filtering</li>
 </ul>
-<h3>Tickets Page (<code>tickets.html</code>)</h3>
-<p><strong>Main Controller</strong>: <code>/scripts/pages/tickets.js</code></p>
+<h3>Tickets Page (`tickets.html`)</h3><p><strong>Main Controller</strong>: <code>/scripts/pages/tickets.js</code></p>
 <p><strong>Features</strong>:</p>
 <ul>
 <li>Complete CRUD operations for tickets</li>
@@ -266,17 +245,14 @@
 <li>Audit trail management</li>
 </ul>
 <hr>
-<h2>Shared Infrastructure</h2>
-<h3>Utility Modules</h3>
-<p><strong>Location</strong>: <code>/scripts/utils/</code></p>
+<h2>Shared Infrastructure</h2><h3>Utility Modules</h3><p><strong>Location</strong>: <code>/scripts/utils/</code></p>
 <ul>
 <li><code>accessibility-announcer.js</code> - Screen reader support</li>
 <li><code>security.js</code> - XSS prevention and input sanitization</li>
 <li><code>theme-contrast-tester.js</code> - WCAG compliance validation</li>
 <li><code>wcag-contrast-validator.js</code> - Color contrast validation</li>
 </ul>
-<h3>Shared Components</h3>
-<p><strong>Location</strong>: <code>/scripts/shared/</code></p>
+<h3>Shared Components</h3><p><strong>Location</strong>: <code>/scripts/shared/</code></p>
 <ul>
 <li><code>header-loader.js</code> - Dynamic header management</li>
 <li><code>footer-loader.js</code> - Footer content loading</li>
@@ -285,9 +261,7 @@
 <li><code>cve-utilities.js</code> - CVE validation and formatting</li>
 </ul>
 <hr>
-<h2>Event-Driven Communication</h2>
-<h3>Event Flow Architecture</h3>
-<div class="mermaid">sequenceDiagram
+<h2>Event-Driven Communication</h2><h3>Event Flow Architecture</h3><div class="mermaid">sequenceDiagram
     participant User
     participant Grid as GridManager
     participant Orch as Orchestrator
@@ -308,32 +282,26 @@
 <li><code>exportComplete</code> - Export operation finished</li>
 </ul>
 <hr>
-<h2>Performance Optimizations</h2>
-<h3>Data Management</h3>
-<ul>
+<h2>Performance Optimizations</h2><h3>Data Management</h3><ul>
 <li><strong>Caching Strategy</strong>: Intelligent cache invalidation</li>
 <li><strong>Virtual Scrolling</strong>: AG-Grid virtualization for large datasets</li>
 <li><strong>Lazy Loading</strong>: Progressive data loading</li>
 <li><strong>Debounced Operations</strong>: Search and filter debouncing</li>
 </ul>
-<h3>Rendering Optimizations</h3>
-<ul>
+<h3>Rendering Optimizations</h3><ul>
 <li><strong>Chart Throttling</strong>: Progress update throttling (100ms)</li>
 <li><strong>DOM Optimization</strong>: Minimal DOM manipulation</li>
 <li><strong>Event Delegation</strong>: Efficient event handling</li>
 <li><strong>Memory Management</strong>: Proper cleanup and disposal</li>
 </ul>
-<h3>Network Optimization</h3>
-<ul>
+<h3>Network Optimization</h3><ul>
 <li><strong>Request Batching</strong>: Combined API requests</li>
 <li><strong>Response Compression</strong>: Gzip/deflate support</li>
 <li><strong>Connection Pooling</strong>: WebSocket connection reuse</li>
 <li><strong>Progressive Enhancement</strong>: Graceful degradation</li>
 </ul>
 <hr>
-<h2>Error Handling &amp; Recovery</h2>
-<h3>Graceful Degradation</h3>
-<pre><code class="language-javascript"><span class="hljs-comment">// Example error handling in orchestrator</span>
+<h2>Error Handling & Recovery</h2><h3>Graceful Degradation</h3><pre><code class="language-javascript"><span class="hljs-comment">// Example error handling in orchestrator</span>
 <span class="hljs-keyword">async</span> <span class="hljs-title function_">handleModuleError</span>(<span class="hljs-params">moduleName, error</span>) {
     <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">`Module <span class="hljs-subst">${moduleName}</span> error:`</span>, error);
 
@@ -356,25 +324,20 @@
 <li>Error logging and reporting</li>
 </ul>
 <hr>
-<h2>Development &amp; Testing</h2>
-<h3>Module Testing Strategy</h3>
-<ul>
+<h2>Development & Testing</h2><h3>Module Testing Strategy</h3><ul>
 <li><strong>Unit Tests</strong>: Individual manager testing</li>
 <li><strong>Integration Tests</strong>: Orchestrator communication testing</li>
 <li><strong>E2E Tests</strong>: Playwright automation for workflows</li>
 <li><strong>Performance Tests</strong>: Load testing with large datasets</li>
 </ul>
-<h3>Development Tools</h3>
-<ul>
+<h3>Development Tools</h3><ul>
 <li><strong>ES6 Modules</strong>: Native module system</li>
 <li><strong>Hot Reloading</strong>: Development server support</li>
 <li><strong>Source Maps</strong>: Debugging support</li>
 <li><strong>Code Splitting</strong>: Optimized loading</li>
 </ul>
 <hr>
-<h2>Future Enhancements</h2>
-<h3>Planned Improvements</h3>
-<table>
+<h2>Future Enhancements</h2><h3>Planned Improvements</h3><table>
 <thead>
 <tr>
 <th>Area</th>
@@ -413,16 +376,14 @@
 <td>High</td>
 </tr>
 </tbody></table>
-<h3>Architecture Evolution</h3>
-<ul>
+<h3>Architecture Evolution</h3><ul>
 <li><strong>TypeScript Migration</strong>: Gradual TypeScript adoption</li>
 <li><strong>Framework Integration</strong>: Consider React/Vue integration</li>
 <li><strong>API Standardization</strong>: GraphQL implementation</li>
 <li><strong>Real-time Enhancements</strong>: Enhanced WebSocket features</li>
 </ul>
 <hr>
-<h2>Summary</h2>
-<p>The HexTrackr frontend demonstrates a mature, modular architecture that prioritizes:</p>
+<h2>Summary</h2><p>The HexTrackr frontend demonstrates a mature, modular architecture that prioritizes:</p>
 <ul>
 <li><strong>Separation of Concerns</strong>: Each module has distinct responsibilities</li>
 <li><strong>Event-Driven Communication</strong>: Loose coupling between components</li>

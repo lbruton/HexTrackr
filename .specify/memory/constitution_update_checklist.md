@@ -1,12 +1,13 @@
-# Constitution Update Checklist v10.0.0
+# Constitution Update Checklist v11.0.0
 
-When amending The HexTrackr Development Constitution (`/memory/constitution.md`), ensure all articles and sections remain clear and enforceable.
+When amending The HexTrackr Development Constitution (`.specify/memory/constitution.md`), ensure all articles and sections remain clear and enforceable.
 
 ## Version & Structure
 - [ ] Version number updated in constitution
 - [ ] Previous version referenced if applicable
-- [ ] Four-article structure maintained (Development Framework + Spec-Kit + MCP Tools + Performance)
+- [ ] Six-article structure maintained (Dev Framework + Spec-Kit + MCP Tools + Gemini + Codex + Performance)
 - [ ] Clear, enforceable language using SHALL/SHALL NOT
+- [ ] Article numbering verified (no duplicates)
 
 ---
 
@@ -18,19 +19,38 @@ When amending The HexTrackr Development Constitution (`/memory/constitution.md`)
 - [ ] Sources verified (Memento, branch status, docs)
 - [ ] No ambiguous context requirements
 
-### Section II: Memory Guidance
-- [ ] Significant sessions SHALL be recorded to Memento
-- [ ] Summaries and outcomes SHALL be stored
-- [ ] Insights and discoveries SHALL be preserved
+### Section II: Memory Guidance (via Memento MCP - Article III Section I)
+- [ ] Significant sessions recorded to Memento MCP knowledge graph
+- [ ] Summaries and outcomes stored for recall
+- [ ] Insights and discoveries preserved in Memento
 - [ ] Future recall capability ensured
+- [ ] Memory operations follow Article III Section I requirements
+- [ ] Cross-reference to Memento MCP verified
 
-### Section III: Documentation
-- [ ] New features SHALL be documented in app/public/docs-source/
-- [ ] Context7 SHALL be used for framework documentation
-- [ ] No stale or unverified references allowed
-- [ ] Documentation accuracy mandated
-- [ ] Documentation regenerated after significant changes
-- [ ] Public docs match implementation
+### Section III: Documentation Pipeline & Standards
+- [ ] 100% JSDoc coverage maintained for all /app/ files
+- [ ] JSDoc comments are single source of truth
+- [ ] All required JSDoc tags present:
+  - [ ] @description - Function purpose explained
+  - [ ] @param - All parameters documented with types
+  - [ ] @returns - Return value documented
+  - [ ] @throws - Exceptions documented
+  - [ ] @example - Usage examples for public APIs
+  - [ ] @since - Version tracking included
+  - [ ] @module - Module identification present
+- [ ] Documentation pipeline followed:
+  - [ ] Step 1: JSDoc comments maintained during development
+  - [ ] Step 2: Technical docs generated via `npm run docs:dev`
+  - [ ] Step 3: Technical docs reviewed for public content
+  - [ ] Step 4: Public markdown created in app/public/docs-source/
+  - [ ] Step 5: HTML portal generated via `npm run docs:generate`
+- [ ] Technical docs in app/dev-docs-html/
+- [ ] Public docs in app/public/docs-source/ (markdown)
+- [ ] HTML portal in app/public/docs-html/
+- [ ] Context7 used for framework verification
+- [ ] Documentation regenerated after each feature
+- [ ] NPM Scripts documented in NPMGUIDE.md
+- [ ] Weekly JSDoc coverage review completed
 
 ### Section IV: Code Quality and Linting
 - [ ] Codacy quality checks SHALL pass
@@ -82,23 +102,73 @@ When amending The HexTrackr Development Constitution (`/memory/constitution.md`)
 
 ## Article III: MCP Tool Usage Verification
 
-### Section I: Claude-Dev Mode
-- [ ] Brave-search MCP SHALL be used for web searches
-- [ ] Summarizer option specified for best results
-- [ ] Context7 SHALL be used for code changes
-- [ ] Framework compatibility ensured
-- [ ] Codacy quality checks SHALL pass
-- [ ] All code must meet quality standards
+### Section I: Memento
+- [ ] Memento MCP used as primary knowledge graph
+- [ ] All searches SHALL be Semantic
+- [ ] Entities use PROJECT:DOMAIN:TYPE format
+- [ ] Entities contain TIMESTAMP:YYYYMMDDHHMMSS
+- [ ] Entities contain ABSTRACT and SUMMARY
 
-### Additional Tool Usage Checks
-- [ ] Tool requirements clearly specified
-- [ ] MCP server availability considered
-- [ ] Quality gates enforceable
-- [ ] Tool usage aligns with development workflow
+### Section II: Context7
+- [ ] Context7 used for all framework code changes
+- [ ] Framework compatibility ensured
+- [ ] Frameworks downloaded in markdown to /dev-docs/frameworks/
+
+### Section III: Brave Search
+- [ ] Web searches use brave-search MCP when available
+- [ ] Summarizer option used for best results
+- [ ] Search results properly integrated
+
+### Section IV: Codacy
+- [ ] All code passes Codacy quality checks
+- [ ] Quality gates enforced
+- [ ] Codacy integration configured correctly
+
+### Section V: Playwright
+- [ ] Playwright testing performed before UI changes
+- [ ] Playwright testing performed after UI changes
+- [ ] E2E test coverage maintained
+
+### Section VI: Sequential Thinking
+- [ ] Complex tasks broken down with Sequential Thinking
+- [ ] Problem decomposition documented
+- [ ] Thinking chains preserved for review
+
+### Section VII: Zen
+- [ ] Zen tools used only at user request
+- [ ] Multi-model consensus when needed
+- [ ] Zen MCP server availability verified
+
+### MCP Configuration Checks
+- [ ] cld alias → minimal (memento + sequential-thinking)
+- [ ] cld-dev alias → development (all standard MCP tools)
+- [ ] cld-zen alias → enhanced (includes Zen server)
 
 ---
 
-## Article IV: Performance Requirements Verification
+## Article IV: Gemini CLI Tools Verification
+
+### Section I: Usage Requirements
+- [ ] Gemini CLI used only for complex tasks
+- [ ] Used only at user's explicit request
+- [ ] All tools documented in GEMINICLITOOLS.md
+- [ ] Command syntax verified
+- [ ] Output properly integrated
+
+---
+
+## Article V: Codex CLI Tools Verification
+
+### Section I: Usage Requirements
+- [ ] Codex CLI used only for complex tasks
+- [ ] Used only at user's explicit request
+- [ ] All tools documented in CODEXCLITOOLS.md
+- [ ] Command syntax verified
+- [ ] Output properly integrated
+
+---
+
+## Article VI: Performance Requirements Verification
 
 ### Section I: Response Time Standards
 - [ ] Page loads within 2 seconds
@@ -133,6 +203,7 @@ When amending The HexTrackr Development Constitution (`/memory/constitution.md`)
 - [ ] Unified development philosophy maintained
 - [ ] Clear priority when principles intersect
 - [ ] All sections support overall framework
+- [ ] Article numbering sequential (no duplicates)
 
 ### Enforceability
 - [ ] All requirements practically enforceable
@@ -155,6 +226,7 @@ When amending The HexTrackr Development Constitution (`/memory/constitution.md`)
 - [ ] Document rationale in Memento
 - [ ] Update this checklist if structure changed
 - [ ] Verify all sections still coherent
+- [ ] Check for duplicate article numbers
 
 ### Impact Assessment
 - [ ] Change doesn't overcomplicate constitution
@@ -174,7 +246,7 @@ When amending The HexTrackr Development Constitution (`/memory/constitution.md`)
 
 ### Sign-off Requirements
 - [ ] Constitution version updated
-- [ ] Checklist version updated
+- [ ] Checklist version updated (now v11.0.0)
 - [ ] All checks completed
 - [ ] User approval obtained
 - [ ] Changes documented in Memento
@@ -185,8 +257,8 @@ When amending The HexTrackr Development Constitution (`/memory/constitution.md`)
 
 **Article I: Development Framework**
 1. Context Accuracy - No work without verified context
-2. Memory Guidance - Sessions recorded to Memento
-3. Documentation - Accurate docs, regenerated regularly
+2. Memory Guidance - Sessions recorded to Memento MCP (→ Article III.I)
+3. Documentation Pipeline - 100% JSDoc → Tech docs → Public docs → HTML portal
 4. Code Quality - Pass all linting checks
 5. Branch Discipline - Use copilot/spec branches, PRs for protected
 6. Docker Principles - Always use container (8989)
@@ -198,23 +270,59 @@ When amending The HexTrackr Development Constitution (`/memory/constitution.md`)
 2. No implementation without specification
 
 **Article III: MCP Tool Usage**
-1. Claude-Dev Mode - Brave-search for web, Context7 for code, Codacy for quality
+1. Memento - Primary knowledge graph, semantic search
+2. Context7 - Framework compatibility verification
+3. Brave Search - Web searches with summarizer
+4. Codacy - Code quality enforcement
+5. Playwright - UI testing before/after changes
+6. Sequential Thinking - Complex task decomposition
+7. Zen - Multi-model consensus (user request only)
 
-**Article IV: Performance Requirements**
+**Article IV: Gemini CLI Tools**
+1. Complex tasks only, user request required
+2. Documented in GEMINICLITOOLS.md
+
+**Article V: Codex CLI Tools**
+1. Complex tasks only, user request required
+2. Documented in CODEXCLITOOLS.md
+
+**Article VI: Performance Requirements**
 1. Response Times - 2s pages, 500ms APIs, 100ms DB
 2. Processing - 1000 rows/sec CSV, 100 concurrent batch
 3. Resources - 512MB memory, 80% CPU, log rotation
 
 ---
 
-*Last Updated: September 17, 2025*
-*Constitution Version: Current (4 Articles)*
-*Checklist Version: 10.0.0*
+## Alias Configuration Reference
+
+### cld (Minimal Mode)
+- Memento MCP
+- Sequential Thinking MCP
+
+### cld-dev (Development Mode) - DEFAULT
+- Memento MCP
+- Sequential Thinking MCP
+- Context7 MCP
+- Codacy MCP
+- Brave Search MCP
+- Playwright MCP
+
+### cld-zen (Enhanced AI Mode)
+- All cld-dev tools
+- Zen MCP Server
+
+---
+
+*Last Updated: September 18, 2025*
+*Constitution Version: Current (6 Articles)*
+*Checklist Version: 11.0.0*
 
 ## Notes
-- This checklist aligns with the four-article constitutional structure
+- This checklist aligns with the six-article constitutional structure
+- Article III expanded to cover all 7 MCP tool sections
+- New Articles IV & V for CLI tool integrations
+- Performance requirements moved to Article VI
 - Focus on SHALL/SHALL NOT enforcement language
 - All sections must be practically verifiable
 - Constitution governs "core operating principals" (sic) as stated in preamble
-- Article III ensures proper MCP tool usage in Claude-Dev mode
-- Article IV sets measurable performance benchmarks
+- Default development mode is cld-dev for constitutional compliance

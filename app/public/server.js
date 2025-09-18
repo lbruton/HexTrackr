@@ -4,7 +4,7 @@
  * Handles API endpoints, vulnerability data management, file uploads, and serves the frontend
  */
 /* eslint-env node */
-/* global __dirname, __filename, require, console, process */
+/* global __dirname, require, console, process */
 
 // Core dependencies
 const express = require("express");
@@ -19,14 +19,12 @@ const sqlite3 = require("sqlite3").verbose();
 const fs = require("fs");
 
 // Configuration modules
-const { config: dbConfig, getEnvironmentConfig } = require("../config/database");
+const { config: dbConfig } = require("../config/database");
 const middlewareConfig = require("../config/middleware");
 const { getSocketOptions } = require("../config/websocket");
 
 // Utility modules
-const PathValidator = require("../utils/PathValidator");
 const ProgressTracker = require("../utils/ProgressTracker");
-const helpers = require("../utils/helpers");
 
 // Service modules
 const DatabaseService = require("../services/databaseService");
@@ -47,15 +45,18 @@ const dbPath = path.join(__dirname, dbConfig.path.relative);
 const db = new sqlite3.Database(dbPath);
 const databaseService = new DatabaseService(dbPath);
 
-// Configure multer for file uploads
-const upload = multer(middlewareConfig.upload);
+// Configure multer for file uploads (kept for future use)
+const _upload = multer(middlewareConfig.upload);
 
 // Import controllers that need initialization
 const VulnerabilityController = require("../controllers/vulnerabilityController");
 const TicketController = require("../controllers/ticketController");
 const BackupController = require("../controllers/backupController");
 
-// Initialize database and controllers
+/**
+ * Initializes the database and controllers.
+ * @returns {Promise<void>}
+ */
 async function initDb() {
     await databaseService.initialize();
 
@@ -93,7 +94,12 @@ app.use((req, res, next) => {
     next();
 });
 
-// Health check endpoint - Fixed to match monolithic version
+/**
+ * @description Health check endpoint
+ * @name /health
+ * @method GET
+ * @returns {object} Health status object
+ */
 app.get("/health", (req, res) => {
     try {
         // Get version from environment or default
@@ -120,7 +126,10 @@ app.get("/health", (req, res) => {
     }
 });
 
-// Start server with proper initialization order
+/**
+ * Starts the server.
+ * @returns {Promise<void>}
+ */
 async function startServer() {
     // Initialize database and controllers BEFORE importing routes
     await initDb();
@@ -140,7 +149,12 @@ async function startServer() {
     app.use("/api/import", importRoutes); // Also mount at /api/import for legacy routes
     app.use("/api/tickets", ticketRoutes);
 
-    // Legacy simple routes that don't need full extraction
+    /**
+     * @description Get all sites
+     * @name /api/sites
+     * @method GET
+     * @returns {Array<object>} Array of site objects
+     */
     app.get("/api/sites", (req, res) => {
         db.all("SELECT DISTINCT hostname FROM vulnerabilities ORDER BY hostname", [], (err, rows) => {
             if (err) {return res.status(500).json({ error: err.message });}
@@ -148,6 +162,12 @@ async function startServer() {
         });
     });
 
+    /**
+     * @description Get all locations
+     * @name /api/locations
+     * @method GET
+     * @returns {Array<object>} Array of location objects
+     */
     app.get("/api/locations", (req, res) => {
         db.all("SELECT DISTINCT ip_address FROM vulnerabilities WHERE ip_address != '' ORDER BY ip_address", [], (err, rows) => {
             if (err) {return res.status(500).json({ error: err.message });}
@@ -164,6 +184,15 @@ async function startServer() {
         }
     }));
 
+    // Developer documentation (JSDoc generated - not linked in main navigation)
+    app.use("/dev-docs", express.static(path.join(__dirname, "../dev-docs-html"), {
+        setHeaders: (res, filePath) => {
+            if (filePath.endsWith(".html")) {
+                res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+            }
+        }
+    }));
+
     app.use(express.static(path.join(__dirname), {
         setHeaders: (res, filePath) => {
             if (filePath.endsWith(".html")) {
@@ -172,13 +201,17 @@ async function startServer() {
         }
     }));
 
-    // Default route
+    /**
+     * @description Default route
+     * @name /
+     * @method GET
+     */
     app.get("/", (req, res) => {
         res.redirect("/vulnerabilities.html");
     });
 
     // Error handling middleware
-    app.use((error, req, res, next) => {
+    app.use((error, req, res, _next) => {
         console.error("Unhandled error:", error);
         res.status(500).json({
             success: false,
