@@ -97,7 +97,7 @@ app.use((req, res, next) => {
 app.get("/health", (req, res) => {
     try {
         // Get version from environment or default
-        const version = process.env.HEXTRACKR_VERSION || "1.0.13";
+        const version = process.env.HEXTRACKR_VERSION || "1.0.16";
 
         // Check if database file exists
         const dbExists = fs.existsSync(dbPath);

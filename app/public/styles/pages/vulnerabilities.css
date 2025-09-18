@@ -1,5 +1,92 @@
 /* Vulnerabilities Page Specific Styles */
 
+/* VPR Severity Color System - Single Source of Truth */
+:root {
+    /* Primary severity colors for light mode */
+    --vpr-critical: #dc2626;
+    --vpr-high: #d97706;     /* Adjusted for WCAG AA compliance */
+    --vpr-medium: #2563eb;
+    --vpr-low: #16a34a;
+
+    /* RGB values for alpha transparency */
+    --vpr-critical-rgb: 220, 38, 38;
+    --vpr-high-rgb: 217, 119, 6;
+    --vpr-medium-rgb: 37, 99, 235;
+    --vpr-low-rgb: 22, 163, 74;
+
+    /* Background colors with opacity */
+    --vpr-critical-bg: rgb(var(--vpr-critical-rgb), 0.1);
+    --vpr-high-bg: rgb(var(--vpr-high-rgb), 0.1);
+    --vpr-medium-bg: rgb(var(--vpr-medium-rgb), 0.1);
+    --vpr-low-bg: rgb(var(--vpr-low-rgb), 0.1);
+}
+
+/* Dark mode color overrides for better visibility */
+[data-theme="dark"] {
+    /* Adjusted colors for dark mode visibility */
+    --vpr-critical: #ef4444;
+    --vpr-high: #f97316;
+    --vpr-medium: #3b82f6;
+    --vpr-low: #22c55e;
+
+    /* RGB values for dark mode */
+    --vpr-critical-rgb: 239, 68, 68;
+    --vpr-high-rgb: 249, 115, 22;
+    --vpr-medium-rgb: 59, 130, 246;
+    --vpr-low-rgb: 34, 197, 94;
+}
+
+/* VPR Utility Classes - Text Colors */
+.text-vpr-critical {
+    color: var(--vpr-critical) !important;
+}
+
+.text-vpr-high {
+    color: var(--vpr-high) !important;
+}
+
+.text-vpr-medium {
+    color: var(--vpr-medium) !important;
+}
+
+.text-vpr-low {
+    color: var(--vpr-low) !important;
+}
+
+/* VPR Utility Classes - Background Colors */
+.bg-vpr-critical {
+    background-color: var(--vpr-critical-bg) !important;
+}
+
+.bg-vpr-high {
+    background-color: var(--vpr-high-bg) !important;
+}
+
+.bg-vpr-medium {
+    background-color: var(--vpr-medium-bg) !important;
+}
+
+.bg-vpr-low {
+    background-color: var(--vpr-low-bg) !important;
+}
+
+/* VPR Utility Classes - Border Colors */
+.border-vpr-critical {
+    border-color: var(--vpr-critical) !important;
+}
+
+.border-vpr-high {
+    border-color: var(--vpr-high) !important;
+}
+
+.border-vpr-medium {
+    border-color: var(--vpr-medium) !important;
+}
+
+.border-vpr-low {
+    border-color: var(--vpr-low) !important;
+}
+
 /* Enhanced Card System - Dark Mode Surface Hierarchy - P001 */
 .card {
     background-color: var(--hextrackr-surface-1);
