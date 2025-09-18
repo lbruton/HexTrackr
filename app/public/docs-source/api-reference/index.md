@@ -1,10 +1,29 @@
 # API Reference
 
-This section provides detailed documentation for the HexTrackr REST API endpoints. All endpoints use standard REST conventions with JSON request/response bodies.
+> Automatically generated from JSDoc comments in source code
 
-## API Collections
+## Documentation Sections
 
-- **[Tickets API](./tickets-api.md)**: Endpoints for creating, reading, updating, and deleting tickets.
-- **[Vulnerabilities API](./vulnerabilities-api.md)**: Endpoints for managing and analyzing vulnerability data, including the historical trend analysis.
-- **[Backup and Restore API](./backup-api.md)**: Endpoints for performing system-wide backup and restore operations.
-- **[WebSocket API](./websocket-api.md)**: Documentation for the WebSocket/Socket.io implementation for real-time communication.
+- [Backend API](./backend-api.md) - Controllers, Services, Routes
+- [Frontend API](./frontend-api.md) - UI Components and Pages
+- [Middleware & Config](./middleware-config.md) - Request Pipeline
+- [Utilities](./utilities.md) - Helper Functions
+
+## Coverage Statistics
+
+| Metric | Count | Coverage |
+|--------|-------|----------|
+| Files | 10 | 100% |
+| Functions | 907 | 89% |
+
+### Coverage by Category
+
+- **backend**: 190 documented functions
+- **frontend**: 528 documented functions
+- **middlewareConfig**: 64 documented functions
+- **utilities**: 27 documented functions
+
+---
+
+*Generated: 2025-09-18T14:25:59.301Z*
+*Pipeline Version: 2.0*
