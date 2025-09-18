@@ -19,7 +19,7 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 | Component | Purpose | Location |
 | --------- | ------- | -------- |
 | `server.js` | Main application runtime (orchestration + initialization) | `/app/public/` |
-| **Controllers** | Business logic with singleton pattern | `/app/controllers/` |
+| **Controllers** | Business logic (mixed patterns - see Controller Patterns section) | `/app/controllers/` |
 | **Services** | Data access and business services | `/app/services/` |
 | **Routes** | Express route definitions | `/app/routes/` |
 | **Configuration** | Database, middleware, websocket configs | `/app/config/` |
@@ -29,13 +29,187 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 
 ### Module Organization
 
-| Directory | Contents |
-| --------- | -------- |
-| `/app/controllers/` | `vulnerabilityController.js`, `ticketController.js`, `backupController.js`, `importController.js`, `docsController.js` |
-| `/app/services/` | `databaseService.js`, `vulnerabilityService.js`, `vulnerabilityStatsService.js`, `ticketService.js` |
-| `/app/routes/` | `vulnerabilities.js`, `tickets.js`, `backup.js`, `imports.js`, `docs.js` |
-| `/app/config/` | `database.js`, `middleware.js`, `websocket.js` |
-| `/app/utils/` | `PathValidator.js`, `ProgressTracker.js`, `helpers.js` |
+| Directory | Contents | Pattern |
+| --------- | -------- | ------- |
+| `/app/controllers/` | 5 controller modules | Mixed (3 singleton, 2 functional) |
+| `/app/services/` | 10 service modules | Functional exports |
+| `/app/routes/` | 5 route definition files | Express router pattern |
+| `/app/config/` | 4 configuration modules | Module exports |
+| `/app/middleware/` | 4 middleware modules | Express middleware pattern |
+| `/app/utils/` | 4 utility modules | Static class methods |
+
+### Controller Files
+
+| Controller | Pattern | Methods | Dependency Injection |
+| ---------- | ------- | ------- | -------------------- |
+| `vulnerabilityController.js` | Singleton | 14 static methods | `initialize(db, progressTracker)` |
+| `ticketController.js` | Singleton | 7 static methods | `initialize(db)` |
+| `backupController.js` | Singleton | 6 static methods | `initialize(db)` |
+| `importController.js` | Functional | 6 exported functions | `setProgressTracker(tracker)` |
+| `docsController.js` | Instance | 2 wrapped methods | Direct instantiation |
+
+### Service Files
+
+| Service | Purpose | Key Methods |
+| ------- | ------- | ----------- |
+| `databaseService.js` | Core database operations | `getDb()`, `runQuery()`, `transaction()` |
+| `vulnerabilityService.js` | Vulnerability CRUD operations | `getVulnerabilities()`, `createVulnerability()` |
+| `vulnerabilityStatsService.js` | Statistics and aggregations | `getStats()`, `getTrends()` |
+| `ticketService.js` | Ticket CRUD operations | `getTickets()`, `createTicket()` |
+| `importService.js` | Import business logic | `processVulnerabilitiesWithLifecycle()`, `bulkLoadToStagingTable()` |
+| `backupService.js` | Backup/restore operations | `getBackupStats()`, `restoreBackup()` |
+| `docsService.js` | Documentation statistics | `computeStats()`, `computeApiEndpoints()` |
+| `fileService.js` | File system operations | `readFile()`, `writeFile()` |
+| `progressService.js` | WebSocket progress tracking | `createSession()`, `updateProgress()` |
+| `validationService.js` | Input validation and sanitization | `validateVulnerability()`, `sanitizeInput()` |
+
+---
+
+## Controller Patterns
+
+The backend uses two distinct controller patterns, with ongoing migration toward singleton pattern for consistency:
+
+### Singleton Pattern Controllers
+
+Three controllers (`VulnerabilityController`, `TicketController`, `BackupController`) implement the singleton pattern:
+
+```javascript
+class VulnerabilityController {
+    static instance = null;
+
+    static initialize(database, progressTracker) {
+        if (!VulnerabilityController.instance) {
+            VulnerabilityController.instance = new VulnerabilityController();
+        }
+        VulnerabilityController.instance.db = database;
+        VulnerabilityController.instance.progressTracker = progressTracker;
+        return VulnerabilityController.instance;
+    }
+
+    static getInstance() {
+        if (!VulnerabilityController.instance) {
+            throw new Error("Controller not initialized. Call initialize() first.");
+        }
+        return VulnerabilityController.instance;
+    }
+
+    // All route methods are static and use getInstance()
+    static async getStats(req, res) {
+        const controller = VulnerabilityController.getInstance();
+        // Implementation...
+    }
+}
+```
+
+**Characteristics:**
+- Static `initialize()` method for dependency injection
+- Static `getInstance()` method for retrieving singleton
+- All route methods are static
+- Throws error if accessed before initialization
+
+### Functional Pattern Controllers
+
+Two controllers (`ImportController`, `DocsController`) use different patterns:
+
+**ImportController (Functional exports):**
+```javascript
+let progressTracker = null;
+
+function setProgressTracker(tracker) {
+    progressTracker = tracker;
+}
+
+async function importVulnerabilities(req, res) {
+    // Direct function implementation
+}
+
+module.exports = {
+    setProgressTracker,
+    importVulnerabilities,
+    // Other functions...
+};
+```
+
+**DocsController (Instance-based):**
+```javascript
+class DocsController {
+    constructor() {
+        // Direct instantiation
+    }
+
+    async getStats() {
+        // Instance method
+    }
+}
+
+const docsController = new DocsController();
+
+module.exports = {
+    getStats: () => docsController.getStats(),
+    // Wrapped methods...
+};
+```
+
+### Migration Status
+
+| Controller | Current Pattern | Target Pattern | Priority |
+| ---------- | -------------- | -------------- | -------- |
+| ImportController | Functional | Singleton | High - Complex dependencies |
+| DocsController | Instance | Singleton | Low - Simple controller |
+
+---
+
+## Initialization Sequence
+
+**CRITICAL**: The initialization order is crucial for proper dependency injection. Controllers must be initialized BEFORE routes are imported.
+
+```javascript
+async function startServer() {
+    // 1. Initialize database FIRST
+    await initDb();
+    const db = getDatabase();
+
+    // 2. Initialize utilities
+    const progressTracker = new ProgressTracker(io);
+
+    // 3. Initialize ALL controllers with dependencies
+    // ORDER MATTERS - initialize before importing routes!
+    VulnerabilityController.initialize(db, progressTracker);
+    TicketController.initialize(db);
+    BackupController.initialize(db);
+
+    // For functional controllers
+    ImportController.setProgressTracker(progressTracker);
+
+    // 4. NOW import routes (after controllers are ready)
+    const vulnerabilityRoutes = require("../routes/vulnerabilities");
+    const ticketRoutes = require("../routes/tickets");
+    const backupRoutes = require("../routes/backup");
+    const importRoutes = require("../routes/imports");
+    const docsRoutes = require("../routes/docs");
+
+    // 5. Mount routes on Express app
+    app.use("/api/vulnerabilities", vulnerabilityRoutes);
+    app.use("/api/tickets", ticketRoutes);
+    app.use("/api/backup", backupRoutes);
+    app.use("/api", importRoutes);  // Import routes at root API level
+    app.use("/api/docs", docsRoutes);
+
+    // 6. Start server
+    server.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+```
+
+### Common Initialization Errors
+
+| Error | Cause | Solution |
+| ----- | ----- | -------- |
+| "Controller not initialized" | Routes imported before controller initialization | Follow initialization sequence |
+| "Cannot read property 'db' of undefined" | Controller accessed before `initialize()` called | Ensure `initialize()` called first |
+| "progressTracker is null" | ImportController used before `setProgressTracker()` | Call `setProgressTracker()` during init |
+| Empty API responses | Database not initialized before controllers | Await database initialization |
 
 ### PathValidator Security Class
 
@@ -180,15 +354,22 @@ return `desc:${descriptionHash}|host:${hostIdentifier}`;
 
 ## API Surface (High-Level)
 
-| Domain | Endpoints (Examples) |
-| ------ | -------------------- |
-| Health | `GET /health` |
-| Vulnerabilities (Current) | `GET /api/vulnerabilities`, `/stats`, `/recent-trends`, `/trends` |
-| Vulnerability Import | `POST /api/vulnerabilities/import` (rollover), `POST /api/vulnerabilities/import-staging` (staged), `POST /api/import/vulnerabilities` (JSON) |
-| Tickets | `GET/POST/PUT/DELETE /api/tickets`, `POST /api/tickets/migrate`, `POST /api/import/tickets` |
-| Reference | `GET /api/sites`, `GET /api/locations` |
-| Backup/Restore | `GET /api/backup/stats`, `GET /api/backup/all`, `POST /api/restore`, clear endpoints |
-| Documentation | `GET /api/docs/stats`, `/docs-html` SPA shell & hash routing |
+| Domain | Endpoints | Documentation |
+| ------ | --------- | ------------- |
+| Health | `GET /health` | System health check |
+| Vulnerabilities | 14 endpoints for CRUD, stats, trends | [Vulnerabilities API](../api-reference/vulnerabilities-api.md) |
+| Imports | 6 endpoints for CSV/JSON imports | [Import API](../api-reference/imports-api.md) |
+| Tickets | 7 endpoints for CRUD and migration | [Tickets API](../api-reference/tickets-api.md) |
+| Backup/Restore | 6 endpoints for backup operations | [Backup API](../api-reference/backup-api.md) |
+| Documentation | Stats and portal delivery | [Docs API](../api-reference/complete-reference.md#documentation) |
+| Reference | Sites and locations lookup | [Reference Data](../api-reference/complete-reference.md#reference-data) |
+
+### API Endpoint Summary
+
+- **Total Endpoints**: ~45 REST endpoints
+- **Import System**: 6 dedicated import endpoints (see [Import API](../api-reference/imports-api.md))
+- **WebSocket**: Separate progress tracking on port 8988
+- **Rate Limited**: 100 requests per 15 minutes per IP
 
 ---
 

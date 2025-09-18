@@ -1,0 +1,537 @@
+{
+  "version": "1.0.0",
+  "description": "HexTrackr Theme Variables - Complete inventory for theme engine",
+  "generated": "2025-09-17",
+
+  "colorSystems": {
+    "brand": {
+      "description": "Core brand colors",
+      "variables": {
+        "primary": {
+          "light": "#206bc4",
+          "dark": "#2563eb",
+          "css": "--hextrackr-primary",
+          "usage": "Primary actions, links, focus states"
+        },
+        "secondary": {
+          "light": "#6c757d",
+          "dark": "#6b7280",
+          "css": "--hextrackr-secondary",
+          "usage": "Secondary actions, muted elements"
+        },
+        "success": {
+          "light": "#2fb344",
+          "dark": "#047857",
+          "css": "--hextrackr-success",
+          "usage": "Success states, positive actions"
+        },
+        "warning": {
+          "light": "#f76707",
+          "dark": "#b45309",
+          "css": "--hextrackr-warning",
+          "usage": "Warning states, caution indicators"
+        },
+        "danger": {
+          "light": "#d63384",
+          "dark": "#dc2626",
+          "css": "--hextrackr-danger",
+          "usage": "Error states, destructive actions"
+        },
+        "info": {
+          "light": "#0dcaf0",
+          "dark": "#0369a1",
+          "css": "--hextrackr-info",
+          "usage": "Informational states, tooltips"
+        }
+      }
+    },
+
+    "surfaces": {
+      "description": "Surface elevation hierarchy",
+      "variables": {
+        "base": {
+          "light": "#f8f9fa",
+          "dark": "#0f172a",
+          "css": "--hextrackr-surface-base",
+          "usage": "Page background",
+          "level": 0
+        },
+        "surface1": {
+          "light": "#ffffff",
+          "dark": "#1a2332",
+          "css": "--hextrackr-surface-1",
+          "usage": "Cards, primary containers",
+          "level": 1
+        },
+        "surface2": {
+          "light": "#f8f9fa",
+          "dark": "#253241",
+          "css": "--hextrackr-surface-2",
+          "usage": "Tables, secondary containers",
+          "level": 2
+        },
+        "surface3": {
+          "light": "#f5f5f5",
+          "dark": "#2f3f50",
+          "css": "--hextrackr-surface-3",
+          "usage": "Modal headers/footers, sections",
+          "level": 3
+        },
+        "surface4": {
+          "light": "#ffffff",
+          "dark": "#526880",
+          "css": "--hextrackr-surface-4",
+          "usage": "Modal containers, overlays",
+          "level": 4
+        }
+      }
+    },
+
+    "vpr": {
+      "description": "Vulnerability Priority Rating colors",
+      "variables": {
+        "critical": {
+          "base": "#dc2626",
+          "dark": "#ef4444",
+          "css": "--vpr-critical",
+          "rgb": "220, 38, 38",
+          "background": "rgba(220, 38, 38, 0.1)",
+          "range": "9.0-10.0"
+        },
+        "high": {
+          "base": "#d97706",
+          "dark": "#f97316",
+          "css": "--vpr-high",
+          "rgb": "217, 119, 6",
+          "background": "rgba(217, 119, 6, 0.1)",
+          "range": "7.0-8.9"
+        },
+        "medium": {
+          "base": "#2563eb",
+          "dark": "#3b82f6",
+          "css": "--vpr-medium",
+          "rgb": "37, 99, 235",
+          "background": "rgba(37, 99, 235, 0.1)",
+          "range": "4.0-6.9"
+        },
+        "low": {
+          "base": "#16a34a",
+          "dark": "#22c55e",
+          "css": "--vpr-low",
+          "rgb": "22, 163, 74",
+          "background": "rgba(22, 163, 74, 0.1)",
+          "range": "0.1-3.9"
+        }
+      }
+    },
+
+    "status": {
+      "description": "Status indicator colors",
+      "variables": {
+        "active": {
+          "color": "#10b981",
+          "css": "--status-active",
+          "usage": "Active tickets, running processes"
+        },
+        "pending": {
+          "color": "#f59e0b",
+          "css": "--status-pending",
+          "usage": "Pending items, waiting states"
+        },
+        "resolved": {
+          "color": "#6b7280",
+          "css": "--status-resolved",
+          "usage": "Completed items, closed tickets"
+        },
+        "overdue": {
+          "color": "#ef4444",
+          "css": "--status-overdue",
+          "usage": "Overdue items, expired deadlines"
+        }
+      }
+    },
+
+    "charts": {
+      "description": "Chart color palette",
+      "palette": {
+        "color1": {
+          "value": "#3b82f6",
+          "css": "--chart-color-1",
+          "usage": "Primary data series"
+        },
+        "color2": {
+          "value": "#10b981",
+          "css": "--chart-color-2",
+          "usage": "Secondary data series"
+        },
+        "color3": {
+          "value": "#f59e0b",
+          "css": "--chart-color-3",
+          "usage": "Tertiary data series"
+        },
+        "color4": {
+          "value": "#ef4444",
+          "css": "--chart-color-4",
+          "usage": "Quaternary data series"
+        },
+        "color5": {
+          "value": "#8b5cf6",
+          "css": "--chart-color-5",
+          "usage": "Additional series"
+        },
+        "color6": {
+          "value": "#06b6d4",
+          "css": "--chart-color-6",
+          "usage": "Additional series"
+        },
+        "color7": {
+          "value": "#84cc16",
+          "css": "--chart-color-7",
+          "usage": "Additional series"
+        },
+        "color8": {
+          "value": "#f97316",
+          "css": "--chart-color-8",
+          "usage": "Additional series"
+        }
+      },
+      "structure": {
+        "background": {
+          "light": "#ffffff",
+          "dark": "#1e293b",
+          "css": "--chart-background"
+        },
+        "grid": {
+          "light": "#e5e7eb",
+          "dark": "#374151",
+          "css": "--chart-grid-color"
+        },
+        "text": {
+          "light": "#6b7280",
+          "dark": "#9ca3af",
+          "css": "--chart-text-color"
+        },
+        "title": {
+          "light": "#111827",
+          "dark": "#f9fafb",
+          "css": "--chart-title-color"
+        },
+        "axis": {
+          "light": "#9ca3af",
+          "dark": "#6b7280",
+          "css": "--chart-axis-color"
+        }
+      }
+    },
+
+    "agGrid": {
+      "description": "AG-Grid table theming",
+      "variables": {
+        "background": {
+          "light": "#ffffff",
+          "dark": "#1a2332",
+          "css": "--ag-background-color"
+        },
+        "foreground": {
+          "light": "#000000",
+          "dark": "#e2e8f0",
+          "css": "--ag-foreground-color"
+        },
+        "border": {
+          "light": "#dde2e6",
+          "dark": "rgba(255, 255, 255, 0.15)",
+          "css": "--ag-border-color"
+        },
+        "headerBackground": {
+          "light": "#f8f9fa",
+          "dark": "#253241",
+          "css": "--ag-header-background-color"
+        },
+        "headerForeground": {
+          "light": "#000000",
+          "dark": "#f8fafc",
+          "css": "--ag-header-foreground-color"
+        },
+        "rowHover": {
+          "light": "#f1f3f5",
+          "dark": "rgba(59, 130, 246, 0.1)",
+          "css": "--ag-row-hover-color"
+        },
+        "rowSelected": {
+          "light": "#e9ecef",
+          "dark": "rgba(59, 130, 246, 0.2)",
+          "css": "--ag-selected-row-background-color"
+        },
+        "oddRow": {
+          "light": "transparent",
+          "dark": "rgba(255, 255, 255, 0.02)",
+          "css": "--ag-odd-row-background-color"
+        }
+      }
+    },
+
+    "borders": {
+      "description": "Border system",
+      "variables": {
+        "subtle": {
+          "light": "rgba(0, 0, 0, 0.08)",
+          "dark": "rgba(255, 255, 255, 0.15)",
+          "css": "--hextrackr-border-subtle"
+        },
+        "muted": {
+          "light": "rgba(0, 0, 0, 0.12)",
+          "dark": "rgba(255, 255, 255, 0.20)",
+          "css": "--hextrackr-border-muted"
+        },
+        "strong": {
+          "light": "rgba(0, 0, 0, 0.16)",
+          "dark": "rgba(255, 255, 255, 0.25)",
+          "css": "--hextrackr-border-strong"
+        }
+      }
+    },
+
+    "shadows": {
+      "description": "Shadow system",
+      "variables": {
+        "sm": {
+          "light": "0 1px 3px rgba(0, 0, 0, 0.1)",
+          "dark": "0 1px 3px rgba(0, 0, 0, 0.3)",
+          "css": "--hextrackr-shadow-sm"
+        },
+        "md": {
+          "light": "0 4px 12px rgba(0, 0, 0, 0.15)",
+          "dark": "0 4px 12px rgba(0, 0, 0, 0.4)",
+          "css": "--hextrackr-shadow-md"
+        },
+        "lg": {
+          "light": "0 8px 24px rgba(0, 0, 0, 0.2)",
+          "dark": "0 8px 24px rgba(0, 0, 0, 0.5)",
+          "css": "--hextrackr-shadow-lg"
+        }
+      }
+    },
+
+    "text": {
+      "description": "Text colors",
+      "variables": {
+        "body": {
+          "light": "#212529",
+          "dark": "#e2e8f0",
+          "css": "--bs-body-color"
+        },
+        "emphasis": {
+          "light": "#000000",
+          "dark": "#f8fafc",
+          "css": "--bs-emphasis-color"
+        },
+        "secondary": {
+          "light": "#6c757d",
+          "dark": "#94a3b8",
+          "css": "--bs-secondary-color"
+        },
+        "tertiary": {
+          "light": "#6c757d",
+          "dark": "#94a3b8",
+          "css": "--bs-tertiary-color"
+        }
+      }
+    }
+  },
+
+  "presetThemes": {
+    "default": {
+      "name": "Default",
+      "description": "Standard HexTrackr theme"
+    },
+    "sepia": {
+      "name": "Sepia",
+      "description": "Warm, paper-like theme for reduced eye strain",
+      "overrides": {
+        "surfaces": {
+          "base": "#f4f1e8",
+          "surface1": "#faf8f3",
+          "surface2": "#f0ede4",
+          "surface3": "#ebe7dc",
+          "surface4": "#e6e1d3"
+        },
+        "text": {
+          "body": "#5c4033",
+          "emphasis": "#3e2723",
+          "secondary": "#795548"
+        }
+      }
+    },
+    "highContrast": {
+      "name": "High Contrast",
+      "description": "Maximum contrast for accessibility",
+      "overrides": {
+        "surfaces": {
+          "base": "#000000",
+          "surface1": "#1a1a1a",
+          "surface2": "#2a2a2a",
+          "surface3": "#3a3a3a",
+          "surface4": "#4a4a4a"
+        },
+        "text": {
+          "body": "#ffffff",
+          "emphasis": "#ffffff",
+          "secondary": "#e0e0e0"
+        },
+        "borders": {
+          "subtle": "rgba(255, 255, 255, 0.3)",
+          "muted": "rgba(255, 255, 255, 0.5)",
+          "strong": "rgba(255, 255, 255, 0.7)"
+        }
+      }
+    },
+    "deuteranopia": {
+      "name": "Deuteranopia",
+      "description": "Color-blind friendly (red-green)",
+      "overrides": {
+        "vpr": {
+          "critical": "#0066cc",
+          "high": "#ff9900",
+          "medium": "#663399",
+          "low": "#117733"
+        }
+      }
+    },
+    "protanopia": {
+      "name": "Protanopia",
+      "description": "Color-blind friendly (red-green variant)",
+      "overrides": {
+        "vpr": {
+          "critical": "#0066cc",
+          "high": "#ffcc00",
+          "medium": "#663399",
+          "low": "#117733"
+        }
+      }
+    }
+  },
+
+  "components": {
+    "description": "Component-specific variable mappings",
+    "card": {
+      "background": "surfaces.surface1",
+      "border": "borders.subtle",
+      "shadow": "shadows.md",
+      "headerBackground": "surfaces.base",
+      "headerText": "text.emphasis"
+    },
+    "table": {
+      "background": "surfaces.surface2",
+      "headerBackground": "agGrid.headerBackground",
+      "rowHover": "agGrid.rowHover",
+      "rowSelected": "agGrid.rowSelected",
+      "border": "agGrid.border"
+    },
+    "modal": {
+      "backdrop": "rgba(0, 0, 0, 0.5)",
+      "container": "surfaces.surface4",
+      "header": "surfaces.surface3",
+      "body": "surfaces.surface4",
+      "footer": "surfaces.surface3",
+      "border": "borders.muted"
+    },
+    "button": {
+      "primary": {
+        "background": "brand.primary",
+        "text": "#ffffff",
+        "border": "brand.primary"
+      },
+      "secondary": {
+        "background": "brand.secondary",
+        "text": "#ffffff",
+        "border": "brand.secondary"
+      },
+      "success": {
+        "background": "brand.success",
+        "text": "#ffffff",
+        "border": "brand.success"
+      },
+      "danger": {
+        "background": "brand.danger",
+        "text": "#ffffff",
+        "border": "brand.danger"
+      }
+    },
+    "form": {
+      "inputBackground": {
+        "light": "#ffffff",
+        "dark": "#1e293b"
+      },
+      "inputBorder": {
+        "light": "#ced4da",
+        "dark": "#475569"
+      },
+      "inputText": "text.body",
+      "focusBorder": "brand.primary",
+      "focusShadow": "rgba(var(--primary-rgb), 0.25)"
+    }
+  },
+
+  "customThemeSchema": {
+    "description": "Schema for user-created custom themes",
+    "properties": {
+      "name": {
+        "type": "string",
+        "required": true,
+        "maxLength": 50
+      },
+      "description": {
+        "type": "string",
+        "maxLength": 200
+      },
+      "baseTheme": {
+        "type": "string",
+        "enum": ["light", "dark"],
+        "required": true
+      },
+      "colors": {
+        "type": "object",
+        "properties": {
+          "brand": {
+            "type": "object",
+            "properties": {
+              "primary": {"type": "string", "format": "hex"},
+              "secondary": {"type": "string", "format": "hex"},
+              "success": {"type": "string", "format": "hex"},
+              "warning": {"type": "string", "format": "hex"},
+              "danger": {"type": "string", "format": "hex"},
+              "info": {"type": "string", "format": "hex"}
+            }
+          },
+          "surfaces": {
+            "type": "object",
+            "properties": {
+              "base": {"type": "string", "format": "hex"},
+              "surface1": {"type": "string", "format": "hex"},
+              "surface2": {"type": "string", "format": "hex"},
+              "surface3": {"type": "string", "format": "hex"},
+              "surface4": {"type": "string", "format": "hex"}
+            }
+          },
+          "vpr": {
+            "type": "object",
+            "properties": {
+              "critical": {"type": "string", "format": "hex"},
+              "high": {"type": "string", "format": "hex"},
+              "medium": {"type": "string", "format": "hex"},
+              "low": {"type": "string", "format": "hex"}
+            }
+          }
+        }
+      },
+      "createdAt": {
+        "type": "string",
+        "format": "iso8601"
+      },
+      "updatedAt": {
+        "type": "string",
+        "format": "iso8601"
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "generated": "2025-09-17T08:11:57.130Z",
+  "generated": "2025-09-18T04:47:05.683Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -15,6 +15,11 @@
           "file": "api-reference/complete-reference",
           "title": "Complete Reference",
           "path": "api-reference/complete-reference.html"
+        },
+        "imports-api": {
+          "file": "api-reference/imports-api",
+          "title": "Imports Api",
+          "path": "api-reference/imports-api.html"
         },
         "tickets-api": {
           "file": "api-reference/tickets-api",
@@ -130,10 +135,20 @@
           "title": "Dependencies",
           "path": "technical-reference/dependencies.html"
         },
+        "middleware-config": {
+          "file": "technical-reference/middleware-config",
+          "title": "Middleware Config",
+          "path": "technical-reference/middleware-config.html"
+        },
         "modules-catalog": {
           "file": "technical-reference/modules-catalog",
           "title": "Modules Catalog",
           "path": "technical-reference/modules-catalog.html"
+        },
+        "service-layer": {
+          "file": "technical-reference/service-layer",
+          "title": "Service Layer",
+          "path": "technical-reference/service-layer.html"
         }
       }
     },
@@ -175,5 +190,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 32
+  "totalFiles": 35
 }

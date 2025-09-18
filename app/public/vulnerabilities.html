@@ -566,7 +566,7 @@
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
-                                            <span class="bg-red text-white avatar">
+                                            <span class="bg-red text-white avatar" style="background-color: var(--vpr-critical) !important;">
                                                 <i class="fas fa-exclamation-triangle"></i>
                                             </span>
                                         </div>
@@ -574,19 +574,19 @@
                                             <div class="card-front">
                                                 <div class="font-weight-medium h2 mb-1" id="criticalCount">0</div>
                                                 <div class="text-muted small">Critical Vulnerabilities</div>
-                                                <div class="text-red small fw-bold mt-1" id="criticalVPR">0.0 VPR</div>
+                                                <div class="text-vpr-critical small fw-bold mt-1" id="criticalVPR">0.0 VPR</div>
                                             </div>
                                             <div class="card-back">
                                                 <div class="font-weight-medium h2 mb-1" id="criticalTotalVPR">0.0</div>
                                                 <div class="text-muted small">Total VPR Score</div>
-                                                <div class="text-red small fw-bold mt-1" id="criticalAvgVPR">0.0 avg</div>
+                                                <div class="text-vpr-critical small fw-bold mt-1" id="criticalAvgVPR">0.0 avg</div>
                                             </div>
                                         </div>
                                         <div class="col-auto">
-                                            <div class="text-red" id="criticalTrend">
+                                            <div class="text-vpr-critical" id="criticalTrend">
                                                 <div class="d-flex flex-column align-items-end">
                                                     <i class="ti ti-trending-up fs-3"></i>
-                                                    <span class="badge bg-red-lt text-red trend-value">+0%</span>
+                                                    <span class="badge bg-vpr-critical text-vpr-critical trend-value">+0%</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -601,7 +601,7 @@
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
-                                            <span class="bg-orange text-white avatar">
+                                            <span class="bg-orange text-white avatar" style="background-color: var(--vpr-high) !important;">
                                                 <i class="fas fa-exclamation"></i>
                                             </span>
                                         </div>
@@ -609,19 +609,19 @@
                                             <div class="card-front">
                                                 <div class="font-weight-medium h2 mb-1" id="highCount">0</div>
                                                 <div class="text-muted small">High Vulnerabilities</div>
-                                                <div class="text-orange small fw-bold mt-1" id="highVPR">0.0 VPR</div>
+                                                <div class="text-vpr-high small fw-bold mt-1" id="highVPR">0.0 VPR</div>
                                             </div>
                                             <div class="card-back">
                                                 <div class="font-weight-medium h2 mb-1" id="highTotalVPR">0.0</div>
                                                 <div class="text-muted small">Total VPR Score</div>
-                                                <div class="text-orange small fw-bold mt-1" id="highAvgVPR">0.0 avg</div>
+                                                <div class="text-vpr-high small fw-bold mt-1" id="highAvgVPR">0.0 avg</div>
                                             </div>
                                         </div>
                                         <div class="col-auto">
-                                            <div class="text-orange" id="highTrend">
+                                            <div class="text-vpr-high" id="highTrend">
                                                 <div class="d-flex flex-column align-items-end">
                                                     <i class="ti ti-trending-up fs-3"></i>
-                                                    <span class="badge bg-orange-lt text-orange trend-value">+0%</span>
+                                                    <span class="badge bg-vpr-high text-vpr-high trend-value">+0%</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -636,7 +636,7 @@
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
-                                            <span class="bg-yellow text-white avatar">
+                                            <span class="bg-blue text-white avatar" style="background-color: var(--vpr-medium) !important;">
                                                 <i class="fas fa-minus"></i>
                                             </span>
                                         </div>
@@ -644,19 +644,19 @@
                                             <div class="card-front">
                                                 <div class="font-weight-medium h2 mb-1" id="mediumCount">0</div>
                                                 <div class="text-muted small">Medium Vulnerabilities</div>
-                                                <div class="text-yellow small fw-bold mt-1" id="mediumVPR">0.0 VPR</div>
+                                                <div class="text-vpr-medium small fw-bold mt-1" id="mediumVPR">0.0 VPR</div>
                                             </div>
                                             <div class="card-back">
                                                 <div class="font-weight-medium h2 mb-1" id="mediumTotalVPR">0.0</div>
                                                 <div class="text-muted small">Total VPR Score</div>
-                                                <div class="text-yellow small fw-bold mt-1" id="mediumAvgVPR">0.0 avg</div>
+                                                <div class="text-vpr-medium small fw-bold mt-1" id="mediumAvgVPR">0.0 avg</div>
                                             </div>
                                         </div>
                                         <div class="col-auto">
-                                            <div class="text-yellow" id="mediumTrend">
+                                            <div class="text-vpr-medium" id="mediumTrend">
                                                 <div class="d-flex flex-column align-items-end">
                                                     <i class="ti ti-trending-up fs-3"></i>
-                                                    <span class="badge bg-yellow-lt text-yellow trend-value">+0%</span>
+                                                    <span class="badge bg-vpr-medium text-vpr-medium trend-value">+0%</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -671,7 +671,7 @@
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
-                                            <span class="bg-green text-white avatar">
+                                            <span class="bg-green text-white avatar" style="background-color: var(--vpr-low) !important;">
                                                 <i class="fas fa-info"></i>
                                             </span>
                                         </div>
@@ -679,19 +679,19 @@
                                             <div class="card-front">
                                                 <div class="font-weight-medium h2 mb-1" id="lowCount">0</div>
                                                 <div class="text-muted small">Low Vulnerabilities</div>
-                                                <div class="text-green small fw-bold mt-1" id="lowVPR">0.0 VPR</div>
+                                                <div class="text-vpr-low small fw-bold mt-1" id="lowVPR">0.0 VPR</div>
                                             </div>
                                             <div class="card-back">
                                                 <div class="font-weight-medium h2 mb-1" id="lowTotalVPR">0.0</div>
                                                 <div class="text-muted small">Total VPR Score</div>
-                                                <div class="text-green small fw-bold mt-1" id="lowAvgVPR">0.0 avg</div>
+                                                <div class="text-vpr-low small fw-bold mt-1" id="lowAvgVPR">0.0 avg</div>
                                             </div>
                                         </div>
                                         <div class="col-auto">
-                                            <div class="text-green" id="lowTrend">
+                                            <div class="text-vpr-low" id="lowTrend">
                                                 <div class="d-flex flex-column align-items-end">
                                                     <i class="ti ti-trending-down fs-3"></i>
-                                                    <span class="badge bg-green-lt text-green trend-value">-0%</span>
+                                                    <span class="badge bg-vpr-low text-vpr-low trend-value">-0%</span>
                                                 </div>
                                             </div>
                                         </div>
