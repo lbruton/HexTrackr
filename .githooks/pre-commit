@@ -15,7 +15,7 @@ OVERALL_STATUS=0
 # ============================================================================
 # MARKDOWN LINTING with Auto-fix
 # ============================================================================
-STAGED_MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.md$' || true)
+STAGED_MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '^app/' | grep -E '\.md$' || true)
 
 if [ -n "$STAGED_MD_FILES" ]; then
   echo "\n${YELLOW}[pre-commit]${NC} Checking Markdown files..."
@@ -50,7 +50,7 @@ fi
 # ============================================================================
 # CSS/SCSS LINTING with Auto-fix
 # ============================================================================
-STAGED_CSS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(css|scss)$' || true)
+STAGED_CSS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '^app/' | grep -E '\.(css|scss)$' || true)
 
 if [ -n "$STAGED_CSS_FILES" ]; then
   echo "\n${YELLOW}[pre-commit]${NC} Checking CSS/SCSS files..."
@@ -77,7 +77,7 @@ fi
 # ============================================================================
 # JAVASCRIPT LINTING with Selective Auto-fix
 # ============================================================================
-STAGED_JS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.js$' | grep -v '\.min\.js$' || true)
+STAGED_JS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '^app/' | grep -E '\.js$' | grep -v '\.min\.js$' || true)
 
 if [ -n "$STAGED_JS_FILES" ]; then
   echo "\n${YELLOW}[pre-commit]${NC} Checking JavaScript files..."

@@ -4,12 +4,11 @@ Welcome to the HexTrackr documentation portal. This comprehensive guide covers e
 
 ## 📚 Navigation
 
-- **[Getting Started](getting-started/index.md)**: New to HexTrackr? Start here.
-- **[User Guides](user-guides/index.md)**: Detailed instructions for using application features.
-- **[Development](development/index.md)**: Information for developers, including setup and contribution guidelines.
+- **[Getting Started](guides/getting-started.md)**: New to HexTrackr? Start here.
+- **[User Guides](guides/user-guide.md)**: Detailed instructions for using application features.
 - **[Architecture](architecture/index.md)**: A deep dive into the system's architecture.
 - **[API Reference](api-reference/index.md)**: Complete reference for the HexTrackr REST API.
-- **[Security](security/index.md)**: Security-related documentation.
+- **[Technical Reference](reference/index.md)**: Security, performance, and troubleshooting documentation.
 
 ## 🏷️ Standards & Compliance
 

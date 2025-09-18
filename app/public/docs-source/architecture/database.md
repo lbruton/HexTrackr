@@ -233,7 +233,7 @@ For more information on the data lifecycle, see the [Data Lifecycle and Rollover
 
 ## Database Migrations
 
-Database migrations are handled automatically by the application. For more information on the migration process, see the [Database Migrations](../development/database-migrations.md) documentation.
+Database migrations are handled automatically by the application through runtime schema evolution using idempotent ALTER TABLE statements.
 
 ---
 

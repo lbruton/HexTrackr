@@ -1,0 +1,2555 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - heading " HexTrackr" [level=1] [ref=e5]:
+        - link " HexTrackr" [ref=e6] [cursor=pointer]:
+          - /url: /tickets.html
+          - generic [ref=e7] [cursor=pointer]: 
+          - text: HexTrackr
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - link "Enable dark mode" [ref=e10] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e11] [cursor=pointer]: 
+          - text: 
+        - generic [ref=e12]:
+          - link "Open user menu" [ref=e13] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e15] [cursor=pointer]:
+              - generic [ref=e16] [cursor=pointer]: HexTrackr User
+              - generic [ref=e17] [cursor=pointer]: Manager
+          - text:      
+      - list [ref=e20]:
+        - listitem [ref=e21]:
+          - link " Tickets" [ref=e22] [cursor=pointer]:
+            - /url: /tickets.html
+            - generic [ref=e24] [cursor=pointer]: 
+            - generic [ref=e25] [cursor=pointer]: Tickets
+        - listitem [ref=e26]:
+          - link " Vulnerabilities" [ref=e27] [cursor=pointer]:
+            - /url: /vulnerabilities.html
+            - generic [ref=e29] [cursor=pointer]: 
+            - generic [ref=e30] [cursor=pointer]: Vulnerabilities
+        - listitem [ref=e31]:
+          - link " Documentation" [ref=e32] [cursor=pointer]:
+            - /url: /docs-html/
+            - generic [ref=e34] [cursor=pointer]: 
+            - generic [ref=e35] [cursor=pointer]: Documentation
+  - generic [ref=e39]:
+    - navigation "breadcrumb" [ref=e42]:
+      - list [ref=e43]:
+        - listitem [ref=e44]:
+          - link "HexTrackr" [ref=e45] [cursor=pointer]:
+            - /url: /tickets.html
+        - listitem [ref=e46]:
+          - text: /
+          - link "Documentation" [ref=e47] [cursor=pointer]:
+            - /url: "#overview"
+        - listitem [ref=e48]: / Backend Api
+    - generic [ref=e49]:
+      - generic [ref=e51]:
+        - heading "Navigation" [level=3] [ref=e53]:
+          - img [ref=e54]
+          - text: Navigation
+        - generic [ref=e59]:
+          - link " Overview" [ref=e60] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e61] [cursor=pointer]:
+              - generic [ref=e63] [cursor=pointer]: 
+              - generic [ref=e64] [cursor=pointer]: Overview
+          - link " API Reference " [ref=e65] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e66] [cursor=pointer]:
+              - generic [ref=e68] [cursor=pointer]: 
+              - generic [ref=e69] [cursor=pointer]: API Reference
+              - generic [ref=e70] [cursor=pointer]: 
+          - text:    
+          - link " Architecture " [ref=e71] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e72] [cursor=pointer]:
+              - generic [ref=e74] [cursor=pointer]: 
+              - generic [ref=e75] [cursor=pointer]: Architecture
+              - generic [ref=e76] [cursor=pointer]: 
+          - text:     
+          - link " Guides " [ref=e77] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e78] [cursor=pointer]:
+              - generic [ref=e80] [cursor=pointer]: 
+              - generic [ref=e81] [cursor=pointer]: Guides
+              - generic [ref=e82] [cursor=pointer]: 
+          - text:  
+          - link " Reference " [ref=e83] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e84] [cursor=pointer]:
+              - generic [ref=e86] [cursor=pointer]: 
+              - generic [ref=e87] [cursor=pointer]: Reference
+              - generic [ref=e88] [cursor=pointer]: 
+          - text:    
+          - link " Roadmap" [ref=e89] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e90] [cursor=pointer]:
+              - generic [ref=e92] [cursor=pointer]: 
+              - generic [ref=e93] [cursor=pointer]: Roadmap
+          - link " Changelog" [ref=e94] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e95] [cursor=pointer]:
+              - generic [ref=e97] [cursor=pointer]: 
+              - generic [ref=e98] [cursor=pointer]: Changelog
+      - generic [ref=e103]:
+        - heading "Backend API Reference" [level=1] [ref=e104]
+        - blockquote [ref=e105]:
+          - paragraph [ref=e106]: Controllers, Services, Routes, and Server Configuration
+        - heading "Documentation Coverage" [level=2] [ref=e107]
+        - list [ref=e108]:
+          - listitem [ref=e109]:
+            - strong [ref=e110]: Files Processed
+            - text: ": 3"
+          - listitem [ref=e111]:
+            - strong [ref=e112]: Functions Found
+            - text: ": 164"
+          - listitem [ref=e113]:
+            - strong [ref=e114]: Files with Docs
+            - text: ": 3"
+        - separator [ref=e115]
+        - heading "Table of Contents" [level=2] [ref=e116]
+        - list [ref=e117]:
+          - listitem [ref=e118]:
+            - link "Services" [ref=e119] [cursor=pointer]:
+              - /url: "#services"
+          - listitem [ref=e120]:
+            - link "Routes" [ref=e121] [cursor=pointer]:
+              - /url: "#routes"
+          - listitem [ref=e122]:
+            - link "Server" [ref=e123] [cursor=pointer]:
+              - /url: "#server"
+        - separator [ref=e124]
+        - 'heading "Services {#services}" [level=2] [ref=e125]'
+        - blockquote [ref=e126]:
+          - paragraph [ref=e127]:
+            - text: "Source:"
+            - code [ref=e128]: app/services/**/*.js
+        - heading "Classes" [level=3] [ref=e129]
+        - grid [ref=e133]:
+          - rowgroup [ref=e135]:
+            - row "Global Description" [ref=e136]:
+              - columnheader "Global" [ref=e137]:
+                - generic [ref=e140] [cursor=pointer]: Global
+              - columnheader "Description" [ref=e141]:
+                - generic [ref=e144] [cursor=pointer]: Description
+          - rowgroup [ref=e145]:
+            - row "DatabaseService" [ref=e146]:
+              - gridcell "DatabaseService" [ref=e147]:
+                - link "DatabaseService" [ref=e149] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#DatabaseService
+              - gridcell [ref=e150]
+            - row "DocsService Documentation Service Handles business logic for documentation statistics and file operations Extracted from server.js (T030)" [ref=e151]:
+              - gridcell "DocsService" [ref=e152]:
+                - link "DocsService" [ref=e154] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#DocsService
+              - gridcell "Documentation Service Handles business logic for documentation statistics and file operations Extracted from server.js (T030)" [ref=e155]
+            - 'row "ProgressService ProgressService - High-level service for managing import/export progress tracking This service provides a convenient interface for tracking progress of long-running operations like CSV imports, exports, and batch processing. It builds on top of the ProgressTracker utility to provide domain-specific functionality. Features: Import progress tracking with standardized phases Export progress tracking for various data types Batch operation progress management WebSocket integration for real-time updates Session lifecycle management Error handling and recovery Usage: const progressService = new ProgressService(io); const sessionId = progressService.startImport(\"vulnerabilities.csv\", 10000); progressService.updateImportProgress(sessionId, 500, \"processing\"); progressService.completeImport(sessionId, { imported: 9500, errors: 500 });" [ref=e156]':
+              - gridcell "ProgressService" [ref=e157]:
+                - link "ProgressService" [ref=e159] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#ProgressService
+              - 'gridcell "ProgressService - High-level service for managing import/export progress tracking This service provides a convenient interface for tracking progress of long-running operations like CSV imports, exports, and batch processing. It builds on top of the ProgressTracker utility to provide domain-specific functionality. Features: Import progress tracking with standardized phases Export progress tracking for various data types Batch operation progress management WebSocket integration for real-time updates Session lifecycle management Error handling and recovery Usage: const progressService = new ProgressService(io); const sessionId = progressService.startImport(\"vulnerabilities.csv\", 10000); progressService.updateImportProgress(sessionId, 500, \"processing\"); progressService.completeImport(sessionId, { imported: 9500, errors: 500 });" [ref=e160]'
+            - 'row "TicketService TicketService - Ticket business logic and database operations Extracted from server.js lines: 3320-3344, 3369-3394, 3396-3422, 3424-3435, 3437-3479, 3482-3498, 1802-1874, 3606-3621 Handles: CRUD operations for tickets table Device management (JSON field handling) CSV import processing with mapping Migration operations Export functionality Ticket number generation (XT numbers) T053 INTEGRATION NOTES: This service requires database initialization before use. In server.js, after database connection, call: ticketController.initialize(db);" [ref=e161]':
+              - gridcell "TicketService" [ref=e162]:
+                - link "TicketService" [ref=e164] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#TicketService
+              - 'gridcell "TicketService - Ticket business logic and database operations Extracted from server.js lines: 3320-3344, 3369-3394, 3396-3422, 3424-3435, 3437-3479, 3482-3498, 1802-1874, 3606-3621 Handles: CRUD operations for tickets table Device management (JSON field handling) CSV import processing with mapping Migration operations Export functionality Ticket number generation (XT numbers) T053 INTEGRATION NOTES: This service requires database initialization before use. In server.js, after database connection, call: ticketController.initialize(db);" [ref=e165]'
+            - row [ref=e166]:
+              - gridcell "VulnerabilityStatsService" [ref=e167]:
+                - link "VulnerabilityStatsService" [ref=e169] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#VulnerabilityStatsService
+              - gridcell [ref=e170]
+          - rowgroup
+          - rowgroup [ref=e171]
+          - rowgroup
+        - heading "Constants" [level=3] [ref=e172]
+        - grid [ref=e176]:
+          - rowgroup [ref=e178]:
+            - row "Global Description" [ref=e179]:
+              - columnheader "Global" [ref=e180]:
+                - generic [ref=e183] [cursor=pointer]: Global
+              - columnheader "Description" [ref=e184]:
+                - generic [ref=e187] [cursor=pointer]: Description
+          - rowgroup [ref=e188]:
+            - 'row "_DatabaseService BackupService - Database backup and restore operations Extracted from server.js lines: 2701, 3274-3798 Handles: Database export to JSON format Backup file restoration from ZIP/JSON Data clearing operations Backup statistics and file management" [ref=e189]':
+              - gridcell "_DatabaseService" [ref=e190]:
+                - link "_DatabaseService" [ref=e192] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#_DatabaseService
+              - 'gridcell "BackupService - Database backup and restore operations Extracted from server.js lines: 2701, 3274-3798 Handles: Database export to JSON format Backup file restoration from ZIP/JSON Data clearing operations Backup statistics and file management" [ref=e193]'
+            - 'row "sqlite3 DatabaseService - Extracted from app/public/server.js lines 12, 1932-3280+ This service encapsulates all SQLite database operations from the monolithic server.js, providing connection pooling patterns, transaction management, and common query methods. Key extractions from server.js: Line 12: const sqlite3 = require(\"sqlite3\").verbose(); Line 1933: const dbPath = path.join(__dirname, \"data\", \"hextrackr.db\"); Line 1934: const db = new sqlite3.Database(dbPath); Lines 2785-3280: Database initialization, schema creation, and operations Transaction patterns from lines 782-783, 1033-1034, etc. Error handling patterns throughout server.js database operations" [ref=e194]':
+              - gridcell "sqlite3" [ref=e195]:
+                - link "sqlite3" [ref=e197] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#sqlite3
+              - 'gridcell "DatabaseService - Extracted from app/public/server.js lines 12, 1932-3280+ This service encapsulates all SQLite database operations from the monolithic server.js, providing connection pooling patterns, transaction management, and common query methods. Key extractions from server.js: Line 12: const sqlite3 = require(\"sqlite3\").verbose(); Line 1933: const dbPath = path.join(__dirname, \"data\", \"hextrackr.db\"); Line 1934: const db = new sqlite3.Database(dbPath); Lines 2785-3280: Database initialization, schema creation, and operations Transaction patterns from lines 782-783, 1033-1034, etc. Error handling patterns throughout server.js database operations" [ref=e198]'
+            - row "fs FileService - Centralized file operations using PathValidator Handles file uploads, CSV processing, backup operations, and temporary files" [ref=e199]:
+              - gridcell "fs" [ref=e200]:
+                - link "fs" [ref=e202] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#fs
+              - gridcell "FileService - Centralized file operations using PathValidator Handles file uploads, CSV processing, backup operations, and temporary files" [ref=e203]
+            - 'row "Papa Import Service - Vendor CSV Import Business Logic This service handles operational imports of vendor CSV data (e.g., Tenable vulnerability scans), not backup/restore operations. Those are handled by the backup service. Business logic extracted from server.js lines: 252-341, 1306-1823, 2291-2335, and various processing functions INTEGRATION DEPENDENCIES FOR T053: Uses DatabaseService for all database operations Uses PathValidator for secure file operations Uses helpers for vulnerability mapping and deduplication Requires existing database schema (staging tables, current tables) Compatible with existing ProgressTracker WebSocket implementation Maintains all existing CSV parsing and mapping logic" [ref=e204]':
+              - gridcell "Papa" [ref=e205]:
+                - link "Papa" [ref=e207] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#Papa
+              - 'gridcell "Import Service - Vendor CSV Import Business Logic This service handles operational imports of vendor CSV data (e.g., Tenable vulnerability scans), not backup/restore operations. Those are handled by the backup service. Business logic extracted from server.js lines: 252-341, 1306-1823, 2291-2335, and various processing functions INTEGRATION DEPENDENCIES FOR T053: Uses DatabaseService for all database operations Uses PathValidator for secure file operations Uses helpers for vulnerability mapping and deduplication Requires existing database schema (staging tables, current tables) Compatible with existing ProgressTracker WebSocket implementation Maintains all existing CSV parsing and mapping logic" [ref=e208]'
+            - row [ref=e209]:
+              - gridcell "Papa" [ref=e210]:
+                - link "Papa" [ref=e212] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#Papa
+              - gridcell [ref=e213]
+          - rowgroup
+          - rowgroup [ref=e214]
+          - rowgroup
+        - heading "Functions" [level=3] [ref=e215]
+        - grid [ref=e219]:
+          - rowgroup [ref=e221]:
+            - row "Global Description" [ref=e222]:
+              - columnheader "Global" [ref=e223]:
+                - generic [ref=e226] [cursor=pointer]: Global
+              - columnheader "Description" [ref=e227]:
+                - generic [ref=e230] [cursor=pointer]: Description
+          - rowgroup [ref=e231]:
+            - row "extractDateFromFilename(filename) ⇒ string | null Extracts a date from a filename using various common patterns." [ref=e232]:
+              - gridcell "extractDateFromFilename(filename) ⇒ string | null" [ref=e233]:
+                - link "extractDateFromFilename(filename) ⇒ string | null" [ref=e235] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#extractDateFromFilename
+              - gridcell "Extracts a date from a filename using various common patterns." [ref=e236]
+            - row "extractVendorFromFilename(filename) ⇒ string Extracts the vendor name from a filename based on common patterns." [ref=e237]:
+              - gridcell "extractVendorFromFilename(filename) ⇒ string" [ref=e238]:
+                - link "extractVendorFromFilename(filename) ⇒ string" [ref=e240] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#extractVendorFromFilename
+              - gridcell "Extracts the vendor name from a filename based on common patterns." [ref=e241]
+            - row "mapVulnerabilityRow(row) ⇒ Array. Maps a CSV row to one or more vulnerability records, splitting multi-CVE entries." [ref=e242]:
+              - gridcell "mapVulnerabilityRow(row) ⇒ Array." [ref=e243]:
+                - link "mapVulnerabilityRow(row) ⇒ Array." [ref=e245] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#mapVulnerabilityRow
+                  - text: mapVulnerabilityRow(row) ⇒ Array.
+              - gridcell "Maps a CSV row to one or more vulnerability records, splitting multi-CVE entries." [ref=e247]
+            - row "parseCSV(csvData) ⇒ Promise. Parses CSV data using PapaParse." [ref=e248]:
+              - gridcell "parseCSV(csvData) ⇒ Promise." [ref=e249]:
+                - link "parseCSV(csvData) ⇒ Promise." [ref=e251] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#parseCSV
+                  - text: parseCSV(csvData) ⇒ Promise.
+              - gridcell "Parses CSV data using PapaParse." [ref=e253]
+            - row "createImportRecord(options) ⇒ Promise. Creates an import record in the database." [ref=e254]:
+              - gridcell "createImportRecord(options) ⇒ Promise." [ref=e255]:
+                - link "createImportRecord(options) ⇒ Promise." [ref=e257] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#createImportRecord
+                  - text: createImportRecord(options) ⇒ Promise.
+              - gridcell "Creates an import record in the database." [ref=e259]
+            - row "processVulnerabilitiesWithLifecycle(rows, importId, filePath, scanDate) ⇒ Promise. Processes vulnerabilities with enhanced lifecycle management." [ref=e260]:
+              - gridcell "processVulnerabilitiesWithLifecycle(rows, importId, filePath, scanDate) ⇒ Promise." [ref=e261]:
+                - link "processVulnerabilitiesWithLifecycle(rows, importId, filePath, scanDate) ⇒ Promise." [ref=e263] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#processVulnerabilitiesWithLifecycle
+                  - text: processVulnerabilitiesWithLifecycle(rows, importId, filePath, scanDate) ⇒ Promise.
+              - gridcell "Processes vulnerabilities with enhanced lifecycle management." [ref=e265]
+            - row "processStagingImport(options) ⇒ Promise. Processes a staging import with progress tracking." [ref=e266]:
+              - gridcell "processStagingImport(options) ⇒ Promise." [ref=e267]:
+                - link "processStagingImport(options) ⇒ Promise." [ref=e269] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#processStagingImport
+                  - text: processStagingImport(options) ⇒ Promise.
+              - gridcell "Processes a staging import with progress tracking." [ref=e270]
+            - row "bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, sessionId, startTime, progressTracker) ⇒ Promise. Performs a simplified bulk load to a staging table." [ref=e271]:
+              - gridcell "bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, sessionId, startTime, progressTracker) ⇒ Promise." [ref=e272]:
+                - link "bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, sessionId, startTime, progressTracker) ⇒ Promise." [ref=e274] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#bulkLoadToStagingTable
+                  - text: bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, sessionId, startTime, progressTracker) ⇒ Promise.
+              - gridcell "Performs a simplified bulk load to a staging table." [ref=e276]
+            - row "processVulnerabilitiesJSON(csvData) ⇒ Promise. Processes JSON vulnerability data." [ref=e277]:
+              - gridcell "processVulnerabilitiesJSON(csvData) ⇒ Promise." [ref=e278]:
+                - link "processVulnerabilitiesJSON(csvData) ⇒ Promise." [ref=e280] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#processVulnerabilitiesJSON
+                  - text: processVulnerabilitiesJSON(csvData) ⇒ Promise.
+              - gridcell "Processes JSON vulnerability data." [ref=e282]
+            - row "processTicketsJSON(csvData) ⇒ Promise. Processes JSON ticket data." [ref=e283]:
+              - gridcell "processTicketsJSON(csvData) ⇒ Promise." [ref=e284]:
+                - link "processTicketsJSON(csvData) ⇒ Promise." [ref=e286] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#processTicketsJSON
+                  - text: processTicketsJSON(csvData) ⇒ Promise.
+              - gridcell "Processes JSON ticket data." [ref=e288]
+            - row "getImportHistory() ⇒ Promise.> Gets the import history with vulnerability counts." [ref=e289]:
+              - gridcell "getImportHistory() ⇒ Promise.>" [ref=e290]:
+                - link "getImportHistory() ⇒ Promise.>" [ref=e292] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#getImportHistory
+                  - text: getImportHistory() ⇒ Promise.
+                  - generic [ref=e293] [cursor=pointer]: ">"
+              - gridcell "Gets the import history with vulnerability counts." [ref=e294]
+          - rowgroup
+          - rowgroup [ref=e295]
+          - rowgroup
+        - paragraph
+        - heading "DatabaseService" [level=3] [ref=e296]
+        - paragraph [ref=e297]:
+          - strong [ref=e298]: Kind
+          - text: ": global class"
+        - list [ref=e299]:
+          - listitem [ref=e300]:
+            - link "DatabaseService" [ref=e301] [cursor=pointer]:
+              - /url: "#DatabaseService"
+            - list [ref=e302]:
+              - listitem [ref=e303]:
+                - link "new DatabaseService(dbPath)" [ref=e304] [cursor=pointer]:
+                  - /url: "#new_DatabaseService_new"
+              - listitem [ref=e305]:
+                - link "databaseService.initialize()" [ref=e306] [cursor=pointer]:
+                  - /url: "#DatabaseService+initialize"
+              - listitem [ref=e307]:
+                - link "databaseService._initializeSchema()" [ref=e308] [cursor=pointer]:
+                  - /url: "#DatabaseService+_initializeSchema"
+              - listitem [ref=e309]:
+                - link "databaseService._createTables()" [ref=e310] [cursor=pointer]:
+                  - /url: "#DatabaseService+_createTables"
+              - listitem [ref=e311]:
+                - link "databaseService._createIndexes()" [ref=e312] [cursor=pointer]:
+                  - /url: "#DatabaseService+_createIndexes"
+              - listitem [ref=e313]:
+                - link "databaseService.all()" [ref=e314] [cursor=pointer]:
+                  - /url: "#DatabaseService+all"
+              - listitem [ref=e315]:
+                - link "databaseService.get()" [ref=e316] [cursor=pointer]:
+                  - /url: "#DatabaseService+get"
+              - listitem [ref=e317]:
+                - link "databaseService.run()" [ref=e318] [cursor=pointer]:
+                  - /url: "#DatabaseService+run"
+              - listitem [ref=e319]:
+                - link "databaseService.query()" [ref=e320] [cursor=pointer]:
+                  - /url: "#DatabaseService+query"
+              - listitem [ref=e321]:
+                - link "databaseService.beginTransaction()" [ref=e322] [cursor=pointer]:
+                  - /url: "#DatabaseService+beginTransaction"
+              - listitem [ref=e323]:
+                - link "databaseService.commit()" [ref=e324] [cursor=pointer]:
+                  - /url: "#DatabaseService+commit"
+              - listitem [ref=e325]:
+                - link "databaseService.rollback()" [ref=e326] [cursor=pointer]:
+                  - /url: "#DatabaseService+rollback"
+              - listitem [ref=e327]:
+                - link "databaseService.transaction()" [ref=e328] [cursor=pointer]:
+                  - /url: "#DatabaseService+transaction"
+              - listitem [ref=e329]:
+                - link "databaseService.prepare()" [ref=e330] [cursor=pointer]:
+                  - /url: "#DatabaseService+prepare"
+              - listitem [ref=e331]:
+                - link "databaseService.serialize()" [ref=e332] [cursor=pointer]:
+                  - /url: "#DatabaseService+serialize"
+              - listitem [ref=e333]:
+                - link "databaseService.getHealthStatus()" [ref=e334] [cursor=pointer]:
+                  - /url: "#DatabaseService+getHealthStatus"
+              - listitem [ref=e335]:
+                - link "databaseService.close()" [ref=e336] [cursor=pointer]:
+                  - /url: "#DatabaseService+close"
+        - separator [ref=e337]
+        - paragraph
+        - heading "new DatabaseService(dbPath)" [level=4] [ref=e338]
+        - paragraph [ref=e339]: Creates an instance of DatabaseService.
+        - grid [ref=e343]:
+          - rowgroup [ref=e345]:
+            - row "Param Type Description" [ref=e346]:
+              - columnheader "Param" [ref=e347]:
+                - generic [ref=e350] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e351]:
+                - generic [ref=e354] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e355]:
+                - generic [ref=e358] [cursor=pointer]: Description
+          - rowgroup [ref=e359]:
+            - row "dbPath string The path to the SQLite database file." [ref=e360]:
+              - gridcell "dbPath" [ref=e361]
+              - gridcell "string" [ref=e362]
+              - gridcell "The path to the SQLite database file." [ref=e363]
+          - rowgroup
+          - rowgroup [ref=e364]
+          - rowgroup
+        - separator [ref=e365]
+        - paragraph
+        - heading "databaseService.initialize()" [level=4] [ref=e366]
+        - paragraph [ref=e367]:
+          - text: Initialize database connection and schema
+          - text: Extracted from server.js lines 1934 + 2785-3280
+        - paragraph [ref=e368]:
+          - strong [ref=e369]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e370] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e371] [cursor=pointer]: DatabaseService
+        - separator [ref=e372]
+        - paragraph
+        - heading "databaseService._initializeSchema()" [level=4] [ref=e373]
+        - paragraph [ref=e374]:
+          - text: Initialize database schema
+          - text: Extracted from server.js lines 2785-3280 (initDb function)
+          - text: Enhanced with full table creation from init-database.js
+        - paragraph [ref=e375]:
+          - strong [ref=e376]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e377] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e378] [cursor=pointer]: DatabaseService
+        - separator [ref=e379]
+        - paragraph
+        - heading "databaseService._createTables()" [level=4] [ref=e380]
+        - paragraph [ref=e381]:
+          - text: Create database tables
+          - text: Extracted from server.js lines 2888-3013
+        - paragraph [ref=e382]:
+          - strong [ref=e383]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e384] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e385] [cursor=pointer]: DatabaseService
+        - separator [ref=e386]
+        - paragraph
+        - heading "databaseService._createIndexes()" [level=4] [ref=e387]
+        - paragraph [ref=e388]:
+          - text: Create database indexes
+          - text: Extracted from server.js lines 3016-3106
+        - paragraph [ref=e389]:
+          - strong [ref=e390]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e391] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e392] [cursor=pointer]: DatabaseService
+        - separator [ref=e393]
+        - paragraph
+        - heading "databaseService.all()" [level=4] [ref=e394]
+        - paragraph [ref=e395]:
+          - text: Execute a query and return all results
+          - text: Common pattern from server.js database operations
+        - paragraph [ref=e396]:
+          - strong [ref=e397]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e398] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e399] [cursor=pointer]: DatabaseService
+        - separator [ref=e400]
+        - paragraph
+        - heading "databaseService.get()" [level=4] [ref=e401]
+        - paragraph [ref=e402]:
+          - text: Execute a query and return first result
+          - text: Common pattern from server.js database operations
+        - paragraph [ref=e403]:
+          - strong [ref=e404]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e405] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e406] [cursor=pointer]: DatabaseService
+        - separator [ref=e407]
+        - paragraph
+        - heading "databaseService.run()" [level=4] [ref=e408]
+        - paragraph [ref=e409]:
+          - text: Execute a statement (INSERT, UPDATE, DELETE)
+          - text: Common pattern from server.js database operations
+        - paragraph [ref=e410]:
+          - strong [ref=e411]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e412] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e413] [cursor=pointer]: DatabaseService
+        - separator [ref=e414]
+        - paragraph
+        - heading "databaseService.query()" [level=4] [ref=e415]
+        - paragraph [ref=e416]: Generic query method for custom operations
+        - paragraph [ref=e417]:
+          - strong [ref=e418]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e419] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e420] [cursor=pointer]: DatabaseService
+        - separator [ref=e421]
+        - paragraph
+        - heading "databaseService.beginTransaction()" [level=4] [ref=e422]
+        - paragraph [ref=e423]:
+          - text: Begin transaction
+          - text: Pattern extracted from server.js lines 783, 1034
+        - paragraph [ref=e424]:
+          - strong [ref=e425]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e426] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e427] [cursor=pointer]: DatabaseService
+        - separator [ref=e428]
+        - paragraph
+        - heading "databaseService.commit()" [level=4] [ref=e429]
+        - paragraph [ref=e430]:
+          - text: Commit transaction
+          - text: Pattern extracted from server.js lines 880, 1162
+        - paragraph [ref=e431]:
+          - strong [ref=e432]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e433] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e434] [cursor=pointer]: DatabaseService
+        - separator [ref=e435]
+        - paragraph
+        - heading "databaseService.rollback()" [level=4] [ref=e436]
+        - paragraph [ref=e437]:
+          - text: Rollback transaction
+          - text: Pattern extracted from server.js line 873
+        - paragraph [ref=e438]:
+          - strong [ref=e439]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e440] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e441] [cursor=pointer]: DatabaseService
+        - separator [ref=e442]
+        - paragraph
+        - heading "databaseService.transaction()" [level=4] [ref=e443]
+        - paragraph [ref=e444]:
+          - text: Execute multiple operations in a transaction
+          - text: Wrapper pattern commonly used in server.js
+        - paragraph [ref=e445]:
+          - strong [ref=e446]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e447] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e448] [cursor=pointer]: DatabaseService
+        - separator [ref=e449]
+        - paragraph
+        - heading "databaseService.prepare()" [level=4] [ref=e450]
+        - paragraph [ref=e451]:
+          - text: Create prepared statement
+          - text: Pattern used throughout server.js for batch operations
+        - paragraph [ref=e452]:
+          - strong [ref=e453]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e454] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e455] [cursor=pointer]: DatabaseService
+        - separator [ref=e456]
+        - paragraph
+        - heading "databaseService.serialize()" [level=4] [ref=e457]
+        - paragraph [ref=e458]:
+          - text: Serialize database operations
+          - text: Pattern from server.js lines 782, 1033, 2518, 2793, 3739
+        - paragraph [ref=e459]:
+          - strong [ref=e460]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e461] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e462] [cursor=pointer]: DatabaseService
+        - separator [ref=e463]
+        - paragraph
+        - heading "databaseService.getHealthStatus()" [level=4] [ref=e464]
+        - paragraph [ref=e465]: Get database connection health status
+        - paragraph [ref=e466]:
+          - strong [ref=e467]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e468] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e469] [cursor=pointer]: DatabaseService
+        - separator [ref=e470]
+        - paragraph
+        - heading "databaseService.close()" [level=4] [ref=e471]
+        - paragraph [ref=e472]: Close database connection
+        - paragraph [ref=e473]:
+          - strong [ref=e474]: Kind
+          - text: ": instance method of"
+          - link "DatabaseService" [ref=e475] [cursor=pointer]:
+            - /url: "#DatabaseService"
+            - code [ref=e476] [cursor=pointer]: DatabaseService
+        - separator [ref=e477]
+        - paragraph
+        - heading "DocsService" [level=3] [ref=e478]
+        - paragraph [ref=e479]:
+          - text: Documentation Service
+          - text: Handles business logic for documentation statistics and file operations
+          - text: Extracted from server.js (T030)
+        - paragraph [ref=e480]:
+          - strong [ref=e481]: Kind
+          - text: ": global class"
+        - list [ref=e482]:
+          - listitem [ref=e483]:
+            - link "DocsService" [ref=e484] [cursor=pointer]:
+              - /url: "#DocsService"
+            - list [ref=e485]:
+              - listitem [ref=e486]:
+                - link "docsService.computeStats()" [ref=e487] [cursor=pointer]:
+                  - /url: "#DocsService+computeStats"
+              - listitem [ref=e488]:
+                - link "docsService.computeApiEndpoints()" [ref=e489] [cursor=pointer]:
+                  - /url: "#DocsService+computeApiEndpoints"
+              - listitem [ref=e490]:
+                - link "docsService.computeJsFunctionCount()" [ref=e491] [cursor=pointer]:
+                  - /url: "#DocsService+computeJsFunctionCount"
+              - listitem [ref=e492]:
+                - link "docsService.detectFrameworks()" [ref=e493] [cursor=pointer]:
+                  - /url: "#DocsService+detectFrameworks"
+              - listitem [ref=e494]:
+                - link "docsService.findDocsSectionForFilename()" [ref=e495] [cursor=pointer]:
+                  - /url: "#DocsService+findDocsSectionForFilename"
+        - separator [ref=e496]
+        - paragraph
+        - heading "docsService.computeStats()" [level=4] [ref=e497]
+        - paragraph [ref=e498]:
+          - text: Compute comprehensive documentation statistics
+          - text: Combines API endpoints, JS function count, and framework detection
+          - text: "Original: server.js lines 2624-2680"
+        - paragraph [ref=e499]:
+          - strong [ref=e500]: Kind
+          - text: ": instance method of"
+          - link "DocsService" [ref=e501] [cursor=pointer]:
+            - /url: "#DocsService"
+            - code [ref=e502] [cursor=pointer]: DocsService
+        - separator [ref=e503]
+        - paragraph
+        - heading "docsService.computeApiEndpoints()" [level=4] [ref=e504]
+        - paragraph [ref=e505]:
+          - text: Count unique Express API routes by scanning server.js file
+          - text: "Extracts routes matching pattern: app.(get|post|put|delete|patch)(\"/api/...\")"
+        - paragraph [ref=e506]:
+          - strong [ref=e507]: Kind
+          - text: ": instance method of"
+          - link "DocsService" [ref=e508] [cursor=pointer]:
+            - /url: "#DocsService"
+            - code [ref=e509] [cursor=pointer]: DocsService
+        - separator [ref=e510]
+        - paragraph
+        - heading "docsService.computeJsFunctionCount()" [level=4] [ref=e511]
+        - paragraph [ref=e512]:
+          - text: Approximate JS function count across scripts/, docs-html/js/, and server.js
+          - text: Uses multiple regex patterns to detect various function declaration styles
+        - paragraph [ref=e513]:
+          - strong [ref=e514]: Kind
+          - text: ": instance method of"
+          - link "DocsService" [ref=e515] [cursor=pointer]:
+            - /url: "#DocsService"
+            - code [ref=e516] [cursor=pointer]: DocsService
+        - separator [ref=e517]
+        - paragraph
+        - heading "docsService.detectFrameworks()" [level=4] [ref=e518]
+        - paragraph [ref=e519]:
+          - text: Detect primary frameworks used in the project
+          - text: Returns static list of core frameworks for HexTrackr
+        - paragraph [ref=e520]:
+          - strong [ref=e521]: Kind
+          - text: ": instance method of"
+          - link "DocsService" [ref=e522] [cursor=pointer]:
+            - /url: "#DocsService"
+            - code [ref=e523] [cursor=pointer]: DocsService
+        - separator [ref=e524]
+        - paragraph
+        - heading "docsService.findDocsSectionForFilename()" [level=4] [ref=e525]
+        - paragraph [ref=e526]:
+          - text: Find a section path for a given filename by scanning the content folder
+          - text: Used by documentation portal routing to resolve direct filename requests
+          - text: "Original: server.js lines 2560-2582"
+        - paragraph [ref=e527]:
+          - strong [ref=e528]: Kind
+          - text: ": instance method of"
+          - link "DocsService" [ref=e529] [cursor=pointer]:
+            - /url: "#DocsService"
+            - code [ref=e530] [cursor=pointer]: DocsService
+        - separator [ref=e531]
+        - paragraph
+        - heading "ProgressService" [level=3] [ref=e532]
+        - paragraph [ref=e533]: ProgressService - High-level service for managing import/export progress tracking
+        - paragraph [ref=e534]:
+          - text: This service provides a convenient interface for tracking progress of long-running
+          - text: operations like CSV imports, exports, and batch processing. It builds on top of
+          - text: the ProgressTracker utility to provide domain-specific functionality.
+        - paragraph [ref=e535]: "Features:"
+        - list [ref=e536]:
+          - listitem [ref=e537]: Import progress tracking with standardized phases
+          - listitem [ref=e538]: Export progress tracking for various data types
+          - listitem [ref=e539]: Batch operation progress management
+          - listitem [ref=e540]: WebSocket integration for real-time updates
+          - listitem [ref=e541]: Session lifecycle management
+          - listitem [ref=e542]: Error handling and recovery
+        - paragraph [ref=e543]:
+          - text: "Usage:"
+          - text: const progressService = new ProgressService(io);
+          - text: const sessionId = progressService.startImport("vulnerabilities.csv", 10000);
+          - text: progressService.updateImportProgress(sessionId, 500, "processing");
+          - text: "progressService.completeImport(sessionId, { imported: 9500, errors: 500 });"
+        - paragraph [ref=e544]:
+          - strong [ref=e545]: Kind
+          - text: ": global class"
+        - list [ref=e546]:
+          - listitem [ref=e547]:
+            - link "ProgressService" [ref=e548] [cursor=pointer]:
+              - /url: "#ProgressService"
+            - list [ref=e549]:
+              - listitem [ref=e550]:
+                - link "new ProgressService(io)" [ref=e551] [cursor=pointer]:
+                  - /url: "#new_ProgressService_new"
+              - listitem [ref=e552]:
+                - link "progressService.startImport(filename, totalRows, vendor, scanDate, customSessionId)" [ref=e553] [cursor=pointer]:
+                  - /url: "#ProgressService+startImport"
+                - text: ⇒
+                - code [ref=e554]: string
+              - listitem [ref=e555]:
+                - link "progressService.updateImportProgress(sessionId, processed, status, additionalData)" [ref=e556] [cursor=pointer]:
+                  - /url: "#ProgressService+updateImportProgress"
+                - text: ⇒
+                - code [ref=e557]: boolean
+              - listitem [ref=e558]:
+                - link "progressService.updateImportParsingProgress(sessionId, rowCount, status)" [ref=e559] [cursor=pointer]:
+                  - /url: "#ProgressService+updateImportParsingProgress"
+                - text: ⇒
+                - code [ref=e560]: boolean
+              - listitem [ref=e561]:
+                - link "progressService.updateImportStagingProgress(sessionId, staged, total, status)" [ref=e562] [cursor=pointer]:
+                  - /url: "#ProgressService+updateImportStagingProgress"
+                - text: ⇒
+                - code [ref=e563]: boolean
+              - listitem [ref=e564]:
+                - link "progressService.updateImportBatchProgress(sessionId, currentBatch, totalBatches, processedRows, status)" [ref=e565] [cursor=pointer]:
+                  - /url: "#ProgressService+updateImportBatchProgress"
+                - text: ⇒
+                - code [ref=e566]: boolean
+              - listitem [ref=e567]:
+                - link "progressService.completeImport(sessionId, results)" [ref=e568] [cursor=pointer]:
+                  - /url: "#ProgressService+completeImport"
+                - text: ⇒
+                - code [ref=e569]: boolean
+              - listitem [ref=e570]:
+                - link "progressService.startExport(type, totalItems, format, customSessionId)" [ref=e571] [cursor=pointer]:
+                  - /url: "#ProgressService+startExport"
+                - text: ⇒
+                - code [ref=e572]: string
+              - listitem [ref=e573]:
+                - link "progressService.updateExportProgress(sessionId, processed, phase, status)" [ref=e574] [cursor=pointer]:
+                  - /url: "#ProgressService+updateExportProgress"
+                - text: ⇒
+                - code [ref=e575]: boolean
+              - listitem [ref=e576]:
+                - link "progressService.completeExport(sessionId, results)" [ref=e577] [cursor=pointer]:
+                  - /url: "#ProgressService+completeExport"
+                - text: ⇒
+                - code [ref=e578]: boolean
+              - listitem [ref=e579]:
+                - link "progressService.getProgress(sessionId)" [ref=e580] [cursor=pointer]:
+                  - /url: "#ProgressService+getProgress"
+                - text: ⇒
+                - code [ref=e581]: Object
+                - text: "|"
+                - code [ref=e582]: "null"
+              - listitem [ref=e583]:
+                - link "progressService.handleError(sessionId, errorMessage, errorData)" [ref=e584] [cursor=pointer]:
+                  - /url: "#ProgressService+handleError"
+                - text: ⇒
+                - code [ref=e585]: boolean
+              - listitem [ref=e586]:
+                - link "progressService.getActiveSessions()" [ref=e587] [cursor=pointer]:
+                  - /url: "#ProgressService+getActiveSessions"
+                - text: ⇒
+                - code [ref=e588]: Array
+              - listitem [ref=e589]:
+                - link "progressService.cleanupSession(sessionId)" [ref=e590] [cursor=pointer]:
+                  - /url: "#ProgressService+cleanupSession"
+                - text: ⇒
+                - code [ref=e591]: boolean
+              - listitem [ref=e592]:
+                - link "progressService.broadcastEvent(eventName, data)" [ref=e593] [cursor=pointer]:
+                  - /url: "#ProgressService+broadcastEvent"
+        - separator [ref=e594]
+        - paragraph
+        - heading "new ProgressService(io)" [level=4] [ref=e595]
+        - paragraph [ref=e596]: Creates an instance of ProgressService.
+        - grid [ref=e600]:
+          - rowgroup [ref=e602]:
+            - row "Param Type Description" [ref=e603]:
+              - columnheader "Param" [ref=e604]:
+                - generic [ref=e607] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e608]:
+                - generic [ref=e611] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e612]:
+                - generic [ref=e615] [cursor=pointer]: Description
+          - rowgroup [ref=e616]:
+            - row "io object The socket.io instance." [ref=e617]:
+              - gridcell "io" [ref=e618]
+              - gridcell "object" [ref=e619]
+              - gridcell "The socket.io instance." [ref=e620]
+          - rowgroup
+          - rowgroup [ref=e621]
+          - rowgroup
+        - separator [ref=e622]
+        - paragraph
+        - heading "progressService.startImport(filename, totalRows, vendor, scanDate, customSessionId) ⇒ string" [level=4] [ref=e623]:
+          - text: progressService.startImport(filename, totalRows, vendor, scanDate, customSessionId) ⇒
+          - code [ref=e624]: string
+        - paragraph [ref=e625]: Start tracking progress for a CSV import operation
+        - paragraph [ref=e626]:
+          - strong [ref=e627]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e628] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e629] [cursor=pointer]: ProgressService
+          - strong [ref=e630]: Returns
+          - text: ":"
+          - code [ref=e631]: string
+          - text: "- sessionId - Unique session identifier"
+        - grid [ref=e635]:
+          - rowgroup [ref=e637]:
+            - row "Param Type Default Description" [ref=e638]:
+              - columnheader "Param" [ref=e639]:
+                - generic [ref=e642] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e643]:
+                - generic [ref=e646] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e647]:
+                - generic [ref=e650] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e651]:
+                - generic [ref=e654] [cursor=pointer]: Description
+          - rowgroup [ref=e655]:
+            - row "filename string Name of the file being imported" [ref=e656]:
+              - gridcell "filename" [ref=e657]
+              - gridcell "string" [ref=e658]
+              - gridcell [ref=e659]
+              - gridcell "Name of the file being imported" [ref=e660]
+            - row "totalRows number Total number of rows to process" [ref=e661]:
+              - gridcell "totalRows" [ref=e662]
+              - gridcell "number" [ref=e663]
+              - gridcell [ref=e664]
+              - gridcell "Total number of rows to process" [ref=e665]
+            - row "vendor string \"unknown\" Vendor/source of the data" [ref=e666]:
+              - gridcell "vendor" [ref=e667]
+              - gridcell "string" [ref=e668]
+              - gridcell "\"unknown\"" [ref=e669]
+              - gridcell "Vendor/source of the data" [ref=e670]
+            - row "scanDate string null Date of the scan data" [ref=e671]:
+              - gridcell "scanDate" [ref=e672]
+              - gridcell "string" [ref=e673]
+              - gridcell "null" [ref=e674]
+              - gridcell "Date of the scan data" [ref=e675]
+            - row "customSessionId string null Optional custom session ID" [ref=e676]:
+              - gridcell "customSessionId" [ref=e677]
+              - gridcell "string" [ref=e678]
+              - gridcell "null" [ref=e679]
+              - gridcell "Optional custom session ID" [ref=e680]
+          - rowgroup
+          - rowgroup [ref=e681]
+          - rowgroup
+        - separator [ref=e682]
+        - paragraph
+        - heading "progressService.updateImportProgress(sessionId, processed, status, additionalData) ⇒ boolean" [level=4] [ref=e683]:
+          - text: progressService.updateImportProgress(sessionId, processed, status, additionalData) ⇒
+          - code [ref=e684]: boolean
+        - paragraph [ref=e685]: Update import progress based on current phase and processed items
+        - paragraph [ref=e686]:
+          - strong [ref=e687]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e688] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e689] [cursor=pointer]: ProgressService
+          - strong [ref=e690]: Returns
+          - text: ":"
+          - code [ref=e691]: boolean
+          - text: "- Success status"
+        - grid [ref=e695]:
+          - rowgroup [ref=e697]:
+            - row "Param Type Description" [ref=e698]:
+              - columnheader "Param" [ref=e699]:
+                - generic [ref=e702] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e703]:
+                - generic [ref=e706] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e707]:
+                - generic [ref=e710] [cursor=pointer]: Description
+          - rowgroup [ref=e711]:
+            - row "sessionId string Session identifier" [ref=e712]:
+              - gridcell "sessionId" [ref=e713]
+              - gridcell "string" [ref=e714]
+              - gridcell "Session identifier" [ref=e715]
+            - row "processed number Number of items processed in current phase" [ref=e716]:
+              - gridcell "processed" [ref=e717]
+              - gridcell "number" [ref=e718]
+              - gridcell "Number of items processed in current phase" [ref=e719]
+            - row "status string Current operation status" [ref=e720]:
+              - gridcell "status" [ref=e721]
+              - gridcell "string" [ref=e722]
+              - gridcell "Current operation status" [ref=e723]
+            - row "additionalData Object Additional metadata" [ref=e724]:
+              - gridcell "additionalData" [ref=e725]
+              - gridcell "Object" [ref=e726]
+              - gridcell "Additional metadata" [ref=e727]
+          - rowgroup
+          - rowgroup [ref=e728]
+          - rowgroup
+        - separator [ref=e729]
+        - paragraph
+        - heading "progressService.updateImportParsingProgress(sessionId, rowCount, status) ⇒ boolean" [level=4] [ref=e730]:
+          - text: progressService.updateImportParsingProgress(sessionId, rowCount, status) ⇒
+          - code [ref=e731]: boolean
+        - paragraph [ref=e732]: Update import progress for CSV parsing phase
+        - paragraph [ref=e733]:
+          - strong [ref=e734]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e735] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e736] [cursor=pointer]: ProgressService
+          - strong [ref=e737]: Returns
+          - text: ":"
+          - code [ref=e738]: boolean
+          - text: "- Success status"
+        - grid [ref=e742]:
+          - rowgroup [ref=e744]:
+            - row "Param Type Default Description" [ref=e745]:
+              - columnheader "Param" [ref=e746]:
+                - generic [ref=e749] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e750]:
+                - generic [ref=e753] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e754]:
+                - generic [ref=e757] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e758]:
+                - generic [ref=e761] [cursor=pointer]: Description
+          - rowgroup [ref=e762]:
+            - row "sessionId string Session identifier" [ref=e763]:
+              - gridcell "sessionId" [ref=e764]
+              - gridcell "string" [ref=e765]
+              - gridcell [ref=e766]
+              - gridcell "Session identifier" [ref=e767]
+            - row "rowCount number Number of rows parsed" [ref=e768]:
+              - gridcell "rowCount" [ref=e769]
+              - gridcell "number" [ref=e770]
+              - gridcell [ref=e771]
+              - gridcell "Number of rows parsed" [ref=e772]
+            - row "status string \"parsing\" Parsing status" [ref=e773]:
+              - gridcell "status" [ref=e774]
+              - gridcell "string" [ref=e775]
+              - gridcell "\"parsing\"" [ref=e776]
+              - gridcell "Parsing status" [ref=e777]
+          - rowgroup
+          - rowgroup [ref=e778]
+          - rowgroup
+        - separator [ref=e779]
+        - paragraph
+        - heading "progressService.updateImportStagingProgress(sessionId, staged, total, status) ⇒ boolean" [level=4] [ref=e780]:
+          - text: progressService.updateImportStagingProgress(sessionId, staged, total, status) ⇒
+          - code [ref=e781]: boolean
+        - paragraph [ref=e782]: Update import progress for staging phase
+        - paragraph [ref=e783]:
+          - strong [ref=e784]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e785] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e786] [cursor=pointer]: ProgressService
+          - strong [ref=e787]: Returns
+          - text: ":"
+          - code [ref=e788]: boolean
+          - text: "- Success status"
+        - grid [ref=e792]:
+          - rowgroup [ref=e794]:
+            - row "Param Type Default Description" [ref=e795]:
+              - columnheader "Param" [ref=e796]:
+                - generic [ref=e799] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e800]:
+                - generic [ref=e803] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e804]:
+                - generic [ref=e807] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e808]:
+                - generic [ref=e811] [cursor=pointer]: Description
+          - rowgroup [ref=e812]:
+            - row "sessionId string Session identifier" [ref=e813]:
+              - gridcell "sessionId" [ref=e814]
+              - gridcell "string" [ref=e815]
+              - gridcell [ref=e816]
+              - gridcell "Session identifier" [ref=e817]
+            - row "staged number Number of rows staged" [ref=e818]:
+              - gridcell "staged" [ref=e819]
+              - gridcell "number" [ref=e820]
+              - gridcell [ref=e821]
+              - gridcell "Number of rows staged" [ref=e822]
+            - row "total number Total rows to stage" [ref=e823]:
+              - gridcell "total" [ref=e824]
+              - gridcell "number" [ref=e825]
+              - gridcell [ref=e826]
+              - gridcell "Total rows to stage" [ref=e827]
+            - row "status string \"staging\" Staging status" [ref=e828]:
+              - gridcell "status" [ref=e829]
+              - gridcell "string" [ref=e830]
+              - gridcell "\"staging\"" [ref=e831]
+              - gridcell "Staging status" [ref=e832]
+          - rowgroup
+          - rowgroup [ref=e833]
+          - rowgroup
+        - separator [ref=e834]
+        - paragraph
+        - heading "progressService.updateImportBatchProgress(sessionId, currentBatch, totalBatches, processedRows, status) ⇒ boolean" [level=4] [ref=e835]:
+          - text: progressService.updateImportBatchProgress(sessionId, currentBatch, totalBatches, processedRows, status) ⇒
+          - code [ref=e836]: boolean
+        - paragraph [ref=e837]: Update import progress for batch processing phase
+        - paragraph [ref=e838]:
+          - strong [ref=e839]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e840] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e841] [cursor=pointer]: ProgressService
+          - strong [ref=e842]: Returns
+          - text: ":"
+          - code [ref=e843]: boolean
+          - text: "- Success status"
+        - grid [ref=e847]:
+          - rowgroup [ref=e849]:
+            - row "Param Type Default Description" [ref=e850]:
+              - columnheader "Param" [ref=e851]:
+                - generic [ref=e854] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e855]:
+                - generic [ref=e858] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e859]:
+                - generic [ref=e862] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e863]:
+                - generic [ref=e866] [cursor=pointer]: Description
+          - rowgroup [ref=e867]:
+            - row "sessionId string Session identifier" [ref=e868]:
+              - gridcell "sessionId" [ref=e869]
+              - gridcell "string" [ref=e870]
+              - gridcell [ref=e871]
+              - gridcell "Session identifier" [ref=e872]
+            - row "currentBatch number Current batch number" [ref=e873]:
+              - gridcell "currentBatch" [ref=e874]
+              - gridcell "number" [ref=e875]
+              - gridcell [ref=e876]
+              - gridcell "Current batch number" [ref=e877]
+            - row "totalBatches number Total number of batches" [ref=e878]:
+              - gridcell "totalBatches" [ref=e879]
+              - gridcell "number" [ref=e880]
+              - gridcell [ref=e881]
+              - gridcell "Total number of batches" [ref=e882]
+            - row "processedRows number Total rows processed so far" [ref=e883]:
+              - gridcell "processedRows" [ref=e884]
+              - gridcell "number" [ref=e885]
+              - gridcell [ref=e886]
+              - gridcell "Total rows processed so far" [ref=e887]
+            - row "status string \"processing\" Processing status" [ref=e888]:
+              - gridcell "status" [ref=e889]
+              - gridcell "string" [ref=e890]
+              - gridcell "\"processing\"" [ref=e891]
+              - gridcell "Processing status" [ref=e892]
+          - rowgroup
+          - rowgroup [ref=e893]
+          - rowgroup
+        - separator [ref=e894]
+        - paragraph
+        - heading "progressService.completeImport(sessionId, results) ⇒ boolean" [level=4] [ref=e895]:
+          - text: progressService.completeImport(sessionId, results) ⇒
+          - code [ref=e896]: boolean
+        - paragraph [ref=e897]: Complete an import operation with final results
+        - paragraph [ref=e898]:
+          - strong [ref=e899]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e900] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e901] [cursor=pointer]: ProgressService
+          - strong [ref=e902]: Returns
+          - text: ":"
+          - code [ref=e903]: boolean
+          - text: "- Success status"
+        - grid [ref=e907]:
+          - rowgroup [ref=e909]:
+            - row "Param Type Description" [ref=e910]:
+              - columnheader "Param" [ref=e911]:
+                - generic [ref=e914] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e915]:
+                - generic [ref=e918] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e919]:
+                - generic [ref=e922] [cursor=pointer]: Description
+          - rowgroup [ref=e923]:
+            - row "sessionId string Session identifier" [ref=e924]:
+              - gridcell "sessionId" [ref=e925]
+              - gridcell "string" [ref=e926]
+              - gridcell "Session identifier" [ref=e927]
+            - row "results Object Final import results" [ref=e928]:
+              - gridcell "results" [ref=e929]
+              - gridcell "Object" [ref=e930]
+              - gridcell "Final import results" [ref=e931]
+          - rowgroup
+          - rowgroup [ref=e932]
+          - rowgroup
+        - separator [ref=e933]
+        - paragraph
+        - heading "progressService.startExport(type, totalItems, format, customSessionId) ⇒ string" [level=4] [ref=e934]:
+          - text: progressService.startExport(type, totalItems, format, customSessionId) ⇒
+          - code [ref=e935]: string
+        - paragraph [ref=e936]: Start tracking progress for an export operation
+        - paragraph [ref=e937]:
+          - strong [ref=e938]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e939] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e940] [cursor=pointer]: ProgressService
+          - strong [ref=e941]: Returns
+          - text: ":"
+          - code [ref=e942]: string
+          - text: "- sessionId - Unique session identifier"
+        - grid [ref=e946]:
+          - rowgroup [ref=e948]:
+            - row "Param Type Default Description" [ref=e949]:
+              - columnheader "Param" [ref=e950]:
+                - generic [ref=e953] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e954]:
+                - generic [ref=e957] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e958]:
+                - generic [ref=e961] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e962]:
+                - generic [ref=e965] [cursor=pointer]: Description
+          - rowgroup [ref=e966]:
+            - row "type string Type of export (vulnerabilities, tickets, combined)" [ref=e967]:
+              - gridcell "type" [ref=e968]
+              - gridcell "string" [ref=e969]
+              - gridcell [ref=e970]
+              - gridcell "Type of export (vulnerabilities, tickets, combined)" [ref=e971]
+            - row "totalItems number Total number of items to export" [ref=e972]:
+              - gridcell "totalItems" [ref=e973]
+              - gridcell "number" [ref=e974]
+              - gridcell [ref=e975]
+              - gridcell "Total number of items to export" [ref=e976]
+            - row "format string \"json\" Export format (json, csv, xlsx)" [ref=e977]:
+              - gridcell "format" [ref=e978]
+              - gridcell "string" [ref=e979]
+              - gridcell "\"json\"" [ref=e980]
+              - gridcell "Export format (json, csv, xlsx)" [ref=e981]
+            - row "customSessionId string null Optional custom session ID" [ref=e982]:
+              - gridcell "customSessionId" [ref=e983]
+              - gridcell "string" [ref=e984]
+              - gridcell "null" [ref=e985]
+              - gridcell "Optional custom session ID" [ref=e986]
+          - rowgroup
+          - rowgroup [ref=e987]
+          - rowgroup
+        - separator [ref=e988]
+        - paragraph
+        - heading "progressService.updateExportProgress(sessionId, processed, phase, status) ⇒ boolean" [level=4] [ref=e989]:
+          - text: progressService.updateExportProgress(sessionId, processed, phase, status) ⇒
+          - code [ref=e990]: boolean
+        - paragraph [ref=e991]: Update export progress based on current phase
+        - paragraph [ref=e992]:
+          - strong [ref=e993]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e994] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e995] [cursor=pointer]: ProgressService
+          - strong [ref=e996]: Returns
+          - text: ":"
+          - code [ref=e997]: boolean
+          - text: "- Success status"
+        - grid [ref=e1001]:
+          - rowgroup [ref=e1003]:
+            - row "Param Type Default Description" [ref=e1004]:
+              - columnheader "Param" [ref=e1005]:
+                - generic [ref=e1008] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1009]:
+                - generic [ref=e1012] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e1013]:
+                - generic [ref=e1016] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e1017]:
+                - generic [ref=e1020] [cursor=pointer]: Description
+          - rowgroup [ref=e1021]:
+            - row "sessionId string Session identifier" [ref=e1022]:
+              - gridcell "sessionId" [ref=e1023]
+              - gridcell "string" [ref=e1024]
+              - gridcell [ref=e1025]
+              - gridcell "Session identifier" [ref=e1026]
+            - row "processed number Number of items processed" [ref=e1027]:
+              - gridcell "processed" [ref=e1028]
+              - gridcell "number" [ref=e1029]
+              - gridcell [ref=e1030]
+              - gridcell "Number of items processed" [ref=e1031]
+            - row "phase string \"querying\" Current export phase" [ref=e1032]:
+              - gridcell "phase" [ref=e1033]
+              - gridcell "string" [ref=e1034]
+              - gridcell "\"querying\"" [ref=e1035]
+              - gridcell "Current export phase" [ref=e1036]
+            - row "status string Current operation status" [ref=e1037]:
+              - gridcell "status" [ref=e1038]
+              - gridcell "string" [ref=e1039]
+              - gridcell [ref=e1040]
+              - gridcell "Current operation status" [ref=e1041]
+          - rowgroup
+          - rowgroup [ref=e1042]
+          - rowgroup
+        - separator [ref=e1043]
+        - paragraph
+        - heading "progressService.completeExport(sessionId, results) ⇒ boolean" [level=4] [ref=e1044]:
+          - text: progressService.completeExport(sessionId, results) ⇒
+          - code [ref=e1045]: boolean
+        - paragraph [ref=e1046]: Complete an export operation with final results
+        - paragraph [ref=e1047]:
+          - strong [ref=e1048]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e1049] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e1050] [cursor=pointer]: ProgressService
+          - strong [ref=e1051]: Returns
+          - text: ":"
+          - code [ref=e1052]: boolean
+          - text: "- Success status"
+        - grid [ref=e1056]:
+          - rowgroup [ref=e1058]:
+            - row "Param Type Description" [ref=e1059]:
+              - columnheader "Param" [ref=e1060]:
+                - generic [ref=e1063] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1064]:
+                - generic [ref=e1067] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1068]:
+                - generic [ref=e1071] [cursor=pointer]: Description
+          - rowgroup [ref=e1072]:
+            - row "sessionId string Session identifier" [ref=e1073]:
+              - gridcell "sessionId" [ref=e1074]
+              - gridcell "string" [ref=e1075]
+              - gridcell "Session identifier" [ref=e1076]
+            - row "results Object Final export results" [ref=e1077]:
+              - gridcell "results" [ref=e1078]
+              - gridcell "Object" [ref=e1079]
+              - gridcell "Final export results" [ref=e1080]
+          - rowgroup
+          - rowgroup [ref=e1081]
+          - rowgroup
+        - separator [ref=e1082]
+        - paragraph
+        - heading "progressService.getProgress(sessionId) ⇒ Object | null" [level=4] [ref=e1083]:
+          - text: progressService.getProgress(sessionId) ⇒
+          - code [ref=e1084]: Object
+          - text: "|"
+          - code [ref=e1085]: "null"
+        - paragraph [ref=e1086]: Get progress information for a session
+        - paragraph [ref=e1087]:
+          - strong [ref=e1088]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e1089] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e1090] [cursor=pointer]: ProgressService
+          - strong [ref=e1091]: Returns
+          - text: ":"
+          - code [ref=e1092]: Object
+          - text: "|"
+          - code [ref=e1093]: "null"
+          - text: "- Session progress data or null if not found"
+        - grid [ref=e1097]:
+          - rowgroup [ref=e1099]:
+            - row "Param Type Description" [ref=e1100]:
+              - columnheader "Param" [ref=e1101]:
+                - generic [ref=e1104] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1105]:
+                - generic [ref=e1108] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1109]:
+                - generic [ref=e1112] [cursor=pointer]: Description
+          - rowgroup [ref=e1113]:
+            - row "sessionId string Session identifier" [ref=e1114]:
+              - gridcell "sessionId" [ref=e1115]
+              - gridcell "string" [ref=e1116]
+              - gridcell "Session identifier" [ref=e1117]
+          - rowgroup
+          - rowgroup [ref=e1118]
+          - rowgroup
+        - separator [ref=e1119]
+        - paragraph
+        - heading "progressService.handleError(sessionId, errorMessage, errorData) ⇒ boolean" [level=4] [ref=e1120]:
+          - text: progressService.handleError(sessionId, errorMessage, errorData) ⇒
+          - code [ref=e1121]: boolean
+        - paragraph [ref=e1122]: Handle import/export errors
+        - paragraph [ref=e1123]:
+          - strong [ref=e1124]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e1125] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e1126] [cursor=pointer]: ProgressService
+          - strong [ref=e1127]: Returns
+          - text: ":"
+          - code [ref=e1128]: boolean
+          - text: "- Success status"
+        - grid [ref=e1132]:
+          - rowgroup [ref=e1134]:
+            - row "Param Type Description" [ref=e1135]:
+              - columnheader "Param" [ref=e1136]:
+                - generic [ref=e1139] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1140]:
+                - generic [ref=e1143] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1144]:
+                - generic [ref=e1147] [cursor=pointer]: Description
+          - rowgroup [ref=e1148]:
+            - row "sessionId string Session identifier" [ref=e1149]:
+              - gridcell "sessionId" [ref=e1150]
+              - gridcell "string" [ref=e1151]
+              - gridcell "Session identifier" [ref=e1152]
+            - row "errorMessage string Error description" [ref=e1153]:
+              - gridcell "errorMessage" [ref=e1154]
+              - gridcell "string" [ref=e1155]
+              - gridcell "Error description" [ref=e1156]
+            - row "errorData Object Error details" [ref=e1157]:
+              - gridcell "errorData" [ref=e1158]
+              - gridcell "Object" [ref=e1159]
+              - gridcell "Error details" [ref=e1160]
+          - rowgroup
+          - rowgroup [ref=e1161]
+          - rowgroup
+        - separator [ref=e1162]
+        - paragraph
+        - heading "progressService.getActiveSessions() ⇒ Array" [level=4] [ref=e1163]:
+          - text: progressService.getActiveSessions() ⇒
+          - code [ref=e1164]: Array
+        - paragraph [ref=e1165]: Get all active progress sessions
+        - paragraph [ref=e1166]:
+          - strong [ref=e1167]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e1168] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e1169] [cursor=pointer]: ProgressService
+          - strong [ref=e1170]: Returns
+          - text: ":"
+          - code [ref=e1171]: Array
+          - text: "- Array of active session objects"
+        - separator [ref=e1172]
+        - paragraph
+        - heading "progressService.cleanupSession(sessionId) ⇒ boolean" [level=4] [ref=e1173]:
+          - text: progressService.cleanupSession(sessionId) ⇒
+          - code [ref=e1174]: boolean
+        - paragraph [ref=e1175]: Clean up a specific session
+        - paragraph [ref=e1176]:
+          - strong [ref=e1177]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e1178] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e1179] [cursor=pointer]: ProgressService
+          - strong [ref=e1180]: Returns
+          - text: ":"
+          - code [ref=e1181]: boolean
+          - text: "- Success status"
+        - grid [ref=e1185]:
+          - rowgroup [ref=e1187]:
+            - row "Param Type Description" [ref=e1188]:
+              - columnheader "Param" [ref=e1189]:
+                - generic [ref=e1192] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1193]:
+                - generic [ref=e1196] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1197]:
+                - generic [ref=e1200] [cursor=pointer]: Description
+          - rowgroup [ref=e1201]:
+            - row "sessionId string Session identifier" [ref=e1202]:
+              - gridcell "sessionId" [ref=e1203]
+              - gridcell "string" [ref=e1204]
+              - gridcell "Session identifier" [ref=e1205]
+          - rowgroup
+          - rowgroup [ref=e1206]
+          - rowgroup
+        - separator [ref=e1207]
+        - paragraph
+        - heading "progressService.broadcastEvent(eventName, data)" [level=4] [ref=e1208]
+        - paragraph [ref=e1209]: Broadcast a custom progress event to all connected clients
+        - paragraph [ref=e1210]:
+          - strong [ref=e1211]: Kind
+          - text: ": instance method of"
+          - link "ProgressService" [ref=e1212] [cursor=pointer]:
+            - /url: "#ProgressService"
+            - code [ref=e1213] [cursor=pointer]: ProgressService
+        - grid [ref=e1217]:
+          - rowgroup [ref=e1219]:
+            - row "Param Type Description" [ref=e1220]:
+              - columnheader "Param" [ref=e1221]:
+                - generic [ref=e1224] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1225]:
+                - generic [ref=e1228] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1229]:
+                - generic [ref=e1232] [cursor=pointer]: Description
+          - rowgroup [ref=e1233]:
+            - row "eventName string Event name" [ref=e1234]:
+              - gridcell "eventName" [ref=e1235]
+              - gridcell "string" [ref=e1236]
+              - gridcell "Event name" [ref=e1237]
+            - row "data Object Event data" [ref=e1238]:
+              - gridcell "data" [ref=e1239]
+              - gridcell "Object" [ref=e1240]
+              - gridcell "Event data" [ref=e1241]
+          - rowgroup
+          - rowgroup [ref=e1242]
+          - rowgroup
+        - separator [ref=e1243]
+        - paragraph
+        - heading "TicketService" [level=3] [ref=e1244]
+        - paragraph [ref=e1245]:
+          - text: TicketService - Ticket business logic and database operations
+          - text: "Extracted from server.js lines: 3320-3344, 3369-3394, 3396-3422, 3424-3435, 3437-3479, 3482-3498, 1802-1874, 3606-3621"
+        - paragraph [ref=e1246]: "Handles:"
+        - list [ref=e1247]:
+          - listitem [ref=e1248]: CRUD operations for tickets table
+          - listitem [ref=e1249]: Device management (JSON field handling)
+          - listitem [ref=e1250]: CSV import processing with mapping
+          - listitem [ref=e1251]: Migration operations
+          - listitem [ref=e1252]: Export functionality
+          - listitem [ref=e1253]: Ticket number generation (XT numbers)
+        - paragraph [ref=e1254]:
+          - text: "T053 INTEGRATION NOTES:"
+          - text: This service requires database initialization before use.
+          - text: "In server.js, after database connection, call:"
+          - text: ticketController.initialize(db);
+        - paragraph [ref=e1255]:
+          - strong [ref=e1256]: Kind
+          - text: ": global class"
+        - list [ref=e1257]:
+          - listitem [ref=e1258]:
+            - link "TicketService" [ref=e1259] [cursor=pointer]:
+              - /url: "#TicketService"
+            - list [ref=e1260]:
+              - listitem [ref=e1261]:
+                - link "ticketService.initialize(database)" [ref=e1262] [cursor=pointer]:
+                  - /url: "#TicketService+initialize"
+              - listitem [ref=e1263]:
+                - link "ticketService.getAllTickets()" [ref=e1264] [cursor=pointer]:
+                  - /url: "#TicketService+getAllTickets"
+              - listitem [ref=e1265]:
+                - link "ticketService.createTicket()" [ref=e1266] [cursor=pointer]:
+                  - /url: "#TicketService+createTicket"
+              - listitem [ref=e1267]:
+                - link "ticketService.updateTicket()" [ref=e1268] [cursor=pointer]:
+                  - /url: "#TicketService+updateTicket"
+              - listitem [ref=e1269]:
+                - link "ticketService.deleteTicket()" [ref=e1270] [cursor=pointer]:
+                  - /url: "#TicketService+deleteTicket"
+              - listitem [ref=e1271]:
+                - link "ticketService.migrateTickets()" [ref=e1272] [cursor=pointer]:
+                  - /url: "#TicketService+migrateTickets"
+              - listitem [ref=e1273]:
+                - link "ticketService.importTickets()" [ref=e1274] [cursor=pointer]:
+                  - /url: "#TicketService+importTickets"
+              - listitem [ref=e1275]:
+                - link "ticketService._mapTicketRow()" [ref=e1276] [cursor=pointer]:
+                  - /url: "#TicketService+_mapTicketRow"
+              - listitem [ref=e1277]:
+                - link "ticketService.exportTickets()" [ref=e1278] [cursor=pointer]:
+                  - /url: "#TicketService+exportTickets"
+              - listitem [ref=e1279]:
+                - link "ticketService.generateNextXTNumber()" [ref=e1280] [cursor=pointer]:
+                  - /url: "#TicketService+generateNextXTNumber"
+              - listitem [ref=e1281]:
+                - link "ticketService.updateTicketDevices()" [ref=e1282] [cursor=pointer]:
+                  - /url: "#TicketService+updateTicketDevices"
+              - listitem [ref=e1283]:
+                - link "ticketService.getTicketById()" [ref=e1284] [cursor=pointer]:
+                  - /url: "#TicketService+getTicketById"
+        - separator [ref=e1285]
+        - paragraph
+        - heading "ticketService.initialize(database)" [level=4] [ref=e1286]
+        - paragraph [ref=e1287]: Initialize service with database connection
+        - paragraph [ref=e1288]:
+          - strong [ref=e1289]: Kind
+          - text: ": instance method of"
+          - link "TicketService" [ref=e1290] [cursor=pointer]:
+            - /url: "#TicketService"
+            - code [ref=e1291] [cursor=pointer]: TicketService
+        - grid [ref=e1295]:
+          - rowgroup [ref=e1297]:
+            - row "Param Type Description" [ref=e1298]:
+              - columnheader "Param" [ref=e1299]:
+                - generic [ref=e1302] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1303]:
+                - generic [ref=e1306] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1307]:
+                - generic [ref=e1310] [cursor=pointer]: Description
+          - rowgroup [ref=e1311]:
+            - row "database sqlite3.Database Database connection from server.js" [ref=e1312]:
+              - gridcell "database" [ref=e1313]
+              - gridcell "sqlite3.Database" [ref=e1314]
+              - gridcell "Database connection from server.js" [ref=e1315]
+          - rowgroup
+          - rowgroup [ref=e1316]
+          - rowgroup
+        - separator [ref=e1317]
+        - paragraph
+        - heading "ticketService.getAllTickets()" [level=4] [ref=e1318]
+        - paragraph [ref=e1319]:
+          - text: Get all tickets with ID normalization
+          - text: Extracted from server.js line 3320-3344
+        - paragraph [ref=e1320]:
+          - strong [ref=e1321]: Kind
+          - text: ": instance method of"
+          - link "TicketService" [ref=e1322] [cursor=pointer]:
+            - /url: "#TicketService"
+            - code [ref=e1323] [cursor=pointer]: TicketService
+        - separator [ref=e1324]
+        - paragraph
+        - heading "ticketService.createTicket()" [level=4] [ref=e1325]
+        - paragraph [ref=e1326]:
+          - text: Create new ticket
+          - text: Extracted from server.js line 3369-3394
+        - paragraph [ref=e1327]:
+          - strong [ref=e1328]: Kind
+          - text: ": instance method of"
+          - link "TicketService" [ref=e1329] [cursor=pointer]:
+            - /url: "#TicketService"
+            - code [ref=e1330] [cursor=pointer]: TicketService
+        - separator [ref=e1331]
+        - paragraph
+        - heading "ticketService.updateTicket()" [level=4] [ref=e1332]
+        - paragraph [ref=e1333]:
+          - text: Update existing ticket
+          - text: Extracted from server.js line 3396-3422
+        - paragraph [ref=e1334]:
+          - strong [ref=e1335]: Kind
+          - text: ": instance method of"
+          - link "TicketService" [ref=e1336] [cursor=pointer]:
+            - /url: "#TicketService"
+            - code [ref=e1337] [cursor=pointer]: TicketService
+        - separator [ref=e1338]
+        - paragraph
+        - heading "ticketService.deleteTicket()" [level=4] [ref=e1339]
+        - paragraph [ref=e1340]:
+          - text: Delete ticket by ID
+          - text: Extracted from server.js line 3424-3435
+        - paragraph [ref=e1341]:
+          - strong [ref=e1342]: Kind
+          - text: ": instance method of"
+          - link "TicketService" [ref=e1343] [cursor=pointer]:
+            - /url: "#TicketService"
+            - code [ref=e1344] [cursor=pointer]: TicketService
+        - separator [ref=e1345]
+        - paragraph
+        - heading "ticketService.migrateTickets()" [level=4] [ref=e1346]
+        - paragraph [ref=e1347]:
+          - text: Migrate tickets from legacy format
+          - text: Extracted from server.js line 3437-3479
+        - paragraph [ref=e1348]:
+          - strong [ref=e1349]: Kind
+          - text: ": instance method of"
+          - link "TicketService" [ref=e1350] [cursor=pointer]:
+            - /url: "#TicketService"
+            - code [ref=e1351] [cursor=pointer]: TicketService
+        - separator [ref=e1352]
+        - paragraph
+        - heading "ticketService.importTickets()" [level=4] [ref=e1353]
+        - paragraph [ref=e1354]:
+          - text: Import tickets from CSV data
+          - text: Extracted from server.js line 3482-3498 + processTicketRows (1825-1874) + mapTicketRow (1802-1823)
+        - paragraph [ref=e1355]:
+          - strong [ref=e1356]: Kind
+          - text: ": instance method of"
+          - link "TicketService" [ref=e1357] [cursor=pointer]:
+            - /url: "#TicketService"
+            - code [ref=e1358] [cursor=pointer]: TicketService
+        - separator [ref=e1359]
+        - paragraph
+        - heading "ticketService._mapTicketRow()" [level=4] [ref=e1360]
+        - paragraph [ref=e1361]:
+          - text: Map CSV row to ticket object
+          - text: Extracted from server.js line 1802-1823
+        - paragraph [ref=e1362]:
+          - strong [ref=e1363]: Kind
+          - text: ": instance method of"
+          - link "TicketService" [ref=e1364] [cursor=pointer]:
+            - /url: "#TicketService"
+            - code [ref=e1365] [cursor=pointer]: TicketService
+        - separator [ref=e1366]
+        - paragraph
+        - heading "ticketService.exportTickets()" [level=4] [ref=e1367]
+        - paragraph [ref=e1368]:
+          - text: Export tickets for backup
+          - text: Extracted from server.js line 3606-3621
+        - paragraph [ref=e1369]:
+          - strong [ref=e1370]: Kind
+          - text: ": instance method of"
+          - link "TicketService" [ref=e1371] [cursor=pointer]:
+            - /url: "#TicketService"
+            - code [ref=e1372] [cursor=pointer]: TicketService
+        - separator [ref=e1373]
+        - paragraph
+        - heading "ticketService.generateNextXTNumber()" [level=4] [ref=e1374]
+        - paragraph [ref=e1375]: Generate next XT number for new tickets
+        - paragraph [ref=e1376]:
+          - strong [ref=e1377]: Kind
+          - text: ": instance method of"
+          - link "TicketService" [ref=e1378] [cursor=pointer]:
+            - /url: "#TicketService"
+            - code [ref=e1379] [cursor=pointer]: TicketService
+        - separator [ref=e1380]
+        - paragraph
+        - heading "ticketService.updateTicketDevices()" [level=4] [ref=e1381]
+        - paragraph [ref=e1382]:
+          - text: Update devices for a specific ticket
+          - text: Helper method for device management
+        - paragraph [ref=e1383]:
+          - strong [ref=e1384]: Kind
+          - text: ": instance method of"
+          - link "TicketService" [ref=e1385] [cursor=pointer]:
+            - /url: "#TicketService"
+            - code [ref=e1386] [cursor=pointer]: TicketService
+        - separator [ref=e1387]
+        - paragraph
+        - heading "ticketService.getTicketById()" [level=4] [ref=e1388]
+        - paragraph [ref=e1389]:
+          - text: Get ticket by ID
+          - text: Helper method for single ticket retrieval
+        - paragraph [ref=e1390]:
+          - strong [ref=e1391]: Kind
+          - text: ": instance method of"
+          - link "TicketService" [ref=e1392] [cursor=pointer]:
+            - /url: "#TicketService"
+            - code [ref=e1393] [cursor=pointer]: TicketService
+        - separator [ref=e1394]
+        - paragraph
+        - heading "VulnerabilityStatsService" [level=3] [ref=e1395]
+        - paragraph [ref=e1396]:
+          - text: VulnerabilityStatsService - Vulnerability statistics and analytics business logic
+          - text: "Extracted from server.js lines: 1996-2016, 2019-2092, 2095-2156, 1719-1798"
+        - paragraph [ref=e1397]: "This service handles all statistical calculations and analytics for vulnerabilities:"
+        - list [ref=e1398]:
+          - listitem [ref=e1399]: Current vulnerability statistics with VPR totals and distribution
+          - listitem [ref=e1400]: Recent trends comparison for dashboard cards (current vs previous day)
+          - listitem [ref=e1401]: Historical trending data with date range filtering
+          - listitem [ref=e1402]: Daily totals calculation and rollup operations
+          - listitem [ref=e1403]: Enhanced lifecycle state tracking (active, resolved, reopened)
+          - listitem [ref=e1404]: VPR score aggregations and severity-based metrics
+        - paragraph [ref=e1405]: "Separated from vulnerabilityService due to complexity and distinct concerns:"
+        - list [ref=e1406]:
+          - listitem [ref=e1407]: "vulnerabilityService: CRUD, import, data management"
+          - listitem [ref=e1408]: "vulnerabilityStatsService: Analytics, trends, statistics, rollups"
+        - paragraph [ref=e1409]:
+          - text: "T053 INTEGRATION NOTES:"
+          - text: This service requires database initialization and works with vulnerability_daily_totals table.
+          - text: Complex statistical calculations are isolated here for maintainability.
+        - paragraph [ref=e1410]:
+          - strong [ref=e1411]: Kind
+          - text: ": global class"
+        - list [ref=e1412]:
+          - listitem [ref=e1413]:
+            - link "VulnerabilityStatsService" [ref=e1414] [cursor=pointer]:
+              - /url: "#VulnerabilityStatsService"
+            - list [ref=e1415]:
+              - listitem [ref=e1416]:
+                - link "vulnerabilityStatsService.initialize(database)" [ref=e1417] [cursor=pointer]:
+                  - /url: "#VulnerabilityStatsService+initialize"
+              - listitem [ref=e1418]:
+                - link "vulnerabilityStatsService.getStats()" [ref=e1419] [cursor=pointer]:
+                  - /url: "#VulnerabilityStatsService+getStats"
+              - listitem [ref=e1420]:
+                - link "vulnerabilityStatsService.getRecentTrends()" [ref=e1421] [cursor=pointer]:
+                  - /url: "#VulnerabilityStatsService+getRecentTrends"
+              - listitem [ref=e1422]:
+                - link "vulnerabilityStatsService.getTrends()" [ref=e1423] [cursor=pointer]:
+                  - /url: "#VulnerabilityStatsService+getTrends"
+              - listitem [ref=e1424]:
+                - link "vulnerabilityStatsService.calculateAndStoreDailyTotalsEnhanced()" [ref=e1425] [cursor=pointer]:
+                  - /url: "#VulnerabilityStatsService+calculateAndStoreDailyTotalsEnhanced"
+              - listitem [ref=e1426]:
+                - link "vulnerabilityStatsService.getVulnerabilityDistribution()" [ref=e1427] [cursor=pointer]:
+                  - /url: "#VulnerabilityStatsService+getVulnerabilityDistribution"
+              - listitem [ref=e1428]:
+                - link "vulnerabilityStatsService.getTopVulnerableHosts()" [ref=e1429] [cursor=pointer]:
+                  - /url: "#VulnerabilityStatsService+getTopVulnerableHosts"
+              - listitem [ref=e1430]:
+                - link "vulnerabilityStatsService.getVprScoreDistribution()" [ref=e1431] [cursor=pointer]:
+                  - /url: "#VulnerabilityStatsService+getVprScoreDistribution"
+              - listitem [ref=e1432]:
+                - link "vulnerabilityStatsService.getVulnerabilityAging()" [ref=e1433] [cursor=pointer]:
+                  - /url: "#VulnerabilityStatsService+getVulnerabilityAging"
+              - listitem [ref=e1434]:
+                - link "vulnerabilityStatsService.getDailyTotalsRange()" [ref=e1435] [cursor=pointer]:
+                  - /url: "#VulnerabilityStatsService+getDailyTotalsRange"
+        - separator [ref=e1436]
+        - paragraph
+        - heading "vulnerabilityStatsService.initialize(database)" [level=4] [ref=e1437]
+        - paragraph [ref=e1438]: Initialize service with database connection
+        - paragraph [ref=e1439]:
+          - strong [ref=e1440]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityStatsService" [ref=e1441] [cursor=pointer]:
+            - /url: "#VulnerabilityStatsService"
+            - code [ref=e1442] [cursor=pointer]: VulnerabilityStatsService
+        - grid [ref=e1446]:
+          - rowgroup [ref=e1448]:
+            - row "Param Type Description" [ref=e1449]:
+              - columnheader "Param" [ref=e1450]:
+                - generic [ref=e1453] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1454]:
+                - generic [ref=e1457] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1458]:
+                - generic [ref=e1461] [cursor=pointer]: Description
+          - rowgroup [ref=e1462]:
+            - row "database sqlite3.Database Database connection from server.js" [ref=e1463]:
+              - gridcell "database" [ref=e1464]
+              - gridcell "sqlite3.Database" [ref=e1465]
+              - gridcell "Database connection from server.js" [ref=e1466]
+          - rowgroup
+          - rowgroup [ref=e1467]
+          - rowgroup
+        - separator [ref=e1468]
+        - paragraph
+        - heading "vulnerabilityStatsService.getStats()" [level=4] [ref=e1469]
+        - paragraph [ref=e1470]:
+          - text: Get vulnerability statistics with VPR totals
+          - text: Extracted from server.js lines 1996-2016
+        - paragraph [ref=e1471]:
+          - strong [ref=e1472]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityStatsService" [ref=e1473] [cursor=pointer]:
+            - /url: "#VulnerabilityStatsService"
+            - code [ref=e1474] [cursor=pointer]: VulnerabilityStatsService
+        - separator [ref=e1475]
+        - paragraph
+        - heading "vulnerabilityStatsService.getRecentTrends()" [level=4] [ref=e1476]
+        - paragraph [ref=e1477]:
+          - text: Get recent vulnerability statistics with trend comparison (for dashboard cards)
+          - text: Extracted from server.js lines 2019-2092
+        - paragraph [ref=e1478]:
+          - strong [ref=e1479]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityStatsService" [ref=e1480] [cursor=pointer]:
+            - /url: "#VulnerabilityStatsService"
+            - code [ref=e1481] [cursor=pointer]: VulnerabilityStatsService
+        - separator [ref=e1482]
+        - paragraph
+        - heading "vulnerabilityStatsService.getTrends()" [level=4] [ref=e1483]
+        - paragraph [ref=e1484]:
+          - text: Get historical trending data with optional date range filtering
+          - text: Extracted from server.js lines 2095-2156
+        - paragraph [ref=e1485]:
+          - strong [ref=e1486]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityStatsService" [ref=e1487] [cursor=pointer]:
+            - /url: "#VulnerabilityStatsService"
+            - code [ref=e1488] [cursor=pointer]: VulnerabilityStatsService
+        - separator [ref=e1489]
+        - paragraph
+        - heading "vulnerabilityStatsService.calculateAndStoreDailyTotalsEnhanced()" [level=4] [ref=e1490]
+        - paragraph [ref=e1491]:
+          - text: Calculate and store enhanced daily totals with lifecycle states
+          - text: Extracted from server.js lines 1719-1798
+        - paragraph [ref=e1492]:
+          - strong [ref=e1493]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityStatsService" [ref=e1494] [cursor=pointer]:
+            - /url: "#VulnerabilityStatsService"
+            - code [ref=e1495] [cursor=pointer]: VulnerabilityStatsService
+        - separator [ref=e1496]
+        - paragraph
+        - heading "vulnerabilityStatsService.getVulnerabilityDistribution()" [level=4] [ref=e1497]
+        - paragraph [ref=e1498]:
+          - text: Get vulnerability distribution by severity
+          - text: Helper method for analytics
+        - paragraph [ref=e1499]:
+          - strong [ref=e1500]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityStatsService" [ref=e1501] [cursor=pointer]:
+            - /url: "#VulnerabilityStatsService"
+            - code [ref=e1502] [cursor=pointer]: VulnerabilityStatsService
+        - separator [ref=e1503]
+        - paragraph
+        - heading "vulnerabilityStatsService.getTopVulnerableHosts()" [level=4] [ref=e1504]
+        - paragraph [ref=e1505]:
+          - text: Get top vulnerable hosts by VPR score
+          - text: Helper method for analytics
+        - paragraph [ref=e1506]:
+          - strong [ref=e1507]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityStatsService" [ref=e1508] [cursor=pointer]:
+            - /url: "#VulnerabilityStatsService"
+            - code [ref=e1509] [cursor=pointer]: VulnerabilityStatsService
+        - separator [ref=e1510]
+        - paragraph
+        - heading "vulnerabilityStatsService.getVprScoreDistribution()" [level=4] [ref=e1511]
+        - paragraph [ref=e1512]:
+          - text: Get VPR score distribution statistics
+          - text: Helper method for analytics
+        - paragraph [ref=e1513]:
+          - strong [ref=e1514]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityStatsService" [ref=e1515] [cursor=pointer]:
+            - /url: "#VulnerabilityStatsService"
+            - code [ref=e1516] [cursor=pointer]: VulnerabilityStatsService
+        - separator [ref=e1517]
+        - paragraph
+        - heading "vulnerabilityStatsService.getVulnerabilityAging()" [level=4] [ref=e1518]
+        - paragraph [ref=e1519]:
+          - text: Get vulnerability aging metrics
+          - text: Helper method for analytics
+        - paragraph [ref=e1520]:
+          - strong [ref=e1521]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityStatsService" [ref=e1522] [cursor=pointer]:
+            - /url: "#VulnerabilityStatsService"
+            - code [ref=e1523] [cursor=pointer]: VulnerabilityStatsService
+        - separator [ref=e1524]
+        - paragraph
+        - heading "vulnerabilityStatsService.getDailyTotalsRange()" [level=4] [ref=e1525]
+        - paragraph [ref=e1526]:
+          - text: Get daily totals for a specific date range
+          - text: Helper method for custom analytics
+        - paragraph [ref=e1527]:
+          - strong [ref=e1528]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityStatsService" [ref=e1529] [cursor=pointer]:
+            - /url: "#VulnerabilityStatsService"
+            - code [ref=e1530] [cursor=pointer]: VulnerabilityStatsService
+        - separator [ref=e1531]
+        - paragraph
+        - heading "_DatabaseService" [level=3] [ref=e1532]
+        - paragraph [ref=e1533]:
+          - text: BackupService - Database backup and restore operations
+          - text: "Extracted from server.js lines: 2701, 3274-3798"
+        - paragraph [ref=e1534]: "Handles:"
+        - list [ref=e1535]:
+          - listitem [ref=e1536]: Database export to JSON format
+          - listitem [ref=e1537]: Backup file restoration from ZIP/JSON
+          - listitem [ref=e1538]: Data clearing operations
+          - listitem [ref=e1539]: Backup statistics and file management
+        - paragraph [ref=e1540]:
+          - strong [ref=e1541]: Kind
+          - text: ": global constant"
+        - separator [ref=e1542]
+        - paragraph
+        - heading "sqlite3" [level=3] [ref=e1543]
+        - paragraph [ref=e1544]: DatabaseService - Extracted from app/public/server.js lines 12, 1932-3280+
+        - paragraph [ref=e1545]:
+          - text: This service encapsulates all SQLite database operations from the monolithic server.js,
+          - text: providing connection pooling patterns, transaction management, and common query methods.
+        - paragraph [ref=e1546]: "Key extractions from server.js:"
+        - list [ref=e1547]:
+          - listitem [ref=e1548]: "Line 12: const sqlite3 = require(\"sqlite3\").verbose();"
+          - listitem [ref=e1549]: "Line 1933: const dbPath = path.join(__dirname, \"data\", \"hextrackr.db\");"
+          - listitem [ref=e1550]: "Line 1934: const db = new sqlite3.Database(dbPath);"
+          - listitem [ref=e1551]: "Lines 2785-3280: Database initialization, schema creation, and operations"
+          - listitem [ref=e1552]: Transaction patterns from lines 782-783, 1033-1034, etc.
+          - listitem [ref=e1553]: Error handling patterns throughout server.js database operations
+        - paragraph [ref=e1554]:
+          - strong [ref=e1555]: Kind
+          - text: ": global constant"
+        - separator [ref=e1556]
+        - paragraph
+        - heading "fs" [level=3] [ref=e1557]
+        - paragraph [ref=e1558]:
+          - text: FileService - Centralized file operations using PathValidator
+          - text: Handles file uploads, CSV processing, backup operations, and temporary files
+        - paragraph [ref=e1559]:
+          - strong [ref=e1560]: Kind
+          - text: ": global constant"
+        - separator [ref=e1561]
+        - paragraph
+        - heading "Papa" [level=3] [ref=e1562]
+        - paragraph [ref=e1563]: Import Service - Vendor CSV Import Business Logic
+        - paragraph [ref=e1564]:
+          - text: This service handles operational imports of vendor CSV data (e.g., Tenable vulnerability scans),
+          - text: not backup/restore operations. Those are handled by the backup service.
+        - paragraph [ref=e1565]: "Business logic extracted from server.js lines: 252-341, 1306-1823, 2291-2335, and various processing functions"
+        - heading "INTEGRATION DEPENDENCIES FOR T053:" [level=1] [ref=e1566]
+        - list [ref=e1567]:
+          - listitem [ref=e1568]: Uses DatabaseService for all database operations
+          - listitem [ref=e1569]: Uses PathValidator for secure file operations
+          - listitem [ref=e1570]: Uses helpers for vulnerability mapping and deduplication
+          - listitem [ref=e1571]: Requires existing database schema (staging tables, current tables)
+          - listitem [ref=e1572]: Compatible with existing ProgressTracker WebSocket implementation
+          - listitem [ref=e1573]: Maintains all existing CSV parsing and mapping logic
+        - paragraph [ref=e1574]:
+          - strong [ref=e1575]: Kind
+          - text: ": global constant"
+        - separator [ref=e1576]
+        - paragraph
+        - heading "Papa" [level=3] [ref=e1577]
+        - paragraph [ref=e1578]:
+          - text: VulnerabilityService - Core vulnerability business logic and database operations
+          - text: "Extracted from server.js lines: 252-341, 343-558, 559-742, 768-1295, 1306-1703, 2159-2283, 2337-2514, 2517-2531, 3304-3317, 3501-3565"
+        - paragraph [ref=e1579]: "This service handles the most complex business logic in HexTrackr:"
+        - list [ref=e1580]:
+          - listitem [ref=e1581]: Multi-vendor vulnerability data processing and normalization
+          - listitem [ref=e1582]: Advanced deduplication using enhanced unique keys with confidence scoring
+          - listitem [ref=e1583]: Lifecycle management (active, grace_period, resolved, reopened states)
+          - listitem [ref=e1584]: CSV import processing with staging table support for performance
+          - listitem [ref=e1585]: VPR and CVSS score processing and validation
+          - listitem [ref=e1586]: Host/IP normalization and asset correlation
+          - listitem [ref=e1587]: Daily totals calculation and rollup operations
+          - listitem [ref=e1588]: Large-scale data operations with performance instrumentation
+        - paragraph [ref=e1589]: "Key Dependencies (utility functions remain in server.js):"
+        - list [ref=e1590]:
+          - listitem [ref=e1591]: "mapVulnerabilityRow: Maps CSV rows to vulnerability objects"
+          - listitem [ref=e1592]: "generateEnhancedUniqueKey: Multi-tier deduplication key generation"
+          - listitem [ref=e1593]: "extractScanDateFromFilename: Date extraction from filenames"
+          - listitem [ref=e1594]: "normalizeHostname, normalizeIPAddress: Network asset normalization"
+          - listitem [ref=e1595]: "PathValidator: Secure file operations"
+          - listitem [ref=e1596]: "Papa: CSV parsing"
+        - paragraph [ref=e1597]:
+          - text: "T053 INTEGRATION NOTES:"
+          - text: This service requires database initialization and access to utility functions.
+          - text: Utility functions must remain in server.js for shared access.
+        - paragraph [ref=e1598]:
+          - strong [ref=e1599]: Kind
+          - text: ": global constant"
+        - separator [ref=e1600]
+        - paragraph
+        - heading "extractDateFromFilename(filename) ⇒ string | null" [level=3] [ref=e1601]:
+          - text: extractDateFromFilename(filename) ⇒
+          - code [ref=e1602]: string
+          - text: "|"
+          - code [ref=e1603]: "null"
+        - paragraph [ref=e1604]: Extracts a date from a filename using various common patterns.
+        - paragraph [ref=e1605]:
+          - strong [ref=e1606]: Kind
+          - text: ": global function"
+          - strong [ref=e1607]: Returns
+          - text: ":"
+          - code [ref=e1608]: string
+          - text: "|"
+          - code [ref=e1609]: "null"
+          - text: "- The extracted date in YYYY-MM-DD format, or null if no date is found."
+        - grid [ref=e1613]:
+          - rowgroup [ref=e1615]:
+            - row "Param Type Description" [ref=e1616]:
+              - columnheader "Param" [ref=e1617]:
+                - generic [ref=e1620] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1621]:
+                - generic [ref=e1624] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1625]:
+                - generic [ref=e1628] [cursor=pointer]: Description
+          - rowgroup [ref=e1629]:
+            - row "filename string The filename to parse." [ref=e1630]:
+              - gridcell "filename" [ref=e1631]
+              - gridcell "string" [ref=e1632]
+              - gridcell "The filename to parse." [ref=e1633]
+          - rowgroup
+          - rowgroup [ref=e1634]
+          - rowgroup
+        - separator [ref=e1635]
+        - paragraph
+        - heading "extractVendorFromFilename(filename) ⇒ string" [level=3] [ref=e1636]:
+          - text: extractVendorFromFilename(filename) ⇒
+          - code [ref=e1637]: string
+        - paragraph [ref=e1638]: Extracts the vendor name from a filename based on common patterns.
+        - paragraph [ref=e1639]:
+          - strong [ref=e1640]: Kind
+          - text: ": global function"
+          - strong [ref=e1641]: Returns
+          - text: ":"
+          - code [ref=e1642]: string
+          - text: "- The extracted vendor name, or \"unknown\" if no vendor is found."
+        - grid [ref=e1646]:
+          - rowgroup [ref=e1648]:
+            - row "Param Type Description" [ref=e1649]:
+              - columnheader "Param" [ref=e1650]:
+                - generic [ref=e1653] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1654]:
+                - generic [ref=e1657] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1658]:
+                - generic [ref=e1661] [cursor=pointer]: Description
+          - rowgroup [ref=e1662]:
+            - row "filename string The filename to parse." [ref=e1663]:
+              - gridcell "filename" [ref=e1664]
+              - gridcell "string" [ref=e1665]
+              - gridcell "The filename to parse." [ref=e1666]
+          - rowgroup
+          - rowgroup [ref=e1667]
+          - rowgroup
+        - separator [ref=e1668]
+        - paragraph
+        - heading "mapVulnerabilityRow(row) ⇒ Array.<Object>" [level=3] [ref=e1669]:
+          - text: mapVulnerabilityRow(row) ⇒
+          - code [ref=e1670]: Array.<Object>
+        - paragraph [ref=e1671]: Maps a CSV row to one or more vulnerability records, splitting multi-CVE entries.
+        - paragraph [ref=e1672]:
+          - strong [ref=e1673]: Kind
+          - text: ": global function"
+          - strong [ref=e1674]: Returns
+          - text: ":"
+          - code [ref=e1675]: Array.<Object>
+          - text: "- An array of vulnerability records."
+        - grid [ref=e1679]:
+          - rowgroup [ref=e1681]:
+            - row "Param Type Description" [ref=e1682]:
+              - columnheader "Param" [ref=e1683]:
+                - generic [ref=e1686] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1687]:
+                - generic [ref=e1690] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1691]:
+                - generic [ref=e1694] [cursor=pointer]: Description
+          - rowgroup [ref=e1695]:
+            - row "row Object A single row from the parsed CSV data." [ref=e1696]:
+              - gridcell "row" [ref=e1697]
+              - gridcell "Object" [ref=e1698]
+              - gridcell "A single row from the parsed CSV data." [ref=e1699]
+          - rowgroup
+          - rowgroup [ref=e1700]
+          - rowgroup
+        - separator [ref=e1701]
+        - paragraph
+        - heading "parseCSV(csvData) ⇒ Promise.<Object>" [level=3] [ref=e1702]:
+          - text: parseCSV(csvData) ⇒
+          - code [ref=e1703]: Promise.<Object>
+        - paragraph [ref=e1704]: Parses CSV data using PapaParse.
+        - paragraph [ref=e1705]:
+          - strong [ref=e1706]: Kind
+          - text: ": global function"
+          - strong [ref=e1707]: Returns
+          - text: ":"
+          - code [ref=e1708]: Promise.<Object>
+          - text: "- A promise that resolves with the parsed CSV results."
+        - grid [ref=e1712]:
+          - rowgroup [ref=e1714]:
+            - row "Param Type Description" [ref=e1715]:
+              - columnheader "Param" [ref=e1716]:
+                - generic [ref=e1719] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1720]:
+                - generic [ref=e1723] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1724]:
+                - generic [ref=e1727] [cursor=pointer]: Description
+          - rowgroup [ref=e1728]:
+            - row "csvData string The CSV data to parse." [ref=e1729]:
+              - gridcell "csvData" [ref=e1730]
+              - gridcell "string" [ref=e1731]
+              - gridcell "The CSV data to parse." [ref=e1732]
+          - rowgroup
+          - rowgroup [ref=e1733]
+          - rowgroup
+        - separator [ref=e1734]
+        - paragraph
+        - heading "createImportRecord(options) ⇒ Promise.<Object>" [level=3] [ref=e1735]:
+          - text: createImportRecord(options) ⇒
+          - code [ref=e1736]: Promise.<Object>
+        - paragraph [ref=e1737]: Creates an import record in the database.
+        - paragraph [ref=e1738]:
+          - strong [ref=e1739]: Kind
+          - text: ": global function"
+          - strong [ref=e1740]: Returns
+          - text: ":"
+          - code [ref=e1741]: Promise.<Object>
+          - text: "- A promise that resolves with the import ID and import date."
+        - grid [ref=e1745]:
+          - rowgroup [ref=e1747]:
+            - row "Param Type Description" [ref=e1748]:
+              - columnheader "Param" [ref=e1749]:
+                - generic [ref=e1752] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1753]:
+                - generic [ref=e1756] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1757]:
+                - generic [ref=e1760] [cursor=pointer]: Description
+          - rowgroup [ref=e1761]:
+            - row "options Object The options for creating the import record." [ref=e1762]:
+              - gridcell "options" [ref=e1763]
+              - gridcell "Object" [ref=e1764]
+              - gridcell "The options for creating the import record." [ref=e1765]
+            - row "options.filename string The name of the imported file." [ref=e1766]:
+              - gridcell "options.filename" [ref=e1767]
+              - gridcell "string" [ref=e1768]
+              - gridcell "The name of the imported file." [ref=e1769]
+            - row "options.vendor string The vendor of the imported file." [ref=e1770]:
+              - gridcell "options.vendor" [ref=e1771]
+              - gridcell "string" [ref=e1772]
+              - gridcell "The vendor of the imported file." [ref=e1773]
+            - row "options.scanDate string The scan date of the imported file." [ref=e1774]:
+              - gridcell "options.scanDate" [ref=e1775]
+              - gridcell "string" [ref=e1776]
+              - gridcell "The scan date of the imported file." [ref=e1777]
+            - row "options.rowCount number The number of rows in the imported file." [ref=e1778]:
+              - gridcell "options.rowCount" [ref=e1779]
+              - gridcell "number" [ref=e1780]
+              - gridcell "The number of rows in the imported file." [ref=e1781]
+            - row "options.fileSize number The size of the imported file." [ref=e1782]:
+              - gridcell "options.fileSize" [ref=e1783]
+              - gridcell "number" [ref=e1784]
+              - gridcell "The size of the imported file." [ref=e1785]
+            - row "options.headers Array.<string> The headers of the imported file." [ref=e1786]:
+              - gridcell "options.headers" [ref=e1787]
+              - gridcell "Array.<string>" [ref=e1788]
+              - gridcell "The headers of the imported file." [ref=e1789]
+          - rowgroup
+          - rowgroup [ref=e1790]
+          - rowgroup
+        - separator [ref=e1791]
+        - paragraph
+        - heading "processVulnerabilitiesWithLifecycle(rows, importId, filePath, scanDate) ⇒ Promise.<Object>" [level=3] [ref=e1792]:
+          - text: processVulnerabilitiesWithLifecycle(rows, importId, filePath, scanDate) ⇒
+          - code [ref=e1793]: Promise.<Object>
+        - paragraph [ref=e1794]: Processes vulnerabilities with enhanced lifecycle management.
+        - paragraph [ref=e1795]:
+          - strong [ref=e1796]: Kind
+          - text: ": global function"
+          - strong [ref=e1797]: Returns
+          - text: ":"
+          - code [ref=e1798]: Promise.<Object>
+          - text: "- A promise that resolves with the import statistics."
+        - grid [ref=e1802]:
+          - rowgroup [ref=e1804]:
+            - row "Param Type Description" [ref=e1805]:
+              - columnheader "Param" [ref=e1806]:
+                - generic [ref=e1809] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1810]:
+                - generic [ref=e1813] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1814]:
+                - generic [ref=e1817] [cursor=pointer]: Description
+          - rowgroup [ref=e1818]:
+            - row "rows Array.<Object> The rows of vulnerability data to process." [ref=e1819]:
+              - gridcell "rows" [ref=e1820]
+              - gridcell "Array.<Object>" [ref=e1821]
+              - gridcell "The rows of vulnerability data to process." [ref=e1822]
+            - row "importId number The ID of the import record." [ref=e1823]:
+              - gridcell "importId" [ref=e1824]
+              - gridcell "number" [ref=e1825]
+              - gridcell "The ID of the import record." [ref=e1826]
+            - row "filePath string The path to the imported file." [ref=e1827]:
+              - gridcell "filePath" [ref=e1828]
+              - gridcell "string" [ref=e1829]
+              - gridcell "The path to the imported file." [ref=e1830]
+            - row "scanDate string The scan date of the imported file." [ref=e1831]:
+              - gridcell "scanDate" [ref=e1832]
+              - gridcell "string" [ref=e1833]
+              - gridcell "The scan date of the imported file." [ref=e1834]
+          - rowgroup
+          - rowgroup [ref=e1835]
+          - rowgroup
+        - separator [ref=e1836]
+        - paragraph
+        - heading "processStagingImport(options) ⇒ Promise.<void>" [level=3] [ref=e1837]:
+          - text: processStagingImport(options) ⇒
+          - code [ref=e1838]: Promise.<void>
+        - paragraph [ref=e1839]: Processes a staging import with progress tracking.
+        - paragraph [ref=e1840]:
+          - strong [ref=e1841]: Kind
+          - text: ": global function"
+        - grid [ref=e1845]:
+          - rowgroup [ref=e1847]:
+            - row "Param Type Description" [ref=e1848]:
+              - columnheader "Param" [ref=e1849]:
+                - generic [ref=e1852] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1853]:
+                - generic [ref=e1856] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1857]:
+                - generic [ref=e1860] [cursor=pointer]: Description
+          - rowgroup [ref=e1861]:
+            - row "options Object The options for processing the staging import." [ref=e1862]:
+              - gridcell "options" [ref=e1863]
+              - gridcell "Object" [ref=e1864]
+              - gridcell "The options for processing the staging import." [ref=e1865]
+            - row "options.filePath string The path to the imported file." [ref=e1866]:
+              - gridcell "options.filePath" [ref=e1867]
+              - gridcell "string" [ref=e1868]
+              - gridcell "The path to the imported file." [ref=e1869]
+            - row "options.filename string The name of the imported file." [ref=e1870]:
+              - gridcell "options.filename" [ref=e1871]
+              - gridcell "string" [ref=e1872]
+              - gridcell "The name of the imported file." [ref=e1873]
+            - row "options.vendor string The vendor of the imported file." [ref=e1874]:
+              - gridcell "options.vendor" [ref=e1875]
+              - gridcell "string" [ref=e1876]
+              - gridcell "The vendor of the imported file." [ref=e1877]
+            - row "options.scanDate string The scan date of the imported file." [ref=e1878]:
+              - gridcell "options.scanDate" [ref=e1879]
+              - gridcell "string" [ref=e1880]
+              - gridcell "The scan date of the imported file." [ref=e1881]
+            - row "options.sessionId string The ID of the import session." [ref=e1882]:
+              - gridcell "options.sessionId" [ref=e1883]
+              - gridcell "string" [ref=e1884]
+              - gridcell "The ID of the import session." [ref=e1885]
+            - row "options.startTime number The start time of the import session." [ref=e1886]:
+              - gridcell "options.startTime" [ref=e1887]
+              - gridcell "number" [ref=e1888]
+              - gridcell "The start time of the import session." [ref=e1889]
+            - row "options.progressTracker Object The progress tracker instance." [ref=e1890]:
+              - gridcell "options.progressTracker" [ref=e1891]
+              - gridcell "Object" [ref=e1892]
+              - gridcell "The progress tracker instance." [ref=e1893]
+          - rowgroup
+          - rowgroup [ref=e1894]
+          - rowgroup
+        - separator [ref=e1895]
+        - paragraph
+        - heading "bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, sessionId, startTime, progressTracker) ⇒ Promise.<Object>" [level=3] [ref=e1896]:
+          - text: bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, sessionId, startTime, progressTracker) ⇒
+          - code [ref=e1897]: Promise.<Object>
+        - paragraph [ref=e1898]: Performs a simplified bulk load to a staging table.
+        - paragraph [ref=e1899]:
+          - strong [ref=e1900]: Kind
+          - text: ": global function"
+          - strong [ref=e1901]: Returns
+          - text: ":"
+          - code [ref=e1902]: Promise.<Object>
+          - text: "- A promise that resolves with the number of inserted and errored records."
+        - grid [ref=e1906]:
+          - rowgroup [ref=e1908]:
+            - row "Param Type Description" [ref=e1909]:
+              - columnheader "Param" [ref=e1910]:
+                - generic [ref=e1913] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1914]:
+                - generic [ref=e1917] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1918]:
+                - generic [ref=e1921] [cursor=pointer]: Description
+          - rowgroup [ref=e1922]:
+            - row "rows Array.<Object> The rows of data to load." [ref=e1923]:
+              - gridcell "rows" [ref=e1924]
+              - gridcell "Array.<Object>" [ref=e1925]
+              - gridcell "The rows of data to load." [ref=e1926]
+            - row "importId number The ID of the import record." [ref=e1927]:
+              - gridcell "importId" [ref=e1928]
+              - gridcell "number" [ref=e1929]
+              - gridcell "The ID of the import record." [ref=e1930]
+            - row "scanDate string The scan date of the import." [ref=e1931]:
+              - gridcell "scanDate" [ref=e1932]
+              - gridcell "string" [ref=e1933]
+              - gridcell "The scan date of the import." [ref=e1934]
+            - row "filePath string The path to the imported file." [ref=e1935]:
+              - gridcell "filePath" [ref=e1936]
+              - gridcell "string" [ref=e1937]
+              - gridcell "The path to the imported file." [ref=e1938]
+            - row "responseData Object The response data." [ref=e1939]:
+              - gridcell "responseData" [ref=e1940]
+              - gridcell "Object" [ref=e1941]
+              - gridcell "The response data." [ref=e1942]
+            - row "sessionId string The ID of the import session." [ref=e1943]:
+              - gridcell "sessionId" [ref=e1944]
+              - gridcell "string" [ref=e1945]
+              - gridcell "The ID of the import session." [ref=e1946]
+            - row "startTime number The start time of the import session." [ref=e1947]:
+              - gridcell "startTime" [ref=e1948]
+              - gridcell "number" [ref=e1949]
+              - gridcell "The start time of the import session." [ref=e1950]
+            - row "progressTracker Object The progress tracker instance." [ref=e1951]:
+              - gridcell "progressTracker" [ref=e1952]
+              - gridcell "Object" [ref=e1953]
+              - gridcell "The progress tracker instance." [ref=e1954]
+          - rowgroup
+          - rowgroup [ref=e1955]
+          - rowgroup
+        - separator [ref=e1956]
+        - paragraph
+        - heading "processVulnerabilitiesJSON(csvData) ⇒ Promise.<Object>" [level=3] [ref=e1957]:
+          - text: processVulnerabilitiesJSON(csvData) ⇒
+          - code [ref=e1958]: Promise.<Object>
+        - paragraph [ref=e1959]: Processes JSON vulnerability data.
+        - paragraph [ref=e1960]:
+          - strong [ref=e1961]: Kind
+          - text: ": global function"
+          - strong [ref=e1962]: Returns
+          - text: ":"
+          - code [ref=e1963]: Promise.<Object>
+          - text: "- A promise that resolves with the number of imported records, the import ID, and any errors."
+        - grid [ref=e1967]:
+          - rowgroup [ref=e1969]:
+            - row "Param Type Description" [ref=e1970]:
+              - columnheader "Param" [ref=e1971]:
+                - generic [ref=e1974] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1975]:
+                - generic [ref=e1978] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1979]:
+                - generic [ref=e1982] [cursor=pointer]: Description
+          - rowgroup [ref=e1983]:
+            - row "csvData Array.<Object> The vulnerability data to process." [ref=e1984]:
+              - gridcell "csvData" [ref=e1985]
+              - gridcell "Array.<Object>" [ref=e1986]
+              - gridcell "The vulnerability data to process." [ref=e1987]
+          - rowgroup
+          - rowgroup [ref=e1988]
+          - rowgroup
+        - separator [ref=e1989]
+        - paragraph
+        - heading "processTicketsJSON(csvData) ⇒ Promise.<Object>" [level=3] [ref=e1990]:
+          - text: processTicketsJSON(csvData) ⇒
+          - code [ref=e1991]: Promise.<Object>
+        - paragraph [ref=e1992]: Processes JSON ticket data.
+        - paragraph [ref=e1993]:
+          - strong [ref=e1994]: Kind
+          - text: ": global function"
+          - strong [ref=e1995]: Returns
+          - text: ":"
+          - code [ref=e1996]: Promise.<Object>
+          - text: "- A promise that resolves with the number of imported records and any errors."
+        - grid [ref=e2000]:
+          - rowgroup [ref=e2002]:
+            - row "Param Type Description" [ref=e2003]:
+              - columnheader "Param" [ref=e2004]:
+                - generic [ref=e2007] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2008]:
+                - generic [ref=e2011] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2012]:
+                - generic [ref=e2015] [cursor=pointer]: Description
+          - rowgroup [ref=e2016]:
+            - row "csvData Array.<Object> The ticket data to process." [ref=e2017]:
+              - gridcell "csvData" [ref=e2018]
+              - gridcell "Array.<Object>" [ref=e2019]
+              - gridcell "The ticket data to process." [ref=e2020]
+          - rowgroup
+          - rowgroup [ref=e2021]
+          - rowgroup
+        - separator [ref=e2022]
+        - paragraph
+        - heading "getImportHistory() ⇒ Promise.<Array.<Object>>" [level=3] [ref=e2023]:
+          - text: getImportHistory() ⇒
+          - code [ref=e2024]: Promise.<Array.<Object>>
+        - paragraph [ref=e2025]: Gets the import history with vulnerability counts.
+        - paragraph [ref=e2026]:
+          - strong [ref=e2027]: Kind
+          - text: ": global function"
+          - strong [ref=e2028]: Returns
+          - text: ":"
+          - code [ref=e2029]: Promise.<Array.<Object>>
+          - text: "- A promise that resolves with the import history."
+        - separator [ref=e2030]
+        - separator [ref=e2031]
+        - 'heading "Routes {#routes}" [level=2] [ref=e2032]'
+        - blockquote [ref=e2033]:
+          - paragraph [ref=e2034]:
+            - text: "Source:"
+            - code [ref=e2035]: app/routes/**/*.js
+        - heading "Constants" [level=3] [ref=e2036]
+        - grid [ref=e2040]:
+          - rowgroup [ref=e2042]:
+            - row "Global Description" [ref=e2043]:
+              - columnheader "Global" [ref=e2044]:
+                - generic [ref=e2047] [cursor=pointer]: Global
+              - columnheader "Description" [ref=e2048]:
+                - generic [ref=e2051] [cursor=pointer]: Description
+          - rowgroup [ref=e2052]:
+            - 'row "express Backup and Restore Routes Extracted from server.js lines: 2701, 3274-3798 Routes: DELETE /api/backup/clear/:type - Clear data (line 2701) GET /api/backup/stats - Get backup statistics (line 3274) GET /api/backup/vulnerabilities - Export vulnerabilities (line 3304) GET /api/backup/tickets - Export tickets (line 3606) GET /api/backup/all - Export complete backup (line 3623) POST /api/restore - Restore from backup file (line 3654)" [ref=e2053]':
+              - gridcell "express" [ref=e2054]:
+                - link "express" [ref=e2056] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#express
+              - 'gridcell "Backup and Restore Routes Extracted from server.js lines: 2701, 3274-3798 Routes: DELETE /api/backup/clear/:type - Clear data (line 2701) GET /api/backup/stats - Get backup statistics (line 3274) GET /api/backup/vulnerabilities - Export vulnerabilities (line 3304) GET /api/backup/tickets - Export tickets (line 3606) GET /api/backup/all - Export complete backup (line 3623) POST /api/restore - Restore from backup file (line 3654)" [ref=e2057]'
+            - row [ref=e2058]:
+              - gridcell "express" [ref=e2059]:
+                - link "express" [ref=e2061] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#express
+              - gridcell [ref=e2062]
+            - 'row "express Ticket Routes Extracted from server.js lines: 3320-3344, 3369-3394, 3396-3422, 3424-3435, 3437-3479, 3482-3498, 3606-3621 Routes: GET /api/tickets - List all tickets (line 3320) POST /api/tickets - Create new ticket (line 3369) PUT /api/tickets/:id - Update ticket (line 3396) DELETE /api/tickets/:id - Delete ticket (line 3424) POST /api/tickets/migrate - Migrate tickets (line 3437) POST /api/import/tickets - Import tickets from CSV (line 3482) - NOTE: This route needs special handling in T053 GET /api/backup/tickets - Export tickets (line 3606) - NOTE: This conflicts with backup routes in T053" [ref=e2063]':
+              - gridcell "express" [ref=e2064]:
+                - link "express" [ref=e2066] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#express
+              - 'gridcell "Ticket Routes Extracted from server.js lines: 3320-3344, 3369-3394, 3396-3422, 3424-3435, 3437-3479, 3482-3498, 3606-3621 Routes: GET /api/tickets - List all tickets (line 3320) POST /api/tickets - Create new ticket (line 3369) PUT /api/tickets/:id - Update ticket (line 3396) DELETE /api/tickets/:id - Delete ticket (line 3424) POST /api/tickets/migrate - Migrate tickets (line 3437) POST /api/import/tickets - Import tickets from CSV (line 3482) - NOTE: This route needs special handling in T053 GET /api/backup/tickets - Export tickets (line 3606) - NOTE: This conflicts with backup routes in T053" [ref=e2067]'
+            - row [ref=e2068]:
+              - gridcell "express" [ref=e2069]:
+                - link "express" [ref=e2071] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#express
+              - gridcell [ref=e2072]
+          - rowgroup
+          - rowgroup [ref=e2073]
+          - rowgroup
+        - paragraph
+        - heading "express" [level=3] [ref=e2074]
+        - paragraph [ref=e2075]:
+          - text: Backup and Restore Routes
+          - text: "Extracted from server.js lines: 2701, 3274-3798"
+        - paragraph [ref=e2076]: "Routes:"
+        - list [ref=e2077]:
+          - listitem [ref=e2078]: DELETE /api/backup/clear/:type - Clear data (line 2701)
+          - listitem [ref=e2079]: GET /api/backup/stats - Get backup statistics (line 3274)
+          - listitem [ref=e2080]: GET /api/backup/vulnerabilities - Export vulnerabilities (line 3304)
+          - listitem [ref=e2081]: GET /api/backup/tickets - Export tickets (line 3606)
+          - listitem [ref=e2082]: GET /api/backup/all - Export complete backup (line 3623)
+          - listitem [ref=e2083]: POST /api/restore - Restore from backup file (line 3654)
+        - paragraph [ref=e2084]:
+          - strong [ref=e2085]: Kind
+          - text: ": global constant"
+        - separator [ref=e2086]
+        - paragraph
+        - heading "express" [level=3] [ref=e2087]
+        - paragraph [ref=e2088]: Import Routes - Vendor CSV Import Operations
+        - paragraph [ref=e2089]:
+          - text: This module handles operational imports of vendor CSV data (e.g., Tenable vulnerability scans),
+          - text: not backup/restore operations. Those are handled by the backup module.
+        - paragraph [ref=e2090]: "Routes extracted from server.js lines: 2337-2399, 2403-2531, 3482-3604, 2534-2550"
+        - heading "INTEGRATION INSTRUCTIONS FOR T053:" [level=1] [ref=e2091]
+        - list [ref=e2092]:
+          - listitem [ref=e2093]: "In server.js, add: const importRoutes = require(\"./routes/imports\");"
+          - listitem [ref=e2094]: "In server.js, add: importController.setProgressTracker(progressTracker);"
+          - listitem [ref=e2095]: "In server.js, add: app.use(\"/api\", importRoutes);"
+          - listitem [ref=e2096]: Remove the corresponding routes from server.js (lines documented above)
+          - listitem [ref=e2097]: Ensure multer upload configuration matches server.js exactly
+        - paragraph [ref=e2098]: "ROUTE MAPPING:"
+        - list [ref=e2099]:
+          - listitem [ref=e2100]: /api/vulnerabilities/import -> router.post("/vulnerabilities/import")
+          - listitem [ref=e2101]: /api/vulnerabilities/import-staging -> router.post("/vulnerabilities/import-staging")
+          - listitem [ref=e2102]: /api/import/vulnerabilities -> router.post("/import/vulnerabilities")
+          - listitem [ref=e2103]: /api/import/tickets -> router.post("/import/tickets")
+          - listitem [ref=e2104]: /api/imports -> router.get("/imports")
+          - listitem [ref=e2105]: /api/import/progress/:sessionId -> router.get("/import/progress/:sessionId")
+        - paragraph [ref=e2106]:
+          - strong [ref=e2107]: Kind
+          - text: ": global constant"
+        - separator [ref=e2108]
+        - paragraph
+        - heading "express" [level=3] [ref=e2109]
+        - paragraph [ref=e2110]:
+          - text: Ticket Routes
+          - text: "Extracted from server.js lines: 3320-3344, 3369-3394, 3396-3422, 3424-3435, 3437-3479, 3482-3498, 3606-3621"
+        - paragraph [ref=e2111]: "Routes:"
+        - list [ref=e2112]:
+          - listitem [ref=e2113]: GET /api/tickets - List all tickets (line 3320)
+          - listitem [ref=e2114]: POST /api/tickets - Create new ticket (line 3369)
+          - listitem [ref=e2115]: PUT /api/tickets/:id - Update ticket (line 3396)
+          - listitem [ref=e2116]: DELETE /api/tickets/:id - Delete ticket (line 3424)
+          - listitem [ref=e2117]: POST /api/tickets/migrate - Migrate tickets (line 3437)
+          - listitem [ref=e2118]: "POST /api/import/tickets - Import tickets from CSV (line 3482) - NOTE: This route needs special handling in T053"
+          - listitem [ref=e2119]: "GET /api/backup/tickets - Export tickets (line 3606) - NOTE: This conflicts with backup routes in T053"
+        - paragraph [ref=e2120]:
+          - strong [ref=e2121]: Kind
+          - text: ": global constant"
+        - separator [ref=e2122]
+        - paragraph
+        - heading "express" [level=3] [ref=e2123]
+        - paragraph [ref=e2124]:
+          - text: Vulnerability Routes
+          - text: "Extracted from server.js lines: 1996-2016, 2019-2092, 2095-2156, 2159-2218, 2221-2283, 2337-2399, 2403-2514, 2517-2531, 3304-3317, 3501-3565"
+        - paragraph [ref=e2125]: "This is the largest and most complex module in HexTrackr, handling:"
+        - list [ref=e2126]:
+          - listitem [ref=e2127]: Core vulnerability CRUD operations
+          - listitem [ref=e2128]: Statistics and analytics endpoints
+          - listitem [ref=e2129]: Import/export functionality (CSV imports, backup exports)
+          - listitem [ref=e2130]: Trend analysis and historical data
+          - listitem [ref=e2131]: Staging-based imports for performance
+          - listitem [ref=e2132]: Multi-vendor vulnerability data processing
+        - paragraph [ref=e2133]: "Routes:"
+        - list [ref=e2134]:
+          - listitem [ref=e2135]: GET /api/vulnerabilities/stats - Statistics with VPR totals (lines 1996-2016)
+          - listitem [ref=e2136]: GET /api/vulnerabilities/recent-trends - Recent trends for dashboard cards (lines 2019-2092)
+          - listitem [ref=e2137]: GET /api/vulnerabilities/trends - Historical trending data (lines 2095-2156)
+          - listitem [ref=e2138]: GET /api/vulnerabilities - List vulnerabilities with pagination/filters (lines 2159-2218)
+          - listitem [ref=e2139]: GET /api/vulnerabilities/resolved - List resolved vulnerabilities (lines 2221-2283)
+          - listitem [ref=e2140]: POST /api/vulnerabilities/import - Standard CSV import (lines 2337-2399)
+          - listitem [ref=e2141]: POST /api/vulnerabilities/import-staging - High-performance staging import (lines 2403-2514)
+          - listitem [ref=e2142]: DELETE /api/vulnerabilities/clear - Clear all vulnerability data (lines 2517-2531)
+          - listitem [ref=e2143]: "GET /api/backup/vulnerabilities - Export vulnerability data (lines 3304-3317) - NOTE: Conflicts with backup routes"
+          - listitem [ref=e2144]: "POST /api/import/vulnerabilities - Web-based import (lines 3501-3565) - NOTE: Part of import system"
+        - paragraph [ref=e2145]:
+          - strong [ref=e2146]: Kind
+          - text: ": global constant"
+        - separator [ref=e2147]
+        - separator [ref=e2148]
+        - 'heading "Server {#server}" [level=2] [ref=e2149]'
+        - blockquote [ref=e2150]:
+          - paragraph [ref=e2151]:
+            - text: "Source:"
+            - code [ref=e2152]: app/public/server.js
+        - heading "Functions" [level=3] [ref=e2153]
+        - grid [ref=e2157]:
+          - rowgroup [ref=e2159]:
+            - row "Global Description" [ref=e2160]:
+              - columnheader "Global" [ref=e2161]:
+                - generic [ref=e2164] [cursor=pointer]: Global
+              - columnheader "Description" [ref=e2165]:
+                - generic [ref=e2168] [cursor=pointer]: Description
+          - rowgroup [ref=e2169]:
+            - row "initDb() ⇒ Promise. Initializes the database and controllers." [ref=e2170]:
+              - gridcell "initDb() ⇒ Promise." [ref=e2171]:
+                - link "initDb() ⇒ Promise." [ref=e2173] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#initDb
+                  - text: initDb() ⇒ Promise.
+              - gridcell "Initializes the database and controllers." [ref=e2174]
+            - row "GET() ⇒ object Health check endpoint" [ref=e2175]:
+              - gridcell "GET() ⇒ object" [ref=e2176]:
+                - link "GET() ⇒ object" [ref=e2178] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#GET
+              - gridcell "Health check endpoint" [ref=e2179]
+            - row "startServer() ⇒ Promise. Starts the server." [ref=e2180]:
+              - gridcell "startServer() ⇒ Promise." [ref=e2181]:
+                - link "startServer() ⇒ Promise." [ref=e2183] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#startServer
+                  - text: startServer() ⇒ Promise.
+              - gridcell "Starts the server." [ref=e2184]
+            - row "GET() ⇒ Array. Get all sites" [ref=e2185]:
+              - gridcell "GET() ⇒ Array." [ref=e2186]:
+                - link "GET() ⇒ Array." [ref=e2188] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#GET
+                  - text: GET() ⇒ Array.
+              - gridcell "Get all sites" [ref=e2190]
+            - row "GET() ⇒ Array. Get all locations" [ref=e2191]:
+              - gridcell "GET() ⇒ Array." [ref=e2192]:
+                - link "GET() ⇒ Array." [ref=e2194] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#GET
+                  - text: GET() ⇒ Array.
+              - gridcell "Get all locations" [ref=e2196]
+            - row "GET() Default route" [ref=e2197]:
+              - gridcell "GET()" [ref=e2198]:
+                - link "GET()" [ref=e2200] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#GET
+              - gridcell "Default route" [ref=e2201]
+          - rowgroup
+          - rowgroup [ref=e2202]
+          - rowgroup
+        - paragraph
+        - heading "initDb() ⇒ Promise.<void>" [level=3] [ref=e2203]:
+          - text: initDb() ⇒
+          - code [ref=e2204]: Promise.<void>
+        - paragraph [ref=e2205]: Initializes the database and controllers.
+        - paragraph [ref=e2206]:
+          - strong [ref=e2207]: Kind
+          - text: ": global function"
+        - separator [ref=e2208]
+        - paragraph
+        - heading "GET() ⇒ object" [level=3] [ref=e2209]:
+          - text: GET() ⇒
+          - code [ref=e2210]: object
+        - paragraph [ref=e2211]: Health check endpoint
+        - paragraph [ref=e2212]:
+          - strong [ref=e2213]: Kind
+          - text: ": global function"
+          - strong [ref=e2214]: Returns
+          - text: ":"
+          - code [ref=e2215]: object
+          - text: "- Health status object"
+        - separator [ref=e2216]
+        - paragraph
+        - heading "startServer() ⇒ Promise.<void>" [level=3] [ref=e2217]:
+          - text: startServer() ⇒
+          - code [ref=e2218]: Promise.<void>
+        - paragraph [ref=e2219]: Starts the server.
+        - paragraph [ref=e2220]:
+          - strong [ref=e2221]: Kind
+          - text: ": global function"
+        - separator [ref=e2222]
+        - paragraph
+        - heading "GET() ⇒ Array.<object>" [level=3] [ref=e2223]:
+          - text: GET() ⇒
+          - code [ref=e2224]: Array.<object>
+        - paragraph [ref=e2225]: Get all sites
+        - paragraph [ref=e2226]:
+          - strong [ref=e2227]: Kind
+          - text: ": global function"
+          - strong [ref=e2228]: Returns
+          - text: ":"
+          - code [ref=e2229]: Array.<object>
+          - text: "- Array of site objects"
+        - separator [ref=e2230]
+        - paragraph
+        - heading "GET() ⇒ Array.<object>" [level=3] [ref=e2231]:
+          - text: GET() ⇒
+          - code [ref=e2232]: Array.<object>
+        - paragraph [ref=e2233]: Get all locations
+        - paragraph [ref=e2234]:
+          - strong [ref=e2235]: Kind
+          - text: ": global function"
+          - strong [ref=e2236]: Returns
+          - text: ":"
+          - code [ref=e2237]: Array.<object>
+          - text: "- Array of location objects"
+        - separator [ref=e2238]
+        - paragraph
+        - heading "GET()" [level=3] [ref=e2239]
+        - paragraph [ref=e2240]: Default route
+        - paragraph [ref=e2241]:
+          - strong [ref=e2242]: Kind
+          - text: ": global function"
+        - separator [ref=e2243]
+        - separator [ref=e2244]
+        - paragraph [ref=e2245]:
+          - emphasis [ref=e2246]: "Generated: 2025-09-18T09:50:29.333Z"
+  - contentinfo [ref=e2248]:
+    - generic [ref=e2251]:
+      - list [ref=e2252]:
+        - listitem [ref=e2253]:
+          - link "HexTrackr Version" [ref=e2254] [cursor=pointer]:
+            - /url: /docs-html/#CHANGELOG
+            - img "HexTrackr Version" [ref=e2255] [cursor=pointer]
+        - listitem [ref=e2256]:
+          - text: ·
+          - link "Documentation" [ref=e2257] [cursor=pointer]:
+            - /url: /docs-html/
+            - img "Documentation" [ref=e2258] [cursor=pointer]
+        - listitem [ref=e2259]:
+          - text: ·
+          - link "GitHub Repository" [ref=e2260] [cursor=pointer]:
+            - /url: https://github.com/Lonnie-Bruton/HexTrackr
+            - img "GitHub Repository" [ref=e2261] [cursor=pointer]
+        - listitem [ref=e2262]:
+          - text: ·
+          - link "Codacy Grade A" [ref=e2263] [cursor=pointer]:
+            - /url: https://app.codacy.com?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
+            - img "Codacy Grade A" [ref=e2264] [cursor=pointer]
+      - list [ref=e2265]:
+        - listitem [ref=e2266]:
+          - img "SQLite Database" [ref=e2267]
+        - listitem [ref=e2268]:
+          - text: ·
+          - img "Express.js Backend" [ref=e2269]
+        - listitem [ref=e2270]:
+          - text: ·
+          - img "Tabler UI Framework" [ref=e2271]
+        - listitem [ref=e2272]:
+          - text: ·
+          - link "Coded with Vibes" [ref=e2273] [cursor=pointer]:
+            - /url: https://www.reddit.com/r/vibecoding
+            - img "Coded with Vibes" [ref=e2274] [cursor=pointer]
+  - generic:                                                  
+```

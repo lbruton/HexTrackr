@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+### Project Constitution (Non-Negotiable Laws of the Project)
+  - .specify/memory/constitution.md (Our must follow laws of the land!)
+  - .specify/memory/constitution_update_checklist.md (Checklist to use when amending the constitution)
+
+### Subagent Orchestration
+  - **LLMSUBAGENT.md** - Complete guide for optimal subagent selection
+  - Use subagents to preserve context and maximize efficiency
+  - Key agents: claude-gemini (analysis), claude-codex (generation), documentation-maintainer (docs)
+
 ## Essential Commands
 
 ### Development Setup

@@ -1,10 +1,8 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>Backend Architecture</h1>
-<p>The backend is a modular Node.js/Express application providing REST endpoints, rollover ingestion, documentation delivery, and SQLite persistence. It serves the static frontend pages (<code>tickets.html</code>, <code>vulnerabilities.html</code>) and the generated documentation portal (<code>/docs-html</code>).</p>
+    <h1>Backend Architecture</h1><p>The backend is a modular Node.js/Express application providing REST endpoints, rollover ingestion, documentation delivery, and SQLite persistence. It serves the static frontend pages (<code>tickets.html</code>, <code>vulnerabilities.html</code>) and the generated documentation portal (<code>/docs-html</code>).</p>
 <hr>
-<h2>Key Characteristics</h2>
-<ul>
+<h2>Key Characteristics</h2><ul>
 <li><strong>Modular Architecture</strong>: <code>server.js</code> (~205 lines) orchestrates modular components across multiple directories.</li>
 <li><strong>Separation of Concerns</strong>: Controllers, services, routes, and configuration are cleanly separated.</li>
 <li><strong>Unified Delivery</strong>: API + static assets + docs from one process.</li>
@@ -12,8 +10,7 @@
 <li><strong>Security Utilities</strong>: Extracted <code>PathValidator</code> class for safe file operations + security headers.</li>
 </ul>
 <hr>
-<h2>Core Components</h2>
-<table>
+<h2>Core Components</h2><table>
 <thead>
 <tr>
 <th>Component</th>
@@ -62,8 +59,7 @@
 <td>Express middleware</td>
 </tr>
 </tbody></table>
-<h3>Module Organization</h3>
-<table>
+<h3>Module Organization</h3><table>
 <thead>
 <tr>
 <th>Directory</th>
@@ -102,8 +98,7 @@
 <td>Static class methods</td>
 </tr>
 </tbody></table>
-<h3>Controller Files</h3>
-<table>
+<h3>Controller Files</h3><table>
 <thead>
 <tr>
 <th>Controller</th>
@@ -143,8 +138,7 @@
 <td>Direct instantiation</td>
 </tr>
 </tbody></table>
-<h3>Service Files</h3>
-<table>
+<h3>Service Files</h3><table>
 <thead>
 <tr>
 <th>Service</th>
@@ -204,10 +198,8 @@
 </tr>
 </tbody></table>
 <hr>
-<h2>Controller Patterns</h2>
-<p>The backend uses two distinct controller patterns, with ongoing migration toward singleton pattern for consistency:</p>
-<h3>Singleton Pattern Controllers</h3>
-<p>Three controllers (<code>VulnerabilityController</code>, <code>TicketController</code>, <code>BackupController</code>) implement the singleton pattern:</p>
+<h2>Controller Patterns</h2><p>The backend uses two distinct controller patterns, with ongoing migration toward singleton pattern for consistency:</p>
+<h3>Singleton Pattern Controllers</h3><p>Three controllers (<code>VulnerabilityController</code>, <code>TicketController</code>, <code>BackupController</code>) implement the singleton pattern:</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityController</span> {
     <span class="hljs-keyword">static</span> instance = <span class="hljs-literal">null</span>;
 
@@ -239,8 +231,7 @@
 <li>All route methods are static</li>
 <li>Throws error if accessed before initialization</li>
 </ul>
-<h3>Functional Pattern Controllers</h3>
-<p>Two controllers (<code>ImportController</code>, <code>DocsController</code>) use different patterns:</p>
+<h3>Functional Pattern Controllers</h3><p>Two controllers (<code>ImportController</code>, <code>DocsController</code>) use different patterns:</p>
 <p><strong>ImportController (Functional exports):</strong></p>
 <pre><code class="language-javascript"><span class="hljs-keyword">let</span> progressTracker = <span class="hljs-literal">null</span>;
 
@@ -272,8 +263,7 @@
 <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = {
     <span class="hljs-attr">getStats</span>: <span class="hljs-function">() =&gt;</span> docsController.<span class="hljs-title function_">getStats</span>(),
     <span class="hljs-comment">// Wrapped methods...</span>
-};</code></pre><h3>Migration Status</h3>
-<table>
+};</code></pre><h3>Migration Status</h3><table>
 <thead>
 <tr>
 <th>Controller</th>
@@ -296,8 +286,7 @@
 </tr>
 </tbody></table>
 <hr>
-<h2>Initialization Sequence</h2>
-<p><strong>CRITICAL</strong>: The initialization order is crucial for proper dependency injection. Controllers must be initialized BEFORE routes are imported.</p>
+<h2>Initialization Sequence</h2><p><strong>CRITICAL</strong>: The initialization order is crucial for proper dependency injection. Controllers must be initialized BEFORE routes are imported.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">startServer</span>(<span class="hljs-params"></span>) {
     <span class="hljs-comment">// 1. Initialize database FIRST</span>
     <span class="hljs-keyword">await</span> <span class="hljs-title function_">initDb</span>();
@@ -333,8 +322,7 @@
     server.<span class="hljs-title function_">listen</span>(<span class="hljs-variable constant_">PORT</span>, <span class="hljs-function">() =&gt;</span> {
         <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Server running on port <span class="hljs-subst">${PORT}</span>`</span>);
     });
-}</code></pre><h3>Common Initialization Errors</h3>
-<table>
+}</code></pre><h3>Common Initialization Errors</h3><table>
 <thead>
 <tr>
 <th>Error</th>
@@ -363,8 +351,7 @@
 <td>Await database initialization</td>
 </tr>
 </tbody></table>
-<h3>PathValidator Security Class</h3>
-<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">PathValidator</span> {
+<h3>PathValidator Security Class</h3><pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">PathValidator</span> {
   <span class="hljs-keyword">static</span> <span class="hljs-title function_">validatePath</span>(<span class="hljs-params">filePath</span>) {
     <span class="hljs-comment">// Path normalization</span>
     <span class="hljs-keyword">const</span> normalizedPath = path.<span class="hljs-title function_">normalize</span>(filePath);
@@ -393,8 +380,7 @@
 <li>Exception-based error handling</li>
 </ul>
 <hr>
-<h2>Middleware &amp; Infrastructure</h2>
-<table>
+<h2>Middleware & Infrastructure</h2><table>
 <thead>
 <tr>
 <th>Concern</th>
@@ -427,18 +413,15 @@
 </tr>
 </tbody></table>
 <hr>
-<h2>Persistence &amp; Schema Evolution</h2>
-<ul>
+<h2>Persistence & Schema Evolution</h2><ul>
 <li><strong>Initialization</strong>: If DB missing, runs <code>scripts/init-database.js</code>.</li>
 <li><strong>Runtime Evolution</strong>: Idempotent <code>ALTER TABLE</code> adds new columns (<code>vendor</code>, <code>vulnerability_date</code>, <code>state</code>, <code>import_date</code>, etc.) to legacy tables for backward compatibility.</li>
 <li><strong>Rollover Tables</strong>: Created on startup if absent (<code>vulnerability_snapshots</code>, <code>vulnerabilities_current</code>, <code>vulnerability_daily_totals</code>).</li>
 </ul>
 <p>See: <a href="#architecture/data-model">Data Model</a> for exhaustive schema &amp; index inventory.</p>
 <hr>
-<h2>Vulnerability Rollover Workflow</h2>
-<p>Purpose: Maintain real-time deduplicated active set + full historical timeline + fast daily aggregates.</p>
-<h3>CSV Import (Rollover Path)</h3>
-<div class="mermaid">sequenceDiagram
+<h2>Vulnerability Rollover Workflow</h2><p>Purpose: Maintain real-time deduplicated active set + full historical timeline + fast daily aggregates.</p>
+<h3>CSV Import (Rollover Path)</h3><div class="mermaid">sequenceDiagram
     participant User
     participant API as server.js
     participant DB as SQLite
@@ -457,8 +440,7 @@
     API--&gt;&gt;User: { importId, insertCount, updateCount, removedStale, scanDate, performanceMetrics }</div><blockquote>
 <p><strong>Staging importer</strong>: <code>POST /api/vulnerabilities/import-staging</code> follows the same steps but first bulk loads data into <code>vulnerability_staging</code> and streams <code>ProgressTracker</code> events (<code>progress-update</code>, <code>progress-complete</code>, <code>progress-error</code>).</p>
 </blockquote>
-<h3>Enhanced Deduplication System</h3>
-<p>HexTrackr implements a sophisticated 4-tier unique key generation strategy:</p>
+<h3>Enhanced Deduplication System</h3><p>HexTrackr implements a sophisticated 4-tier unique key generation strategy:</p>
 <p><strong>Tier 1: Asset ID + Plugin ID</strong> (Highest Reliability)</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">if</span> (mapped.<span class="hljs-property">assetId</span> &amp;&amp; mapped.<span class="hljs-property">pluginId</span>) {
   <span class="hljs-keyword">return</span> <span class="hljs-string">`asset:<span class="hljs-subst">${mapped.assetId}</span>|plugin:<span class="hljs-subst">${mapped.pluginId}</span>`</span>;
@@ -474,8 +456,7 @@
 }</code></pre><p><strong>Tier 4: Description Hash + Hostname/IP</strong> (Fallback)</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> descriptionHash = <span class="hljs-title function_">createDescriptionHash</span>(mapped.<span class="hljs-property">description</span>);
 <span class="hljs-keyword">const</span> hostIdentifier = normalizedIP || normalizedHostname;
-<span class="hljs-keyword">return</span> <span class="hljs-string">`desc:<span class="hljs-subst">${descriptionHash}</span>|host:<span class="hljs-subst">${hostIdentifier}</span>`</span>;</code></pre><h3>Key Safeguards</h3>
-<table>
+<span class="hljs-keyword">return</span> <span class="hljs-string">`desc:<span class="hljs-subst">${descriptionHash}</span>|host:<span class="hljs-subst">${hostIdentifier}</span>`</span>;</code></pre><h3>Key Safeguards</h3><table>
 <thead>
 <tr>
 <th>Risk</th>
@@ -516,8 +497,7 @@
 </tr>
 </tbody></table>
 <hr>
-<h2>API Surface (High-Level)</h2>
-<table>
+<h2>API Surface (High-Level)</h2><table>
 <thead>
 <tr>
 <th>Domain</th>
@@ -533,22 +513,22 @@
 <tr>
 <td>Vulnerabilities</td>
 <td>14 endpoints for CRUD, stats, trends</td>
-<td><a href="#api-reference/vulnerabilities-api">Vulnerabilities API</a></td>
+<td><a href="../api-reference/backend-api.md#vulnerabilities">Backend API</a></td>
 </tr>
 <tr>
 <td>Imports</td>
 <td>6 endpoints for CSV/JSON imports</td>
-<td><a href="#api-reference/imports-api">Import API</a></td>
+<td><a href="../api-reference/backend-api.md#imports">Backend API</a></td>
 </tr>
 <tr>
 <td>Tickets</td>
 <td>7 endpoints for CRUD and migration</td>
-<td><a href="#api-reference/tickets-api">Tickets API</a></td>
+<td><a href="../api-reference/backend-api.md#tickets">Backend API</a></td>
 </tr>
 <tr>
 <td>Backup/Restore</td>
 <td>6 endpoints for backup operations</td>
-<td><a href="#api-reference/backup-api">Backup API</a></td>
+<td><a href="../api-reference/backend-api.md#backup">Backend API</a></td>
 </tr>
 <tr>
 <td>Documentation</td>
@@ -561,17 +541,14 @@
 <td><a href="../api-reference/complete-reference.md#reference-data">Reference Data</a></td>
 </tr>
 </tbody></table>
-<h3>API Endpoint Summary</h3>
-<ul>
+<h3>API Endpoint Summary</h3><ul>
 <li><strong>Total Endpoints</strong>: ~45 REST endpoints</li>
-<li><strong>Import System</strong>: 6 dedicated import endpoints (see <a href="#api-reference/imports-api">Import API</a>)</li>
+<li><strong>Import System</strong>: 6 dedicated import endpoints (see <a href="../api-reference/backend-api.md#imports">Backend API</a>)</li>
 <li><strong>WebSocket</strong>: Separate progress tracking on port 8988</li>
 <li><strong>Rate Limited</strong>: 100 requests per 15 minutes per IP</li>
 </ul>
 <hr>
-<h2>Real-time Communication (WebSocket)</h2>
-<h3>ProgressTracker Architecture</h3>
-<p>HexTrackr implements a sophisticated WebSocket-based progress tracking system through the <code>ProgressTracker</code> class:</p>
+<h2>Real-time Communication (WebSocket)</h2><h3>ProgressTracker Architecture</h3><p>HexTrackr implements a sophisticated WebSocket-based progress tracking system through the <code>ProgressTracker</code> class:</p>
 <ul>
 <li><strong>Port</strong>: 8988 (separate from REST API)</li>
 <li><strong>Library</strong>: Socket.io with enhanced session management</li>
@@ -579,8 +556,7 @@
 <li><strong>Throttling</strong>: 100ms minimum interval between progress events</li>
 <li><strong>Auto-cleanup</strong>: 30-minute session timeout with automatic garbage collection</li>
 </ul>
-<h3>ProgressTracker Features</h3>
-<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ProgressTracker</span> {
+<h3>ProgressTracker Features</h3><pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ProgressTracker</span> {
   <span class="hljs-title function_">constructor</span>(<span class="hljs-params">io</span>) {
     <span class="hljs-variable language_">this</span>.<span class="hljs-property">sessions</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
     <span class="hljs-variable language_">this</span>.<span class="hljs-property">eventThrottle</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
@@ -595,8 +571,7 @@
 <li>Automatic session cleanup for memory management</li>
 <li>Error handling with graceful degradation</li>
 </ul>
-<h3>WebSocket Events</h3>
-<table>
+<h3>WebSocket Events</h3><table>
 <thead>
 <tr>
 <th>Event Type</th>
@@ -630,8 +605,7 @@
 <td>No</td>
 </tr>
 </tbody></table>
-<h3>Session Lifecycle</h3>
-<div class="mermaid">sequenceDiagram
+<h3>Session Lifecycle</h3><div class="mermaid">sequenceDiagram
     participant Client
     participant ProgressTracker
     participant Import as Import Process
@@ -648,10 +622,9 @@
 
     Import-&gt;&gt;ProgressTracker: completeSession(sessionId)
     ProgressTracker--&gt;&gt;Client: import_complete event
-    ProgressTracker-&gt;&gt;ProgressTracker: cleanup(sessionId)</div><p>For more details, see the <a href="#api-reference/websocket-api">WebSocket API documentation</a>.</p>
+    ProgressTracker-&gt;&gt;ProgressTracker: cleanup(sessionId)</div><p>For more details, see the <a href="#reference/websocket">WebSocket Protocol documentation</a>.</p>
 <hr>
-<h2>Pagination Flow (Current Vulnerabilities)</h2>
-<div class="mermaid">sequenceDiagram
+<h2>Pagination Flow (Current Vulnerabilities)</h2><div class="mermaid">sequenceDiagram
     participant UI
     participant API as server.js
     participant DB as SQLite
@@ -661,8 +634,7 @@
     API-&gt;&gt;DB: SELECT COUNT(*) (same filters)
     DB--&gt;&gt;API: Total
     API--&gt;&gt;UI: { data, pagination }</div><hr>
-<h2>Legacy vs Rollover Paths</h2>
-<table>
+<h2>Legacy vs Rollover Paths</h2><table>
 <thead>
 <tr>
 <th>Aspect</th>
@@ -692,16 +664,13 @@
 </tr>
 </tbody></table>
 <hr>
-<h2>Utility Endpoints</h2>
-<ul>
+<h2>Utility Endpoints</h2><ul>
 <li><strong><code>GET /health</code></strong>: <code>{ status, version, db, uptime }</code></li>
 <li><strong><code>GET /api/docs/stats</code></strong>: Counts routes + approximates function definitions.</li>
 <li><strong>Backup</strong>: Returns structured JSON (vulnerabilities legacy + tickets) or combined.</li>
 </ul>
 <hr>
-<h2>Security &amp; Hardening</h2>
-<h3>Current Security Implementations</h3>
-<table>
+<h2>Security & Hardening</h2><h3>Current Security Implementations</h3><table>
 <thead>
 <tr>
 <th>Concern</th>
@@ -745,8 +714,7 @@
 <td>Client-side XSS prevention</td>
 </tr>
 </tbody></table>
-<h3>PathValidator Security Features</h3>
-<pre><code class="language-javascript"><span class="hljs-comment">// Safe file operations with built-in validation</span>
+<h3>PathValidator Security Features</h3><pre><code class="language-javascript"><span class="hljs-comment">// Safe file operations with built-in validation</span>
 <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeReadFileSync</span>(filePath, options)
 <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeWriteFileSync</span>(filePath, data, options)
 <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeReaddirSync</span>(dirPath, options)
@@ -760,15 +728,13 @@
 <li>Exception-based error handling</li>
 <li>Graceful fallbacks for invalid paths</li>
 </ul>
-<h3>Rate Limiting Configuration</h3>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> limiter = <span class="hljs-title function_">rateLimit</span>({
+<h3>Rate Limiting Configuration</h3><pre><code class="language-javascript"><span class="hljs-keyword">const</span> limiter = <span class="hljs-title function_">rateLimit</span>({
   <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>, <span class="hljs-comment">// 15 minutes</span>
   <span class="hljs-attr">max</span>: <span class="hljs-number">100</span>, <span class="hljs-comment">// Limit each IP to 100 requests per windowMs</span>
   <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Too many requests from this IP&#x27;</span>,
   <span class="hljs-attr">standardHeaders</span>: <span class="hljs-literal">true</span>,
   <span class="hljs-attr">legacyHeaders</span>: <span class="hljs-literal">false</span>
-});</code></pre><h3>Future Security Enhancements</h3>
-<table>
+});</code></pre><h3>Future Security Enhancements</h3><table>
 <thead>
 <tr>
 <th>Concern</th>
@@ -809,9 +775,7 @@
 </tr>
 </tbody></table>
 <hr>
-<h2>Planned Enhancements</h2>
-<h3>Observability &amp; Monitoring</h3>
-<table>
+<h2>Planned Enhancements</h2><h3>Observability & Monitoring</h3><table>
 <thead>
 <tr>
 <th>Area</th>
@@ -840,8 +804,7 @@
 <td>Medium</td>
 </tr>
 </tbody></table>
-<h3>Architecture &amp; Modularity</h3>
-<table>
+<h3>Architecture & Modularity</h3><table>
 <thead>
 <tr>
 <th>Area</th>
@@ -870,8 +833,7 @@
 <td>Medium</td>
 </tr>
 </tbody></table>
-<h3>Data Quality &amp; Validation</h3>
-<table>
+<h3>Data Quality & Validation</h3><table>
 <thead>
 <tr>
 <th>Area</th>
@@ -900,8 +862,7 @@
 <td>Medium</td>
 </tr>
 </tbody></table>
-<h3>Legacy Migration</h3>
-<table>
+<h3>Legacy Migration</h3><table>
 <thead>
 <tr>
 <th>Area</th>
@@ -925,8 +886,7 @@
 <td>Medium</td>
 </tr>
 </tbody></table>
-<h3>Testing &amp; Quality Assurance</h3>
-<table>
+<h3>Testing & Quality Assurance</h3><table>
 <thead>
 <tr>
 <th>Area</th>
@@ -956,8 +916,7 @@
 </tr>
 </tbody></table>
 <hr>
-<h2>Summary</h2>
-<p>The backend favors simplicity (single process, embedded DB) while implementing a robust rollover pipeline for vulnerability lifecycle tracking. Incremental improvements will focus on modularity, observability, and deprecating legacy ingestion paths.</p>
+<h2>Summary</h2><p>The backend favors simplicity (single process, embedded DB) while implementing a robust rollover pipeline for vulnerability lifecycle tracking. Incremental improvements will focus on modularity, observability, and deprecating legacy ingestion paths.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

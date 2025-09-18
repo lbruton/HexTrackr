@@ -1,0 +1,5357 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - heading " HexTrackr" [level=1] [ref=e5]:
+        - link " HexTrackr" [ref=e6] [cursor=pointer]:
+          - /url: /tickets.html
+          - generic [ref=e7] [cursor=pointer]: 
+          - text: HexTrackr
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - link "Enable dark mode" [ref=e10] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e11] [cursor=pointer]: 
+          - text: 
+        - generic [ref=e12]:
+          - link "Open user menu" [ref=e13] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e15] [cursor=pointer]:
+              - generic [ref=e16] [cursor=pointer]: HexTrackr User
+              - generic [ref=e17] [cursor=pointer]: Manager
+          - text:      
+      - list [ref=e20]:
+        - listitem [ref=e21]:
+          - link " Tickets" [ref=e22] [cursor=pointer]:
+            - /url: /tickets.html
+            - generic [ref=e24] [cursor=pointer]: 
+            - generic [ref=e25] [cursor=pointer]: Tickets
+        - listitem [ref=e26]:
+          - link " Vulnerabilities" [ref=e27] [cursor=pointer]:
+            - /url: /vulnerabilities.html
+            - generic [ref=e29] [cursor=pointer]: 
+            - generic [ref=e30] [cursor=pointer]: Vulnerabilities
+        - listitem [ref=e31]:
+          - link " Documentation" [ref=e32] [cursor=pointer]:
+            - /url: /docs-html/
+            - generic [ref=e34] [cursor=pointer]: 
+            - generic [ref=e35] [cursor=pointer]: Documentation
+  - generic [ref=e39]:
+    - navigation "breadcrumb" [ref=e42]:
+      - list [ref=e43]:
+        - listitem [ref=e44]:
+          - link "HexTrackr" [ref=e45] [cursor=pointer]:
+            - /url: /tickets.html
+        - listitem [ref=e46]:
+          - text: /
+          - link "Documentation" [ref=e47] [cursor=pointer]:
+            - /url: "#overview"
+        - listitem [ref=e48]: / Frontend Api
+    - generic [ref=e49]:
+      - generic [ref=e51]:
+        - heading "Navigation" [level=3] [ref=e53]:
+          - img [ref=e54]
+          - text: Navigation
+        - generic [ref=e59]:
+          - link " Overview" [ref=e60] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e61] [cursor=pointer]:
+              - generic [ref=e63] [cursor=pointer]: 
+              - generic [ref=e64] [cursor=pointer]: Overview
+          - link " API Reference " [ref=e65] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e66] [cursor=pointer]:
+              - generic [ref=e68] [cursor=pointer]: 
+              - generic [ref=e69] [cursor=pointer]: API Reference
+              - generic [ref=e70] [cursor=pointer]: 
+          - text:    
+          - link " Architecture " [ref=e71] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e72] [cursor=pointer]:
+              - generic [ref=e74] [cursor=pointer]: 
+              - generic [ref=e75] [cursor=pointer]: Architecture
+              - generic [ref=e76] [cursor=pointer]: 
+          - text:     
+          - link " Guides " [ref=e77] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e78] [cursor=pointer]:
+              - generic [ref=e80] [cursor=pointer]: 
+              - generic [ref=e81] [cursor=pointer]: Guides
+              - generic [ref=e82] [cursor=pointer]: 
+          - text:  
+          - link " Reference " [ref=e83] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e84] [cursor=pointer]:
+              - generic [ref=e86] [cursor=pointer]: 
+              - generic [ref=e87] [cursor=pointer]: Reference
+              - generic [ref=e88] [cursor=pointer]: 
+          - text:    
+          - link " Roadmap" [ref=e89] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e90] [cursor=pointer]:
+              - generic [ref=e92] [cursor=pointer]: 
+              - generic [ref=e93] [cursor=pointer]: Roadmap
+          - link " Changelog" [ref=e94] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e95] [cursor=pointer]:
+              - generic [ref=e97] [cursor=pointer]: 
+              - generic [ref=e98] [cursor=pointer]: Changelog
+      - generic [ref=e103]:
+        - heading "Frontend API Reference" [level=1] [ref=e104]
+        - blockquote [ref=e105]:
+          - paragraph [ref=e106]: Page Components, Shared Modules, and Utilities
+        - heading "Documentation Coverage" [level=2] [ref=e107]
+        - list [ref=e108]:
+          - listitem [ref=e109]:
+            - strong [ref=e110]: Files Processed
+            - text: ": 3"
+          - listitem [ref=e111]:
+            - strong [ref=e112]: Functions Found
+            - text: ": 603"
+          - listitem [ref=e113]:
+            - strong [ref=e114]: Files with Docs
+            - text: ": 3"
+        - separator [ref=e115]
+        - heading "Table of Contents" [level=2] [ref=e116]
+        - list [ref=e117]:
+          - listitem [ref=e118]:
+            - link "Page Components" [ref=e119] [cursor=pointer]:
+              - /url: "#page-components"
+          - listitem [ref=e120]:
+            - link "Shared Components" [ref=e121] [cursor=pointer]:
+              - /url: "#shared-components"
+          - listitem [ref=e122]:
+            - link "Utilities" [ref=e123] [cursor=pointer]:
+              - /url: "#utilities"
+        - separator [ref=e124]
+        - 'heading "Page Components {#page-components}" [level=2] [ref=e125]'
+        - blockquote [ref=e126]:
+          - paragraph [ref=e127]:
+            - text: "Source:"
+            - code [ref=e128]: app/public/scripts/pages/**/*.js
+        - paragraph
+        - heading "escapeHtml(text) ⇒ string" [level=3] [ref=e129]:
+          - text: escapeHtml(text) ⇒
+          - code [ref=e130]: string
+        - paragraph [ref=e131]: Escape HTML entities to prevent XSS attacks
+        - paragraph [ref=e132]:
+          - strong [ref=e133]: Kind
+          - text: ": global function"
+          - strong [ref=e134]: Returns
+          - text: ":"
+          - code [ref=e135]: string
+          - text: "- - The escaped text"
+        - grid [ref=e139]:
+          - rowgroup [ref=e141]:
+            - row "Param Type Description" [ref=e142]:
+              - columnheader "Param" [ref=e143]:
+                - generic [ref=e146] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e147]:
+                - generic [ref=e150] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e151]:
+                - generic [ref=e154] [cursor=pointer]: Description
+          - rowgroup [ref=e155]:
+            - row "text string The text to escape" [ref=e156]:
+              - gridcell "text" [ref=e157]
+              - gridcell "string" [ref=e158]
+              - gridcell "The text to escape" [ref=e159]
+          - rowgroup
+          - rowgroup [ref=e160]
+          - rowgroup
+        - separator [ref=e161]
+        - separator [ref=e162]
+        - 'heading "Shared Components {#shared-components}" [level=2] [ref=e163]'
+        - blockquote [ref=e164]:
+          - paragraph [ref=e165]:
+            - text: "Source:"
+            - code [ref=e166]: app/public/scripts/shared/**/*.js
+        - heading "Classes" [level=3] [ref=e167]
+        - grid [ref=e171]:
+          - rowgroup [ref=e173]:
+            - row "Global Description" [ref=e174]:
+              - columnheader "Global" [ref=e175]:
+                - generic [ref=e178] [cursor=pointer]: Global
+              - columnheader "Description" [ref=e179]:
+                - generic [ref=e182] [cursor=pointer]: Description
+          - rowgroup [ref=e183]:
+            - row "HeaderThemeManager" [ref=e184]:
+              - gridcell "HeaderThemeManager" [ref=e185]:
+                - link "HeaderThemeManager" [ref=e187] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#HeaderThemeManager
+              - gridcell [ref=e188]
+            - row "ModalMonitor Modal Monitoring and Instrumentation System Provides comprehensive monitoring for modal operations" [ref=e189]:
+              - gridcell "ModalMonitor" [ref=e190]:
+                - link "ModalMonitor" [ref=e192] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#ModalMonitor
+              - gridcell "Modal Monitoring and Instrumentation System Provides comprehensive monitoring for modal operations" [ref=e193]
+            - row "ModalMonitorIntegration Modal Monitor Integration Helper Provides easy integration with existing modal system" [ref=e194]:
+              - gridcell "ModalMonitorIntegration" [ref=e195]:
+                - link "ModalMonitorIntegration" [ref=e197] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#ModalMonitorIntegration
+              - gridcell "Modal Monitor Integration Helper Provides easy integration with existing modal system" [ref=e198]
+            - 'row "PaginationController PaginationController - Handles pagination logic and UI generation Usage: const pagination = new PaginationController(12, [6, 12, 24, 48]); pagination.setTotalItems(150); pagination.renderPaginationControls(''pagination-container'', () => renderCurrentPage(), () => renderCurrentPage() );" [ref=e199]':
+              - gridcell "PaginationController" [ref=e200]:
+                - link "PaginationController" [ref=e202] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#PaginationController
+              - 'gridcell "PaginationController - Handles pagination logic and UI generation Usage: const pagination = new PaginationController(12, [6, 12, 24, 48]); pagination.setTotalItems(150); pagination.renderPaginationControls(''pagination-container'', () => renderCurrentPage(), () => renderCurrentPage() );" [ref=e203]'
+            - row "ProgressModal Real-time Progress Modal Class" [ref=e204]:
+              - gridcell "ProgressModal" [ref=e205]:
+                - link "ProgressModal" [ref=e207] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#ProgressModal
+              - gridcell "Real-time Progress Modal Class" [ref=e208]
+            - row "ThemeController ThemeController class for managing dark/light theme switching in HexTrackr. Handles system preference detection, theme persistence, and event listening." [ref=e209]:
+              - gridcell "ThemeController" [ref=e210]:
+                - link "ThemeController" [ref=e212] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#ThemeController
+              - gridcell "ThemeController class for managing dark/light theme switching in HexTrackr. Handles system preference detection, theme persistence, and event listening." [ref=e213]
+            - row "ToastManager Toast Manager class for handling all user notifications Provides consistent UI feedback across the application" [ref=e214]:
+              - gridcell "ToastManager" [ref=e215]:
+                - link "ToastManager" [ref=e217] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#ToastManager
+              - gridcell "Toast Manager class for handling all user notifications Provides consistent UI feedback across the application" [ref=e218]
+            - row "VulnerabilityCardsManager Manages device cards and vulnerability cards rendering with pagination" [ref=e219]:
+              - gridcell "VulnerabilityCardsManager" [ref=e220]:
+                - link "VulnerabilityCardsManager" [ref=e222] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#VulnerabilityCardsManager
+              - gridcell "Manages device cards and vulnerability cards rendering with pagination" [ref=e223]
+            - row "VulnerabilityChartManager VulnerabilityChartManager - Manages vulnerability chart lifecycle Extends EventTarget for event-driven communication with other components" [ref=e224]:
+              - gridcell "VulnerabilityChartManager" [ref=e225]:
+                - link "VulnerabilityChartManager" [ref=e227] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#VulnerabilityChartManager
+              - gridcell "VulnerabilityChartManager - Manages vulnerability chart lifecycle Extends EventTarget for event-driven communication with other components" [ref=e228]
+            - row "VulnerabilityCoreOrchestrator Central orchestrator for vulnerability management system Coordinates between all extracted modules and handles cross-cutting concerns" [ref=e229]:
+              - gridcell "VulnerabilityCoreOrchestrator" [ref=e230]:
+                - link "VulnerabilityCoreOrchestrator" [ref=e232] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#VulnerabilityCoreOrchestrator
+              - gridcell "Central orchestrator for vulnerability management system Coordinates between all extracted modules and handles cross-cutting concerns" [ref=e233]
+            - 'row "VulnerabilityDataManager VulnerabilityDataManager - Centralized data management for vulnerability system Usage: const dataManager = new VulnerabilityDataManager(''/api''); await dataManager.loadData(); const filteredData = dataManager.filterData(''searchTerm'', ''Critical'');" [ref=e234]':
+              - gridcell "VulnerabilityDataManager" [ref=e235]:
+                - link "VulnerabilityDataManager" [ref=e237] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#VulnerabilityDataManager
+              - 'gridcell "VulnerabilityDataManager - Centralized data management for vulnerability system Usage: const dataManager = new VulnerabilityDataManager(''/api''); await dataManager.loadData(); const filteredData = dataManager.filterData(''searchTerm'', ''Critical'');" [ref=e238]'
+            - row "VulnerabilityGridManager Manages all AG Grid operations for vulnerability data display" [ref=e239]:
+              - gridcell "VulnerabilityGridManager" [ref=e240]:
+                - link "VulnerabilityGridManager" [ref=e242] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#VulnerabilityGridManager
+              - gridcell "Manages all AG Grid operations for vulnerability data display" [ref=e243]
+            - row "VulnerabilitySearchManager Manages vulnerability search, filtering, and external lookup operations" [ref=e244]:
+              - gridcell "VulnerabilitySearchManager" [ref=e245]:
+                - link "VulnerabilitySearchManager" [ref=e247] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#VulnerabilitySearchManager
+              - gridcell "Manages vulnerability search, filtering, and external lookup operations" [ref=e248]
+            - row "WebSocketClient WebSocket client class for real-time progress tracking" [ref=e249]:
+              - gridcell "WebSocketClient" [ref=e250]:
+                - link "WebSocketClient" [ref=e252] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#WebSocketClient
+              - gridcell "WebSocket client class for real-time progress tracking" [ref=e253]
+          - rowgroup
+          - rowgroup [ref=e254]
+          - rowgroup
+        - heading "Constants" [level=3] [ref=e255]
+        - grid [ref=e259]:
+          - rowgroup [ref=e261]:
+            - row "Global Description" [ref=e262]:
+              - columnheader "Global" [ref=e263]:
+                - generic [ref=e266] [cursor=pointer]: Global
+              - columnheader "Description" [ref=e267]:
+                - generic [ref=e270] [cursor=pointer]: Description
+          - rowgroup [ref=e271]:
+            - row "headerThemeManager Auto-initialize header theme management when module loads This ensures theme toggles work on all pages that include this script" [ref=e272]:
+              - gridcell "headerThemeManager" [ref=e273]:
+                - link "headerThemeManager" [ref=e275] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#headerThemeManager
+              - gridcell "Auto-initialize header theme management when module loads This ensures theme toggles work on all pages that include this script" [ref=e276]
+            - row "VPR_COLORS Vulnerability Color Constants Single source of truth for VPR severity colors These values match the CSS variables defined in vulnerabilities.css" [ref=e277]:
+              - gridcell "VPR_COLORS" [ref=e278]:
+                - link "VPR_COLORS" [ref=e280] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#VPR_COLORS
+              - gridcell "Vulnerability Color Constants Single source of truth for VPR severity colors These values match the CSS variables defined in vulnerabilities.css" [ref=e281]
+          - rowgroup
+          - rowgroup [ref=e282]
+          - rowgroup
+        - heading "Functions" [level=3] [ref=e283]
+        - grid [ref=e287]:
+          - rowgroup [ref=e289]:
+            - row "Global Description" [ref=e290]:
+              - columnheader "Global" [ref=e291]:
+                - generic [ref=e294] [cursor=pointer]: Global
+              - columnheader "Description" [ref=e295]:
+                - generic [ref=e298] [cursor=pointer]: Description
+          - rowgroup [ref=e299]:
+            - row "debounce(func, delay) ⇒ function Debounce function to limit the rate at which a function gets called. This is crucial for performance on events that fire rapidly, like window resize." [ref=e300]:
+              - gridcell "debounce(func, delay) ⇒ function" [ref=e301]:
+                - link "debounce(func, delay) ⇒ function" [ref=e303] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#debounce
+              - gridcell "Debounce function to limit the rate at which a function gets called. This is crucial for performance on events that fire rapidly, like window resize." [ref=e304]
+            - row "createVulnerabilityGridOptions(componentContext, isDarkMode) ⇒ GridOptions Creates and returns the complete AG Grid configuration object." [ref=e305]:
+              - gridcell "createVulnerabilityGridOptions(componentContext, isDarkMode) ⇒ GridOptions" [ref=e306]:
+                - link "createVulnerabilityGridOptions(componentContext, isDarkMode) ⇒ GridOptions" [ref=e308] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#createVulnerabilityGridOptions
+              - gridcell "Creates and returns the complete AG Grid configuration object." [ref=e309]
+            - row "createFallbackFooter(container) Creates a safe fallback footer using DOM methods with badges" [ref=e310]:
+              - gridcell "createFallbackFooter(container)" [ref=e311]:
+                - link "createFallbackFooter(container)" [ref=e313] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#createFallbackFooter
+              - gridcell "Creates a safe fallback footer using DOM methods with badges" [ref=e314]
+            - row "escapeHtml(text) ⇒ string Escape HTML characters to prevent XSS attacks" [ref=e315]:
+              - gridcell "escapeHtml(text) ⇒ string" [ref=e316]:
+                - link "escapeHtml(text) ⇒ string" [ref=e318] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#escapeHtml
+              - gridcell "Escape HTML characters to prevent XSS attacks" [ref=e319]
+            - row "getVPRColors(theme) ⇒ Array. Get severity colors for the current theme" [ref=e320]:
+              - gridcell "getVPRColors(theme) ⇒ Array." [ref=e321]:
+                - link "getVPRColors(theme) ⇒ Array." [ref=e323] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#getVPRColors
+                  - text: getVPRColors(theme) ⇒ Array.
+              - gridcell "Get severity colors for the current theme" [ref=e324]
+            - row "getSeverityColor(severity, theme) ⇒ Object Get color configuration for a specific severity" [ref=e325]:
+              - gridcell "getSeverityColor(severity, theme) ⇒ Object" [ref=e326]:
+                - link "getSeverityColor(severity, theme) ⇒ Object" [ref=e328] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#getSeverityColor
+              - gridcell "Get color configuration for a specific severity" [ref=e329]
+            - row "getVPRColorsFromCSS() ⇒ Array. Get colors from CSS variables (dynamic, theme-aware)" [ref=e330]:
+              - gridcell "getVPRColorsFromCSS() ⇒ Array." [ref=e331]:
+                - link "getVPRColorsFromCSS() ⇒ Array." [ref=e333] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#getVPRColorsFromCSS
+                  - text: getVPRColorsFromCSS() ⇒ Array.
+              - gridcell "Get colors from CSS variables (dynamic, theme-aware)" [ref=e334]
+            - row "getCurrentTheme() ⇒ string Get the current theme from document body" [ref=e335]:
+              - gridcell "getCurrentTheme() ⇒ string" [ref=e336]:
+                - link "getCurrentTheme() ⇒ string" [ref=e338] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#getCurrentTheme
+              - gridcell "Get the current theme from document body" [ref=e339]
+          - rowgroup
+          - rowgroup [ref=e340]
+          - rowgroup
+        - paragraph
+        - heading "HeaderThemeManager" [level=3] [ref=e341]
+        - paragraph [ref=e342]:
+          - strong [ref=e343]: Kind
+          - text: ": global class"
+        - list [ref=e344]:
+          - listitem [ref=e345]:
+            - link "HeaderThemeManager" [ref=e346] [cursor=pointer]:
+              - /url: "#HeaderThemeManager"
+            - list [ref=e347]:
+              - listitem [ref=e348]:
+                - link "new HeaderThemeManager()" [ref=e349] [cursor=pointer]:
+                  - /url: "#new_HeaderThemeManager_new"
+              - listitem [ref=e350]:
+                - link "headerThemeManager.HeaderThemeManager" [ref=e351] [cursor=pointer]:
+                  - /url: "#HeaderThemeManager+HeaderThemeManager"
+                - list [ref=e352]:
+                  - listitem [ref=e353]:
+                    - link "new exports.HeaderThemeManager()" [ref=e354] [cursor=pointer]:
+                      - /url: "#new_HeaderThemeManager+HeaderThemeManager_new"
+              - listitem [ref=e355]:
+                - link "headerThemeManager.init()" [ref=e356] [cursor=pointer]:
+                  - /url: "#HeaderThemeManager+init"
+                - text: ⇒
+                - code [ref=e357]: void
+              - listitem [ref=e358]:
+                - link "headerThemeManager.initializeToggles()" [ref=e359] [cursor=pointer]:
+                  - /url: "#HeaderThemeManager+initializeToggles"
+                - text: ⇒
+                - code [ref=e360]: void
+              - listitem [ref=e361]:
+                - link "headerThemeManager.applyInitialTheme()" [ref=e362] [cursor=pointer]:
+                  - /url: "#HeaderThemeManager+applyInitialTheme"
+                - text: ⇒
+                - code [ref=e363]: void
+              - listitem [ref=e364]:
+                - link "headerThemeManager.toggleToDark()" [ref=e365] [cursor=pointer]:
+                  - /url: "#HeaderThemeManager+toggleToDark"
+                - text: ⇒
+                - code [ref=e366]: void
+              - listitem [ref=e367]:
+                - link "headerThemeManager.toggleToLight()" [ref=e368] [cursor=pointer]:
+                  - /url: "#HeaderThemeManager+toggleToLight"
+                - text: ⇒
+                - code [ref=e369]: void
+              - listitem [ref=e370]:
+                - link "headerThemeManager.updateToggleVisibility(currentTheme)" [ref=e371] [cursor=pointer]:
+                  - /url: "#HeaderThemeManager+updateToggleVisibility"
+                - text: ⇒
+                - code [ref=e372]: void
+              - listitem [ref=e373]:
+                - link "headerThemeManager.getThemeController()" [ref=e374] [cursor=pointer]:
+                  - /url: "#HeaderThemeManager+getThemeController"
+                - text: ⇒
+                - link "ThemeController" [ref=e375] [cursor=pointer]:
+                  - /url: "#ThemeController"
+                  - code [ref=e376] [cursor=pointer]: ThemeController
+              - listitem [ref=e377]:
+                - link "headerThemeManager.isInitialized()" [ref=e378] [cursor=pointer]:
+                  - /url: "#HeaderThemeManager+isInitialized"
+                - text: ⇒
+                - code [ref=e379]: boolean
+        - separator [ref=e380]
+        - paragraph
+        - heading "new HeaderThemeManager()" [level=4] [ref=e381]
+        - paragraph [ref=e382]: Header Theme Manager - manages theme toggle UI in navigation header
+        - separator [ref=e383]
+        - paragraph
+        - heading "headerThemeManager.HeaderThemeManager" [level=4] [ref=e384]
+        - paragraph [ref=e385]:
+          - strong [ref=e386]: Kind
+          - text: ": instance class of"
+          - link "HeaderThemeManager" [ref=e387] [cursor=pointer]:
+            - /url: "#HeaderThemeManager"
+            - code [ref=e388] [cursor=pointer]: HeaderThemeManager
+        - separator [ref=e389]
+        - paragraph
+        - heading "new exports.HeaderThemeManager()" [level=5] [ref=e390]
+        - paragraph [ref=e391]: Initialize header theme management
+        - separator [ref=e392]
+        - paragraph
+        - heading "headerThemeManager.init() ⇒ void" [level=4] [ref=e393]:
+          - text: headerThemeManager.init() ⇒
+          - code [ref=e394]: void
+        - paragraph [ref=e395]:
+          - text: Initialize theme toggles after DOM is loaded
+          - text: "T023: Theme toggle UI button integration"
+        - paragraph [ref=e396]:
+          - strong [ref=e397]: Kind
+          - text: ": instance method of"
+          - link "HeaderThemeManager" [ref=e398] [cursor=pointer]:
+            - /url: "#HeaderThemeManager"
+            - code [ref=e399] [cursor=pointer]: HeaderThemeManager
+        - separator [ref=e400]
+        - paragraph
+        - heading "headerThemeManager.initializeToggles() ⇒ void" [level=4] [ref=e401]:
+          - text: headerThemeManager.initializeToggles() ⇒
+          - code [ref=e402]: void
+        - paragraph [ref=e403]: Initialize theme toggle elements and event listeners
+        - paragraph [ref=e404]:
+          - strong [ref=e405]: Kind
+          - text: ": instance method of"
+          - link "HeaderThemeManager" [ref=e406] [cursor=pointer]:
+            - /url: "#HeaderThemeManager"
+            - code [ref=e407] [cursor=pointer]: HeaderThemeManager
+        - separator [ref=e408]
+        - paragraph
+        - heading "headerThemeManager.applyInitialTheme() ⇒ void" [level=4] [ref=e409]:
+          - text: headerThemeManager.applyInitialTheme() ⇒
+          - code [ref=e410]: void
+        - paragraph [ref=e411]: Apply initial theme on page load
+        - paragraph [ref=e412]:
+          - strong [ref=e413]: Kind
+          - text: ": instance method of"
+          - link "HeaderThemeManager" [ref=e414] [cursor=pointer]:
+            - /url: "#HeaderThemeManager"
+            - code [ref=e415] [cursor=pointer]: HeaderThemeManager
+        - separator [ref=e416]
+        - paragraph
+        - heading "headerThemeManager.toggleToDark() ⇒ void" [level=4] [ref=e417]:
+          - text: headerThemeManager.toggleToDark() ⇒
+          - code [ref=e418]: void
+        - paragraph [ref=e419]: Toggle to dark theme
+        - paragraph [ref=e420]:
+          - strong [ref=e421]: Kind
+          - text: ": instance method of"
+          - link "HeaderThemeManager" [ref=e422] [cursor=pointer]:
+            - /url: "#HeaderThemeManager"
+            - code [ref=e423] [cursor=pointer]: HeaderThemeManager
+        - separator [ref=e424]
+        - paragraph
+        - heading "headerThemeManager.toggleToLight() ⇒ void" [level=4] [ref=e425]:
+          - text: headerThemeManager.toggleToLight() ⇒
+          - code [ref=e426]: void
+        - paragraph [ref=e427]: Toggle to light theme
+        - paragraph [ref=e428]:
+          - strong [ref=e429]: Kind
+          - text: ": instance method of"
+          - link "HeaderThemeManager" [ref=e430] [cursor=pointer]:
+            - /url: "#HeaderThemeManager"
+            - code [ref=e431] [cursor=pointer]: HeaderThemeManager
+        - separator [ref=e432]
+        - paragraph
+        - heading "headerThemeManager.updateToggleVisibility(currentTheme) ⇒ void" [level=4] [ref=e433]:
+          - text: headerThemeManager.updateToggleVisibility(currentTheme) ⇒
+          - code [ref=e434]: void
+        - paragraph [ref=e435]:
+          - text: Update theme toggle visibility based on current theme
+          - text: "T023: Show/hide appropriate toggle buttons"
+        - paragraph [ref=e436]:
+          - strong [ref=e437]: Kind
+          - text: ": instance method of"
+          - link "HeaderThemeManager" [ref=e438] [cursor=pointer]:
+            - /url: "#HeaderThemeManager"
+            - code [ref=e439] [cursor=pointer]: HeaderThemeManager
+        - grid [ref=e443]:
+          - rowgroup [ref=e445]:
+            - row "Param Type Description" [ref=e446]:
+              - columnheader "Param" [ref=e447]:
+                - generic [ref=e450] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e451]:
+                - generic [ref=e454] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e455]:
+                - generic [ref=e458] [cursor=pointer]: Description
+          - rowgroup [ref=e459]:
+            - row "currentTheme string Current active theme ('light'" [ref=e460]:
+              - gridcell "currentTheme" [ref=e461]
+              - gridcell "string" [ref=e462]
+              - gridcell "Current active theme ('light'" [ref=e463]
+          - rowgroup
+          - rowgroup [ref=e464]
+          - rowgroup
+        - separator [ref=e465]
+        - paragraph
+        - heading "headerThemeManager.getThemeController() ⇒ ThemeController" [level=4] [ref=e466]:
+          - text: headerThemeManager.getThemeController() ⇒
+          - link "ThemeController" [ref=e467] [cursor=pointer]:
+            - /url: "#ThemeController"
+            - code [ref=e468] [cursor=pointer]: ThemeController
+        - paragraph [ref=e469]: Get current theme controller instance
+        - paragraph [ref=e470]:
+          - strong [ref=e471]: Kind
+          - text: ": instance method of"
+          - link "HeaderThemeManager" [ref=e472] [cursor=pointer]:
+            - /url: "#HeaderThemeManager"
+            - code [ref=e473] [cursor=pointer]: HeaderThemeManager
+          - strong [ref=e474]: Returns
+          - text: ":"
+          - link "ThemeController" [ref=e475] [cursor=pointer]:
+            - /url: "#ThemeController"
+            - code [ref=e476] [cursor=pointer]: ThemeController
+          - text: "- The theme controller instance"
+        - separator [ref=e477]
+        - paragraph
+        - heading "headerThemeManager.isInitialized() ⇒ boolean" [level=4] [ref=e478]:
+          - text: headerThemeManager.isInitialized() ⇒
+          - code [ref=e479]: boolean
+        - paragraph [ref=e480]: Check if header theme manager is initialized
+        - paragraph [ref=e481]:
+          - strong [ref=e482]: Kind
+          - text: ": instance method of"
+          - link "HeaderThemeManager" [ref=e483] [cursor=pointer]:
+            - /url: "#HeaderThemeManager"
+            - code [ref=e484] [cursor=pointer]: HeaderThemeManager
+          - strong [ref=e485]: Returns
+          - text: ":"
+          - code [ref=e486]: boolean
+          - text: "- True if initialized"
+        - separator [ref=e487]
+        - paragraph
+        - heading "ModalMonitor" [level=3] [ref=e488]
+        - paragraph [ref=e489]:
+          - text: Modal Monitoring and Instrumentation System
+          - text: Provides comprehensive monitoring for modal operations
+        - paragraph [ref=e490]:
+          - strong [ref=e491]: Kind
+          - text: ": global class"
+        - list [ref=e492]:
+          - listitem [ref=e493]:
+            - link "ModalMonitor" [ref=e494] [cursor=pointer]:
+              - /url: "#ModalMonitor"
+            - list [ref=e495]:
+              - listitem [ref=e496]:
+                - link "modalMonitor.init()" [ref=e497] [cursor=pointer]:
+                  - /url: "#ModalMonitor+init"
+              - listitem [ref=e498]:
+                - link "modalMonitor.startMemoryMonitoring()" [ref=e499] [cursor=pointer]:
+                  - /url: "#ModalMonitor+startMemoryMonitoring"
+              - listitem [ref=e500]:
+                - link "modalMonitor.recordMemorySnapshot()" [ref=e501] [cursor=pointer]:
+                  - /url: "#ModalMonitor+recordMemorySnapshot"
+              - listitem [ref=e502]:
+                - link "modalMonitor.reportMemoryLeak()" [ref=e503] [cursor=pointer]:
+                  - /url: "#ModalMonitor+reportMemoryLeak"
+              - listitem [ref=e504]:
+                - link "modalMonitor.instrumentPerformanceAPIs()" [ref=e505] [cursor=pointer]:
+                  - /url: "#ModalMonitor+instrumentPerformanceAPIs"
+              - listitem [ref=e506]:
+                - link "modalMonitor.setupErrorTracking()" [ref=e507] [cursor=pointer]:
+                  - /url: "#ModalMonitor+setupErrorTracking"
+              - listitem [ref=e508]:
+                - link "modalMonitor.trackModalOperationStart()" [ref=e509] [cursor=pointer]:
+                  - /url: "#ModalMonitor+trackModalOperationStart"
+              - listitem [ref=e510]:
+                - link "modalMonitor.trackModalOperationEnd()" [ref=e511] [cursor=pointer]:
+                  - /url: "#ModalMonitor+trackModalOperationEnd"
+              - listitem [ref=e512]:
+                - link "modalMonitor.reportPerformanceIssue()" [ref=e513] [cursor=pointer]:
+                  - /url: "#ModalMonitor+reportPerformanceIssue"
+              - listitem [ref=e514]:
+                - link "modalMonitor.logError()" [ref=e515] [cursor=pointer]:
+                  - /url: "#ModalMonitor+logError"
+              - listitem [ref=e516]:
+                - link "modalMonitor.trimMetricsArrays()" [ref=e517] [cursor=pointer]:
+                  - /url: "#ModalMonitor+trimMetricsArrays"
+              - listitem [ref=e518]:
+                - link "modalMonitor.startPeriodicReporting()" [ref=e519] [cursor=pointer]:
+                  - /url: "#ModalMonitor+startPeriodicReporting"
+              - listitem [ref=e520]:
+                - link "modalMonitor.generatePerformanceReport()" [ref=e521] [cursor=pointer]:
+                  - /url: "#ModalMonitor+generatePerformanceReport"
+              - listitem [ref=e522]:
+                - link "modalMonitor.calculatePerformanceStats()" [ref=e523] [cursor=pointer]:
+                  - /url: "#ModalMonitor+calculatePerformanceStats"
+              - listitem [ref=e524]:
+                - link "modalMonitor.calculateMemoryStats()" [ref=e525] [cursor=pointer]:
+                  - /url: "#ModalMonitor+calculateMemoryStats"
+              - listitem [ref=e526]:
+                - link "modalMonitor.calculateStats()" [ref=e527] [cursor=pointer]:
+                  - /url: "#ModalMonitor+calculateStats"
+              - listitem [ref=e528]:
+                - link "modalMonitor.getRecentErrors()" [ref=e529] [cursor=pointer]:
+                  - /url: "#ModalMonitor+getRecentErrors"
+              - listitem [ref=e530]:
+                - link "modalMonitor.calculateHealthScore()" [ref=e531] [cursor=pointer]:
+                  - /url: "#ModalMonitor+calculateHealthScore"
+              - listitem [ref=e532]:
+                - link "modalMonitor.getStatus()" [ref=e533] [cursor=pointer]:
+                  - /url: "#ModalMonitor+getStatus"
+              - listitem [ref=e534]:
+                - link "modalMonitor.getMetrics()" [ref=e535] [cursor=pointer]:
+                  - /url: "#ModalMonitor+getMetrics"
+              - listitem [ref=e536]:
+                - link "modalMonitor.dispatchEvent()" [ref=e537] [cursor=pointer]:
+                  - /url: "#ModalMonitor+dispatchEvent"
+              - listitem [ref=e538]:
+                - link "modalMonitor.formatBytes()" [ref=e539] [cursor=pointer]:
+                  - /url: "#ModalMonitor+formatBytes"
+              - listitem [ref=e540]:
+                - link "modalMonitor.destroy()" [ref=e541] [cursor=pointer]:
+                  - /url: "#ModalMonitor+destroy"
+        - separator [ref=e542]
+        - paragraph
+        - heading "modalMonitor.init()" [level=4] [ref=e543]
+        - paragraph [ref=e544]: Initialize monitoring system
+        - paragraph [ref=e545]:
+          - strong [ref=e546]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e547] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e548] [cursor=pointer]: ModalMonitor
+        - separator [ref=e549]
+        - paragraph
+        - heading "modalMonitor.startMemoryMonitoring()" [level=4] [ref=e550]
+        - paragraph [ref=e551]: Start memory monitoring
+        - paragraph [ref=e552]:
+          - strong [ref=e553]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e554] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e555] [cursor=pointer]: ModalMonitor
+        - separator [ref=e556]
+        - paragraph
+        - heading "modalMonitor.recordMemorySnapshot()" [level=4] [ref=e557]
+        - paragraph [ref=e558]: Record memory snapshot
+        - paragraph [ref=e559]:
+          - strong [ref=e560]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e561] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e562] [cursor=pointer]: ModalMonitor
+        - separator [ref=e563]
+        - paragraph
+        - heading "modalMonitor.reportMemoryLeak()" [level=4] [ref=e564]
+        - paragraph [ref=e565]: Report memory leak detection
+        - paragraph [ref=e566]:
+          - strong [ref=e567]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e568] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e569] [cursor=pointer]: ModalMonitor
+        - separator [ref=e570]
+        - paragraph
+        - heading "modalMonitor.instrumentPerformanceAPIs()" [level=4] [ref=e571]
+        - paragraph [ref=e572]: Instrument performance APIs for modal operations
+        - paragraph [ref=e573]:
+          - strong [ref=e574]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e575] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e576] [cursor=pointer]: ModalMonitor
+        - separator [ref=e577]
+        - paragraph
+        - heading "modalMonitor.setupErrorTracking()" [level=4] [ref=e578]
+        - paragraph [ref=e579]: Setup error tracking
+        - paragraph [ref=e580]:
+          - strong [ref=e581]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e582] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e583] [cursor=pointer]: ModalMonitor
+        - separator [ref=e584]
+        - paragraph
+        - heading "modalMonitor.trackModalOperationStart()" [level=4] [ref=e585]
+        - paragraph [ref=e586]: Track modal operation start
+        - paragraph [ref=e587]:
+          - strong [ref=e588]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e589] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e590] [cursor=pointer]: ModalMonitor
+        - separator [ref=e591]
+        - paragraph
+        - heading "modalMonitor.trackModalOperationEnd()" [level=4] [ref=e592]
+        - paragraph [ref=e593]: Track modal operation end
+        - paragraph [ref=e594]:
+          - strong [ref=e595]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e596] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e597] [cursor=pointer]: ModalMonitor
+        - separator [ref=e598]
+        - paragraph
+        - heading "modalMonitor.reportPerformanceIssue()" [level=4] [ref=e599]
+        - paragraph [ref=e600]: Report performance issue
+        - paragraph [ref=e601]:
+          - strong [ref=e602]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e603] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e604] [cursor=pointer]: ModalMonitor
+        - separator [ref=e605]
+        - paragraph
+        - heading "modalMonitor.logError()" [level=4] [ref=e606]
+        - paragraph [ref=e607]: Log error to error tracking system
+        - paragraph [ref=e608]:
+          - strong [ref=e609]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e610] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e611] [cursor=pointer]: ModalMonitor
+        - separator [ref=e612]
+        - paragraph
+        - heading "modalMonitor.trimMetricsArrays()" [level=4] [ref=e613]
+        - paragraph [ref=e614]: Trim metrics arrays to prevent memory issues
+        - paragraph [ref=e615]:
+          - strong [ref=e616]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e617] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e618] [cursor=pointer]: ModalMonitor
+        - separator [ref=e619]
+        - paragraph
+        - heading "modalMonitor.startPeriodicReporting()" [level=4] [ref=e620]
+        - paragraph [ref=e621]: Start periodic reporting
+        - paragraph [ref=e622]:
+          - strong [ref=e623]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e624] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e625] [cursor=pointer]: ModalMonitor
+        - separator [ref=e626]
+        - paragraph
+        - heading "modalMonitor.generatePerformanceReport()" [level=4] [ref=e627]
+        - paragraph [ref=e628]: Generate performance report
+        - paragraph [ref=e629]:
+          - strong [ref=e630]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e631] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e632] [cursor=pointer]: ModalMonitor
+        - separator [ref=e633]
+        - paragraph
+        - heading "modalMonitor.calculatePerformanceStats()" [level=4] [ref=e634]
+        - paragraph [ref=e635]: Calculate performance statistics
+        - paragraph [ref=e636]:
+          - strong [ref=e637]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e638] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e639] [cursor=pointer]: ModalMonitor
+        - separator [ref=e640]
+        - paragraph
+        - heading "modalMonitor.calculateMemoryStats()" [level=4] [ref=e641]
+        - paragraph [ref=e642]: Calculate memory statistics
+        - paragraph [ref=e643]:
+          - strong [ref=e644]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e645] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e646] [cursor=pointer]: ModalMonitor
+        - separator [ref=e647]
+        - paragraph
+        - heading "modalMonitor.calculateStats()" [level=4] [ref=e648]
+        - paragraph [ref=e649]: Calculate basic statistics for array
+        - paragraph [ref=e650]:
+          - strong [ref=e651]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e652] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e653] [cursor=pointer]: ModalMonitor
+        - separator [ref=e654]
+        - paragraph
+        - heading "modalMonitor.getRecentErrors()" [level=4] [ref=e655]
+        - paragraph [ref=e656]: Get recent errors
+        - paragraph [ref=e657]:
+          - strong [ref=e658]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e659] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e660] [cursor=pointer]: ModalMonitor
+        - separator [ref=e661]
+        - paragraph
+        - heading "modalMonitor.calculateHealthScore()" [level=4] [ref=e662]
+        - paragraph [ref=e663]: Calculate overall health score (0-100)
+        - paragraph [ref=e664]:
+          - strong [ref=e665]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e666] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e667] [cursor=pointer]: ModalMonitor
+        - separator [ref=e668]
+        - paragraph
+        - heading "modalMonitor.getStatus()" [level=4] [ref=e669]
+        - paragraph [ref=e670]: Get current monitoring status
+        - paragraph [ref=e671]:
+          - strong [ref=e672]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e673] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e674] [cursor=pointer]: ModalMonitor
+        - separator [ref=e675]
+        - paragraph
+        - heading "modalMonitor.getMetrics()" [level=4] [ref=e676]
+        - paragraph [ref=e677]: Get all metrics data
+        - paragraph [ref=e678]:
+          - strong [ref=e679]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e680] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e681] [cursor=pointer]: ModalMonitor
+        - separator [ref=e682]
+        - paragraph
+        - heading "modalMonitor.dispatchEvent()" [level=4] [ref=e683]
+        - paragraph [ref=e684]: Dispatch custom event
+        - paragraph [ref=e685]:
+          - strong [ref=e686]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e687] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e688] [cursor=pointer]: ModalMonitor
+        - separator [ref=e689]
+        - paragraph
+        - heading "modalMonitor.formatBytes()" [level=4] [ref=e690]
+        - paragraph [ref=e691]: Format bytes for human reading
+        - paragraph [ref=e692]:
+          - strong [ref=e693]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e694] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e695] [cursor=pointer]: ModalMonitor
+        - separator [ref=e696]
+        - paragraph
+        - heading "modalMonitor.destroy()" [level=4] [ref=e697]
+        - paragraph [ref=e698]: Clean up monitoring
+        - paragraph [ref=e699]:
+          - strong [ref=e700]: Kind
+          - text: ": instance method of"
+          - link "ModalMonitor" [ref=e701] [cursor=pointer]:
+            - /url: "#ModalMonitor"
+            - code [ref=e702] [cursor=pointer]: ModalMonitor
+        - separator [ref=e703]
+        - paragraph
+        - heading "ModalMonitorIntegration" [level=3] [ref=e704]
+        - paragraph [ref=e705]:
+          - text: Modal Monitor Integration Helper
+          - text: Provides easy integration with existing modal system
+        - paragraph [ref=e706]:
+          - strong [ref=e707]: Kind
+          - text: ": global class"
+        - separator [ref=e708]
+        - paragraph
+        - heading "PaginationController" [level=3] [ref=e709]
+        - paragraph [ref=e710]: PaginationController - Handles pagination logic and UI generation
+        - paragraph [ref=e711]: "Usage:"
+        - code [ref=e713]:
+          - generic [ref=e714]: const
+          - text: pagination
+          - generic [ref=e715]: =
+          - generic [ref=e716]: new
+          - generic [ref=e717]: PaginationController
+          - generic [ref=e718]: (
+          - generic [ref=e719]: "12"
+          - generic [ref=e720]: ","
+          - generic [ref=e721]: "["
+          - generic [ref=e722]: "6"
+          - generic [ref=e723]: ","
+          - generic [ref=e724]: "12"
+          - generic [ref=e725]: ","
+          - generic [ref=e726]: "24"
+          - generic [ref=e727]: ","
+          - generic [ref=e728]: "48"
+          - generic [ref=e729]: "]"
+          - generic [ref=e730]: )
+          - generic [ref=e731]: ;
+          - text: pagination
+          - generic [ref=e732]: .
+          - generic [ref=e733]: setTotalItems
+          - generic [ref=e734]: (
+          - generic [ref=e735]: "150"
+          - generic [ref=e736]: )
+          - generic [ref=e737]: ;
+          - text: pagination
+          - generic [ref=e738]: .
+          - generic [ref=e739]: renderPaginationControls
+          - generic [ref=e740]: (
+          - generic [ref=e741]: "'pagination-container'"
+          - generic [ref=e742]: ","
+          - generic [ref=e743]: (
+          - generic [ref=e744]: )
+          - generic [ref=e745]: =>
+          - generic [ref=e746]: renderCurrentPage
+          - generic [ref=e747]: (
+          - generic [ref=e748]: )
+          - generic [ref=e749]: ","
+          - generic [ref=e750]: (
+          - generic [ref=e751]: )
+          - generic [ref=e752]: =>
+          - generic [ref=e753]: renderCurrentPage
+          - generic [ref=e754]: (
+          - generic [ref=e755]: )
+          - generic [ref=e756]: )
+          - generic [ref=e757]: ;
+        - paragraph [ref=e758]:
+          - strong [ref=e759]: Kind
+          - text: ": global class"
+        - separator [ref=e760]
+        - paragraph
+        - heading "ProgressModal" [level=3] [ref=e761]
+        - paragraph [ref=e762]: Real-time Progress Modal Class
+        - paragraph [ref=e763]:
+          - strong [ref=e764]: Kind
+          - text: ": global class"
+        - list [ref=e765]:
+          - listitem [ref=e766]:
+            - link "ProgressModal" [ref=e767] [cursor=pointer]:
+              - /url: "#ProgressModal"
+            - list [ref=e768]:
+              - listitem [ref=e769]:
+                - link "progressModal.createModalHTML()" [ref=e770] [cursor=pointer]:
+                  - /url: "#ProgressModal+createModalHTML"
+              - listitem [ref=e771]:
+                - link "progressModal.setupEventListeners()" [ref=e772] [cursor=pointer]:
+                  - /url: "#ProgressModal+setupEventListeners"
+              - listitem [ref=e773]:
+                - link "progressModal.setupWebSocketListeners()" [ref=e774] [cursor=pointer]:
+                  - /url: "#ProgressModal+setupWebSocketListeners"
+              - listitem [ref=e775]:
+                - link "progressModal.removeWebSocketListeners()" [ref=e776] [cursor=pointer]:
+                  - /url: "#ProgressModal+removeWebSocketListeners"
+              - listitem [ref=e777]:
+                - link "progressModal.show(options)" [ref=e778] [cursor=pointer]:
+                  - /url: "#ProgressModal+show"
+              - listitem [ref=e779]:
+                - link "progressModal.hide()" [ref=e780] [cursor=pointer]:
+                  - /url: "#ProgressModal+hide"
+              - listitem [ref=e781]:
+                - link "progressModal.update(data)" [ref=e782] [cursor=pointer]:
+                  - /url: "#ProgressModal+update"
+              - listitem [ref=e783]:
+                - link "progressModal.handleProgressUpdate(data)" [ref=e784] [cursor=pointer]:
+                  - /url: "#ProgressModal+handleProgressUpdate"
+              - listitem [ref=e785]:
+                - link "progressModal.handleProgressStatus(data)" [ref=e786] [cursor=pointer]:
+                  - /url: "#ProgressModal+handleProgressStatus"
+              - listitem [ref=e787]:
+                - link "progressModal.handleProgressComplete(data)" [ref=e788] [cursor=pointer]:
+                  - /url: "#ProgressModal+handleProgressComplete"
+              - listitem [ref=e789]:
+                - link "progressModal.handleWebSocketError()" [ref=e790] [cursor=pointer]:
+                  - /url: "#ProgressModal+handleWebSocketError"
+              - listitem [ref=e791]:
+                - link "progressModal.updateUI()" [ref=e792] [cursor=pointer]:
+                  - /url: "#ProgressModal+updateUI"
+              - listitem [ref=e793]:
+                - link "progressModal.showSuccess(message)" [ref=e794] [cursor=pointer]:
+                  - /url: "#ProgressModal+showSuccess"
+              - listitem [ref=e795]:
+                - link "progressModal.showError(message)" [ref=e796] [cursor=pointer]:
+                  - /url: "#ProgressModal+showError"
+              - listitem [ref=e797]:
+                - link "progressModal.showCompleteButtons()" [ref=e798] [cursor=pointer]:
+                  - /url: "#ProgressModal+showCompleteButtons"
+              - listitem [ref=e799]:
+                - link "progressModal.handleCancel()" [ref=e800] [cursor=pointer]:
+                  - /url: "#ProgressModal+handleCancel"
+              - listitem [ref=e801]:
+                - link "progressModal.showCancelConfirmation()" [ref=e802] [cursor=pointer]:
+                  - /url: "#ProgressModal+showCancelConfirmation"
+              - listitem [ref=e803]:
+                - link "progressModal.handleClose()" [ref=e804] [cursor=pointer]:
+                  - /url: "#ProgressModal+handleClose"
+              - listitem [ref=e805]:
+                - link "progressModal.isActiveProgress()" [ref=e806] [cursor=pointer]:
+                  - /url: "#ProgressModal+isActiveProgress"
+                - text: ⇒
+                - code [ref=e807]: boolean
+              - listitem [ref=e808]:
+                - link "progressModal.resetProgressState()" [ref=e809] [cursor=pointer]:
+                  - /url: "#ProgressModal+resetProgressState"
+              - listitem [ref=e810]:
+                - link "progressModal.cleanup()" [ref=e811] [cursor=pointer]:
+                  - /url: "#ProgressModal+cleanup"
+              - listitem [ref=e812]:
+                - link "progressModal.destroy()" [ref=e813] [cursor=pointer]:
+                  - /url: "#ProgressModal+destroy"
+        - separator [ref=e814]
+        - paragraph
+        - heading "progressModal.createModalHTML()" [level=4] [ref=e815]
+        - paragraph [ref=e816]: Create the modal HTML structure following HexTrackr patterns
+        - paragraph [ref=e817]:
+          - strong [ref=e818]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e819] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e820] [cursor=pointer]: ProgressModal
+        - separator [ref=e821]
+        - paragraph
+        - heading "progressModal.setupEventListeners()" [level=4] [ref=e822]
+        - paragraph [ref=e823]: Setup event listeners for modal interactions
+        - paragraph [ref=e824]:
+          - strong [ref=e825]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e826] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e827] [cursor=pointer]: ProgressModal
+        - separator [ref=e828]
+        - paragraph
+        - heading "progressModal.setupWebSocketListeners()" [level=4] [ref=e829]
+        - paragraph [ref=e830]: Setup WebSocket event listeners
+        - paragraph [ref=e831]:
+          - strong [ref=e832]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e833] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e834] [cursor=pointer]: ProgressModal
+        - separator [ref=e835]
+        - paragraph
+        - heading "progressModal.removeWebSocketListeners()" [level=4] [ref=e836]
+        - paragraph [ref=e837]: Remove WebSocket event listeners
+        - paragraph [ref=e838]:
+          - strong [ref=e839]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e840] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e841] [cursor=pointer]: ProgressModal
+        - separator [ref=e842]
+        - paragraph
+        - heading "progressModal.show(options)" [level=4] [ref=e843]
+        - paragraph [ref=e844]: Show the progress modal
+        - paragraph [ref=e845]:
+          - strong [ref=e846]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e847] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e848] [cursor=pointer]: ProgressModal
+        - grid [ref=e852]:
+          - rowgroup [ref=e854]:
+            - row "Param Type Description" [ref=e855]:
+              - columnheader "Param" [ref=e856]:
+                - generic [ref=e859] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e860]:
+                - generic [ref=e863] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e864]:
+                - generic [ref=e867] [cursor=pointer]: Description
+          - rowgroup [ref=e868]:
+            - row "options Object Configuration options" [ref=e869]:
+              - gridcell "options" [ref=e870]
+              - gridcell "Object" [ref=e871]
+              - gridcell "Configuration options" [ref=e872]
+            - row "options.title string Modal title" [ref=e873]:
+              - gridcell "options.title" [ref=e874]
+              - gridcell "string" [ref=e875]
+              - gridcell "Modal title" [ref=e876]
+            - row "options.sessionId string Session ID for WebSocket room" [ref=e877]:
+              - gridcell "options.sessionId" [ref=e878]
+              - gridcell "string" [ref=e879]
+              - gridcell "Session ID for WebSocket room" [ref=e880]
+            - row "options.allowCancel boolean Whether to show cancel button" [ref=e881]:
+              - gridcell "options.allowCancel" [ref=e882]
+              - gridcell "boolean" [ref=e883]
+              - gridcell "Whether to show cancel button" [ref=e884]
+            - row "options.onCancel function Callback for cancel action" [ref=e885]:
+              - gridcell "options.onCancel" [ref=e886]
+              - gridcell "function" [ref=e887]
+              - gridcell "Callback for cancel action" [ref=e888]
+            - row "options.initialMessage string Initial status message" [ref=e889]:
+              - gridcell "options.initialMessage" [ref=e890]
+              - gridcell "string" [ref=e891]
+              - gridcell "Initial status message" [ref=e892]
+          - rowgroup
+          - rowgroup [ref=e893]
+          - rowgroup
+        - separator [ref=e894]
+        - paragraph
+        - heading "progressModal.hide()" [level=4] [ref=e895]
+        - paragraph [ref=e896]: Hide the progress modal
+        - paragraph [ref=e897]:
+          - strong [ref=e898]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e899] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e900] [cursor=pointer]: ProgressModal
+        - separator [ref=e901]
+        - paragraph
+        - heading "progressModal.update(data)" [level=4] [ref=e902]
+        - paragraph [ref=e903]: Update progress manually (for non-WebSocket usage)
+        - paragraph [ref=e904]:
+          - strong [ref=e905]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e906] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e907] [cursor=pointer]: ProgressModal
+        - grid [ref=e911]:
+          - rowgroup [ref=e913]:
+            - row "Param Type Description" [ref=e914]:
+              - columnheader "Param" [ref=e915]:
+                - generic [ref=e918] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e919]:
+                - generic [ref=e922] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e923]:
+                - generic [ref=e926] [cursor=pointer]: Description
+          - rowgroup [ref=e927]:
+            - row "data Object Progress data" [ref=e928]:
+              - gridcell "data" [ref=e929]
+              - gridcell "Object" [ref=e930]
+              - gridcell "Progress data" [ref=e931]
+          - rowgroup
+          - rowgroup [ref=e932]
+          - rowgroup
+        - separator [ref=e933]
+        - paragraph
+        - heading "progressModal.handleProgressUpdate(data)" [level=4] [ref=e934]
+        - paragraph [ref=e935]: Handle progress updates from WebSocket
+        - paragraph [ref=e936]:
+          - strong [ref=e937]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e938] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e939] [cursor=pointer]: ProgressModal
+        - grid [ref=e943]:
+          - rowgroup [ref=e945]:
+            - row "Param Type Description" [ref=e946]:
+              - columnheader "Param" [ref=e947]:
+                - generic [ref=e950] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e951]:
+                - generic [ref=e954] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e955]:
+                - generic [ref=e958] [cursor=pointer]: Description
+          - rowgroup [ref=e959]:
+            - row "data Object Progress data from WebSocket" [ref=e960]:
+              - gridcell "data" [ref=e961]
+              - gridcell "Object" [ref=e962]
+              - gridcell "Progress data from WebSocket" [ref=e963]
+          - rowgroup
+          - rowgroup [ref=e964]
+          - rowgroup
+        - separator [ref=e965]
+        - paragraph
+        - heading "progressModal.handleProgressStatus(data)" [level=4] [ref=e966]
+        - paragraph [ref=e967]: Handle status updates from WebSocket
+        - paragraph [ref=e968]:
+          - strong [ref=e969]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e970] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e971] [cursor=pointer]: ProgressModal
+        - grid [ref=e975]:
+          - rowgroup [ref=e977]:
+            - row "Param Type Description" [ref=e978]:
+              - columnheader "Param" [ref=e979]:
+                - generic [ref=e982] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e983]:
+                - generic [ref=e986] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e987]:
+                - generic [ref=e990] [cursor=pointer]: Description
+          - rowgroup [ref=e991]:
+            - row "data Object Status data from WebSocket" [ref=e992]:
+              - gridcell "data" [ref=e993]
+              - gridcell "Object" [ref=e994]
+              - gridcell "Status data from WebSocket" [ref=e995]
+          - rowgroup
+          - rowgroup [ref=e996]
+          - rowgroup
+        - separator [ref=e997]
+        - paragraph
+        - heading "progressModal.handleProgressComplete(data)" [level=4] [ref=e998]
+        - paragraph [ref=e999]: Handle progress completion from WebSocket
+        - paragraph [ref=e1000]:
+          - strong [ref=e1001]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1002] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1003] [cursor=pointer]: ProgressModal
+        - grid [ref=e1007]:
+          - rowgroup [ref=e1009]:
+            - row "Param Type Description" [ref=e1010]:
+              - columnheader "Param" [ref=e1011]:
+                - generic [ref=e1014] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1015]:
+                - generic [ref=e1018] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1019]:
+                - generic [ref=e1022] [cursor=pointer]: Description
+          - rowgroup [ref=e1023]:
+            - row "data Object Completion data from WebSocket" [ref=e1024]:
+              - gridcell "data" [ref=e1025]
+              - gridcell "Object" [ref=e1026]
+              - gridcell "Completion data from WebSocket" [ref=e1027]
+          - rowgroup
+          - rowgroup [ref=e1028]
+          - rowgroup
+        - separator [ref=e1029]
+        - paragraph
+        - heading "progressModal.handleWebSocketError()" [level=4] [ref=e1030]
+        - paragraph [ref=e1031]: Handle WebSocket connection errors
+        - paragraph [ref=e1032]:
+          - strong [ref=e1033]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1034] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1035] [cursor=pointer]: ProgressModal
+        - separator [ref=e1036]
+        - paragraph
+        - heading "progressModal.updateUI()" [level=4] [ref=e1037]
+        - paragraph [ref=e1038]: Update the UI with current progress data
+        - paragraph [ref=e1039]:
+          - strong [ref=e1040]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1041] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1042] [cursor=pointer]: ProgressModal
+        - separator [ref=e1043]
+        - paragraph
+        - heading "progressModal.showSuccess(message)" [level=4] [ref=e1044]
+        - paragraph [ref=e1045]: Show success state
+        - paragraph [ref=e1046]:
+          - strong [ref=e1047]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1048] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1049] [cursor=pointer]: ProgressModal
+        - grid [ref=e1053]:
+          - rowgroup [ref=e1055]:
+            - row "Param Type Description" [ref=e1056]:
+              - columnheader "Param" [ref=e1057]:
+                - generic [ref=e1060] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1061]:
+                - generic [ref=e1064] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1065]:
+                - generic [ref=e1068] [cursor=pointer]: Description
+          - rowgroup [ref=e1069]:
+            - row "message string Success message" [ref=e1070]:
+              - gridcell "message" [ref=e1071]
+              - gridcell "string" [ref=e1072]
+              - gridcell "Success message" [ref=e1073]
+          - rowgroup
+          - rowgroup [ref=e1074]
+          - rowgroup
+        - separator [ref=e1075]
+        - paragraph
+        - heading "progressModal.showError(message)" [level=4] [ref=e1076]
+        - paragraph [ref=e1077]: Show error state
+        - paragraph [ref=e1078]:
+          - strong [ref=e1079]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1080] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1081] [cursor=pointer]: ProgressModal
+        - grid [ref=e1085]:
+          - rowgroup [ref=e1087]:
+            - row "Param Type Description" [ref=e1088]:
+              - columnheader "Param" [ref=e1089]:
+                - generic [ref=e1092] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1093]:
+                - generic [ref=e1096] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1097]:
+                - generic [ref=e1100] [cursor=pointer]: Description
+          - rowgroup [ref=e1101]:
+            - row "message string Error message" [ref=e1102]:
+              - gridcell "message" [ref=e1103]
+              - gridcell "string" [ref=e1104]
+              - gridcell "Error message" [ref=e1105]
+          - rowgroup
+          - rowgroup [ref=e1106]
+          - rowgroup
+        - separator [ref=e1107]
+        - paragraph
+        - heading "progressModal.showCompleteButtons()" [level=4] [ref=e1108]
+        - paragraph [ref=e1109]: Show completion buttons (hide cancel, show close)
+        - paragraph [ref=e1110]:
+          - strong [ref=e1111]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1112] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1113] [cursor=pointer]: ProgressModal
+        - separator [ref=e1114]
+        - paragraph
+        - heading "progressModal.handleCancel()" [level=4] [ref=e1115]
+        - paragraph [ref=e1116]: Handle cancel button click
+        - paragraph [ref=e1117]:
+          - strong [ref=e1118]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1119] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1120] [cursor=pointer]: ProgressModal
+        - separator [ref=e1121]
+        - paragraph
+        - heading "progressModal.showCancelConfirmation()" [level=4] [ref=e1122]
+        - paragraph [ref=e1123]: Show cancel confirmation dialog
+        - paragraph [ref=e1124]:
+          - strong [ref=e1125]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1126] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1127] [cursor=pointer]: ProgressModal
+        - separator [ref=e1128]
+        - paragraph
+        - heading "progressModal.handleClose()" [level=4] [ref=e1129]
+        - paragraph [ref=e1130]: Handle close button click
+        - paragraph [ref=e1131]:
+          - strong [ref=e1132]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1133] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1134] [cursor=pointer]: ProgressModal
+        - separator [ref=e1135]
+        - paragraph
+        - heading "progressModal.isActiveProgress() ⇒ boolean" [level=4] [ref=e1136]:
+          - text: progressModal.isActiveProgress() ⇒
+          - code [ref=e1137]: boolean
+        - paragraph [ref=e1138]: Check if progress is actively running
+        - paragraph [ref=e1139]:
+          - strong [ref=e1140]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1141] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1142] [cursor=pointer]: ProgressModal
+          - strong [ref=e1143]: Returns
+          - text: ":"
+          - code [ref=e1144]: boolean
+          - text: "- True if progress is active"
+        - separator [ref=e1145]
+        - paragraph
+        - heading "progressModal.resetProgressState()" [level=4] [ref=e1146]
+        - paragraph [ref=e1147]: Reset progress state to initial values
+        - paragraph [ref=e1148]:
+          - strong [ref=e1149]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1150] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1151] [cursor=pointer]: ProgressModal
+        - separator [ref=e1152]
+        - paragraph
+        - heading "progressModal.cleanup()" [level=4] [ref=e1153]
+        - paragraph [ref=e1154]: Cleanup resources when modal is hidden
+        - paragraph [ref=e1155]:
+          - strong [ref=e1156]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1157] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1158] [cursor=pointer]: ProgressModal
+        - separator [ref=e1159]
+        - paragraph
+        - heading "progressModal.destroy()" [level=4] [ref=e1160]
+        - paragraph [ref=e1161]: Destroy the modal and remove all event listeners
+        - paragraph [ref=e1162]:
+          - strong [ref=e1163]: Kind
+          - text: ": instance method of"
+          - link "ProgressModal" [ref=e1164] [cursor=pointer]:
+            - /url: "#ProgressModal"
+            - code [ref=e1165] [cursor=pointer]: ProgressModal
+        - separator [ref=e1166]
+        - paragraph
+        - heading "ToastManager" [level=3] [ref=e1167]
+        - paragraph [ref=e1168]:
+          - text: Toast Manager class for handling all user notifications
+          - text: Provides consistent UI feedback across the application
+        - paragraph [ref=e1169]:
+          - strong [ref=e1170]: Kind
+          - text: ": global class"
+        - list [ref=e1171]:
+          - listitem [ref=e1172]:
+            - link "ToastManager" [ref=e1173] [cursor=pointer]:
+              - /url: "#ToastManager"
+            - list [ref=e1174]:
+              - listitem [ref=e1175]:
+                - link "toastManager.showToast(message, [type], [options])" [ref=e1176] [cursor=pointer]:
+                  - /url: "#ToastManager+showToast"
+                - text: ⇒
+                - code [ref=e1177]: string
+              - listitem [ref=e1178]:
+                - link "toastManager.showLoading(message, [options])" [ref=e1179] [cursor=pointer]:
+                  - /url: "#ToastManager+showLoading"
+                - text: ⇒
+                - code [ref=e1180]: string
+              - listitem [ref=e1181]:
+                - link "toastManager.hideLoading()" [ref=e1182] [cursor=pointer]:
+                  - /url: "#ToastManager+hideLoading"
+              - listitem [ref=e1183]:
+                - link "toastManager.showError(message, [error], [options])" [ref=e1184] [cursor=pointer]:
+                  - /url: "#ToastManager+showError"
+              - listitem [ref=e1185]:
+                - link "toastManager.showSuccess(message, [options])" [ref=e1186] [cursor=pointer]:
+                  - /url: "#ToastManager+showSuccess"
+              - listitem [ref=e1187]:
+                - link "toastManager.showWarning(message, [options])" [ref=e1188] [cursor=pointer]:
+                  - /url: "#ToastManager+showWarning"
+              - listitem [ref=e1189]:
+                - link "toastManager.showInfo(message, [options])" [ref=e1190] [cursor=pointer]:
+                  - /url: "#ToastManager+showInfo"
+              - listitem [ref=e1191]:
+                - link "toastManager.showCVEStatus(cveId, status, [data])" [ref=e1192] [cursor=pointer]:
+                  - /url: "#ToastManager+showCVEStatus"
+              - listitem [ref=e1193]:
+                - link "toastManager.clearAll()" [ref=e1194] [cursor=pointer]:
+                  - /url: "#ToastManager+clearAll"
+              - listitem [ref=e1195]:
+                - link "toastManager.showModalError(modalId, message, [options])" [ref=e1196] [cursor=pointer]:
+                  - /url: "#ToastManager+showModalError"
+              - listitem [ref=e1197]:
+                - link "toastManager.clearModalErrors(modalId)" [ref=e1198] [cursor=pointer]:
+                  - /url: "#ToastManager+clearModalErrors"
+        - separator [ref=e1199]
+        - paragraph
+        - heading "toastManager.showToast(message, [type], [options]) ⇒ string" [level=4] [ref=e1200]:
+          - text: toastManager.showToast(message, [type], [options]) ⇒
+          - code [ref=e1201]: string
+        - paragraph [ref=e1202]: Show a toast notification
+        - paragraph [ref=e1203]:
+          - strong [ref=e1204]: Kind
+          - text: ": instance method of"
+          - link "ToastManager" [ref=e1205] [cursor=pointer]:
+            - /url: "#ToastManager"
+            - code [ref=e1206] [cursor=pointer]: ToastManager
+          - strong [ref=e1207]: Returns
+          - text: ":"
+          - code [ref=e1208]: string
+          - text: "- Toast ID for reference"
+        - grid [ref=e1212]:
+          - rowgroup [ref=e1214]:
+            - row "Param Type Default Description" [ref=e1215]:
+              - columnheader "Param" [ref=e1216]:
+                - generic [ref=e1219] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1220]:
+                - generic [ref=e1223] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e1224]:
+                - generic [ref=e1227] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e1228]:
+                - generic [ref=e1231] [cursor=pointer]: Description
+          - rowgroup [ref=e1232]:
+            - row "message string Message to display" [ref=e1233]:
+              - gridcell "message" [ref=e1234]
+              - gridcell "string" [ref=e1235]
+              - gridcell [ref=e1236]
+              - gridcell "Message to display" [ref=e1237]
+            - 'row "[type] string \"''info''\" Type: success, error, warning, info, danger" [ref=e1238]':
+              - gridcell "[type]" [ref=e1239]
+              - gridcell "string" [ref=e1240]
+              - gridcell "\"'info'\"" [ref=e1241]
+              - 'gridcell "Type: success, error, warning, info, danger" [ref=e1242]'
+            - row "[options] Object Additional options" [ref=e1243]:
+              - gridcell "[options]" [ref=e1244]
+              - gridcell "Object" [ref=e1245]
+              - gridcell [ref=e1246]
+              - gridcell "Additional options" [ref=e1247]
+          - rowgroup
+          - rowgroup [ref=e1248]
+          - rowgroup
+        - separator [ref=e1249]
+        - paragraph
+        - heading "toastManager.showLoading(message, [options]) ⇒ string" [level=4] [ref=e1250]:
+          - text: toastManager.showLoading(message, [options]) ⇒
+          - code [ref=e1251]: string
+        - paragraph [ref=e1252]: Show a loading toast with spinner
+        - paragraph [ref=e1253]:
+          - strong [ref=e1254]: Kind
+          - text: ": instance method of"
+          - link "ToastManager" [ref=e1255] [cursor=pointer]:
+            - /url: "#ToastManager"
+            - code [ref=e1256] [cursor=pointer]: ToastManager
+          - strong [ref=e1257]: Returns
+          - text: ":"
+          - code [ref=e1258]: string
+          - text: "- Loading toast ID"
+        - grid [ref=e1262]:
+          - rowgroup [ref=e1264]:
+            - row "Param Type Default Description" [ref=e1265]:
+              - columnheader "Param" [ref=e1266]:
+                - generic [ref=e1269] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1270]:
+                - generic [ref=e1273] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e1274]:
+                - generic [ref=e1277] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e1278]:
+                - generic [ref=e1281] [cursor=pointer]: Description
+          - rowgroup [ref=e1282]:
+            - row "message string \"Loading...\" Loading message" [ref=e1283]:
+              - gridcell "message" [ref=e1284]
+              - gridcell "string" [ref=e1285]
+              - gridcell "\"Loading...\"" [ref=e1286]
+              - gridcell "Loading message" [ref=e1287]
+            - row "[options] Object Additional options" [ref=e1288]:
+              - gridcell "[options]" [ref=e1289]
+              - gridcell "Object" [ref=e1290]
+              - gridcell [ref=e1291]
+              - gridcell "Additional options" [ref=e1292]
+          - rowgroup
+          - rowgroup [ref=e1293]
+          - rowgroup
+        - separator [ref=e1294]
+        - paragraph
+        - heading "toastManager.hideLoading()" [level=4] [ref=e1295]
+        - paragraph [ref=e1296]: Hide the loading toast
+        - paragraph [ref=e1297]:
+          - strong [ref=e1298]: Kind
+          - text: ": instance method of"
+          - link "ToastManager" [ref=e1299] [cursor=pointer]:
+            - /url: "#ToastManager"
+            - code [ref=e1300] [cursor=pointer]: ToastManager
+        - separator [ref=e1301]
+        - paragraph
+        - heading "toastManager.showError(message, [error], [options])" [level=4] [ref=e1302]
+        - paragraph [ref=e1303]: Show error with details
+        - paragraph [ref=e1304]:
+          - strong [ref=e1305]: Kind
+          - text: ": instance method of"
+          - link "ToastManager" [ref=e1306] [cursor=pointer]:
+            - /url: "#ToastManager"
+            - code [ref=e1307] [cursor=pointer]: ToastManager
+        - grid [ref=e1311]:
+          - rowgroup [ref=e1313]:
+            - row "Param Type Default Description" [ref=e1314]:
+              - columnheader "Param" [ref=e1315]:
+                - generic [ref=e1318] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1319]:
+                - generic [ref=e1322] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e1323]:
+                - generic [ref=e1326] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e1327]:
+                - generic [ref=e1330] [cursor=pointer]: Description
+          - rowgroup [ref=e1331]:
+            - row "message string Error message" [ref=e1332]:
+              - gridcell "message" [ref=e1333]
+              - gridcell "string" [ref=e1334]
+              - gridcell [ref=e1335]
+              - gridcell "Error message" [ref=e1336]
+            - row "[error] Error | Object Error object with details" [ref=e1337]:
+              - gridcell "[error]" [ref=e1338]
+              - gridcell "Error | Object" [ref=e1339]
+              - gridcell [ref=e1340]
+              - gridcell "Error object with details" [ref=e1341]
+            - row "[options] Object Additional options" [ref=e1342]:
+              - gridcell "[options]" [ref=e1343]
+              - gridcell "Object" [ref=e1344]
+              - gridcell [ref=e1345]
+              - gridcell "Additional options" [ref=e1346]
+          - rowgroup
+          - rowgroup [ref=e1347]
+          - rowgroup
+        - separator [ref=e1348]
+        - paragraph
+        - heading "toastManager.showSuccess(message, [options])" [level=4] [ref=e1349]
+        - paragraph [ref=e1350]: Show success message
+        - paragraph [ref=e1351]:
+          - strong [ref=e1352]: Kind
+          - text: ": instance method of"
+          - link "ToastManager" [ref=e1353] [cursor=pointer]:
+            - /url: "#ToastManager"
+            - code [ref=e1354] [cursor=pointer]: ToastManager
+        - grid [ref=e1358]:
+          - rowgroup [ref=e1360]:
+            - row "Param Type Description" [ref=e1361]:
+              - columnheader "Param" [ref=e1362]:
+                - generic [ref=e1365] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1366]:
+                - generic [ref=e1369] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1370]:
+                - generic [ref=e1373] [cursor=pointer]: Description
+          - rowgroup [ref=e1374]:
+            - row "message string Success message" [ref=e1375]:
+              - gridcell "message" [ref=e1376]
+              - gridcell "string" [ref=e1377]
+              - gridcell "Success message" [ref=e1378]
+            - row "[options] Object Additional options" [ref=e1379]:
+              - gridcell "[options]" [ref=e1380]
+              - gridcell "Object" [ref=e1381]
+              - gridcell "Additional options" [ref=e1382]
+          - rowgroup
+          - rowgroup [ref=e1383]
+          - rowgroup
+        - separator [ref=e1384]
+        - paragraph
+        - heading "toastManager.showWarning(message, [options])" [level=4] [ref=e1385]
+        - paragraph [ref=e1386]: Show warning message
+        - paragraph [ref=e1387]:
+          - strong [ref=e1388]: Kind
+          - text: ": instance method of"
+          - link "ToastManager" [ref=e1389] [cursor=pointer]:
+            - /url: "#ToastManager"
+            - code [ref=e1390] [cursor=pointer]: ToastManager
+        - grid [ref=e1394]:
+          - rowgroup [ref=e1396]:
+            - row "Param Type Description" [ref=e1397]:
+              - columnheader "Param" [ref=e1398]:
+                - generic [ref=e1401] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1402]:
+                - generic [ref=e1405] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1406]:
+                - generic [ref=e1409] [cursor=pointer]: Description
+          - rowgroup [ref=e1410]:
+            - row "message string Warning message" [ref=e1411]:
+              - gridcell "message" [ref=e1412]
+              - gridcell "string" [ref=e1413]
+              - gridcell "Warning message" [ref=e1414]
+            - row "[options] Object Additional options" [ref=e1415]:
+              - gridcell "[options]" [ref=e1416]
+              - gridcell "Object" [ref=e1417]
+              - gridcell "Additional options" [ref=e1418]
+          - rowgroup
+          - rowgroup [ref=e1419]
+          - rowgroup
+        - separator [ref=e1420]
+        - paragraph
+        - heading "toastManager.showInfo(message, [options])" [level=4] [ref=e1421]
+        - paragraph [ref=e1422]: Show info message
+        - paragraph [ref=e1423]:
+          - strong [ref=e1424]: Kind
+          - text: ": instance method of"
+          - link "ToastManager" [ref=e1425] [cursor=pointer]:
+            - /url: "#ToastManager"
+            - code [ref=e1426] [cursor=pointer]: ToastManager
+        - grid [ref=e1430]:
+          - rowgroup [ref=e1432]:
+            - row "Param Type Description" [ref=e1433]:
+              - columnheader "Param" [ref=e1434]:
+                - generic [ref=e1437] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1438]:
+                - generic [ref=e1441] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1442]:
+                - generic [ref=e1445] [cursor=pointer]: Description
+          - rowgroup [ref=e1446]:
+            - row "message string Info message" [ref=e1447]:
+              - gridcell "message" [ref=e1448]
+              - gridcell "string" [ref=e1449]
+              - gridcell "Info message" [ref=e1450]
+            - row "[options] Object Additional options" [ref=e1451]:
+              - gridcell "[options]" [ref=e1452]
+              - gridcell "Object" [ref=e1453]
+              - gridcell "Additional options" [ref=e1454]
+          - rowgroup
+          - rowgroup [ref=e1455]
+          - rowgroup
+        - separator [ref=e1456]
+        - paragraph
+        - heading "toastManager.showCVEStatus(cveId, status, [data])" [level=4] [ref=e1457]
+        - paragraph [ref=e1458]: Show a toast for CVE lookup status
+        - paragraph [ref=e1459]:
+          - strong [ref=e1460]: Kind
+          - text: ": instance method of"
+          - link "ToastManager" [ref=e1461] [cursor=pointer]:
+            - /url: "#ToastManager"
+            - code [ref=e1462] [cursor=pointer]: ToastManager
+        - grid [ref=e1466]:
+          - rowgroup [ref=e1468]:
+            - row "Param Type Description" [ref=e1469]:
+              - columnheader "Param" [ref=e1470]:
+                - generic [ref=e1473] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1474]:
+                - generic [ref=e1477] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1478]:
+                - generic [ref=e1481] [cursor=pointer]: Description
+          - rowgroup [ref=e1482]:
+            - row "cveId string CVE identifier" [ref=e1483]:
+              - gridcell "cveId" [ref=e1484]
+              - gridcell "string" [ref=e1485]
+              - gridcell "CVE identifier" [ref=e1486]
+            - 'row "status string Status: looking, found, notfound, error" [ref=e1487]':
+              - gridcell "status" [ref=e1488]
+              - gridcell "string" [ref=e1489]
+              - 'gridcell "Status: looking, found, notfound, error" [ref=e1490]'
+            - row "[data] Object Additional data" [ref=e1491]:
+              - gridcell "[data]" [ref=e1492]
+              - gridcell "Object" [ref=e1493]
+              - gridcell "Additional data" [ref=e1494]
+          - rowgroup
+          - rowgroup [ref=e1495]
+          - rowgroup
+        - separator [ref=e1496]
+        - paragraph
+        - heading "toastManager.clearAll()" [level=4] [ref=e1497]
+        - paragraph [ref=e1498]: Clear all toasts
+        - paragraph [ref=e1499]:
+          - strong [ref=e1500]: Kind
+          - text: ": instance method of"
+          - link "ToastManager" [ref=e1501] [cursor=pointer]:
+            - /url: "#ToastManager"
+            - code [ref=e1502] [cursor=pointer]: ToastManager
+        - separator [ref=e1503]
+        - paragraph
+        - heading "toastManager.showModalError(modalId, message, [options])" [level=4] [ref=e1504]
+        - paragraph [ref=e1505]: Show modal error state
+        - paragraph [ref=e1506]:
+          - strong [ref=e1507]: Kind
+          - text: ": instance method of"
+          - link "ToastManager" [ref=e1508] [cursor=pointer]:
+            - /url: "#ToastManager"
+            - code [ref=e1509] [cursor=pointer]: ToastManager
+        - grid [ref=e1513]:
+          - rowgroup [ref=e1515]:
+            - row "Param Type Description" [ref=e1516]:
+              - columnheader "Param" [ref=e1517]:
+                - generic [ref=e1520] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1521]:
+                - generic [ref=e1524] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1525]:
+                - generic [ref=e1528] [cursor=pointer]: Description
+          - rowgroup [ref=e1529]:
+            - row "modalId string Modal element ID" [ref=e1530]:
+              - gridcell "modalId" [ref=e1531]
+              - gridcell "string" [ref=e1532]
+              - gridcell "Modal element ID" [ref=e1533]
+            - row "message string Error message" [ref=e1534]:
+              - gridcell "message" [ref=e1535]
+              - gridcell "string" [ref=e1536]
+              - gridcell "Error message" [ref=e1537]
+            - row "[options] Object Additional options" [ref=e1538]:
+              - gridcell "[options]" [ref=e1539]
+              - gridcell "Object" [ref=e1540]
+              - gridcell "Additional options" [ref=e1541]
+          - rowgroup
+          - rowgroup [ref=e1542]
+          - rowgroup
+        - separator [ref=e1543]
+        - paragraph
+        - heading "toastManager.clearModalErrors(modalId)" [level=4] [ref=e1544]
+        - paragraph [ref=e1545]: Clear modal errors
+        - paragraph [ref=e1546]:
+          - strong [ref=e1547]: Kind
+          - text: ": instance method of"
+          - link "ToastManager" [ref=e1548] [cursor=pointer]:
+            - /url: "#ToastManager"
+            - code [ref=e1549] [cursor=pointer]: ToastManager
+        - grid [ref=e1553]:
+          - rowgroup [ref=e1555]:
+            - row "Param Type Description" [ref=e1556]:
+              - columnheader "Param" [ref=e1557]:
+                - generic [ref=e1560] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1561]:
+                - generic [ref=e1564] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1565]:
+                - generic [ref=e1568] [cursor=pointer]: Description
+          - rowgroup [ref=e1569]:
+            - row "modalId string Modal element ID" [ref=e1570]:
+              - gridcell "modalId" [ref=e1571]
+              - gridcell "string" [ref=e1572]
+              - gridcell "Modal element ID" [ref=e1573]
+          - rowgroup
+          - rowgroup [ref=e1574]
+          - rowgroup
+        - separator [ref=e1575]
+        - paragraph
+        - heading "VulnerabilityCardsManager" [level=3] [ref=e1576]
+        - paragraph [ref=e1577]: Manages device cards and vulnerability cards rendering with pagination
+        - paragraph [ref=e1578]:
+          - strong [ref=e1579]: Kind
+          - text: ": global class"
+        - list [ref=e1580]:
+          - listitem [ref=e1581]:
+            - link "VulnerabilityCardsManager" [ref=e1582] [cursor=pointer]:
+              - /url: "#VulnerabilityCardsManager"
+            - list [ref=e1583]:
+              - listitem [ref=e1584]:
+                - link "vulnerabilityCardsManager.renderDeviceCards()" [ref=e1585] [cursor=pointer]:
+                  - /url: "#VulnerabilityCardsManager+renderDeviceCards"
+              - listitem [ref=e1586]:
+                - link "vulnerabilityCardsManager.generateDeviceCardsHTML(devices)" [ref=e1587] [cursor=pointer]:
+                  - /url: "#VulnerabilityCardsManager+generateDeviceCardsHTML"
+                - text: ⇒
+                - code [ref=e1588]: string
+              - listitem [ref=e1589]:
+                - link "vulnerabilityCardsManager.renderVulnerabilityCards()" [ref=e1590] [cursor=pointer]:
+                  - /url: "#VulnerabilityCardsManager+renderVulnerabilityCards"
+              - listitem [ref=e1591]:
+                - link "vulnerabilityCardsManager.generateVulnerabilityCardsHTML(vulnEntries)" [ref=e1592] [cursor=pointer]:
+                  - /url: "#VulnerabilityCardsManager+generateVulnerabilityCardsHTML"
+                - text: ⇒
+                - code [ref=e1593]: string
+              - listitem [ref=e1594]:
+                - link "vulnerabilityCardsManager.generateVulnerabilityLinkHTML(cve, primaryVuln)" [ref=e1595] [cursor=pointer]:
+                  - /url: "#VulnerabilityCardsManager+generateVulnerabilityLinkHTML"
+                - text: ⇒
+                - code [ref=e1596]: string
+              - listitem [ref=e1597]:
+                - link "vulnerabilityCardsManager.generateVulnerabilityActionsHTML(cve, primaryVuln, vulnDataId)" [ref=e1598] [cursor=pointer]:
+                  - /url: "#VulnerabilityCardsManager+generateVulnerabilityActionsHTML"
+                - text: ⇒
+                - code [ref=e1599]: string
+              - listitem [ref=e1600]:
+                - link "vulnerabilityCardsManager.initializeSortable(container)" [ref=e1601] [cursor=pointer]:
+                  - /url: "#VulnerabilityCardsManager+initializeSortable"
+              - listitem [ref=e1602]:
+                - link "vulnerabilityCardsManager.updateForCurrentView(viewType)" [ref=e1603] [cursor=pointer]:
+                  - /url: "#VulnerabilityCardsManager+updateForCurrentView"
+        - separator [ref=e1604]
+        - paragraph
+        - heading "vulnerabilityCardsManager.renderDeviceCards()" [level=4] [ref=e1605]
+        - paragraph [ref=e1606]: Render device cards with VPR scoring and pagination
+        - paragraph [ref=e1607]:
+          - strong [ref=e1608]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityCardsManager" [ref=e1609] [cursor=pointer]:
+            - /url: "#VulnerabilityCardsManager"
+            - code [ref=e1610] [cursor=pointer]: VulnerabilityCardsManager
+        - separator [ref=e1611]
+        - paragraph
+        - heading "vulnerabilityCardsManager.generateDeviceCardsHTML(devices) ⇒ string" [level=4] [ref=e1612]:
+          - text: vulnerabilityCardsManager.generateDeviceCardsHTML(devices) ⇒
+          - code [ref=e1613]: string
+        - paragraph [ref=e1614]: Generate HTML for device cards
+        - paragraph [ref=e1615]:
+          - strong [ref=e1616]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityCardsManager" [ref=e1617] [cursor=pointer]:
+            - /url: "#VulnerabilityCardsManager"
+            - code [ref=e1618] [cursor=pointer]: VulnerabilityCardsManager
+          - strong [ref=e1619]: Returns
+          - text: ":"
+          - code [ref=e1620]: string
+          - text: "- HTML string for device cards"
+        - grid [ref=e1624]:
+          - rowgroup [ref=e1626]:
+            - row "Param Type Description" [ref=e1627]:
+              - columnheader "Param" [ref=e1628]:
+                - generic [ref=e1631] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1632]:
+                - generic [ref=e1635] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1636]:
+                - generic [ref=e1639] [cursor=pointer]: Description
+          - rowgroup [ref=e1640]:
+            - row "devices Array Array of device objects" [ref=e1641]:
+              - gridcell "devices" [ref=e1642]
+              - gridcell "Array" [ref=e1643]
+              - gridcell "Array of device objects" [ref=e1644]
+          - rowgroup
+          - rowgroup [ref=e1645]
+          - rowgroup
+        - separator [ref=e1646]
+        - paragraph
+        - heading "vulnerabilityCardsManager.renderVulnerabilityCards()" [level=4] [ref=e1647]
+        - paragraph [ref=e1648]: Render vulnerability cards grouped by CVE with VPR scoring
+        - paragraph [ref=e1649]:
+          - strong [ref=e1650]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityCardsManager" [ref=e1651] [cursor=pointer]:
+            - /url: "#VulnerabilityCardsManager"
+            - code [ref=e1652] [cursor=pointer]: VulnerabilityCardsManager
+        - separator [ref=e1653]
+        - paragraph
+        - heading "vulnerabilityCardsManager.generateVulnerabilityCardsHTML(vulnEntries) ⇒ string" [level=4] [ref=e1654]:
+          - text: vulnerabilityCardsManager.generateVulnerabilityCardsHTML(vulnEntries) ⇒
+          - code [ref=e1655]: string
+        - paragraph [ref=e1656]: Generate HTML for vulnerability cards
+        - paragraph [ref=e1657]:
+          - strong [ref=e1658]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityCardsManager" [ref=e1659] [cursor=pointer]:
+            - /url: "#VulnerabilityCardsManager"
+            - code [ref=e1660] [cursor=pointer]: VulnerabilityCardsManager
+          - strong [ref=e1661]: Returns
+          - text: ":"
+          - code [ref=e1662]: string
+          - text: "- HTML string for vulnerability cards"
+        - grid [ref=e1666]:
+          - rowgroup [ref=e1668]:
+            - row "Param Type Description" [ref=e1669]:
+              - columnheader "Param" [ref=e1670]:
+                - generic [ref=e1673] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1674]:
+                - generic [ref=e1677] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1678]:
+                - generic [ref=e1681] [cursor=pointer]: Description
+          - rowgroup [ref=e1682]:
+            - row "vulnEntries Array Array of [cve, vulns] tuples" [ref=e1683]:
+              - gridcell "vulnEntries" [ref=e1684]
+              - gridcell "Array" [ref=e1685]
+              - gridcell "Array of [cve, vulns] tuples" [ref=e1686]
+          - rowgroup
+          - rowgroup [ref=e1687]
+          - rowgroup
+        - separator [ref=e1688]
+        - paragraph
+        - heading "vulnerabilityCardsManager.generateVulnerabilityLinkHTML(cve, primaryVuln) ⇒ string" [level=4] [ref=e1689]:
+          - text: vulnerabilityCardsManager.generateVulnerabilityLinkHTML(cve, primaryVuln) ⇒
+          - code [ref=e1690]: string
+        - paragraph [ref=e1691]:
+          - text: Generate vulnerability link HTML (CVE or Cisco SA)
+          - text: Handles multiple CVEs with proper individual link creation
+        - paragraph [ref=e1692]:
+          - strong [ref=e1693]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityCardsManager" [ref=e1694] [cursor=pointer]:
+            - /url: "#VulnerabilityCardsManager"
+            - code [ref=e1695] [cursor=pointer]: VulnerabilityCardsManager
+          - strong [ref=e1696]: Returns
+          - text: ":"
+          - code [ref=e1697]: string
+          - text: "- HTML string for vulnerability link(s)"
+        - grid [ref=e1701]:
+          - rowgroup [ref=e1703]:
+            - row "Param Type Description" [ref=e1704]:
+              - columnheader "Param" [ref=e1705]:
+                - generic [ref=e1708] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1709]:
+                - generic [ref=e1712] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1713]:
+                - generic [ref=e1716] [cursor=pointer]: Description
+          - rowgroup [ref=e1717]:
+            - row "cve string CVE identifier(s) - may be comma/space separated" [ref=e1718]:
+              - gridcell "cve" [ref=e1719]
+              - gridcell "string" [ref=e1720]
+              - gridcell "CVE identifier(s) - may be comma/space separated" [ref=e1721]
+            - row "primaryVuln Object Primary vulnerability object" [ref=e1722]:
+              - gridcell "primaryVuln" [ref=e1723]
+              - gridcell "Object" [ref=e1724]
+              - gridcell "Primary vulnerability object" [ref=e1725]
+          - rowgroup
+          - rowgroup [ref=e1726]
+          - rowgroup
+        - separator [ref=e1727]
+        - paragraph
+        - heading "vulnerabilityCardsManager.generateVulnerabilityActionsHTML(cve, primaryVuln, vulnDataId) ⇒ string" [level=4] [ref=e1728]:
+          - text: vulnerabilityCardsManager.generateVulnerabilityActionsHTML(cve, primaryVuln, vulnDataId) ⇒
+          - code [ref=e1729]: string
+        - paragraph [ref=e1730]: Generate vulnerability card actions HTML
+        - paragraph [ref=e1731]:
+          - strong [ref=e1732]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityCardsManager" [ref=e1733] [cursor=pointer]:
+            - /url: "#VulnerabilityCardsManager"
+            - code [ref=e1734] [cursor=pointer]: VulnerabilityCardsManager
+          - strong [ref=e1735]: Returns
+          - text: ":"
+          - code [ref=e1736]: string
+          - text: "- HTML string for card actions"
+        - grid [ref=e1740]:
+          - rowgroup [ref=e1742]:
+            - row "Param Type Description" [ref=e1743]:
+              - columnheader "Param" [ref=e1744]:
+                - generic [ref=e1747] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1748]:
+                - generic [ref=e1751] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1752]:
+                - generic [ref=e1755] [cursor=pointer]: Description
+          - rowgroup [ref=e1756]:
+            - row "cve string CVE identifier" [ref=e1757]:
+              - gridcell "cve" [ref=e1758]
+              - gridcell "string" [ref=e1759]
+              - gridcell "CVE identifier" [ref=e1760]
+            - row "primaryVuln Object Primary vulnerability object" [ref=e1761]:
+              - gridcell "primaryVuln" [ref=e1762]
+              - gridcell "Object" [ref=e1763]
+              - gridcell "Primary vulnerability object" [ref=e1764]
+            - row "vulnDataId string Vulnerability data ID" [ref=e1765]:
+              - gridcell "vulnDataId" [ref=e1766]
+              - gridcell "string" [ref=e1767]
+              - gridcell "Vulnerability data ID" [ref=e1768]
+          - rowgroup
+          - rowgroup [ref=e1769]
+          - rowgroup
+        - separator [ref=e1770]
+        - paragraph
+        - heading "vulnerabilityCardsManager.initializeSortable(container)" [level=4] [ref=e1771]
+        - paragraph [ref=e1772]: Initialize Sortable.js for drag-and-drop functionality
+        - paragraph [ref=e1773]:
+          - strong [ref=e1774]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityCardsManager" [ref=e1775] [cursor=pointer]:
+            - /url: "#VulnerabilityCardsManager"
+            - code [ref=e1776] [cursor=pointer]: VulnerabilityCardsManager
+        - grid [ref=e1780]:
+          - rowgroup [ref=e1782]:
+            - row "Param Type Description" [ref=e1783]:
+              - columnheader "Param" [ref=e1784]:
+                - generic [ref=e1787] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1788]:
+                - generic [ref=e1791] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1792]:
+                - generic [ref=e1795] [cursor=pointer]: Description
+          - rowgroup [ref=e1796]:
+            - row "container HTMLElement Container element" [ref=e1797]:
+              - gridcell "container" [ref=e1798]
+              - gridcell "HTMLElement" [ref=e1799]
+              - gridcell "Container element" [ref=e1800]
+          - rowgroup
+          - rowgroup [ref=e1801]
+          - rowgroup
+        - separator [ref=e1802]
+        - paragraph
+        - heading "vulnerabilityCardsManager.updateForCurrentView(viewType)" [level=4] [ref=e1803]
+        - paragraph [ref=e1804]: Update cards for current view type
+        - paragraph [ref=e1805]:
+          - strong [ref=e1806]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityCardsManager" [ref=e1807] [cursor=pointer]:
+            - /url: "#VulnerabilityCardsManager"
+            - code [ref=e1808] [cursor=pointer]: VulnerabilityCardsManager
+        - grid [ref=e1812]:
+          - rowgroup [ref=e1814]:
+            - row "Param Type Description" [ref=e1815]:
+              - columnheader "Param" [ref=e1816]:
+                - generic [ref=e1819] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1820]:
+                - generic [ref=e1823] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e1824]:
+                - generic [ref=e1827] [cursor=pointer]: Description
+          - rowgroup [ref=e1828]:
+            - row "viewType string Current view type" [ref=e1829]:
+              - gridcell "viewType" [ref=e1830]
+              - gridcell "string" [ref=e1831]
+              - gridcell "Current view type" [ref=e1832]
+          - rowgroup
+          - rowgroup [ref=e1833]
+          - rowgroup
+        - separator [ref=e1834]
+        - paragraph
+        - heading "VulnerabilityDataManager" [level=3] [ref=e1835]
+        - paragraph [ref=e1836]: VulnerabilityDataManager - Centralized data management for vulnerability system
+        - paragraph [ref=e1837]: "Usage:"
+        - code [ref=e1839]:
+          - generic [ref=e1840]: const
+          - text: dataManager
+          - generic [ref=e1841]: =
+          - generic [ref=e1842]: new
+          - generic [ref=e1843]: VulnerabilityDataManager
+          - generic [ref=e1844]: (
+          - generic [ref=e1845]: "'/api'"
+          - generic [ref=e1846]: )
+          - generic [ref=e1847]: ;
+          - generic [ref=e1848]: await
+          - text: dataManager
+          - generic [ref=e1849]: .
+          - generic [ref=e1850]: loadData
+          - generic [ref=e1851]: (
+          - generic [ref=e1852]: )
+          - generic [ref=e1853]: ;
+          - generic [ref=e1854]: const
+          - text: filteredData
+          - generic [ref=e1855]: =
+          - text: dataManager
+          - generic [ref=e1856]: .
+          - generic [ref=e1857]: filterData
+          - generic [ref=e1858]: (
+          - generic [ref=e1859]: "'searchTerm'"
+          - generic [ref=e1860]: ","
+          - generic [ref=e1861]: "'Critical'"
+          - generic [ref=e1862]: )
+          - generic [ref=e1863]: ;
+        - paragraph [ref=e1864]:
+          - strong [ref=e1865]: Kind
+          - text: ": global class"
+        - list [ref=e1866]:
+          - listitem [ref=e1867]:
+            - link "VulnerabilityDataManager" [ref=e1868] [cursor=pointer]:
+              - /url: "#VulnerabilityDataManager"
+            - list [ref=e1869]:
+              - listitem [ref=e1870]:
+                - link "vulnerabilityDataManager.loadData()" [ref=e1871] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+loadData"
+                - text: ⇒
+                - code [ref=e1872]: Promise.<void>
+              - listitem [ref=e1873]:
+                - link "vulnerabilityDataManager.processDevices()" [ref=e1874] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+processDevices"
+              - listitem [ref=e1875]:
+                - link "vulnerabilityDataManager.loadStatistics()" [ref=e1876] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+loadStatistics"
+                - text: ⇒
+                - code [ref=e1877]: Promise.<void>
+              - listitem [ref=e1878]:
+                - link "vulnerabilityDataManager.filterData(searchTerm, severityFilter)" [ref=e1879] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+filterData"
+                - text: ⇒
+                - code [ref=e1880]: Array
+              - listitem [ref=e1881]:
+                - link "vulnerabilityDataManager.groupVulnerabilitiesByCVE()" [ref=e1882] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+groupVulnerabilitiesByCVE"
+                - text: ⇒
+                - code [ref=e1883]: Object
+              - listitem [ref=e1884]:
+                - link "vulnerabilityDataManager.getDeviceByHostname(hostname)" [ref=e1885] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+getDeviceByHostname"
+                - text: ⇒
+                - code [ref=e1886]: Object
+                - text: "|"
+                - code [ref=e1887]: "null"
+              - listitem [ref=e1888]:
+                - link "vulnerabilityDataManager.getStatistics()" [ref=e1889] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+getStatistics"
+                - text: ⇒
+                - code [ref=e1890]: Object
+              - listitem [ref=e1891]:
+                - link "vulnerabilityDataManager.getTrends()" [ref=e1892] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+getTrends"
+                - text: ⇒
+                - code [ref=e1893]: Object
+              - listitem [ref=e1894]:
+                - link "vulnerabilityDataManager.getHistoricalData()" [ref=e1895] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+getHistoricalData"
+                - text: ⇒
+                - code [ref=e1896]: Array
+              - listitem [ref=e1897]:
+                - link "vulnerabilityDataManager.getAllVulnerabilities()" [ref=e1898] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+getAllVulnerabilities"
+                - text: ⇒
+                - code [ref=e1899]: Array
+              - listitem [ref=e1900]:
+                - link "vulnerabilityDataManager.getFilteredVulnerabilities()" [ref=e1901] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+getFilteredVulnerabilities"
+                - text: ⇒
+                - code [ref=e1902]: Array
+              - listitem [ref=e1903]:
+                - link "vulnerabilityDataManager.getDevices()" [ref=e1904] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+getDevices"
+                - text: ⇒
+                - code [ref=e1905]: Array
+              - listitem [ref=e1906]:
+                - link "vulnerabilityDataManager.getUniqueAssetCount()" [ref=e1907] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+getUniqueAssetCount"
+                - text: ⇒
+                - code [ref=e1908]: number
+              - listitem [ref=e1909]:
+                - link "vulnerabilityDataManager.refreshData()" [ref=e1910] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+refreshData"
+                - text: ⇒
+                - code [ref=e1911]: Promise.<void>
+              - listitem [ref=e1912]:
+                - link "vulnerabilityDataManager.on(event, callback)" [ref=e1913] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+on"
+              - listitem [ref=e1914]:
+                - link "vulnerabilityDataManager.off(event, callback)" [ref=e1915] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+off"
+              - listitem [ref=e1916]:
+                - link "vulnerabilityDataManager.emit(event, data)" [ref=e1917] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+emit"
+              - listitem [ref=e1918]:
+                - link "vulnerabilityDataManager.extendTimelineData(originalData)" [ref=e1919] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+extendTimelineData"
+                - text: ⇒
+                - code [ref=e1920]: Array
+              - listitem [ref=e1921]:
+                - link "vulnerabilityDataManager.exportDeviceReport(hostname)" [ref=e1922] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+exportDeviceReport"
+                - text: ⇒
+                - code [ref=e1923]: Object
+                - text: "|"
+                - code [ref=e1924]: "null"
+              - listitem [ref=e1925]:
+                - link "vulnerabilityDataManager.saveVulnerability(id, formData)" [ref=e1926] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+saveVulnerability"
+                - text: ⇒
+                - code [ref=e1927]: Promise.<boolean>
+              - listitem [ref=e1928]:
+                - link "vulnerabilityDataManager.deleteVulnerability(id)" [ref=e1929] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+deleteVulnerability"
+                - text: ⇒
+                - code [ref=e1930]: Promise.<boolean>
+              - listitem [ref=e1931]:
+                - link "vulnerabilityDataManager.clearAllData()" [ref=e1932] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+clearAllData"
+                - text: ⇒
+                - code [ref=e1933]: Promise.<boolean>
+              - listitem [ref=e1934]:
+                - link "vulnerabilityDataManager.fetchTenableHistoricalData(apiKey, secretKey)" [ref=e1935] [cursor=pointer]:
+                  - /url: "#VulnerabilityDataManager+fetchTenableHistoricalData"
+                - text: ⇒
+                - code [ref=e1936]: Promise.<(Object|null)>
+        - separator [ref=e1937]
+        - paragraph
+        - heading "vulnerabilityDataManager.loadData() ⇒ Promise.<void>" [level=4] [ref=e1938]:
+          - text: vulnerabilityDataManager.loadData() ⇒
+          - code [ref=e1939]: Promise.<void>
+        - paragraph [ref=e1940]: Load vulnerability data from API endpoints
+        - paragraph [ref=e1941]:
+          - strong [ref=e1942]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e1943] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e1944] [cursor=pointer]: VulnerabilityDataManager
+        - separator [ref=e1945]
+        - paragraph
+        - heading "vulnerabilityDataManager.processDevices()" [level=4] [ref=e1946]
+        - paragraph [ref=e1947]: Process vulnerability data to create device aggregations
+        - paragraph [ref=e1948]:
+          - strong [ref=e1949]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e1950] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e1951] [cursor=pointer]: VulnerabilityDataManager
+        - separator [ref=e1952]
+        - paragraph
+        - heading "vulnerabilityDataManager.loadStatistics() ⇒ Promise.<void>" [level=4] [ref=e1953]:
+          - text: vulnerabilityDataManager.loadStatistics() ⇒
+          - code [ref=e1954]: Promise.<void>
+        - paragraph [ref=e1955]: Load statistics and trend data from API
+        - paragraph [ref=e1956]:
+          - strong [ref=e1957]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e1958] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e1959] [cursor=pointer]: VulnerabilityDataManager
+        - separator [ref=e1960]
+        - paragraph
+        - heading "vulnerabilityDataManager.filterData(searchTerm, severityFilter) ⇒ Array" [level=4] [ref=e1961]:
+          - text: vulnerabilityDataManager.filterData(searchTerm, severityFilter) ⇒
+          - code [ref=e1962]: Array
+        - paragraph [ref=e1963]: Filter vulnerability data based on search term and severity
+        - paragraph [ref=e1964]:
+          - strong [ref=e1965]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e1966] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e1967] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e1968]: Returns
+          - text: ":"
+          - code [ref=e1969]: Array
+          - text: "- Filtered vulnerabilities"
+        - grid [ref=e1973]:
+          - rowgroup [ref=e1975]:
+            - row "Param Type Default Description" [ref=e1976]:
+              - columnheader "Param" [ref=e1977]:
+                - generic [ref=e1980] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e1981]:
+                - generic [ref=e1984] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e1985]:
+                - generic [ref=e1988] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e1989]:
+                - generic [ref=e1992] [cursor=pointer]: Description
+          - rowgroup [ref=e1993]:
+            - row "searchTerm string null Search term for hostname, CVE, or plugin name" [ref=e1994]:
+              - gridcell "searchTerm" [ref=e1995]
+              - gridcell "string" [ref=e1996]
+              - gridcell "null" [ref=e1997]
+              - gridcell "Search term for hostname, CVE, or plugin name" [ref=e1998]
+            - row "severityFilter string null Severity level filter" [ref=e1999]:
+              - gridcell "severityFilter" [ref=e2000]
+              - gridcell "string" [ref=e2001]
+              - gridcell "null" [ref=e2002]
+              - gridcell "Severity level filter" [ref=e2003]
+          - rowgroup
+          - rowgroup [ref=e2004]
+          - rowgroup
+        - separator [ref=e2005]
+        - paragraph
+        - heading "vulnerabilityDataManager.groupVulnerabilitiesByCVE() ⇒ Object" [level=4] [ref=e2006]:
+          - text: vulnerabilityDataManager.groupVulnerabilitiesByCVE() ⇒
+          - code [ref=e2007]: Object
+        - paragraph [ref=e2008]: Group vulnerabilities by CVE for card view display
+        - paragraph [ref=e2009]:
+          - strong [ref=e2010]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2011] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2012] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2013]: Returns
+          - text: ":"
+          - code [ref=e2014]: Object
+          - text: "- Grouped vulnerabilities by CVE or plugin ID"
+        - separator [ref=e2015]
+        - paragraph
+        - heading "vulnerabilityDataManager.getDeviceByHostname(hostname) ⇒ Object | null" [level=4] [ref=e2016]:
+          - text: vulnerabilityDataManager.getDeviceByHostname(hostname) ⇒
+          - code [ref=e2017]: Object
+          - text: "|"
+          - code [ref=e2018]: "null"
+        - paragraph [ref=e2019]: Get device by hostname
+        - paragraph [ref=e2020]:
+          - strong [ref=e2021]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2022] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2023] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2024]: Returns
+          - text: ":"
+          - code [ref=e2025]: Object
+          - text: "|"
+          - code [ref=e2026]: "null"
+          - text: "- Device object or null if not found"
+        - grid [ref=e2030]:
+          - rowgroup [ref=e2032]:
+            - row "Param Type Description" [ref=e2033]:
+              - columnheader "Param" [ref=e2034]:
+                - generic [ref=e2037] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2038]:
+                - generic [ref=e2041] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2042]:
+                - generic [ref=e2045] [cursor=pointer]: Description
+          - rowgroup [ref=e2046]:
+            - row "hostname string Device hostname" [ref=e2047]:
+              - gridcell "hostname" [ref=e2048]
+              - gridcell "string" [ref=e2049]
+              - gridcell "Device hostname" [ref=e2050]
+          - rowgroup
+          - rowgroup [ref=e2051]
+          - rowgroup
+        - separator [ref=e2052]
+        - paragraph
+        - heading "vulnerabilityDataManager.getStatistics() ⇒ Object" [level=4] [ref=e2053]:
+          - text: vulnerabilityDataManager.getStatistics() ⇒
+          - code [ref=e2054]: Object
+        - paragraph [ref=e2055]: Get vulnerability statistics
+        - paragraph [ref=e2056]:
+          - strong [ref=e2057]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2058] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2059] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2060]: Returns
+          - text: ":"
+          - code [ref=e2061]: Object
+          - text: "- Current statistics object"
+        - separator [ref=e2062]
+        - paragraph
+        - heading "vulnerabilityDataManager.getTrends() ⇒ Object" [level=4] [ref=e2063]:
+          - text: vulnerabilityDataManager.getTrends() ⇒
+          - code [ref=e2064]: Object
+        - paragraph [ref=e2065]: Get trend data
+        - paragraph [ref=e2066]:
+          - strong [ref=e2067]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2068] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2069] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2070]: Returns
+          - text: ":"
+          - code [ref=e2071]: Object
+          - text: "- Current trend data"
+        - separator [ref=e2072]
+        - paragraph
+        - heading "vulnerabilityDataManager.getHistoricalData() ⇒ Array" [level=4] [ref=e2073]:
+          - text: vulnerabilityDataManager.getHistoricalData() ⇒
+          - code [ref=e2074]: Array
+        - paragraph [ref=e2075]: Get historical data for charting
+        - paragraph [ref=e2076]:
+          - strong [ref=e2077]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2078] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2079] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2080]: Returns
+          - text: ":"
+          - code [ref=e2081]: Array
+          - text: "- Historical trend data"
+        - separator [ref=e2082]
+        - paragraph
+        - heading "vulnerabilityDataManager.getAllVulnerabilities() ⇒ Array" [level=4] [ref=e2083]:
+          - text: vulnerabilityDataManager.getAllVulnerabilities() ⇒
+          - code [ref=e2084]: Array
+        - paragraph [ref=e2085]: Get all vulnerability data
+        - paragraph [ref=e2086]:
+          - strong [ref=e2087]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2088] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2089] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2090]: Returns
+          - text: ":"
+          - code [ref=e2091]: Array
+          - text: "- All vulnerabilities"
+        - separator [ref=e2092]
+        - paragraph
+        - heading "vulnerabilityDataManager.getFilteredVulnerabilities() ⇒ Array" [level=4] [ref=e2093]:
+          - text: vulnerabilityDataManager.getFilteredVulnerabilities() ⇒
+          - code [ref=e2094]: Array
+        - paragraph [ref=e2095]: Get filtered vulnerability data
+        - paragraph [ref=e2096]:
+          - strong [ref=e2097]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2098] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2099] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2100]: Returns
+          - text: ":"
+          - code [ref=e2101]: Array
+          - text: "- Filtered vulnerabilities"
+        - separator [ref=e2102]
+        - paragraph
+        - heading "vulnerabilityDataManager.getDevices() ⇒ Array" [level=4] [ref=e2103]:
+          - text: vulnerabilityDataManager.getDevices() ⇒
+          - code [ref=e2104]: Array
+        - paragraph [ref=e2105]: Get all processed devices
+        - paragraph [ref=e2106]:
+          - strong [ref=e2107]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2108] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2109] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2110]: Returns
+          - text: ":"
+          - code [ref=e2111]: Array
+          - text: "- All device objects"
+        - separator [ref=e2112]
+        - paragraph
+        - heading "vulnerabilityDataManager.getUniqueAssetCount() ⇒ number" [level=4] [ref=e2113]:
+          - text: vulnerabilityDataManager.getUniqueAssetCount() ⇒
+          - code [ref=e2114]: number
+        - paragraph [ref=e2115]: Get unique asset count
+        - paragraph [ref=e2116]:
+          - strong [ref=e2117]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2118] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2119] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2120]: Returns
+          - text: ":"
+          - code [ref=e2121]: number
+          - text: "- Number of unique assets"
+        - separator [ref=e2122]
+        - paragraph
+        - heading "vulnerabilityDataManager.refreshData() ⇒ Promise.<void>" [level=4] [ref=e2123]:
+          - text: vulnerabilityDataManager.refreshData() ⇒
+          - code [ref=e2124]: Promise.<void>
+        - paragraph [ref=e2125]: Refresh all data from API
+        - paragraph [ref=e2126]:
+          - strong [ref=e2127]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2128] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2129] [cursor=pointer]: VulnerabilityDataManager
+        - separator [ref=e2130]
+        - paragraph
+        - heading "vulnerabilityDataManager.on(event, callback)" [level=4] [ref=e2131]
+        - paragraph [ref=e2132]: Add event listener
+        - paragraph [ref=e2133]:
+          - strong [ref=e2134]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2135] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2136] [cursor=pointer]: VulnerabilityDataManager
+        - grid [ref=e2140]:
+          - rowgroup [ref=e2142]:
+            - row "Param Type Description" [ref=e2143]:
+              - columnheader "Param" [ref=e2144]:
+                - generic [ref=e2147] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2148]:
+                - generic [ref=e2151] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2152]:
+                - generic [ref=e2155] [cursor=pointer]: Description
+          - rowgroup [ref=e2156]:
+            - row "event string Event name" [ref=e2157]:
+              - gridcell "event" [ref=e2158]
+              - gridcell "string" [ref=e2159]
+              - gridcell "Event name" [ref=e2160]
+            - row "callback function Callback function" [ref=e2161]:
+              - gridcell "callback" [ref=e2162]
+              - gridcell "function" [ref=e2163]
+              - gridcell "Callback function" [ref=e2164]
+          - rowgroup
+          - rowgroup [ref=e2165]
+          - rowgroup
+        - separator [ref=e2166]
+        - paragraph
+        - heading "vulnerabilityDataManager.off(event, callback)" [level=4] [ref=e2167]
+        - paragraph [ref=e2168]: Remove event listener
+        - paragraph [ref=e2169]:
+          - strong [ref=e2170]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2171] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2172] [cursor=pointer]: VulnerabilityDataManager
+        - grid [ref=e2176]:
+          - rowgroup [ref=e2178]:
+            - row "Param Type Description" [ref=e2179]:
+              - columnheader "Param" [ref=e2180]:
+                - generic [ref=e2183] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2184]:
+                - generic [ref=e2187] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2188]:
+                - generic [ref=e2191] [cursor=pointer]: Description
+          - rowgroup [ref=e2192]:
+            - row "event string Event name" [ref=e2193]:
+              - gridcell "event" [ref=e2194]
+              - gridcell "string" [ref=e2195]
+              - gridcell "Event name" [ref=e2196]
+            - row "callback function Callback function to remove" [ref=e2197]:
+              - gridcell "callback" [ref=e2198]
+              - gridcell "function" [ref=e2199]
+              - gridcell "Callback function to remove" [ref=e2200]
+          - rowgroup
+          - rowgroup [ref=e2201]
+          - rowgroup
+        - separator [ref=e2202]
+        - paragraph
+        - heading "vulnerabilityDataManager.emit(event, data)" [level=4] [ref=e2203]
+        - paragraph [ref=e2204]: Emit event to all listeners
+        - paragraph [ref=e2205]:
+          - strong [ref=e2206]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2207] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2208] [cursor=pointer]: VulnerabilityDataManager
+        - grid [ref=e2212]:
+          - rowgroup [ref=e2214]:
+            - row "Param Type Description" [ref=e2215]:
+              - columnheader "Param" [ref=e2216]:
+                - generic [ref=e2219] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2220]:
+                - generic [ref=e2223] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2224]:
+                - generic [ref=e2227] [cursor=pointer]: Description
+          - rowgroup [ref=e2228]:
+            - row "event string Event name" [ref=e2229]:
+              - gridcell "event" [ref=e2230]
+              - gridcell "string" [ref=e2231]
+              - gridcell "Event name" [ref=e2232]
+            - row "data Object Event data" [ref=e2233]:
+              - gridcell "data" [ref=e2234]
+              - gridcell "Object" [ref=e2235]
+              - gridcell "Event data" [ref=e2236]
+          - rowgroup
+          - rowgroup [ref=e2237]
+          - rowgroup
+        - separator [ref=e2238]
+        - paragraph
+        - heading "vulnerabilityDataManager.extendTimelineData(originalData) ⇒ Array" [level=4] [ref=e2239]:
+          - text: vulnerabilityDataManager.extendTimelineData(originalData) ⇒
+          - code [ref=e2240]: Array
+        - paragraph [ref=e2241]: Extend timeline data with interpolated values for charting
+        - paragraph [ref=e2242]:
+          - strong [ref=e2243]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2244] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2245] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2246]: Returns
+          - text: ":"
+          - code [ref=e2247]: Array
+          - text: "- Extended data with interpolated values"
+        - grid [ref=e2251]:
+          - rowgroup [ref=e2253]:
+            - row "Param Type Description" [ref=e2254]:
+              - columnheader "Param" [ref=e2255]:
+                - generic [ref=e2258] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2259]:
+                - generic [ref=e2262] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2263]:
+                - generic [ref=e2266] [cursor=pointer]: Description
+          - rowgroup [ref=e2267]:
+            - row "originalData Array Original historical data points" [ref=e2268]:
+              - gridcell "originalData" [ref=e2269]
+              - gridcell "Array" [ref=e2270]
+              - gridcell "Original historical data points" [ref=e2271]
+          - rowgroup
+          - rowgroup [ref=e2272]
+          - rowgroup
+        - separator [ref=e2273]
+        - paragraph
+        - heading "vulnerabilityDataManager.exportDeviceReport(hostname) ⇒ Object | null" [level=4] [ref=e2274]:
+          - text: vulnerabilityDataManager.exportDeviceReport(hostname) ⇒
+          - code [ref=e2275]: Object
+          - text: "|"
+          - code [ref=e2276]: "null"
+        - paragraph [ref=e2277]: Export device vulnerability report as CSV data
+        - paragraph [ref=e2278]:
+          - strong [ref=e2279]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2280] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2281] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2282]: Returns
+          - text: ":"
+          - code [ref=e2283]: Object
+          - text: "|"
+          - code [ref=e2284]: "null"
+          - text: "- CSV data and metadata or null if device not found"
+        - grid [ref=e2288]:
+          - rowgroup [ref=e2290]:
+            - row "Param Type Description" [ref=e2291]:
+              - columnheader "Param" [ref=e2292]:
+                - generic [ref=e2295] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2296]:
+                - generic [ref=e2299] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2300]:
+                - generic [ref=e2303] [cursor=pointer]: Description
+          - rowgroup [ref=e2304]:
+            - row "hostname string Device hostname" [ref=e2305]:
+              - gridcell "hostname" [ref=e2306]
+              - gridcell "string" [ref=e2307]
+              - gridcell "Device hostname" [ref=e2308]
+          - rowgroup
+          - rowgroup [ref=e2309]
+          - rowgroup
+        - separator [ref=e2310]
+        - paragraph
+        - heading "vulnerabilityDataManager.saveVulnerability(id, formData) ⇒ Promise.<boolean>" [level=4] [ref=e2311]:
+          - text: vulnerabilityDataManager.saveVulnerability(id, formData) ⇒
+          - code [ref=e2312]: Promise.<boolean>
+        - paragraph [ref=e2313]: Save vulnerability changes via API
+        - paragraph [ref=e2314]:
+          - strong [ref=e2315]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2316] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2317] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2318]: Returns
+          - text: ":"
+          - code [ref=e2319]: Promise.<boolean>
+          - text: "- Success status"
+        - grid [ref=e2323]:
+          - rowgroup [ref=e2325]:
+            - row "Param Type Description" [ref=e2326]:
+              - columnheader "Param" [ref=e2327]:
+                - generic [ref=e2330] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2331]:
+                - generic [ref=e2334] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2335]:
+                - generic [ref=e2338] [cursor=pointer]: Description
+          - rowgroup [ref=e2339]:
+            - row "id number Vulnerability ID" [ref=e2340]:
+              - gridcell "id" [ref=e2341]
+              - gridcell "number" [ref=e2342]
+              - gridcell "Vulnerability ID" [ref=e2343]
+            - row "formData Object Updated vulnerability data" [ref=e2344]:
+              - gridcell "formData" [ref=e2345]
+              - gridcell "Object" [ref=e2346]
+              - gridcell "Updated vulnerability data" [ref=e2347]
+          - rowgroup
+          - rowgroup [ref=e2348]
+          - rowgroup
+        - separator [ref=e2349]
+        - paragraph
+        - heading "vulnerabilityDataManager.deleteVulnerability(id) ⇒ Promise.<boolean>" [level=4] [ref=e2350]:
+          - text: vulnerabilityDataManager.deleteVulnerability(id) ⇒
+          - code [ref=e2351]: Promise.<boolean>
+        - paragraph [ref=e2352]: Delete vulnerability via API
+        - paragraph [ref=e2353]:
+          - strong [ref=e2354]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2355] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2356] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2357]: Returns
+          - text: ":"
+          - code [ref=e2358]: Promise.<boolean>
+          - text: "- Success status"
+        - grid [ref=e2362]:
+          - rowgroup [ref=e2364]:
+            - row "Param Type Description" [ref=e2365]:
+              - columnheader "Param" [ref=e2366]:
+                - generic [ref=e2369] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2370]:
+                - generic [ref=e2373] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2374]:
+                - generic [ref=e2377] [cursor=pointer]: Description
+          - rowgroup [ref=e2378]:
+            - row "id number Vulnerability ID" [ref=e2379]:
+              - gridcell "id" [ref=e2380]
+              - gridcell "number" [ref=e2381]
+              - gridcell "Vulnerability ID" [ref=e2382]
+          - rowgroup
+          - rowgroup [ref=e2383]
+          - rowgroup
+        - separator [ref=e2384]
+        - paragraph
+        - heading "vulnerabilityDataManager.clearAllData() ⇒ Promise.<boolean>" [level=4] [ref=e2385]:
+          - text: vulnerabilityDataManager.clearAllData() ⇒
+          - code [ref=e2386]: Promise.<boolean>
+        - paragraph [ref=e2387]: Clear all vulnerability data via API
+        - paragraph [ref=e2388]:
+          - strong [ref=e2389]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2390] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2391] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2392]: Returns
+          - text: ":"
+          - code [ref=e2393]: Promise.<boolean>
+          - text: "- Success status"
+        - separator [ref=e2394]
+        - paragraph
+        - heading "vulnerabilityDataManager.fetchTenableHistoricalData(apiKey, secretKey) ⇒ Promise.<(Object|null)>" [level=4] [ref=e2395]:
+          - text: vulnerabilityDataManager.fetchTenableHistoricalData(apiKey, secretKey) ⇒
+          - code [ref=e2396]: Promise.<(Object|null)>
+        - paragraph [ref=e2397]: Fetch historical VPR data from Tenable API
+        - paragraph [ref=e2398]:
+          - strong [ref=e2399]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilityDataManager" [ref=e2400] [cursor=pointer]:
+            - /url: "#VulnerabilityDataManager"
+            - code [ref=e2401] [cursor=pointer]: VulnerabilityDataManager
+          - strong [ref=e2402]: Returns
+          - text: ":"
+          - code [ref=e2403]: Promise.<(Object|null)>
+          - text: "- Fetched data or null on error"
+        - grid [ref=e2407]:
+          - rowgroup [ref=e2409]:
+            - row "Param Type Description" [ref=e2410]:
+              - columnheader "Param" [ref=e2411]:
+                - generic [ref=e2414] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2415]:
+                - generic [ref=e2418] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2419]:
+                - generic [ref=e2422] [cursor=pointer]: Description
+          - rowgroup [ref=e2423]:
+            - row "apiKey string Tenable API key" [ref=e2424]:
+              - gridcell "apiKey" [ref=e2425]
+              - gridcell "string" [ref=e2426]
+              - gridcell "Tenable API key" [ref=e2427]
+            - row "secretKey string Tenable secret key" [ref=e2428]:
+              - gridcell "secretKey" [ref=e2429]
+              - gridcell "string" [ref=e2430]
+              - gridcell "Tenable secret key" [ref=e2431]
+          - rowgroup
+          - rowgroup [ref=e2432]
+          - rowgroup
+        - separator [ref=e2433]
+        - paragraph
+        - heading "VulnerabilitySearchManager" [level=3] [ref=e2434]
+        - paragraph [ref=e2435]: Manages vulnerability search, filtering, and external lookup operations
+        - paragraph [ref=e2436]:
+          - strong [ref=e2437]: Kind
+          - text: ": global class"
+        - list [ref=e2438]:
+          - listitem [ref=e2439]:
+            - link "VulnerabilitySearchManager" [ref=e2440] [cursor=pointer]:
+              - /url: "#VulnerabilitySearchManager"
+            - list [ref=e2441]:
+              - listitem [ref=e2442]:
+                - link "vulnerabilitySearchManager.setupEventListeners()" [ref=e2443] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+setupEventListeners"
+              - listitem [ref=e2444]:
+                - link "vulnerabilitySearchManager.lookupVulnerability(vulnId, pluginName)" [ref=e2445] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+lookupVulnerability"
+              - listitem [ref=e2446]:
+                - link "vulnerabilitySearchManager.lookupCVE(cveId)" [ref=e2447] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+lookupCVE"
+              - listitem [ref=e2448]:
+                - link "vulnerabilitySearchManager.lookupCVEWithCiscoAPI(cveId, clientId, clientSecret, retryCount, maxRetries)" [ref=e2449] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+lookupCVEWithCiscoAPI"
+              - listitem [ref=e2450]:
+                - link "vulnerabilitySearchManager.openCVEPopups(cveIds)" [ref=e2451] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+openCVEPopups"
+              - listitem [ref=e2452]:
+                - link "vulnerabilitySearchManager.displayCVEInfo(cveId, data)" [ref=e2453] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+displayCVEInfo"
+              - listitem [ref=e2454]:
+                - link "vulnerabilitySearchManager.extractCiscoVulnId(pluginName)" [ref=e2455] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+extractCiscoVulnId"
+                - text: ⇒
+                - code [ref=e2456]: string
+                - text: "|"
+                - code [ref=e2457]: "null"
+              - listitem [ref=e2458]:
+                - link "vulnerabilitySearchManager.getVulnerabilityLink(vulnData)" [ref=e2459] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+getVulnerabilityLink"
+                - text: ⇒
+                - code [ref=e2460]: Object
+              - listitem [ref=e2461]:
+                - link "vulnerabilitySearchManager.delay(ms)" [ref=e2462] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+delay"
+              - listitem [ref=e2463]:
+                - link "vulnerabilitySearchManager.cacheAPIResponse(cveId, data)" [ref=e2464] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+cacheAPIResponse"
+              - listitem [ref=e2465]:
+                - link "vulnerabilitySearchManager.getCachedAPIResponse(cveId)" [ref=e2466] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+getCachedAPIResponse"
+                - text: ⇒
+                - code [ref=e2467]: Object
+                - text: "|"
+                - code [ref=e2468]: "null"
+              - listitem [ref=e2469]:
+                - link "vulnerabilitySearchManager.handleOfflineMode(cveId)" [ref=e2470] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+handleOfflineMode"
+              - listitem [ref=e2471]:
+                - link "vulnerabilitySearchManager.displayOfflineCVEInfo(cveId)" [ref=e2472] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+displayOfflineCVEInfo"
+              - listitem [ref=e2473]:
+                - link "vulnerabilitySearchManager.processPendingCVELookups()" [ref=e2474] [cursor=pointer]:
+                  - /url: "#VulnerabilitySearchManager+processPendingCVELookups"
+        - separator [ref=e2475]
+        - paragraph
+        - heading "vulnerabilitySearchManager.setupEventListeners()" [level=4] [ref=e2476]
+        - paragraph [ref=e2477]: Setup search and filter event listeners
+        - paragraph [ref=e2478]:
+          - strong [ref=e2479]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2480] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2481] [cursor=pointer]: VulnerabilitySearchManager
+        - separator [ref=e2482]
+        - paragraph
+        - heading "vulnerabilitySearchManager.lookupVulnerability(vulnId, pluginName)" [level=4] [ref=e2483]
+        - paragraph [ref=e2484]: Enhanced lookup method that handles different vulnerability ID types
+        - paragraph [ref=e2485]:
+          - strong [ref=e2486]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2487] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2488] [cursor=pointer]: VulnerabilitySearchManager
+        - grid [ref=e2492]:
+          - rowgroup [ref=e2494]:
+            - row "Param Type Default Description" [ref=e2495]:
+              - columnheader "Param" [ref=e2496]:
+                - generic [ref=e2499] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2500]:
+                - generic [ref=e2503] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e2504]:
+                - generic [ref=e2507] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e2508]:
+                - generic [ref=e2511] [cursor=pointer]: Description
+          - rowgroup [ref=e2512]:
+            - row "vulnId string Vulnerability ID (CVE, Cisco SA, or plugin)" [ref=e2513]:
+              - gridcell "vulnId" [ref=e2514]
+              - gridcell "string" [ref=e2515]
+              - gridcell [ref=e2516]
+              - gridcell "Vulnerability ID (CVE, Cisco SA, or plugin)" [ref=e2517]
+            - row "pluginName string null Optional plugin name for extraction" [ref=e2518]:
+              - gridcell "pluginName" [ref=e2519]
+              - gridcell "string" [ref=e2520]
+              - gridcell "null" [ref=e2521]
+              - gridcell "Optional plugin name for extraction" [ref=e2522]
+          - rowgroup
+          - rowgroup [ref=e2523]
+          - rowgroup
+        - separator [ref=e2524]
+        - paragraph
+        - heading "vulnerabilitySearchManager.lookupCVE(cveId)" [level=4] [ref=e2525]
+        - paragraph [ref=e2526]: Handle CVE lookup with multiple CVE support
+        - paragraph [ref=e2527]:
+          - strong [ref=e2528]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2529] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2530] [cursor=pointer]: VulnerabilitySearchManager
+        - grid [ref=e2534]:
+          - rowgroup [ref=e2536]:
+            - row "Param Type Description" [ref=e2537]:
+              - columnheader "Param" [ref=e2538]:
+                - generic [ref=e2541] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2542]:
+                - generic [ref=e2545] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2546]:
+                - generic [ref=e2549] [cursor=pointer]: Description
+          - rowgroup [ref=e2550]:
+            - row "cveId string CVE identifier(s)" [ref=e2551]:
+              - gridcell "cveId" [ref=e2552]
+              - gridcell "string" [ref=e2553]
+              - gridcell "CVE identifier(s)" [ref=e2554]
+          - rowgroup
+          - rowgroup [ref=e2555]
+          - rowgroup
+        - separator [ref=e2556]
+        - paragraph
+        - heading "vulnerabilitySearchManager.lookupCVEWithCiscoAPI(cveId, clientId, clientSecret, retryCount, maxRetries)" [level=4] [ref=e2557]
+        - paragraph [ref=e2558]: Lookup CVE using Cisco PSIRT API with retry and fallback (T040)
+        - paragraph [ref=e2559]:
+          - strong [ref=e2560]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2561] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2562] [cursor=pointer]: VulnerabilitySearchManager
+        - grid [ref=e2566]:
+          - rowgroup [ref=e2568]:
+            - row "Param Type Default Description" [ref=e2569]:
+              - columnheader "Param" [ref=e2570]:
+                - generic [ref=e2573] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2574]:
+                - generic [ref=e2577] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e2578]:
+                - generic [ref=e2581] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e2582]:
+                - generic [ref=e2585] [cursor=pointer]: Description
+          - rowgroup [ref=e2586]:
+            - row "cveId string Single CVE identifier" [ref=e2587]:
+              - gridcell "cveId" [ref=e2588]
+              - gridcell "string" [ref=e2589]
+              - gridcell [ref=e2590]
+              - gridcell "Single CVE identifier" [ref=e2591]
+            - row "clientId string Cisco API client ID" [ref=e2592]:
+              - gridcell "clientId" [ref=e2593]
+              - gridcell "string" [ref=e2594]
+              - gridcell [ref=e2595]
+              - gridcell "Cisco API client ID" [ref=e2596]
+            - row "clientSecret string Cisco API client secret" [ref=e2597]:
+              - gridcell "clientSecret" [ref=e2598]
+              - gridcell "string" [ref=e2599]
+              - gridcell [ref=e2600]
+              - gridcell "Cisco API client secret" [ref=e2601]
+            - row "retryCount number 0 Current retry attempt" [ref=e2602]:
+              - gridcell "retryCount" [ref=e2603]
+              - gridcell "number" [ref=e2604]
+              - gridcell "0" [ref=e2605]
+              - gridcell "Current retry attempt" [ref=e2606]
+            - row "maxRetries number 3 Maximum number of retries" [ref=e2607]:
+              - gridcell "maxRetries" [ref=e2608]
+              - gridcell "number" [ref=e2609]
+              - gridcell "3" [ref=e2610]
+              - gridcell "Maximum number of retries" [ref=e2611]
+          - rowgroup
+          - rowgroup [ref=e2612]
+          - rowgroup
+        - separator [ref=e2613]
+        - paragraph
+        - heading "vulnerabilitySearchManager.openCVEPopups(cveIds)" [level=4] [ref=e2614]
+        - paragraph [ref=e2615]: Open CVE lookup popups for multiple CVE IDs
+        - paragraph [ref=e2616]:
+          - strong [ref=e2617]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2618] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2619] [cursor=pointer]: VulnerabilitySearchManager
+        - grid [ref=e2623]:
+          - rowgroup [ref=e2625]:
+            - row "Param Type Description" [ref=e2626]:
+              - columnheader "Param" [ref=e2627]:
+                - generic [ref=e2630] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2631]:
+                - generic [ref=e2634] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2635]:
+                - generic [ref=e2638] [cursor=pointer]: Description
+          - rowgroup [ref=e2639]:
+            - row "cveIds Array Array of CVE identifiers" [ref=e2640]:
+              - gridcell "cveIds" [ref=e2641]
+              - gridcell "Array" [ref=e2642]
+              - gridcell "Array of CVE identifiers" [ref=e2643]
+          - rowgroup
+          - rowgroup [ref=e2644]
+          - rowgroup
+        - separator [ref=e2645]
+        - paragraph
+        - heading "vulnerabilitySearchManager.displayCVEInfo(cveId, data)" [level=4] [ref=e2646]
+        - paragraph [ref=e2647]: Display CVE information from Cisco PSIRT API
+        - paragraph [ref=e2648]:
+          - strong [ref=e2649]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2650] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2651] [cursor=pointer]: VulnerabilitySearchManager
+        - grid [ref=e2655]:
+          - rowgroup [ref=e2657]:
+            - row "Param Type Description" [ref=e2658]:
+              - columnheader "Param" [ref=e2659]:
+                - generic [ref=e2662] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2663]:
+                - generic [ref=e2666] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2667]:
+                - generic [ref=e2670] [cursor=pointer]: Description
+          - rowgroup [ref=e2671]:
+            - row "cveId string CVE identifier" [ref=e2672]:
+              - gridcell "cveId" [ref=e2673]
+              - gridcell "string" [ref=e2674]
+              - gridcell "CVE identifier" [ref=e2675]
+            - row "data Object CVE data from API" [ref=e2676]:
+              - gridcell "data" [ref=e2677]
+              - gridcell "Object" [ref=e2678]
+              - gridcell "CVE data from API" [ref=e2679]
+          - rowgroup
+          - rowgroup [ref=e2680]
+          - rowgroup
+        - separator [ref=e2681]
+        - paragraph
+        - heading "vulnerabilitySearchManager.extractCiscoVulnId(pluginName) ⇒ string | null" [level=4] [ref=e2682]:
+          - text: vulnerabilitySearchManager.extractCiscoVulnId(pluginName) ⇒
+          - code [ref=e2683]: string
+          - text: "|"
+          - code [ref=e2684]: "null"
+        - paragraph [ref=e2685]: Extract Cisco vulnerability ID from plugin name
+        - paragraph [ref=e2686]:
+          - strong [ref=e2687]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2688] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2689] [cursor=pointer]: VulnerabilitySearchManager
+          - strong [ref=e2690]: Returns
+          - text: ":"
+          - code [ref=e2691]: string
+          - text: "|"
+          - code [ref=e2692]: "null"
+          - text: "- Cisco SA identifier or null"
+        - grid [ref=e2696]:
+          - rowgroup [ref=e2698]:
+            - row "Param Type Description" [ref=e2699]:
+              - columnheader "Param" [ref=e2700]:
+                - generic [ref=e2703] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2704]:
+                - generic [ref=e2707] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2708]:
+                - generic [ref=e2711] [cursor=pointer]: Description
+          - rowgroup [ref=e2712]:
+            - row "pluginName string Plugin name to search" [ref=e2713]:
+              - gridcell "pluginName" [ref=e2714]
+              - gridcell "string" [ref=e2715]
+              - gridcell "Plugin name to search" [ref=e2716]
+          - rowgroup
+          - rowgroup [ref=e2717]
+          - rowgroup
+        - separator [ref=e2718]
+        - paragraph
+        - heading "vulnerabilitySearchManager.getVulnerabilityLink(vulnData) ⇒ Object" [level=4] [ref=e2719]:
+          - text: vulnerabilitySearchManager.getVulnerabilityLink(vulnData) ⇒
+          - code [ref=e2720]: Object
+        - paragraph [ref=e2721]: Determine vulnerability ID type and create appropriate link
+        - paragraph [ref=e2722]:
+          - strong [ref=e2723]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2724] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2725] [cursor=pointer]: VulnerabilitySearchManager
+          - strong [ref=e2726]: Returns
+          - text: ":"
+          - code [ref=e2727]: Object
+          - text: "- Link information object"
+        - grid [ref=e2731]:
+          - rowgroup [ref=e2733]:
+            - row "Param Type Description" [ref=e2734]:
+              - columnheader "Param" [ref=e2735]:
+                - generic [ref=e2738] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2739]:
+                - generic [ref=e2742] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2743]:
+                - generic [ref=e2746] [cursor=pointer]: Description
+          - rowgroup [ref=e2747]:
+            - row "vulnData Object Vulnerability data object" [ref=e2748]:
+              - gridcell "vulnData" [ref=e2749]
+              - gridcell "Object" [ref=e2750]
+              - gridcell "Vulnerability data object" [ref=e2751]
+          - rowgroup
+          - rowgroup [ref=e2752]
+          - rowgroup
+        - separator [ref=e2753]
+        - paragraph
+        - heading "vulnerabilitySearchManager.delay(ms)" [level=4] [ref=e2754]
+        - paragraph [ref=e2755]: "T040: Helper method for exponential backoff delay"
+        - paragraph [ref=e2756]:
+          - strong [ref=e2757]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2758] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2759] [cursor=pointer]: VulnerabilitySearchManager
+        - grid [ref=e2763]:
+          - rowgroup [ref=e2765]:
+            - row "Param Type Description" [ref=e2766]:
+              - columnheader "Param" [ref=e2767]:
+                - generic [ref=e2770] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2771]:
+                - generic [ref=e2774] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2775]:
+                - generic [ref=e2778] [cursor=pointer]: Description
+          - rowgroup [ref=e2779]:
+            - row "ms number Milliseconds to delay" [ref=e2780]:
+              - gridcell "ms" [ref=e2781]
+              - gridcell "number" [ref=e2782]
+              - gridcell "Milliseconds to delay" [ref=e2783]
+          - rowgroup
+          - rowgroup [ref=e2784]
+          - rowgroup
+        - separator [ref=e2785]
+        - paragraph
+        - heading "vulnerabilitySearchManager.cacheAPIResponse(cveId, data)" [level=4] [ref=e2786]
+        - paragraph [ref=e2787]: "T040: Cache API responses for offline/failure scenarios"
+        - paragraph [ref=e2788]:
+          - strong [ref=e2789]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2790] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2791] [cursor=pointer]: VulnerabilitySearchManager
+        - grid [ref=e2795]:
+          - rowgroup [ref=e2797]:
+            - row "Param Type Description" [ref=e2798]:
+              - columnheader "Param" [ref=e2799]:
+                - generic [ref=e2802] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2803]:
+                - generic [ref=e2806] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2807]:
+                - generic [ref=e2810] [cursor=pointer]: Description
+          - rowgroup [ref=e2811]:
+            - row "cveId string CVE identifier" [ref=e2812]:
+              - gridcell "cveId" [ref=e2813]
+              - gridcell "string" [ref=e2814]
+              - gridcell "CVE identifier" [ref=e2815]
+            - row "data Object API response data" [ref=e2816]:
+              - gridcell "data" [ref=e2817]
+              - gridcell "Object" [ref=e2818]
+              - gridcell "API response data" [ref=e2819]
+          - rowgroup
+          - rowgroup [ref=e2820]
+          - rowgroup
+        - separator [ref=e2821]
+        - paragraph
+        - heading "vulnerabilitySearchManager.getCachedAPIResponse(cveId) ⇒ Object | null" [level=4] [ref=e2822]:
+          - text: vulnerabilitySearchManager.getCachedAPIResponse(cveId) ⇒
+          - code [ref=e2823]: Object
+          - text: "|"
+          - code [ref=e2824]: "null"
+        - paragraph [ref=e2825]: "T040: Retrieve cached API response"
+        - paragraph [ref=e2826]:
+          - strong [ref=e2827]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2828] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2829] [cursor=pointer]: VulnerabilitySearchManager
+          - strong [ref=e2830]: Returns
+          - text: ":"
+          - code [ref=e2831]: Object
+          - text: "|"
+          - code [ref=e2832]: "null"
+          - text: "- Cached data or null"
+        - grid [ref=e2836]:
+          - rowgroup [ref=e2838]:
+            - row "Param Type Description" [ref=e2839]:
+              - columnheader "Param" [ref=e2840]:
+                - generic [ref=e2843] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2844]:
+                - generic [ref=e2847] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2848]:
+                - generic [ref=e2851] [cursor=pointer]: Description
+          - rowgroup [ref=e2852]:
+            - row "cveId string CVE identifier" [ref=e2853]:
+              - gridcell "cveId" [ref=e2854]
+              - gridcell "string" [ref=e2855]
+              - gridcell "CVE identifier" [ref=e2856]
+          - rowgroup
+          - rowgroup [ref=e2857]
+          - rowgroup
+        - separator [ref=e2858]
+        - paragraph
+        - heading "vulnerabilitySearchManager.handleOfflineMode(cveId)" [level=4] [ref=e2859]
+        - paragraph [ref=e2860]: "T040: Handle offline mode with graceful degradation"
+        - paragraph [ref=e2861]:
+          - strong [ref=e2862]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2863] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2864] [cursor=pointer]: VulnerabilitySearchManager
+        - grid [ref=e2868]:
+          - rowgroup [ref=e2870]:
+            - row "Param Type Description" [ref=e2871]:
+              - columnheader "Param" [ref=e2872]:
+                - generic [ref=e2875] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2876]:
+                - generic [ref=e2879] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2880]:
+                - generic [ref=e2883] [cursor=pointer]: Description
+          - rowgroup [ref=e2884]:
+            - row "cveId string CVE identifier" [ref=e2885]:
+              - gridcell "cveId" [ref=e2886]
+              - gridcell "string" [ref=e2887]
+              - gridcell "CVE identifier" [ref=e2888]
+          - rowgroup
+          - rowgroup [ref=e2889]
+          - rowgroup
+        - separator [ref=e2890]
+        - paragraph
+        - heading "vulnerabilitySearchManager.displayOfflineCVEInfo(cveId)" [level=4] [ref=e2891]
+        - paragraph [ref=e2892]: "T040: Display offline CVE information"
+        - paragraph [ref=e2893]:
+          - strong [ref=e2894]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2895] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2896] [cursor=pointer]: VulnerabilitySearchManager
+        - grid [ref=e2900]:
+          - rowgroup [ref=e2902]:
+            - row "Param Type Description" [ref=e2903]:
+              - columnheader "Param" [ref=e2904]:
+                - generic [ref=e2907] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2908]:
+                - generic [ref=e2911] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2912]:
+                - generic [ref=e2915] [cursor=pointer]: Description
+          - rowgroup [ref=e2916]:
+            - row "cveId string CVE identifier" [ref=e2917]:
+              - gridcell "cveId" [ref=e2918]
+              - gridcell "string" [ref=e2919]
+              - gridcell "CVE identifier" [ref=e2920]
+          - rowgroup
+          - rowgroup [ref=e2921]
+          - rowgroup
+        - separator [ref=e2922]
+        - paragraph
+        - heading "vulnerabilitySearchManager.processPendingCVELookups()" [level=4] [ref=e2923]
+        - paragraph [ref=e2924]: "T040: Process pending CVE lookups when coming back online"
+        - paragraph [ref=e2925]:
+          - strong [ref=e2926]: Kind
+          - text: ": instance method of"
+          - link "VulnerabilitySearchManager" [ref=e2927] [cursor=pointer]:
+            - /url: "#VulnerabilitySearchManager"
+            - code [ref=e2928] [cursor=pointer]: VulnerabilitySearchManager
+        - separator [ref=e2929]
+        - paragraph
+        - heading "WebSocketClient" [level=3] [ref=e2930]
+        - paragraph [ref=e2931]: WebSocket client class for real-time progress tracking
+        - paragraph [ref=e2932]:
+          - strong [ref=e2933]: Kind
+          - text: ": global class"
+        - list [ref=e2934]:
+          - listitem [ref=e2935]:
+            - link "WebSocketClient" [ref=e2936] [cursor=pointer]:
+              - /url: "#WebSocketClient"
+            - list [ref=e2937]:
+              - listitem [ref=e2938]:
+                - link "webSocketClient.debug()" [ref=e2939] [cursor=pointer]:
+                  - /url: "#WebSocketClient+debug"
+              - listitem [ref=e2940]:
+                - link "webSocketClient.connect()" [ref=e2941] [cursor=pointer]:
+                  - /url: "#WebSocketClient+connect"
+                - text: ⇒
+                - code [ref=e2942]: Promise.<boolean>
+        - separator [ref=e2943]
+        - paragraph
+        - heading "webSocketClient.debug()" [level=4] [ref=e2944]
+        - paragraph [ref=e2945]: Debug logging method - only logs when debug mode is enabled
+        - paragraph [ref=e2946]:
+          - strong [ref=e2947]: Kind
+          - text: ": instance method of"
+          - link "WebSocketClient" [ref=e2948] [cursor=pointer]:
+            - /url: "#WebSocketClient"
+            - code [ref=e2949] [cursor=pointer]: WebSocketClient
+        - separator [ref=e2950]
+        - paragraph
+        - heading "webSocketClient.connect() ⇒ Promise.<boolean>" [level=4] [ref=e2951]:
+          - text: webSocketClient.connect() ⇒
+          - code [ref=e2952]: Promise.<boolean>
+        - paragraph [ref=e2953]: Connect to WebSocket server
+        - paragraph [ref=e2954]:
+          - strong [ref=e2955]: Kind
+          - text: ": instance method of"
+          - link "WebSocketClient" [ref=e2956] [cursor=pointer]:
+            - /url: "#WebSocketClient"
+            - code [ref=e2957] [cursor=pointer]: WebSocketClient
+          - strong [ref=e2958]: Returns
+          - text: ":"
+          - code [ref=e2959]: Promise.<boolean>
+          - text: "- Connection success"
+        - separator [ref=e2960]
+        - paragraph
+        - heading "headerThemeManager" [level=3] [ref=e2961]
+        - paragraph [ref=e2962]:
+          - text: Auto-initialize header theme management when module loads
+          - text: This ensures theme toggles work on all pages that include this script
+        - paragraph [ref=e2963]:
+          - strong [ref=e2964]: Kind
+          - text: ": global constant"
+        - separator [ref=e2965]
+        - paragraph
+        - heading "VPR_COLORS" [level=3] [ref=e2966]
+        - paragraph [ref=e2967]:
+          - text: Vulnerability Color Constants
+          - text: Single source of truth for VPR severity colors
+          - text: These values match the CSS variables defined in vulnerabilities.css
+        - paragraph [ref=e2968]:
+          - strong [ref=e2969]: Kind
+          - text: ": global constant"
+        - separator [ref=e2970]
+        - paragraph
+        - heading "debounce(func, delay) ⇒ function" [level=3] [ref=e2971]:
+          - text: debounce(func, delay) ⇒
+          - code [ref=e2972]: function
+        - paragraph [ref=e2973]:
+          - text: Debounce function to limit the rate at which a function gets called.
+          - text: This is crucial for performance on events that fire rapidly, like window resize.
+        - paragraph [ref=e2974]:
+          - strong [ref=e2975]: Kind
+          - text: ": global function"
+          - strong [ref=e2976]: Returns
+          - text: ":"
+          - code [ref=e2977]: function
+          - text: "- The debounced function."
+        - grid [ref=e2981]:
+          - rowgroup [ref=e2983]:
+            - row "Param Type Description" [ref=e2984]:
+              - columnheader "Param" [ref=e2985]:
+                - generic [ref=e2988] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e2989]:
+                - generic [ref=e2992] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e2993]:
+                - generic [ref=e2996] [cursor=pointer]: Description
+          - rowgroup [ref=e2997]:
+            - row "func function The function to debounce." [ref=e2998]:
+              - gridcell "func" [ref=e2999]
+              - gridcell "function" [ref=e3000]
+              - gridcell "The function to debounce." [ref=e3001]
+            - row "delay number The debounce delay in milliseconds." [ref=e3002]:
+              - gridcell "delay" [ref=e3003]
+              - gridcell "number" [ref=e3004]
+              - gridcell "The debounce delay in milliseconds." [ref=e3005]
+          - rowgroup
+          - rowgroup [ref=e3006]
+          - rowgroup
+        - separator [ref=e3007]
+        - paragraph
+        - heading "createVulnerabilityGridOptions(componentContext, isDarkMode) ⇒ GridOptions" [level=3] [ref=e3008]:
+          - text: createVulnerabilityGridOptions(componentContext, isDarkMode) ⇒
+          - code [ref=e3009]: GridOptions
+        - paragraph [ref=e3010]: Creates and returns the complete AG Grid configuration object.
+        - paragraph [ref=e3011]:
+          - strong [ref=e3012]: Kind
+          - text: ": global function"
+          - strong [ref=e3013]: Returns
+          - text: ":"
+          - code [ref=e3014]: GridOptions
+          - text: "- A complete AG Grid"
+          - code [ref=e3015]: gridOptions
+          - text: object.
+        - grid [ref=e3019]:
+          - rowgroup [ref=e3021]:
+            - row "Param Type Default Description" [ref=e3022]:
+              - columnheader "Param" [ref=e3023]:
+                - generic [ref=e3026] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3027]:
+                - generic [ref=e3030] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e3031]:
+                - generic [ref=e3034] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e3035]:
+                - generic [ref=e3038] [cursor=pointer]: Description
+          - rowgroup [ref=e3039]:
+            - row "componentContext object The \"this\" context of the calling component (e.g., ModernVulnManager) to access its methods and properties like gridApi." [ref=e3040]:
+              - gridcell "componentContext" [ref=e3041]
+              - gridcell "object" [ref=e3042]
+              - gridcell [ref=e3043]
+              - gridcell "The \"this\" context of the calling component (e.g., ModernVulnManager) to access its methods and properties like gridApi." [ref=e3044]
+            - row "isDarkMode boolean false Whether to use dark mode theme (optional)" [ref=e3045]:
+              - gridcell "isDarkMode" [ref=e3046]
+              - gridcell "boolean" [ref=e3047]
+              - gridcell "false" [ref=e3048]
+              - gridcell "Whether to use dark mode theme (optional)" [ref=e3049]
+          - rowgroup
+          - rowgroup [ref=e3050]
+          - rowgroup
+        - separator [ref=e3051]
+        - paragraph
+        - heading "createFallbackFooter(container)" [level=3] [ref=e3052]
+        - paragraph [ref=e3053]: Creates a safe fallback footer using DOM methods with badges
+        - paragraph [ref=e3054]:
+          - strong [ref=e3055]: Kind
+          - text: ": global function"
+        - grid [ref=e3059]:
+          - rowgroup [ref=e3061]:
+            - row "Param Type Description" [ref=e3062]:
+              - columnheader "Param" [ref=e3063]:
+                - generic [ref=e3066] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3067]:
+                - generic [ref=e3070] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e3071]:
+                - generic [ref=e3074] [cursor=pointer]: Description
+          - rowgroup [ref=e3075]:
+            - row "container Element The container element to add footer to" [ref=e3076]:
+              - gridcell "container" [ref=e3077]
+              - gridcell "Element" [ref=e3078]
+              - gridcell "The container element to add footer to" [ref=e3079]
+          - rowgroup
+          - rowgroup [ref=e3080]
+          - rowgroup
+        - separator [ref=e3081]
+        - paragraph
+        - heading "escapeHtml(text) ⇒ string" [level=3] [ref=e3082]:
+          - text: escapeHtml(text) ⇒
+          - code [ref=e3083]: string
+        - paragraph [ref=e3084]: Escape HTML characters to prevent XSS attacks
+        - paragraph [ref=e3085]:
+          - strong [ref=e3086]: Kind
+          - text: ": global function"
+          - strong [ref=e3087]: Returns
+          - text: ":"
+          - code [ref=e3088]: string
+          - text: "- Escaped text"
+        - grid [ref=e3092]:
+          - rowgroup [ref=e3094]:
+            - row "Param Type Description" [ref=e3095]:
+              - columnheader "Param" [ref=e3096]:
+                - generic [ref=e3099] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3100]:
+                - generic [ref=e3103] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e3104]:
+                - generic [ref=e3107] [cursor=pointer]: Description
+          - rowgroup [ref=e3108]:
+            - row "text string Text to escape" [ref=e3109]:
+              - gridcell "text" [ref=e3110]
+              - gridcell "string" [ref=e3111]
+              - gridcell "Text to escape" [ref=e3112]
+          - rowgroup
+          - rowgroup [ref=e3113]
+          - rowgroup
+        - separator [ref=e3114]
+        - paragraph
+        - heading "getVPRColors(theme) ⇒ Array.<string>" [level=3] [ref=e3115]:
+          - text: getVPRColors(theme) ⇒
+          - code [ref=e3116]: Array.<string>
+        - paragraph [ref=e3117]: Get severity colors for the current theme
+        - paragraph [ref=e3118]:
+          - strong [ref=e3119]: Kind
+          - text: ": global function"
+          - strong [ref=e3120]: Returns
+          - text: ":"
+          - code [ref=e3121]: Array.<string>
+          - text: "- Array of hex color values"
+        - grid [ref=e3125]:
+          - rowgroup [ref=e3127]:
+            - row "Param Type Default Description" [ref=e3128]:
+              - columnheader "Param" [ref=e3129]:
+                - generic [ref=e3132] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3133]:
+                - generic [ref=e3136] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e3137]:
+                - generic [ref=e3140] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e3141]:
+                - generic [ref=e3144] [cursor=pointer]: Description
+          - rowgroup [ref=e3145]:
+            - row "theme string \"light\" 'light' or 'dark'" [ref=e3146]:
+              - gridcell "theme" [ref=e3147]
+              - gridcell "string" [ref=e3148]
+              - gridcell "\"light\"" [ref=e3149]
+              - gridcell "'light' or 'dark'" [ref=e3150]
+          - rowgroup
+          - rowgroup [ref=e3151]
+          - rowgroup
+        - separator [ref=e3152]
+        - paragraph
+        - heading "getSeverityColor(severity, theme) ⇒ Object" [level=3] [ref=e3153]:
+          - text: getSeverityColor(severity, theme) ⇒
+          - code [ref=e3154]: Object
+        - paragraph [ref=e3155]: Get color configuration for a specific severity
+        - paragraph [ref=e3156]:
+          - strong [ref=e3157]: Kind
+          - text: ": global function"
+          - strong [ref=e3158]: Returns
+          - text: ":"
+          - code [ref=e3159]: Object
+          - text: "- Color configuration object"
+        - grid [ref=e3163]:
+          - rowgroup [ref=e3165]:
+            - row "Param Type Default Description" [ref=e3166]:
+              - columnheader "Param" [ref=e3167]:
+                - generic [ref=e3170] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3171]:
+                - generic [ref=e3174] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e3175]:
+                - generic [ref=e3178] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e3179]:
+                - generic [ref=e3182] [cursor=pointer]: Description
+          - rowgroup [ref=e3183]:
+            - row "severity string 'critical', 'high', 'medium', or 'low'" [ref=e3184]:
+              - gridcell "severity" [ref=e3185]
+              - gridcell "string" [ref=e3186]
+              - gridcell [ref=e3187]
+              - gridcell "'critical', 'high', 'medium', or 'low'" [ref=e3188]
+            - row "theme string \"light\" 'light' or 'dark'" [ref=e3189]:
+              - gridcell "theme" [ref=e3190]
+              - gridcell "string" [ref=e3191]
+              - gridcell "\"light\"" [ref=e3192]
+              - gridcell "'light' or 'dark'" [ref=e3193]
+          - rowgroup
+          - rowgroup [ref=e3194]
+          - rowgroup
+        - separator [ref=e3195]
+        - paragraph
+        - heading "getVPRColorsFromCSS() ⇒ Array.<string>" [level=3] [ref=e3196]:
+          - text: getVPRColorsFromCSS() ⇒
+          - code [ref=e3197]: Array.<string>
+        - paragraph [ref=e3198]: Get colors from CSS variables (dynamic, theme-aware)
+        - paragraph [ref=e3199]:
+          - strong [ref=e3200]: Kind
+          - text: ": global function"
+          - strong [ref=e3201]: Returns
+          - text: ":"
+          - code [ref=e3202]: Array.<string>
+          - text: "- Array of hex color values from CSS"
+        - separator [ref=e3203]
+        - paragraph
+        - heading "getCurrentTheme() ⇒ string" [level=3] [ref=e3204]:
+          - text: getCurrentTheme() ⇒
+          - code [ref=e3205]: string
+        - paragraph [ref=e3206]: Get the current theme from document body
+        - paragraph [ref=e3207]:
+          - strong [ref=e3208]: Kind
+          - text: ": global function"
+          - strong [ref=e3209]: Returns
+          - text: ":"
+          - code [ref=e3210]: string
+          - text: "- 'light' or 'dark'"
+        - separator [ref=e3211]
+        - separator [ref=e3212]
+        - 'heading "Utilities {#utilities}" [level=2] [ref=e3213]'
+        - blockquote [ref=e3214]:
+          - paragraph [ref=e3215]:
+            - text: "Source:"
+            - code [ref=e3216]: app/public/scripts/utils/**/*.js
+        - heading "Modules" [level=3] [ref=e3217]
+        - grid [ref=e3221]:
+          - rowgroup [ref=e3223]:
+            - row "Module Description" [ref=e3224]:
+              - columnheader "Module" [ref=e3225]:
+                - generic [ref=e3228] [cursor=pointer]: Module
+              - columnheader "Description" [ref=e3229]:
+                - generic [ref=e3232] [cursor=pointer]: Description
+          - rowgroup [ref=e3233]:
+            - row "AccessibilityAnnouncer Accessibility Announcer Utility - T044 Provides ARIA live region management for screen reader announcements Follows WCAG 2.1 guidelines for dynamic content announcement" [ref=e3234]:
+              - gridcell "AccessibilityAnnouncer" [ref=e3235]:
+                - link "AccessibilityAnnouncer" [ref=e3237] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#module_AccessibilityAnnouncer
+              - gridcell "Accessibility Announcer Utility - T044 Provides ARIA live region management for screen reader announcements Follows WCAG 2.1 guidelines for dynamic content announcement" [ref=e3238]
+          - rowgroup
+          - rowgroup [ref=e3239]
+          - rowgroup
+        - heading "Classes" [level=3] [ref=e3240]
+        - grid [ref=e3244]:
+          - rowgroup [ref=e3246]:
+            - row "Global Description" [ref=e3247]:
+              - columnheader "Global" [ref=e3248]:
+                - generic [ref=e3251] [cursor=pointer]: Global
+              - columnheader "Description" [ref=e3252]:
+                - generic [ref=e3255] [cursor=pointer]: Description
+          - rowgroup [ref=e3256]:
+            - row "ChartThemeAdapter" [ref=e3257]:
+              - gridcell "ChartThemeAdapter" [ref=e3258]:
+                - link "ChartThemeAdapter" [ref=e3260] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#ChartThemeAdapter
+              - gridcell [ref=e3261]
+          - rowgroup
+          - rowgroup [ref=e3262]
+          - rowgroup
+        - heading "Constants" [level=3] [ref=e3263]
+        - grid [ref=e3267]:
+          - rowgroup [ref=e3269]:
+            - row "Global Description" [ref=e3270]:
+              - columnheader "Global" [ref=e3271]:
+                - generic [ref=e3274] [cursor=pointer]: Global
+              - columnheader "Description" [ref=e3275]:
+                - generic [ref=e3278] [cursor=pointer]: Description
+          - rowgroup [ref=e3279]:
+            - row "DARK_THEME_COLORS HexTrackr Dark Theme Color Definitions Extracted from dark-theme.css for testing" [ref=e3280]:
+              - gridcell "DARK_THEME_COLORS" [ref=e3281]:
+                - link "DARK_THEME_COLORS" [ref=e3283] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#DARK_THEME_COLORS
+              - gridcell "HexTrackr Dark Theme Color Definitions Extracted from dark-theme.css for testing" [ref=e3284]
+            - row "CRITICAL_COMBINATIONS Critical text/background combinations to test These represent the most important UI elements for accessibility" [ref=e3285]:
+              - gridcell "CRITICAL_COMBINATIONS" [ref=e3286]:
+                - link "CRITICAL_COMBINATIONS" [ref=e3288] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#CRITICAL_COMBINATIONS
+              - gridcell "Critical text/background combinations to test These represent the most important UI elements for accessibility" [ref=e3289]
+          - rowgroup
+          - rowgroup [ref=e3290]
+          - rowgroup
+        - heading "Functions" [level=3] [ref=e3291]
+        - grid [ref=e3295]:
+          - rowgroup [ref=e3297]:
+            - row "Global Description" [ref=e3298]:
+              - columnheader "Global" [ref=e3299]:
+                - generic [ref=e3302] [cursor=pointer]: Global
+              - columnheader "Description" [ref=e3303]:
+                - generic [ref=e3306] [cursor=pointer]: Description
+          - rowgroup [ref=e3307]:
+            - row "safeSetInnerHTML(element, htmlContent) Safely set innerHTML with DOMPurify sanitization" [ref=e3308]:
+              - gridcell "safeSetInnerHTML(element, htmlContent)" [ref=e3309]:
+                - link "safeSetInnerHTML(element, htmlContent)" [ref=e3311] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#safeSetInnerHTML
+              - gridcell "Safely set innerHTML with DOMPurify sanitization" [ref=e3312]
+            - row "escapeHtml(text) ⇒ string Escape HTML entities to prevent XSS attacks" [ref=e3313]:
+              - gridcell "escapeHtml(text) ⇒ string" [ref=e3314]:
+                - link "escapeHtml(text) ⇒ string" [ref=e3316] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#escapeHtml
+              - gridcell "Escape HTML entities to prevent XSS attacks" [ref=e3317]
+            - row "safeCreateElement(tagName, content, attributes) ⇒ HTMLElement Safely create element with sanitized content" [ref=e3318]:
+              - gridcell "safeCreateElement(tagName, content, attributes) ⇒ HTMLElement" [ref=e3319]:
+                - link "safeCreateElement(tagName, content, attributes) ⇒ HTMLElement" [ref=e3321] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#safeCreateElement
+              - gridcell "Safely create element with sanitized content" [ref=e3322]
+            - row "testDarkThemeCompliance(verbose) ⇒ Object Run WCAG AA compliance test on all critical color combinations" [ref=e3323]:
+              - gridcell "testDarkThemeCompliance(verbose) ⇒ Object" [ref=e3324]:
+                - link "testDarkThemeCompliance(verbose) ⇒ Object" [ref=e3326] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#testDarkThemeCompliance
+              - gridcell "Run WCAG AA compliance test on all critical color combinations" [ref=e3327]
+            - row "generateRecommendations(criticalFailures, nonCriticalFailures) ⇒ Array Generate actionable recommendations for fixing accessibility issues" [ref=e3328]:
+              - gridcell "generateRecommendations(criticalFailures, nonCriticalFailures) ⇒ Array" [ref=e3329]:
+                - link "generateRecommendations(criticalFailures, nonCriticalFailures) ⇒ Array" [ref=e3331] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#generateRecommendations
+              - gridcell "Generate actionable recommendations for fixing accessibility issues" [ref=e3332]
+            - row "testColorCombination(foreground, background, label) ⇒ Object Test specific color combination" [ref=e3333]:
+              - gridcell "testColorCombination(foreground, background, label) ⇒ Object" [ref=e3334]:
+                - link "testColorCombination(foreground, background, label) ⇒ Object" [ref=e3336] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#testColorCombination
+              - gridcell "Test specific color combination" [ref=e3337]
+            - 'row "hexToRgb(hex) ⇒ Object Convert hex color to RGB values Handles both 3-digit and 6-digit hex codes with or without #" [ref=e3338]':
+              - gridcell "hexToRgb(hex) ⇒ Object" [ref=e3339]:
+                - link "hexToRgb(hex) ⇒ Object" [ref=e3341] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#hexToRgb
+              - 'gridcell "Convert hex color to RGB values Handles both 3-digit and 6-digit hex codes with or without #" [ref=e3342]'
+            - row "calculateLuminance(rgb) ⇒ number Calculate relative luminance of a color per WCAG 2.1 formula" [ref=e3343]:
+              - gridcell "calculateLuminance(rgb) ⇒ number" [ref=e3344]:
+                - link "calculateLuminance(rgb) ⇒ number" [ref=e3346] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#calculateLuminance
+              - gridcell "Calculate relative luminance of a color per WCAG 2.1 formula" [ref=e3347]
+            - row "calculateContrastRatio(color1, color2) ⇒ number Calculate contrast ratio between two colors per WCAG 2.1" [ref=e3348]:
+              - gridcell "calculateContrastRatio(color1, color2) ⇒ number" [ref=e3349]:
+                - link "calculateContrastRatio(color1, color2) ⇒ number" [ref=e3351] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#calculateContrastRatio
+              - gridcell "Calculate contrast ratio between two colors per WCAG 2.1" [ref=e3352]
+            - row "validateWCAGCompliance(ratio, level, textSize) ⇒ Object Validate if contrast ratio meets WCAG standards" [ref=e3353]:
+              - gridcell "validateWCAGCompliance(ratio, level, textSize) ⇒ Object" [ref=e3354]:
+                - link "validateWCAGCompliance(ratio, level, textSize) ⇒ Object" [ref=e3356] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#validateWCAGCompliance
+              - gridcell "Validate if contrast ratio meets WCAG standards" [ref=e3357]
+            - row "validateColorCombination(foreground, background, options) ⇒ Object Comprehensive contrast validation for a color combination" [ref=e3358]:
+              - gridcell "validateColorCombination(foreground, background, options) ⇒ Object" [ref=e3359]:
+                - link "validateColorCombination(foreground, background, options) ⇒ Object" [ref=e3361] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#validateColorCombination
+              - gridcell "Comprehensive contrast validation for a color combination" [ref=e3362]
+            - row "batchValidateColors(combinations, options) ⇒ Array Batch validate multiple color combinations" [ref=e3363]:
+              - gridcell "batchValidateColors(combinations, options) ⇒ Array" [ref=e3364]:
+                - link "batchValidateColors(combinations, options) ⇒ Array" [ref=e3366] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#batchValidateColors
+              - gridcell "Batch validate multiple color combinations" [ref=e3367]
+            - row "generateAccessibilityReport(themeColors, level) ⇒ Object Generate accessibility report for theme colors" [ref=e3368]:
+              - gridcell "generateAccessibilityReport(themeColors, level) ⇒ Object" [ref=e3369]:
+                - link "generateAccessibilityReport(themeColors, level) ⇒ Object" [ref=e3371] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#generateAccessibilityReport
+              - gridcell "Generate accessibility report for theme colors" [ref=e3372]
+            - row "suggestImprovedColors(foreground, background, targetRatio) ⇒ Object Suggest improved colors for failing combinations" [ref=e3373]:
+              - gridcell "suggestImprovedColors(foreground, background, targetRatio) ⇒ Object" [ref=e3374]:
+                - link "suggestImprovedColors(foreground, background, targetRatio) ⇒ Object" [ref=e3376] [cursor=pointer]:
+                  - /url: http://localhost:8989/docs-html/index.html#suggestImprovedColors
+              - gridcell "Suggest improved colors for failing combinations" [ref=e3377]
+          - rowgroup
+          - rowgroup [ref=e3378]
+          - rowgroup
+        - paragraph
+        - heading "AccessibilityAnnouncer" [level=3] [ref=e3379]
+        - paragraph [ref=e3380]:
+          - text: Accessibility Announcer Utility - T044
+          - text: Provides ARIA live region management for screen reader announcements
+          - text: Follows WCAG 2.1 guidelines for dynamic content announcement
+        - paragraph [ref=e3381]:
+          - strong [ref=e3382]: Version
+          - text: ": 1.0.0"
+        - list [ref=e3383]:
+          - listitem [ref=e3384]:
+            - link "AccessibilityAnnouncer" [ref=e3385] [cursor=pointer]:
+              - /url: "#module_AccessibilityAnnouncer"
+            - list [ref=e3386]:
+              - listitem [ref=e3387]:
+                - link ".AccessibilityAnnouncer" [ref=e3388] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+                - list [ref=e3389]:
+                  - listitem [ref=e3390]:
+                    - link "new exports.AccessibilityAnnouncer()" [ref=e3391] [cursor=pointer]:
+                      - /url: "#new_module_AccessibilityAnnouncer.AccessibilityAnnouncer_new"
+                  - listitem [ref=e3392]:
+                    - link "accessibilityAnnouncer.initializeLiveRegions()" [ref=e3393] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+initializeLiveRegions"
+                    - text: ⇒
+                    - code [ref=e3394]: void
+                  - listitem [ref=e3395]:
+                    - link "accessibilityAnnouncer.announce(message, options)" [ref=e3396] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+announce"
+                    - text: ⇒
+                    - code [ref=e3397]: boolean
+                  - listitem [ref=e3398]:
+                    - link "accessibilityAnnouncer.announceThemeChange(newTheme, previousTheme, source)" [ref=e3399] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+announceThemeChange"
+                    - text: ⇒
+                    - code [ref=e3400]: boolean
+                  - listitem [ref=e3401]:
+                    - link "accessibilityAnnouncer.announceAccessibilityStatus(accessibilityReport, theme)" [ref=e3402] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+announceAccessibilityStatus"
+                    - text: ⇒
+                    - code [ref=e3403]: boolean
+                  - listitem [ref=e3404]:
+                    - link "accessibilityAnnouncer.sanitizeMessage(message)" [ref=e3405] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+sanitizeMessage"
+                    - text: ⇒
+                    - code [ref=e3406]: string
+                    - text: "|"
+                    - code [ref=e3407]: "null"
+                  - listitem [ref=e3408]:
+                    - link "accessibilityAnnouncer.isDuplicateAnnouncement(announcement)" [ref=e3409] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+isDuplicateAnnouncement"
+                    - text: ⇒
+                    - code [ref=e3410]: boolean
+                  - listitem [ref=e3411]:
+                    - link "accessibilityAnnouncer.queueAnnouncement(announcement)" [ref=e3412] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+queueAnnouncement"
+                    - text: ⇒
+                    - code [ref=e3413]: boolean
+                  - listitem [ref=e3414]:
+                    - link "accessibilityAnnouncer.processAnnouncementQueue()" [ref=e3415] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+processAnnouncementQueue"
+                    - text: ⇒
+                    - code [ref=e3416]: void
+                  - listitem [ref=e3417]:
+                    - link "accessibilityAnnouncer.performAnnouncement(announcement)" [ref=e3418] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+performAnnouncement"
+                    - text: ⇒
+                    - code [ref=e3419]: boolean
+                  - listitem [ref=e3420]:
+                    - link "accessibilityAnnouncer.generateAnnouncementId()" [ref=e3421] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+generateAnnouncementId"
+                    - text: ⇒
+                    - code [ref=e3422]: string
+                  - listitem [ref=e3423]:
+                    - link "accessibilityAnnouncer.getStats()" [ref=e3424] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+getStats"
+                    - text: ⇒
+                    - code [ref=e3425]: Object
+                  - listitem [ref=e3426]:
+                    - link "accessibilityAnnouncer.clearQueue()" [ref=e3427] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+clearQueue"
+                    - text: ⇒
+                    - code [ref=e3428]: void
+                  - listitem [ref=e3429]:
+                    - link "accessibilityAnnouncer.registerCleanup()" [ref=e3430] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+registerCleanup"
+                    - text: ⇒
+                    - code [ref=e3431]: void
+                  - listitem [ref=e3432]:
+                    - link "accessibilityAnnouncer.destroy()" [ref=e3433] [cursor=pointer]:
+                      - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+destroy"
+                    - text: ⇒
+                    - code [ref=e3434]: void
+        - separator [ref=e3435]
+        - paragraph
+        - heading "AccessibilityAnnouncer.AccessibilityAnnouncer" [level=4] [ref=e3436]
+        - paragraph [ref=e3437]:
+          - text: ARIA live region manager for dynamic content announcements
+          - text: Creates and manages invisible live regions for screen reader accessibility
+        - paragraph [ref=e3438]:
+          - strong [ref=e3439]: Kind
+          - text: ": static class of"
+          - link "AccessibilityAnnouncer" [ref=e3440] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer"
+            - code [ref=e3441] [cursor=pointer]: AccessibilityAnnouncer
+        - list [ref=e3442]:
+          - listitem [ref=e3443]:
+            - link ".AccessibilityAnnouncer" [ref=e3444] [cursor=pointer]:
+              - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - list [ref=e3445]:
+              - listitem [ref=e3446]:
+                - link "new exports.AccessibilityAnnouncer()" [ref=e3447] [cursor=pointer]:
+                  - /url: "#new_module_AccessibilityAnnouncer.AccessibilityAnnouncer_new"
+              - listitem [ref=e3448]:
+                - link "accessibilityAnnouncer.initializeLiveRegions()" [ref=e3449] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+initializeLiveRegions"
+                - text: ⇒
+                - code [ref=e3450]: void
+              - listitem [ref=e3451]:
+                - link "accessibilityAnnouncer.announce(message, options)" [ref=e3452] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+announce"
+                - text: ⇒
+                - code [ref=e3453]: boolean
+              - listitem [ref=e3454]:
+                - link "accessibilityAnnouncer.announceThemeChange(newTheme, previousTheme, source)" [ref=e3455] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+announceThemeChange"
+                - text: ⇒
+                - code [ref=e3456]: boolean
+              - listitem [ref=e3457]:
+                - link "accessibilityAnnouncer.announceAccessibilityStatus(accessibilityReport, theme)" [ref=e3458] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+announceAccessibilityStatus"
+                - text: ⇒
+                - code [ref=e3459]: boolean
+              - listitem [ref=e3460]:
+                - link "accessibilityAnnouncer.sanitizeMessage(message)" [ref=e3461] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+sanitizeMessage"
+                - text: ⇒
+                - code [ref=e3462]: string
+                - text: "|"
+                - code [ref=e3463]: "null"
+              - listitem [ref=e3464]:
+                - link "accessibilityAnnouncer.isDuplicateAnnouncement(announcement)" [ref=e3465] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+isDuplicateAnnouncement"
+                - text: ⇒
+                - code [ref=e3466]: boolean
+              - listitem [ref=e3467]:
+                - link "accessibilityAnnouncer.queueAnnouncement(announcement)" [ref=e3468] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+queueAnnouncement"
+                - text: ⇒
+                - code [ref=e3469]: boolean
+              - listitem [ref=e3470]:
+                - link "accessibilityAnnouncer.processAnnouncementQueue()" [ref=e3471] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+processAnnouncementQueue"
+                - text: ⇒
+                - code [ref=e3472]: void
+              - listitem [ref=e3473]:
+                - link "accessibilityAnnouncer.performAnnouncement(announcement)" [ref=e3474] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+performAnnouncement"
+                - text: ⇒
+                - code [ref=e3475]: boolean
+              - listitem [ref=e3476]:
+                - link "accessibilityAnnouncer.generateAnnouncementId()" [ref=e3477] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+generateAnnouncementId"
+                - text: ⇒
+                - code [ref=e3478]: string
+              - listitem [ref=e3479]:
+                - link "accessibilityAnnouncer.getStats()" [ref=e3480] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+getStats"
+                - text: ⇒
+                - code [ref=e3481]: Object
+              - listitem [ref=e3482]:
+                - link "accessibilityAnnouncer.clearQueue()" [ref=e3483] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+clearQueue"
+                - text: ⇒
+                - code [ref=e3484]: void
+              - listitem [ref=e3485]:
+                - link "accessibilityAnnouncer.registerCleanup()" [ref=e3486] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+registerCleanup"
+                - text: ⇒
+                - code [ref=e3487]: void
+              - listitem [ref=e3488]:
+                - link "accessibilityAnnouncer.destroy()" [ref=e3489] [cursor=pointer]:
+                  - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer+destroy"
+                - text: ⇒
+                - code [ref=e3490]: void
+        - separator [ref=e3491]
+        - paragraph
+        - heading "new exports.AccessibilityAnnouncer()" [level=5] [ref=e3492]
+        - paragraph [ref=e3493]: Constructor - initializes live regions and announcement queue
+        - separator [ref=e3494]
+        - paragraph
+        - heading "accessibilityAnnouncer.initializeLiveRegions() ⇒ void" [level=5] [ref=e3495]:
+          - text: accessibilityAnnouncer.initializeLiveRegions() ⇒
+          - code [ref=e3496]: void
+        - paragraph [ref=e3497]:
+          - text: Initialize ARIA live regions in the DOM
+          - text: Creates invisible but accessible regions for screen reader announcements
+        - paragraph [ref=e3498]:
+          - strong [ref=e3499]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3500] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3501] [cursor=pointer]: AccessibilityAnnouncer
+        - separator [ref=e3502]
+        - paragraph
+        - heading "accessibilityAnnouncer.announce(message, options) ⇒ boolean" [level=5] [ref=e3503]:
+          - text: accessibilityAnnouncer.announce(message, options) ⇒
+          - code [ref=e3504]: boolean
+        - paragraph [ref=e3505]: Announce message to screen readers with specified priority
+        - paragraph [ref=e3506]:
+          - strong [ref=e3507]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3508] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3509] [cursor=pointer]: AccessibilityAnnouncer
+          - strong [ref=e3510]: Returns
+          - text: ":"
+          - code [ref=e3511]: boolean
+          - text: "- True if announcement was queued/announced, false otherwise"
+        - grid [ref=e3515]:
+          - rowgroup [ref=e3517]:
+            - row "Param Type Description" [ref=e3518]:
+              - columnheader "Param" [ref=e3519]:
+                - generic [ref=e3522] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3523]:
+                - generic [ref=e3526] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e3527]:
+                - generic [ref=e3530] [cursor=pointer]: Description
+          - rowgroup [ref=e3531]:
+            - row "message string Message to announce" [ref=e3532]:
+              - gridcell "message" [ref=e3533]
+              - gridcell "string" [ref=e3534]
+              - gridcell "Message to announce" [ref=e3535]
+            - row "options Object Announcement options" [ref=e3536]:
+              - gridcell "options" [ref=e3537]
+              - gridcell "Object" [ref=e3538]
+              - gridcell "Announcement options" [ref=e3539]
+            - 'row "options.priority string ''polite'', ''assertive'', or ''status'' (default: ''polite'')" [ref=e3540]':
+              - gridcell "options.priority" [ref=e3541]
+              - gridcell "string" [ref=e3542]
+              - 'gridcell "''polite'', ''assertive'', or ''status'' (default: ''polite'')" [ref=e3543]'
+            - 'row "options.immediate boolean Skip queue and announce immediately (default: false)" [ref=e3544]':
+              - gridcell "options.immediate" [ref=e3545]
+              - gridcell "boolean" [ref=e3546]
+              - 'gridcell "Skip queue and announce immediately (default: false)" [ref=e3547]'
+            - 'row "options.category string Category for duplicate filtering (default: ''general'')" [ref=e3548]':
+              - gridcell "options.category" [ref=e3549]
+              - gridcell "string" [ref=e3550]
+              - 'gridcell "Category for duplicate filtering (default: ''general'')" [ref=e3551]'
+          - rowgroup
+          - rowgroup [ref=e3552]
+          - rowgroup
+        - separator [ref=e3553]
+        - paragraph
+        - heading "accessibilityAnnouncer.announceThemeChange(newTheme, previousTheme, source) ⇒ boolean" [level=5] [ref=e3554]:
+          - text: accessibilityAnnouncer.announceThemeChange(newTheme, previousTheme, source) ⇒
+          - code [ref=e3555]: boolean
+        - paragraph [ref=e3556]:
+          - text: Announce theme change specifically - T044 primary use case
+          - text: Provides contextual information about the theme switch
+        - paragraph [ref=e3557]:
+          - strong [ref=e3558]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3559] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3560] [cursor=pointer]: AccessibilityAnnouncer
+          - strong [ref=e3561]: Returns
+          - text: ":"
+          - code [ref=e3562]: boolean
+          - text: "- True if announcement was successful"
+        - grid [ref=e3566]:
+          - rowgroup [ref=e3568]:
+            - row "Param Type Default Description" [ref=e3569]:
+              - columnheader "Param" [ref=e3570]:
+                - generic [ref=e3573] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3574]:
+                - generic [ref=e3577] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e3578]:
+                - generic [ref=e3581] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e3582]:
+                - generic [ref=e3585] [cursor=pointer]: Description
+          - rowgroup [ref=e3586]:
+            - row "newTheme string The new theme ('light' or 'dark')" [ref=e3587]:
+              - gridcell "newTheme" [ref=e3588]
+              - gridcell "string" [ref=e3589]
+              - gridcell [ref=e3590]
+              - gridcell "The new theme ('light' or 'dark')" [ref=e3591]
+            - row "previousTheme string The previous theme" [ref=e3592]:
+              - gridcell "previousTheme" [ref=e3593]
+              - gridcell "string" [ref=e3594]
+              - gridcell [ref=e3595]
+              - gridcell "The previous theme" [ref=e3596]
+            - row "source string \"user\" Source of the change ('user', 'system', etc.)" [ref=e3597]:
+              - gridcell "source" [ref=e3598]
+              - gridcell "string" [ref=e3599]
+              - gridcell "\"user\"" [ref=e3600]
+              - gridcell "Source of the change ('user', 'system', etc.)" [ref=e3601]
+          - rowgroup
+          - rowgroup [ref=e3602]
+          - rowgroup
+        - separator [ref=e3603]
+        - paragraph
+        - heading "accessibilityAnnouncer.announceAccessibilityStatus(accessibilityReport, theme) ⇒ boolean" [level=5] [ref=e3604]:
+          - text: accessibilityAnnouncer.announceAccessibilityStatus(accessibilityReport, theme) ⇒
+          - code [ref=e3605]: boolean
+        - paragraph [ref=e3606]:
+          - text: Announce accessibility compliance status - T044 enhancement
+          - text: Informs users about WCAG compliance when theme changes
+        - paragraph [ref=e3607]:
+          - strong [ref=e3608]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3609] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3610] [cursor=pointer]: AccessibilityAnnouncer
+          - strong [ref=e3611]: Returns
+          - text: ":"
+          - code [ref=e3612]: boolean
+          - text: "- True if announcement was successful"
+        - grid [ref=e3616]:
+          - rowgroup [ref=e3618]:
+            - row "Param Type Description" [ref=e3619]:
+              - columnheader "Param" [ref=e3620]:
+                - generic [ref=e3623] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3624]:
+                - generic [ref=e3627] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e3628]:
+                - generic [ref=e3631] [cursor=pointer]: Description
+          - rowgroup [ref=e3632]:
+            - row "accessibilityReport Object Report from WCAG validator" [ref=e3633]:
+              - gridcell "accessibilityReport" [ref=e3634]
+              - gridcell "Object" [ref=e3635]
+              - gridcell "Report from WCAG validator" [ref=e3636]
+            - row "theme string Current theme" [ref=e3637]:
+              - gridcell "theme" [ref=e3638]
+              - gridcell "string" [ref=e3639]
+              - gridcell "Current theme" [ref=e3640]
+          - rowgroup
+          - rowgroup [ref=e3641]
+          - rowgroup
+        - separator [ref=e3642]
+        - paragraph
+        - heading "accessibilityAnnouncer.sanitizeMessage(message) ⇒ string | null" [level=5] [ref=e3643]:
+          - text: accessibilityAnnouncer.sanitizeMessage(message) ⇒
+          - code [ref=e3644]: string
+          - text: "|"
+          - code [ref=e3645]: "null"
+        - paragraph [ref=e3646]: Sanitize message to prevent XSS and ensure safe announcement
+        - paragraph [ref=e3647]:
+          - strong [ref=e3648]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3649] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3650] [cursor=pointer]: AccessibilityAnnouncer
+          - strong [ref=e3651]: Returns
+          - text: ":"
+          - code [ref=e3652]: string
+          - text: "|"
+          - code [ref=e3653]: "null"
+          - text: "- Sanitized message or null if unsafe"
+        - grid [ref=e3657]:
+          - rowgroup [ref=e3659]:
+            - row "Param Type Description" [ref=e3660]:
+              - columnheader "Param" [ref=e3661]:
+                - generic [ref=e3664] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3665]:
+                - generic [ref=e3668] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e3669]:
+                - generic [ref=e3672] [cursor=pointer]: Description
+          - rowgroup [ref=e3673]:
+            - row "message string Message to sanitize" [ref=e3674]:
+              - gridcell "message" [ref=e3675]
+              - gridcell "string" [ref=e3676]
+              - gridcell "Message to sanitize" [ref=e3677]
+          - rowgroup
+          - rowgroup [ref=e3678]
+          - rowgroup
+        - separator [ref=e3679]
+        - paragraph
+        - heading "accessibilityAnnouncer.isDuplicateAnnouncement(announcement) ⇒ boolean" [level=5] [ref=e3680]:
+          - text: accessibilityAnnouncer.isDuplicateAnnouncement(announcement) ⇒
+          - code [ref=e3681]: boolean
+        - paragraph [ref=e3682]: Check if announcement is a duplicate to prevent spam
+        - paragraph [ref=e3683]:
+          - strong [ref=e3684]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3685] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3686] [cursor=pointer]: AccessibilityAnnouncer
+          - strong [ref=e3687]: Returns
+          - text: ":"
+          - code [ref=e3688]: boolean
+          - text: "- True if this is a duplicate announcement"
+        - grid [ref=e3692]:
+          - rowgroup [ref=e3694]:
+            - row "Param Type Description" [ref=e3695]:
+              - columnheader "Param" [ref=e3696]:
+                - generic [ref=e3699] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3700]:
+                - generic [ref=e3703] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e3704]:
+                - generic [ref=e3707] [cursor=pointer]: Description
+          - rowgroup [ref=e3708]:
+            - row "announcement Object Announcement to check" [ref=e3709]:
+              - gridcell "announcement" [ref=e3710]
+              - gridcell "Object" [ref=e3711]
+              - gridcell "Announcement to check" [ref=e3712]
+          - rowgroup
+          - rowgroup [ref=e3713]
+          - rowgroup
+        - separator [ref=e3714]
+        - paragraph
+        - heading "accessibilityAnnouncer.queueAnnouncement(announcement) ⇒ boolean" [level=5] [ref=e3715]:
+          - text: accessibilityAnnouncer.queueAnnouncement(announcement) ⇒
+          - code [ref=e3716]: boolean
+        - paragraph [ref=e3717]: Add announcement to queue for processing
+        - paragraph [ref=e3718]:
+          - strong [ref=e3719]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3720] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3721] [cursor=pointer]: AccessibilityAnnouncer
+          - strong [ref=e3722]: Returns
+          - text: ":"
+          - code [ref=e3723]: boolean
+          - text: "- True if queued successfully"
+        - grid [ref=e3727]:
+          - rowgroup [ref=e3729]:
+            - row "Param Type Description" [ref=e3730]:
+              - columnheader "Param" [ref=e3731]:
+                - generic [ref=e3734] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3735]:
+                - generic [ref=e3738] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e3739]:
+                - generic [ref=e3742] [cursor=pointer]: Description
+          - rowgroup [ref=e3743]:
+            - row "announcement Object Announcement object" [ref=e3744]:
+              - gridcell "announcement" [ref=e3745]
+              - gridcell "Object" [ref=e3746]
+              - gridcell "Announcement object" [ref=e3747]
+          - rowgroup
+          - rowgroup [ref=e3748]
+          - rowgroup
+        - separator [ref=e3749]
+        - paragraph
+        - heading "accessibilityAnnouncer.processAnnouncementQueue() ⇒ void" [level=5] [ref=e3750]:
+          - text: accessibilityAnnouncer.processAnnouncementQueue() ⇒
+          - code [ref=e3751]: void
+        - paragraph [ref=e3752]: Process the announcement queue sequentially
+        - paragraph [ref=e3753]:
+          - strong [ref=e3754]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3755] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3756] [cursor=pointer]: AccessibilityAnnouncer
+        - separator [ref=e3757]
+        - paragraph
+        - heading "accessibilityAnnouncer.performAnnouncement(announcement) ⇒ boolean" [level=5] [ref=e3758]:
+          - text: accessibilityAnnouncer.performAnnouncement(announcement) ⇒
+          - code [ref=e3759]: boolean
+        - paragraph [ref=e3760]: Perform the actual announcement to screen readers
+        - paragraph [ref=e3761]:
+          - strong [ref=e3762]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3763] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3764] [cursor=pointer]: AccessibilityAnnouncer
+          - strong [ref=e3765]: Returns
+          - text: ":"
+          - code [ref=e3766]: boolean
+          - text: "- True if announcement was performed"
+        - grid [ref=e3770]:
+          - rowgroup [ref=e3772]:
+            - row "Param Type Description" [ref=e3773]:
+              - columnheader "Param" [ref=e3774]:
+                - generic [ref=e3777] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3778]:
+                - generic [ref=e3781] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e3782]:
+                - generic [ref=e3785] [cursor=pointer]: Description
+          - rowgroup [ref=e3786]:
+            - row "announcement Object Announcement object" [ref=e3787]:
+              - gridcell "announcement" [ref=e3788]
+              - gridcell "Object" [ref=e3789]
+              - gridcell "Announcement object" [ref=e3790]
+          - rowgroup
+          - rowgroup [ref=e3791]
+          - rowgroup
+        - separator [ref=e3792]
+        - paragraph
+        - heading "accessibilityAnnouncer.generateAnnouncementId() ⇒ string" [level=5] [ref=e3793]:
+          - text: accessibilityAnnouncer.generateAnnouncementId() ⇒
+          - code [ref=e3794]: string
+        - paragraph [ref=e3795]: Generate unique announcement ID for tracking
+        - paragraph [ref=e3796]:
+          - strong [ref=e3797]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3798] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3799] [cursor=pointer]: AccessibilityAnnouncer
+          - strong [ref=e3800]: Returns
+          - text: ":"
+          - code [ref=e3801]: string
+          - text: "- Unique announcement identifier"
+        - separator [ref=e3802]
+        - paragraph
+        - heading "accessibilityAnnouncer.getStats() ⇒ Object" [level=5] [ref=e3803]:
+          - text: accessibilityAnnouncer.getStats() ⇒
+          - code [ref=e3804]: Object
+        - paragraph [ref=e3805]: Get announcement statistics for monitoring
+        - paragraph [ref=e3806]:
+          - strong [ref=e3807]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3808] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3809] [cursor=pointer]: AccessibilityAnnouncer
+          - strong [ref=e3810]: Returns
+          - text: ":"
+          - code [ref=e3811]: Object
+          - text: "- Statistics object"
+        - separator [ref=e3812]
+        - paragraph
+        - heading "accessibilityAnnouncer.clearQueue() ⇒ void" [level=5] [ref=e3813]:
+          - text: accessibilityAnnouncer.clearQueue() ⇒
+          - code [ref=e3814]: void
+        - paragraph [ref=e3815]: Clear announcement queue and reset state
+        - paragraph [ref=e3816]:
+          - strong [ref=e3817]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3818] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3819] [cursor=pointer]: AccessibilityAnnouncer
+        - separator [ref=e3820]
+        - paragraph
+        - heading "accessibilityAnnouncer.registerCleanup() ⇒ void" [level=5] [ref=e3821]:
+          - text: accessibilityAnnouncer.registerCleanup() ⇒
+          - code [ref=e3822]: void
+        - paragraph [ref=e3823]: Register cleanup handlers for page unload
+        - paragraph [ref=e3824]:
+          - strong [ref=e3825]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3826] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3827] [cursor=pointer]: AccessibilityAnnouncer
+        - separator [ref=e3828]
+        - paragraph
+        - heading "accessibilityAnnouncer.destroy() ⇒ void" [level=5] [ref=e3829]:
+          - text: accessibilityAnnouncer.destroy() ⇒
+          - code [ref=e3830]: void
+        - paragraph [ref=e3831]: Clean up resources and remove DOM elements
+        - paragraph [ref=e3832]:
+          - strong [ref=e3833]: Kind
+          - text: ": instance method of"
+          - link "AccessibilityAnnouncer" [ref=e3834] [cursor=pointer]:
+            - /url: "#module_AccessibilityAnnouncer.AccessibilityAnnouncer"
+            - code [ref=e3835] [cursor=pointer]: AccessibilityAnnouncer
+        - separator [ref=e3836]
+        - paragraph
+        - heading "ChartThemeAdapter" [level=3] [ref=e3837]
+        - paragraph [ref=e3838]:
+          - strong [ref=e3839]: Kind
+          - text: ": global class"
+        - list [ref=e3840]:
+          - listitem [ref=e3841]:
+            - link "ChartThemeAdapter" [ref=e3842] [cursor=pointer]:
+              - /url: "#ChartThemeAdapter"
+            - list [ref=e3843]:
+              - listitem [ref=e3844]:
+                - link "new ChartThemeAdapter()" [ref=e3845] [cursor=pointer]:
+                  - /url: "#new_ChartThemeAdapter_new"
+              - listitem [ref=e3846]:
+                - link "chartThemeAdapter.detectCurrentTheme()" [ref=e3847] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+detectCurrentTheme"
+                - text: ⇒
+                - code [ref=e3848]: string
+              - listitem [ref=e3849]:
+                - link "chartThemeAdapter.getThemeConfig(theme)" [ref=e3850] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+getThemeConfig"
+                - text: ⇒
+                - code [ref=e3851]: Object
+              - listitem [ref=e3852]:
+                - link "chartThemeAdapter.getCSSVariables(theme)" [ref=e3853] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+getCSSVariables"
+                - text: ⇒
+                - code [ref=e3854]: Object
+              - listitem [ref=e3855]:
+                - link "chartThemeAdapter.getFallbackConfig(theme)" [ref=e3856] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+getFallbackConfig"
+                - text: ⇒
+                - code [ref=e3857]: Object
+              - listitem [ref=e3858]:
+                - link "chartThemeAdapter.getFallbackCSSVariables(theme)" [ref=e3859] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+getFallbackCSSVariables"
+                - text: ⇒
+                - code [ref=e3860]: Object
+              - listitem [ref=e3861]:
+                - link "chartThemeAdapter.getVulnerabilityColors(theme)" [ref=e3862] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+getVulnerabilityColors"
+                - text: ⇒
+                - code [ref=e3863]: Array
+              - listitem [ref=e3864]:
+                - link "chartThemeAdapter.updateChartTheme(chartInstance, theme, chartId)" [ref=e3865] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+updateChartTheme"
+                - text: ⇒
+                - code [ref=e3866]: Promise.<boolean>
+              - listitem [ref=e3867]:
+                - link "chartThemeAdapter.registerCharts(charts)" [ref=e3868] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+registerCharts"
+                - text: ⇒
+                - code [ref=e3869]: void
+              - listitem [ref=e3870]:
+                - link "chartThemeAdapter.updateAllCharts(theme)" [ref=e3871] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+updateAllCharts"
+                - text: ⇒
+                - code [ref=e3872]: Promise.<Array>
+              - listitem [ref=e3873]:
+                - link "chartThemeAdapter.applyGridTheme(gridApi, theme, gridId)" [ref=e3874] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+applyGridTheme"
+                - text: ⇒
+                - code [ref=e3875]: boolean
+              - listitem [ref=e3876]:
+                - link "chartThemeAdapter.applyGridThemeLegacy(gridApi, theme, gridId)" [ref=e3877] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+applyGridThemeLegacy"
+                - text: ⇒
+                - code [ref=e3878]: boolean
+              - listitem [ref=e3879]:
+                - link "chartThemeAdapter.registerGrids(grids)" [ref=e3880] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+registerGrids"
+                - text: ⇒
+                - code [ref=e3881]: void
+              - listitem [ref=e3882]:
+                - link "chartThemeAdapter.updateAllGrids(theme)" [ref=e3883] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+updateAllGrids"
+                - text: ⇒
+                - code [ref=e3884]: Array.<boolean>
+              - listitem [ref=e3885]:
+                - link "chartThemeAdapter.updateAllComponents(theme)" [ref=e3886] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+updateAllComponents"
+                - text: ⇒
+                - code [ref=e3887]: Promise.<Object>
+              - listitem [ref=e3888]:
+                - link "chartThemeAdapter.getCurrentTheme()" [ref=e3889] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+getCurrentTheme"
+                - text: ⇒
+                - code [ref=e3890]: string
+              - listitem [ref=e3891]:
+                - link "chartThemeAdapter.getRegistryStatus()" [ref=e3892] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+getRegistryStatus"
+                - text: ⇒
+                - code [ref=e3893]: Object
+              - listitem [ref=e3894]:
+                - link "chartThemeAdapter.clearRegistry()" [ref=e3895] [cursor=pointer]:
+                  - /url: "#ChartThemeAdapter+clearRegistry"
+                - text: ⇒
+                - code [ref=e3896]: void
+        - separator [ref=e3897]
+        - paragraph
+        - heading "new ChartThemeAdapter()" [level=4] [ref=e3898]
+        - paragraph [ref=e3899]:
+          - text: Creates an instance of ChartThemeAdapter.
+          - text: "T025: Initialize theme detection and chart registry"
+        - separator [ref=e3900]
+        - paragraph
+        - heading "chartThemeAdapter.detectCurrentTheme() ⇒ string" [level=4] [ref=e3901]:
+          - text: chartThemeAdapter.detectCurrentTheme() ⇒
+          - code [ref=e3902]: string
+        - paragraph [ref=e3903]:
+          - text: Detect current theme from document element
+          - text: "T025: Theme detection logic"
+        - paragraph [ref=e3904]:
+          - strong [ref=e3905]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e3906] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e3907] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e3908]: Returns
+          - text: ":"
+          - code [ref=e3909]: string
+          - text: "- Current theme ('light' | 'dark')"
+        - separator [ref=e3910]
+        - paragraph
+        - heading "chartThemeAdapter.getThemeConfig(theme) ⇒ Object" [level=4] [ref=e3911]:
+          - text: chartThemeAdapter.getThemeConfig(theme) ⇒
+          - code [ref=e3912]: Object
+        - paragraph [ref=e3913]:
+          - text: Retrieves the theme configuration for ApexCharts based on the specified theme.
+          - text: "T025: Complete ApexCharts theme configuration with CSS custom properties"
+        - paragraph [ref=e3914]:
+          - strong [ref=e3915]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e3916] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e3917] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e3918]: Returns
+          - text: ":"
+          - code [ref=e3919]: Object
+          - text: "- The configuration object for ApexCharts compatible with the theme"
+        - grid [ref=e3923]:
+          - rowgroup [ref=e3925]:
+            - row "Param Type Default Description" [ref=e3926]:
+              - columnheader "Param" [ref=e3927]:
+                - generic [ref=e3930] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3931]:
+                - generic [ref=e3934] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e3935]:
+                - generic [ref=e3938] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e3939]:
+                - generic [ref=e3942] [cursor=pointer]: Description
+          - rowgroup [ref=e3943]:
+            - row "theme string \"light\" The theme to apply ('light' or 'dark')" [ref=e3944]:
+              - gridcell "theme" [ref=e3945]
+              - gridcell "string" [ref=e3946]
+              - gridcell "\"light\"" [ref=e3947]
+              - gridcell "The theme to apply ('light' or 'dark')" [ref=e3948]
+          - rowgroup
+          - rowgroup [ref=e3949]
+          - rowgroup
+        - separator [ref=e3950]
+        - paragraph
+        - heading "chartThemeAdapter.getCSSVariables(theme) ⇒ Object" [level=4] [ref=e3951]:
+          - text: chartThemeAdapter.getCSSVariables(theme) ⇒
+          - code [ref=e3952]: Object
+        - paragraph [ref=e3953]:
+          - text: Get CSS custom property values for theming
+          - text: "T025: CSS variable extraction for dynamic theming"
+        - paragraph [ref=e3954]:
+          - strong [ref=e3955]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e3956] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e3957] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e3958]: Returns
+          - text: ":"
+          - code [ref=e3959]: Object
+          - text: "- CSS variable values"
+        - grid [ref=e3963]:
+          - rowgroup [ref=e3965]:
+            - row "Param Type Description" [ref=e3966]:
+              - columnheader "Param" [ref=e3967]:
+                - generic [ref=e3970] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e3971]:
+                - generic [ref=e3974] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e3975]:
+                - generic [ref=e3978] [cursor=pointer]: Description
+          - rowgroup [ref=e3979]:
+            - row "theme string Theme name ('light'" [ref=e3980]:
+              - gridcell "theme" [ref=e3981]
+              - gridcell "string" [ref=e3982]
+              - gridcell "Theme name ('light'" [ref=e3983]
+          - rowgroup
+          - rowgroup [ref=e3984]
+          - rowgroup
+        - separator [ref=e3985]
+        - paragraph
+        - heading "chartThemeAdapter.getFallbackConfig(theme) ⇒ Object" [level=4] [ref=e3986]:
+          - text: chartThemeAdapter.getFallbackConfig(theme) ⇒
+          - code [ref=e3987]: Object
+        - paragraph [ref=e3988]:
+          - text: Fallback theme configuration when CSS variables fail
+          - text: "T025: Error resilience for theme configuration"
+        - paragraph [ref=e3989]:
+          - strong [ref=e3990]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e3991] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e3992] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e3993]: Returns
+          - text: ":"
+          - code [ref=e3994]: Object
+          - text: "- Fallback configuration"
+        - grid [ref=e3998]:
+          - rowgroup [ref=e4000]:
+            - row "Param Type Description" [ref=e4001]:
+              - columnheader "Param" [ref=e4002]:
+                - generic [ref=e4005] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4006]:
+                - generic [ref=e4009] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4010]:
+                - generic [ref=e4013] [cursor=pointer]: Description
+          - rowgroup [ref=e4014]:
+            - row "theme string Theme name" [ref=e4015]:
+              - gridcell "theme" [ref=e4016]
+              - gridcell "string" [ref=e4017]
+              - gridcell "Theme name" [ref=e4018]
+          - rowgroup
+          - rowgroup [ref=e4019]
+          - rowgroup
+        - separator [ref=e4020]
+        - paragraph
+        - heading "chartThemeAdapter.getFallbackCSSVariables(theme) ⇒ Object" [level=4] [ref=e4021]:
+          - text: chartThemeAdapter.getFallbackCSSVariables(theme) ⇒
+          - code [ref=e4022]: Object
+        - paragraph [ref=e4023]: Fallback CSS variables when extraction fails
+        - paragraph [ref=e4024]:
+          - strong [ref=e4025]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4026] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4027] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e4028]: Returns
+          - text: ":"
+          - code [ref=e4029]: Object
+          - text: "- Fallback CSS variables"
+        - grid [ref=e4033]:
+          - rowgroup [ref=e4035]:
+            - row "Param Type Description" [ref=e4036]:
+              - columnheader "Param" [ref=e4037]:
+                - generic [ref=e4040] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4041]:
+                - generic [ref=e4044] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4045]:
+                - generic [ref=e4048] [cursor=pointer]: Description
+          - rowgroup [ref=e4049]:
+            - row "theme string Theme name" [ref=e4050]:
+              - gridcell "theme" [ref=e4051]
+              - gridcell "string" [ref=e4052]
+              - gridcell "Theme name" [ref=e4053]
+          - rowgroup
+          - rowgroup [ref=e4054]
+          - rowgroup
+        - separator [ref=e4055]
+        - paragraph
+        - heading "chartThemeAdapter.getVulnerabilityColors(theme) ⇒ Array" [level=4] [ref=e4056]:
+          - text: chartThemeAdapter.getVulnerabilityColors(theme) ⇒
+          - code [ref=e4057]: Array
+        - paragraph [ref=e4058]: Get vulnerability-specific chart colors - S002
+        - paragraph [ref=e4059]:
+          - strong [ref=e4060]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4061] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4062] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e4063]: Returns
+          - text: ":"
+          - code [ref=e4064]: Array
+          - text: "- Array of vulnerability severity colors [critical, high, medium, low]"
+        - grid [ref=e4068]:
+          - rowgroup [ref=e4070]:
+            - row "Param Type Default Description" [ref=e4071]:
+              - columnheader "Param" [ref=e4072]:
+                - generic [ref=e4075] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4076]:
+                - generic [ref=e4079] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e4080]:
+                - generic [ref=e4083] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e4084]:
+                - generic [ref=e4087] [cursor=pointer]: Description
+          - rowgroup [ref=e4088]:
+            - row "theme string \"light\" Theme name ('light'" [ref=e4089]:
+              - gridcell "theme" [ref=e4090]
+              - gridcell "string" [ref=e4091]
+              - gridcell "\"light\"" [ref=e4092]
+              - gridcell "Theme name ('light'" [ref=e4093]
+          - rowgroup
+          - rowgroup [ref=e4094]
+          - rowgroup
+        - separator [ref=e4095]
+        - paragraph
+        - heading "chartThemeAdapter.updateChartTheme(chartInstance, theme, chartId) ⇒ Promise.<boolean>" [level=4] [ref=e4096]:
+          - text: chartThemeAdapter.updateChartTheme(chartInstance, theme, chartId) ⇒
+          - code [ref=e4097]: Promise.<boolean>
+        - paragraph [ref=e4098]:
+          - text: Updates the theme of an existing ApexCharts instance.
+          - text: "T025: Dynamic chart theme updates with performance optimization"
+        - paragraph [ref=e4099]:
+          - strong [ref=e4100]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4101] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4102] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e4103]: Returns
+          - text: ":"
+          - code [ref=e4104]: Promise.<boolean>
+          - text: "- True if update succeeded"
+        - grid [ref=e4108]:
+          - rowgroup [ref=e4110]:
+            - row "Param Type Default Description" [ref=e4111]:
+              - columnheader "Param" [ref=e4112]:
+                - generic [ref=e4115] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4116]:
+                - generic [ref=e4119] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e4120]:
+                - generic [ref=e4123] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e4124]:
+                - generic [ref=e4127] [cursor=pointer]: Description
+          - rowgroup [ref=e4128]:
+            - row "chartInstance Object The ApexCharts instance to update" [ref=e4129]:
+              - gridcell "chartInstance" [ref=e4130]
+              - gridcell "Object" [ref=e4131]
+              - gridcell [ref=e4132]
+              - gridcell "The ApexCharts instance to update" [ref=e4133]
+            - row "theme string The theme to apply ('light' or 'dark')" [ref=e4134]:
+              - gridcell "theme" [ref=e4135]
+              - gridcell "string" [ref=e4136]
+              - gridcell [ref=e4137]
+              - gridcell "The theme to apply ('light' or 'dark')" [ref=e4138]
+            - row "chartId string null Optional chart identifier for registry" [ref=e4139]:
+              - gridcell "chartId" [ref=e4140]
+              - gridcell "string" [ref=e4141]
+              - gridcell "null" [ref=e4142]
+              - gridcell "Optional chart identifier for registry" [ref=e4143]
+          - rowgroup
+          - rowgroup [ref=e4144]
+          - rowgroup
+        - separator [ref=e4145]
+        - paragraph
+        - heading "chartThemeAdapter.registerCharts(charts) ⇒ void" [level=4] [ref=e4146]:
+          - text: chartThemeAdapter.registerCharts(charts) ⇒
+          - code [ref=e4147]: void
+        - paragraph [ref=e4148]:
+          - text: Register multiple chart instances for bulk theme updates
+          - text: "T025: Chart instance management for bulk operations"
+        - paragraph [ref=e4149]:
+          - strong [ref=e4150]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4151] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4152] [cursor=pointer]: ChartThemeAdapter
+        - grid [ref=e4156]:
+          - rowgroup [ref=e4158]:
+            - row "Param Type Description" [ref=e4159]:
+              - columnheader "Param" [ref=e4160]:
+                - generic [ref=e4163] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4164]:
+                - generic [ref=e4167] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4168]:
+                - generic [ref=e4171] [cursor=pointer]: Description
+          - rowgroup [ref=e4172]:
+            - 'row "charts Object Object with chartId: chartInstance pairs" [ref=e4173]':
+              - gridcell "charts" [ref=e4174]
+              - gridcell "Object" [ref=e4175]
+              - 'gridcell "Object with chartId: chartInstance pairs" [ref=e4176]'
+          - rowgroup
+          - rowgroup [ref=e4177]
+          - rowgroup
+        - separator [ref=e4178]
+        - paragraph
+        - heading "chartThemeAdapter.updateAllCharts(theme) ⇒ Promise.<Array>" [level=4] [ref=e4179]:
+          - text: chartThemeAdapter.updateAllCharts(theme) ⇒
+          - code [ref=e4180]: Promise.<Array>
+        - paragraph [ref=e4181]:
+          - text: Update all registered charts to new theme
+          - text: "T025: Bulk chart theme updates for performance"
+        - paragraph [ref=e4182]:
+          - strong [ref=e4183]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4184] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4185] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e4186]: Returns
+          - text: ":"
+          - code [ref=e4187]: Promise.<Array>
+          - text: "- Results of all chart updates"
+        - grid [ref=e4191]:
+          - rowgroup [ref=e4193]:
+            - row "Param Type Description" [ref=e4194]:
+              - columnheader "Param" [ref=e4195]:
+                - generic [ref=e4198] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4199]:
+                - generic [ref=e4202] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4203]:
+                - generic [ref=e4206] [cursor=pointer]: Description
+          - rowgroup [ref=e4207]:
+            - row "theme string Theme to apply to all charts" [ref=e4208]:
+              - gridcell "theme" [ref=e4209]
+              - gridcell "string" [ref=e4210]
+              - gridcell "Theme to apply to all charts" [ref=e4211]
+          - rowgroup
+          - rowgroup [ref=e4212]
+          - rowgroup
+        - separator [ref=e4213]
+        - paragraph
+        - heading "chartThemeAdapter.applyGridTheme(gridApi, theme, gridId) ⇒ boolean" [level=4] [ref=e4214]:
+          - text: chartThemeAdapter.applyGridTheme(gridApi, theme, gridId) ⇒
+          - code [ref=e4215]: boolean
+        - paragraph [ref=e4216]:
+          - text: Applies the specified theme to an AG-Grid instance using modern themeQuartz API.
+          - text: "T037: Modern AG-Grid theme switching with themeQuartz for smooth transitions"
+        - paragraph [ref=e4217]:
+          - strong [ref=e4218]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4219] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4220] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e4221]: Returns
+          - text: ":"
+          - code [ref=e4222]: boolean
+          - text: "- True if theme applied successfully"
+        - grid [ref=e4226]:
+          - rowgroup [ref=e4228]:
+            - row "Param Type Default Description" [ref=e4229]:
+              - columnheader "Param" [ref=e4230]:
+                - generic [ref=e4233] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4234]:
+                - generic [ref=e4237] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e4238]:
+                - generic [ref=e4241] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e4242]:
+                - generic [ref=e4245] [cursor=pointer]: Description
+          - rowgroup [ref=e4246]:
+            - row "gridApi Object The AG-Grid API instance to update" [ref=e4247]:
+              - gridcell "gridApi" [ref=e4248]
+              - gridcell "Object" [ref=e4249]
+              - gridcell [ref=e4250]
+              - gridcell "The AG-Grid API instance to update" [ref=e4251]
+            - row "theme string The theme to apply ('light' or 'dark')" [ref=e4252]:
+              - gridcell "theme" [ref=e4253]
+              - gridcell "string" [ref=e4254]
+              - gridcell [ref=e4255]
+              - gridcell "The theme to apply ('light' or 'dark')" [ref=e4256]
+            - row "gridId string null Optional grid identifier for registry" [ref=e4257]:
+              - gridcell "gridId" [ref=e4258]
+              - gridcell "string" [ref=e4259]
+              - gridcell "null" [ref=e4260]
+              - gridcell "Optional grid identifier for registry" [ref=e4261]
+          - rowgroup
+          - rowgroup [ref=e4262]
+          - rowgroup
+        - separator [ref=e4263]
+        - paragraph
+        - heading "chartThemeAdapter.applyGridThemeLegacy(gridApi, theme, gridId) ⇒ boolean" [level=4] [ref=e4264]:
+          - text: chartThemeAdapter.applyGridThemeLegacy(gridApi, theme, gridId) ⇒
+          - code [ref=e4265]: boolean
+        - paragraph [ref=e4266]:
+          - text: Legacy fallback method for AG-Grid theme switching using CSS classes
+          - text: "T026: Backward compatibility for older AG-Grid setups"
+        - paragraph [ref=e4267]:
+          - strong [ref=e4268]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4269] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4270] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e4271]: Returns
+          - text: ":"
+          - code [ref=e4272]: boolean
+          - text: "- True if theme applied successfully"
+        - grid [ref=e4276]:
+          - rowgroup [ref=e4278]:
+            - row "Param Type Default Description" [ref=e4279]:
+              - columnheader "Param" [ref=e4280]:
+                - generic [ref=e4283] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4284]:
+                - generic [ref=e4287] [cursor=pointer]: Type
+              - columnheader "Default" [ref=e4288]:
+                - generic [ref=e4291] [cursor=pointer]: Default
+              - columnheader "Description" [ref=e4292]:
+                - generic [ref=e4295] [cursor=pointer]: Description
+          - rowgroup [ref=e4296]:
+            - row "gridApi Object The AG-Grid API instance to update" [ref=e4297]:
+              - gridcell "gridApi" [ref=e4298]
+              - gridcell "Object" [ref=e4299]
+              - gridcell [ref=e4300]
+              - gridcell "The AG-Grid API instance to update" [ref=e4301]
+            - row "theme string The theme to apply ('light' or 'dark')" [ref=e4302]:
+              - gridcell "theme" [ref=e4303]
+              - gridcell "string" [ref=e4304]
+              - gridcell [ref=e4305]
+              - gridcell "The theme to apply ('light' or 'dark')" [ref=e4306]
+            - row "gridId string null Optional grid identifier for registry" [ref=e4307]:
+              - gridcell "gridId" [ref=e4308]
+              - gridcell "string" [ref=e4309]
+              - gridcell "null" [ref=e4310]
+              - gridcell "Optional grid identifier for registry" [ref=e4311]
+          - rowgroup
+          - rowgroup [ref=e4312]
+          - rowgroup
+        - separator [ref=e4313]
+        - paragraph
+        - heading "chartThemeAdapter.registerGrids(grids) ⇒ void" [level=4] [ref=e4314]:
+          - text: chartThemeAdapter.registerGrids(grids) ⇒
+          - code [ref=e4315]: void
+        - paragraph [ref=e4316]:
+          - text: Register multiple AG-Grid instances for bulk theme updates
+          - text: "T026: Grid instance management for bulk operations"
+        - paragraph [ref=e4317]:
+          - strong [ref=e4318]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4319] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4320] [cursor=pointer]: ChartThemeAdapter
+        - grid [ref=e4324]:
+          - rowgroup [ref=e4326]:
+            - row "Param Type Description" [ref=e4327]:
+              - columnheader "Param" [ref=e4328]:
+                - generic [ref=e4331] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4332]:
+                - generic [ref=e4335] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4336]:
+                - generic [ref=e4339] [cursor=pointer]: Description
+          - rowgroup [ref=e4340]:
+            - 'row "grids Object Object with gridId: gridApi pairs" [ref=e4341]':
+              - gridcell "grids" [ref=e4342]
+              - gridcell "Object" [ref=e4343]
+              - 'gridcell "Object with gridId: gridApi pairs" [ref=e4344]'
+          - rowgroup
+          - rowgroup [ref=e4345]
+          - rowgroup
+        - separator [ref=e4346]
+        - paragraph
+        - heading "chartThemeAdapter.updateAllGrids(theme) ⇒ Array.<boolean>" [level=4] [ref=e4347]:
+          - text: chartThemeAdapter.updateAllGrids(theme) ⇒
+          - code [ref=e4348]: Array.<boolean>
+        - paragraph [ref=e4349]:
+          - text: Update all registered grids to new theme
+          - text: "T026: Bulk grid theme updates"
+        - paragraph [ref=e4350]:
+          - strong [ref=e4351]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4352] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4353] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e4354]: Returns
+          - text: ":"
+          - code [ref=e4355]: Array.<boolean>
+          - text: "- Results of all grid updates"
+        - grid [ref=e4359]:
+          - rowgroup [ref=e4361]:
+            - row "Param Type Description" [ref=e4362]:
+              - columnheader "Param" [ref=e4363]:
+                - generic [ref=e4366] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4367]:
+                - generic [ref=e4370] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4371]:
+                - generic [ref=e4374] [cursor=pointer]: Description
+          - rowgroup [ref=e4375]:
+            - row "theme string Theme to apply to all grids" [ref=e4376]:
+              - gridcell "theme" [ref=e4377]
+              - gridcell "string" [ref=e4378]
+              - gridcell "Theme to apply to all grids" [ref=e4379]
+          - rowgroup
+          - rowgroup [ref=e4380]
+          - rowgroup
+        - separator [ref=e4381]
+        - paragraph
+        - heading "chartThemeAdapter.updateAllComponents(theme) ⇒ Promise.<Object>" [level=4] [ref=e4382]:
+          - text: chartThemeAdapter.updateAllComponents(theme) ⇒
+          - code [ref=e4383]: Promise.<Object>
+        - paragraph [ref=e4384]:
+          - text: Update all registered charts and grids to new theme
+          - text: "T025/T026: Complete theme system update"
+        - paragraph [ref=e4385]:
+          - strong [ref=e4386]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4387] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4388] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e4389]: Returns
+          - text: ":"
+          - code [ref=e4390]: Promise.<Object>
+          - text: "- Results of updates"
+        - grid [ref=e4394]:
+          - rowgroup [ref=e4396]:
+            - row "Param Type Description" [ref=e4397]:
+              - columnheader "Param" [ref=e4398]:
+                - generic [ref=e4401] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4402]:
+                - generic [ref=e4405] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4406]:
+                - generic [ref=e4409] [cursor=pointer]: Description
+          - rowgroup [ref=e4410]:
+            - row "theme string Theme to apply ('light' or 'dark')" [ref=e4411]:
+              - gridcell "theme" [ref=e4412]
+              - gridcell "string" [ref=e4413]
+              - gridcell "Theme to apply ('light' or 'dark')" [ref=e4414]
+          - rowgroup
+          - rowgroup [ref=e4415]
+          - rowgroup
+        - separator [ref=e4416]
+        - paragraph
+        - heading "chartThemeAdapter.getCurrentTheme() ⇒ string" [level=4] [ref=e4417]:
+          - text: chartThemeAdapter.getCurrentTheme() ⇒
+          - code [ref=e4418]: string
+        - paragraph [ref=e4419]: Get current theme state
+        - paragraph [ref=e4420]:
+          - strong [ref=e4421]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4422] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4423] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e4424]: Returns
+          - text: ":"
+          - code [ref=e4425]: string
+          - text: "- Current theme ('light' or 'dark')"
+        - separator [ref=e4426]
+        - paragraph
+        - heading "chartThemeAdapter.getRegistryStatus() ⇒ Object" [level=4] [ref=e4427]:
+          - text: chartThemeAdapter.getRegistryStatus() ⇒
+          - code [ref=e4428]: Object
+        - paragraph [ref=e4429]: Get registry status for debugging
+        - paragraph [ref=e4430]:
+          - strong [ref=e4431]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4432] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4433] [cursor=pointer]: ChartThemeAdapter
+          - strong [ref=e4434]: Returns
+          - text: ":"
+          - code [ref=e4435]: Object
+          - text: "- Registry information"
+        - separator [ref=e4436]
+        - paragraph
+        - heading "chartThemeAdapter.clearRegistry() ⇒ void" [level=4] [ref=e4437]:
+          - text: chartThemeAdapter.clearRegistry() ⇒
+          - code [ref=e4438]: void
+        - paragraph [ref=e4439]: Clear all registrations (useful for cleanup)
+        - paragraph [ref=e4440]:
+          - strong [ref=e4441]: Kind
+          - text: ": instance method of"
+          - link "ChartThemeAdapter" [ref=e4442] [cursor=pointer]:
+            - /url: "#ChartThemeAdapter"
+            - code [ref=e4443] [cursor=pointer]: ChartThemeAdapter
+        - separator [ref=e4444]
+        - paragraph
+        - heading "DARK_THEME_COLORS" [level=3] [ref=e4445]
+        - paragraph [ref=e4446]:
+          - text: HexTrackr Dark Theme Color Definitions
+          - text: Extracted from dark-theme.css for testing
+        - paragraph [ref=e4447]:
+          - strong [ref=e4448]: Kind
+          - text: ": global constant"
+        - separator [ref=e4449]
+        - paragraph
+        - heading "CRITICAL_COMBINATIONS" [level=3] [ref=e4450]
+        - paragraph [ref=e4451]:
+          - text: Critical text/background combinations to test
+          - text: These represent the most important UI elements for accessibility
+        - paragraph [ref=e4452]:
+          - strong [ref=e4453]: Kind
+          - text: ": global constant"
+        - separator [ref=e4454]
+        - paragraph
+        - heading "safeSetInnerHTML(element, htmlContent)" [level=3] [ref=e4455]
+        - paragraph [ref=e4456]: Safely set innerHTML with DOMPurify sanitization
+        - paragraph [ref=e4457]:
+          - strong [ref=e4458]: Kind
+          - text: ": global function"
+        - grid [ref=e4462]:
+          - rowgroup [ref=e4464]:
+            - row "Param Type Description" [ref=e4465]:
+              - columnheader "Param" [ref=e4466]:
+                - generic [ref=e4469] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4470]:
+                - generic [ref=e4473] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4474]:
+                - generic [ref=e4477] [cursor=pointer]: Description
+          - rowgroup [ref=e4478]:
+            - row "element HTMLElement The DOM element to update" [ref=e4479]:
+              - gridcell "element" [ref=e4480]
+              - gridcell "HTMLElement" [ref=e4481]
+              - gridcell "The DOM element to update" [ref=e4482]
+            - row "htmlContent string The HTML content to sanitize and inject" [ref=e4483]:
+              - gridcell "htmlContent" [ref=e4484]
+              - gridcell "string" [ref=e4485]
+              - gridcell "The HTML content to sanitize and inject" [ref=e4486]
+          - rowgroup
+          - rowgroup [ref=e4487]
+          - rowgroup
+        - separator [ref=e4488]
+        - paragraph
+        - heading "escapeHtml(text) ⇒ string" [level=3] [ref=e4489]:
+          - text: escapeHtml(text) ⇒
+          - code [ref=e4490]: string
+        - paragraph [ref=e4491]: Escape HTML entities to prevent XSS attacks
+        - paragraph [ref=e4492]:
+          - strong [ref=e4493]: Kind
+          - text: ": global function"
+          - strong [ref=e4494]: Returns
+          - text: ":"
+          - code [ref=e4495]: string
+          - text: "- - The escaped text"
+        - grid [ref=e4499]:
+          - rowgroup [ref=e4501]:
+            - row "Param Type Description" [ref=e4502]:
+              - columnheader "Param" [ref=e4503]:
+                - generic [ref=e4506] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4507]:
+                - generic [ref=e4510] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4511]:
+                - generic [ref=e4514] [cursor=pointer]: Description
+          - rowgroup [ref=e4515]:
+            - row "text string The text to escape" [ref=e4516]:
+              - gridcell "text" [ref=e4517]
+              - gridcell "string" [ref=e4518]
+              - gridcell "The text to escape" [ref=e4519]
+          - rowgroup
+          - rowgroup [ref=e4520]
+          - rowgroup
+        - separator [ref=e4521]
+        - paragraph
+        - heading "safeCreateElement(tagName, content, attributes) ⇒ HTMLElement" [level=3] [ref=e4522]:
+          - text: safeCreateElement(tagName, content, attributes) ⇒
+          - code [ref=e4523]: HTMLElement
+        - paragraph [ref=e4524]: Safely create element with sanitized content
+        - paragraph [ref=e4525]:
+          - strong [ref=e4526]: Kind
+          - text: ": global function"
+          - strong [ref=e4527]: Returns
+          - text: ":"
+          - code [ref=e4528]: HTMLElement
+          - text: "- - The created element"
+        - grid [ref=e4532]:
+          - rowgroup [ref=e4534]:
+            - row "Param Type Description" [ref=e4535]:
+              - columnheader "Param" [ref=e4536]:
+                - generic [ref=e4539] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4540]:
+                - generic [ref=e4543] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4544]:
+                - generic [ref=e4547] [cursor=pointer]: Description
+          - rowgroup [ref=e4548]:
+            - row "tagName string The HTML tag name" [ref=e4549]:
+              - gridcell "tagName" [ref=e4550]
+              - gridcell "string" [ref=e4551]
+              - gridcell "The HTML tag name" [ref=e4552]
+            - row "content string The content to sanitize" [ref=e4553]:
+              - gridcell "content" [ref=e4554]
+              - gridcell "string" [ref=e4555]
+              - gridcell "The content to sanitize" [ref=e4556]
+            - row "attributes object Optional attributes to set" [ref=e4557]:
+              - gridcell "attributes" [ref=e4558]
+              - gridcell "object" [ref=e4559]
+              - gridcell "Optional attributes to set" [ref=e4560]
+          - rowgroup
+          - rowgroup [ref=e4561]
+          - rowgroup
+        - separator [ref=e4562]
+        - paragraph
+        - heading "testDarkThemeCompliance(verbose) ⇒ Object" [level=3] [ref=e4563]:
+          - text: testDarkThemeCompliance(verbose) ⇒
+          - code [ref=e4564]: Object
+        - paragraph [ref=e4565]: Run WCAG AA compliance test on all critical color combinations
+        - paragraph [ref=e4566]:
+          - strong [ref=e4567]: Kind
+          - text: ": global function"
+          - strong [ref=e4568]: Returns
+          - text: ":"
+          - code [ref=e4569]: Object
+          - text: "- Test results with summary and violations"
+        - grid [ref=e4573]:
+          - rowgroup [ref=e4575]:
+            - row "Param Type Description" [ref=e4576]:
+              - columnheader "Param" [ref=e4577]:
+                - generic [ref=e4580] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4581]:
+                - generic [ref=e4584] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4585]:
+                - generic [ref=e4588] [cursor=pointer]: Description
+          - rowgroup [ref=e4589]:
+            - row "verbose boolean Include detailed results in output" [ref=e4590]:
+              - gridcell "verbose" [ref=e4591]
+              - gridcell "boolean" [ref=e4592]
+              - gridcell "Include detailed results in output" [ref=e4593]
+          - rowgroup
+          - rowgroup [ref=e4594]
+          - rowgroup
+        - separator [ref=e4595]
+        - paragraph
+        - heading "generateRecommendations(criticalFailures, nonCriticalFailures) ⇒ Array" [level=3] [ref=e4596]:
+          - text: generateRecommendations(criticalFailures, nonCriticalFailures) ⇒
+          - code [ref=e4597]: Array
+        - paragraph [ref=e4598]: Generate actionable recommendations for fixing accessibility issues
+        - paragraph [ref=e4599]:
+          - strong [ref=e4600]: Kind
+          - text: ": global function"
+          - strong [ref=e4601]: Returns
+          - text: ":"
+          - code [ref=e4602]: Array
+          - text: "- List of actionable recommendations"
+        - grid [ref=e4606]:
+          - rowgroup [ref=e4608]:
+            - row "Param Type Description" [ref=e4609]:
+              - columnheader "Param" [ref=e4610]:
+                - generic [ref=e4613] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4614]:
+                - generic [ref=e4617] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4618]:
+                - generic [ref=e4621] [cursor=pointer]: Description
+          - rowgroup [ref=e4622]:
+            - row "criticalFailures Array Critical accessibility violations" [ref=e4623]:
+              - gridcell "criticalFailures" [ref=e4624]
+              - gridcell "Array" [ref=e4625]
+              - gridcell "Critical accessibility violations" [ref=e4626]
+            - row "nonCriticalFailures Array Non-critical accessibility issues" [ref=e4627]:
+              - gridcell "nonCriticalFailures" [ref=e4628]
+              - gridcell "Array" [ref=e4629]
+              - gridcell "Non-critical accessibility issues" [ref=e4630]
+          - rowgroup
+          - rowgroup [ref=e4631]
+          - rowgroup
+        - separator [ref=e4632]
+        - paragraph
+        - heading "testColorCombination(foreground, background, label) ⇒ Object" [level=3] [ref=e4633]:
+          - text: testColorCombination(foreground, background, label) ⇒
+          - code [ref=e4634]: Object
+        - paragraph [ref=e4635]: Test specific color combination
+        - paragraph [ref=e4636]:
+          - strong [ref=e4637]: Kind
+          - text: ": global function"
+          - strong [ref=e4638]: Returns
+          - text: ":"
+          - code [ref=e4639]: Object
+          - text: "- Detailed test result"
+        - grid [ref=e4643]:
+          - rowgroup [ref=e4645]:
+            - row "Param Type Description" [ref=e4646]:
+              - columnheader "Param" [ref=e4647]:
+                - generic [ref=e4650] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4651]:
+                - generic [ref=e4654] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4655]:
+                - generic [ref=e4658] [cursor=pointer]: Description
+          - rowgroup [ref=e4659]:
+            - row "foreground string Foreground color (hex)" [ref=e4660]:
+              - gridcell "foreground" [ref=e4661]
+              - gridcell "string" [ref=e4662]
+              - gridcell "Foreground color (hex)" [ref=e4663]
+            - row "background string Background color (hex)" [ref=e4664]:
+              - gridcell "background" [ref=e4665]
+              - gridcell "string" [ref=e4666]
+              - gridcell "Background color (hex)" [ref=e4667]
+            - row "label string Description of the combination" [ref=e4668]:
+              - gridcell "label" [ref=e4669]
+              - gridcell "string" [ref=e4670]
+              - gridcell "Description of the combination" [ref=e4671]
+          - rowgroup
+          - rowgroup [ref=e4672]
+          - rowgroup
+        - separator [ref=e4673]
+        - paragraph
+        - heading "hexToRgb(hex) ⇒ Object" [level=3] [ref=e4674]:
+          - text: hexToRgb(hex) ⇒
+          - code [ref=e4675]: Object
+        - paragraph [ref=e4676]:
+          - text: Convert hex color to RGB values
+          - text: "Handles both 3-digit and 6-digit hex codes with or without #"
+        - paragraph [ref=e4677]:
+          - strong [ref=e4678]: Kind
+          - text: ": global function"
+          - strong [ref=e4679]: Returns
+          - text: ":"
+          - code [ref=e4680]: Object
+          - text: "- RGB values {r, g, b} or null if invalid"
+        - grid [ref=e4684]:
+          - rowgroup [ref=e4686]:
+            - row "Param Type Description" [ref=e4687]:
+              - columnheader "Param" [ref=e4688]:
+                - generic [ref=e4691] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4692]:
+                - generic [ref=e4695] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4696]:
+                - generic [ref=e4699] [cursor=pointer]: Description
+          - rowgroup [ref=e4700]:
+            - row "hex string Hex color code" [ref=e4701]:
+              - gridcell "hex" [ref=e4702]
+              - gridcell "string" [ref=e4703]
+              - gridcell "Hex color code" [ref=e4704]
+          - rowgroup
+          - rowgroup [ref=e4705]
+          - rowgroup
+        - separator [ref=e4706]
+        - paragraph
+        - heading "calculateLuminance(rgb) ⇒ number" [level=3] [ref=e4707]:
+          - text: calculateLuminance(rgb) ⇒
+          - code [ref=e4708]: number
+        - paragraph [ref=e4709]: Calculate relative luminance of a color per WCAG 2.1 formula
+        - paragraph [ref=e4710]:
+          - strong [ref=e4711]: Kind
+          - text: ": global function"
+          - strong [ref=e4712]: Returns
+          - text: ":"
+          - code [ref=e4713]: number
+          - text: "- Relative luminance (0-1)"
+        - grid [ref=e4717]:
+          - rowgroup [ref=e4719]:
+            - row "Param Type Description" [ref=e4720]:
+              - columnheader "Param" [ref=e4721]:
+                - generic [ref=e4724] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4725]:
+                - generic [ref=e4728] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4729]:
+                - generic [ref=e4732] [cursor=pointer]: Description
+          - rowgroup [ref=e4733]:
+            - 'row "rgb Object RGB color values {r, g, b}" [ref=e4734]':
+              - gridcell "rgb" [ref=e4735]
+              - gridcell "Object" [ref=e4736]
+              - 'gridcell "RGB color values {r, g, b}" [ref=e4737]'
+          - rowgroup
+          - rowgroup [ref=e4738]
+          - rowgroup
+        - separator [ref=e4739]
+        - paragraph
+        - heading "calculateContrastRatio(color1, color2) ⇒ number" [level=3] [ref=e4740]:
+          - text: calculateContrastRatio(color1, color2) ⇒
+          - code [ref=e4741]: number
+        - paragraph [ref=e4742]: Calculate contrast ratio between two colors per WCAG 2.1
+        - paragraph [ref=e4743]:
+          - strong [ref=e4744]: Kind
+          - text: ": global function"
+          - strong [ref=e4745]: Returns
+          - text: ":"
+          - code [ref=e4746]: number
+          - text: "- Contrast ratio (1-21)"
+        - grid [ref=e4750]:
+          - rowgroup [ref=e4752]:
+            - row "Param Type Description" [ref=e4753]:
+              - columnheader "Param" [ref=e4754]:
+                - generic [ref=e4757] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4758]:
+                - generic [ref=e4761] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4762]:
+                - generic [ref=e4765] [cursor=pointer]: Description
+          - rowgroup [ref=e4766]:
+            - row "color1 string First color (hex)" [ref=e4767]:
+              - gridcell "color1" [ref=e4768]
+              - gridcell "string" [ref=e4769]
+              - gridcell "First color (hex)" [ref=e4770]
+            - row "color2 string Second color (hex)" [ref=e4771]:
+              - gridcell "color2" [ref=e4772]
+              - gridcell "string" [ref=e4773]
+              - gridcell "Second color (hex)" [ref=e4774]
+          - rowgroup
+          - rowgroup [ref=e4775]
+          - rowgroup
+        - separator [ref=e4776]
+        - paragraph
+        - heading "validateWCAGCompliance(ratio, level, textSize) ⇒ Object" [level=3] [ref=e4777]:
+          - text: validateWCAGCompliance(ratio, level, textSize) ⇒
+          - code [ref=e4778]: Object
+        - paragraph [ref=e4779]: Validate if contrast ratio meets WCAG standards
+        - paragraph [ref=e4780]:
+          - strong [ref=e4781]: Kind
+          - text: ": global function"
+          - strong [ref=e4782]: Returns
+          - text: ":"
+          - code [ref=e4783]: Object
+          - text: "- Validation result"
+        - grid [ref=e4787]:
+          - rowgroup [ref=e4789]:
+            - row "Param Type Description" [ref=e4790]:
+              - columnheader "Param" [ref=e4791]:
+                - generic [ref=e4794] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4795]:
+                - generic [ref=e4798] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4799]:
+                - generic [ref=e4802] [cursor=pointer]: Description
+          - rowgroup [ref=e4803]:
+            - row "ratio number Contrast ratio to validate" [ref=e4804]:
+              - gridcell "ratio" [ref=e4805]
+              - gridcell "number" [ref=e4806]
+              - gridcell "Contrast ratio to validate" [ref=e4807]
+            - row "level string WCAG level ('AA' or 'AAA')" [ref=e4808]:
+              - gridcell "level" [ref=e4809]
+              - gridcell "string" [ref=e4810]
+              - gridcell "WCAG level ('AA' or 'AAA')" [ref=e4811]
+            - row "textSize string Text size ('normal' or 'large')" [ref=e4812]:
+              - gridcell "textSize" [ref=e4813]
+              - gridcell "string" [ref=e4814]
+              - gridcell "Text size ('normal' or 'large')" [ref=e4815]
+          - rowgroup
+          - rowgroup [ref=e4816]
+          - rowgroup
+        - separator [ref=e4817]
+        - paragraph
+        - heading "validateColorCombination(foreground, background, options) ⇒ Object" [level=3] [ref=e4818]:
+          - text: validateColorCombination(foreground, background, options) ⇒
+          - code [ref=e4819]: Object
+        - paragraph [ref=e4820]: Comprehensive contrast validation for a color combination
+        - paragraph [ref=e4821]:
+          - strong [ref=e4822]: Kind
+          - text: ": global function"
+          - strong [ref=e4823]: Returns
+          - text: ":"
+          - code [ref=e4824]: Object
+          - text: "- Complete validation results"
+        - grid [ref=e4828]:
+          - rowgroup [ref=e4830]:
+            - row "Param Type Description" [ref=e4831]:
+              - columnheader "Param" [ref=e4832]:
+                - generic [ref=e4835] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4836]:
+                - generic [ref=e4839] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4840]:
+                - generic [ref=e4843] [cursor=pointer]: Description
+          - rowgroup [ref=e4844]:
+            - row "foreground string Foreground color (hex)" [ref=e4845]:
+              - gridcell "foreground" [ref=e4846]
+              - gridcell "string" [ref=e4847]
+              - gridcell "Foreground color (hex)" [ref=e4848]
+            - row "background string Background color (hex)" [ref=e4849]:
+              - gridcell "background" [ref=e4850]
+              - gridcell "string" [ref=e4851]
+              - gridcell "Background color (hex)" [ref=e4852]
+            - row "options Object Validation options" [ref=e4853]:
+              - gridcell "options" [ref=e4854]
+              - gridcell "Object" [ref=e4855]
+              - gridcell "Validation options" [ref=e4856]
+          - rowgroup
+          - rowgroup [ref=e4857]
+          - rowgroup
+        - separator [ref=e4858]
+        - paragraph
+        - heading "batchValidateColors(combinations, options) ⇒ Array" [level=3] [ref=e4859]:
+          - text: batchValidateColors(combinations, options) ⇒
+          - code [ref=e4860]: Array
+        - paragraph [ref=e4861]: Batch validate multiple color combinations
+        - paragraph [ref=e4862]:
+          - strong [ref=e4863]: Kind
+          - text: ": global function"
+          - strong [ref=e4864]: Returns
+          - text: ":"
+          - code [ref=e4865]: Array
+          - text: "- Array of validation results"
+        - grid [ref=e4869]:
+          - rowgroup [ref=e4871]:
+            - row "Param Type Description" [ref=e4872]:
+              - columnheader "Param" [ref=e4873]:
+                - generic [ref=e4876] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4877]:
+                - generic [ref=e4880] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4881]:
+                - generic [ref=e4884] [cursor=pointer]: Description
+          - rowgroup [ref=e4885]:
+            - 'row "combinations Array Array of {fg, bg, label} objects" [ref=e4886]':
+              - gridcell "combinations" [ref=e4887]
+              - gridcell "Array" [ref=e4888]
+              - 'gridcell "Array of {fg, bg, label} objects" [ref=e4889]'
+            - row "options Object Validation options" [ref=e4890]:
+              - gridcell "options" [ref=e4891]
+              - gridcell "Object" [ref=e4892]
+              - gridcell "Validation options" [ref=e4893]
+          - rowgroup
+          - rowgroup [ref=e4894]
+          - rowgroup
+        - separator [ref=e4895]
+        - paragraph
+        - heading "generateAccessibilityReport(themeColors, level) ⇒ Object" [level=3] [ref=e4896]:
+          - text: generateAccessibilityReport(themeColors, level) ⇒
+          - code [ref=e4897]: Object
+        - paragraph [ref=e4898]: Generate accessibility report for theme colors
+        - paragraph [ref=e4899]:
+          - strong [ref=e4900]: Kind
+          - text: ": global function"
+          - strong [ref=e4901]: Returns
+          - text: ":"
+          - code [ref=e4902]: Object
+          - text: "- Accessibility report"
+        - grid [ref=e4906]:
+          - rowgroup [ref=e4908]:
+            - row "Param Type Description" [ref=e4909]:
+              - columnheader "Param" [ref=e4910]:
+                - generic [ref=e4913] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4914]:
+                - generic [ref=e4917] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4918]:
+                - generic [ref=e4921] [cursor=pointer]: Description
+          - rowgroup [ref=e4922]:
+            - row "themeColors Object Theme color definitions" [ref=e4923]:
+              - gridcell "themeColors" [ref=e4924]
+              - gridcell "Object" [ref=e4925]
+              - gridcell "Theme color definitions" [ref=e4926]
+            - row "level string WCAG level to validate against" [ref=e4927]:
+              - gridcell "level" [ref=e4928]
+              - gridcell "string" [ref=e4929]
+              - gridcell "WCAG level to validate against" [ref=e4930]
+          - rowgroup
+          - rowgroup [ref=e4931]
+          - rowgroup
+        - separator [ref=e4932]
+        - paragraph
+        - heading "suggestImprovedColors(foreground, background, targetRatio) ⇒ Object" [level=3] [ref=e4933]:
+          - text: suggestImprovedColors(foreground, background, targetRatio) ⇒
+          - code [ref=e4934]: Object
+        - paragraph [ref=e4935]: Suggest improved colors for failing combinations
+        - paragraph [ref=e4936]:
+          - strong [ref=e4937]: Kind
+          - text: ": global function"
+          - strong [ref=e4938]: Returns
+          - text: ":"
+          - code [ref=e4939]: Object
+          - text: "- Color suggestions"
+        - grid [ref=e4943]:
+          - rowgroup [ref=e4945]:
+            - row "Param Type Description" [ref=e4946]:
+              - columnheader "Param" [ref=e4947]:
+                - generic [ref=e4950] [cursor=pointer]: Param
+              - columnheader "Type" [ref=e4951]:
+                - generic [ref=e4954] [cursor=pointer]: Type
+              - columnheader "Description" [ref=e4955]:
+                - generic [ref=e4958] [cursor=pointer]: Description
+          - rowgroup [ref=e4959]:
+            - row "foreground string Current foreground color" [ref=e4960]:
+              - gridcell "foreground" [ref=e4961]
+              - gridcell "string" [ref=e4962]
+              - gridcell "Current foreground color" [ref=e4963]
+            - row "background string Current background color" [ref=e4964]:
+              - gridcell "background" [ref=e4965]
+              - gridcell "string" [ref=e4966]
+              - gridcell "Current background color" [ref=e4967]
+            - row "targetRatio number Target contrast ratio" [ref=e4968]:
+              - gridcell "targetRatio" [ref=e4969]
+              - gridcell "number" [ref=e4970]
+              - gridcell "Target contrast ratio" [ref=e4971]
+          - rowgroup
+          - rowgroup [ref=e4972]
+          - rowgroup
+        - separator [ref=e4973]
+        - separator [ref=e4974]
+        - paragraph [ref=e4975]:
+          - emphasis [ref=e4976]: "Generated: 2025-09-18T09:50:29.990Z"
+  - contentinfo [ref=e4978]:
+    - generic [ref=e4981]:
+      - list [ref=e4982]:
+        - listitem [ref=e4983]:
+          - link "HexTrackr Version" [ref=e4984] [cursor=pointer]:
+            - /url: /docs-html/#CHANGELOG
+            - img "HexTrackr Version" [ref=e4985] [cursor=pointer]
+        - listitem [ref=e4986]:
+          - text: ·
+          - link "Documentation" [ref=e4987] [cursor=pointer]:
+            - /url: /docs-html/
+            - img "Documentation" [ref=e4988] [cursor=pointer]
+        - listitem [ref=e4989]:
+          - text: ·
+          - link "GitHub Repository" [ref=e4990] [cursor=pointer]:
+            - /url: https://github.com/Lonnie-Bruton/HexTrackr
+            - img "GitHub Repository" [ref=e4991] [cursor=pointer]
+        - listitem [ref=e4992]:
+          - text: ·
+          - link "Codacy Grade A" [ref=e4993] [cursor=pointer]:
+            - /url: https://app.codacy.com?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
+            - img "Codacy Grade A" [ref=e4994] [cursor=pointer]
+      - list [ref=e4995]:
+        - listitem [ref=e4996]:
+          - img "SQLite Database" [ref=e4997]
+        - listitem [ref=e4998]:
+          - text: ·
+          - img "Express.js Backend" [ref=e4999]
+        - listitem [ref=e5000]:
+          - text: ·
+          - img "Tabler UI Framework" [ref=e5001]
+        - listitem [ref=e5002]:
+          - text: ·
+          - link "Coded with Vibes" [ref=e5003] [cursor=pointer]:
+            - /url: https://www.reddit.com/r/vibecoding
+            - img "Coded with Vibes" [ref=e5004] [cursor=pointer]
+  - generic:                                                  
+```
