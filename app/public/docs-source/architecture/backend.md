@@ -360,17 +360,17 @@ return `desc:${descriptionHash}|host:${hostIdentifier}`;
 | Domain | Endpoints | Documentation |
 | ------ | --------- | ------------- |
 | Health | `GET /health` | System health check |
-| Vulnerabilities | 14 endpoints for CRUD, stats, trends | [Vulnerabilities API](../api-reference/vulnerabilities-api.md) |
-| Imports | 6 endpoints for CSV/JSON imports | [Import API](../api-reference/imports-api.md) |
-| Tickets | 7 endpoints for CRUD and migration | [Tickets API](../api-reference/tickets-api.md) |
-| Backup/Restore | 6 endpoints for backup operations | [Backup API](../api-reference/backup-api.md) |
+| Vulnerabilities | 14 endpoints for CRUD, stats, trends | [Backend API](../api-reference/backend-api.md#vulnerabilities) |
+| Imports | 6 endpoints for CSV/JSON imports | [Backend API](../api-reference/backend-api.md#imports) |
+| Tickets | 7 endpoints for CRUD and migration | [Backend API](../api-reference/backend-api.md#tickets) |
+| Backup/Restore | 6 endpoints for backup operations | [Backend API](../api-reference/backend-api.md#backup) |
 | Documentation | Stats and portal delivery | [Docs API](../api-reference/complete-reference.md#documentation) |
 | Reference | Sites and locations lookup | [Reference Data](../api-reference/complete-reference.md#reference-data) |
 
 ### API Endpoint Summary
 
 - **Total Endpoints**: ~45 REST endpoints
-- **Import System**: 6 dedicated import endpoints (see [Import API](../api-reference/imports-api.md))
+- **Import System**: 6 dedicated import endpoints (see [Backend API](../api-reference/backend-api.md#imports))
 - **WebSocket**: Separate progress tracking on port 8988
 - **Rate Limited**: 100 requests per 15 minutes per IP
 
@@ -442,7 +442,7 @@ sequenceDiagram
     ProgressTracker->>ProgressTracker: cleanup(sessionId)
 ```
 
-For more details, see the [WebSocket API documentation](../api-reference/websocket-api.md).
+For more details, see the [WebSocket Protocol documentation](../reference/websocket.md).
 
 ---
 

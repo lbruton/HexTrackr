@@ -17,15 +17,16 @@
  */
 
 const Papa = require("papaparse");
-const crypto = require("crypto");
+const _crypto = require("crypto");
 const PathValidator = require("../utils/PathValidator");
 const DatabaseService = require("./databaseService");
-const ValidationService = require("./validationService");
+const _ValidationService = require("./validationService");
 const helpers = require("../utils/helpers");
 
 /**
- * Extract scan date from filename using various patterns
- * From server.js lines 2291-2335
+ * Extracts a date from a filename using various common patterns.
+ * @param {string} filename - The filename to parse.
+ * @returns {string|null} The extracted date in YYYY-MM-DD format, or null if no date is found.
  */
 function extractDateFromFilename(filename) {
     if (!filename) {
@@ -76,7 +77,9 @@ function extractDateFromFilename(filename) {
 }
 
 /**
- * Extract vendor from filename based on common patterns
+ * Extracts the vendor name from a filename based on common patterns.
+ * @param {string} filename - The filename to parse.
+ * @returns {string} The extracted vendor name, or "unknown" if no vendor is found.
  */
 function extractVendorFromFilename(filename) {
     if (!filename) {
@@ -106,8 +109,9 @@ function extractVendorFromFilename(filename) {
 }
 
 /**
- * Map CSV row to vulnerability record(s) with multi-CVE splitting
- * From server.js lines 252-341
+ * Maps a CSV row to one or more vulnerability records, splitting multi-CVE entries.
+ * @param {Object} row - A single row from the parsed CSV data.
+ * @returns {Array<Object>} An array of vulnerability records.
  */
 function mapVulnerabilityRow(row) {
     // CVE extraction logic - try direct field first, then extract from name
@@ -201,7 +205,9 @@ function mapVulnerabilityRow(row) {
 }
 
 /**
- * Parse CSV file using PapaParse
+ * Parses CSV data using PapaParse.
+ * @param {string} csvData - The CSV data to parse.
+ * @returns {Promise<Object>} A promise that resolves with the parsed CSV results.
  */
 async function parseCSV(csvData) {
     return new Promise((resolve, reject) => {
@@ -215,9 +221,17 @@ async function parseCSV(csvData) {
 }
 
 /**
- * Create import record in database
+ * Creates an import record in the database.
+ * @param {Object} options - The options for creating the import record.
+ * @param {string} options.filename - The name of the imported file.
+ * @param {string} options.vendor - The vendor of the imported file.
+ * @param {string} options.scanDate - The scan date of the imported file.
+ * @param {number} options.rowCount - The number of rows in the imported file.
+ * @param {number} options.fileSize - The size of the imported file.
+ * @param {Array<string>} options.headers - The headers of the imported file.
+ * @returns {Promise<Object>} A promise that resolves with the import ID and import date.
  */
-async function createImportRecord({ filename, vendor, scanDate, rowCount, fileSize, headers }) {
+async function createImportRecord({ filename, vendor, scanDate: _scanDate, rowCount, fileSize, headers }) {
     return new Promise((resolve, reject) => {
         const importDate = new Date().toISOString();
 
@@ -249,8 +263,12 @@ async function createImportRecord({ filename, vendor, scanDate, rowCount, fileSi
 }
 
 /**
- * Process vulnerabilities with enhanced lifecycle management
- * Simplified version of the complex logic from server.js lines 1306+
+ * Processes vulnerabilities with enhanced lifecycle management.
+ * @param {Array<Object>} rows - The rows of vulnerability data to process.
+ * @param {number} importId - The ID of the import record.
+ * @param {string} filePath - The path to the imported file.
+ * @param {string} scanDate - The scan date of the imported file.
+ * @returns {Promise<Object>} A promise that resolves with the import statistics.
  */
 async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, scanDate) {
     return new Promise((resolve, reject) => {
@@ -421,8 +439,16 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
 }
 
 /**
- * Process staging import with progress tracking
- * High-performance import using staging table for batch processing
+ * Processes a staging import with progress tracking.
+ * @param {Object} options - The options for processing the staging import.
+ * @param {string} options.filePath - The path to the imported file.
+ * @param {string} options.filename - The name of the imported file.
+ * @param {string} options.vendor - The vendor of the imported file.
+ * @param {string} options.scanDate - The scan date of the imported file.
+ * @param {string} options.sessionId - The ID of the import session.
+ * @param {number} options.startTime - The start time of the import session.
+ * @param {Object} options.progressTracker - The progress tracker instance.
+ * @returns {Promise<void>}
  */
 async function processStagingImport({ filePath, filename, vendor, scanDate, sessionId, startTime, progressTracker }) {
     try {
@@ -476,7 +502,16 @@ async function processStagingImport({ filePath, filename, vendor, scanDate, sess
 }
 
 /**
- * Simplified bulk load to staging table
+ * Performs a simplified bulk load to a staging table.
+ * @param {Array<Object>} rows - The rows of data to load.
+ * @param {number} importId - The ID of the import record.
+ * @param {string} scanDate - The scan date of the import.
+ * @param {string} filePath - The path to the imported file.
+ * @param {Object} responseData - The response data.
+ * @param {string} sessionId - The ID of the import session.
+ * @param {number} startTime - The start time of the import session.
+ * @param {Object} progressTracker - The progress tracker instance.
+ * @returns {Promise<Object>} A promise that resolves with the number of inserted and errored records.
  */
 async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, sessionId, startTime, progressTracker) {
     return new Promise((resolve, reject) => {
@@ -635,7 +670,9 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
 }
 
 /**
- * Process JSON vulnerability data
+ * Processes JSON vulnerability data.
+ * @param {Array<Object>} csvData - The vulnerability data to process.
+ * @returns {Promise<Object>} A promise that resolves with the number of imported records, the import ID, and any errors.
  */
 async function processVulnerabilitiesJSON(csvData) {
     return new Promise((resolve, reject) => {
@@ -725,7 +762,9 @@ async function processVulnerabilitiesJSON(csvData) {
 }
 
 /**
- * Process JSON ticket data
+ * Processes JSON ticket data.
+ * @param {Array<Object>} csvData - The ticket data to process.
+ * @returns {Promise<Object>} A promise that resolves with the number of imported records and any errors.
  */
 async function processTicketsJSON(csvData) {
     return new Promise((resolve, reject) => {
@@ -749,7 +788,7 @@ async function processTicketsJSON(csvData) {
                 if (row.devices) {
                     try {
                         devices = typeof row.devices === "string" ? JSON.parse(row.devices) : row.devices;
-                    } catch (parseError) {
+                    } catch (_parseError) {
                         devices = [row.devices]; // Fallback to array with string
                     }
                 }
@@ -796,7 +835,8 @@ async function processTicketsJSON(csvData) {
 }
 
 /**
- * Get import history with vulnerability counts
+ * Gets the import history with vulnerability counts.
+ * @returns {Promise<Array<Object>>} A promise that resolves with the import history.
  */
 async function getImportHistory() {
     return new Promise((resolve, reject) => {

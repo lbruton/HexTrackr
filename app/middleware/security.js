@@ -317,6 +317,11 @@ module.exports = {
     securityErrorHandler,
 
     // Convenience function to apply all security middleware
+    /**
+     * Applies all security middleware to the Express app.
+     * @param {object} app - The Express app instance.
+     * @returns {object} The Express app instance with security middleware applied.
+     */
     applySecurityMiddleware: function(app) {
         // Apply CORS
         app.use(this.createCorsMiddleware());

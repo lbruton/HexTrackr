@@ -156,9 +156,27 @@ class HtmlContentUpdater {
                 // Default link rendering for all other links
                 const titleAttr = title ? ` title="${title}"` : "";
                 return `<a href="${fixedHref}"${titleAttr}>${text}</a>`;
+            },
+
+            // Add heading handler to properly process {#id} anchor syntax
+            heading(token) {
+                // Handle both old and new marked.js API formats
+                const text = typeof token === "string" ? token : token.text;
+                const level = arguments.length > 1 ? arguments[1] : token.depth;
+
+                // Check for {#id} syntax in the heading text
+                const anchorMatch = text.match(/^(.+?)\s*\{#([^}]+)\}$/);
+                if (anchorMatch) {
+                    const headingText = anchorMatch[1].trim();
+                    const id = anchorMatch[2].trim();
+                    return `<h${level} id="${id}">${headingText}</h${level}>`;
+                }
+
+                // Default heading without custom ID
+                return `<h${level}>${text}</h${level}>`;
             }
         };
-        
+
         // Add code block handler for Mermaid diagrams
         renderer.code = function(token) {
             const code = typeof token === "string" ? token : token.text;

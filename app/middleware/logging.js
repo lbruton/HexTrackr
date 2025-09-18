@@ -16,11 +16,18 @@ const LOG_LEVELS = {
 };
 
 class LoggingManager {
+    /**
+     * Creates an instance of LoggingManager.
+     */
     constructor() {
         this.currentLogLevel = this.determineLogLevel();
         this.requestStats = new Map();
     }
 
+    /**
+     * Determines the log level based on the current environment.
+     * @returns {number} The log level.
+     */
     determineLogLevel() {
         const env = process.env.NODE_ENV || "development";
         switch (env) {
@@ -33,14 +40,31 @@ class LoggingManager {
         }
     }
 
+    /**
+     * Checks if a log level should be logged.
+     * @param {number} level - The log level to check.
+     * @returns {boolean} True if the log level should be logged, false otherwise.
+     */
     shouldLog(level) {
         return level <= this.currentLogLevel;
     }
 
+    /**
+     * Formats the timestamp for a log message.
+     * @returns {string} The formatted timestamp.
+     */
     formatTimestamp() {
         return new Date().toISOString();
     }
 
+    /**
+     * Formats a log message.
+     * @param {number} level - The log level.
+     * @param {string} message - The log message.
+     * @param {object} [data=null] - Additional data to log.
+     * @param {string} [requestId=null] - The request ID.
+     * @returns {string} The formatted log message.
+     */
     formatMessage(level, message, data = null, requestId = null) {
         const timestamp = this.formatTimestamp();
         const levelName = Object.keys(LOG_LEVELS)[level];
@@ -60,31 +84,60 @@ class LoggingManager {
         return formatted;
     }
 
+    /**
+     * Logs an error message.
+     * @param {string} message - The error message.
+     * @param {object} [data=null] - Additional data to log.
+     * @param {string} [requestId=null] - The request ID.
+     */
     error(message, data = null, requestId = null) {
         if (this.shouldLog(LOG_LEVELS.ERROR)) {
             console.error(this.formatMessage(LOG_LEVELS.ERROR, message, data, requestId));
         }
     }
 
+    /**
+     * Logs a warning message.
+     * @param {string} message - The warning message.
+     * @param {object} [data=null] - Additional data to log.
+     * @param {string} [requestId=null] - The request ID.
+     */
     warn(message, data = null, requestId = null) {
         if (this.shouldLog(LOG_LEVELS.WARN)) {
             console.warn(this.formatMessage(LOG_LEVELS.WARN, message, data, requestId));
         }
     }
 
+    /**
+     * Logs an info message.
+     * @param {string} message - The info message.
+     * @param {object} [data=null] - Additional data to log.
+     * @param {string} [requestId=null] - The request ID.
+     */
     info(message, data = null, requestId = null) {
         if (this.shouldLog(LOG_LEVELS.INFO)) {
             console.log(this.formatMessage(LOG_LEVELS.INFO, message, data, requestId));
         }
     }
 
+    /**
+     * Logs a debug message.
+     * @param {string} message - The debug message.
+     * @param {object} [data=null] - Additional data to log.
+     * @param {string} [requestId=null] - The request ID.
+     */
     debug(message, data = null, requestId = null) {
         if (this.shouldLog(LOG_LEVELS.DEBUG)) {
             console.log(this.formatMessage(LOG_LEVELS.DEBUG, message, data, requestId));
         }
     }
 
-    // Performance timing utilities
+    /**
+     * Starts a timer for performance monitoring.
+     * @param {string} operation - The name of the operation to time.
+     * @param {string} [requestId=null] - The request ID.
+     * @returns {string} The timer ID.
+     */
     startTimer(operation, requestId = null) {
         const timerId = `${operation}_${Date.now()}_${Math.random()}`;
         const timer = {
@@ -99,6 +152,12 @@ class LoggingManager {
         return timerId;
     }
 
+    /**
+     * Ends a timer and logs the duration.
+     * @param {string} timerId - The ID of the timer to end.
+     * @param {object} [additionalData=null] - Additional data to log.
+     * @returns {number|null} The duration of the timer in milliseconds, or null if the timer was not found.
+     */
     endTimer(timerId, additionalData = null) {
         const timer = this.requestStats.get(timerId);
         if (!timer) {
@@ -124,7 +183,14 @@ class LoggingManager {
         return duration;
     }
 
-    // Database operation logging
+    /**
+     * Logs a database operation.
+     * @param {string} operation - The name of the database operation.
+     * @param {string} query - The SQL query.
+     * @param {number} duration - The duration of the operation in milliseconds.
+     * @param {Error} [error=null] - The error object if the operation failed.
+     * @param {string} [requestId=null] - The request ID.
+     */
     logDatabaseOperation(operation, query, duration, error = null, requestId = null) {
         const logData = {
             operation,
@@ -141,7 +207,14 @@ class LoggingManager {
         }
     }
 
-    // Batch operation progress logging
+    /**
+     * Logs the progress of a batch operation.
+     * @param {string} operation - The name of the batch operation.
+     * @param {number} current - The current number of items processed.
+     * @param {number} total - The total number of items to process.
+     * @param {object} [additionalStats=null] - Additional statistics to log.
+     * @param {string} [requestId=null] - The request ID.
+     */
     logBatchProgress(operation, current, total, additionalStats = null, requestId = null) {
         const percentage = Math.round((current / total) * 100);
         const logData = {
@@ -158,7 +231,12 @@ class LoggingManager {
         }
     }
 
-    // Import/Export operation logging
+    /**
+     * Logs the progress of an import operation.
+     * @param {string} phase - The current phase of the import.
+     * @param {object} stats - Statistics about the import.
+     * @param {string} [requestId=null] - The request ID.
+     */
     logImportProgress(phase, stats, requestId = null) {
         const logData = {
             phase,
@@ -168,6 +246,13 @@ class LoggingManager {
         this.info(`Import progress: ${phase}`, logData, requestId);
     }
 
+    /**
+     * Logs the completion of an import operation.
+     * @param {string} operation - The name of the import operation.
+     * @param {object} finalStats - The final statistics of the import.
+     * @param {number} duration - The duration of the import in milliseconds.
+     * @param {string} [requestId=null] - The request ID.
+     */
     logImportCompletion(operation, finalStats, duration, requestId = null) {
         const logData = {
             operation,
@@ -178,7 +263,11 @@ class LoggingManager {
         this.info(`Import completed: ${operation}`, logData, requestId);
     }
 
-    // Memory usage logging
+    /**
+     * Logs the current memory usage.
+     * @param {string} operation - The name of the operation.
+     * @param {string} [requestId=null] - The request ID.
+     */
     logMemoryUsage(operation, requestId = null) {
         const memUsage = process.memoryUsage();
         const logData = {
@@ -191,7 +280,12 @@ class LoggingManager {
         this.debug(`Memory usage: ${operation}`, logData, requestId);
     }
 
-    // Performance summary logging
+    /**
+     * Logs a performance summary.
+     * @param {string} operation - The name of the operation.
+     * @param {object} stats - The performance statistics.
+     * @param {string} [requestId=null] - The request ID.
+     */
     logPerformanceSummary(operation, stats, requestId = null) {
         const summary = {
             operation,
@@ -254,7 +348,7 @@ function requestLoggingMiddleware(req, res, next) {
  * Error logging middleware
  * Logs uncaught errors with request context
  */
-function errorLoggingMiddleware(err, req, res, next) {
+function errorLoggingMiddleware(err, req, res, _next) {
     const requestId = req.requestId || "unknown";
 
     logger.error("Unhandled request error", {

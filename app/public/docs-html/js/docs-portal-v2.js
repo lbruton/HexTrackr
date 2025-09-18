@@ -84,6 +84,9 @@ class DocumentationPortalV2 {
         this.init();
     }
 
+    /**
+     * Initializes the documentation portal.
+     */
     async init() {
         console.log("🚀 Initializing HexTrackr Documentation Portal v2.0");
 
@@ -213,9 +216,25 @@ class DocumentationPortalV2 {
                 };
             }
             
-            // Add special sections in the desired order: Current Sprint, Roadmap, Changelog
-            const specialOrder = ["sprint", "roadmap", "changelog"];
+            // Add special sections in the desired order: Current Sprint, Roadmap, Changelog, Dev Docs
+            const specialOrder = ["sprint", "roadmap", "changelog", "developer-api"];
             for (const specialKey of specialOrder) {
+                // Handle Developer API specially (external link)
+                if (specialKey === "developer-api") {
+                    // Get current theme to pass to popup
+                    const currentTheme = localStorage.getItem("hextrackr-theme") || "dark";
+                    this.navigationStructure["developer-api"] = {
+                        title: "Dev Docs",
+                        icon: "fas fa-code",
+                        isExternal: true,
+                        url: `/dev-docs/?theme=${currentTheme}`,
+                        openInPopup: true,
+                        popupWidth: 1200,
+                        popupHeight: 800
+                    };
+                    continue;
+                }
+
                 const foundSpecial = specialSections.find(([key]) => key === specialKey);
                 if (foundSpecial) {
                     const [sectionKey, sectionData] = foundSpecial;
@@ -223,7 +242,7 @@ class DocumentationPortalV2 {
                         title: this.formatTitle(sectionKey),
                         icon: "fas fa-file-alt" // Default icon
                     };
-                    
+
                     this.navigationStructure[sectionKey] = {
                         title: config.title,
                         icon: config.icon,
@@ -684,13 +703,34 @@ class DocumentationPortalV2 {
         for (const [key, section] of Object.entries(this.navigationStructure)) {
             const hasChildren = section.children && Object.keys(section.children).length > 0;
             const collapseId = `collapse-${key}`;
-            
+
+            // Handle external links (like Developer API)
+            if (section.isExternal) {
+                // Create onclick handler that gets theme at click time
+                const baseUrl = section.url.split("?")[0]; // Remove any existing query params
+                html += `
+                    <a class="list-group-item list-group-item-action d-flex align-items-center"
+                       href="javascript:void(0)"
+                       onclick="let themeValue = 'dark'; try { const stored = localStorage.getItem('hextrackr-theme'); if (stored) { const parsed = JSON.parse(stored); themeValue = parsed.theme || 'dark'; } } catch(e) { themeValue = localStorage.getItem('hextrackr-theme') || 'dark'; } window.open('${baseUrl}?theme=' + themeValue, 'developerAPI', 'width=${section.popupWidth},height=${section.popupHeight},scrollbars=yes,resizable=yes,toolbar=no,location=no,menubar=no,status=yes'); return false;"
+                       title="Opens in a new window">
+                        <div class="d-flex align-items-center w-100">
+                            <span class="avatar avatar-xs bg-primary-lt me-3">
+                                <i class="${section.icon}"></i>
+                            </span>
+                            <span class="flex-fill text-body fw-medium">${section.title}</span>
+                            <i class="fas fa-external-link-alt ms-2 text-muted small"></i>
+                        </div>
+                    </a>
+                `;
+                continue;
+            }
+
             // Use the section's main file (which should be index) instead of first child
             const sectionFile = section.file;
 
             html += `
                 <a class="list-group-item list-group-item-action d-flex align-items-center${hasChildren ? " collapsed" : ""}"
-                   href="#${sectionFile}"
+                   href="javascript:void(0)"
                    data-section="${sectionFile}"
                    ${hasChildren ? `data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false"` : ""}>
                     <div class="d-flex align-items-center w-100">
@@ -760,7 +800,7 @@ class DocumentationPortalV2 {
         for (const [_key, child] of Object.entries(children)) {
             html += `
                 <a class="list-group-item list-group-item-action d-flex align-items-center ps-5 sub-nav-item"
-                   href="#${child.file}"
+                   href="javascript:void(0)"
                    data-section="${child.file}">
                     <span class="avatar avatar-xs bg-secondary-lt me-3">
                         <i class="fas fa-file-alt"></i>
@@ -813,6 +853,19 @@ class DocumentationPortalV2 {
         // Hash change for direct links
         window.addEventListener("hashchange", () => {
             const hash = window.location.hash.substring(1);
+
+            // Check if the hash refers to an anchor in the current page
+            if (hash && !hash.includes("/")) {
+                // This looks like an anchor within the current page
+                const element = document.getElementById(hash);
+                if (element) {
+                    // Scroll to the element
+                    element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    return;
+                }
+            }
+
+            // Otherwise, treat as section navigation
             if (hash && hash !== this.currentSection) {
                 this.loadSection(hash);
             }
@@ -983,9 +1036,9 @@ class DocumentationPortalV2 {
                     // Map section to actual file name
                     let fileName = section;
                     if (section === "overview") {
-                        fileName = "OVERVIEW"; // Special case: overview section maps to OVERVIEW.html
+                        fileName = "overview"; // Special case: keep lowercase for overview.html
                     } else if (section === "roadmap") {
-                        fileName = "ROADMAP"; // Special case: roadmap section maps to ROADMAP.html  
+                        fileName = "ROADMAP"; // Special case: roadmap section maps to ROADMAP.html
                     } else if (section === "changelog") {
                         fileName = "CHANGELOG"; // Special case: changelog section maps to CHANGELOG.html
                     } else if (section === "sprint") {
@@ -1034,11 +1087,12 @@ class DocumentationPortalV2 {
      */
     getBasePath() {
         const currentPath = window.location.pathname;
-        
+
         // If we're serving directly from docs-html directory (like http://localhost:8081)
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-            return "";  // No prefix needed when serving from docs-html itself
-        }
+        // This is removed because we always need to respect the path structure
+        // if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+        //     return "";  // No prefix needed when serving from docs-html itself
+        // }
         
         // If we're in the docs-html directory, return the path to docs-html
         if (currentPath.includes("/docs-html/")) {
@@ -1060,7 +1114,9 @@ class DocumentationPortalV2 {
      */
     getContentUrl(relativePath) {
         const basePath = this.getBasePath();
-        return `${basePath}content/${relativePath}`;
+        const fullUrl = `${basePath}content/${relativePath}`;
+        console.log(`📁 Base path: ${basePath}, Full URL: ${fullUrl}`);
+        return fullUrl;
     }
 
     /**
@@ -1259,6 +1315,60 @@ class DocumentationPortalV2 {
             Prism.highlightAllUnder(contentArea);
         }
 
+        // Handle clicks on anchor links within the content
+        contentArea.addEventListener("click", (e) => {
+            const link = e.target.closest("a");
+
+            // Handle traditional anchor links
+            if (link && link.getAttribute("href")?.startsWith("#")) {
+                const hash = link.getAttribute("href").substring(1);
+
+                // Check if this is an anchor in the current page
+                if (!hash.includes("/")) {
+                    e.preventDefault();
+                    const element = document.getElementById(hash);
+                    if (element) {
+                        // Update the URL hash without triggering hashchange
+                        history.pushState(null, null, `#${hash}`);
+                        // Scroll to the element
+                        element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                }
+            }
+
+            // Handle new documentation internal links with data attributes
+            if (link && link.classList.contains("doc-internal-link")) {
+                e.preventDefault();
+                const docRef = link.getAttribute("data-doc-ref");
+                if (docRef) {
+                    const element = document.getElementById(docRef);
+                    if (element) {
+                        // Scroll to the element
+                        element.scrollIntoView({ behavior: "smooth", block: "start" });
+
+                        // Highlight the element briefly
+                        element.style.backgroundColor = "rgba(32, 107, 196, 0.1)";
+                        element.style.transition = "background-color 0.3s";
+                        setTimeout(() => {
+                            element.style.backgroundColor = "";
+                        }, 2000);
+                    }
+                }
+            }
+
+            // Handle section links that scroll to section headers
+            if (link && link.classList.contains("doc-section-link")) {
+                e.preventDefault();
+                const section = link.getAttribute("data-doc-section");
+                if (section) {
+                    const element = document.getElementById(section);
+                    if (element) {
+                        element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                }
+            }
+        });
+
         // Initialize Mermaid diagrams
         if (window.mermaid) {
             // Configure Mermaid to match theme
@@ -1395,10 +1505,10 @@ class DocumentationPortalV2 {
         
         breadcrumb.innerHTML = `
             <li class="breadcrumb-item">
-                <a href="../tickets.html">HexTrackr</a>
+                <a href="/tickets.html">HexTrackr</a>
             </li>
             <li class="breadcrumb-item">
-                <a href="#index">Documentation</a>
+                <a href="#overview">Documentation</a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">${sectionTitle}</li>
         `;

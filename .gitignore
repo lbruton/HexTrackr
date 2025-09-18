@@ -20,6 +20,9 @@ logs/
 # Agent logs (preserved locally but not committed)
 /hextrackr-specs/data/agentlogs/
 
+# Developer documentation (auto-generated)
+app/dev-docs-html/
+
 # Temporary files
 tmp/
 temp/
@@ -84,3 +87,6 @@ claudelogs/sessions/*.md
 
 # Athena tracking file (preserve to avoid reprocessing)
 # scripts/.athena-processed-scrolls.json
+
+# Memento shared database
+memento/
