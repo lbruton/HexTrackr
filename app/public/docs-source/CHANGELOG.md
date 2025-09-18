@@ -5,6 +5,34 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.16] - 2025-09-18
+
+### Fixed
+
+#### Documentation Navigation State Management
+
+- **Navigation State Persistence Issue**: Fixed dual highlighting of menu sections when navigating to documentation from external pages
+  - Root cause: Saved navigation state from localStorage was restored even when accessing docs from tickets/vulnerabilities pages
+  - Solution: Detect external navigation via `document.referrer` and clear saved state for clean entry
+  - Added exclusive menu expansion to prevent multiple sections appearing active simultaneously
+  - Overview page now always starts with all menus collapsed for consistent presentation
+
+#### Version Consistency
+
+- **Health API Version Mismatch**: Fixed health endpoint reporting outdated version (1.0.13 instead of 1.0.15)
+  - Root cause: Hardcoded `HEXTRACKR_VERSION=1.0.13` in docker-compose.yml overriding code defaults
+  - Solution: Enhanced docs generation script to automatically sync version across all files
+
+### Changed
+
+#### Version Management System
+
+- **Centralized Version Updates**: Enhanced html-content-updater.js with comprehensive version synchronization
+  - Single source of truth: `app/public/package.json`
+  - Automatically updates: footer.html, docker-compose.yml, root package.json, and server.js fallback
+  - Runs during `npm run docs:generate` to maintain version consistency project-wide
+  - Prevents version drift across multiple hardcoded locations
+
 ## [1.0.15] - 2025-09-17
 
 ### Changed

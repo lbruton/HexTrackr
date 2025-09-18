@@ -9,6 +9,37 @@
                         <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
                              alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
                     </a>.</p>
+<h2>[1.0.16] - 2025-09-18</h2>
+<h3>Fixed</h3>
+<h4>Documentation Navigation State Management</h4>
+<ul>
+<li><strong>Navigation State Persistence Issue</strong>: Fixed dual highlighting of menu sections when navigating to documentation from external pages<ul>
+<li>Root cause: Saved navigation state from localStorage was restored even when accessing docs from tickets/vulnerabilities pages</li>
+<li>Solution: Detect external navigation via <code>document.referrer</code> and clear saved state for clean entry</li>
+<li>Added exclusive menu expansion to prevent multiple sections appearing active simultaneously</li>
+<li>Overview page now always starts with all menus collapsed for consistent presentation</li>
+</ul>
+</li>
+</ul>
+<h4>Version Consistency</h4>
+<ul>
+<li><strong>Health API Version Mismatch</strong>: Fixed health endpoint reporting outdated version (1.0.13 instead of 1.0.15)<ul>
+<li>Root cause: Hardcoded <code>HEXTRACKR_VERSION=1.0.13</code> in docker-compose.yml overriding code defaults</li>
+<li>Solution: Enhanced docs generation script to automatically sync version across all files</li>
+</ul>
+</li>
+</ul>
+<h3>Changed</h3>
+<h4>Version Management System</h4>
+<ul>
+<li><strong>Centralized Version Updates</strong>: Enhanced html-content-updater.js with comprehensive version synchronization<ul>
+<li>Single source of truth: <code>app/public/package.json</code></li>
+<li>Automatically updates: footer.html, docker-compose.yml, root package.json, and server.js fallback</li>
+<li>Runs during <code>npm run docs:generate</code> to maintain version consistency project-wide</li>
+<li>Prevents version drift across multiple hardcoded locations</li>
+</ul>
+</li>
+</ul>
 <h2>[1.0.15] - 2025-09-17</h2>
 <h3>Changed</h3>
 <h4>Backend Modularization Complete</h4>

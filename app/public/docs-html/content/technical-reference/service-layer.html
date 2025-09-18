@@ -1,0 +1,808 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Service Layer Reference</h1>
+<p>The service layer provides the business logic and data access operations for HexTrackr. Services are organized by domain and follow functional export patterns.</p>
+<h2>Overview</h2>
+<p>Services handle:</p>
+<ul>
+<li>Database operations and transactions</li>
+<li>Business logic and data transformations</li>
+<li>File system operations</li>
+<li>External integrations</li>
+<li>Complex calculations and aggregations</li>
+</ul>
+<h2>Service Architecture</h2>
+<pre><code class="language-javascript"><span class="hljs-comment">// Typical service structure</span>
+<span class="hljs-keyword">const</span> db = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../config/database&quot;</span>);
+<span class="hljs-keyword">const</span> { validateInput } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../utils/helpers&quot;</span>);
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getItems</span>(<span class="hljs-params">filters = {}</span>) {
+    <span class="hljs-comment">// Business logic</span>
+    <span class="hljs-keyword">const</span> query = <span class="hljs-title function_">buildQuery</span>(filters);
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> db.<span class="hljs-title function_">all</span>(query);
+}
+
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = {
+    getItems,
+    <span class="hljs-comment">// Other exports...</span>
+};</code></pre><h2>Core Services</h2>
+<h3>DatabaseService</h3>
+<p><strong>Location</strong>: <code>/app/services/databaseService.js</code></p>
+<p>Core database operations and connection management.</p>
+<h4>Methods</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>getDb()</code></td>
+<td>None</td>
+<td>Database instance</td>
+<td>Returns active database connection</td>
+</tr>
+<tr>
+<td><code>runQuery(sql, params)</code></td>
+<td>SQL string, parameters</td>
+<td>Query result</td>
+<td>Executes parameterized query</td>
+</tr>
+<tr>
+<td><code>transaction(callback)</code></td>
+<td>Transaction callback</td>
+<td>Transaction result</td>
+<td>Wraps operations in transaction</td>
+</tr>
+<tr>
+<td><code>backup(path)</code></td>
+<td>Backup file path</td>
+<td>Success boolean</td>
+<td>Creates database backup</td>
+</tr>
+<tr>
+<td><code>restore(path)</code></td>
+<td>Backup file path</td>
+<td>Success boolean</td>
+<td>Restores from backup</td>
+</tr>
+</tbody></table>
+<h4>Usage Example</h4>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { runQuery, transaction } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../services/databaseService&quot;</span>);
+
+<span class="hljs-comment">// Simple query</span>
+<span class="hljs-keyword">const</span> results = <span class="hljs-keyword">await</span> <span class="hljs-title function_">runQuery</span>(
+    <span class="hljs-string">&quot;SELECT * FROM vulnerabilities WHERE severity = ?&quot;</span>,
+    [<span class="hljs-string">&quot;Critical&quot;</span>]
+);
+
+<span class="hljs-comment">// Transaction</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title function_">transaction</span>(<span class="hljs-title function_">async</span> (db) =&gt; {
+    <span class="hljs-keyword">await</span> db.<span class="hljs-title function_">run</span>(<span class="hljs-string">&quot;INSERT INTO tickets ...&quot;</span>);
+    <span class="hljs-keyword">await</span> db.<span class="hljs-title function_">run</span>(<span class="hljs-string">&quot;UPDATE counters ...&quot;</span>);
+});</code></pre><hr>
+<h3>VulnerabilityService</h3>
+<p><strong>Location</strong>: <code>/app/services/vulnerabilityService.js</code></p>
+<p>Vulnerability CRUD operations and lifecycle management.</p>
+<h4>Methods</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>getVulnerabilities(filters, pagination)</code></td>
+<td>Filter object, pagination</td>
+<td>Vulnerability array</td>
+<td>Retrieves filtered vulnerabilities</td>
+</tr>
+<tr>
+<td><code>getVulnerabilityById(id)</code></td>
+<td>Vulnerability ID</td>
+<td>Vulnerability object</td>
+<td>Gets single vulnerability</td>
+</tr>
+<tr>
+<td><code>createVulnerability(data)</code></td>
+<td>Vulnerability data</td>
+<td>Created vulnerability</td>
+<td>Creates new vulnerability</td>
+</tr>
+<tr>
+<td><code>updateVulnerability(id, data)</code></td>
+<td>ID, update data</td>
+<td>Updated vulnerability</td>
+<td>Updates existing vulnerability</td>
+</tr>
+<tr>
+<td><code>deleteVulnerability(id)</code></td>
+<td>Vulnerability ID</td>
+<td>Success boolean</td>
+<td>Deletes vulnerability</td>
+</tr>
+<tr>
+<td><code>getResolvedVulnerabilities(days)</code></td>
+<td>Days to look back</td>
+<td>Resolved array</td>
+<td>Gets recently resolved vulns</td>
+</tr>
+</tbody></table>
+<h4>Data Structures</h4>
+<pre><code class="language-javascript"><span class="hljs-comment">// Vulnerability object</span>
+{
+    <span class="hljs-attr">vulnerability_id</span>: <span class="hljs-string">&quot;VULN-001&quot;</span>,
+    <span class="hljs-attr">unique_key</span>: <span class="hljs-string">&quot;plugin:123|host:server01|vendor:tenable&quot;</span>,
+    <span class="hljs-attr">title</span>: <span class="hljs-string">&quot;Critical Security Update&quot;</span>,
+    <span class="hljs-attr">severity</span>: <span class="hljs-string">&quot;Critical&quot;</span>,
+    <span class="hljs-attr">cvss</span>: <span class="hljs-number">9.8</span>,
+    <span class="hljs-attr">cve_id</span>: <span class="hljs-string">&quot;CVE-2024-1234&quot;</span>,
+    <span class="hljs-attr">affected_hosts</span>: <span class="hljs-string">&quot;server01.example.com&quot;</span>,
+    <span class="hljs-attr">port</span>: <span class="hljs-number">443</span>,
+    <span class="hljs-attr">protocol</span>: <span class="hljs-string">&quot;tcp&quot;</span>,
+    <span class="hljs-attr">service_name</span>: <span class="hljs-string">&quot;https&quot;</span>,
+    <span class="hljs-attr">remediation</span>: <span class="hljs-string">&quot;Apply security patch&quot;</span>,
+    <span class="hljs-attr">description</span>: <span class="hljs-string">&quot;Detailed vulnerability description&quot;</span>,
+    <span class="hljs-attr">vendor</span>: <span class="hljs-string">&quot;Tenable&quot;</span>,
+    <span class="hljs-attr">scan_date</span>: <span class="hljs-string">&quot;2024-03-15&quot;</span>,
+    <span class="hljs-attr">first_seen</span>: <span class="hljs-string">&quot;2024-01-01&quot;</span>,
+    <span class="hljs-attr">last_seen</span>: <span class="hljs-string">&quot;2024-03-15&quot;</span>,
+    <span class="hljs-attr">state</span>: <span class="hljs-string">&quot;active&quot;</span>
+}</code></pre><hr>
+<h3>VulnerabilityStatsService</h3>
+<p><strong>Location</strong>: <code>/app/services/vulnerabilityStatsService.js</code></p>
+<p>Statistics, aggregations, and trend analysis for vulnerabilities.</p>
+<h4>Methods</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>getStats()</code></td>
+<td>None</td>
+<td>Stats object</td>
+<td>Overall vulnerability statistics</td>
+</tr>
+<tr>
+<td><code>getTrends(days)</code></td>
+<td>Number of days</td>
+<td>Trend array</td>
+<td>Daily vulnerability trends</td>
+</tr>
+<tr>
+<td><code>getRecentTrends()</code></td>
+<td>None</td>
+<td>Trend object</td>
+<td>Last 30 days trends</td>
+</tr>
+<tr>
+<td><code>getSeverityDistribution()</code></td>
+<td>None</td>
+<td>Distribution object</td>
+<td>Count by severity</td>
+</tr>
+<tr>
+<td><code>getVendorStats()</code></td>
+<td>None</td>
+<td>Vendor stats</td>
+<td>Stats grouped by vendor</td>
+</tr>
+<tr>
+<td><code>getHostStats()</code></td>
+<td>None</td>
+<td>Host stats</td>
+<td>Most vulnerable hosts</td>
+</tr>
+</tbody></table>
+<h4>Response Examples</h4>
+<pre><code class="language-javascript"><span class="hljs-comment">// getStats() response</span>
+{
+    <span class="hljs-attr">total</span>: <span class="hljs-number">5000</span>,
+    <span class="hljs-attr">critical</span>: <span class="hljs-number">500</span>,
+    <span class="hljs-attr">high</span>: <span class="hljs-number">1500</span>,
+    <span class="hljs-attr">medium</span>: <span class="hljs-number">2000</span>,
+    <span class="hljs-attr">low</span>: <span class="hljs-number">1000</span>,
+    <span class="hljs-attr">activeHosts</span>: <span class="hljs-number">250</span>,
+    <span class="hljs-attr">resolvedLast30Days</span>: <span class="hljs-number">300</span>,
+    <span class="hljs-attr">newLast30Days</span>: <span class="hljs-number">450</span>,
+    <span class="hljs-attr">avgCVSS</span>: <span class="hljs-number">6.5</span>
+}
+
+<span class="hljs-comment">// getTrends() response</span>
+[
+    {
+        <span class="hljs-attr">date</span>: <span class="hljs-string">&quot;2024-03-15&quot;</span>,
+        <span class="hljs-attr">total</span>: <span class="hljs-number">5000</span>,
+        <span class="hljs-attr">critical</span>: <span class="hljs-number">500</span>,
+        <span class="hljs-attr">high</span>: <span class="hljs-number">1500</span>,
+        <span class="hljs-attr">new</span>: <span class="hljs-number">50</span>,
+        <span class="hljs-attr">resolved</span>: <span class="hljs-number">30</span>
+    }
+]</code></pre><hr>
+<h3>ImportService</h3>
+<p><strong>Location</strong>: <code>/app/services/importService.js</code></p>
+<p>Complex import operations for vulnerabilities and tickets.</p>
+<h4>Methods</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>parseCSV(data)</code></td>
+<td>CSV string</td>
+<td>Parsed object</td>
+<td>Parses CSV using PapaParse</td>
+</tr>
+<tr>
+<td><code>extractDateFromFilename(filename)</code></td>
+<td>Filename string</td>
+<td>Date string</td>
+<td>Extracts scan date from filename</td>
+</tr>
+<tr>
+<td><code>extractVendorFromFilename(filename)</code></td>
+<td>Filename string</td>
+<td>Vendor string</td>
+<td>Identifies vendor from filename</td>
+</tr>
+<tr>
+<td><code>createImportRecord(metadata)</code></td>
+<td>Import metadata</td>
+<td>Import record</td>
+<td>Creates import tracking record</td>
+</tr>
+<tr>
+<td><code>processVulnerabilitiesWithLifecycle(rows, importId, filePath, scanDate)</code></td>
+<td>Data array, import ID, path, date</td>
+<td>Processing result</td>
+<td>Full vulnerability import with deduplication</td>
+</tr>
+<tr>
+<td><code>bulkLoadToStagingTable(rows, importId)</code></td>
+<td>Data array, import ID</td>
+<td>Load result</td>
+<td>High-performance staging load</td>
+</tr>
+<tr>
+<td><code>processStagingToFinalTables(importId, scanDate)</code></td>
+<td>Import ID, scan date</td>
+<td>Processing result</td>
+<td>Processes staged data to final tables</td>
+</tr>
+<tr>
+<td><code>mapVulnerabilityRow(row, importId)</code></td>
+<td>CSV row, import ID</td>
+<td>Mapped object</td>
+<td>Maps CSV columns to database schema</td>
+</tr>
+</tbody></table>
+<h4>Complex Operations</h4>
+<p><strong>processVulnerabilitiesWithLifecycle</strong>: Handles the complete import lifecycle:</p>
+<ol>
+<li>Marks existing vulnerabilities as potentially stale</li>
+<li>Processes each row with deduplication</li>
+<li>Generates unique keys (4-tier strategy)</li>
+<li>Updates or inserts vulnerabilities</li>
+<li>Removes stale entries not seen in current scan</li>
+<li>Updates daily totals</li>
+</ol>
+<p><strong>Unique Key Generation</strong> (4-tier strategy):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Tier 1: Asset + Plugin (most reliable)</span>
+<span class="hljs-string">`asset:<span class="hljs-subst">${assetId}</span>|plugin:<span class="hljs-subst">${pluginId}</span>`</span>
+
+<span class="hljs-comment">// Tier 2: CVE + Host</span>
+<span class="hljs-string">`cve:<span class="hljs-subst">${cve}</span>|host:<span class="hljs-subst">${hostname}</span>`</span>
+
+<span class="hljs-comment">// Tier 3: Plugin + Host + Vendor</span>
+<span class="hljs-string">`plugin:<span class="hljs-subst">${pluginId}</span>|host:<span class="hljs-subst">${hostname}</span>|vendor:<span class="hljs-subst">${vendor}</span>`</span>
+
+<span class="hljs-comment">// Tier 4: Description hash + Host (fallback)</span>
+<span class="hljs-string">`desc:<span class="hljs-subst">${hash}</span>|host:<span class="hljs-subst">${hostname}</span>`</span></code></pre><hr>
+<h3>TicketService</h3>
+<p><strong>Location</strong>: <code>/app/services/ticketService.js</code></p>
+<p>Ticket CRUD operations and device management.</p>
+<h4>Methods</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>getAllTickets(filters)</code></td>
+<td>Filter object</td>
+<td>Ticket array</td>
+<td>Gets filtered tickets</td>
+</tr>
+<tr>
+<td><code>getTicketById(id)</code></td>
+<td>Ticket ID</td>
+<td>Ticket object</td>
+<td>Gets single ticket</td>
+</tr>
+<tr>
+<td><code>createTicket(data)</code></td>
+<td>Ticket data</td>
+<td>Created ticket</td>
+<td>Creates new ticket</td>
+</tr>
+<tr>
+<td><code>updateTicket(id, data)</code></td>
+<td>ID, update data</td>
+<td>Updated ticket</td>
+<td>Updates existing ticket</td>
+</tr>
+<tr>
+<td><code>deleteTicket(id)</code></td>
+<td>Ticket ID</td>
+<td>Success boolean</td>
+<td>Deletes ticket</td>
+</tr>
+<tr>
+<td><code>generateXTNumber()</code></td>
+<td>None</td>
+<td>XT number string</td>
+<td>Generates unique XT#</td>
+</tr>
+<tr>
+<td><code>migrateTickets(tickets)</code></td>
+<td>Ticket array</td>
+<td>Migration result</td>
+<td>Bulk ticket migration</td>
+</tr>
+</tbody></table>
+<h4>Data Structures</h4>
+<pre><code class="language-javascript"><span class="hljs-comment">// Ticket object</span>
+{
+    <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-attr">ticket_number</span>: <span class="hljs-string">&quot;INC0012345&quot;</span>,
+    <span class="hljs-attr">xt_number</span>: <span class="hljs-string">&quot;XT24-001&quot;</span>,
+    <span class="hljs-attr">title</span>: <span class="hljs-string">&quot;Network Maintenance&quot;</span>,
+    <span class="hljs-attr">description</span>: <span class="hljs-string">&quot;Scheduled maintenance window&quot;</span>,
+    <span class="hljs-attr">priority</span>: <span class="hljs-string">&quot;Medium&quot;</span>,
+    <span class="hljs-attr">status</span>: <span class="hljs-string">&quot;Open&quot;</span>,
+    <span class="hljs-attr">assignee</span>: <span class="hljs-string">&quot;John Doe&quot;</span>,
+    <span class="hljs-attr">devices</span>: [<span class="hljs-string">&quot;switch01&quot;</span>, <span class="hljs-string">&quot;router02&quot;</span>], <span class="hljs-comment">// JSON array</span>
+    <span class="hljs-attr">location</span>: <span class="hljs-string">&quot;Data Center A&quot;</span>,
+    <span class="hljs-attr">site</span>: <span class="hljs-string">&quot;Primary&quot;</span>,
+    <span class="hljs-attr">created_date</span>: <span class="hljs-string">&quot;2024-03-15T10:00:00Z&quot;</span>,
+    <span class="hljs-attr">updated_date</span>: <span class="hljs-string">&quot;2024-03-15T14:00:00Z&quot;</span>,
+    <span class="hljs-attr">notes</span>: <span class="hljs-string">&quot;Additional notes&quot;</span>
+}</code></pre><hr>
+<h3>BackupService</h3>
+<p><strong>Location</strong>: <code>/app/services/backupService.js</code></p>
+<p>Backup and restore operations for all data types.</p>
+<h4>Methods</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>getBackupStats()</code></td>
+<td>None</td>
+<td>Stats object</td>
+<td>Backup statistics</td>
+</tr>
+<tr>
+<td><code>exportVulnerabilities()</code></td>
+<td>None</td>
+<td>Vulnerability array</td>
+<td>Exports all vulnerabilities</td>
+</tr>
+<tr>
+<td><code>exportTickets()</code></td>
+<td>None</td>
+<td>Ticket array</td>
+<td>Exports all tickets</td>
+</tr>
+<tr>
+<td><code>exportAll()</code></td>
+<td>None</td>
+<td>Combined export</td>
+<td>Exports all data</td>
+</tr>
+<tr>
+<td><code>restoreBackup(data, options)</code></td>
+<td>Backup data, options</td>
+<td>Restore result</td>
+<td>Restores from backup</td>
+</tr>
+<tr>
+<td><code>clearData(type)</code></td>
+<td>Data type string</td>
+<td>Clear result</td>
+<td>Clears specific data type</td>
+</tr>
+</tbody></table>
+<h4>Restore Options</h4>
+<pre><code class="language-javascript">{
+    <span class="hljs-attr">clearExisting</span>: <span class="hljs-literal">true</span>,  <span class="hljs-comment">// Clear before restore</span>
+    <span class="hljs-attr">skipValidation</span>: <span class="hljs-literal">false</span>, <span class="hljs-comment">// Skip data validation</span>
+    <span class="hljs-attr">dataTypes</span>: [<span class="hljs-string">&quot;vulnerabilities&quot;</span>, <span class="hljs-string">&quot;tickets&quot;</span>], <span class="hljs-comment">// Types to restore</span>
+    <span class="hljs-attr">progressCallback</span>: <span class="hljs-function">(<span class="hljs-params">progress</span>) =&gt;</span> {} <span class="hljs-comment">// Progress updates</span>
+}</code></pre><hr>
+<h3>DocsService</h3>
+<p><strong>Location</strong>: <code>/app/services/docsService.js</code></p>
+<p>Documentation statistics and metadata generation.</p>
+<h4>Methods</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>computeStats()</code></td>
+<td>None</td>
+<td>Stats object</td>
+<td>Documentation statistics</td>
+</tr>
+<tr>
+<td><code>computeApiEndpoints()</code></td>
+<td>None</td>
+<td>Endpoint count</td>
+<td>Counts API endpoints</td>
+</tr>
+<tr>
+<td><code>computeJsFunctionCount()</code></td>
+<td>None</td>
+<td>Function count</td>
+<td>Counts JS functions</td>
+</tr>
+<tr>
+<td><code>computeDocPages()</code></td>
+<td>None</td>
+<td>Page count</td>
+<td>Counts documentation pages</td>
+</tr>
+<tr>
+<td><code>getFileMetadata(path)</code></td>
+<td>File path</td>
+<td>Metadata object</td>
+<td>Gets file metadata</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>FileService</h3>
+<p><strong>Location</strong>: <code>/app/services/fileService.js</code></p>
+<p>Safe file system operations using PathValidator.</p>
+<h4>Methods</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>readFile(path, options)</code></td>
+<td>File path, read options</td>
+<td>File content</td>
+<td>Safely reads file</td>
+</tr>
+<tr>
+<td><code>writeFile(path, data, options)</code></td>
+<td>Path, data, write options</td>
+<td>Success boolean</td>
+<td>Safely writes file</td>
+</tr>
+<tr>
+<td><code>deleteFile(path)</code></td>
+<td>File path</td>
+<td>Success boolean</td>
+<td>Safely deletes file</td>
+</tr>
+<tr>
+<td><code>listDirectory(path, options)</code></td>
+<td>Directory path, options</td>
+<td>File array</td>
+<td>Lists directory contents</td>
+</tr>
+<tr>
+<td><code>createDirectory(path)</code></td>
+<td>Directory path</td>
+<td>Success boolean</td>
+<td>Creates directory</td>
+</tr>
+<tr>
+<td><code>fileExists(path)</code></td>
+<td>File path</td>
+<td>Boolean</td>
+<td>Checks file existence</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>ProgressService</h3>
+<p><strong>Location</strong>: <code>/app/services/progressService.js</code></p>
+<p>WebSocket-based progress tracking for long-running operations.</p>
+<h4>Methods</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>createSession(metadata)</code></td>
+<td>Session metadata</td>
+<td>Session ID</td>
+<td>Creates progress session</td>
+</tr>
+<tr>
+<td><code>updateProgress(sessionId, progress, message)</code></td>
+<td>ID, progress %, message</td>
+<td>Success boolean</td>
+<td>Updates session progress</td>
+</tr>
+<tr>
+<td><code>completeSession(sessionId, result)</code></td>
+<td>Session ID, result</td>
+<td>Success boolean</td>
+<td>Marks session complete</td>
+</tr>
+<tr>
+<td><code>errorSession(sessionId, error)</code></td>
+<td>Session ID, error</td>
+<td>Success boolean</td>
+<td>Marks session failed</td>
+</tr>
+<tr>
+<td><code>getSession(sessionId)</code></td>
+<td>Session ID</td>
+<td>Session object</td>
+<td>Gets session details</td>
+</tr>
+<tr>
+<td><code>cleanupSessions()</code></td>
+<td>None</td>
+<td>Cleanup count</td>
+<td>Removes old sessions</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>ValidationService</h3>
+<p><strong>Location</strong>: <code>/app/services/validationService.js</code></p>
+<p>Input validation and sanitization for all data types.</p>
+<h4>Methods</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>validateVulnerability(data)</code></td>
+<td>Vulnerability object</td>
+<td>Validation result</td>
+<td>Validates vulnerability data</td>
+</tr>
+<tr>
+<td><code>validateTicket(data)</code></td>
+<td>Ticket object</td>
+<td>Validation result</td>
+<td>Validates ticket data</td>
+</tr>
+<tr>
+<td><code>sanitizeInput(input, type)</code></td>
+<td>Input data, data type</td>
+<td>Sanitized data</td>
+<td>Sanitizes user input</td>
+</tr>
+<tr>
+<td><code>validateCSVHeaders(headers, type)</code></td>
+<td>Header array, CSV type</td>
+<td>Validation result</td>
+<td>Validates CSV structure</td>
+</tr>
+<tr>
+<td><code>normalizeHostname(hostname)</code></td>
+<td>Hostname string</td>
+<td>Normalized hostname</td>
+<td>Normalizes hostname format</td>
+</tr>
+<tr>
+<td><code>normalizeIP(ip)</code></td>
+<td>IP string</td>
+<td>Normalized IP</td>
+<td>Normalizes IP address</td>
+</tr>
+</tbody></table>
+<h4>Validation Rules</h4>
+<pre><code class="language-javascript"><span class="hljs-comment">// Vulnerability validation</span>
+{
+    <span class="hljs-attr">vulnerability_id</span>: { <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">maxLength</span>: <span class="hljs-number">100</span> },
+    <span class="hljs-attr">severity</span>: { <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">enum</span>: [<span class="hljs-string">&quot;Critical&quot;</span>, <span class="hljs-string">&quot;High&quot;</span>, <span class="hljs-string">&quot;Medium&quot;</span>, <span class="hljs-string">&quot;Low&quot;</span>] },
+    <span class="hljs-attr">cvss</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;number&quot;</span>, <span class="hljs-attr">min</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">10</span> },
+    <span class="hljs-attr">port</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;number&quot;</span>, <span class="hljs-attr">min</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">65535</span> },
+    <span class="hljs-attr">cve_id</span>: { <span class="hljs-attr">pattern</span>: <span class="hljs-regexp">/^CVE-\d{4}-\d+$/</span> }
+}
+
+<span class="hljs-comment">// Ticket validation</span>
+{
+    <span class="hljs-attr">ticket_number</span>: { <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">pattern</span>: <span class="hljs-regexp">/^[A-Z]{3}\d{7}$/</span> },
+    <span class="hljs-attr">priority</span>: { <span class="hljs-attr">enum</span>: [<span class="hljs-string">&quot;Critical&quot;</span>, <span class="hljs-string">&quot;High&quot;</span>, <span class="hljs-string">&quot;Medium&quot;</span>, <span class="hljs-string">&quot;Low&quot;</span>] },
+    <span class="hljs-attr">status</span>: { <span class="hljs-attr">enum</span>: [<span class="hljs-string">&quot;Open&quot;</span>, <span class="hljs-string">&quot;In Progress&quot;</span>, <span class="hljs-string">&quot;Resolved&quot;</span>, <span class="hljs-string">&quot;Closed&quot;</span>] }
+}</code></pre><h2>Service Patterns</h2>
+<h3>Error Handling</h3>
+<p>All services follow consistent error handling:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">serviceMethod</span>(<span class="hljs-params">params</span>) {
+    <span class="hljs-keyword">try</span> {
+        <span class="hljs-comment">// Validate input</span>
+        <span class="hljs-keyword">const</span> validation = <span class="hljs-title function_">validateInput</span>(params);
+        <span class="hljs-keyword">if</span> (!validation.<span class="hljs-property">valid</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ValidationError</span>(validation.<span class="hljs-property">errors</span>);
+        }
+
+        <span class="hljs-comment">// Business logic</span>
+        <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> <span class="hljs-title function_">performOperation</span>(params);
+
+        <span class="hljs-comment">// Return success</span>
+        <span class="hljs-keyword">return</span> {
+            <span class="hljs-attr">success</span>: <span class="hljs-literal">true</span>,
+            <span class="hljs-attr">data</span>: result
+        };
+    } <span class="hljs-keyword">catch</span> (error) {
+        <span class="hljs-comment">// Log error</span>
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">`ServiceMethod failed:`</span>, error);
+
+        <span class="hljs-comment">// Return error</span>
+        <span class="hljs-keyword">return</span> {
+            <span class="hljs-attr">success</span>: <span class="hljs-literal">false</span>,
+            <span class="hljs-attr">error</span>: error.<span class="hljs-property">message</span>,
+            <span class="hljs-attr">code</span>: error.<span class="hljs-property">code</span> || <span class="hljs-string">&quot;UNKNOWN_ERROR&quot;</span>
+        };
+    }
+}</code></pre><h3>Database Transactions</h3>
+<p>For operations requiring atomicity:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { transaction } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;./databaseService&quot;</span>);
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">complexOperation</span>(<span class="hljs-params">data</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">transaction</span>(<span class="hljs-title function_">async</span> (db) =&gt; {
+        <span class="hljs-comment">// Multiple operations in transaction</span>
+        <span class="hljs-keyword">const</span> id = <span class="hljs-keyword">await</span> db.<span class="hljs-title function_">run</span>(<span class="hljs-string">&quot;INSERT INTO table1 ...&quot;</span>);
+        <span class="hljs-keyword">await</span> db.<span class="hljs-title function_">run</span>(<span class="hljs-string">&quot;UPDATE table2 WHERE id = ?&quot;</span>, [id]);
+        <span class="hljs-keyword">await</span> db.<span class="hljs-title function_">run</span>(<span class="hljs-string">&quot;DELETE FROM table3 WHERE ...&quot;</span>);
+
+        <span class="hljs-keyword">return</span> { <span class="hljs-attr">success</span>: <span class="hljs-literal">true</span>, id };
+    });
+}</code></pre><h3>Pagination Pattern</h3>
+<pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getPaginatedData</span>(<span class="hljs-params">page = <span class="hljs-number">1</span>, limit = <span class="hljs-number">50</span>, filters = {}</span>) {
+    <span class="hljs-keyword">const</span> offset = (page - <span class="hljs-number">1</span>) * limit;
+
+    <span class="hljs-comment">// Get data</span>
+    <span class="hljs-keyword">const</span> query = <span class="hljs-title function_">buildQuery</span>(filters) + <span class="hljs-string">` LIMIT ? OFFSET ?`</span>;
+    <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> db.<span class="hljs-title function_">all</span>(query, [...filterParams, limit, offset]);
+
+    <span class="hljs-comment">// Get total count</span>
+    <span class="hljs-keyword">const</span> countQuery = <span class="hljs-string">`SELECT COUNT(*) as total FROM (<span class="hljs-subst">${buildQuery(filters)}</span>)`</span>;
+    <span class="hljs-keyword">const</span> { total } = <span class="hljs-keyword">await</span> db.<span class="hljs-title function_">get</span>(countQuery, filterParams);
+
+    <span class="hljs-keyword">return</span> {
+        data,
+        <span class="hljs-attr">pagination</span>: {
+            page,
+            limit,
+            total,
+            <span class="hljs-attr">totalPages</span>: <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">ceil</span>(total / limit)
+        }
+    };
+}</code></pre><h2>Service Dependencies</h2>
+<div class="mermaid">graph TD
+    Controllers --&gt; Services
+    Services --&gt; DatabaseService
+    Services --&gt; ValidationService
+    Services --&gt; FileService
+    ImportService --&gt; ProgressService
+    BackupService --&gt; FileService
+    VulnerabilityService --&gt; VulnerabilityStatsService</div><h2>Testing Services</h2>
+<p>Services should be tested in isolation:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Example service test</span>
+<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;VulnerabilityService&quot;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-title function_">beforeEach</span>(<span class="hljs-function">() =&gt;</span> {
+        <span class="hljs-comment">// Mock database</span>
+        jest.<span class="hljs-title function_">mock</span>(<span class="hljs-string">&quot;../config/database&quot;</span>);
+    });
+
+    <span class="hljs-title function_">test</span>(<span class="hljs-string">&quot;getVulnerabilities returns filtered results&quot;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+        <span class="hljs-keyword">const</span> filters = { <span class="hljs-attr">severity</span>: <span class="hljs-string">&quot;Critical&quot;</span> };
+        <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> vulnerabilityService.<span class="hljs-title function_">getVulnerabilities</span>(filters);
+
+        <span class="hljs-title function_">expect</span>(result).<span class="hljs-title function_">toHaveLength</span>(<span class="hljs-number">10</span>);
+        <span class="hljs-title function_">expect</span>(result[<span class="hljs-number">0</span>].<span class="hljs-property">severity</span>).<span class="hljs-title function_">toBe</span>(<span class="hljs-string">&quot;Critical&quot;</span>);
+    });
+});</code></pre><h2>Performance Considerations</h2>
+<h3>Query Optimization</h3>
+<ul>
+<li>Use indexes for frequently filtered columns</li>
+<li>Batch operations when possible</li>
+<li>Use staging tables for large imports</li>
+<li>Implement query result caching where appropriate</li>
+</ul>
+<h3>Memory Management</h3>
+<ul>
+<li>Stream large datasets instead of loading into memory</li>
+<li>Use pagination for large result sets</li>
+<li>Clean up temporary files after processing</li>
+<li>Implement session cleanup for progress tracking</li>
+</ul>
+<h2>Future Enhancements</h2>
+<h3>Planned Improvements</h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Enhancement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>All Services</td>
+<td>TypeScript migration</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>DatabaseService</td>
+<td>Connection pooling</td>
+<td>High</td>
+</tr>
+<tr>
+<td>ImportService</td>
+<td>Parallel processing</td>
+<td>High</td>
+</tr>
+<tr>
+<td>ValidationService</td>
+<td>JSON schema validation</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>ProgressService</td>
+<td>Redis-based sessions</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>All Services</td>
+<td>Unit test coverage</td>
+<td>High</td>
+</tr>
+</tbody></table>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
