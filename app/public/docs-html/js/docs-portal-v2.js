@@ -86,25 +86,42 @@ class DocumentationPortalV2 {
 
     async init() {
         console.log("🚀 Initializing HexTrackr Documentation Portal v2.0");
-        
+
         await this.loadNavigationStructure();
         this.renderNavigation();
         this.setupEventListeners();
-        
+
+        // Check if navigation is from external page (tickets/vulnerabilities)
+        const isExternalNavigation = this.isExternalNavigation();
+
         // Handle initial hash or load overview
         const hash = window.location.hash.substring(1);
+        // Default to "overview" which maps to OVERVIEW.html
         const initialSection = hash || "overview";
+
+        // Clear saved state if navigating externally without a specific hash
+        // This ensures clean entry to documentation portal
+        if (isExternalNavigation && !hash) {
+            console.log("🔄 External navigation detected - clearing saved state for clean entry");
+            this.clearNavigationState();
+        }
+
         await this.loadSection(initialSection);
 
-        // Restore navigation state if no hash is present and we have saved state
-        if (!hash) {
+        // Only restore navigation state for internal navigation with no hash
+        // Don't restore if coming from external pages or loading overview
+        // Overview should always start with collapsed menus for clean presentation
+        if (!hash && !isExternalNavigation && initialSection !== "overview") {
             const savedState = this.restoreNavigationState();
             if (savedState && savedState.expandedSection) {
-                // Restore the expanded menu
-                const expandedElement = document.querySelector(savedState.expandedSection);
-                if (expandedElement) {
-                    const bsCollapse = new bootstrap.Collapse(expandedElement, { toggle: false });
-                    bsCollapse.show();
+                // Only restore if the saved active section matches current section
+                if (savedState.activeSection === initialSection) {
+                    // Restore the expanded menu
+                    const expandedElement = document.querySelector(savedState.expandedSection);
+                    if (expandedElement) {
+                        const bsCollapse = new bootstrap.Collapse(expandedElement, { toggle: false });
+                        bsCollapse.show();
+                    }
                 }
             }
         }
@@ -879,6 +896,45 @@ class DocumentationPortalV2 {
     }
 
     /**
+     * Check if navigation is from an external page (tickets/vulnerabilities)
+     * @returns {boolean} - True if navigated from external page
+     */
+    isExternalNavigation() {
+        const referrer = document.referrer;
+        if (!referrer) {
+            // No referrer means direct navigation or bookmark
+            return false;
+        }
+
+        // Check if referrer is from the same domain but different page
+        try {
+            const referrerUrl = new URL(referrer);
+            const currentUrl = new URL(window.location.href);
+
+            // Same domain check
+            if (referrerUrl.origin !== currentUrl.origin) {
+                return true; // Different domain is external
+            }
+
+            // Check if coming from tickets, vulnerabilities, or other non-docs pages
+            const referrerPath = referrerUrl.pathname.toLowerCase();
+            const isFromDocs = referrerPath.includes("/docs-html/") ||
+                               referrerPath.includes("/docs/");
+
+            // If not from docs, it's external navigation
+            if (!isFromDocs) {
+                console.log(`📍 External navigation detected from: ${referrerPath}`);
+                return true;
+            }
+
+            return false;
+        } catch (error) {
+            console.warn("⚠️ Could not parse referrer URL:", error);
+            return false;
+        }
+    }
+
+    /**
      * Collapse all other expanded menus except the target
      * @param {string} currentTarget - The collapse target ID to keep open
      */
@@ -1266,12 +1322,21 @@ class DocumentationPortalV2 {
      * Update active navigation state
      */
     updateActiveNavigation(section) {
+        // First, collapse ALL expanded menus to ensure clean state
+        document.querySelectorAll(".collapse.show").forEach(collapse => {
+            const bsCollapse = new bootstrap.Collapse(collapse, { toggle: false });
+            bsCollapse.hide();
+        });
+
         // Remove all active states from list-group items
         document.querySelectorAll(".list-group-item-action").forEach(link => {
             link.classList.remove("active");
+            // Reset aria-expanded state for all expandable links
+            if (link.hasAttribute("data-bs-toggle")) {
+                link.setAttribute("aria-expanded", "false");
+                link.classList.add("collapsed");
+            }
         });
-
-        // Note: Don't close all collapses here, let the menu click handler manage exclusive expansion
 
         // Add active state to current section
         const activeLink = document.querySelector(`[data-section="${section}"]`);
@@ -1290,17 +1355,25 @@ class DocumentationPortalV2 {
                 if (parentLink) {
                     parentLink.setAttribute("aria-expanded", "true");
                     parentLink.classList.remove("collapsed");
+                    // Don't mark parent as active, only the child
                 }
             } else {
-                // This is a main section, check if it has a dropdown and should be expanded
-                const nextElement = activeLink.nextElementSibling;
-                if (nextElement && nextElement.classList.contains("collapse")) {
-                    const bsCollapse = new bootstrap.Collapse(nextElement, { toggle: false });
-                    bsCollapse.show();
-
-                    // Update the parent link's aria state
-                    activeLink.setAttribute("aria-expanded", "true");
-                    activeLink.classList.remove("collapsed");
+                // This is a main section
+                // For sections with children, only expand if explicitly loading the parent section
+                // Don't auto-expand just because it's active
+                const targetSection = section.split("/")[0]; // Get root section name
+                if (section === targetSection || section.includes("index")) {
+                    // Loading the main section itself, can expand if has children
+                    const nextElement = activeLink.nextElementSibling;
+                    if (nextElement && nextElement.classList.contains("collapse")) {
+                        // Only expand if this is the actual target, not just a parent
+                        if (section === activeLink.dataset.section) {
+                            const bsCollapse = new bootstrap.Collapse(nextElement, { toggle: false });
+                            bsCollapse.show();
+                            activeLink.setAttribute("aria-expanded", "true");
+                            activeLink.classList.remove("collapsed");
+                        }
+                    }
                 }
             }
 

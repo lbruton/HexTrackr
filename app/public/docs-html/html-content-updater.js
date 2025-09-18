@@ -195,31 +195,107 @@ class HtmlContentUpdater {
 
 
     /**
-     * Update footer version badge to match package.json version
+     * Update version across all project files to match package.json version
+     * Source of truth: app/public/package.json
      */
-    async updateFooterVersion() {
+    async updateVersionsAcrossFiles() {
         try {
-            // Read current version from package.json
+            // Read current version from package.json (source of truth)
             const packagePath = path.join(process.cwd(), "app", "public", "package.json");
             const packageContent = JSON.parse(await fs.readFile(packagePath, "utf8"));
             const currentVersion = packageContent.version;
 
-            // Update footer.html badge
-            const footerPath = path.join(process.cwd(), "app", "public", "scripts", "shared", "footer.html");
-            let footerContent = await fs.readFile(footerPath, "utf8");
-            const updatedContent = footerContent.replace(
-                /HexTrackr-v[\d.]+(-blue\?style=flat)/g,
-                `HexTrackr-v${currentVersion}$1`
-            );
+            console.log(`🔄 Updating all version references to v${currentVersion}...`);
 
-            if (footerContent !== updatedContent) {
-                await fs.writeFile(footerPath, updatedContent);
-                console.log(`✅ Updated footer version badge to v${currentVersion}`);
+            let updatesApplied = 0;
+
+            // 1. Update footer.html badge
+            try {
+                const footerPath = path.join(process.cwd(), "app", "public", "scripts", "shared", "footer.html");
+                const footerContent = await fs.readFile(footerPath, "utf8");
+                const updatedFooter = footerContent.replace(
+                    /HexTrackr-v[\d.]+(-blue\?style=flat)/g,
+                    `HexTrackr-v${currentVersion}$1`
+                );
+
+                if (footerContent !== updatedFooter) {
+                    await fs.writeFile(footerPath, updatedFooter);
+                    console.log("  ✅ Updated footer.html version badge");
+                    updatesApplied++;
+                }
+            } catch (error) {
+                console.warn(`  ⚠️  Could not update footer.html: ${error.message}`);
             }
+
+            // 2. Update docker-compose.yml HEXTRACKR_VERSION
+            try {
+                const dockerComposePath = path.join(process.cwd(), "docker-compose.yml");
+                const dockerContent = await fs.readFile(dockerComposePath, "utf8");
+                const updatedDocker = dockerContent.replace(
+                    /HEXTRACKR_VERSION=[\d.]+/g,
+                    `HEXTRACKR_VERSION=${currentVersion}`
+                );
+
+                if (dockerContent !== updatedDocker) {
+                    await fs.writeFile(dockerComposePath, updatedDocker);
+                    console.log("  ✅ Updated docker-compose.yml HEXTRACKR_VERSION");
+                    updatesApplied++;
+                }
+            } catch (error) {
+                console.warn(`  ⚠️  Could not update docker-compose.yml: ${error.message}`);
+            }
+
+            // 3. Update root package.json
+            try {
+                const rootPackagePath = path.join(process.cwd(), "package.json");
+                const rootPackageContent = JSON.parse(await fs.readFile(rootPackagePath, "utf8"));
+
+                if (rootPackageContent.version !== currentVersion) {
+                    rootPackageContent.version = currentVersion;
+                    await fs.writeFile(rootPackagePath, JSON.stringify(rootPackageContent, null, 2) + "\n");
+                    console.log("  ✅ Updated root package.json version");
+                    updatesApplied++;
+                }
+            } catch (error) {
+                console.warn(`  ⚠️  Could not update root package.json: ${error.message}`);
+            }
+
+            // 4. Update server.js fallback version (optional - for consistency)
+            try {
+                const serverPath = path.join(process.cwd(), "app", "public", "server.js");
+                const serverContent = await fs.readFile(serverPath, "utf8");
+                const updatedServer = serverContent.replace(
+                    /HEXTRACKR_VERSION \|\| "[\d.]+"/g,
+                    `HEXTRACKR_VERSION || "${currentVersion}"`
+                );
+
+                if (serverContent !== updatedServer) {
+                    await fs.writeFile(serverPath, updatedServer);
+                    console.log("  ✅ Updated server.js fallback version");
+                    updatesApplied++;
+                }
+            } catch (error) {
+                console.warn(`  ⚠️  Could not update server.js: ${error.message}`);
+            }
+
+            if (updatesApplied > 0) {
+                console.log(`✨ Version sync complete: ${updatesApplied} files updated to v${currentVersion}`);
+            } else {
+                console.log(`✓ All files already at v${currentVersion}`);
+            }
+
         } catch (error) {
-            console.warn("⚠️  Could not update footer version:", error.message);
+            console.warn("⚠️  Could not read source package.json:", error.message);
             // Non-fatal - continue with HTML generation
         }
+    }
+
+    /**
+     * Legacy method name for backward compatibility
+     * @deprecated Use updateVersionsAcrossFiles() instead
+     */
+    async updateFooterVersion() {
+        return this.updateVersionsAcrossFiles();
     }
 
     /**
@@ -520,8 +596,8 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
             // Initialize marked library first
             await this.initializeMarked();
 
-            // Update footer version to match package.json
-            await this.updateFooterVersion();
+            // Update version across all project files to maintain consistency
+            await this.updateVersionsAcrossFiles();
 
             // Load the template first
             await this.loadTemplate();

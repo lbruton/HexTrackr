@@ -246,11 +246,11 @@ class ChartThemeAdapter {
         chartColor7: computedStyle.getPropertyValue("--chart-color-7").trim() || "#84cc16",
         chartColor8: computedStyle.getPropertyValue("--chart-color-8").trim() || "#f97316",
 
-        // Vulnerability-specific colors - S002
-        vulnCriticalColor: computedStyle.getPropertyValue("--chart-vuln-critical-color").trim() || "#dc2626",
-        vulnHighColor: computedStyle.getPropertyValue("--chart-vuln-high-color").trim() || "#ea580c",
-        vulnMediumColor: computedStyle.getPropertyValue("--chart-vuln-medium-color").trim() || "#2563eb",
-        vulnLowColor: computedStyle.getPropertyValue("--chart-vuln-low-color").trim() || "#16a34a"
+        // Vulnerability-specific colors - Read from VPR CSS variables
+        vulnCriticalColor: computedStyle.getPropertyValue("--vpr-critical").trim() || "#dc2626",
+        vulnHighColor: computedStyle.getPropertyValue("--vpr-high").trim() || "#d97706",
+        vulnMediumColor: computedStyle.getPropertyValue("--vpr-medium").trim() || "#2563eb",
+        vulnLowColor: computedStyle.getPropertyValue("--vpr-low").trim() || "#16a34a"
       };
       
       // Restore original theme
@@ -319,9 +319,9 @@ class ChartThemeAdapter {
       chartColor6: "#06b6d4",
       chartColor7: "#84cc16",
       chartColor8: "#f97316",
-      // Vulnerability-specific fallback colors - S002
+      // Vulnerability-specific fallback colors - Updated for WCAG compliance
       vulnCriticalColor: "#dc2626",
-      vulnHighColor: "#ea580c",
+      vulnHighColor: "#d97706",
       vulnMediumColor: "#2563eb",
       vulnLowColor: "#16a34a"
     };
@@ -376,13 +376,14 @@ class ChartThemeAdapter {
                                    seriesNames.includes("Low");
 
         if (isVulnerabilityChart) {
-          // Get vulnerability-specific colors from CSS variables
-          const cssVars = this.getCSSVariables(theme);
+          // Get vulnerability-specific colors from CSS variables (fresh read for theme changes)
+          const root = document.documentElement;
+          const style = getComputedStyle(root);
           const vulnerabilityColors = [
-            cssVars.vulnCriticalColor,
-            cssVars.vulnHighColor,
-            cssVars.vulnMediumColor,
-            cssVars.vulnLowColor
+            style.getPropertyValue("--vpr-critical").trim() || "#dc2626",
+            style.getPropertyValue("--vpr-high").trim() || "#d97706",
+            style.getPropertyValue("--vpr-medium").trim() || "#2563eb",
+            style.getPropertyValue("--vpr-low").trim() || "#16a34a"
           ];
 
           // Create modified theme config that preserves vulnerability colors
