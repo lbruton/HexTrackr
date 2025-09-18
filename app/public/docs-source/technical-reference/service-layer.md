@@ -5,6 +5,7 @@ The service layer provides the business logic and data access operations for Hex
 ## Overview
 
 Services handle:
+
 - Database operations and transactions
 - Business logic and data transformations
 - File system operations
@@ -182,6 +183,7 @@ Complex import operations for vulnerabilities and tickets.
 #### Complex Operations
 
 **processVulnerabilitiesWithLifecycle**: Handles the complete import lifecycle:
+
 1. Marks existing vulnerabilities as potentially stale
 2. Processes each row with deduplication
 3. Generates unique keys (4-tier strategy)
@@ -190,6 +192,7 @@ Complex import operations for vulnerabilities and tickets.
 6. Updates daily totals
 
 **Unique Key Generation** (4-tier strategy):
+
 ```javascript
 // Tier 1: Asset + Plugin (most reliable)
 `asset:${assetId}|plugin:${pluginId}`
