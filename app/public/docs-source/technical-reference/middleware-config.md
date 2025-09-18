@@ -89,12 +89,14 @@ module.exports = process.env.NODE_ENV === "production"
 #### Log Format
 
 **Development**:
+
 ```
 GET /api/vulnerabilities 200 45.123 ms - 2048
 POST /api/tickets 201 23.456 ms - 512
 ```
 
 **Production** (Combined Log Format):
+
 ```
 192.168.1.1 - - [15/Mar/2024:10:00:00 +0000] "GET /api/vulnerabilities HTTP/1.1" 200 2048 "https://example.com" "Mozilla/5.0"
 ```
