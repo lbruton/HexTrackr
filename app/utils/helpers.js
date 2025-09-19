@@ -273,9 +273,18 @@ function generateUniqueKey(mapped) {
 // =============================================================================
 
 /**
- * Map CSV row data to vulnerability object structure
- * @param {object} row - Raw CSV row data
- * @returns {array} Array of mapped vulnerability objects (may contain multiple CVEs)
+ * Map a raw CSV row to one or more normalized vulnerability objects.
+ *
+ * The mapper performs the following normalization so downstream import services can
+ * operate without reaching back into the raw CSV payload:
+ * - Normalizes hostnames/IPs and preserves vendor / plugin metadata.
+ * - Parses VPR/CVSS values once and emits them as `vprScore`/`cvssScore` (with a
+ *   legacy `vpr` alias for older call sites).
+ * - Splits rows that contain multiple CVEs into one record per CVE while keeping
+ *   the descriptive context aligned with each CVE.
+ *
+ * @param {Object} row Raw CSV row data (Tenable export format).
+ * @returns {Object[]} Array of mapped vulnerability objects (1..n per source row).
  */
 function mapVulnerabilityRow(row) {
     // CVE extraction logic - try direct field first, then extract from name
@@ -293,65 +302,80 @@ function mapVulnerabilityRow(row) {
 
     // Enhanced hostname processing with normalization
     let hostname = row["asset.name"] || row["hostname"] || row["Host"] || "";
-    hostname = normalizeHostname(hostname); // Use existing function
+    hostname = normalizeHostname(hostname);
 
     // Enhanced IP address handling for multiple formats
     let ipAddress = row["asset.display_ipv4_address"] || row["asset.ipv4_addresses"] || row["ip_address"] || row["IP Address"] || "";
     if (ipAddress && ipAddress.includes(",")) {
-        // Take first valid IP from comma-separated list
         const ips = ipAddress.split(",").map(ip => ip.trim());
-        ipAddress = ips[0]; // Use first IP as primary
+        ipAddress = ips[0];
     }
 
-    // Enhanced description handling - prefer definition.description for Tenable, name for others
+    // Prefer Tenable description, fallback to plugin name/description fields
     const description = row["definition.description"] || row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "";
-
-    // Plugin name contains the full vulnerability name/description for matching and display
     const pluginName = row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "";
+
+    const vprValue = row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"] || row["vpr"] || row["VPR"];
+    const parsedVpr = vprValue !== undefined && vprValue !== null && vprValue !== "" ? parseFloat(vprValue) : null;
+    const vprScore = Number.isFinite(parsedVpr) ? parsedVpr : null;
+
+    const cvssValue = row["cvss_score"] || row["CVSS Score"] || row["cvss"];
+    const parsedCvss = cvssValue !== undefined && cvssValue !== null && cvssValue !== "" ? parseFloat(cvssValue) : null;
+    const cvssScore = Number.isFinite(parsedCvss) ? parsedCvss : null;
+
+    const state = row["state"] || row["State"] || "ACTIVE";
+    const vendor = normalizeVendor(row["definition.family"] || row["vendor"] || row["Vendor"] || "");
+    const pluginId = row["definition.id"] || row["plugin_id"] || row["Plugin ID"] || "";
+    const pluginPublished = row["definition.plugin_published"] || row["definition.plugin_updated"] || row["definition.vulnerability_published"] || row["vulnerability_date"] || row["plugin_published"] || "";
+    const firstSeen = row["first_seen"] || row["First Seen"] || "";
+    const lastSeen = row["last_seen"] || row["Last Seen"] || "";
+    const solution = row["solution"] || row["Solution"] || "";
+
+    const baseRecord = {
+        assetId: row["asset.id"] || row["asset_id"] || row["Asset ID"] || "",
+        hostname,
+        ipAddress,
+        severity: row["severity"] || row["Severity"] || "",
+        vprScore,
+        vpr: vprScore,
+        cvssScore,
+        vendor,
+        pluginName,
+        description,
+        solution,
+        state,
+        firstSeen,
+        lastSeen,
+        pluginId,
+        pluginPublished
+    };
 
     // Parse multiple CVEs and create separate records for each
     const cvePattern = /CVE-\d{4}-\d{4,}/gi;
     const ciscoPattern = /cisco-sa-[\w-]+/gi;
-
     const cveMatches = (cve || "").match(cvePattern) || [];
     const ciscoMatches = (cve || "").match(ciscoPattern) || [];
     const allCVEs = [...cveMatches, ...ciscoMatches];
 
-    // If no CVEs found, create single record with empty CVE
     if (allCVEs.length === 0) {
         return [{
-            assetId: row["asset.id"] || row["asset_id"] || row["Asset ID"] || "",
-            hostname: hostname,
-            ipAddress: ipAddress,
-            cve: "",
-            severity: row["severity"] || row["Severity"] || "",
-            cvssScore: parseFloat(row["cvss_score"] || row["CVSS Score"] || row["cvss"] || 0),
-            vpr: parseFloat(row["vpr"] || row["VPR"] || 0),
-            description: description,
-            pluginName: pluginName,
-            pluginId: row["definition.id"] || row["plugin_id"] || row["Plugin ID"] || "",
-            vendor: row["vendor"] || row["Vendor"] || "",
-            firstSeen: row["first_seen"] || row["First Seen"] || "",
-            lastSeen: row["last_seen"] || row["Last Seen"] || ""
+            ...baseRecord,
+            cve: ""
         }];
     }
 
-    // Create separate record for each CVE
-    return allCVEs.map(singleCVE => ({
-        assetId: row["asset.id"] || row["asset_id"] || row["Asset ID"] || "",
-        hostname: hostname,
-        ipAddress: ipAddress,
-        cve: singleCVE,
-        severity: row["severity"] || row["Severity"] || "",
-        cvssScore: parseFloat(row["cvss_score"] || row["CVSS Score"] || row["cvss"] || 0),
-        vpr: parseFloat(row["vpr"] || row["VPR"] || 0),
-        description: description,
-        pluginName: pluginName,
-        pluginId: row["definition.id"] || row["plugin_id"] || row["Plugin ID"] || "",
-        vendor: row["vendor"] || row["Vendor"] || "",
-        firstSeen: row["first_seen"] || row["First Seen"] || "",
-        lastSeen: row["last_seen"] || row["Last Seen"] || ""
-    }));
+    return allCVEs.map(individualCVE => {
+        let augmentedDescription = description;
+        if (description && !description.includes(individualCVE)) {
+            augmentedDescription = `${description} (${individualCVE})`;
+        }
+
+        return {
+            ...baseRecord,
+            description: augmentedDescription,
+            cve: individualCVE
+        };
+    });
 }
 
 /**

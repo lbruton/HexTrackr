@@ -5,6 +5,35 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.17] - 2025-09-19
+
+### Fixed
+
+#### CSV Import Pipeline
+
+- **Daily Totals Calculation**: Fixed critical bug where `calculateAndStoreDailyTotalsEnhanced` was missing scan_date filter
+  - Root cause: Spec 001 backend refactoring removed the WHERE clause filtering by specific scan date
+  - Impact: Each import would overwrite all previous daily totals instead of updating only the current date
+  - Solution: Restored `WHERE scan_date = ?` filter in importService.js line 985
+
+- **Batch Processing Restoration**: Re-implemented `processStagingToFinalTables` function with proper lifecycle management
+  - Restored grace period handling for vulnerability state transitions
+  - Fixed batch processing with 1000-record chunks for performance
+  - Ensured atomic imports via staging table approach
+
+- **API Response Format**: Fixed /api/vulnerabilities/stats returning array instead of expected object format
+  - Frontend expected severity-keyed object but received array after modularization
+  - Restored legacy response contract to maintain backward compatibility
+
+### Documentation
+
+- **Developer Documentation Link**: Fixed broken dev docs link in documentation portal
+  - Changed from `/dev-docs/` to `/dev-docs-html/` to match actual directory structure
+
+- **JSDoc Regeneration**: Updated developer documentation with all recent fixes
+  - Documented new import service functions and batch processing
+  - Added comprehensive function descriptions for ImportService
+
 ## [1.0.16] - 2025-09-18
 
 ### Fixed
