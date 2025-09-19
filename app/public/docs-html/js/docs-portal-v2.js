@@ -227,7 +227,7 @@ class DocumentationPortalV2 {
                         title: "Dev Docs",
                         icon: "fas fa-code",
                         isExternal: true,
-                        url: `/dev-docs/?theme=${currentTheme}`,
+                        url: `/dev-docs-html/?theme=${currentTheme}`,
                         openInPopup: true,
                         popupWidth: 1200,
                         popupHeight: 800
