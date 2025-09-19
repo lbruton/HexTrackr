@@ -187,15 +187,27 @@ Ticket management and device tracking.
 
 **Location:** `app/services/importService.js`
 
-File import processing and validation.
+Vendor CSV import processing with lifecycle management and batch operations.
 
 **Capabilities:**
 
 - CSV parsing with PapaParse
 - Field mapping and transformation
-- Data type conversion
-- Error recovery and logging
-- Progress tracking integration
+- Data type conversion and validation
+- Batch processing with configurable size (1000 records)
+- Vulnerability lifecycle management (active, grace_period, resolved)
+- Deduplication using hostname and plugin_id
+- Daily totals calculation with VPR aggregation
+- Staging table for atomic imports
+- Progress tracking with WebSocket integration
+- Multi-vendor support (Tenable, Cisco, Qualys)
+
+**Key Functions:**
+
+- `processStagingToFinalTables()` - Batch processes staged data to production tables
+- `calculateAndStoreDailyTotalsEnhanced()` - Calculates per-scan-date statistics with VPR
+- `bulkLoadToStagingTable()` - High-performance bulk import to staging
+- `extractDateFromFilename()` - Smart date extraction from various filename formats
 
 ### BackupService
 
