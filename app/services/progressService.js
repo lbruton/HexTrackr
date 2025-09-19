@@ -22,10 +22,6 @@ const ProgressTracker = require("../utils/ProgressTracker");
  * progressService.completeImport(sessionId, { imported: 9500, errors: 500 });
  */
 class ProgressService {
-    /**
-     * Creates an instance of ProgressService.
-     * @param {object} io - The socket.io instance.
-     */
     constructor(io) {
         this.progressTracker = new ProgressTracker(io);
         this.io = io;
@@ -156,7 +152,7 @@ class ProgressService {
      * @param {string} status - Processing status
      * @returns {boolean} Success status
      */
-    updateImportBatchProgress(sessionId, currentBatch, totalBatches, processedRows, _status = "processing") {
+    updateImportBatchProgress(sessionId, currentBatch, totalBatches, processedRows, status = "processing") {
         const batchProgress = (currentBatch / totalBatches) * 100;
         const phaseConfig = this.IMPORT_PHASES.PROCESSING;
         const overallProgress = phaseConfig.start + (batchProgress * (phaseConfig.end - phaseConfig.start) / 100);
