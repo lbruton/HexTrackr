@@ -28,6 +28,7 @@ const ProgressTracker = require("../utils/ProgressTracker");
 
 // Service modules
 const DatabaseService = require("../services/databaseService");
+const importService = require("../services/importService");
 
 // Initialize Express app and server
 const app = express();
@@ -44,6 +45,17 @@ const progressTracker = new ProgressTracker(io);
 const dbPath = path.join(__dirname, dbConfig.path.relative);
 const db = new sqlite3.Database(dbPath);
 const databaseService = new DatabaseService(dbPath);
+
+// Make database globally accessible for services that need it
+global.db = db;
+
+// Set up global utility functions for import processes
+global.PathValidator = require("../utils/PathValidator");
+global.extractScanDateFromFilename = importService.extractScanDateFromFilename;
+global.extractDateFromFilename = importService.extractDateFromFilename;
+global.bulkLoadToStagingTable = importService.bulkLoadToStagingTable;
+global.mapVulnerabilityRow = importService.mapVulnerabilityRow;
+global.processVulnerabilityRowsWithEnhancedLifecycle = importService.processVulnerabilitiesWithLifecycle;
 
 // Configure multer for file uploads (kept for future use)
 const _upload = multer(middlewareConfig.upload);
@@ -65,7 +77,9 @@ async function initDb() {
     VulnerabilityController.initialize(db, progressTracker);
     TicketController.initialize(db);
     BackupController.initialize(db);
-    // Note: importController and docsController don't have initialize methods
+    // Initialize importController with progressTracker
+    const importController = require("../controllers/importController");
+    importController.setProgressTracker(progressTracker);
 
     console.log("✅ Database and controllers initialized successfully");
 }
