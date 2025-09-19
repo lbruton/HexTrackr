@@ -55,7 +55,7 @@ router.get("/trends", VulnerabilityController.getTrends);
 router.get("/", VulnerabilityController.getVulnerabilities); // Main listing with pagination/filters
 router.get("/resolved", VulnerabilityController.getResolvedVulnerabilities);
 
-// Import Operations
+// Import Operations - REMOVED: These are now handled in imports.js
 router.post("/import", upload.single("csvFile"), VulnerabilityController.importCSV);
 router.post("/import-staging", upload.single("csvFile"), VulnerabilityController.importCsvStaging);
 

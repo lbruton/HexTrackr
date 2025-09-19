@@ -251,14 +251,26 @@
 <li>Automatic timestamp management</li>
 </ul>
 <h3>ImportService</h3><p><strong>Location:</strong> <code>app/services/importService.js</code></p>
-<p>File import processing and validation.</p>
+<p>Vendor CSV import processing with lifecycle management and batch operations.</p>
 <p><strong>Capabilities:</strong></p>
 <ul>
 <li>CSV parsing with PapaParse</li>
 <li>Field mapping and transformation</li>
-<li>Data type conversion</li>
-<li>Error recovery and logging</li>
-<li>Progress tracking integration</li>
+<li>Data type conversion and validation</li>
+<li>Batch processing with configurable size (1000 records)</li>
+<li>Vulnerability lifecycle management (active, grace_period, resolved)</li>
+<li>Deduplication using hostname and plugin_id</li>
+<li>Daily totals calculation with VPR aggregation</li>
+<li>Staging table for atomic imports</li>
+<li>Progress tracking with WebSocket integration</li>
+<li>Multi-vendor support (Tenable, Cisco, Qualys)</li>
+</ul>
+<p><strong>Key Functions:</strong></p>
+<ul>
+<li><code>processStagingToFinalTables()</code> - Batch processes staged data to production tables</li>
+<li><code>calculateAndStoreDailyTotalsEnhanced()</code> - Calculates per-scan-date statistics with VPR</li>
+<li><code>bulkLoadToStagingTable()</code> - High-performance bulk import to staging</li>
+<li><code>extractDateFromFilename()</code> - Smart date extraction from various filename formats</li>
 </ul>
 <h3>BackupService</h3><p><strong>Location:</strong> <code>app/services/backupService.js</code></p>
 <p>Database backup and restore operations.</p>
