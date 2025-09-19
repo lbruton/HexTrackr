@@ -17,16 +17,15 @@
  */
 
 const Papa = require("papaparse");
-const _crypto = require("crypto");
+const crypto = require("crypto");
 const PathValidator = require("../utils/PathValidator");
 const DatabaseService = require("./databaseService");
-const _ValidationService = require("./validationService");
+const ValidationService = require("./validationService");
 const helpers = require("../utils/helpers");
 
 /**
- * Extracts a date from a filename using various common patterns.
- * @param {string} filename - The filename to parse.
- * @returns {string|null} The extracted date in YYYY-MM-DD format, or null if no date is found.
+ * Extract scan date from filename using various patterns
+ * From server.js lines 2291-2335
  */
 function extractDateFromFilename(filename) {
     if (!filename) {
@@ -77,9 +76,7 @@ function extractDateFromFilename(filename) {
 }
 
 /**
- * Extracts the vendor name from a filename based on common patterns.
- * @param {string} filename - The filename to parse.
- * @returns {string} The extracted vendor name, or "unknown" if no vendor is found.
+ * Extract vendor from filename based on common patterns
  */
 function extractVendorFromFilename(filename) {
     if (!filename) {
@@ -109,9 +106,8 @@ function extractVendorFromFilename(filename) {
 }
 
 /**
- * Maps a CSV row to one or more vulnerability records, splitting multi-CVE entries.
- * @param {Object} row - A single row from the parsed CSV data.
- * @returns {Array<Object>} An array of vulnerability records.
+ * Map CSV row to vulnerability record(s) with multi-CVE splitting
+ * From server.js lines 252-341
  */
 function mapVulnerabilityRow(row) {
     // CVE extraction logic - try direct field first, then extract from name
@@ -205,9 +201,7 @@ function mapVulnerabilityRow(row) {
 }
 
 /**
- * Parses CSV data using PapaParse.
- * @param {string} csvData - The CSV data to parse.
- * @returns {Promise<Object>} A promise that resolves with the parsed CSV results.
+ * Parse CSV file using PapaParse
  */
 async function parseCSV(csvData) {
     return new Promise((resolve, reject) => {
@@ -221,17 +215,9 @@ async function parseCSV(csvData) {
 }
 
 /**
- * Creates an import record in the database.
- * @param {Object} options - The options for creating the import record.
- * @param {string} options.filename - The name of the imported file.
- * @param {string} options.vendor - The vendor of the imported file.
- * @param {string} options.scanDate - The scan date of the imported file.
- * @param {number} options.rowCount - The number of rows in the imported file.
- * @param {number} options.fileSize - The size of the imported file.
- * @param {Array<string>} options.headers - The headers of the imported file.
- * @returns {Promise<Object>} A promise that resolves with the import ID and import date.
+ * Create import record in database
  */
-async function createImportRecord({ filename, vendor, scanDate: _scanDate, rowCount, fileSize, headers }) {
+async function createImportRecord({ filename, vendor, scanDate, rowCount, fileSize, headers }) {
     return new Promise((resolve, reject) => {
         const importDate = new Date().toISOString();
 
@@ -241,7 +227,8 @@ async function createImportRecord({ filename, vendor, scanDate: _scanDate, rowCo
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
 
-        DatabaseService.getDatabase().run(importQuery, [
+        const db = global.db;
+        db.run(importQuery, [
             filename,
             importDate,
             rowCount,
@@ -263,17 +250,13 @@ async function createImportRecord({ filename, vendor, scanDate: _scanDate, rowCo
 }
 
 /**
- * Processes vulnerabilities with enhanced lifecycle management.
- * @param {Array<Object>} rows - The rows of vulnerability data to process.
- * @param {number} importId - The ID of the import record.
- * @param {string} filePath - The path to the imported file.
- * @param {string} scanDate - The scan date of the imported file.
- * @returns {Promise<Object>} A promise that resolves with the import statistics.
+ * Process vulnerabilities with enhanced lifecycle management
+ * Simplified version of the complex logic from server.js lines 1306+
  */
 async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, scanDate) {
     return new Promise((resolve, reject) => {
         const currentDate = scanDate || new Date().toISOString().split("T")[0];
-        const db = DatabaseService.getDatabase();
+        const db = global.db;
 
         console.log("🚀 PERFORMANCE: Starting enhanced rollover import");
         console.log(`📊 PERFORMANCE: Scan date: ${currentDate}, Rows: ${rows.length}`);
@@ -439,16 +422,8 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
 }
 
 /**
- * Processes a staging import with progress tracking.
- * @param {Object} options - The options for processing the staging import.
- * @param {string} options.filePath - The path to the imported file.
- * @param {string} options.filename - The name of the imported file.
- * @param {string} options.vendor - The vendor of the imported file.
- * @param {string} options.scanDate - The scan date of the imported file.
- * @param {string} options.sessionId - The ID of the import session.
- * @param {number} options.startTime - The start time of the import session.
- * @param {Object} options.progressTracker - The progress tracker instance.
- * @returns {Promise<void>}
+ * Process staging import with progress tracking
+ * High-performance import using staging table for batch processing
  */
 async function processStagingImport({ filePath, filename, vendor, scanDate, sessionId, startTime, progressTracker }) {
     try {
@@ -502,20 +477,11 @@ async function processStagingImport({ filePath, filename, vendor, scanDate, sess
 }
 
 /**
- * Performs a simplified bulk load to a staging table.
- * @param {Array<Object>} rows - The rows of data to load.
- * @param {number} importId - The ID of the import record.
- * @param {string} scanDate - The scan date of the import.
- * @param {string} filePath - The path to the imported file.
- * @param {Object} responseData - The response data.
- * @param {string} sessionId - The ID of the import session.
- * @param {number} startTime - The start time of the import session.
- * @param {Object} progressTracker - The progress tracker instance.
- * @returns {Promise<Object>} A promise that resolves with the number of inserted and errored records.
+ * Simplified bulk load to staging table
  */
 async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, sessionId, startTime, progressTracker) {
     return new Promise((resolve, reject) => {
-        const db = DatabaseService.getDatabase();
+        const db = global.db;
         const loadStart = Date.now();
 
         console.log(`🚀 BULK LOAD: Starting bulk insert of ${rows.length} rows to staging table`);
@@ -532,13 +498,17 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
             db.run("BEGIN TRANSACTION", (err) => {
                 if (err) {
                     console.error("Error starting transaction:", err);
-                    progressTracker.errorSession(sessionId, "Transaction start failed", { error: err });
+                    if (progressTracker && progressTracker.errorSession) {
+                        progressTracker.errorSession(sessionId, "Transaction start failed", { error: err });
+                    }
                     reject(err);
                     return;
                 }
 
                 console.log("💾 Transaction started - bulk inserting rows");
-                progressTracker.updateProgress(sessionId, 25, "Inserting rows into staging table...", { currentStep: 2 });
+                if (progressTracker && progressTracker.updateProgress) {
+                    progressTracker.updateProgress(sessionId, 25, "Inserting rows into staging table...", { currentStep: 2 });
+                }
 
                 const stmt = db.prepare(stagingInsertSQL);
                 let insertedCount = 0;
@@ -593,12 +563,14 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                                 // Update progress every 100 records
                                 if (insertedCount % 100 === 0 || insertedCount === allMappedRecords.length) {
                                     const progress = 25 + ((insertedCount / allMappedRecords.length) * 35); // 25-60% range
-                                    progressTracker.updateProgress(sessionId, progress,
-                                        `Inserted ${insertedCount}/${allMappedRecords.length} records to staging table...`, {
-                                            currentStep: 2,
-                                            insertedCount,
-                                            totalRows: allMappedRecords.length
-                                        });
+                                    if (progressTracker && progressTracker.updateProgress) {
+                                        progressTracker.updateProgress(sessionId, progress,
+                                            `Inserted ${insertedCount}/${allMappedRecords.length} records to staging table...`, {
+                                                currentStep: 2,
+                                                insertedCount,
+                                                totalRows: allMappedRecords.length
+                                            });
+                                    }
                                 }
                             }
                         });
@@ -613,7 +585,9 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                     if (err) {
                         console.error("Error finalizing statement:", err);
                         db.run("ROLLBACK", () => {
-                            progressTracker.errorSession(sessionId, "Staging insert failed", { error: err, errorCount });
+                            if (progressTracker && progressTracker.errorSession) {
+                                progressTracker.errorSession(sessionId, "Staging insert failed", { error: err, errorCount });
+                            }
                             reject(err);
                         });
                         return;
@@ -622,7 +596,9 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                     db.run("COMMIT", (err) => {
                         if (err) {
                             console.error("Error committing transaction:", err);
-                            progressTracker.errorSession(sessionId, "Transaction commit failed", { error: err });
+                            if (progressTracker && progressTracker.errorSession) {
+                                progressTracker.errorSession(sessionId, "Transaction commit failed", { error: err });
+                            }
                             reject(err);
                             return;
                         }
@@ -633,13 +609,15 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                         console.log(`✅ BULK LOAD COMPLETE: ${insertedCount} records inserted in ${loadTime}ms (${rowsPerSecond.toFixed(1)} records/sec)`);
 
                         // Update progress: Staging complete
-                        progressTracker.updateProgress(sessionId, 60,
-                            `Staging complete. Processing ${insertedCount} records to final tables...`, {
-                            currentStep: 3,
-                            insertedToStaging: insertedCount,
-                            loadTime,
-                            rowsPerSecond: parseFloat(rowsPerSecond.toFixed(1))
-                        });
+                        if (progressTracker && progressTracker.updateProgress) {
+                            progressTracker.updateProgress(sessionId, 60,
+                                `Staging complete. Processing ${insertedCount} records to final tables...`, {
+                                currentStep: 3,
+                                insertedToStaging: insertedCount,
+                                loadTime,
+                                rowsPerSecond: parseFloat(rowsPerSecond.toFixed(1))
+                            });
+                        }
 
                         // Clean up file
                         try {
@@ -651,12 +629,14 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                         }
 
                         // Complete with staging results
-                        progressTracker.completeSession(sessionId, "Staging import completed successfully", {
-                            insertedToStaging: insertedCount,
-                            stagingErrors: errorCount,
-                            bulkLoadTime: loadTime,
-                            bulkLoadRowsPerSecond: parseFloat(rowsPerSecond.toFixed(1))
-                        });
+                        if (progressTracker && progressTracker.completeSession) {
+                            progressTracker.completeSession(sessionId, "Staging import completed successfully", {
+                                insertedToStaging: insertedCount,
+                                stagingErrors: errorCount,
+                                bulkLoadTime: loadTime,
+                                bulkLoadRowsPerSecond: parseFloat(rowsPerSecond.toFixed(1))
+                            });
+                        }
 
                         resolve({
                             insertedToStaging: insertedCount,
@@ -670,9 +650,7 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
 }
 
 /**
- * Processes JSON vulnerability data.
- * @param {Array<Object>} csvData - The vulnerability data to process.
- * @returns {Promise<Object>} A promise that resolves with the number of imported records, the import ID, and any errors.
+ * Process JSON vulnerability data
  */
 async function processVulnerabilitiesJSON(csvData) {
     return new Promise((resolve, reject) => {
@@ -689,7 +667,7 @@ async function processVulnerabilitiesJSON(csvData) {
             fileSize: 0,
             headers: Object.keys(csvData[0] || {})
         }).then(importRecord => {
-            const db = DatabaseService.getDatabase();
+            const db = global.db;
 
             // Prepare insert statement
             const stmt = db.prepare(`
@@ -762,13 +740,11 @@ async function processVulnerabilitiesJSON(csvData) {
 }
 
 /**
- * Processes JSON ticket data.
- * @param {Array<Object>} csvData - The ticket data to process.
- * @returns {Promise<Object>} A promise that resolves with the number of imported records and any errors.
+ * Process JSON ticket data
  */
 async function processTicketsJSON(csvData) {
     return new Promise((resolve, reject) => {
-        const db = DatabaseService.getDatabase();
+        const db = global.db;
         let imported = 0;
         const errors = [];
 
@@ -788,7 +764,7 @@ async function processTicketsJSON(csvData) {
                 if (row.devices) {
                     try {
                         devices = typeof row.devices === "string" ? JSON.parse(row.devices) : row.devices;
-                    } catch (_parseError) {
+                    } catch (parseError) {
                         devices = [row.devices]; // Fallback to array with string
                     }
                 }
@@ -835,12 +811,11 @@ async function processTicketsJSON(csvData) {
 }
 
 /**
- * Gets the import history with vulnerability counts.
- * @returns {Promise<Array<Object>>} A promise that resolves with the import history.
+ * Get import history with vulnerability counts
  */
 async function getImportHistory() {
     return new Promise((resolve, reject) => {
-        const db = DatabaseService.getDatabase();
+        const db = global.db;
 
         const query = `
             SELECT
@@ -873,5 +848,8 @@ module.exports = {
     processStagingImport,
     processVulnerabilitiesJSON,
     processTicketsJSON,
-    getImportHistory
+    getImportHistory,
+    bulkLoadToStagingTable,
+    // Alias for compatibility
+    extractScanDateFromFilename: extractDateFromFilename
 };
