@@ -88,7 +88,7 @@ router.post("/import/tickets", ImportController.importTicketsJSON);
  * Get import history with vulnerability counts
  * From server.js lines 2534-2550
  */
-router.get("/", ImportController.getImportHistory);
+router.get("/imports", ImportController.getImportHistory);
 
 /**
  * GET /api/import/progress/:sessionId

@@ -6,7 +6,7 @@ This document serves as the single source of truth for all HexTrackr subagents. 
 
 **HexTrackr** is a network administrator's toolkit for tracking maintenance tickets and vulnerability management. Built by a network admin for network admins, it provides a unified dashboard for ServiceNow tickets, Hexagon maintenance windows, and vulnerability reports.
 
-- **Current Version**: 1.0.15
+- **Current Version**: 1.0.16
 - **Architecture**: Modular monolith with separated frontend/backend
 - **Database**: SQLite (embedded, no external dependencies)
 - **Deployment**: Docker Compose
@@ -55,6 +55,25 @@ scripts/
 │   └── tickets.js                 # TicketManager
 └── utils/           # Security and helpers
 ```
+
+### CRITICAL: Hybrid Module Loading Pattern
+
+```
+⚠️ HexTrackr uses BOTH ES6 modules AND traditional script loading!
+```
+
+#### ES6 Modules (use export/import)
+- `vulnerability-chart-manager.js` - Exports VulnerabilityChartManager
+- `vulnerability-grid.js` - Exports VulnerabilityGridManager
+- `vulnerability-core.js` - Imports the above modules
+
+#### Traditional Scripts (global variables via <script> tags)
+- `vulnerability-data.js` - Defines global VulnerabilityDataManager
+- `vulnerability-statistics.js` - Defines global VulnerabilityStatisticsManager
+- `vulnerability-search.js` - Defines global VulnerabilitySearchManager
+- `vulnerability-cards.js` - Defines global VulnerabilityCardsManager
+
+**Never add ES6 imports for classes loaded as global scripts!**
 
 ### Module Pattern (Frontend)
 
@@ -361,14 +380,15 @@ describe("GET /api/vulnerabilities", () => {
 
 ## Common Pitfalls to Avoid
 
-1. **Port Confusion**: External 8989 maps to internal 8080
-2. **Theme Variables**: Use --hextrackr-surface-* not Bootstrap
-3. **Running Locally**: Never run `node server.js` directly
-4. **Playwright Tests**: Must restart Docker first
-5. **Path Security**: Always use PathValidator class
-6. **Modal Z-Index**: Known issue with nested modals
-7. **Controller Init**: Database MUST be ready before routes
-8. **AG-Grid Themes**: Requires both CSS class AND API update
+1. **Module Loading**: Some modules are ES6, others are global scripts - CHECK FIRST!
+2. **Port Confusion**: External 8989 maps to internal 8080
+3. **Theme Variables**: Use --hextrackr-surface-* not Bootstrap
+4. **Running Locally**: Never run `node server.js` directly
+5. **Playwright Tests**: Must restart Docker first
+6. **Path Security**: Always use PathValidator class
+7. **Modal Z-Index**: Known issue with nested modals
+8. **Controller Init**: Database MUST be ready before routes
+9. **AG-Grid Themes**: Requires both CSS class AND API update
 
 ## Project Files Quick Reference
 
