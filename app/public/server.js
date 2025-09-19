@@ -1,181 +1,190 @@
 /**
- * HexTrackr Express Server - Fixed Modular backend application server
- * Refactored from monolithic 3,800-line server.js to use extracted modules
- * Handles API endpoints, vulnerability data management, file uploads, and serves the frontend
+ * HexTrackr Express Server - Modular Implementation
+ * Replaces the monolithic ~3,800 line server with route/controller modules
+ * while preserving the legacy implementation in app/backups/server-monolithic-backup.js
  */
 /* eslint-env node */
 /* global __dirname, require, console, process */
 
-// Core dependencies
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
-const multer = require("multer");
 const http = require("http");
 const socketIo = require("socket.io");
-const sqlite3 = require("sqlite3").verbose();
 const fs = require("fs");
 
-// Configuration modules
-const { config: dbConfig } = require("../config/database");
+// Configuration & utilities
 const middlewareConfig = require("../config/middleware");
-const { getSocketOptions } = require("../config/websocket");
-
-// Utility modules
 const ProgressTracker = require("../utils/ProgressTracker");
-
-// Service modules
 const DatabaseService = require("../services/databaseService");
 
-// Initialize Express app and server
+// Controllers that require initialization
+const VulnerabilityController = require("../controllers/vulnerabilityController");
+const TicketController = require("../controllers/ticketController");
+const BackupController = require("../controllers/backupController");
+const ImportController = require("../controllers/importController");
+const DocsController = require("../controllers/docsController");
+
+// Route modules
+const vulnerabilityRoutes = require("../routes/vulnerabilities");
+const ticketRoutes = require("../routes/tickets");
+const importRoutes = require("../routes/imports");
+const backupRoutes = require("../routes/backup");
+const docsRoutes = require("../routes/docs");
+
+// Express application & HTTP server
 const app = express();
 const PORT = process.env.PORT || 8080;
 const server = http.createServer(app);
 
-// Initialize Socket.io with configuration
-const io = socketIo(server, getSocketOptions());
-
-// Initialize progress tracker with WebSocket support
+// WebSocket setup for progress tracking
+const io = socketIo(server, middlewareConfig.websocket);
 const progressTracker = new ProgressTracker(io);
+ImportController.setProgressTracker(progressTracker);
 
-// Database initialization
-const dbPath = path.join(__dirname, dbConfig.path.relative);
-const db = new sqlite3.Database(dbPath);
+io.on("connection", (socket) => {
+    console.log(`📡 WebSocket client connected: ${socket.id}`);
+
+    socket.on("join-progress", (sessionId) => {
+        if (sessionId && typeof sessionId === "string") {
+            socket.join(`progress-${sessionId}`);
+            console.log(`Client ${socket.id} joined progress room: ${sessionId}`);
+
+            const session = progressTracker.getSession(sessionId);
+            if (session) {
+                socket.emit("progress-status", {
+                    sessionId,
+                    progress: session.progress,
+                    status: session.status,
+                    message: session.metadata.message,
+                    metadata: session.metadata
+                });
+            }
+        }
+    });
+
+    socket.on("leave-progress", (sessionId) => {
+        if (sessionId && typeof sessionId === "string") {
+            socket.leave(`progress-${sessionId}`);
+            console.log(`Client ${socket.id} left progress room: ${sessionId}`);
+        }
+    });
+
+    socket.on("disconnect", (reason) => {
+        console.log(`📡 WebSocket client disconnected: ${socket.id} (${reason})`);
+    });
+});
+
+// Database bootstrap using the extracted DatabaseService
+const dbPath = path.join(__dirname, "data", "hextrackr.db");
 const databaseService = new DatabaseService(dbPath);
 
-// Configure multer for file uploads (kept for future use)
-const _upload = multer(middlewareConfig.upload);
-
-// Import controllers that need initialization
-const VulnerabilityController = require("../controllers/vulnerabilityController");
-const TicketController = require("../controllers/ticketController");
-const BackupController = require("../controllers/backupController");
-
-/**
- * Initializes the database and controllers.
- * @returns {Promise<void>}
- */
-async function initDb() {
+async function initializeApplication() {
     await databaseService.initialize();
+    const db = databaseService.db; // underlying sqlite3.Database instance
+    global.db = db; // maintain compatibility with legacy services
 
-    // Initialize controllers with database and dependencies
-    // These are static methods that set up the singleton instances
+    // Initialize controllers that depend on database/progress tracker
     VulnerabilityController.initialize(db, progressTracker);
     TicketController.initialize(db);
     BackupController.initialize(db);
-    // Note: importController and docsController don't have initialize methods
 
-    console.log("✅ Database and controllers initialized successfully");
-}
+    // Apply middleware configuration
+    app.use(cors(middlewareConfig.cors));
+    app.use("/api/", rateLimit(middlewareConfig.rateLimit));
+    app.use(compression());
+    app.use(express.json(middlewareConfig.bodyParser.json));
+    app.use(express.urlencoded(middlewareConfig.bodyParser.urlencoded));
 
-// Setup WebSocket event handlers
-io.on("connection", (socket) => {
-    console.log("📡 Client connected:", socket.id);
-
-    socket.on("disconnect", () => {
-        console.log("📡 Client disconnected:", socket.id);
-    });
-});
-
-// Apply middleware configuration
-app.use(cors(middlewareConfig.cors));
-app.use("/api/", rateLimit(middlewareConfig.rateLimit));
-app.use(compression());
-app.use(express.json(middlewareConfig.bodyParser.json));
-app.use(express.urlencoded(middlewareConfig.bodyParser.urlencoded));
-
-// Apply security headers
-app.use((req, res, next) => {
-    Object.entries(middlewareConfig.security.headers).forEach(([header, value]) => {
-        res.setHeader(header, value);
-    });
-    next();
-});
-
-/**
- * @description Health check endpoint
- * @name /health
- * @method GET
- * @returns {object} Health status object
- */
-app.get("/health", (req, res) => {
-    try {
-        // Get version from environment or default
-        const version = process.env.HEXTRACKR_VERSION || "1.0.16";
-
-        // Check if database file exists
-        const dbExists = fs.existsSync(dbPath);
-
-        // Return full health status
-        res.json({
-            status: "ok",
-            version: version,
-            db: dbExists,
-            uptime: process.uptime()
+    // Security headers
+    app.use((req, res, next) => {
+        Object.entries(middlewareConfig.security.headers).forEach(([header, value]) => {
+            res.setHeader(header, value);
         });
-    } catch (error) {
-        console.error("Health endpoint error:", error.message);
-        res.json({
-            status: "ok",
-            version: process.env.HEXTRACKR_VERSION || "unknown",
-            db: false,
-            uptime: process.uptime()
-        });
-    }
-});
+        next();
+    });
 
-/**
- * Starts the server.
- * @returns {Promise<void>}
- */
-async function startServer() {
-    // Initialize database and controllers BEFORE importing routes
-    await initDb();
+    // Lightweight health endpoint
+    app.get("/health", (req, res) => {
+        try {
+            let version = "unknown";
+            try {
+                version = require("./package.json").version;
+            } catch (packageError) {
+                version = process.env.HEXTRACKR_VERSION || "unknown";
+                console.log(`Using environment version: ${version} (package.json not found: ${packageError.message})`);
+            }
 
-    // NOW import route modules (after controllers are initialized)
-    const vulnerabilityRoutes = require("../routes/vulnerabilities");
-    const ticketRoutes = require("../routes/tickets");
-    const importRoutes = require("../routes/imports");
-    const backupRoutes = require("../routes/backup");
-    const docsRoutes = require("../routes/docs");
+            const dbExists = fs.existsSync(dbPath);
+            res.json({ status: "ok", version, db: dbExists, uptime: process.uptime() });
+        } catch (error) {
+            console.error("Health endpoint error:", error.message);
+            res.json({ status: "ok", version: process.env.HEXTRACKR_VERSION || "unknown", db: false, uptime: process.uptime() });
+        }
+    });
 
-    // Mount route modules (order matters to avoid conflicts)
+    // Register modular route stacks
     app.use("/api/docs", docsRoutes);
     app.use("/api/backup", backupRoutes);
     app.use("/api/vulnerabilities", vulnerabilityRoutes);
-    app.use("/api/imports", importRoutes);
-    app.use("/api/import", importRoutes); // Also mount at /api/import for legacy routes
+    app.use("/api", importRoutes); // handles /vulnerabilities/import, /import/tickets, /imports, etc.
     app.use("/api/tickets", ticketRoutes);
 
-    /**
-     * @description Get all sites
-     * @name /api/sites
-     * @method GET
-     * @returns {Array<object>} Array of site objects
-     */
+    // Legacy lightweight endpoints retained from monolith
     app.get("/api/sites", (req, res) => {
-        db.all("SELECT DISTINCT hostname FROM vulnerabilities ORDER BY hostname", [], (err, rows) => {
-            if (err) {return res.status(500).json({ error: err.message });}
-            res.json(rows.map(row => ({ name: row.hostname })));
+        db.all("SELECT * FROM sites ORDER BY name ASC", (err, rows) => {
+            if (err) {
+                console.error("Error fetching sites:", err);
+                return res.status(500).json({ error: "Failed to fetch sites" });
+            }
+            res.json(rows);
         });
     });
 
-    /**
-     * @description Get all locations
-     * @name /api/locations
-     * @method GET
-     * @returns {Array<object>} Array of location objects
-     */
     app.get("/api/locations", (req, res) => {
-        db.all("SELECT DISTINCT ip_address FROM vulnerabilities WHERE ip_address != '' ORDER BY ip_address", [], (err, rows) => {
-            if (err) {return res.status(500).json({ error: err.message });}
-            res.json(rows.map(row => ({ name: row.ip_address })));
+        db.all("SELECT * FROM locations ORDER BY name ASC", (err, rows) => {
+            if (err) {
+                console.error("Error fetching locations:", err);
+                return res.status(500).json({ error: "Failed to fetch locations" });
+            }
+            res.json(rows);
         });
     });
 
-    // Static file serving
+    // Documentation deep-link redirects (mirror original behavior)
+    app.get(/^\/docs-html\/([^\/]+)\.html$/, (req, res) => {
+        let section = req.params[0];
+        const validSections = [
+            "getting-started", "user-guides", "development", "architecture",
+            "api-reference", "project-management", "security", "index",
+            "getting-started/index", "getting-started/installation",
+            "user-guides/index", "user-guides/ticket-management", "user-guides/vulnerability-management",
+            "development/index", "development/coding-standards", "development/contributing",
+            "development/development-setup", "development/docs-portal-guide", "development/memory-system", "development/pre-commit-hooks",
+            "architecture/index", "architecture/backend", "architecture/database", "architecture/deployment",
+            "architecture/frameworks", "architecture/frontend",
+            "api-reference/index", "api-reference/backup-api", "api-reference/tickets-api", "api-reference/vulnerabilities-api",
+            "project-management/index", "project-management/codacy-compliance", "project-management/quality-badges",
+            "project-management/roadmap-to-sprint-system", "project-management/strategic-roadmap",
+            "security/index", "security/overview", "security/vulnerability-disclosure",
+            "html-update-report", "CHANGELOG", "ROADMAP"
+        ];
+
+        if (!section.includes("/")) {
+            const resolved = DocsController.findDocsSectionForFilename(`${section}.html`);
+            if (resolved) {section = resolved;}
+        }
+
+        if (!validSections.includes(section)) {
+            return res.status(404).json({ error: "Documentation section not found" });
+        }
+
+        res.redirect(302, `/docs-html/#${section}`);
+    });
+
+    // Static assets for documentation portal and SPA shell
     app.use("/docs-html", express.static(path.join(__dirname, "docs-html"), {
         setHeaders: (res, filePath) => {
             if (filePath.endsWith(".html")) {
@@ -184,8 +193,8 @@ async function startServer() {
         }
     }));
 
-    // Developer documentation (JSDoc generated - not linked in main navigation)
-    app.use("/dev-docs", express.static(path.join(__dirname, "../dev-docs-html"), {
+    // Serve developer documentation (JSDoc)
+    app.use("/dev-docs-html", express.static(path.join(__dirname, "../dev-docs-html"), {
         setHeaders: (res, filePath) => {
             if (filePath.endsWith(".html")) {
                 res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -193,7 +202,7 @@ async function startServer() {
         }
     }));
 
-    app.use(express.static(path.join(__dirname), {
+    app.use(express.static(__dirname, {
         setHeaders: (res, filePath) => {
             if (filePath.endsWith(".html")) {
                 res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -201,16 +210,12 @@ async function startServer() {
         }
     }));
 
-    /**
-     * @description Default route
-     * @name /
-     * @method GET
-     */
+    // Root fallback
     app.get("/", (req, res) => {
-        res.redirect("/vulnerabilities.html");
+        res.sendFile(path.join(__dirname, "tickets.html"));
     });
 
-    // Error handling middleware
+    // Global error handler
     app.use((error, req, res, _next) => {
         console.error("Unhandled error:", error);
         res.status(500).json({
@@ -220,20 +225,24 @@ async function startServer() {
         });
     });
 
-    // Now start listening for requests
     server.listen(PORT, "0.0.0.0", () => {
         console.log(`🚀 HexTrackr server running on http://localhost:${PORT}`);
-        console.log("📊 Database-powered vulnerability management enabled");
+        console.log("📊 Modular backend initialized");
         console.log("🔌 WebSocket progress tracking enabled");
         console.log("Available endpoints:");
         console.log(`  - Tickets: http://localhost:${PORT}/tickets.html`);
         console.log(`  - Vulnerabilities: http://localhost:${PORT}/vulnerabilities.html`);
-        console.log(`  - API: http://localhost:${PORT}/api/vulnerabilities`);
+        console.log(`  - API Root: http://localhost:${PORT}/api`);
     });
 }
 
-// Start the server
-startServer().catch(error => {
+initializeApplication().catch(error => {
     console.error("Failed to start server:", error);
     process.exit(1);
 });
+
+/*
+ * Legacy monolithic server implementation retained for reference in:
+ *   app/backups/server-monolithic-backup.js
+ * The historical code is no longer executed here to complete T053 modular refactor.
+ */

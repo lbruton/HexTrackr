@@ -8,6 +8,41 @@
                         <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
                              alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
                     </a>.</p>
+<h2>[1.0.17] - 2025-09-19</h2><h3>Fixed</h3><h4>CSV Import Pipeline</h4><ul>
+<li><p><strong>Daily Totals Calculation</strong>: Fixed critical bug where <code>calculateAndStoreDailyTotalsEnhanced</code> was missing scan_date filter</p>
+<ul>
+<li>Root cause: Spec 001 backend refactoring removed the WHERE clause filtering by specific scan date</li>
+<li>Impact: Each import would overwrite all previous daily totals instead of updating only the current date</li>
+<li>Solution: Restored <code>WHERE scan_date = ?</code> filter in importService.js line 985</li>
+</ul>
+</li>
+<li><p><strong>Batch Processing Restoration</strong>: Re-implemented <code>processStagingToFinalTables</code> function with proper lifecycle management</p>
+<ul>
+<li>Restored grace period handling for vulnerability state transitions</li>
+<li>Fixed batch processing with 1000-record chunks for performance</li>
+<li>Ensured atomic imports via staging table approach</li>
+</ul>
+</li>
+<li><p><strong>API Response Format</strong>: Fixed /api/vulnerabilities/stats returning array instead of expected object format</p>
+<ul>
+<li>Frontend expected severity-keyed object but received array after modularization</li>
+<li>Restored legacy response contract to maintain backward compatibility</li>
+</ul>
+</li>
+</ul>
+<h3>Documentation</h3><ul>
+<li><p><strong>Developer Documentation Link</strong>: Fixed broken dev docs link in documentation portal</p>
+<ul>
+<li>Changed from <code>/dev-docs/</code> to <code>/dev-docs-html/</code> to match actual directory structure</li>
+</ul>
+</li>
+<li><p><strong>JSDoc Regeneration</strong>: Updated developer documentation with all recent fixes</p>
+<ul>
+<li>Documented new import service functions and batch processing</li>
+<li>Added comprehensive function descriptions for ImportService</li>
+</ul>
+</li>
+</ul>
 <h2>[1.0.16] - 2025-09-18</h2><h3>Fixed</h3><h4>Documentation Navigation State Management</h4><ul>
 <li><strong>Navigation State Persistence Issue</strong>: Fixed dual highlighting of menu sections when navigating to documentation from external pages<ul>
 <li>Root cause: Saved navigation state from localStorage was restored even when accessing docs from tickets/vulnerabilities pages</li>
