@@ -21,13 +21,8 @@ class TicketController {
     }
 
     /**
-     * @description Initialize controller with database connection. Called from server.js during setup.
-     * @param {Object} database - SQLite database connection instance
-     * @returns {TicketController} The initialized controller instance
-     * @throws {Error} If database connection is invalid
-     * @example
-     * // In server.js after database initialization
-     * const ticketController = TicketController.initialize(db);
+     * Initialize controller with database connection
+     * Called from server.js during setup
      */
     static initialize(database) {
         if (!TicketController.instance) {
@@ -38,12 +33,7 @@ class TicketController {
     }
 
     /**
-     * @description Get singleton instance of TicketController for use in routes
-     * @returns {TicketController} The singleton controller instance
-     * @throws {Error} If controller not initialized via initialize() method
-     * @example
-     * // In route handlers
-     * const controller = TicketController.getInstance();
+     * Get singleton instance (for use in routes)
      */
     static getInstance() {
         if (!TicketController.instance) {
@@ -53,14 +43,8 @@ class TicketController {
     }
 
     /**
-     * @description Get all tickets from the database
-     * @param {Object} req - Express request object
-     * @param {Object} res - Express response object
-     * @returns {Promise<void>} Sends JSON response with array of tickets
-     * @throws {Error} Database query errors
-     * @example
-     * // GET /api/tickets
-     * // Response: [{ id: 1, ticketNumber: "TCK-001", title: "Issue", ... }]
+     * Get all tickets
+     * Extracted from server.js line 3320-3344
      */
     static async getAllTickets(req, res) {
         try {
@@ -78,20 +62,8 @@ class TicketController {
     }
 
     /**
-     * @description Create a new ticket in the database
-     * @param {Object} req - Express request object
-     * @param {Object} req.body - Ticket data object
-     * @param {string} req.body.ticketNumber - Unique ticket number
-     * @param {string} req.body.title - Ticket title
-     * @param {string} req.body.description - Ticket description
-     * @param {string} req.body.priority - Ticket priority (low/medium/high)
-     * @param {Object} res - Express response object
-     * @returns {Promise<void>} Sends JSON response with success status and new ticket ID
-     * @throws {Error} Validation or database insertion errors
-     * @example
-     * // POST /api/tickets
-     * // Body: { ticketNumber: "TCK-001", title: "New Issue", ... }
-     * // Response: { success: true, id: 123, message: "Ticket saved successfully" }
+     * Create new ticket
+     * Extracted from server.js line 3369-3394
      */
     static async createTicket(req, res) {
         try {
@@ -115,18 +87,8 @@ class TicketController {
     }
 
     /**
-     * @description Update an existing ticket by ID
-     * @param {Object} req - Express request object
-     * @param {Object} req.params - Route parameters
-     * @param {string} req.params.id - Ticket ID to update
-     * @param {Object} req.body - Updated ticket data
-     * @param {Object} res - Express response object
-     * @returns {Promise<void>} Sends JSON response with success status
-     * @throws {Error} Ticket not found or database update errors
-     * @example
-     * // PUT /api/tickets/123
-     * // Body: { title: "Updated Title", status: "resolved" }
-     * // Response: { success: true, message: "Ticket updated successfully" }
+     * Update existing ticket
+     * Extracted from server.js line 3396-3422
      */
     static async updateTicket(req, res) {
         try {
@@ -134,7 +96,7 @@ class TicketController {
             const ticketId = req.params.id;
             const ticket = req.body;
 
-            const _result = await controller.ticketService.updateTicket(ticketId, ticket);
+            const result = await controller.ticketService.updateTicket(ticketId, ticket);
             res.json({
                 success: true,
                 id: ticketId,
@@ -151,16 +113,8 @@ class TicketController {
     }
 
     /**
-     * @description Delete a ticket by ID
-     * @param {Object} req - Express request object
-     * @param {Object} req.params - Route parameters
-     * @param {string} req.params.id - Ticket ID to delete
-     * @param {Object} res - Express response object
-     * @returns {Promise<void>} Sends JSON response with deletion count
-     * @throws {Error} Ticket not found or database deletion errors
-     * @example
-     * // DELETE /api/tickets/123
-     * // Response: { success: true, deleted: 1 }
+     * Delete ticket
+     * Extracted from server.js line 3424-3435
      */
     static async deleteTicket(req, res) {
         try {
@@ -183,17 +137,8 @@ class TicketController {
     }
 
     /**
-     * @description Migrate tickets from legacy import format
-     * @param {Object} req - Express request object
-     * @param {Object} req.body - Request body
-     * @param {Array<Object>} req.body.tickets - Array of ticket objects to migrate
-     * @param {Object} res - Express response object
-     * @returns {Promise<void>} Sends JSON response with migration results
-     * @throws {Error} Migration or database insertion errors
-     * @example
-     * // POST /api/tickets/migrate
-     * // Body: { tickets: [{ id: 'legacy-1', ... }] }
-     * // Response: { success: true, message: "Migration completed: 1 tickets migrated, 0 errors" }
+     * Migrate tickets (legacy import format)
+     * Extracted from server.js line 3437-3479
      */
     static async migrateTickets(req, res) {
         try {
@@ -220,17 +165,8 @@ class TicketController {
     }
 
     /**
-     * @description Import tickets from CSV data structure
-     * @param {Object} req - Express request object
-     * @param {Object} req.body - Request body
-     * @param {Array<Object>} req.body.data - Array of objects representing ticket data from CSV
-     * @param {Object} res - Express response object
-     * @returns {Promise<void>} Sends JSON response with import results
-     * @throws {Error} Import process or validation errors
-     * @example
-     * // POST /api/tickets/import
-     * // Body: { data: [{ "XT Number": "XT001", ... }] }
-     * // Response: { success: true, imported: 1, total: 1, errors: undefined }
+     * Import tickets from CSV data
+     * Extracted from server.js line 3482-3498 + processTicketRows function
      */
     static async importTickets(req, res) {
         try {
@@ -262,14 +198,8 @@ class TicketController {
     }
 
     /**
-     * @description Export all tickets to JSON format for backup
-     * @param {Object} req - Express request object
-     * @param {Object} res - Express response object
-     * @returns {Promise<void>} Sends JSON response containing exported ticket data
-     * @throws {Error} Database query or export errors
-     * @example
-     * // GET /api/tickets/export
-     * // Response: { type: "tickets", count: 5, data: [...], exported_at: "2024-01-01T00:00:00.000Z" }
+     * Export tickets for backup
+     * Extracted from server.js line 3606-3621
      */
     static async exportTickets(req, res) {
         try {
