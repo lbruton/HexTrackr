@@ -9,7 +9,7 @@
  * - Backup statistics and file management
  */
 
-const _DatabaseService = require("./databaseService");
+const DatabaseService = require("./databaseService");
 const FileService = require("./fileService");
 const PathValidator = require("../utils/PathValidator");
 const JSZip = require("jszip");
