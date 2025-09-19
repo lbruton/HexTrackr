@@ -48,6 +48,7 @@
    - All new features, changes, and code updates SHALL pass Markdownlint
    - All new features, changes, and code updates SHALL pass ESlint9+
    - All Framework code must be reviewed against Context7 to ensure accuracy. 
+   - ***non-negotiable*** ***NEVER*** fix lint issues by adding _unserscores to functions!!!
 
 ### Section V: Backups and Branch Discipline
 
@@ -85,10 +86,12 @@
 
 ### Section I: Memento
    - Memento MCP SHALL be used as the primary knowledge graph for the project
-   - All Searches SHALL be Semantic
-   - Entities SHALL Use PROJECT:DOMAIN:TYPE
-   - Entities SHALL Contain TIMESTAMP:YYYYMMDDHHMMSS
-   - Entities SHALL Contain an ABSTRACT and SUMMARY
+   - All Searches SHALL be Semantic (with hybrid and keyword as alternatives)
+   - Entities SHALL Use PROJECT:DOMAIN:TYPE classification pattern
+   - Entities SHALL Contain TIMESTAMP in ISO 8601 format as first observation
+   - Entities SHALL Contain an ABSTRACT (second) and SUMMARY (third) observation
+   - All entities SHALL be tagged per `/memento/TAXONOMY.md` requirements
+   - Tag taxonomy and conventions defined in `/memento/TAXONOMY.md` SHALL be followed
 
 ### Section II: Context 7
    - Context7 SHALL be used for all code changes to ensure full framework compatability.
@@ -104,7 +107,7 @@
    - Playwright Testing SHALL be performed before and after any UI changes.
 
 ### Section VI: Sequential Thinking
-   - All complex tasks SHALL be broken down with Sequential Thinking 
+   - All tasks SHALL be broken down with Sequential Thinking 
 
 ### Section VII: Zen
    - If Available, Zen tools may be used at the users request only.
