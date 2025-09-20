@@ -36,10 +36,18 @@ const upload = multer({
         fileSize: 100 * 1024 * 1024 // 100MB limit
     },
     fileFilter: (req, file, cb) => {
-        if (file.mimetype !== "text/csv") {
-            return cb(new Error("Only CSV files allowed"));
+        // Accept CSV files with various MIME types
+        const allowedMimes = ["text/csv", "application/csv", "text/plain", "application/vnd.ms-excel"];
+        const allowedExtensions = [".csv"];
+
+        const hasAllowedMime = allowedMimes.includes(file.mimetype);
+        const hasAllowedExt = allowedExtensions.some(ext => file.originalname.toLowerCase().endsWith(ext));
+
+        if (hasAllowedMime || hasAllowedExt) {
+            cb(null, true);
+        } else {
+            cb(new Error("Only CSV files allowed"));
         }
-        cb(null, true);
     }
 });
 
@@ -67,6 +75,83 @@ router.post("/vulnerabilities/import-staging", upload.single("csvFile"), ImportC
  * From server.js lines 3501-3604
  */
 router.post("/import/vulnerabilities", ImportController.importVulnerabilitiesJSON);
+
+// ===============================
+// GENERIC IMPORT ROUTE (for Settings Modal)
+// ===============================
+
+/**
+ * POST /api/import
+ * Generic import handler that routes based on 'type' parameter
+ * Used by Settings Modal for CSV imports
+ */
+router.post("/import", upload.single("file"), async (req, res) => {
+    const { type } = req.body;
+    const file = req.file;
+
+    if (!file) {
+        return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    try {
+        // Route to appropriate handler based on type
+        if (type === "tickets") {
+            // For tickets, we need to use the CSV parser from tickets.js
+            // Read the CSV file and parse it
+            const fs = require("fs");
+            const csvContent = fs.readFileSync(file.path, "utf-8");
+
+            // Import the ticket service to handle the import
+            const TicketService = require("../services/ticketService");
+            const ticketService = new TicketService();
+            ticketService.initialize(global.db);
+
+            // Parse CSV and import tickets
+            const Papa = require("papaparse");
+            const parseResult = Papa.parse(csvContent, {
+                header: true,
+                skipEmptyLines: true
+            });
+
+            if (parseResult.errors.length > 0) {
+                throw new Error(`CSV parsing errors: ${parseResult.errors.map(e => e.message).join(", ")}`);
+            }
+
+            // Import tickets using CSV import method
+            const result = await ticketService.importTicketsFromCSV(parseResult.data, "replace");
+
+            // Clean up uploaded file
+            fs.unlinkSync(file.path);
+
+            return res.json({
+                success: true,
+                message: `Successfully imported ${result.imported} tickets`,
+                imported: result.imported
+            });
+        } else if (type === "vulnerabilities") {
+            // Forward to existing vulnerability import handler
+            req.body.csvFile = file;
+            return ImportController.importVulnerabilities(req, res);
+        } else {
+            throw new Error(`Unsupported import type: ${type}`);
+        }
+    } catch (error) {
+        // Clean up uploaded file on error
+        if (file && file.path) {
+            const fs = require("fs");
+            try {
+                fs.unlinkSync(file.path);
+            } catch (e) {
+                console.error("Error deleting uploaded file:", e);
+            }
+        }
+
+        return res.status(500).json({
+            error: error.message || "Import failed",
+            message: error.message || "Import failed"
+        });
+    }
+});
 
 // ===============================
 // TICKET IMPORT ROUTES
