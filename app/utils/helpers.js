@@ -386,7 +386,8 @@ function mapVulnerabilityRow(row) {
  */
 function mapTicketRow(row, index) {
     const now = new Date().toISOString();
-    const xtNumber = row.xt_number || row["XT Number"] || `XT${String(index + 1).padStart(3, "0")}`;
+    const rawXtNumber = row.xt_number || row["XT Number"] || row.xtNumber;
+    const xtNumber = normalizeXtNumber(rawXtNumber) || String(index + 1).padStart(4, "0");
     const ticketId = row.id || `ticket_${Date.now()}_${index}`;
 
     return {
@@ -405,6 +406,22 @@ function mapTicketRow(row, index) {
         createdAt: row.created_at || now,
         updatedAt: now
     };
+}
+
+/**
+ * Normalize XT number values to four-digit strings without prefixes.
+ * @param {string|number|undefined} value - Raw XT identifier value
+ * @returns {string|undefined} Normalized four digit string or undefined when unavailable
+ */
+function normalizeXtNumber(value) {
+    if (value === undefined || value === null) {
+        return undefined;
+    }
+
+    const match = String(value).match(/\d+/);
+    if (!match) {return undefined;}
+
+    return match[0].padStart(4, "0");
 }
 
 // =============================================================================
@@ -464,6 +481,7 @@ module.exports = {
     // CSV data mapping helpers
     mapVulnerabilityRow,
     mapTicketRow,
+    normalizeXtNumber,
 
     // Documentation helpers
     findDocsSectionForFilename

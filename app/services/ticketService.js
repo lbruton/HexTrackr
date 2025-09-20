@@ -1,3 +1,5 @@
+const { normalizeXtNumber } = require("../utils/helpers");
+
 /**
  * TicketService - Ticket business logic and database operations
  * Extracted from server.js lines: 3320-3344, 3369-3394, 3396-3422, 3424-3435, 3437-3479, 3482-3498, 1802-1874, 3606-3621
@@ -8,7 +10,7 @@
  * - CSV import processing with mapping
  * - Migration operations
  * - Export functionality
- * - Ticket number generation (XT numbers)
+ * - Ticket number generation (4-digit IDs)
  *
  * T053 INTEGRATION NOTES:
  * This service requires database initialization before use.
@@ -47,10 +49,42 @@ class TicketService {
 
                 // Transform the rows to ensure each ticket has an id (use xt_number if id is null)
                 const transformedRows = rows.map(row => {
-                    // If id is null, use xt_number as the id
+                    const currentXt = row.xt_number;
+                    const normalizedXt = currentXt ? normalizeXtNumber(currentXt) : undefined;
+
+                    // If id is null, use the available XT number as the id
                     if (row.id === null || row.id === undefined) {
-                        row.id = row.xt_number;
+                        row.id = normalizedXt || currentXt;
                     }
+
+                    if (normalizedXt) {
+                        if (normalizedXt !== currentXt) {
+                            this.db.run(
+                                "UPDATE tickets SET xt_number = ? WHERE id = ?",
+                                [normalizedXt, row.id],
+                                (updateErr) => {
+                                    if (updateErr) {
+                                        console.error("Failed to normalize xt_number for ticket", row.id, updateErr);
+                                    }
+                                }
+                            );
+                        }
+                        row.xt_number = normalizedXt;
+                        row.xtNumber = normalizedXt;
+                    }
+
+                    // Parse devices field if it's a JSON string
+                    if (row.devices && typeof row.devices === "string") {
+                        try {
+                            row.devices = JSON.parse(row.devices);
+                        } catch (e) {
+                            console.error("Failed to parse devices JSON for ticket", row.id, e);
+                            row.devices = [];
+                        }
+                    } else if (!row.devices) {
+                        row.devices = [];
+                    }
+
                     return row;
                 });
 
@@ -64,6 +98,13 @@ class TicketService {
      * Extracted from server.js line 3369-3394
      */
     async createTicket(ticket) {
+        const normalizedXt = normalizeXtNumber(ticket.xt_number || ticket.xtNumber) || null;
+        const payload = {
+            ...ticket,
+            xt_number: normalizedXt,
+            xtNumber: normalizedXt
+        };
+
         return new Promise((resolve, reject) => {
             const sql = `INSERT INTO tickets (
                 id, date_submitted, date_due, hexagon_ticket, service_now_ticket, location,
@@ -72,31 +113,31 @@ class TicketService {
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
-                ticket.id,
-                ticket.dateSubmitted,
-                ticket.dateDue,
-                ticket.hexagonTicket,
-                ticket.serviceNowTicket,
-                ticket.location,
-                JSON.stringify(ticket.devices),
-                ticket.supervisor,
-                ticket.tech,
-                ticket.status,
-                ticket.notes,
-                JSON.stringify(ticket.attachments || []),
-                ticket.createdAt,
-                ticket.updatedAt,
-                ticket.site,
-                ticket.xt_number,
-                ticket.site_id,
-                ticket.location_id
+                payload.id,
+                payload.dateSubmitted,
+                payload.dateDue,
+                payload.hexagonTicket,
+                payload.serviceNowTicket,
+                payload.location,
+                JSON.stringify(payload.devices),
+                payload.supervisor,
+                payload.tech,
+                payload.status,
+                payload.notes,
+                JSON.stringify(payload.attachments || []),
+                payload.createdAt,
+                payload.updatedAt,
+                payload.site,
+                payload.xt_number,
+                payload.site_id,
+                payload.location_id
             ];
 
             this.db.run(sql, params, function(err) {
                 if (err) {
                     return reject(new Error("Failed to save ticket: " + err.message));
                 }
-                resolve({ id: ticket.id });
+                resolve({ id: payload.id });
             });
         });
     }
@@ -106,6 +147,13 @@ class TicketService {
      * Extracted from server.js line 3396-3422
      */
     async updateTicket(ticketId, ticket) {
+        const normalizedXt = normalizeXtNumber(ticket.xt_number || ticket.xtNumber) || null;
+        const payload = {
+            ...ticket,
+            xt_number: normalizedXt,
+            xtNumber: normalizedXt
+        };
+
         return new Promise((resolve, reject) => {
             const sql = `UPDATE tickets SET
                 date_submitted = ?, date_due = ?, hexagon_ticket = ?, service_now_ticket = ?,
@@ -114,22 +162,22 @@ class TicketService {
                 WHERE id = ?`;
 
             const params = [
-                ticket.dateSubmitted,
-                ticket.dateDue,
-                ticket.hexagonTicket,
-                ticket.serviceNowTicket,
-                ticket.location,
-                JSON.stringify(ticket.devices),
-                ticket.supervisor,
-                ticket.tech,
-                ticket.status,
-                ticket.notes,
-                JSON.stringify(ticket.attachments || []),
-                ticket.updatedAt,
-                ticket.site,
-                ticket.xt_number,
-                ticket.site_id,
-                ticket.location_id,
+                payload.dateSubmitted,
+                payload.dateDue,
+                payload.hexagonTicket,
+                payload.serviceNowTicket,
+                payload.location,
+                JSON.stringify(payload.devices),
+                payload.supervisor,
+                payload.tech,
+                payload.status,
+                payload.notes,
+                JSON.stringify(payload.attachments || []),
+                payload.updatedAt,
+                payload.site,
+                payload.xt_number,
+                payload.site_id,
+                payload.location_id,
                 ticketId
             ];
 
@@ -154,6 +202,76 @@ class TicketService {
                 }
                 resolve(this.changes);
             });
+        });
+    }
+
+    /**
+     * Import tickets from CSV export format
+     * Maps CSV fields to database schema
+     */
+    async importTicketsFromCSV(tickets, mode = "replace") {
+        return new Promise(async (resolve, reject) => {
+            try {
+                // Clear existing tickets if replace mode
+                if (mode === "replace") {
+                    await new Promise((res, rej) => {
+                        this.db.run("DELETE FROM tickets", (err) => {
+                            if (err) {rej(err);}
+                            else {res();}
+                        });
+                    });
+                }
+
+                let imported = 0;
+                let skipped = 0;
+
+                for (const ticket of tickets) {
+                    try {
+                        // Map CSV fields to camelCase for createTicket method
+                        // Handle devices field - it may come as JSON string or already parsed array
+                        let devicesArray = [];
+                        if (ticket.devices) {
+                            if (typeof ticket.devices === "string") {
+                                try {
+                                    devicesArray = JSON.parse(ticket.devices);
+                                } catch (e) {
+                                    // Not JSON, treat as single device or empty
+                                    devicesArray = ticket.devices ? [ticket.devices] : [];
+                                }
+                            } else if (Array.isArray(ticket.devices)) {
+                                devicesArray = ticket.devices;
+                            }
+                        }
+
+                        const mappedTicket = {
+                            id: ticket.id || Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                            dateSubmitted: ticket.date_submitted || ticket.dateSubmitted,
+                            dateDue: ticket.date_due || ticket.dateDue,
+                            hexagonTicket: ticket.hexagon_ticket || ticket.hexagonTicket || "",
+                            serviceNowTicket: ticket.service_now_ticket || ticket.serviceNowTicket || "",
+                            location: ticket.location || "",
+                            devices: devicesArray, // Pass as actual array
+                            supervisor: ticket.supervisor || "",
+                            tech: ticket.tech || "",
+                            status: ticket.status || "Open",
+                            notes: ticket.notes || "",
+                            xtNumber: ticket.xt_number || ticket.xtNumber || "",
+                            createdAt: ticket.created_at || new Date().toISOString(),
+                            updatedAt: ticket.updated_at || new Date().toISOString()
+                        };
+
+                        await this.createTicket(mappedTicket);
+                        imported++;
+                    } catch (err) {
+                        console.error("Error importing ticket:", err);
+                        skipped++;
+                    }
+                }
+
+                resolve({ imported, skipped, total: tickets.length });
+            } catch (error) {
+                reject(error);
+            }
         });
     }
 
@@ -280,7 +398,7 @@ class TicketService {
      */
     _mapTicketRow(row, index) {
         const now = new Date().toISOString();
-        const xtNumber = row.xt_number || row["XT Number"] || `XT${String(index + 1).padStart(3, "0")}`;
+        const xtNumber = normalizeXtNumber(row.xt_number || row["XT Number"] || row.xtNumber) || String(index + 1).padStart(4, "0");
         const ticketId = row.id || `ticket_${Date.now()}_${index}`;
 
         return {
@@ -323,24 +441,27 @@ class TicketService {
     }
 
     /**
-     * Generate next XT number for new tickets
+     * Generate next ticket number for new tickets
      */
     async generateNextXTNumber() {
         return new Promise((resolve, reject) => {
-            this.db.get(
-                "SELECT xt_number FROM tickets WHERE xt_number LIKE 'XT%' ORDER BY xt_number DESC LIMIT 1",
-                (err, row) => {
+            this.db.all(
+                "SELECT xt_number FROM tickets WHERE xt_number IS NOT NULL",
+                (err, rows) => {
                     if (err) {
-                        return reject(new Error("Failed to generate XT number: " + err.message));
+                        return reject(new Error("Failed to generate ticket number: " + err.message));
                     }
 
-                    let nextNumber = 1;
-                    if (row && row.xt_number) {
-                        const currentNum = parseInt(row.xt_number.replace("XT", ""));
-                        nextNumber = isNaN(currentNum) ? 1 : currentNum + 1;
-                    }
+                    const numbers = (rows || [])
+                        .map(r => normalizeXtNumber(r.xt_number))
+                        .filter(Boolean)
+                        .map(value => parseInt(value, 10))
+                        .filter(num => !isNaN(num));
 
-                    resolve(`XT${String(nextNumber).padStart(3, "0")}`);
+                    const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
+                    const nextNumber = maxNumber + 1;
+
+                    resolve(String(nextNumber).padStart(4, "0"));
                 }
             );
         });

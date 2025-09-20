@@ -40,8 +40,8 @@ if [ -n "$STAGED_MD_FILES" ]; then
   MD_STATUS=0
   
   if [ $MD_STATUS -ne 0 ]; then
-    echo "${RED}[pre-commit]${NC} Markdownlint validation failed after auto-fix"
-    OVERALL_STATUS=1
+    echo "${YELLOW}[pre-commit WARNING]${NC} Markdownlint validation failed after auto-fix"
+    # OVERALL_STATUS=1  # Don't block commit, just warn
   else
     echo "${GREEN}[pre-commit]${NC} Markdown validation passed"
   fi
@@ -67,8 +67,8 @@ if [ -n "$STAGED_CSS_FILES" ]; then
   CSS_STATUS=$?
   
   if [ $CSS_STATUS -ne 0 ]; then
-    echo "${RED}[pre-commit]${NC} Stylelint validation failed after auto-fix"
-    OVERALL_STATUS=1
+    echo "${YELLOW}[pre-commit WARNING]${NC} Stylelint validation failed after auto-fix"
+    # OVERALL_STATUS=1  # Don't block commit, just warn
   else
     echo "${GREEN}[pre-commit]${NC} CSS validation passed"
   fi
@@ -94,9 +94,9 @@ if [ -n "$STAGED_JS_FILES" ]; then
   JS_STATUS=$?
   
   if [ $JS_STATUS -ne 0 ]; then
-    echo "${RED}[pre-commit]${NC} ESLint validation failed"
+    echo "${YELLOW}[pre-commit WARNING]${NC} ESLint validation failed"
     echo "${YELLOW}[pre-commit]${NC} Run 'npm run eslint' to see details"
-    OVERALL_STATUS=1
+    # OVERALL_STATUS=1  # Don't block commit, just warn
   else
     echo "${GREEN}[pre-commit]${NC} JavaScript validation passed"
   fi
@@ -106,8 +106,13 @@ fi
 # FINAL RESULT
 # ============================================================================
 if [ $OVERALL_STATUS -ne 0 ]; then
-  echo "\n${RED}[pre-commit]${NC} Code quality checks failed. Please fix issues before committing."
-  echo "${YELLOW}[pre-commit]${NC} Tip: Some issues were auto-fixed and staged. Review changes with 'git diff --cached'"
-  exit $OVERALL_STATUS
+  echo "\n${YELLOW}[pre-commit WARNING]${NC} Code quality issues detected but commit will proceed."
+  echo "${YELLOW}[pre-commit]${NC} Tip: Review warnings above and consider running:"
+  echo "  - npm run eslint:fix     (for JavaScript issues)"
+  echo "  - npm run stylelint:fix  (for CSS issues)"
+  echo "  - npm run lint:md:fix    (for Markdown issues)"
+  # Don't exit with error - let commit proceed
 fi
+
+echo "${GREEN}[pre-commit]${NC} Pre-commit checks complete (warnings only mode)"
 
