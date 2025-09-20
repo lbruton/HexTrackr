@@ -250,7 +250,7 @@ class DeviceSecurityModal {
                         }
                         window.vulnModalData[vulnDataId] = params.data;
                         
-                        return `<a href="#" class="text-decoration-none text-dark" style="cursor: pointer;" title="${value}" onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}')">${value}</a>`;
+                        return `<a href="#" class="ag-grid-link" title="${value}" onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}')">${value}</a>`;
                     }
                     return `<span title="${value}">${value}</span>`;
                 }
