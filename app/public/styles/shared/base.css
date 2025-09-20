@@ -34,6 +34,32 @@ body {
 
     /* Theme-specific shadows */
     --hextrackr-primary-shadow: rgb(32, 107, 196, 0.15);   /* Blue shadow for light mode */
+
+    /* Ticket Accent Colors */
+    --ticket-accent-blue: #2563eb;
+    --ticket-accent-purple: #7c3aed;
+    --ticket-accent-teal: #0d9488;
+    --ticket-accent-amber: #d97706;
+    --ticket-accent-rose: #db2777;
+    --ticket-accent-slate: #334155;
+
+    /* VPR Severity Color System */
+    --vpr-critical: #dc2626;
+    --vpr-high: #d97706;
+    --vpr-medium: #2563eb;
+    --vpr-low: #16a34a;
+
+    /* VPR RGB values for alpha transparency */
+    --vpr-critical-rgb: 220, 38, 38;
+    --vpr-high-rgb: 217, 119, 6;
+    --vpr-medium-rgb: 37, 99, 235;
+    --vpr-low-rgb: 22, 163, 74;
+
+    /* VPR Background colors with opacity */
+    --vpr-critical-bg: rgb(var(--vpr-critical-rgb), 0.1);
+    --vpr-high-bg: rgb(var(--vpr-high-rgb), 0.1);
+    --vpr-medium-bg: rgb(var(--vpr-medium-rgb), 0.1);
+    --vpr-low-bg: rgb(var(--vpr-low-rgb), 0.1);
 }
 
 /* Base gradient for HexTrackr branding */
