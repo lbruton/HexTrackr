@@ -33,26 +33,16 @@
 ## Summary
 [Extract from feature spec: primary requirement + technical approach from research]
 
-## Technical Context (HexTrackr)
-**Language/Version**: JavaScript ES6+, Node.js 18+
-**Primary Dependencies**: Express.js, SQLite3, AG-Grid v33+, Tabler UI (Bootstrap 5)
-**Storage**: SQLite database at `data/hextrackr.db`
-**Testing**: Playwright (E2E), Jest (unit tests)
-**Target Platform**: Web browsers (Chrome, Firefox, Safari, Edge)
-**Project Type**: web - HexTrackr vulnerability management application
-**Performance Goals**: <2s page load, 10k+ vulnerabilities, <200ms API response
-**Constraints**: Docker port 8989, no React/Vue/Angular (vanilla JS only)
-**Scale/Scope**: ~2000 devices, 9 states, 100k+ vulnerabilities per import
-**Security**: PathValidator required, DOMPurify for input, parameterized SQL
-
-## Codebase Integration (FROM DISCOVERY - MANDATORY)
-**Existing Files to Modify**: [MUST FILL from discovery-template.md]
-**New Files to Create**: [MUST FILL from discovery-template.md]
-**Controllers Affected**: [e.g., VulnerabilityController, TicketController]
-**Services Affected**: [e.g., ImportService, VulnerabilityService]
-**Routes to Update**: [e.g., /app/routes/vulnerabilities.js]
-**Frontend Modules**: [e.g., vulnerability-grid.js, theme-manager.js]
-**Database Changes**: [e.g., new columns, indexes, tables]
+## Technical Context
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
+**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: [single/web/mobile - determines source structure]  
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
@@ -72,47 +62,44 @@ specs/[###-feature]/
 └── tasks.md             # Phase 2 output (/tasks command - NOT created by /plan)
 ```
 
-### Source Code (HexTrackr Structure - ALWAYS USE THIS)
+### Source Code (repository root)
 ```
-app/
-├── controllers/         # Singleton pattern controllers
-│   ├── VulnerabilityController.js
-│   ├── TicketController.js
-│   └── ImportController.js
-├── services/           # Business logic services
-│   ├── VulnerabilityService.js
-│   ├── ImportService.js
-│   └── DatabaseService.js
-├── routes/             # Express route definitions
-│   ├── vulnerabilities.js
-│   ├── tickets.js
-│   └── imports.js
-├── middleware/         # Express middleware
-│   ├── errorHandler.js
-│   └── rateLimiter.js
-├── utils/              # Utilities
-│   ├── PathValidator.js
-│   └── ProgressTracker.js
-├── public/             # Frontend files
-│   ├── scripts/
-│   │   ├── pages/     # Page-specific JS (vulnerabilities.js, tickets.js)
-│   │   ├── shared/    # Shared modules (grid managers, theme adapters)
-│   │   └── utils/     # Utility functions
-│   ├── styles/        # CSS modules
-│   │   ├── pages/     # Page-specific CSS
-│   │   ├── components/# Component CSS
-│   │   └── theme/     # Theme files (dark.css, light.css)
-│   └── *.html         # HTML pages
-└── data/               # Database files
-    └── hextrackr.db
+# Option 1: Single project (DEFAULT)
+src/
+├── models/
+├── services/
+├── cli/
+└── lib/
 
-tests/                  # Test files
-├── e2e/               # Playwright tests
-├── integration/       # Integration tests
-└── unit/              # Unit tests
+tests/
+├── contract/
+├── integration/
+└── unit/
+
+# Option 2: Web application (when "frontend" + "backend" detected)
+backend/
+├── src/
+│   ├── models/
+│   ├── services/
+│   └── api/
+└── tests/
+
+frontend/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   └── services/
+└── tests/
+
+# Option 3: Mobile + API (when "iOS/Android" detected)
+api/
+└── [same as backend above]
+
+ios/ or android/
+└── [platform-specific structure]
 ```
 
-**Structure Decision**: HexTrackr existing structure (NO CHANGES to directory layout)
+**Structure Decision**: [DEFAULT to Option 1 unless Technical Context indicates web/mobile app]
 
 ## Phase 0: Outline & Research
 1. **Extract unknowns from Technical Context** above:

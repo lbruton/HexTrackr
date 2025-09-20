@@ -49,25 +49,23 @@
         let quartzTheme = null;
         if (typeof window.agGrid !== "undefined" && window.agGrid.themeQuartz) {
             if (darkMode) {
-                // Dark mode Quartz theme - matching AG-Grid Theme Builder
+                // Use centralized theme configuration for consistency
                 quartzTheme = window.agGrid.themeQuartz.withParams({
-                    backgroundColor: "#1f2836",
-                    foregroundColor: "#e9ecef",
-                    chromeBackgroundColor: {
-                        ref: "foregroundColor",
-                        mix: 0.07,
-                        onto: "backgroundColor"
-                    },
-                    headerBackgroundColor: "#2d3748",
-                    headerTextColor: "#f7fafc",
+                    backgroundColor: "#0F1C31", // Dark navy background - EXACT
+                    foregroundColor: "#FFF", // Pure white text
+                    browserColorScheme: "dark",
+                    chromeBackgroundColor: "#202c3f", // EXACT header color (no mixing)
+                    headerBackgroundColor: "#202c3f", // EXACT header color - matches vulnerabilities
+                    headerTextColor: "#FFF",
+                    headerFontSize: 14,
                     oddRowBackgroundColor: "rgba(255, 255, 255, 0.02)",
                     rowBorder: false,
                     headerRowBorder: false,
                     columnBorder: false,
-                    borderColor: "#4a5568",
-                    selectedRowBackgroundColor: "#3182ce",
-                    rowHoverColor: "rgba(49, 130, 206, 0.1)",
-                    rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+                    borderColor: "#2a3f5f", // Subtle navy border
+                    selectedRowBackgroundColor: "#2563eb", // Bright blue for selection
+                    rowHoverColor: "rgba(37, 99, 235, 0.15)", // Blue hover effect
+                    rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)"
                 });
             } else {
                 // Light mode Quartz theme - matching AG-Grid Theme Builder

@@ -10,10 +10,12 @@
 
 .card {
     background-color: var(--hextrackr-surface-1);
-    border: 1px solid var(--hextrackr-border-subtle);
+    /* REVERT FIX: Changed to transparent border to fix thick white borders */
+    border: 1px solid transparent !important;
     box-shadow: var(--hextrackr-shadow-sm);
     transition: all 0.2s ease;
-    border-radius: var(--tblr-border-radius);
+    /* REVERT FIX: Set explicit border-radius to restore rounded corners */
+    border-radius: 8px !important;
 }
 
 .card:hover {
@@ -40,8 +42,10 @@
 }
 
 /* Card Body */
+/* REVERT FIX: Added margin-top for spacing between header and content */
 .card-body {
     padding: 1.25rem;
+    margin-top: 1rem;  /* Added spacing between header and table */
 }
 
 /* Card Footer */
@@ -277,7 +281,8 @@
 
 [data-bs-theme="dark"] .card {
     background: var(--tblr-bg-surface);
-    border-color: var(--tblr-border-color-dark);
+    /* REVERT FIX: Force transparent borders in dark mode */
+    border-color: transparent !important;
 }
 
 [data-bs-theme="dark"] .card-header,

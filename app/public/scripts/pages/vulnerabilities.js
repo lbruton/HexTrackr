@@ -50,7 +50,10 @@ export class ModernVulnManager {
         this.searchManager = this.coreOrchestrator.searchManager;
         this.gridManager = this.coreOrchestrator.gridManager;
         this.cardsManager = this.coreOrchestrator.cardsManager;
-        
+
+        // Expose gridOptions for debugging and theme validation
+        this.gridOptions = this.gridManager ? this.gridManager.gridOptions : null;
+
         console.log("ModernVulnManager: All modules initialized via orchestrator");
     }
 

@@ -35,9 +35,10 @@ function debounce(func, delay) {
  * @param {object} componentContext - The "this" context of the calling component (e.g., ModernVulnManager)
  *                                    to access its methods and properties like `gridApi`.
  * @param {boolean} isDarkMode - Whether to use dark mode theme (optional)
+ * @param {boolean} usePagination - Whether to use built-in AG-Grid pagination (default: true)
  * @returns {GridOptions} A complete AG Grid `gridOptions` object.
  */
-function createVulnerabilityGridOptions(componentContext, isDarkMode = false) {
+function createVulnerabilityGridOptions(componentContext, isDarkMode = false, usePagination = true) {
     // Column definitions with optimized responsive width management
     const isDesktop = window.innerWidth >= 1200;
     const isMobile = window.innerWidth < 768;
@@ -116,7 +117,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false) {
             resizable: true,
             cellRenderer: (params) => {
                 const hostname = params.value || "-";
-                return `<a href="#" class="fw-bold text-primary text-decoration-none" style="cursor: pointer;">${hostname}</a>`;
+                return `<a href="#" class="fw-bold link-primary" style="cursor: pointer;">${hostname}</a>`;
             }
         },
         {
@@ -131,7 +132,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false) {
             hide: isMobile,
             cellRenderer: (params) => {
                 const ip = params.value || "N/A";
-                return ip !== "N/A" ? `<code class="text-muted small">${ip}</code>` : "<span class=\"text-muted\">N/A</span>";
+                return ip !== "N/A" ? `<code class="text-muted-var small">${ip}</code>` : "<span class=\"text-muted-var\">N/A</span>";
             }
         },
         {
@@ -161,12 +162,12 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false) {
                 
                 // Simple single CVE handling (records are now split during import)
                 if (cve && cve.startsWith("CVE-")) {
-                    return `<a href="#" class="text-decoration-none" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${cve}'); return false;">${cve}</a>`;
+                    return `<a href="#" class="link-primary" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${cve}'); return false;">${cve}</a>`;
                 }
                 
                 // Check for Cisco SA ID
                 if (cve && cve.startsWith("cisco-sa-")) {
-                    return `<a href="#" class="text-decoration-none text-warning" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${cve}'); return false;">${cve}</a>`;
+                    return `<a href="#" class="link-primary text-warning" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${cve}'); return false;">${cve}</a>`;
                 }
                 
                 // Check for Cisco SA ID in plugin name (fallback)
@@ -174,7 +175,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false) {
                     const ciscoSaMatch = pluginName.match(/cisco-sa-([a-zA-Z0-9-]+)/i);
                     if (ciscoSaMatch) {
                         const ciscoId = `cisco-sa-${ciscoSaMatch[1]}`;
-                        return `<a href="#" class="text-decoration-none text-warning" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${ciscoId}'); return false;">${ciscoId}</a>`;
+                        return `<a href="#" class="link-primary text-warning" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${ciscoId}'); return false;">${ciscoId}</a>`;
                     }
                 }
                 
@@ -211,7 +212,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false) {
                     }
                     window.vulnModalData[vulnDataId] = params.data;
                     
-                    return `<a href="#" class="text-decoration-none text-dark" style="cursor: pointer;" title="${value}" onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}')">${value}</a>`;
+                    return `<a href="#" class="ag-grid-link" title="${value}" onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}'); return false;">${value}</a>`;
                 }
                 return `<span title="${value}">${value}</span>`;
             },
@@ -222,25 +223,23 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false) {
     let quartzTheme = null;
     if (typeof window.agGrid !== "undefined" && window.agGrid.themeQuartz) {
         if (isDarkMode) {
-            // Dark mode Quartz theme - matching AG-Grid Theme Builder
+            // Updated dark theme with EXACT colors from AG-Grid Theme Builder
             quartzTheme = window.agGrid.themeQuartz.withParams({
-                backgroundColor: "#1f2836",
-                foregroundColor: "#e9ecef", 
-                chromeBackgroundColor: {
-                    ref: "foregroundColor",
-                    mix: 0.07,
-                    onto: "backgroundColor"
-                },
-                headerBackgroundColor: "#2d3748",
-                headerTextColor: "#f7fafc",
+                backgroundColor: "#0F1C31", // Dark navy background - EXACT
+                foregroundColor: "#FFF", // Pure white text for better contrast
+                browserColorScheme: "dark",
+                chromeBackgroundColor: "#202c3f", // EXACT header color (no mixing function)
+                headerBackgroundColor: "#202c3f", // EXACT header color #202c3f as specified
+                headerTextColor: "#FFF",
+                headerFontSize: 14,
                 oddRowBackgroundColor: "rgba(255, 255, 255, 0.02)",
                 rowBorder: false,
                 headerRowBorder: false,
                 columnBorder: false,
-                borderColor: "#4a5568",
-                selectedRowBackgroundColor: "#3182ce",
-                rowHoverColor: "rgba(49, 130, 206, 0.1)",
-                rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+                borderColor: "#2a3f5f", // Subtle navy border
+                selectedRowBackgroundColor: "#2563eb", // Bright blue for selection
+                rowHoverColor: "rgba(37, 99, 235, 0.15)", // Blue hover effect
+                rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)"
             });
         } else {
             // Light mode Quartz theme - matching AG-Grid Theme Builder  
@@ -276,10 +275,11 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false) {
         animateRows: true,
         rowSelection: "multiple",
         suppressRowClickSelection: true,
-        pagination: true,
-        paginationPageSize: 10,
-        paginationPageSizeSelector: [10, 25, 50, 100, 200],
-        
+        // Pagination configuration - controlled by usePagination parameter
+        pagination: usePagination,
+        paginationPageSize: usePagination ? 10 : undefined,
+        paginationPageSizeSelector: usePagination ? [10, 25, 50, 100, 200] : undefined,
+
         // Enable auto-height to let pagination control vertical display
         domLayout: "autoHeight",
         
