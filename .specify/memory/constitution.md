@@ -9,6 +9,7 @@
  ### Section I: Context Accuracy
  
     - Work SHALL NOT begin until all relevant information is gathered and confirmed accurate.
+   - Context gathering SHALL prioritize Claude Context semantic search over manual file exploration.
 
  ### Section II: Memory Guidance (via Memento MCP - See Article III Section I)
    
@@ -40,7 +41,7 @@
    - All new features, changes, and code updates MUST pass Markdownlint
    - All new features, changes, and code updates MUST pass ESlint9+
    - All new features, changes, and code udpates MUST be reviewed against Context7 to ensure best practices are followed 
-   - ***NEVER*** fix lint issues by adding _unserscores to functions
+   - **NEVER** fix lint issues by adding unserscores to functions
 
 ### Section V: Backups and Branch Discipline
 
@@ -67,14 +68,34 @@
    - Secrets SHALL NEVER be committed to the repository
    - API tokens SHALL be stored in environment variables
 
-## Article II: Spec-Kit Framework
+## Article II: Claude Context Framework
+
+### Section I: Primary Tool Mandate
+   - Claude Context MCP SHALL be the PRIMARY tool for codebase discovery and understanding
+   - All feature implementation SHALL begin with semantic code search, NOT file reads
+   - Token optimization SHALL prioritize semantic search (80% fewer tokens than file reads)
+
+### Section II: Index Management
+   - The codebase index SHALL be maintained with AST-based splitting for syntax awareness
+   - Index status SHALL be verified at the start of each session using get_indexing_status
+   - Re-indexing SHALL be performed after major structural changes (new modules, refactoring)
+
+### Section III: Query Patterns
+   - Semantic searches SHALL be used before reading multiple files or using grep/find
+   - Query patterns SHALL follow the documented strategies:
+     - Feature Discovery: Natural language descriptions of functionality
+     - Bug Investigation: Describe the problematic behavior and components
+     - Architecture Understanding: Query for patterns and relationships
+     - Security Review: Search for validation and sanitization patterns
+
+## Article III: Spec-Kit Framework
 
 ### Section I:
 
    - All new features SHALL follow the /specify → /plan → /tasks workflow
    - No implementation SHALL begin without a written specification.
 
-## Article III: MCP Tool Usage
+## Article IV: MCP Tool Usage
 
 ### Section I: Memento
    - Memento MCP SHALL be used as the primary knowledge graph
@@ -103,11 +124,11 @@
 ### Section VII: Zen
    - If Available, Zen tools may be used at the users request only.
 
-## Artivle IV: Gemini CLI Tools
-   - Gemini CLI may be used for coplext tasks at the users request only. 
+## Article V: Gemini CLI Tools
+   - Gemini CLI may be used for complex tasks at the users request only.
    - All tools SHALL be documented in GEMINICLITOOLS.md
 
-## Article V: Codex CLI Tools
-   - Codex CLI Tools may be used for complext tasks at the users request only. 
+## Article VI: Codex CLI Tools
+   - Codex CLI Tools may be used for complex tasks at the users request only.
    - All tools SHALL be documented in CODEXCLITOOLS.md
 

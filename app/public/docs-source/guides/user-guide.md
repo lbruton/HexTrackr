@@ -366,10 +366,10 @@ The dashboard provides multiple ways to analyze your vulnerability data.
 
 ### Statistics Cards
 
-At the top of the page, you'll find cards summarizing the current vulnerability state by severity. You can **click on any card** to flip it and view the data in two ways:
+At the top of the page, you'll find cards summarizing the current vulnerability state by severity. Each card displays **VPR Totals** by default - the sum of the Vulnerability Priority Rating scores for that severity level, providing a risk-based perspective. You can **click on any card** to toggle between two views:
 
+- **VPR Totals** (default): The sum of all VPR scores for that severity, emphasizing overall risk.
 - **Vulnerability Counts**: The total number of vulnerabilities for that severity.
-- **VPR Totals**: The sum of the Vulnerability Priority Rating (VPR) scores for that severity, giving you a risk-based perspective.
 
 ### Historical Trend Chart
 
