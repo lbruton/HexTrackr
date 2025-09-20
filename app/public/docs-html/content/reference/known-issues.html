@@ -1,0 +1,173 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Known Issues Tracker</h1><p>This document tracks all security vulnerabilities, performance issues, and quality concerns identified through automated code reviews. Each issue includes a checkbox for tracking resolution status, file location, and reference to the original review report.</p>
+<h2>Review Reports Archive</h2><p>All detailed analysis reports are stored in <code>/subagents/reviews/</code> organized by date.</p>
+<hr>
+<h2>🔴 Critical Issues (Must Fix Immediately)</h2><h3>Security Vulnerabilities</h3><ul>
+<li><p><input disabled="" type="checkbox"> 
+<strong>CSV Injection Vulnerability</strong> - <code>vulnerability-core.js:653-655</code> (<a href="../../../../subagents/reviews/2025-09-18/20250918-164008-review-final.md#L18">Review: 2025-09-18</a>)</p>
+<ul>
+<li><strong>Risk</strong>: Formula injection in Excel/spreadsheet applications</li>
+<li><strong>Fix</strong>: Sanitize cells starting with <code>=</code>, <code>+</code>, <code>-</code>, <code>@</code> by prefixing with <code>&#39;</code></li>
+<li><strong>Code Location</strong>: <code>exportVulnerabilityReport()</code> method</li>
+</ul>
+<pre><code class="language-javascript"><span class="hljs-comment">// Required fix: Prevent formula injection</span>
+.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/^[=+\-@]/g</span>, <span class="hljs-string">&quot;&#x27;<!-- CONTENT WILL BE INJECTED HERE -->amp;&quot;</span>)</code></pre></li>
+</ul>
+<h3>Memory Leaks</h3><ul>
+<li><p><input disabled="" type="checkbox"> 
+<strong>UI Event Listeners Memory Leak</strong> - <code>vulnerability-core.js:148-208, 763-798</code> (<a href="../../../../subagents/reviews/2025-09-18/20250918-164008-review-final.md#L31">Review: 2025-09-18</a>)</p>
+<ul>
+<li><strong>Risk</strong>: Prevents garbage collection, causes performance degradation</li>
+<li><strong>Fix</strong>: Store listener references and remove in destroy() method</li>
+<li><strong>Impact</strong>: Long-running sessions will exhaust memory</li>
+</ul>
+</li>
+<li><p><input disabled="" type="checkbox"> 
+<strong>Theme Listeners Memory Leak</strong> - <code>vulnerability-core.js:224-261</code> (<a href="../../../../subagents/reviews/2025-09-18/20250918-164008-review-final.md#L51">Review: 2025-09-18</a>)</p>
+<ul>
+<li><strong>Risk</strong>: Theme change listeners never removed</li>
+<li><strong>Fix</strong>: Store listener references for cleanup</li>
+<li><strong>Impact</strong>: Memory accumulation on theme changes</li>
+</ul>
+</li>
+</ul>
+<h3>Input Validation</h3><ul>
+<li><input disabled="" type="checkbox"> <strong>File Upload Validation Missing</strong> - <code>vulnerability-core.js:414-418</code> (<a href="../../../../subagents/reviews/2025-09-18/20250918-164008-review-final.md#L57">Review: 2025-09-18</a>)<ul>
+<li><strong>Risk</strong>: Accepts any file type without validation</li>
+<li><strong>Fix</strong>: Check file extension, MIME type, and size limits</li>
+<li><strong>Required</strong>: <code>.csv</code> files only, max 100MB</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>🟠 High Priority Issues (Fix This Sprint)</h2><h3>Performance Violations</h3><ul>
+<li><input disabled="" type="checkbox"> <strong>WebSocket Timeout Violation</strong> - <code>vulnerability-core.js:92-99</code> (<a href="../../../../subagents/reviews/2025-09-18/20250918-164008-review-final.md#L64">Review: 2025-09-18</a>)<ul>
+<li><strong>Issue</strong>: 5-second timeout exceeds constitutional requirement (&lt;50ms for WebSocket)</li>
+<li><strong>Fix</strong>: Reduce timeout to 3 seconds max</li>
+<li><strong>Constitutional Reference</strong>: Article V Section I</li>
+</ul>
+</li>
+</ul>
+<h3>Documentation Compliance</h3><ul>
+<li><input disabled="" type="checkbox"> <strong>JSDoc Coverage Missing</strong> - <code>vulnerability-core.js:multiple</code> (<a href="../../../../subagents/reviews/2025-09-18/20250918-164008-review-final.md#L69">Review: 2025-09-18</a>)<ul>
+<li><strong>Issue</strong>: Multiple public methods lack JSDoc documentation</li>
+<li><strong>Requirement</strong>: 100% JSDoc coverage per constitution Article I Section III</li>
+<li><strong>Methods Missing Docs</strong>:<ul>
+<li><code>setupEventListeners()</code></li>
+<li><code>setupThemeHandling()</code></li>
+<li><code>setupWebSocketListeners()</code></li>
+<li><code>showToast()</code></li>
+<li><code>flipStatCards()</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>🟡 Medium Priority Issues (Next Sprint)</h2><h3>Architecture & Maintainability</h3><ul>
+<li><input disabled="" type="checkbox"> <strong>Module Loading Inconsistency</strong> - <code>vulnerability-core.js:12-19</code> (<a href="../../../../subagents/reviews/2025-09-18/20250918-164008-review-final.md#L77">Review: 2025-09-18</a>)<ul>
+<li><strong>Issue</strong>: Mixed ES6 modules and global script dependencies</li>
+<li><strong>Fix</strong>: Refactor to consistent ES6 module pattern</li>
+<li><strong>Impact</strong>: Maintainability and testing complexity</li>
+</ul>
+</li>
+</ul>
+<h3>Data Sanitization</h3><ul>
+<li><input disabled="" type="checkbox"> <strong>Filename Sanitization</strong> - <code>vulnerability-core.js:639</code> (<a href="../../../../subagents/reviews/2025-09-18/20250918-164008-review-final.md#L83">Review: 2025-09-18</a>)<ul>
+<li><strong>Issue</strong>: Special characters in hostnames create confusing filenames</li>
+<li><strong>Fix</strong>: <code>hostname.replace(/[^a-zA-Z0-9_-]/g, &#39;_&#39;)</code></li>
+<li><strong>Impact</strong>: User experience when exporting files</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>Constitutional Violations Summary</h2><h3>Failed Requirements</h3><ul>
+<li>❌ <strong>Article I Section III</strong>: JSDoc 100% coverage requirement</li>
+<li>❌ <strong>Article I Section VIII</strong>: Security practices - input validation gaps</li>
+<li>❌ <strong>Article V Section I</strong>: Performance requirements - WebSocket timeout</li>
+<li>❌ <strong>Article V Section III</strong>: Resource constraints - memory leaks</li>
+</ul>
+<h3>Compliance Path</h3><ol>
+<li>Complete JSDoc documentation (6 methods)</li>
+<li>Fix security vulnerabilities (2 critical)</li>
+<li>Address performance violations (1 timeout issue)</li>
+<li>Implement resource cleanup (2 memory leaks)</li>
+</ol>
+<hr>
+<h2>Metrics Summary</h2><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Count</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Critical Issues</td>
+<td>4</td>
+<td>🔴 Unresolved</td>
+</tr>
+<tr>
+<td>High Priority</td>
+<td>2</td>
+<td>🟠 Unresolved</td>
+</tr>
+<tr>
+<td>Medium Priority</td>
+<td>2</td>
+<td>🟡 Unresolved</td>
+</tr>
+<tr>
+<td>Constitutional Violations</td>
+<td>4</td>
+<td>❌ Failed</td>
+</tr>
+<tr>
+<td>Security Vulnerabilities</td>
+<td>2</td>
+<td>🔴 Critical</td>
+</tr>
+<tr>
+<td>Memory Leaks</td>
+<td>2</td>
+<td>🔴 Critical</td>
+</tr>
+<tr>
+<td>Performance Issues</td>
+<td>1</td>
+<td>🟠 High</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Recommended Implementation Order</h2><h3>Phase 1: Security Critical (Immediate)</h3><ol>
+<li>Fix CSV injection vulnerability</li>
+<li>Add file upload validation</li>
+<li>Implement memory leak fixes</li>
+</ol>
+<h3>Phase 2: Compliance (This Sprint)</h3><ol>
+<li>Complete JSDoc documentation</li>
+<li>Fix WebSocket timeout</li>
+<li>Add test coverage</li>
+</ol>
+<h3>Phase 3: Quality (Next Sprint)</h3><ol>
+<li>Refactor module architecture</li>
+<li>Add filename sanitization</li>
+<li>Extract utility functions</li>
+</ol>
+<hr>
+<h2>Tracking Instructions</h2><ol>
+<li>Check off issues as they are resolved</li>
+<li>Add PR numbers when fixes are implemented</li>
+<li>Update review date when re-reviewing</li>
+<li>Add new issues from future reviews below</li>
+</ol>
+<hr>
+<h2>Additional Issues (From Future Reviews)</h2><p><em>This section will be populated as more files are reviewed</em></p>
+<hr>
+<p><em>Last Updated: 2025-09-18</em><br><em>Review Tool: Code Review Agent with Gemini Cross-Validation</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
