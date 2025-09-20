@@ -114,6 +114,7 @@
 
 ### Section IV: Codacy
    - All code MUST be scanned with Codacy CLI and pass
+   - Note: Codacy MCP is optional (only needed for API/PR management tasks)
 
 ### Section V: Playwright
    - Playwright Testing MUST be performed before and after any UI changes.
