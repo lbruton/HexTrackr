@@ -1,0 +1,285 @@
+/**
+ * @fileoverview Shared badge and label styles for HexTrackr
+ * @description Common badge, severity, and status styling
+ * @version 1.0.0
+ */
+
+/* ===========================
+   Base Badge Styles
+   =========================== */
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    display: inline-block;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+}
+
+/* Enhanced Badge Styles */
+.severity-badge,
+.status-badge {
+    font-size: 0.8em;
+    padding: 0.4em 0.8em;
+    border-radius: 20px;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* ===========================
+   Severity Badges
+   =========================== */
+
+/* Light Mode Severity Colors */
+.severity-critical {
+    background-color: #fef2f2;
+    color: var(--hextrackr-danger, #dc2626);
+    border: 1px solid #fecaca;
+}
+
+.severity-high {
+    background-color: #fffbeb;
+    color: var(--hextrackr-warning, #d97706);
+    border: 1px solid #fed7aa;
+}
+
+.severity-medium {
+    background-color: #eff6ff;
+    color: var(--hextrackr-info, #2563eb);
+    border: 1px solid #bfdbfe;
+}
+
+.severity-low {
+    background-color: #f0fdf4;
+    color: var(--hextrackr-success, #16a34a);
+    border: 1px solid #bbf7d0;
+}
+
+/* Dark Mode Severity Colors */
+[data-bs-theme="dark"] .severity-critical {
+    background-color: rgb(220, 38, 38, 0.15);
+    color: #f87171;
+    border-color: rgb(248, 113, 113, 0.3);
+}
+
+[data-bs-theme="dark"] .severity-high {
+    background-color: rgb(217, 119, 6, 0.15);
+    color: #fb923c;
+    border-color: rgb(251, 146, 60, 0.3);
+}
+
+[data-bs-theme="dark"] .severity-medium {
+    background-color: rgb(37, 99, 235, 0.15);
+    color: #60a5fa;
+    border-color: rgb(96, 165, 250, 0.3);
+}
+
+[data-bs-theme="dark"] .severity-low {
+    background-color: rgb(22, 163, 74, 0.15);
+    color: #34d399;
+    border-color: rgb(52, 211, 153, 0.3);
+}
+
+/* ===========================
+   VPR Score Badges
+   =========================== */
+
+.vpr-badge {
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    min-width: 3rem;
+    text-align: center;
+}
+
+.vpr-critical {
+    background-color: var(--vpr-critical-bg);
+    color: var(--vpr-critical);
+}
+
+.vpr-high {
+    background-color: var(--vpr-high-bg);
+    color: var(--vpr-high);
+}
+
+.vpr-medium {
+    background-color: var(--vpr-medium-bg);
+    color: var(--vpr-medium);
+}
+
+.vpr-low {
+    background-color: var(--vpr-low-bg);
+    color: var(--vpr-low);
+}
+
+/* ===========================
+   Status Badges
+   =========================== */
+
+.status-open {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+}
+
+.status-closed {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+}
+
+.status-in-progress {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+.status-resolved {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+
+.status-pending {
+    background-color: #fed7e2;
+    color: #9b1c1c;
+    border: 1px solid #fca5a5;
+}
+
+/* Dark Mode Status Colors */
+[data-bs-theme="dark"] .status-open {
+    background-color: rgb(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border-color: rgb(96, 165, 250, 0.3);
+}
+
+[data-bs-theme="dark"] .status-closed {
+    background-color: rgb(107, 114, 128, 0.15);
+    color: #9ca3af;
+    border-color: rgb(156, 163, 175, 0.3);
+}
+
+[data-bs-theme="dark"] .status-in-progress {
+    background-color: rgb(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border-color: rgb(251, 191, 36, 0.3);
+}
+
+[data-bs-theme="dark"] .status-resolved {
+    background-color: rgb(16, 185, 129, 0.15);
+    color: #34d399;
+    border-color: rgb(52, 211, 153, 0.3);
+}
+
+[data-bs-theme="dark"] .status-pending {
+    background-color: rgb(239, 68, 68, 0.15);
+    color: #f87171;
+    border-color: rgb(248, 113, 113, 0.3);
+}
+
+/* ===========================
+   Count Badges
+   =========================== */
+
+.count-badge {
+    background-color: var(--tblr-secondary);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 10px;
+    min-width: 1.5rem;
+}
+
+.count-badge-lg {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.625rem;
+    min-width: 2rem;
+}
+
+/* ===========================
+   Badge Groups
+   =========================== */
+
+.badge-group {
+    display: inline-flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.badge-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+/* ===========================
+   Animated Badges
+   =========================== */
+
+.badge-pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 currentcolor;
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgb(0, 0, 0, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgb(0, 0, 0, 0);
+    }
+}
+
+/* ===========================
+   Badge Utilities
+   =========================== */
+
+/* Pill badges */
+.badge-pill {
+    border-radius: 10rem;
+    padding-left: 0.6em;
+    padding-right: 0.6em;
+}
+
+/* Dot badges */
+.badge-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    padding: 0;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+/* Badge with icon */
+.badge-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.badge-icon i {
+    font-size: 0.875em;
+}
+
+/* Clickable badges */
+.badge-clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.badge-clickable:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgb(0, 0, 0, 0.1);
+}
