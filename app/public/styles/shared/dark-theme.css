@@ -74,10 +74,12 @@
     --hextrackr-surface-3: #2f3f50;          /* Modal sections - higher elevation */
     --hextrackr-surface-4: #526880;          /* Modal container - balanced 2.7:1 contrast */
 
+    /* REVERT FIX: Changed from white to dark borders to reduce visibility in dark mode */
+    /* Original values: rgb(255, 255, 255, 0.15/0.20/0.25) */
     /* Border Definition System - Enhanced for WCAG AA compliance */
-    --hextrackr-border-subtle: rgb(255, 255, 255, 0.15);   /* Subtle element borders - increased opacity */
-    --hextrackr-border-muted: rgb(255, 255, 255, 0.20);    /* Muted element borders - increased opacity */
-    --hextrackr-border-strong: rgb(255, 255, 255, 0.25);   /* Strong element borders - increased opacity */
+    --hextrackr-border-subtle: rgb(0, 0, 0, 0.2);     /* Subtle element borders - darker for less visibility */
+    --hextrackr-border-muted: rgb(0, 0, 0, 0.25);     /* Muted element borders - darker shade */
+    --hextrackr-border-strong: rgb(0, 0, 0, 0.3);     /* Strong element borders - darker shade */
 
     /* Enhanced Shadow System (Optimized for Dark Mode) */
     --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.3);    /* Small shadows */

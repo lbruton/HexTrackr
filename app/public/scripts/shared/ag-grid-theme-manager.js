@@ -93,6 +93,56 @@ class AGGridThemeManager {
     }
 
     /**
+     * Get the current theme configuration for AG-Grid
+     * @returns {Object} The configured AG-Grid theme object
+     */
+    getCurrentTheme() {
+        const isDark = this.currentTheme === "dark";
+
+        if (!window.agGrid || !window.agGrid.themeQuartz) {
+            return null;
+        }
+
+        if (isDark) {
+            // Return dark theme configuration
+            return window.agGrid.themeQuartz.withParams({
+                backgroundColor: "#0F1C31",
+                foregroundColor: "#FFF",
+                browserColorScheme: "dark",
+                chromeBackgroundColor: "#202c3f",
+                headerBackgroundColor: "#202c3f",
+                headerTextColor: "#FFF",
+                headerFontSize: 14,
+                oddRowBackgroundColor: "rgba(255, 255, 255, 0.02)",
+                rowBorder: false,
+                headerRowBorder: false,
+                columnBorder: false,
+                borderColor: "#2a3f5f",
+                selectedRowBackgroundColor: "#2563eb",
+                rowHoverColor: "rgba(37, 99, 235, 0.15)",
+                rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)"
+            });
+        } else {
+            // Return light theme configuration
+            return window.agGrid.themeQuartz.withParams({
+                backgroundColor: "#ffffff",
+                foregroundColor: "#2d3748",
+                chromeBackgroundColor: "#f7fafc",
+                headerBackgroundColor: "#edf2f7",
+                headerTextColor: "#2d3748",
+                oddRowBackgroundColor: "rgba(0, 0, 0, 0.02)",
+                rowBorder: false,
+                headerRowBorder: false,
+                columnBorder: false,
+                borderColor: "#e2e8f0",
+                selectedRowBackgroundColor: "#3182ce",
+                rowHoverColor: "rgba(49, 130, 206, 0.1)",
+                rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+            });
+        }
+    }
+
+    /**
      * Apply theme to specific grid
      * @param {string} gridId - Grid identifier
      * @param {boolean} isDark - Whether to apply dark theme
@@ -110,7 +160,53 @@ class AGGridThemeManager {
             return;
         }
 
-        // Otherwise, directly manipulate element classes
+        // Update the grid's theme object with custom Quartz parameters
+        if (gridInfo.api && window.agGrid && window.agGrid.themeQuartz) {
+            let quartzTheme = null;
+
+            if (isDark) {
+                // Apply custom navy dark theme with EXACT colors
+                quartzTheme = window.agGrid.themeQuartz.withParams({
+                    backgroundColor: "#0F1C31", // Dark navy background - EXACT
+                    foregroundColor: "#FFF", // Pure white text for better contrast
+                    browserColorScheme: "dark",
+                    chromeBackgroundColor: "#202c3f", // EXACT header color (no mixing)
+                    headerBackgroundColor: "#202c3f", // EXACT header color you specified
+                    headerTextColor: "#FFF",
+                    headerFontSize: 14,
+                    oddRowBackgroundColor: "rgba(255, 255, 255, 0.02)",
+                    rowBorder: false,
+                    headerRowBorder: false,
+                    columnBorder: false,
+                    borderColor: "#2a3f5f", // Subtle navy border
+                    selectedRowBackgroundColor: "#2563eb", // Bright blue for selection
+                    rowHoverColor: "rgba(37, 99, 235, 0.15)", // Blue hover effect
+                    rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)"
+                });
+            } else {
+                // Light mode Quartz theme
+                quartzTheme = window.agGrid.themeQuartz.withParams({
+                    backgroundColor: "#ffffff",
+                    foregroundColor: "#2d3748",
+                    chromeBackgroundColor: "#f7fafc",
+                    headerBackgroundColor: "#edf2f7",
+                    headerTextColor: "#2d3748",
+                    oddRowBackgroundColor: "rgba(0, 0, 0, 0.02)",
+                    rowBorder: false,
+                    headerRowBorder: false,
+                    columnBorder: false,
+                    borderColor: "#e2e8f0",
+                    selectedRowBackgroundColor: "#3182ce",
+                    rowHoverColor: "rgba(49, 130, 206, 0.1)",
+                    rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+                });
+            }
+
+            // Apply the theme to the grid
+            gridInfo.api.setGridOption("theme", quartzTheme);
+        }
+
+        // Also update element classes for CSS fallback
         const element = gridInfo.element || document.getElementById(gridId);
         if (element) {
             element.classList.remove("ag-theme-quartz", "ag-theme-quartz-dark");
