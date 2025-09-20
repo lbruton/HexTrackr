@@ -325,158 +325,76 @@
     font-weight: 600;
 }
 
-/* AG Grid customizations for vulnerabilities */
-.ag-theme-alpine {
-    --ag-font-size: 14px;
-    --ag-row-height: 42px;
-    --ag-header-background-color: var(--hextrackr-primary);
-    --ag-header-foreground-color: white;
+/* ===========================
+   AG-Grid Styles
+   ===========================
+   Common AG-Grid styles are now in shared/tables.css
+   This includes:
+   - Container setup and responsive heights
+   - Link styling with WCAG AAA contrast
+   - Cell focus and keyboard navigation
+   - Row states and highlighting
+   - Button and tooltip styles
+   - Scrollbar customization
+   - Print styles
+
+   Only page-specific AG-Grid customizations should be added here.
+   The app uses AG-Grid Quartz theme (not Alpine).
+   Theme switching is handled by AGGridThemeManager.
+   =========================== */
+
+/* Vulnerabilities-specific grid configurations */
+#vulnGrid {
+    /* Inherits base styles from shared/tables.css */
+    /* Add any vulnerabilities-specific overrides here */
 }
 
-/* Enhanced AG Grid styles for horizontal scrolling and single-row layout */
-.ag-theme-alpine .ag-root-wrapper {
-    border-radius: 8px;
-    overflow: hidden;
-    position: relative;
-}
-
-/* Enable horizontal scrolling for the main body */
-.ag-theme-alpine .ag-body-horizontal-scroll-viewport {
-    overflow-x: auto !important;
-}
-
-.ag-theme-alpine .ag-center-cols-viewport {
-    overflow-x: auto !important;
-    scrollbar-width: thin;
-    scrollbar-color: rgb(0,0,0,0.3) rgb(0,0,0,0.1);
-}
-
-.ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar {
-    height: 8px;
-}
-
-.ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar-track {
-    background: rgb(0,0,0,0.05);
-    border-radius: 4px;
-}
-
-.ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar-thumb {
-    background: rgb(0,0,0,0.3);
-    border-radius: 4px;
-}
-
-.ag-theme-alpine .ag-center-cols-viewport::-webkit-scrollbar-thumb:hover {
-    background: rgb(0,0,0,0.5);
-}
-
-.ag-theme-alpine .ag-center-cols-container {
-    min-width: max-content;
-}
-
-/* Ensure single-row display for all cells */
-.ag-theme-alpine .ag-cell {
+/* Force single-line display for vulnerability grid cells */
+#vulnGrid .ag-cell {
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    line-height: 42px !important;
-    display: flex !important;
-    align-items: center !important;
-    padding: 0 8px !important;
+    line-height: normal !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
 }
 
-/* Prevent header text wrapping */
-.ag-theme-alpine .ag-header-cell-text {
+/* Ensure vulnerability descriptions don't wrap */
+#vulnGrid .ag-cell-value,
+#vulnGrid .vulnerability-description {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+}
+
+/* Fix severity badge stretching - keep them compact */
+#vulnGrid .severity-badge {
+    display: inline-block !important;
+    align-self: center;
+    line-height: 1.2 !important;
+    vertical-align: middle;
+}
+
+/* Compact row height for vulnerabilities table */
+#vulnGrid .ag-row {
+    min-height: 42px !important;
+    max-height: 42px !important;
+}
+
+/* Override the wrap text class if it exists */
+#vulnGrid .ag-cell-wrap-text {
+    white-space: nowrap !important;
+}
+
+/* Apply same single-line rules to other grids on vulnerabilities page */
+#device-vuln-grid .ag-cell,
+#vuln-affected-assets-grid .ag-cell,
+#vulnerabilityAssetsGrid .ag-cell {
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
-
-/* Enhanced cell styling for better readability */
-.ag-cell-wrap-text {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-/* Ensure column resizing handles are visible */
-.ag-theme-alpine .ag-header-cell-resize {
-    opacity: 0.5;
-    transition: opacity 0.2s ease;
-}
-
-/* Better visual feedback for resizable columns */
-.ag-theme-alpine .ag-header-cell-resize:hover {
-    background-color: var(--hextrackr-primary);
-    opacity: 1;
-}
-
-.ag-theme-alpine .ag-header-cell:hover .ag-header-cell-resize {
-    opacity: 1;
-}
-
-/* Group panel styling */
-.ag-theme-alpine .ag-group-panel {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid var(--hextrackr-primary);
-    padding: 12px;
-    border-radius: 8px 8px 0 0;
-    min-height: 60px;
-    display: flex;
-    align-items: center;
-}
-
-.ag-theme-alpine .ag-group-panel .ag-column-drop-title {
-    font-weight: 600;
-    color: var(--hextrackr-primary);
-    font-size: 14px;
-}
-
-.ag-theme-alpine .ag-group-panel .ag-column-drop-empty-message {
-    color: #6c757d;
-    font-style: italic;
-    font-size: 13px;
-}
-
-/* Drag and drop styling for group panel */
-.ag-theme-alpine .ag-group-panel .ag-column-drop-cell {
-    background-color: var(--hextrackr-primary);
-    color: white;
-    border-radius: 16px;
-    padding: 4px 12px;
-    margin: 2px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.ag-theme-alpine .ag-group-panel .ag-column-drop-cell-text {
-    color: white;
-}
-
-.ag-theme-alpine .ag-group-panel .ag-column-drop-cell-button {
-    color: white;
-    opacity: 0.8;
-}
-
-.ag-theme-alpine .ag-group-panel .ag-column-drop-cell-button:hover {
-    opacity: 1;
-    background-color: rgb(255,255,255,0.2);
-}
-
-/* Enhanced row grouping styles */
-.ag-theme-alpine .ag-group-expanded .ag-icon {
-    color: var(--hextrackr-primary);
-}
-
-.ag-theme-alpine .ag-group-collapsed .ag-icon {
-    color: var(--hextrackr-secondary);
-}
-
-.ag-theme-alpine .ag-row-group {
-    font-weight: 600;
-    background-color: rgb(32, 107, 196, 0.05);
-}
-
-/* Horizontal scroll indicator - Removed for cleaner appearance */
 
 /* Export buttons */
 .export-controls .btn {
