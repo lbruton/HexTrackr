@@ -36,24 +36,16 @@
 - **[P]**: Can run in parallel (different files, no dependencies)
 - Include exact file paths in descriptions
 
-## Path Conventions (HexTrackr)
-- **Backend**: `app/controllers/`, `app/services/`, `app/routes/`
-- **Frontend**: `app/public/scripts/pages/`, `app/public/scripts/shared/`
-- **Styles**: `app/public/styles/pages/`, `app/public/styles/components/`
-- **Tests**: `tests/e2e/`, `tests/integration/`, `tests/unit/`
-- **Database**: `data/hextrackr.db`
+## Path Conventions
+- **Single project**: `src/`, `tests/` at repository root
+- **Web app**: `backend/src/`, `frontend/src/`
+- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
+- Paths shown below assume single project - adjust based on plan.md structure
 
-## Phase 3.0: Discovery Verification
-- [ ] T001 Verify Claude Context index is current (< 1 hour old)
-- [ ] T002 Read existing files identified in discovery phase: [list from discovery]
-- [ ] T003 [P] Document integration points with comments in affected files
-
-## Phase 3.1: Existing Code Modifications
-- [ ] T004 Update [existing controller] in app/controllers/[name].js
-- [ ] T005 Extend [existing service] in app/services/[name].js
-- [ ] T006 Add new routes to app/routes/[name].js
-- [ ] T007 [P] Update frontend module app/public/scripts/[path]
-- [ ] T008 [P] Add CSS variables to app/public/styles/[path]
+## Phase 3.1: Setup
+- [ ] T001 Create project structure per implementation plan
+- [ ] T002 Initialize [language] project with [framework] dependencies
+- [ ] T003 [P] Configure linting and formatting tools
 
 ## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
@@ -77,20 +69,12 @@
 - [ ] T017 Request/response logging
 - [ ] T018 CORS and security headers
 
-## Phase 3.5: Polish & Index Management
-- [ ] T019 [P] Unit tests for new functionality in tests/unit/
-- [ ] T020 Performance tests (<200ms API response)
-- [ ] T021 [P] Update documentation in app/public/docs-source/
-- [ ] T022 Run ESLint and fix issues: `npm run eslint:fix`
-- [ ] T023 Run Stylelint and fix issues: `npm run stylelint:fix`
-- [ ] T024 Re-index Claude Context after all changes:
-```javascript
-mcp__claude-context__index_codebase({
-  path: "/Volumes/DATA/GitHub/HexTrackr",
-  force: true
-})
-```
-- [ ] T025 Verify new code is searchable in Claude Context
+## Phase 3.5: Polish
+- [ ] T019 [P] Unit tests for validation in tests/unit/test_validation.py
+- [ ] T020 Performance tests (<200ms)
+- [ ] T021 [P] Update docs/api.md
+- [ ] T022 Remove duplication
+- [ ] T023 Run manual-testing.md
 
 ## Dependencies
 - Tests (T004-T007) before implementation (T008-T014)
