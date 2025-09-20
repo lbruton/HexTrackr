@@ -1,0 +1,324 @@
+/**
+ * @fileoverview Shared animation styles for HexTrackr
+ * @description Common animations, transitions, and loading states
+ * @version 1.0.0
+ */
+
+/* ===========================
+   Keyframe Animations
+   =========================== */
+
+/* Fade In */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Slide Up */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Slide Down */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Spin */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Pulse */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Loading Skeleton */
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Bounce */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* ===========================
+   Animation Classes
+   =========================== */
+
+/* Fade animations */
+.fade-in {
+    animation: fadeIn 0.6s ease forwards;
+}
+
+.fade-in-fast {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+.fade-in-slow {
+    animation: fadeIn 1s ease forwards;
+}
+
+/* Slide animations */
+.slide-up {
+    animation: slideUp 0.5s ease forwards;
+}
+
+.slide-down {
+    animation: slideDown 0.5s ease forwards;
+}
+
+/* Spin animation */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+.spin-slow {
+    animation: spin 2s linear infinite;
+}
+
+/* Pulse animation */
+.pulse {
+    animation: pulse 2s ease infinite;
+}
+
+/* Bounce animation */
+.bounce {
+    animation: bounce 1s ease infinite;
+}
+
+/* ===========================
+   Loading States
+   =========================== */
+
+/* Loading skeleton */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+[data-bs-theme="dark"] .loading-skeleton {
+    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+}
+
+/* Loading spinner */
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgb(0, 0, 0, 0.1);
+    border-top-color: var(--hextrackr-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Progress bar animation */
+.progress-modern {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #e2e8f0;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-modern .progress-bar {
+    transition: width 0.6s ease;
+    background: linear-gradient(90deg, var(--hextrackr-primary) 0%, var(--hextrackr-info) 100%);
+}
+
+/* ===========================
+   Drag and Drop Effects
+   =========================== */
+
+.sortable-ghost {
+    opacity: 0.5;
+    transform: rotate(2deg);
+}
+
+.sortable-chosen {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgb(32, 107, 196, 0.25);
+}
+
+.sortable-drag {
+    transform: rotate(-2deg);
+    box-shadow: 0 12px 30px rgb(0, 0, 0, 0.2);
+    cursor: grabbing !important;
+}
+
+/* ===========================
+   Transition Utilities
+   =========================== */
+
+/* Base transitions */
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+.transition-fast {
+    transition: all 0.15s ease;
+}
+
+.transition-slow {
+    transition: all 0.5s ease;
+}
+
+/* Specific transitions */
+.transition-opacity {
+    transition: opacity 0.3s ease;
+}
+
+.transition-transform {
+    transition: transform 0.3s ease;
+}
+
+.transition-colors {
+    transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ===========================
+   Hover Effects
+   =========================== */
+
+/* Lift on hover */
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgb(0, 0, 0, 0.15);
+}
+
+/* Scale on hover */
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+/* Glow on hover */
+.hover-glow:hover {
+    box-shadow: 0 0 20px rgb(32, 107, 196, 0.3);
+}
+
+/* ===========================
+   Page Transitions
+   =========================== */
+
+/* Page content fade in */
+.page-content {
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+    animation-delay: 0.1s;
+}
+
+/* Staggered animations */
+.stagger-item {
+    opacity: 0;
+    animation: slideUp 0.5s ease forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.stagger-item:nth-child(5) { animation-delay: 0.5s; }
+
+/* ===========================
+   Empty State Animations
+   =========================== */
+
+.empty-state-icon {
+    animation: bounce 2s ease infinite;
+    animation-delay: 0.5s;
+}
+
+.empty-state-fade {
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards;
+    animation-delay: 0.3s;
+}
+
+/* ===========================
+   Utility Classes
+   =========================== */
+
+/* Disable animations */
+.no-animation {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Pause on hover */
+.pause-on-hover:hover {
+    animation-play-state: paused;
+}
+
+/* Hidden initially for animations */
+.animate-init {
+    opacity: 0;
+}
+
+/* Smooth scroll behavior */
+.smooth-scroll {
+    scroll-behavior: smooth;
+}
