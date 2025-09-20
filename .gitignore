@@ -27,6 +27,10 @@ app/dev-docs-html/
 tmp/
 temp/
 
+# Playwright test artifacts
+.playwright-mcp/
+test-results/
+
 # CSV uploads (keep sample files)
 uploads/*.csv
 !uploads/sample*.csv
