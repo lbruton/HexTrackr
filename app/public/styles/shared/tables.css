@@ -1,0 +1,424 @@
+/**
+ * @fileoverview Shared AG-Grid table styles for HexTrackr
+ * @description Common styles for all AG-Grid implementations across the application
+ * @version 1.0.0
+ *
+ * USAGE GUIDE:
+ * 1. Include this CSS in your HTML: <link rel="stylesheet" href="styles/shared/tables.css">
+ * 2. Add ag-theme-quartz class to your grid container
+ * 3. Register your grid with AGGridThemeManager for theme switching
+ * 4. Use themeQuartz.withParams() in JavaScript for programmatic theming
+ *
+ * THEME SWITCHING:
+ * - Light mode: ag-theme-quartz
+ * - Dark mode: ag-theme-quartz-dark
+ * - Managed by AGGridThemeManager (ag-grid-theme-manager.js)
+ */
+
+/* ===========================
+   AG-Grid Container Styles
+   =========================== */
+
+/* Standard AG-Grid container setup */
+.ag-theme-quartz,
+.ag-theme-quartz-dark {
+    width: 100%;
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    font-size: 13px; /* Consistent with HexTrackr tables */
+}
+
+/* Responsive height management */
+.ag-grid-container {
+    width: 100%;
+    height: auto;
+    min-height: 400px;
+    max-height: 800px;
+    overflow-x: auto; /* Allow horizontal scrolling like Bootstrap responsive tables */
+}
+
+/* Fixed height variant for modals */
+.ag-grid-fixed {
+    height: 500px !important;
+}
+
+/* Auto-height variant for smaller datasets */
+.ag-grid-auto {
+    height: auto !important;
+    min-height: 200px;
+}
+
+/* ===========================
+   Link Styles (WCAG AAA)
+   =========================== */
+
+/* Light mode links - 7.3:1 contrast on white */
+.ag-theme-quartz .ag-cell a {
+    color: #0052cc;
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+.ag-theme-quartz .ag-cell a:hover {
+    color: #003d99;
+    text-decoration: underline;
+}
+
+/* Dark mode links - 7.1:1 contrast on dark */
+.ag-theme-quartz-dark .ag-cell a {
+    color: #4da6ff;
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+.ag-theme-quartz-dark .ag-cell a:hover {
+    color: #66b3ff;
+    text-decoration: underline;
+}
+
+/* ===========================
+   Cell Focus & Navigation
+   =========================== */
+
+/* Keyboard navigation highlight */
+.ag-cell-focus:not(.ag-cell-range-selected, .ag-cell-range-single-cell) {
+    border: 2px solid var(--bs-primary) !important;
+    outline: none;
+}
+
+/* Accessible focus styles */
+.ag-cell:focus-visible,
+.ag-header-cell:focus-visible {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: -1px;
+}
+
+/* Cell text wrapping - opt-in by adding .ag-wrap-text class to grid */
+.ag-wrap-text .ag-cell-wrap-text,
+.ag-cell-wrap-text.wrap-enabled {
+    white-space: normal !important;
+    line-height: 1.4;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+/* Default: single-line cells with ellipsis */
+.ag-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===========================
+   Row States & Highlighting
+   =========================== */
+
+/* Row hover effect */
+.ag-theme-quartz .ag-row-hover,
+.ag-theme-quartz .ag-row:hover {
+    background-color: rgb(49, 130, 206, 0.05);
+}
+
+.ag-theme-quartz-dark .ag-row-hover,
+.ag-theme-quartz-dark .ag-row:hover {
+    background-color: rgb(49, 130, 206, 0.08);
+}
+
+/* Special row states */
+.ag-row.row-overdue {
+    background-color: rgb(220, 53, 69, 0.1);
+}
+
+.ag-theme-quartz-dark .ag-row.row-overdue {
+    background-color: rgb(245, 101, 101, 0.1);
+}
+
+.ag-row.row-warning {
+    background-color: rgb(255, 193, 7, 0.1);
+}
+
+.ag-theme-quartz-dark .ag-row.row-warning {
+    background-color: rgb(255, 193, 7, 0.15);
+}
+
+.ag-row.row-success {
+    background-color: rgb(40, 167, 69, 0.1);
+}
+
+.ag-theme-quartz-dark .ag-row.row-success {
+    background-color: rgb(40, 167, 69, 0.15);
+}
+
+/* Row virtualization performance */
+.ag-row-position-absolute {
+    transition: none; /* Disable transitions for virtualized rows */
+}
+
+/* ===========================
+   Cell Content Styles
+   =========================== */
+
+/* Multi-value cells */
+.multi-value-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.multi-value-cell-inline {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* Badge styles within cells */
+.ag-cell .badge {
+    font-size: 0.75em;
+    padding: 0.25em 0.5em;
+    margin: 0 0.125rem;
+}
+
+/* Status badges */
+.severity-badge,
+.status-badge {
+    font-size: 0.8em;
+    padding: 0.4em 0.8em;
+    border-radius: 20px;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+/* Danger text in cells */
+.ag-cell .text-danger {
+    color: #dc3545 !important;
+}
+
+.ag-theme-quartz-dark .ag-cell .text-danger {
+    color: #f56565 !important;
+}
+
+/* Muted text in cells */
+.ag-cell .text-muted {
+    color: #6c757d !important;
+}
+
+.ag-theme-quartz-dark .ag-cell .text-muted {
+    color: #9ca3af !important;
+}
+
+/* ===========================
+   Action Cells & Buttons
+   =========================== */
+
+/* Action cell alignment */
+.ag-cell.actions-cell,
+.ticket-actions-cell {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Action header alignment */
+.ticket-actions-header .ag-header-cell-comp-wrapper,
+.actions-header .ag-header-cell-comp-wrapper {
+    justify-content: flex-end;
+}
+
+/* Button groups in cells */
+.ag-cell .btn-group {
+    display: inline-flex;
+    gap: 0.25rem;
+}
+
+/* Small buttons in cells */
+.ag-cell .btn-sm {
+    padding: 0.125rem 0.375rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+/* Icon buttons in cells */
+.ag-cell .btn-icon {
+    padding: 0.25rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===========================
+   Tooltip Styles
+   =========================== */
+
+.ag-tooltip {
+    max-width: 300px;
+    padding: 0.5rem;
+    background-color: var(--bs-gray-900);
+    color: var(--bs-white);
+    border-radius: var(--bs-border-radius);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    box-shadow: 0 0.25rem 0.5rem rgb(0, 0, 0, 0.2);
+}
+
+/* ===========================
+   Header Styles
+   =========================== */
+
+/* Header cell customization */
+.ag-header-cell-text {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+/* Header resize handle */
+.ag-header-cell-resize {
+    opacity: 0.5;
+    width: 4px;
+}
+
+.ag-header-cell-resize:hover {
+    opacity: 1;
+    background-color: var(--bs-primary);
+}
+
+/* ===========================
+   Scrollbar Customization
+   =========================== */
+
+/* Webkit scrollbars */
+.ag-theme-quartz ::-webkit-scrollbar,
+.ag-theme-quartz-dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.ag-theme-quartz ::-webkit-scrollbar-track {
+    background: var(--bs-gray-100);
+    border-radius: 4px;
+}
+
+.ag-theme-quartz-dark ::-webkit-scrollbar-track {
+    background: var(--bs-gray-800);
+    border-radius: 4px;
+}
+
+.ag-theme-quartz ::-webkit-scrollbar-thumb {
+    background: var(--bs-gray-400);
+    border-radius: 4px;
+}
+
+.ag-theme-quartz-dark ::-webkit-scrollbar-thumb {
+    background: var(--bs-gray-600);
+    border-radius: 4px;
+}
+
+.ag-theme-quartz ::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-gray-500);
+}
+
+.ag-theme-quartz-dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-gray-500);
+}
+
+/* ===========================
+   Responsive Styles
+   =========================== */
+
+/* Tablet adjustments */
+@media (max-width: 768px) {
+    .ag-grid-container {
+        min-height: 300px;
+        max-height: 500px;
+    }
+
+    .ag-theme-quartz,
+    .ag-theme-quartz-dark {
+        font-size: 12px;
+    }
+
+    .ag-header-cell-text {
+        font-size: 0.7rem;
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 576px) {
+    .ag-grid-container {
+        min-height: 250px;
+        max-height: 400px;
+    }
+
+    .ag-cell .btn-sm {
+        padding: 0.1rem 0.25rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* ===========================
+   Print Styles
+   =========================== */
+
+@media print {
+    .ag-grid-container,
+    .ag-theme-quartz,
+    .ag-theme-quartz-dark {
+        height: auto !important;
+        max-height: none !important;
+    }
+
+    /* Hide pagination for printing */
+    .ag-paging-panel {
+        display: none !important;
+    }
+
+    /* Hide action buttons */
+    .ag-cell .btn-group,
+    .actions-cell {
+        display: none !important;
+    }
+
+    /* Ensure all rows are visible */
+    .ag-row {
+        break-inside: avoid;
+    }
+}
+
+/* ===========================
+   Utility Classes
+   =========================== */
+
+/* Force full width */
+.ag-grid-fullwidth {
+    width: 100% !important;
+}
+
+/* Compact mode */
+.ag-grid-compact {
+    font-size: 11px;
+}
+
+.ag-grid-compact .ag-row {
+    min-height: 32px;
+}
+
+/* No border variant */
+.ag-grid-borderless {
+    border: none !important;
+}
+
+/* Shadow variant */
+.ag-grid-shadow {
+    box-shadow: 0 0.125rem 0.25rem rgb(0, 0, 0, 0.075);
+}
+
+.ag-grid-shadow:hover {
+    box-shadow: 0 0.25rem 0.5rem rgb(0, 0, 0, 0.1);
+}
