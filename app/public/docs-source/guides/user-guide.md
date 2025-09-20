@@ -20,7 +20,7 @@ This section provides a comprehensive overview of the features available on the 
 ### Creating a New Ticket
 
 1. From the main tickets view, click the **Add New Ticket** button to open the ticket modal.
-2. The **Ticket Number (XT#)** is automatically generated for you and is not editable.
+2. The **Ticket Number** is automatically generated as a four-digit code (e.g., `0001`) and is not editable.
 3. Fill in the required fields, including **Date Submitted**, **Date Due**, **Site**, and **Location**.
 4. Add devices to the ticket using the **Devices** section (see below for details).
 5. Click **Save Ticket** to create the new ticket.
@@ -53,19 +53,19 @@ From the main ticket list, you can view a ticket's details or download a bundle 
   - The ticket details in **PDF** format (generated with jsPDF using the same content as the modal).
   - The ticket details in **Markdown** format.
   - Any shared documentation uploaded during the session.
-  - File attachments stored with the record. The bundler renames files to match the XT number and sanitizes file names to avoid path traversal.
+  - File attachments stored with the record. The bundler renames files to match the ticket number and sanitizes file names to avoid path traversal.
 
 ## Searching and Filtering
 
 The ticket list can be quickly filtered to find what you need.
 
-- **Global Search**: The main search bar filters tickets based on a wide range of fields, including XT#, Hexagon #, ServiceNow #, location, site, supervisor, tech, and device names.
+- **Global Search**: The main search bar filters tickets based on a wide range of fields, including the four-digit ticket #, Hexagon #, ServiceNow #, location, site, supervisor, tech, and device names.
 - **Status Filter**: Use the dropdown to show tickets with a specific status (e.g., "Open", "Overdue").
 - **Location Filter**: This dropdown is dynamically populated with all unique locations from the tickets in the database, allowing you to easily filter by a specific location.
 
 ## Importing Ticket Data
 
-- **CSV Import Button**: Selecting **Import CSV** opens a file picker and routes the file through PapaParse in the browser. The parser trims whitespace, normalizes device lists (arrays, commas, or semicolons), and generates XT numbers when the column is missing.
+- **CSV Import Button**: Selecting **Import CSV** opens a file picker and routes the file through PapaParse in the browser. The parser trims whitespace, normalizes device lists (arrays, commas, or semicolons), and generates ticket numbers when the column is missing.
 - **Mode Selection**: When the database already contains tickets, the importer prompts for **Replace All Data** (clears the table before importing) or **Add to Existing Data** (upsert into the current dataset). Both options call `POST /api/tickets/migrate` with a `mode` flag.
 - **Error Handling**: Invalid rows surface as toast notifications and are logged in the browser console for troubleshooting. The migration endpoint responds with counts for migrated and failed rows.
 
