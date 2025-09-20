@@ -1,25 +1,9 @@
 # Feature Specification: [FEATURE NAME]
 
-**Feature Branch**: `[###-feature-name]`
-**Created**: [DATE]
-**Status**: Draft
+**Feature Branch**: `[###-feature-name]`  
+**Created**: [DATE]  
+**Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
-
-## Phase 0: Discovery (MANDATORY - Complete First!)
-**Discovery Template**: Execute `discovery-template.md` before proceeding
-**Discovery Status**: [ ] Not Started [ ] In Progress [ ] Complete
-
-### Existing Implementation Summary
-[Paste key findings from discovery-template.md]
-- Existing files involved: [list]
-- Similar features found: [list]
-- Integration points: [list]
-
-### Build Approach
-[ ] Greenfield (no existing code)
-[ ] Extension (adding to existing feature)
-[ ] Modification (changing existing feature)
-[ ] Refactoring (restructuring existing code)
 
 ## Execution Flow (main)
 ```
