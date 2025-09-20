@@ -105,7 +105,11 @@ fi
 
 echo ""
 echo "💡 To generate comprehensive JSDoc for all files:"
-echo "   gemini -p \"@app/ Generate JSDoc for all JavaScript files\""
+echo "   # Using Ollama (FREE - recommended):"
+echo "   ./scripts/ollama-code.sh \"@app/ Generate JSDoc for all JavaScript files\""
+echo ""
+echo "   # Using Gemini (WARNING: Uses significant API quota):"
+echo "   # gemini -p \"@app/ Generate JSDoc for all JavaScript files\""
 echo ""
 echo "📚 To run documentation pipeline after adding JSDoc:"
 echo "   npm run docs:generate"
