@@ -7,6 +7,7 @@ This section provides a comprehensive overview of the HexTrackr system architect
 - **[Technology Stack](./technology-stack.md)**: The technologies used in the project.
 - **[Backend Architecture](./backend.md)**: A detailed look at the Node.js/Express server, its middleware, and its core logic.
 - **[Frontend Architecture](./frontend.md)**: An explanation of the client-side architecture, including the different pages and JavaScript modules.
+- **[Theme Architecture](./theme-architecture.md)**: Comprehensive guide to the centralized theme system, CSS variables, and component styling.
 - **[Database Architecture](./database.md)**: A high-level overview of the SQLite database, including data flow diagrams.
 - **[Data Model](./data-model.md)**: The definitive guide to the database schema, including detailed descriptions of all tables and columns.
 
