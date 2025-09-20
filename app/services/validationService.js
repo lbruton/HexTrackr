@@ -369,16 +369,16 @@ class ValidationService {
     }
 
     /**
-     * Validate XT number format
-     * @param {string} xtNumber - XT number to validate
-     * @returns {boolean} True if valid XT number format
+     * Validate ticket number format (four-digit identifier)
+     * @param {string} xtNumber - Ticket number to validate
+     * @returns {boolean} True if valid ticket number format
      */
     validateXTNumberFormat(xtNumber) {
         if (!xtNumber || typeof xtNumber !== "string") {
             return false;
         }
 
-        const xtRegex = /^XT\d{3,}$/i;
+        const xtRegex = /^\d{4}$/;
         return xtRegex.test(xtNumber.trim());
     }
 

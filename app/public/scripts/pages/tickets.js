@@ -95,18 +95,37 @@ class HexagonTicketsManager {
         // Don't mark completed or closed tickets as overdue
         const isActiveOverdue = isOverdue && status !== "Completed" && status !== "Closed";
         
+        const normalizedXtNumber = this.normalizeXtNumber(rawTicket.xt_number || rawTicket.xtNumber);
+
         return {
             ...rawTicket,
             status: status, // Use the potentially updated status
             devices: typeof rawTicket.devices === "string" ? JSON.parse(rawTicket.devices) : rawTicket.devices || [],
             attachments: typeof rawTicket.attachments === "string" ? JSON.parse(rawTicket.attachments) : rawTicket.attachments || [],
-            xtNumber: rawTicket.xt_number || rawTicket.xtNumber,
+            xtNumber: normalizedXtNumber,
             dateSubmitted: rawTicket.date_submitted || rawTicket.dateSubmitted,
             dateDue: rawTicket.date_due || rawTicket.dateDue,
             hexagonTicket: rawTicket.hexagon_ticket || rawTicket.hexagonTicket,
             serviceNowTicket: rawTicket.service_now_ticket || rawTicket.serviceNowTicket,
+            site: rawTicket.site || "",
+            location: rawTicket.location || "",
             isOverdue: isActiveOverdue // Add the isOverdue flag
         };
+    }
+
+    /**
+     * Normalize XT number values to four-digit strings without prefixes.
+     * @param {string} value - Raw XT number value
+     * @returns {string|undefined} Normalized value or undefined if none provided
+     */
+    normalizeXtNumber(value) {
+        if (!value) {return undefined;}
+
+        const digitMatch = value.match(/\d+/);
+        if (!digitMatch) {return undefined;}
+
+        const digits = digitMatch[0];
+        return digits.padStart(4, "0");
     }
 
     async loadTicketsFromDB() {
@@ -443,27 +462,25 @@ class HexagonTicketsManager {
     }
 
     /**
-     * Generate the next XT number for new tickets
-     * @returns {string} Next XT number (e.g., "XT018")
+     * Generate the next ticket number for new records.
+     * @returns {string} Next ticket number (e.g., "0001")
      */
     generateNextXtNumber() {
         // Get all existing XT numbers
         const xtNumbers = this.tickets
             .map(ticket => ticket.xtNumber || ticket.xt_number)
-            .filter(xt => xt && xt.startsWith("XT"))
             .map(xt => {
-                // Extract the numeric part
-                const match = xt.match(/XT(\d+)/);
-                return match ? parseInt(match[1], 10) : 0;
+                const match = typeof xt === "string" ? xt.match(/\d+/) : null;
+                return match ? parseInt(match[0], 10) : NaN;
             })
             .filter(num => !isNaN(num));
 
         // Find the highest number
         const maxNumber = xtNumbers.length > 0 ? Math.max(...xtNumbers) : 0;
-        
-        // Generate next number with zero padding (3 digits)
+
+        // Generate next number with zero padding (4 digits)
         const nextNumber = maxNumber + 1;
-        return `XT${nextNumber.toString().padStart(3, "0")}`;
+        return nextNumber.toString().padStart(4, "0");
     }
 
     /**
@@ -475,7 +492,8 @@ class HexagonTicketsManager {
             if (this.currentEditingId) {
                 // Show current ticket's XT number when editing
                 const ticket = this.getTicketById(this.currentEditingId);
-                xtDisplayElement.textContent = ticket?.xtNumber || ticket?.xt_number || "N/A";
+                const xtValue = this.normalizeXtNumber(ticket?.xtNumber || ticket?.xt_number);
+                xtDisplayElement.textContent = xtValue || "N/A";
             } else {
                 // Show next available XT number for new tickets
                 const nextXt = this.generateNextXtNumber();
@@ -942,6 +960,8 @@ class HexagonTicketsManager {
             updatedAt: new Date().toISOString()
         };
 
+        ticket.xt_number = ticket.xtNumber;
+
         try {
             // Save to database instead of localStorage
             await this.saveTicketToDB(ticket);
@@ -1096,7 +1116,7 @@ class HexagonTicketsManager {
             const isOverdue = ticket.isOverdue || ticket.status === "Overdue";
             
             // Format XT# to show only last 4 digits - escape for safety
-            const displayXtNumber = ticket.xtNumber ? escapeHtml(ticket.xtNumber.slice(-4)) : "N/A";
+            const displayXtNumber = ticket.xtNumber ? escapeHtml(ticket.xtNumber) : "N/A";
             
             return `
                 <tr class="${isOverdue ? "table-danger" : ""}" data-ticket-id="${escapeHtml(ticket.id)}">
@@ -1317,15 +1337,15 @@ class HexagonTicketsManager {
         const locationFilter = document.getElementById("locationFilter").value;
 
         return this.tickets.filter(ticket => {
-            const matchesSearch = !searchTerm || 
+            const matchesSearch = !searchTerm ||
                 (ticket.xtNumber && ticket.xtNumber.toLowerCase().includes(searchTerm)) ||
-                ticket.hexagonTicket.toLowerCase().includes(searchTerm) ||
-                ticket.serviceNowTicket.toLowerCase().includes(searchTerm) ||
-                ticket.location.toLowerCase().includes(searchTerm) ||
+                (ticket.hexagonTicket && ticket.hexagonTicket.toString().toLowerCase().includes(searchTerm)) ||
+                (ticket.serviceNowTicket && ticket.serviceNowTicket.toLowerCase().includes(searchTerm)) ||
+                (ticket.location && ticket.location.toLowerCase().includes(searchTerm)) ||
                 (ticket.site && ticket.site.toLowerCase().includes(searchTerm)) ||
-                ticket.supervisor.toLowerCase().includes(searchTerm) ||
-                ticket.tech.toLowerCase().includes(searchTerm) ||
-                ticket.devices.some(device => device.toLowerCase().includes(searchTerm));
+                (ticket.supervisor && ticket.supervisor.toLowerCase().includes(searchTerm)) ||
+                (ticket.tech && ticket.tech.toLowerCase().includes(searchTerm)) ||
+                (ticket.devices && Array.isArray(ticket.devices) && ticket.devices.some(device => device && device.toLowerCase().includes(searchTerm)));
 
             const matchesStatus = !statusFilter || ticket.status === statusFilter;
             const matchesLocation = !locationFilter || ticket.location === locationFilter;
@@ -1827,18 +1847,20 @@ class HexagonTicketsManager {
     }
 
     exportCSV(tickets) {
-        const headers = ["Date Submitted", "Date Due", "Hexagon Ticket #", "Service Now #", "Location", "Devices", "Supervisor", "Tech", "Status", "Notes"];
+        const headers = ["XT Number", "Date Submitted", "Date Due", "Hexagon Ticket #", "Service Now #", "Site", "Location", "Devices", "Supervisor", "Tech", "Status", "Notes"];
         const csvContent = [
             headers.join(","),
             ...tickets.map(ticket => [
+                `"${ticket.xtNumber || ""}"`,
                 ticket.dateSubmitted,
                 ticket.dateDue,
                 `"${ticket.hexagonTicket}"`,
                 `"${ticket.serviceNowTicket || ""}"`,
-                `"${ticket.location}"`,
+                `"${ticket.site || ""}"`,
+                `"${ticket.location || ""}"`,
                 `"${ticket.devices.join("; ")}"`,
-                `"${ticket.supervisor}"`,
-                `"${ticket.tech}"`,
+                `"${ticket.supervisor || ""}"`,
+                `"${ticket.tech || ""}"`,
                 `"${ticket.status}"`,
                 `"${ticket.notes || ""}"`
             ].join(","))
@@ -1849,14 +1871,16 @@ class HexagonTicketsManager {
 
     exportExcel(tickets) {
         const ws = XLSX.utils.json_to_sheet(tickets.map(ticket => ({
+            "XT Number": ticket.xtNumber || "",
             "Date Submitted": ticket.dateSubmitted,
             "Date Due": ticket.dateDue,
             "Hexagon Ticket #": ticket.hexagonTicket,
             "Service Now #": ticket.serviceNowTicket,
-            "Location": ticket.location,
+            "Site": ticket.site || "",
+            "Location": ticket.location || "",
             "Devices": ticket.devices.join("; "),
-            "Supervisor": ticket.supervisor,
-            "Tech": ticket.tech,
+            "Supervisor": ticket.supervisor || "",
+            "Tech": ticket.tech || "",
             "Status": ticket.status,
             "Notes": ticket.notes || ""
         })));
@@ -2219,6 +2243,11 @@ class HexagonTicketsManager {
         const headers = lines[0].split(",").map(h => h.trim().replace(/"/g, ""));
         const tickets = [];
 
+        let nextImportNumber = parseInt(this.generateNextXtNumber(), 10);
+        if (isNaN(nextImportNumber)) {
+            nextImportNumber = this.tickets.length + 1;
+        }
+
         for (let i = 1; i < lines.length; i++) {
             const values = this.parseCsvLine(lines[i]);
             if (values.length === headers.length) {
@@ -2231,29 +2260,45 @@ class HexagonTicketsManager {
                     switch (header.toLowerCase()) {
                         case "date submitted":
                         case "datesubmitted":
+                        case "date_submitted":  // Support snake_case from export
                             ticket.dateSubmitted = value;
                             break;
                         case "date due":
                         case "datedue":
+                        case "date_due":  // Support snake_case from export
                             ticket.dateDue = value;
                             break;
                         case "hexagon ticket":
                         case "hexagon ticket #":
                         case "hexagonticket":
+                        case "hexagon_ticket":  // Support snake_case from export
                             ticket.hexagonTicket = value;
                             break;
                         case "service now #":
                         case "servicenow ticket":
                         case "servicenow ticket #":
                         case "servicenowticket":
+                        case "service_now_ticket":  // Support snake_case from export
                             ticket.serviceNowTicket = value;
+                            break;
+                        case "site":
+                            ticket.site = value;
                             break;
                         case "location":
                         case "site/group":
                             ticket.location = value;
                             break;
                         case "devices":
-                            ticket.devices = value ? value.split(";").map(d => d.trim()).filter(d => d) : [];
+                            // Handle both JSON array format and semicolon-separated format
+                            if (value.startsWith("[") && value.endsWith("]")) {
+                                try {
+                                    ticket.devices = JSON.parse(value);
+                                } catch (e) {
+                                    ticket.devices = value ? value.split(";").map(d => d.trim()).filter(d => d) : [];
+                                }
+                            } else {
+                                ticket.devices = value ? value.split(";").map(d => d.trim()).filter(d => d) : [];
+                            }
                             break;
                         case "supervisor":
                             ticket.supervisor = value;
@@ -2268,6 +2313,21 @@ class HexagonTicketsManager {
                         case "notes":
                             ticket.notes = value;
                             break;
+                        case "xt#":
+                        case "xt":
+                        case "xtnumber":
+                        case "xt_number":  // Support snake_case from export
+                            ticket.xtNumber = this.normalizeXtNumber(value);
+                            break;
+                        case "id":  // Pass through ID from export if present
+                            ticket.existingId = value;
+                            break;
+                        case "created_at":  // Pass through timestamps from export
+                            ticket.createdAt = value;
+                            break;
+                        case "updated_at":
+                            ticket.updatedAt = value;
+                            break;
                     }
                 });
 
@@ -2276,23 +2336,37 @@ class HexagonTicketsManager {
                 ticket.dateDue = ticket.dateDue || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
                 ticket.hexagonTicket = ticket.hexagonTicket || "";
                 ticket.serviceNowTicket = ticket.serviceNowTicket || "";
+                ticket.site = ticket.site || "";
+                ticket.location = ticket.location || "";
                 ticket.devices = ticket.devices || [];
                 ticket.supervisor = ticket.supervisor || "";
                 ticket.tech = ticket.tech || "";
                 ticket.status = ticket.status || "Open";
                 ticket.notes = ticket.notes || "";
 
-                // Generate ID and timestamps using cryptographically secure random
-                const randomBytes = new Uint8Array(9);
-                window.crypto.getRandomValues(randomBytes);
-                const randomString = Array.from(randomBytes, byte => byte.toString(36).padStart(2, "0")).join("").substr(0, 9);
-                ticket.id = Date.now().toString() + randomString;
-                ticket.createdAt = new Date().toISOString();
-                ticket.updatedAt = new Date().toISOString();
+                ticket.xtNumber = ticket.xtNumber || String(nextImportNumber).padStart(4, "0");
+                ticket.xt_number = ticket.xtNumber;
+
+                // Use existing ID from export if available, otherwise generate new one
+                if (ticket.existingId) {
+                    ticket.id = ticket.existingId;
+                    delete ticket.existingId;
+                } else {
+                    // Generate ID using cryptographically secure random
+                    const randomBytes = new Uint8Array(9);
+                    window.crypto.getRandomValues(randomBytes);
+                    const randomString = Array.from(randomBytes, byte => byte.toString(36).padStart(2, "0")).join("").substr(0, 9);
+                    ticket.id = Date.now().toString() + randomString;
+                }
+
+                // Use existing timestamps if available
+                ticket.createdAt = ticket.createdAt || new Date().toISOString();
+                ticket.updatedAt = ticket.updatedAt || new Date().toISOString();
 
                 // Only require location (consistent with form validation)
                 if (ticket.location && ticket.location.trim()) {
                     tickets.push(ticket);
+                    nextImportNumber += 1;
                 } else {
                     console.log("Skipping ticket with missing location:", ticket);
                 }

@@ -19,71 +19,6 @@ Before ANY full-stack development, you MUST understand the project context:
    - **Database**: SQLite with runtime migrations
    - **Communication**: REST APIs + WebSockets
 
-## HexTrackr Full-Stack Patterns
-
-### CRITICAL: Hybrid Module Loading
-```javascript
-// ⚠️ Frontend uses BOTH patterns - CHECK FIRST!
-
-// ES6 Modules (use export/import)
-- vulnerability-chart-manager.js
-- vulnerability-grid.js
-- vulnerability-core.js
-
-// Global Scripts (NO imports, use <script> tags)
-- vulnerability-data.js (global VulnerabilityDataManager)
-- vulnerability-statistics.js (global VulnerabilityStatisticsManager)
-- vulnerability-search.js (global VulnerabilitySearchManager)
-- vulnerability-cards.js (global VulnerabilityCardsManager)
-```
-
-### End-to-End Feature Flow
-
-#### 1. Database Schema
-```javascript
-// Add column with runtime migration
-const migration = `
-ALTER TABLE vulnerabilities
-ADD COLUMN new_field TEXT DEFAULT NULL
-`;
-```
-
-#### 2. Backend API
-```javascript
-// Controller method (singleton pattern)
-async getNewFeature(req, res) {
-    try {
-        const data = await this.service.getNewFeature();
-        res.json({ success: true, data });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-}
-```
-
-#### 3. Frontend Integration
-```javascript
-// API call from frontend
-async loadNewFeature() {
-    const response = await fetch("/api/new-feature");
-    const result = await response.json();
-    if (result.success) {
-        this.updateUI(result.data);
-    }
-}
-```
-
-#### 4. WebSocket Real-time Updates
-```javascript
-// Backend emit
-io.emit("featureUpdate", { data });
-
-// Frontend listen
-this.websocket.on("featureUpdate", (data) => {
-    this.handleRealtimeUpdate(data);
-});
-```
-
 ## Technology Bridge
 
 ### Frontend Technologies
@@ -100,24 +35,6 @@ this.websocket.on("featureUpdate", (data) => {
 - Multer file uploads
 - PapaParse CSV processing
 
-### API Patterns
-```javascript
-// RESTful endpoints
-GET    /api/resources      // List
-GET    /api/resources/:id  // Single
-POST   /api/resources      // Create
-PUT    /api/resources/:id  // Update
-DELETE /api/resources/:id  // Delete
-
-// Consistent response format
-{
-    success: boolean,
-    data?: any,
-    error?: string,
-    details?: string
-}
-```
-
 ## Full-Stack Development Workflow
 
 ### Adding New Feature
@@ -130,47 +47,6 @@ DELETE /api/resources/:id  // Delete
 7. **WebSocket**: Add real-time updates if needed
 8. **Documentation**: Update JSDoc
 
-### Data Flow Patterns
-
-#### Upload → Process → Display
-```javascript
-// 1. Frontend: File upload
-const formData = new FormData();
-formData.append("file", file);
-
-// 2. Backend: Process with Multer
-app.post("/upload", upload.single("file"), async (req, res) => {
-    const data = await processFile(req.file);
-    io.emit("uploadProgress", { status: "complete" });
-    res.json({ success: true, data });
-});
-
-// 3. Frontend: Update display
-websocket.on("uploadProgress", updateProgressBar);
-```
-
-## Theme Integration (Both Layers)
-
-### Frontend Theme Handling
-```javascript
-// Check theme on load
-const theme = localStorage.getItem("theme") || "light";
-document.documentElement.setAttribute("data-bs-theme", theme);
-
-// AG-Grid theme update
-gridApi.setGridTheme(theme === "dark"
-    ? "ag-theme-quartz-dark"
-    : "ag-theme-quartz");
-```
-
-### Backend Theme Support
-```javascript
-// Store user preferences if needed
-app.put("/api/user/preferences", async (req, res) => {
-    const { theme } = req.body;
-    // Store in database or session
-});
-```
 
 ## Performance Optimization
 
@@ -230,26 +106,5 @@ app.put("/api/user/preferences", async (req, res) => {
 5. **Async Handling**: Proper error propagation
 6. **Memory Leaks**: Clean up listeners
 
-## Testing Full-Stack Features
-
-```javascript
-// Contract test
-describe("Feature End-to-End", () => {
-    it("should handle complete flow", async () => {
-        // 1. Test API
-        const apiResponse = await request(app)
-            .post("/api/feature")
-            .send(testData);
-        expect(apiResponse.status).toBe(200);
-
-        // 2. Test WebSocket
-        const wsData = await waitForWebSocketEvent("featureUpdate");
-        expect(wsData).toBeDefined();
-
-        // 3. Test UI update
-        // Use Playwright for E2E
-    });
-});
-```
 
 Remember: You're coordinating between vanilla JS frontend and Express backend. Ensure smooth data flow, consistent error handling, and constitutional compliance across both layers.
