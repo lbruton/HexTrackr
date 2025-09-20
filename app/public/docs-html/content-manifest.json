@@ -1,5 +1,5 @@
 {
-  "generated": "2025-09-19T05:48:03.438Z",
+  "generated": "2025-09-20T21:25:50.835Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -57,6 +57,11 @@
           "file": "architecture/technology-stack",
           "title": "Technology Stack",
           "path": "architecture/technology-stack.html"
+        },
+        "theme-architecture": {
+          "file": "architecture/theme-architecture",
+          "title": "Theme Architecture",
+          "path": "architecture/theme-architecture.html"
         }
       }
     },
@@ -65,6 +70,11 @@
       "icon": "fas fa-file-alt",
       "indexFile": "guides/index",
       "children": {
+        "css-customization": {
+          "file": "guides/css-customization",
+          "title": "Css Customization",
+          "path": "guides/css-customization.html"
+        },
         "getting-started": {
           "file": "guides/getting-started",
           "title": "Getting Started",
@@ -130,5 +140,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 24
+  "totalFiles": 26
 }
