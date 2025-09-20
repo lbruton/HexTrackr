@@ -211,6 +211,33 @@
     --hextrackr-focus-ring: 0 0 0 0.2rem rgb(37, 99, 235, 0.25);
     --hextrackr-hover-opacity: 0.8;
     --hextrackr-disabled-opacity: 0.6;
+
+    /* =================
+       Modal Components
+       ================= */
+    /* Modal backgrounds use surface hierarchy */
+    --hextrackr-modal-bg: var(--hextrackr-surface-1);
+    --hextrackr-modal-header-bg: var(--hextrackr-surface-2);
+    --hextrackr-modal-footer-bg: var(--hextrackr-surface-2);
+
+    /* Risk indicator card colors (light theme) */
+    --hextrackr-risk-critical-bg: #fef2f2;
+    --hextrackr-risk-critical-border: #fecaca;
+    --hextrackr-risk-critical-text: #dc2626;
+    --hextrackr-risk-high-bg: #fff7ed;
+    --hextrackr-risk-high-border: #fed7aa;
+    --hextrackr-risk-high-text: #d97706;
+    --hextrackr-risk-medium-bg: #eff6ff;
+    --hextrackr-risk-medium-border: #bfdbfe;
+    --hextrackr-risk-medium-text: #2563eb;
+    --hextrackr-risk-low-bg: #f0fdf4;
+    --hextrackr-risk-low-border: #bbf7d0;
+    --hextrackr-risk-low-text: #16a34a;
+
+    /* Device/Vulnerability count cards */
+    --hextrackr-info-card-bg: #eff6ff;
+    --hextrackr-info-card-border: #bfdbfe;
+    --hextrackr-info-card-text: #2563eb;
 }
 
 /* ===========================
@@ -328,6 +355,33 @@
     --hextrackr-focus-ring: 0 0 0 0.2rem rgb(96, 165, 250, 0.35);
     --hextrackr-hover-opacity: 0.9;
     --hextrackr-disabled-opacity: 0.5;
+
+    /* =================
+       Modal Components (dark mode)
+       ================= */
+    /* Modal backgrounds use surface hierarchy */
+    --hextrackr-modal-bg: var(--hextrackr-surface-1);
+    --hextrackr-modal-header-bg: var(--hextrackr-surface-2);
+    --hextrackr-modal-footer-bg: var(--hextrackr-surface-2);
+
+    /* Risk indicator card colors (dark theme) */
+    --hextrackr-risk-critical-bg: rgb(220, 38, 38, 0.15);
+    --hextrackr-risk-critical-border: rgb(248, 113, 113, 0.3);
+    --hextrackr-risk-critical-text: #f87171;
+    --hextrackr-risk-high-bg: rgb(217, 119, 6, 0.15);
+    --hextrackr-risk-high-border: rgb(251, 146, 60, 0.3);
+    --hextrackr-risk-high-text: #fb923c;
+    --hextrackr-risk-medium-bg: rgb(37, 99, 235, 0.15);
+    --hextrackr-risk-medium-border: rgb(96, 165, 250, 0.3);
+    --hextrackr-risk-medium-text: #60a5fa;
+    --hextrackr-risk-low-bg: rgb(22, 163, 74, 0.15);
+    --hextrackr-risk-low-border: rgb(52, 211, 153, 0.3);
+    --hextrackr-risk-low-text: #34d399;
+
+    /* Device/Vulnerability count cards (dark theme) */
+    --hextrackr-info-card-bg: rgb(37, 99, 235, 0.15);
+    --hextrackr-info-card-border: rgb(96, 165, 250, 0.3);
+    --hextrackr-info-card-text: #60a5fa;
 }
 
 /* ===========================
