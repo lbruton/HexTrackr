@@ -609,7 +609,7 @@
                         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="ticketManager.copyEmailMarkdown()">
                             <i class="fas fa-envelope me-1"></i>Email
                         </button>
-                        <button type="button" class="btn btn-outline-primary btn-sm" id="editTemplateBtn" onclick="templateEditor.toggleEditMode()" title="Edit email template">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="editTemplateBtn" onclick="toggleUnifiedEditMode()" title="Edit ticket details and email template">
                             <i class="fas fa-edit me-1"></i>Edit
                         </button>
                         <button type="button" class="btn btn-outline-success btn-sm" onclick="ticketManager.downloadBundleFromView()">
@@ -626,15 +626,15 @@
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="vulnerabilities-tab" data-bs-toggle="tab" data-bs-target="#vulnerabilities-content"
-                                type="button" role="tab" aria-controls="vulnerabilities-content" aria-selected="false">
-                                Vulnerabilities
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
                             <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email-content"
                                 type="button" role="tab" aria-controls="email-content" aria-selected="false">
                                 Email Template
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="vulnerabilities-tab" data-bs-toggle="tab" data-bs-target="#vulnerabilities-content"
+                                type="button" role="tab" aria-controls="vulnerabilities-content" aria-selected="false">
+                                Vulnerabilities
                             </button>
                         </li>
                     </ul>
@@ -642,13 +642,88 @@
                     <!-- Tab Content -->
                     <div class="tab-content mt-3" id="ticketViewTabContent">
                         <div class="tab-pane fade show active" id="ticket-content" role="tabpanel" aria-labelledby="ticket-tab">
-                            <pre id="markdownContent" class="terminal-content"></pre>
-                        </div>
-                        <div class="tab-pane fade" id="vulnerabilities-content" role="tabpanel" aria-labelledby="vulnerabilities-tab">
-                            <div id="vulnerabilityLoadingMessage" class="text-center text-muted py-3">
-                                <i class="fas fa-spinner fa-spin me-2"></i>Loading vulnerability data...
+                            <!-- View Mode (Default) -->
+                            <div id="ticketViewMode">
+                                <pre id="markdownContent" class="terminal-content"></pre>
                             </div>
-                            <pre id="vulnerabilityMarkdownContent" class="terminal-content" style="display: none;"></pre>
+
+                            <!-- Edit Mode (Hidden by default) -->
+                            <div id="ticketEditMode" style="display: none;">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-edit me-2"></i>Edit Ticket Details
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="ticketEditForm">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="editHexagonTicket" class="form-label">Hexagon Ticket #</label>
+                                                    <input type="text" class="form-control" id="editHexagonTicket" name="hexagonTicket">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="editServiceNowTicket" class="form-label">ServiceNow Ticket #</label>
+                                                    <input type="text" class="form-control" id="editServiceNowTicket" name="serviceNowTicket">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="editSite" class="form-label">Site</label>
+                                                    <input type="text" class="form-control" id="editSite" name="site" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="editLocation" class="form-label">Location</label>
+                                                    <input type="text" class="form-control" id="editLocation" name="location" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-4">
+                                                    <label for="editStatus" class="form-label">Status</label>
+                                                    <select class="form-select" id="editStatus" name="status">
+                                                        <option value="open">Open</option>
+                                                        <option value="in_progress">In Progress</option>
+                                                        <option value="waiting">Waiting</option>
+                                                        <option value="resolved">Resolved</option>
+                                                        <option value="closed">Closed</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="editDateSubmitted" class="form-label">Date Submitted</label>
+                                                    <input type="date" class="form-control" id="editDateSubmitted" name="dateSubmitted" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="editDateDue" class="form-label">Required Completion Date</label>
+                                                    <input type="date" class="form-control" id="editDateDue" name="dateDue" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="editSupervisor" class="form-label">Supervisor</label>
+                                                    <input type="text" class="form-control" id="editSupervisor" name="supervisor">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="editTech" class="form-label">Technician</label>
+                                                    <input type="text" class="form-control" id="editTech" name="tech">
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="editDevices" class="form-label">Devices <small class="text-muted">(one per line)</small></label>
+                                                <textarea class="form-control" id="editDevices" name="devices" rows="4" placeholder="Enter device names, one per line"></textarea>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="editNotes" class="form-label">Additional Notes</label>
+                                                <textarea class="form-control" id="editNotes" name="notes" rows="3"></textarea>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="tab-pane fade" id="email-content" role="tabpanel" aria-labelledby="email-tab">
                             <!-- View Mode (Default) -->
@@ -714,6 +789,12 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="tab-pane fade" id="vulnerabilities-content" role="tabpanel" aria-labelledby="vulnerabilities-tab">
+                            <div id="vulnerabilityLoadingMessage" class="text-center text-muted py-3">
+                                <i class="fas fa-spinner fa-spin me-2"></i>Loading vulnerability data...
+                            </div>
+                            <pre id="vulnerabilityMarkdownContent" class="terminal-content" style="display: none;"></pre>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -751,7 +832,111 @@
     <script src="/vendor/ag-grid/ag-grid-community.min.js"></script>
     <script src="scripts/shared/ag-grid-theme-manager.js"></script>
     <script src="scripts/shared/template-editor.js"></script>
+    <script src="scripts/shared/ticket-editor.js"></script>
     <script src="scripts/pages/tickets.js"></script>
     <script src="scripts/pages/tickets-aggrid.js"></script>
+
+    <script>
+        /**
+         * Unified Edit Mode Controller
+         * Coordinates between ticket editor and template editor
+         */
+        let isUnifiedEditMode = false;
+
+        async function toggleUnifiedEditMode() {
+            const editBtn = document.getElementById('editTemplateBtn');
+
+            if (!isUnifiedEditMode) {
+                // Entering unified edit mode
+                try {
+                    // Set ticket data for both editors
+                    const currentTicket = window.ticketManager?.currentTicket;
+                    if (currentTicket) {
+                        window.ticketEditor.setTicketData(currentTicket);
+                        window.templateEditor.setTicketData(currentTicket);
+                    }
+
+                    // Toggle both editors to edit mode
+                    await window.ticketEditor.toggleEditMode();
+                    await window.templateEditor.toggleEditMode();
+
+                    isUnifiedEditMode = true;
+
+                    // Update button appearance
+                    editBtn.innerHTML = '<i class="fas fa-times me-1"></i>Cancel';
+                    editBtn.className = 'btn btn-outline-secondary btn-sm';
+                    editBtn.title = 'Cancel editing';
+
+                    // Show success message
+                    if (window.ticketManager?.showToast) {
+                        window.ticketManager.showToast('Unified edit mode enabled - you can now edit both ticket details and email template', 'info');
+                    }
+                } catch (error) {
+                    console.error('Error entering unified edit mode:', error);
+                    if (window.ticketManager?.showToast) {
+                        window.ticketManager.showToast('Failed to enter edit mode', 'error');
+                    }
+                }
+            } else {
+                // Exiting unified edit mode
+                try {
+                    // Toggle both editors back to view mode
+                    await window.ticketEditor.toggleEditMode();
+                    await window.templateEditor.toggleEditMode();
+
+                    isUnifiedEditMode = false;
+
+                    // Reset button appearance
+                    editBtn.innerHTML = '<i class="fas fa-edit me-1"></i>Edit';
+                    editBtn.className = 'btn btn-outline-primary btn-sm';
+                    editBtn.title = 'Edit ticket details and email template';
+
+                    // Show success message
+                    if (window.ticketManager?.showToast) {
+                        window.ticketManager.showToast('Edit mode disabled', 'info');
+                    }
+                } catch (error) {
+                    console.error('Error exiting unified edit mode:', error);
+                }
+            }
+        }
+
+        /**
+         * Enhanced save functionality for unified edit mode
+         */
+        async function saveUnifiedChanges() {
+            if (!isUnifiedEditMode) return;
+
+            try {
+                // Save both ticket and template changes
+                await window.ticketEditor.saveTicket();
+                await window.templateEditor.saveTemplate();
+
+                // Exit unified edit mode
+                await toggleUnifiedEditMode();
+
+                if (window.ticketManager?.showToast) {
+                    window.ticketManager.showToast('All changes saved successfully', 'success');
+                }
+            } catch (error) {
+                console.error('Error saving unified changes:', error);
+                if (window.ticketManager?.showToast) {
+                    window.ticketManager.showToast('Failed to save some changes', 'error');
+                }
+            }
+        }
+
+        /**
+         * Initialize unified edit mode when editors are ready
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ensure both editors are available
+            if (window.ticketEditor && window.templateEditor) {
+                console.log('✅ Unified edit mode ready');
+            } else {
+                console.warn('⚠️ Some editors not available for unified mode');
+            }
+        });
+    </script>
 </body>
 </html>
