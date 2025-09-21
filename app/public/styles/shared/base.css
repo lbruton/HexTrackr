@@ -2,7 +2,7 @@
 
 /* Remove conflicting font family - let Tabler handle it */
 body {
-    background-color: #f8f9fa;
+    background-color: var(--hextrackr-surface-0);
     /* Removed font-family override - use Tabler's default */
 }
 
@@ -23,9 +23,9 @@ body {
     --hextrackr-surface-4: #ffffff;           /* Modal container */
 
     /* Border Definition System - Light theme */
-    --hextrackr-border-subtle: rgb(0, 0, 0, 0.08);   /* Subtle element borders */
-    --hextrackr-border-muted: rgb(0, 0, 0, 0.12);    /* Muted element borders */
-    --hextrackr-border-strong: rgb(0, 0, 0, 0.16);   /* Strong element borders */
+    --hextrackr-border-subtle: rgb(0, 0, 0, 0.15);   /* Subtle element borders */
+    --hextrackr-border-muted: rgb(0, 0, 0, 0.20);    /* Muted element borders */
+    --hextrackr-border-strong: rgb(0, 0, 0, 0.25);   /* Strong element borders */
 
     /* Enhanced Shadow System - Light theme */
     --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.1);    /* Small shadows */
@@ -62,9 +62,9 @@ body {
     --vpr-low-bg: rgb(var(--vpr-low-rgb), 0.1);
 }
 
-/* Base gradient for HexTrackr branding */
+/* Base primary background - uses theme variables */
 .bg-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background-color: var(--hextrackr-primary) !important;
 }
 
 /* Base card styling that works with Tabler */
