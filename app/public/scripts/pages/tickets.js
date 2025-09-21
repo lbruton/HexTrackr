@@ -1643,6 +1643,148 @@ class HexagonTicketsManager {
         });
     }
 
+    // Simple hostname matching - case-insensitive only
+    hostnameMatches(hostname1, hostname2) {
+        if (!hostname1 || !hostname2) return false;
+
+        // Simple case-insensitive match
+        return hostname1.toLowerCase().trim() === hostname2.toLowerCase().trim();
+    }
+
+    // Fetch vulnerabilities for matched devices
+    async fetchVulnerabilitiesForDevices(devices) {
+        if (!devices || devices.length === 0) return [];
+
+        try {
+            // Fetch vulnerabilities from the API
+            const response = await fetch('/api/vulnerabilities?' + new URLSearchParams({
+                limit: '10000',  // Get all vulnerabilities for these devices
+                sort: 'severity'
+            }));
+
+            if (!response.ok) {
+                console.error('[VulnBundle] Failed to fetch vulnerabilities:', response.status);
+                return [];
+            }
+
+            const data = await response.json();
+
+            // Check if we got the expected data structure
+            if (!data || !data.data || !Array.isArray(data.data)) {
+                console.error('[VulnBundle] Unexpected API response structure');
+                return [];
+            }
+
+            // Filter vulnerabilities to match our devices
+            const matchedVulns = data.data.filter(vuln => {
+                return devices.some(device => {
+                    return this.hostnameMatches(vuln.hostname, device);
+                });
+            });
+
+            // Log matching summary (production-friendly)
+            if (matchedVulns.length > 0) {
+                const uniqueHosts = new Set(matchedVulns.map(v => v.hostname));
+                console.log(`[VulnBundle] Found ${matchedVulns.length} vulnerabilities across ${uniqueHosts.size} device(s)`);
+            }
+
+            return matchedVulns;
+        } catch (error) {
+            console.error('[VulnBundle] Error fetching vulnerabilities:', error);
+            return [];
+        }
+    }
+
+    // Generate vulnerability markdown report
+    generateVulnerabilityMarkdown(ticket, vulnerabilities) {
+        if (!vulnerabilities || vulnerabilities.length === 0) {
+            return null;  // No report if no vulnerabilities
+        }
+
+        // Group vulnerabilities by device
+        const vulnsByDevice = {};
+        vulnerabilities.forEach(vuln => {
+            const hostname = vuln.hostname || 'Unknown Device';
+            if (!vulnsByDevice[hostname]) {
+                vulnsByDevice[hostname] = [];
+            }
+            vulnsByDevice[hostname].push(vuln);
+        });
+
+        // Build the markdown report
+        let markdown = `# Vulnerability Report for ${ticket.location || ticket.site || 'Unknown Location'}\n\n`;
+        markdown += `**XT#:** ${ticket.xtNumber || ticket.xt_number || 'N/A'}\n`;
+        markdown += `**Hexagon#:** ${ticket.hexagonTicket || 'N/A'}\n`;
+        markdown += `**ServiceNow#:** ${ticket.serviceNowTicket || 'N/A'}\n\n`;
+        markdown += `Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n\n`;
+        markdown += `## Summary\n`;
+        markdown += `- Total Vulnerabilities: ${vulnerabilities.length}\n`;
+        markdown += `- Affected Devices: ${Object.keys(vulnsByDevice).length}\n`;
+
+        // Count by severity
+        const severityCounts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
+        vulnerabilities.forEach(v => {
+            const sev = (v.severity || 'LOW').toUpperCase();
+            if (severityCounts[sev] !== undefined) {
+                severityCounts[sev]++;
+            }
+        });
+        markdown += `- Critical: ${severityCounts.CRITICAL}, High: ${severityCounts.HIGH}, Medium: ${severityCounts.MEDIUM}, Low: ${severityCounts.LOW}\n\n`;
+
+        // Add vulnerabilities by device
+        Object.keys(vulnsByDevice).sort().forEach(hostname => {
+            const deviceVulns = vulnsByDevice[hostname];
+
+            markdown += `## Device: ${hostname}\n`;
+            markdown += `Total Vulnerabilities: ${deviceVulns.length}\n\n`;
+
+            // Sort by VPR score (highest to lowest)
+            deviceVulns.sort((a, b) => {
+                return (b.vpr_score || 0) - (a.vpr_score || 0);
+            });
+
+            // Create table
+            markdown += `| CVE/Plugin | Description | Severity | VPR | First Seen | Last Seen |\n`;
+            markdown += `|------------|-------------|----------|-----|------------|-------------||\n`;
+
+            deviceVulns.forEach(vuln => {
+                const id = vuln.cve || vuln.plugin_id || 'N/A';
+                const desc = (vuln.plugin_name || vuln.description || 'N/A').substring(0, 50);
+                const severity = vuln.severity || 'N/A';
+                const vpr = vuln.vpr_score ? vuln.vpr_score.toFixed(1) : 'N/A';
+                const firstSeen = vuln.first_seen ? new Date(vuln.first_seen).toLocaleDateString() : 'N/A';
+                const lastSeen = vuln.last_seen ? new Date(vuln.last_seen).toLocaleDateString() : 'N/A';
+
+                markdown += `| ${id} | ${desc} | ${severity} | ${vpr} | ${firstSeen} | ${lastSeen} |\n`;
+            });
+
+            markdown += '\n';
+        });
+
+        // Add devices with no vulnerabilities
+        if (ticket.devices && ticket.devices.length > 0) {
+            const devicesWithoutVulns = ticket.devices.filter(device => {
+                return !vulnerabilities.some(v => {
+                    return this.hostnameMatches(v.hostname, device);
+                });
+            });
+
+            if (devicesWithoutVulns.length > 0) {
+                markdown += `---\n\n`;
+                markdown += `## Devices with No Vulnerabilities Found\n`;
+                devicesWithoutVulns.forEach(device => {
+                    markdown += `- ${device}\n`;
+                });
+                markdown += '\n';
+            }
+        }
+
+        markdown += `---\n`;
+        markdown += `*This report was automatically generated based on matching device hostnames.*\n`;
+
+        return markdown;
+    }
+
     // Bundle ticket files into zip
     async bundleTicketFiles(id) {
         const ticket = this.getTicketById(id);
@@ -1790,6 +1932,56 @@ class HexagonTicketsManager {
             const markdownContent = this.generateMarkdown(ticket);
             const markdownBlob = new Blob([markdownContent], { type: "text/markdown" });
             zip.file(`${baseFilename}.md`, markdownBlob);
+
+            // Automatically fetch and include vulnerabilities if devices are present
+            if (ticket.devices && ticket.devices.length > 0) {
+                try {
+                    // Ensure devices is an array (sometimes it might be a string from the database)
+                    let deviceArray = ticket.devices;
+                    if (typeof deviceArray === 'string') {
+                        try {
+                            deviceArray = JSON.parse(deviceArray);
+                        } catch (e) {
+                            console.error('[VulnBundle] Failed to parse devices string:', e);
+                            deviceArray = [];
+                        }
+                    }
+
+                    if (!Array.isArray(deviceArray) || deviceArray.length === 0) {
+                        deviceArray = [];
+                    }
+
+                    // Check if vulnerability feature is available
+                    const statsResponse = await fetch('/api/vulnerabilities/stats');
+
+                    if (statsResponse.ok) {
+                        const stats = await statsResponse.json();
+
+                        // Calculate total vulnerabilities from all severities
+                        const totalVulns = (stats.critical?.count || 0) + (stats.high?.count || 0) +
+                                          (stats.medium?.count || 0) + (stats.low?.count || 0);
+
+                        // Only proceed if there are vulnerabilities in the database
+                        if (totalVulns > 0 && deviceArray.length > 0) {
+                            console.log(`[VulnBundle] Checking ${deviceArray.length} devices for vulnerabilities...`);
+                            const vulnerabilities = await this.fetchVulnerabilitiesForDevices(deviceArray);
+
+                            if (vulnerabilities && vulnerabilities.length > 0) {
+                                const vulnMarkdown = this.generateVulnerabilityMarkdown(ticket, vulnerabilities);
+
+                                if (vulnMarkdown) {
+                                    const vulnBlob = new Blob([vulnMarkdown], { type: "text/markdown" });
+                                    zip.file(`${baseFilename}_vulnerabilities.md`, vulnBlob);
+                                    console.log('[VulnBundle] ✅ Vulnerability report added to bundle');
+                                }
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('[VulnBundle] Error during vulnerability processing:', error);
+                    // Continue without vulnerability report - don't fail the whole bundle
+                }
+            }
 
             // Add shared documentation files (uploaded via "Attach Documentation")
             if (this.sharedDocumentation && this.sharedDocumentation.length > 0) {
@@ -2597,4 +2789,60 @@ window.showToast = function(message, type) {
 document.addEventListener("DOMContentLoaded", function() {
     // Initialize the ticket manager and explicitly set it as a global variable
     window.ticketManager = new HexagonTicketsManager();
+
+    // Check if we're coming from vulnerability page with a device to create a ticket for
+    const autoOpen = sessionStorage.getItem('autoOpenModal');
+    const deviceHostname = sessionStorage.getItem('createTicketDevice');
+
+    if (autoOpen === 'true' && deviceHostname) {
+        // Clear the flags immediately to prevent issues with multiple tabs
+        sessionStorage.removeItem('autoOpenModal');
+        sessionStorage.removeItem('createTicketDevice');
+
+        // Wait a moment for everything to initialize, then open modal
+        setTimeout(() => {
+            // Open the ticket modal using Bootstrap
+            const ticketModal = document.getElementById('ticketModal');
+            if (ticketModal) {
+                const modal = new bootstrap.Modal(ticketModal);
+                modal.show();
+
+                // Wait for modal to be fully shown, then populate the device
+                ticketModal.addEventListener('shown.bs.modal', function onModalShown() {
+                    // Remove the event listener to avoid multiple calls
+                    ticketModal.removeEventListener('shown.bs.modal', onModalShown);
+
+                    // Populate the device field
+                    setTimeout(() => {
+                        // Find the first device input field (there's usually one by default)
+                        const firstDeviceInput = document.querySelector('#devicesContainer .device-input');
+
+                        if (firstDeviceInput) {
+                            // If first device field is empty, use it
+                            if (!firstDeviceInput.value || firstDeviceInput.value.trim() === '') {
+                                firstDeviceInput.value = deviceHostname;
+                                firstDeviceInput.focus();
+                            } else {
+                                // Otherwise, add a new device field
+                                window.ticketManager.addDeviceField();
+
+                                // Then find the newly added input
+                                setTimeout(() => {
+                                    const deviceInputs = document.querySelectorAll('#devicesContainer .device-input');
+                                    if (deviceInputs.length > 0) {
+                                        const lastInput = deviceInputs[deviceInputs.length - 1];
+                                        lastInput.value = deviceHostname;
+                                        lastInput.focus();
+                                    }
+                                }, 50);
+                            }
+                        }
+
+                        // Show a helpful message
+                        window.ticketManager.showToast(`Creating ticket for ${deviceHostname}`, 'info');
+                    }, 100);
+                }, { once: true });
+            }
+        }, 500);
+    }
 });
