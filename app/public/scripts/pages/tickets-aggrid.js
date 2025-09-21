@@ -553,7 +553,7 @@
             pagination: true,
             paginationPageSize: manager.rowsPerPage || 10,
             paginationPageSizeSelector: [10, 25, 50, 100, 200],
-            suppressPaginationPanel: true, // Hide AG-Grid pagination - using card controls instead
+            // Show AG-Grid's built-in pagination controls
             animateRows: true,
             rowHeight: 42,
             domLayout: "autoHeight",
@@ -694,91 +694,19 @@
     };
 
     HexagonTicketsManager.prototype.updatePaginationDisplay = function updatePaginationDisplay() {
-        const info = document.getElementById("paginationInfo");
-        if (!info) {
-            return;
-        }
-
-        if (!this.gridApi || !this.filteredTicketsCount) {
-            info.textContent = "Showing 0 to 0 of 0 entries";
-            if (this.gridApi) {
-                this.renderPaginationControls(0);
-            }
+        if (!this.gridApi) {
+            this.currentPage = 1;
             return;
         }
 
         const fallbackPageSize = this.rowsPerPage || 25;
         const pageSize = getPaginationPageSize(this.gridApi, fallbackPageSize);
         const currentPageIndex = Math.max(getCurrentPaginationPage(this.gridApi), 0);
-        const totalRows = this.filteredTicketsCount;
-        const start = currentPageIndex * pageSize + 1;
-        const end = Math.min((currentPageIndex + 1) * pageSize, totalRows);
+        const totalRows = this.filteredTicketsCount || 0;
+        const totalPages = pageSize > 0 ? Math.ceil(totalRows / pageSize) : 0;
 
-        info.textContent = `Showing ${start} to ${end} of ${totalRows} entries`;
-        this.currentPage = currentPageIndex + 1;
-
-        const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
-        this.renderPaginationControls(totalPages);
-    };
-
-    HexagonTicketsManager.prototype.renderPaginationControls = function renderPaginationControls(totalPages) {
-        const container = document.getElementById("paginationControls");
-        if (!container) {
-            return;
-        }
-
-        if (!this.gridApi || totalPages <= 1) {
-            container.innerHTML = "";
-            return;
-        }
-
-        const currentPageIndex = getCurrentPaginationPage(this.gridApi);
-        const lastPageIndex = totalPages - 1;
-        const maxVisible = 5;
-        let startPageIndex = Math.max(0, currentPageIndex - Math.floor(maxVisible / 2));
-        const endPageIndex = Math.min(startPageIndex + maxVisible - 1, lastPageIndex);
-        startPageIndex = Math.max(0, endPageIndex - maxVisible + 1);
-
-        let html = "";
-        html += `<li class="page-item ${currentPageIndex === 0 ? "disabled" : ""}">` +
-            "<a class=\"page-link\" href=\"#\" data-nav=\"prev\"><i class=\"fas fa-chevron-left\"></i></a></li>";
-
-        for (let page = startPageIndex; page <= endPageIndex; page += 1) {
-            const isActive = page === currentPageIndex;
-            html += `<li class="page-item ${isActive ? "active" : ""}"><a class="page-link" href="#" data-page="${page + 1}">${page + 1}</a></li>`;
-        }
-
-        html += `<li class="page-item ${currentPageIndex >= lastPageIndex ? "disabled" : ""}">` +
-            "<a class=\"page-link\" href=\"#\" data-nav=\"next\"><i class=\"fas fa-chevron-right\"></i></a></li>";
-
-        container.innerHTML = html;
-
-        container.querySelectorAll("a[data-page]").forEach((link) => {
-            link.addEventListener("click", (event) => {
-                event.preventDefault();
-                const target = Number(link.getAttribute("data-page"));
-                if (!Number.isNaN(target)) {
-                    this.goToPage(target);
-                }
-            });
-        });
-
-        container.querySelectorAll("a[data-nav]").forEach((link) => {
-            link.addEventListener("click", (event) => {
-                event.preventDefault();
-                const parent = link.closest(".page-item");
-                if (parent && parent.classList.contains("disabled")) {
-                    return;
-                }
-
-                const direction = link.getAttribute("data-nav");
-                if (direction === "prev") {
-                    this.goToPage(currentPageIndex);
-                } else if (direction === "next") {
-                    this.goToPage(currentPageIndex + 2);
-                }
-            });
-        });
+        this.rowsPerPage = pageSize;
+        this.currentPage = totalPages === 0 ? 1 : currentPageIndex + 1;
     };
 
     HexagonTicketsManager.prototype.goToPage = function goToPage(pageNumber) {
