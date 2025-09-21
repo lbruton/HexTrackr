@@ -171,12 +171,21 @@ class TemplateService {
     }
 
     /**
-     * Validate template content
+     * Validate template content with comprehensive checks
      * @param {string} templateContent - Template content to validate
-     * @returns {Object} Validation result with valid boolean and errors array
+     * @returns {Object} Validation result with valid boolean, errors array, and warnings
      */
     validateTemplate(templateContent) {
         const errors = [];
+        const warnings = [];
+        const variableMapping = this.getVariableMapping();
+        const knownVariables = Object.keys(variableMapping);
+
+        // Basic structure validation
+        if (!templateContent || typeof templateContent !== 'string') {
+            errors.push("Template content must be a non-empty string");
+            return { valid: false, errors, warnings };
+        }
 
         // Check for unmatched brackets
         const openBrackets = (templateContent.match(/\[/g) || []).length;
@@ -196,9 +205,71 @@ class TemplateService {
             errors.push("Nested brackets are not allowed");
         }
 
+        // Extract all variables from template
+        const variableMatches = templateContent.match(/\[[A-Z_]+\]/g) || [];
+        const uniqueVariables = [...new Set(variableMatches)];
+
+        // Check for unknown variables
+        const unknownVariables = uniqueVariables.filter(variable =>
+            !knownVariables.includes(variable)
+        );
+
+        if (unknownVariables.length > 0) {
+            warnings.push(`Unknown variables: ${unknownVariables.join(', ')}`);
+        }
+
+        // Check for unused known variables
+        const usedVariables = uniqueVariables.filter(variable =>
+            knownVariables.includes(variable)
+        );
+        const unusedRequiredVariables = knownVariables.filter(variable => {
+            const config = variableMapping[variable];
+            return config.required && !usedVariables.includes(variable);
+        });
+
+        if (unusedRequiredVariables.length > 0) {
+            warnings.push(`Missing required variables: ${unusedRequiredVariables.join(', ')}`);
+        }
+
+        // Check for potentially problematic patterns
+        if (templateContent.includes('[[') || templateContent.includes(']]')) {
+            errors.push("Double brackets are not allowed");
+        }
+
+        // Check for malformed variables (brackets with spaces or special chars)
+        const malformedVariables = templateContent.match(/\[[^A-Z_\]]*[^A-Z_\]]+[^A-Z_\]]*\]/g);
+        if (malformedVariables) {
+            errors.push(`Malformed variables found: ${malformedVariables.join(', ')}`);
+        }
+
+        // Check template length (reasonable limits)
+        if (templateContent.length > 50000) {
+            warnings.push("Template is very large (>50KB), consider breaking it down");
+        }
+
+        // Check for potential injection patterns
+        const dangerousPatterns = [
+            /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+            /javascript:/gi,
+            /on\w+\s*=/gi
+        ];
+
+        for (const pattern of dangerousPatterns) {
+            if (pattern.test(templateContent)) {
+                errors.push("Potentially dangerous content detected (script tags, javascript:, event handlers)");
+                break;
+            }
+        }
+
         return {
             valid: errors.length === 0,
-            errors
+            errors,
+            warnings,
+            variables: {
+                found: uniqueVariables,
+                unknown: unknownVariables,
+                missing_required: unusedRequiredVariables
+            }
         };
     }
 
@@ -206,42 +277,227 @@ class TemplateService {
      * Process template with ticket data (variable substitution)
      * @param {number} id - Template ID
      * @param {Object} ticketData - Ticket data for variable substitution
+     * @param {Object} options - Additional options (vulnerabilityData, fallbackToHardcoded)
      * @returns {Promise<string|null>} Processed template content or null if template not found
      */
-    async processTemplate(id, ticketData) {
-        const template = await this.getTemplateById(id);
-        if (!template) {
-            return null;
-        }
+    async processTemplate(id, ticketData, options = {}) {
+        try {
+            const template = await this.getTemplateById(id);
+            if (!template) {
+                if (options.fallbackToHardcoded) {
+                    console.warn(`Template ${id} not found, using hardcoded fallback`);
+                    return this.processHardcodedTemplate(ticketData, options);
+                }
+                return null;
+            }
 
-        return this.substituteVariables(template.template_content, ticketData);
+            return this.substituteVariables(template.template_content, ticketData, options);
+        } catch (error) {
+            console.error(`Error processing template ${id}:`, error);
+
+            if (options.fallbackToHardcoded) {
+                console.warn('Database error, falling back to hardcoded template');
+                return this.processHardcodedTemplate(ticketData, options);
+            }
+
+            throw error;
+        }
     }
 
     /**
-     * Substitute variables in template content
+     * Process template using hardcoded fallback (mirrors tickets.js generateEmailMarkdown)
+     * @param {Object} ticketData - Ticket data for substitution
+     * @param {Object} options - Additional options (vulnerabilityData)
+     * @returns {string} Processed hardcoded template
+     */
+    processHardcodedTemplate(ticketData, options = {}) {
+        // This mirrors the hardcoded template from tickets.js but with our variable system
+        const hardcodedTemplate = `Subject: Hexagon Work Order - [SITE_NAME] - [HEXAGON_NUM]
+
+Hello [GREETING],
+
+We have submitted a Hexagon work order ([HEXAGON_NUM]) for the [SITE_NAME] site.
+
+There are critical security patches that must be applied within 30 days.
+
+Please see the attached notes for more information. If you have any questions or concerns please feel free to reach out to NetOps at netops@oneok.com.
+
+**MAINTENANCE DETAILS:**
+• Location: [SITE_NAME] - [LOCATION]
+• Hexagon Ticket: [HEXAGON_NUM]
+• ServiceNow Reference: [SERVICENOW_NUM]
+• Required Completion: [DATE_DUE]
+
+**AFFECTED SYSTEMS:**
+[DEVICE_COUNT] device${ticketData.devices && ticketData.devices.length > 1 ? 's' : ''} require security patches and will need to be rebooted:
+[DEVICE_LIST]
+
+**ACTION REQUIRED:**
+• Schedule a maintenance window of at least 2 hours
+• Contact ITCC at 918-732-4822 with ServiceNow ticket [SERVICENOW_NUM]
+• Coordinate with NetOps for patch application
+
+**TIMELINE:**
+• Request Submitted: [DATE_SUBMITTED]
+• Required Completion: [DATE_DUE]
+• Maintenance Window: To be scheduled
+
+[VULNERABILITY_SUMMARY]
+
+Please confirm receipt and provide your proposed maintenance window.
+
+---
+Generated by HexTrackr v1.0.21 (Fallback Mode)
+Ticket ID: [XT_NUMBER]`;
+
+        return this.substituteVariables(hardcodedTemplate, ticketData, options);
+    }
+
+    /**
+     * Get template with automatic fallback handling
+     * @param {string} templateName - Template name (default: 'default_email')
+     * @param {Object} ticketData - Ticket data for processing
+     * @param {Object} options - Additional options
+     * @returns {Promise<string>} Processed template content
+     */
+    async getProcessedTemplate(templateName = 'default_email', ticketData, options = {}) {
+        try {
+            // Try to get template by name first
+            const template = await this.getTemplateByName(templateName);
+
+            if (template) {
+                return this.substituteVariables(template.template_content, ticketData, options);
+            } else {
+                console.warn(`Template '${templateName}' not found, using hardcoded fallback`);
+                return this.processHardcodedTemplate(ticketData, options);
+            }
+        } catch (error) {
+            console.error('Database error getting template, using hardcoded fallback:', error);
+            return this.processHardcodedTemplate(ticketData, options);
+        }
+    }
+
+    /**
+     * Get variable mapping configuration
+     * @returns {Object} Variable definitions with processing functions
+     */
+    getVariableMapping() {
+        return {
+            '[GREETING]': {
+                description: 'Supervisor first name or Team for multiple supervisors',
+                required: false,
+                fallback: '[Supervisor First Name]',
+                processor: (ticketData) => this.getSupervisorGreeting(ticketData && ticketData.supervisor)
+            },
+            '[SITE_NAME]': {
+                description: 'Site name from ticket',
+                required: true,
+                fallback: '[Site Name]',
+                processor: (ticketData) => (ticketData && ticketData.site) || '[Site Name]'
+            },
+            '[LOCATION]': {
+                description: 'Location from ticket',
+                required: true,
+                fallback: '[Location]',
+                processor: (ticketData) => (ticketData && ticketData.location) || '[Location]'
+            },
+            '[HEXAGON_NUM]': {
+                description: 'Hexagon ticket number',
+                required: false,
+                fallback: '[Hexagon #]',
+                processor: (ticketData) => (ticketData && ticketData.hexagonTicket) || '[Hexagon #]'
+            },
+            '[SERVICENOW_NUM]': {
+                description: 'ServiceNow ticket number',
+                required: false,
+                fallback: '[ServiceNow #]',
+                processor: (ticketData) => (ticketData && ticketData.serviceNowTicket) || '[ServiceNow #]'
+            },
+            '[XT_NUMBER]': {
+                description: 'Internal XT number',
+                required: true,
+                fallback: 'XT#[ID]',
+                processor: (ticketData) => (ticketData && ticketData.xt_number) || `XT#${(ticketData && ticketData.id) || 'UNKNOWN'}`
+            },
+            '[DEVICE_COUNT]': {
+                description: 'Number of devices in ticket',
+                required: true,
+                fallback: '0',
+                processor: (ticketData) => String((ticketData && ticketData.devices) ? ticketData.devices.length : 0)
+            },
+            '[DEVICE_LIST]': {
+                description: 'Enumerated list of devices',
+                required: true,
+                fallback: 'Device list to be confirmed',
+                processor: (ticketData) => this.generateDeviceList(ticketData && ticketData.devices)
+            },
+            '[DATE_DUE]': {
+                description: 'Due date formatted',
+                required: true,
+                fallback: '[Due Date]',
+                processor: (ticketData) => this.formatDate(ticketData && ticketData.dateDue) || '[Due Date]'
+            },
+            '[DATE_SUBMITTED]': {
+                description: 'Submission date formatted',
+                required: true,
+                fallback: '[Submitted Date]',
+                processor: (ticketData) => this.formatDate(ticketData && ticketData.dateSubmitted) || '[Submitted Date]'
+            },
+            '[VULNERABILITY_SUMMARY]': {
+                description: 'Dynamic vulnerability summary (generated at runtime)',
+                required: false,
+                fallback: '',
+                processor: (ticketData, vulnerabilityData) => {
+                    if (vulnerabilityData) {
+                        return this.generateVulnerabilitySummary(ticketData, vulnerabilityData);
+                    }
+                    return this.fallback;
+                }
+            }
+        };
+    }
+
+    /**
+     * Substitute variables in template content with enhanced processing
      * @param {string} templateContent - Template content with variables
      * @param {Object} ticketData - Ticket data for substitution
+     * @param {Object} options - Additional options (vulnerabilityData, etc.)
      * @returns {string} Processed template with variables replaced
      */
-    substituteVariables(templateContent, ticketData) {
-        // This will be expanded in Session 2, for now return basic substitution
-        const replacements = {
-            '[GREETING]': this.getSupervisorGreeting(ticketData.supervisor),
-            '[SITE_NAME]': ticketData.site || "[Site Name]",
-            '[LOCATION]': ticketData.location || "[Location]",
-            '[HEXAGON_NUM]': ticketData.hexagonTicket || "[Hexagon #]",
-            '[SERVICENOW_NUM]': ticketData.serviceNowTicket || "[ServiceNow #]",
-            '[XT_NUMBER]': ticketData.xt_number || `XT#${ticketData.id}`,
-            '[DEVICE_COUNT]': ticketData.devices ? ticketData.devices.length : 0,
-            '[DEVICE_LIST]': this.generateDeviceList(ticketData.devices),
-            '[DATE_DUE]': this.formatDate(ticketData.dateDue),
-            '[DATE_SUBMITTED]': this.formatDate(ticketData.dateSubmitted),
-            '[VULNERABILITY_SUMMARY]': '' // Added dynamically later
-        };
-
+    substituteVariables(templateContent, ticketData, options = {}) {
+        const variableMapping = this.getVariableMapping();
         let processed = templateContent;
-        for (const [tag, value] of Object.entries(replacements)) {
-            processed = processed.replace(new RegExp(this.escapeRegex(tag), 'g'), value);
+
+        // Process each variable
+        for (const [variable, config] of Object.entries(variableMapping)) {
+            try {
+                // Set fallback in config context for processors
+                config.fallback = config.fallback;
+
+                // Process the variable with ticket data and options
+                let value;
+                if (variable === '[VULNERABILITY_SUMMARY]') {
+                    value = config.processor(ticketData, options.vulnerabilityData);
+                } else {
+                    value = config.processor(ticketData);
+                }
+
+                // Replace all instances of the variable
+                const regex = new RegExp(this.escapeRegex(variable), 'g');
+                processed = processed.replace(regex, String(value || config.fallback));
+
+            } catch (error) {
+                console.error(`Error processing variable ${variable}:`, error);
+                // Use fallback on error
+                const regex = new RegExp(this.escapeRegex(variable), 'g');
+                processed = processed.replace(regex, config.fallback);
+            }
+        }
+
+        // Check for unprocessed variables and warn
+        const remainingVariables = processed.match(/\[[A-Z_]+\]/g);
+        if (remainingVariables) {
+            console.warn('Unprocessed variables found:', remainingVariables);
         }
 
         return processed;
@@ -293,7 +549,53 @@ class TemplateService {
             return "Device list to be confirmed";
         }
 
-        return devices.map((device, index) => `${index + 1}. ${device}`).join('\\n');
+        return devices.map((device, index) => `${index + 1}. ${device}`).join('\n');
+    }
+
+    /**
+     * Helper: Generate vulnerability summary for email
+     * @param {Object} ticketData - Ticket data
+     * @param {Array} vulnerabilityData - Vulnerability data for devices
+     * @returns {string} Formatted vulnerability summary
+     */
+    generateVulnerabilitySummary(ticketData, vulnerabilityData) {
+        if (!vulnerabilityData || vulnerabilityData.length === 0) {
+            return '';
+        }
+
+        // Group vulnerabilities by device and severity
+        const deviceSummary = {};
+        vulnerabilityData.forEach(vuln => {
+            const device = vuln.hostname || 'Unknown Device';
+            if (!deviceSummary[device]) {
+                deviceSummary[device] = { total: 0, critical: 0, high: 0, medium: 0, low: 0 };
+            }
+            deviceSummary[device].total++;
+
+            const severity = (vuln.severity || 'unknown').toLowerCase();
+            if (deviceSummary[device][severity] !== undefined) {
+                deviceSummary[device][severity]++;
+            }
+        });
+
+        let summary = '\n**VULNERABILITY SUMMARY:**\n';
+
+        Object.entries(deviceSummary).forEach(([device, counts]) => {
+            summary += `• ${device}: ${counts.total} vulnerabilities`;
+
+            const severityBreakdown = [];
+            if (counts.critical > 0) severityBreakdown.push(`${counts.critical} Critical`);
+            if (counts.high > 0) severityBreakdown.push(`${counts.high} High`);
+            if (counts.medium > 0) severityBreakdown.push(`${counts.medium} Medium`);
+            if (counts.low > 0) severityBreakdown.push(`${counts.low} Low`);
+
+            if (severityBreakdown.length > 0) {
+                summary += ` (${severityBreakdown.join(', ')})`;
+            }
+            summary += '\n';
+        });
+
+        return summary;
     }
 
     /**
@@ -318,7 +620,7 @@ class TemplateService {
      * @returns {string} Escaped string
      */
     escapeRegex(string) {
-        return string.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 }
 
