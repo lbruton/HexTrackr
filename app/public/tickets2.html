@@ -685,6 +685,9 @@
                                                     <button type="button" class="btn btn-outline-success" onclick="ticketMarkdownEditor.saveTemplate()" title="Save template changes">
                                                         <i class="fas fa-save me-1"></i>Save
                                                     </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="ticketMarkdownEditor.toggleEditMode()" title="Exit edit mode">
+                                                        <i class="fas fa-times me-1"></i>Cancel
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div class="card-body p-0">
@@ -809,6 +812,9 @@
                                                     <button type="button" class="btn btn-outline-success" onclick="vulnerabilityMarkdownEditor.saveTemplate()" title="Save template changes">
                                                         <i class="fas fa-save me-1"></i>Save
                                                     </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="vulnerabilityMarkdownEditor.toggleEditMode()" title="Exit edit mode">
+                                                        <i class="fas fa-times me-1"></i>Cancel
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div class="card-body p-0">
@@ -878,6 +884,10 @@
             if (!isUnifiedEditMode) {
                 // Entering unified edit mode
                 try {
+                    // Wait for editors to be available
+                    if (!window.ticketMarkdownEditor || !window.templateEditor || !window.vulnerabilityMarkdownEditor) {
+                        throw new Error('Template editors not fully loaded. Please refresh the page and try again.');
+                    }
                     // Get ticket data from modal
                     const ticketId = document.getElementById("viewTicketModal").getAttribute("data-ticket-id");
                     const currentTicket = window.ticketManager?.getTicketById(ticketId);
@@ -892,9 +902,9 @@
                     if (window.vulnerabilityMarkdownEditor) window.vulnerabilityMarkdownEditor.setTicketData(currentTicket);
 
                     // Toggle all three editors to edit mode
-                    await toggleTicketEditMode();
-                    await window.templateEditor.toggleEditMode();
-                    await toggleVulnerabilityEditMode();
+                    if (window.ticketMarkdownEditor) await window.ticketMarkdownEditor.toggleEditMode();
+                    if (window.templateEditor) await window.templateEditor.toggleEditMode();
+                    if (window.vulnerabilityMarkdownEditor) await window.vulnerabilityMarkdownEditor.toggleEditMode();
 
                     isUnifiedEditMode = true;
 
@@ -922,9 +932,9 @@
                 // Exiting unified edit mode
                 try {
                     // Toggle all editors back to view mode
-                    await toggleTicketEditMode();
-                    await window.templateEditor.toggleEditMode();
-                    await toggleVulnerabilityEditMode();
+                    if (window.ticketMarkdownEditor) await window.ticketMarkdownEditor.toggleEditMode();
+                    if (window.templateEditor) await window.templateEditor.toggleEditMode();
+                    if (window.vulnerabilityMarkdownEditor) await window.vulnerabilityMarkdownEditor.toggleEditMode();
 
                     isUnifiedEditMode = false;
 

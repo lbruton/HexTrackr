@@ -107,6 +107,44 @@
             color: var(--hextrackr-primary);
         }
 
+        /* KEV Badge - Known Exploited Vulnerability indicator */
+        .kev-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            animation: pulse-subtle 2s infinite;
+            z-index: 10;
+            user-select: none;
+            box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+        }
+
+        .kev-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 6px rgba(220, 38, 38, 0.4);
+        }
+
+        .kev-indicator {
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .kev-indicator:hover {
+            transform: scale(1.2);
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
         /* Fixed height containers - page-specific */
         .chart-height { height: 350px; }
         .grid-height { height: 600px; }
@@ -375,6 +413,7 @@
                                         <div class="flex-shrink-0">
                                             <select class="form-select severity-filter" id="severityFilter" aria-label="Filter by severity">
                                                 <option value="">All Severities</option>
+                                                <option value="KEV">KEV</option>
                                                 <option value="Critical">Critical</option>
                                                 <option value="High">High</option>
                                                 <option value="Medium">Medium</option>
@@ -881,6 +920,128 @@
     <script type="module" src="scripts/shared/vulnerability-chart-manager.js"></script>
     <script type="module" src="scripts/shared/vulnerability-core.js"></script>
     <script type="module" src="scripts/pages/vulnerabilities.js"></script>
+
+    <!-- KEV Details Modal Script -->
+    <script>
+        /**
+         * Show KEV details modal for a specific CVE
+         * @param {string} cveId - CVE identifier
+         */
+        async function showKevDetails(cveId) {
+            if (!cveId) {
+                console.warn('No CVE ID provided for KEV details');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/kev/${cveId}`);
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        showNotification(`${cveId} is not in the CISA KEV catalog`, 'warning');
+                    } else {
+                        throw new Error(`Failed to fetch KEV data: ${response.statusText}`);
+                    }
+                    return;
+                }
+
+                const kevData = await response.json();
+
+                // Create modal content
+                const modalContent = `
+                    <div class="modal fade" id="kevDetailsModal" tabindex="-1" aria-labelledby="kevDetailsModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title" id="kevDetailsModalLabel">
+                                        🔥 Known Exploited Vulnerability: ${cveId}
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="alert alert-danger" role="alert">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <strong>Critical:</strong> This vulnerability is actively being exploited in the wild according to CISA.
+                                    </div>
+
+                                    <h6 class="fw-bold">Vulnerability Details</h6>
+                                    <div class="mb-3">
+                                        <strong>Name:</strong> ${kevData.vulnerability_name || 'N/A'}<br>
+                                        <strong>Vendor/Project:</strong> ${kevData.vendor_project || 'N/A'}<br>
+                                        <strong>Product:</strong> ${kevData.product || 'N/A'}<br>
+                                        <strong>Date Added to KEV:</strong> ${kevData.date_added ? new Date(kevData.date_added).toLocaleDateString() : 'N/A'}
+                                    </div>
+
+                                    <h6 class="fw-bold">Remediation Requirements</h6>
+                                    <div class="mb-3">
+                                        <strong>Required Action:</strong><br>
+                                        <div class="alert alert-warning">
+                                            ${kevData.required_action || 'No specific action documented'}
+                                        </div>
+                                        <strong>Due Date:</strong> ${kevData.due_date ? new Date(kevData.due_date).toLocaleDateString() : 'Not specified'}
+                                    </div>
+
+                                    ${kevData.known_ransomware_use ? `
+                                    <div class="alert alert-danger" role="alert">
+                                        <i class="fas fa-skull-crossbones me-2"></i>
+                                        <strong>Ransomware Campaign:</strong> This vulnerability has been used in ransomware campaigns.
+                                    </div>
+                                    ` : ''}
+
+                                    ${kevData.notes ? `
+                                    <h6 class="fw-bold">Additional Notes</h6>
+                                    <p>${kevData.notes.replace(
+                                        /(https?:\/\/[^\s]+)/g,
+                                        '<a href="$1" onclick="window.open(\'$1\', \'kev_popup\', \'width=1200,height=1200,scrollbars=yes,resizable=yes\'); return false;" style="color: #007bff; text-decoration: underline;">$1</a>'
+                                    )}</p>
+                                    ` : ''}
+
+                                    <div class="text-muted small">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Data source: CISA Known Exploited Vulnerabilities Catalog
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" onclick="showVulnerabilityDetailsByCVE('${cveId}')">
+                                        <i class="fas fa-info-circle me-2"></i>View CVE Details
+                                    </button>
+                                    <a href="https://nvd.nist.gov/vuln/detail/${cveId}" target="_blank" class="btn btn-primary">
+                                        <i class="fas fa-external-link-alt me-2"></i>NIST NVD
+                                    </a>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Remove existing modal if present
+                const existingModal = document.getElementById('kevDetailsModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+
+                // Add modal to DOM
+                document.body.insertAdjacentHTML('beforeend', modalContent);
+
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('kevDetailsModal'));
+                modal.show();
+
+                // Clean up modal when hidden
+                document.getElementById('kevDetailsModal').addEventListener('hidden.bs.modal', function() {
+                    this.remove();
+                }, { once: true });
+
+            } catch (error) {
+                console.error('Error showing KEV details:', error);
+                showNotification('Failed to load KEV details: ' + error.message, 'error');
+            }
+        }
+
+        // Make function globally available
+        window.showKevDetails = showKevDetails;
+    </script>
 
 </body>
 </html>
