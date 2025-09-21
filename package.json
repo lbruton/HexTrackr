@@ -1,6 +1,6 @@
 {
   "name": "hextrackr-server",
-  "version": "1.0.18",
+  "version": "1.0.17",
   "description": "HexTrackr with database backend",
   "main": "app/public/server.js",
   "type": "commonjs",
@@ -16,7 +16,7 @@
     "stylelint:fix": "stylelint '**/*.css' --fix",
     "docs:generate": "node app/public/docs-html/html-content-updater.js",
     "docs:analyze": "node app/public/scripts/generate-architecture-analysis.js && node app/public/docs-html/html-content-updater.js",
-    "docs:dev": "jsdoc -c jsdoc.dev.json && node app/scripts/inject-jsdoc-theme.js",
+    "docs:dev": "jsdoc -c jsdoc.dev.json && bash app/scripts/inject-jsdoc-theme-wrapper.sh",
     "docs:dev:watch": "nodemon --watch app --ext js --exec 'npm run docs:dev'",
     "docs:all": "npm run docs:dev && npm run docs:generate",
     "lint:md": "markdownlint --config .markdownlint.json --ignore-path .markdownlintignore '**/*.md'",
