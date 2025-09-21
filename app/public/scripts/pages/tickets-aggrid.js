@@ -600,6 +600,14 @@
     const originalGoToPage = HexagonTicketsManager.prototype.goToPage;
     const originalSortTable = HexagonTicketsManager.prototype.sortTable;
 
+    /**
+     * Initialize AG Grid integration for the tickets display.
+     * Creates the AG Grid instance and sets up theme management.
+     * Only initializes once to prevent duplicate grids.
+     *
+     * @this {HexagonTicketsManager}
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.initializeAgGrid = function initializeAgGrid() {
         if (this.agGridInitialized) {
             return;
@@ -660,6 +668,13 @@
         }
     };
 
+    /**
+     * Automatically resize grid columns to fit the available space.
+     * Uses requestAnimationFrame for smooth resizing and error handling.
+     *
+     * @this {HexagonTicketsManager}
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.sizeTicketsGridColumns = function sizeTicketsGridColumns() {
         if (!this.gridApi) {
             return;
@@ -676,6 +691,14 @@
         });
     };
 
+    /**
+     * Show or hide the empty state message based on whether tickets are available.
+     * Manages ARIA attributes for accessibility compliance.
+     *
+     * @this {HexagonTicketsManager}
+     * @param {boolean} hasRows - True if tickets are present, false if empty
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.toggleTicketsEmptyState = function toggleTicketsEmptyState(hasRows) {
         const emptyState = document.getElementById("ticketsGridEmptyState");
         if (!emptyState) {
@@ -693,6 +716,13 @@
         }
     };
 
+    /**
+     * Update pagination information and synchronize with AG Grid state.
+     * Calculates current page, page size, and total pages from grid state.
+     *
+     * @this {HexagonTicketsManager}
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.updatePaginationDisplay = function updatePaginationDisplay() {
         if (!this.gridApi) {
             this.currentPage = 1;
@@ -709,6 +739,14 @@
         this.currentPage = totalPages === 0 ? 1 : currentPageIndex + 1;
     };
 
+    /**
+     * Navigate to a specific page in the AG Grid pagination.
+     * Falls back to original implementation if AG Grid is not available.
+     *
+     * @this {HexagonTicketsManager}
+     * @param {number} pageNumber - 1-based page number to navigate to
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.goToPage = function goToPage(pageNumber) {
         if (this.gridApi) {
             const targetIndex = Math.max(0, pageNumber - 1);
@@ -723,6 +761,14 @@
         }
     };
 
+    /**
+     * Render tickets using AG Grid integration.
+     * Initializes AG Grid if needed and updates the grid with filtered ticket data.
+     * Falls back to original rendering if AG Grid initialization fails.
+     *
+     * @this {HexagonTicketsManager}
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.renderTickets = function renderTickets() {
         this.initializeAgGrid();
 
@@ -763,10 +809,25 @@
         this.updatePaginationDisplay();
     };
 
+    /**
+     * Update pagination information display.
+     * Alias for updatePaginationDisplay for backward compatibility.
+     *
+     * @this {HexagonTicketsManager}
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.updatePaginationInfo = function updatePaginationInfo() {
         this.updatePaginationDisplay();
     };
 
+    /**
+     * Apply sorting to the tickets grid with AG Grid integration.
+     * Synchronizes sorting between legacy implementation and AG Grid column state.
+     *
+     * @this {HexagonTicketsManager}
+     * @param {string} column - Column identifier to sort by
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.sortTable = function sortTable(column) {
         if (typeof originalSortTable === "function") {
             originalSortTable.call(this, column);
