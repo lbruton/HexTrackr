@@ -339,8 +339,32 @@ class HexagonTicketsManager {
         });
 
         // Shared documentation handling
-        document.getElementById("attachDocsBtn").addEventListener("click", () => {
-            document.getElementById("sharedDocsInput").click();
+        const attachBtn = document.getElementById("attachDocsBtn");
+        attachBtn.addEventListener("click", (e) => {
+            // Check if user is holding Shift key to clear attachments
+            if (e.shiftKey && this.sharedDocumentation && this.sharedDocumentation.length > 0) {
+                if (confirm(`Clear all ${this.sharedDocumentation.length} attached documentation file(s)?`)) {
+                    this.sharedDocumentation = [];
+                    this.saveSharedDocumentation();
+                    this.updateAttachmentTooltip();
+                    this.showToast("Documentation attachments cleared", "info");
+                }
+            } else {
+                document.getElementById("sharedDocsInput").click();
+            }
+        });
+
+        // Add context menu (right-click) to clear attachments
+        attachBtn.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            if (this.sharedDocumentation && this.sharedDocumentation.length > 0) {
+                if (confirm(`Clear all ${this.sharedDocumentation.length} attached documentation file(s)?`)) {
+                    this.sharedDocumentation = [];
+                    this.saveSharedDocumentation();
+                    this.updateAttachmentTooltip();
+                    this.showToast("Documentation attachments cleared", "info");
+                }
+            }
         });
 
         document.getElementById("sharedDocsInput").addEventListener("change", (e) => {
@@ -2007,7 +2031,7 @@ class HexagonTicketsManager {
         if (files.length === 0) {return;}
 
         this.sharedDocumentation = [];
-        
+
         for (const file of files) {
             try {
                 const base64Content = await this.fileToBase64(file);
@@ -2024,6 +2048,7 @@ class HexagonTicketsManager {
         }
 
         this.saveSharedDocumentation();
+        this.updateAttachmentTooltip(); // Update tooltip to show new files
         this.showToast(`${files.length} documentation file(s) uploaded successfully!`, "success");
     }
 
@@ -2037,6 +2062,57 @@ class HexagonTicketsManager {
         const saved = localStorage.getItem("hexagon_shared_docs");
         if (saved) {
             this.sharedDocumentation = JSON.parse(saved);
+            // Update the button tooltip to show loaded files
+            this.updateAttachmentTooltip();
+        }
+    }
+
+    // Update the attachment button tooltip and appearance
+    updateAttachmentTooltip() {
+        const btn = document.getElementById("attachDocsBtn");
+        const countBadge = document.getElementById("attachDocsCount");
+
+        if (!btn) return;
+
+        // Initialize or get existing Bootstrap tooltip instance
+        let tooltipInstance = bootstrap.Tooltip.getInstance(btn);
+        if (!tooltipInstance) {
+            tooltipInstance = new bootstrap.Tooltip(btn);
+        }
+
+        if (this.sharedDocumentation && this.sharedDocumentation.length > 0) {
+            // Format file list for tooltip
+            const fileList = this.sharedDocumentation.map(doc => {
+                const sizeKB = (doc.size / 1024).toFixed(1);
+                return `• ${doc.name} (${sizeKB} KB)`;
+            }).join('<br>');
+
+            const tooltipContent = `<strong>Attached Documentation:</strong><br>${fileList}<br><br><small><em>Shift+Click or Right-Click to clear</em></small>`;
+
+            // Update tooltip content
+            tooltipInstance.setContent({ '.tooltip-inner': tooltipContent });
+
+            // Update button appearance
+            btn.classList.remove("btn-outline-secondary");
+            btn.classList.add("btn-outline-primary");
+
+            // Show file count badge
+            if (countBadge) {
+                countBadge.textContent = this.sharedDocumentation.length;
+                countBadge.style.display = "inline-block";
+            }
+        } else {
+            // No files attached
+            tooltipInstance.setContent({ '.tooltip-inner': 'No documentation attached' });
+
+            // Reset button appearance
+            btn.classList.remove("btn-outline-primary");
+            btn.classList.add("btn-outline-secondary");
+
+            // Hide file count badge
+            if (countBadge) {
+                countBadge.style.display = "none";
+            }
         }
     }
 
