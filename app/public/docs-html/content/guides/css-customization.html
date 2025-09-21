@@ -383,6 +383,54 @@ cellRenderer: (params) =&gt; {
   <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
   <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-primary);
   <span class="hljs-comment">/* Never hardcode: background: #fff; color: #000; */</span>
+}</code></pre><p><strong>Issue</strong>: Modal components not inheriting theme properly</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ❌ Problem: Modal not using theme-aware selectors */</span>
+<span class="hljs-selector-class">.modal-content</span> { <span class="hljs-attribute">background</span>: <span class="hljs-number">#ffffff</span>; <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-number">#e2e8f0</span>; }
+
+<span class="hljs-comment">/* ✅ Solution: Use data-bs-theme selector and CSS variables */</span>
+<span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;dark&quot;</span>]</span> <span class="hljs-selector-class">.modal-content</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-modal-bg);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--hextrackr-border);
+}</code></pre><p><strong>Issue</strong>: Card borders inconsistent between light and dark themes</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ❌ Problem: Hard-coded border values */</span>
+<span class="hljs-selector-class">.device-card</span> { <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-number">#e2e8f0</span>; }
+
+<span class="hljs-comment">/* ✅ Solution: Use theme-responsive border hierarchy */</span>
+<span class="hljs-selector-class">.device-card</span> {
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--hextrackr-border-subtle);
+  <span class="hljs-comment">/* Automatically adapts: rgba(0,0,0,0.08) light, rgba(255,255,255,0.08) dark */</span>
+}</code></pre><p><strong>Issue</strong>: VPR score colors not readable in dark mode</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ❌ Problem: Light mode colors used in dark theme */</span>
+<span class="hljs-selector-class">.vpr-critical</span> { <span class="hljs-attribute">color</span>: <span class="hljs-number">#dc2626</span>; } <span class="hljs-comment">/* Too dark for dark backgrounds */</span>
+
+<span class="hljs-comment">/* ✅ Solution: Use VPR variables that adapt per theme */</span>
+<span class="hljs-selector-class">.vpr-critical</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--vpr-critical);
+  <span class="hljs-comment">/* #dc2626 in light mode, #f87171 in dark mode */</span>
+}</code></pre><p><strong>Issue</strong>: Ticket accent colors have poor contrast</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ❌ Problem: Same colors used for light and dark backgrounds */</span>
+<span class="hljs-selector-class">.ticket-blue</span> { <span class="hljs-attribute">color</span>: <span class="hljs-number">#3b82f6</span>; } <span class="hljs-comment">/* Poor contrast on dark backgrounds */</span>
+
+<span class="hljs-comment">/* ✅ Solution: Use theme-specific ticket accent variables */</span>
+<span class="hljs-selector-class">.ticket-blue</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--ticket-accent-blue);
+  <span class="hljs-comment">/* #2563eb (light), #60a5fa (dark) - both WCAG AA compliant */</span>
+}</code></pre><p><strong>Issue</strong>: CSS transitions causing performance issues</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ❌ Problem: Transitioning all properties */</span>
+<span class="hljs-selector-class">.card</span> { <span class="hljs-attribute">transition</span>: all <span class="hljs-number">250ms</span> ease; }
+
+<span class="hljs-comment">/* ✅ Solution: Only transition properties that change */</span>
+<span class="hljs-selector-class">.card</span> {
+  <span class="hljs-attribute">transition</span>: background-color <span class="hljs-built_in">var</span>(--hextrackr-transition-fast) <span class="hljs-built_in">var</span>(--hextrackr-ease-out),
+              border-color <span class="hljs-built_in">var</span>(--hextrackr-transition-fast) <span class="hljs-built_in">var</span>(--hextrackr-ease-out);
+}</code></pre><p><strong>Issue</strong>: AG-Grid theme not switching properly</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ❌ Problem: Not registering grid with theme manager</span>
+<span class="hljs-keyword">const</span> gridApi = <span class="hljs-title function_">createGrid</span>(gridDiv, gridOptions);
+
+<span class="hljs-comment">// ✅ Solution: Register with AGGridThemeManager</span>
+<span class="hljs-keyword">const</span> gridApi = <span class="hljs-title function_">createGrid</span>(gridDiv, gridOptions);
+<span class="hljs-keyword">if</span> (<span class="hljs-variable language_">window</span>.<span class="hljs-property">agGridThemeManager</span>) {
+  <span class="hljs-variable language_">window</span>.<span class="hljs-property">agGridThemeManager</span>.<span class="hljs-title function_">registerGrid</span>(<span class="hljs-string">&#x27;myGrid&#x27;</span>, gridApi, gridDiv);
 }</code></pre><hr>
 <h2>Tools and Validation</h2><h3>CSS Variable Inspector</h3><p>Use browser Developer Tools to inspect CSS variables:</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Console command to check current theme variables</span>
@@ -397,6 +445,98 @@ cellRenderer: (params) =&gt; {
 <li><input disabled="" type="checkbox"> Animations don&#39;t conflict with theme switching</li>
 </ul>
 <hr>
+<h2>Performance Optimization</h2><h3>CSS Performance Best Practices</h3><h4>1. CSS Variable Optimization</h4><pre><code class="language-css"><span class="hljs-comment">/* ✅ GOOD: Use CSS custom properties for efficient theme switching */</span>
+<span class="hljs-selector-class">.component</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-primary);
+  <span class="hljs-comment">/* Browser can optimize variable lookups */</span>
+}
+
+<span class="hljs-comment">/* ❌ AVOID: Excessive calculations in CSS variables */</span>
+<span class="hljs-selector-class">.component</span> {
+  <span class="hljs-comment">/* Avoid complex calc() expressions that run on every paint */</span>
+  <span class="hljs-attribute">width</span>: <span class="hljs-built_in">calc</span>(<span class="hljs-built_in">var</span>(--hextrackr-space-<span class="hljs-number">4</span>) * <span class="hljs-number">3.5</span> + <span class="hljs-built_in">var</span>(--hextrackr-space-<span class="hljs-number">2</span>) / <span class="hljs-number">2</span>);
+}</code></pre><h4>2. Selector Performance</h4><pre><code class="language-css"><span class="hljs-comment">/* ✅ GOOD: Low specificity, efficient selectors */</span>
+<span class="hljs-selector-class">.device-card</span> { }
+<span class="hljs-selector-class">.vpr-mini-card</span> { }
+
+<span class="hljs-comment">/* ❌ AVOID: Complex selectors that impact performance */</span>
+<span class="hljs-selector-class">.page</span> <span class="hljs-selector-class">.container</span> <span class="hljs-selector-class">.row</span> <span class="hljs-selector-class">.col</span> <span class="hljs-selector-class">.card</span> <span class="hljs-selector-class">.device-card</span> <span class="hljs-selector-class">.vpr-mini-card</span> { }</code></pre><h4>3. CSS Containment</h4><pre><code class="language-css"><span class="hljs-comment">/* ✅ GOOD: Use CSS containment for large card grids */</span>
+<span class="hljs-selector-class">.device-cards-container</span> {
+  <span class="hljs-attribute">contain</span>: layout style paint;
+  <span class="hljs-comment">/* Isolates layout changes within container */</span>
+}
+
+<span class="hljs-selector-class">.vulnerability-cards-container</span> {
+  <span class="hljs-attribute">contain</span>: layout style;
+  <span class="hljs-comment">/* Prevents style recalculation cascading */</span>
+}</code></pre><h4>4. Theme Switching Performance</h4><pre><code class="language-css"><span class="hljs-comment">/* ✅ GOOD: Efficient theme transitions */</span>
+<span class="hljs-selector-class">.card</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">transition</span>: background-color <span class="hljs-built_in">var</span>(--hextrackr-transition-fast) <span class="hljs-built_in">var</span>(--hextrackr-ease-out);
+  <span class="hljs-comment">/* Only animate properties that change between themes */</span>
+}
+
+<span class="hljs-comment">/* ❌ AVOID: Transition all properties */</span>
+<span class="hljs-selector-class">.card</span> {
+  <span class="hljs-attribute">transition</span>: all <span class="hljs-number">250ms</span> ease; <span class="hljs-comment">/* Can cause layout thrashing */</span>
+}</code></pre><h3>Performance Monitoring</h3><h4>CSS Variable Inspector</h4><p>Use browser Developer Tools to monitor CSS variable performance:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Console command to check CSS variable usage</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">getAllCSSVariables</span> = (<span class="hljs-params"></span>) =&gt; {
+  <span class="hljs-keyword">const</span> style = <span class="hljs-title function_">getComputedStyle</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>);
+  <span class="hljs-keyword">const</span> variables = {};
+
+  <span class="hljs-comment">// Check HexTrackr variables</span>
+  [<span class="hljs-string">&#x27;--hextrackr-primary&#x27;</span>, <span class="hljs-string">&#x27;--hextrackr-surface-base&#x27;</span>, <span class="hljs-string">&#x27;--vpr-critical&#x27;</span>].<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">prop</span> =&gt;</span> {
+    variables[prop] = style.<span class="hljs-title function_">getPropertyValue</span>(prop);
+  });
+
+  <span class="hljs-keyword">return</span> variables;
+};
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">table</span>(<span class="hljs-title function_">getAllCSSVariables</span>());</code></pre><h4>Performance Checklist</h4><ul>
+<li><input disabled="" type="checkbox"> <strong>CSS containment</strong> applied to card containers</li>
+<li><input disabled="" type="checkbox"> <strong>Transition properties</strong> limited to changing values only</li>
+<li><input disabled="" type="checkbox"> <strong>Selector specificity</strong> kept under 3 levels deep</li>
+<li><input disabled="" type="checkbox"> <strong>Variable calculations</strong> minimized in frequently updated components</li>
+<li><input disabled="" type="checkbox"> <strong>Theme switching</strong> completes under 16ms for 60fps</li>
+<li><input disabled="" type="checkbox"> <strong>Large lists</strong> (50+ items) use <code>contain: layout style paint</code></li>
+</ul>
+<h3>CSS Containment Strategies</h3><h4>Layout Containment</h4><pre><code class="language-css"><span class="hljs-comment">/* Isolate layout changes within card grids */</span>
+<span class="hljs-selector-class">.ag-grid-theme-container</span> {
+  <span class="hljs-attribute">contain</span>: layout;
+  <span class="hljs-comment">/* Prevents AG-Grid layout changes from affecting parent */</span>
+}
+
+<span class="hljs-selector-class">.modal-content</span> {
+  <span class="hljs-attribute">contain</span>: layout style;
+  <span class="hljs-comment">/* Isolates modal content for better scrolling performance */</span>
+}</code></pre><h4>Paint Containment</h4><pre><code class="language-css"><span class="hljs-comment">/* Optimize rendering for frequently updated components */</span>
+<span class="hljs-selector-class">.vpr-score-indicator</span> {
+  <span class="hljs-attribute">contain</span>: paint;
+  <span class="hljs-comment">/* Changes to VPR scores don&#x27;t repaint surrounding elements */</span>
+}
+
+<span class="hljs-selector-class">.sortable-ghost</span> {
+  <span class="hljs-attribute">contain</span>: layout paint;
+  <span class="hljs-comment">/* Dragging animations stay contained */</span>
+}</code></pre><h4>Style Containment</h4><pre><code class="language-css"><span class="hljs-comment">/* Prevent style recalculation cascading */</span>
+<span class="hljs-selector-class">.device-security-modal</span> <span class="hljs-selector-class">.card</span> {
+  <span class="hljs-attribute">contain</span>: style;
+  <span class="hljs-comment">/* Modal-specific styling doesn&#x27;t affect page styles */</span>
+}</code></pre><h3>Memory Optimization</h3><h4>CSS Custom Property Cleanup</h4><pre><code class="language-javascript"><span class="hljs-comment">// Remove unused CSS variables on page unload</span>
+<span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;beforeunload&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-comment">// Clear any dynamically created CSS variables</span>
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">window</span>.<span class="hljs-property">vulnModalData</span>) {
+    <span class="hljs-keyword">delete</span> <span class="hljs-variable language_">window</span>.<span class="hljs-property">vulnModalData</span>;
+  }
+});</code></pre><h4>Theme Asset Loading</h4><pre><code class="language-css"><span class="hljs-comment">/* Preload critical theme assets */</span>
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">prefers-color-scheme</span>: dark) {
+  <span class="hljs-comment">/* Dark theme assets are only loaded when needed */</span>
+  <span class="hljs-selector-class">.ag-theme-quartz-dark</span> {
+    <span class="hljs-comment">/* Dark theme styles */</span>
+  }
+}</code></pre><hr>
 <h2>Related Documentation</h2><ul>
 <li><a href="#architecture/theme-architecture">Theme Architecture</a> - Technical theme system details</li>
 <li><a href="#architecture/frontend">Frontend Architecture</a> - Component integration patterns</li>
