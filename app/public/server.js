@@ -24,6 +24,7 @@ const DatabaseService = require("../services/databaseService");
 const VulnerabilityController = require("../controllers/vulnerabilityController");
 const TicketController = require("../controllers/ticketController");
 const BackupController = require("../controllers/backupController");
+const TemplateController = require("../controllers/templateController");
 const ImportController = require("../controllers/importController");
 const DocsController = require("../controllers/docsController");
 
@@ -33,6 +34,7 @@ const ticketRoutes = require("../routes/tickets");
 const importRoutes = require("../routes/imports");
 const backupRoutes = require("../routes/backup");
 const docsRoutes = require("../routes/docs");
+const templateRoutes = require("../routes/templates");
 
 // Express application & HTTP server
 const app = express();
@@ -90,6 +92,15 @@ async function initializeApplication() {
     VulnerabilityController.initialize(db, progressTracker);
     TicketController.initialize(db);
     BackupController.initialize(db);
+    TemplateController.initialize(db);
+
+    // Seed email templates (v1.0.21 feature)
+    const { seedEmailTemplates } = require("../utils/seedEmailTemplates");
+    try {
+        await seedEmailTemplates(db);
+    } catch (seedError) {
+        console.error("⚠️ Failed to seed email templates:", seedError.message);
+    }
 
     // Apply middleware configuration
     app.use(cors(middlewareConfig.cors));
@@ -134,6 +145,7 @@ async function initializeApplication() {
     app.use("/api/vulnerabilities", vulnerabilityRoutes);
     app.use("/api", importRoutes); // handles /vulnerabilities/import, /import/tickets, /imports, etc.
     app.use("/api/tickets", ticketRoutes);
+    app.use("/api/templates", templateRoutes);
 
     // Legacy lightweight endpoints retained from monolith
     app.get("/api/sites", (req, res) => {
