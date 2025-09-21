@@ -91,8 +91,6 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             minWidth: 70,
             maxWidth: 120,
             resizable: true,
-            aggFunc: "sum",
-            enableValue: true,
             cellRenderer: (params) => {
                 const score = parseFloat(params.value) || 0;
                 let className = "severity-low";
@@ -302,10 +300,10 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
         rowHeight: 42,
         suppressRowTransform: false,
         
-        // Enhanced features for requirements
-        enableRangeSelection: true,
-        enableRangeHandle: true,
-        enableFillHandle: true,
+        // Enhanced features for requirements (Community edition only)
+        // enableRangeSelection: true, // Enterprise feature - removed
+        // enableRangeHandle: true, // Enterprise feature - removed
+        // enableFillHandle: true, // Enterprise feature - removed
         
         // Column sizing enhancements
         maintainColumnOrder: true,

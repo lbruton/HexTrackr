@@ -80,7 +80,7 @@ class DocumentationTableConverter {
                     minWidth: 100
                 },
                 animateRows: true,
-                enableRangeSelection: true,
+                // enableRangeSelection: true, // Enterprise feature - removed
                 suppressMovableColumns: false,
                 suppressMenuHide: true,
                 onGridReady: (params) => {
