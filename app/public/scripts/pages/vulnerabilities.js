@@ -2,8 +2,8 @@
 /* eslint-env browser, es6 */
 /* global window */
 
-// Import ES6 modules
-import { VulnerabilityCoreOrchestrator } from '../shared/vulnerability-core.js';
+// Import ES6 modules - converted to global references for browser compatibility
+// import { VulnerabilityCoreOrchestrator } from '../shared/vulnerability-core.js'; // Changed to global reference
  
 
 /**
@@ -38,7 +38,7 @@ export class ModernVulnManager {
      */
     async initializeModules() {
         // Initialize core orchestrator - it will create and coordinate all modules
-        this.coreOrchestrator = new VulnerabilityCoreOrchestrator();
+        this.coreOrchestrator = new window.VulnerabilityCoreOrchestrator();
         
         // Let orchestrator handle all module creation and wiring
         await this.coreOrchestrator.initializeAllModules(this);
