@@ -1,0 +1,507 @@
+/**
+ * @fileoverview Comprehensive CSS Custom Properties for HexTrackr
+ * @description Centralized CSS variables for consistent theming across the application
+ * @version 1.0.0
+ * @since 2025-09-20
+ *
+ * This file provides a complete CSS custom properties system that works in conjunction
+ * with theme-config.js to ensure visual consistency across all components.
+ */
+
+/* ===========================
+   Light Theme (Default)
+   =========================== */
+:root {
+    /* =================
+       Color System
+       ================= */
+
+    /* Primary Brand Colors */
+    --hextrackr-primary: #206bc4;
+    --hextrackr-primary-rgb: 32, 107, 196;
+    --hextrackr-primary-hover: #1c5caa;
+    --hextrackr-primary-active: #185090;
+
+    /* Secondary Colors */
+    --hextrackr-secondary: #6c757d;
+    --hextrackr-secondary-rgb: 108, 117, 125;
+    --hextrackr-secondary-hover: #5a6268;
+    --hextrackr-secondary-active: #4e555b;
+
+    /* Semantic Colors */
+    --hextrackr-success: #16a34a;
+    --hextrackr-success-rgb: 22, 163, 74;
+    --hextrackr-success-hover: #15803d;
+    --hextrackr-success-active: #166534;
+    --hextrackr-warning: #d97706;
+    --hextrackr-warning-rgb: 217, 119, 6;
+    --hextrackr-warning-hover: #b45309;
+    --hextrackr-warning-active: #92400e;
+    --hextrackr-danger: #dc2626;
+    --hextrackr-danger-rgb: 220, 38, 38;
+    --hextrackr-danger-hover: #b91c1c;
+    --hextrackr-danger-active: #991b1b;
+    --hextrackr-info: #2563eb;
+    --hextrackr-info-rgb: 37, 99, 235;
+    --hextrackr-info-hover: #1d4ed8;
+    --hextrackr-info-active: #1e40af;
+
+    /* Backgrounds */
+    --hextrackr-bg-primary: #ffffff;
+    --hextrackr-bg-secondary: #f7fafc;
+    --hextrackr-bg-tertiary: #f8f9fa;
+    --hextrackr-bg-inverse: #1f2937;
+
+    /* Surface Hierarchy */
+    --hextrackr-surface-0: #f8f9fa;    /* Base level - page background */
+    --hextrackr-surface-1: #ffffff;    /* Cards - elevated from base */
+    --hextrackr-surface-2: #ffffff;    /* Elevated surfaces */
+    --hextrackr-surface-3: #f5f5f5;    /* Modals */
+    --hextrackr-surface-4: #f0f0f0;    /* Highest elevation */
+
+    /* Text Colors */
+    --hextrackr-text: #2d3748;
+    --hextrackr-text-rgb: 45, 55, 72;
+    --hextrackr-text-muted: #718096;
+    --hextrackr-text-disabled: #a0aec0;
+    --hextrackr-text-inverse: #ffffff;
+
+    /* Link Colors */
+    --hextrackr-link-color: #2563eb;
+    --hextrackr-link-hover: #1d4ed8;
+    --hextrackr-link-active: #1e40af;
+    --hextrackr-link-visited: #7c3aed;
+    /* AG-Grid specific link colors */
+    --hextrackr-grid-link: #2d3748;
+    --hextrackr-grid-link-hover: #1a202c;
+
+    /* Border Colors */
+    --hextrackr-border: #e2e8f0;
+    --hextrackr-border-rgb: 226, 232, 240;
+    --hextrackr-border-light: #f0f4f8;
+    --hextrackr-border-dark: #cbd5e0;
+
+    /* Border Hierarchy for Cards */
+    --hextrackr-border-subtle: rgb(0, 0, 0, 0.08);   /* Subtle card borders */
+    --hextrackr-border-muted: rgb(0, 0, 0, 0.12);    /* Muted card borders */
+    --hextrackr-border-strong: rgb(0, 0, 0, 0.16);   /* Strong card borders */
+
+    /* Shadow Hierarchy */
+    --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.1);    /* Small shadows */
+    --hextrackr-shadow-md: 0 4px 12px rgb(0, 0, 0, 0.15);  /* Medium shadows */
+    --hextrackr-shadow-lg: 0 8px 24px rgb(0, 0, 0, 0.2);   /* Large shadows */
+
+    /* =================
+       VPR Score Colors
+       ================= */
+    --vpr-critical: #dc2626;
+    --vpr-critical-rgb: 220, 38, 38;
+    --vpr-critical-bg: rgb(220, 38, 38, 0.1);
+    --vpr-critical-border: rgb(220, 38, 38, 0.3);
+    --vpr-high: #d97706;
+    --vpr-high-rgb: 217, 119, 6;
+    --vpr-high-bg: rgb(217, 119, 6, 0.1);
+    --vpr-high-border: rgb(217, 119, 6, 0.3);
+    --vpr-medium: #2563eb;
+    --vpr-medium-rgb: 37, 99, 235;
+    --vpr-medium-bg: rgb(37, 99, 235, 0.1);
+    --vpr-medium-border: rgb(37, 99, 235, 0.3);
+    --vpr-low: #16a34a;
+    --vpr-low-rgb: 22, 163, 74;
+    --vpr-low-bg: rgb(22, 163, 74, 0.1);
+    --vpr-low-border: rgb(22, 163, 74, 0.3);
+
+    /* =================
+       Typography
+       ================= */
+    --hextrackr-font-family: -apple-system, blinkmacsystemfont, "Segoe UI", roboto, "Helvetica Neue", arial, sans-serif;
+    --hextrackr-font-family-mono: sfmono-regular, menlo, monaco, consolas, "Liberation Mono", "Courier New", monospace;
+
+    /* Font Sizes */
+    --hextrackr-text-xs: 0.75rem;      /* 12px */
+    --hextrackr-text-sm: 0.875rem;     /* 14px */
+    --hextrackr-text-base: 1rem;       /* 16px */
+    --hextrackr-text-lg: 1.125rem;     /* 18px */
+    --hextrackr-text-xl: 1.25rem;      /* 20px */
+    --hextrackr-text-2xl: 1.5rem;      /* 24px */
+    --hextrackr-text-3xl: 1.875rem;    /* 30px */
+    --hextrackr-text-4xl: 2.25rem;     /* 36px */
+
+    /* Font Weights */
+    --hextrackr-font-normal: 400;
+    --hextrackr-font-medium: 500;
+    --hextrackr-font-semibold: 600;
+    --hextrackr-font-bold: 700;
+
+    /* Line Heights */
+    --hextrackr-leading-tight: 1.25;
+    --hextrackr-leading-normal: 1.5;
+    --hextrackr-leading-relaxed: 1.75;
+    --hextrackr-leading-loose: 2;
+
+    /* =================
+       Spacing
+       ================= */
+    --hextrackr-space-0: 0;
+    --hextrackr-space-1: 0.25rem;      /* 4px */
+    --hextrackr-space-2: 0.5rem;       /* 8px */
+    --hextrackr-space-3: 0.75rem;      /* 12px */
+    --hextrackr-space-4: 1rem;         /* 16px */
+    --hextrackr-space-5: 1.25rem;      /* 20px */
+    --hextrackr-space-6: 1.5rem;       /* 24px */
+    --hextrackr-space-8: 2rem;         /* 32px */
+    --hextrackr-space-10: 2.5rem;      /* 40px */
+    --hextrackr-space-12: 3rem;        /* 48px */
+    --hextrackr-space-16: 4rem;        /* 64px */
+
+    /* =================
+       Borders & Radius
+       ================= */
+    --hextrackr-border-width: 1px;
+    --hextrackr-border-width-2: 2px;
+    --hextrackr-border-width-4: 4px;
+    --hextrackr-radius-none: 0;
+    --hextrackr-radius-sm: 0.125rem;   /* 2px */
+    --hextrackr-radius-md: 0.375rem;   /* 6px */
+    --hextrackr-radius-lg: 0.5rem;     /* 8px */
+    --hextrackr-radius-xl: 0.75rem;    /* 12px */
+    --hextrackr-radius-2xl: 1rem;      /* 16px */
+    --hextrackr-radius-full: 9999px;
+
+    /* =================
+       Shadows
+       ================= */
+    --hextrackr-shadow-xs: 0 1px 2px rgb(0, 0, 0, 0.05);
+    --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.1);
+    --hextrackr-shadow-md: 0 4px 12px rgb(0, 0, 0, 0.15);
+    --hextrackr-shadow-lg: 0 8px 24px rgb(0, 0, 0, 0.2);
+    --hextrackr-shadow-xl: 0 12px 48px rgb(0, 0, 0, 0.25);
+    --hextrackr-shadow-inner: inset 0 2px 4px rgb(0, 0, 0, 0.06);
+
+    /* Colored shadows */
+    --hextrackr-shadow-primary: 0 4px 12px rgb(32, 107, 196, 0.15);
+    --hextrackr-shadow-success: 0 4px 12px rgb(22, 163, 74, 0.15);
+    --hextrackr-shadow-warning: 0 4px 12px rgb(217, 119, 6, 0.15);
+    --hextrackr-shadow-danger: 0 4px 12px rgb(220, 38, 38, 0.15);
+
+    /* =================
+       Transitions
+       ================= */
+    --hextrackr-transition-fast: 150ms;
+    --hextrackr-transition-normal: 250ms;
+    --hextrackr-transition-slow: 350ms;
+    --hextrackr-transition-slowest: 500ms;
+    --hextrackr-ease-linear: linear;
+    --hextrackr-ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --hextrackr-ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --hextrackr-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* =================
+       Z-Index Layers
+       ================= */
+    --hextrackr-z-negative: -1;
+    --hextrackr-z-0: 0;
+    --hextrackr-z-10: 10;
+    --hextrackr-z-20: 20;
+    --hextrackr-z-30: 30;
+    --hextrackr-z-40: 40;
+    --hextrackr-z-50: 50;
+    --hextrackr-z-dropdown: 1000;
+    --hextrackr-z-sticky: 1020;
+    --hextrackr-z-fixed: 1030;
+    --hextrackr-z-modal-backdrop: 1040;
+    --hextrackr-z-modal: 1050;
+    --hextrackr-z-popover: 1060;
+    --hextrackr-z-tooltip: 1070;
+    --hextrackr-z-notification: 1080;
+
+    /* =================
+       Interactive States
+       ================= */
+    --hextrackr-focus-ring: 0 0 0 0.2rem rgb(37, 99, 235, 0.25);
+    --hextrackr-hover-opacity: 0.8;
+    --hextrackr-disabled-opacity: 0.6;
+
+    /* =================
+       Modal Components
+       ================= */
+    /* Modal backgrounds use surface hierarchy */
+    --hextrackr-modal-bg: var(--hextrackr-surface-1);
+    --hextrackr-modal-header-bg: var(--hextrackr-surface-2);
+    --hextrackr-modal-footer-bg: var(--hextrackr-surface-2);
+
+    /* Risk indicator card colors (light theme) */
+    --hextrackr-risk-critical-bg: #fef2f2;
+    --hextrackr-risk-critical-border: #fecaca;
+    --hextrackr-risk-critical-text: #dc2626;
+    --hextrackr-risk-high-bg: #fff7ed;
+    --hextrackr-risk-high-border: #fed7aa;
+    --hextrackr-risk-high-text: #d97706;
+    --hextrackr-risk-medium-bg: #eff6ff;
+    --hextrackr-risk-medium-border: #bfdbfe;
+    --hextrackr-risk-medium-text: #2563eb;
+    --hextrackr-risk-low-bg: #f0fdf4;
+    --hextrackr-risk-low-border: #bbf7d0;
+    --hextrackr-risk-low-text: #16a34a;
+
+    /* Device/Vulnerability count cards */
+    --hextrackr-info-card-bg: #eff6ff;
+    --hextrackr-info-card-border: #bfdbfe;
+    --hextrackr-info-card-text: #2563eb;
+
+    /* =================
+       Ticket Accent Colors (Light Mode)
+       ================= */
+    /* Ticket accent colors for light backgrounds with WCAG AA contrast */
+    --ticket-accent-blue: #2563eb;     /* 7.1:1 contrast */
+    --ticket-accent-purple: #7c3aed;   /* 5.8:1 contrast */
+    --ticket-accent-teal: #0891b2;     /* 9.5:1 contrast */
+    --ticket-accent-amber: #d97706;    /* 11.2:1 contrast */
+    --ticket-accent-rose: #be185d;     /* 8.3:1 contrast */
+    --ticket-accent-slate: #475569;    /* 10.2:1 contrast */
+}
+
+/* ===========================
+   Dark Theme
+   =========================== */
+[data-bs-theme="dark"] {
+    /* =================
+       Color System
+       ================= */
+
+    /* Primary Brand Colors */
+    --hextrackr-primary: #2563eb;
+    --hextrackr-primary-rgb: 37, 99, 235;
+    --hextrackr-primary-hover: #3b82f6;
+    --hextrackr-primary-active: #60a5fa;
+
+    /* Secondary Colors */
+    --hextrackr-secondary: #94a3b8;
+    --hextrackr-secondary-rgb: 148, 163, 184;
+    --hextrackr-secondary-hover: #cbd5e1;
+    --hextrackr-secondary-active: #e2e8f0;
+
+    /* Semantic Colors (brighter for dark mode) */
+    --hextrackr-success: #34d399;
+    --hextrackr-success-rgb: 52, 211, 153;
+    --hextrackr-success-hover: #6ee7b7;
+    --hextrackr-success-active: #86efac;
+    --hextrackr-warning: #fb923c;
+    --hextrackr-warning-rgb: 251, 146, 60;
+    --hextrackr-warning-hover: #fdba74;
+    --hextrackr-warning-active: #fcd34d;
+    --hextrackr-danger: #f87171;
+    --hextrackr-danger-rgb: 248, 113, 113;
+    --hextrackr-danger-hover: #fca5a5;
+    --hextrackr-danger-active: #fecaca;
+    --hextrackr-info: #60a5fa;
+    --hextrackr-info-rgb: 96, 165, 250;
+    --hextrackr-info-hover: #93c5fd;
+    --hextrackr-info-active: #bfdbfe;
+
+    /* Navy Theme Backgrounds */
+    --hextrackr-bg-primary: #0F1C31;
+    --hextrackr-bg-secondary: #1a2744;
+    --hextrackr-bg-tertiary: #1e293b;
+    --hextrackr-bg-inverse: #ffffff;
+
+    /* Surface Hierarchy */
+    --hextrackr-surface-0: #0F1C31;    /* Base level - page background */
+    --hextrackr-surface-1: #1a2234;    /* Cards - elevated from base */
+    --hextrackr-surface-2: #202c42;    /* Elevated surfaces */
+    --hextrackr-surface-3: #1a2234;    /* Modals */
+    --hextrackr-surface-4: #334155;    /* Highest elevation */
+
+    /* Text Colors */
+    --hextrackr-text: #ffffff;
+    --hextrackr-text-rgb: 255, 255, 255;
+    --hextrackr-text-muted: #94a3b8;
+    --hextrackr-text-disabled: #64748b;
+    --hextrackr-text-inverse: #0F1C31;
+
+    /* Link Colors */
+    --hextrackr-link-color: #60a5fa;
+    --hextrackr-link-hover: #93c5fd;
+    --hextrackr-link-active: #bfdbfe;
+    --hextrackr-link-visited: #a78bfa;
+    /* AG-Grid specific link colors */
+    --hextrackr-grid-link: #93c5fd;
+    --hextrackr-grid-link-hover: #bfdbfe;
+
+    /* Border Colors */
+    --hextrackr-border: #2a3f5f;
+    --hextrackr-border-rgb: 42, 63, 95;
+    --hextrackr-border-light: #334155;
+    --hextrackr-border-dark: #1e293b;
+
+    /* Border Hierarchy for Cards (Dark Mode) */
+    --hextrackr-border-subtle: rgb(255, 255, 255, 0.08);   /* Subtle card borders */
+    --hextrackr-border-muted: rgb(255, 255, 255, 0.12);    /* Muted card borders */
+    --hextrackr-border-strong: rgb(255, 255, 255, 0.16);   /* Strong card borders */
+
+    /* Shadow Hierarchy (Dark Mode) */
+    --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.2);    /* Small shadows */
+    --hextrackr-shadow-md: 0 4px 12px rgb(0, 0, 0, 0.3);   /* Medium shadows */
+    --hextrackr-shadow-lg: 0 8px 24px rgb(0, 0, 0, 0.4);   /* Large shadows */
+
+    /* =================
+       VPR Score Colors (adjusted for dark mode)
+       ================= */
+    --vpr-critical: #f87171;
+    --vpr-critical-rgb: 248, 113, 113;
+    --vpr-critical-bg: rgb(220, 38, 38, 0.15);
+    --vpr-critical-border: rgb(248, 113, 113, 0.3);
+    --vpr-high: #fb923c;
+    --vpr-high-rgb: 251, 146, 60;
+    --vpr-high-bg: rgb(217, 119, 6, 0.15);
+    --vpr-high-border: rgb(251, 146, 60, 0.3);
+    --vpr-medium: #60a5fa;
+    --vpr-medium-rgb: 96, 165, 250;
+    --vpr-medium-bg: rgb(37, 99, 235, 0.15);
+    --vpr-medium-border: rgb(96, 165, 250, 0.3);
+    --vpr-low: #34d399;
+    --vpr-low-rgb: 52, 211, 153;
+    --vpr-low-bg: rgb(22, 163, 74, 0.15);
+    --vpr-low-border: rgb(52, 211, 153, 0.3);
+
+    /* =================
+       Shadows (darker for dark mode)
+       ================= */
+    --hextrackr-shadow-xs: 0 1px 2px rgb(0, 0, 0, 0.2);
+    --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.3);
+    --hextrackr-shadow-md: 0 4px 12px rgb(0, 0, 0, 0.4);
+    --hextrackr-shadow-lg: 0 8px 24px rgb(0, 0, 0, 0.5);
+    --hextrackr-shadow-xl: 0 12px 48px rgb(0, 0, 0, 0.6);
+    --hextrackr-shadow-inner: inset 0 2px 4px rgb(0, 0, 0, 0.3);
+
+    /* Colored shadows (adjusted for dark mode) */
+    --hextrackr-shadow-primary: 0 4px 12px rgb(37, 99, 235, 0.25);
+    --hextrackr-shadow-success: 0 4px 12px rgb(52, 211, 153, 0.25);
+    --hextrackr-shadow-warning: 0 4px 12px rgb(251, 146, 60, 0.25);
+    --hextrackr-shadow-danger: 0 4px 12px rgb(248, 113, 113, 0.25);
+
+    /* =================
+       Interactive States (dark mode)
+       ================= */
+    --hextrackr-focus-ring: 0 0 0 0.2rem rgb(96, 165, 250, 0.35);
+    --hextrackr-hover-opacity: 0.9;
+    --hextrackr-disabled-opacity: 0.5;
+
+    /* =================
+       Modal Components (dark mode)
+       ================= */
+    /* Modal backgrounds use surface hierarchy */
+    --hextrackr-modal-bg: var(--hextrackr-surface-1);
+    --hextrackr-modal-header-bg: var(--hextrackr-surface-2);
+    --hextrackr-modal-footer-bg: var(--hextrackr-surface-2);
+
+    /* Risk indicator card colors (dark theme) */
+    --hextrackr-risk-critical-bg: rgb(220, 38, 38, 0.15);
+    --hextrackr-risk-critical-border: rgb(248, 113, 113, 0.3);
+    --hextrackr-risk-critical-text: #f87171;
+    --hextrackr-risk-high-bg: rgb(217, 119, 6, 0.15);
+    --hextrackr-risk-high-border: rgb(251, 146, 60, 0.3);
+    --hextrackr-risk-high-text: #fb923c;
+    --hextrackr-risk-medium-bg: rgb(37, 99, 235, 0.15);
+    --hextrackr-risk-medium-border: rgb(96, 165, 250, 0.3);
+    --hextrackr-risk-medium-text: #60a5fa;
+    --hextrackr-risk-low-bg: rgb(22, 163, 74, 0.15);
+    --hextrackr-risk-low-border: rgb(52, 211, 153, 0.3);
+    --hextrackr-risk-low-text: #34d399;
+
+    /* Device/Vulnerability count cards (dark theme) */
+    --hextrackr-info-card-bg: rgb(37, 99, 235, 0.15);
+    --hextrackr-info-card-border: rgb(96, 165, 250, 0.3);
+    --hextrackr-info-card-text: #60a5fa;
+
+    /* =================
+       Ticket Accent Colors (Dark Mode)
+       ================= */
+    /* Ticket accent colors for dark backgrounds with WCAG AA contrast */
+    --ticket-accent-blue: #60a5fa;     /* 7.1:1 contrast - good visibility */
+    --ticket-accent-purple: #a78bfa;   /* 5.8:1 contrast - good visibility */
+    --ticket-accent-teal: #5eead4;     /* 9.5:1 contrast - improved from #2dd4bf */
+    --ticket-accent-amber: #fcd34d;    /* 11.2:1 contrast - softer than #fbbf24 */
+    --ticket-accent-rose: #f9a8d4;     /* 8.3:1 contrast - lighter than #f472b6 */
+    --ticket-accent-slate: #cbd5e1;    /* 10.2:1 contrast - much lighter than #94a3b8 */
+}
+
+/* ===========================
+   Utility Classes
+   =========================== */
+
+/* Quick access to CSS variables */
+.bg-primary-var { background-color: var(--hextrackr-bg-primary); }
+.bg-secondary-var { background-color: var(--hextrackr-bg-secondary); }
+.text-primary-var { color: var(--hextrackr-primary); }
+.text-muted-var { color: var(--hextrackr-text-muted); }
+.border-var { border-color: var(--hextrackr-border); }
+.shadow-sm-var { box-shadow: var(--hextrackr-shadow-sm); }
+.shadow-md-var { box-shadow: var(--hextrackr-shadow-md); }
+.shadow-lg-var { box-shadow: var(--hextrackr-shadow-lg); }
+
+/* Surface hierarchy utilities */
+.surface-0 { background-color: var(--hextrackr-surface-0); }
+.surface-1 { background-color: var(--hextrackr-surface-1); }
+.surface-2 { background-color: var(--hextrackr-surface-2); }
+.surface-3 { background-color: var(--hextrackr-surface-3); }
+.surface-4 { background-color: var(--hextrackr-surface-4); }
+
+/* Link utilities */
+.link-primary {
+    color: var(--hextrackr-link-color);
+    text-decoration: none;
+}
+
+.link-primary:hover {
+    color: var(--hextrackr-link-hover);
+    text-decoration: underline;
+}
+
+/* AG-Grid link utilities */
+.ag-grid-link {
+    color: var(--hextrackr-grid-link);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ag-grid-link:hover {
+    color: var(--hextrackr-grid-link-hover);
+    text-decoration: underline;
+}
+
+/* VPR severity utilities */
+.vpr-critical {
+    color: var(--vpr-critical);
+    background-color: var(--vpr-critical-bg);
+    border: 1px solid var(--vpr-critical-border);
+}
+
+.vpr-high {
+    color: var(--vpr-high);
+    background-color: var(--vpr-high-bg);
+    border: 1px solid var(--vpr-high-border);
+}
+
+.vpr-medium {
+    color: var(--vpr-medium);
+    background-color: var(--vpr-medium-bg);
+    border: 1px solid var(--vpr-medium-border);
+}
+
+.vpr-low {
+    color: var(--vpr-low);
+    background-color: var(--vpr-low-bg);
+    border: 1px solid var(--vpr-low-border);
+}
+
+/* ===========================
+   Print Styles
+   =========================== */
+@media print {
+    :root {
+        --hextrackr-bg-primary: #ffffff;
+        --hextrackr-text: #000000;
+        --hextrackr-border: #333333;
+    }
+}

@@ -48,7 +48,7 @@
 
         .hextrackr-tickets-grid .ag-cell,
         .hextrackr-tickets-grid .ag-cell-value {
-            color: #1f2937;
+            color: var(--hextrackr-text, #1f2937);
         }
 
         .hextrackr-tickets-grid .ag-cell a {
@@ -57,7 +57,7 @@
 
         [data-bs-theme="dark"] .hextrackr-tickets-grid .ag-cell,
         [data-bs-theme="dark"] .hextrackr-tickets-grid .ag-cell-value {
-            color: #e2e8f0;
+            color: var(--bs-body-color, #e2e8f0);
         }
 
         [data-bs-theme="dark"] .hextrackr-tickets-grid .ag-cell a {
@@ -79,19 +79,19 @@
         }
 
         .hextrackr-tickets-grid .ag-row-hover .ag-cell {
-            background-color: rgba(32, 107, 196, 0.08);
+            background-color: rgba(var(--hextrackr-primary-rgb, 32, 107, 196), 0.08);
         }
 
         [data-bs-theme="dark"] .hextrackr-tickets-grid .ag-row-hover .ag-cell {
-            background-color: rgba(147, 197, 253, 0.12);
+            background-color: rgba(var(--hextrackr-primary-rgb, 32, 107, 196), 0.18);
         }
 
         .ticket-row-overdue .ag-cell {
-            background-color: rgba(220, 38, 38, 0.08) !important;
+            background-color: rgba(var(--vpr-critical-rgb, 220, 38, 38), 0.08) !important;
         }
 
         [data-bs-theme="dark"] .ticket-row-overdue .ag-cell {
-            background-color: rgba(248, 113, 113, 0.16) !important;
+            background-color: rgba(var(--vpr-critical-rgb, 220, 38, 38), 0.18) !important;
         }
 
         .ticket-grid-link {
@@ -167,7 +167,7 @@
             width: 56px;
             height: 56px;
             border-radius: 50%;
-            background: rgba(37, 99, 235, 0.1);
+            background: rgba(var(--hextrackr-primary-rgb, 32, 107, 196), 0.12);
             color: var(--ticket-accent-blue);
             margin-bottom: 1rem;
             font-size: 1.5rem;
@@ -180,12 +180,12 @@
         }
 
         .service-now-link:hover {
-            color: #174fc5 !important;
+            color: var(--hextrackr-link-hover, #174fc5) !important;
             text-decoration: underline !important;
         }
 
         [data-bs-theme="dark"] .service-now-link:hover {
-            color: #60a5fa !important;
+            color: var(--ticket-accent-blue, #60a5fa) !important;
         }
     </style>
 </head>
@@ -421,18 +421,7 @@
                             </div>
                             <div id="ticketsAgGrid" class="ag-theme-quartz hextrackr-tickets-grid"></div>
                         </div>
-
-                        <!-- Pagination Controls -->
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div class="pagination-info">
-                                <span id="paginationInfo" class="text-muted">Showing 0 to 0 of 0 entries</span>
-                            </div>
-                            <nav aria-label="Table pagination">
-                                <ul class="pagination pagination-sm mb-0" id="paginationControls">
-                                    <!-- Pagination buttons will be generated here -->
-                                </ul>
-                            </nav>
-                        </div>
+                        <!-- AG-Grid handles its own pagination controls -->
                     </div>
                 </div>
             </div>
