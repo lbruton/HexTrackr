@@ -600,14 +600,45 @@
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-end mb-3 gap-2">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="ticketManager.copyMarkdownToClipboard()">
-                            <i class="fas fa-copy me-2"></i>Copy Markdown
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="ticketManager.copyTicketMarkdown()">
+                            <i class="fas fa-copy me-1"></i>Ticket
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="ticketManager.copyVulnerabilityMarkdown()">
+                            <i class="fas fa-copy me-1"></i>Vulnerabilities
                         </button>
                         <button type="button" class="btn btn-outline-success btn-sm" onclick="ticketManager.downloadBundleFromView()">
                             <i class="fas fa-archive me-2"></i>Download Bundle
                         </button>
                     </div>
-                    <pre id="markdownContent" class="terminal-content"></pre>
+
+                    <!-- Bootstrap Tabs -->
+                    <ul class="nav nav-tabs" id="ticketViewTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="ticket-tab" data-bs-toggle="tab" data-bs-target="#ticket-content"
+                                type="button" role="tab" aria-controls="ticket-content" aria-selected="true">
+                                Ticket Details
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="vulnerabilities-tab" data-bs-toggle="tab" data-bs-target="#vulnerabilities-content"
+                                type="button" role="tab" aria-controls="vulnerabilities-content" aria-selected="false">
+                                Vulnerabilities
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content mt-3" id="ticketViewTabContent">
+                        <div class="tab-pane fade show active" id="ticket-content" role="tabpanel" aria-labelledby="ticket-tab">
+                            <pre id="markdownContent" class="terminal-content"></pre>
+                        </div>
+                        <div class="tab-pane fade" id="vulnerabilities-content" role="tabpanel" aria-labelledby="vulnerabilities-tab">
+                            <div id="vulnerabilityLoadingMessage" class="text-center text-muted py-3">
+                                <i class="fas fa-spinner fa-spin me-2"></i>Loading vulnerability data...
+                            </div>
+                            <pre id="vulnerabilityMarkdownContent" class="terminal-content" style="display: none;"></pre>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

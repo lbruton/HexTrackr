@@ -77,7 +77,14 @@ class HexagonTicketsManager {
 
     // ==================== DATABASE API METHODS ====================
 
-    // Helper function to transform raw ticket data
+    /**
+     * Transform raw ticket data from database to display format.
+     * Handles overdue status calculation, XT number normalization,
+     * and data structure transformation for UI consumption.
+     *
+     * @param {Object} rawTicket - Raw ticket object from database
+     * @returns {Object} Transformed ticket object for display
+     */
     transformTicketData(rawTicket) {
         // Calculate if the ticket is overdue based on due date
         const dueDate = rawTicket.date_due || rawTicket.dateDue;
@@ -117,6 +124,19 @@ class HexagonTicketsManager {
      * Normalize XT number values to four-digit strings without prefixes.
      * @param {string} value - Raw XT number value
      * @returns {string|undefined} Normalized value or undefined if none provided
+     */
+    /**
+     * Normalize XT ticket number to 4-digit format.
+     * Extracts digits from input and pads with leading zeros to ensure
+     * consistent 4-digit format for display and sorting.
+     *
+     * @param {string|number} value - XT number value to normalize
+     * @returns {string|undefined} Normalized 4-digit XT number or undefined if invalid
+     * @example
+     * // Returns: "0123"
+     * normalizeXtNumber("123");
+     * normalizeXtNumber("XT-123");
+     * normalizeXtNumber(123);
      */
     normalizeXtNumber(value) {
         if (!value) {return undefined;}
@@ -280,6 +300,13 @@ class HexagonTicketsManager {
 
     // ==================== END DATABASE API METHODS ====================
 
+    /**
+     * Set up all event listeners for the tickets management interface.
+     * Includes search, filter, pagination, and form submission handlers.
+     * Resets pagination to first page when filters change.
+     *
+     * @returns {void}
+     */
     setupEventListeners() {
         // Search functionality
         document.getElementById("searchInput").addEventListener("input", () => {
@@ -388,6 +415,13 @@ class HexagonTicketsManager {
         // });
     }
 
+    /**
+     * Initialize device management functionality including drag-and-drop,
+     * device field addition/removal, and device ordering controls.
+     * Sets up all device-related UI interactions and event handlers.
+     *
+     * @returns {void}
+     */
     setupDeviceManagement() {
         const container = document.getElementById("devicesContainer");
         
@@ -407,6 +441,13 @@ class HexagonTicketsManager {
         this.initializeDragAndDrop();
     }
 
+    /**
+     * Add a new device input field to the ticket form.
+     * Creates device field with drag-and-drop functionality,
+     * auto-generates device names, and updates UI controls.
+     *
+     * @returns {void}
+     */
     addDeviceField() {
         const container = document.getElementById("devicesContainer");
         const deviceEntry = document.createElement("div");
@@ -1059,10 +1100,42 @@ class HexagonTicketsManager {
 
         // Generate markdown content for the ticket
         const markdownContent = this.generateMarkdown(ticket);
-        
+
         // Display in the markdown view modal
         document.getElementById("markdownContent").textContent = markdownContent;
         document.getElementById("viewTicketModal").setAttribute("data-ticket-id", id);
+
+        // Reset tabs to show ticket tab first
+        const ticketTab = document.getElementById("ticket-tab");
+        const vulnTab = document.getElementById("vulnerabilities-tab");
+        if (ticketTab && vulnTab) {
+            // Bootstrap tab switching
+            const bsTicketTab = new bootstrap.Tab(ticketTab);
+            bsTicketTab.show();
+        }
+
+        // Clear vulnerability markdown content initially
+        const vulnContent = document.getElementById("vulnerabilityMarkdownContent");
+        const vulnLoading = document.getElementById("vulnerabilityLoadingMessage");
+        if (vulnContent) {
+            vulnContent.textContent = '';
+            vulnContent.style.display = 'none';
+        }
+        if (vulnLoading) {
+            vulnLoading.style.display = 'block';
+        }
+
+        // Load vulnerability data when the tab is clicked
+        const vulnTabBtn = document.getElementById("vulnerabilities-tab");
+        if (vulnTabBtn) {
+            // Remove any existing listeners to prevent duplicates
+            const newVulnTabBtn = vulnTabBtn.cloneNode(true);
+            vulnTabBtn.parentNode.replaceChild(newVulnTabBtn, vulnTabBtn);
+
+            newVulnTabBtn.addEventListener('shown.bs.tab', async () => {
+                await this.loadVulnerabilityMarkdownForModal();
+            });
+        }
         
         // Check if we're using Bootstrap or Tabler
         const viewTicketModal = document.getElementById("viewTicketModal");
@@ -1092,10 +1165,80 @@ class HexagonTicketsManager {
         const ticketId = document.getElementById("viewTicketModal").getAttribute("data-ticket-id");
         const viewModal = bootstrap.Modal.getInstance(document.getElementById("viewTicketModal"));
         viewModal.hide();
-        
+
         setTimeout(() => {
             this.editTicket(ticketId);
         }, 300);
+    }
+
+    // Load vulnerability markdown for the modal view
+    async loadVulnerabilityMarkdownForModal() {
+        const ticketId = document.getElementById("viewTicketModal").getAttribute("data-ticket-id");
+        const ticket = this.getTicketById(ticketId);
+
+        if (!ticket) {
+            console.error('[VulnModal] No ticket found for vulnerability loading');
+            return;
+        }
+
+        const vulnContent = document.getElementById("vulnerabilityMarkdownContent");
+        const vulnLoading = document.getElementById("vulnerabilityLoadingMessage");
+
+        try {
+            // Check if ticket has devices
+            if (!ticket.devices || ticket.devices.length === 0) {
+                if (vulnContent) {
+                    vulnContent.textContent = `# No Devices Found\n\nThis ticket has no devices associated with it.`;
+                    vulnContent.style.display = 'block';
+                }
+                if (vulnLoading) {
+                    vulnLoading.style.display = 'none';
+                }
+                return;
+            }
+
+            // Fetch vulnerabilities for this ticket's devices
+            console.log('[VulnModal] Fetching vulnerabilities for devices:', ticket.devices);
+            const vulnerabilities = await this.fetchVulnerabilitiesForDevices(ticket.devices);
+            console.log('[VulnModal] Fetched vulnerabilities:', vulnerabilities?.length || 0);
+
+            if (!vulnerabilities || vulnerabilities.length === 0) {
+                // No vulnerabilities found
+                if (vulnContent) {
+                    const deviceList = ticket.devices.join(', ');
+                    vulnContent.textContent = `# No Vulnerabilities Found\n\nNo vulnerability data found for the devices in this ticket:\n${deviceList}`;
+                    vulnContent.style.display = 'block';
+                }
+                if (vulnLoading) {
+                    vulnLoading.style.display = 'none';
+                }
+                return;
+            }
+
+            // Generate the markdown report
+            const markdownReport = this.generateVulnerabilityMarkdown(ticket, vulnerabilities);
+
+            // Display the markdown
+            if (vulnContent) {
+                vulnContent.textContent = markdownReport || 'No vulnerability data available';
+                vulnContent.style.display = 'block';
+            }
+            if (vulnLoading) {
+                vulnLoading.style.display = 'none';
+            }
+
+            console.log('[VulnModal] Vulnerability markdown loaded successfully');
+
+        } catch (error) {
+            console.error('[VulnModal] Error loading vulnerability markdown:', error);
+            if (vulnContent) {
+                vulnContent.textContent = `# Error Loading Vulnerabilities\n\nFailed to load vulnerability data. Please try again.`;
+                vulnContent.style.display = 'block';
+            }
+            if (vulnLoading) {
+                vulnLoading.style.display = 'none';
+            }
+        }
     }
 
     renderTickets() {
@@ -1355,6 +1498,12 @@ class HexagonTicketsManager {
         return Math.abs(hash);
     }
 
+    /**
+     * Get tickets filtered by search term, status, location, and supervisor.
+     * Applies all active filters and returns matching tickets for display.
+     *
+     * @returns {Array} Array of filtered ticket objects
+     */
     getFilteredTickets() {
         const searchTerm = document.getElementById("searchInput").value.toLowerCase();
         const statusFilter = document.getElementById("statusFilter").value;
@@ -1394,6 +1543,12 @@ class HexagonTicketsManager {
         }).join("");
     }
 
+    /**
+     * Update ticket statistics display with current data.
+     * Calculates and displays total tickets, active tickets, and overdue tickets.
+     *
+     * @returns {void}
+     */
     updateStatistics() {
         const total = this.tickets.length;
         const open = this.tickets.filter(t => t.status === "Open" || t.status === "In Progress").length;
@@ -1422,6 +1577,12 @@ class HexagonTicketsManager {
         filter.value = currentValue;
     }
 
+    /**
+     * Reset the ticket creation/editing form to default state.
+     * Clears all form fields, resets device entries, and clears any editing state.
+     *
+     * @returns {void}
+     */
     resetForm() {
         document.getElementById("ticketForm").reset();
         this.currentEditingId = null;
@@ -2366,15 +2527,46 @@ class HexagonTicketsManager {
         return markdown;
     }
 
-    // Copy markdown to clipboard
-    copyMarkdownToClipboard() {
+    // Copy ticket markdown to clipboard
+    copyTicketMarkdown() {
         const content = document.getElementById("markdownContent").textContent;
         navigator.clipboard.writeText(content).then(() => {
-            this.showToast("Markdown copied to clipboard!", "success");
+            this.showToast("Ticket markdown copied to clipboard!", "success");
         }).catch(err => {
-            console.error("Failed to copy markdown:", err);
-            this.showToast("Failed to copy markdown", "error");
+            console.error("Failed to copy ticket markdown:", err);
+            this.showToast("Failed to copy ticket markdown", "error");
         });
+    }
+
+    // Copy vulnerability markdown to clipboard
+    async copyVulnerabilityMarkdown() {
+        // First ensure we have the vulnerability markdown loaded
+        const vulnContent = document.getElementById("vulnerabilityMarkdownContent");
+
+        if (!vulnContent || !vulnContent.textContent || vulnContent.textContent.trim() === '') {
+            // If not loaded, generate it first
+            await this.loadVulnerabilityMarkdownForModal();
+        }
+
+        const content = document.getElementById("vulnerabilityMarkdownContent").textContent;
+
+        if (!content || content.trim() === '') {
+            this.showToast("No vulnerability data available for this ticket", "warning");
+            return;
+        }
+
+        navigator.clipboard.writeText(content).then(() => {
+            this.showToast("Vulnerability report copied to clipboard!", "success");
+        }).catch(err => {
+            console.error("Failed to copy vulnerability markdown:", err);
+            this.showToast("Failed to copy vulnerability report", "error");
+        });
+    }
+
+    // Backwards compatibility
+    copyMarkdownToClipboard() {
+        // Redirect to the new method for backward compatibility
+        this.copyTicketMarkdown();
     }
 
     // Download bundle from view modal
