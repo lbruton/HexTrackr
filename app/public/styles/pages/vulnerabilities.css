@@ -104,10 +104,10 @@
     background-color: transparent;
 }
 
-/* Modal Enhancement - Higher elevation for modals */
+/* Modal Enhancement - Using modal-specific variables */
 .modal-content {
-    background-color: var(--hextrackr-surface-3);
-    border: 1px solid var(--hextrackr-border-muted);
+    background-color: var(--hextrackr-modal-bg);
+    border: 1px solid var(--hextrackr-border);
     box-shadow: var(--hextrackr-shadow-lg);
 }
 
