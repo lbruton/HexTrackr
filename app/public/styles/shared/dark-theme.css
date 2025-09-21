@@ -32,17 +32,10 @@
     --hextrackr-primary-shadow: rgb(59, 130, 246, 0.2);  /* Blue shadow for dark mode */
     --bs-body-color: #e2e8f0;                 /* Light gray text */
 
-    /* VPR Severity Colors - Dark Mode */
-    --vpr-critical: #ef4444;
-    --vpr-high: #f97316;
-    --vpr-medium: #3b82f6;
-    --vpr-low: #22c55e;
-
-    /* VPR RGB values for dark mode */
-    --vpr-critical-rgb: 239, 68, 68;
-    --vpr-high-rgb: 249, 115, 22;
-    --vpr-medium-rgb: 59, 130, 246;
-    --vpr-low-rgb: 34, 197, 94;
+    /* NOTE: VPR Severity Colors are now managed in css-variables.css
+     * with proper light/dark theme handling and contrast variants.
+     * This ensures consistent theming and eliminates duplicate variables.
+     */
     
     /* Text Colors */
     --bs-body-color-rgb: 226, 232, 240;       /* Body color RGB values */
