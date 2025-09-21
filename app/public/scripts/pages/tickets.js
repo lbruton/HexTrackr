@@ -2063,7 +2063,10 @@ class HexagonTicketsManager {
         if (saved) {
             this.sharedDocumentation = JSON.parse(saved);
             // Update the button tooltip to show loaded files
-            this.updateAttachmentTooltip();
+            // Use setTimeout to ensure DOM is fully ready when navigating between pages
+            setTimeout(() => {
+                this.updateAttachmentTooltip();
+            }, 100);
         }
     }
 
@@ -2072,13 +2075,23 @@ class HexagonTicketsManager {
         const btn = document.getElementById("attachDocsBtn");
         const countBadge = document.getElementById("attachDocsCount");
 
-        if (!btn) return;
-
-        // Initialize or get existing Bootstrap tooltip instance
-        let tooltipInstance = bootstrap.Tooltip.getInstance(btn);
-        if (!tooltipInstance) {
-            tooltipInstance = new bootstrap.Tooltip(btn);
+        if (!btn) {
+            console.debug("Attach button not found in DOM");
+            return;
         }
+
+        // Dispose of any existing tooltip to avoid stale data
+        let existingTooltip = bootstrap.Tooltip.getInstance(btn);
+        if (existingTooltip) {
+            existingTooltip.dispose();
+        }
+
+        // Create fresh tooltip instance
+        const tooltipInstance = new bootstrap.Tooltip(btn, {
+            html: true,
+            placement: 'bottom',
+            trigger: 'hover'
+        });
 
         if (this.sharedDocumentation && this.sharedDocumentation.length > 0) {
             // Format file list for tooltip
