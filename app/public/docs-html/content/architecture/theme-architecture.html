@@ -218,7 +218,22 @@
     <span class="hljs-comment">// ... other parameters</span>
 });
 
-gridApi.<span class="hljs-title function_">setGridOption</span>(<span class="hljs-string">&quot;theme&quot;</span>, quartzTheme);</code></pre><hr>
+gridApi.<span class="hljs-title function_">setGridOption</span>(<span class="hljs-string">&quot;theme&quot;</span>, quartzTheme);</code></pre><h3>Grid Surface Styling (tickets2 &amp; vulnerabilities)</h3><p>Inline overrides now reference the shared tokens so light/dark parity stays centralized in <code>css-variables.css</code>:</p>
+<pre><code class="language-css"><span class="hljs-selector-class">.hextrackr-tickets-grid</span> <span class="hljs-selector-class">.ag-row-hover</span> <span class="hljs-selector-class">.ag-cell</span> {
+    <span class="hljs-attribute">background-color</span>: rgba(<span class="hljs-built_in">var</span>(--hextrackr-primary-rgb), <span class="hljs-number">0.08</span>);
+}
+
+<span class="hljs-selector-attr">[data-bs-theme=&quot;dark&quot;]</span> <span class="hljs-selector-class">.hextrackr-tickets-grid</span> <span class="hljs-selector-class">.ag-row-hover</span> <span class="hljs-selector-class">.ag-cell</span> {
+    <span class="hljs-attribute">background-color</span>: rgba(<span class="hljs-built_in">var</span>(--hextrackr-primary-rgb), <span class="hljs-number">0.18</span>);
+}
+
+<span class="hljs-selector-class">.ticket-row-overdue</span> <span class="hljs-selector-class">.ag-cell</span> {
+    <span class="hljs-attribute">background-color</span>: rgba(<span class="hljs-built_in">var</span>(--vpr-critical-rgb), <span class="hljs-number">0.08</span>) <span class="hljs-meta">!important</span>;
+}
+
+<span class="hljs-selector-attr">[data-bs-theme=&quot;dark&quot;]</span> <span class="hljs-selector-class">.ticket-row-overdue</span> <span class="hljs-selector-class">.ag-cell</span> {
+    <span class="hljs-attribute">background-color</span>: rgba(<span class="hljs-built_in">var</span>(--vpr-critical-rgb), <span class="hljs-number">0.18</span>) <span class="hljs-meta">!important</span>;
+}</code></pre><p>The vulnerabilities grid mirrors the same pattern, so palette changes propagate automatically without updating page-specific CSS.</p><hr>
 <h2>Chart Theme Integration</h2><h3>ApexCharts Theme Adapter</h3><p>Charts use a sophisticated theme adapter that reads CSS variables for consistency:</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// chart-theme-adapter.js</span>
 <span class="hljs-title function_">getCSSVariables</span>(<span class="hljs-params">theme</span>) {

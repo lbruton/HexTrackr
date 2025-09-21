@@ -1,0 +1,379 @@
+/**
+ * HexTrackr Dark Theme CSS Variables - T024
+ * 
+ * Comprehensive dark theme implementation compatible with:
+ * - Tabler.io v1.0.0-beta17 CSS framework
+ * - ApexCharts data visualization
+ * - AG-Grid Community Edition
+ * - HexTrackr vulnerability management components
+ * 
+ * @version 1.0.0
+ * @spec 005-dark-mode-theme-system
+ * @task T024 - CSS custom properties dark theme palette
+ */
+
+/* Theme Application via Document Element */
+[data-bs-theme="dark"] .vulnerability-title {
+    color: var(--bs-emphasis-color) !important;
+}
+
+[data-bs-theme="dark"] .ag-theme-quartz .text-dark {
+    color: var(--ag-foreground-color) !important;
+}
+
+/* Global Dark Mode Theme Variables - Moved to css-variables.css for consolidation */
+
+[data-bs-theme="dark"] .ag-theme-quartz {
+    /* ===========================================
+     * CORE THEME COLORS - Tabler.io v1.0.0-beta17
+     * =========================================== */
+
+    /* HexTrackr-specific theme variables */
+    --hextrackr-primary-shadow: rgb(59, 130, 246, 0.2);  /* Blue shadow for dark mode */
+    --bs-body-color: #e2e8f0;                 /* Light gray text */
+
+    /* VPR Severity Colors - Dark Mode */
+    --vpr-critical: #ef4444;
+    --vpr-high: #f97316;
+    --vpr-medium: #3b82f6;
+    --vpr-low: #22c55e;
+
+    /* VPR RGB values for dark mode */
+    --vpr-critical-rgb: 239, 68, 68;
+    --vpr-high-rgb: 249, 115, 22;
+    --vpr-medium-rgb: 59, 130, 246;
+    --vpr-low-rgb: 34, 197, 94;
+    
+    /* Text Colors */
+    --bs-body-color-rgb: 226, 232, 240;       /* Body color RGB values */
+    --bs-emphasis-color: #f8fafc;             /* High emphasis text */
+    --bs-emphasis-color-rgb: 248, 250, 252;
+    --bs-secondary-color: #94a3b8;            /* Secondary text - lightened for 4.5:1 contrast */
+    --bs-secondary-color-rgb: 148, 163, 184;
+    --bs-tertiary-color: #94a3b8;             /* Tertiary text - lightened to match secondary for WCAG AA compliance */
+    --bs-tertiary-color-rgb: 148, 163, 184;
+    
+    /* ===========================================
+     * COMPONENT COLORS
+     * =========================================== */
+    
+    /* ===========================================
+     * SURFACE HIERARCHY SYSTEM - P001
+     * =========================================== */
+
+    /* Surface Hierarchy - Balanced for visual comfort */
+    --hextrackr-surface-base: #0f172a;        /* Page background - darkest */
+    --hextrackr-surface-1: #1a2332;          /* Cards - low elevation */
+    --hextrackr-surface-2: #253241;          /* Tables - medium elevation */
+    --hextrackr-surface-3: #2f3f50;          /* Modal sections - higher elevation */
+    --hextrackr-surface-4: #526880;          /* Modal container - balanced 2.7:1 contrast */
+
+    /* Border Definition System - Enhanced for visibility in dark mode */
+    --hextrackr-border-subtle: rgb(255, 255, 255, 0.15);     /* Subtle element borders - visible white borders */
+    --hextrackr-border-muted: rgb(255, 255, 255, 0.20);      /* Muted element borders - more visible */
+    --hextrackr-border-strong: rgb(255, 255, 255, 0.25);     /* Strong element borders - clearly visible */
+
+    /* Enhanced Shadow System (Optimized for Dark Mode) */
+    --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.3);    /* Small shadows */
+    --hextrackr-shadow-md: 0 4px 12px rgb(0, 0, 0, 0.4);   /* Medium shadows */
+    --hextrackr-shadow-lg: 0 8px 24px rgb(0, 0, 0, 0.5);   /* Large shadows */
+
+    /* Bootstrap/Tabler Component Surface Mapping */
+    --bs-body-bg: var(--hextrackr-surface-base);       /* Page background */
+    --bs-body-bg-secondary: var(--hextrackr-surface-1); /* Secondary backgrounds */
+    --bs-body-secondary-bg: var(--hextrackr-surface-1); /* Bootstrap secondary bg */
+
+    /* Cards and Panels */
+    --bs-card-bg: var(--hextrackr-surface-1);          /* Card background */
+    --bs-card-border-color: var(--hextrackr-border-subtle); /* Card borders */
+    --bs-card-cap-bg: var(--hextrackr-surface-base);   /* Card header/footer background */
+
+    /* Tables */
+    --bs-table-bg: var(--hextrackr-surface-2);         /* Table background */
+
+    /* Navigation and Headers */
+    --bs-navbar-bg: #0f172a;                  /* Navigation background */
+    --bs-navbar-brand-color: #f8fafc;         /* Brand text color */
+    --bs-navbar-nav-link-color: #cbd5e1;      /* Nav link color */
+    --bs-navbar-nav-link-hover-color: #f8fafc; /* Nav link hover */
+    
+    /* Buttons - Full Spectrum */
+    --bs-btn-bg: #334155;                     /* Default button background */
+    --bs-btn-border-color: #475569;           /* Button border */
+    --bs-btn-color: #e2e8f0;                  /* Button text */
+    --bs-btn-hover-bg: #475569;               /* Button hover background */
+    --bs-btn-hover-border-color: #64748b;     /* Button hover border */
+    --bs-btn-active-bg: #64748b;              /* Button active background */
+    --bs-btn-focus-shadow-rgb: 100, 116, 139; /* Button focus shadow */
+    
+    /* Form Controls */
+    --bs-form-control-bg: #1e293b;            /* Input background */
+    --bs-form-control-color: #e2e8f0;         /* Input text color */
+    --bs-form-control-border-color: #475569;  /* Input border */
+    --bs-form-control-focus-border-color: #3b82f6; /* Input focus border */
+    --bs-form-control-focus-box-shadow: 0 0 0 0.2rem rgb(59, 130, 246, 0.25);
+    
+    /* ===========================================
+     * SEMANTIC COLORS - Brand & States
+     * =========================================== */
+    
+    /* Primary Brand Color - WCAG AA Compliant */
+    --bs-primary: #2563eb;                    /* HexTrackr blue - darkened for 4.5:1 contrast */
+    --bs-primary-rgb: 37, 99, 235;
+    --bs-primary-bg-subtle: #1e3a8a;          /* Subtle primary background */
+    --bs-primary-border-subtle: #3730a3;      /* Subtle primary border */
+    --bs-primary-text-emphasis: #60a5fa;      /* Emphasized primary text */
+    
+    /* Success States - WCAG AA Compliant */
+    --bs-success: #047857;                    /* Success green - further darkened for 4.5:1 contrast */
+    --bs-success-rgb: 4, 120, 87;
+    --bs-success-bg-subtle: #064e3b;          /* Subtle success background */
+    --bs-success-border-subtle: #047857;      /* Subtle success border */
+    --bs-success-text-emphasis: #34d399;      /* Emphasized success text */
+    
+    /* Warning States - WCAG AA Compliant */
+    --bs-warning: #b45309;                    /* Warning amber - further darkened for 4.5:1 contrast */
+    --bs-warning-rgb: 180, 83, 9;
+    --bs-warning-bg-subtle: #92400e;          /* Subtle warning background */
+    --bs-warning-border-subtle: #b45309;      /* Subtle warning border */
+    --bs-warning-text-emphasis: #fbbf24;      /* Emphasized warning text */
+    
+    /* Danger/Error States - WCAG AA Compliant */
+    --bs-danger: #dc2626;                     /* Danger red - darkened for 4.5:1 contrast */
+    --bs-danger-rgb: 220, 38, 38;
+    --bs-danger-bg-subtle: #7f1d1d;           /* Subtle danger background */
+    --bs-danger-border-subtle: #991b1b;       /* Subtle danger border */
+    --bs-danger-text-emphasis: #f87171;       /* Emphasized danger text */
+    
+    /* Secondary/Info States */
+    --bs-secondary: #6b7280;                  /* Secondary gray */
+    --bs-secondary-rgb: 107, 114, 128;
+    --bs-info: #0369a1;                       /* Info sky blue - darkened for 4.5:1 contrast */
+    --bs-info-rgb: 3, 105, 161;
+    
+    /* ===========================================
+     * BORDER AND SURFACE COLORS
+     * =========================================== */
+    
+    --bs-border-color: #374151;               /* General borders */
+    --bs-border-color-translucent: rgb(226, 232, 240, 0.15); /* Semi-transparent */
+    --bs-border-width: 1px;
+    --bs-border-style: solid;
+    --bs-border-radius: 0.5rem;
+    
+    /* ===========================================
+     * HEXTRACKR-SPECIFIC COMPONENTS
+     * =========================================== */
+    
+    /* VPR (Vulnerability Priority Rating) Badge Colors - WCAG AA Compliant */
+    --vpr-critical: #dc2626;                  /* Critical vulnerabilities - already compliant */
+    --vpr-critical-bg: rgb(220, 38, 38, 0.1);
+    --vpr-high: #c2410c;                      /* High priority - darkened for 4.5:1 contrast */
+    --vpr-high-bg: rgb(194, 65, 12, 0.1);
+    --vpr-medium: #b45309;                    /* Medium priority - darkened for 4.5:1 contrast */
+    --vpr-medium-bg: rgb(180, 83, 9, 0.1);
+    --vpr-low: #15803d;                       /* Low priority - darkened for 4.5:1 contrast */
+    --vpr-low-bg: rgb(21, 128, 61, 0.1);
+    --vpr-info: #0f766e;                      /* Informational - darkened for 4.5:1 contrast */
+    --vpr-info-bg: rgb(15, 118, 110, 0.1);
+    
+    /* Status Indicators */
+    --status-active: #10b981;                 /* Active tickets/vulnerabilities */
+    --status-pending: #f59e0b;                /* Pending items */
+    --status-resolved: #6b7280;               /* Completed/resolved items */
+    --status-overdue: #ef4444;                /* Overdue items */
+    
+    /* ===========================================
+     * APEXCHARTS DATA VISUALIZATION
+     * =========================================== */
+    
+    /* Chart Color Palette - Professional Dark Theme */
+    --chart-color-1: #3b82f6;                 /* Primary blue */
+    --chart-color-2: #10b981;                 /* Success green */
+    --chart-color-3: #f59e0b;                 /* Warning amber */
+    --chart-color-4: #ef4444;                 /* Danger red */
+    --chart-color-5: #8b5cf6;                 /* Purple */
+    --chart-color-6: #06b6d4;                 /* Cyan */
+    --chart-color-7: #84cc16;                 /* Lime green */
+    --chart-color-8: #f97316;                 /* Orange */
+
+    /* Vulnerability Chart Specific Colors - Severity Mapping */
+    --chart-vuln-critical-color: #dc2626;     /* Critical: Red */
+    --chart-vuln-high-color: #ea580c;         /* High: Orange */
+    --chart-vuln-medium-color: #2563eb;       /* Medium: Blue */
+    --chart-vuln-low-color: #16a34a;          /* Low: Green */
+
+    /* Chart Background and Grid */
+    --chart-background: #1e293b;              /* Chart background */
+    --chart-grid-color: #374151;              /* Grid lines */
+    --chart-text-color: #9ca3af;              /* Chart text */
+    --chart-title-color: #f9fafb;             /* Chart titles */
+    --chart-axis-color: #6b7280;              /* Axis lines and labels */
+    
+    /* ===========================================
+     * AG-GRID COMMUNITY EDITION THEMING
+     * =========================================== */
+    
+    /* Grid Background and Structure */
+    --ag-background-color: var(--hextrackr-surface-1);  /* Main grid background */
+    --ag-foreground-color: #e2e8f0;           /* Text color */
+    --ag-border-color: var(--hextrackr-border-subtle);  /* Grid borders */
+    --ag-secondary-border-color: var(--hextrackr-border-muted); /* Secondary borders */
+    
+    /* Headers */
+    --ag-header-background-color: var(--hextrackr-surface-2); /* Header background */
+    --ag-header-foreground-color: #f8fafc;    /* Header text */
+    --ag-header-cell-hover-background-color: var(--hextrackr-surface-3); /* Header hover */
+    --ag-header-cell-moving-background-color: var(--hextrackr-surface-3); /* Moving header */
+    
+    /* Rows and Cells */
+    --ag-row-background-color: transparent;              /* Row background */
+    --ag-odd-row-background-color: rgb(255, 255, 255, 0.02); /* Alternate row color */
+    --ag-row-hover-color: rgb(59, 130, 246, 0.1); /* Row hover */
+    --ag-selected-row-background-color: rgb(59, 130, 246, 0.2); /* Selected row */
+    --ag-cell-horizontal-border: var(--hextrackr-border-subtle); /* Cell borders */
+    
+    /* Interactive Elements */
+    --ag-range-selection-background-color: rgb(59, 130, 246, 0.2);
+    --ag-range-selection-highlight-color: rgb(59, 130, 246, 0.3);
+    
+    /* ===========================================
+     * MODAL AND OVERLAY COMPONENTS
+     * =========================================== */
+    
+    /* Modal */
+    --bs-modal-bg: var(--hextrackr-surface-3);         /* Modal background */
+    --bs-modal-border-color: var(--hextrackr-border-muted); /* Modal border */
+    --bs-modal-header-bg: var(--hextrackr-surface-2);  /* Modal header */
+    --bs-modal-footer-bg: var(--hextrackr-surface-2);  /* Modal footer */
+    
+    /* Dropdown */
+    --bs-dropdown-bg: var(--hextrackr-surface-4);      /* Dropdown background */
+    --bs-dropdown-border-color: var(--hextrackr-border-muted); /* Dropdown border */
+    --bs-dropdown-link-color: #e2e8f0;        /* Dropdown link text */
+    --bs-dropdown-link-hover-color: #f8fafc;  /* Dropdown link hover text */
+    --bs-dropdown-link-hover-bg: #374151;     /* Dropdown link hover background */
+    
+    /* Tooltip */
+    --bs-tooltip-bg: #0f172a;                 /* Tooltip background */
+    --bs-tooltip-color: #e2e8f0;              /* Tooltip text */
+    
+    /* ===========================================
+     * PRINT MEDIA OVERRIDES
+     * =========================================== */
+    
+    /* Force light theme for printing */
+    --bs-print-body-bg: #ffffff;
+    --bs-print-body-color: #000000;
+    --bs-print-border-color: #dee2e6;
+}
+
+/* ===========================================
+ * MODAL DARK MODE FIXES - T001
+ * Resolves visual separation issues identified in R001
+ * =========================================== */
+
+/* Modal Content - Balanced visual separation
+ * Contrast Decision: 2.7:1 ratio (#526880) chosen over WCAG 3.0:1 ratio (#5c7895)
+ * Rationale: User feedback indicated 3.0:1 made tabs appear "too bright"
+ * Balance: Maintains accessibility while providing visual comfort in dark theme
+ * Testing: Verified across Settings, Device Security, and Vulnerability Details modals
+ */
+[data-bs-theme="dark"] .modal-content {
+    background-color: var(--hextrackr-modal-bg);
+    border: 1px solid var(--hextrackr-border);
+    box-shadow: 0 8px 24px rgb(0, 0, 0, 0.5);
+    color: var(--hextrackr-text);
+}
+
+/* Modal Header & Footer - Secondary elevation */
+[data-bs-theme="dark"] .modal-header {
+    background-color: var(--hextrackr-modal-header-bg);
+    border-bottom: 1px solid var(--hextrackr-border);
+    color: var(--hextrackr-text);
+}
+
+[data-bs-theme="dark"] .modal-footer {
+    background-color: var(--hextrackr-modal-footer-bg);
+    border-top: 1px solid var(--hextrackr-border);
+    color: var(--hextrackr-text);
+}
+
+/* Cards within Modals - Lower hierarchy */
+[data-bs-theme="dark"] .modal-body .card {
+    background-color: #253241 !important;  /* surface-2 */
+    border: 1px solid rgb(255, 255, 255, 0.15) !important;
+    color: var(--bs-body-color);
+}
+
+/* Modal Title */
+[data-bs-theme="dark"] .modal-title {
+    color: var(--bs-emphasis-color);
+}
+
+/* Close Button Enhancement */
+[data-bs-theme="dark"] .modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 0.8;
+}
+
+[data-bs-theme="dark"] .modal-header .btn-close:hover {
+    opacity: 1;
+}
+
+/* Modal Backdrop Enhancement */
+[data-bs-theme="dark"] .modal-backdrop {
+    background-color: #000000;
+    opacity: 0.6 !important;
+}
+
+/* Print media query to override dark theme */
+@media print {
+    [data-bs-theme="dark"],
+    :root.theme-dark {
+        --bs-body-bg: var(--bs-print-body-bg) !important;
+        --bs-body-color: var(--bs-print-body-color) !important;
+        --bs-card-bg: #ffffff !important;
+        --bs-border-color: var(--bs-print-border-color) !important;
+    }
+}
+
+/* ===========================================
+ * HIGH CONTRAST MODE SUPPORT
+ * =========================================== */
+ 
+@media (prefers-contrast: more) {
+    [data-bs-theme="dark"],
+    :root.theme-dark {
+        --bs-body-bg: #000000;
+        --bs-body-color: #ffffff;
+        --bs-card-bg: #1a1a1a;
+        --bs-border-color: #666666;
+    }
+}
+
+/* ===========================================
+ * CHART CONTAINMENT - T037
+ * =========================================== */
+
+/* Global chart containment for performance during theme transitions */
+[data-bs-theme="dark"] .apexcharts-canvas,
+:root.theme-dark .apexcharts-canvas,
+[data-bs-theme="dark"] .ag-root-wrapper,
+:root.theme-dark .ag-root-wrapper {
+    contain: layout style paint;
+    isolation: isolate;
+}
+
+/* ===========================================
+ * REDUCED MOTION SUPPORT
+ * =========================================== */
+ 
+@media (prefers-reduced-motion: reduce) {
+    [data-bs-theme="dark"] *,
+    :root.theme-dark * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
