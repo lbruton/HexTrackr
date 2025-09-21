@@ -7,6 +7,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.22] - 2025-09-21
+
+### Enhanced - KEV (Known Exploited Vulnerabilities) Integration
+
+#### AG-Grid Table Improvements
+
+- **Filterable KEV Column**: Replaced fire emoji (🔥) with filterable YES/NO pills in KEV column
+  - Red badge for "YES" (vulnerability is in KEV catalog)
+  - Blue badge for "NO" (not in KEV catalog)
+  - Follows same design pattern as severity and VPR columns for consistency
+  - Enables proper filtering using AG-Grid's built-in text-based filter system
+
+- **KEV Column Filtering Fix**: Fixed KEV column filtering to work with AG-Grid's filtering system
+  - Changed database query to return 'Yes'/'No' text values instead of 1/0 boolean
+  - Updated column renderer to parse text values for proper filtering compatibility
+  - Made KEV badges clickable to open detailed KEV modal for vulnerability information
+
+#### KEV Modal Enhancements
+
+- **CVE Details Integration**: Added "View CVE Details" button in KEV modal
+  - Opens vulnerability details modal for comprehensive CVE information
+  - Provides seamless navigation between KEV catalog info and full vulnerability details
+  - Uses existing `showVulnerabilityDetailsByCVE()` function for consistency
+
+- **NIST NVD Integration**: Replaced CISA KEV Catalog link with NIST NVD link
+  - Uses pattern `https://nvd.nist.gov/vuln/detail/${cveId}` for direct CVE lookup
+  - Provides more comprehensive vulnerability information from authoritative source
+  - Both modal buttons now use consistent primary button style for better UI cohesion
+
+- **Clickable Links in Notes**: Made all HTTPS links in KEV additional notes clickable
+  - Links open in 1200x1200px popup windows for consistency with rest of application
+  - Automatic regex replacement converts plain URLs to clickable links
+  - Preserves existing text while enhancing usability
+
+#### Filter Dropdown Improvements
+
+- **Filter Option Cleanup**: Removed fire emoji from KEV filter option in severity dropdown
+  - Changed dropdown option from "🔥 KEV" to simply "KEV" for cleaner interface
+  - Maintains clear identification of KEV filtering without emoji clutter
+
+- **KEV Filter Logic Fix**: Fixed KEV filter to properly match vulnerabilities
+  - Added special handling in filter logic to distinguish KEV from severity filtering
+  - Fixed filter matching to properly check `isKev === "Yes"` when KEV filter selected
+  - Ensures consistent filtering behavior across grid, cards, and modal contexts
+
+### Fixed - KEV Data Handling
+
+- **Database Service Updates**: Updated vulnerability service to return text-based KEV values
+  - Changed database query from returning 1/0 to 'Yes'/'No' text values
+  - Ensures compatibility with AG-Grid's text-based filtering system
+  - Maintains data integrity while improving UI functionality
+
+- **Component Consistency**: Fixed KEV handling across all vulnerability components
+  - Updated vulnerability cards to check for text value "Yes" instead of boolean
+  - Ensured consistent KEV data interpretation in grid, cards, modals, and filters
+  - Eliminated discrepancies between different UI components
+
+## [1.0.21] - 2025-09-21
+
+### Added
+
+#### Markdown Editor Integration for Tickets
+
+- **Enhanced Ticket Modal**: Integrated markdown editor with live preview for ticket descriptions
+  - Real-time markdown rendering with syntax highlighting
+  - Split-pane view showing markdown source and rendered preview
+  - Toolbar with common formatting buttons (bold, italic, headers, lists, links)
+  - Auto-save functionality to prevent data loss during editing
+
 ## [1.0.20] - 2025-09-21
 
 ### Added

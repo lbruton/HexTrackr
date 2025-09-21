@@ -1098,11 +1098,14 @@ class HexagonTicketsManager {
             return;
         }
 
-        // Generate markdown content for the ticket
-        const markdownContent = this.generateMarkdown(ticket);
-
-        // Display in the markdown view modal
-        document.getElementById("markdownContent").textContent = markdownContent;
+        // Generate markdown content for the ticket (async)
+        this.generateMarkdown(ticket).then(markdownContent => {
+            // Display in the markdown view modal
+            document.getElementById("markdownContent").textContent = markdownContent;
+        }).catch(error => {
+            console.error('Error generating ticket markdown:', error);
+            document.getElementById("markdownContent").textContent = 'Error loading ticket details';
+        });
         document.getElementById("viewTicketModal").setAttribute("data-ticket-id", id);
 
         // Reset tabs to show ticket tab first
@@ -1239,7 +1242,7 @@ class HexagonTicketsManager {
             }
 
             // Generate the markdown report
-            const markdownReport = this.generateVulnerabilityMarkdown(ticket, vulnerabilities);
+            const markdownReport = await this.generateVulnerabilityMarkdown(ticket, vulnerabilities);
 
             // Display the markdown
             if (vulnContent) {
@@ -1880,7 +1883,33 @@ class HexagonTicketsManager {
     }
 
     // Generate vulnerability markdown report
-    generateVulnerabilityMarkdown(ticket, vulnerabilities) {
+    async generateVulnerabilityMarkdown(ticket, vulnerabilities) {
+        if (!vulnerabilities || vulnerabilities.length === 0) {
+            return null;  // No report if no vulnerabilities
+        }
+
+        try {
+            // Try to fetch template from database first
+            const template = await this.fetchTemplateFromDB('default_vulnerability');
+
+            if (template) {
+                // Use database template with variable substitution
+                const variableMap = this.buildVariableMap(ticket, vulnerabilities);
+                return this.processTemplateWithVariables(template, variableMap);
+            } else {
+                console.warn('Vulnerability template not found in database, using fallback');
+                // Fallback to hardcoded template
+                return this.generateVulnerabilityMarkdownFallback(ticket, vulnerabilities);
+            }
+        } catch (error) {
+            console.error('Error generating vulnerability markdown from template:', error);
+            // Use fallback on any error
+            return this.generateVulnerabilityMarkdownFallback(ticket, vulnerabilities);
+        }
+    }
+
+    // Fallback vulnerability markdown generation (original hardcoded version)
+    generateVulnerabilityMarkdownFallback(ticket, vulnerabilities) {
         if (!vulnerabilities || vulnerabilities.length === 0) {
             return null;  // No report if no vulnerabilities
         }
@@ -2112,8 +2141,8 @@ class HexagonTicketsManager {
             const pdfBlob = doc.output("blob");
             zip.file(`${baseFilename}.pdf`, pdfBlob);
 
-            // Generate and add markdown file to zip
-            const markdownContent = this.generateMarkdown(ticket);
+            // Generate and add markdown file to zip (async)
+            const markdownContent = await this.generateMarkdown(ticket);
             const markdownBlob = new Blob([markdownContent], { type: "text/markdown" });
             zip.file(`${baseFilename}.md`, markdownBlob);
 
@@ -2151,7 +2180,7 @@ class HexagonTicketsManager {
                             const vulnerabilities = await this.fetchVulnerabilitiesForDevices(deviceArray);
 
                             if (vulnerabilities && vulnerabilities.length > 0) {
-                                const vulnMarkdown = this.generateVulnerabilityMarkdown(ticket, vulnerabilities);
+                                const vulnMarkdown = await this.generateVulnerabilityMarkdown(ticket, vulnerabilities);
 
                                 if (vulnMarkdown) {
                                     const vulnBlob = new Blob([vulnMarkdown], { type: "text/markdown" });
@@ -2505,28 +2534,217 @@ class HexagonTicketsManager {
         }
     }
 
+    // Template processing helper functions
+
+    /**
+     * Fetch template content from database by name
+     * @description Retrieves template content from the database API endpoint
+     * @param {string} templateName - Name of the template to fetch (e.g., 'default_email', 'default_ticket', 'default_vulnerability')
+     * @returns {Promise<string|null>} Template content string or null if not found/error
+     * @throws {Error} Network or API errors during template fetch
+     * @example
+     * const template = await this.fetchTemplateFromDB('default_email');
+     * if (template) {
+     *   // Process template
+     * }
+     * @since 1.0.21
+     * @module TicketsManager
+     */
+    async fetchTemplateFromDB(templateName) {
+        try {
+            const response = await fetch(`/api/templates/by-name/${templateName}`);
+            if (!response.ok) {
+                console.warn(`Template ${templateName} not found in database, using fallback`);
+                return null;
+            }
+            const result = await response.json();
+            if (result.success && result.data) {
+                return result.data.template_content;
+            }
+            return null;
+        } catch (error) {
+            console.error(`Error fetching template ${templateName}:`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Build variable mapping for template substitution
+     * @description Creates a key-value map of template variables and their actual values for substitution
+     * @param {Object} ticket - Ticket object containing all ticket data
+     * @param {Array|string|null} vulnerabilitiesOrType - Either vulnerability array, template type ('email', 'ticket', 'vulnerability'), or null
+     * @returns {Object} Object mapping template variables to actual values
+     * @example
+     * const variables = this.buildVariableMap(ticket, 'email');
+     * // Returns: { '[SITE_NAME]': 'Example Site', '[HEXAGON_NUM]': 'HEX123', ... }
+     * @since 1.0.21
+     * @module TicketsManager
+     */
+    buildVariableMap(ticket, vulnerabilitiesOrType = null) {
+        const deviceCount = ticket.devices ? ticket.devices.length : 0;
+        const deviceList = ticket.devices && ticket.devices.length > 0
+            ? ticket.devices.map((device, index) => `${index + 1}. ${device}`).join('\n')
+            : 'Device list to be confirmed';
+
+        const variables = {
+            '[HEXAGON_TICKET]': ticket.hexagonTicket || 'N/A',
+            '[HEXAGON_NUM]': ticket.hexagonTicket || 'N/A',
+            '[SERVICENOW_TICKET]': ticket.serviceNowTicket || 'N/A',
+            '[SERVICENOW_NUM]': ticket.serviceNowTicket || 'N/A',
+            '[XT_NUMBER]': ticket.xt_number || `XT#${ticket.id}`,
+            '[SITE]': ticket.site || 'N/A',
+            '[SITE_NAME]': ticket.site || 'N/A',
+            '[LOCATION]': ticket.location || 'N/A',
+            '[STATUS]': ticket.status || 'N/A',
+            '[DATE_SUBMITTED]': this.formatDate(ticket.dateSubmitted),
+            '[DATE_DUE]': this.formatDate(ticket.dateDue),
+            '[DEVICE_COUNT]': deviceCount.toString(),
+            '[DEVICE_LIST]': deviceList,
+            '[SUPERVISOR]': ticket.supervisor || 'N/A',
+            '[TECHNICIAN]': ticket.technician || 'N/A',
+            '[NOTES]': ticket.notes || 'N/A',
+            '[GENERATED_TIME]': new Date().toLocaleString(),
+            '[GREETING]': this.getSupervisorGreeting(ticket.supervisor)
+        };
+
+        // Handle vulnerabilities array (backward compatibility)
+        if (vulnerabilitiesOrType && Array.isArray(vulnerabilitiesOrType)) {
+            const vulnerabilities = vulnerabilitiesOrType;
+            const severityCounts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
+            vulnerabilities.forEach(v => {
+                const sev = (v.severity || 'LOW').toUpperCase();
+                if (severityCounts[sev] !== undefined) {
+                    severityCounts[sev]++;
+                }
+            });
+
+            variables['[TOTAL_VULNERABILITIES]'] = vulnerabilities.length.toString();
+            variables['[CRITICAL_COUNT]'] = severityCounts.CRITICAL.toString();
+            variables['[HIGH_COUNT]'] = severityCounts.HIGH.toString();
+            variables['[MEDIUM_COUNT]'] = severityCounts.MEDIUM.toString();
+            variables['[LOW_COUNT]'] = severityCounts.LOW.toString();
+            variables['[DEVICE_COUNT]'] = Object.keys(this.groupVulnerabilitiesByDevice(vulnerabilities)).length.toString();
+            variables['[VULNERABILITY_DETAILS]'] = this.buildVulnerabilityDetails(vulnerabilities);
+        }
+
+        // Add template-specific variables
+        if (vulnerabilitiesOrType === 'email') {
+            // Email-specific variables can be added here if needed
+            // Currently using common variables which should work for email templates
+        } else if (vulnerabilitiesOrType === 'ticket') {
+            // Ticket-specific variables can be added here if needed
+        } else if (vulnerabilitiesOrType === 'vulnerability') {
+            // Vulnerability-specific variables can be added here if needed
+        }
+
+        return variables;
+    }
+
+    groupVulnerabilitiesByDevice(vulnerabilities) {
+        const vulnsByDevice = {};
+        vulnerabilities.forEach(vuln => {
+            const hostname = vuln.hostname || 'Unknown Device';
+            if (!vulnsByDevice[hostname]) {
+                vulnsByDevice[hostname] = [];
+            }
+            vulnsByDevice[hostname].push(vuln);
+        });
+        return vulnsByDevice;
+    }
+
+    buildVulnerabilityDetails(vulnerabilities) {
+        const vulnsByDevice = this.groupVulnerabilitiesByDevice(vulnerabilities);
+        let details = '';
+
+        Object.keys(vulnsByDevice).sort().forEach(hostname => {
+            const deviceVulns = vulnsByDevice[hostname];
+            details += `### Device: ${hostname}\n`;
+            details += `Total Vulnerabilities: ${deviceVulns.length}\n\n`;
+
+            // Sort by VPR score (highest to lowest)
+            deviceVulns.sort((a, b) => (b.vpr_score || 0) - (a.vpr_score || 0));
+
+            details += '| CVE | Severity | VPR | Description |\n';
+            details += '|-----|----------|-----|-------------|\n';
+
+            deviceVulns.slice(0, 10).forEach(vuln => { // Limit to top 10 per device
+                const cve = vuln.cve || 'N/A';
+                const severity = vuln.severity || 'Unknown';
+                const vpr = vuln.vpr_score || 'N/A';
+                const desc = (vuln.description || 'No description').substring(0, 50) + '...';
+                details += `| ${cve} | ${severity} | ${vpr} | ${desc} |\n`;
+            });
+
+            details += '\n';
+        });
+
+        return details;
+    }
+
+    /**
+     * Process template by substituting variables with actual values
+     * @description Replaces template variables (e.g., [SITE_NAME]) with actual values from variable map
+     * @param {string} template - Template content with variable placeholders
+     * @param {Object} variables - Object mapping variable names to values
+     * @returns {string} Processed template with variables substituted
+     * @example
+     * const result = this.processTemplateWithVariables(
+     *   'Hello [GREETING] at [SITE_NAME]',
+     *   { '[GREETING]': 'John', '[SITE_NAME]': 'Main Office' }
+     * );
+     * // Returns: 'Hello John at Main Office'
+     * @since 1.0.21
+     * @module TicketsManager
+     */
+    processTemplateWithVariables(template, variables) {
+        let processedTemplate = template;
+
+        // Replace all variables in the template
+        Object.keys(variables).forEach(variable => {
+            const value = variables[variable] || '';
+            // Use global replace to handle multiple occurrences
+            processedTemplate = processedTemplate.replace(new RegExp(variable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), value);
+        });
+
+        return processedTemplate;
+    }
+
     // View ticket in markdown format
-    // Generate markdown format for ticket
-    generateMarkdown(ticket) {
+    // Generate markdown format for ticket using database template
+    async generateMarkdown(ticket) {
+        try {
+            // Try to fetch template from database
+            const template = await this.fetchTemplateFromDB('default_ticket');
+
+            if (template) {
+                // Use template system
+                const variables = this.buildVariableMap(ticket, 'ticket');
+                return this.processTemplateWithVariables(template, variables);
+            }
+        } catch (error) {
+            console.error('Error using ticket template:', error);
+        }
+
+        // Fallback to hardcoded template if database fails
         let markdown = "# Hexagon Work Request\n\n";
-        
+
         markdown += "**Ticket Information:**\n";
         markdown += `- Hexagon Ticket #: ${ticket.hexagonTicket || "N/A"}\n`;
         markdown += `- ServiceNow Ticket #: ${ticket.serviceNowTicket || "N/A"}\n`;
         markdown += `- Site: ${ticket.site || "N/A"}\n`;
         markdown += `- Location: ${ticket.location || "N/A"}\n`;
         markdown += `- Status: ${ticket.status || "N/A"}\n\n`;
-        
+
         markdown += "**Timeline:**\n";
         markdown += `- Date Submitted: ${this.formatDate(ticket.dateSubmitted)}\n`;
         markdown += `- Required Completion Date: ${this.formatDate(ticket.dateDue)}\n\n`;
-        
+
         markdown += "**Task Instruction:**\n";
         markdown += `There are critical security patches that must be applied within 30 days at the [${ticket.site || "SITE NAME"}] site.\n`;
         markdown += "Please schedule a maintenance outage of at least two hours and contact the ITCC @\n";
         markdown += `918-732-4822 with service now ticket number [${ticket.serviceNowTicket || "SERVICE NOW TICKET"}] to coordinate Netops to apply security\n`;
         markdown += "updates and reboot the equipment.\n\n";
-        
+
         if (ticket.devices && ticket.devices.length > 0) {
             markdown += "**Devices to be Updated:**\n";
             markdown += "The following devices will be updated and rebooted:\n\n";
@@ -2650,7 +2868,29 @@ class HexagonTicketsManager {
     }
 
     // Generate email template markdown for ticket
-    generateEmailMarkdown(ticket) {
+    async generateEmailMarkdown(ticket) {
+        try {
+            // Try to fetch template from database first
+            const template = await this.fetchTemplateFromDB('default_email');
+
+            if (template) {
+                // Use database template with variable substitution
+                const variableMap = this.buildVariableMap(ticket, 'email');
+                return this.processTemplateWithVariables(template, variableMap);
+            } else {
+                console.warn('Email template not found in database, using fallback');
+                // Fallback to hardcoded template
+                return this.generateEmailMarkdownFallback(ticket);
+            }
+        } catch (error) {
+            console.error('Error generating email markdown from template:', error);
+            // Use fallback on any error
+            return this.generateEmailMarkdownFallback(ticket);
+        }
+    }
+
+    // Fallback email markdown generation (original hardcoded version)
+    generateEmailMarkdownFallback(ticket) {
         const siteName = ticket.site || "[Site Name]";
         const location = ticket.location || "[Location]";
         const hexagonNum = ticket.hexagonTicket || "[Hexagon #]";
@@ -2788,7 +3028,7 @@ class HexagonTicketsManager {
 
         try {
             // Generate the base email markdown
-            let emailMarkdown = this.generateEmailMarkdown(ticket);
+            let emailMarkdown = await this.generateEmailMarkdown(ticket);
 
             // If there are devices, fetch vulnerability data and append summary
             if (ticket.devices && ticket.devices.length > 0) {
