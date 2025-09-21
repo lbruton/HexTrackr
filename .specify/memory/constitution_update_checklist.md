@@ -132,31 +132,6 @@ When amending The HexTrackr Development Constitution (`.specify/memory/constitut
 - [ ] Multi-model consensus when needed
 - [ ] Zen MCP server availability verified
 
-### MCP Configuration Checks
-- [ ] cld alias → minimal (memento + sequential-thinking)
-- [ ] cld-dev alias → development (all standard MCP tools)
-- [ ] cld-zen alias → enhanced (includes Zen server)
-
----
-
-## Article IV: Gemini CLI Tools Verification
-
-### Section I: Usage Requirements
-- [ ] Gemini CLI may be used for complex tasks at the users request only
-- [ ] All tools SHALL be documented in GEMINICLITOOLS.md
-- [ ] Command syntax verified
-- [ ] Output properly integrated
-
----
-
-## Article V: Codex CLI Tools Verification
-
-### Section I: Usage Requirements
-- [ ] Codex CLI Tools may be used for complex tasks at the users request only
-- [ ] All tools SHALL be documented in CODEXCLITOOLS.md
-- [ ] Command syntax verified
-- [ ] Output properly integrated
-
 ---
 
 ## Constitutional Integrity
