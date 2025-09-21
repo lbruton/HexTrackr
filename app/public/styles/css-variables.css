@@ -92,24 +92,44 @@
     --hextrackr-shadow-lg: 0 8px 24px rgb(0, 0, 0, 0.2);   /* Large shadows */
 
     /* =================
-       VPR Score Colors
+       VPR Score Colors (Light Mode)
        ================= */
-    --vpr-critical: #dc2626;
-    --vpr-critical-rgb: 220, 38, 38;
-    --vpr-critical-bg: rgb(220, 38, 38, 0.1);
-    --vpr-critical-border: rgb(220, 38, 38, 0.3);
-    --vpr-high: #d97706;
-    --vpr-high-rgb: 217, 119, 6;
-    --vpr-high-bg: rgb(217, 119, 6, 0.1);
-    --vpr-high-border: rgb(217, 119, 6, 0.3);
-    --vpr-medium: #2563eb;
-    --vpr-medium-rgb: 37, 99, 235;
-    --vpr-medium-bg: rgb(37, 99, 235, 0.1);
-    --vpr-medium-border: rgb(37, 99, 235, 0.3);
-    --vpr-low: #16a34a;
-    --vpr-low-rgb: 22, 163, 74;
-    --vpr-low-bg: rgb(22, 163, 74, 0.1);
-    --vpr-low-border: rgb(22, 163, 74, 0.3);
+
+    /* Standard VPR Colors - Balanced for light backgrounds */
+    --vpr-critical: #ef4444;
+    --vpr-critical-rgb: 239, 68, 68;
+    --vpr-critical-bg: rgb(239, 68, 68, 0.1);
+    --vpr-critical-border: rgb(239, 68, 68, 0.3);
+    --vpr-high: #f97316;
+    --vpr-high-rgb: 249, 115, 22;
+    --vpr-high-bg: rgb(249, 115, 22, 0.1);
+    --vpr-high-border: rgb(249, 115, 22, 0.3);
+    --vpr-medium: #3b82f6;
+    --vpr-medium-rgb: 59, 130, 246;
+    --vpr-medium-bg: rgb(59, 130, 246, 0.1);
+    --vpr-medium-border: rgb(59, 130, 246, 0.3);
+    --vpr-low: #22c55e;
+    --vpr-low-rgb: 34, 197, 94;
+    --vpr-low-bg: rgb(34, 197, 94, 0.1);
+    --vpr-low-border: rgb(34, 197, 94, 0.3);
+
+    /* WCAG Contrast Optimized VPR Colors - For enhanced accessibility */
+    --vpr-critical-contrast: #dc2626;
+    --vpr-critical-contrast-rgb: 220, 38, 38;
+    --vpr-critical-contrast-bg: rgb(220, 38, 38, 0.1);
+    --vpr-critical-contrast-border: rgb(220, 38, 38, 0.3);
+    --vpr-high-contrast: #d97706;
+    --vpr-high-contrast-rgb: 217, 119, 6;
+    --vpr-high-contrast-bg: rgb(217, 119, 6, 0.1);
+    --vpr-high-contrast-border: rgb(217, 119, 6, 0.3);
+    --vpr-medium-contrast: #2563eb;
+    --vpr-medium-contrast-rgb: 37, 99, 235;
+    --vpr-medium-contrast-bg: rgb(37, 99, 235, 0.1);
+    --vpr-medium-contrast-border: rgb(37, 99, 235, 0.3);
+    --vpr-low-contrast: #16a34a;
+    --vpr-low-contrast-rgb: 22, 163, 74;
+    --vpr-low-contrast-bg: rgb(22, 163, 74, 0.1);
+    --vpr-low-contrast-border: rgb(22, 163, 74, 0.3);
 
     /* =================
        Typography
@@ -339,14 +359,13 @@
     --hextrackr-border-muted: rgb(255, 255, 255, 0.12);    /* Muted card borders */
     --hextrackr-border-strong: rgb(255, 255, 255, 0.16);   /* Strong card borders */
 
-    /* Shadow Hierarchy (Dark Mode) */
-    --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.2);    /* Small shadows */
-    --hextrackr-shadow-md: 0 4px 12px rgb(0, 0, 0, 0.3);   /* Medium shadows */
-    --hextrackr-shadow-lg: 0 8px 24px rgb(0, 0, 0, 0.4);   /* Large shadows */
+    /* NOTE: Shadow hierarchy is defined below in the comprehensive shadows section */
 
     /* =================
-       VPR Score Colors (adjusted for dark mode)
+       VPR Score Colors (Dark Mode)
        ================= */
+
+    /* Standard VPR Colors - Lighter for dark backgrounds */
     --vpr-critical: #f87171;
     --vpr-critical-rgb: 248, 113, 113;
     --vpr-critical-bg: rgb(220, 38, 38, 0.15);
@@ -363,6 +382,24 @@
     --vpr-low-rgb: 52, 211, 153;
     --vpr-low-bg: rgb(22, 163, 74, 0.15);
     --vpr-low-border: rgb(52, 211, 153, 0.3);
+
+    /* WCAG Contrast Optimized VPR Colors - Enhanced visibility on dark backgrounds */
+    --vpr-critical-contrast: #dc2626;
+    --vpr-critical-contrast-rgb: 220, 38, 38;
+    --vpr-critical-contrast-bg: rgb(220, 38, 38, 0.2);
+    --vpr-critical-contrast-border: rgb(220, 38, 38, 0.4);
+    --vpr-high-contrast: #c2410c;
+    --vpr-high-contrast-rgb: 194, 65, 12;
+    --vpr-high-contrast-bg: rgb(194, 65, 12, 0.2);
+    --vpr-high-contrast-border: rgb(194, 65, 12, 0.4);
+    --vpr-medium-contrast: #b45309;
+    --vpr-medium-contrast-rgb: 180, 83, 9;
+    --vpr-medium-contrast-bg: rgb(180, 83, 9, 0.2);
+    --vpr-medium-contrast-border: rgb(180, 83, 9, 0.4);
+    --vpr-low-contrast: #15803d;
+    --vpr-low-contrast-rgb: 21, 128, 61;
+    --vpr-low-contrast-bg: rgb(21, 128, 61, 0.2);
+    --vpr-low-contrast-border: rgb(21, 128, 61, 0.4);
 
     /* =================
        Shadows (darker for dark mode)
