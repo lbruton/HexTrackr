@@ -27,27 +27,78 @@ class TemplateService {
     }
 
     /**
-     * Get all templates
+     * Get template table name based on template name prefix
+     * @param {string} templateName - Template name (e.g., 'default_email', 'default_ticket')
+     * @returns {string} Table name
+     */
+    getTemplateTable(templateName) {
+        if (templateName.includes('_email') || templateName === 'default_email') {
+            return 'email_templates';
+        } else if (templateName.includes('_ticket') || templateName === 'default_ticket') {
+            return 'ticket_templates';
+        } else if (templateName.includes('_vulnerability') || templateName === 'default_vulnerability') {
+            return 'vulnerability_templates';
+        }
+        // Default to email_templates for backward compatibility
+        return 'email_templates';
+    }
+
+    /**
+     * Get template table name by ID by checking all tables
+     * @param {number} id - Template ID
+     * @returns {Promise<string|null>} Table name or null if not found
+     */
+    async getTemplateTableById(id) {
+        return new Promise((resolve, reject) => {
+            const tables = ['email_templates', 'ticket_templates', 'vulnerability_templates'];
+            let found = false;
+            let completed = 0;
+
+            tables.forEach(tableName => {
+                this.db.get(`SELECT id FROM ${tableName} WHERE id = ? AND is_active = 1`, [id], (err, row) => {
+                    completed++;
+                    if (err) {
+                        return reject(new Error(`Failed to check ${tableName}: ${err.message}`));
+                    }
+                    if (row && !found) {
+                        found = true;
+                        resolve(tableName);
+                    } else if (completed === tables.length && !found) {
+                        resolve(null);
+                    }
+                });
+            });
+        });
+    }
+
+    /**
+     * Get all templates from all template types
      * @returns {Promise<Array>} Array of template objects
      */
     async getAllTemplates() {
         return new Promise((resolve, reject) => {
-            this.db.all(
-                "SELECT * FROM email_templates WHERE is_active = 1 ORDER BY name",
-                (err, rows) => {
-                    if (err) {
-                        return reject(new Error("Failed to fetch templates: " + err.message));
-                    }
+            // Query all three template tables
+            const queries = [
+                "SELECT *, 'email' as template_type FROM email_templates WHERE is_active = 1",
+                "SELECT *, 'ticket' as template_type FROM ticket_templates WHERE is_active = 1",
+                "SELECT *, 'vulnerability' as template_type FROM vulnerability_templates WHERE is_active = 1"
+            ];
 
-                    // Parse variables JSON for each template
-                    const templates = rows.map(row => ({
-                        ...row,
-                        variables: JSON.parse(row.variables || "[]")
-                    }));
+            const unionQuery = queries.join(" UNION ALL ") + " ORDER BY name";
 
-                    resolve(templates);
+            this.db.all(unionQuery, (err, rows) => {
+                if (err) {
+                    return reject(new Error("Failed to fetch templates: " + err.message));
                 }
-            );
+
+                // Parse variables JSON for each template
+                const templates = rows.map(row => ({
+                    ...row,
+                    variables: JSON.parse(row.variables || "[]")
+                }));
+
+                resolve(templates);
+            });
         });
     }
 
@@ -57,27 +108,36 @@ class TemplateService {
      * @returns {Promise<Object|null>} Template object or null if not found
      */
     async getTemplateById(id) {
-        return new Promise((resolve, reject) => {
-            this.db.get(
-                "SELECT * FROM email_templates WHERE id = ? AND is_active = 1",
-                [id],
-                (err, row) => {
-                    if (err) {
-                        return reject(new Error("Failed to fetch template: " + err.message));
-                    }
+        try {
+            const tableName = await this.getTemplateTableById(id);
+            if (!tableName) {
+                return null;
+            }
 
-                    if (!row) {
-                        return resolve(null);
-                    }
+            return new Promise((resolve, reject) => {
+                this.db.get(
+                    `SELECT * FROM ${tableName} WHERE id = ? AND is_active = 1`,
+                    [id],
+                    (err, row) => {
+                        if (err) {
+                            return reject(new Error("Failed to fetch template: " + err.message));
+                        }
 
-                    // Parse variables JSON
-                    resolve({
-                        ...row,
-                        variables: JSON.parse(row.variables || "[]")
-                    });
-                }
-            );
-        });
+                        if (!row) {
+                            return resolve(null);
+                        }
+
+                        // Parse variables JSON
+                        resolve({
+                            ...row,
+                            variables: JSON.parse(row.variables || "[]")
+                        });
+                    }
+                );
+            });
+        } catch (error) {
+            throw error;
+        }
     }
 
     /**
@@ -87,8 +147,10 @@ class TemplateService {
      */
     async getTemplateByName(name) {
         return new Promise((resolve, reject) => {
+            const tableName = this.getTemplateTable(name);
+
             this.db.get(
-                "SELECT * FROM email_templates WHERE name = ? AND is_active = 1",
+                `SELECT * FROM ${tableName} WHERE name = ? AND is_active = 1`,
                 [name],
                 (err, row) => {
                     if (err) {
@@ -116,30 +178,39 @@ class TemplateService {
      * @returns {Promise<Object|null>} Updated template or null if not found
      */
     async updateTemplate(id, updates) {
-        return new Promise((resolve, reject) => {
-            const { template_content, description } = updates;
+        try {
+            const tableName = await this.getTemplateTableById(id);
+            if (!tableName) {
+                return null;
+            }
 
-            this.db.run(
-                `UPDATE email_templates
-                 SET template_content = ?,
-                     description = COALESCE(?, description),
-                     updated_at = CURRENT_TIMESTAMP
-                 WHERE id = ? AND is_active = 1`,
-                [template_content, description, id],
-                function(err) {
-                    if (err) {
-                        return reject(new Error("Failed to update template: " + err.message));
+            return new Promise((resolve, reject) => {
+                const { template_content, description } = updates;
+
+                this.db.run(
+                    `UPDATE ${tableName}
+                     SET template_content = ?,
+                         description = COALESCE(?, description),
+                         updated_at = CURRENT_TIMESTAMP
+                     WHERE id = ? AND is_active = 1`,
+                    [template_content, description, id],
+                    function(err) {
+                        if (err) {
+                            return reject(new Error("Failed to update template: " + err.message));
+                        }
+
+                        if (this.changes === 0) {
+                            return resolve(null);
+                        }
+
+                        // Return the updated template
+                        resolve({ id, template_content, description, updated: true });
                     }
-
-                    if (this.changes === 0) {
-                        return resolve(null);
-                    }
-
-                    // Return the updated template
-                    resolve({ id, template_content, description, updated: true });
-                }
-            );
-        });
+                );
+            });
+        } catch (error) {
+            throw error;
+        }
     }
 
     /**
@@ -148,26 +219,35 @@ class TemplateService {
      * @returns {Promise<Object|null>} Reset template or null if not found
      */
     async resetTemplateToDefault(id) {
-        return new Promise((resolve, reject) => {
-            this.db.run(
-                `UPDATE email_templates
-                 SET template_content = default_content,
-                     updated_at = CURRENT_TIMESTAMP
-                 WHERE id = ? AND is_active = 1`,
-                [id],
-                function(err) {
-                    if (err) {
-                        return reject(new Error("Failed to reset template: " + err.message));
-                    }
+        try {
+            const tableName = await this.getTemplateTableById(id);
+            if (!tableName) {
+                return null;
+            }
 
-                    if (this.changes === 0) {
-                        return resolve(null);
-                    }
+            return new Promise((resolve, reject) => {
+                this.db.run(
+                    `UPDATE ${tableName}
+                     SET template_content = default_content,
+                         updated_at = CURRENT_TIMESTAMP
+                     WHERE id = ? AND is_active = 1`,
+                    [id],
+                    function(err) {
+                        if (err) {
+                            return reject(new Error("Failed to reset template: " + err.message));
+                        }
 
-                    resolve({ id, reset: true });
-                }
-            );
-        });
+                        if (this.changes === 0) {
+                            return resolve(null);
+                        }
+
+                        resolve({ id, reset: true });
+                    }
+                );
+            });
+        } catch (error) {
+            throw error;
+        }
     }
 
     /**
@@ -395,23 +475,47 @@ Ticket ID: [XT_NUMBER]`;
                 fallback: '[Site Name]',
                 processor: (ticketData) => (ticketData && ticketData.site) || '[Site Name]'
             },
+            '[SITE]': {
+                description: 'Site name from ticket (alias)',
+                required: true,
+                fallback: '[Site]',
+                processor: (ticketData) => (ticketData && ticketData.site) || '[Site]'
+            },
             '[LOCATION]': {
                 description: 'Location from ticket',
                 required: true,
                 fallback: '[Location]',
                 processor: (ticketData) => (ticketData && ticketData.location) || '[Location]'
             },
+            '[STATUS]': {
+                description: 'Ticket status',
+                required: true,
+                fallback: '[Status]',
+                processor: (ticketData) => (ticketData && ticketData.status) || '[Status]'
+            },
             '[HEXAGON_NUM]': {
                 description: 'Hexagon ticket number',
                 required: false,
                 fallback: '[Hexagon #]',
-                processor: (ticketData) => (ticketData && ticketData.hexagonTicket) || '[Hexagon #]'
+                processor: (ticketData) => (ticketData && (ticketData.hexagon_ticket || ticketData.hexagonTicket)) || '[Hexagon #]'
+            },
+            '[HEXAGON_TICKET]': {
+                description: 'Hexagon ticket number (alias)',
+                required: false,
+                fallback: '[Hexagon Ticket]',
+                processor: (ticketData) => (ticketData && (ticketData.hexagon_ticket || ticketData.hexagonTicket)) || '[Hexagon Ticket]'
             },
             '[SERVICENOW_NUM]': {
                 description: 'ServiceNow ticket number',
                 required: false,
                 fallback: '[ServiceNow #]',
-                processor: (ticketData) => (ticketData && ticketData.serviceNowTicket) || '[ServiceNow #]'
+                processor: (ticketData) => (ticketData && (ticketData.servicenow_ticket || ticketData.serviceNowTicket)) || '[ServiceNow #]'
+            },
+            '[SERVICENOW_TICKET]': {
+                description: 'ServiceNow ticket number (alias)',
+                required: false,
+                fallback: '[ServiceNow Ticket]',
+                processor: (ticketData) => (ticketData && (ticketData.servicenow_ticket || ticketData.serviceNowTicket)) || '[ServiceNow Ticket]'
             },
             '[XT_NUMBER]': {
                 description: 'Internal XT number',
@@ -435,13 +539,37 @@ Ticket ID: [XT_NUMBER]`;
                 description: 'Due date formatted',
                 required: true,
                 fallback: '[Due Date]',
-                processor: (ticketData) => this.formatDate(ticketData && ticketData.dateDue) || '[Due Date]'
+                processor: (ticketData) => this.formatDate(ticketData && (ticketData.date_due || ticketData.dateDue)) || '[Due Date]'
             },
             '[DATE_SUBMITTED]': {
                 description: 'Submission date formatted',
                 required: true,
                 fallback: '[Submitted Date]',
-                processor: (ticketData) => this.formatDate(ticketData && ticketData.dateSubmitted) || '[Submitted Date]'
+                processor: (ticketData) => this.formatDate(ticketData && (ticketData.date_submitted || ticketData.dateSubmitted)) || '[Submitted Date]'
+            },
+            '[SUPERVISOR]': {
+                description: 'Supervisor name',
+                required: false,
+                fallback: 'N/A',
+                processor: (ticketData) => (ticketData && ticketData.supervisor) || 'N/A'
+            },
+            '[TECHNICIAN]': {
+                description: 'Technician name',
+                required: false,
+                fallback: 'N/A',
+                processor: (ticketData) => (ticketData && ticketData.technician) || 'N/A'
+            },
+            '[NOTES]': {
+                description: 'Additional notes',
+                required: false,
+                fallback: 'N/A',
+                processor: (ticketData) => (ticketData && (ticketData.notes || ticketData.additional_notes)) || 'N/A'
+            },
+            '[GENERATED_TIME]': {
+                description: 'Current date and time',
+                required: false,
+                fallback: new Date().toLocaleString(),
+                processor: () => new Date().toLocaleString()
             },
             '[VULNERABILITY_SUMMARY]': {
                 description: 'Dynamic vulnerability summary (generated at runtime)',

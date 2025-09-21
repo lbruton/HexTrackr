@@ -105,6 +105,26 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             }
         },
         {
+            headerName: "KEV",
+            field: "isKev",
+            sortable: true,
+            filter: true,
+            width: 70,
+            minWidth: 60,
+            maxWidth: 90,
+            resizable: true,
+            cellRenderer: (params) => {
+                const kevStatus = params.value || "No";
+                if (kevStatus === "Yes") {
+                    return '<span class="badge bg-danger" style="cursor: pointer;" title="Known Exploited Vulnerability" onclick="showKevDetails(\'' + (params.data.cve || '') + '\')">YES</span>';
+                }
+                return '<span class="badge bg-primary">NO</span>';
+            },
+            cellStyle: {
+                textAlign: 'center'
+            }
+        },
+        {
             headerName: "Hostname",
             field: "hostname",
             sortable: true,

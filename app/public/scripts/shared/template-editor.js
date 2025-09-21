@@ -62,7 +62,6 @@ class TemplateEditor {
     async toggleEditMode() {
         const viewMode = document.getElementById('emailViewMode');
         const editMode = document.getElementById('emailEditMode');
-        const editBtn = document.getElementById('editTemplateBtn');
 
         if (!this.isEditMode) {
             // Entering edit mode
@@ -73,21 +72,19 @@ class TemplateEditor {
                 editMode.style.display = 'block';
                 this.isEditMode = true;
 
-                // Update button appearance
-                editBtn.innerHTML = '<i class="fas fa-times me-1"></i>Cancel';
-                editBtn.className = 'btn btn-outline-secondary btn-sm';
-                editBtn.title = 'Cancel editing';
-
                 // Focus on editor
                 const editor = document.getElementById('templateEditor');
                 if (editor) {
                     editor.focus();
                 }
 
-                this.showToast('Edit mode enabled', 'info');
+                // Ensure variable panel is populated
+                this.populateVariablePanel();
+
+                this.showToast('Email template edit mode enabled', 'info');
             } catch (error) {
                 console.error('Error entering edit mode:', error);
-                this.showToast('Failed to enter edit mode', 'error');
+                this.showToast('Failed to enter email template edit mode', 'error');
             }
         } else {
             // Exiting edit mode
@@ -95,12 +92,7 @@ class TemplateEditor {
             editMode.style.display = 'none';
             this.isEditMode = false;
 
-            // Reset button appearance
-            editBtn.innerHTML = '<i class="fas fa-edit me-1"></i>Edit';
-            editBtn.className = 'btn btn-outline-primary btn-sm';
-            editBtn.title = 'Edit email template';
-
-            this.showToast('Edit mode disabled', 'info');
+            this.showToast('Email template edit mode disabled', 'info');
         }
     }
 
@@ -109,14 +101,39 @@ class TemplateEditor {
      */
     async loadTemplateForEditing() {
         try {
+            // Try cache first
+            const cachedTemplate = this.getCachedTemplate('default_email');
+            if (cachedTemplate) {
+                console.log('Loading email template from cache');
+                this.currentTemplate = cachedTemplate;
+
+                // Load template content into editor
+                const editor = document.getElementById('templateEditor');
+                if (editor) {
+                    editor.value = this.currentTemplate.template_content;
+                    this.validateTemplate();
+                }
+                return;
+            }
+
+            // Cache miss - fetch from database
             const response = await fetch('/api/templates/by-name/default_email');
             if (!response.ok) {
+                // If template doesn't exist, create a default one
+                if (response.status === 404) {
+                    console.warn('Email template not found in database, creating default template');
+                    await this.createDefaultTemplate();
+                    return;
+                }
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const result = await response.json();
             if (result.success) {
                 this.currentTemplate = result.data;
+
+                // Cache the template
+                this.cacheTemplate(this.currentTemplate);
 
                 // Load template content into editor
                 const editor = document.getElementById('templateEditor');
@@ -131,8 +148,15 @@ class TemplateEditor {
             }
         } catch (error) {
             console.error('Error loading template:', error);
-            this.showToast('Failed to load template for editing', 'error');
-            throw error;
+            // Try to create default template as fallback
+            try {
+                await this.createDefaultTemplate();
+                this.showToast('Created default email template', 'info');
+            } catch (createError) {
+                console.error('Failed to create default template:', createError);
+                this.showToast('Failed to load template for editing', 'error');
+                throw error;
+            }
         }
     }
 
@@ -202,27 +226,36 @@ class TemplateEditor {
         try {
             const templateContent = editor.value;
 
-            const response = await fetch('/api/templates/1/preview', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    ticketData: this.currentTicketData
-                })
-            });
+            // If we have a current template ID, try server-side processing
+            if (this.currentTemplate?.id) {
+                try {
+                    const response = await fetch(`/api/templates/${this.currentTemplate.id}/preview`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            template_content: templateContent,
+                            ticketData: this.currentTicketData
+                        })
+                    });
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            this.showPreviewModal(result.data.processed_content);
+                            return;
+                        }
+                    }
+                } catch (serverError) {
+                    console.warn('Server-side preview failed, using client-side processing:', serverError);
+                }
             }
 
-            const result = await response.json();
-            if (result.success) {
-                // Show preview in a modal or overlay
-                this.showPreviewModal(result.data.processed_content);
-            } else {
-                throw new Error(result.error || 'Preview failed');
-            }
+            // Fallback to client-side processing
+            const processedContent = this.processTemplate(templateContent, this.currentTicketData);
+            this.showPreviewModal(processedContent);
+
         } catch (error) {
             console.error('Error previewing template:', error);
             this.showToast('Failed to generate preview', 'error');
@@ -280,7 +313,10 @@ class TemplateEditor {
      */
     async saveTemplate() {
         const editor = document.getElementById('templateEditor');
-        if (!editor || !this.currentTemplate) return;
+        if (!editor) {
+            this.showToast('Editor not found', 'error');
+            return;
+        }
 
         try {
             const templateContent = editor.value;
@@ -290,6 +326,15 @@ class TemplateEditor {
             if (!validation.valid) {
                 this.showToast(`Cannot save: ${validation.errors.join(', ')}`, 'error');
                 return;
+            }
+
+            // If no current template, create a new one
+            if (!this.currentTemplate) {
+                await this.createDefaultTemplate();
+                if (!this.currentTemplate) {
+                    this.showToast('Failed to create template', 'error');
+                    return;
+                }
             }
 
             const response = await fetch(`/api/templates/${this.currentTemplate.id}`, {
@@ -308,13 +353,13 @@ class TemplateEditor {
 
             const result = await response.json();
             if (result.success) {
-                this.showToast('Template saved successfully', 'success');
+                this.showToast('Email template saved successfully', 'success');
 
                 // Update current template
                 this.currentTemplate.template_content = templateContent;
 
-                // Exit edit mode
-                await this.toggleEditMode();
+                // Update cache
+                this.cacheTemplate(this.currentTemplate);
 
                 // Refresh the email view if it's loaded
                 if (window.ticketManager && window.ticketManager.loadEmailMarkdownForModal) {
@@ -325,7 +370,7 @@ class TemplateEditor {
             }
         } catch (error) {
             console.error('Error saving template:', error);
-            this.showToast('Failed to save template', 'error');
+            this.showToast('Failed to save email template', 'error');
         }
     }
 
@@ -511,6 +556,274 @@ class TemplateEditor {
             window.ticketManager.showToast(message, type);
         } else {
             console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+    }
+
+    /**
+     * Process template with ticket data (client-side)
+     * @param {string} template - Template content
+     * @param {Object} ticket - Ticket data
+     * @returns {string} Processed content
+     */
+    processTemplate(template, ticket) {
+        let processed = template;
+
+        // Replace variables with actual data
+        const replacements = {
+            '[GREETING]': this.getSupervisorGreeting(ticket.supervisor),
+            '[SITE_NAME]': ticket.site || 'N/A',
+            '[SITE]': ticket.site || 'N/A',
+            '[LOCATION]': ticket.location || 'N/A',
+            '[STATUS]': ticket.status || 'N/A',
+            '[HEXAGON_NUM]': ticket.hexagon_ticket || ticket.hexagonTicket || 'N/A',
+            '[HEXAGON_TICKET]': ticket.hexagon_ticket || ticket.hexagonTicket || 'N/A',
+            '[SERVICENOW_NUM]': ticket.servicenow_ticket || ticket.serviceNowTicket || 'N/A',
+            '[SERVICENOW_TICKET]': ticket.servicenow_ticket || ticket.serviceNowTicket || 'N/A',
+            '[XT_NUMBER]': ticket.xt_number || ticket.xtNumber || `${ticket.id}`,
+            '[DEVICE_COUNT]': ticket.devices ? ticket.devices.length : 0,
+            '[DEVICE_LIST]': this.formatDeviceList(ticket.devices),
+            '[DATE_DUE]': this.formatDate(ticket.date_due || ticket.dateDue),
+            '[DATE_SUBMITTED]': this.formatDate(ticket.date_submitted || ticket.dateSubmitted),
+            '[SUPERVISOR]': ticket.supervisor || 'N/A',
+            '[TECHNICIAN]': ticket.technician || 'N/A',
+            '[NOTES]': ticket.notes || ticket.additional_notes || 'N/A',
+            '[GENERATED_TIME]': new Date().toLocaleString(),
+            '[VULNERABILITY_SUMMARY]': this.generateVulnerabilitySummary(ticket)
+        };
+
+        Object.keys(replacements).forEach(variable => {
+            const regex = new RegExp(this.escapeRegex(variable), 'g');
+            processed = processed.replace(regex, replacements[variable]);
+        });
+
+        return processed;
+    }
+
+    /**
+     * Helper: Get supervisor greeting
+     * @param {string} supervisorField - Supervisor field value
+     * @returns {string} Appropriate greeting
+     */
+    getSupervisorGreeting(supervisorField) {
+        if (!supervisorField || supervisorField === "N/A") {
+            return "[Supervisor First Name]";
+        }
+
+        const trimmed = supervisorField.trim();
+
+        // Check for multiple supervisors
+        const commaCount = (trimmed.match(/,/g) || []).length;
+        if (trimmed.includes(';') || trimmed.includes('&') || commaCount > 1) {
+            return "Team";
+        }
+
+        // Single supervisor - try to extract first name
+        let name = trimmed;
+        if (trimmed.includes(',')) {
+            const parts = trimmed.split(',').map(p => p.trim());
+            name = parts.length > 1 ? parts[1] : parts[0];
+        }
+
+        const words = name.split(/\s+/);
+        return words[0] || "[Supervisor First Name]";
+    }
+
+    /**
+     * Helper: Format device list
+     * @param {Array} devices - Device array
+     * @returns {string} Formatted device list
+     */
+    formatDeviceList(devices) {
+        if (!devices || devices.length === 0) {
+            return 'Device list to be confirmed';
+        }
+        return devices.map((device, index) => `${index + 1}. ${device}`).join('\n');
+    }
+
+    /**
+     * Helper: Format date
+     * @param {string} dateString - Date string
+     * @returns {string} Formatted date
+     */
+    formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        try {
+            return new Date(dateString).toLocaleDateString();
+        } catch (error) {
+            return dateString;
+        }
+    }
+
+    /**
+     * Helper: Generate vulnerability summary
+     * @param {Object} ticket - Ticket data
+     * @returns {string} Vulnerability summary
+     */
+    generateVulnerabilitySummary(ticket) {
+        // This is a placeholder - in full implementation, this would fetch vulnerability data
+        return '(Vulnerability summary will be generated based on devices when available)';
+    }
+
+    /**
+     * Helper: Escape regex special characters
+     * @param {string} string - String to escape
+     * @returns {string} Escaped string
+     */
+    escapeRegex(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    /**
+     * Cache template in localStorage
+     * @param {Object} template - Template object to cache
+     */
+    cacheTemplate(template) {
+        try {
+            const cacheKey = `hextrackr_template_${template.name}`;
+            const cacheData = {
+                template: template,
+                timestamp: Date.now(),
+                expires: Date.now() + (60 * 60 * 1000) // 1 hour expiry
+            };
+            localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+        } catch (error) {
+            console.warn('Failed to cache template:', error);
+        }
+    }
+
+    /**
+     * Get template from localStorage cache
+     * @param {string} templateName - Name of template to retrieve
+     * @returns {Object|null} Cached template or null if not found/expired
+     */
+    getCachedTemplate(templateName) {
+        try {
+            const cacheKey = `hextrackr_template_${templateName}`;
+            const cached = localStorage.getItem(cacheKey);
+
+            if (!cached) return null;
+
+            const cacheData = JSON.parse(cached);
+
+            // Check if cache is expired
+            if (cacheData.expires < Date.now()) {
+                localStorage.removeItem(cacheKey);
+                return null;
+            }
+
+            return cacheData.template;
+        } catch (error) {
+            console.warn('Failed to retrieve cached template:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Clear template cache
+     * @param {string} templateName - Optional specific template to clear
+     */
+    clearTemplateCache(templateName = null) {
+        try {
+            if (templateName) {
+                const cacheKey = `hextrackr_template_${templateName}`;
+                localStorage.removeItem(cacheKey);
+            } else {
+                // Clear all template caches
+                const keys = Object.keys(localStorage);
+                keys.forEach(key => {
+                    if (key.startsWith('hextrackr_template_')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+            }
+        } catch (error) {
+            console.warn('Failed to clear template cache:', error);
+        }
+    }
+
+    /**
+     * Create default email template if none exists
+     */
+    async createDefaultTemplate() {
+        const defaultContent = `Subject: Hexagon Work Order - [SITE_NAME] - [HEXAGON_NUM]
+
+Hello [GREETING],
+
+We have submitted a Hexagon work order ([HEXAGON_NUM]) for the [SITE_NAME] site.
+
+There are critical security patches that must be applied within 30 days.
+
+Please see the attached notes for more information. If you have any questions or concerns please feel free to reach out to NetOps at netops@oneok.com.
+
+**MAINTENANCE DETAILS:**
+• Location: [SITE_NAME] - [LOCATION]
+• Hexagon Ticket: [HEXAGON_NUM]
+• ServiceNow Reference: [SERVICENOW_NUM]
+• Required Completion: [DATE_DUE]
+
+**AFFECTED SYSTEMS:**
+[DEVICE_COUNT] device(s) require security patches and will need to be rebooted:
+[DEVICE_LIST]
+
+**ACTION REQUIRED:**
+• Schedule a maintenance window of at least 2 hours
+• Contact ITCC at 918-732-4822 with ServiceNow ticket [SERVICENOW_NUM]
+• Coordinate with NetOps for patch application
+
+**TIMELINE:**
+• Request Submitted: [DATE_SUBMITTED]
+• Required Completion: [DATE_DUE]
+• Maintenance Window: To be scheduled
+
+[VULNERABILITY_SUMMARY]
+
+Please confirm receipt and provide your proposed maintenance window.
+
+---
+Generated by HexTrackr v1.0.21
+Ticket ID: [XT_NUMBER]`;
+
+        try {
+            const templateData = {
+                name: 'default_email',
+                description: 'Default email template for Hexagon work orders',
+                template_content: defaultContent,
+                default_content: defaultContent,
+                variables: JSON.stringify(this.variables),
+                category: 'email'
+            };
+
+            const response = await fetch('/api/templates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(templateData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            if (result.success) {
+                this.currentTemplate = result.data;
+
+                // Cache the new template
+                this.cacheTemplate(this.currentTemplate);
+
+                // Load template content into editor
+                const editor = document.getElementById('templateEditor');
+                if (editor) {
+                    editor.value = this.currentTemplate.template_content;
+                    this.validateTemplate();
+                }
+            } else {
+                throw new Error(result.error || 'Failed to create default template');
+            }
+        } catch (error) {
+            console.error('Error creating default template:', error);
+            throw error;
         }
     }
 }

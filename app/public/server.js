@@ -35,6 +35,7 @@ const importRoutes = require("../routes/imports");
 const backupRoutes = require("../routes/backup");
 const docsRoutes = require("../routes/docs");
 const templateRoutes = require("../routes/templates");
+const kevRoutes = require("../routes/kev");
 
 // Express application & HTTP server
 const app = express();
@@ -146,6 +147,7 @@ async function initializeApplication() {
     app.use("/api", importRoutes); // handles /vulnerabilities/import, /import/tickets, /imports, etc.
     app.use("/api/tickets", ticketRoutes);
     app.use("/api/templates", templateRoutes);
+    app.use("/api/kev", kevRoutes(db));
 
     // Legacy lightweight endpoints retained from monolith
     app.get("/api/sites", (req, res) => {

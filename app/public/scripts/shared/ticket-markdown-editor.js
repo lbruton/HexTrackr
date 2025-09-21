@@ -37,7 +37,9 @@ class TicketMarkdownEditor {
             { name: '[SUPERVISOR]', description: 'Supervisor name', required: false },
             { name: '[TECHNICIAN]', description: 'Technician name', required: false },
             { name: '[NOTES]', description: 'Additional notes', required: false },
-            { name: '[GENERATED_TIME]', description: 'Current date and time', required: false }
+            { name: '[GENERATED_TIME]', description: 'Current date and time', required: false },
+            { name: '[GREETING]', description: 'Supervisor greeting', required: false },
+            { name: '[VULNERABILITY_SUMMARY]', description: 'Vulnerability assessment summary', required: false }
         ];
 
         this.init();
@@ -79,6 +81,9 @@ class TicketMarkdownEditor {
                 if (editor) {
                     editor.focus();
                 }
+
+                // Ensure variable panel is populated
+                this.populateVariablePanel();
 
                 this.showToast('Ticket template edit mode enabled', 'info');
             } catch (error) {
@@ -265,22 +270,27 @@ Generated: [GENERATED_TIME]`;
     processTemplate(template, ticket) {
         let processed = template;
 
-        // Replace variables with actual data
+        // Replace variables with actual data - matching server-side variable names
         const replacements = {
-            '[HEXAGON_TICKET]': ticket.hexagonTicket || 'N/A',
-            '[SERVICENOW_TICKET]': ticket.serviceNowTicket || 'N/A',
-            '[XT_NUMBER]': ticket.xtNumber || ticket.xt_number || 'N/A',
+            '[GREETING]': this.getSupervisorGreeting(ticket.supervisor),
+            '[SITE_NAME]': ticket.site || 'N/A',
             '[SITE]': ticket.site || 'N/A',
             '[LOCATION]': ticket.location || 'N/A',
             '[STATUS]': ticket.status || 'N/A',
-            '[DATE_SUBMITTED]': this.formatDate(ticket.dateSubmitted),
-            '[DATE_DUE]': this.formatDate(ticket.dateDue),
+            '[HEXAGON_NUM]': ticket.hexagon_ticket || ticket.hexagonTicket || 'N/A',
+            '[HEXAGON_TICKET]': ticket.hexagon_ticket || ticket.hexagonTicket || 'N/A',
+            '[SERVICENOW_NUM]': ticket.servicenow_ticket || ticket.serviceNowTicket || 'N/A',
+            '[SERVICENOW_TICKET]': ticket.servicenow_ticket || ticket.serviceNowTicket || 'N/A',
+            '[XT_NUMBER]': ticket.xt_number || ticket.xtNumber || `${ticket.id}`,
             '[DEVICE_COUNT]': ticket.devices ? ticket.devices.length : 0,
             '[DEVICE_LIST]': this.formatDeviceList(ticket.devices),
+            '[DATE_DUE]': this.formatDate(ticket.date_due || ticket.dateDue),
+            '[DATE_SUBMITTED]': this.formatDate(ticket.date_submitted || ticket.dateSubmitted),
             '[SUPERVISOR]': ticket.supervisor || 'N/A',
-            '[TECHNICIAN]': ticket.tech || 'N/A',
-            '[NOTES]': ticket.notes || '',
-            '[GENERATED_TIME]': `${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`
+            '[TECHNICIAN]': ticket.technician || ticket.tech || 'N/A',
+            '[NOTES]': ticket.notes || ticket.additional_notes || 'N/A',
+            '[GENERATED_TIME]': new Date().toLocaleString(),
+            '[VULNERABILITY_SUMMARY]': this.generateVulnerabilitySummary(ticket)
         };
 
         Object.keys(replacements).forEach(variable => {
@@ -315,6 +325,55 @@ Generated: [GENERATED_TIME]`;
         } catch (error) {
             return dateString;
         }
+    }
+
+    /**
+     * Get supervisor greeting (matches server-side logic)
+     * @param {string} supervisorField - Supervisor field value
+     * @returns {string} Appropriate greeting
+     */
+    getSupervisorGreeting(supervisorField) {
+        if (!supervisorField || supervisorField === "N/A") {
+            return "[Supervisor First Name]";
+        }
+
+        const trimmed = supervisorField.trim();
+
+        // Check for multiple supervisors (semicolon or comma separated)
+        if (trimmed.includes(';') || trimmed.includes(',')) {
+            return "Team";
+        }
+
+        // Extract first name from "LAST, FIRST" format
+        if (trimmed.includes(',')) {
+            const parts = trimmed.split(',');
+            if (parts.length >= 2) {
+                const firstName = parts[1].trim();
+                return firstName || "[Supervisor First Name]";
+            }
+        }
+
+        // For single word entries, return as-is
+        if (!trimmed.includes(' ') && !trimmed.includes(',')) {
+            return trimmed;
+        }
+
+        // For other formats, try to extract first word
+        const firstWord = trimmed.split(' ')[0];
+        return firstWord || "[Supervisor First Name]";
+    }
+
+    /**
+     * Generate vulnerability summary for ticket
+     * @param {Object} ticket - Ticket data
+     * @returns {string} Vulnerability summary
+     */
+    generateVulnerabilitySummary(ticket) {
+        // Simple implementation - could be enhanced with actual vulnerability data
+        if (ticket?.devices && ticket.devices.length > 0) {
+            return `Vulnerability assessment pending for ${ticket.devices.length} device(s): ${ticket.devices.join(', ')}`;
+        }
+        return 'No vulnerability data available';
     }
 
     /**
@@ -520,8 +579,8 @@ Generated: [GENERATED_TIME]`;
         const warnings = [];
 
         // Basic bracket matching
-        const openBrackets = (content.match(/\\[/g) || []).length;
-        const closeBrackets = (content.match(/\\]/g) || []).length;
+        const openBrackets = (content.match(/\[/g) || []).length;
+        const closeBrackets = (content.match(/\]/g) || []).length;
 
         if (openBrackets !== closeBrackets) {
             errors.push('Unmatched brackets detected');
