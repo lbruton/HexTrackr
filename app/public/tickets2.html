@@ -606,6 +606,12 @@
                         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="ticketManager.copyVulnerabilityMarkdown()">
                             <i class="fas fa-copy me-1"></i>Vulnerabilities
                         </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="ticketManager.copyEmailMarkdown()">
+                            <i class="fas fa-envelope me-1"></i>Email
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" disabled title="Template editing coming in v1.0.21">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </button>
                         <button type="button" class="btn btn-outline-success btn-sm" onclick="ticketManager.downloadBundleFromView()">
                             <i class="fas fa-archive me-2"></i>Download Bundle
                         </button>
@@ -625,6 +631,12 @@
                                 Vulnerabilities
                             </button>
                         </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email-content"
+                                type="button" role="tab" aria-controls="email-content" aria-selected="false">
+                                Email Template
+                            </button>
+                        </li>
                     </ul>
 
                     <!-- Tab Content -->
@@ -637,6 +649,12 @@
                                 <i class="fas fa-spinner fa-spin me-2"></i>Loading vulnerability data...
                             </div>
                             <pre id="vulnerabilityMarkdownContent" class="terminal-content" style="display: none;"></pre>
+                        </div>
+                        <div class="tab-pane fade" id="email-content" role="tabpanel" aria-labelledby="email-tab">
+                            <div id="emailLoadingMessage" class="text-center text-muted py-3">
+                                <i class="fas fa-spinner fa-spin me-2"></i>Generating email template...
+                            </div>
+                            <pre id="emailMarkdownContent" class="terminal-content" style="display: none;"></pre>
                         </div>
                     </div>
                 </div>
