@@ -1125,6 +1125,17 @@ class HexagonTicketsManager {
             vulnLoading.style.display = 'block';
         }
 
+        // Clear email markdown content initially
+        const emailContent = document.getElementById("emailMarkdownContent");
+        const emailLoading = document.getElementById("emailLoadingMessage");
+        if (emailContent) {
+            emailContent.textContent = '';
+            emailContent.style.display = 'none';
+        }
+        if (emailLoading) {
+            emailLoading.style.display = 'block';
+        }
+
         // Load vulnerability data when the tab is clicked
         const vulnTabBtn = document.getElementById("vulnerabilities-tab");
         if (vulnTabBtn) {
@@ -1134,6 +1145,18 @@ class HexagonTicketsManager {
 
             newVulnTabBtn.addEventListener('shown.bs.tab', async () => {
                 await this.loadVulnerabilityMarkdownForModal();
+            });
+        }
+
+        // Load email template when the tab is clicked
+        const emailTabBtn = document.getElementById("email-tab");
+        if (emailTabBtn) {
+            // Remove any existing listeners to prevent duplicates
+            const newEmailTabBtn = emailTabBtn.cloneNode(true);
+            emailTabBtn.parentNode.replaceChild(newEmailTabBtn, emailTabBtn);
+
+            newEmailTabBtn.addEventListener('shown.bs.tab', async () => {
+                await this.loadEmailMarkdownForModal();
             });
         }
         
@@ -2527,6 +2550,168 @@ class HexagonTicketsManager {
         return markdown;
     }
 
+    // Generate vulnerability summary for email
+    generateVulnerabilitySummaryForEmail(ticket, vulnerabilities) {
+        if (!ticket.devices || ticket.devices.length === 0) {
+            return "";
+        }
+
+        let summary = "**VULNERABILITY SUMMARY:**\n\n";
+
+        // Group vulnerabilities by device
+        const deviceVulnMap = {};
+
+        // Initialize all devices with 0 counts
+        ticket.devices.forEach(device => {
+            deviceVulnMap[device.toUpperCase()] = {
+                critical: 0,
+                high: 0,
+                medium: 0,
+                low: 0,
+                total: 0
+            };
+        });
+
+        // Count vulnerabilities per device
+        vulnerabilities.forEach(vuln => {
+            const matchedDevice = ticket.devices.find(device =>
+                this.hostnameMatches(vuln.hostname, device)
+            );
+
+            if (matchedDevice) {
+                const key = matchedDevice.toUpperCase();
+                if (deviceVulnMap[key]) {
+                    const severity = vuln.severity?.toLowerCase() || 'low';
+                    if (deviceVulnMap[key][severity] !== undefined) {
+                        deviceVulnMap[key][severity]++;
+                    }
+                    deviceVulnMap[key].total++;
+                }
+            }
+        });
+
+        // Generate summary lines
+        ticket.devices.forEach(device => {
+            const key = device.toUpperCase();
+            const counts = deviceVulnMap[key];
+
+            if (counts.total === 0) {
+                summary += `${device}: No vulnerabilities found\n`;
+            } else {
+                summary += `${device}: ${counts.total} total vulnerabilities`;
+
+                // Add severity breakdown if there are vulnerabilities
+                const severityBreakdown = [];
+                if (counts.critical > 0) severityBreakdown.push(`${counts.critical} critical`);
+                if (counts.high > 0) severityBreakdown.push(`${counts.high} high`);
+                if (counts.medium > 0) severityBreakdown.push(`${counts.medium} medium`);
+                if (counts.low > 0) severityBreakdown.push(`${counts.low} low`);
+
+                if (severityBreakdown.length > 0) {
+                    summary += ` (${severityBreakdown.join(', ')})`;
+                }
+                summary += '\n';
+            }
+        });
+
+        return summary;
+    }
+
+    // Helper function to extract first name from supervisor field
+    getSupervisorGreeting(supervisorField) {
+        if (!supervisorField || supervisorField === "N/A") {
+            return "[Supervisor First Name]";
+        }
+
+        const trimmed = supervisorField.trim();
+
+        // Check for multiple supervisors (semicolon, ampersand, or multiple commas)
+        const commaCount = (trimmed.match(/,/g) || []).length;
+        if (trimmed.includes(';') || trimmed.includes('&') || commaCount > 1) {
+            return "Team";
+        }
+
+        // Handle "Last, First" format (single comma)
+        if (commaCount === 1) {
+            const parts = trimmed.split(',');
+            if (parts.length >= 2) {
+                const firstName = parts[1].trim().split(' ')[0];
+                if (firstName) return firstName;
+            }
+        }
+
+        // Handle "First Last" or "First Middle Last" format
+        const parts = trimmed.split(' ');
+        if (parts.length > 0 && parts[0]) {
+            return parts[0];
+        }
+
+        return trimmed;
+    }
+
+    // Generate email template markdown for ticket
+    generateEmailMarkdown(ticket) {
+        const siteName = ticket.site || "[Site Name]";
+        const location = ticket.location || "[Location]";
+        const hexagonNum = ticket.hexagonTicket || "[Hexagon #]";
+        const serviceNowNum = ticket.serviceNowTicket || "[ServiceNow #]";
+        const xtNumber = ticket.xt_number || `XT#${ticket.id}`;
+        const deviceCount = ticket.devices ? ticket.devices.length : 0;
+        const dateDue = this.formatDate(ticket.dateDue);
+        const dateSubmitted = this.formatDate(ticket.dateSubmitted);
+
+        // Get appropriate greeting
+        const greeting = this.getSupervisorGreeting(ticket.supervisor);
+
+        // Build email
+        let email = `Subject: Hexagon Work Order - ${siteName} - ${hexagonNum}\n\n`;
+
+        email += `Hello ${greeting},\n\n`;
+
+        email += `We have submitted a Hexagon work order (${hexagonNum}) for the ${siteName} site.\n\n`;
+
+        email += "There are critical security patches that must be applied within 30 days.\n\n";
+
+        email += "Please see the attached notes for more information. If you have any questions or concerns please feel free to reach out to NetOps at netops@oneok.com.\n\n";
+
+        email += "**MAINTENANCE DETAILS:**\n";
+        email += `• Location: ${siteName} - ${location}\n`;
+        email += `• Hexagon Ticket: ${hexagonNum}\n`;
+        email += `• ServiceNow Reference: ${serviceNowNum}\n`;
+        email += `• Required Completion: ${dateDue}\n\n`;
+
+        email += "**AFFECTED SYSTEMS:**\n";
+        if (deviceCount > 0) {
+            email += `${deviceCount} device${deviceCount > 1 ? 's' : ''} require security patches and will need to be rebooted:\n`;
+            ticket.devices.forEach((device, index) => {
+                email += `${index + 1}. ${device}\n`;
+            });
+            email += "\n";
+        } else {
+            email += "Device list to be confirmed\n\n";
+        }
+
+        email += "**ACTION REQUIRED:**\n";
+        email += "• Schedule a maintenance window of at least 2 hours\n";
+        email += `• Contact ITCC at 918-732-4822 with ServiceNow ticket ${serviceNowNum}\n`;
+        email += "• Coordinate with NetOps for patch application\n\n";
+
+        email += "**TIMELINE:**\n";
+        email += `• Request Submitted: ${dateSubmitted}\n`;
+        email += `• Required Completion: ${dateDue}\n`;
+        email += "• Maintenance Window: To be scheduled\n\n";
+
+        // Note: Vulnerability summary will be added by loadEmailMarkdownForModal
+
+        email += "Please confirm receipt and provide your proposed maintenance window.\n\n";
+
+        email += "---\n";
+        email += "Generated by HexTrackr v1.0.20\n";
+        email += `Ticket ID: ${xtNumber}\n`;
+
+        return email;
+    }
+
     // Copy ticket markdown to clipboard
     copyTicketMarkdown() {
         const content = document.getElementById("markdownContent").textContent;
@@ -2561,6 +2746,106 @@ class HexagonTicketsManager {
             console.error("Failed to copy vulnerability markdown:", err);
             this.showToast("Failed to copy vulnerability report", "error");
         });
+    }
+
+    // Copy email markdown to clipboard
+    async copyEmailMarkdown() {
+        // First ensure we have the email markdown loaded
+        const emailContent = document.getElementById("emailMarkdownContent");
+
+        if (!emailContent || !emailContent.textContent || emailContent.textContent.trim() === '') {
+            // If not loaded, generate it first
+            await this.loadEmailMarkdownForModal();
+        }
+
+        const content = document.getElementById("emailMarkdownContent").textContent;
+
+        if (!content || content.trim() === '') {
+            this.showToast("No email template available for this ticket", "warning");
+            return;
+        }
+
+        navigator.clipboard.writeText(content).then(() => {
+            this.showToast("Email template copied to clipboard!", "success");
+        }).catch(err => {
+            console.error("Failed to copy email markdown:", err);
+            this.showToast("Failed to copy email template", "error");
+        });
+    }
+
+    // Load email markdown for modal display
+    async loadEmailMarkdownForModal() {
+        const ticketId = document.getElementById("viewTicketModal").getAttribute("data-ticket-id");
+        const ticket = this.getTicketById(ticketId);
+
+        if (!ticket) {
+            console.error("[EmailTemplate] Ticket not found:", ticketId);
+            document.getElementById("emailMarkdownContent").textContent = "# Error Loading Email Template\n\nTicket not found.";
+            document.getElementById("emailMarkdownContent").style.display = 'block';
+            document.getElementById("emailLoadingMessage").style.display = 'none';
+            return;
+        }
+
+        try {
+            // Generate the base email markdown
+            let emailMarkdown = this.generateEmailMarkdown(ticket);
+
+            // If there are devices, fetch vulnerability data and append summary
+            if (ticket.devices && ticket.devices.length > 0) {
+                try {
+                    // Show loading message while fetching
+                    document.getElementById("emailLoadingMessage").textContent = "Generating email template with vulnerability summary...";
+
+                    // Fetch vulnerabilities for the devices
+                    const vulnerabilities = await this.fetchVulnerabilitiesForDevices(ticket.devices);
+
+                    // Insert vulnerability summary before the "Please confirm receipt" line
+                    const confirmReceiptIndex = emailMarkdown.indexOf("\nPlease confirm receipt");
+                    if (confirmReceiptIndex > -1) {
+                        const beforeConfirm = emailMarkdown.substring(0, confirmReceiptIndex);
+                        const fromConfirm = emailMarkdown.substring(confirmReceiptIndex);
+
+                        // Generate vulnerability summary
+                        const vulnSummary = this.generateVulnerabilitySummaryForEmail(ticket, vulnerabilities || []);
+
+                        // Combine with vulnerability summary
+                        emailMarkdown = beforeConfirm + vulnSummary + "\n" + fromConfirm;
+                    } else {
+                        // Fallback: insert before final separator
+                        const finalSeparatorIndex = emailMarkdown.lastIndexOf("\n---\nGenerated by HexTrackr");
+                        if (finalSeparatorIndex > -1) {
+                            const beforeFinalSeparator = emailMarkdown.substring(0, finalSeparatorIndex);
+                            const finalSeparator = emailMarkdown.substring(finalSeparatorIndex);
+                            const vulnSummary = this.generateVulnerabilitySummaryForEmail(ticket, vulnerabilities || []);
+                            emailMarkdown = beforeFinalSeparator + "\n" + vulnSummary + finalSeparator;
+                        }
+                    }
+
+                    console.log('[EmailTemplate] Added vulnerability summary to email template');
+                } catch (vulnError) {
+                    console.error('[EmailTemplate] Error fetching vulnerabilities:', vulnError);
+                    // Continue without vulnerability data - don't fail the whole email
+                    const confirmReceiptIndex = emailMarkdown.indexOf("\nPlease confirm receipt");
+                    if (confirmReceiptIndex > -1) {
+                        const beforeConfirm = emailMarkdown.substring(0, confirmReceiptIndex);
+                        const fromConfirm = emailMarkdown.substring(confirmReceiptIndex);
+                        emailMarkdown = beforeConfirm + "**VULNERABILITY SUMMARY:**\n\nUnable to fetch vulnerability data.\n\n" + fromConfirm;
+                    }
+                }
+            }
+
+            // Display the complete email markdown
+            document.getElementById("emailMarkdownContent").textContent = emailMarkdown;
+            document.getElementById("emailMarkdownContent").style.display = 'block';
+            document.getElementById("emailLoadingMessage").style.display = 'none';
+
+            console.log('[EmailTemplate] Email template generated for ticket:', ticketId);
+        } catch (error) {
+            console.error('[EmailTemplate] Error generating email template:', error);
+            document.getElementById("emailMarkdownContent").textContent = "# Error Loading Email Template\n\nFailed to generate email template. Please try again.";
+            document.getElementById("emailMarkdownContent").style.display = 'block';
+            document.getElementById("emailLoadingMessage").style.display = 'none';
+        }
     }
 
     // Backwards compatibility
