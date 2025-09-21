@@ -7,7 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.17] - 2025-09-19
 
+### Added
+
+#### UI/UX Enhancements
+
+- **tickets2.html Beta Implementation**: Introduced beta version of redesigned tickets page with AG-Grid integration
+  - Advanced table with column filtering, sorting, resizing, and responsive design
+  - SITE and LOCATION columns with ticket accent colors for visual categorization
+  - Enhanced user experience with modern data table interface
+  - Maintains backward compatibility with existing tickets.html
+
 ### Fixed
+
+#### Theme Engine & Visual Improvements
+
+- **Card Border Visibility**: Fixed critical card border issue where vulnerability and device cards blended into page background
+  - Root cause: CSS specificity conflicts with `border-color: transparent !important` overrides in dark theme
+  - Solution: Standardized border variables from `--tblr-border-color` to `--hextrackr-border-subtle`
+  - Enhanced border opacity from 0.08 to 0.15 for better visibility across both light and dark modes
+  - Applied Five Whys root cause analysis to identify true underlying issues
+
+- **AG-Grid Dark Mode Contrast**: Fixed poor contrast for SITE and LOCATION ticket accent colors in dark mode
+  - Moved ticket accent colors from `.ag-theme-quartz` scope to global `[data-bs-theme="dark"]` scope
+  - Optimized colors for WCAG AA compliance with enhanced contrast ratios:
+    - Teal: #2dd4bf → #5eead4 (9.5:1 contrast ratio)
+    - Amber: #fbbf24 → #fcd34d (11.2:1 contrast ratio)
+    - Slate: #94a3b8 → #cbd5e1 (10.2:1 contrast ratio)
+  - All ticket accent colors now meet accessibility standards for dark backgrounds
+
+- **CSS Variable Consolidation**: Comprehensive cleanup of CSS variable architecture
+  - Fixed Stylelint duplicate variable warnings by creating properly namespaced versions
+  - Implemented standard and `-contrast` variants for VPR (Vulnerability Priority Rating) colors
+  - Consolidated shadow variables with theme-specific opacity values
+  - Created single source of truth for all color definitions across light/dark themes
+
+- **Device Card Interactivity**: Enhanced device cards with click functionality matching vulnerability cards
+  - Made device cards clickable with proper cursor styling and modal integration
+  - Unified user experience patterns between vulnerability and device card interactions
+  - Added comprehensive JSDoc documentation for improved code maintainability
 
 #### CSV Import Pipeline
 
@@ -27,12 +64,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
+- **CSS Theme Architecture**: Added comprehensive documentation for theme system architecture
+  - Documented CSS variable hierarchy and naming conventions
+  - Added WCAG contrast guidelines and accessibility best practices
+  - Provided CSS customization guide for theme modifications
+
 - **Developer Documentation Link**: Fixed broken dev docs link in documentation portal
   - Changed from `/dev-docs/` to `/dev-docs-html/` to match actual directory structure
 
 - **JSDoc Regeneration**: Updated developer documentation with all recent fixes
   - Documented new import service functions and batch processing
   - Added comprehensive function descriptions for ImportService
+  - Enhanced vulnerability-cards.js with detailed JSDoc comments
 
 ## [1.0.16] - 2025-09-18
 
