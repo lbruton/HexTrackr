@@ -111,8 +111,11 @@ async function initializeApplication() {
         try {
             let version = "unknown";
             try {
-                version = require("./package.json").version;
+                // Try to read from the mounted package.json in Docker container (/app/package.json)
+                // Server is at /app/public/server.js, so package.json is at ../package.json
+                version = require("../package.json").version;
             } catch (packageError) {
+                // Fallback to environment variable if package.json not found
                 version = process.env.HEXTRACKR_VERSION || "unknown";
                 console.log(`Using environment version: ${version} (package.json not found: ${packageError.message})`);
             }
