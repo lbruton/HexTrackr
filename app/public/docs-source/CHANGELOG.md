@@ -20,6 +20,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Smooth animations and visual feedback for improved user experience
   - Resolves issue where users had no visibility of attached files until downloading bundles
 
+### Fixed
+
+#### Bug Fixes
+
+- **Attachment Tooltip Navigation Bug**: Fixed issue where tooltip displayed empty content after navigating between pages
+  - Root cause: Bootstrap tooltip wasn't properly reinitializing when returning to tickets page
+  - Solution: Dispose old tooltip instances and create fresh ones with proper data on page load
+  - Added 100ms delay to ensure DOM readiness when navigating between pages
+
+- **Version Display in Health Endpoint**: Fixed incorrect version reporting in `/health` API endpoint
+  - Corrected package.json path in server.js from `./package.json` to `../package.json` for Docker container
+  - Updated docker-compose.yml HEXTRACKR_VERSION environment variable to match package.json
+  - Health endpoint now correctly reports version 1.0.18 instead of falling back to old versions
+
+#### Documentation
+
+- **JSDoc Dark Mode Restoration**: Fixed missing dark mode support in developer documentation
+  - Ran `inject-jsdoc-theme.js` script to inject theme synchronization into 96 JSDoc HTML files
+  - Dark mode now properly syncs with main application theme preference
+  - Restored proper styling with dark backgrounds (#0f172a) and light text in dark mode
+
 ## [1.0.17] - 2025-09-19
 
 ### Added
