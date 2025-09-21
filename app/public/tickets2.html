@@ -849,12 +849,17 @@
             if (!isUnifiedEditMode) {
                 // Entering unified edit mode
                 try {
-                    // Set ticket data for both editors
-                    const currentTicket = window.ticketManager?.currentTicket;
-                    if (currentTicket) {
-                        window.ticketEditor.setTicketData(currentTicket);
-                        window.templateEditor.setTicketData(currentTicket);
+                    // Get ticket data from modal
+                    const ticketId = document.getElementById("viewTicketModal").getAttribute("data-ticket-id");
+                    const currentTicket = window.ticketManager?.getTicketById(ticketId);
+
+                    if (!currentTicket) {
+                        throw new Error('No ticket data available for editing');
                     }
+
+                    // Set ticket data for both editors
+                    window.ticketEditor.setTicketData(currentTicket);
+                    window.templateEditor.setTicketData(currentTicket);
 
                     // Toggle both editors to edit mode
                     await window.ticketEditor.toggleEditMode();
