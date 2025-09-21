@@ -159,31 +159,40 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             cellRenderer: (params) => {
                 const cve = params.value;
                 const pluginName = params.data.plugin_name;
-                
-                // Simple single CVE handling (records are now split during import)
+
+                // Simple single CVE handling - open external CVE link in popup
                 if (cve && cve.startsWith("CVE-")) {
-                    return `<a href="#" class="link-primary" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${cve}'); return false;">${cve}</a>`;
+                    const cveUrl = `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}`;
+                    return `<a href="#" class="link-primary"
+                               onclick="window.open('${cveUrl}', 'cve_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
+                               title="View CVE details on MITRE">${cve}</a>`;
                 }
-                
-                // Check for Cisco SA ID
+
+                // Check for Cisco SA ID - open external Cisco Security Advisory in popup
                 if (cve && cve.startsWith("cisco-sa-")) {
-                    return `<a href="#" class="link-primary text-warning" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${cve}'); return false;">${cve}</a>`;
+                    const ciscoUrl = `https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/${cve}`;
+                    return `<a href="#" class="link-primary text-warning"
+                               onclick="window.open('${ciscoUrl}', 'cisco_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
+                               title="View Cisco Security Advisory">${cve}</a>`;
                 }
-                
-                // Check for Cisco SA ID in plugin name (fallback)
+
+                // Check for Cisco SA ID in plugin name (fallback) - open external link in popup
                 if (pluginName && typeof pluginName === "string") {
                     const ciscoSaMatch = pluginName.match(/cisco-sa-([a-zA-Z0-9-]+)/i);
                     if (ciscoSaMatch) {
                         const ciscoId = `cisco-sa-${ciscoSaMatch[1]}`;
-                        return `<a href="#" class="link-primary text-warning" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${ciscoId}'); return false;">${ciscoId}</a>`;
+                        const ciscoUrl = `https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/${ciscoId}`;
+                        return `<a href="#" class="link-primary text-warning"
+                                   onclick="window.open('${ciscoUrl}', 'cisco_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
+                                   title="View Cisco Security Advisory">${ciscoId}</a>`;
                     }
                 }
-                
+
                 // Fall back to Plugin ID
                 if (params.data.plugin_id) {
                     return `<span class="text-muted">Plugin ${params.data.plugin_id}</span>`;
                 }
-                
+
                 return "-";
             }
         },

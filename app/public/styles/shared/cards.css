@@ -10,12 +10,10 @@
 
 .card {
     background-color: var(--hextrackr-surface-1);
-    /* REVERT FIX: Changed to transparent border to fix thick white borders */
-    border: 1px solid transparent !important;
+    border: 1px solid var(--hextrackr-border-subtle);
     box-shadow: var(--hextrackr-shadow-sm);
     transition: all 0.2s ease;
-    /* REVERT FIX: Set explicit border-radius to restore rounded corners */
-    border-radius: 8px !important;
+    border-radius: 8px;
 }
 
 .card:hover {
@@ -80,7 +78,7 @@
 
 .device-card {
     transition: all 0.3s ease;
-    border: 1px solid var(--tblr-border-color);
+    border: 1px solid var(--hextrackr-border-subtle);
     min-height: 320px;
     display: flex;
     flex-direction: column;
@@ -126,7 +124,7 @@
 .vulnerability-card,
 .vuln-card {
     transition: all 0.3s ease;
-    border: 1px solid var(--tblr-border-color);
+    border: 1px solid var(--hextrackr-border-subtle);
     min-height: 380px;
     display: flex;
     flex-direction: column;
@@ -281,8 +279,8 @@
 
 [data-bs-theme="dark"] .card {
     background: var(--tblr-bg-surface);
-    /* REVERT FIX: Force transparent borders in dark mode */
-    border-color: transparent !important;
+    /* Use CSS variable borders instead of forcing transparent */
+    border-color: var(--hextrackr-border-subtle);
 }
 
 [data-bs-theme="dark"] .card-header,
