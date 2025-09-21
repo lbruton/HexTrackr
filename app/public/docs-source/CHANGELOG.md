@@ -5,6 +5,21 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.18] - 2025-09-20
+
+### Added
+
+#### UI/UX Enhancements
+
+- **Attachment Visibility for Tickets**: Added comprehensive tooltip functionality for "Attach Documentation" button on tickets2.html
+  - Displays list of currently attached files with sizes on hover
+  - Shows file count badge when documents are attached (e.g., "(3)")
+  - Button changes from gray outline to blue when files are present
+  - Tooltips persist across page refreshes using localStorage
+  - Added Shift+Click and Right-Click functionality to clear all attachments with confirmation
+  - Smooth animations and visual feedback for improved user experience
+  - Resolves issue where users had no visibility of attached files until downloading bundles
+
 ## [1.0.17] - 2025-09-19
 
 ### Added
