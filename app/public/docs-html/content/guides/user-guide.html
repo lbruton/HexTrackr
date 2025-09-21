@@ -13,7 +13,7 @@
 <h2>Ticket Management</h2><p>This section provides a comprehensive overview of the features available on the Tickets page (<code>/tickets.html</code>), from creating and managing tickets to exporting data.</p>
 <h2>Creating and Editing Tickets</h2><h3>Creating a New Ticket</h3><ol>
 <li>From the main tickets view, click the <strong>Add New Ticket</strong> button to open the ticket modal.</li>
-<li>The <strong>Ticket Number (XT#)</strong> is automatically generated for you and is not editable.</li>
+<li>The <strong>Ticket Number</strong> is automatically generated as a four-digit code (e.g., <code>0001</code>) and is not editable.</li>
 <li>Fill in the required fields, including <strong>Date Submitted</strong>, <strong>Date Due</strong>, <strong>Site</strong>, and <strong>Location</strong>.</li>
 <li>Add devices to the ticket using the <strong>Devices</strong> section (see below for details).</li>
 <li>Click <strong>Save Ticket</strong> to create the new ticket.</li>
@@ -43,18 +43,18 @@
 <li>The ticket details in <strong>PDF</strong> format (generated with jsPDF using the same content as the modal).</li>
 <li>The ticket details in <strong>Markdown</strong> format.</li>
 <li>Any shared documentation uploaded during the session.</li>
-<li>File attachments stored with the record. The bundler renames files to match the XT number and sanitizes file names to avoid path traversal.</li>
+<li>File attachments stored with the record. The bundler renames files to match the ticket number and sanitizes file names to avoid path traversal.</li>
 </ul>
 </li>
 </ul>
 <h2>Searching and Filtering</h2><p>The ticket list can be quickly filtered to find what you need.</p>
 <ul>
-<li><strong>Global Search</strong>: The main search bar filters tickets based on a wide range of fields, including XT#, Hexagon #, ServiceNow #, location, site, supervisor, tech, and device names.</li>
+<li><strong>Global Search</strong>: The main search bar filters tickets based on a wide range of fields, including the four-digit ticket #, Hexagon #, ServiceNow #, location, site, supervisor, tech, and device names.</li>
 <li><strong>Status Filter</strong>: Use the dropdown to show tickets with a specific status (e.g., &quot;Open&quot;, &quot;Overdue&quot;).</li>
 <li><strong>Location Filter</strong>: This dropdown is dynamically populated with all unique locations from the tickets in the database, allowing you to easily filter by a specific location.</li>
 </ul>
 <h2>Importing Ticket Data</h2><ul>
-<li><strong>CSV Import Button</strong>: Selecting <strong>Import CSV</strong> opens a file picker and routes the file through PapaParse in the browser. The parser trims whitespace, normalizes device lists (arrays, commas, or semicolons), and generates XT numbers when the column is missing.</li>
+<li><strong>CSV Import Button</strong>: Selecting <strong>Import CSV</strong> opens a file picker and routes the file through PapaParse in the browser. The parser trims whitespace, normalizes device lists (arrays, commas, or semicolons), and generates ticket numbers when the column is missing.</li>
 <li><strong>Mode Selection</strong>: When the database already contains tickets, the importer prompts for <strong>Replace All Data</strong> (clears the table before importing) or <strong>Add to Existing Data</strong> (upsert into the current dataset). Both options call <code>POST /api/tickets/migrate</code> with a <code>mode</code> flag.</li>
 <li><strong>Error Handling</strong>: Invalid rows surface as toast notifications and are logged in the browser console for troubleshooting. The migration endpoint responds with counts for migrated and failed rows.</li>
 </ul>
@@ -347,10 +347,10 @@
 <li>Database transaction handling ensures data integrity</li>
 </ul>
 <h2>The Dashboard</h2><p>The dashboard provides multiple ways to analyze your vulnerability data.</p>
-<h3>Statistics Cards</h3><p>At the top of the page, you&#39;ll find cards summarizing the current vulnerability state by severity. You can <strong>click on any card</strong> to flip it and view the data in two ways:</p>
+<h3>Statistics Cards</h3><p>At the top of the page, you&#39;ll find cards summarizing the current vulnerability state by severity. Each card displays <strong>VPR Totals</strong> by default - the sum of the Vulnerability Priority Rating scores for that severity level, providing a risk-based perspective. You can <strong>click on any card</strong> to toggle between two views:</p>
 <ul>
+<li><strong>VPR Totals</strong> (default): The sum of all VPR scores for that severity, emphasizing overall risk.</li>
 <li><strong>Vulnerability Counts</strong>: The total number of vulnerabilities for that severity.</li>
-<li><strong>VPR Totals</strong>: The sum of the Vulnerability Priority Rating (VPR) scores for that severity, giving you a risk-based perspective.</li>
 </ul>
 <h3>Historical Trend Chart</h3><p>The main chart visualizes vulnerability trends over time. You can toggle the view to see trends based on:</p>
 <ul>

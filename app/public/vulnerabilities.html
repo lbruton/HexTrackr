@@ -430,30 +430,7 @@
                             <!-- Table View -->
                             <div id="tableView" class="view-content">
                                 <div id="vulnGrid" class="ag-theme-quartz" style="width: 100%;"></div>
-                                <!-- REVERT FIX: Added external pagination controls with page size dropdown -->
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="pagination-info">
-                                            <span id="vulnPaginationInfo" class="text-muted">Showing 0 to 0 of 0 entries</span>
-                                        </div>
-                                        <!-- REVERT FIX: Added page size dropdown like other views -->
-                                        <div class="d-flex align-items-center gap-2">
-                                            <label for="vulnPageSize" class="form-label mb-0 text-muted small">Items per page:</label>
-                                            <select id="vulnPageSize" class="form-select form-select-sm" style="width: auto;">
-                                                <option value="10">10</option>
-                                                <option value="15" selected>15</option>
-                                                <option value="25">25</option>
-                                                <option value="50">50</option>
-                                                <option value="100">100</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <nav aria-label="Table pagination">
-                                        <ul class="pagination pagination-sm mb-0" id="vulnPaginationControls">
-                                            <!-- Pagination buttons will be generated here -->
-                                        </ul>
-                                    </nav>
-                                </div>
+                                <!-- AG-Grid handles its own pagination controls -->
                             </div>
                             
                             <!-- Device Cards View -->
