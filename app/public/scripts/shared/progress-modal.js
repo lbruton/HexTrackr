@@ -84,7 +84,7 @@ class ProgressModal {
             <div class="modal fade" id="progressModal" tabindex="-1" aria-labelledby="progressModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
-                        <div class="modal-header bg-primary text-white">
+                        <div class="modal-header">
                             <h5 class="modal-title d-flex align-items-center" id="progressModalLabel">
                                 <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
                                 <span id="progressModalTitle">Processing...</span>
@@ -259,6 +259,7 @@ class ProgressModal {
             initialMessage = "Starting process..."
         } = options;
 
+
         // Add theme detection
         const currentTheme = document.documentElement.getAttribute("data-bs-theme") || "light";
         const modalElement = document.getElementById("progressModal");
@@ -289,6 +290,7 @@ class ProgressModal {
             this.currentSessionId = sessionId;
             this.websocketClient.joinProgressRoom(sessionId);
         }
+
 
         // Show modal
         this.isVisible = true;
