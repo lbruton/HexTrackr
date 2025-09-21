@@ -2,136 +2,373 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-<!-- SPEC-KIT START -->
-<!-- DO NOT MODIFY: This section is managed by spec-kit scripts -->
-## Active Technologies
-- Node.js/Express + SQLite (HexTrackr core)
+ # HexTrackr Constitutional Framework
 
-## Recent Changes
-- 003-vulnerability-vpr-score: VPR scoring implementation
-- 004-tickets-table-prototype: AG-Grid implementation for tickets table
-<!-- SPEC-KIT END -->
+ ## Preamble
 
-<!-- MANUAL ADDITIONS START -->
+ This constitutional framework governs the core ***NON-NEOTIABLE*** operating principals mandated for AI agents working on the the HexTrackr project. 
 
-## 🧠 Memory Keyword Matrix
+ ## Article I: Developmet Practices
 
-When user says → I should:
-- **"remember"/"recall"/"do you know"** → Search Memento semantically for relevant memories
-- **"last time"/"previously"/"before"** → Check recent bundles + Memento SESSION entities
-- **"we discussed"/"we talked about"** → `mcp__memento__search_nodes` with "project:hextrackr SESSION [topic]"
-- **"the bug with"/"the issue where"** → Search "critical-bug [feature]" in Memento
-- **"insight about"/"lesson learned"** → Search "INSIGHT breakthrough [topic]"
-- **"what did we decide"** → Search "DECISION conclusion [topic]"
-- **"progress on"/"status of"** → Search "in-progress blocked [feature]"
+ ### Section I: Context Accuracy
+ 
+    - Context MUST be gathered before starting any work
+        - Session Logs SHALL be stored as context bundles (See Article II, Section VI)
+      - Project Knowledge SHALL be retained in ***Memento*** (See Article II, Section II)
+      - Codebase SHALL be indexed and searchable in ***Claude-Context*** (See Article II, Section VIII)
+      - Context7 SHALL be used to verify framework documentation accuracy
 
-## 🛠️ MCP Servers Reference
+ ### Section III: Documentation Pipeline & Standards
 
-### Primary Tools
-- **Claude Context**: Semantic code search. Re-index at session start with `force: true` if git shows recent changes
-- **Memento**: Knowledge graph. Always use `mode: "semantic"` for conceptual searches
-- **Brave Search**: Web research. Use with `summary: true` then `brave_summarizer` for AI synthesis
+   - All files in /app/ directory SHALL maintain  JSDoc comment coverage
+   - All JavaScript functions SHALL include complete JSDoc comments with:
+     - @description - Clear explanation of function purpose
+     - @param - All parameters with types and descriptions
+     - @returns - Return value type and description
+     - @throws - Exceptions that may be thrown
+     - @example - Usage examples for public APIs
+     - @since - Version when feature was added
+     - @module - Module identification for organization
+   - Technical documentation SHALL reside in app/dev-docs-html/
+   - Public documentation SHALL reside in app/public/docs-source/ (markdown) and app/public/docs-html/ (HTML)
+   - Context7 SHALL be used to verify framework documentation accuracy
+   - Documentation SHALL be regenerated after every feature completion
+   - All NPM Scripts SHALL be documented in NPMGUIDE.md
+   - JSDoc coverage reports SHALL be reviewed weekly
 
-### Specialized Tools
-- **Context7**: Library docs. Call `resolve-library-id` first, then `get-library-docs`
-- **Playwright**: Browser testing. Always `docker-compose restart` before E2E tests
-- **Sequential-thinking**: Break down complex tasks into steps
-- **Zen**: Deep analysis tools (user request only)
+ ### Section IV: Code Quality and Linting
 
-## ⚡ Essential Workflows
+   - All new features, changes, and code updates SHALL pass Codacy quality checks
+   - All new features, changes, and code updates SHALL pass Markdownlint
+   - All new features, changes, and code updates SHALL pass ESlint9+
+   - All Framework code must be reviewed against Context7 to ensure accuracy. 
 
-### Session Start (/prime)
-```javascript
-// 1. Git context + re-index
-date && git log --oneline -5 && git status
-mcp__claude-context__index_codebase({path: "/Volumes/DATA/GitHub/HexTrackr", force: true})
 
-// 2. Recent memories
-mcp__memento__search_nodes({query: "project:hextrackr SESSION 2025-09", mode: "semantic"})
+### Section V: Backups and Branch Discipline
 
-// 3. Bundle check if needed
-~/.claude/hooks/list-bundles.sh | head -5
-```
+   - All development work SHALL be sourced from the 'copilot' branch
+   - Protected branches SHALL use Pull Requests for merging, never direct pushes
 
-### Code Discovery Pattern
-```
-Did I just write/modify code?
-├─ YES → Use Read/Grep directly (index is stale)
-└─ NO → Use claude-context__search_code first
-```
+### Section VI: Docker Principles
 
-### After Code Changes
-1. Read changed files directly
-2. Re-index only after batch of changes complete
-3. Never search for code just written (use Read)
+   - All Testing and Development SHALL use the docker container (8989)
+   - NEVER run http/https locally, ALWAYS use the docker container.
 
-## 🏗️ Key Patterns
+# Article II: Tool Usage
 
-### AG-Grid Tables
-- Custom cell renderers for arrays (show 2 + overflow)
-- `tooltipValueGetter` for full data display
-- Theme switching via class toggle: `ag-theme-quartz` ↔ `ag-theme-quartz-dark`
+### Section I: Memento
+   - Memento MCP SHALL be used as the primary knowledge graph for the project
+   - All Searches SHALL be Semantic (with hybrid and keyword as alternatives)
+   - Entities SHALL Use PROJECT:DOMAIN:TYPE classification pattern
+   - Entities SHALL Contain TIMESTAMP in ISO 8601 format as first observation
+   - Entities SHALL Contain an ABSTRACT (second) and SUMMARY (third) observation
+   - All entities SHALL be tagged per `/memento/TAXONOMY.md` requirements
+   - Tag taxonomy and conventions defined in `/memento/TAXONOMY.md` SHALL be followed
 
-### Security & Testing
-- **PathValidator** for all file operations
-- **Docker only** for testing (port 8989)
-- **Lint before commit**: `npm run eslint && npm run stylelint`
+### Section II: Context 7
+   - Context7 SHALL be used for all code changes to ensure full framework compatability.
+   - All Framework SHALL be downloaded in markdown format to the /dev-docs/frameworks/ folder
 
-### Critical Paths
-- Controllers: `/app/controllers/` (singleton pattern)
-- Services: `/app/services/` (functional exports)
-- Frontend: `/app/public/scripts/pages/` (ES6 modules)
-- Styles: `/app/public/styles/` (modular CSS)
+### Section III: Brave Search
+   - Web searches SHALL be completed using the brave-search MCP if available and should use the summerizer option to get the best results.
 
-## 📜 Constitution & Rules
+### Section IV: Codacy
+   - All code must pass Codacy Quality Checks
 
-**LAW OF THE LAND**: `.specify/memory/constitution.md` contains mandatory operating principles
-- Claude Context is PRIMARY discovery tool (not file reads)
-- All code MUST pass linting (ESLint 9+, Stylelint)
-- Docker for ALL testing (never run locally)
-- Document AFTER feature completion
+### Section V: Playwright
+   - Playwright Testing SHALL be performed before and after any UI changes.
 
-**Spec-Kit** (EXPERIMENTAL): Use `/specify` → `/plan` → `/tasks` when helpful, not mandatory
+### Section VI: Sequential Thinking
+   - All tasks SHALL be broken down with Sequential Thinking 
 
-## 🚀 Quick Commands
+### Section VII: Zen
+   - If Available, Zen tools may be used at the users request only.
+
+### Section VIII: Claude-Context
+   - Claude-Context MUST be used when searching the code base
+   - Always verify the Index is current beore searches. 
+
+## Artivle IV: Gemini CLI Tools
+   - Gemini CLI may be used for coplext tasks at the users request only. 
+   - All tools SHALL be documented in ~/docs/GEMINICLITOOLS.md
+
+## Article V: Codex CLI Tools
+   - Codex CLI Tools may be used for complext tasks at the users request only. 
+   - All tools SHALL be documented in ~/docs/CODEXCLITOOLS.md
+
+## Article V: Custom Context Bundles
+Execute this exact command using the Bash tool:
+- Run: `~/.claude/hooks/list-bundles.sh | head -10` to see recent session summaries
+
+
+## Project Overview
+
+HexTrackr is a network administrator's toolkit for tracking maintenance tickets and vulnerability management. It provides a unified dashboard for ServiceNow tickets, Hexagon maintenance windows, and vulnerability reports from various scanners.
+
+## Essential Commands
 
 ### Development
 ```bash
-docker-compose up -d         # Start (port 8989)
-docker-compose restart       # Before Playwright tests
-npm run eslint:fix          # Fix JS issues
-npm run stylelint:fix       # Fix CSS issues
+# Start the application (always use Docker)
+docker-compose up -d
+
+# Access the application
+open http://localhost:8989
+
+# Watch logs
+docker-compose logs -f
+
+# Restart container (required before Playwright tests)
+docker-compose restart
 ```
 
-### Documentation
+### Database Operations
 ```bash
-npm run docs:generate       # Update HTML portal
-npm run docs:pipeline       # JSDoc → Markdown
+# Initialize database
+npm run init-db
+
+# Access SQLite database
+sqlite3 data/hextrackr.db
 ```
 
 ### Testing
 ```bash
-npm test                    # All tests
-npx playwright test         # E2E tests
-npm run test:coverage       # Coverage report
+# Run all tests
+npm test
+
+# Run specific test suites
+npm run test:unit
+npm run test:integration
+npm run test:contract
+
+# Run tests with coverage
+npm run test:coverage
+
+# Watch mode for development
+npm run test:watch
 ```
 
-### Code Quality (No MCP Required)
+### Linting & Code Quality
 ```bash
-# HexTrackr has Codacy CLI built-in at .codacy/cli.sh
-./.codacy/cli.sh analyze --format text       # Text output
-./.codacy/cli.sh analyze --format json       # JSON output
+# Run all linters (ALWAYS run before committing)
+npm run lint:all
 
-# Config file: .codacy/codacy.yaml
-# Excludes tests, vendor libs, minified files
-# Tools: ESLint, Lizard, PMD, Semgrep, Trivy
+# Fix all auto-fixable issues
+npm run fix:all
+
+# Individual linters
+npm run eslint          # JavaScript linting
+npm run stylelint       # CSS linting
+npm run lint:md         # Markdown linting
+
+# Individual fixers
+npm run eslint:fix
+npm run stylelint:fix
+npm run lint:md:fix
 ```
 
-## 🎯 Focus Areas
+### Documentation
+```bash
+# Generate technical documentation (JSDoc)
+npm run docs:dev
 
-1. **Performance**: AG-Grid handles 10K+ rows, WebSocket for progress
-2. **Architecture**: Modular ES6 frontend, Express + SQLite backend
-3. **Themes**: CSS variable hierarchy for dark/light modes
-4. **Security**: PathValidator, DOMPurify, parameterized queries
+# Generate public documentation portal
+npm run docs:generate
 
-<!-- MANUAL ADDITIONS END -->
+# Full documentation pipeline
+npm run docs:all
+
+# Watch JSDoc changes
+npm run docs:dev:watch
+```
+
+## Architecture & Key Patterns
+
+### Modular Server Architecture
+The server has been refactored from a monolithic 3,800-line file to a modular structure:
+- **Main Server**: `app/public/server.js` - Express server initialization and route mounting
+- **Controllers**: `app/controllers/` - Business logic for each feature domain
+- **Routes**: `app/routes/` - RESTful API endpoint definitions
+- **Services**: `app/services/` - Shared business logic and utilities
+- **Middleware**: `app/middleware/` - Express middleware for auth, validation, etc.
+
+### Database Architecture
+- **Database**: SQLite (`data/hextrackr.db`)
+- **Service**: `app/services/databaseService.js` handles all database operations
+- **Tables**: `tickets`, `vulnerabilities`, `vulnerability_trend`, `vulnerability_daily_aggregations`
+
+### Frontend Architecture
+- **Vanilla JavaScript** with no framework dependencies
+- **Global modules** accessed via `window` object
+- **Key UI Libraries**:
+  - AG-Grid for data tables
+  - ApexCharts for visualizations
+  - Chart.js for additional charts
+  - Tabler for UI components
+
+### WebSocket Communication
+Real-time progress tracking for large imports using Socket.io:
+- Server: `app/utils/ProgressTracker.js`
+- Client: `app/public/scripts/shared/progress-manager.js`
+
+### Security Patterns
+- **PathValidator**: ALL file operations must use `app/services/PathValidator.js`
+- **Input Sanitization**: All user inputs sanitized before processing
+- **Rate Limiting**: Applied to all API endpoints
+- **CORS**: Configured in `app/config/middleware.js`
+
+## Critical Development Rules
+
+### Constitutional Requirements (MUST FOLLOW)
+1. **NEVER run HTTP/HTTPS locally** - Always use Docker container on port 8989
+2. **NEVER fix lint issues by adding underscores** to function names
+3. **ALWAYS use PathValidator** for file operations
+4. **ALWAYS maintain JSDoc comments** for all functions in `/app/` directory
+5. **ALWAYS run linters** before committing: `npm run lint:all`
+6. **ALWAYS use Codacy** for code quality checks
+7. **Development branch is 'copilot'** - never push directly to main
+
+### Testing Requirements
+1. **Restart Docker before Playwright tests**: `docker-compose restart`
+2. **Write contract tests** for all new API endpoints
+3. **Test critical functionality** before merging
+
+### Documentation Pipeline
+1. Maintain JSDoc comments during development
+2. Generate docs with `npm run docs:dev`
+3. Extract public content to `app/public/docs-source/`
+4. Generate HTML portal with `npm run docs:generate`
+
+## Working with Features
+
+### Ticket Management
+- **Main Controller**: `app/controllers/ticketController.js`
+- **Routes**: `app/routes/tickets.js`
+- **Frontend**: `app/public/scripts/pages/tickets-manager.js`
+- **Features**: Drag-and-drop ordering, XT# generation, CSV/PDF export
+
+### Vulnerability Management
+- **Core Module**: `app/public/scripts/shared/vulnerability-core.js` (ES6 modules)
+- **Controller**: `app/controllers/vulnerabilityController.js`
+- **Routes**: `app/routes/vulnerabilities.js`
+- **Features**: CSV import, deduplication, VPR scoring, CISA KEV tracking
+
+### Import Processing
+- **Controller**: `app/controllers/importController.js`
+- **Progress Tracking**: WebSocket-based real-time updates
+- **File Uploads**: Handled via `multer` to `app/uploads/`
+
+## MCP Tool Integration
+
+### Claude-Context
+- **ALWAYS index before searching**: Check index status first
+- Use for codebase searches and understanding architecture
+
+### Memento (Primary Knowledge Graph)
+
+#### Efficient Search Patterns
+- **NEVER use `read_graph`** - Will fail with 200K+ tokens
+- **ALWAYS use semantic search first** for best results
+- **Include temporal markers** for recent work discovery
+
+#### Two-Search Pattern for Context Loading
+```javascript
+// Search 1: Last 48 Hours (captures recent handoffs, sessions, insights)
+mcp__memento__search_nodes({
+  query: "[YESTERDAY] [TODAY] week-[WEEK#]-[YEAR] handoff session insight completed in-progress",
+  mode: "semantic",
+  topK: 10,
+  threshold: 0.35
+})
+
+// Search 2: Keyword-Driven (captures patterns and breakthroughs)
+mcp__memento__search_nodes({
+  query: "project:hextrackr [relevant keywords]",
+  mode: "hybrid",
+  topK: 5
+})
+```
+
+#### Entity Naming Convention
+- Pattern: `PROJECT:DOMAIN:TYPE`
+- PROJECT: `HEXTRACKR`, `PROJECT`, `SYSTEM`, `MEMENTO`, `SPEC-KIT`
+- DOMAIN: `DEVELOPMENT`, `ARCHITECTURE`, `FRONTEND`, `BACKEND`, `DATABASE`, `DOCUMENTATION`
+- TYPE: `SESSION`, `HANDOFF`, `INSIGHT`, `PATTERN`, `BREAKTHROUGH`, `ISSUE`
+
+#### Required Observations (In Order)
+1. `TIMESTAMP: ISO 8601 format` - When created
+2. `ABSTRACT: One-line summary` - Quick overview
+3. `SUMMARY: Detailed description` - Full context
+4. `[TYPE]_ID: Unique identifier` - SESSION_ID, HANDOFF_ID, etc.
+
+#### Tag Taxonomy (from /memento/TAXONOMY.md)
+
+**Project Tags** (Required):
+- `project:hextrackr`, `project:zen`, `project:claude-tools`
+
+**Temporal Tags**:
+- `week-XX-YYYY` (e.g., `week-38-2025`)
+- `YYYY-MM-DD` for specific dates
+- `sprint-X`, `vX.X.X`, `qX-YYYY`
+
+**Status Tags**:
+- `completed`, `in-progress`, `blocked`
+- `handoff`, `needs-review`, `archived`
+
+**Learning Tags**:
+- `lesson-learned`, `pattern`, `breakthrough`
+- `pain-point`, `best-practice`, `anti-pattern`
+- `reusable` for cross-project applicable
+
+**Category Tags**:
+- `frontend`, `backend`, `database`
+- `documentation`, `testing`, `infrastructure`
+
+#### Expected Entity Types
+- **SESSION entities**: Work sessions from /save-conversations.md
+- **HANDOFF entities**: Transition packages from /save-handoff.md
+- **INSIGHT entities**: Learned patterns from /save-insights.md
+- **PATTERN entities**: Reusable solutions
+- **BREAKTHROUGH entities**: Major discoveries
+
+#### Search Strategy Examples
+```javascript
+// Find recent work
+"2025-09-20 week-38-2025 handoff"
+
+// Find specific spec work
+"spec:001 backend completed"
+
+// Find cross-project insights
+"reusable pattern testing"
+
+// Find active development
+"in-progress project:hextrackr frontend"
+```
+
+### Context7
+- Verify framework documentation accuracy
+- Download framework docs to `/dev-docs/frameworks/`
+
+### Playwright
+- Test UI changes before and after modifications
+- Restart Docker before running: `docker-compose restart`
+
+## Common Troubleshooting
+
+### Port Conflicts
+- Application runs on external port 8989, internal port 8080
+- Check for conflicts: `lsof -i :8989`
+
+### Database Issues
+- Database location: `data/hextrackr.db`
+- Reset database: `npm run init-db`
+
+### Module Loading Issues
+- Vulnerability modules use ES6 syntax but loaded as regular scripts
+- Access via `window` object in browser context
+
+### Docker Issues
+- Always use `docker-compose` commands, not direct Docker
+- Logs: `docker-compose logs -f`
+- Full restart: `docker-compose down && docker-compose up -d`
