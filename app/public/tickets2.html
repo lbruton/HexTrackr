@@ -609,8 +609,8 @@
                         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="ticketManager.copyEmailMarkdown()">
                             <i class="fas fa-envelope me-1"></i>Email
                         </button>
-                        <button type="button" class="btn btn-outline-primary btn-sm" id="editTemplateBtn" onclick="toggleUnifiedEditMode()" title="Edit ticket details and email template">
-                            <i class="fas fa-edit me-1"></i>Edit
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="editTemplateBtn" onclick="toggleUnifiedEditMode()" title="Edit markdown templates for ticket, email, and vulnerabilities">
+                            <i class="fas fa-edit me-1"></i>Edit Markdown
                         </button>
                         <button type="button" class="btn btn-outline-success btn-sm" onclick="ticketManager.downloadBundleFromView()">
                             <i class="fas fa-archive me-2"></i>Download Bundle
@@ -649,78 +649,51 @@
 
                             <!-- Edit Mode (Hidden by default) -->
                             <div id="ticketEditMode" style="display: none;">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6 class="card-title mb-0">
-                                            <i class="fas fa-edit me-2"></i>Edit Ticket Details
-                                        </h6>
+                                <div class="row">
+                                    <!-- Variable Reference Panel -->
+                                    <div class="col-md-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-tags me-2"></i>Available Variables
+                                                </h6>
+                                            </div>
+                                            <div class="card-body p-2">
+                                                <div id="ticketVariablePanel" class="variable-list">
+                                                    <!-- Variables will be populated by JavaScript -->
+                                                </div>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Click variables to insert at cursor position</small>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
-                                        <form id="ticketEditForm">
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label for="editHexagonTicket" class="form-label">Hexagon Ticket #</label>
-                                                    <input type="text" class="form-control" id="editHexagonTicket" name="hexagonTicket">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="editServiceNowTicket" class="form-label">ServiceNow Ticket #</label>
-                                                    <input type="text" class="form-control" id="editServiceNowTicket" name="serviceNowTicket">
-                                                </div>
-                                            </div>
-
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label for="editSite" class="form-label">Site</label>
-                                                    <input type="text" class="form-control" id="editSite" name="site" required>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="editLocation" class="form-label">Location</label>
-                                                    <input type="text" class="form-control" id="editLocation" name="location" required>
+                                    <!-- Template Editor -->
+                                    <div class="col-md-8">
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-edit me-2"></i>Ticket Markdown Template
+                                                </h6>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="ticketMarkdownEditor.previewTemplate()" title="Preview with current ticket data">
+                                                        <i class="fas fa-eye me-1"></i>Preview
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-warning" onclick="ticketMarkdownEditor.resetToDefault()" title="Reset to default template">
+                                                        <i class="fas fa-undo me-1"></i>Reset
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-success" onclick="ticketMarkdownEditor.saveTemplate()" title="Save template changes">
+                                                        <i class="fas fa-save me-1"></i>Save
+                                                    </button>
                                                 </div>
                                             </div>
-
-                                            <div class="row mb-3">
-                                                <div class="col-md-4">
-                                                    <label for="editStatus" class="form-label">Status</label>
-                                                    <select class="form-select" id="editStatus" name="status">
-                                                        <option value="open">Open</option>
-                                                        <option value="in_progress">In Progress</option>
-                                                        <option value="waiting">Waiting</option>
-                                                        <option value="resolved">Resolved</option>
-                                                        <option value="closed">Closed</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label for="editDateSubmitted" class="form-label">Date Submitted</label>
-                                                    <input type="date" class="form-control" id="editDateSubmitted" name="dateSubmitted" required>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label for="editDateDue" class="form-label">Required Completion Date</label>
-                                                    <input type="date" class="form-control" id="editDateDue" name="dateDue" required>
-                                                </div>
+                                            <div class="card-body p-0">
+                                                <textarea id="ticketTemplateEditor" class="form-control" rows="25" placeholder="Loading template..." style="border: none; resize: vertical; font-family: 'Courier New', monospace; font-size: 13px;"></textarea>
                                             </div>
-
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <label for="editSupervisor" class="form-label">Supervisor</label>
-                                                    <input type="text" class="form-control" id="editSupervisor" name="supervisor">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="editTech" class="form-label">Technician</label>
-                                                    <input type="text" class="form-control" id="editTech" name="tech">
-                                                </div>
+                                            <div class="card-footer">
+                                                <div id="ticketTemplateValidation" class="template-validation"></div>
                                             </div>
-
-                                            <div class="mb-3">
-                                                <label for="editDevices" class="form-label">Devices <small class="text-muted">(one per line)</small></label>
-                                                <textarea class="form-control" id="editDevices" name="devices" rows="4" placeholder="Enter device names, one per line"></textarea>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label for="editNotes" class="form-label">Additional Notes</label>
-                                                <textarea class="form-control" id="editNotes" name="notes" rows="3"></textarea>
-                                            </div>
-                                        </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -790,14 +763,68 @@
                             </div>
                         </div>
                         <div class="tab-pane fade" id="vulnerabilities-content" role="tabpanel" aria-labelledby="vulnerabilities-tab">
-                            <div id="vulnerabilityLoadingMessage" class="text-center text-muted py-3">
-                                <i class="fas fa-spinner fa-spin me-2"></i>Loading vulnerability data...
+                            <!-- View Mode (Default) -->
+                            <div id="vulnerabilityViewMode">
+                                <div id="vulnerabilityLoadingMessage" class="text-center text-muted py-3">
+                                    <i class="fas fa-spinner fa-spin me-2"></i>Loading vulnerability data...
+                                </div>
+                                <pre id="vulnerabilityMarkdownContent" class="terminal-content" style="display: none;"></pre>
                             </div>
-                            <pre id="vulnerabilityMarkdownContent" class="terminal-content" style="display: none;"></pre>
+
+                            <!-- Edit Mode (Hidden by default) -->
+                            <div id="vulnerabilityEditMode" style="display: none;">
+                                <div class="row">
+                                    <!-- Variable Reference Panel -->
+                                    <div class="col-md-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-tags me-2"></i>Available Variables
+                                                </h6>
+                                            </div>
+                                            <div class="card-body p-2">
+                                                <div id="vulnerabilityVariablePanel" class="variable-list">
+                                                    <!-- Variables will be populated by JavaScript -->
+                                                </div>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Click variables to insert at cursor position</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Template Editor -->
+                                    <div class="col-md-8">
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-edit me-2"></i>Vulnerability Report Template
+                                                </h6>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="vulnerabilityMarkdownEditor.previewTemplate()" title="Preview with current vulnerability data">
+                                                        <i class="fas fa-eye me-1"></i>Preview
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-warning" onclick="vulnerabilityMarkdownEditor.resetToDefault()" title="Reset to default template">
+                                                        <i class="fas fa-undo me-1"></i>Reset
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-success" onclick="vulnerabilityMarkdownEditor.saveTemplate()" title="Save template changes">
+                                                        <i class="fas fa-save me-1"></i>Save
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <textarea id="vulnerabilityTemplateEditor" class="form-control" rows="25" placeholder="Loading template..." style="border: none; resize: vertical; font-family: 'Courier New', monospace; font-size: 13px;"></textarea>
+                                            </div>
+                                            <div class="card-footer">
+                                                <div id="vulnerabilityTemplateValidation" class="template-validation"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" id="viewTicketModalFooter">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" onclick="editTicketFromView()">
                         <i class="fas fa-edit me-2"></i>Edit Ticket
@@ -832,7 +859,8 @@
     <script src="/vendor/ag-grid/ag-grid-community.min.js"></script>
     <script src="scripts/shared/ag-grid-theme-manager.js"></script>
     <script src="scripts/shared/template-editor.js"></script>
-    <script src="scripts/shared/ticket-editor.js"></script>
+    <script src="scripts/shared/ticket-markdown-editor.js"></script>
+    <script src="scripts/shared/vulnerability-markdown-editor.js"></script>
     <script src="scripts/pages/tickets.js"></script>
     <script src="scripts/pages/tickets-aggrid.js"></script>
 
@@ -845,6 +873,7 @@
 
         async function toggleUnifiedEditMode() {
             const editBtn = document.getElementById('editTemplateBtn');
+            const modalFooter = document.getElementById('viewTicketModalFooter');
 
             if (!isUnifiedEditMode) {
                 // Entering unified edit mode
@@ -857,24 +886,31 @@
                         throw new Error('No ticket data available for editing');
                     }
 
-                    // Set ticket data for both editors
-                    window.ticketEditor.setTicketData(currentTicket);
-                    window.templateEditor.setTicketData(currentTicket);
+                    // Set ticket data for all three editors
+                    if (window.ticketMarkdownEditor) window.ticketMarkdownEditor.setTicketData(currentTicket);
+                    if (window.templateEditor) window.templateEditor.setTicketData(currentTicket);
+                    if (window.vulnerabilityMarkdownEditor) window.vulnerabilityMarkdownEditor.setTicketData(currentTicket);
 
-                    // Toggle both editors to edit mode
-                    await window.ticketEditor.toggleEditMode();
+                    // Toggle all three editors to edit mode
+                    await toggleTicketEditMode();
                     await window.templateEditor.toggleEditMode();
+                    await toggleVulnerabilityEditMode();
 
                     isUnifiedEditMode = true;
+
+                    // Hide modal footer buttons
+                    if (modalFooter) {
+                        modalFooter.style.display = 'none';
+                    }
 
                     // Update button appearance
                     editBtn.innerHTML = '<i class="fas fa-times me-1"></i>Cancel';
                     editBtn.className = 'btn btn-outline-secondary btn-sm';
-                    editBtn.title = 'Cancel editing';
+                    editBtn.title = 'Cancel markdown editing';
 
                     // Show success message
                     if (window.ticketManager?.showToast) {
-                        window.ticketManager.showToast('Unified edit mode enabled - you can now edit both ticket details and email template', 'info');
+                        window.ticketManager.showToast('Markdown edit mode enabled - you can now edit all three templates', 'info');
                     }
                 } catch (error) {
                     console.error('Error entering unified edit mode:', error);
@@ -885,16 +921,22 @@
             } else {
                 // Exiting unified edit mode
                 try {
-                    // Toggle both editors back to view mode
-                    await window.ticketEditor.toggleEditMode();
+                    // Toggle all editors back to view mode
+                    await toggleTicketEditMode();
                     await window.templateEditor.toggleEditMode();
+                    await toggleVulnerabilityEditMode();
 
                     isUnifiedEditMode = false;
 
+                    // Show modal footer buttons
+                    if (modalFooter) {
+                        modalFooter.style.display = 'flex';
+                    }
+
                     // Reset button appearance
-                    editBtn.innerHTML = '<i class="fas fa-edit me-1"></i>Edit';
+                    editBtn.innerHTML = '<i class="fas fa-edit me-1"></i>Edit Markdown';
                     editBtn.className = 'btn btn-outline-primary btn-sm';
-                    editBtn.title = 'Edit ticket details and email template';
+                    editBtn.title = 'Edit markdown templates for ticket, email, and vulnerabilities';
 
                     // Show success message
                     if (window.ticketManager?.showToast) {
@@ -903,6 +945,37 @@
                 } catch (error) {
                     console.error('Error exiting unified edit mode:', error);
                 }
+            }
+        }
+
+        // Helper functions to toggle individual edit modes
+        async function toggleTicketEditMode() {
+            const viewMode = document.getElementById('ticketViewMode');
+            const editMode = document.getElementById('ticketEditMode');
+
+            if (viewMode.style.display !== 'none') {
+                // Entering edit mode
+                viewMode.style.display = 'none';
+                editMode.style.display = 'block';
+            } else {
+                // Exiting edit mode
+                viewMode.style.display = 'block';
+                editMode.style.display = 'none';
+            }
+        }
+
+        async function toggleVulnerabilityEditMode() {
+            const viewMode = document.getElementById('vulnerabilityViewMode');
+            const editMode = document.getElementById('vulnerabilityEditMode');
+
+            if (viewMode.style.display !== 'none') {
+                // Entering edit mode
+                viewMode.style.display = 'none';
+                editMode.style.display = 'block';
+            } else {
+                // Exiting edit mode
+                viewMode.style.display = 'block';
+                editMode.style.display = 'none';
             }
         }
 
