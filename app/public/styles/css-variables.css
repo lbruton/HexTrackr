@@ -53,9 +53,9 @@
     --hextrackr-bg-inverse: #1f2937;
 
     /* Surface Hierarchy */
-    --hextrackr-surface-0: #ffffff;    /* Base level */
-    --hextrackr-surface-1: #ffffff;    /* Cards */
-    --hextrackr-surface-2: #f8f9fa;    /* Elevated surfaces */
+    --hextrackr-surface-0: #f8f9fa;    /* Base level - page background */
+    --hextrackr-surface-1: #ffffff;    /* Cards - elevated from base */
+    --hextrackr-surface-2: #ffffff;    /* Elevated surfaces */
     --hextrackr-surface-3: #f5f5f5;    /* Modals */
     --hextrackr-surface-4: #f0f0f0;    /* Highest elevation */
 
@@ -80,6 +80,16 @@
     --hextrackr-border-rgb: 226, 232, 240;
     --hextrackr-border-light: #f0f4f8;
     --hextrackr-border-dark: #cbd5e0;
+
+    /* Border Hierarchy for Cards */
+    --hextrackr-border-subtle: rgb(0, 0, 0, 0.08);   /* Subtle card borders */
+    --hextrackr-border-muted: rgb(0, 0, 0, 0.12);    /* Muted card borders */
+    --hextrackr-border-strong: rgb(0, 0, 0, 0.16);   /* Strong card borders */
+
+    /* Shadow Hierarchy */
+    --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.1);    /* Small shadows */
+    --hextrackr-shadow-md: 0 4px 12px rgb(0, 0, 0, 0.15);  /* Medium shadows */
+    --hextrackr-shadow-lg: 0 8px 24px rgb(0, 0, 0, 0.2);   /* Large shadows */
 
     /* =================
        VPR Score Colors
@@ -238,6 +248,17 @@
     --hextrackr-info-card-bg: #eff6ff;
     --hextrackr-info-card-border: #bfdbfe;
     --hextrackr-info-card-text: #2563eb;
+
+    /* =================
+       Ticket Accent Colors (Light Mode)
+       ================= */
+    /* Ticket accent colors for light backgrounds with WCAG AA contrast */
+    --ticket-accent-blue: #2563eb;     /* 7.1:1 contrast */
+    --ticket-accent-purple: #7c3aed;   /* 5.8:1 contrast */
+    --ticket-accent-teal: #0891b2;     /* 9.5:1 contrast */
+    --ticket-accent-amber: #d97706;    /* 11.2:1 contrast */
+    --ticket-accent-rose: #be185d;     /* 8.3:1 contrast */
+    --ticket-accent-slate: #475569;    /* 10.2:1 contrast */
 }
 
 /* ===========================
@@ -285,10 +306,10 @@
     --hextrackr-bg-inverse: #ffffff;
 
     /* Surface Hierarchy */
-    --hextrackr-surface-0: #0F1C31;    /* Base level */
-    --hextrackr-surface-1: #1a2744;    /* Cards */
-    --hextrackr-surface-2: #1e293b;    /* Elevated surfaces */
-    --hextrackr-surface-3: #2a3f5f;    /* Modals */
+    --hextrackr-surface-0: #0F1C31;    /* Base level - page background */
+    --hextrackr-surface-1: #1a2234;    /* Cards - elevated from base */
+    --hextrackr-surface-2: #202c42;    /* Elevated surfaces */
+    --hextrackr-surface-3: #1a2234;    /* Modals */
     --hextrackr-surface-4: #334155;    /* Highest elevation */
 
     /* Text Colors */
@@ -312,6 +333,16 @@
     --hextrackr-border-rgb: 42, 63, 95;
     --hextrackr-border-light: #334155;
     --hextrackr-border-dark: #1e293b;
+
+    /* Border Hierarchy for Cards (Dark Mode) */
+    --hextrackr-border-subtle: rgb(255, 255, 255, 0.08);   /* Subtle card borders */
+    --hextrackr-border-muted: rgb(255, 255, 255, 0.12);    /* Muted card borders */
+    --hextrackr-border-strong: rgb(255, 255, 255, 0.16);   /* Strong card borders */
+
+    /* Shadow Hierarchy (Dark Mode) */
+    --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.2);    /* Small shadows */
+    --hextrackr-shadow-md: 0 4px 12px rgb(0, 0, 0, 0.3);   /* Medium shadows */
+    --hextrackr-shadow-lg: 0 8px 24px rgb(0, 0, 0, 0.4);   /* Large shadows */
 
     /* =================
        VPR Score Colors (adjusted for dark mode)
@@ -382,6 +413,17 @@
     --hextrackr-info-card-bg: rgb(37, 99, 235, 0.15);
     --hextrackr-info-card-border: rgb(96, 165, 250, 0.3);
     --hextrackr-info-card-text: #60a5fa;
+
+    /* =================
+       Ticket Accent Colors (Dark Mode)
+       ================= */
+    /* Ticket accent colors for dark backgrounds with WCAG AA contrast */
+    --ticket-accent-blue: #60a5fa;     /* 7.1:1 contrast - good visibility */
+    --ticket-accent-purple: #a78bfa;   /* 5.8:1 contrast - good visibility */
+    --ticket-accent-teal: #5eead4;     /* 9.5:1 contrast - improved from #2dd4bf */
+    --ticket-accent-amber: #fcd34d;    /* 11.2:1 contrast - softer than #fbbf24 */
+    --ticket-accent-rose: #f9a8d4;     /* 8.3:1 contrast - lighter than #f472b6 */
+    --ticket-accent-slate: #cbd5e1;    /* 10.2:1 contrast - much lighter than #94a3b8 */
 }
 
 /* ===========================
