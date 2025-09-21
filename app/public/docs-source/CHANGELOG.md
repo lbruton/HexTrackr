@@ -7,30 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.20] - 2025-09-21
+
 ### Added
 
-#### Bidirectional Vulnerability-Ticket Integration
+#### Email Template Generation for Tickets
 
-- **Complete Workflow Integration**: Seamless bidirectional integration between vulnerabilities and tickets
-  - **Vulnerability → Ticket**: Create tickets directly from vulnerability device cards
-    - "Create Ticket" button on device cards pre-fills new ticket with hostname
-    - Uses sessionStorage for cross-page data transfer
-    - Auto-opens ticket modal with device populated
-  - **Ticket → Vulnerability**: Automatic vulnerability reports in ticket bundles
-    - Queries `vulnerabilities_current` table for all ticket devices
-    - Case-insensitive hostname matching (handles WTULSANSWAN01 vs wtulsanswan01)
-    - Generates markdown report sorted by VPR score (highest risk first)
-    - Shows "Devices with No Vulnerabilities Found" for patched systems
-    - Report title shows location with all ticket numbers (XT#, Hexagon#, ServiceNow#)
-  - **Zero Configuration**: Works automatically without settings or toggles
-  - **Production Ready**: Clean logging with [VulnBundle] prefix
+- **Third Tab in Ticket Modal**: Added "Email Template" tab alongside existing "Ticket Details" and "Vulnerabilities" tabs
+  - Professional email template automatically generated from ticket data
+  - Includes subject line suggestion with site name and Hexagon ticket number
+  - Formatted with clear sections: Maintenance Details, Affected Systems, Action Required, Timeline
+  - Automatic device list formatting with enumeration
 
-### Fixed
+- **Email Copy Button**: New dedicated copy button for email template
+  - Icon uses envelope symbol for clear identification
+  - Copies formatted email template to clipboard
+  - Toast notification confirms successful copy
+  - Lazy loading only generates template when tab is clicked
 
-- **Vulnerability Bundle Generation**: Fixed API stats endpoint compatibility
-  - Corrected stats.total check to sum all severity counts
-  - Fixed to use `vulnerabilities_current` table (14K+ records)
-  - Resolved case sensitivity issues in hostname matching
+- **Template Edit Button Stub**: Placeholder for future v1.0.21 template editing feature
+  - Disabled button with tooltip indicating "Template editing coming in v1.0.21"
+  - Positioned alongside copy buttons for consistent UI
+  - Prepares interface for upcoming customizable templates
+
+- **Enhanced Workflow**: Email template streamlines communication process
+  - Pre-formatted professional communication ready for sending
+  - Includes all critical ticket information in email-friendly format
+  - Consistent messaging across team communications
+  - Reduces time spent composing maintenance notifications
+
+## [1.0.19] - 2025-09-21
+
+### Added
+
+#### Enhanced Ticket Modal with Vulnerability Integration
+
+- **Dual Copy Buttons**: Ticket modal now features two separate copy buttons
+  - "Ticket" button: Copies ticket markdown to clipboard (existing functionality)
+  - "Vulnerabilities" button: Copies vulnerability report markdown without requiring bundle download
+
+- **Tabbed Interface**: New Bootstrap tabs in ticket modal for better information organization
+  - "Ticket Details" tab: Shows existing ticket markdown view
+  - "Vulnerabilities" tab: Displays vulnerability report for all devices in the ticket
+  - Lazy loading: Vulnerability data only fetched when tab is clicked
+  - Fuzzy hostname matching using Levenshtein distance for flexible device matching
+
+- **Improved Workflow**: Users can now quickly access and copy vulnerability data directly from the ticket modal without needing to download the full bundle
+
+### Changed
+
+- **Repository Cleanup**: Removed deprecated files and development artifacts
+  - Cleaned up .claude/, .specify/, and .context7/ directories
+  - Removed test files, backups, and temporary uploads
+  - Streamlined repository structure for better maintainability
 
 ## [1.0.18] - 2025-09-20
 
