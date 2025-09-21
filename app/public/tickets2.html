@@ -609,7 +609,7 @@
                         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="ticketManager.copyEmailMarkdown()">
                             <i class="fas fa-envelope me-1"></i>Email
                         </button>
-                        <button type="button" class="btn btn-outline-primary btn-sm" disabled title="Template editing coming in v1.0.21">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="editTemplateBtn" onclick="templateEditor.toggleEditMode()" title="Edit email template">
                             <i class="fas fa-edit me-1"></i>Edit
                         </button>
                         <button type="button" class="btn btn-outline-success btn-sm" onclick="ticketManager.downloadBundleFromView()">
@@ -651,10 +651,68 @@
                             <pre id="vulnerabilityMarkdownContent" class="terminal-content" style="display: none;"></pre>
                         </div>
                         <div class="tab-pane fade" id="email-content" role="tabpanel" aria-labelledby="email-tab">
-                            <div id="emailLoadingMessage" class="text-center text-muted py-3">
-                                <i class="fas fa-spinner fa-spin me-2"></i>Generating email template...
+                            <!-- View Mode (Default) -->
+                            <div id="emailViewMode">
+                                <div id="emailLoadingMessage" class="text-center text-muted py-3">
+                                    <i class="fas fa-spinner fa-spin me-2"></i>Generating email template...
+                                </div>
+                                <pre id="emailMarkdownContent" class="terminal-content" style="display: none;"></pre>
                             </div>
-                            <pre id="emailMarkdownContent" class="terminal-content" style="display: none;"></pre>
+
+                            <!-- Edit Mode (Hidden by default) -->
+                            <div id="emailEditMode" style="display: none;">
+                                <div class="row">
+                                    <!-- Variable Reference Panel -->
+                                    <div class="col-md-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-tags me-2"></i>Available Variables
+                                                </h6>
+                                            </div>
+                                            <div class="card-body p-2">
+                                                <div id="variablePanel" class="variable-list">
+                                                    <!-- Variables will be populated by JavaScript -->
+                                                </div>
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Click variables to insert at cursor position</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Template Editor -->
+                                    <div class="col-md-8">
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-edit me-2"></i>Template Editor
+                                                </h6>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="templateEditor.previewTemplate()" title="Preview with current ticket data">
+                                                        <i class="fas fa-eye me-1"></i>Preview
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-warning" onclick="templateEditor.resetToDefault()" title="Reset to default template">
+                                                        <i class="fas fa-undo me-1"></i>Reset
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-success" onclick="templateEditor.saveTemplate()" title="Save template changes">
+                                                        <i class="fas fa-save me-1"></i>Save
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="templateEditor.toggleEditMode()" title="Exit edit mode">
+                                                        <i class="fas fa-times me-1"></i>Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <textarea id="templateEditor" class="form-control" rows="20" placeholder="Loading template..." style="border: none; resize: vertical; font-family: 'Courier New', monospace; font-size: 13px;"></textarea>
+                                            </div>
+                                            <div class="card-footer">
+                                                <div id="templateValidation" class="template-validation"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -692,6 +750,7 @@
     <script src="scripts/shared/settings-modal.js"></script>
     <script src="/vendor/ag-grid/ag-grid-community.min.js"></script>
     <script src="scripts/shared/ag-grid-theme-manager.js"></script>
+    <script src="scripts/shared/template-editor.js"></script>
     <script src="scripts/pages/tickets.js"></script>
     <script src="scripts/pages/tickets-aggrid.js"></script>
 </body>
