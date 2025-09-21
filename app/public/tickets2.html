@@ -222,8 +222,14 @@
                             <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#ticketModal">
                                 <i class="fas fa-plus me-2"></i>Add New Ticket
                             </button>
-                            <button type="button" class="btn btn-outline-secondary btn-lg ms-2" id="attachDocsBtn">
-                                <i class="fas fa-paperclip me-2"></i>Attach Documentation
+                            <button type="button" class="btn btn-outline-secondary btn-lg ms-2" id="attachDocsBtn"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom"
+                                    data-bs-html="true"
+                                    title="No documentation attached">
+                                <i class="fas fa-paperclip me-2"></i>
+                                <span id="attachDocsBtnText">Attach Documentation</span>
+                                <span id="attachDocsCount" class="badge bg-primary ms-1" style="display: none;">0</span>
                             </button>
                         </div>
                         <div class="col-md-6 text-end">
