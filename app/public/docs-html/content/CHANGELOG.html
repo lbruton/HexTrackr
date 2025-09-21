@@ -8,6 +8,65 @@
                         <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
                              alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
                     </a>.</p>
+<h2>[Unreleased]</h2><h2>[1.0.20] - 2025-09-21</h2><h3>Added</h3><h4>Email Template Generation for Tickets</h4><ul>
+<li><p><strong>Third Tab in Ticket Modal</strong>: Added &quot;Email Template&quot; tab alongside existing &quot;Ticket Details&quot; and &quot;Vulnerabilities&quot; tabs</p>
+<ul>
+<li>Professional email template automatically generated from ticket data</li>
+<li>Includes subject line suggestion with site name and Hexagon ticket number</li>
+<li>Formatted with clear sections: Maintenance Details, Affected Systems, Action Required, Timeline</li>
+<li>Automatic device list formatting with enumeration</li>
+</ul>
+</li>
+<li><p><strong>Email Copy Button</strong>: New dedicated copy button for email template</p>
+<ul>
+<li>Icon uses envelope symbol for clear identification</li>
+<li>Copies formatted email template to clipboard</li>
+<li>Toast notification confirms successful copy</li>
+<li>Lazy loading only generates template when tab is clicked</li>
+</ul>
+</li>
+<li><p><strong>Template Edit Button Stub</strong>: Placeholder for future v1.0.21 template editing feature</p>
+<ul>
+<li>Disabled button with tooltip indicating &quot;Template editing coming in v1.0.21&quot;</li>
+<li>Positioned alongside copy buttons for consistent UI</li>
+<li>Prepares interface for upcoming customizable templates</li>
+</ul>
+</li>
+<li><p><strong>Enhanced Workflow</strong>: Email template streamlines communication process</p>
+<ul>
+<li>Pre-formatted professional communication ready for sending</li>
+<li>Includes all critical ticket information in email-friendly format</li>
+<li>Consistent messaging across team communications</li>
+<li>Reduces time spent composing maintenance notifications</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.19] - 2025-09-21</h2><h3>Added</h3><h4>Enhanced Ticket Modal with Vulnerability Integration</h4><ul>
+<li><p><strong>Dual Copy Buttons</strong>: Ticket modal now features two separate copy buttons</p>
+<ul>
+<li>&quot;Ticket&quot; button: Copies ticket markdown to clipboard (existing functionality)</li>
+<li>&quot;Vulnerabilities&quot; button: Copies vulnerability report markdown without requiring bundle download</li>
+</ul>
+</li>
+<li><p><strong>Tabbed Interface</strong>: New Bootstrap tabs in ticket modal for better information organization</p>
+<ul>
+<li>&quot;Ticket Details&quot; tab: Shows existing ticket markdown view</li>
+<li>&quot;Vulnerabilities&quot; tab: Displays vulnerability report for all devices in the ticket</li>
+<li>Lazy loading: Vulnerability data only fetched when tab is clicked</li>
+<li>Fuzzy hostname matching using Levenshtein distance for flexible device matching</li>
+</ul>
+</li>
+<li><p><strong>Improved Workflow</strong>: Users can now quickly access and copy vulnerability data directly from the ticket modal without needing to download the full bundle</p>
+</li>
+</ul>
+<h3>Changed</h3><ul>
+<li><strong>Repository Cleanup</strong>: Removed deprecated files and development artifacts<ul>
+<li>Cleaned up .claude/, .specify/, and .context7/ directories</li>
+<li>Removed test files, backups, and temporary uploads</li>
+<li>Streamlined repository structure for better maintainability</li>
+</ul>
+</li>
+</ul>
 <h2>[1.0.18] - 2025-09-20</h2><h3>Added</h3><h4>UI/UX Enhancements</h4><ul>
 <li><strong>Attachment Visibility for Tickets</strong>: Added comprehensive tooltip functionality for &quot;Attach Documentation&quot; button on tickets2.html<ul>
 <li>Displays list of currently attached files with sizes on hover</li>
@@ -17,6 +76,30 @@
 <li>Added Shift+Click and Right-Click functionality to clear all attachments with confirmation</li>
 <li>Smooth animations and visual feedback for improved user experience</li>
 <li>Resolves issue where users had no visibility of attached files until downloading bundles</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed</h3><h4>Bug Fixes</h4><ul>
+<li><p><strong>Attachment Tooltip Navigation Bug</strong>: Fixed issue where tooltip displayed empty content after navigating between pages</p>
+<ul>
+<li>Root cause: Bootstrap tooltip wasn&#39;t properly reinitializing when returning to tickets page</li>
+<li>Solution: Dispose old tooltip instances and create fresh ones with proper data on page load</li>
+<li>Added 100ms delay to ensure DOM readiness when navigating between pages</li>
+</ul>
+</li>
+<li><p><strong>Version Display in Health Endpoint</strong>: Fixed incorrect version reporting in <code>/health</code> API endpoint</p>
+<ul>
+<li>Corrected package.json path in server.js from <code>./package.json</code> to <code>../package.json</code> for Docker container</li>
+<li>Updated docker-compose.yml HEXTRACKR_VERSION environment variable to match package.json</li>
+<li>Health endpoint now correctly reports version 1.0.18 instead of falling back to old versions</li>
+</ul>
+</li>
+</ul>
+<h4>Documentation</h4><ul>
+<li><strong>JSDoc Dark Mode Restoration</strong>: Fixed missing dark mode support in developer documentation<ul>
+<li>Ran <code>inject-jsdoc-theme.js</code> script to inject theme synchronization into 96 JSDoc HTML files</li>
+<li>Dark mode now properly syncs with main application theme preference</li>
+<li>Restored proper styling with dark backgrounds (#0f172a) and light text in dark mode</li>
 </ul>
 </li>
 </ul>
