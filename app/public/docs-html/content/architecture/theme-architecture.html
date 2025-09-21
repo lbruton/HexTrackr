@@ -129,42 +129,88 @@
 <h2>CSS Variables System</h2><h3>Core Color Variables</h3><p>The centralized color system uses CSS custom properties to ensure consistency across themes:</p>
 <pre><code class="language-css"><span class="hljs-comment">/* Light Mode Defaults */</span>
 <span class="hljs-selector-pseudo">:root</span> {
+  <span class="hljs-comment">/* Background Hierarchy */</span>
   <span class="hljs-attr">--hextrackr-bg-primary</span>: <span class="hljs-number">#ffffff</span>;
-  <span class="hljs-attr">--hextrackr-bg-secondary</span>: <span class="hljs-number">#f8f9fa</span>;
-  <span class="hljs-attr">--hextrackr-surface-base</span>: <span class="hljs-number">#ffffff</span>;
-  <span class="hljs-attr">--hextrackr-text-primary</span>: <span class="hljs-number">#2d3748</span>;
-  <span class="hljs-attr">--hextrackr-border-color</span>: <span class="hljs-number">#e2e8f0</span>;
+  <span class="hljs-attr">--hextrackr-bg-secondary</span>: <span class="hljs-number">#f7fafc</span>;
+  <span class="hljs-attr">--hextrackr-bg-tertiary</span>: <span class="hljs-number">#f8f9fa</span>;
+
+  <span class="hljs-comment">/* Surface Hierarchy (Cards, Modals) */</span>
+  <span class="hljs-attr">--hextrackr-surface-0</span>: <span class="hljs-number">#f8f9fa</span>;    <span class="hljs-comment">/* Base level */</span>
+  <span class="hljs-attr">--hextrackr-surface-1</span>: <span class="hljs-number">#ffffff</span>;    <span class="hljs-comment">/* Cards */</span>
+  <span class="hljs-attr">--hextrackr-surface-2</span>: <span class="hljs-number">#ffffff</span>;    <span class="hljs-comment">/* Elevated surfaces */</span>
+  <span class="hljs-attr">--hextrackr-surface-3</span>: <span class="hljs-number">#f5f5f5</span>;    <span class="hljs-comment">/* Modals */</span>
+
+  <span class="hljs-comment">/* Text Colors */</span>
+  <span class="hljs-attr">--hextrackr-text</span>: <span class="hljs-number">#2d3748</span>;
+  <span class="hljs-attr">--hextrackr-text-muted</span>: <span class="hljs-number">#718096</span>;
+  <span class="hljs-attr">--hextrackr-text-disabled</span>: <span class="hljs-number">#a0aec0</span>;
+
+  <span class="hljs-comment">/* Border Hierarchy */</span>
+  <span class="hljs-attr">--hextrackr-border</span>: <span class="hljs-number">#e2e8f0</span>;
+  <span class="hljs-attr">--hextrackr-border-subtle</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.08</span>);
+  <span class="hljs-attr">--hextrackr-border-muted</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.12</span>);
+  <span class="hljs-attr">--hextrackr-border-strong</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.16</span>);
 
   <span class="hljs-comment">/* VPR Severity Colors */</span>
   <span class="hljs-attr">--vpr-critical</span>: <span class="hljs-number">#dc2626</span>;
   <span class="hljs-attr">--vpr-high</span>: <span class="hljs-number">#d97706</span>;
   <span class="hljs-attr">--vpr-medium</span>: <span class="hljs-number">#2563eb</span>;
   <span class="hljs-attr">--vpr-low</span>: <span class="hljs-number">#16a34a</span>;
-  <span class="hljs-attr">--vpr-info</span>: <span class="hljs-number">#6b7280</span>;
+
+  <span class="hljs-comment">/* Ticket Accent Colors (WCAG AA Compliant) */</span>
+  <span class="hljs-attr">--ticket-accent-blue</span>: <span class="hljs-number">#2563eb</span>;     <span class="hljs-comment">/* 7.1:1 contrast */</span>
+  <span class="hljs-attr">--ticket-accent-purple</span>: <span class="hljs-number">#7c3aed</span>;   <span class="hljs-comment">/* 5.8:1 contrast */</span>
+  <span class="hljs-attr">--ticket-accent-teal</span>: <span class="hljs-number">#0891b2</span>;     <span class="hljs-comment">/* 9.5:1 contrast */</span>
+  <span class="hljs-attr">--ticket-accent-amber</span>: <span class="hljs-number">#d97706</span>;    <span class="hljs-comment">/* 11.2:1 contrast */</span>
+  <span class="hljs-attr">--ticket-accent-rose</span>: <span class="hljs-number">#be185d</span>;     <span class="hljs-comment">/* 8.3:1 contrast */</span>
+  <span class="hljs-attr">--ticket-accent-slate</span>: <span class="hljs-number">#475569</span>;    <span class="hljs-comment">/* 10.2:1 contrast */</span>
 
   <span class="hljs-comment">/* AG-Grid Specific */</span>
-  <span class="hljs-attr">--hextrackr-grid-header</span>: <span class="hljs-number">#edf2f7</span>;
-  <span class="hljs-attr">--hextrackr-grid-link</span>: <span class="hljs-number">#3b82f6</span>;
+  <span class="hljs-attr">--hextrackr-grid-link</span>: <span class="hljs-number">#2d3748</span>;
+  <span class="hljs-attr">--hextrackr-grid-link-hover</span>: <span class="hljs-number">#1a202c</span>;
 }
 
 <span class="hljs-comment">/* Dark Mode Overrides */</span>
 <span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;dark&quot;</span>]</span> {
+  <span class="hljs-comment">/* Background Hierarchy */</span>
   <span class="hljs-attr">--hextrackr-bg-primary</span>: <span class="hljs-number">#0F1C31</span>;
-  <span class="hljs-attr">--hextrackr-bg-secondary</span>: <span class="hljs-number">#1a2332</span>;
-  <span class="hljs-attr">--hextrackr-surface-base</span>: <span class="hljs-number">#202c3f</span>;
-  <span class="hljs-attr">--hextrackr-text-primary</span>: <span class="hljs-number">#ffffff</span>;
-  <span class="hljs-attr">--hextrackr-border-color</span>: <span class="hljs-number">#2a3f5f</span>;
+  <span class="hljs-attr">--hextrackr-bg-secondary</span>: <span class="hljs-number">#1a2744</span>;
+  <span class="hljs-attr">--hextrackr-bg-tertiary</span>: <span class="hljs-number">#1e293b</span>;
+
+  <span class="hljs-comment">/* Surface Hierarchy (Cards, Modals) */</span>
+  <span class="hljs-attr">--hextrackr-surface-0</span>: <span class="hljs-number">#0F1C31</span>;    <span class="hljs-comment">/* Base level */</span>
+  <span class="hljs-attr">--hextrackr-surface-1</span>: <span class="hljs-number">#1a2234</span>;    <span class="hljs-comment">/* Cards */</span>
+  <span class="hljs-attr">--hextrackr-surface-2</span>: <span class="hljs-number">#202c42</span>;    <span class="hljs-comment">/* Elevated surfaces */</span>
+  <span class="hljs-attr">--hextrackr-surface-3</span>: <span class="hljs-number">#1a2234</span>;    <span class="hljs-comment">/* Modals */</span>
+
+  <span class="hljs-comment">/* Text Colors */</span>
+  <span class="hljs-attr">--hextrackr-text</span>: <span class="hljs-number">#ffffff</span>;
+  <span class="hljs-attr">--hextrackr-text-muted</span>: <span class="hljs-number">#94a3b8</span>;
+  <span class="hljs-attr">--hextrackr-text-disabled</span>: <span class="hljs-number">#64748b</span>;
+
+  <span class="hljs-comment">/* Border Hierarchy */</span>
+  <span class="hljs-attr">--hextrackr-border</span>: <span class="hljs-number">#2a3f5f</span>;
+  <span class="hljs-attr">--hextrackr-border-subtle</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">255</span>, <span class="hljs-number">255</span>, <span class="hljs-number">255</span>, <span class="hljs-number">0.08</span>);
+  <span class="hljs-attr">--hextrackr-border-muted</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">255</span>, <span class="hljs-number">255</span>, <span class="hljs-number">255</span>, <span class="hljs-number">0.12</span>);
+  <span class="hljs-attr">--hextrackr-border-strong</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">255</span>, <span class="hljs-number">255</span>, <span class="hljs-number">255</span>, <span class="hljs-number">0.16</span>);
 
   <span class="hljs-comment">/* VPR Severity Colors (adjusted for dark mode) */</span>
-  <span class="hljs-attr">--vpr-critical</span>: <span class="hljs-number">#ef4444</span>;
-  <span class="hljs-attr">--vpr-high</span>: <span class="hljs-number">#f97316</span>;
-  <span class="hljs-attr">--vpr-medium</span>: <span class="hljs-number">#3b82f6</span>;
-  <span class="hljs-attr">--vpr-low</span>: <span class="hljs-number">#22c55e</span>;
-  <span class="hljs-attr">--vpr-info</span>: <span class="hljs-number">#9ca3af</span>;
+  <span class="hljs-attr">--vpr-critical</span>: <span class="hljs-number">#f87171</span>;
+  <span class="hljs-attr">--vpr-high</span>: <span class="hljs-number">#fb923c</span>;
+  <span class="hljs-attr">--vpr-medium</span>: <span class="hljs-number">#60a5fa</span>;
+  <span class="hljs-attr">--vpr-low</span>: <span class="hljs-number">#34d399</span>;
+
+  <span class="hljs-comment">/* Ticket Accent Colors (WCAG AA Compliant) */</span>
+  <span class="hljs-attr">--ticket-accent-blue</span>: <span class="hljs-number">#60a5fa</span>;     <span class="hljs-comment">/* 7.1:1 contrast */</span>
+  <span class="hljs-attr">--ticket-accent-purple</span>: <span class="hljs-number">#a78bfa</span>;   <span class="hljs-comment">/* 5.8:1 contrast */</span>
+  <span class="hljs-attr">--ticket-accent-teal</span>: <span class="hljs-number">#5eead4</span>;     <span class="hljs-comment">/* 9.5:1 contrast */</span>
+  <span class="hljs-attr">--ticket-accent-amber</span>: <span class="hljs-number">#fcd34d</span>;    <span class="hljs-comment">/* 11.2:1 contrast */</span>
+  <span class="hljs-attr">--ticket-accent-rose</span>: <span class="hljs-number">#f9a8d4</span>;     <span class="hljs-comment">/* 8.3:1 contrast */</span>
+  <span class="hljs-attr">--ticket-accent-slate</span>: <span class="hljs-number">#cbd5e1</span>;    <span class="hljs-comment">/* 10.2:1 contrast */</span>
 
   <span class="hljs-comment">/* AG-Grid Specific */</span>
-  <span class="hljs-attr">--hextrackr-grid-header</span>: <span class="hljs-number">#202c3f</span>;
   <span class="hljs-attr">--hextrackr-grid-link</span>: <span class="hljs-number">#93c5fd</span>;
+  <span class="hljs-attr">--hextrackr-grid-link-hover</span>: <span class="hljs-number">#bfdbfe</span>;
 }</code></pre><h3>Variable Usage Patterns</h3><p><strong>✅ Correct Usage:</strong></p>
 <pre><code class="language-css"><span class="hljs-selector-class">.card</span> {
   <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
@@ -218,22 +264,23 @@
     <span class="hljs-comment">// ... other parameters</span>
 });
 
-gridApi.<span class="hljs-title function_">setGridOption</span>(<span class="hljs-string">&quot;theme&quot;</span>, quartzTheme);</code></pre><h3>Grid Surface Styling (tickets2 &amp; vulnerabilities)</h3><p>Inline overrides now reference the shared tokens so light/dark parity stays centralized in <code>css-variables.css</code>:</p>
+gridApi.<span class="hljs-title function_">setGridOption</span>(<span class="hljs-string">&quot;theme&quot;</span>, quartzTheme);</code></pre><h3>Grid Surface Styling (tickets2 & vulnerabilities)</h3><p>Inline overrides in the grid pages now lean exclusively on the shared theme tokens so light/dark parity stays centralized in <code>css-variables.css</code>:</p>
 <pre><code class="language-css"><span class="hljs-selector-class">.hextrackr-tickets-grid</span> <span class="hljs-selector-class">.ag-row-hover</span> <span class="hljs-selector-class">.ag-cell</span> {
-    <span class="hljs-attribute">background-color</span>: rgba(<span class="hljs-built_in">var</span>(--hextrackr-primary-rgb), <span class="hljs-number">0.08</span>);
+    <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-built_in">var</span>(--hextrackr-primary-rgb), <span class="hljs-number">0.08</span>);
 }
 
-<span class="hljs-selector-attr">[data-bs-theme=&quot;dark&quot;]</span> <span class="hljs-selector-class">.hextrackr-tickets-grid</span> <span class="hljs-selector-class">.ag-row-hover</span> <span class="hljs-selector-class">.ag-cell</span> {
-    <span class="hljs-attribute">background-color</span>: rgba(<span class="hljs-built_in">var</span>(--hextrackr-primary-rgb), <span class="hljs-number">0.18</span>);
+<span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;dark&quot;</span>]</span> <span class="hljs-selector-class">.hextrackr-tickets-grid</span> <span class="hljs-selector-class">.ag-row-hover</span> <span class="hljs-selector-class">.ag-cell</span> {
+    <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-built_in">var</span>(--hextrackr-primary-rgb), <span class="hljs-number">0.18</span>);
 }
 
 <span class="hljs-selector-class">.ticket-row-overdue</span> <span class="hljs-selector-class">.ag-cell</span> {
-    <span class="hljs-attribute">background-color</span>: rgba(<span class="hljs-built_in">var</span>(--vpr-critical-rgb), <span class="hljs-number">0.08</span>) <span class="hljs-meta">!important</span>;
+    <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-built_in">var</span>(--vpr-critical-rgb), <span class="hljs-number">0.08</span>) <span class="hljs-meta">!important</span>;
 }
 
-<span class="hljs-selector-attr">[data-bs-theme=&quot;dark&quot;]</span> <span class="hljs-selector-class">.ticket-row-overdue</span> <span class="hljs-selector-class">.ag-cell</span> {
-    <span class="hljs-attribute">background-color</span>: rgba(<span class="hljs-built_in">var</span>(--vpr-critical-rgb), <span class="hljs-number">0.18</span>) <span class="hljs-meta">!important</span>;
-}</code></pre><p>The vulnerabilities grid mirrors the same pattern, so palette changes propagate automatically without updating page-specific CSS.</p><hr>
+<span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;dark&quot;</span>]</span> <span class="hljs-selector-class">.ticket-row-overdue</span> <span class="hljs-selector-class">.ag-cell</span> {
+    <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-built_in">var</span>(--vpr-critical-rgb), <span class="hljs-number">0.18</span>) <span class="hljs-meta">!important</span>;
+}</code></pre><p>The vulnerabilities grid follows the same pattern, so both experiences inherit palette changes from the tokens without touching page-specific CSS.</p>
+<hr>
 <h2>Chart Theme Integration</h2><h3>ApexCharts Theme Adapter</h3><p>Charts use a sophisticated theme adapter that reads CSS variables for consistency:</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// chart-theme-adapter.js</span>
 <span class="hljs-title function_">getCSSVariables</span>(<span class="hljs-params">theme</span>) {
