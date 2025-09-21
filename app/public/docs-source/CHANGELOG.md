@@ -5,6 +5,33 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+#### Bidirectional Vulnerability-Ticket Integration
+
+- **Complete Workflow Integration**: Seamless bidirectional integration between vulnerabilities and tickets
+  - **Vulnerability → Ticket**: Create tickets directly from vulnerability device cards
+    - "Create Ticket" button on device cards pre-fills new ticket with hostname
+    - Uses sessionStorage for cross-page data transfer
+    - Auto-opens ticket modal with device populated
+  - **Ticket → Vulnerability**: Automatic vulnerability reports in ticket bundles
+    - Queries `vulnerabilities_current` table for all ticket devices
+    - Case-insensitive hostname matching (handles WTULSANSWAN01 vs wtulsanswan01)
+    - Generates markdown report sorted by VPR score (highest risk first)
+    - Shows "Devices with No Vulnerabilities Found" for patched systems
+    - Report title shows location with all ticket numbers (XT#, Hexagon#, ServiceNow#)
+  - **Zero Configuration**: Works automatically without settings or toggles
+  - **Production Ready**: Clean logging with [VulnBundle] prefix
+
+### Fixed
+
+- **Vulnerability Bundle Generation**: Fixed API stats endpoint compatibility
+  - Corrected stats.total check to sum all severity counts
+  - Fixed to use `vulnerabilities_current` table (14K+ records)
+  - Resolved case sensitivity issues in hostname matching
+
 ## [1.0.18] - 2025-09-20
 
 ### Added
