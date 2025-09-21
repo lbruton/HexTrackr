@@ -350,6 +350,80 @@ mcp__memento__search_nodes({
 - Verify framework documentation accuracy
 - Download framework docs to `/dev-docs/frameworks/`
 
+### the-brain Agent (Project-Aware Research Specialist)
+- **Primary Use**: Delegate ALL research tasks to save main session tokens
+- **Capabilities**: Sequential Thinking + Claude-Context + Context7 + Brave Search + Memento persistence
+- **Project Context**: Understands HexTrackr's architecture, tech stack, and constraints
+- **Research Flow**: Context → Internal → External → Synthesis (always checks codebase first)
+
+#### Agent-Powered Research Pattern (Token-Saving Strategy)
+
+**Core Principle**: Use the-brain for background research while you focus on implementation in the main session.
+
+**When to Use the-brain**:
+- Framework/library compatibility research (AG-Grid, ApexCharts, Socket.io)
+- Error investigation and debugging
+- Best practice research for specific implementations
+- Performance optimization strategies
+- Security vulnerability research
+- Any research that would consume 5-10K tokens in main session
+
+**Usage Pattern**:
+```javascript
+// Step 1: Launch the-brain for research (runs on separate token budget)
+Task tool → the-brain → "Research WebSocket authentication best practices for HexTrackr"
+
+// Step 2: Continue implementation work in main session
+// (Focus high-value tokens on coding, testing, debugging)
+
+// Step 3: Retrieve research findings when needed (100-200 tokens)
+mcp__memento__search_nodes({
+  query: "research-websocket authentication week-38-2025",
+  mode: "semantic"
+})
+```
+
+**Example Parallel Workflow**:
+- **Main Session**: "I'll implement the user management UI while the-brain researches session handling best practices"
+- **the-brain**: Analyzes current auth.js, researches Express session patterns, provides HexTrackr-specific integration plan
+- **Result**: Implementation proceeds while research happens in background, then integrate findings
+
+**Research Retrieval Patterns**:
+```javascript
+// Find today's research
+"research-* week-38-2025"
+
+// Find specific topic research
+"research-websocket", "research-cors", "research-performance"
+
+// Find integration-ready solutions
+"integration-ready codebase-analyzed"
+
+// Find critical security research
+"research:security-review critical"
+
+// Find implementation guides
+"research:implementation-guide verified"
+```
+
+**Token Savings**:
+- Research tasks: 5-10K tokens → Delegated to the-brain
+- Main session: Focus on implementation (high-value token usage)
+- Retrieval: 100-200 tokens when findings needed
+- **Result**: 95% token efficiency improvement for research-heavy tasks
+
+**Quick Reference Commands**:
+```bash
+# Launch the-brain for research
+Task tool with subagent_type: "the-brain"
+
+# Retrieve research findings
+mcp__memento__search_nodes with query: "research-[topic] week-XX-YYYY"
+
+# Check what research is available
+mcp__memento__search_nodes with query: "research-* project:hextrackr"
+```
+
 ### Playwright
 - Test UI changes before and after modifications
 - Restart Docker before running: `docker-compose restart`

@@ -315,7 +315,35 @@ class DatabaseService {
                 template_content TEXT NOT NULL,
                 default_content TEXT NOT NULL,
                 variables TEXT NOT NULL,
+                category TEXT DEFAULT 'email',
+                is_active BOOLEAN DEFAULT 1,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )`,
+
+            // Ticket templates table - customizable ticket markdown templates
+            `CREATE TABLE IF NOT EXISTS ticket_templates (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                description TEXT,
+                template_content TEXT NOT NULL,
+                default_content TEXT NOT NULL,
+                variables TEXT NOT NULL,
                 category TEXT DEFAULT 'ticket',
+                is_active BOOLEAN DEFAULT 1,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )`,
+
+            // Vulnerability templates table - customizable vulnerability report templates
+            `CREATE TABLE IF NOT EXISTS vulnerability_templates (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                description TEXT,
+                template_content TEXT NOT NULL,
+                default_content TEXT NOT NULL,
+                variables TEXT NOT NULL,
+                category TEXT DEFAULT 'vulnerability',
                 is_active BOOLEAN DEFAULT 1,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -365,7 +393,17 @@ class DatabaseService {
             // Email templates indexes
             "CREATE INDEX IF NOT EXISTS idx_email_templates_name ON email_templates (name)",
             "CREATE INDEX IF NOT EXISTS idx_email_templates_category ON email_templates (category)",
-            "CREATE INDEX IF NOT EXISTS idx_email_templates_active ON email_templates (is_active)"
+            "CREATE INDEX IF NOT EXISTS idx_email_templates_active ON email_templates (is_active)",
+
+            // Ticket templates indexes
+            "CREATE INDEX IF NOT EXISTS idx_ticket_templates_name ON ticket_templates (name)",
+            "CREATE INDEX IF NOT EXISTS idx_ticket_templates_category ON ticket_templates (category)",
+            "CREATE INDEX IF NOT EXISTS idx_ticket_templates_active ON ticket_templates (is_active)",
+
+            // Vulnerability templates indexes
+            "CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_name ON vulnerability_templates (name)",
+            "CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_category ON vulnerability_templates (category)",
+            "CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_active ON vulnerability_templates (is_active)"
         ];
 
         return Promise.all(indexes.map(sql => this.run(sql)));

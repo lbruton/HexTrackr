@@ -141,11 +141,16 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
         
         // API test buttons
         document.getElementById("testCiscoConnection")?.addEventListener("click", testCiscoConnection);
-        document.getElementById("testTenableConnection")?.addEventListener("click", testTenableConnection);
-        
-        // Data fetch buttons
-        document.getElementById("fetchCiscoData")?.addEventListener("click", fetchCiscoData);
-        document.getElementById("fetchTenableData")?.addEventListener("click", fetchTenableData);
+
+        // KEV sync button
+        document.getElementById("syncKevNow")?.addEventListener("click", syncKevData);
+        document.getElementById("kevAutoSync")?.addEventListener("change", toggleKevAutoSync);
+
+        // Load KEV status when modal opens
+        const settingsModalElement = document.getElementById("settingsModal");
+        if (settingsModalElement) {
+            settingsModalElement.addEventListener("shown.bs.modal", loadKevSyncStatus);
+        }
         
         // Settings save button
         document.getElementById("saveSettings")?.addEventListener("click", saveSettings);
@@ -593,37 +598,144 @@ async function testCiscoConnection() {
 }
 
 /**
- * Test Tenable API connection
+ * Sync CISA KEV data
+ * @async
+ * @function syncKevData
  * @returns {Promise<void>}
  */
-async function testTenableConnection() {
-    showNotification("Tenable API connectivity test - feature coming soon", "info");
-    // TODO: Implement actual Tenable API test
-    document.getElementById("tenableStatus").textContent = "Testing...";
-    document.getElementById("tenableStatus").className = "badge bg-warning";
-    
-    setTimeout(() => {
-        document.getElementById("tenableStatus").textContent = "Not Configured";
-        document.getElementById("tenableStatus").className = "badge bg-secondary";
-    }, 2000);
+async function syncKevData() {
+    const syncButton = document.getElementById("syncKevNow");
+    const statusBadge = document.getElementById("kevStatus");
+
+    // Disable button and show loading state
+    if (syncButton) {
+        syncButton.disabled = true;
+        syncButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Syncing...';
+    }
+
+    if (statusBadge) {
+        statusBadge.textContent = "Syncing";
+        statusBadge.className = "badge bg-warning";
+    }
+
+    try {
+        const response = await fetch("/api/kev/sync", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Sync failed: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        // Update UI with sync results
+        updateKevSyncStatus(result);
+        showNotification(`KEV sync completed: ${result.totalKevs} total KEVs, ${result.matchedCount} matched in your environment`, "success");
+
+    } catch (error) {
+        console.error("KEV sync error:", error);
+        showNotification("Failed to sync KEV data: " + error.message, "error");
+
+        if (statusBadge) {
+            statusBadge.textContent = "Sync Failed";
+            statusBadge.className = "badge bg-danger";
+        }
+    } finally {
+        // Re-enable button
+        if (syncButton) {
+            syncButton.disabled = false;
+            syncButton.innerHTML = '<i class="fas fa-sync me-2"></i>Sync Now';
+        }
+    }
 }
 
 /**
- * Fetch data from Cisco PSIRT API
- * @returns {Promise<void>}
+ * Toggle KEV auto-sync setting
+ * @function toggleKevAutoSync
+ * @returns {void}
  */
-async function fetchCiscoData() {
-    showNotification("Cisco data fetch - feature coming soon", "info");
-    // TODO: Implement actual Cisco PSIRT data fetch
+function toggleKevAutoSync() {
+    const autoSyncCheckbox = document.getElementById("kevAutoSync");
+    if (autoSyncCheckbox) {
+        localStorage.setItem("kevAutoSyncEnabled", autoSyncCheckbox.checked);
+        showNotification(`KEV auto-sync ${autoSyncCheckbox.checked ? 'enabled' : 'disabled'}`, "info");
+    }
 }
 
 /**
- * Fetch data from Tenable API
+ * Update KEV sync status in UI
+ * @function updateKevSyncStatus
+ * @param {Object} status - Status object from server
+ * @returns {void}
+ */
+function updateKevSyncStatus(status) {
+    // Update last sync time
+    const lastSyncElement = document.getElementById("kevLastSync");
+    if (lastSyncElement && status.lastSync) {
+        const syncDate = new Date(status.lastSync);
+        lastSyncElement.textContent = syncDate.toLocaleString();
+    }
+
+    // Update statistics
+    const totalCountElement = document.getElementById("kevTotalCount");
+    if (totalCountElement && status.totalKevs !== undefined) {
+        totalCountElement.textContent = status.totalKevs;
+    }
+
+    const matchedCountElement = document.getElementById("kevMatchedCount");
+    if (matchedCountElement && status.matchedCount !== undefined) {
+        matchedCountElement.textContent = status.matchedCount;
+    }
+
+    // Update status badge
+    const statusBadge = document.getElementById("kevStatus");
+    if (statusBadge) {
+        statusBadge.textContent = "Synced";
+        statusBadge.className = "badge bg-success";
+    }
+
+    // Store last sync time
+    localStorage.setItem("kevLastSync", status.lastSync || new Date().toISOString());
+}
+
+/**
+ * Load KEV sync status on modal open
+ * @async
+ * @function loadKevSyncStatus
  * @returns {Promise<void>}
  */
-async function fetchTenableData() {
-    showNotification("Tenable data fetch - feature coming soon", "info");
-    // TODO: Implement actual Tenable data fetch
+async function loadKevSyncStatus() {
+    try {
+        // Load auto-sync setting
+        const autoSyncEnabled = localStorage.getItem("kevAutoSyncEnabled") !== "false";
+        const autoSyncCheckbox = document.getElementById("kevAutoSync");
+        if (autoSyncCheckbox) {
+            autoSyncCheckbox.checked = autoSyncEnabled;
+        }
+
+        // Load last sync time from localStorage first (faster)
+        const lastSync = localStorage.getItem("kevLastSync");
+        if (lastSync) {
+            const lastSyncElement = document.getElementById("kevLastSync");
+            if (lastSyncElement) {
+                const syncDate = new Date(lastSync);
+                lastSyncElement.textContent = syncDate.toLocaleString();
+            }
+        }
+
+        // Fetch current status from server
+        const response = await fetch("/api/kev/status");
+        if (response.ok) {
+            const status = await response.json();
+            updateKevSyncStatus(status);
+        }
+    } catch (error) {
+        console.error("Error loading KEV status:", error);
+    }
 }
 
 /**
@@ -1152,9 +1264,10 @@ if (typeof module !== "undefined" && module.exports) {
         importData,
         clearData,
         testCiscoConnection,
-        testTenableConnection,
-        fetchCiscoData,
-        fetchTenableData,
+        syncKevData,
+        toggleKevAutoSync,
+        updateKevSyncStatus,
+        loadKevSyncStatus,
         saveSettings,
         initServiceNowSettings,
         loadServiceNowSettings,
