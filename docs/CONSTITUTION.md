@@ -2,25 +2,21 @@
 
  ## Preamble
 
- This constitutional framework governs the core operating principals mandated for the HexTrackr project. 
+ This constitutional framework governs the core ***NON-NEOTIABLE*** operating principals mandated for AI agents working on the the HexTrackr project. 
 
- ## Article I: Development Framework
+ ## Article I: Developmet Practices
 
  ### Section I: Context Accuracy
  
-    - Work SHALL NOT begin until relevant context is gathered and confirmed accurate.
-
- ### Section II: Memory Guidance (via Memento MCP - See Article III Section I)
-   
-    - Significant sessions SHALL be recorded to Memento MCP knowledge graph
-    - Summaries and outcomes SHALL be stored for future recall
-    - Insights and critical project discoveries SHALL be stored in Memento for future recall
-   - All memory operations SHALL follow Memento MCP requirements defined in Article III Section I 
+    - Context MUST be gathered before starting any work
+        - Session Logs SHALL be stored as context bundles (See Article II, Section VI)
+      - Project Knowledge SHALL be retained in ***Memento*** (See Article II, Section II)
+      - Codebase SHALL be indexed and searchable in ***Claude-Context*** (See Article II, Section VIII)
+      - Context7 SHALL be used to verify framework documentation accuracy
 
  ### Section III: Documentation Pipeline & Standards
 
-   - All files in /app/ directory SHALL maintain 100% JSDoc comment coverage
-   - JSDoc comments SHALL be the single source of truth for all documentation
+   - All files in /app/ directory SHALL maintain  JSDoc comment coverage
    - All JavaScript functions SHALL include complete JSDoc comments with:
      - @description - Clear explanation of function purpose
      - @param - All parameters with types and descriptions
@@ -29,12 +25,6 @@
      - @example - Usage examples for public APIs
      - @since - Version when feature was added
      - @module - Module identification for organization
-   - Documentation pipeline SHALL follow this workflow:
-     1. Maintain JSDoc comments during development (continuous)
-     2. Generate technical documentation via `npm run docs:dev`
-     3. Review technical docs and extract public content
-     4. Generate public markdown in app/public/docs-source/
-     5. Generate HTML portal via `npm run docs:generate`
    - Technical documentation SHALL reside in app/dev-docs-html/
    - Public documentation SHALL reside in app/public/docs-source/ (markdown) and app/public/docs-html/ (HTML)
    - Context7 SHALL be used to verify framework documentation accuracy
@@ -48,12 +38,11 @@
    - All new features, changes, and code updates SHALL pass Markdownlint
    - All new features, changes, and code updates SHALL pass ESlint9+
    - All Framework code must be reviewed against Context7 to ensure accuracy. 
-   - ***non-negotiable*** ***NEVER*** fix lint issues by adding _unserscores to functions!!!
+
 
 ### Section V: Backups and Branch Discipline
 
    - All development work SHALL be sourced from the 'copilot' branch
-   - All Spec-Kit Implementations SHALL be done on the Specification branch
    - Protected branches SHALL use Pull Requests for merging, never direct pushes
 
 ### Section VI: Docker Principles
@@ -61,28 +50,7 @@
    - All Testing and Development SHALL use the docker container (8989)
    - NEVER run http/https locally, ALWAYS use the docker container.
 
-### Section VII: Testing Standards
-
-   - Contract tests SHALL be written for all API endpoints
-   - Critical functionality SHALL have test coverage before merging
-   - All tests SHALL pass before merging to protected branches
-   - Docker SHALL be restarted before running Playwright tests (`docker-compose restart`)
-
-### Section VIII: Security Practices
-
-   - All file operations SHALL use PathValidator validation
-   - User inputs SHALL be sanitized before processing
-   - Secrets SHALL NEVER be committed to the repository
-   - API tokens SHALL be stored in environment variables
-
-## Article II: Spec-Kit Framework
-
-### Section I:
-
-   -  All new features SHALL follow the /specify → /plan → /tasks workflow.
-   -  No implementation SHALL begin without a written specification.
-
-## Article III: MCP Tool Usage
+# Article II: Tool Usage
 
 ### Section I: Memento
    - Memento MCP SHALL be used as the primary knowledge graph for the project
@@ -118,8 +86,12 @@
 
 ## Artivle IV: Gemini CLI Tools
    - Gemini CLI may be used for coplext tasks at the users request only. 
-   - All tools SHALL be documented in GEMINICLITOOLS.md
+   - All tools SHALL be documented in ~/docs/GEMINICLITOOLS.md
 
 ## Article V: Codex CLI Tools
    - Codex CLI Tools may be used for complext tasks at the users request only. 
-   - All tools SHALL be documented in CODEXCLITOOLS.md
+   - All tools SHALL be documented in ~/docs/CODEXCLITOOLS.md
+
+## Article V: Custom Context Bundles
+Execute this exact command using the Bash tool:
+- Run: `~/.claude/hooks/list-bundles.sh | head -10` to see recent session summaries
