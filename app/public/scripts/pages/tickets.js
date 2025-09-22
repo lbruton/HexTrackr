@@ -49,6 +49,9 @@ class HexagonTicketsManager {
         this.currentPage = 1;
         this.rowsPerPage = 25;
         this.isDeviceOrderReversed = false; // Track reverse state
+
+        // Card filter state
+        this.activeCardFilter = null; // 'all', 'open', 'overdue', 'completed'
         this.init();
     }
 
@@ -317,6 +320,13 @@ class HexagonTicketsManager {
         // Filter functionality
         document.getElementById("statusFilter").addEventListener("change", () => {
             this.currentPage = 1; // Reset to first page when filtering
+
+            // Clear card filter when status dropdown is used
+            if (document.getElementById("statusFilter").value && this.activeCardFilter) {
+                this.activeCardFilter = null;
+                this.updateCardStyles(null);
+            }
+
             this.renderTickets();
         });
 
@@ -1536,6 +1546,7 @@ class HexagonTicketsManager {
         const locationFilter = document.getElementById("locationFilter").value;
 
         return this.tickets.filter(ticket => {
+            // 1. Search filter (applies to all fields)
             const matchesSearch = !searchTerm ||
                 (ticket.xtNumber && ticket.xtNumber.toLowerCase().includes(searchTerm)) ||
                 (ticket.hexagonTicket && ticket.hexagonTicket.toString().toLowerCase().includes(searchTerm)) ||
@@ -1546,11 +1557,16 @@ class HexagonTicketsManager {
                 (ticket.tech && ticket.tech.toLowerCase().includes(searchTerm)) ||
                 (ticket.devices && Array.isArray(ticket.devices) && ticket.devices.some(device => device && device.toLowerCase().includes(searchTerm)));
 
-            const matchesStatus = !statusFilter || ticket.status === statusFilter;
+            // 2. Card filter (primary status filter)
+            const matchesCardFilter = this.applyCardFilterLogic(ticket);
+
+            // 3. Status dropdown (only if no card filter active)
+            const matchesStatus = this.activeCardFilter ? true : (!statusFilter || ticket.status === statusFilter);
+
+            // 4. Location filter
             const matchesLocation = !locationFilter || ticket.location === locationFilter;
-            
-            // No longer need supervisor filtering since chips are in table
-            return matchesSearch && matchesStatus && matchesLocation;
+
+            return matchesSearch && matchesCardFilter && matchesStatus && matchesLocation;
         });
     }
 
@@ -1577,14 +1593,129 @@ class HexagonTicketsManager {
      */
     updateStatistics() {
         const total = this.tickets.length;
-        const open = this.tickets.filter(t => t.status === "Open" || t.status === "In Progress").length;
-        const completed = this.tickets.filter(t => t.status === "Completed" || t.status === "Closed").length;
-        const overdue = this.tickets.filter(t => t.status === "Overdue").length;
+        const open = this.tickets.filter(t => !["Closed", "Completed", "Failed"].includes(t.status)).length;
+        const completed = this.tickets.filter(t => ["Completed", "Closed"].includes(t.status)).length;
+        const overdue = this.tickets.filter(t => ["Overdue", "Failed"].includes(t.status)).length;
 
         document.getElementById("totalTickets").textContent = total;
         document.getElementById("openTickets").textContent = open;
         document.getElementById("completedTickets").textContent = completed;
         document.getElementById("overdueTickets").textContent = overdue;
+    }
+
+    /**
+     * Apply card filter based on the clicked statistics card.
+     * Updates filter state, visual styling, and re-renders the ticket table.
+     *
+     * @param {string} filterType - The type of filter ('all', 'open', 'overdue', 'completed')
+     * @returns {void}
+     */
+    applyCardFilter(filterType) {
+        // Validate filter type
+        const validTypes = ["all", "open", "overdue", "completed"];
+        if (!validTypes.includes(filterType)) {
+            console.warn(`Invalid filter type: ${filterType}`);
+            return;
+        }
+
+        // Handle clicking the same card (reset to all)
+        if (this.activeCardFilter === filterType && filterType !== "all") {
+            this.activeCardFilter = null;
+            filterType = "all";
+        } else {
+            this.activeCardFilter = filterType === "all" ? null : filterType;
+        }
+
+        // Clear status dropdown when card is clicked
+        if (this.activeCardFilter) {
+            document.getElementById("statusFilter").value = "";
+        }
+
+        // Reset pagination and update visuals
+        this.currentPage = 1;
+        this.updateCardStyles(filterType === "all" ? null : filterType);
+        this.announceFilterChange(filterType);
+        this.renderTickets();
+    }
+
+    /**
+     * Apply card filter logic to a single ticket.
+     * Determines if ticket matches the currently active card filter.
+     *
+     * @param {Object} ticket - Ticket object to test
+     * @returns {boolean} True if ticket matches active card filter
+     */
+    applyCardFilterLogic(ticket) {
+        if (!this.activeCardFilter) {
+            return true; // No card filter active, include all tickets
+        }
+
+        switch (this.activeCardFilter) {
+            case "open":
+                // Active tickets needing attention
+                return !["Closed", "Completed", "Failed"].includes(ticket.status);
+
+            case "overdue":
+                // Urgent/problematic tickets
+                return ["Overdue", "Failed"].includes(ticket.status);
+
+            case "completed":
+                // Successfully finished tickets
+                return ["Completed", "Closed"].includes(ticket.status);
+
+            default:
+                return true;
+        }
+    }
+
+    /**
+     * Update visual styling for statistics cards based on active filter.
+     * Adds/removes active styling to show which filter is currently applied.
+     *
+     * @param {string|null} activeFilter - The currently active filter type or null
+     * @returns {void}
+     */
+    updateCardStyles(activeFilter) {
+        const cards = document.querySelectorAll(".stats-card");
+        cards.forEach(card => {
+            const cardType = card.getAttribute("data-filter-type");
+            if (cardType === activeFilter) {
+                card.classList.add("stats-card-active");
+                card.setAttribute("aria-pressed", "true");
+            } else {
+                card.classList.remove("stats-card-active");
+                card.setAttribute("aria-pressed", "false");
+            }
+        });
+    }
+
+    /**
+     * Announce filter changes to screen readers for accessibility.
+     * Updates live region with human-readable filter status.
+     *
+     * @param {string} filterType - The filter type that was applied
+     * @returns {void}
+     */
+    announceFilterChange(filterType) {
+        const messages = {
+            "all": "Showing all tickets",
+            "open": "Showing open tickets only",
+            "overdue": "Showing overdue and failed tickets",
+            "completed": "Showing completed tickets only"
+        };
+
+        // Find or create announcement element
+        let announcement = document.getElementById("filterAnnouncement");
+        if (!announcement) {
+            announcement = document.createElement("div");
+            announcement.id = "filterAnnouncement";
+            announcement.className = "sr-only";
+            announcement.setAttribute("aria-live", "polite");
+            announcement.setAttribute("aria-atomic", "true");
+            document.body.appendChild(announcement);
+        }
+
+        announcement.textContent = messages[filterType] || "Filter applied";
     }
 
     populateLocationFilter() {
