@@ -187,6 +187,105 @@
         [data-bs-theme="dark"] .service-now-link:hover {
             color: var(--ticket-accent-blue, #60a5fa) !important;
         }
+        /* Template Variable Dropdown Styles */
+        .variable-dropdown {
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--tblr-border-color, #dee2e6);
+            border-radius: 8px;
+            background-color: var(--tblr-bg-surface, #ffffff);
+        }
+
+        .variable-dropdown .dropdown-header {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--tblr-muted, #6c757d);
+            padding: 0.5rem 1rem 0.25rem;
+            border-bottom: 1px solid var(--tblr-border-color, #dee2e6);
+            background: var(--tblr-bg-surface-secondary, #f8f9fa);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .variable-dropdown .dropdown-item {
+            padding: 0.5rem 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--tblr-primary, #0054a6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .variable-dropdown .dropdown-item:hover {
+            background-color: var(--tblr-primary, #0054a6);
+            color: white;
+        }
+
+        .variable-dropdown .dropdown-item.required {
+            color: var(--tblr-orange, #fb8500);
+        }
+
+        .variable-dropdown .dropdown-item.required:hover {
+            background-color: var(--tblr-orange, #fb8500);
+            color: white;
+        }
+
+        .variable-dropdown .dropdown-item .variable-description {
+            font-size: 0.7rem;
+            font-family: var(--tblr-font-sans-serif);
+            opacity: 0.8;
+            margin-left: 0.5rem;
+            font-weight: normal;
+        }
+
+        .variable-dropdown .dropdown-divider {
+            margin: 0.25rem 0;
+            border-color: var(--tblr-border-color, #dee2e6);
+        }
+
+        /* Dark theme support */
+        [data-bs-theme="dark"] .variable-dropdown {
+            background-color: var(--tblr-bg-surface-dark, #1e293b);
+            border-color: var(--tblr-border-color-dark, #374151);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        [data-bs-theme="dark"] .variable-dropdown .dropdown-header {
+            background-color: var(--tblr-bg-surface-secondary-dark, #2d3748);
+            border-bottom-color: var(--tblr-border-color-dark, #374151);
+        }
+
+        [data-bs-theme="dark"] .variable-dropdown .dropdown-item {
+            color: var(--tblr-primary-dark, #60a5fa);
+        }
+
+        [data-bs-theme="dark"] .variable-dropdown .dropdown-item:hover {
+            background-color: var(--tblr-primary-dark, #3b82f6);
+        }
+
+        [data-bs-theme="dark"] .variable-dropdown .dropdown-item.required {
+            color: var(--tblr-orange-dark, #fbbf24);
+        }
+
+        [data-bs-theme="dark"] .variable-dropdown .dropdown-item.required:hover {
+            background-color: var(--tblr-orange-dark, #f59e0b);
+        }
+
+        [data-bs-theme="dark"] .variable-dropdown .dropdown-divider {
+            border-color: var(--tblr-border-color-dark, #374151);
+        }
     </style>
 </head>
 <body>
@@ -649,27 +748,9 @@
 
                             <!-- Edit Mode (Hidden by default) -->
                             <div id="ticketEditMode" style="display: none;">
+                                <!-- Template Editor (Full Width) -->
                                 <div class="row">
-                                    <!-- Variable Reference Panel -->
-                                    <div class="col-md-4">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-tags me-2"></i>Available Variables
-                                                </h6>
-                                            </div>
-                                            <div class="card-body p-2">
-                                                <div id="ticketVariablePanel" class="variable-list">
-                                                    <!-- Variables will be populated by JavaScript -->
-                                                </div>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Click variables to insert at cursor position</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Template Editor -->
-                                    <div class="col-md-8">
+                                    <div class="col-12">
                                         <div class="card">
                                             <div class="card-header d-flex justify-content-between align-items-center">
                                                 <h6 class="card-title mb-0">
@@ -679,6 +760,14 @@
                                                     <button type="button" class="btn btn-outline-secondary" onclick="ticketMarkdownEditor.previewTemplate()" title="Preview with current ticket data">
                                                         <i class="fas fa-eye me-1"></i>Preview
                                                     </button>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Insert template variables">
+                                                            <i class="fas fa-code me-1"></i>Variables
+                                                        </button>
+                                                        <ul class="dropdown-menu" id="ticketVariableDropdown">
+                                                            <!-- Variables will be populated by JavaScript -->
+                                                        </ul>
+                                                    </div>
                                                     <button type="button" class="btn btn-outline-warning" onclick="ticketMarkdownEditor.resetToDefault()" title="Reset to default template">
                                                         <i class="fas fa-undo me-1"></i>Reset
                                                     </button>
@@ -697,6 +786,7 @@
                                                 <div id="ticketTemplateValidation" class="template-validation"></div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -712,28 +802,9 @@
 
                             <!-- Edit Mode (Hidden by default) -->
                             <div id="emailEditMode" style="display: none;">
+                                <!-- Template Editor (Full Width) -->
                                 <div class="row">
-                                    <!-- Variable Reference Panel -->
-                                    <div class="col-md-4">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-tags me-2"></i>Available Variables
-                                                </h6>
-                                            </div>
-                                            <div class="card-body p-2">
-                                                <div id="variablePanel" class="variable-list">
-                                                    <!-- Variables will be populated by JavaScript -->
-                                                </div>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Click variables to insert at cursor position</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Template Editor -->
-                                    <div class="col-md-8">
+                                    <div class="col-12">
                                         <div class="card">
                                             <div class="card-header d-flex justify-content-between align-items-center">
                                                 <h6 class="card-title mb-0">
@@ -743,6 +814,14 @@
                                                     <button type="button" class="btn btn-outline-secondary" onclick="templateEditor.previewTemplate()" title="Preview with current ticket data">
                                                         <i class="fas fa-eye me-1"></i>Preview
                                                     </button>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Insert template variables">
+                                                            <i class="fas fa-code me-1"></i>Variables
+                                                        </button>
+                                                        <ul class="dropdown-menu" id="emailVariableDropdown">
+                                                            <!-- Variables will be populated by JavaScript -->
+                                                        </ul>
+                                                    </div>
                                                     <button type="button" class="btn btn-outline-warning" onclick="templateEditor.resetToDefault()" title="Reset to default template">
                                                         <i class="fas fa-undo me-1"></i>Reset
                                                     </button>
@@ -761,6 +840,7 @@
                                                 <div id="templateValidation" class="template-validation"></div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -776,27 +856,9 @@
 
                             <!-- Edit Mode (Hidden by default) -->
                             <div id="vulnerabilityEditMode" style="display: none;">
+                                <!-- Template Editor (Full Width) -->
                                 <div class="row">
-                                    <!-- Variable Reference Panel -->
-                                    <div class="col-md-4">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-tags me-2"></i>Available Variables
-                                                </h6>
-                                            </div>
-                                            <div class="card-body p-2">
-                                                <div id="vulnerabilityVariablePanel" class="variable-list">
-                                                    <!-- Variables will be populated by JavaScript -->
-                                                </div>
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Click variables to insert at cursor position</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Template Editor -->
-                                    <div class="col-md-8">
+                                    <div class="col-12">
                                         <div class="card">
                                             <div class="card-header d-flex justify-content-between align-items-center">
                                                 <h6 class="card-title mb-0">
@@ -806,6 +868,14 @@
                                                     <button type="button" class="btn btn-outline-secondary" onclick="vulnerabilityMarkdownEditor.previewTemplate()" title="Preview with current vulnerability data">
                                                         <i class="fas fa-eye me-1"></i>Preview
                                                     </button>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Insert template variables">
+                                                            <i class="fas fa-code me-1"></i>Variables
+                                                        </button>
+                                                        <ul class="dropdown-menu" id="vulnerabilityVariableDropdown">
+                                                            <!-- Variables will be populated by JavaScript -->
+                                                        </ul>
+                                                    </div>
                                                     <button type="button" class="btn btn-outline-warning" onclick="vulnerabilityMarkdownEditor.resetToDefault()" title="Reset to default template">
                                                         <i class="fas fa-undo me-1"></i>Reset
                                                     </button>
@@ -824,6 +894,7 @@
                                                 <div id="vulnerabilityTemplateValidation" class="template-validation"></div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -864,6 +935,7 @@
     <script src="scripts/shared/settings-modal.js"></script>
     <script src="/vendor/ag-grid/ag-grid-community.min.js"></script>
     <script src="scripts/shared/ag-grid-theme-manager.js"></script>
+    <script src="scripts/shared/template-variables.js"></script>
     <script src="scripts/shared/template-editor.js"></script>
     <script src="scripts/shared/ticket-markdown-editor.js"></script>
     <script src="scripts/shared/vulnerability-markdown-editor.js"></script>
@@ -914,9 +986,9 @@
                     }
 
                     // Update button appearance
-                    editBtn.innerHTML = '<i class="fas fa-times me-1"></i>Cancel';
+                    editBtn.innerHTML = '<i class="fas fa-times me-1"></i>Close';
                     editBtn.className = 'btn btn-outline-secondary btn-sm';
-                    editBtn.title = 'Cancel markdown editing';
+                    editBtn.title = 'Close markdown editing';
 
                     // Show success message
                     if (window.ticketManager?.showToast) {
@@ -935,6 +1007,42 @@
                     if (window.ticketMarkdownEditor) await window.ticketMarkdownEditor.toggleEditMode();
                     if (window.templateEditor) await window.templateEditor.toggleEditMode();
                     if (window.vulnerabilityMarkdownEditor) await window.vulnerabilityMarkdownEditor.toggleEditMode();
+
+                    // Clear caches and reload templates to ensure correct content is displayed
+                    console.log('[UnifiedEdit] Clearing template caches and reloading...');
+
+                    // Clear all template caches to force fresh reload
+                    if (window.ticketMarkdownEditor) {
+                        window.ticketMarkdownEditor.clearTemplateCache('default_ticket');
+                    }
+                    if (window.templateEditor) {
+                        window.templateEditor.clearTemplateCache('default_email');
+                    }
+                    if (window.vulnerabilityMarkdownEditor) {
+                        window.vulnerabilityMarkdownEditor.clearTemplateCache('default_vulnerability');
+                    }
+
+                    // Add delays between reloads to prevent race conditions
+                    await new Promise(resolve => setTimeout(resolve, 100));
+
+                    // Force reload each template view
+                    if (window.ticketManager) {
+                        if (window.ticketManager.loadTicketMarkdownForModal) {
+                            await window.ticketManager.loadTicketMarkdownForModal();
+                        }
+
+                        await new Promise(resolve => setTimeout(resolve, 100));
+
+                        if (window.ticketManager.loadEmailMarkdownForModal) {
+                            await window.ticketManager.loadEmailMarkdownForModal();
+                        }
+
+                        await new Promise(resolve => setTimeout(resolve, 100));
+
+                        if (window.ticketManager.loadVulnerabilityMarkdownForModal) {
+                            await window.ticketManager.loadVulnerabilityMarkdownForModal();
+                        }
+                    }
 
                     isUnifiedEditMode = false;
 

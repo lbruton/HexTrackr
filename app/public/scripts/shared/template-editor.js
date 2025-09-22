@@ -22,21 +22,10 @@ class TemplateEditor {
         this.currentTemplate = null;
         this.currentTicketData = null;
         this.validationTimeout = null;
+        this.isRestoring = false;
 
-        // Available variables from the backend
-        this.variables = [
-            { name: '[GREETING]', description: 'Supervisor first name or Team for multiple supervisors', required: false },
-            { name: '[SITE_NAME]', description: 'Site name from ticket', required: true },
-            { name: '[LOCATION]', description: 'Location from ticket', required: true },
-            { name: '[HEXAGON_NUM]', description: 'Hexagon ticket number', required: false },
-            { name: '[SERVICENOW_NUM]', description: 'ServiceNow ticket number', required: false },
-            { name: '[XT_NUMBER]', description: 'Internal XT number', required: true },
-            { name: '[DEVICE_COUNT]', description: 'Number of devices in ticket', required: true },
-            { name: '[DEVICE_LIST]', description: 'Enumerated list of devices', required: true },
-            { name: '[DATE_DUE]', description: 'Due date formatted', required: true },
-            { name: '[DATE_SUBMITTED]', description: 'Submission date formatted', required: true },
-            { name: '[VULNERABILITY_SUMMARY]', description: 'Dynamic vulnerability summary (generated at runtime)', required: false }
-        ];
+        // Use unified variables from the global variable system
+        this.variables = window.HexTrackrTemplateVariables?.getRecommendedVariables('email') || [];
 
         this.init();
     }
@@ -98,57 +87,75 @@ class TemplateEditor {
 
     /**
      * Load template for editing
+     * @param {boolean} forceRefresh - When true, bypass cache and fetch from server
      */
-    async loadTemplateForEditing() {
+    async loadTemplateForEditing(forceRefresh = false) {
         try {
-            // Try cache first
-            const cachedTemplate = this.getCachedTemplate('default_email');
-            if (cachedTemplate) {
-                console.log('Loading email template from cache');
-                this.currentTemplate = cachedTemplate;
+            // If forceRefresh is true, always fetch from API
+            if (forceRefresh) {
+                console.log('[TemplateEditor] Force refresh requested, fetching from API');
+                const response = await fetch('/api/templates/by-name/default_email');
 
-                // Load template content into editor
-                const editor = document.getElementById('templateEditor');
-                if (editor) {
-                    editor.value = this.currentTemplate.template_content;
-                    this.validateTemplate();
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        console.warn('Email template not found in database, creating default template');
+                        await this.createDefaultTemplate();
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                return;
-            }
 
-            // Cache miss - fetch from database
-            const response = await fetch('/api/templates/by-name/default_email');
-            if (!response.ok) {
-                // If template doesn't exist, create a default one
-                if (response.status === 404) {
-                    console.warn('Email template not found in database, creating default template');
-                    await this.createDefaultTemplate();
-                    return;
-                }
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            if (result.success) {
-                this.currentTemplate = result.data;
-
-                // Cache the template
-                this.cacheTemplate(this.currentTemplate);
-
-                // Load template content into editor
-                const editor = document.getElementById('templateEditor');
-                if (editor) {
-                    editor.value = this.currentTemplate.template_content;
-
-                    // Trigger validation
-                    this.validateTemplate();
+                const result = await response.json();
+                if (result.success) {
+                    this.currentTemplate = result.data;
+                    this.cacheTemplate(this.currentTemplate);
+                    console.log('[TemplateEditor] Template refreshed from API');
+                } else {
+                    throw new Error(result.error || 'Failed to load template');
                 }
             } else {
-                throw new Error(result.error || 'Failed to load template');
+                // Try cache first, then API if no cache
+                const cachedTemplate = this.getCachedTemplate('default_email');
+                if (cachedTemplate) {
+                    this.currentTemplate = cachedTemplate;
+                    console.log('[TemplateEditor] Using cached template');
+                } else if (!this.currentTemplate) {
+                    const response = await fetch('/api/templates/by-name/default_email');
+
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            console.warn('Email template not found in database, creating default template');
+                            await this.createDefaultTemplate();
+                            return;
+                        }
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    if (result.success) {
+                        this.currentTemplate = result.data;
+                        this.cacheTemplate(this.currentTemplate);
+                        console.log('[TemplateEditor] Template loaded from API');
+                    } else {
+                        throw new Error(result.error || 'Failed to load template');
+                    }
+                }
+            }
+
+            // Temporarily disable aggressive template validation to prevent unwanted restoration
+            // TODO: Implement more robust template validation that doesn't interfere with user edits
+            if (!this.isRestoring && this.currentTemplate && !this.isTemplateContentValid(this.currentTemplate.template_content)) {
+                console.warn('Template content validation failed, but allowing user content to load for editing.');
+                console.log('Template content preview:', this.currentTemplate.template_content.substring(0, 100));
+            }
+
+            const editor = document.getElementById('templateEditor');
+            if (editor && this.currentTemplate) {
+                editor.value = this.currentTemplate.template_content;
+                this.validateTemplate();
             }
         } catch (error) {
             console.error('Error loading template:', error);
-            // Try to create default template as fallback
             try {
                 await this.createDefaultTemplate();
                 this.showToast('Created default email template', 'info');
@@ -161,28 +168,67 @@ class TemplateEditor {
     }
 
     /**
-     * Populate the variable reference panel
+     * Populate the variable reference dropdown with organized categories
      */
     populateVariablePanel() {
-        const panel = document.getElementById('variablePanel');
-        if (!panel) return;
+        const dropdown = document.getElementById('emailVariableDropdown');
+        if (!dropdown) return;
 
-        panel.innerHTML = '';
+        dropdown.innerHTML = '';
+        dropdown.className = 'dropdown-menu variable-dropdown';
 
+        // Get categories from the global variable system
+        const categories = window.HexTrackrTemplateVariables?.categories || {};
+
+        // Group variables by category
+        const variablesByCategory = {};
         this.variables.forEach(variable => {
-            const variableElement = document.createElement('div');
-            variableElement.className = 'variable-item mb-2';
+            const category = variable.category || 'other';
+            if (!variablesByCategory[category]) {
+                variablesByCategory[category] = [];
+            }
+            variablesByCategory[category].push(variable);
+        });
 
-            variableElement.innerHTML = `
-                <span class="variable-tag ${variable.required ? 'required' : 'optional'}"
-                      onclick="templateEditor.insertVariable('${variable.name}')"
-                      title="${variable.description}${variable.required ? ' (Required)' : ' (Optional)'}">
-                    ${variable.name}
-                </span>
-                <small class="text-muted d-block">${variable.description}</small>
+        // Create dropdown items organized by category
+        Object.keys(variablesByCategory).forEach((categoryKey, index) => {
+            const categoryInfo = categories[categoryKey] || { label: categoryKey, icon: 'fas fa-tag' };
+            const variables = variablesByCategory[categoryKey];
+
+            // Add category header
+            const categoryHeader = document.createElement('li');
+            categoryHeader.innerHTML = `
+                <h6 class="dropdown-header">
+                    <i class="${categoryInfo.icon}"></i>
+                    ${categoryInfo.label}
+                </h6>
             `;
+            dropdown.appendChild(categoryHeader);
 
-            panel.appendChild(variableElement);
+            // Add variables for this category
+            variables.forEach(variable => {
+                const item = document.createElement('li');
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = `dropdown-item ${variable.required ? 'required' : ''}`;
+                button.onclick = () => this.insertVariable(variable.name);
+                button.title = `${variable.description}${variable.required ? ' (Required)' : ' (Optional)'}`;
+
+                button.innerHTML = `
+                    <span>${variable.name}</span>
+                    <small class="variable-description">${variable.description}</small>
+                `;
+
+                item.appendChild(button);
+                dropdown.appendChild(item);
+            });
+
+            // Add divider between categories (except for last category)
+            if (index < Object.keys(variablesByCategory).length - 1) {
+                const divider = document.createElement('li');
+                divider.innerHTML = '<hr class="dropdown-divider">';
+                dropdown.appendChild(divider);
+            }
         });
     }
 
@@ -337,13 +383,18 @@ class TemplateEditor {
                 }
             }
 
+            console.log(`[TemplateEditor] Saving template with ID: ${this.currentTemplate.id}, category: 'email', name: 'default_email'`);
+            console.log(`[TemplateEditor] Template content preview: ${templateContent.substring(0, 100)}...`);
+
             const response = await fetch(`/api/templates/${this.currentTemplate.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    template_content: templateContent
+                    template_content: templateContent,
+                    category: 'email',
+                    template_name: 'default_email'
                 })
             });
 
@@ -385,6 +436,7 @@ class TemplateEditor {
         }
 
         try {
+            this.isRestoring = true;
             const response = await fetch(`/api/templates/${this.currentTemplate.id}/reset`, {
                 method: 'POST'
             });
@@ -398,13 +450,16 @@ class TemplateEditor {
                 this.showToast('Template reset to default', 'success');
 
                 // Reload template for editing
-                await this.loadTemplateForEditing();
+                this.clearTemplateCache('default_email');
+                await this.loadTemplateForEditing(true);
             } else {
                 throw new Error(result.error || 'Reset failed');
             }
         } catch (error) {
             console.error('Error resetting template:', error);
             this.showToast('Failed to reset template', 'error');
+        } finally {
+            this.isRestoring = false;
         }
     }
 
@@ -660,8 +715,7 @@ class TemplateEditor {
      * @returns {string} Vulnerability summary
      */
     generateVulnerabilitySummary(ticket) {
-        // This is a placeholder - in full implementation, this would fetch vulnerability data
-        return '(Vulnerability summary will be generated based on devices when available)';
+        return '';
     }
 
     /**
@@ -670,7 +724,7 @@ class TemplateEditor {
      * @returns {string} Escaped string
      */
     escapeRegex(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
     }
 
     /**
@@ -679,13 +733,15 @@ class TemplateEditor {
      */
     cacheTemplate(template) {
         try {
-            const cacheKey = `hextrackr_template_${template.name}`;
+            const cacheKey = `hextrackr_email_template_${template.name}`;
             const cacheData = {
                 template: template,
                 timestamp: Date.now(),
-                expires: Date.now() + (60 * 60 * 1000) // 1 hour expiry
+                expires: Date.now() + (60 * 60 * 1000), // 1 hour expiry
+                category: 'email'
             };
             localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+            console.log(`[TemplateEditor] Cached template with key: ${cacheKey}`);
         } catch (error) {
             console.warn('Failed to cache template:', error);
         }
@@ -698,19 +754,24 @@ class TemplateEditor {
      */
     getCachedTemplate(templateName) {
         try {
-            const cacheKey = `hextrackr_template_${templateName}`;
+            const cacheKey = `hextrackr_email_template_${templateName}`;
             const cached = localStorage.getItem(cacheKey);
 
-            if (!cached) return null;
+            if (!cached) {
+                console.log(`[TemplateEditor] No cached template found for key: ${cacheKey}`);
+                return null;
+            }
 
             const cacheData = JSON.parse(cached);
 
             // Check if cache is expired
             if (cacheData.expires < Date.now()) {
+                console.log(`[TemplateEditor] Cached template expired for key: ${cacheKey}`);
                 localStorage.removeItem(cacheKey);
                 return null;
             }
 
+            console.log(`[TemplateEditor] Retrieved cached template for key: ${cacheKey}`);
             return cacheData.template;
         } catch (error) {
             console.warn('Failed to retrieve cached template:', error);
@@ -725,19 +786,56 @@ class TemplateEditor {
     clearTemplateCache(templateName = null) {
         try {
             if (templateName) {
-                const cacheKey = `hextrackr_template_${templateName}`;
+                const cacheKey = `hextrackr_email_template_${templateName}`;
                 localStorage.removeItem(cacheKey);
+                console.log(`[TemplateEditor] Cleared cache for key: ${cacheKey}`);
             } else {
-                // Clear all template caches
+                // Clear all email template caches
                 const keys = Object.keys(localStorage);
                 keys.forEach(key => {
-                    if (key.startsWith('hextrackr_template_')) {
+                    if (key.startsWith('hextrackr_email_template_')) {
                         localStorage.removeItem(key);
+                        console.log(`[TemplateEditor] Cleared cache for key: ${key}`);
                     }
                 });
             }
         } catch (error) {
             console.warn('Failed to clear template cache:', error);
+        }
+    }
+
+    /**
+     * Validate that the email template content matches the expected structure
+     * @param {string} content - Template content to validate
+     * @returns {boolean} True when template content appears valid for email
+     */
+    isTemplateContentValid(content) {
+        if (!content) {
+            return false;
+        }
+
+        const hasEmailSignature = content.includes('Subject: Hexagon Work Order');
+        const containsForeignSignature = content.includes('# Vulnerability Report');
+
+        return hasEmailSignature && !containsForeignSignature;
+    }
+
+    /**
+     * Restore the email template from server defaults when corruption is detected
+     */
+    async restoreTemplateFromServer() {
+        this.isRestoring = true;
+        try {
+            if (this.currentTemplate?.id) {
+                await fetch(`/api/templates/${this.currentTemplate.id}/reset`, { method: 'POST' });
+            }
+        } catch (resetError) {
+            console.warn('Failed to reset email template on server:', resetError.message);
+        } finally {
+            this.clearTemplateCache('default_email');
+            this.currentTemplate = null;
+            await this.loadTemplateForEditing(true);
+            this.isRestoring = false;
         }
     }
 

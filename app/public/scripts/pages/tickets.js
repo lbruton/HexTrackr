@@ -2008,142 +2008,41 @@ class HexagonTicketsManager {
 
         try {
             const zip = new JSZip();
+            const ticketMarkdown = await this.generateMarkdown(ticket);
 
-            // Generate the PDF content using the same structure as markdown
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF("p", "mm", "a4");
-
-            // Set up margins and formatting constants
             const margin = 20;
-            const pageWidth = 170; // A4 width minus margins
-            let yPosition = 25;
-            const lineHeight = 7;
-            const sectionSpacing = 10;
+            const pageWidth = doc.internal.pageSize.getWidth() - (margin * 2);
+            const lineHeight = 6;
+            let yPosition = margin;
 
-            // Title
-            doc.setFontSize(18);
-            doc.setTextColor(0, 102, 204);
-            doc.text("Hexagon Work Request", margin, yPosition);
-            yPosition += 15;
-
-            // Ticket Information Section
-            doc.setFontSize(14);
-            doc.setTextColor(0, 0, 0);
-            doc.setFont("helvetica", "bold");
-            doc.text("Ticket Information:", margin, yPosition);
-            yPosition += lineHeight + 3;
-
+            doc.setFont("courier", "normal");
             doc.setFontSize(11);
-            doc.setFont("helvetica", "normal");
-            doc.text(`• Hexagon Ticket #: ${ticket.hexagonTicket || "N/A"}`, margin + 5, yPosition);
-            yPosition += lineHeight;
-            doc.text(`• ServiceNow Ticket #: ${ticket.serviceNowTicket || "N/A"}`, margin + 5, yPosition);
-            yPosition += lineHeight;
-            doc.text(`• Site: ${ticket.site || "N/A"}`, margin + 5, yPosition);
-            yPosition += lineHeight;
-            doc.text(`• Location: ${ticket.location || "N/A"}`, margin + 5, yPosition);
-            yPosition += lineHeight;
-            doc.text(`• Status: ${ticket.status || "N/A"}`, margin + 5, yPosition);
-            yPosition += sectionSpacing + 5;
 
-            // Timeline Section
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.text("Timeline:", margin, yPosition);
-            yPosition += lineHeight + 3;
+            const wrappedLines = doc.splitTextToSize(ticketMarkdown, pageWidth);
+            wrappedLines.forEach(line => {
+                if (yPosition > doc.internal.pageSize.getHeight() - margin) {
+                    doc.addPage();
+                    doc.setFont("courier", "normal");
+                    doc.setFontSize(11);
+                    yPosition = margin;
+                }
+                doc.text(line, margin, yPosition);
+                yPosition += lineHeight;
+            });
 
-            doc.setFontSize(11);
-            doc.setFont("helvetica", "normal");
-            doc.text(`• Date Submitted: ${this.formatDate(ticket.dateSubmitted)}`, margin + 5, yPosition);
-            yPosition += lineHeight;
-            doc.text(`• Required Completion Date: ${this.formatDate(ticket.dateDue)}`, margin + 5, yPosition);
-            yPosition += sectionSpacing + 5;
+            const sanitizedSite = (ticket.site || ticket.location || 'UNKNOWN')
+                .replace(/\s+/g, '')
+                .replace(/[^a-zA-Z0-9_-]/g, '');
+            const dateStr = (ticket.dateSubmitted || new Date().toISOString().split('T')[0]).replace(/-/g, '');
+            const hexagonId = (ticket.hexagonTicket || 'TICKET').replace(/[^a-zA-Z0-9_-]/g, '');
+            const baseFilename = `${sanitizedSite}_${dateStr}_${hexagonId}`;
 
-            // Task Instruction Section
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.text("Task Instruction:", margin, yPosition);
-            yPosition += lineHeight + 3;
-            
-            doc.setFontSize(11);
-            doc.setFont("helvetica", "normal");
-            const taskText = `There are critical security patches that must be applied within 30 days at the [${ticket.site || "SITE NAME"}] site.`;
-            const splitTaskText = doc.splitTextToSize(taskText, pageWidth);
-            doc.text(splitTaskText, margin, yPosition);
-            yPosition += splitTaskText.length * lineHeight + 5;
-
-            const instructionText = `Please schedule a maintenance outage of at least two hours and contact the ITCC @ 918-732-4822 with service now ticket number [${ticket.serviceNowTicket || "SERVICE NOW TICKET"}] to coordinate Netops to apply security updates and reboot the equipment.`;
-            const splitInstructionText = doc.splitTextToSize(instructionText, pageWidth);
-            doc.text(splitInstructionText, margin, yPosition);
-            yPosition += splitInstructionText.length * lineHeight + sectionSpacing;
-
-            // Devices section
-            if (ticket.devices && ticket.devices.length > 0) {
-                doc.setFontSize(14);
-                doc.setFont("helvetica", "bold");
-                doc.text("Devices to be Updated:", margin, yPosition);
-                yPosition += lineHeight + 3;
-
-                doc.setFontSize(11);
-                doc.setFont("helvetica", "normal");
-                doc.text("The following devices will be updated and rebooted:", margin, yPosition);
-                yPosition += lineHeight + 3;
-
-                ticket.devices.forEach((device, index) => {
-                    doc.text(`${index + 1}. ${device}`, margin + 5, yPosition);
-                    yPosition += lineHeight;
-                });
-                yPosition += sectionSpacing;
-            }
-
-            // Personnel section
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.text("Personnel:", margin, yPosition);
-            yPosition += lineHeight + 3;
-
-            doc.setFontSize(11);
-            doc.setFont("helvetica", "normal");
-            doc.text(`• Supervisor: ${ticket.supervisor || "N/A"}`, margin + 5, yPosition);
-            yPosition += lineHeight;
-            doc.text(`• Technician: ${ticket.tech || "N/A"}`, margin + 5, yPosition);
-            yPosition += sectionSpacing + 5;
-
-            // Additional Notes section
-            if (ticket.notes && ticket.notes.trim()) {
-                doc.setFontSize(14);
-                doc.setFont("helvetica", "bold");
-                doc.text("Additional Notes:", margin, yPosition);
-                yPosition += lineHeight + 3;
-
-                doc.setFontSize(11);
-                doc.setFont("helvetica", "normal");
-                const splitNotes = doc.splitTextToSize(ticket.notes, pageWidth);
-                doc.text(splitNotes, margin, yPosition);
-                yPosition += splitNotes.length * lineHeight + sectionSpacing;
-            }
-
-            // Footer with generation info
-            yPosition += 10;
-            doc.setFontSize(9);
-            doc.setTextColor(100, 100, 100);
-            doc.text("---", margin, yPosition);
-            yPosition += 5;
-            doc.text(`Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, margin, yPosition);
-
-            // Generate base filename
-            const siteName = (ticket.site || ticket.location || "UNKNOWN").replace(/\s+/g, "").replace(/[^a-zA-Z0-9]/g, "");
-            const dateStr = ticket.dateSubmitted.replace(/-/g, "");
-            const ticketNum = ticket.hexagonTicket.replace(/[^a-zA-Z0-9]/g, "");
-            const baseFilename = `${siteName}_${dateStr}_${ticketNum}`;
-
-            // Add PDF to zip
-            const pdfBlob = doc.output("blob");
+            const pdfBlob = doc.output('blob');
             zip.file(`${baseFilename}.pdf`, pdfBlob);
 
-            // Generate and add markdown file to zip (async)
-            const markdownContent = await this.generateMarkdown(ticket);
-            const markdownBlob = new Blob([markdownContent], { type: "text/markdown" });
+            const markdownBlob = new Blob([ticketMarkdown], { type: 'text/markdown' });
             zip.file(`${baseFilename}.md`, markdownBlob);
 
             // Automatically fetch and include vulnerabilities if devices are present
@@ -3030,47 +2929,35 @@ class HexagonTicketsManager {
             // Generate the base email markdown
             let emailMarkdown = await this.generateEmailMarkdown(ticket);
 
-            // If there are devices, fetch vulnerability data and append summary
-            if (ticket.devices && ticket.devices.length > 0) {
-                try {
-                    // Show loading message while fetching
-                    document.getElementById("emailLoadingMessage").textContent = "Generating email template with vulnerability summary...";
+            let summaryBlock = '';
 
-                    // Fetch vulnerabilities for the devices
+            if (ticket.devices && ticket.devices.length > 0) {
+                document.getElementById("emailLoadingMessage").textContent = "Generating email template with vulnerability summary...";
+
+                try {
                     const vulnerabilities = await this.fetchVulnerabilitiesForDevices(ticket.devices);
 
-                    // Insert vulnerability summary before the "Please confirm receipt" line
-                    const confirmReceiptIndex = emailMarkdown.indexOf("\nPlease confirm receipt");
-                    if (confirmReceiptIndex > -1) {
-                        const beforeConfirm = emailMarkdown.substring(0, confirmReceiptIndex);
-                        const fromConfirm = emailMarkdown.substring(confirmReceiptIndex);
-
-                        // Generate vulnerability summary
-                        const vulnSummary = this.generateVulnerabilitySummaryForEmail(ticket, vulnerabilities || []);
-
-                        // Combine with vulnerability summary
-                        emailMarkdown = beforeConfirm + vulnSummary + "\n" + fromConfirm;
-                    } else {
-                        // Fallback: insert before final separator
-                        const finalSeparatorIndex = emailMarkdown.lastIndexOf("\n---\nGenerated by HexTrackr");
-                        if (finalSeparatorIndex > -1) {
-                            const beforeFinalSeparator = emailMarkdown.substring(0, finalSeparatorIndex);
-                            const finalSeparator = emailMarkdown.substring(finalSeparatorIndex);
-                            const vulnSummary = this.generateVulnerabilitySummaryForEmail(ticket, vulnerabilities || []);
-                            emailMarkdown = beforeFinalSeparator + "\n" + vulnSummary + finalSeparator;
-                        }
+                    if (vulnerabilities && vulnerabilities.length > 0) {
+                        summaryBlock = this.generateVulnerabilitySummaryForEmail(ticket, vulnerabilities || []);
                     }
-
-                    console.log('[EmailTemplate] Added vulnerability summary to email template');
                 } catch (vulnError) {
                     console.error('[EmailTemplate] Error fetching vulnerabilities:', vulnError);
-                    // Continue without vulnerability data - don't fail the whole email
-                    const confirmReceiptIndex = emailMarkdown.indexOf("\nPlease confirm receipt");
-                    if (confirmReceiptIndex > -1) {
-                        const beforeConfirm = emailMarkdown.substring(0, confirmReceiptIndex);
-                        const fromConfirm = emailMarkdown.substring(confirmReceiptIndex);
-                        emailMarkdown = beforeConfirm + "**VULNERABILITY SUMMARY:**\n\nUnable to fetch vulnerability data.\n\n" + fromConfirm;
-                    }
+                    summaryBlock = "**VULNERABILITY SUMMARY:**\n\nUnable to fetch vulnerability data.";
+                }
+            }
+
+            const summaryReplacement = summaryBlock && summaryBlock.trim() ? `${summaryBlock.trim()}\n\n` : '';
+
+            if (emailMarkdown.includes('[VULNERABILITY_SUMMARY]')) {
+                emailMarkdown = emailMarkdown.replace(/\[VULNERABILITY_SUMMARY\]/g, summaryReplacement);
+            } else if (summaryReplacement) {
+                const confirmReceiptIndex = emailMarkdown.indexOf("\nPlease confirm receipt");
+                if (confirmReceiptIndex > -1) {
+                    const beforeConfirm = emailMarkdown.substring(0, confirmReceiptIndex);
+                    const afterConfirm = emailMarkdown.substring(confirmReceiptIndex);
+                    emailMarkdown = `${beforeConfirm}${summaryReplacement}${afterConfirm}`;
+                } else {
+                    emailMarkdown = `${emailMarkdown}\n\n${summaryReplacement}`;
                 }
             }
 

@@ -21,26 +21,10 @@ class TicketMarkdownEditor {
         this.currentTemplate = null;
         this.currentTicketData = null;
         this.validationTimeout = null;
+        this.isRestoring = false;
 
-        // Available variables for ticket markdown template
-        this.variables = [
-            { name: '[HEXAGON_TICKET]', description: 'Hexagon ticket number', required: false },
-            { name: '[SERVICENOW_TICKET]', description: 'ServiceNow ticket number', required: false },
-            { name: '[XT_NUMBER]', description: 'Internal XT number', required: true },
-            { name: '[SITE]', description: 'Site name', required: true },
-            { name: '[LOCATION]', description: 'Location name', required: true },
-            { name: '[STATUS]', description: 'Ticket status', required: true },
-            { name: '[DATE_SUBMITTED]', description: 'Date submitted (formatted)', required: true },
-            { name: '[DATE_DUE]', description: 'Due date (formatted)', required: true },
-            { name: '[DEVICE_LIST]', description: 'Formatted list of devices', required: true },
-            { name: '[DEVICE_COUNT]', description: 'Number of devices', required: true },
-            { name: '[SUPERVISOR]', description: 'Supervisor name', required: false },
-            { name: '[TECHNICIAN]', description: 'Technician name', required: false },
-            { name: '[NOTES]', description: 'Additional notes', required: false },
-            { name: '[GENERATED_TIME]', description: 'Current date and time', required: false },
-            { name: '[GREETING]', description: 'Supervisor greeting', required: false },
-            { name: '[VULNERABILITY_SUMMARY]', description: 'Vulnerability assessment summary', required: false }
-        ];
+        // Use unified variables from the global variable system
+        this.variables = window.HexTrackrTemplateVariables?.getRecommendedVariables('ticket') || [];
 
         this.init();
     }
@@ -103,48 +87,73 @@ class TicketMarkdownEditor {
     /**
      * Load template for editing
      */
-    async loadTemplateForEditing() {
+    async loadTemplateForEditing(forceRefresh = false) {
         try {
-            const response = await fetch('/api/templates/by-name/default_ticket');
-            if (!response.ok) {
-                // If template doesn't exist, use fallback
-                console.warn('No ticket template found, using default');
-                this.createDefaultTemplate();
+            // If forceRefresh is true, always fetch from API
+            if (forceRefresh) {
+                console.log('[TicketMarkdownEditor] Force refresh requested, fetching from API');
+                const response = await fetch('/api/templates/by-name/default_ticket');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        this.currentTemplate = result.data;
+                        this.cacheTemplate(this.currentTemplate);
+                        console.log('[TicketMarkdownEditor] Template refreshed from API');
+                    }
+                }
+            } else {
+                // Try cache first, then API if no cache
+                const cached = this.getCachedTemplate('default_ticket');
+                if (cached) {
+                    this.currentTemplate = cached;
+                    console.log('[TicketMarkdownEditor] Using cached template');
+                } else if (!this.currentTemplate) {
+                    const response = await fetch('/api/templates/by-name/default_ticket');
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            this.currentTemplate = result.data;
+                            this.cacheTemplate(this.currentTemplate);
+                            console.log('[TicketMarkdownEditor] Template loaded from API');
+                        }
+                    }
+                }
+            }
+
+            if (!this.currentTemplate) {
+                await this.createDefaultTemplate();
                 return;
             }
 
-            const result = await response.json();
-            if (result.success) {
-                this.currentTemplate = result.data;
+            // Temporarily disable aggressive template validation to prevent unwanted restoration
+            // TODO: Implement more robust template validation that doesn't interfere with user edits
+            if (!this.isRestoring && !this.isTemplateContentValid(this.currentTemplate.template_content)) {
+                console.warn('Template content validation failed, but allowing user content to load for editing.');
+                console.log('Template content preview:', this.currentTemplate.template_content.substring(0, 100));
+            }
 
-                // Load template content into editor
-                const editor = document.getElementById('ticketTemplateEditor');
-                if (editor) {
-                    editor.value = this.currentTemplate.template_content;
-
-                    // Trigger validation
-                    this.validateTemplate();
-                }
-            } else {
-                throw new Error(result.error || 'Failed to load ticket template');
+            const editor = document.getElementById('ticketTemplateEditor');
+            if (editor && this.currentTemplate) {
+                editor.value = this.currentTemplate.template_content;
+                this.validateTemplate();
             }
         } catch (error) {
             console.error('Error loading ticket template:', error);
-            // Use default template
-            this.createDefaultTemplate();
+            await this.createDefaultTemplate();
         }
     }
 
     /**
      * Create default template from hardcoded version
      */
-    createDefaultTemplate() {
+    async createDefaultTemplate() {
         const defaultContent = `# Hexagon Work Request
 
 **Ticket Information:**
 - Hexagon Ticket #: [HEXAGON_TICKET]
 - ServiceNow Ticket #: [SERVICENOW_TICKET]
-- Site: [SITE]
+- XT Number: [XT_NUMBER]
+- Site: [SITE_NAME]
 - Location: [LOCATION]
 - Status: [STATUS]
 
@@ -153,10 +162,7 @@ class TicketMarkdownEditor {
 - Required Completion Date: [DATE_DUE]
 
 **Task Instruction:**
-There are critical security patches that must be applied within 30 days at the [[SITE]] site.
-Please schedule a maintenance outage of at least two hours and contact the ITCC @
-918-732-4822 with service now ticket number [[SERVICENOW_TICKET]] to coordinate Netops to apply security
-updates and reboot the equipment.
+There are critical security patches that must be applied within 30 days at the [SITE_NAME] site. Please schedule a maintenance outage of at least two hours and contact the ITCC at 918-732-4822 with ServiceNow ticket [SERVICENOW_TICKET] to coordinate NetOps for applying security updates and rebooting the equipment.
 
 **Devices to be Updated:**
 The following [DEVICE_COUNT] device(s) will be updated and rebooted:
@@ -173,42 +179,130 @@ The following [DEVICE_COUNT] device(s) will be updated and rebooted:
 ---
 Generated: [GENERATED_TIME]`;
 
-        const editor = document.getElementById('ticketTemplateEditor');
-        if (editor) {
-            editor.value = defaultContent;
-            this.validateTemplate();
-        }
+        try {
+            const templateData = {
+                name: 'default_ticket',
+                description: 'Default ticket markdown template',
+                template_content: defaultContent,
+                default_content: defaultContent,
+                variables: JSON.stringify(this.variables),
+                category: 'ticket'
+            };
 
-        this.currentTemplate = {
-            id: null,
-            name: 'default_ticket',
-            template_content: defaultContent
-        };
+            const response = await fetch('/api/templates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(templateData)
+            });
+
+            if (response.status === 409) {
+                const existing = await fetch('/api/templates/by-name/default_ticket');
+                if (existing.ok) {
+                    const existingResult = await existing.json();
+                    if (existingResult.success) {
+                        this.currentTemplate = existingResult.data;
+                    }
+                }
+            } else {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to seed ticket template');
+                }
+
+                this.currentTemplate = result.data;
+            }
+
+            const editor = document.getElementById('ticketTemplateEditor');
+            if (editor) {
+                editor.value = this.currentTemplate.template_content;
+                this.validateTemplate();
+            }
+
+            this.cacheTemplate(this.currentTemplate);
+        } catch (error) {
+            console.error('Error ensuring default ticket template:', error);
+            const editor = document.getElementById('ticketTemplateEditor');
+            if (editor) {
+                editor.value = defaultContent;
+                this.validateTemplate();
+            }
+
+            this.currentTemplate = {
+                id: null,
+                name: 'default_ticket',
+                template_content: defaultContent
+            };
+        }
     }
 
     /**
-     * Populate the variable reference panel
+     * Populate the variable reference dropdown with organized categories
      */
     populateVariablePanel() {
-        const panel = document.getElementById('ticketVariablePanel');
-        if (!panel) return;
+        const dropdown = document.getElementById('ticketVariableDropdown');
+        if (!dropdown) return;
 
-        panel.innerHTML = '';
+        dropdown.innerHTML = '';
+        dropdown.className = 'dropdown-menu variable-dropdown';
 
+        // Get categories from the global variable system
+        const categories = window.HexTrackrTemplateVariables?.categories || {};
+
+        // Group variables by category
+        const variablesByCategory = {};
         this.variables.forEach(variable => {
-            const variableElement = document.createElement('div');
-            variableElement.className = 'variable-item mb-2';
+            const category = variable.category || 'other';
+            if (!variablesByCategory[category]) {
+                variablesByCategory[category] = [];
+            }
+            variablesByCategory[category].push(variable);
+        });
 
-            variableElement.innerHTML = `
-                <span class="variable-tag ${variable.required ? 'required' : 'optional'}"
-                      onclick="ticketMarkdownEditor.insertVariable('${variable.name}')"
-                      title="${variable.description}${variable.required ? ' (Required)' : ' (Optional)'}">
-                    ${variable.name}
-                </span>
-                <small class="text-muted d-block">${variable.description}</small>
+        // Create dropdown items organized by category
+        Object.keys(variablesByCategory).forEach((categoryKey, index) => {
+            const categoryInfo = categories[categoryKey] || { label: categoryKey, icon: 'fas fa-tag' };
+            const variables = variablesByCategory[categoryKey];
+
+            // Add category header
+            const categoryHeader = document.createElement('li');
+            categoryHeader.innerHTML = `
+                <h6 class="dropdown-header">
+                    <i class="${categoryInfo.icon}"></i>
+                    ${categoryInfo.label}
+                </h6>
             `;
+            dropdown.appendChild(categoryHeader);
 
-            panel.appendChild(variableElement);
+            // Add variables for this category
+            variables.forEach(variable => {
+                const item = document.createElement('li');
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = `dropdown-item ${variable.required ? 'required' : ''}`;
+                button.onclick = () => this.insertVariable(variable.name);
+                button.title = `${variable.description}${variable.required ? ' (Required)' : ' (Optional)'}`;
+
+                button.innerHTML = `
+                    <span>${variable.name}</span>
+                    <small class="variable-description">${variable.description}</small>
+                `;
+
+                item.appendChild(button);
+                dropdown.appendChild(item);
+            });
+
+            // Add divider between categories (except for last category)
+            if (index < Object.keys(variablesByCategory).length - 1) {
+                const divider = document.createElement('li');
+                divider.innerHTML = '<hr class="dropdown-divider">';
+                dropdown.appendChild(divider);
+            }
         });
     }
 
@@ -369,11 +463,10 @@ Generated: [GENERATED_TIME]`;
      * @returns {string} Vulnerability summary
      */
     generateVulnerabilitySummary(ticket) {
-        // Simple implementation - could be enhanced with actual vulnerability data
         if (ticket?.devices && ticket.devices.length > 0) {
-            return `Vulnerability assessment pending for ${ticket.devices.length} device(s): ${ticket.devices.join(', ')}`;
+            return '';
         }
-        return 'No vulnerability data available';
+        return '';
     }
 
     /**
@@ -382,7 +475,7 @@ Generated: [GENERATED_TIME]`;
      * @returns {string} Escaped string
      */
     escapeRegex(string) {
-        return string.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');
+        return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
     }
 
     /**
@@ -448,26 +541,23 @@ Generated: [GENERATED_TIME]`;
             }
 
             // Create or update template
-            const templateData = {
-                name: 'default_ticket',
-                description: 'Default ticket markdown template',
-                template_content: templateContent,
-                default_content: templateContent,
-                variables: JSON.stringify(this.variables),
-                category: 'ticket'
-            };
+            if (!this.currentTemplate?.id) {
+                await this.createDefaultTemplate();
+            }
 
-            const url = this.currentTemplate?.id ?
-                `/api/templates/${this.currentTemplate.id}` :
-                '/api/templates';
-            const method = this.currentTemplate?.id ? 'PUT' : 'POST';
+            console.log(`[TicketMarkdownEditor] Saving template with ID: ${this.currentTemplate.id}, category: 'ticket', name: 'default_ticket'`);
+            console.log(`[TicketMarkdownEditor] Template content preview: ${templateContent.substring(0, 100)}...`);
 
-            const response = await fetch(url, {
-                method: method,
+            const response = await fetch(`/api/templates/${this.currentTemplate.id}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(templateData)
+                body: JSON.stringify({
+                    template_content: templateContent,
+                    category: 'ticket',
+                    template_name: 'default_ticket'
+                })
             });
 
             if (!response.ok) {
@@ -479,11 +569,8 @@ Generated: [GENERATED_TIME]`;
                 this.showToast('Ticket template saved successfully', 'success');
 
                 // Update current template
-                if (!this.currentTemplate?.id) {
-                    this.currentTemplate = result.data;
-                } else {
-                    this.currentTemplate.template_content = templateContent;
-                }
+                this.currentTemplate.template_content = templateContent;
+                this.cacheTemplate(this.currentTemplate);
 
                 // Refresh the ticket view if loaded
                 if (window.ticketManager && window.ticketManager.viewTicket) {
@@ -509,16 +596,146 @@ Generated: [GENERATED_TIME]`;
      * Reset template to default
      */
     async resetToDefault() {
+        if (!this.currentTemplate?.id) {
+            await this.createDefaultTemplate();
+        }
+
         if (!confirm('Reset template to default? This will lose all custom changes.')) {
             return;
         }
 
+        this.isRestoring = true;
         try {
-            this.createDefaultTemplate();
+            const response = await fetch(`/api/templates/${this.currentTemplate.id}/reset`, {
+                method: 'POST'
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Reset failed');
+            }
+
+            this.clearTemplateCache('default_ticket');
+            await this.loadTemplateForEditing(true);
             this.showToast('Ticket template reset to default', 'success');
         } catch (error) {
             console.error('Error resetting ticket template:', error);
             this.showToast('Failed to reset ticket template', 'error');
+        } finally {
+            this.isRestoring = false;
+        }
+    }
+
+    /**
+     * Cache template in localStorage
+     * @param {Object} template - Template object to cache
+     */
+    cacheTemplate(template) {
+        try {
+            if (!template?.name) return;
+            const cacheKey = `hextrackr_ticket_template_${template.name}`;
+            const cacheData = {
+                template,
+                timestamp: Date.now(),
+                expires: Date.now() + (60 * 60 * 1000),
+                category: 'ticket'
+            };
+            localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+            console.log(`[TicketMarkdownEditor] Cached template with key: ${cacheKey}`);
+        } catch (error) {
+            console.warn('Failed to cache ticket template:', error);
+        }
+    }
+
+    /**
+     * Retrieve cached template from localStorage
+     * @param {string} templateName - Template name
+     * @returns {Object|null} Cached template or null
+     */
+    getCachedTemplate(templateName) {
+        try {
+            const cacheKey = `hextrackr_ticket_template_${templateName}`;
+            const cached = localStorage.getItem(cacheKey);
+            if (!cached) {
+                console.log(`[TicketMarkdownEditor] No cached template found for key: ${cacheKey}`);
+                return null;
+            }
+
+            const cacheData = JSON.parse(cached);
+            if (cacheData.expires < Date.now()) {
+                console.log(`[TicketMarkdownEditor] Cached template expired for key: ${cacheKey}`);
+                localStorage.removeItem(cacheKey);
+                return null;
+            }
+
+            console.log(`[TicketMarkdownEditor] Retrieved cached template for key: ${cacheKey}`);
+            return cacheData.template;
+        } catch (error) {
+            console.warn('Failed to load cached ticket template:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Clear cached template(s)
+     * @param {string|null} templateName - Specific template to clear or all
+     */
+    clearTemplateCache(templateName = null) {
+        try {
+            if (templateName) {
+                const cacheKey = `hextrackr_ticket_template_${templateName}`;
+                localStorage.removeItem(cacheKey);
+                console.log(`[TicketMarkdownEditor] Cleared cache for key: ${cacheKey}`);
+                return;
+            }
+
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('hextrackr_ticket_template_')) {
+                    localStorage.removeItem(key);
+                    console.log(`[TicketMarkdownEditor] Cleared cache for key: ${key}`);
+                }
+            });
+        } catch (error) {
+            console.warn('Failed to clear ticket template cache:', error);
+        }
+    }
+
+    /**
+     * Validate ticket template content against expected markers
+     * @param {string} content - Template content to validate
+     * @returns {boolean} True when content looks correct for ticket templates
+     */
+    isTemplateContentValid(content) {
+        if (!content) {
+            return false;
+        }
+
+        const hasTicketSignature = content.includes('# Hexagon Work Request');
+        const containsForeignSignature = content.includes('# Vulnerability Report');
+
+        return hasTicketSignature && !containsForeignSignature;
+    }
+
+    /**
+     * Restore ticket template from server defaults when corruption is detected
+     */
+    async restoreTemplateFromServer() {
+        this.isRestoring = true;
+        try {
+            if (this.currentTemplate?.id) {
+                await fetch(`/api/templates/${this.currentTemplate.id}/reset`, { method: 'POST' });
+            }
+        } catch (resetError) {
+            console.warn('Failed to reset ticket template on server:', resetError.message);
+        } finally {
+            this.clearTemplateCache('default_ticket');
+            this.currentTemplate = null;
+            await this.loadTemplateForEditing(true);
+            this.isRestoring = false;
         }
     }
 
