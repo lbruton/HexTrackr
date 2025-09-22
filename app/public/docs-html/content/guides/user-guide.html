@@ -5,7 +5,10 @@
 </blockquote>
 <h2>Table of Contents</h2><ul>
 <li><a href="#ticket-management">Ticket Management</a></li>
-<li><a href="#vulnerability-management">Vulnerability Management</a></li>
+<li><a href="#vulnerability-management">Vulnerability Management</a><ul>
+<li><a href="#kev-known-exploited-vulnerabilities-integration">KEV (Known Exploited Vulnerabilities) Integration</a></li>
+</ul>
+</li>
 <li><a href="#import--export">Import & Export</a></li>
 <li><a href="#settings--preferences">Settings & Preferences</a></li>
 </ul>
@@ -67,6 +70,54 @@
 <h2>ServiceNow Integration</h2><p>If ServiceNow integration is configured in the settings, all ServiceNow ticket numbers in the list become clickable links that open directly to the corresponding ticket in your ServiceNow instance.</p>
 <hr>
 <h2>Vulnerability Management</h2><p>The Vulnerability Management dashboard (<code>vulnerabilities.html</code>) is a powerful tool for analyzing, tracking, and managing security vulnerabilities across your assets.</p>
+<h3>KEV (Known Exploited Vulnerabilities) Integration</h3><p>HexTrackr v1.0.22 introduces comprehensive integration with CISA&#39;s Known Exploited Vulnerabilities (KEV) catalog, providing critical threat intelligence to help prioritize vulnerabilities that are actively being exploited in the wild.</p>
+<h4>Understanding KEV Indicators</h4><p>KEV vulnerabilities are marked throughout the interface with clear visual indicators:</p>
+<ul>
+<li><strong>KEV Column</strong>: In the vulnerability table, a dedicated KEV column shows YES/NO badges<ul>
+<li><strong>Red &quot;YES&quot; badge</strong>: Vulnerability is in CISA&#39;s KEV catalog (high priority)</li>
+<li><strong>Blue &quot;NO&quot; badge</strong>: Vulnerability is not in KEV catalog (standard priority)</li>
+</ul>
+</li>
+<li><strong>Filterable</strong>: Use the KEV column filter to quickly view only exploited vulnerabilities</li>
+<li><strong>Clickable</strong>: Click any KEV badge to open detailed vulnerability information</li>
+</ul>
+<h4>KEV Modal and Details</h4><p>When you click on a KEV badge or vulnerability with KEV status, you&#39;ll see:</p>
+<ul>
+<li><strong>KEV Information Panel</strong>: Shows if the vulnerability is in the CISA catalog</li>
+<li><strong>NIST NVD Integration</strong>: Direct links to authoritative CVE information</li>
+<li><strong>CVE Details Navigation</strong>: Seamless transition to full vulnerability details</li>
+<li><strong>Additional Notes</strong>: Any special guidance or context from CISA</li>
+<li><strong>Clickable External Links</strong>: All HTTPS links in KEV notes open in popup windows</li>
+</ul>
+<h4>Filtering and Searching KEV Vulnerabilities</h4><p>Several ways to focus on exploited vulnerabilities:</p>
+<ol>
+<li><strong>KEV Column Filter</strong>: Click the filter icon in the KEV column header</li>
+<li><strong>Severity Dropdown</strong>: Select &quot;KEV&quot; from the main filter dropdown</li>
+<li><strong>Combined Filtering</strong>: Use KEV filter with severity, VPR, or other criteria</li>
+<li><strong>Search Integration</strong>: KEV status is included in all vulnerability searches</li>
+</ol>
+<h4>Automatic KEV Synchronization</h4><p>HexTrackr automatically maintains current KEV data:</p>
+<ul>
+<li><strong>Daily Sync</strong>: CISA KEV catalog is automatically synchronized every 24 hours</li>
+<li><strong>Background Process</strong>: Updates happen transparently without interrupting workflow</li>
+<li><strong>No Authentication Required</strong>: CISA provides public access to KEV data</li>
+<li><strong>Settings Control</strong>: Configure sync schedule and display options in Settings modal</li>
+</ul>
+<h4>Using KEV for Prioritization</h4><p>KEV integration helps security teams focus on the most critical threats:</p>
+<ul>
+<li><strong>Immediate Attention</strong>: KEV vulnerabilities require urgent remediation</li>
+<li><strong>Regulatory Compliance</strong>: Many frameworks require KEV tracking</li>
+<li><strong>Risk Assessment</strong>: Combine KEV status with VPR scores for comprehensive prioritization</li>
+<li><strong>Threat Intelligence</strong>: Real-world exploitation data from CISA</li>
+</ul>
+<h4>KEV Settings and Configuration</h4><p>Access KEV settings through the main Settings modal:</p>
+<ul>
+<li><strong>Enable/Disable Sync</strong>: Control automatic KEV updates</li>
+<li><strong>Sync Schedule</strong>: Configure update frequency (default: daily)</li>
+<li><strong>Display Options</strong>: Customize KEV indicators and badges</li>
+<li><strong>Manual Sync</strong>: Force immediate update from CISA catalog</li>
+<li><strong>Sync Status</strong>: View last update time and success/failure status</li>
+</ul>
 <hr>
 <h2>Import & Export</h2><p>HexTrackr provides comprehensive import and export capabilities for both ticket and vulnerability data, ensuring seamless data migration and backup operations.</p>
 <h3>Importing Vulnerability Data</h3><p>The primary way to populate the dashboard is by importing CSV files from vulnerability scanners. HexTrackr supports multiple CSV formats with advanced processing capabilities.</p>
