@@ -286,6 +286,52 @@
         [data-bs-theme="dark"] .variable-dropdown .dropdown-divider {
             border-color: var(--tblr-border-color-dark, #374151);
         }
+
+        /* Statistics Card Filter Styles */
+        .stats-card {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-card:focus {
+            outline: 2px solid var(--hextrackr-primary);
+            outline-offset: 2px;
+        }
+
+        .stats-card-active {
+            border: 2px solid var(--hextrackr-primary);
+            background: var(--hextrackr-surface-active, rgba(32, 107, 196, 0.05));
+            box-shadow: 0 6px 20px rgba(32, 107, 196, 0.2);
+        }
+
+        /* Dark theme hover effects */
+        [data-bs-theme="dark"] .stats-card:hover {
+            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.1);
+        }
+
+        [data-bs-theme="dark"] .stats-card-active {
+            background: var(--hextrackr-surface-active-dark, rgba(96, 165, 250, 0.1));
+            box-shadow: 0 6px 20px rgba(96, 165, 250, 0.2);
+        }
+
+        /* Screen reader only text */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
     </style>
 </head>
 <body>
@@ -361,7 +407,13 @@
         <!-- Statistics Cards -->
         <div class="row mb-4">
             <div class="col-md-3">
-                <div class="card">
+                <div class="card stats-card"
+                     data-filter-type="all"
+                     onclick="window.ticketManager?.applyCardFilter('all')"
+                     role="button"
+                     tabindex="0"
+                     aria-label="Show all tickets"
+                     aria-describedby="allTicketsDesc">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-auto">
@@ -376,13 +428,22 @@
                                 <div class="text-muted">
                                     <span class="h2 mb-0" id="totalTickets">0</span>
                                 </div>
+                                <div id="allTicketsDesc" class="sr-only">
+                                    Click to show all tickets including completed and closed
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card">
+                <div class="card stats-card"
+                     data-filter-type="open"
+                     onclick="window.ticketManager?.applyCardFilter('open')"
+                     role="button"
+                     tabindex="0"
+                     aria-label="Show open tickets"
+                     aria-describedby="openTicketsDesc">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-auto">
@@ -397,13 +458,22 @@
                                 <div class="text-muted">
                                     <span class="h2 mb-0" id="openTickets">0</span>
                                 </div>
+                                <div id="openTicketsDesc" class="sr-only">
+                                    Click to show only active tickets that need attention
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card">
+                <div class="card stats-card"
+                     data-filter-type="overdue"
+                     onclick="window.ticketManager?.applyCardFilter('overdue')"
+                     role="button"
+                     tabindex="0"
+                     aria-label="Show overdue tickets"
+                     aria-describedby="overdueTicketsDesc">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-auto">
@@ -418,13 +488,22 @@
                                 <div class="text-muted">
                                     <span class="h2 mb-0" id="overdueTickets">0</span>
                                 </div>
+                                <div id="overdueTicketsDesc" class="sr-only">
+                                    Click to show overdue and failed tickets requiring urgent attention
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card">
+                <div class="card stats-card"
+                     data-filter-type="completed"
+                     onclick="window.ticketManager?.applyCardFilter('completed')"
+                     role="button"
+                     tabindex="0"
+                     aria-label="Show completed tickets"
+                     aria-describedby="completedTicketsDesc">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-auto">
@@ -438,6 +517,9 @@
                                 </div>
                                 <div class="text-muted">
                                     <span class="h2 mb-0" id="completedTickets">0</span>
+                                </div>
+                                <div id="completedTicketsDesc" class="sr-only">
+                                    Click to show completed and closed tickets
                                 </div>
                             </div>
                         </div>
@@ -941,6 +1023,17 @@
     <script src="scripts/shared/vulnerability-markdown-editor.js"></script>
     <script src="scripts/pages/tickets.js"></script>
     <script src="scripts/pages/tickets-aggrid.js"></script>
+
+    <script>
+        // Keyboard navigation support for stats cards
+        document.addEventListener('keydown', function(e) {
+            if (e.target.classList.contains('stats-card') &&
+                (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                e.target.click();
+            }
+        });
+    </script>
 
     <script>
         /**
