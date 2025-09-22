@@ -133,15 +133,15 @@ class TemplateController {
     }
 
     /**
-     * Update template content
-     * PUT /api/templates/:id
-     * @param {Request} req - Express request
-     * @param {Response} res - Express response
-     */
+ * Update template content
+ * PUT /api/templates/:id
+ * @param {Request} req - Express request
+ * @param {Response} res - Express response
+ */
     async updateTemplate(req, res) {
         try {
             const { id } = req.params;
-            const { template_content, description } = req.body;
+            const { template_content, description, category, template_name } = req.body;
 
             if (!template_content) {
                 return res.status(400).json({
@@ -162,7 +162,9 @@ class TemplateController {
 
             const updatedTemplate = await this.templateService.updateTemplate(id, {
                 template_content,
-                description
+                description,
+                category,
+                template_name
             });
 
             if (!updatedTemplate) {
@@ -182,6 +184,54 @@ class TemplateController {
             res.status(500).json({
                 success: false,
                 error: "Failed to update template",
+                details: error.message
+            });
+        }
+    }
+
+    /**
+     * Create template content
+     * POST /api/templates
+     * @param {Request} req - Express request
+     * @param {Response} res - Express response
+     */
+    async createTemplate(req, res) {
+        try {
+            const { name, template_content, default_content, variables, category, description } = req.body;
+
+            if (!name || !template_content) {
+                return res.status(400).json({
+                    success: false,
+                    error: "name and template_content are required"
+                });
+            }
+
+            const createdTemplate = await this.templateService.createTemplate({
+                name,
+                template_content,
+                default_content,
+                variables,
+                category,
+                description
+            });
+
+            res.status(201).json({
+                success: true,
+                data: createdTemplate,
+                message: "Template created successfully"
+            });
+        } catch (error) {
+            console.error("Error creating template:", error);
+            if (error.message && error.message.includes('UNIQUE')) {
+                return res.status(409).json({
+                    success: false,
+                    error: "Template already exists",
+                    details: error.message
+                });
+            }
+            res.status(500).json({
+                success: false,
+                error: "Failed to create template",
                 details: error.message
             });
         }
