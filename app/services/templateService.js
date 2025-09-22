@@ -44,6 +44,23 @@ class TemplateService {
     }
 
     /**
+     * Resolve template table name using category
+     * @param {string} category - Template category (email|ticket|vulnerability)
+     * @returns {string} Table name
+     */
+    getTemplateTableByCategory(category) {
+        switch ((category || '').toLowerCase()) {
+            case 'ticket':
+                return 'ticket_templates';
+            case 'vulnerability':
+                return 'vulnerability_templates';
+            case 'email':
+            default:
+                return 'email_templates';
+        }
+    }
+
+    /**
      * Get template table name by ID by checking all tables
      * @param {number} id - Template ID
      * @returns {Promise<string|null>} Table name or null if not found
@@ -179,13 +196,44 @@ class TemplateService {
      */
     async updateTemplate(id, updates) {
         try {
-            const tableName = await this.getTemplateTableById(id);
+            const { category, template_name } = updates;
+
+            // Use category if provided for more reliable table resolution
+            let tableName;
+            if (category) {
+                tableName = this.getTemplateTableByCategory(category);
+                console.log(`[TemplateService] Using category '${category}' to determine table: ${tableName}`);
+            } else {
+                tableName = await this.getTemplateTableById(id);
+                console.log(`[TemplateService] Using ID lookup to determine table: ${tableName}`);
+            }
+
             if (!tableName) {
+                console.error(`[TemplateService] Could not determine table for template ID ${id}, category: ${category}`);
                 return null;
             }
 
             return new Promise((resolve, reject) => {
                 const { template_content, description } = updates;
+
+                // Add additional validation - verify template name matches expected category
+                if (template_name && category) {
+                    const expectedTable = this.getTemplateTableByCategory(category);
+                    if (tableName !== expectedTable) {
+                        console.warn(`[TemplateService] Table mismatch detected! Expected ${expectedTable}, got ${tableName}. Using category-based table.`);
+                        tableName = expectedTable;
+                    }
+                }
+
+                // Validate template content matches expected category
+                if (template_content && category) {
+                    const validation = this.validateTemplateCategory(template_content, category);
+                    if (validation.warnings.length > 0) {
+                        console.warn(`[TemplateService] Template validation warnings:`, validation.warnings);
+                    }
+                }
+
+                console.log(`[TemplateService] Updating template ID ${id} in table ${tableName} with category ${category}`);
 
                 this.db.run(
                     `UPDATE ${tableName}
@@ -199,18 +247,93 @@ class TemplateService {
                             return reject(new Error("Failed to update template: " + err.message));
                         }
 
-                        if (this.changes === 0) {
-                            return resolve(null);
-                        }
-
-                        // Return the updated template
-                        resolve({ id, template_content, description, updated: true });
+                    if (this.changes === 0) {
+                        return resolve(null);
                     }
+
+                    // Return the updated template
+                    resolve({ id, template_content, description, updated: true });
+                }
                 );
             });
         } catch (error) {
             throw error;
         }
+    }
+
+    /**
+     * Create a new template record
+     * @param {Object} templateData - Template payload
+     * @param {string} templateData.name - Template name
+     * @param {string} templateData.template_content - Template content
+     * @param {string} [templateData.default_content] - Default content fallback
+     * @param {string|Array} [templateData.variables] - Variables in JSON string or array form
+     * @param {string} [templateData.category] - Template category
+     * @param {string} [templateData.description] - Optional description
+     * @returns {Promise<Object>} Newly created template row
+     */
+    async createTemplate(templateData) {
+        if (!templateData || !templateData.name || !templateData.template_content) {
+            throw new Error('Invalid template payload');
+        }
+
+        const tableName = this.getTemplateTableByCategory(templateData.category || templateData.template_type);
+        const variables = typeof templateData.variables === 'string'
+            ? templateData.variables
+            : JSON.stringify(templateData.variables || []);
+        const defaultContent = templateData.default_content || templateData.template_content;
+        const description = templateData.description || null;
+        const category = (templateData.category || 'email').toLowerCase();
+        const service = this;
+
+        return new Promise((resolve, reject) => {
+            service.db.run(
+                `INSERT INTO ${tableName} (
+                    name,
+                    description,
+                    template_content,
+                    default_content,
+                    variables,
+                    category,
+                    is_active
+                ) VALUES (?, ?, ?, ?, ?, ?, 1)` ,
+                [
+                    templateData.name,
+                    description,
+                    templateData.template_content,
+                    defaultContent,
+                    variables,
+                    category
+                ],
+                function(err) {
+                    if (err) {
+                        return reject(new Error('Failed to create template: ' + err.message));
+                    }
+
+                    const insertedId = this.lastID;
+                    service.getTemplateById(insertedId)
+                        .then(template => resolve(template || {
+                            id: insertedId,
+                            name: templateData.name,
+                            template_content: templateData.template_content,
+                            default_content: defaultContent,
+                            variables: JSON.parse(variables || '[]'),
+                            category
+                        }))
+                        .catch(fetchError => {
+                            console.warn('TemplateService: Failed to read back created template:', fetchError.message);
+                            resolve({
+                                id: insertedId,
+                                name: templateData.name,
+                                template_content: templateData.template_content,
+                                default_content: defaultContent,
+                                variables: JSON.parse(variables || '[]'),
+                                category
+                            });
+                        });
+                }
+            );
+        });
     }
 
     /**
@@ -222,30 +345,61 @@ class TemplateService {
         try {
             const tableName = await this.getTemplateTableById(id);
             if (!tableName) {
+                console.error(`[TemplateService] Could not determine table for template ID ${id}`);
                 return null;
             }
 
+            console.log(`[TemplateService] Resetting template ID ${id} in table ${tableName}`);
+
             return new Promise((resolve, reject) => {
-                this.db.run(
-                    `UPDATE ${tableName}
-                     SET template_content = default_content,
-                         updated_at = CURRENT_TIMESTAMP
-                     WHERE id = ? AND is_active = 1`,
+                // First check if the template has default_content
+                this.db.get(
+                    `SELECT default_content FROM ${tableName} WHERE id = ? AND is_active = 1`,
                     [id],
-                    function(err) {
+                    (err, row) => {
                         if (err) {
-                            return reject(new Error("Failed to reset template: " + err.message));
+                            console.error(`[TemplateService] Error checking default_content for ID ${id}:`, err.message);
+                            return reject(new Error("Failed to check template: " + err.message));
                         }
 
-                        if (this.changes === 0) {
+                        if (!row) {
+                            console.error(`[TemplateService] Template not found for ID ${id}`);
                             return resolve(null);
                         }
 
-                        resolve({ id, reset: true });
+                        if (!row.default_content) {
+                            console.warn(`[TemplateService] No default_content found for template ID ${id}, cannot reset`);
+                            return resolve(null);
+                        }
+
+                        console.log(`[TemplateService] Found default_content, proceeding with reset for ID ${id}`);
+
+                        this.db.run(
+                            `UPDATE ${tableName}
+                             SET template_content = default_content,
+                                 updated_at = CURRENT_TIMESTAMP
+                             WHERE id = ? AND is_active = 1`,
+                            [id],
+                            function(err) {
+                                if (err) {
+                                    console.error(`[TemplateService] Reset failed for ID ${id}:`, err.message);
+                                    return reject(new Error("Failed to reset template: " + err.message));
+                                }
+
+                                if (this.changes === 0) {
+                                    console.warn(`[TemplateService] No rows affected when resetting template ID ${id}`);
+                                    return resolve(null);
+                                }
+
+                                console.log(`[TemplateService] Successfully reset template ID ${id}`);
+                                resolve({ id, reset: true });
+                            }
+                        );
                     }
                 );
             });
         } catch (error) {
+            console.error(`[TemplateService] Error in resetTemplateToDefault:`, error.message);
             throw error;
         }
     }
@@ -576,10 +730,10 @@ Ticket ID: [XT_NUMBER]`;
                 required: false,
                 fallback: '',
                 processor: (ticketData, vulnerabilityData) => {
-                    if (vulnerabilityData) {
+                    if (vulnerabilityData && vulnerabilityData.length > 0) {
                         return this.generateVulnerabilitySummary(ticketData, vulnerabilityData);
                     }
-                    return this.fallback;
+                    return '';
                 }
             }
         };
@@ -748,7 +902,60 @@ Ticket ID: [XT_NUMBER]`;
      * @returns {string} Escaped string
      */
     escapeRegex(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+    }
+
+    /**
+     * Validate template content matches expected category
+     * @param {string} content - Template content to validate
+     * @param {string} category - Expected category (email|ticket|vulnerability)
+     * @returns {Object} Validation result with warnings
+     */
+    validateTemplateCategory(content, category) {
+        const result = {
+            valid: true,
+            warnings: [],
+            suggestedCategory: null
+        };
+
+        // Define category-specific variable patterns
+        const categoryPatterns = {
+            email: [
+                '[GREETING]', '[HEXAGON_NUM]', '[VULNERABILITY_SUMMARY]'
+            ],
+            ticket: [
+                '[HEXAGON_TICKET]', '[SERVICENOW_TICKET]', '[SUPERVISOR]', '[TECHNICIAN]'
+            ],
+            vulnerability: [
+                '[VULNERABILITY_DETAILS]', '[CRITICAL_COUNT]', '[HIGH_COUNT]', '[DEVICE_COUNT]'
+            ]
+        };
+
+        // Count matches for each category
+        const categoryScores = {};
+        Object.keys(categoryPatterns).forEach(cat => {
+            categoryScores[cat] = 0;
+            categoryPatterns[cat].forEach(pattern => {
+                if (content.includes(pattern)) {
+                    categoryScores[cat]++;
+                }
+            });
+        });
+
+        // Determine best match
+        const bestMatch = Object.keys(categoryScores).reduce((a, b) =>
+            categoryScores[a] > categoryScores[b] ? a : b
+        );
+
+        // Check if content matches expected category
+        if (category && bestMatch !== category && categoryScores[bestMatch] > 0) {
+            result.warnings.push(`Template content appears to contain ${bestMatch} variables but is being saved as ${category} template`);
+            result.suggestedCategory = bestMatch;
+        }
+
+        console.log(`[TemplateService] Category validation for ${category}: scores=${JSON.stringify(categoryScores)}, bestMatch=${bestMatch}`);
+
+        return result;
     }
 }
 

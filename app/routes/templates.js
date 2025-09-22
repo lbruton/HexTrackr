@@ -29,12 +29,12 @@ router.get("/", async (req, res) => {
 });
 
 /**
- * Get template by ID
- * GET /api/templates/:id
+ * Create template
+ * POST /api/templates
  */
-router.get("/:id", async (req, res) => {
+router.post("/", async (req, res) => {
     const controller = TemplateController.getInstance();
-    await controller.getTemplateById(req, res);
+    await controller.createTemplate(req, res);
 });
 
 /**
@@ -44,6 +44,15 @@ router.get("/:id", async (req, res) => {
 router.get("/by-name/:name", async (req, res) => {
     const controller = TemplateController.getInstance();
     await controller.getTemplateByName(req, res);
+});
+
+/**
+ * Get template by ID
+ * GET /api/templates/:id
+ */
+router.get("/:id", async (req, res) => {
+    const controller = TemplateController.getInstance();
+    await controller.getTemplateById(req, res);
 });
 
 /**
