@@ -96,11 +96,11 @@ async function initializeApplication() {
     TemplateController.initialize(db);
 
     // Seed email templates (v1.0.21 feature)
-    const { seedEmailTemplates } = require("../utils/seedEmailTemplates");
+    const { seedAllTemplates } = require("../utils/seedEmailTemplates");
     try {
-        await seedEmailTemplates(db);
+        await seedAllTemplates(db);
     } catch (seedError) {
-        console.error("⚠️ Failed to seed email templates:", seedError.message);
+        console.error("⚠️ Failed to seed templates:", seedError.message);
     }
 
     // Apply middleware configuration

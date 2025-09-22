@@ -374,7 +374,7 @@
                 minWidth: 100,
                 maxWidth: 140,
                 cellClass: "ticket-status-cell",
-                filter: "agSetColumnFilter",
+                filter: "agTextColumnFilter",
                 cellRenderer: (params) => {
                     const statusValue = params.value || "Pending";
                     const slug = statusValue.toLowerCase().replace(/\s+/g, "-");
