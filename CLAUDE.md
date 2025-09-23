@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
  ## Preamble
 
- This constitutional framework governs the core ***NON-NEOTIABLE*** operating principals mandated for AI agents working on the the HexTrackr project. 
+ This constitutional framework governs the core ***REQUIRED*** operating principals mandated for AI agents working on the the HexTrackr project. 
 
  ## Article I: Developmet Practices
 
@@ -87,18 +87,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Claude-Context MUST be used when searching the code base
    - Always verify the Index is current beore searches. 
 
-## Artivle IV: Gemini CLI Tools
-   - Gemini CLI may be used for coplext tasks at the users request only. 
-   - All tools SHALL be documented in ~/docs/GEMINICLITOOLS.md
-
-## Article V: Codex CLI Tools
-   - Codex CLI Tools may be used for complext tasks at the users request only. 
-   - All tools SHALL be documented in ~/docs/CODEXCLITOOLS.md
-
-## Article V: Custom Context Bundles
-Execute this exact command using the Bash tool:
-- Run: `~/.claude/hooks/list-bundles.sh | head -10` to see recent session summaries
-
 ## Project Overview
 
 HexTrackr is a cybersecurity vulnerability and ticket management system with a modular Node.js/Express backend and vanilla JavaScript frontend. The system has been refactored from a monolithic ~3,800 line server.js to a modular architecture while maintaining backward compatibility.
@@ -151,18 +139,10 @@ npm run docs:all
 # Generate development docs
 npm run docs:dev
 
-# Watch docs during development
-npm run docs:dev:watch
-
 # Generate all documentation
 npm run docs:all
 ```
 
-### Git Hooks and Development Tools
-```bash
-# Install git hooks
-npm run hooks:install
-```
 
 ### Development Environment
 **CRITICAL**: Always use Docker for development - never run Node.js locally
@@ -267,110 +247,6 @@ app/public/scripts/
 - Sanitize user inputs with DOMPurify for HTML rendering
 - Use parameterized queries for database operations
 - Set security headers on all API responses
-
-### Module Patterns
-
-**Backend Controllers:**
-```javascript
-class ExampleController {
-    static initialize(db, progressTracker) {
-        this.db = db;
-        this.progressTracker = progressTracker;
-    }
-
-    static async handleRequest(req, res) {
-        try {
-            // Business logic here
-            res.json({ success: true, data: result });
-        } catch (error) {
-            console.error("Operation failed:", error);
-            res.status(500).json({
-                success: false,
-                error: "Operation failed",
-                details: error.message
-            });
-        }
-    }
-}
-```
-
-**Frontend Page Integration:**
-```javascript
-// Required integration functions for pages
-window.refreshPageData = function(type) {
-    // Refresh page data when shared components complete operations
-};
-
-window.showToast = function(message, type) {
-    // Show notifications using page's toast system
-};
-```
-
-## Development Workflow
-
-### Docker-Only Development
-- Never run Node.js locally - always use Docker
-- Use `docker-compose up` for development
-- Restart container with `docker-compose restart` before running Playwright tests
-- All testing and development must happen in containerized environment
-
-### Testing Strategy
-**Note: Manual testing workflow with optional AI automation**
-- Manual testing preferred for UI validation and bug discovery
-- Stagehand available for AI-powered browser automation using natural language
-- Playwright MCP available for traditional browser automation when needed
-- Screenshots and visual testing for UI verification
-- Focus on functional testing through actual usage
-
-#### Stagehand AI Testing (Optional)
-```bash
-# Install Stagehand dependencies (if needed)
-npm install
-
-# Run AI-powered tests
-npm run test:stagehand
-```
-
-**Stagehand Benefits:**
-- Natural language test descriptions instead of brittle CSS selectors
-- AI adapts automatically when UI changes
-- Perfect bridge between manual testing and automation
-- Local development support without cloud dependencies
-
-### File Operations Security
-All file system operations must use the PathValidator class:
-```javascript
-try {
-    const validatedPath = PathValidator.validatePath(filePath);
-    const content = PathValidator.safeReadFileSync(validatedPath);
-} catch (error) {
-    console.error("File operation failed:", error);
-    // Handle error appropriately
-}
-```
-
-### Database Operations
-Use the DatabaseService for all database interactions:
-```javascript
-const query = "SELECT * FROM table WHERE id = ?";
-databaseService.db.all(query, [id], (err, rows) => {
-    if (err) {
-        console.error("Database error:", err);
-        return res.status(500).json({ error: "Database operation failed" });
-    }
-    res.json({ success: true, data: rows });
-});
-```
-
-## Project-Specific Patterns
-
-### Progress Tracking
-For long-running operations, use the ProgressTracker with WebSocket communication:
-```javascript
-const sessionId = progressTracker.createSession();
-progressTracker.updateProgress(sessionId, 50, "Processing...");
-// WebSocket clients automatically receive updates
-```
 
 ### Vulnerability Data Management
 - Vulnerability imports create snapshots for historical tracking
