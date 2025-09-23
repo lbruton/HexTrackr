@@ -9,16 +9,19 @@ This document provides comprehensive visual design specifications for integratin
 ## Design Principles
 
 ### 1. Security-First Visual Hierarchy
+
 - **KEV vulnerabilities receive highest visual priority**
 - **Color coding follows severity conventions (red = critical attention)**
 - **Clear distinction between exploited vs. unexploited vulnerabilities**
 
 ### 2. Accessibility Standards
+
 - **WCAG AA compliance** for color contrast ratios
 - **Screen reader friendly** with proper ARIA labels
 - **Keyboard navigation** support for all KEV controls
 
 ### 3. Performance Considerations
+
 - **Minimal visual overhead** - badges don't impact load times
 - **Progressive enhancement** - KEV features degrade gracefully
 - **Responsive design** - consistent across all device sizes
@@ -603,12 +606,14 @@ describe('KEV Accessibility', () => {
 ## Future Enhancements
 
 ### Interactive Elements
+
 - **Drag-and-drop KEV prioritization**
 - **Bulk KEV actions** (mark as patched, create tickets)
 - **KEV timeline visualization** with historical data
 - **Customizable KEV dashboard widgets**
 
 ### Advanced Visualizations
+
 - **KEV heat map** by network segment
 - **Remediation progress tracking** with gantt charts
 - **Threat landscape comparison** with industry data
@@ -617,6 +622,7 @@ describe('KEV Accessibility', () => {
 ---
 
 **Document Information:**
+
 - **Created**: 2025-09-21
 - **Version**: 1.0
 - **Status**: Planning Phase
@@ -624,6 +630,7 @@ describe('KEV Accessibility', () => {
 - **Accessibility Target**: WCAG 2.1 AA compliance
 
 **Related Documents:**
+
 - `/planning/kev-lookup-plan.md` - Main planning document
 - `/planning/kev-database-schema.sql` - Database specifications
 - `/planning/kev-api-specification.md` - API architecture
