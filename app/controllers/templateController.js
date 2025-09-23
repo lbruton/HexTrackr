@@ -222,7 +222,7 @@ class TemplateController {
             });
         } catch (error) {
             console.error("Error creating template:", error);
-            if (error.message && error.message.includes('UNIQUE')) {
+            if (error.message && error.message.includes("UNIQUE")) {
                 return res.status(409).json({
                     success: false,
                     error: "Template already exists",

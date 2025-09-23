@@ -116,12 +116,12 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             cellRenderer: (params) => {
                 const kevStatus = params.value || "No";
                 if (kevStatus === "Yes") {
-                    return '<span class="badge bg-danger" style="cursor: pointer;" title="Known Exploited Vulnerability" onclick="showKevDetails(\'' + (params.data.cve || '') + '\')">YES</span>';
+                    return "<span class=\"badge bg-danger\" style=\"cursor: pointer;\" title=\"Known Exploited Vulnerability\" onclick=\"showKevDetails('" + (params.data.cve || "") + "')\">YES</span>";
                 }
-                return '<span class="badge bg-primary">NO</span>';
+                return "<span class=\"badge bg-primary\">NO</span>";
             },
             cellStyle: {
-                textAlign: 'center'
+                textAlign: "center"
             }
         },
         {
