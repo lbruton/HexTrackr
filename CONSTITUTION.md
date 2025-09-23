@@ -103,6 +103,5 @@
 
 ## Article V: Custom Context Bundles
 
-Execute this exact command using the Bash tool:
-
+- Context Bundles SHALL be saved of each session
 - Run: `~/.claude/hooks/list-bundles.sh | head -10` to see recent session summaries
