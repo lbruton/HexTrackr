@@ -470,4 +470,147 @@
     color: #1f2937;
 }
 
+/* ===========================
+   v1.0.24 - Vulnerability Card UI Improvements
+   =========================== */
 
+/* VPR Mini-Cards - ONLY for device cards where they show useful information */
+.device-card .vpr-mini-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.device-card .vpr-mini-card {
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius);
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    position: relative;
+    min-height: 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.device-card .vpr-mini-card:hover {
+    border-color: var(--hextrackr-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(32, 107, 196, 0.15);
+}
+
+.device-card .vpr-mini-card.critical {
+    border-left: 3px solid var(--vpr-critical);
+}
+
+.device-card .vpr-mini-card.high {
+    border-left: 3px solid var(--vpr-high);
+}
+
+.device-card .vpr-mini-card.medium {
+    border-left: 3px solid var(--vpr-medium);
+}
+
+.device-card .vpr-mini-card.low {
+    border-left: 3px solid var(--vpr-low);
+}
+
+.device-card .vpr-mini-card .vpr-count {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.device-card .vpr-mini-card .vpr-label {
+    font-size: 0.75rem;
+    color: var(--tblr-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-bottom: 0.25rem;
+}
+
+.device-card .vpr-mini-card .vpr-sum {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--hextrackr-primary);
+}
+
+/* Enhanced device display for vulnerability cards */
+.device-display-enhanced {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--tblr-bg-surface-secondary);
+    border-radius: var(--tblr-border-radius);
+    margin-top: 1rem;
+    transition: all 0.2s ease;
+}
+
+.device-display-enhanced:hover {
+    background: var(--hextrackr-bg-secondary);
+    transform: translateY(-1px);
+}
+
+.device-count-large {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--hextrackr-text-primary);
+}
+
+/* Vulnerability identifier alignment */
+.vulnerability-identifiers {
+    display: flex;
+    align-items: center;
+}
+
+.vulnerability-identifiers .badge {
+    font-size: 0.7rem;
+    padding: 0.3em 0.6em;
+}
+
+/* Card height optimization for vulnerability cards */
+.vulnerability-card,
+.vuln-card {
+    min-height: 320px; /* Reduced from 380px */
+}
+
+/* KEV badge positioning and styling */
+.vulnerability-card .kev-indicator {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.vulnerability-card .kev-indicator:focus-visible {
+    outline: 2px solid var(--hextrackr-primary);
+    outline-offset: 2px;
+}
+
+.kev-badge {
+    background: #dc2626;
+    color: #ffffff;
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+[data-bs-theme="dark"] .kev-badge {
+    background: rgba(239, 68, 68, 0.9);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+}

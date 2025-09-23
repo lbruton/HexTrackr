@@ -9,17 +9,23 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ## Session 1: Card Click Infrastructure (1.5 hours)
 
 ### Prerequisites
+
 - [ ] **Git Status Check**: Ensure working directory is clean
 - [ ] **Commit Current Work**: If any uncommitted changes exist
+
   ```bash
   git add .
   git commit -m "docs: Update documentation for v1.0.22"
   ```
+
 - [ ] **Create Feature Branch**:
+
   ```bash
   git checkout -b feature/v1.0.23-ticket-filters
   ```
+
 - [ ] **Start Docker**: Ensure application runs on port 8989
+
   ```bash
   docker-compose up -d
   ```
@@ -27,10 +33,13 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 1.1: Add CSS for Clickable Cards (30 minutes)
 
 #### Files to Modify
+
 - `/app/public/tickets2.html`
 
 #### Tasks
+
 - [ ] **Add CSS classes to statistics cards section** (around line 361)
+
   ```html
   <!-- Add this CSS in the <style> section around line 189 -->
   .stats-card {
@@ -62,6 +71,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   - Completed card (line ~426): `<div class="card stats-card" data-filter-type="completed">`
 
 #### Checkpoint 1.1
+
 - [ ] Cards show pointer cursor on hover
 - [ ] Hover effects work (slight lift and shadow)
 - [ ] No console errors
@@ -70,10 +80,13 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 1.2: Add Click Event Handlers (30 minutes)
 
 #### Files to Modify
+
 - `/app/public/tickets2.html`
 
 #### Tasks
+
 - [ ] **Add onclick handlers to each card div**
+
   ```html
   <!-- Total Tickets Card -->
   <div class="card stats-card" data-filter-type="all"
@@ -101,6 +114,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 - [ ] **Add keyboard event support**
+
   ```html
   <!-- Add this script before closing </body> tag -->
   <script>
@@ -115,6 +129,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 #### Checkpoint 1.2
+
 - [ ] Clicking cards calls `applyCardFilter()` function
 - [ ] Keyboard (Enter/Space) works on focused cards
 - [ ] Console shows function calls (even if undefined)
@@ -123,10 +138,13 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 1.3: Create Basic Filter Function Stub (30 minutes)
 
 #### Files to Modify
+
 - `/app/public/scripts/pages/tickets.js`
 
 #### Tasks
+
 - [ ] **Add filter state property** (around line 50, in constructor)
+
   ```javascript
   constructor() {
       // ... existing code ...
@@ -135,6 +153,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 - [ ] **Add applyCardFilter method** (add after updateStatistics method, around line 1590)
+
   ```javascript
   /**
    * Apply card-based filter to tickets table.
@@ -167,6 +186,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 - [ ] **Add updateCardStyles method**
+
   ```javascript
   /**
    * Update visual styling of cards to show active state.
@@ -191,12 +211,14 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 #### Checkpoint 1.3
+
 - [ ] Clicking cards logs filter type to console
 - [ ] Active card gets visual highlighting
 - [ ] Status dropdown resets when card clicked
 - [ ] No JavaScript errors
 
 ### Session 1 Final Testing (30 minutes)
+
 - [ ] **Test all four cards**
   - Total Tickets: Logs "all", no highlighting
   - Open Tickets: Logs "open", gets active styling
@@ -218,6 +240,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   - Test in both light and dark themes
 
 #### Session 1 Success Criteria
+
 ✅ All cards are visually clickable with hover effects
 ✅ Click handlers are attached and functional
 ✅ Basic filter state management works
@@ -231,10 +254,13 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 2.1: Modify getFilteredTickets Method (45 minutes)
 
 #### Files to Modify
+
 - `/app/public/scripts/pages/tickets.js`
 
 #### Tasks
+
 - [ ] **Update getFilteredTickets method** (around line 1538)
+
   ```javascript
   /**
    * Get tickets filtered by search term, card filter, status, location, and supervisor.
@@ -274,6 +300,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 - [ ] **Add applyCardFilterLogic method**
+
   ```javascript
   /**
    * Apply card filter logic to a single ticket.
@@ -311,6 +338,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 #### Checkpoint 2.1
+
 - [ ] Filter logic compiles without errors
 - [ ] Console shows appropriate filtering behavior
 - [ ] Cards still trigger visual updates
@@ -318,10 +346,13 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 2.2: Fix Statistics Calculations (45 minutes)
 
 #### Files to Modify
+
 - `/app/public/scripts/pages/tickets.js`
 
 #### Tasks
+
 - [ ] **Update updateStatistics method** (around line 1578)
+
   ```javascript
   /**
    * Update ticket statistics display with current data.
@@ -357,6 +388,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 #### Checkpoint 2.2
+
 - [ ] Statistics calculations match card filter logic
 - [ ] Numbers update correctly when data changes
 - [ ] No console errors in calculations
@@ -364,10 +396,13 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 2.3: Add Filter Coordination (30 minutes)
 
 #### Files to Modify
+
 - `/app/public/scripts/pages/tickets.js`
 
 #### Tasks
+
 - [ ] **Extend existing status dropdown handler** (modify existing setupEventListeners method around line 318)
+
   ```javascript
   // Modify the existing status filter listener in setupEventListeners()
   document.getElementById("statusFilter").addEventListener("change", () => {
@@ -384,6 +419,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 - [ ] **Update applyCardFilter method** to handle interactions and pagination
+
   ```javascript
   applyCardFilter(filterType) {
       console.log(`Applying card filter: ${filterType}`);
@@ -417,11 +453,13 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 #### Checkpoint 2.3
+
 - [ ] Status dropdown clears card filter when used
 - [ ] Clicking same card twice resets to "all"
 - [ ] Filter coordination works smoothly
 
 ### Session 2 Testing (20 minutes)
+
 - [ ] **Test each card filter**
   - Total: Shows all tickets
   - Open: Excludes Closed, Completed, Failed
@@ -439,6 +477,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   - Rapid clicking between cards
 
 #### Session 2 Success Criteria
+
 ✅ All card filters work according to requirements
 ✅ Statistics calculations are accurate
 ✅ Filter combinations behave correctly
@@ -451,9 +490,11 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 3.1: Verify AG-Grid Updates (30 minutes)
 
 #### Files to Test
+
 - `/app/public/scripts/pages/tickets-aggrid.js`
 
 #### Tasks
+
 - [ ] **Test AG-Grid data updates**
   - Verify `renderTickets()` method still works
   - Check that filtered data reaches AG-Grid
@@ -466,6 +507,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   - Check for memory leaks with rapid filtering
 
 #### Checkpoint 3.1
+
 - [ ] AG-Grid updates correctly with filtered data
 - [ ] Pagination handles filter changes
 - [ ] Performance is acceptable
@@ -473,10 +515,13 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 3.2: Enhanced Visual Polish (45 minutes)
 
 #### Files to Modify
+
 - `/app/public/tickets2.html`
 
 #### Tasks
+
 - [ ] **Improve card styling** (update CSS in style section)
+
   ```css
   .stats-card {
       cursor: pointer;
@@ -539,12 +584,14 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 - [ ] **OPTIONAL - Add loading state handling** (Skip for v1.0.23 - adds complexity)
+
   ```javascript
   // OPTIONAL: Can be added in future version if needed
   // Loading state prevents double-clicks during filter operations
   ```
 
 #### Checkpoint 3.2
+
 - [ ] Enhanced visual effects work smoothly
 - [ ] Loading states prevent double-clicks
 - [ ] Active card styling is prominent but not overwhelming
@@ -559,6 +606,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 - Focus on core card filtering behavior first
 
 #### Session 3 Success Criteria
+
 ✅ AG-Grid integration works flawlessly
 ✅ Visual polish is complete and professional
 ✅ Filter status system provides clear feedback
@@ -571,10 +619,13 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 4.1: Accessibility Enhancements (45 minutes)
 
 #### Files to Modify
+
 - `/app/public/tickets2.html`
 
 #### Tasks
+
 - [ ] **Enhance ARIA attributes** (Fix ID conflicts and update labels)
+
   ```html
   <!-- Total Tickets Card -->
   <div class="card stats-card" data-filter-type="all"
@@ -612,6 +663,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 - [ ] **Add screen reader announcements** (and wire into applyCardFilter)
+
   ```javascript
   // Add this method to tickets.js
   announceFilterChange(filterType) {
@@ -654,6 +706,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 4.2: Cross-Browser Testing (30 minutes)
 
 #### Testing Matrix
+
 - [ ] **Chrome (latest)**
   - Card hover effects
   - Click functionality
@@ -675,22 +728,27 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 4.3: Performance Optimization (35 minutes)
 
 #### Files to Modify
+
 - `/app/public/scripts/pages/tickets.js`
 
 #### Tasks
+
 - [ ] **OPTIONAL - Add debouncing** (Skip for v1.0.23 - adds complexity)
+
   ```javascript
   // OPTIONAL: Simple filtering should be fast enough without debouncing
   // Can add if performance issues arise
   ```
 
 - [ ] **SKIP - Filter caching optimization** (Not needed for initial version)
+
   ```javascript
   // SKIP: Current filter operations should be fast enough
   // Premature optimization - add only if performance issues confirmed
   ```
 
 #### Session 4 Success Criteria
+
 ✅ Full accessibility compliance achieved
 ✅ Cross-browser compatibility verified
 ✅ Performance optimized for large datasets
@@ -703,6 +761,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 5.1: Comprehensive Feature Testing (30 minutes)
 
 #### Test Scenarios
+
 - [ ] **Basic Functionality**
   - [ ] Each card filters correctly
   - [ ] Visual feedback works
@@ -730,6 +789,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 5.2: Code Quality Review (20 minutes)
 
 #### Tasks
+
 - [ ] **Remove debug code**
   - Console.log statements
   - Temporary variables
@@ -741,6 +801,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   - Return values documented
 
 - [ ] **Run linters**
+
   ```bash
   npm run lint:all
   ```
@@ -753,10 +814,13 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ### Task 5.3: Documentation Updates (10 minutes)
 
 #### Files to Update
+
 - `/app/public/docs-source/CHANGELOG.md`
 
 #### Tasks
+
 - [ ] **Add changelog entry**
+
   ```markdown
   ## [1.0.23] - 2025-09-22
 
@@ -795,6 +859,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
   ```
 
 #### Final Session Success Criteria
+
 ✅ All tests pass with no issues
 ✅ Code quality meets HexTrackr standards
 ✅ Documentation is complete and accurate
@@ -805,6 +870,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 ## Implementation Summary
 
 ### Total Estimated Time: 7-8 hours
+
 - Session 1: 1.5 hours (Infrastructure)
 - Session 2: 2 hours (Core Logic)
 - Session 3: 1.5 hours (Integration)
@@ -812,6 +878,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 - Session 5: 1 hour (Final)
 
 ### Key Success Metrics
+
 1. **Functional**: All cards filter according to requirements
 2. **Performance**: < 100ms filter operations
 3. **Accessibility**: WCAG 2.1 AA compliance
@@ -819,6 +886,7 @@ This feature will be implemented in 5 focused sessions, each targeting specific 
 5. **Integration**: Seamless with existing features
 
 ### Risk Mitigation Completed
+
 - Incremental implementation with testing
 - Preservation of existing functionality
 - Comprehensive cross-browser testing

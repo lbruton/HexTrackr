@@ -1,14 +1,16 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-# HexTrackr Constitutional Framework
 
- ## Preamble
+## Overview
 
- This constitutional framework governs the core ***REQUIRED*** operating principals mandated for AI agents working on the the HexTrackr project. 
+HexTrackr is a vulnerability tracking and ticket management system built with Node.js, Express, and SQLite. The application has been refactored from a monolithic ~3,800 line server into a modular architecture with separate controllers, services, routes, and utilities.
 
- ## Article I: Developmet Practices
+This constitutional framework governs the core operating principles for AI agents working on the HexTrackr project.
 
+## Development Commands
+
+<<<<<<< HEAD
  ### Section I: Context Accuracy
  
     - Context MUST be gathered before starting any work
@@ -102,20 +104,37 @@ HexTrackr is a cybersecurity vulnerability and ticket management system with a m
 ## Common Development Commands
 
 ### Running the Application
+=======
+### Essential Commands
+>>>>>>> v1.0.24-vuln-card-view
 ```bash
-# Start development server with auto-restart
-npm run dev
+# Development (preferred)
+docker-compose up                 # Start with Docker on port 8989
+npm run dev                       # Development with nodemon hot-reload
+npm start                         # Production server directly
 
-# Start production server
-npm start
+# Database
+npm run init-db                   # Initialize/reset SQLite database
 
-# Initialize/reset database
-npm run init-db
+# Code Quality (run before commits)
+npm run lint:all                  # Check all linters (markdown, JS, CSS)
+npm run fix:all                   # Auto-fix all linting issues
+npm run eslint                    # JavaScript linting only
+npm run stylelint                 # CSS linting only
+npm run lint:md                   # Markdown linting only
+
+# Documentation
+npm run docs:generate             # Convert markdown docs to HTML
+npm run docs:dev                  # Generate JSDoc HTML documentation
+npm run docs:all                  # Complete documentation regeneration
+
+# Testing (optional)
+npm run test:stagehand            # AI-powered browser automation tests
 ```
 
-
-### Linting and Code Quality
+### Git Hooks
 ```bash
+<<<<<<< HEAD
 # Run all linting
 npm run lint:all
 
@@ -158,46 +177,54 @@ docker-compose ps
 
 # View container logs
 docker-compose logs
+=======
+npm run hooks:install             # Configure git hooks (run after clone)
+>>>>>>> v1.0.24-vuln-card-view
 ```
 
 ## Architecture Overview
 
-### Backend Architecture (Modular Design)
+### Core Structure
+- **app/public/server.js**: Main entry point that wires routes, middleware, and WebSocket
+- **app/controllers/**: Request handling and HTTP response logic
+- **app/services/**: Reusable business logic and data operations
+- **app/routes/**: Express router definitions and endpoint mounting
+- **app/utils/**: Shared utilities like ProgressTracker and constants
+- **app/config/**: Configuration modules for middleware, database, WebSocket
+- **data/**: SQLite database files and schema definitions
 
-HexTrackr has transitioned from a monolithic server.js to a modular architecture:
+### Key Components
+1. **Modular Route System**: Separated from monolithic server into focused route files
+2. **Service Layer**: Business logic abstracted into dedicated service classes
+3. **WebSocket Integration**: Real-time progress tracking via Socket.IO
+4. **Documentation Pipeline**: JSDoc extraction to markdown, then HTML generation
 
-**Core Structure:**
-- `app/public/server.js` - Main Express application with route registration
-- `app/controllers/` - Business logic controllers (VulnerabilityController, TicketController, BackupController, ImportController, DocsController, TemplateController, KevController)
-- `app/services/` - Service layer (12 services total)
-- `app/routes/` - Express route definitions
-- `app/middleware/` - Custom middleware (errorHandler, logging, security, validation)
-- `app/utils/` - Utility classes (PathValidator, ProgressTracker, helpers, constants)
+### Database
+- **Type**: SQLite with schema defined in `data/schema.sql`
+- **Location**: `data/hextrackr.db` (created by `npm run init-db`)
+- **Key Tables**: tickets, vulnerabilities, templates, settings
+- **Service**: DatabaseService handles connections and queries
 
-**Complete Service Layer:**
-- `backupService` - Database backup and restore operations
-- `databaseService` - SQLite connection and transaction management
-- `docsService` - Documentation generation and management
-- `fileService` - File system operations and management
-- `importService` - CSV import/export functionality with progress tracking
-- `kevService` - Known Exploited Vulnerabilities (KEV) integration
-- `progressService` - Real-time progress tracking for long operations
-- `templateService` - Email, ticket, and vulnerability template management
-- `ticketService` - Ticket CRUD operations and device management
-- `validationService` - Input validation and data sanitization
-- `vulnerabilityService` - Vulnerability data management and operations
-- `vulnerabilityStatsService` - Vulnerability statistics and analytics
+### Frontend Architecture
+- **Location**: `app/public/` directory
+- **Scripts**: Modular JavaScript in `scripts/pages/`, `scripts/shared/`, `scripts/utils/`
+- **Styles**: CSS organized in `styles/pages/`, `styles/shared/`, `styles/utils/`
+- **Vendor Libraries**: AG-Grid, Chart.js, Socket.IO, DOMPurify, Highlight.js
 
-**Key Utilities:**
-- `PathValidator` - Security utility preventing path traversal attacks
-- `ProgressTracker` - WebSocket-based progress tracking for long operations
-- `helpers` - Common utility functions
-- `constants` - Application-wide constants
+## Code Style & Standards
 
-### Frontend Architecture (Modular JavaScript)
+### JavaScript
+- **ESLint Config**: Uses `@stylistic/eslint-plugin` with custom rules
+- **Style**: Double quotes, semicolons, 4-space indentation
+- **ES6 Modules**: Vulnerability management files use import/export syntax
+- **Variables**: Prefer `const`/`let`, avoid unused variables
+- **File Size**: Keep controllers/services under 300 lines for readability
 
-The frontend follows a modular pattern with clear separation of concerns:
+### CSS
+- **Linter**: Stylelint with standard config
+- **Architecture**: Component-based with shared utilities
 
+<<<<<<< HEAD
 **Directory Structure:**
 ```
 app/public/scripts/
@@ -252,52 +279,108 @@ app/public/scripts/
 - Vulnerability imports create snapshots for historical tracking
 - Rollover functionality manages data retention
 - CSV import/export via Papa Parse library with 100MB file limits
+=======
+### File Naming
+- **Folders**: kebab-case (e.g., `modules/ticket-tracker`)
+- **Classes**: PascalCase exports
+- **Helpers**: camelCase functions
 
-### KEV (Known Exploited Vulnerabilities) Integration
-- Automated synchronization with CISA's Known Exploited Vulnerabilities catalog
-- KEV status tracking for vulnerabilities (Active/Not Active)
-- Sync metadata management for tracking last update times
-- REST API endpoints for KEV status queries and manual sync triggers
+## Development Workflow
 
-### Template System
-- **Email Templates**: Customizable email notifications with variable substitution
-- **Ticket Templates**: Pre-configured ticket creation templates with markdown support
-- **Vulnerability Templates**: Standardized vulnerability reporting templates
-- **Variable System**: Dynamic content insertion using `{{variable}}` syntax
-- **Markdown Editor**: Full-featured markdown editor with live preview for template editing
-- **Database Storage**: Templates stored in dedicated database tables (email_templates, ticket_templates, vulnerability_templates)
+### Docker Development (Recommended)
+```bash
+docker-compose up                 # Starts on localhost:8989
+```
+The Docker setup mounts the entire `/app` directory for hot-reloading and persists the database in `/data`.
 
-### Modular Frontend Architecture
-- Shared components are loaded first in HTML
-- Page-specific JavaScript loaded second
-- Communication between modules via window object callbacks
-- No build process - direct script loading
+### Local Development
+```bash
+npm run dev                       # Uses nodemon for auto-restart
+```
 
-## Important Files and Locations
+### Before Committing
+1. Run `npm run lint:all` to check all code quality
+2. Run `npm run fix:all` to auto-fix issues
+3. Ensure documentation is current with `npm run docs:generate`
+4. Verify database migrations if schema changes were made
 
-**Configuration:**
-- `eslint.config.mjs` - ESLint configuration
-- `.markdownlint.json` - Markdown linting rules
-- `package.json` - Dependencies and scripts
-- `docker-compose.yml` - Containerization setup
-- Note: .cursorrules file not present (development rules in CLAUDE.md instead)
+## Key Integration Points
 
-**Core Application:**
-- `app/public/server.js` - Main Express server
-- `app/services/databaseService.js` - Database abstraction layer
-- `app/utils/PathValidator.js` - Security utility for file operations
-- `app/public/scripts/shared/settings-modal.js` - Global settings component
+### WebSocket Communication
+- **ProgressTracker**: Utility class for real-time progress updates
+- **Socket.IO**: Configured in `app/config/websocket.js`
+- **Usage**: Import operations and backup processes use progress tracking
 
-**Database:**
-- `app/public/data/hextrackr.db` - SQLite database file
-- `app/public/scripts/init-database.js` - Database initialization
+### Route-Controller Pattern
+Controllers are initialized in `server.js` and referenced by route modules:
+```javascript
+// In server.js
+const VulnerabilityController = require("../controllers/vulnerabilityController");
+const vulnerabilityRoutes = require("../routes/vulnerabilities");
 
-**Testing:**
-- Manual testing workflow with visual verification
-- Playwright MCP for browser automation when needed
+// Routes use initialized controllers
+app.use("/api/vulnerabilities", vulnerabilityRoutes);
+```
 
-## Port and Environment
-- Application runs on internal port 8080 (Docker container)
-- External Docker port mapping: 8989 → 8080 (prevents test conflicts)
-- Always use `http://localhost:8989` for testing and development when using Docker
-- Docker-only environment - no local Node.js execution allowed
+### Service Dependencies
+Services often depend on DatabaseService and may use ProgressTracker:
+```javascript
+const DatabaseService = require("./databaseService");
+// Services handle business logic, controllers handle HTTP concerns
+```
+
+## Testing
+
+### Optional AI Testing
+- **Stagehand**: Natural language browser automation (`npm run test:stagehand`)
+- **Requirements**: Docker container running on localhost:8080
+- **Use Case**: Tests ticket creation, vulnerability import, settings functionality
+- **Benefits**: Adapts to UI changes automatically, no brittle selectors
+
+## Documentation System
+>>>>>>> v1.0.24-vuln-card-view
+
+### Source and Output Structure
+- **Source**: `app/public/docs-source/` (markdown files)
+- **Output**: `app/public/docs-html/` (generated HTML)
+- **JSDoc**: Extracted to markdown via unified pipeline
+- **Generation**: `npm run docs:generate` converts markdown to HTML
+
+### Documentation Commands
+- `docs:generate`: Markdown to HTML conversion
+- `docs:dev`: JSDoc HTML generation
+- `docs:all`: Complete pipeline regeneration
+
+## Environment & Configuration
+
+### Environment Variables
+- Copy `.env.example` to `.env` for local development
+- Docker uses environment variables defined in `docker-compose.yml`
+- **Port**: Defaults to 8080 internally, 8989 externally (Docker)
+
+### Security Considerations
+- Rate limiting configured in `app/config/middleware.js`
+- CORS origins, methods, and headers defined in constants
+- Avoid committing secrets or local database files
+- File upload restrictions via multer configuration
+
+## Common Tasks
+
+### Adding New Features
+1. Create controller in `app/controllers/`
+2. Create service in `app/services/` for business logic
+3. Create route module in `app/routes/`
+4. Update `server.js` to wire controller and routes
+5. Add frontend components in `app/public/scripts/`
+
+### Database Changes
+1. Update schema in `data/schema.sql`
+2. Test with `npm run init-db`
+3. Update relevant services for new table/column access
+4. Document migration steps in PR
+
+### Performance Considerations
+- SQLite database suitable for small to medium deployments
+- WebSocket connections for real-time updates
+- Compression middleware enabled
+- AG-Grid for efficient data table rendering

@@ -473,10 +473,13 @@ Click **View Device Details** to see a list of all vulnerabilities affecting tha
 
 This view groups all findings by vulnerability identifier (CVE, Cisco SA, or plugin ID). Each card represents a unique vulnerability and shows:
 
-- The number of devices affected by it.
-- The total VPR score it contributes across all devices.
-- A breakdown of the severity of the findings.
-- **Enhanced Display**: Vulnerability identifiers are now shown in a dedicated "Vulnerability" column with appropriate linking:
+- The number of devices affected by it (v1.0.24+ with enhanced display)
+- The total VPR score it contributes across all devices
+- The severity level prominently displayed alongside the vulnerability identifier
+- **Streamlined Card Layout (v1.0.24+)**: Removed redundant VPR mini-cards to focus on key information
+- **Enhanced Device Display**: Larger, more prominent device count with improved visual hierarchy
+- **KEV Indicator**: Red KEV badge in the top-right corner for Known Exploited Vulnerabilities
+- **Enhanced Display**: Vulnerability identifiers are now shown with appropriate linking:
   - **CVE identifiers** link to the MITRE CVE database
   - **Cisco SA identifiers** link to Cisco's security advisory portal
   - **Plugin IDs** are styled for easy identification when CVE/SA data is unavailable

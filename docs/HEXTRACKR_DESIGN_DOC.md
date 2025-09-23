@@ -11,11 +11,13 @@
 As a network administrator managing nearly 2,000 devices across 9 states, I was drowning in spreadsheets and notepad files while coordinating vulnerability remediation across multiple teams and ticketing systems.
 
 The core problem: Our organization requires tickets in **multiple systems** for vulnerability resolution:
+
 - **ServiceNow**: For change tracking and network operations technician assignments
 - **Hexagon**: For field operations technician dispatch and on-site reboots
 - **Tenable**: Weekly CSV exports requiring manual processing for VPR trend analysis
 
 This fragmentation led to:
+
 - 🕐 Hours of manual data entry per week
 - 📊 Inconsistent reporting across systems
 - 🔄 Duplicate work and potential errors
@@ -24,6 +26,7 @@ This fragmentation led to:
 ### The Solution
 
 HexTrackr consolidates these workflows into a single, purpose-built platform that:
+
 - Generates tickets with proper formatting for both ServiceNow and Hexagon
 - Imports and deduplicates vulnerability data from multiple scanners
 - Tracks VPR trends with visual dashboards
@@ -76,6 +79,7 @@ Friday Review:
 ### Shared Components
 
 #### Navigation Header
+
 All pages share a unified header with consistent theming and navigation:
 
 ```
@@ -88,6 +92,7 @@ All pages share a unified header with consistent theming and navigation:
 ```
 
 #### Footer
+
 Provides quick access to version info and external resources:
 
 ```
@@ -100,6 +105,7 @@ Provides quick access to version info and external resources:
 ## TICKETS.HTML - Ticket Management Interface
 
 ### Workflow Process
+
 1. **Attach Documentation**: Upload fix instructions (cached for bundle generation)
 2. **Create Ticket**: Add ticket with dates, generate XT# for Hexagon
 3. **Device Management**: Add devices, drag-and-drop to set boot order
@@ -171,6 +177,7 @@ Provides quick access to version info and external resources:
 ## VULNERABILITIES.HTML - Vulnerability Dashboard
 
 ### Key Features
+
 - **Import**: Process Tenable CSV files (100k+ entries in <30 seconds)
 - **Deduplication**: Smart detection of duplicate vulnerabilities
 - **VPR Tracking**: Monitor Vulnerability Priority Rating trends
@@ -451,6 +458,7 @@ DevOps:
 ## Performance Metrics
 
 ### System Performance
+
 - **CSV Import**: 1,000+ rows/second processing
 - **Page Load**: <2 seconds for dashboard
 - **API Response**: <500ms average
@@ -458,6 +466,7 @@ DevOps:
 - **Database Queries**: <100ms for complex operations
 
 ### Operational Impact
+
 - **Time Savings**: 15+ hours/week reduced manual work
 - **Error Reduction**: 90% fewer data entry errors
 - **Visibility**: 100% improvement in vulnerability tracking
@@ -499,24 +508,28 @@ npm run test:e2e         # Run Playwright tests
 ## Future Roadmap
 
 ### Phase 1: Enhanced Security (Q1 2025)
+
 - [ ] Multi-factor authentication
 - [ ] Role-based access control
 - [ ] Audit logging
 - [ ] Encrypted data at rest
 
 ### Phase 2: API Integrations (Q2 2025)
+
 - [ ] Tenable.io direct API integration
 - [ ] ServiceNow REST API automation
 - [ ] Cisco DNA Center integration
 - [ ] SNMP monitoring capabilities
 
 ### Phase 3: Advanced Analytics (Q3 2025)
+
 - [ ] Predictive vulnerability scoring
 - [ ] Automated remediation workflows
 - [ ] Custom dashboard widgets
 - [ ] Executive reporting suite
 
 ### Phase 4: Enterprise Features (Q4 2025)
+
 - [ ] Multi-tenancy support
 - [ ] High availability clustering
 - [ ] Config backup automation
@@ -525,14 +538,17 @@ npm run test:e2e         # Run Playwright tests
 ## Support & Contributing
 
 ### Getting Help
-- **Documentation**: http://localhost:8989/docs
-- **GitHub Issues**: https://github.com/Lonnie-Bruton/HexTrackr/issues
+
+- **Documentation**: <http://localhost:8989/docs>
+- **GitHub Issues**: <https://github.com/Lonnie-Bruton/HexTrackr/issues>
 - **Code Quality**: [![Codacy Badge](https://app.codacy.com/project/badge/Grade/xyz)](https://app.codacy.com/gh/Lonnie-Bruton/HexTrackr)
 
 ### Contributing
+
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### License
+
 MIT License - See [LICENSE](LICENSE) file for details.
 
 ---

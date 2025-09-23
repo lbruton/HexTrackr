@@ -5,68 +5,69 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
 
-### Fixed - NPM Scripts Cleanup
 
-#### Development Workflow Improvements
+## [1.0.25] - 2025-09-23
 
-- **Removed Broken Scripts**: Eliminated NPM scripts that referenced non-existent files
-  - Removed `npm run roadmap` (scripts/generate-roadmap-portal.js missing)
-  - Removed `npm run docs:review` (app/public/scripts/gemini-docs-generator.js missing)
-  - Removed `npm run docs:analyze` (app/public/scripts/generate-architecture-analysis.js missing)
+### Added - Import Summary HTML Export
 
-- **Fixed Test Scripts**: Updated test commands to handle missing test directories gracefully
-  - Added `--passWithNoTests` flag to test:unit, test:integration, test:contract
-  - Scripts now pass without error when no test files exist
-  - Clear warnings added in NPMGUIDE.md about directory status
+#### Professional Report Generation
 
-#### Documentation Updates
+- **Standalone HTML Reports**: Added ability to download import summaries as complete HTML documents with embedded CSS styling
+  - **Export Button**: New "Download Report" button appears in progress modal when CVE import summaries are available
+  - **Self-Contained Files**: Reports include all necessary CSS (Tabler.io framework, HexTrackr variables, component styles) embedded inline
+  - **Professional Formatting**: Complete document structure with metadata headers, generation timestamps, and HexTrackr branding
+  - **Print-Friendly Styling**: Optimized CSS for both screen viewing and professional printing
 
-- **Updated NPMGUIDE.md**: Moved to root directory and cleaned up outdated script references
-  - Removed documentation for broken scripts
-  - Added status warnings for placeholder test commands
-  - Updated workflow examples to use working commands
+#### Technical Implementation
 
-- **CLAUDE.md Corrections**: Removed references to broken scripts in development commands
-  - Simplified documentation section to show only working scripts
-  - Added reference to NPMGUIDE.md location
+- **CSS Extraction Engine**: Automated system fetches and combines 7 key stylesheets into single embedded block
+  - Tabler.io framework, CSS custom properties, modal styles, badges, cards, tables, and base styles
+  - Font Awesome icons via CDN import for universal compatibility
+  - Custom print media queries for professional output
+- **Dynamic File Naming**: Descriptive filenames using pattern `HexTrackr_Import_Report_YYYY-MM-DD_[source-filename].html`
+- **Blob Download Pattern**: Follows established file export approach with proper MIME types and browser compatibility
 
-#### Impact
+#### User Experience Enhancements
 
-- All documented NPM scripts now function correctly
-- No more confusion about missing script files
-- Clear guidance on test infrastructure development status
-- Improved developer onboarding experience
+- **Visual Feedback System**: Export button provides clear state indicators
+  - Loading state with spinner and "Generating..." text
+  - Success confirmation with checkmark and "Downloaded!" message
+  - Error handling with warning icon and failure notification
+- **Conditional Visibility**: Export option only appears when import summaries contain meaningful CVE discovery data
+- **Non-Disruptive Integration**: Feature seamlessly extends existing import workflow without affecting standard operations
 
-### Removed - Testing Infrastructure Cleanup
+### Fixed - Import Modal State Persistence
 
-#### Development Simplification
+#### Clean Loading States
 
-- **Removed Jest Testing Framework**: Eliminated unused Jest test infrastructure
-  - Removed 8 testing devDependencies (@jest/globals, jest, jest-environment-jsdom, etc.)
-  - Removed 6 test-related NPM scripts (test, test:watch, test:coverage, etc.)
-  - Kept only templateService.test.js as reference example
+- **Resolved Stale Data Display**: Fixed issue where previous import summaries appeared during new import loading phases
+  - **Root Cause**: `resetProgressState()` function didn't clear `importSummary` data or associated DOM elements
+  - **Solution**: Added explicit `importSummary: null` reset and summary container cleanup
+- **Complete State Reset**: Enhanced modal initialization to properly clear all previous session data
+  - Hide and clear `progressSummary` container content during reset
+  - Reset export button visibility to prevent stale UI states
+  - Ensure clean slate for each new import operation
 
-- **Removed Playwright Testing Framework**: Eliminated unused Playwright E2E testing
-  - Removed @playwright/test and playwright packages
-  - Removed supertest dependency
-  - Simplified to manual testing workflow
+#### Technical Improvements
 
-#### Rationale
+- **Data Lifecycle Management**: Improved progress modal data handling to prevent state leakage between sessions
+- **DOM Cleanup**: Systematic clearing of dynamically created summary content and UI elements
+- **ESLint Compliance**: All code modifications passed linting validation with zero errors
 
-- **Workflow Alignment**: Manual testing with screenshots preferred by development team
-- **Playwright MCP Available**: Browser automation available through MCP when needed
-- **Complexity Reduction**: Removed 750MB+ of testing dependencies and tooling
-- **Faster Development**: Simplified npm install and reduced cognitive overhead
+## [1.0.24] - 2025-09-23
 
-#### Impact
+### Enhanced - Vulnerability Card Polish
 
-- Package size reduced significantly (Jest + Playwright = ~750MB dependencies)
-- Faster npm install times
-- Cleaner package.json with focus on actual workflow
-- Manual testing remains primary validation method
-- Playwright MCP provides automation capabilities when needed
+#### Card Layout Simplification
+
+- **Streamlined Card Body**: Removed the redundant criticality subcards from vulnerability cards to focus on the key summary details and reduce visual noise.
+- **Consistent Spacing**: Tweaked card padding to accommodate the simplified layout without affecting existing content hierarchy.
+
+#### KEV Indicator Improvements
+
+- **Accessible Badge Placement**: Replaced the inline flame icon with an accessible red KEV pill badge anchored to the top-right corner of each vulnerability card.
+- **Improved Visual Priority**: Updated the indicator styling and keyboard handling so KEV status remains prominent while staying aligned with the HexTrackr design system.
 
 ## [1.0.23] - 2025-09-22
 
