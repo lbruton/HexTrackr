@@ -15,11 +15,13 @@ This refined approach eliminates unnecessary complexity by leveraging the fact t
 ## Phase 1: Settings Modal & Auto-Sync Infrastructure
 
 ### 1.1 Replace Tenable Card with CISA KEV Sync
+
 **File**: `/app/public/scripts/shared/settings-modal.html`
 **Location**: Lines 74-100 (Tenable API card)
 **Action**: Replace with CISA KEV Sync card
 
 **New CISA KEV Card Design:**
+
 ```html
 <!-- CISA KEV Sync Configuration -->
 <div class="col-lg-6 mb-4">
@@ -55,6 +57,7 @@ This refined approach eliminates unnecessary complexity by leveraging the fact t
 ```
 
 ### 1.2 Create KEV Service Module
+
 **File**: `/app/services/kevService.js`
 **Strategy**: Simple refresh with no history tracking
 
@@ -96,6 +99,7 @@ class KevService {
 ```
 
 ### 1.3 Auto-Sync on Page Load
+
 **Implementation**: Check and sync transparently
 
 ```javascript
@@ -116,6 +120,7 @@ async function checkKevSync() {
 ## Phase 2: Database Implementation (Simple Refresh)
 
 ### 2.1 KEV Status Table
+
 **Strategy**: Minimal schema, no staging tables
 
 ```sql
@@ -136,6 +141,7 @@ CREATE INDEX idx_kev_due ON kev_status(due_date);
 ```
 
 ### 2.2 Simple Refresh Strategy
+
 - **No Rollover**: Just truncate and reload
 - **No History**: Current KEV status only
 - **Fast**: ~1,200 records takes <2 seconds
@@ -146,6 +152,7 @@ CREATE INDEX idx_kev_due ON kev_status(due_date);
 ## Phase 3: UI Integration (Easy Wins)
 
 ### 3.1 Table View - Add KEV Column
+
 **File**: `/app/public/scripts/shared/ag-grid-responsive-config.js`
 **Position**: After VPR column
 
@@ -161,6 +168,7 @@ CREATE INDEX idx_kev_due ON kev_status(due_date);
 ```
 
 ### 3.2 Vulnerability Cards - Add KEV Badge
+
 **File**: `/app/public/scripts/shared/vulnerability-cards.js`
 **Position**: Top-right corner of card
 
@@ -170,6 +178,7 @@ ${vuln.isKev ? '<span class="kev-badge" onclick="showKevDetails(\''+vuln.cveId+'
 ```
 
 **CSS for KEV Badge:**
+
 ```css
 .kev-badge {
     position: absolute;
@@ -191,6 +200,7 @@ ${vuln.isKev ? '<span class="kev-badge" onclick="showKevDetails(\''+vuln.cveId+'
 ```
 
 ### 3.3 Device Cards - Add KEV Count
+
 **File**: `/app/public/scripts/shared/vulnerability-cards.js`
 **Position**: Device card header
 
@@ -200,6 +210,7 @@ ${device.kevCount > 0 ? '<span class="kev-count-badge">'+device.kevCount+' KEVs<
 ```
 
 ### 3.4 Severity Filter Dropdown - Add KEV Option
+
 **File**: `/app/public/vulnerabilities.html`
 **Line**: 376-382
 
@@ -219,9 +230,11 @@ ${device.kevCount > 0 ? '<span class="kev-count-badge">'+device.kevCount+' KEVs<
 ## Phase 4: Modal Enhancements
 
 ### 4.1 Vulnerability Details Modal - Two Card Layout
+
 **File**: `/app/public/scripts/shared/vulnerability-details-modal.js`
 
 **New Layout Structure:**
+
 ```
 ┌───────────────────────────────────────────────────┐
 │                Modal Header                       │
@@ -240,6 +253,7 @@ ${device.kevCount > 0 ? '<span class="kev-count-badge">'+device.kevCount+' KEVs<
 ```
 
 ### 4.2 Device Details Modal - KEV Column
+
 **File**: `/app/public/scripts/shared/device-security-modal.js`
 **Action**: Add KEV indicator to vulnerability table
 
@@ -258,6 +272,7 @@ ${device.kevCount > 0 ? '<span class="kev-count-badge">'+device.kevCount+' KEVs<
 ```
 
 ### 4.3 KEV Details Modal (New)
+
 **File**: `/app/public/scripts/shared/kev-details-modal.js`
 
 ```javascript
@@ -316,16 +331,19 @@ function showKevDetails(cveId) {
 ## Implementation Timeline
 
 ### Week 1: Core Infrastructure
+
 - Day 1: Settings modal modification
 - Day 2: KEV service and database
 - Day 3: Auto-sync implementation
 
 ### Week 2: UI Integration
+
 - Day 1: Table and card badges
 - Day 2: Filter dropdown
 - Day 3: Modal enhancements
 
 ### Testing & Polish
+
 - Day 1: Integration testing
 - Day 2: Performance validation
 - Day 3: Documentation
@@ -354,6 +372,7 @@ function showKevDetails(cveId) {
 ---
 
 **Next Steps**:
+
 1. Screenshot exchange session for exact UI placement
 2. Implement Phase 1 (Settings & Auto-sync)
 3. Test with real CISA data

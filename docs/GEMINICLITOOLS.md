@@ -9,6 +9,7 @@ This document is a list of 'bash' commands that can be ran to call gemini CLI fo
 The Gemini CLI supports a powerful `@` syntax for including files and directories directly in prompts. This is cleaner and more efficient than command substitution.
 
 ### Basic @ Syntax
+
 ```bash
 # Single file
 gemini -p "@app/public/server.js Explain this server setup"
@@ -32,12 +33,14 @@ gemini --all_files -p "Analyze the complete project structure and architecture"
 ## COMMANDS
 
 ### Test Connection
+
 ```bash
 # Simple test to verify Gemini CLI is working
 gemini -p "What is 2 + 2? Please respond with just the number."
 ```
 
 ### Project Analysis
+
 ```bash
 # Using @ syntax for cleaner file inclusion
 gemini -p "@app/public/ @app/controllers/ @app/services/ Analyze the HexTrackr architecture:
@@ -51,6 +54,7 @@ gemini -p "Analyze: $(ls -la app/public/) $(head -50 app/public/server.js)"
 ```
 
 ### Code Review
+
 ```bash
 # Using @ syntax (preferred)
 gemini -p "@app/controllers/vulnerabilityController.js Review this module for:
@@ -65,6 +69,7 @@ gemini -p "Review: $(cat app/controllers/vulnerabilityController.js)"
 ```
 
 ### Documentation Generation
+
 ```bash
 # Using @ syntax (preferred)
 gemini -p "@app/services/vulnerabilityService.js Generate complete JSDoc comments for this file. Include:
@@ -76,6 +81,7 @@ gemini -p "@app/services/vulnerabilityService.js Generate complete JSDoc comment
 ```
 
 ### Security Audit
+
 ```bash
 # Using @ syntax for multiple files
 gemini -p "@app/public/server.js @app/middleware/security.js Perform a security audit checking for:
@@ -89,6 +95,7 @@ gemini -p "@app/public/server.js @app/middleware/security.js Perform a security 
 ```
 
 ### Test Generation
+
 ```bash
 # Generate Jest tests
 gemini -p "Generate comprehensive Jest test cases for this module:
@@ -103,6 +110,7 @@ Use Jest best practices and include describe/it blocks."
 ```
 
 ### Performance Analysis
+
 ```bash
 # Performance review
 gemini -p "Analyze performance bottlenecks in:
@@ -117,6 +125,7 @@ Focus on:
 ```
 
 ### Dependency Check
+
 ```bash
 # Check dependencies
 gemini -p "Analyze package.json dependencies:
@@ -132,6 +141,7 @@ Identify:
 ```
 
 ### Bug Analysis
+
 ```bash
 # Debug assistance
 gemini -p "Debug this error:
@@ -147,6 +157,7 @@ Provide:
 ```
 
 ### Full Codebase Analysis
+
 ```bash
 # Using @ syntax for entire directories (preferred)
 gemini -p "@app/ Provide a comprehensive analysis of this JavaScript codebase focusing on architecture, patterns, and quality"
@@ -166,6 +177,7 @@ find app -name "*.js" -not -path "*/vendor/*" -not -name "*.min.js" | \
 Use these commands to verify if specific features, patterns, or security measures are implemented in HexTrackr.
 
 ### Feature Implementation Checks
+
 ```bash
 # Check if dark mode is implemented
 gemini -p "@app/public/scripts/ @app/public/styles/ Has dark mode been implemented? Show the theme switching logic and CSS variables"
@@ -187,6 +199,7 @@ gemini -p "@app/controllers/vulnerabilityController.js @app/services/vulnerabili
 ```
 
 ### Security Verification
+
 ```bash
 # SQL injection protection
 gemini -p "@app/ Are SQL queries properly parameterized to prevent SQL injection? Show examples"
@@ -205,6 +218,7 @@ gemini -p "@app/middleware/validation.js @app/services/validationService.js How 
 ```
 
 ### Test Coverage Verification
+
 ```bash
 # Overall test coverage
 gemini -p "@tests/ @app/ What is the test coverage for this codebase? List untested modules"
@@ -220,6 +234,7 @@ gemini -p "@tests/integration/ @app/services/ Which services have integration te
 ```
 
 ### Code Quality Checks
+
 ```bash
 # JSDoc coverage
 gemini -p "@app/ What percentage of functions have complete JSDoc comments? List undocumented functions"
@@ -238,6 +253,7 @@ gemini -p "@app/services/importService.js @app/services/vulnerabilityService.js 
 ```
 
 ### Architecture Verification
+
 ```bash
 # Module boundaries
 gemini -p "@app/controllers/ @app/services/ @app/routes/ Is proper separation of concerns maintained? Show any violations of MVC pattern"
@@ -253,6 +269,7 @@ gemini -p "@app/services/ @app/config/database.js What database patterns are use
 ```
 
 ### HexTrackr-Specific Verifications
+
 ```bash
 # Vulnerability import pipeline
 gemini -p "@app/services/importService.js @app/controllers/importController.js Analyze the complete vulnerability import pipeline. What formats are supported?"
@@ -273,6 +290,7 @@ gemini -p "@app/public/scripts/utils/chart-theme-adapter.js @app/public/scripts/
 ## WHEN TO USE GEMINI CLI
 
 Use `gemini -p` when:
+
 - Analyzing entire codebases or large directories
 - Comparing multiple large files
 - Understanding project-wide patterns or architecture
@@ -290,4 +308,3 @@ Use `gemini -p` when:
 - Save responses: `gemini -p "prompt" > output.md`
 - Responses are typically fast but may vary with prompt complexity
 - No need for file size limits with the 1M token context
-

@@ -7,12 +7,14 @@ This guide documents how to use Codacy CLI for code quality checks in HexTrackr.
 ## Installation
 
 ### macOS (Homebrew)
+
 ```bash
 brew tap codacy/tap
 brew install codacy-analysis-cli
 ```
 
 ### Manual Installation
+
 ```bash
 # Download latest release
 curl -L https://github.com/codacy/codacy-analysis-cli/releases/latest/download/codacy-analysis-cli.sh -o codacy
@@ -23,6 +25,7 @@ sudo mv codacy /usr/local/bin/
 ## Basic Usage
 
 ### Quick Scan
+
 ```bash
 # From HexTrackr root directory
 cd /Volumes/DATA/GitHub/HexTrackr
@@ -30,6 +33,7 @@ codacy-analysis-cli analyze
 ```
 
 ### Detailed Scan with Output
+
 ```bash
 # JSON output for detailed analysis
 codacy-analysis-cli analyze \
@@ -44,6 +48,7 @@ codacy-analysis-cli analyze \
 ```
 
 ### Scan Specific Directories
+
 ```bash
 # Scan only app directory (production code)
 codacy-analysis-cli analyze --directory /Volumes/DATA/GitHub/HexTrackr/app
@@ -55,13 +60,16 @@ codacy-analysis-cli analyze --directory /Volumes/DATA/GitHub/HexTrackr/app/publi
 ## Configuration
 
 ### .codacy.yml
+
 HexTrackr includes a `.codacy.yml` configuration file that:
+
 - Excludes vendor libraries
 - Focuses on `/app/` directory
 - Skips test files and documentation
 - Applies JavaScript/Node.js specific rules
 
 ### Custom Patterns
+
 ```bash
 # Use specific tools only
 codacy-analysis-cli analyze --tool eslint
@@ -73,6 +81,7 @@ codacy-analysis-cli analyze --exclude "tests/**,docs/**"
 ## Integration with HexTrackr Workflow
 
 ### Pre-Commit Check
+
 ```bash
 # Run before committing
 codacy-analysis-cli analyze --directory app/
@@ -84,6 +93,7 @@ fi
 ```
 
 ### CI/CD Integration
+
 ```bash
 # In your CI pipeline
 npm run eslint && \
@@ -92,6 +102,7 @@ codacy-analysis-cli analyze
 ```
 
 ### With Docker
+
 ```bash
 # Run analysis inside Docker container
 docker run -v $(pwd):/code codacy/codacy-analysis-cli analyze
@@ -100,16 +111,19 @@ docker run -v $(pwd):/code codacy/codacy-analysis-cli analyze
 ## Understanding Results
 
 ### Exit Codes
+
 - `0` - No issues found
 - `1` - Issues found
 - `2` - Error running analysis
 
 ### Issue Levels
+
 - **Error**: Must fix - security vulnerabilities, bugs
 - **Warning**: Should fix - code smells, complexity
 - **Info**: Consider fixing - style issues, minor improvements
 
 ### Common Issues in HexTrackr
+
 1. **Complexity**: Functions over 15 lines
 2. **Duplication**: Similar code blocks
 3. **Security**: Path traversal risks (use PathValidator)
@@ -118,12 +132,14 @@ docker run -v $(pwd):/code codacy/codacy-analysis-cli analyze
 ## Troubleshooting
 
 ### Analysis Takes Too Long
+
 ```bash
 # Exclude large directories
 codacy-analysis-cli analyze --exclude "node_modules/**,data/**"
 ```
 
 ### No Issues Found (Unexpected)
+
 ```bash
 # Check configuration is loaded
 codacy-analysis-cli validate-configuration
@@ -133,6 +149,7 @@ codacy-analysis-cli analyze --tool jshint --tool eslint
 ```
 
 ### Permission Errors
+
 ```bash
 # Ensure executable permissions
 chmod +x $(which codacy-analysis-cli)
@@ -141,6 +158,7 @@ chmod +x $(which codacy-analysis-cli)
 ## When to Use Codacy MCP
 
 The Codacy MCP server is only needed for:
+
 - Managing pull requests via API
 - Listing organization repositories
 - Getting PR-specific issues
