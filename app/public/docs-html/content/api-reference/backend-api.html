@@ -208,6 +208,41 @@
 <td>Documentation coverage statistics</td>
 </tr>
 </tbody></table>
+<h3>KevController</h3><p><strong>Location:</strong> <code>app/controllers/kevController.js</code><br><strong>Since:</strong> v1.0.22</p>
+<p>Manages CISA Known Exploited Vulnerabilities (KEV) integration and synchronization.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Automatic daily synchronization with CISA KEV catalog</li>
+<li>Conflict detection and resolution for concurrent sync requests</li>
+<li>Comprehensive error handling and retry logic</li>
+<li>Real-time sync status tracking</li>
+<li>Integration with vulnerability matching system</li>
+</ul>
+<p><strong>Main Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>POST</td>
+<td><code>/api/kev/sync</code></td>
+<td>Trigger manual KEV synchronization from CISA</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/kev/status</code></td>
+<td>Get current sync status and statistics</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/kev/vulnerability/:cveId</code></td>
+<td>Get KEV details for specific CVE</td>
+</tr>
+</tbody></table>
 <hr>
 <h2 id="services">Services</h2><p>Services encapsulate business logic and data access. They are injected into controllers during initialization.</p>
 <h3>VulnerabilityService</h3><p><strong>Location:</strong> <code>app/services/vulnerabilityService.js</code></p>
@@ -322,6 +357,24 @@
 <li>Temporary file cleanup</li>
 <li>Path validation</li>
 </ul>
+<h3>KevService</h3><p><strong>Location:</strong> <code>app/services/kevService.js</code><br><strong>Since:</strong> v1.0.22</p>
+<p>CISA Known Exploited Vulnerabilities data management and synchronization.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Daily automatic synchronization with CISA KEV API</li>
+<li>CVE-based vulnerability matching and flagging</li>
+<li>Sync status tracking and error handling</li>
+<li>Local KEV catalog caching for performance</li>
+<li>Integration with vulnerability database</li>
+</ul>
+<p><strong>Core Methods:</strong></p>
+<ul>
+<li><code>syncKevData()</code> - Fetch and process CISA KEV catalog</li>
+<li><code>getSyncStatus()</code> - Current synchronization status</li>
+<li><code>getKevByCve(cveId)</code> - Retrieve KEV details for specific CVE</li>
+<li><code>matchVulnerabilities()</code> - Update vulnerability KEV flags</li>
+<li><code>scheduleAutoSync()</code> - Configure automatic sync intervals</li>
+</ul>
 <hr>
 <h2 id="routes">Routes</h2><p>Route modules define API endpoints and apply middleware.</p>
 <h3>Vulnerability Routes</h3><p><strong>File:</strong> <code>app/routes/vulnerabilities.js</code><br><strong>Base Path:</strong> <code>/api/vulnerabilities</code></p>
@@ -345,7 +398,10 @@
 <pre><code class="language-javascript"><span class="hljs-variable constant_">POST</span>   /create                <span class="hljs-comment">// Create backup</span>
 <span class="hljs-variable constant_">GET</span>    /list                  <span class="hljs-comment">// List backups</span>
 <span class="hljs-variable constant_">POST</span>   /restore               <span class="hljs-comment">// Restore backup</span>
-<span class="hljs-variable constant_">DELETE</span> /:filename             <span class="hljs-comment">// Delete backup</span></code></pre><hr>
+<span class="hljs-variable constant_">DELETE</span> /:filename             <span class="hljs-comment">// Delete backup</span></code></pre><h3>KEV Routes</h3><p><strong>File:</strong> <code>app/routes/kev.js</code><br><strong>Base Path:</strong> <code>/api/kev</code><br><strong>Since:</strong> v1.0.22</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">POST</span>   /sync                  <span class="hljs-comment">// Manual KEV synchronization</span>
+<span class="hljs-variable constant_">GET</span>    /status                <span class="hljs-comment">// Sync status and statistics</span>
+<span class="hljs-variable constant_">GET</span>    /vulnerability/:cveId  <span class="hljs-comment">// KEV details for specific CVE</span></code></pre><hr>
 <h2 id="server">Server Configuration</h2><h3>Main Server</h3><p><strong>File:</strong> <code>app/public/server.js</code></p>
 <p>The main server file orchestrates the entire application using a modular initialization sequence.</p>
 <p><strong>Initialization Order:</strong></p>
