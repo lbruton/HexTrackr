@@ -69,6 +69,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Accessible Badge Placement**: Replaced the inline flame icon with an accessible red KEV pill badge anchored to the top-right corner of each vulnerability card.
 - **Improved Visual Priority**: Updated the indicator styling and keyboard handling so KEV status remains prominent while staying aligned with the HexTrackr design system.
 
+- **Vulnerability Cards UI Enhancement**: Removed redundant VPR mini-cards from vulnerability cards to reduce visual clutter
+- **CSS Architecture**: Migrated inline styles to external CSS files for better maintainability
+- **Enhanced Device Display**: Improved device information presentation in vulnerability cards with theme-aware styling
+- **Responsive Design**: Enhanced mobile and tablet layout for vulnerability cards
+
+### Technical Details
+- Added page-specific CSS file (`vulnerabilities.css`) for vulnerability page styling
+- Updated `cards.css` with enhanced device display component
+- Removed VPR mini-cards HTML generation from `VulnerabilityCardsManager`
+- Preserved VPR mini-cards functionality in device cards where they remain relevant
+- Implemented CSS selector specificity to target only vulnerability cards
+- Added theme support with light/dark mode transitions
+
+### Files Modified
+- `app/public/styles/pages/vulnerabilities.css` (created)
+- `app/public/styles/shared/cards.css` (enhanced)
+- `app/public/scripts/shared/vulnerability-cards.js` (modified)
+- `app/public/pages/vulnerabilities.html` (updated CSS references)
+
 ## [1.0.23] - 2025-09-22
 
 ### Added - Interactive Statistics Card Filtering
