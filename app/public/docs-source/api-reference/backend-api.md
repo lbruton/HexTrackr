@@ -125,6 +125,29 @@ Serves documentation portal and API documentation.
 |--------|----------|-------------|
 | GET | `/api/docs/stats` | Documentation coverage statistics |
 
+### KevController
+
+**Location:** `app/controllers/kevController.js`
+**Since:** v1.0.22
+
+Manages CISA Known Exploited Vulnerabilities (KEV) integration and synchronization.
+
+**Key Features:**
+
+- Automatic daily synchronization with CISA KEV catalog
+- Conflict detection and resolution for concurrent sync requests
+- Comprehensive error handling and retry logic
+- Real-time sync status tracking
+- Integration with vulnerability matching system
+
+**Main Endpoints:**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/kev/sync` | Trigger manual KEV synchronization from CISA |
+| GET | `/api/kev/status` | Get current sync status and statistics |
+| GET | `/api/kev/vulnerability/:cveId` | Get KEV details for specific CVE |
+
 ---
 
 ## Services {#services}
@@ -279,6 +302,29 @@ Secure file operations.
 - Temporary file cleanup
 - Path validation
 
+### KevService
+
+**Location:** `app/services/kevService.js`
+**Since:** v1.0.22
+
+CISA Known Exploited Vulnerabilities data management and synchronization.
+
+**Key Features:**
+
+- Daily automatic synchronization with CISA KEV API
+- CVE-based vulnerability matching and flagging
+- Sync status tracking and error handling
+- Local KEV catalog caching for performance
+- Integration with vulnerability database
+
+**Core Methods:**
+
+- `syncKevData()` - Fetch and process CISA KEV catalog
+- `getSyncStatus()` - Current synchronization status
+- `getKevByCve(cveId)` - Retrieve KEV details for specific CVE
+- `matchVulnerabilities()` - Update vulnerability KEV flags
+- `scheduleAutoSync()` - Configure automatic sync intervals
+
 ---
 
 ## Routes {#routes}
@@ -336,6 +382,18 @@ POST   /create                // Create backup
 GET    /list                  // List backups
 POST   /restore               // Restore backup
 DELETE /:filename             // Delete backup
+```
+
+### KEV Routes
+
+**File:** `app/routes/kev.js`
+**Base Path:** `/api/kev`
+**Since:** v1.0.22
+
+```javascript
+POST   /sync                  // Manual KEV synchronization
+GET    /status                // Sync status and statistics
+GET    /vulnerability/:cveId  // KEV details for specific CVE
 ```
 
 ---

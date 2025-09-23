@@ -2,8 +2,8 @@
 /* eslint-env browser, es6 */
 /* global window */
 
-// Import ES6 modules
-import { VulnerabilityCoreOrchestrator } from '../shared/vulnerability-core.js';
+// Import ES6 modules - converted to global references for browser compatibility
+// import { VulnerabilityCoreOrchestrator } from '../shared/vulnerability-core.js'; // Changed to global reference
  
 
 /**
@@ -12,7 +12,7 @@ import { VulnerabilityCoreOrchestrator } from '../shared/vulnerability-core.js';
  * This class now serves as a thin initialization layer that coordinates the modular architecture.
  * All major functionality has been extracted into specialized modules:
  * - VulnerabilityDataManager: Data fetching, processing, caching
- * - VulnerabilityStatisticsManager: Metric calculations, trend analysis  
+ * - VulnerabilityStatisticsManager: Metric calculations, trend analysis
  * - VulnerabilityChartManager: ApexCharts visualization
  * - VulnerabilitySearchManager: Search, filtering, CVE lookups
  * - VulnerabilityGridManager: AG Grid operations
@@ -22,6 +22,10 @@ import { VulnerabilityCoreOrchestrator } from '../shared/vulnerability-core.js';
  * @version 2.0.0 - Modularized Architecture
  * @author Claude (Modularization), Original by Gemini
  * @date 2025-09-08
+ *
+ * @note ES6 Module Dependency: This file uses export class syntax for proper module
+ * functionality. ESLint configuration (eslint.config.mjs) has been updated to handle
+ * ES6 modules with sourceType: "module" for vulnerability management files.
  */
 
 /**
@@ -38,7 +42,7 @@ export class ModernVulnManager {
      */
     async initializeModules() {
         // Initialize core orchestrator - it will create and coordinate all modules
-        this.coreOrchestrator = new VulnerabilityCoreOrchestrator();
+        this.coreOrchestrator = new window.VulnerabilityCoreOrchestrator();
         
         // Let orchestrator handle all module creation and wiring
         await this.coreOrchestrator.initializeAllModules(this);
@@ -94,6 +98,10 @@ export class ModernVulnManager {
         return this.coreOrchestrator.generateVulnerabilityPDF();
     }
 
+    createTicketFromDevice(hostname) {
+        return this.coreOrchestrator.createTicketFromDevice(hostname);
+    }
+
     showToast(message, type) {
         return this.coreOrchestrator.showToast(message, type);
     }
@@ -112,7 +120,7 @@ window.refreshPageData = function(type) {
 };
 
 // Initialize the application when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
     window.modernVulnManager = new ModernVulnManager();
     // Create global alias for HTML onclick handlers
     window.vulnManager = window.modernVulnManager;

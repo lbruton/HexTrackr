@@ -2,136 +2,185 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-<!-- SPEC-KIT START -->
-<!-- DO NOT MODIFY: This section is managed by spec-kit scripts -->
-## Active Technologies
-- Node.js/Express + SQLite (HexTrackr core)
+## Overview
 
-## Recent Changes
-- 003-vulnerability-vpr-score: VPR scoring implementation
-- 004-tickets-table-prototype: AG-Grid implementation for tickets table
-<!-- SPEC-KIT END -->
+HexTrackr is a vulnerability tracking and ticket management system built with Node.js, Express, and SQLite. The application has been refactored from a monolithic ~3,800 line server into a modular architecture with separate controllers, services, routes, and utilities.
 
-<!-- MANUAL ADDITIONS START -->
+## Development Commands
 
-## 🧠 Memory Keyword Matrix
+### Essential Commands
+```bash
+# Development (preferred)
+docker-compose up                 # Start with Docker on port 8989
+npm run dev                       # Development with nodemon hot-reload
+npm start                         # Production server directly
 
-When user says → I should:
-- **"remember"/"recall"/"do you know"** → Search Memento semantically for relevant memories
-- **"last time"/"previously"/"before"** → Check recent bundles + Memento SESSION entities
-- **"we discussed"/"we talked about"** → `mcp__memento__search_nodes` with "project:hextrackr SESSION [topic]"
-- **"the bug with"/"the issue where"** → Search "critical-bug [feature]" in Memento
-- **"insight about"/"lesson learned"** → Search "INSIGHT breakthrough [topic]"
-- **"what did we decide"** → Search "DECISION conclusion [topic]"
-- **"progress on"/"status of"** → Search "in-progress blocked [feature]"
+# Database
+npm run init-db                   # Initialize/reset SQLite database
 
-## 🛠️ MCP Servers Reference
+# Code Quality (run before commits)
+npm run lint:all                  # Check all linters (markdown, JS, CSS)
+npm run fix:all                   # Auto-fix all linting issues
+npm run eslint                    # JavaScript linting only
+npm run stylelint                 # CSS linting only
+npm run lint:md                   # Markdown linting only
 
-### Primary Tools
-- **Claude Context**: Semantic code search. Re-index at session start with `force: true` if git shows recent changes
-- **Memento**: Knowledge graph. Always use `mode: "semantic"` for conceptual searches
-- **Brave Search**: Web research. Use with `summary: true` then `brave_summarizer` for AI synthesis
+# Documentation
+npm run docs:generate             # Convert markdown docs to HTML
+npm run docs:dev                  # Generate JSDoc HTML documentation
+npm run docs:all                  # Complete documentation regeneration
 
-### Specialized Tools
-- **Context7**: Library docs. Call `resolve-library-id` first, then `get-library-docs`
-- **Playwright**: Browser testing. Always `docker-compose restart` before E2E tests
-- **Sequential-thinking**: Break down complex tasks into steps
-- **Zen**: Deep analysis tools (user request only)
+# Testing (optional)
+npm run test:stagehand            # AI-powered browser automation tests
+```
 
-## ⚡ Essential Workflows
+### Git Hooks
+```bash
+npm run hooks:install             # Configure git hooks (run after clone)
+```
 
-### Session Start (/prime)
+## Architecture Overview
+
+### Core Structure
+- **app/public/server.js**: Main entry point that wires routes, middleware, and WebSocket
+- **app/controllers/**: Request handling and HTTP response logic
+- **app/services/**: Reusable business logic and data operations
+- **app/routes/**: Express router definitions and endpoint mounting
+- **app/utils/**: Shared utilities like ProgressTracker and constants
+- **app/config/**: Configuration modules for middleware, database, WebSocket
+- **data/**: SQLite database files and schema definitions
+
+### Key Components
+1. **Modular Route System**: Separated from monolithic server into focused route files
+2. **Service Layer**: Business logic abstracted into dedicated service classes
+3. **WebSocket Integration**: Real-time progress tracking via Socket.IO
+4. **Documentation Pipeline**: JSDoc extraction to markdown, then HTML generation
+
+### Database
+- **Type**: SQLite with schema defined in `data/schema.sql`
+- **Location**: `data/hextrackr.db` (created by `npm run init-db`)
+- **Key Tables**: tickets, vulnerabilities, templates, settings
+- **Service**: DatabaseService handles connections and queries
+
+### Frontend Architecture
+- **Location**: `app/public/` directory
+- **Scripts**: Modular JavaScript in `scripts/pages/`, `scripts/shared/`, `scripts/utils/`
+- **Styles**: CSS organized in `styles/pages/`, `styles/shared/`, `styles/utils/`
+- **Vendor Libraries**: AG-Grid, Chart.js, Socket.IO, DOMPurify, Highlight.js
+
+## Code Style & Standards
+
+### JavaScript
+- **ESLint Config**: Uses `@stylistic/eslint-plugin` with custom rules
+- **Style**: Double quotes, semicolons, 4-space indentation
+- **ES6 Modules**: Vulnerability management files use import/export syntax
+- **Variables**: Prefer `const`/`let`, avoid unused variables
+- **File Size**: Keep controllers/services under 300 lines for readability
+
+### CSS
+- **Linter**: Stylelint with standard config
+- **Architecture**: Component-based with shared utilities
+
+### File Naming
+- **Folders**: kebab-case (e.g., `modules/ticket-tracker`)
+- **Classes**: PascalCase exports
+- **Helpers**: camelCase functions
+
+## Development Workflow
+
+### Docker Development (Recommended)
+```bash
+docker-compose up                 # Starts on localhost:8989
+```
+The Docker setup mounts the entire `/app` directory for hot-reloading and persists the database in `/data`.
+
+### Local Development
+```bash
+npm run dev                       # Uses nodemon for auto-restart
+```
+
+### Before Committing
+1. Run `npm run lint:all` to check all code quality
+2. Run `npm run fix:all` to auto-fix issues
+3. Ensure documentation is current with `npm run docs:generate`
+4. Verify database migrations if schema changes were made
+
+## Key Integration Points
+
+### WebSocket Communication
+- **ProgressTracker**: Utility class for real-time progress updates
+- **Socket.IO**: Configured in `app/config/websocket.js`
+- **Usage**: Import operations and backup processes use progress tracking
+
+### Route-Controller Pattern
+Controllers are initialized in `server.js` and referenced by route modules:
 ```javascript
-// 1. Git context + re-index
-date && git log --oneline -5 && git status
-mcp__claude-context__index_codebase({path: "/Volumes/DATA/GitHub/HexTrackr", force: true})
+// In server.js
+const VulnerabilityController = require("../controllers/vulnerabilityController");
+const vulnerabilityRoutes = require("../routes/vulnerabilities");
 
-// 2. Recent memories
-mcp__memento__search_nodes({query: "project:hextrackr SESSION 2025-09", mode: "semantic"})
-
-// 3. Bundle check if needed
-~/.claude/hooks/list-bundles.sh | head -5
+// Routes use initialized controllers
+app.use("/api/vulnerabilities", vulnerabilityRoutes);
 ```
 
-### Code Discovery Pattern
-```
-Did I just write/modify code?
-├─ YES → Use Read/Grep directly (index is stale)
-└─ NO → Use claude-context__search_code first
-```
-
-### After Code Changes
-1. Read changed files directly
-2. Re-index only after batch of changes complete
-3. Never search for code just written (use Read)
-
-## 🏗️ Key Patterns
-
-### AG-Grid Tables
-- Custom cell renderers for arrays (show 2 + overflow)
-- `tooltipValueGetter` for full data display
-- Theme switching via class toggle: `ag-theme-quartz` ↔ `ag-theme-quartz-dark`
-
-### Security & Testing
-- **PathValidator** for all file operations
-- **Docker only** for testing (port 8989)
-- **Lint before commit**: `npm run eslint && npm run stylelint`
-
-### Critical Paths
-- Controllers: `/app/controllers/` (singleton pattern)
-- Services: `/app/services/` (functional exports)
-- Frontend: `/app/public/scripts/pages/` (ES6 modules)
-- Styles: `/app/public/styles/` (modular CSS)
-
-## 📜 Constitution & Rules
-
-**LAW OF THE LAND**: `.specify/memory/constitution.md` contains mandatory operating principles
-- Claude Context is PRIMARY discovery tool (not file reads)
-- All code MUST pass linting (ESLint 9+, Stylelint)
-- Docker for ALL testing (never run locally)
-- Document AFTER feature completion
-
-**Spec-Kit** (EXPERIMENTAL): Use `/specify` → `/plan` → `/tasks` when helpful, not mandatory
-
-## 🚀 Quick Commands
-
-### Development
-```bash
-docker-compose up -d         # Start (port 8989)
-docker-compose restart       # Before Playwright tests
-npm run eslint:fix          # Fix JS issues
-npm run stylelint:fix       # Fix CSS issues
+### Service Dependencies
+Services often depend on DatabaseService and may use ProgressTracker:
+```javascript
+const DatabaseService = require("./databaseService");
+// Services handle business logic, controllers handle HTTP concerns
 ```
 
-### Documentation
-```bash
-npm run docs:generate       # Update HTML portal
-npm run docs:pipeline       # JSDoc → Markdown
-```
+## Testing
 
-### Testing
-```bash
-npm test                    # All tests
-npx playwright test         # E2E tests
-npm run test:coverage       # Coverage report
-```
+### Optional AI Testing
+- **Stagehand**: Natural language browser automation (`npm run test:stagehand`)
+- **Requirements**: Docker container running on localhost:8080
+- **Use Case**: Tests ticket creation, vulnerability import, settings functionality
+- **Benefits**: Adapts to UI changes automatically, no brittle selectors
 
-### Code Quality (No MCP Required)
-```bash
-# HexTrackr has Codacy CLI built-in at .codacy/cli.sh
-./.codacy/cli.sh analyze --format text       # Text output
-./.codacy/cli.sh analyze --format json       # JSON output
+## Documentation System
 
-# Config file: .codacy/codacy.yaml
-# Excludes tests, vendor libs, minified files
-# Tools: ESLint, Lizard, PMD, Semgrep, Trivy
-```
+### Source and Output Structure
+- **Source**: `app/public/docs-source/` (markdown files)
+- **Output**: `app/public/docs-html/` (generated HTML)
+- **JSDoc**: Extracted to markdown via unified pipeline
+- **Generation**: `npm run docs:generate` converts markdown to HTML
 
-## 🎯 Focus Areas
+### Documentation Commands
+- `docs:generate`: Markdown to HTML conversion
+- `docs:dev`: JSDoc HTML generation
+- `docs:all`: Complete pipeline regeneration
 
-1. **Performance**: AG-Grid handles 10K+ rows, WebSocket for progress
-2. **Architecture**: Modular ES6 frontend, Express + SQLite backend
-3. **Themes**: CSS variable hierarchy for dark/light modes
-4. **Security**: PathValidator, DOMPurify, parameterized queries
+## Environment & Configuration
 
-<!-- MANUAL ADDITIONS END -->
+### Environment Variables
+- Copy `.env.example` to `.env` for local development
+- Docker uses environment variables defined in `docker-compose.yml`
+- **Port**: Defaults to 8080 internally, 8989 externally (Docker)
+
+### Security Considerations
+- Rate limiting configured in `app/config/middleware.js`
+- CORS origins, methods, and headers defined in constants
+- Avoid committing secrets or local database files
+- File upload restrictions via multer configuration
+
+## Common Tasks
+
+### Adding New Features
+1. Create controller in `app/controllers/`
+2. Create service in `app/services/` for business logic
+3. Create route module in `app/routes/`
+4. Update `server.js` to wire controller and routes
+5. Add frontend components in `app/public/scripts/`
+
+### Database Changes
+1. Update schema in `data/schema.sql`
+2. Test with `npm run init-db`
+3. Update relevant services for new table/column access
+4. Document migration steps in PR
+
+### Performance Considerations
+- SQLite database suitable for small to medium deployments
+- WebSocket connections for real-time updates
+- Compression middleware enabled
+- AG-Grid for efficient data table rendering

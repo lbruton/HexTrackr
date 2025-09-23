@@ -24,6 +24,7 @@ const DatabaseService = require("../services/databaseService");
 const VulnerabilityController = require("../controllers/vulnerabilityController");
 const TicketController = require("../controllers/ticketController");
 const BackupController = require("../controllers/backupController");
+const TemplateController = require("../controllers/templateController");
 const ImportController = require("../controllers/importController");
 const DocsController = require("../controllers/docsController");
 
@@ -33,6 +34,8 @@ const ticketRoutes = require("../routes/tickets");
 const importRoutes = require("../routes/imports");
 const backupRoutes = require("../routes/backup");
 const docsRoutes = require("../routes/docs");
+const templateRoutes = require("../routes/templates");
+const kevRoutes = require("../routes/kev");
 
 // Express application & HTTP server
 const app = express();
@@ -90,6 +93,15 @@ async function initializeApplication() {
     VulnerabilityController.initialize(db, progressTracker);
     TicketController.initialize(db);
     BackupController.initialize(db);
+    TemplateController.initialize(db);
+
+    // Seed email templates (v1.0.21 feature)
+    const { seedAllTemplates } = require("../utils/seedEmailTemplates");
+    try {
+        await seedAllTemplates(db);
+    } catch (seedError) {
+        console.error("⚠️ Failed to seed templates:", seedError.message);
+    }
 
     // Apply middleware configuration
     app.use(cors(middlewareConfig.cors));
@@ -111,8 +123,11 @@ async function initializeApplication() {
         try {
             let version = "unknown";
             try {
-                version = require("./package.json").version;
+                // Try to read from the mounted package.json in Docker container (/app/package.json)
+                // Server is at /app/public/server.js, so package.json is at ../package.json
+                version = require("../package.json").version;
             } catch (packageError) {
+                // Fallback to environment variable if package.json not found
                 version = process.env.HEXTRACKR_VERSION || "unknown";
                 console.log(`Using environment version: ${version} (package.json not found: ${packageError.message})`);
             }
@@ -131,6 +146,8 @@ async function initializeApplication() {
     app.use("/api/vulnerabilities", vulnerabilityRoutes);
     app.use("/api", importRoutes); // handles /vulnerabilities/import, /import/tickets, /imports, etc.
     app.use("/api/tickets", ticketRoutes);
+    app.use("/api/templates", templateRoutes);
+    app.use("/api/kev", kevRoutes(db));
 
     // Legacy lightweight endpoints retained from monolith
     app.get("/api/sites", (req, res) => {

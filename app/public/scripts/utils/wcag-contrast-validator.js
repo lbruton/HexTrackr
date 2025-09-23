@@ -33,15 +33,15 @@ export const WCAG_STANDARDS = {
 export function hexToRgb(hex) {
   try {
     // Remove # if present and validate format
-    hex = hex.replace('#', '');
+    hex = hex.replace("#", "");
     
     // Expand 3-digit hex to 6-digit
     if (hex.length === 3) {
-      hex = hex.split('').map(char => char + char).join('');
+      hex = hex.split("").map(char => char + char).join("");
     }
     
     if (hex.length !== 6 || !/^[0-9A-Fa-f]{6}$/.test(hex)) {
-      console.warn('Invalid hex color format:', hex);
+      console.warn("Invalid hex color format:", hex);
       return null;
     }
     
@@ -51,7 +51,7 @@ export function hexToRgb(hex) {
     
     return { r, g, b };
   } catch (error) {
-    console.error('Error converting hex to RGB:', error);
+    console.error("Error converting hex to RGB:", error);
     return null;
   }
 }
@@ -64,8 +64,8 @@ export function hexToRgb(hex) {
  */
 export function calculateLuminance(rgb) {
   try {
-    if (!rgb || typeof rgb.r === 'undefined' || typeof rgb.g === 'undefined' || typeof rgb.b === 'undefined') {
-      throw new Error('Invalid RGB object');
+    if (!rgb || typeof rgb.r === "undefined" || typeof rgb.g === "undefined" || typeof rgb.b === "undefined") {
+      throw new Error("Invalid RGB object");
     }
     
     // Convert RGB values to sRGB (0-1 range)
@@ -89,7 +89,7 @@ export function calculateLuminance(rgb) {
     
     return luminance;
   } catch (error) {
-    console.error('Error calculating luminance:', error);
+    console.error("Error calculating luminance:", error);
     return 0;
   }
 }
@@ -107,7 +107,7 @@ export function calculateContrastRatio(color1, color2) {
     const rgb2 = hexToRgb(color2);
     
     if (!rgb1 || !rgb2) {
-      throw new Error('Invalid color format');
+      throw new Error("Invalid color format");
     }
     
     const luminance1 = calculateLuminance(rgb1);
@@ -121,7 +121,7 @@ export function calculateContrastRatio(color1, color2) {
     
     return Math.round(contrastRatio * 100) / 100; // Round to 2 decimal places
   } catch (error) {
-    console.error('Error calculating contrast ratio:', error);
+    console.error("Error calculating contrast ratio:", error);
     return 1; // Worst possible contrast
   }
 }
@@ -134,19 +134,19 @@ export function calculateContrastRatio(color1, color2) {
  * @param {string} textSize - Text size ('normal' or 'large')
  * @returns {Object} Validation result
  */
-export function validateWCAGCompliance(ratio, level = 'AA', textSize = 'normal') {
+export function validateWCAGCompliance(ratio, level = "AA", textSize = "normal") {
   try {
     const standards = WCAG_STANDARDS[level];
     if (!standards) {
-      throw new Error('Invalid WCAG level');
+      throw new Error("Invalid WCAG level");
     }
     
-    const requiredRatio = textSize === 'large' 
+    const requiredRatio = textSize === "large" 
       ? standards.LARGE_TEXT 
       : standards.NORMAL_TEXT;
     
     const passes = ratio >= requiredRatio;
-    const grade = passes ? 'PASS' : 'FAIL';
+    const grade = passes ? "PASS" : "FAIL";
     
     return {
       passes,
@@ -158,10 +158,10 @@ export function validateWCAGCompliance(ratio, level = 'AA', textSize = 'normal')
       message: `${grade}: ${ratio}:1 (requires ${requiredRatio}:1 for WCAG ${level} ${textSize} text)`
     };
   } catch (error) {
-    console.error('Error validating WCAG compliance:', error);
+    console.error("Error validating WCAG compliance:", error);
     return {
       passes: false,
-      grade: 'ERROR',
+      grade: "ERROR",
       ratio: 0,
       required: 0,
       level,
@@ -181,10 +181,10 @@ export function validateWCAGCompliance(ratio, level = 'AA', textSize = 'normal')
  */
 export function validateColorCombination(foreground, background, options = {}) {
   const {
-    level = 'AA',
+    level = "AA",
     includeAAA = false,
-    textSizes = ['normal', 'large'],
-    label = 'Color combination'
+    textSizes = ["normal", "large"],
+    label = "Color combination"
   } = options;
   
   try {
@@ -208,7 +208,7 @@ export function validateColorCombination(foreground, background, options = {}) {
     if (includeAAA) {
       textSizes.forEach(textSize => {
         const key = `AAA_${textSize}`;
-        results.validations[key] = validateWCAGCompliance(ratio, 'AAA', textSize);
+        results.validations[key] = validateWCAGCompliance(ratio, "AAA", textSize);
       });
     }
     
@@ -218,7 +218,7 @@ export function validateColorCombination(foreground, background, options = {}) {
     
     return results;
   } catch (error) {
-    console.error('Error validating color combination:', error);
+    console.error("Error validating color combination:", error);
     return {
       foreground,
       background,
@@ -242,7 +242,7 @@ export function batchValidateColors(combinations, options = {}) {
   try {
     return combinations.map(combo => {
       if (!combo.fg || !combo.bg) {
-        console.warn('Invalid color combination:', combo);
+        console.warn("Invalid color combination:", combo);
         return null;
       }
       
@@ -252,7 +252,7 @@ export function batchValidateColors(combinations, options = {}) {
       });
     }).filter(result => result !== null);
   } catch (error) {
-    console.error('Error in batch validation:', error);
+    console.error("Error in batch validation:", error);
     return [];
   }
 }
@@ -264,7 +264,7 @@ export function batchValidateColors(combinations, options = {}) {
  * @param {string} level - WCAG level to validate against
  * @returns {Object} Accessibility report
  */
-export function generateAccessibilityReport(themeColors, level = 'AA') {
+export function generateAccessibilityReport(themeColors, level = "AA") {
   try {
     const report = {
       level: level,
@@ -282,15 +282,15 @@ export function generateAccessibilityReport(themeColors, level = 'AA') {
     
     // Common text/background combinations to test
     const testCombinations = [
-      { fg: themeColors['--bs-body-color'], bg: themeColors['--bs-body-bg'], label: 'Body text' },
-      { fg: themeColors['--bs-emphasis-color'], bg: themeColors['--bs-body-bg'], label: 'Emphasis text' },
-      { fg: themeColors['--bs-secondary-color'], bg: themeColors['--bs-body-bg'], label: 'Secondary text' },
-      { fg: themeColors['--bs-tertiary-color'], bg: themeColors['--bs-body-bg'], label: 'Tertiary text' },
-      { fg: '#ffffff', bg: themeColors['--vpr-critical'], label: 'Critical VPR badge' },
-      { fg: '#ffffff', bg: themeColors['--vpr-high'], label: 'High VPR badge' },
-      { fg: themeColors['--bs-body-color'], bg: themeColors['--vpr-medium'], label: 'Medium VPR badge' },
-      { fg: '#ffffff', bg: themeColors['--vpr-low'], label: 'Low VPR badge' },
-      { fg: '#ffffff', bg: themeColors['--vpr-info'], label: 'Info VPR badge' }
+      { fg: themeColors["--bs-body-color"], bg: themeColors["--bs-body-bg"], label: "Body text" },
+      { fg: themeColors["--bs-emphasis-color"], bg: themeColors["--bs-body-bg"], label: "Emphasis text" },
+      { fg: themeColors["--bs-secondary-color"], bg: themeColors["--bs-body-bg"], label: "Secondary text" },
+      { fg: themeColors["--bs-tertiary-color"], bg: themeColors["--bs-body-bg"], label: "Tertiary text" },
+      { fg: "#ffffff", bg: themeColors["--vpr-critical"], label: "Critical VPR badge" },
+      { fg: "#ffffff", bg: themeColors["--vpr-high"], label: "High VPR badge" },
+      { fg: themeColors["--bs-body-color"], bg: themeColors["--vpr-medium"], label: "Medium VPR badge" },
+      { fg: "#ffffff", bg: themeColors["--vpr-low"], label: "Low VPR badge" },
+      { fg: "#ffffff", bg: themeColors["--vpr-info"], label: "Info VPR badge" }
     ].filter(combo => combo.fg && combo.bg);
     
     // Validate all combinations
@@ -316,7 +316,7 @@ export function generateAccessibilityReport(themeColors, level = 'AA') {
     
     return report;
   } catch (error) {
-    console.error('Error generating accessibility report:', error);
+    console.error("Error generating accessibility report:", error);
     return {
       level,
       timestamp: new Date().toISOString(),
@@ -349,7 +349,7 @@ export function suggestImprovedColors(foreground, background, targetRatio = 4.5)
       return {
         current: { foreground, background, ratio: currentRatio },
         suggestions: [],
-        message: 'Current colors already meet target ratio'
+        message: "Current colors already meet target ratio"
       };
     }
     
@@ -357,16 +357,16 @@ export function suggestImprovedColors(foreground, background, targetRatio = 4.5)
       current: { foreground, background, ratio: currentRatio },
       suggestions: [
         {
-          type: 'manual_adjustment',
+          type: "manual_adjustment",
           message: `Current ratio ${currentRatio}:1 needs improvement to ${targetRatio}:1`,
-          recommendation: 'Manually adjust color lightness to meet target ratio'
+          recommendation: "Manually adjust color lightness to meet target ratio"
         }
       ],
-      message: 'Automatic color adjustment requires HSL implementation'
+      message: "Automatic color adjustment requires HSL implementation"
     };
     
   } catch (error) {
-    console.error('Error suggesting improved colors:', error);
+    console.error("Error suggesting improved colors:", error);
     return {
       current: { foreground, background, ratio: 0 },
       suggestions: [],
