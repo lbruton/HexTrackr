@@ -374,7 +374,7 @@
                 minWidth: 100,
                 maxWidth: 140,
                 cellClass: "ticket-status-cell",
-                filter: "agSetColumnFilter",
+                filter: "agTextColumnFilter",
                 cellRenderer: (params) => {
                     const statusValue = params.value || "Pending";
                     const slug = statusValue.toLowerCase().replace(/\s+/g, "-");
@@ -553,7 +553,7 @@
             pagination: true,
             paginationPageSize: manager.rowsPerPage || 10,
             paginationPageSizeSelector: [10, 25, 50, 100, 200],
-            suppressPaginationPanel: true, // Hide AG-Grid pagination - using card controls instead
+            // Show AG-Grid's built-in pagination controls
             animateRows: true,
             rowHeight: 42,
             domLayout: "autoHeight",
@@ -600,6 +600,14 @@
     const originalGoToPage = HexagonTicketsManager.prototype.goToPage;
     const originalSortTable = HexagonTicketsManager.prototype.sortTable;
 
+    /**
+     * Initialize AG Grid integration for the tickets display.
+     * Creates the AG Grid instance and sets up theme management.
+     * Only initializes once to prevent duplicate grids.
+     *
+     * @this {HexagonTicketsManager}
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.initializeAgGrid = function initializeAgGrid() {
         if (this.agGridInitialized) {
             return;
@@ -660,6 +668,13 @@
         }
     };
 
+    /**
+     * Automatically resize grid columns to fit the available space.
+     * Uses requestAnimationFrame for smooth resizing and error handling.
+     *
+     * @this {HexagonTicketsManager}
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.sizeTicketsGridColumns = function sizeTicketsGridColumns() {
         if (!this.gridApi) {
             return;
@@ -676,6 +691,14 @@
         });
     };
 
+    /**
+     * Show or hide the empty state message based on whether tickets are available.
+     * Manages ARIA attributes for accessibility compliance.
+     *
+     * @this {HexagonTicketsManager}
+     * @param {boolean} hasRows - True if tickets are present, false if empty
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.toggleTicketsEmptyState = function toggleTicketsEmptyState(hasRows) {
         const emptyState = document.getElementById("ticketsGridEmptyState");
         if (!emptyState) {
@@ -693,94 +716,37 @@
         }
     };
 
+    /**
+     * Update pagination information and synchronize with AG Grid state.
+     * Calculates current page, page size, and total pages from grid state.
+     *
+     * @this {HexagonTicketsManager}
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.updatePaginationDisplay = function updatePaginationDisplay() {
-        const info = document.getElementById("paginationInfo");
-        if (!info) {
-            return;
-        }
-
-        if (!this.gridApi || !this.filteredTicketsCount) {
-            info.textContent = "Showing 0 to 0 of 0 entries";
-            if (this.gridApi) {
-                this.renderPaginationControls(0);
-            }
+        if (!this.gridApi) {
+            this.currentPage = 1;
             return;
         }
 
         const fallbackPageSize = this.rowsPerPage || 25;
         const pageSize = getPaginationPageSize(this.gridApi, fallbackPageSize);
         const currentPageIndex = Math.max(getCurrentPaginationPage(this.gridApi), 0);
-        const totalRows = this.filteredTicketsCount;
-        const start = currentPageIndex * pageSize + 1;
-        const end = Math.min((currentPageIndex + 1) * pageSize, totalRows);
+        const totalRows = this.filteredTicketsCount || 0;
+        const totalPages = pageSize > 0 ? Math.ceil(totalRows / pageSize) : 0;
 
-        info.textContent = `Showing ${start} to ${end} of ${totalRows} entries`;
-        this.currentPage = currentPageIndex + 1;
-
-        const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
-        this.renderPaginationControls(totalPages);
+        this.rowsPerPage = pageSize;
+        this.currentPage = totalPages === 0 ? 1 : currentPageIndex + 1;
     };
 
-    HexagonTicketsManager.prototype.renderPaginationControls = function renderPaginationControls(totalPages) {
-        const container = document.getElementById("paginationControls");
-        if (!container) {
-            return;
-        }
-
-        if (!this.gridApi || totalPages <= 1) {
-            container.innerHTML = "";
-            return;
-        }
-
-        const currentPageIndex = getCurrentPaginationPage(this.gridApi);
-        const lastPageIndex = totalPages - 1;
-        const maxVisible = 5;
-        let startPageIndex = Math.max(0, currentPageIndex - Math.floor(maxVisible / 2));
-        const endPageIndex = Math.min(startPageIndex + maxVisible - 1, lastPageIndex);
-        startPageIndex = Math.max(0, endPageIndex - maxVisible + 1);
-
-        let html = "";
-        html += `<li class="page-item ${currentPageIndex === 0 ? "disabled" : ""}">` +
-            "<a class=\"page-link\" href=\"#\" data-nav=\"prev\"><i class=\"fas fa-chevron-left\"></i></a></li>";
-
-        for (let page = startPageIndex; page <= endPageIndex; page += 1) {
-            const isActive = page === currentPageIndex;
-            html += `<li class="page-item ${isActive ? "active" : ""}"><a class="page-link" href="#" data-page="${page + 1}">${page + 1}</a></li>`;
-        }
-
-        html += `<li class="page-item ${currentPageIndex >= lastPageIndex ? "disabled" : ""}">` +
-            "<a class=\"page-link\" href=\"#\" data-nav=\"next\"><i class=\"fas fa-chevron-right\"></i></a></li>";
-
-        container.innerHTML = html;
-
-        container.querySelectorAll("a[data-page]").forEach((link) => {
-            link.addEventListener("click", (event) => {
-                event.preventDefault();
-                const target = Number(link.getAttribute("data-page"));
-                if (!Number.isNaN(target)) {
-                    this.goToPage(target);
-                }
-            });
-        });
-
-        container.querySelectorAll("a[data-nav]").forEach((link) => {
-            link.addEventListener("click", (event) => {
-                event.preventDefault();
-                const parent = link.closest(".page-item");
-                if (parent && parent.classList.contains("disabled")) {
-                    return;
-                }
-
-                const direction = link.getAttribute("data-nav");
-                if (direction === "prev") {
-                    this.goToPage(currentPageIndex);
-                } else if (direction === "next") {
-                    this.goToPage(currentPageIndex + 2);
-                }
-            });
-        });
-    };
-
+    /**
+     * Navigate to a specific page in the AG Grid pagination.
+     * Falls back to original implementation if AG Grid is not available.
+     *
+     * @this {HexagonTicketsManager}
+     * @param {number} pageNumber - 1-based page number to navigate to
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.goToPage = function goToPage(pageNumber) {
         if (this.gridApi) {
             const targetIndex = Math.max(0, pageNumber - 1);
@@ -795,6 +761,14 @@
         }
     };
 
+    /**
+     * Render tickets using AG Grid integration.
+     * Initializes AG Grid if needed and updates the grid with filtered ticket data.
+     * Falls back to original rendering if AG Grid initialization fails.
+     *
+     * @this {HexagonTicketsManager}
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.renderTickets = function renderTickets() {
         this.initializeAgGrid();
 
@@ -835,10 +809,25 @@
         this.updatePaginationDisplay();
     };
 
+    /**
+     * Update pagination information display.
+     * Alias for updatePaginationDisplay for backward compatibility.
+     *
+     * @this {HexagonTicketsManager}
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.updatePaginationInfo = function updatePaginationInfo() {
         this.updatePaginationDisplay();
     };
 
+    /**
+     * Apply sorting to the tickets grid with AG Grid integration.
+     * Synchronizes sorting between legacy implementation and AG Grid column state.
+     *
+     * @this {HexagonTicketsManager}
+     * @param {string} column - Column identifier to sort by
+     * @returns {void}
+     */
     HexagonTicketsManager.prototype.sortTable = function sortTable(column) {
         if (typeof originalSortTable === "function") {
             originalSortTable.call(this, column);

@@ -91,8 +91,6 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             minWidth: 70,
             maxWidth: 120,
             resizable: true,
-            aggFunc: "sum",
-            enableValue: true,
             cellRenderer: (params) => {
                 const score = parseFloat(params.value) || 0;
                 let className = "severity-low";
@@ -104,6 +102,26 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
                     className = "severity-medium";
                 }
                 return `<span class="severity-badge ${className}">${score.toFixed(1)}</span>`;
+            }
+        },
+        {
+            headerName: "KEV",
+            field: "isKev",
+            sortable: true,
+            filter: true,
+            width: 70,
+            minWidth: 60,
+            maxWidth: 90,
+            resizable: true,
+            cellRenderer: (params) => {
+                const kevStatus = params.value || "No";
+                if (kevStatus === "Yes") {
+                    return "<span class=\"badge bg-danger\" style=\"cursor: pointer;\" title=\"Known Exploited Vulnerability\" onclick=\"showKevDetails('" + (params.data.cve || "") + "')\">YES</span>";
+                }
+                return "<span class=\"badge bg-primary\">NO</span>";
+            },
+            cellStyle: {
+                textAlign: "center"
             }
         },
         {
@@ -159,31 +177,40 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             cellRenderer: (params) => {
                 const cve = params.value;
                 const pluginName = params.data.plugin_name;
-                
-                // Simple single CVE handling (records are now split during import)
+
+                // Simple single CVE handling - open external CVE link in popup
                 if (cve && cve.startsWith("CVE-")) {
-                    return `<a href="#" class="link-primary" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${cve}'); return false;">${cve}</a>`;
+                    const cveUrl = `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}`;
+                    return `<a href="#" class="link-primary"
+                               onclick="window.open('${cveUrl}', 'cve_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
+                               title="View CVE details on MITRE">${cve}</a>`;
                 }
-                
-                // Check for Cisco SA ID
+
+                // Check for Cisco SA ID - open external Cisco Security Advisory in popup
                 if (cve && cve.startsWith("cisco-sa-")) {
-                    return `<a href="#" class="link-primary text-warning" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${cve}'); return false;">${cve}</a>`;
+                    const ciscoUrl = `https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/${cve}`;
+                    return `<a href="#" class="link-primary text-warning"
+                               onclick="window.open('${ciscoUrl}', 'cisco_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
+                               title="View Cisco Security Advisory">${cve}</a>`;
                 }
-                
-                // Check for Cisco SA ID in plugin name (fallback)
+
+                // Check for Cisco SA ID in plugin name (fallback) - open external link in popup
                 if (pluginName && typeof pluginName === "string") {
                     const ciscoSaMatch = pluginName.match(/cisco-sa-([a-zA-Z0-9-]+)/i);
                     if (ciscoSaMatch) {
                         const ciscoId = `cisco-sa-${ciscoSaMatch[1]}`;
-                        return `<a href="#" class="link-primary text-warning" onclick="event.preventDefault(); event.stopPropagation(); vulnManager.showVulnerabilityDetailsByCVE('${ciscoId}'); return false;">${ciscoId}</a>`;
+                        const ciscoUrl = `https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/${ciscoId}`;
+                        return `<a href="#" class="link-primary text-warning"
+                                   onclick="window.open('${ciscoUrl}', 'cisco_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
+                                   title="View Cisco Security Advisory">${ciscoId}</a>`;
                     }
                 }
-                
+
                 // Fall back to Plugin ID
                 if (params.data.plugin_id) {
                     return `<span class="text-muted">Plugin ${params.data.plugin_id}</span>`;
                 }
-                
+
                 return "-";
             }
         },
@@ -293,10 +320,10 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
         rowHeight: 42,
         suppressRowTransform: false,
         
-        // Enhanced features for requirements
-        enableRangeSelection: true,
-        enableRangeHandle: true,
-        enableFillHandle: true,
+        // Enhanced features for requirements (Community edition only)
+        // enableRangeSelection: true, // Enterprise feature - removed
+        // enableRangeHandle: true, // Enterprise feature - removed
+        // enableFillHandle: true, // Enterprise feature - removed
         
         // Column sizing enhancements
         maintainColumnOrder: true,

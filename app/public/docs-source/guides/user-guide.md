@@ -6,6 +6,7 @@
 
 - [Ticket Management](#ticket-management)
 - [Vulnerability Management](#vulnerability-management)
+  - [KEV (Known Exploited Vulnerabilities) Integration](#kev-known-exploited-vulnerabilities-integration)
 - [Import & Export](#import--export)
 - [Settings & Preferences](#settings--preferences)
 
@@ -86,6 +87,67 @@ If ServiceNow integration is configured in the settings, all ServiceNow ticket n
 ## Vulnerability Management
 
 The Vulnerability Management dashboard (`vulnerabilities.html`) is a powerful tool for analyzing, tracking, and managing security vulnerabilities across your assets.
+
+### KEV (Known Exploited Vulnerabilities) Integration
+
+HexTrackr v1.0.22 introduces comprehensive integration with CISA's Known Exploited Vulnerabilities (KEV) catalog, providing critical threat intelligence to help prioritize vulnerabilities that are actively being exploited in the wild.
+
+#### Understanding KEV Indicators
+
+KEV vulnerabilities are marked throughout the interface with clear visual indicators:
+
+- **KEV Column**: In the vulnerability table, a dedicated KEV column shows YES/NO badges
+  - **Red "YES" badge**: Vulnerability is in CISA's KEV catalog (high priority)
+  - **Blue "NO" badge**: Vulnerability is not in KEV catalog (standard priority)
+- **Filterable**: Use the KEV column filter to quickly view only exploited vulnerabilities
+- **Clickable**: Click any KEV badge to open detailed vulnerability information
+
+#### KEV Modal and Details
+
+When you click on a KEV badge or vulnerability with KEV status, you'll see:
+
+- **KEV Information Panel**: Shows if the vulnerability is in the CISA catalog
+- **NIST NVD Integration**: Direct links to authoritative CVE information
+- **CVE Details Navigation**: Seamless transition to full vulnerability details
+- **Additional Notes**: Any special guidance or context from CISA
+- **Clickable External Links**: All HTTPS links in KEV notes open in popup windows
+
+#### Filtering and Searching KEV Vulnerabilities
+
+Several ways to focus on exploited vulnerabilities:
+
+1. **KEV Column Filter**: Click the filter icon in the KEV column header
+2. **Severity Dropdown**: Select "KEV" from the main filter dropdown
+3. **Combined Filtering**: Use KEV filter with severity, VPR, or other criteria
+4. **Search Integration**: KEV status is included in all vulnerability searches
+
+#### Automatic KEV Synchronization
+
+HexTrackr automatically maintains current KEV data:
+
+- **Daily Sync**: CISA KEV catalog is automatically synchronized every 24 hours
+- **Background Process**: Updates happen transparently without interrupting workflow
+- **No Authentication Required**: CISA provides public access to KEV data
+- **Settings Control**: Configure sync schedule and display options in Settings modal
+
+#### Using KEV for Prioritization
+
+KEV integration helps security teams focus on the most critical threats:
+
+- **Immediate Attention**: KEV vulnerabilities require urgent remediation
+- **Regulatory Compliance**: Many frameworks require KEV tracking
+- **Risk Assessment**: Combine KEV status with VPR scores for comprehensive prioritization
+- **Threat Intelligence**: Real-world exploitation data from CISA
+
+#### KEV Settings and Configuration
+
+Access KEV settings through the main Settings modal:
+
+- **Enable/Disable Sync**: Control automatic KEV updates
+- **Sync Schedule**: Configure update frequency (default: daily)
+- **Display Options**: Customize KEV indicators and badges
+- **Manual Sync**: Force immediate update from CISA catalog
+- **Sync Status**: View last update time and success/failure status
 
 ---
 
@@ -411,10 +473,13 @@ Click **View Device Details** to see a list of all vulnerabilities affecting tha
 
 This view groups all findings by vulnerability identifier (CVE, Cisco SA, or plugin ID). Each card represents a unique vulnerability and shows:
 
-- The number of devices affected by it.
-- The total VPR score it contributes across all devices.
-- A breakdown of the severity of the findings.
-- **Enhanced Display**: Vulnerability identifiers are now shown in a dedicated "Vulnerability" column with appropriate linking:
+- The number of devices affected by it (v1.0.24+ with enhanced display)
+- The total VPR score it contributes across all devices
+- The severity level prominently displayed alongside the vulnerability identifier
+- **Streamlined Card Layout (v1.0.24+)**: Removed redundant VPR mini-cards to focus on key information
+- **Enhanced Device Display**: Larger, more prominent device count with improved visual hierarchy
+- **KEV Indicator**: Red KEV badge in the top-right corner for Known Exploited Vulnerabilities
+- **Enhanced Display**: Vulnerability identifiers are now shown with appropriate linking:
   - **CVE identifiers** link to the MITRE CVE database
   - **Cisco SA identifiers** link to Cisco's security advisory portal
   - **Plugin IDs** are styled for easy identification when CVE/SA data is unavailable

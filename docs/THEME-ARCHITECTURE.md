@@ -1,14 +1,17 @@
 # HexTrackr Theme Architecture
 
 ## Overview
+
 HexTrackr implements a centralized, multi-layer theme system that ensures consistent styling across all UI components, with special focus on AG-Grid tables and Chart.js visualizations.
 
 ## Core Components
 
 ### 1. CSS Variables Layer (`/app/public/styles/css-variables.css`)
+
 - **Purpose**: Define all theme colors as CSS custom properties
 - **Scope**: Application-wide color definitions
 - **Key Variables**:
+
   ```css
   --hextrackr-bg-primary: #0F1C31 (dark mode)
   --hextrackr-header-bg: #202c3f (dark mode)
@@ -17,6 +20,7 @@ HexTrackr implements a centralized, multi-layer theme system that ensures consis
   ```
 
 ### 2. Theme Configuration (`/app/public/scripts/shared/theme-config.js`)
+
 - **Purpose**: JavaScript-based theme configuration for AG-Grid
 - **Pattern**: Centralized configuration object
 - **Key Features**:
@@ -25,11 +29,13 @@ HexTrackr implements a centralized, multi-layer theme system that ensures consis
   - Consistent with CSS variables
 
 ### 3. AG-Grid Overrides (`/app/public/styles/ag-grid-overrides.css`)
+
 - **Purpose**: Force exact colors with !important directives
 - **Reason**: Override AG-Grid's internal color-mix() functions
 - **Critical Fix**: Ensures #202c3f header color in dark mode
 
 ### 4. AGGridThemeManager (`/app/public/scripts/shared/ag-grid-theme-manager.js`)
+
 - **Purpose**: Dynamic theme switching for all AG-Grid instances
 - **Pattern**: Singleton manager
 - **Key Methods**:
@@ -60,6 +66,7 @@ HexTrackr implements a centralized, multi-layer theme system that ensures consis
 ## Color Specifications
 
 ### Dark Mode (Navy Theme)
+
 | Component | Color | Usage |
 |-----------|-------|-------|
 | Background | #0F1C31 | Main application background |
@@ -70,6 +77,7 @@ HexTrackr implements a centralized, multi-layer theme system that ensures consis
 | Selection | #2563eb | Selected rows |
 
 ### Light Mode
+
 | Component | Color | Usage |
 |-----------|-------|-------|
 | Background | #FFFFFF | Main application background |
@@ -82,14 +90,17 @@ HexTrackr implements a centralized, multi-layer theme system that ensures consis
 ## Known Issues & Solutions
 
 ### Issue 1: AG-Grid Color Mixing
+
 **Problem**: AG-Grid applies `color-mix(in srgb, #ffffff, #182230 93%)` internally
 **Solution**: Use CSS !important overrides in ag-grid-overrides.css
 
 ### Issue 2: Link Visibility in Dark Mode
+
 **Problem**: Links using `text-dark` class become invisible
 **Solution**: Use theme-aware classes (`ag-grid-link`) with CSS variables
 
 ### Issue 3: Theme Not Applied to New Pages
+
 **Problem**: New pages missing theme files
 **Solution**: Include all three CSS files and AGGridThemeManager script
 
@@ -98,17 +109,20 @@ HexTrackr implements a centralized, multi-layer theme system that ensures consis
 For any new page with AG-Grid:
 
 1. **Include CSS Files**:
+
    ```html
    <link rel="stylesheet" href="styles/css-variables.css">
    <link rel="stylesheet" href="styles/ag-grid-overrides.css">
    ```
 
 2. **Include Theme Manager**:
+
    ```html
    <script src="scripts/shared/ag-grid-theme-manager.js"></script>
    ```
 
 3. **Register Grid**:
+
    ```javascript
    if (window.agGridThemeManager) {
        window.agGridThemeManager.registerGrid(gridId, gridApi, gridDiv);
@@ -116,6 +130,7 @@ For any new page with AG-Grid:
    ```
 
 4. **Use Theme-Aware Classes**:
+
    ```javascript
    // In cell renderers
    return `<a href="#" class="ag-grid-link">${value}</a>`;
@@ -125,17 +140,20 @@ For any new page with AG-Grid:
 ## Files in Theme System
 
 ### Core Theme Files
+
 - `/app/public/styles/css-variables.css` - CSS custom properties
 - `/app/public/styles/ag-grid-overrides.css` - AG-Grid color overrides
 - `/app/public/scripts/shared/theme-config.js` - JavaScript theme configuration
 - `/app/public/scripts/shared/ag-grid-theme-manager.js` - Theme manager singleton
 
 ### Pages Using Theme System
+
 - `/app/public/vulnerabilities.html` - Main vulnerability dashboard
 - `/app/public/tickets2.html` - Tickets management (AG-Grid version)
 - Various modal components (device-security, vulnerability-details)
 
 ### Grid Implementations
+
 - `/app/public/scripts/shared/vulnerability-grid.js` - Uses AGGridThemeManager
 - `/app/public/scripts/pages/tickets-aggrid.js` - Custom adapter with AGGridThemeManager
 - `/app/public/scripts/shared/ag-grid-responsive-config.js` - Factory with theme support
@@ -172,5 +190,6 @@ For any new page with AG-Grid:
 - **v1.0.0**: Initial theme system with CSS variables
 
 ## Related Specifications
+
 - `005-dark-mode-theme-system` - Dark mode implementation spec
 - `004-tickets-table-prototype` - AG-Grid integration patterns

@@ -237,6 +237,73 @@ Database migrations are handled automatically by the application through runtime
 
 ---
 
+## KEV Integration Tables (v1.0.22)
+
+The CISA Known Exploited Vulnerabilities (KEV) integration introduces dedicated tables for tracking exploited vulnerabilities.
+
+### kev_status
+
+Stores Known Exploited Vulnerabilities metadata from CISA's KEV catalog.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| cve_id | TEXT | Primary key, matches CVE ID from vulnerabilities table |
+| date_added | DATE | When CISA added vulnerability to KEV catalog |
+| vulnerability_name | TEXT | CISA's descriptive vulnerability name |
+| vendor_project | TEXT | Affected vendor or project |
+| product | TEXT | Specific product affected |
+| required_action | TEXT | CISA recommended remediation action |
+| due_date | DATE | Federal agency remediation deadline |
+| known_ransomware_use | BOOLEAN | Indicates use in ransomware campaigns |
+| notes | TEXT | Additional CISA context and guidance |
+| short_description | TEXT | Brief vulnerability description |
+| catalog_version | TEXT | CISA catalog version when added |
+| cisa_date_released | TIMESTAMP | When CISA released this catalog version |
+| created_at | TIMESTAMP | Record creation timestamp |
+| updated_at | TIMESTAMP | Last update timestamp |
+
+**Foreign Key**: `cve_id` references `vulnerabilities(cve_id)` with CASCADE delete
+
+### kev_sync_log
+
+Tracks KEV synchronization operations and status.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER | Primary key |
+| sync_started_at | TIMESTAMP | When synchronization began |
+| sync_completed_at | TIMESTAMP | When synchronization finished |
+| status | TEXT | Sync status (success, error, in_progress) |
+| total_kevs | INTEGER | Total KEV records processed |
+| matched_count | INTEGER | Vulnerabilities matched with KEV status |
+| error_message | TEXT | Error details if sync failed |
+| catalog_version | TEXT | CISA catalog version synchronized |
+
+### Enhanced Vulnerability Table
+
+The main `vulnerabilities` table now includes KEV integration:
+
+**New Column:**
+- `isKev` TEXT - KEV status ('Yes'/'No') for filtering and display
+
+**Performance Indexes:**
+- `idx_vulnerabilities_kev` ON `vulnerabilities(isKev)`
+- `idx_kev_status_cve` ON `kev_status(cve_id)`
+- `idx_kev_sync_log_status` ON `kev_sync_log(status)`
+
+### KEV Data Flow
+
+```mermaid
+graph TD
+    A[CISA KEV API] -->|Daily Sync| B[kev_sync_log]
+    A -->|Catalog Data| C[kev_status]
+    C -->|CVE Matching| D[vulnerabilities.isKev]
+    D -->|Display| E[UI Components]
+    B -->|Status| F[Settings Modal]
+```
+
+---
+
 ## Data Integrity & Future Enhancements
 
 | Area | Current | Planned |

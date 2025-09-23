@@ -174,22 +174,89 @@
 }
 
 /* ===========================
+   Modal Risk & Info Cards
+   =========================== */
+
+/* Risk summary cards for vulnerability/device modals */
+.modal-body .card.bg-red-lt,
+.modal-body .card[class*="bg-red"] {
+    background-color: var(--hextrackr-risk-critical-bg) !important;
+    border-color: var(--hextrackr-risk-critical-border) !important;
+    color: var(--hextrackr-risk-critical-text) !important;
+}
+
+.modal-body .card.bg-orange-lt,
+.modal-body .card[class*="bg-orange"] {
+    background-color: var(--hextrackr-risk-high-bg) !important;
+    border-color: var(--hextrackr-risk-high-border) !important;
+    color: var(--hextrackr-risk-high-text) !important;
+}
+
+.modal-body .card.bg-yellow-lt,
+.modal-body .card[class*="bg-yellow"] {
+    background-color: var(--hextrackr-risk-medium-bg) !important;
+    border-color: var(--hextrackr-risk-medium-border) !important;
+    color: var(--hextrackr-risk-medium-text) !important;
+}
+
+.modal-body .card.bg-green-lt,
+.modal-body .card[class*="bg-green"] {
+    background-color: var(--hextrackr-risk-low-bg) !important;
+    border-color: var(--hextrackr-risk-low-border) !important;
+    color: var(--hextrackr-risk-low-text) !important;
+}
+
+.modal-body .card.bg-blue-lt,
+.modal-body .card[class*="bg-blue"] {
+    background-color: var(--hextrackr-info-card-bg) !important;
+    border-color: var(--hextrackr-info-card-border) !important;
+    color: var(--hextrackr-info-card-text) !important;
+}
+
+/* Text color overrides for modal cards */
+.modal-body .card .text-red {
+    color: var(--hextrackr-risk-critical-text) !important;
+}
+
+.modal-body .card .text-orange {
+    color: var(--hextrackr-risk-high-text) !important;
+}
+
+.modal-body .card .text-yellow {
+    color: var(--hextrackr-risk-medium-text) !important;
+}
+
+.modal-body .card .text-green {
+    color: var(--hextrackr-risk-low-text) !important;
+}
+
+.modal-body .card .text-blue {
+    color: var(--hextrackr-info-card-text) !important;
+}
+
+/* Ensure card text inherits the theme-aware colors */
+.modal-body .card .fw-bold,
+.modal-body .card .h3 {
+    color: inherit !important;
+}
+
+/* ===========================
    Modal Dark Mode
    =========================== */
 
 [data-bs-theme="dark"] .modal-content {
-    background: var(--tblr-bg-surface);
-    color: var(--tblr-body-color);
+    background: var(--hextrackr-modal-bg);
+    color: var(--hextrackr-text);
 }
 
 [data-bs-theme="dark"] .modal-header {
-    background: linear-gradient(135deg, var(--tblr-bg-surface) 0%, var(--tblr-bg-surface-secondary) 100%);
-    border-bottom-color: var(--tblr-border-color-dark);
+    background: var(--hextrackr-modal-header-bg);
+    border-bottom-color: var(--hextrackr-border);
 }
 
 [data-bs-theme="dark"] .modal-footer {
-    background: var(--tblr-bg-surface-secondary);
-    border-top-color: var(--tblr-border-color-dark);
+    background: var(--hextrackr-modal-footer-bg);
+    border-top-color: var(--hextrackr-border);
 }
 
 /* ===========================

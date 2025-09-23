@@ -1,6 +1,6 @@
 {
   "name": "hextrackr-server",
-  "version": "1.0.16",
+  "version": "1.0.22",
   "description": "HexTrackr with database backend",
   "main": "app/public/server.js",
   "type": "commonjs",
@@ -8,28 +8,20 @@
     "start": "node app/public/server.js",
     "dev": "nodemon app/public/server.js",
     "init-db": "node app/public/scripts/init-database.js",
-    "roadmap": "node scripts/generate-roadmap-portal.js",
     "hooks:install": "git config core.hooksPath .githooks",
     "eslint": "eslint '**/*.js' --ignore-pattern '**/*.min.js' --config eslint.config.mjs",
     "eslint:fix": "eslint '**/*.js' --ignore-pattern '**/*.min.js' --config eslint.config.mjs --fix",
     "stylelint": "stylelint '**/*.css'",
     "stylelint:fix": "stylelint '**/*.css' --fix",
     "docs:generate": "node app/public/docs-html/html-content-updater.js",
-    "docs:analyze": "node app/public/scripts/generate-architecture-analysis.js && node app/public/docs-html/html-content-updater.js",
-    "docs:dev": "jsdoc -c jsdoc.dev.json && node app/scripts/inject-jsdoc-theme.js",
+    "docs:dev": "jsdoc -c jsdoc.dev.json && bash app/scripts/inject-jsdoc-theme-wrapper.sh",
     "docs:dev:watch": "nodemon --watch app --ext js --exec 'npm run docs:dev'",
     "docs:all": "npm run docs:dev && npm run docs:generate",
     "lint:md": "markdownlint --config .markdownlint.json --ignore-path .markdownlintignore '**/*.md'",
     "lint:md:fix": "node app/public/scripts/fix-markdown.js",
     "lint:all": "npm run lint:md && npm run eslint && npm run stylelint",
     "fix:all": "npm run lint:md:fix && npm run eslint:fix && npm run stylelint:fix",
-    "docs:review": "node app/public/scripts/gemini-docs-generator.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:unit": "jest tests/unit",
-    "test:integration": "jest tests/integration",
-    "test:contract": "jest tests/contract"
+    "test:stagehand": "node tests/stagehand-examples.js"
   },
   "dependencies": {
     "chart.js": "^4.4.0",
@@ -51,22 +43,16 @@
     "uuid": "^12.0.0"
   },
   "devDependencies": {
-    "@jest/globals": "^30.1.2",
-    "@playwright/test": "^1.55.0",
+    "@browserbasehq/stagehand": "^1.12.1",
     "@stylistic/eslint-plugin": "^5.2.3",
     "eslint": "^9.34.0",
     "eslint-formatter-compact": "^8.40.0",
-    "jest": "^30.1.3",
-    "jest-environment-jsdom": "^30.1.2",
-    "jest-environment-node": "^30.1.2",
-    "jest-mock-extended": "^4.0.0",
     "jsdoc": "^4.0.4",
     "markdownlint-cli": "^0.41.0",
     "nodemon": "^3.0.1",
-    "playwright": "^1.55.0",
     "socket.io-client": "^4.8.1",
     "stylelint": "^16.23.1",
     "stylelint-config-standard": "^39.0.0",
-    "supertest": "^7.1.4"
+    "zod": "^3.23.8"
   }
 }

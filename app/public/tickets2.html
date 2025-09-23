@@ -48,7 +48,7 @@
 
         .hextrackr-tickets-grid .ag-cell,
         .hextrackr-tickets-grid .ag-cell-value {
-            color: #1f2937;
+            color: var(--hextrackr-text, #1f2937);
         }
 
         .hextrackr-tickets-grid .ag-cell a {
@@ -57,7 +57,7 @@
 
         [data-bs-theme="dark"] .hextrackr-tickets-grid .ag-cell,
         [data-bs-theme="dark"] .hextrackr-tickets-grid .ag-cell-value {
-            color: #e2e8f0;
+            color: var(--bs-body-color, #e2e8f0);
         }
 
         [data-bs-theme="dark"] .hextrackr-tickets-grid .ag-cell a {
@@ -79,19 +79,19 @@
         }
 
         .hextrackr-tickets-grid .ag-row-hover .ag-cell {
-            background-color: rgba(32, 107, 196, 0.08);
+            background-color: rgba(var(--hextrackr-primary-rgb, 32, 107, 196), 0.08);
         }
 
         [data-bs-theme="dark"] .hextrackr-tickets-grid .ag-row-hover .ag-cell {
-            background-color: rgba(147, 197, 253, 0.12);
+            background-color: rgba(var(--hextrackr-primary-rgb, 32, 107, 196), 0.18);
         }
 
         .ticket-row-overdue .ag-cell {
-            background-color: rgba(220, 38, 38, 0.08) !important;
+            background-color: rgba(var(--vpr-critical-rgb, 220, 38, 38), 0.08) !important;
         }
 
         [data-bs-theme="dark"] .ticket-row-overdue .ag-cell {
-            background-color: rgba(248, 113, 113, 0.16) !important;
+            background-color: rgba(var(--vpr-critical-rgb, 220, 38, 38), 0.18) !important;
         }
 
         .ticket-grid-link {
@@ -167,7 +167,7 @@
             width: 56px;
             height: 56px;
             border-radius: 50%;
-            background: rgba(37, 99, 235, 0.1);
+            background: rgba(var(--hextrackr-primary-rgb, 32, 107, 196), 0.12);
             color: var(--ticket-accent-blue);
             margin-bottom: 1rem;
             font-size: 1.5rem;
@@ -180,12 +180,157 @@
         }
 
         .service-now-link:hover {
-            color: #174fc5 !important;
+            color: var(--hextrackr-link-hover, #174fc5) !important;
             text-decoration: underline !important;
         }
 
         [data-bs-theme="dark"] .service-now-link:hover {
-            color: #60a5fa !important;
+            color: var(--ticket-accent-blue, #60a5fa) !important;
+        }
+        /* Template Variable Dropdown Styles */
+        .variable-dropdown {
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--tblr-border-color, #dee2e6);
+            border-radius: 8px;
+            background-color: var(--tblr-bg-surface, #ffffff);
+        }
+
+        .variable-dropdown .dropdown-header {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--tblr-muted, #6c757d);
+            padding: 0.5rem 1rem 0.25rem;
+            border-bottom: 1px solid var(--tblr-border-color, #dee2e6);
+            background: var(--tblr-bg-surface-secondary, #f8f9fa);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .variable-dropdown .dropdown-item {
+            padding: 0.5rem 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--tblr-primary, #0054a6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .variable-dropdown .dropdown-item:hover {
+            background-color: var(--tblr-primary, #0054a6);
+            color: white;
+        }
+
+        .variable-dropdown .dropdown-item.required {
+            color: var(--tblr-orange, #fb8500);
+        }
+
+        .variable-dropdown .dropdown-item.required:hover {
+            background-color: var(--tblr-orange, #fb8500);
+            color: white;
+        }
+
+        .variable-dropdown .dropdown-item .variable-description {
+            font-size: 0.7rem;
+            font-family: var(--tblr-font-sans-serif);
+            opacity: 0.8;
+            margin-left: 0.5rem;
+            font-weight: normal;
+        }
+
+        .variable-dropdown .dropdown-divider {
+            margin: 0.25rem 0;
+            border-color: var(--tblr-border-color, #dee2e6);
+        }
+
+        /* Dark theme support */
+        [data-bs-theme="dark"] .variable-dropdown {
+            background-color: var(--tblr-bg-surface-dark, #1e293b);
+            border-color: var(--tblr-border-color-dark, #374151);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        [data-bs-theme="dark"] .variable-dropdown .dropdown-header {
+            background-color: var(--tblr-bg-surface-secondary-dark, #2d3748);
+            border-bottom-color: var(--tblr-border-color-dark, #374151);
+        }
+
+        [data-bs-theme="dark"] .variable-dropdown .dropdown-item {
+            color: var(--tblr-primary-dark, #60a5fa);
+        }
+
+        [data-bs-theme="dark"] .variable-dropdown .dropdown-item:hover {
+            background-color: var(--tblr-primary-dark, #3b82f6);
+        }
+
+        [data-bs-theme="dark"] .variable-dropdown .dropdown-item.required {
+            color: var(--tblr-orange-dark, #fbbf24);
+        }
+
+        [data-bs-theme="dark"] .variable-dropdown .dropdown-item.required:hover {
+            background-color: var(--tblr-orange-dark, #f59e0b);
+        }
+
+        [data-bs-theme="dark"] .variable-dropdown .dropdown-divider {
+            border-color: var(--tblr-border-color-dark, #374151);
+        }
+
+        /* Statistics Card Filter Styles */
+        .stats-card {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-card:focus {
+            outline: 2px solid var(--hextrackr-primary);
+            outline-offset: 2px;
+        }
+
+        .stats-card-active {
+            border: 2px solid var(--hextrackr-primary);
+            background: var(--hextrackr-surface-active, rgba(32, 107, 196, 0.05));
+            box-shadow: 0 6px 20px rgba(32, 107, 196, 0.2);
+        }
+
+        /* Dark theme hover effects */
+        [data-bs-theme="dark"] .stats-card:hover {
+            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.1);
+        }
+
+        [data-bs-theme="dark"] .stats-card-active {
+            background: var(--hextrackr-surface-active-dark, rgba(96, 165, 250, 0.1));
+            box-shadow: 0 6px 20px rgba(96, 165, 250, 0.2);
+        }
+
+        /* Screen reader only text */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
     </style>
 </head>
@@ -222,8 +367,14 @@
                             <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#ticketModal">
                                 <i class="fas fa-plus me-2"></i>Add New Ticket
                             </button>
-                            <button type="button" class="btn btn-outline-secondary btn-lg ms-2" id="attachDocsBtn">
-                                <i class="fas fa-paperclip me-2"></i>Attach Documentation
+                            <button type="button" class="btn btn-outline-secondary btn-lg ms-2" id="attachDocsBtn"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom"
+                                    data-bs-html="true"
+                                    title="No documentation attached">
+                                <i class="fas fa-paperclip me-2"></i>
+                                <span id="attachDocsBtnText">Attach Documentation</span>
+                                <span id="attachDocsCount" class="badge bg-primary ms-1" style="display: none;">0</span>
                             </button>
                         </div>
                         <div class="col-md-6 text-end">
@@ -256,7 +407,13 @@
         <!-- Statistics Cards -->
         <div class="row mb-4">
             <div class="col-md-3">
-                <div class="card">
+                <div class="card stats-card"
+                     data-filter-type="all"
+                     onclick="window.ticketManager?.applyCardFilter('all')"
+                     role="button"
+                     tabindex="0"
+                     aria-label="Show all tickets"
+                     aria-describedby="allTicketsDesc">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-auto">
@@ -271,13 +428,22 @@
                                 <div class="text-muted">
                                     <span class="h2 mb-0" id="totalTickets">0</span>
                                 </div>
+                                <div id="allTicketsDesc" class="sr-only">
+                                    Click to show all tickets including completed and closed
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card">
+                <div class="card stats-card"
+                     data-filter-type="open"
+                     onclick="window.ticketManager?.applyCardFilter('open')"
+                     role="button"
+                     tabindex="0"
+                     aria-label="Show open tickets"
+                     aria-describedby="openTicketsDesc">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-auto">
@@ -292,13 +458,22 @@
                                 <div class="text-muted">
                                     <span class="h2 mb-0" id="openTickets">0</span>
                                 </div>
+                                <div id="openTicketsDesc" class="sr-only">
+                                    Click to show only active tickets that need attention
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card">
+                <div class="card stats-card"
+                     data-filter-type="overdue"
+                     onclick="window.ticketManager?.applyCardFilter('overdue')"
+                     role="button"
+                     tabindex="0"
+                     aria-label="Show overdue tickets"
+                     aria-describedby="overdueTicketsDesc">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-auto">
@@ -313,13 +488,22 @@
                                 <div class="text-muted">
                                     <span class="h2 mb-0" id="overdueTickets">0</span>
                                 </div>
+                                <div id="overdueTicketsDesc" class="sr-only">
+                                    Click to show overdue and failed tickets requiring urgent attention
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card">
+                <div class="card stats-card"
+                     data-filter-type="completed"
+                     onclick="window.ticketManager?.applyCardFilter('completed')"
+                     role="button"
+                     tabindex="0"
+                     aria-label="Show completed tickets"
+                     aria-describedby="completedTicketsDesc">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-auto">
@@ -333,6 +517,9 @@
                                 </div>
                                 <div class="text-muted">
                                     <span class="h2 mb-0" id="completedTickets">0</span>
+                                </div>
+                                <div id="completedTicketsDesc" class="sr-only">
+                                    Click to show completed and closed tickets
                                 </div>
                             </div>
                         </div>
@@ -421,18 +608,7 @@
                             </div>
                             <div id="ticketsAgGrid" class="ag-theme-quartz hextrackr-tickets-grid"></div>
                         </div>
-
-                        <!-- Pagination Controls -->
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div class="pagination-info">
-                                <span id="paginationInfo" class="text-muted">Showing 0 to 0 of 0 entries</span>
-                            </div>
-                            <nav aria-label="Table pagination">
-                                <ul class="pagination pagination-sm mb-0" id="paginationControls">
-                                    <!-- Pagination buttons will be generated here -->
-                                </ul>
-                            </nav>
-                        </div>
+                        <!-- AG-Grid handles its own pagination controls -->
                     </div>
                 </div>
             </div>
@@ -605,16 +781,209 @@
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-end mb-3 gap-2">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="ticketManager.copyMarkdownToClipboard()">
-                            <i class="fas fa-copy me-2"></i>Copy Markdown
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="ticketManager.copyTicketMarkdown()">
+                            <i class="fas fa-copy me-1"></i>Ticket
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="ticketManager.copyVulnerabilityMarkdown()">
+                            <i class="fas fa-copy me-1"></i>Vulnerabilities
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="ticketManager.copyEmailMarkdown()">
+                            <i class="fas fa-envelope me-1"></i>Email
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="editTemplateBtn" onclick="toggleUnifiedEditMode()" title="Edit markdown templates for ticket, email, and vulnerabilities">
+                            <i class="fas fa-edit me-1"></i>Edit Markdown
                         </button>
                         <button type="button" class="btn btn-outline-success btn-sm" onclick="ticketManager.downloadBundleFromView()">
                             <i class="fas fa-archive me-2"></i>Download Bundle
                         </button>
                     </div>
-                    <pre id="markdownContent" class="terminal-content"></pre>
+
+                    <!-- Bootstrap Tabs -->
+                    <ul class="nav nav-tabs" id="ticketViewTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="ticket-tab" data-bs-toggle="tab" data-bs-target="#ticket-content"
+                                type="button" role="tab" aria-controls="ticket-content" aria-selected="true">
+                                Ticket Details
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email-content"
+                                type="button" role="tab" aria-controls="email-content" aria-selected="false">
+                                Email Template
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="vulnerabilities-tab" data-bs-toggle="tab" data-bs-target="#vulnerabilities-content"
+                                type="button" role="tab" aria-controls="vulnerabilities-content" aria-selected="false">
+                                Vulnerabilities
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content mt-3" id="ticketViewTabContent">
+                        <div class="tab-pane fade show active" id="ticket-content" role="tabpanel" aria-labelledby="ticket-tab">
+                            <!-- View Mode (Default) -->
+                            <div id="ticketViewMode">
+                                <pre id="markdownContent" class="terminal-content"></pre>
+                            </div>
+
+                            <!-- Edit Mode (Hidden by default) -->
+                            <div id="ticketEditMode" style="display: none;">
+                                <!-- Template Editor (Full Width) -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-edit me-2"></i>Ticket Markdown Template
+                                                </h6>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="ticketMarkdownEditor.previewTemplate()" title="Preview with current ticket data">
+                                                        <i class="fas fa-eye me-1"></i>Preview
+                                                    </button>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Insert template variables">
+                                                            <i class="fas fa-code me-1"></i>Variables
+                                                        </button>
+                                                        <ul class="dropdown-menu" id="ticketVariableDropdown">
+                                                            <!-- Variables will be populated by JavaScript -->
+                                                        </ul>
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-warning" onclick="ticketMarkdownEditor.resetToDefault()" title="Reset to default template">
+                                                        <i class="fas fa-undo me-1"></i>Reset
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-success" onclick="ticketMarkdownEditor.saveTemplate()" title="Save template changes">
+                                                        <i class="fas fa-save me-1"></i>Save
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="ticketMarkdownEditor.toggleEditMode()" title="Exit edit mode">
+                                                        <i class="fas fa-times me-1"></i>Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <textarea id="ticketTemplateEditor" class="form-control" rows="25" placeholder="Loading template..." style="border: none; resize: vertical; font-family: 'Courier New', monospace; font-size: 13px;"></textarea>
+                                            </div>
+                                            <div class="card-footer">
+                                                <div id="ticketTemplateValidation" class="template-validation"></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="email-content" role="tabpanel" aria-labelledby="email-tab">
+                            <!-- View Mode (Default) -->
+                            <div id="emailViewMode">
+                                <div id="emailLoadingMessage" class="text-center text-muted py-3">
+                                    <i class="fas fa-spinner fa-spin me-2"></i>Generating email template...
+                                </div>
+                                <pre id="emailMarkdownContent" class="terminal-content" style="display: none;"></pre>
+                            </div>
+
+                            <!-- Edit Mode (Hidden by default) -->
+                            <div id="emailEditMode" style="display: none;">
+                                <!-- Template Editor (Full Width) -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-edit me-2"></i>Template Editor
+                                                </h6>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="templateEditor.previewTemplate()" title="Preview with current ticket data">
+                                                        <i class="fas fa-eye me-1"></i>Preview
+                                                    </button>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Insert template variables">
+                                                            <i class="fas fa-code me-1"></i>Variables
+                                                        </button>
+                                                        <ul class="dropdown-menu" id="emailVariableDropdown">
+                                                            <!-- Variables will be populated by JavaScript -->
+                                                        </ul>
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-warning" onclick="templateEditor.resetToDefault()" title="Reset to default template">
+                                                        <i class="fas fa-undo me-1"></i>Reset
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-success" onclick="templateEditor.saveTemplate()" title="Save template changes">
+                                                        <i class="fas fa-save me-1"></i>Save
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="templateEditor.toggleEditMode()" title="Exit edit mode">
+                                                        <i class="fas fa-times me-1"></i>Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <textarea id="templateEditor" class="form-control" rows="20" placeholder="Loading template..." style="border: none; resize: vertical; font-family: 'Courier New', monospace; font-size: 13px;"></textarea>
+                                            </div>
+                                            <div class="card-footer">
+                                                <div id="templateValidation" class="template-validation"></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="vulnerabilities-content" role="tabpanel" aria-labelledby="vulnerabilities-tab">
+                            <!-- View Mode (Default) -->
+                            <div id="vulnerabilityViewMode">
+                                <div id="vulnerabilityLoadingMessage" class="text-center text-muted py-3">
+                                    <i class="fas fa-spinner fa-spin me-2"></i>Loading vulnerability data...
+                                </div>
+                                <pre id="vulnerabilityMarkdownContent" class="terminal-content" style="display: none;"></pre>
+                            </div>
+
+                            <!-- Edit Mode (Hidden by default) -->
+                            <div id="vulnerabilityEditMode" style="display: none;">
+                                <!-- Template Editor (Full Width) -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-edit me-2"></i>Vulnerability Report Template
+                                                </h6>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="vulnerabilityMarkdownEditor.previewTemplate()" title="Preview with current vulnerability data">
+                                                        <i class="fas fa-eye me-1"></i>Preview
+                                                    </button>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Insert template variables">
+                                                            <i class="fas fa-code me-1"></i>Variables
+                                                        </button>
+                                                        <ul class="dropdown-menu" id="vulnerabilityVariableDropdown">
+                                                            <!-- Variables will be populated by JavaScript -->
+                                                        </ul>
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-warning" onclick="vulnerabilityMarkdownEditor.resetToDefault()" title="Reset to default template">
+                                                        <i class="fas fa-undo me-1"></i>Reset
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-success" onclick="vulnerabilityMarkdownEditor.saveTemplate()" title="Save template changes">
+                                                        <i class="fas fa-save me-1"></i>Save
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="vulnerabilityMarkdownEditor.toggleEditMode()" title="Exit edit mode">
+                                                        <i class="fas fa-times me-1"></i>Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <textarea id="vulnerabilityTemplateEditor" class="form-control" rows="25" placeholder="Loading template..." style="border: none; resize: vertical; font-family: 'Courier New', monospace; font-size: 13px;"></textarea>
+                                            </div>
+                                            <div class="card-footer">
+                                                <div id="vulnerabilityTemplateValidation" class="template-validation"></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" id="viewTicketModalFooter">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" onclick="editTicketFromView()">
                         <i class="fas fa-edit me-2"></i>Edit Ticket
@@ -648,7 +1017,215 @@
     <script src="scripts/shared/settings-modal.js"></script>
     <script src="/vendor/ag-grid/ag-grid-community.min.js"></script>
     <script src="scripts/shared/ag-grid-theme-manager.js"></script>
+    <script src="scripts/shared/template-variables.js"></script>
+    <script src="scripts/shared/template-editor.js"></script>
+    <script src="scripts/shared/ticket-markdown-editor.js"></script>
+    <script src="scripts/shared/vulnerability-markdown-editor.js"></script>
     <script src="scripts/pages/tickets.js"></script>
     <script src="scripts/pages/tickets-aggrid.js"></script>
+
+    <script>
+        // Keyboard navigation support for stats cards
+        document.addEventListener('keydown', function(e) {
+            if (e.target.classList.contains('stats-card') &&
+                (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                e.target.click();
+            }
+        });
+    </script>
+
+    <script>
+        /**
+         * Unified Edit Mode Controller
+         * Coordinates between ticket editor and template editor
+         */
+        let isUnifiedEditMode = false;
+
+        async function toggleUnifiedEditMode() {
+            const editBtn = document.getElementById('editTemplateBtn');
+            const modalFooter = document.getElementById('viewTicketModalFooter');
+
+            if (!isUnifiedEditMode) {
+                // Entering unified edit mode
+                try {
+                    // Wait for editors to be available
+                    if (!window.ticketMarkdownEditor || !window.templateEditor || !window.vulnerabilityMarkdownEditor) {
+                        throw new Error('Template editors not fully loaded. Please refresh the page and try again.');
+                    }
+                    // Get ticket data from modal
+                    const ticketId = document.getElementById("viewTicketModal").getAttribute("data-ticket-id");
+                    const currentTicket = window.ticketManager?.getTicketById(ticketId);
+
+                    if (!currentTicket) {
+                        throw new Error('No ticket data available for editing');
+                    }
+
+                    // Set ticket data for all three editors
+                    if (window.ticketMarkdownEditor) window.ticketMarkdownEditor.setTicketData(currentTicket);
+                    if (window.templateEditor) window.templateEditor.setTicketData(currentTicket);
+                    if (window.vulnerabilityMarkdownEditor) window.vulnerabilityMarkdownEditor.setTicketData(currentTicket);
+
+                    // Toggle all three editors to edit mode
+                    if (window.ticketMarkdownEditor) await window.ticketMarkdownEditor.toggleEditMode();
+                    if (window.templateEditor) await window.templateEditor.toggleEditMode();
+                    if (window.vulnerabilityMarkdownEditor) await window.vulnerabilityMarkdownEditor.toggleEditMode();
+
+                    isUnifiedEditMode = true;
+
+                    // Hide modal footer buttons
+                    if (modalFooter) {
+                        modalFooter.style.display = 'none';
+                    }
+
+                    // Update button appearance
+                    editBtn.innerHTML = '<i class="fas fa-times me-1"></i>Close';
+                    editBtn.className = 'btn btn-outline-secondary btn-sm';
+                    editBtn.title = 'Close markdown editing';
+
+                    // Show success message
+                    if (window.ticketManager?.showToast) {
+                        window.ticketManager.showToast('Markdown edit mode enabled - you can now edit all three templates', 'info');
+                    }
+                } catch (error) {
+                    console.error('Error entering unified edit mode:', error);
+                    if (window.ticketManager?.showToast) {
+                        window.ticketManager.showToast('Failed to enter edit mode', 'error');
+                    }
+                }
+            } else {
+                // Exiting unified edit mode
+                try {
+                    // Toggle all editors back to view mode
+                    if (window.ticketMarkdownEditor) await window.ticketMarkdownEditor.toggleEditMode();
+                    if (window.templateEditor) await window.templateEditor.toggleEditMode();
+                    if (window.vulnerabilityMarkdownEditor) await window.vulnerabilityMarkdownEditor.toggleEditMode();
+
+                    // Clear caches and reload templates to ensure correct content is displayed
+                    console.log('[UnifiedEdit] Clearing template caches and reloading...');
+
+                    // Clear all template caches to force fresh reload
+                    if (window.ticketMarkdownEditor) {
+                        window.ticketMarkdownEditor.clearTemplateCache('default_ticket');
+                    }
+                    if (window.templateEditor) {
+                        window.templateEditor.clearTemplateCache('default_email');
+                    }
+                    if (window.vulnerabilityMarkdownEditor) {
+                        window.vulnerabilityMarkdownEditor.clearTemplateCache('default_vulnerability');
+                    }
+
+                    // Add delays between reloads to prevent race conditions
+                    await new Promise(resolve => setTimeout(resolve, 100));
+
+                    // Force reload each template view
+                    if (window.ticketManager) {
+                        if (window.ticketManager.loadTicketMarkdownForModal) {
+                            await window.ticketManager.loadTicketMarkdownForModal();
+                        }
+
+                        await new Promise(resolve => setTimeout(resolve, 100));
+
+                        if (window.ticketManager.loadEmailMarkdownForModal) {
+                            await window.ticketManager.loadEmailMarkdownForModal();
+                        }
+
+                        await new Promise(resolve => setTimeout(resolve, 100));
+
+                        if (window.ticketManager.loadVulnerabilityMarkdownForModal) {
+                            await window.ticketManager.loadVulnerabilityMarkdownForModal();
+                        }
+                    }
+
+                    isUnifiedEditMode = false;
+
+                    // Show modal footer buttons
+                    if (modalFooter) {
+                        modalFooter.style.display = 'flex';
+                    }
+
+                    // Reset button appearance
+                    editBtn.innerHTML = '<i class="fas fa-edit me-1"></i>Edit Markdown';
+                    editBtn.className = 'btn btn-outline-primary btn-sm';
+                    editBtn.title = 'Edit markdown templates for ticket, email, and vulnerabilities';
+
+                    // Show success message
+                    if (window.ticketManager?.showToast) {
+                        window.ticketManager.showToast('Edit mode disabled', 'info');
+                    }
+                } catch (error) {
+                    console.error('Error exiting unified edit mode:', error);
+                }
+            }
+        }
+
+        // Helper functions to toggle individual edit modes
+        async function toggleTicketEditMode() {
+            const viewMode = document.getElementById('ticketViewMode');
+            const editMode = document.getElementById('ticketEditMode');
+
+            if (viewMode.style.display !== 'none') {
+                // Entering edit mode
+                viewMode.style.display = 'none';
+                editMode.style.display = 'block';
+            } else {
+                // Exiting edit mode
+                viewMode.style.display = 'block';
+                editMode.style.display = 'none';
+            }
+        }
+
+        async function toggleVulnerabilityEditMode() {
+            const viewMode = document.getElementById('vulnerabilityViewMode');
+            const editMode = document.getElementById('vulnerabilityEditMode');
+
+            if (viewMode.style.display !== 'none') {
+                // Entering edit mode
+                viewMode.style.display = 'none';
+                editMode.style.display = 'block';
+            } else {
+                // Exiting edit mode
+                viewMode.style.display = 'block';
+                editMode.style.display = 'none';
+            }
+        }
+
+        /**
+         * Enhanced save functionality for unified edit mode
+         */
+        async function saveUnifiedChanges() {
+            if (!isUnifiedEditMode) return;
+
+            try {
+                // Save both ticket and template changes
+                await window.ticketEditor.saveTicket();
+                await window.templateEditor.saveTemplate();
+
+                // Exit unified edit mode
+                await toggleUnifiedEditMode();
+
+                if (window.ticketManager?.showToast) {
+                    window.ticketManager.showToast('All changes saved successfully', 'success');
+                }
+            } catch (error) {
+                console.error('Error saving unified changes:', error);
+                if (window.ticketManager?.showToast) {
+                    window.ticketManager.showToast('Failed to save some changes', 'error');
+                }
+            }
+        }
+
+        /**
+         * Initialize unified edit mode when editors are ready
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ensure both editors are available
+            if (window.ticketEditor && window.templateEditor) {
+                console.log('✅ Unified edit mode ready');
+            } else {
+                console.warn('⚠️ Some editors not available for unified mode');
+            }
+        });
+    </script>
 </body>
 </html>
