@@ -19,7 +19,7 @@
  */
 function normalizeToIndex100(data, options = {}) {
     if (!data || data.length === 0) {
-        throw new Error('Cannot normalize empty dataset');
+        throw new Error("Cannot normalize empty dataset");
     }
 
     // Find baseline (first non-zero value if skipZeros is true)
@@ -38,7 +38,7 @@ function normalizeToIndex100(data, options = {}) {
 
     // Handle all-zero case
     if (baseline === 0) {
-        console.warn('All values are zero, returning zeros');
+        console.warn("All values are zero, returning zeros");
         return data.map(() => 0);
     }
 
@@ -121,9 +121,9 @@ function formatNormalizedTooltip(normalizedValue, actualValue, label) {
  * @returns {boolean} True if settings are valid
  */
 function validateNormalizationSettings(settings) {
-    const validMethods = ['index100', 'percentage', 'logarithmic'];
+    const validMethods = ["index100", "percentage", "logarithmic"];
 
-    if (!settings || typeof settings !== 'object') {
+    if (!settings || typeof settings !== "object") {
         return false;
     }
 
@@ -132,8 +132,8 @@ function validateNormalizationSettings(settings) {
         return false;
     }
 
-    if (typeof settings.showBothInTooltip !== 'boolean') {
-        console.error('showBothInTooltip must be a boolean');
+    if (typeof settings.showBothInTooltip !== "boolean") {
+        console.error("showBothInTooltip must be a boolean");
         return false;
     }
 
@@ -155,10 +155,10 @@ function saveNormalizationState(state) {
             ...state,
             lastUpdated: new Date().toISOString()
         };
-        localStorage.setItem('hextrackr.chartViewState', JSON.stringify(stateToSave));
+        localStorage.setItem("hextrackr.chartViewState", JSON.stringify(stateToSave));
         return true;
     } catch (error) {
-        console.error('Failed to save normalization state:', error);
+        console.error("Failed to save normalization state:", error);
         return false;
     }
 }
@@ -170,10 +170,10 @@ function saveNormalizationState(state) {
  */
 function loadNormalizationState() {
     try {
-        const saved = localStorage.getItem('hextrackr.chartViewState');
+        const saved = localStorage.getItem("hextrackr.chartViewState");
         return saved ? JSON.parse(saved) : null;
     } catch (error) {
-        console.error('Failed to load normalization state:', error);
+        console.error("Failed to load normalization state:", error);
         return null;
     }
 }

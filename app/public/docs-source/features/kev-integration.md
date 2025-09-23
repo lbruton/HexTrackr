@@ -142,6 +142,7 @@ Default configuration includes:
 Access KEV settings through **Settings > KEV Integration**:
 
 #### Synchronization Settings
+
 - ✅ Enable automatic KEV synchronization
 - 🕐 Sync Schedule: Daily, Weekly, or Custom intervals
 - 📊 Last Sync status and timestamp
@@ -149,6 +150,7 @@ Access KEV settings through **Settings > KEV Integration**:
 - 📋 Sync history and error logs
 
 #### Display Options
+
 - ✅ Show KEV badges on vulnerability cards
 - ✅ Highlight KEV vulnerabilities in tables
 - ✅ Show KEV column in vulnerability table
@@ -156,6 +158,7 @@ Access KEV settings through **Settings > KEV Integration**:
 - 🎨 Badge style customization
 
 #### Notification Settings
+
 - 📧 Email alerts for new KEV vulnerabilities
 - ⚠️ Notifications for overdue KEV remediation
 - 📊 Daily/weekly KEV summary reports
@@ -193,16 +196,19 @@ Access KEV settings through **Settings > KEV Integration**:
 ### Common Issues
 
 #### KEV Sync Failures
+
 - **Network Issues**: Check internet connectivity and firewall rules
 - **API Unavailability**: CISA API may be temporarily unavailable
 - **Storage Issues**: Ensure adequate disk space for KEV data
 
 #### Missing KEV Data
+
 - **Recent CVEs**: New vulnerabilities may not yet be in CISA catalog
 - **Data Lag**: CISA updates may take time to reflect in HexTrackr
 - **Sync Timing**: Manual sync may be needed for immediate updates
 
 #### Display Issues
+
 - **Cache Problems**: Browser refresh may resolve display issues
 - **Filter Conflicts**: Check for conflicting filter settings
 - **Theme Issues**: KEV badges should work in both light and dark modes
