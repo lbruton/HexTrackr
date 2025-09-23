@@ -49,7 +49,7 @@ export class AccessibilityAnnouncer {
     // Register cleanup for page unload
     this.registerCleanup();
     
-    console.log('AccessibilityAnnouncer initialized with live regions');
+    console.log("AccessibilityAnnouncer initialized with live regions");
   }
 
   /**
@@ -61,15 +61,15 @@ export class AccessibilityAnnouncer {
   initializeLiveRegions() {
     try {
       // Only initialize if in browser environment
-      if (typeof document === 'undefined') {
-        console.warn('AccessibilityAnnouncer: Document not available, skipping live region setup');
+      if (typeof document === "undefined") {
+        console.warn("AccessibilityAnnouncer: Document not available, skipping live region setup");
         return;
       }
 
       // Create container for all live regions
-      const container = document.createElement('div');
-      container.id = 'accessibility-live-regions';
-      container.setAttribute('aria-hidden', 'true'); // Hide from layout but preserve for screen readers
+      const container = document.createElement("div");
+      container.id = "accessibility-live-regions";
+      container.setAttribute("aria-hidden", "true"); // Hide from layout but preserve for screen readers
       container.style.cssText = `
         position: absolute;
         left: -10000px;
@@ -81,35 +81,35 @@ export class AccessibilityAnnouncer {
       `;
 
       // Create polite live region (non-interrupting)
-      this.liveRegions.polite = document.createElement('div');
-      this.liveRegions.polite.id = 'accessibility-announcer-polite';
-      this.liveRegions.polite.setAttribute('aria-live', 'polite');
-      this.liveRegions.polite.setAttribute('aria-atomic', 'true');
-      this.liveRegions.polite.setAttribute('role', 'status');
+      this.liveRegions.polite = document.createElement("div");
+      this.liveRegions.polite.id = "accessibility-announcer-polite";
+      this.liveRegions.polite.setAttribute("aria-live", "polite");
+      this.liveRegions.polite.setAttribute("aria-atomic", "true");
+      this.liveRegions.polite.setAttribute("role", "status");
       container.appendChild(this.liveRegions.polite);
 
       // Create assertive live region (interrupting)
-      this.liveRegions.assertive = document.createElement('div');
-      this.liveRegions.assertive.id = 'accessibility-announcer-assertive';
-      this.liveRegions.assertive.setAttribute('aria-live', 'assertive');
-      this.liveRegions.assertive.setAttribute('aria-atomic', 'true');
-      this.liveRegions.assertive.setAttribute('role', 'alert');
+      this.liveRegions.assertive = document.createElement("div");
+      this.liveRegions.assertive.id = "accessibility-announcer-assertive";
+      this.liveRegions.assertive.setAttribute("aria-live", "assertive");
+      this.liveRegions.assertive.setAttribute("aria-atomic", "true");
+      this.liveRegions.assertive.setAttribute("role", "alert");
       container.appendChild(this.liveRegions.assertive);
 
       // Create status live region (for status updates)
-      this.liveRegions.status = document.createElement('div');
-      this.liveRegions.status.id = 'accessibility-announcer-status';
-      this.liveRegions.status.setAttribute('aria-live', 'polite');
-      this.liveRegions.status.setAttribute('aria-atomic', 'true');
-      this.liveRegions.status.setAttribute('role', 'status');
+      this.liveRegions.status = document.createElement("div");
+      this.liveRegions.status.id = "accessibility-announcer-status";
+      this.liveRegions.status.setAttribute("aria-live", "polite");
+      this.liveRegions.status.setAttribute("aria-atomic", "true");
+      this.liveRegions.status.setAttribute("role", "status");
       container.appendChild(this.liveRegions.status);
 
       // Add container to document
       document.body.appendChild(container);
 
-      console.log('ARIA live regions created successfully');
+      console.log("ARIA live regions created successfully");
     } catch (error) {
-      console.error('Error initializing live regions:', error);
+      console.error("Error initializing live regions:", error);
     }
   }
 
@@ -126,29 +126,29 @@ export class AccessibilityAnnouncer {
   announce(message, options = {}) {
     try {
       // Validate message
-      if (!message || typeof message !== 'string') {
-        console.warn('AccessibilityAnnouncer: Invalid message provided');
+      if (!message || typeof message !== "string") {
+        console.warn("AccessibilityAnnouncer: Invalid message provided");
         return false;
       }
 
       // Sanitize message for XSS protection
       const sanitizedMessage = this.sanitizeMessage(message);
       if (!sanitizedMessage) {
-        console.warn('AccessibilityAnnouncer: Message failed sanitization');
+        console.warn("AccessibilityAnnouncer: Message failed sanitization");
         return false;
       }
 
       // Extract options with defaults
       const {
-        priority = 'polite',
+        priority = "polite",
         immediate = false,
-        category = 'general'
+        category = "general"
       } = options;
 
       // Validate priority
       if (!this.liveRegions[priority]) {
         console.warn(`AccessibilityAnnouncer: Invalid priority '${priority}', using 'polite'`);
-        return this.announce(sanitizedMessage, { ...options, priority: 'polite' });
+        return this.announce(sanitizedMessage, { ...options, priority: "polite" });
       }
 
       // Create announcement object
@@ -176,7 +176,7 @@ export class AccessibilityAnnouncer {
       return this.queueAnnouncement(announcement);
 
     } catch (error) {
-      console.error('Error in announce method:', error);
+      console.error("Error in announce method:", error);
       return false;
     }
   }
@@ -190,11 +190,11 @@ export class AccessibilityAnnouncer {
    * @param {string} source - Source of the change ('user', 'system', etc.)
    * @returns {boolean} True if announcement was successful
    */
-  announceThemeChange(newTheme, previousTheme, source = 'user') {
+  announceThemeChange(newTheme, previousTheme, source = "user") {
     try {
       // Validate themes
-      if (!newTheme || !['light', 'dark'].includes(newTheme)) {
-        console.warn('Invalid theme for announcement:', newTheme);
+      if (!newTheme || !["light", "dark"].includes(newTheme)) {
+        console.warn("Invalid theme for announcement:", newTheme);
         return false;
       }
 
@@ -202,28 +202,28 @@ export class AccessibilityAnnouncer {
       let message = `Theme changed to ${newTheme} mode`;
       
       // Add context based on source
-      if (source === 'system') {
-        message += ' automatically based on system preferences';
-      } else if (source === 'user') {
-        message += ' by user selection';
+      if (source === "system") {
+        message += " automatically based on system preferences";
+      } else if (source === "user") {
+        message += " by user selection";
       }
 
       // Add accessibility benefits information
-      if (newTheme === 'dark') {
-        message += '. Dark mode may reduce eye strain in low-light environments';
+      if (newTheme === "dark") {
+        message += ". Dark mode may reduce eye strain in low-light environments";
       } else {
-        message += '. Light mode provides high contrast for better readability';
+        message += ". Light mode provides high contrast for better readability";
       }
 
       // Announce with high priority for immediate feedback
       return this.announce(message, {
-        priority: 'assertive',
-        category: 'theme-change',
+        priority: "assertive",
+        category: "theme-change",
         immediate: false // Allow queuing for better UX
       });
 
     } catch (error) {
-      console.error('Error announcing theme change:', error);
+      console.error("Error announcing theme change:", error);
       return false;
     }
   }
@@ -243,7 +243,7 @@ export class AccessibilityAnnouncer {
       }
 
       const { summary } = accessibilityReport;
-      let message = '';
+      let message = "";
 
       if (summary.criticalFailures === 0) {
         message = `${theme} theme meets WCAG accessibility standards with ${summary.passRate}% compliance`;
@@ -252,12 +252,12 @@ export class AccessibilityAnnouncer {
       }
 
       return this.announce(message, {
-        priority: 'polite',
-        category: 'accessibility-status'
+        priority: "polite",
+        category: "accessibility-status"
       });
 
     } catch (error) {
-      console.error('Error announcing accessibility status:', error);
+      console.error("Error announcing accessibility status:", error);
       return false;
     }
   }
@@ -272,15 +272,15 @@ export class AccessibilityAnnouncer {
     try {
       // Basic XSS prevention
       const sanitized = message
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
-        .replace(/<[^>]*>/g, '') // Remove all HTML tags
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "") // Remove script tags
+        .replace(/<[^>]*>/g, "") // Remove all HTML tags
         .replace(/[<>&"']/g, (char) => { // Escape remaining dangerous characters
           const escapeMap = {
-            '<': '&lt;',
-            '>': '&gt;',
-            '&': '&amp;',
-            '"': '&quot;',
-            "'": '&#x27;'
+            "<": "&lt;",
+            ">": "&gt;",
+            "&": "&amp;",
+            "\"": "&quot;",
+            "'": "&#x27;"
           };
           return escapeMap[char] || char;
         })
@@ -288,13 +288,13 @@ export class AccessibilityAnnouncer {
 
       // Length validation
       if (sanitized.length === 0 || sanitized.length > 500) {
-        console.warn('Message length invalid:', sanitized.length);
+        console.warn("Message length invalid:", sanitized.length);
         return null;
       }
 
       return sanitized;
     } catch (error) {
-      console.error('Error sanitizing message:', error);
+      console.error("Error sanitizing message:", error);
       return null;
     }
   }
@@ -321,7 +321,7 @@ export class AccessibilityAnnouncer {
         queued.category === announcement.category
       );
     } catch (error) {
-      console.error('Error checking duplicate announcement:', error);
+      console.error("Error checking duplicate announcement:", error);
       return false; // Assume not duplicate on error
     }
   }
@@ -339,7 +339,7 @@ export class AccessibilityAnnouncer {
         // Remove oldest announcement to make room
         const dropped = this.announcementQueue.shift();
         this.queueDropped++;
-        console.warn('Announcement queue full, dropped:', dropped.message);
+        console.warn("Announcement queue full, dropped:", dropped.message);
       }
 
       // Add to queue
@@ -353,7 +353,7 @@ export class AccessibilityAnnouncer {
 
       return true;
     } catch (error) {
-      console.error('Error queuing announcement:', error);
+      console.error("Error queuing announcement:", error);
       return false;
     }
   }
@@ -382,7 +382,7 @@ export class AccessibilityAnnouncer {
       }, this.debounceDelay);
 
     } catch (error) {
-      console.error('Error processing announcement queue:', error);
+      console.error("Error processing announcement queue:", error);
       this.isAnnouncing = false;
     }
   }
@@ -397,12 +397,12 @@ export class AccessibilityAnnouncer {
     try {
       const liveRegion = this.liveRegions[announcement.priority];
       if (!liveRegion) {
-        console.error('Live region not found for priority:', announcement.priority);
+        console.error("Live region not found for priority:", announcement.priority);
         return false;
       }
 
       // Clear existing content
-      liveRegion.textContent = '';
+      liveRegion.textContent = "";
 
       // Small delay to ensure screen readers detect the change
       setTimeout(() => {
@@ -417,14 +417,14 @@ export class AccessibilityAnnouncer {
         // Clear the announcement after delay to prevent re-reading
         setTimeout(() => {
           if (liveRegion.textContent === announcement.message) {
-            liveRegion.textContent = '';
+            liveRegion.textContent = "";
           }
         }, this.clearDelay);
       }, 50);
 
       return true;
     } catch (error) {
-      console.error('Error performing announcement:', error);
+      console.error("Error performing announcement:", error);
       return false;
     }
   }
@@ -476,7 +476,7 @@ export class AccessibilityAnnouncer {
       
       console.log(`Cleared announcement queue (${queueSize} items removed)`);
     } catch (error) {
-      console.error('Error clearing queue:', error);
+      console.error("Error clearing queue:", error);
     }
   }
 
@@ -487,13 +487,13 @@ export class AccessibilityAnnouncer {
    */
   registerCleanup() {
     try {
-      if (typeof window !== 'undefined') {
-        window.addEventListener('beforeunload', () => {
+      if (typeof window !== "undefined") {
+        window.addEventListener("beforeunload", () => {
           this.destroy();
         });
       }
     } catch (error) {
-      console.error('Error registering cleanup:', error);
+      console.error("Error registering cleanup:", error);
     }
   }
 
@@ -508,7 +508,7 @@ export class AccessibilityAnnouncer {
       this.clearQueue();
       
       // Remove live regions from DOM
-      const container = document.getElementById('accessibility-live-regions');
+      const container = document.getElementById("accessibility-live-regions");
       if (container) {
         container.remove();
       }
@@ -517,9 +517,9 @@ export class AccessibilityAnnouncer {
       this.liveRegions = {};
       this.lastAnnouncement = null;
       
-      console.log('AccessibilityAnnouncer destroyed and cleaned up');
+      console.log("AccessibilityAnnouncer destroyed and cleaned up");
     } catch (error) {
-      console.error('Error destroying AccessibilityAnnouncer:', error);
+      console.error("Error destroying AccessibilityAnnouncer:", error);
     }
   }
 }

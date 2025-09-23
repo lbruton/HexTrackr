@@ -11,6 +11,7 @@ This document defines the API service architecture for integrating CISA Known Ex
 ### KEV Service Module (`app/services/kevService.js`)
 
 **Design Principles:**
+
 - **Single Responsibility**: Handles only KEV-related operations
 - **Dependency Injection**: Receives database connection and logger
 - **Async/Await**: Modern Promise-based patterns
@@ -173,6 +174,7 @@ class KevService {
 ### 1. KEV Management Endpoints
 
 #### `GET /api/kev/sync`
+
 **Purpose**: Manual KEV data synchronization
 **Access**: Admin only
 **Response Time**: 30-120 seconds
@@ -220,6 +222,7 @@ Authorization: Bearer <admin-token>
 ```
 
 #### `GET /api/kev/stats`
+
 **Purpose**: KEV coverage and statistics
 **Access**: All authenticated users
 **Response Time**: <500ms
@@ -250,6 +253,7 @@ GET /api/kev/stats
 ```
 
 #### `GET /api/kev/recent`
+
 **Purpose**: Recent KEV additions
 **Access**: All authenticated users
 **Parameters**: `?days=30` (optional, default 30)
@@ -281,6 +285,7 @@ GET /api/kev/recent?days=7
 ### 2. Enhanced Vulnerability Endpoints
 
 #### `GET /api/vulnerabilities` (Enhanced)
+
 **Purpose**: Vulnerability listing with KEV integration
 **Enhancement**: Add KEV filtering and status
 
@@ -323,6 +328,7 @@ GET /api/vulnerabilities?kev=true&page=1&limit=50
 ```
 
 #### `GET /api/vulnerabilities/:cveId/kev`
+
 **Purpose**: KEV status for specific vulnerability
 **Response Time**: <50ms
 
@@ -370,6 +376,7 @@ GET /api/vulnerabilities/CVE-2024-1234/kev
 ### 3. Bulk Operations
 
 #### `POST /api/kev/bulk-status`
+
 **Purpose**: Bulk KEV status check
 **Access**: Authenticated users
 **Use Case**: Loading vulnerability tables with KEV indicators
@@ -746,11 +753,12 @@ async function migrateKevTables() {
 - **Database Schema**: `/planning/kev-database-schema.sql`
 - **UI Mockups**: `/planning/kev-ui-mockup.md`
 - **Test Plan**: `/planning/kev-test-plan.md`
-- **CISA KEV Catalog**: https://www.cisa.gov/known-exploited-vulnerabilities-catalog
+- **CISA KEV Catalog**: <https://www.cisa.gov/known-exploited-vulnerabilities-catalog>
 
 ---
 
 **Document Information:**
+
 - **Created**: 2025-09-21
 - **Version**: 1.0
 - **Status**: Planning Phase

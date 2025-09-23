@@ -175,7 +175,7 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
             };
 
             let processedRows = 0;
-            const totalRecords = rows.reduce((total, row) => total + mapVulnerabilityRow(row).length, 0);
+            const _totalRecords = rows.reduce((total, row) => total + mapVulnerabilityRow(row).length, 0);
 
             // Process rows sequentially to prevent race conditions
             function processNextRow(index) {
@@ -941,9 +941,23 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                     console.log(`   - Resolved: ${resolvedCount}`);
                     console.log(`   - Errors: ${batchStats.errors}`);
 
-                    // Complete progress tracking
+                    // Generate import summary and complete progress tracking
                     if (progressTracker && progressTracker.completeSession) {
-                        progressTracker.completeSession(sessionId, "Import completed successfully", finalStats);
+                        // Generate comprehensive import summary
+                        generateImportSummary(currentDate, responseData, finalStats)
+                            .then(summary => {
+                                summary.sessionId = sessionId;
+                                const enhancedStats = {
+                                    ...finalStats,
+                                    importSummary: summary
+                                };
+                                progressTracker.completeSession(sessionId, "Import completed successfully", enhancedStats);
+                            })
+                            .catch(summaryErr => {
+                                console.error("Error generating import summary:", summaryErr);
+                                // Complete without summary if generation fails
+                                progressTracker.completeSession(sessionId, "Import completed successfully", finalStats);
+                            });
                     }
                 });
             });
@@ -1105,7 +1119,7 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
 /**
  * Update daily totals (simplified version for non-batch imports)
  */
-function updateDailyTotals(scanDate, callback) {
+function _updateDailyTotals(scanDate, callback) {
     // Just call the enhanced version
     calculateAndStoreDailyTotalsEnhanced(scanDate, callback);
 }
@@ -1113,7 +1127,7 @@ function updateDailyTotals(scanDate, callback) {
 /**
  * Import CSV file with standard processing (non-staging)
  */
-async function importCSV(filepath, filename, vendor, scanDate, options = {}) {
+async function importCSV(filepath, filename, vendor, scanDate, _options = {}) {
     try {
         // Read and parse CSV
         const csvData = PathValidator.safeReadFileSync(filepath, "utf8");
@@ -1126,7 +1140,7 @@ async function importCSV(filepath, filename, vendor, scanDate, options = {}) {
         const extractedDate = scanDate || extractDateFromFilename(filename);
 
         // Create import record
-        const { importId, importDate } = await createImportRecord({
+        const { importId, _importDate } = await createImportRecord({
             filename,
             vendor: extractedVendor,
             scanDate: extractedDate,
@@ -1156,7 +1170,7 @@ async function importCSV(filepath, filename, vendor, scanDate, options = {}) {
 /**
  * Import CSV file with staging (high-performance)
  */
-async function importCsvStaging(filepath, filename, vendor, scanDate, sessionId, progressTracker, options = {}) {
+async function importCsvStaging(filepath, filename, vendor, scanDate, sessionId, progressTracker, _options = {}) {
     const startTime = Date.now();
 
     try {
@@ -1171,7 +1185,7 @@ async function importCsvStaging(filepath, filename, vendor, scanDate, sessionId,
         const extractedDate = scanDate || extractDateFromFilename(filename);
 
         // Create import record
-        const { importId, importDate } = await createImportRecord({
+        const { importId, _importDate } = await createImportRecord({
             filename,
             vendor: extractedVendor,
             scanDate: extractedDate,
@@ -1229,6 +1243,176 @@ async function importCsvStaging(filepath, filename, vendor, scanDate, sessionId,
     }
 }
 
+/**
+ * Generate comprehensive import summary for progress completion
+ * @param {string} scanDate - Scan date for comparison
+ * @param {Object} importMetadata - Import metadata (filename, vendor, etc.)
+ * @param {Object} processingStats - Processing statistics from import
+ * @returns {Promise<Object>} Import summary object
+ */
+async function generateImportSummary(scanDate, importMetadata, processingStats) {
+    return new Promise((resolve, reject) => {
+        const db = global.db;
+
+        console.log("📊 Generating import summary for scan date:", scanDate);
+
+        // Get current and previous daily totals for comparison
+        const totalsQuery = `
+            SELECT
+                scan_date,
+                critical_count, critical_total_vpr,
+                high_count, high_total_vpr,
+                medium_count, medium_total_vpr,
+                low_count, low_total_vpr,
+                total_vulnerabilities, total_vpr,
+                resolved_count, reopened_count
+            FROM vulnerability_daily_totals
+            ORDER BY scan_date DESC
+            LIMIT 2
+        `;
+
+        db.all(totalsQuery, [], (err, totalsRows) => {
+            if (err) {
+                console.error("Error fetching daily totals for summary:", err);
+                return reject(err);
+            }
+
+            const currentTotals = totalsRows[0] || {};
+            const previousTotals = totalsRows[1] || {};
+
+            // Calculate severity impact
+            const severityImpact = {
+                critical: {
+                    current: currentTotals.critical_count || 0,
+                    previous: previousTotals.critical_count || 0,
+                    netChange: (currentTotals.critical_count || 0) - (previousTotals.critical_count || 0),
+                    vprChange: (currentTotals.critical_total_vpr || 0) - (previousTotals.critical_total_vpr || 0)
+                },
+                high: {
+                    current: currentTotals.high_count || 0,
+                    previous: previousTotals.high_count || 0,
+                    netChange: (currentTotals.high_count || 0) - (previousTotals.high_count || 0),
+                    vprChange: (currentTotals.high_total_vpr || 0) - (previousTotals.high_total_vpr || 0)
+                },
+                medium: {
+                    current: currentTotals.medium_count || 0,
+                    previous: previousTotals.medium_count || 0,
+                    netChange: (currentTotals.medium_count || 0) - (previousTotals.medium_count || 0),
+                    vprChange: (currentTotals.medium_total_vpr || 0) - (previousTotals.medium_total_vpr || 0)
+                },
+                low: {
+                    current: currentTotals.low_count || 0,
+                    previous: previousTotals.low_count || 0,
+                    netChange: (currentTotals.low_count || 0) - (previousTotals.low_count || 0),
+                    vprChange: (currentTotals.low_total_vpr || 0) - (previousTotals.low_total_vpr || 0)
+                }
+            };
+
+            // Find new CVEs introduced in this scan
+            const newCvesQuery = `
+                SELECT
+                    cve,
+                    severity,
+                    COUNT(*) as hostCount,
+                    ROUND(SUM(vpr_score), 2) as totalVpr,
+                    MIN(scan_date) as firstSeen
+                FROM vulnerabilities_current
+                WHERE scan_date = ?
+                  AND lifecycle_state IN ('active', 'reopened')
+                  AND cve NOT IN (
+                      SELECT DISTINCT cve
+                      FROM vulnerability_daily_totals prev
+                      JOIN vulnerabilities_current prev_vulns ON prev_vulns.scan_date < ?
+                      WHERE prev_vulns.cve IS NOT NULL
+                  )
+                GROUP BY cve, severity
+                ORDER BY severity, hostCount DESC
+            `;
+
+            db.all(newCvesQuery, [scanDate, scanDate], (cveErr, newCveRows) => {
+                if (cveErr) {
+                    console.error("Error finding new CVEs:", cveErr);
+                    // Continue without CVE discovery data
+                }
+
+                const newCves = newCveRows || [];
+                const totalNewVulnerabilities = newCves.reduce((sum, cve) => sum + cve.hostCount, 0);
+                const totalNewVpr = newCves.reduce((sum, cve) => sum + cve.totalVpr, 0);
+
+                // Calculate percentage changes
+                const totalPrevious = previousTotals.total_vulnerabilities || 0;
+                const totalCurrent = currentTotals.total_vulnerabilities || 0;
+                const percentageChange = totalPrevious > 0 ?
+                    ((totalCurrent - totalPrevious) / totalPrevious * 100) : 0;
+
+                // Get unique hosts affected
+                const hostsQuery = `
+                    SELECT COUNT(DISTINCT hostname) as uniqueHosts
+                    FROM vulnerabilities_current
+                    WHERE scan_date = ? AND lifecycle_state IN ('active', 'reopened')
+                `;
+
+                db.get(hostsQuery, [scanDate], (hostsErr, hostsResult) => {
+                    if (hostsErr) {
+                        console.error("Error counting unique hosts:", hostsErr);
+                    }
+
+                    const uniqueHosts = hostsResult ? hostsResult.uniqueHosts : 0;
+
+                    // Build comprehensive summary
+                    const summary = {
+                        sessionId: null, // Will be set by caller
+                        importMetadata: {
+                            filename: importMetadata.filename || "unknown",
+                            vendor: importMetadata.vendor || "unknown",
+                            scanDate: scanDate,
+                            importId: importMetadata.importId,
+                            totalRows: importMetadata.totalRows || 0,
+                            processingTime: processingStats.processingTime || 0
+                        },
+                        cveDiscovery: {
+                            newCves: newCves.map(cve => ({
+                                cve: cve.cve,
+                                severity: cve.severity,
+                                hostCount: cve.hostCount,
+                                totalVpr: cve.totalVpr,
+                                firstSeen: cve.firstSeen
+                            })),
+                            totalNewCves: newCves.length,
+                            totalNewVulnerabilities: totalNewVulnerabilities,
+                            totalNewVpr: Math.round(totalNewVpr * 100) / 100
+                        },
+                        severityImpact: severityImpact,
+                        hostImpact: {
+                            totalUniqueHosts: uniqueHosts,
+                            newHostsAffected: 0, // Could be calculated if needed
+                            existingHostsUpdated: 0 // Could be calculated if needed
+                        },
+                        comparison: {
+                            previousTotal: totalPrevious,
+                            currentTotal: totalCurrent,
+                            netChange: totalCurrent - totalPrevious,
+                            percentageChange: Math.round(percentageChange * 100) / 100,
+                            significantChange: Math.abs(percentageChange) > 25,
+                            changeThreshold: 25,
+                            resolvedCount: currentTotals.resolved_count || 0,
+                            reopenedCount: currentTotals.reopened_count || 0
+                        }
+                    };
+
+                    console.log("✅ Import summary generated:", {
+                        newCves: summary.cveDiscovery.totalNewCves,
+                        totalChange: summary.comparison.netChange,
+                        percentChange: summary.comparison.percentageChange
+                    });
+
+                    resolve(summary);
+                });
+            });
+        });
+    });
+}
+
 // Export the service functions
 module.exports = {
     extractDateFromFilename,
@@ -1238,5 +1422,6 @@ module.exports = {
     importCsvStaging,
     processVulnerabilitiesWithLifecycle,
     bulkLoadToStagingTable,
-    processStagingToFinalTables
+    processStagingToFinalTables,
+    generateImportSummary
 };

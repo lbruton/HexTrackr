@@ -13,6 +13,7 @@
 The CISA KEV catalog provides a JSON feed of actively exploited vulnerabilities that's freely accessible via REST API. Integration can significantly enhance HexTrackr's vulnerability prioritization with minimal performance impact using proper caching and batch processing strategies. The API requires no authentication and provides real-world exploitation intelligence for approximately 1,200+ CVEs.
 
 🔍 RESEARCH METHODOLOGY
+
 - Tools Used: Brave Search with summarizer for comprehensive coverage
 - Search Strategy: Official CISA documentation, implementation best practices, performance optimization patterns, UI/UX visualization standards
 
@@ -29,11 +30,13 @@ The CISA KEV catalog provides a JSON feed of actively exploited vulnerabilities 
 ## 1. CISA KEV API Documentation
 
 **Primary Endpoint:**
+
 - **JSON Feed**: `https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json`
 - **CSV Alternative**: `https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.csv`
 - **Mirror Repository**: GitHub `cisagov/kev-data` provides redundancy and JSON schema
 
 **API Characteristics:**
+
 - **Authentication**: None required (public endpoint)
 - **Rate Limits**: No documented limits (reasonable use expected)
 - **Content-Type**: `application/json`
@@ -41,6 +44,7 @@ The CISA KEV catalog provides a JSON feed of actively exploited vulnerabilities 
 - **Format**: Well-structured JSON with consistent schema
 
 **JSON Schema Structure:**
+
 ```json
 {
   "title": "CISA Catalog of Known Exploited Vulnerabilities",
@@ -67,12 +71,14 @@ The CISA KEV catalog provides a JSON feed of actively exploited vulnerabilities 
 ## 2. Implementation Best Practices
 
 **Efficient Query Strategy:**
+
 - **Full Download**: Download entire catalog (small file ~500KB)
 - **Compare Versions**: Use `catalogVersion` field to detect updates
 - **Batch Processing**: Process all CVEs in single operation
 - **Error Handling**: Implement retry logic with exponential backoff
 
 **Performance Optimizations:**
+
 - **Memory Efficiency**: Stream processing for large vulnerability databases
 - **Parallel Processing**: Use Node.js Worker Threads for bulk updates
 - **Indexing**: Create database index on CVE_ID for fast lookups
@@ -81,6 +87,7 @@ The CISA KEV catalog provides a JSON feed of actively exploited vulnerabilities 
 ## 3. Database Schema Design
 
 **Recommended Approach: Separate KEV Table**
+
 ```sql
 -- Primary vulnerabilities table (existing)
 CREATE TABLE vulnerabilities (
@@ -113,6 +120,7 @@ CREATE INDEX idx_kev_status_date_added ON kev_status(date_added);
 ```
 
 **Rationale for Separate Table:**
+
 - **Normalized Design**: Maintains data integrity
 - **Future Extensibility**: Easy to add KEV-specific metadata
 - **Performance**: Smaller joins, better indexing
@@ -121,6 +129,7 @@ CREATE INDEX idx_kev_status_date_added ON kev_status(date_added);
 ## 4. Batch Processing Strategy
 
 **Initial Population Algorithm:**
+
 ```javascript
 async function populateKevData() {
   const kevResponse = await fetch(KEV_API_URL);
@@ -149,6 +158,7 @@ async function processBatch(vulnerabilities) {
 ```
 
 **Ongoing Updates Strategy:**
+
 - **Scheduled Updates**: Daily checks during business hours
 - **Version Comparison**: Only download if `catalogVersion` changed
 - **Incremental Processing**: Compare date_added fields for new entries
@@ -157,12 +167,14 @@ async function processBatch(vulnerabilities) {
 ## 5. Visual Indicators - Industry Standards
 
 **KEV Badge Design:**
+
 - **Color**: High-contrast red/orange for critical attention
 - **Icon**: Exclamation triangle or fire symbol
 - **Text**: "KEV" or "Actively Exploited"
 - **Placement**: Prominent position in vulnerability tables
 
 **Dashboard Visualization Patterns:**
+
 - **Status Badges**: Color-coded pills (Red for KEV, Orange for High CVSS)
 - **Priority Columns**: Dedicated KEV indicator column
 - **Filtering**: Quick filters for "KEV Only" view
@@ -170,6 +182,7 @@ async function processBatch(vulnerabilities) {
 - **Charts**: KEV vs Non-KEV distribution pie charts
 
 **UI Implementation Examples:**
+
 ```css
 .kev-badge {
   background: linear-gradient(135deg, #dc2626, #ef4444);
@@ -190,17 +203,20 @@ async function processBatch(vulnerabilities) {
 ## 6. Performance Considerations
 
 **Caching Strategy:**
+
 - **API Response Caching**: 1-hour cache with ETags
 - **Database Results**: Cache KEV lookups for 24 hours
 - **Memory Caching**: Use Redis/Node-cache for hot data
 - **CDN Integration**: Consider CloudFlare for API proxy
 
 **Update Frequency Recommendations:**
+
 - **Production**: Every 6-12 hours during business days
 - **Development**: Weekly or on-demand
 - **Critical Updates**: Webhook or RSS monitoring for urgent additions
 
 **API Call Optimization:**
+
 ```javascript
 // Efficient update check
 async function checkForKevUpdates() {
@@ -218,6 +234,7 @@ async function checkForKevUpdates() {
 ## 7. Integration Architecture
 
 **Service Layer Design:**
+
 ```javascript
 // app/services/kevService.js
 class KevService {
@@ -236,6 +253,7 @@ class KevService {
 ```
 
 **API Endpoints:**
+
 - `GET /api/vulnerabilities?kev=true` - Filter by KEV status
 - `GET /api/kev/sync` - Manual KEV data refresh
 - `GET /api/kev/stats` - KEV coverage statistics

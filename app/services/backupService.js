@@ -71,79 +71,154 @@ class BackupService {
     }
 
     /**
-     * Export vulnerabilities data
-     * Extracted from server.js line 3304-3317
+     * Export vulnerabilities data (FIXED: now exports active data)
+     * Previously exported empty legacy table, now exports complete vulnerability ecosystem
      */
     async exportVulnerabilities() {
-        return new Promise((resolve, reject) => {
-            this.db.all("SELECT * FROM vulnerabilities LIMIT 10000", (err, rows) => {
-                if (err) {
-                    return reject(new Error("Export failed: " + err.message));
-                }
+        return new Promise(async (resolve, reject) => {
+            try {
+                // Export all vulnerability-related tables
+                const vulnerabilitiesData = await Promise.all([
+                    this._fetchData("SELECT * FROM vulnerabilities_current"),
+                    this._fetchData("SELECT * FROM vulnerability_snapshots"),
+                    this._fetchData("SELECT * FROM vulnerability_daily_totals"),
+                    this._fetchData("SELECT * FROM vulnerability_imports"),
+                    this._fetchData("SELECT * FROM vulnerability_templates"),
+                    this._fetchData("SELECT * FROM kev_status"),
+                    this._fetchData("SELECT * FROM ticket_vulnerabilities")
+                ]);
+
+                const [current, snapshots, dailyTotals, imports, templates, kevStatus, ticketVulns] = vulnerabilitiesData;
 
                 resolve({
-                    type: "vulnerabilities",
-                    count: rows.length,
-                    data: rows,
+                    type: "vulnerabilities_complete",
+                    vulnerabilities_current: {
+                        count: current.length,
+                        data: current
+                    },
+                    vulnerability_snapshots: {
+                        count: snapshots.length,
+                        data: snapshots
+                    },
+                    vulnerability_daily_totals: {
+                        count: dailyTotals.length,
+                        data: dailyTotals
+                    },
+                    vulnerability_imports: {
+                        count: imports.length,
+                        data: imports
+                    },
+                    vulnerability_templates: {
+                        count: templates.length,
+                        data: templates
+                    },
+                    kev_status: {
+                        count: kevStatus.length,
+                        data: kevStatus
+                    },
+                    ticket_vulnerabilities: {
+                        count: ticketVulns.length,
+                        data: ticketVulns
+                    },
                     exported_at: new Date().toISOString()
                 });
-            });
+            } catch (error) {
+                reject(new Error("Vulnerability export failed: " + error.message));
+            }
         });
     }
 
     /**
-     * Export tickets data
-     * Extracted from server.js line 3606-3621
+     * Export tickets data (ENHANCED: includes related tables)
+     * Now exports complete ticket ecosystem including templates
      */
     async exportTickets() {
-        return new Promise((resolve, reject) => {
-            this.db.all("SELECT * FROM tickets ORDER BY created_at DESC", (err, rows) => {
-                if (err) {
-                    return reject(new Error("Failed to fetch tickets: " + err.message));
-                }
+        return new Promise(async (resolve, reject) => {
+            try {
+                // Export all ticket-related tables
+                const ticketData = await Promise.all([
+                    this._fetchData("SELECT * FROM tickets ORDER BY created_at DESC"),
+                    this._fetchData("SELECT * FROM ticket_templates"),
+                    this._fetchData("SELECT * FROM email_templates"),
+                    this._fetchData("SELECT * FROM ticket_vulnerabilities"),
+                    this._fetchData("SELECT * FROM sync_metadata")
+                ]);
+
+                const [tickets, ticketTemplates, emailTemplates, ticketVulns, syncMeta] = ticketData;
 
                 resolve({
-                    type: "tickets",
-                    count: rows.length,
-                    data: rows,
+                    type: "tickets_complete",
+                    tickets: {
+                        count: tickets.length,
+                        data: tickets
+                    },
+                    ticket_templates: {
+                        count: ticketTemplates.length,
+                        data: ticketTemplates
+                    },
+                    email_templates: {
+                        count: emailTemplates.length,
+                        data: emailTemplates
+                    },
+                    ticket_vulnerabilities: {
+                        count: ticketVulns.length,
+                        data: ticketVulns
+                    },
+                    sync_metadata: {
+                        count: syncMeta.length,
+                        data: syncMeta
+                    },
                     exported_at: new Date().toISOString()
                 });
-            });
+            } catch (error) {
+                reject(new Error("Ticket export failed: " + error.message));
+            }
         });
     }
 
     /**
-     * Export complete backup (vulnerabilities + tickets)
-     * Extracted from server.js line 3623-3651
+     * Export complete backup (ALL tables + metadata)
+     * COMPLETELY REWRITTEN: Now exports entire database ecosystem
      */
     async exportAll() {
-        return new Promise((resolve, reject) => {
-            // Get vulnerabilities and tickets from database
-            this.db.all("SELECT * FROM vulnerabilities LIMIT 10000", (err, vulnRows) => {
-                if (err) {
-                    return reject(new Error("Export failed: " + err.message));
-                }
+        try {
+            console.log("🔄 Starting comprehensive database backup...");
 
-                this.db.all("SELECT * FROM tickets ORDER BY created_at DESC", (ticketErr, ticketRows) => {
-                    if (ticketErr) {
-                        return reject(new Error("Export failed - tickets error: " + ticketErr.message));
-                    }
+            // Get comprehensive data from both export functions
+            const [vulnerabilityData, ticketData] = await Promise.all([
+                this.exportVulnerabilities(),
+                this.exportTickets()
+            ]);
 
-                    resolve({
-                        type: "complete_backup",
-                        vulnerabilities: {
-                            count: vulnRows.length,
-                            data: vulnRows
-                        },
-                        tickets: {
-                            count: ticketRows.length,
-                            data: ticketRows
-                        },
-                        exported_at: new Date().toISOString()
-                    });
-                });
-            });
-        });
+            // Calculate total record counts for logging
+            const totalVulnRecords = Object.keys(vulnerabilityData)
+                .filter(key => key !== 'type' && key !== 'exported_at')
+                .reduce((sum, key) => sum + (vulnerabilityData[key]?.count || 0), 0);
+
+            const totalTicketRecords = Object.keys(ticketData)
+                .filter(key => key !== 'type' && key !== 'exported_at')
+                .reduce((sum, key) => sum + (ticketData[key]?.count || 0), 0);
+
+            console.log(`✅ Backup complete: ${totalVulnRecords} vulnerability records, ${totalTicketRecords} ticket/template records`);
+
+            return {
+                type: "complete_backup_enhanced",
+                backup_metadata: {
+                    created_at: new Date().toISOString(),
+                    total_vulnerability_records: totalVulnRecords,
+                    total_ticket_records: totalTicketRecords,
+                    database_version: "v1.0.24-enhanced",
+                    backup_schema_version: "2.0"
+                },
+                vulnerability_data: vulnerabilityData,
+                ticket_data: ticketData,
+                exported_at: new Date().toISOString()
+            };
+
+        } catch (error) {
+            console.error("❌ Complete backup failed:", error.message);
+            throw new Error("Complete backup failed: " + error.message);
+        }
     }
 
     /**
@@ -391,6 +466,137 @@ class BackupService {
                 }
             });
         });
+    }
+
+
+
+
+
+
+    /**
+     * Export complete backup as ZIP file
+     * Creates a comprehensive backup with all tables in ZIP format
+     * @returns {Promise<Buffer>} ZIP file buffer
+     */
+    async exportAllAsZip() {
+        try {
+            console.log("🔄 Creating comprehensive ZIP backup...");
+
+            // Get all data using the enhanced export
+            const backupData = await this.exportAll();
+
+            // Create ZIP file
+            const zip = new JSZip();
+
+            // Add main backup data
+            zip.file("complete_backup.json", JSON.stringify(backupData, null, 2));
+
+            // Add individual table exports for easier restoration
+            zip.file("vulnerabilities_current.json", JSON.stringify(backupData.vulnerability_data.vulnerabilities_current, null, 2));
+            zip.file("vulnerability_snapshots.json", JSON.stringify(backupData.vulnerability_data.vulnerability_snapshots, null, 2));
+            zip.file("vulnerability_daily_totals.json", JSON.stringify(backupData.vulnerability_data.vulnerability_daily_totals, null, 2));
+            zip.file("vulnerability_imports.json", JSON.stringify(backupData.vulnerability_data.vulnerability_imports, null, 2));
+            zip.file("tickets.json", JSON.stringify(backupData.ticket_data.tickets, null, 2));
+            zip.file("ticket_templates.json", JSON.stringify(backupData.ticket_data.ticket_templates, null, 2));
+            zip.file("email_templates.json", JSON.stringify(backupData.ticket_data.email_templates, null, 2));
+            zip.file("kev_status.json", JSON.stringify(backupData.vulnerability_data.kev_status, null, 2));
+
+            // Add metadata file
+            const metadata = {
+                backup_type: "complete_enhanced_zip",
+                created_at: new Date().toISOString(),
+                version: "2.0",
+                tables_included: [
+                    "vulnerabilities_current", "vulnerability_snapshots", "vulnerability_daily_totals",
+                    "vulnerability_imports", "vulnerability_templates", "kev_status", "ticket_vulnerabilities",
+                    "tickets", "ticket_templates", "email_templates", "sync_metadata"
+                ],
+                total_records: backupData.backup_metadata.total_vulnerability_records + backupData.backup_metadata.total_ticket_records,
+                restore_instructions: "Use the comprehensive backup restore API with this ZIP file"
+            };
+            zip.file("backup_metadata.json", JSON.stringify(metadata, null, 2));
+
+            // Generate ZIP buffer
+            const zipBuffer = await zip.generateAsync({
+                type: "nodebuffer",
+                compression: "DEFLATE",
+                compressionOptions: { level: 6 }
+            });
+
+            console.log(`✅ ZIP backup created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
+
+            return zipBuffer;
+
+        } catch (error) {
+            console.error("❌ ZIP backup creation failed:", error.message);
+            throw new Error(`ZIP backup failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * Export vulnerabilities as ZIP file
+     * Creates vulnerability-focused backup in ZIP format
+     * @returns {Promise<Buffer>} ZIP file buffer
+     */
+    async exportVulnerabilitiesAsZip() {
+        try {
+            console.log("🔄 Creating vulnerabilities ZIP backup...");
+
+            const vulnData = await this.exportVulnerabilities();
+            const zip = new JSZip();
+
+            // Add vulnerability data
+            zip.file("vulnerabilities.json", JSON.stringify(vulnData, null, 2));
+
+            // Add individual tables
+            Object.keys(vulnData).forEach(key => {
+                if (key !== 'type' && key !== 'exported_at' && vulnData[key].data) {
+                    zip.file(`${key}.json`, JSON.stringify(vulnData[key], null, 2));
+                }
+            });
+
+            const zipBuffer = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
+            console.log(`✅ Vulnerabilities ZIP created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
+
+            return zipBuffer;
+
+        } catch (error) {
+            console.error("❌ Vulnerabilities ZIP backup failed:", error.message);
+            throw new Error(`Vulnerabilities ZIP backup failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * Export tickets as ZIP file
+     * Creates ticket-focused backup in ZIP format
+     * @returns {Promise<Buffer>} ZIP file buffer
+     */
+    async exportTicketsAsZip() {
+        try {
+            console.log("🔄 Creating tickets ZIP backup...");
+
+            const ticketData = await this.exportTickets();
+            const zip = new JSZip();
+
+            // Add ticket data
+            zip.file("tickets.json", JSON.stringify(ticketData, null, 2));
+
+            // Add individual tables
+            Object.keys(ticketData).forEach(key => {
+                if (key !== 'type' && key !== 'exported_at' && ticketData[key].data) {
+                    zip.file(`${key}.json`, JSON.stringify(ticketData[key], null, 2));
+                }
+            });
+
+            const zipBuffer = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
+            console.log(`✅ Tickets ZIP created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
+
+            return zipBuffer;
+
+        } catch (error) {
+            console.error("❌ Tickets ZIP backup failed:", error.message);
+            throw new Error(`Tickets ZIP backup failed: ${error.message}`);
+        }
     }
 }
 
