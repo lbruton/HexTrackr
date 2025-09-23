@@ -214,7 +214,10 @@ class DeviceSecurityModal {
                     const pluginName = params.data.plugin_name;
                     
                     if (cve && cve.startsWith("CVE-")) {
-                        return `<a href="#" class="text-primary text-decoration-none" onclick="vulnManager.lookupVulnerability('${cve}'); return false;">${cve}</a>`;
+                        const cveUrl = `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}`;
+                        return `<a href="#" class="text-primary text-decoration-none"
+                                   onclick="window.open('${cveUrl}', 'cve_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
+                                   title="View CVE details on MITRE">${cve}</a>`;
                     }
                     
                     // Check for Cisco SA ID in plugin name
@@ -222,7 +225,10 @@ class DeviceSecurityModal {
                         const ciscoSaMatch = pluginName.match(/cisco-sa-([a-zA-Z0-9-]+)/i);
                         if (ciscoSaMatch) {
                             const ciscoId = `cisco-sa-${ciscoSaMatch[1]}`;
-                            return `<a href="#" class="text-warning text-decoration-none" onclick="vulnManager.lookupVulnerability('${ciscoId}'); return false;">${ciscoId}</a>`;
+                            const ciscoUrl = `https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/${ciscoId}`;
+                            return `<a href="#" class="text-warning text-decoration-none"
+                                       onclick="window.open('${ciscoUrl}', 'cisco_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
+                                       title="View Cisco Security Advisory">${ciscoId}</a>`;
                         }
                     }
                     
@@ -250,7 +256,7 @@ class DeviceSecurityModal {
                         }
                         window.vulnModalData[vulnDataId] = params.data;
                         
-                        return `<a href="#" class="text-decoration-none text-dark" style="cursor: pointer;" title="${value}" onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}')">${value}</a>`;
+                        return `<a href="#" class="ag-grid-link" title="${value}" onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}')">${value}</a>`;
                     }
                     return `<span title="${value}">${value}</span>`;
                 }

@@ -71,59 +71,40 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Tenable API Configuration -->
+                                    <!-- CISA KEV Sync Configuration -->
                                     <div class="col-lg-6 mb-4">
                                         <div class="card">
                                             <div class="card-header">
                                                 <h6 class="card-title mb-0">
-                                                    <i class="fas fa-shield-alt me-2 text-success"></i>
-                                                    Tenable API
+                                                    <i class="fas fa-fire me-2 text-danger"></i>
+                                                    CISA KEV Sync
                                                 </h6>
                                             </div>
                                             <div class="card-body">
                                                 <div class="mb-3">
-                                                    <label for="tenableApiKey" class="form-label">Access Key</label>
-                                                    <input type="text" class="form-control" id="tenableApiKey" placeholder="Enter Tenable Access Key">
+                                                    <label class="form-label">Last Sync</label>
+                                                    <div class="text-muted" id="kevLastSync">Never synced</div>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label for="tenableSecretKey" class="form-label">Secret Key</label>
-                                                    <input type="password" class="form-control" id="tenableSecretKey" placeholder="Enter Secret Key">
+                                                    <label class="form-label">KEV Statistics</label>
+                                                    <div class="text-muted" id="kevStats">
+                                                        <span id="kevTotalCount">0</span> total KEVs •
+                                                        <span id="kevMatchedCount">0</span> matched in your environment
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="kevAutoSync" checked>
+                                                        <label class="form-check-label" for="kevAutoSync">
+                                                            Auto-sync every 24 hours
+                                                        </label>
+                                                    </div>
                                                 </div>
                                                 <div class="d-flex justify-content-between align-items-center">
-                                                    <button type="button" class="btn btn-outline-success" id="testTenableConnection">
-                                                        <i class="fas fa-satellite-dish me-2"></i>Test Connection
+                                                    <button type="button" class="btn btn-outline-danger" id="syncKevNow">
+                                                        <i class="fas fa-sync me-2"></i>Sync Now
                                                     </button>
-                                                    <span class="badge bg-secondary" id="tenableStatus">Not Configured</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- API Actions -->
-                                    <div class="col-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-download me-2 text-info"></i>
-                                                    Data Synchronization
-                                                </h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row g-2">
-                                                    <div class="col-md-6">
-                                                        <button type="button" class="btn btn-info w-100" id="fetchTenableData">
-                                                            <i class="fas fa-cloud-download-alt me-2"></i>
-                                                            Fetch Tenable Historical Data
-                                                        </button>
-                                                        <small class="text-muted">Retrieves historical VPR score data for trending analysis</small>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <button type="button" class="btn btn-primary w-100" id="fetchCiscoData">
-                                                            <i class="fas fa-cloud-download-alt me-2"></i>
-                                                            Fetch Cisco Security Advisories
-                                                        </button>
-                                                        <small class="text-muted">Downloads latest security advisories from Cisco PSIRT</small>
-                                                    </div>
+                                                    <span class="badge bg-secondary" id="kevStatus">Not Synced</span>
                                                 </div>
                                             </div>
                                         </div>

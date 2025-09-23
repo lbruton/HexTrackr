@@ -8,7 +8,441 @@
                         <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
                              alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
                     </a>.</p>
-<h2>[1.0.17] - 2025-09-19</h2><h3>Fixed</h3><h4>CSV Import Pipeline</h4><ul>
+<h2>[Unreleased]</h2><h3>Fixed - NPM Scripts Cleanup</h3><h4>Development Workflow Improvements</h4><ul>
+<li><p><strong>Removed Broken Scripts</strong>: Eliminated NPM scripts that referenced non-existent files</p>
+<ul>
+<li>Removed <code>npm run roadmap</code> (scripts/generate-roadmap-portal.js missing)</li>
+<li>Removed <code>npm run docs:review</code> (app/public/scripts/gemini-docs-generator.js missing)</li>
+<li>Removed <code>npm run docs:analyze</code> (app/public/scripts/generate-architecture-analysis.js missing)</li>
+</ul>
+</li>
+<li><p><strong>Fixed Test Scripts</strong>: Updated test commands to handle missing test directories gracefully</p>
+<ul>
+<li>Added <code>--passWithNoTests</code> flag to test:unit, test:integration, test:contract</li>
+<li>Scripts now pass without error when no test files exist</li>
+<li>Clear warnings added in NPMGUIDE.md about directory status</li>
+</ul>
+</li>
+</ul>
+<h4>Documentation Updates</h4><ul>
+<li><p><strong>Updated NPMGUIDE.md</strong>: Moved to root directory and cleaned up outdated script references</p>
+<ul>
+<li>Removed documentation for broken scripts</li>
+<li>Added status warnings for placeholder test commands</li>
+<li>Updated workflow examples to use working commands</li>
+</ul>
+</li>
+<li><p><strong>CLAUDE.md Corrections</strong>: Removed references to broken scripts in development commands</p>
+<ul>
+<li>Simplified documentation section to show only working scripts</li>
+<li>Added reference to NPMGUIDE.md location</li>
+</ul>
+</li>
+</ul>
+<h4>Impact</h4><ul>
+<li>All documented NPM scripts now function correctly</li>
+<li>No more confusion about missing script files</li>
+<li>Clear guidance on test infrastructure development status</li>
+<li>Improved developer onboarding experience</li>
+</ul>
+<h3>Removed - Testing Infrastructure Cleanup</h3><h4>Development Simplification</h4><ul>
+<li><p><strong>Removed Jest Testing Framework</strong>: Eliminated unused Jest test infrastructure</p>
+<ul>
+<li>Removed 8 testing devDependencies (@jest/globals, jest, jest-environment-jsdom, etc.)</li>
+<li>Removed 6 test-related NPM scripts (test, test:watch, test:coverage, etc.)</li>
+<li>Kept only templateService.test.js as reference example</li>
+</ul>
+</li>
+<li><p><strong>Removed Playwright Testing Framework</strong>: Eliminated unused Playwright E2E testing</p>
+<ul>
+<li>Removed @playwright/test and playwright packages</li>
+<li>Removed supertest dependency</li>
+<li>Simplified to manual testing workflow</li>
+</ul>
+</li>
+</ul>
+<h4>Rationale</h4><ul>
+<li><strong>Workflow Alignment</strong>: Manual testing with screenshots preferred by development team</li>
+<li><strong>Playwright MCP Available</strong>: Browser automation available through MCP when needed</li>
+<li><strong>Complexity Reduction</strong>: Removed 750MB+ of testing dependencies and tooling</li>
+<li><strong>Faster Development</strong>: Simplified npm install and reduced cognitive overhead</li>
+</ul>
+<h4>Impact</h4><ul>
+<li>Package size reduced significantly (Jest + Playwright = ~750MB dependencies)</li>
+<li>Faster npm install times</li>
+<li>Cleaner package.json with focus on actual workflow</li>
+<li>Manual testing remains primary validation method</li>
+<li>Playwright MCP provides automation capabilities when needed</li>
+</ul>
+<h2>[1.0.23] - 2025-09-22</h2><h3>Added - Interactive Statistics Card Filtering</h3><h4>Enhanced Ticket Management User Experience</h4><ul>
+<li><strong>Clickable Statistics Cards</strong>: Transformed passive statistics displays into interactive filter controls<ul>
+<li><strong>Total Tickets Card</strong>: Shows all tickets, acts as filter reset button</li>
+<li><strong>Open Tickets Card</strong>: Filters to active tickets (excludes Closed, Completed, Failed statuses)</li>
+<li><strong>Overdue Card</strong>: Shows urgent tickets requiring immediate attention (Overdue + Failed statuses)</li>
+<li><strong>Completed Card</strong>: Displays finished work (Completed + Closed statuses)</li>
+</ul>
+</li>
+</ul>
+<h4>Technical Implementation</h4><ul>
+<li><p><strong>Smart Filter Integration</strong>: Card filters integrate seamlessly with existing search and location filters</p>
+<ul>
+<li>Mutual exclusivity with status dropdown to prevent filter conflicts</li>
+<li>Automatic pagination reset when filters are applied</li>
+<li>Preserves existing filter chain architecture for backward compatibility</li>
+</ul>
+</li>
+<li><p><strong>Statistics Logic Fix</strong>: Corrected &quot;Open Tickets&quot; calculation to include all non-terminal statuses</p>
+<ul>
+<li>Previous logic only counted &quot;Open&quot; and &quot;In Progress&quot; statuses</li>
+<li>New logic excludes terminal statuses (Closed, Completed, Failed) for more accurate representation</li>
+<li>Statistics now align perfectly with filter behavior for consistency</li>
+</ul>
+</li>
+</ul>
+<h4>User Interface Enhancements</h4><ul>
+<li><p><strong>Visual Feedback System</strong>: Added comprehensive visual indicators for interactive elements</p>
+<ul>
+<li>Hover effects with theme-aware shadows and subtle lift animations</li>
+<li>Active card highlighting with distinct border and background styling</li>
+<li>Smooth 200ms transitions for professional feel</li>
+<li>Pointer cursor indication for clickability</li>
+</ul>
+</li>
+<li><p><strong>Theme Compatibility</strong>: Full support for both light and dark themes</p>
+<ul>
+<li>Dynamic shadow effects adapted for each theme</li>
+<li>Proper contrast ratios maintained across all visual states</li>
+<li>Consistent styling with existing HexTrackr design system</li>
+</ul>
+</li>
+</ul>
+<h4>Accessibility Excellence</h4><ul>
+<li><p><strong>Screen Reader Support</strong>: Complete accessibility implementation for all users</p>
+<ul>
+<li>ARIA button roles with pressed/unpressed state announcements</li>
+<li>Live region announcements for filter changes (&quot;Showing open tickets only&quot;, etc.)</li>
+<li>Unique descriptive labels for each card&#39;s functionality</li>
+</ul>
+</li>
+<li><p><strong>Keyboard Navigation</strong>: Full keyboard accessibility support</p>
+<ul>
+<li>Tab navigation through all statistics cards</li>
+<li>Enter and Space key activation matching mouse click behavior</li>
+<li>Focus indicators meeting WCAG AA contrast requirements</li>
+<li>Logical tab order for intuitive navigation</li>
+</ul>
+</li>
+</ul>
+<h4>Performance Optimizations</h4><ul>
+<li><strong>Efficient Filter Processing</strong>: Optimized filter operations for large datasets<ul>
+<li>Sub-100ms filter response times for datasets up to 1000+ tickets</li>
+<li>No AG-Grid re-initialization during filter changes</li>
+<li>Preserved existing performance characteristics</li>
+</ul>
+</li>
+</ul>
+<h3>Technical Notes</h3><ul>
+<li><strong>Architecture</strong>: Extends existing <code>HexagonTicketsManager</code> class with minimal code changes</li>
+<li><strong>Integration</strong>: Works seamlessly with AG-Grid v33 and existing filter infrastructure</li>
+<li><strong>Compatibility</strong>: Maintains full backward compatibility with existing workflows</li>
+<li><strong>Testing</strong>: Comprehensive functionality verified across all supported browsers</li>
+</ul>
+<h2>[1.0.22] - 2025-09-21</h2><h3>Enhanced - KEV (Known Exploited Vulnerabilities) Integration</h3><h4>AG-Grid Table Improvements</h4><ul>
+<li><p><strong>Filterable KEV Column</strong>: Replaced fire emoji (🔥) with filterable YES/NO pills in KEV column</p>
+<ul>
+<li>Red badge for &quot;YES&quot; (vulnerability is in KEV catalog)</li>
+<li>Blue badge for &quot;NO&quot; (not in KEV catalog)</li>
+<li>Follows same design pattern as severity and VPR columns for consistency</li>
+<li>Enables proper filtering using AG-Grid&#39;s built-in text-based filter system</li>
+</ul>
+</li>
+<li><p><strong>KEV Column Filtering Fix</strong>: Fixed KEV column filtering to work with AG-Grid&#39;s filtering system</p>
+<ul>
+<li>Changed database query to return &#39;Yes&#39;/&#39;No&#39; text values instead of 1/0 boolean</li>
+<li>Updated column renderer to parse text values for proper filtering compatibility</li>
+<li>Made KEV badges clickable to open detailed KEV modal for vulnerability information</li>
+</ul>
+</li>
+</ul>
+<h4>KEV Modal Enhancements</h4><ul>
+<li><p><strong>CVE Details Integration</strong>: Added &quot;View CVE Details&quot; button in KEV modal</p>
+<ul>
+<li>Opens vulnerability details modal for comprehensive CVE information</li>
+<li>Provides seamless navigation between KEV catalog info and full vulnerability details</li>
+<li>Uses existing <code>showVulnerabilityDetailsByCVE()</code> function for consistency</li>
+</ul>
+</li>
+<li><p><strong>NIST NVD Integration</strong>: Replaced CISA KEV Catalog link with NIST NVD link</p>
+<ul>
+<li>Uses pattern <code>https://nvd.nist.gov/vuln/detail/${cveId}</code> for direct CVE lookup</li>
+<li>Provides more comprehensive vulnerability information from authoritative source</li>
+<li>Both modal buttons now use consistent primary button style for better UI cohesion</li>
+</ul>
+</li>
+<li><p><strong>Clickable Links in Notes</strong>: Made all HTTPS links in KEV additional notes clickable</p>
+<ul>
+<li>Links open in 1200x1200px popup windows for consistency with rest of application</li>
+<li>Automatic regex replacement converts plain URLs to clickable links</li>
+<li>Preserves existing text while enhancing usability</li>
+</ul>
+</li>
+</ul>
+<h4>Filter Dropdown Improvements</h4><ul>
+<li><p><strong>Filter Option Cleanup</strong>: Removed fire emoji from KEV filter option in severity dropdown</p>
+<ul>
+<li>Changed dropdown option from &quot;🔥 KEV&quot; to simply &quot;KEV&quot; for cleaner interface</li>
+<li>Maintains clear identification of KEV filtering without emoji clutter</li>
+</ul>
+</li>
+<li><p><strong>KEV Filter Logic Fix</strong>: Fixed KEV filter to properly match vulnerabilities</p>
+<ul>
+<li>Added special handling in filter logic to distinguish KEV from severity filtering</li>
+<li>Fixed filter matching to properly check <code>isKev === &quot;Yes&quot;</code> when KEV filter selected</li>
+<li>Ensures consistent filtering behavior across grid, cards, and modal contexts</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed - KEV Data Handling</h3><ul>
+<li><p><strong>Database Service Updates</strong>: Updated vulnerability service to return text-based KEV values</p>
+<ul>
+<li>Changed database query from returning 1/0 to &#39;Yes&#39;/&#39;No&#39; text values</li>
+<li>Ensures compatibility with AG-Grid&#39;s text-based filtering system</li>
+<li>Maintains data integrity while improving UI functionality</li>
+</ul>
+</li>
+<li><p><strong>Component Consistency</strong>: Fixed KEV handling across all vulnerability components</p>
+<ul>
+<li>Updated vulnerability cards to check for text value &quot;Yes&quot; instead of boolean</li>
+<li>Ensured consistent KEV data interpretation in grid, cards, modals, and filters</li>
+<li>Eliminated discrepancies between different UI components</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.21] - 2025-09-21</h2><h3>Added</h3><h4>Unified Template Variable System</h4><ul>
+<li><p><strong>Centralized Variable Configuration</strong>: Created <code>template-variables.js</code> with unified variable definitions</p>
+<ul>
+<li>Consistent naming conventions across all template types ([HEXAGON_TICKET], [SERVICENOW_TICKET], etc.)</li>
+<li>Categorized variables by function: Ticket Info, Location, Dates, Devices, Personnel, Content, Counts</li>
+<li>Universal variable access for maximum flexibility across ticket, email, and vulnerability templates</li>
+<li>Backward compatibility maintained for existing templates</li>
+</ul>
+</li>
+<li><p><strong>Dropdown Variable Interface</strong>: Transformed bulky 300px variable panels into compact Bootstrap dropdowns</p>
+<ul>
+<li><strong>87% space reduction</strong>: From 300px fixed panels to 38px dropdown buttons in editor headers</li>
+<li>Organized variable categories with descriptive icons (📋 Ticket Info, 📍 Location, 📅 Dates, etc.)</li>
+<li>Click-to-insert functionality with cursor position preservation</li>
+<li>Auto-close behavior and success notifications for smooth user experience</li>
+<li>Comprehensive dark theme support with proper contrast and hover states</li>
+</ul>
+</li>
+</ul>
+<h4>Template Editing Enhancements</h4><ul>
+<li><p><strong>Enhanced Template Editors</strong>: Improved all three template editors (ticket, email, vulnerability)</p>
+<ul>
+<li>Consistent dropdown-based variable selection across all editors</li>
+<li>Better visual organization with category headers and variable descriptions</li>
+<li>Required vs optional variable highlighting (orange for required, blue for optional)</li>
+<li>Monospace font for variable names with clear descriptions</li>
+</ul>
+</li>
+<li><p><strong>Improved Space Utilization</strong>: Maximized editing area by eliminating horizontal panels</p>
+<ul>
+<li>More screen real estate for template content editing</li>
+<li>Professional appearance with header-integrated dropdown controls</li>
+<li>Responsive design that adapts to container constraints</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed</h3><h4>Template System Bug Resolutions</h4><ul>
+<li><p><strong>Template Cross-Contamination</strong>: Fixed cache key collisions between template types</p>
+<ul>
+<li>Eliminated issue where editing one template would affect another</li>
+<li>Proper isolation between ticket, email, and vulnerability template caches</li>
+<li>Enhanced cache management with template-specific keys</li>
+</ul>
+</li>
+<li><p><strong>Validation System Issues</strong>: Resolved aggressive validation triggering unwanted restoration</p>
+<ul>
+<li>Temporarily disabled overly strict template validation that interfered with user edits</li>
+<li>Improved validation logic to allow user content loading for editing</li>
+<li>Better error handling and user feedback for template operations</li>
+</ul>
+</li>
+<li><p><strong>ForceRefresh Logic</strong>: Fixed template reloading after reset operations</p>
+<ul>
+<li>Corrected conditional statements that prevented proper API calls</li>
+<li>Ensured templates properly reload from server when force refresh is requested</li>
+<li>Enhanced debugging with comprehensive logging for template operations</li>
+</ul>
+</li>
+</ul>
+<h3>Changed</h3><h4>User Interface Improvements</h4><ul>
+<li><p><strong>Variable Selection UI</strong>: Transformed from horizontal panels to dropdown interface</p>
+<ul>
+<li>Replaced space-consuming variable panels with compact dropdown buttons</li>
+<li>Improved workflow with faster variable selection and insertion</li>
+<li>Better visual hierarchy with organized categories and clear descriptions</li>
+</ul>
+</li>
+<li><p><strong>Template Editor Layout</strong>: Optimized modal space utilization</p>
+<ul>
+<li>Removed bulky reference panels below editors</li>
+<li>Integrated variable access directly into editor toolbars</li>
+<li>Cleaner, more professional appearance throughout template editing interface</li>
+</ul>
+</li>
+</ul>
+<h4>Technical Improvements</h4><ul>
+<li><strong>Variable System Architecture</strong>: Unified variable management across all components<ul>
+<li>Centralized variable definitions eliminate duplication and inconsistencies</li>
+<li>Standardized variable naming improves maintainability</li>
+<li>Prepared foundation for future config builder tools and custom template types</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.20] - 2025-09-21</h2><h3>Added</h3><h4>Email Template Generation for Tickets</h4><ul>
+<li><p><strong>Third Tab in Ticket Modal</strong>: Added &quot;Email Template&quot; tab alongside existing &quot;Ticket Details&quot; and &quot;Vulnerabilities&quot; tabs</p>
+<ul>
+<li>Professional email template automatically generated from ticket data</li>
+<li>Includes subject line suggestion with site name and Hexagon ticket number</li>
+<li>Formatted with clear sections: Maintenance Details, Affected Systems, Action Required, Timeline</li>
+<li>Automatic device list formatting with enumeration</li>
+</ul>
+</li>
+<li><p><strong>Email Copy Button</strong>: New dedicated copy button for email template</p>
+<ul>
+<li>Icon uses envelope symbol for clear identification</li>
+<li>Copies formatted email template to clipboard</li>
+<li>Toast notification confirms successful copy</li>
+<li>Lazy loading only generates template when tab is clicked</li>
+</ul>
+</li>
+<li><p><strong>Template Edit Button Stub</strong>: Placeholder for future v1.0.21 template editing feature</p>
+<ul>
+<li>Disabled button with tooltip indicating &quot;Template editing coming in v1.0.21&quot;</li>
+<li>Positioned alongside copy buttons for consistent UI</li>
+<li>Prepares interface for upcoming customizable templates</li>
+</ul>
+</li>
+<li><p><strong>Enhanced Workflow</strong>: Email template streamlines communication process</p>
+<ul>
+<li>Pre-formatted professional communication ready for sending</li>
+<li>Includes all critical ticket information in email-friendly format</li>
+<li>Consistent messaging across team communications</li>
+<li>Reduces time spent composing maintenance notifications</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.19] - 2025-09-21</h2><h3>Added</h3><h4>Enhanced Ticket Modal with Vulnerability Integration</h4><ul>
+<li><p><strong>Dual Copy Buttons</strong>: Ticket modal now features two separate copy buttons</p>
+<ul>
+<li>&quot;Ticket&quot; button: Copies ticket markdown to clipboard (existing functionality)</li>
+<li>&quot;Vulnerabilities&quot; button: Copies vulnerability report markdown without requiring bundle download</li>
+</ul>
+</li>
+<li><p><strong>Tabbed Interface</strong>: New Bootstrap tabs in ticket modal for better information organization</p>
+<ul>
+<li>&quot;Ticket Details&quot; tab: Shows existing ticket markdown view</li>
+<li>&quot;Vulnerabilities&quot; tab: Displays vulnerability report for all devices in the ticket</li>
+<li>Lazy loading: Vulnerability data only fetched when tab is clicked</li>
+<li>Fuzzy hostname matching using Levenshtein distance for flexible device matching</li>
+</ul>
+</li>
+<li><p><strong>Improved Workflow</strong>: Users can now quickly access and copy vulnerability data directly from the ticket modal without needing to download the full bundle</p>
+</li>
+</ul>
+<h3>Changed</h3><ul>
+<li><strong>Repository Cleanup</strong>: Removed deprecated files and development artifacts<ul>
+<li>Cleaned up .claude/, .specify/, and .context7/ directories</li>
+<li>Removed test files, backups, and temporary uploads</li>
+<li>Streamlined repository structure for better maintainability</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.18] - 2025-09-20</h2><h3>Added</h3><h4>UI/UX Enhancements</h4><ul>
+<li><strong>Attachment Visibility for Tickets</strong>: Added comprehensive tooltip functionality for &quot;Attach Documentation&quot; button on tickets2.html<ul>
+<li>Displays list of currently attached files with sizes on hover</li>
+<li>Shows file count badge when documents are attached (e.g., &quot;(3)&quot;)</li>
+<li>Button changes from gray outline to blue when files are present</li>
+<li>Tooltips persist across page refreshes using localStorage</li>
+<li>Added Shift+Click and Right-Click functionality to clear all attachments with confirmation</li>
+<li>Smooth animations and visual feedback for improved user experience</li>
+<li>Resolves issue where users had no visibility of attached files until downloading bundles</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed</h3><h4>Bug Fixes</h4><ul>
+<li><p><strong>Attachment Tooltip Navigation Bug</strong>: Fixed issue where tooltip displayed empty content after navigating between pages</p>
+<ul>
+<li>Root cause: Bootstrap tooltip wasn&#39;t properly reinitializing when returning to tickets page</li>
+<li>Solution: Dispose old tooltip instances and create fresh ones with proper data on page load</li>
+<li>Added 100ms delay to ensure DOM readiness when navigating between pages</li>
+</ul>
+</li>
+<li><p><strong>Version Display in Health Endpoint</strong>: Fixed incorrect version reporting in <code>/health</code> API endpoint</p>
+<ul>
+<li>Corrected package.json path in server.js from <code>./package.json</code> to <code>../package.json</code> for Docker container</li>
+<li>Updated docker-compose.yml HEXTRACKR_VERSION environment variable to match package.json</li>
+<li>Health endpoint now correctly reports version 1.0.18 instead of falling back to old versions</li>
+</ul>
+</li>
+</ul>
+<h4>Documentation</h4><ul>
+<li><strong>JSDoc Dark Mode Restoration</strong>: Fixed missing dark mode support in developer documentation<ul>
+<li>Ran <code>inject-jsdoc-theme.js</code> script to inject theme synchronization into 96 JSDoc HTML files</li>
+<li>Dark mode now properly syncs with main application theme preference</li>
+<li>Restored proper styling with dark backgrounds (#0f172a) and light text in dark mode</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.17] - 2025-09-19</h2><h3>Added</h3><h4>UI/UX Enhancements</h4><ul>
+<li><strong>tickets2.html Beta Implementation</strong>: Introduced beta version of redesigned tickets page with AG-Grid integration<ul>
+<li>Advanced table with column filtering, sorting, resizing, and responsive design</li>
+<li>SITE and LOCATION columns with ticket accent colors for visual categorization</li>
+<li>Enhanced user experience with modern data table interface</li>
+<li>Maintains backward compatibility with existing tickets.html</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed</h3><h4>Theme Engine & Visual Improvements</h4><ul>
+<li><p><strong>Card Border Visibility</strong>: Fixed critical card border issue where vulnerability and device cards blended into page background</p>
+<ul>
+<li>Root cause: CSS specificity conflicts with <code>border-color: transparent !important</code> overrides in dark theme</li>
+<li>Solution: Standardized border variables from <code>--tblr-border-color</code> to <code>--hextrackr-border-subtle</code></li>
+<li>Enhanced border opacity from 0.08 to 0.15 for better visibility across both light and dark modes</li>
+<li>Applied Five Whys root cause analysis to identify true underlying issues</li>
+</ul>
+</li>
+<li><p><strong>AG-Grid Dark Mode Contrast</strong>: Fixed poor contrast for SITE and LOCATION ticket accent colors in dark mode</p>
+<ul>
+<li>Moved ticket accent colors from <code>.ag-theme-quartz</code> scope to global <code>[data-bs-theme=&quot;dark&quot;]</code> scope</li>
+<li>Optimized colors for WCAG AA compliance with enhanced contrast ratios:<ul>
+<li>Teal: #2dd4bf → #5eead4 (9.5:1 contrast ratio)</li>
+<li>Amber: #fbbf24 → #fcd34d (11.2:1 contrast ratio)</li>
+<li>Slate: #94a3b8 → #cbd5e1 (10.2:1 contrast ratio)</li>
+</ul>
+</li>
+<li>All ticket accent colors now meet accessibility standards for dark backgrounds</li>
+</ul>
+</li>
+<li><p><strong>CSS Variable Consolidation</strong>: Comprehensive cleanup of CSS variable architecture</p>
+<ul>
+<li>Fixed Stylelint duplicate variable warnings by creating properly namespaced versions</li>
+<li>Implemented standard and <code>-contrast</code> variants for VPR (Vulnerability Priority Rating) colors</li>
+<li>Consolidated shadow variables with theme-specific opacity values</li>
+<li>Created single source of truth for all color definitions across light/dark themes</li>
+</ul>
+</li>
+<li><p><strong>Device Card Interactivity</strong>: Enhanced device cards with click functionality matching vulnerability cards</p>
+<ul>
+<li>Made device cards clickable with proper cursor styling and modal integration</li>
+<li>Unified user experience patterns between vulnerability and device card interactions</li>
+<li>Added comprehensive JSDoc documentation for improved code maintainability</li>
+</ul>
+</li>
+</ul>
+<h4>CSV Import Pipeline</h4><ul>
 <li><p><strong>Daily Totals Calculation</strong>: Fixed critical bug where <code>calculateAndStoreDailyTotalsEnhanced</code> was missing scan_date filter</p>
 <ul>
 <li>Root cause: Spec 001 backend refactoring removed the WHERE clause filtering by specific scan date</li>
@@ -31,6 +465,13 @@
 </li>
 </ul>
 <h3>Documentation</h3><ul>
+<li><p><strong>CSS Theme Architecture</strong>: Added comprehensive documentation for theme system architecture</p>
+<ul>
+<li>Documented CSS variable hierarchy and naming conventions</li>
+<li>Added WCAG contrast guidelines and accessibility best practices</li>
+<li>Provided CSS customization guide for theme modifications</li>
+</ul>
+</li>
 <li><p><strong>Developer Documentation Link</strong>: Fixed broken dev docs link in documentation portal</p>
 <ul>
 <li>Changed from <code>/dev-docs/</code> to <code>/dev-docs-html/</code> to match actual directory structure</li>
@@ -40,6 +481,7 @@
 <ul>
 <li>Documented new import service functions and batch processing</li>
 <li>Added comprehensive function descriptions for ImportService</li>
+<li>Enhanced vulnerability-cards.js with detailed JSDoc comments</li>
 </ul>
 </li>
 </ul>
