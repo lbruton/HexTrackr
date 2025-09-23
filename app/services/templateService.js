@@ -32,15 +32,15 @@ class TemplateService {
      * @returns {string} Table name
      */
     getTemplateTable(templateName) {
-        if (templateName.includes('_email') || templateName === 'default_email') {
-            return 'email_templates';
-        } else if (templateName.includes('_ticket') || templateName === 'default_ticket') {
-            return 'ticket_templates';
-        } else if (templateName.includes('_vulnerability') || templateName === 'default_vulnerability') {
-            return 'vulnerability_templates';
+        if (templateName.includes("_email") || templateName === "default_email") {
+            return "email_templates";
+        } else if (templateName.includes("_ticket") || templateName === "default_ticket") {
+            return "ticket_templates";
+        } else if (templateName.includes("_vulnerability") || templateName === "default_vulnerability") {
+            return "vulnerability_templates";
         }
         // Default to email_templates for backward compatibility
-        return 'email_templates';
+        return "email_templates";
     }
 
     /**
@@ -49,14 +49,14 @@ class TemplateService {
      * @returns {string} Table name
      */
     getTemplateTableByCategory(category) {
-        switch ((category || '').toLowerCase()) {
-            case 'ticket':
-                return 'ticket_templates';
-            case 'vulnerability':
-                return 'vulnerability_templates';
-            case 'email':
+        switch ((category || "").toLowerCase()) {
+            case "ticket":
+                return "ticket_templates";
+            case "vulnerability":
+                return "vulnerability_templates";
+            case "email":
             default:
-                return 'email_templates';
+                return "email_templates";
         }
     }
 
@@ -67,7 +67,7 @@ class TemplateService {
      */
     async getTemplateTableById(id) {
         return new Promise((resolve, reject) => {
-            const tables = ['email_templates', 'ticket_templates', 'vulnerability_templates'];
+            const tables = ["email_templates", "ticket_templates", "vulnerability_templates"];
             let found = false;
             let completed = 0;
 
@@ -229,7 +229,7 @@ class TemplateService {
                 if (template_content && category) {
                     const validation = this.validateTemplateCategory(template_content, category);
                     if (validation.warnings.length > 0) {
-                        console.warn(`[TemplateService] Template validation warnings:`, validation.warnings);
+                        console.warn("[TemplateService] Template validation warnings:", validation.warnings);
                     }
                 }
 
@@ -274,16 +274,16 @@ class TemplateService {
      */
     async createTemplate(templateData) {
         if (!templateData || !templateData.name || !templateData.template_content) {
-            throw new Error('Invalid template payload');
+            throw new Error("Invalid template payload");
         }
 
         const tableName = this.getTemplateTableByCategory(templateData.category || templateData.template_type);
-        const variables = typeof templateData.variables === 'string'
+        const variables = typeof templateData.variables === "string"
             ? templateData.variables
             : JSON.stringify(templateData.variables || []);
         const defaultContent = templateData.default_content || templateData.template_content;
         const description = templateData.description || null;
-        const category = (templateData.category || 'email').toLowerCase();
+        const category = (templateData.category || "email").toLowerCase();
         const service = this;
 
         return new Promise((resolve, reject) => {
@@ -307,7 +307,7 @@ class TemplateService {
                 ],
                 function(err) {
                     if (err) {
-                        return reject(new Error('Failed to create template: ' + err.message));
+                        return reject(new Error("Failed to create template: " + err.message));
                     }
 
                     const insertedId = this.lastID;
@@ -317,17 +317,17 @@ class TemplateService {
                             name: templateData.name,
                             template_content: templateData.template_content,
                             default_content: defaultContent,
-                            variables: JSON.parse(variables || '[]'),
+                            variables: JSON.parse(variables || "[]"),
                             category
                         }))
                         .catch(fetchError => {
-                            console.warn('TemplateService: Failed to read back created template:', fetchError.message);
+                            console.warn("TemplateService: Failed to read back created template:", fetchError.message);
                             resolve({
                                 id: insertedId,
                                 name: templateData.name,
                                 template_content: templateData.template_content,
                                 default_content: defaultContent,
-                                variables: JSON.parse(variables || '[]'),
+                                variables: JSON.parse(variables || "[]"),
                                 category
                             });
                         });
@@ -399,7 +399,7 @@ class TemplateService {
                 );
             });
         } catch (error) {
-            console.error(`[TemplateService] Error in resetTemplateToDefault:`, error.message);
+            console.error("[TemplateService] Error in resetTemplateToDefault:", error.message);
             throw error;
         }
     }
@@ -416,7 +416,7 @@ class TemplateService {
         const knownVariables = Object.keys(variableMapping);
 
         // Basic structure validation
-        if (!templateContent || typeof templateContent !== 'string') {
+        if (!templateContent || typeof templateContent !== "string") {
             errors.push("Template content must be a non-empty string");
             return { valid: false, errors, warnings };
         }
@@ -449,7 +449,7 @@ class TemplateService {
         );
 
         if (unknownVariables.length > 0) {
-            warnings.push(`Unknown variables: ${unknownVariables.join(', ')}`);
+            warnings.push(`Unknown variables: ${unknownVariables.join(", ")}`);
         }
 
         // Check for unused known variables
@@ -462,18 +462,18 @@ class TemplateService {
         });
 
         if (unusedRequiredVariables.length > 0) {
-            warnings.push(`Missing required variables: ${unusedRequiredVariables.join(', ')}`);
+            warnings.push(`Missing required variables: ${unusedRequiredVariables.join(", ")}`);
         }
 
         // Check for potentially problematic patterns
-        if (templateContent.includes('[[') || templateContent.includes(']]')) {
+        if (templateContent.includes("[[") || templateContent.includes("]]")) {
             errors.push("Double brackets are not allowed");
         }
 
         // Check for malformed variables (brackets with spaces or special chars)
         const malformedVariables = templateContent.match(/\[[^A-Z_\]]*[^A-Z_\]]+[^A-Z_\]]*\]/g);
         if (malformedVariables) {
-            errors.push(`Malformed variables found: ${malformedVariables.join(', ')}`);
+            errors.push(`Malformed variables found: ${malformedVariables.join(", ")}`);
         }
 
         // Check template length (reasonable limits)
@@ -530,7 +530,7 @@ class TemplateService {
             console.error(`Error processing template ${id}:`, error);
 
             if (options.fallbackToHardcoded) {
-                console.warn('Database error, falling back to hardcoded template');
+                console.warn("Database error, falling back to hardcoded template");
                 return this.processHardcodedTemplate(ticketData, options);
             }
 
@@ -563,7 +563,7 @@ Please see the attached notes for more information. If you have any questions or
 • Required Completion: [DATE_DUE]
 
 **AFFECTED SYSTEMS:**
-[DEVICE_COUNT] device${ticketData.devices && ticketData.devices.length > 1 ? 's' : ''} require security patches and will need to be rebooted:
+[DEVICE_COUNT] device${ticketData.devices && ticketData.devices.length > 1 ? "s" : ""} require security patches and will need to be rebooted:
 [DEVICE_LIST]
 
 **ACTION REQUIRED:**
@@ -594,7 +594,7 @@ Ticket ID: [XT_NUMBER]`;
      * @param {Object} options - Additional options
      * @returns {Promise<string>} Processed template content
      */
-    async getProcessedTemplate(templateName = 'default_email', ticketData, options = {}) {
+    async getProcessedTemplate(templateName = "default_email", ticketData, options = {}) {
         try {
             // Try to get template by name first
             const template = await this.getTemplateByName(templateName);
@@ -606,7 +606,7 @@ Ticket ID: [XT_NUMBER]`;
                 return this.processHardcodedTemplate(ticketData, options);
             }
         } catch (error) {
-            console.error('Database error getting template, using hardcoded fallback:', error);
+            console.error("Database error getting template, using hardcoded fallback:", error);
             return this.processHardcodedTemplate(ticketData, options);
         }
     }
@@ -617,123 +617,123 @@ Ticket ID: [XT_NUMBER]`;
      */
     getVariableMapping() {
         return {
-            '[GREETING]': {
-                description: 'Supervisor first name or Team for multiple supervisors',
+            "[GREETING]": {
+                description: "Supervisor first name or Team for multiple supervisors",
                 required: false,
-                fallback: '[Supervisor First Name]',
+                fallback: "[Supervisor First Name]",
                 processor: (ticketData) => this.getSupervisorGreeting(ticketData && ticketData.supervisor)
             },
-            '[SITE_NAME]': {
-                description: 'Site name from ticket',
+            "[SITE_NAME]": {
+                description: "Site name from ticket",
                 required: true,
-                fallback: '[Site Name]',
-                processor: (ticketData) => (ticketData && ticketData.site) || '[Site Name]'
+                fallback: "[Site Name]",
+                processor: (ticketData) => (ticketData && ticketData.site) || "[Site Name]"
             },
-            '[SITE]': {
-                description: 'Site name from ticket (alias)',
+            "[SITE]": {
+                description: "Site name from ticket (alias)",
                 required: true,
-                fallback: '[Site]',
-                processor: (ticketData) => (ticketData && ticketData.site) || '[Site]'
+                fallback: "[Site]",
+                processor: (ticketData) => (ticketData && ticketData.site) || "[Site]"
             },
-            '[LOCATION]': {
-                description: 'Location from ticket',
+            "[LOCATION]": {
+                description: "Location from ticket",
                 required: true,
-                fallback: '[Location]',
-                processor: (ticketData) => (ticketData && ticketData.location) || '[Location]'
+                fallback: "[Location]",
+                processor: (ticketData) => (ticketData && ticketData.location) || "[Location]"
             },
-            '[STATUS]': {
-                description: 'Ticket status',
+            "[STATUS]": {
+                description: "Ticket status",
                 required: true,
-                fallback: '[Status]',
-                processor: (ticketData) => (ticketData && ticketData.status) || '[Status]'
+                fallback: "[Status]",
+                processor: (ticketData) => (ticketData && ticketData.status) || "[Status]"
             },
-            '[HEXAGON_NUM]': {
-                description: 'Hexagon ticket number',
+            "[HEXAGON_NUM]": {
+                description: "Hexagon ticket number",
                 required: false,
-                fallback: '[Hexagon #]',
-                processor: (ticketData) => (ticketData && (ticketData.hexagon_ticket || ticketData.hexagonTicket)) || '[Hexagon #]'
+                fallback: "[Hexagon #]",
+                processor: (ticketData) => (ticketData && (ticketData.hexagon_ticket || ticketData.hexagonTicket)) || "[Hexagon #]"
             },
-            '[HEXAGON_TICKET]': {
-                description: 'Hexagon ticket number (alias)',
+            "[HEXAGON_TICKET]": {
+                description: "Hexagon ticket number (alias)",
                 required: false,
-                fallback: '[Hexagon Ticket]',
-                processor: (ticketData) => (ticketData && (ticketData.hexagon_ticket || ticketData.hexagonTicket)) || '[Hexagon Ticket]'
+                fallback: "[Hexagon Ticket]",
+                processor: (ticketData) => (ticketData && (ticketData.hexagon_ticket || ticketData.hexagonTicket)) || "[Hexagon Ticket]"
             },
-            '[SERVICENOW_NUM]': {
-                description: 'ServiceNow ticket number',
+            "[SERVICENOW_NUM]": {
+                description: "ServiceNow ticket number",
                 required: false,
-                fallback: '[ServiceNow #]',
-                processor: (ticketData) => (ticketData && (ticketData.servicenow_ticket || ticketData.serviceNowTicket)) || '[ServiceNow #]'
+                fallback: "[ServiceNow #]",
+                processor: (ticketData) => (ticketData && (ticketData.servicenow_ticket || ticketData.serviceNowTicket)) || "[ServiceNow #]"
             },
-            '[SERVICENOW_TICKET]': {
-                description: 'ServiceNow ticket number (alias)',
+            "[SERVICENOW_TICKET]": {
+                description: "ServiceNow ticket number (alias)",
                 required: false,
-                fallback: '[ServiceNow Ticket]',
-                processor: (ticketData) => (ticketData && (ticketData.servicenow_ticket || ticketData.serviceNowTicket)) || '[ServiceNow Ticket]'
+                fallback: "[ServiceNow Ticket]",
+                processor: (ticketData) => (ticketData && (ticketData.servicenow_ticket || ticketData.serviceNowTicket)) || "[ServiceNow Ticket]"
             },
-            '[XT_NUMBER]': {
-                description: 'Internal XT number',
+            "[XT_NUMBER]": {
+                description: "Internal XT number",
                 required: true,
-                fallback: 'XT#[ID]',
-                processor: (ticketData) => (ticketData && ticketData.xt_number) || `XT#${(ticketData && ticketData.id) || 'UNKNOWN'}`
+                fallback: "XT#[ID]",
+                processor: (ticketData) => (ticketData && ticketData.xt_number) || `XT#${(ticketData && ticketData.id) || "UNKNOWN"}`
             },
-            '[DEVICE_COUNT]': {
-                description: 'Number of devices in ticket',
+            "[DEVICE_COUNT]": {
+                description: "Number of devices in ticket",
                 required: true,
-                fallback: '0',
+                fallback: "0",
                 processor: (ticketData) => String((ticketData && ticketData.devices) ? ticketData.devices.length : 0)
             },
-            '[DEVICE_LIST]': {
-                description: 'Enumerated list of devices',
+            "[DEVICE_LIST]": {
+                description: "Enumerated list of devices",
                 required: true,
-                fallback: 'Device list to be confirmed',
+                fallback: "Device list to be confirmed",
                 processor: (ticketData) => this.generateDeviceList(ticketData && ticketData.devices)
             },
-            '[DATE_DUE]': {
-                description: 'Due date formatted',
+            "[DATE_DUE]": {
+                description: "Due date formatted",
                 required: true,
-                fallback: '[Due Date]',
-                processor: (ticketData) => this.formatDate(ticketData && (ticketData.date_due || ticketData.dateDue)) || '[Due Date]'
+                fallback: "[Due Date]",
+                processor: (ticketData) => this.formatDate(ticketData && (ticketData.date_due || ticketData.dateDue)) || "[Due Date]"
             },
-            '[DATE_SUBMITTED]': {
-                description: 'Submission date formatted',
+            "[DATE_SUBMITTED]": {
+                description: "Submission date formatted",
                 required: true,
-                fallback: '[Submitted Date]',
-                processor: (ticketData) => this.formatDate(ticketData && (ticketData.date_submitted || ticketData.dateSubmitted)) || '[Submitted Date]'
+                fallback: "[Submitted Date]",
+                processor: (ticketData) => this.formatDate(ticketData && (ticketData.date_submitted || ticketData.dateSubmitted)) || "[Submitted Date]"
             },
-            '[SUPERVISOR]': {
-                description: 'Supervisor name',
+            "[SUPERVISOR]": {
+                description: "Supervisor name",
                 required: false,
-                fallback: 'N/A',
-                processor: (ticketData) => (ticketData && ticketData.supervisor) || 'N/A'
+                fallback: "N/A",
+                processor: (ticketData) => (ticketData && ticketData.supervisor) || "N/A"
             },
-            '[TECHNICIAN]': {
-                description: 'Technician name',
+            "[TECHNICIAN]": {
+                description: "Technician name",
                 required: false,
-                fallback: 'N/A',
-                processor: (ticketData) => (ticketData && ticketData.technician) || 'N/A'
+                fallback: "N/A",
+                processor: (ticketData) => (ticketData && ticketData.technician) || "N/A"
             },
-            '[NOTES]': {
-                description: 'Additional notes',
+            "[NOTES]": {
+                description: "Additional notes",
                 required: false,
-                fallback: 'N/A',
-                processor: (ticketData) => (ticketData && (ticketData.notes || ticketData.additional_notes)) || 'N/A'
+                fallback: "N/A",
+                processor: (ticketData) => (ticketData && (ticketData.notes || ticketData.additional_notes)) || "N/A"
             },
-            '[GENERATED_TIME]': {
-                description: 'Current date and time',
+            "[GENERATED_TIME]": {
+                description: "Current date and time",
                 required: false,
                 fallback: new Date().toLocaleString(),
                 processor: () => new Date().toLocaleString()
             },
-            '[VULNERABILITY_SUMMARY]': {
-                description: 'Dynamic vulnerability summary (generated at runtime)',
+            "[VULNERABILITY_SUMMARY]": {
+                description: "Dynamic vulnerability summary (generated at runtime)",
                 required: false,
-                fallback: '',
+                fallback: "",
                 processor: (ticketData, vulnerabilityData) => {
                     if (vulnerabilityData && vulnerabilityData.length > 0) {
                         return this.generateVulnerabilitySummary(ticketData, vulnerabilityData);
                     }
-                    return '';
+                    return "";
                 }
             }
         };
@@ -758,20 +758,20 @@ Ticket ID: [XT_NUMBER]`;
 
                 // Process the variable with ticket data and options
                 let value;
-                if (variable === '[VULNERABILITY_SUMMARY]') {
+                if (variable === "[VULNERABILITY_SUMMARY]") {
                     value = config.processor(ticketData, options.vulnerabilityData);
                 } else {
                     value = config.processor(ticketData);
                 }
 
                 // Replace all instances of the variable
-                const regex = new RegExp(this.escapeRegex(variable), 'g');
+                const regex = new RegExp(this.escapeRegex(variable), "g");
                 processed = processed.replace(regex, String(value || config.fallback));
 
             } catch (error) {
                 console.error(`Error processing variable ${variable}:`, error);
                 // Use fallback on error
-                const regex = new RegExp(this.escapeRegex(variable), 'g');
+                const regex = new RegExp(this.escapeRegex(variable), "g");
                 processed = processed.replace(regex, config.fallback);
             }
         }
@@ -779,7 +779,7 @@ Ticket ID: [XT_NUMBER]`;
         // Check for unprocessed variables and warn
         const remainingVariables = processed.match(/\[[A-Z_]+\]/g);
         if (remainingVariables) {
-            console.warn('Unprocessed variables found:', remainingVariables);
+            console.warn("Unprocessed variables found:", remainingVariables);
         }
 
         return processed;
@@ -799,21 +799,21 @@ Ticket ID: [XT_NUMBER]`;
 
         // Check for multiple supervisors
         const commaCount = (trimmed.match(/,/g) || []).length;
-        if (trimmed.includes(';') || trimmed.includes('&') || commaCount > 1) {
+        if (trimmed.includes(";") || trimmed.includes("&") || commaCount > 1) {
             return "Team";
         }
 
         // Handle "Last, First" format
         if (commaCount === 1) {
-            const parts = trimmed.split(',');
+            const parts = trimmed.split(",");
             if (parts.length >= 2) {
-                const firstName = parts[1].trim().split(' ')[0];
-                if (firstName) return firstName;
+                const firstName = parts[1].trim().split(" ")[0];
+                if (firstName) {return firstName;}
             }
         }
 
         // Handle "First Last" format
-        const parts = trimmed.split(' ');
+        const parts = trimmed.split(" ");
         if (parts.length > 0 && parts[0]) {
             return parts[0];
         }
@@ -831,7 +831,7 @@ Ticket ID: [XT_NUMBER]`;
             return "Device list to be confirmed";
         }
 
-        return devices.map((device, index) => `${index + 1}. ${device}`).join('\n');
+        return devices.map((device, index) => `${index + 1}. ${device}`).join("\n");
     }
 
     /**
@@ -842,39 +842,39 @@ Ticket ID: [XT_NUMBER]`;
      */
     generateVulnerabilitySummary(ticketData, vulnerabilityData) {
         if (!vulnerabilityData || vulnerabilityData.length === 0) {
-            return '';
+            return "";
         }
 
         // Group vulnerabilities by device and severity
         const deviceSummary = {};
         vulnerabilityData.forEach(vuln => {
-            const device = vuln.hostname || 'Unknown Device';
+            const device = vuln.hostname || "Unknown Device";
             if (!deviceSummary[device]) {
                 deviceSummary[device] = { total: 0, critical: 0, high: 0, medium: 0, low: 0 };
             }
             deviceSummary[device].total++;
 
-            const severity = (vuln.severity || 'unknown').toLowerCase();
+            const severity = (vuln.severity || "unknown").toLowerCase();
             if (deviceSummary[device][severity] !== undefined) {
                 deviceSummary[device][severity]++;
             }
         });
 
-        let summary = '\n**VULNERABILITY SUMMARY:**\n';
+        let summary = "\n**VULNERABILITY SUMMARY:**\n";
 
         Object.entries(deviceSummary).forEach(([device, counts]) => {
             summary += `• ${device}: ${counts.total} vulnerabilities`;
 
             const severityBreakdown = [];
-            if (counts.critical > 0) severityBreakdown.push(`${counts.critical} Critical`);
-            if (counts.high > 0) severityBreakdown.push(`${counts.high} High`);
-            if (counts.medium > 0) severityBreakdown.push(`${counts.medium} Medium`);
-            if (counts.low > 0) severityBreakdown.push(`${counts.low} Low`);
+            if (counts.critical > 0) {severityBreakdown.push(`${counts.critical} Critical`);}
+            if (counts.high > 0) {severityBreakdown.push(`${counts.high} High`);}
+            if (counts.medium > 0) {severityBreakdown.push(`${counts.medium} Medium`);}
+            if (counts.low > 0) {severityBreakdown.push(`${counts.low} Low`);}
 
             if (severityBreakdown.length > 0) {
-                summary += ` (${severityBreakdown.join(', ')})`;
+                summary += ` (${severityBreakdown.join(", ")})`;
             }
-            summary += '\n';
+            summary += "\n";
         });
 
         return summary;
@@ -886,7 +886,7 @@ Ticket ID: [XT_NUMBER]`;
      * @returns {string} Formatted date
      */
     formatDate(dateString) {
-        if (!dateString) return "[Date]";
+        if (!dateString) {return "[Date]";}
 
         try {
             const date = new Date(dateString);
@@ -902,7 +902,7 @@ Ticket ID: [XT_NUMBER]`;
      * @returns {string} Escaped string
      */
     escapeRegex(string) {
-        return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+        return string.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
     }
 
     /**
@@ -921,13 +921,13 @@ Ticket ID: [XT_NUMBER]`;
         // Define category-specific variable patterns
         const categoryPatterns = {
             email: [
-                '[GREETING]', '[HEXAGON_NUM]', '[VULNERABILITY_SUMMARY]'
+                "[GREETING]", "[HEXAGON_NUM]", "[VULNERABILITY_SUMMARY]"
             ],
             ticket: [
-                '[HEXAGON_TICKET]', '[SERVICENOW_TICKET]', '[SUPERVISOR]', '[TECHNICIAN]'
+                "[HEXAGON_TICKET]", "[SERVICENOW_TICKET]", "[SUPERVISOR]", "[TECHNICIAN]"
             ],
             vulnerability: [
-                '[VULNERABILITY_DETAILS]', '[CRITICAL_COUNT]', '[HIGH_COUNT]', '[DEVICE_COUNT]'
+                "[VULNERABILITY_DETAILS]", "[CRITICAL_COUNT]", "[HIGH_COUNT]", "[DEVICE_COUNT]"
             ]
         };
 
