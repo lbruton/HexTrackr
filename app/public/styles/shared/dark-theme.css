@@ -21,34 +21,21 @@
     color: var(--ag-foreground-color) !important;
 }
 
+/* Global Dark Mode Theme Variables - Moved to css-variables.css for consolidation */
+
 [data-bs-theme="dark"] .ag-theme-quartz {
     /* ===========================================
      * CORE THEME COLORS - Tabler.io v1.0.0-beta17
      * =========================================== */
-    
+
     /* HexTrackr-specific theme variables */
     --hextrackr-primary-shadow: rgb(59, 130, 246, 0.2);  /* Blue shadow for dark mode */
     --bs-body-color: #e2e8f0;                 /* Light gray text */
 
-    /* Ticket Accent Colors - Dark Mode */
-    --ticket-accent-blue: #60a5fa;
-    --ticket-accent-purple: #a78bfa;
-    --ticket-accent-teal: #2dd4bf;
-    --ticket-accent-amber: #fbbf24;
-    --ticket-accent-rose: #f472b6;
-    --ticket-accent-slate: #94a3b8;
-
-    /* VPR Severity Colors - Dark Mode */
-    --vpr-critical: #ef4444;
-    --vpr-high: #f97316;
-    --vpr-medium: #3b82f6;
-    --vpr-low: #22c55e;
-
-    /* VPR RGB values for dark mode */
-    --vpr-critical-rgb: 239, 68, 68;
-    --vpr-high-rgb: 249, 115, 22;
-    --vpr-medium-rgb: 59, 130, 246;
-    --vpr-low-rgb: 34, 197, 94;
+    /* NOTE: VPR Severity Colors are now managed in css-variables.css
+     * with proper light/dark theme handling and contrast variants.
+     * This ensures consistent theming and eliminates duplicate variables.
+     */
     
     /* Text Colors */
     --bs-body-color-rgb: 226, 232, 240;       /* Body color RGB values */
@@ -74,12 +61,10 @@
     --hextrackr-surface-3: #2f3f50;          /* Modal sections - higher elevation */
     --hextrackr-surface-4: #526880;          /* Modal container - balanced 2.7:1 contrast */
 
-    /* REVERT FIX: Changed from white to dark borders to reduce visibility in dark mode */
-    /* Original values: rgb(255, 255, 255, 0.15/0.20/0.25) */
-    /* Border Definition System - Enhanced for WCAG AA compliance */
-    --hextrackr-border-subtle: rgb(0, 0, 0, 0.2);     /* Subtle element borders - darker for less visibility */
-    --hextrackr-border-muted: rgb(0, 0, 0, 0.25);     /* Muted element borders - darker shade */
-    --hextrackr-border-strong: rgb(0, 0, 0, 0.3);     /* Strong element borders - darker shade */
+    /* Border Definition System - Enhanced for visibility in dark mode */
+    --hextrackr-border-subtle: rgb(255, 255, 255, 0.15);     /* Subtle element borders - visible white borders */
+    --hextrackr-border-muted: rgb(255, 255, 255, 0.20);      /* Muted element borders - more visible */
+    --hextrackr-border-strong: rgb(255, 255, 255, 0.25);     /* Strong element borders - clearly visible */
 
     /* Enhanced Shadow System (Optimized for Dark Mode) */
     --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.3);    /* Small shadows */
@@ -288,23 +273,23 @@
  * Testing: Verified across Settings, Device Security, and Vulnerability Details modals
  */
 [data-bs-theme="dark"] .modal-content {
-    background-color: #526880 !important;  /* surface-4 balanced 2.7:1 contrast for visual comfort */
-    border: 1px solid rgb(255, 255, 255, 0.25) !important;
-    box-shadow: 0 8px 24px rgb(0, 0, 0, 0.5) !important;
-    color: var(--bs-body-color);
+    background-color: var(--hextrackr-modal-bg);
+    border: 1px solid var(--hextrackr-border);
+    box-shadow: 0 8px 24px rgb(0, 0, 0, 0.5);
+    color: var(--hextrackr-text);
 }
 
 /* Modal Header & Footer - Secondary elevation */
 [data-bs-theme="dark"] .modal-header {
-    background-color: #2f3f50 !important;  /* surface-3 */
-    border-bottom: 1px solid rgb(255, 255, 255, 0.20) !important;
-    color: var(--bs-emphasis-color);
+    background-color: var(--hextrackr-modal-header-bg);
+    border-bottom: 1px solid var(--hextrackr-border);
+    color: var(--hextrackr-text);
 }
 
 [data-bs-theme="dark"] .modal-footer {
-    background-color: #2f3f50 !important;  /* surface-3 */
-    border-top: 1px solid rgb(255, 255, 255, 0.20) !important;
-    color: var(--bs-body-color);
+    background-color: var(--hextrackr-modal-footer-bg);
+    border-top: 1px solid var(--hextrackr-border);
+    color: var(--hextrackr-text);
 }
 
 /* Cards within Modals - Lower hierarchy */

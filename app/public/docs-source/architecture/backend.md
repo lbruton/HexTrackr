@@ -62,6 +62,7 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 | `fileService.js` | File system operations | `readFile()`, `writeFile()` |
 | `progressService.js` | WebSocket progress tracking | `createSession()`, `updateProgress()` |
 | `validationService.js` | Input validation and sanitization | `validateVulnerability()`, `sanitizeInput()` |
+| `kevService.js` *(v1.0.22+)* | CISA KEV integration | `syncKevData()`, `getSyncStatus()`, `getKevByCve()` |
 
 ---
 

@@ -37,120 +37,6 @@
     <link rel="stylesheet" href="styles/shared/animations.css">
     <link rel="stylesheet" href="styles/shared/layouts.css">
 
-    <style>
-        /* Page-specific overrides for vulnerabilities.html ONLY */
-        /* All shared styles have been moved to modular CSS files */
-
-        /* VPR Mini-Cards - specific to vulnerabilities page */
-        .vpr-mini-cards {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.5rem;
-            margin-top: auto;
-            padding-top: 1rem;
-        }
-
-        .vpr-mini-card {
-            background: var(--tblr-bg-surface);
-            border: 1px solid var(--tblr-border-color);
-            border-radius: var(--tblr-border-radius);
-            padding: 0.75rem 0.5rem;
-            text-align: center;
-            transition: all 0.2s ease;
-            position: relative;
-            min-height: 5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .vpr-mini-card:hover {
-            border-color: var(--hextrackr-primary);
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(32, 107, 196, 0.15);
-        }
-
-        .vpr-mini-card.critical {
-            border-left: 3px solid var(--vpr-critical);
-        }
-
-        .vpr-mini-card.high {
-            border-left: 3px solid var(--vpr-high);
-        }
-
-        .vpr-mini-card.medium {
-            border-left: 3px solid var(--vpr-medium);
-        }
-
-        .vpr-mini-card.low {
-            border-left: 3px solid var(--vpr-low);
-        }
-
-        .vpr-mini-card .vpr-count {
-            font-size: 1.25rem;
-            font-weight: 600;
-            line-height: 1;
-            margin-bottom: 0.25rem;
-        }
-
-        .vpr-mini-card .vpr-label {
-            font-size: 0.75rem;
-            color: var(--tblr-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            margin-bottom: 0.25rem;
-        }
-
-        .vpr-mini-card .vpr-sum {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--hextrackr-primary);
-        }
-
-        /* Fixed height containers - page-specific */
-        .chart-height { height: 350px; }
-        .grid-height { height: 600px; }
-        .device-grid-height { height: 400px; }
-
-        /* Custom ApexCharts tooltip styles - specific to vulnerabilities charts */
-        .apexcharts-tooltip-custom {
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 8px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 12px;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            min-width: 200px;
-        }
-
-        .tooltip-date {
-            font-weight: 600;
-            font-size: 13px;
-            color: #1f2937;
-            margin-bottom: 8px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .tooltip-series {
-            display: flex;
-            align-items: center;
-            margin: 4px 0;
-            font-size: 12px;
-        }
-
-        .tooltip-severity {
-            font-weight: 500;
-            color: #374151;
-            margin: 0 6px;
-            min-width: 50px;
-        }
-
-        .tooltip-value {
-            font-weight: 600;
-            color: #111827;
-        }
-    </style>
 </head>
 <body>
     <!-- Header component auto-injected here -->
@@ -375,6 +261,7 @@
                                         <div class="flex-shrink-0">
                                             <select class="form-select severity-filter" id="severityFilter" aria-label="Filter by severity">
                                                 <option value="">All Severities</option>
+                                                <option value="KEV">KEV</option>
                                                 <option value="Critical">Critical</option>
                                                 <option value="High">High</option>
                                                 <option value="Medium">Medium</option>
@@ -430,30 +317,7 @@
                             <!-- Table View -->
                             <div id="tableView" class="view-content">
                                 <div id="vulnGrid" class="ag-theme-quartz" style="width: 100%;"></div>
-                                <!-- REVERT FIX: Added external pagination controls with page size dropdown -->
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="pagination-info">
-                                            <span id="vulnPaginationInfo" class="text-muted">Showing 0 to 0 of 0 entries</span>
-                                        </div>
-                                        <!-- REVERT FIX: Added page size dropdown like other views -->
-                                        <div class="d-flex align-items-center gap-2">
-                                            <label for="vulnPageSize" class="form-label mb-0 text-muted small">Items per page:</label>
-                                            <select id="vulnPageSize" class="form-select form-select-sm" style="width: auto;">
-                                                <option value="10">10</option>
-                                                <option value="15" selected>15</option>
-                                                <option value="25">25</option>
-                                                <option value="50">50</option>
-                                                <option value="100">100</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <nav aria-label="Table pagination">
-                                        <ul class="pagination pagination-sm mb-0" id="vulnPaginationControls">
-                                            <!-- Pagination buttons will be generated here -->
-                                        </ul>
-                                    </nav>
-                                </div>
+                                <!-- AG-Grid handles its own pagination controls -->
                             </div>
                             
                             <!-- Device Cards View -->
@@ -904,6 +768,128 @@
     <script type="module" src="scripts/shared/vulnerability-chart-manager.js"></script>
     <script type="module" src="scripts/shared/vulnerability-core.js"></script>
     <script type="module" src="scripts/pages/vulnerabilities.js"></script>
+
+    <!-- KEV Details Modal Script -->
+    <script>
+        /**
+         * Show KEV details modal for a specific CVE
+         * @param {string} cveId - CVE identifier
+         */
+        async function showKevDetails(cveId) {
+            if (!cveId) {
+                console.warn('No CVE ID provided for KEV details');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/kev/${cveId}`);
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        showNotification(`${cveId} is not in the CISA KEV catalog`, 'warning');
+                    } else {
+                        throw new Error(`Failed to fetch KEV data: ${response.statusText}`);
+                    }
+                    return;
+                }
+
+                const kevData = await response.json();
+
+                // Create modal content
+                const modalContent = `
+                    <div class="modal fade" id="kevDetailsModal" tabindex="-1" aria-labelledby="kevDetailsModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title" id="kevDetailsModalLabel">
+                                        🔥 Known Exploited Vulnerability: ${cveId}
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="alert alert-danger" role="alert">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <strong>Critical:</strong> This vulnerability is actively being exploited in the wild according to CISA.
+                                    </div>
+
+                                    <h6 class="fw-bold">Vulnerability Details</h6>
+                                    <div class="mb-3">
+                                        <strong>Name:</strong> ${kevData.vulnerability_name || 'N/A'}<br>
+                                        <strong>Vendor/Project:</strong> ${kevData.vendor_project || 'N/A'}<br>
+                                        <strong>Product:</strong> ${kevData.product || 'N/A'}<br>
+                                        <strong>Date Added to KEV:</strong> ${kevData.date_added ? new Date(kevData.date_added).toLocaleDateString() : 'N/A'}
+                                    </div>
+
+                                    <h6 class="fw-bold">Remediation Requirements</h6>
+                                    <div class="mb-3">
+                                        <strong>Required Action:</strong><br>
+                                        <div class="alert alert-warning">
+                                            ${kevData.required_action || 'No specific action documented'}
+                                        </div>
+                                        <strong>Due Date:</strong> ${kevData.due_date ? new Date(kevData.due_date).toLocaleDateString() : 'Not specified'}
+                                    </div>
+
+                                    ${kevData.known_ransomware_use ? `
+                                    <div class="alert alert-danger" role="alert">
+                                        <i class="fas fa-skull-crossbones me-2"></i>
+                                        <strong>Ransomware Campaign:</strong> This vulnerability has been used in ransomware campaigns.
+                                    </div>
+                                    ` : ''}
+
+                                    ${kevData.notes ? `
+                                    <h6 class="fw-bold">Additional Notes</h6>
+                                    <p>${kevData.notes.replace(
+                                        /(https?:\/\/[^\s]+)/g,
+                                        '<a href="$1" onclick="window.open(\'$1\', \'kev_popup\', \'width=1200,height=1200,scrollbars=yes,resizable=yes\'); return false;" style="color: #007bff; text-decoration: underline;">$1</a>'
+                                    )}</p>
+                                    ` : ''}
+
+                                    <div class="text-muted small">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Data source: CISA Known Exploited Vulnerabilities Catalog
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" onclick="showVulnerabilityDetailsByCVE('${cveId}')">
+                                        <i class="fas fa-info-circle me-2"></i>View CVE Details
+                                    </button>
+                                    <a href="https://nvd.nist.gov/vuln/detail/${cveId}" target="_blank" class="btn btn-primary">
+                                        <i class="fas fa-external-link-alt me-2"></i>NIST NVD
+                                    </a>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Remove existing modal if present
+                const existingModal = document.getElementById('kevDetailsModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+
+                // Add modal to DOM
+                document.body.insertAdjacentHTML('beforeend', modalContent);
+
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('kevDetailsModal'));
+                modal.show();
+
+                // Clean up modal when hidden
+                document.getElementById('kevDetailsModal').addEventListener('hidden.bs.modal', function() {
+                    this.remove();
+                }, { once: true });
+
+            } catch (error) {
+                console.error('Error showing KEV details:', error);
+                showNotification('Failed to load KEV details: ' + error.message, 'error');
+            }
+        }
+
+        // Make function globally available
+        window.showKevDetails = showKevDetails;
+    </script>
 
 </body>
 </html>

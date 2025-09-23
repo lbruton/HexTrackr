@@ -5,9 +5,393 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.17] - 2025-09-19
+
+
+## [1.0.25] - 2025-09-23
+
+### Added - Import Summary HTML Export
+
+#### Professional Report Generation
+
+- **Standalone HTML Reports**: Added ability to download import summaries as complete HTML documents with embedded CSS styling
+  - **Export Button**: New "Download Report" button appears in progress modal when CVE import summaries are available
+  - **Self-Contained Files**: Reports include all necessary CSS (Tabler.io framework, HexTrackr variables, component styles) embedded inline
+  - **Professional Formatting**: Complete document structure with metadata headers, generation timestamps, and HexTrackr branding
+  - **Print-Friendly Styling**: Optimized CSS for both screen viewing and professional printing
+
+#### Technical Implementation
+
+- **CSS Extraction Engine**: Automated system fetches and combines 7 key stylesheets into single embedded block
+  - Tabler.io framework, CSS custom properties, modal styles, badges, cards, tables, and base styles
+  - Font Awesome icons via CDN import for universal compatibility
+  - Custom print media queries for professional output
+- **Dynamic File Naming**: Descriptive filenames using pattern `HexTrackr_Import_Report_YYYY-MM-DD_[source-filename].html`
+- **Blob Download Pattern**: Follows established file export approach with proper MIME types and browser compatibility
+
+#### User Experience Enhancements
+
+- **Visual Feedback System**: Export button provides clear state indicators
+  - Loading state with spinner and "Generating..." text
+  - Success confirmation with checkmark and "Downloaded!" message
+  - Error handling with warning icon and failure notification
+- **Conditional Visibility**: Export option only appears when import summaries contain meaningful CVE discovery data
+- **Non-Disruptive Integration**: Feature seamlessly extends existing import workflow without affecting standard operations
+
+### Fixed - Import Modal State Persistence
+
+#### Clean Loading States
+
+- **Resolved Stale Data Display**: Fixed issue where previous import summaries appeared during new import loading phases
+  - **Root Cause**: `resetProgressState()` function didn't clear `importSummary` data or associated DOM elements
+  - **Solution**: Added explicit `importSummary: null` reset and summary container cleanup
+- **Complete State Reset**: Enhanced modal initialization to properly clear all previous session data
+  - Hide and clear `progressSummary` container content during reset
+  - Reset export button visibility to prevent stale UI states
+  - Ensure clean slate for each new import operation
+
+#### Technical Improvements
+
+- **Data Lifecycle Management**: Improved progress modal data handling to prevent state leakage between sessions
+- **DOM Cleanup**: Systematic clearing of dynamically created summary content and UI elements
+- **ESLint Compliance**: All code modifications passed linting validation with zero errors
+
+## [1.0.24] - 2025-09-23
+
+### Enhanced - Vulnerability Card Polish
+
+#### Card Layout Simplification
+
+- **Streamlined Card Body**: Removed the redundant criticality subcards from vulnerability cards to focus on the key summary details and reduce visual noise.
+- **Consistent Spacing**: Tweaked card padding to accommodate the simplified layout without affecting existing content hierarchy.
+
+#### KEV Indicator Improvements
+
+- **Accessible Badge Placement**: Replaced the inline flame icon with an accessible red KEV pill badge anchored to the top-right corner of each vulnerability card.
+- **Improved Visual Priority**: Updated the indicator styling and keyboard handling so KEV status remains prominent while staying aligned with the HexTrackr design system.
+
+## [1.0.23] - 2025-09-22
+
+### Added - Interactive Statistics Card Filtering
+
+#### Enhanced Ticket Management User Experience
+
+- **Clickable Statistics Cards**: Transformed passive statistics displays into interactive filter controls
+  - **Total Tickets Card**: Shows all tickets, acts as filter reset button
+  - **Open Tickets Card**: Filters to active tickets (excludes Closed, Completed, Failed statuses)
+  - **Overdue Card**: Shows urgent tickets requiring immediate attention (Overdue + Failed statuses)
+  - **Completed Card**: Displays finished work (Completed + Closed statuses)
+
+#### Technical Implementation
+
+- **Smart Filter Integration**: Card filters integrate seamlessly with existing search and location filters
+  - Mutual exclusivity with status dropdown to prevent filter conflicts
+  - Automatic pagination reset when filters are applied
+  - Preserves existing filter chain architecture for backward compatibility
+
+- **Statistics Logic Fix**: Corrected "Open Tickets" calculation to include all non-terminal statuses
+  - Previous logic only counted "Open" and "In Progress" statuses
+  - New logic excludes terminal statuses (Closed, Completed, Failed) for more accurate representation
+  - Statistics now align perfectly with filter behavior for consistency
+
+#### User Interface Enhancements
+
+- **Visual Feedback System**: Added comprehensive visual indicators for interactive elements
+  - Hover effects with theme-aware shadows and subtle lift animations
+  - Active card highlighting with distinct border and background styling
+  - Smooth 200ms transitions for professional feel
+  - Pointer cursor indication for clickability
+
+- **Theme Compatibility**: Full support for both light and dark themes
+  - Dynamic shadow effects adapted for each theme
+  - Proper contrast ratios maintained across all visual states
+  - Consistent styling with existing HexTrackr design system
+
+#### Accessibility Excellence
+
+- **Screen Reader Support**: Complete accessibility implementation for all users
+  - ARIA button roles with pressed/unpressed state announcements
+  - Live region announcements for filter changes ("Showing open tickets only", etc.)
+  - Unique descriptive labels for each card's functionality
+
+- **Keyboard Navigation**: Full keyboard accessibility support
+  - Tab navigation through all statistics cards
+  - Enter and Space key activation matching mouse click behavior
+  - Focus indicators meeting WCAG AA contrast requirements
+  - Logical tab order for intuitive navigation
+
+#### Performance Optimizations
+
+- **Efficient Filter Processing**: Optimized filter operations for large datasets
+  - Sub-100ms filter response times for datasets up to 1000+ tickets
+  - No AG-Grid re-initialization during filter changes
+  - Preserved existing performance characteristics
+
+### Technical Notes
+
+- **Architecture**: Extends existing `HexagonTicketsManager` class with minimal code changes
+- **Integration**: Works seamlessly with AG-Grid v33 and existing filter infrastructure
+- **Compatibility**: Maintains full backward compatibility with existing workflows
+- **Testing**: Comprehensive functionality verified across all supported browsers
+
+## [1.0.22] - 2025-09-21
+
+### Enhanced - KEV (Known Exploited Vulnerabilities) Integration
+
+#### AG-Grid Table Improvements
+
+- **Filterable KEV Column**: Replaced fire emoji (🔥) with filterable YES/NO pills in KEV column
+  - Red badge for "YES" (vulnerability is in KEV catalog)
+  - Blue badge for "NO" (not in KEV catalog)
+  - Follows same design pattern as severity and VPR columns for consistency
+  - Enables proper filtering using AG-Grid's built-in text-based filter system
+
+- **KEV Column Filtering Fix**: Fixed KEV column filtering to work with AG-Grid's filtering system
+  - Changed database query to return 'Yes'/'No' text values instead of 1/0 boolean
+  - Updated column renderer to parse text values for proper filtering compatibility
+  - Made KEV badges clickable to open detailed KEV modal for vulnerability information
+
+#### KEV Modal Enhancements
+
+- **CVE Details Integration**: Added "View CVE Details" button in KEV modal
+  - Opens vulnerability details modal for comprehensive CVE information
+  - Provides seamless navigation between KEV catalog info and full vulnerability details
+  - Uses existing `showVulnerabilityDetailsByCVE()` function for consistency
+
+- **NIST NVD Integration**: Replaced CISA KEV Catalog link with NIST NVD link
+  - Uses pattern `https://nvd.nist.gov/vuln/detail/${cveId}` for direct CVE lookup
+  - Provides more comprehensive vulnerability information from authoritative source
+  - Both modal buttons now use consistent primary button style for better UI cohesion
+
+- **Clickable Links in Notes**: Made all HTTPS links in KEV additional notes clickable
+  - Links open in 1200x1200px popup windows for consistency with rest of application
+  - Automatic regex replacement converts plain URLs to clickable links
+  - Preserves existing text while enhancing usability
+
+#### Filter Dropdown Improvements
+
+- **Filter Option Cleanup**: Removed fire emoji from KEV filter option in severity dropdown
+  - Changed dropdown option from "🔥 KEV" to simply "KEV" for cleaner interface
+  - Maintains clear identification of KEV filtering without emoji clutter
+
+- **KEV Filter Logic Fix**: Fixed KEV filter to properly match vulnerabilities
+  - Added special handling in filter logic to distinguish KEV from severity filtering
+  - Fixed filter matching to properly check `isKev === "Yes"` when KEV filter selected
+  - Ensures consistent filtering behavior across grid, cards, and modal contexts
+
+### Fixed - KEV Data Handling
+
+- **Database Service Updates**: Updated vulnerability service to return text-based KEV values
+  - Changed database query from returning 1/0 to 'Yes'/'No' text values
+  - Ensures compatibility with AG-Grid's text-based filtering system
+  - Maintains data integrity while improving UI functionality
+
+- **Component Consistency**: Fixed KEV handling across all vulnerability components
+  - Updated vulnerability cards to check for text value "Yes" instead of boolean
+  - Ensured consistent KEV data interpretation in grid, cards, modals, and filters
+  - Eliminated discrepancies between different UI components
+
+## [1.0.21] - 2025-09-21
+
+### Added
+
+#### Unified Template Variable System
+
+- **Centralized Variable Configuration**: Created `template-variables.js` with unified variable definitions
+  - Consistent naming conventions across all template types ([HEXAGON_TICKET], [SERVICENOW_TICKET], etc.)
+  - Categorized variables by function: Ticket Info, Location, Dates, Devices, Personnel, Content, Counts
+  - Universal variable access for maximum flexibility across ticket, email, and vulnerability templates
+  - Backward compatibility maintained for existing templates
+
+- **Dropdown Variable Interface**: Transformed bulky 300px variable panels into compact Bootstrap dropdowns
+  - **87% space reduction**: From 300px fixed panels to 38px dropdown buttons in editor headers
+  - Organized variable categories with descriptive icons (📋 Ticket Info, 📍 Location, 📅 Dates, etc.)
+  - Click-to-insert functionality with cursor position preservation
+  - Auto-close behavior and success notifications for smooth user experience
+  - Comprehensive dark theme support with proper contrast and hover states
+
+#### Template Editing Enhancements
+
+- **Enhanced Template Editors**: Improved all three template editors (ticket, email, vulnerability)
+  - Consistent dropdown-based variable selection across all editors
+  - Better visual organization with category headers and variable descriptions
+  - Required vs optional variable highlighting (orange for required, blue for optional)
+  - Monospace font for variable names with clear descriptions
+
+- **Improved Space Utilization**: Maximized editing area by eliminating horizontal panels
+  - More screen real estate for template content editing
+  - Professional appearance with header-integrated dropdown controls
+  - Responsive design that adapts to container constraints
 
 ### Fixed
+
+#### Template System Bug Resolutions
+
+- **Template Cross-Contamination**: Fixed cache key collisions between template types
+  - Eliminated issue where editing one template would affect another
+  - Proper isolation between ticket, email, and vulnerability template caches
+  - Enhanced cache management with template-specific keys
+
+- **Validation System Issues**: Resolved aggressive validation triggering unwanted restoration
+  - Temporarily disabled overly strict template validation that interfered with user edits
+  - Improved validation logic to allow user content loading for editing
+  - Better error handling and user feedback for template operations
+
+- **ForceRefresh Logic**: Fixed template reloading after reset operations
+  - Corrected conditional statements that prevented proper API calls
+  - Ensured templates properly reload from server when force refresh is requested
+  - Enhanced debugging with comprehensive logging for template operations
+
+### Changed
+
+#### User Interface Improvements
+
+- **Variable Selection UI**: Transformed from horizontal panels to dropdown interface
+  - Replaced space-consuming variable panels with compact dropdown buttons
+  - Improved workflow with faster variable selection and insertion
+  - Better visual hierarchy with organized categories and clear descriptions
+
+- **Template Editor Layout**: Optimized modal space utilization
+  - Removed bulky reference panels below editors
+  - Integrated variable access directly into editor toolbars
+  - Cleaner, more professional appearance throughout template editing interface
+
+#### Technical Improvements
+
+- **Variable System Architecture**: Unified variable management across all components
+  - Centralized variable definitions eliminate duplication and inconsistencies
+  - Standardized variable naming improves maintainability
+  - Prepared foundation for future config builder tools and custom template types
+
+## [1.0.20] - 2025-09-21
+
+### Added
+
+#### Email Template Generation for Tickets
+
+- **Third Tab in Ticket Modal**: Added "Email Template" tab alongside existing "Ticket Details" and "Vulnerabilities" tabs
+  - Professional email template automatically generated from ticket data
+  - Includes subject line suggestion with site name and Hexagon ticket number
+  - Formatted with clear sections: Maintenance Details, Affected Systems, Action Required, Timeline
+  - Automatic device list formatting with enumeration
+
+- **Email Copy Button**: New dedicated copy button for email template
+  - Icon uses envelope symbol for clear identification
+  - Copies formatted email template to clipboard
+  - Toast notification confirms successful copy
+  - Lazy loading only generates template when tab is clicked
+
+- **Template Edit Button Stub**: Placeholder for future v1.0.21 template editing feature
+  - Disabled button with tooltip indicating "Template editing coming in v1.0.21"
+  - Positioned alongside copy buttons for consistent UI
+  - Prepares interface for upcoming customizable templates
+
+- **Enhanced Workflow**: Email template streamlines communication process
+  - Pre-formatted professional communication ready for sending
+  - Includes all critical ticket information in email-friendly format
+  - Consistent messaging across team communications
+  - Reduces time spent composing maintenance notifications
+
+## [1.0.19] - 2025-09-21
+
+### Added
+
+#### Enhanced Ticket Modal with Vulnerability Integration
+
+- **Dual Copy Buttons**: Ticket modal now features two separate copy buttons
+  - "Ticket" button: Copies ticket markdown to clipboard (existing functionality)
+  - "Vulnerabilities" button: Copies vulnerability report markdown without requiring bundle download
+
+- **Tabbed Interface**: New Bootstrap tabs in ticket modal for better information organization
+  - "Ticket Details" tab: Shows existing ticket markdown view
+  - "Vulnerabilities" tab: Displays vulnerability report for all devices in the ticket
+  - Lazy loading: Vulnerability data only fetched when tab is clicked
+  - Fuzzy hostname matching using Levenshtein distance for flexible device matching
+
+- **Improved Workflow**: Users can now quickly access and copy vulnerability data directly from the ticket modal without needing to download the full bundle
+
+### Changed
+
+- **Repository Cleanup**: Removed deprecated files and development artifacts
+  - Cleaned up .claude/, .specify/, and .context7/ directories
+  - Removed test files, backups, and temporary uploads
+  - Streamlined repository structure for better maintainability
+
+## [1.0.18] - 2025-09-20
+
+### Added
+
+#### UI/UX Enhancements
+
+- **Attachment Visibility for Tickets**: Added comprehensive tooltip functionality for "Attach Documentation" button on tickets2.html
+  - Displays list of currently attached files with sizes on hover
+  - Shows file count badge when documents are attached (e.g., "(3)")
+  - Button changes from gray outline to blue when files are present
+  - Tooltips persist across page refreshes using localStorage
+  - Added Shift+Click and Right-Click functionality to clear all attachments with confirmation
+  - Smooth animations and visual feedback for improved user experience
+  - Resolves issue where users had no visibility of attached files until downloading bundles
+
+### Fixed
+
+#### Bug Fixes
+
+- **Attachment Tooltip Navigation Bug**: Fixed issue where tooltip displayed empty content after navigating between pages
+  - Root cause: Bootstrap tooltip wasn't properly reinitializing when returning to tickets page
+  - Solution: Dispose old tooltip instances and create fresh ones with proper data on page load
+  - Added 100ms delay to ensure DOM readiness when navigating between pages
+
+- **Version Display in Health Endpoint**: Fixed incorrect version reporting in `/health` API endpoint
+  - Corrected package.json path in server.js from `./package.json` to `../package.json` for Docker container
+  - Updated docker-compose.yml HEXTRACKR_VERSION environment variable to match package.json
+  - Health endpoint now correctly reports version 1.0.18 instead of falling back to old versions
+
+#### Documentation
+
+- **JSDoc Dark Mode Restoration**: Fixed missing dark mode support in developer documentation
+  - Ran `inject-jsdoc-theme.js` script to inject theme synchronization into 96 JSDoc HTML files
+  - Dark mode now properly syncs with main application theme preference
+  - Restored proper styling with dark backgrounds (#0f172a) and light text in dark mode
+
+## [1.0.17] - 2025-09-19
+
+### Added
+
+#### UI/UX Enhancements
+
+- **tickets2.html Beta Implementation**: Introduced beta version of redesigned tickets page with AG-Grid integration
+  - Advanced table with column filtering, sorting, resizing, and responsive design
+  - SITE and LOCATION columns with ticket accent colors for visual categorization
+  - Enhanced user experience with modern data table interface
+  - Maintains backward compatibility with existing tickets.html
+
+### Fixed
+
+#### Theme Engine & Visual Improvements
+
+- **Card Border Visibility**: Fixed critical card border issue where vulnerability and device cards blended into page background
+  - Root cause: CSS specificity conflicts with `border-color: transparent !important` overrides in dark theme
+  - Solution: Standardized border variables from `--tblr-border-color` to `--hextrackr-border-subtle`
+  - Enhanced border opacity from 0.08 to 0.15 for better visibility across both light and dark modes
+  - Applied Five Whys root cause analysis to identify true underlying issues
+
+- **AG-Grid Dark Mode Contrast**: Fixed poor contrast for SITE and LOCATION ticket accent colors in dark mode
+  - Moved ticket accent colors from `.ag-theme-quartz` scope to global `[data-bs-theme="dark"]` scope
+  - Optimized colors for WCAG AA compliance with enhanced contrast ratios:
+    - Teal: #2dd4bf → #5eead4 (9.5:1 contrast ratio)
+    - Amber: #fbbf24 → #fcd34d (11.2:1 contrast ratio)
+    - Slate: #94a3b8 → #cbd5e1 (10.2:1 contrast ratio)
+  - All ticket accent colors now meet accessibility standards for dark backgrounds
+
+- **CSS Variable Consolidation**: Comprehensive cleanup of CSS variable architecture
+  - Fixed Stylelint duplicate variable warnings by creating properly namespaced versions
+  - Implemented standard and `-contrast` variants for VPR (Vulnerability Priority Rating) colors
+  - Consolidated shadow variables with theme-specific opacity values
+  - Created single source of truth for all color definitions across light/dark themes
+
+- **Device Card Interactivity**: Enhanced device cards with click functionality matching vulnerability cards
+  - Made device cards clickable with proper cursor styling and modal integration
+  - Unified user experience patterns between vulnerability and device card interactions
+  - Added comprehensive JSDoc documentation for improved code maintainability
 
 #### CSV Import Pipeline
 
@@ -27,12 +411,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
+- **CSS Theme Architecture**: Added comprehensive documentation for theme system architecture
+  - Documented CSS variable hierarchy and naming conventions
+  - Added WCAG contrast guidelines and accessibility best practices
+  - Provided CSS customization guide for theme modifications
+
 - **Developer Documentation Link**: Fixed broken dev docs link in documentation portal
   - Changed from `/dev-docs/` to `/dev-docs-html/` to match actual directory structure
 
 - **JSDoc Regeneration**: Updated developer documentation with all recent fixes
   - Documented new import service functions and batch processing
   - Added comprehensive function descriptions for ImportService
+  - Enhanced vulnerability-cards.js with detailed JSDoc comments
 
 ## [1.0.16] - 2025-09-18
 
