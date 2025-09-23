@@ -1,23 +1,42 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-`app/` contains the Express stack: controllers expose routes, services hold business rules, while `modules/` and `utils/` provide shared helpers. The server entry point and static assets live in `app/public/`; middleware and config live beside them under `app/middleware/` and `app/config/`. Test data and snapshots live in `data/` and `backups/`. Docs automation sits in `docs/` and `app/dev-docs-html/`, and operational scripts stay in `scripts/`. Jest code lives in `tests/{unit,integration,contract}/` with setup files in `tests/setup/`; Playwright legacy specs remain in `__tests__/`.
+
+- `app/` hosts the Express server and domain logic; `public/server.js` is the entry point wiring routes, sockets, and middleware.
+- `app/controllers`, `services`, and `modules` keep request handling, reusable business logic, and feature bundles isolated.
+- `app/routes` defines mounted routers, while `app/utils` centralizes helpers such as progress tracking.
+- `data/` stores the SQLite schema and local `hextrackr.db`; do not commit replacements without validating migrations.
+- `docs/` and `app/dev-docs-html/` contain generated documentation; `planning/` and `memento/` capture roadmap material.
 
 ## Build, Test, and Development Commands
-- `npm run dev` starts Nodemon for fast backend iteration.
-- `docker-compose up -d` runs the full stack (app + SQLite volume).
-- `npm run init-db` seeds a clean SQLite database.
-- `npm run lint:all` aggregates markdownlint, ESLint, and Stylelint; `npm run fix:all` auto-corrects.
-- `npm test`, `npm run test:integration`, and `npm run test:coverage` target the Jest projects and produce artifacts in `tests/coverage/`.
+
+- `npm run dev` launches the Express server with nodemon for hot reloading.
+- `npm start` runs the production server directly.
+- `npm run init-db` seeds the SQLite database using `app/public/scripts/init-database.js`.
+- `npm run docs:all` regenerates the architecture and API docs when backend contracts change.
 
 ## Coding Style & Naming Conventions
-ESLint (`eslint.config.mjs`) enforces 2-space indentation, double quotes, semicolons, `prefer-const`, and `eqeqeq`. Use module aliases such as `@services/ticket-service.js` instead of deep relatives. Name modules with camelCase; routers end in `*.router.js`. CSS in `app/public/styles/` must pass `npm run stylelint`; Markdown should clear `npm run lint:md`.
+
+- JavaScript is linted by ESLint with `@stylistic`; use double quotes, semicolons, and 4-space indentation shown in `app/public/server.js`.
+- Favor `const`/`let`, guard against unused variables, and keep controller/service files under 300 lines for readability.
+- CSS changes should pass `npm run stylelint`; Markdown updates should survive `npm run lint:md`.
+- Feature folders follow kebab-case (e.g., `modules/ticket-tracker`); exported classes use PascalCase, helpers camelCase.
 
 ## Testing Guidelines
-Global coverage should stay ≥70%, services ≥80%, controllers ≥75% (see `jest.config.js`). Generate reports with `npm run test:coverage` before merging feature branches. Name new specs `*.test.js`, store fixtures in `tests/fixtures/`, and clean transient files from `tests/temp/`. Browser flows rely on Playwright under `specs/` or `__tests__/`; document manual edge cases in PR notes.
+
+- Jest is configured for Node and browser environments; colocate specs in `tests/` using `*.test.js` naming.
+- Run `npm test` before pushing; use `npm run test:unit` or `npm run test:integration` when focusing on a subset.
+- Ship new features with coverage from `npm run test:coverage`; highlight any intentional gaps in the PR description.
 
 ## Commit & Pull Request Guidelines
-Follow Conventional Commit prefixes (`feat:`, `fix:`, `docs:`, `chore:`) and reference tickets (`Refs HEX-142`) in the body. Keep messages descriptive—avoid "checkpoint" commits in shared branches. PRs need a short summary, verification steps (commands, screenshots for UI work), linked issues, and callouts for schema or script changes. Request reviewers who own the touched modules and attach lint/test results when CI is unavailable.
 
-## Security & Configuration Tips
-Load secrets via `.env`; never commit production credentials or generated SQLite files. For releases, run `npm run docs:analyze` to refresh architecture artifacts and confirm security controls (rate limits, sanitizers) are reflected.
+- Prefer Conventional Commits (`feat:`, `fix:`, `docs:`) as seen in recent history; keep the subject under ~70 characters.
+- Each PR should include: summary of changes, testing output (`npm test`, lint results), linked issues, and screenshots for UI-affecting work.
+- Rebase onto `main` before requesting review; resolve lint/test failures locally instead of relying on CI.
+- For database changes, attach schema diffs or migration notes so reviewers can replay the steps.
+
+## Environment & Security Notes
+
+- Copy `.env` from the secure store when onboarding; avoid committing secrets or local DB files.
+- Rate limiting and socket rooms rely on configuration in `app/config/`; review those modules before altering middleware or WebSocket behavior.
+- Remove stray logs from controllers prior to merging to preserve observability signal-to-noise.

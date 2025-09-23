@@ -1,5 +1,5 @@
 {
-  "generated": "2025-09-20T21:25:50.835Z",
+  "generated": "2025-09-23T02:04:47.514Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -62,6 +62,18 @@
           "file": "architecture/theme-architecture",
           "title": "Theme Architecture",
           "path": "architecture/theme-architecture.html"
+        }
+      }
+    },
+    "features": {
+      "title": "Features",
+      "icon": "fas fa-file-alt",
+      "indexFile": "features/index",
+      "children": {
+        "kev-integration": {
+          "file": "features/kev-integration",
+          "title": "Kev Integration",
+          "path": "features/kev-integration.html"
         }
       }
     },
@@ -140,5 +152,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 26
+  "totalFiles": 27
 }

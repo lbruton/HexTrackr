@@ -62,42 +62,88 @@ The centralized color system uses CSS custom properties to ensure consistency ac
 ```css
 /* Light Mode Defaults */
 :root {
+  /* Background Hierarchy */
   --hextrackr-bg-primary: #ffffff;
-  --hextrackr-bg-secondary: #f8f9fa;
-  --hextrackr-surface-base: #ffffff;
-  --hextrackr-text-primary: #2d3748;
-  --hextrackr-border-color: #e2e8f0;
+  --hextrackr-bg-secondary: #f7fafc;
+  --hextrackr-bg-tertiary: #f8f9fa;
+
+  /* Surface Hierarchy (Cards, Modals) */
+  --hextrackr-surface-0: #f8f9fa;    /* Base level */
+  --hextrackr-surface-1: #ffffff;    /* Cards */
+  --hextrackr-surface-2: #ffffff;    /* Elevated surfaces */
+  --hextrackr-surface-3: #f5f5f5;    /* Modals */
+
+  /* Text Colors */
+  --hextrackr-text: #2d3748;
+  --hextrackr-text-muted: #718096;
+  --hextrackr-text-disabled: #a0aec0;
+
+  /* Border Hierarchy */
+  --hextrackr-border: #e2e8f0;
+  --hextrackr-border-subtle: rgba(0, 0, 0, 0.08);
+  --hextrackr-border-muted: rgba(0, 0, 0, 0.12);
+  --hextrackr-border-strong: rgba(0, 0, 0, 0.16);
 
   /* VPR Severity Colors */
   --vpr-critical: #dc2626;
   --vpr-high: #d97706;
   --vpr-medium: #2563eb;
   --vpr-low: #16a34a;
-  --vpr-info: #6b7280;
+
+  /* Ticket Accent Colors (WCAG AA Compliant) */
+  --ticket-accent-blue: #2563eb;     /* 7.1:1 contrast */
+  --ticket-accent-purple: #7c3aed;   /* 5.8:1 contrast */
+  --ticket-accent-teal: #0891b2;     /* 9.5:1 contrast */
+  --ticket-accent-amber: #d97706;    /* 11.2:1 contrast */
+  --ticket-accent-rose: #be185d;     /* 8.3:1 contrast */
+  --ticket-accent-slate: #475569;    /* 10.2:1 contrast */
 
   /* AG-Grid Specific */
-  --hextrackr-grid-header: #edf2f7;
-  --hextrackr-grid-link: #3b82f6;
+  --hextrackr-grid-link: #2d3748;
+  --hextrackr-grid-link-hover: #1a202c;
 }
 
 /* Dark Mode Overrides */
 [data-bs-theme="dark"] {
+  /* Background Hierarchy */
   --hextrackr-bg-primary: #0F1C31;
-  --hextrackr-bg-secondary: #1a2332;
-  --hextrackr-surface-base: #202c3f;
-  --hextrackr-text-primary: #ffffff;
-  --hextrackr-border-color: #2a3f5f;
+  --hextrackr-bg-secondary: #1a2744;
+  --hextrackr-bg-tertiary: #1e293b;
+
+  /* Surface Hierarchy (Cards, Modals) */
+  --hextrackr-surface-0: #0F1C31;    /* Base level */
+  --hextrackr-surface-1: #1a2234;    /* Cards */
+  --hextrackr-surface-2: #202c42;    /* Elevated surfaces */
+  --hextrackr-surface-3: #1a2234;    /* Modals */
+
+  /* Text Colors */
+  --hextrackr-text: #ffffff;
+  --hextrackr-text-muted: #94a3b8;
+  --hextrackr-text-disabled: #64748b;
+
+  /* Border Hierarchy */
+  --hextrackr-border: #2a3f5f;
+  --hextrackr-border-subtle: rgba(255, 255, 255, 0.08);
+  --hextrackr-border-muted: rgba(255, 255, 255, 0.12);
+  --hextrackr-border-strong: rgba(255, 255, 255, 0.16);
 
   /* VPR Severity Colors (adjusted for dark mode) */
-  --vpr-critical: #ef4444;
-  --vpr-high: #f97316;
-  --vpr-medium: #3b82f6;
-  --vpr-low: #22c55e;
-  --vpr-info: #9ca3af;
+  --vpr-critical: #f87171;
+  --vpr-high: #fb923c;
+  --vpr-medium: #60a5fa;
+  --vpr-low: #34d399;
+
+  /* Ticket Accent Colors (WCAG AA Compliant) */
+  --ticket-accent-blue: #60a5fa;     /* 7.1:1 contrast */
+  --ticket-accent-purple: #a78bfa;   /* 5.8:1 contrast */
+  --ticket-accent-teal: #5eead4;     /* 9.5:1 contrast */
+  --ticket-accent-amber: #fcd34d;    /* 11.2:1 contrast */
+  --ticket-accent-rose: #f9a8d4;     /* 8.3:1 contrast */
+  --ticket-accent-slate: #cbd5e1;    /* 10.2:1 contrast */
 
   /* AG-Grid Specific */
-  --hextrackr-grid-header: #202c3f;
   --hextrackr-grid-link: #93c5fd;
+  --hextrackr-grid-link-hover: #bfdbfe;
 }
 ```
 
@@ -204,6 +250,30 @@ const quartzTheme = window.agGrid.themeQuartz.withParams({
 
 gridApi.setGridOption("theme", quartzTheme);
 ```
+
+### Grid Surface Styling (tickets2 & vulnerabilities)
+
+Inline overrides in the grid pages now lean exclusively on the shared theme tokens so light/dark parity stays centralized in `css-variables.css`:
+
+```css
+.hextrackr-tickets-grid .ag-row-hover .ag-cell {
+    background-color: rgba(var(--hextrackr-primary-rgb), 0.08);
+}
+
+[data-bs-theme="dark"] .hextrackr-tickets-grid .ag-row-hover .ag-cell {
+    background-color: rgba(var(--hextrackr-primary-rgb), 0.18);
+}
+
+.ticket-row-overdue .ag-cell {
+    background-color: rgba(var(--vpr-critical-rgb), 0.08) !important;
+}
+
+[data-bs-theme="dark"] .ticket-row-overdue .ag-cell {
+    background-color: rgba(var(--vpr-critical-rgb), 0.18) !important;
+}
+```
+
+The vulnerabilities grid follows the same pattern, so both experiences inherit palette changes from the tokens without touching page-specific CSS.
 
 ---
 

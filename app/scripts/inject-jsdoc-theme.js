@@ -3,6 +3,8 @@
 /**
  * Post-processor for JSDoc HTML files
  * Injects theme synchronization script into all generated documentation
+ *
+ * Note: Use inject-jsdoc-theme-wrapper.sh if app/package.json causes issues
  */
 
 const fs = require("fs");
