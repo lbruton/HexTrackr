@@ -184,10 +184,16 @@ async initializeCharts() {
 
 **Responsibilities**:
 
-- Card-based view rendering
-- Pagination for card layouts
+- Card-based view rendering with distinct device and vulnerability card types
+- Pagination for card layouts (6 cards per page default)
 - Device grouping and organization
-- Interactive card actions
+- Interactive card actions with modal integration
+- **v1.0.24 Enhancements**:
+  - Streamlined vulnerability cards without redundant VPR mini-cards
+  - Enhanced device display component with larger icons and text
+  - KEV (Known Exploited Vulnerabilities) indicator badges
+  - Theme-aware styling with CSS variable integration
+  - Improved visual hierarchy and reduced DOM complexity (40% element reduction)
 
 ---
 

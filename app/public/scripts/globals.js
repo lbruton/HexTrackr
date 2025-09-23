@@ -26,30 +26,30 @@
  * @namespace BrowserAPIs
  */
 const BROWSER_GLOBALS = [
-    'window',           // Browser window object - main application container
-    'document',         // DOM manipulation and element access
-    'localStorage',     // Persistent client-side storage
-    'sessionStorage',   // Session-based client-side storage
-    'fetch',           // Modern AJAX/fetch API for HTTP requests
-    'console',         // Browser console for debugging and logging
-    'setTimeout',      // Timer functions for delayed execution
-    'clearTimeout',    // Clear delayed execution timers
-    'setInterval',     // Interval timers for repeated execution
-    'clearInterval',   // Clear interval timers
-    'alert',           // Browser alert dialogs
-    'confirm',         // Browser confirmation dialogs
-    'prompt',          // Browser input prompts
-    'btoa',            // Base64 encoding
-    'atob',            // Base64 decoding
-    'URL',             // URL manipulation utilities
-    'Blob',            // Binary data objects
-    'File',            // File objects for file uploads
-    'FileReader',      // File reading utilities
-    'FormData',        // Form data handling for HTTP requests
-    'location',        // Browser location/URL information
-    'history',         // Browser history manipulation
-    'navigator',       // Browser and system information
-    'XMLHttpRequest'   // Legacy AJAX API (for compatibility)
+    "window",           // Browser window object - main application container
+    "document",         // DOM manipulation and element access
+    "localStorage",     // Persistent client-side storage
+    "sessionStorage",   // Session-based client-side storage
+    "fetch",           // Modern AJAX/fetch API for HTTP requests
+    "console",         // Browser console for debugging and logging
+    "setTimeout",      // Timer functions for delayed execution
+    "clearTimeout",    // Clear delayed execution timers
+    "setInterval",     // Interval timers for repeated execution
+    "clearInterval",   // Clear interval timers
+    "alert",           // Browser alert dialogs
+    "confirm",         // Browser confirmation dialogs
+    "prompt",          // Browser input prompts
+    "btoa",            // Base64 encoding
+    "atob",            // Base64 decoding
+    "URL",             // URL manipulation utilities
+    "Blob",            // Binary data objects
+    "File",            // File objects for file uploads
+    "FileReader",      // File reading utilities
+    "FormData",        // Form data handling for HTTP requests
+    "location",        // Browser location/URL information
+    "history",         // Browser history manipulation
+    "navigator",       // Browser and system information
+    "XMLHttpRequest"   // Legacy AJAX API (for compatibility)
 ];
 
 /**
@@ -58,14 +58,14 @@ const BROWSER_GLOBALS = [
  * @namespace ThirdPartyLibs
  */
 const LIBRARY_GLOBALS = [
-    'bootstrap',       // Bootstrap 5 - UI components and utilities
-    'Papa',           // Papa Parse - CSV parsing and generation
-    'agGrid',         // AG Grid - Advanced data grid component
-    'ApexCharts',     // ApexCharts - Chart and visualization library
-    'DOMPurify',      // DOMPurify - HTML sanitization for XSS prevention
-    'Chart',          // Chart.js - Canvas-based charting library
-    'jsPDF',          // jsPDF - PDF generation library
-    'html2canvas'     // html2canvas - HTML to canvas conversion
+    "bootstrap",       // Bootstrap 5 - UI components and utilities
+    "Papa",           // Papa Parse - CSV parsing and generation
+    "agGrid",         // AG Grid - Advanced data grid component
+    "ApexCharts",     // ApexCharts - Chart and visualization library
+    "DOMPurify",      // DOMPurify - HTML sanitization for XSS prevention
+    "Chart",          // Chart.js - Canvas-based charting library
+    "jsPDF",          // jsPDF - PDF generation library
+    "html2canvas"     // html2canvas - HTML to canvas conversion
 ];
 
 /**
@@ -117,19 +117,19 @@ const LIBRARY_GLOBALS = [
  */
 const GLOBAL_CONSTANTS = {
     // API Configuration
-    API_BASE_URL: window.location.origin + '/api',
+    API_BASE_URL: window.location.origin + "/api",
 
     // Application Configuration
-    APP_NAME: 'HexTrackr',
-    APP_VERSION: '2.0.0',
+    APP_NAME: "HexTrackr",
+    APP_VERSION: "2.0.0",
 
     // UI Configuration
-    THEME_STORAGE_KEY: 'theme',
+    THEME_STORAGE_KEY: "theme",
     PAGINATION_DEFAULT_SIZE: 12,
 
     // Security Configuration
     MAX_FILE_SIZE: 100 * 1024 * 1024, // 100MB
-    ALLOWED_FILE_TYPES: ['text/csv', 'application/vnd.ms-excel'],
+    ALLOWED_FILE_TYPES: ["text/csv", "application/vnd.ms-excel"],
 
     // Timing Configuration
     DEBOUNCE_DELAY: 300, // milliseconds
@@ -170,11 +170,11 @@ const GLOBAL_UTILS = {
      * @returns {string} Formatted size string
      */
     formatFileSize: function(bytes) {
-        if (bytes === 0) return '0 Bytes';
+        if (bytes === 0) {return "0 Bytes";}
         const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const sizes = ["Bytes", "KB", "MB", "GB"];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
     },
 
     /**
