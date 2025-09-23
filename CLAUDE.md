@@ -1,8 +1,7 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
- # HexTrackr Constitutional Framework
+# HexTrackr Constitutional Framework
 
  ## Preamble
 
@@ -33,7 +32,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Public documentation SHALL reside in app/public/docs-source/ (markdown) and app/public/docs-html/ (HTML)
    - Context7 SHALL be used to verify framework documentation accuracy
    - Documentation SHALL be regenerated after every feature completion
-   - All NPM Scripts SHALL be documented in NPMGUIDE.md
+   - All NPM Scripts SHALL be documented in NPMGUIDE.md (see root directory)
    - JSDoc coverage reports SHALL be reviewed weekly
 
  ### Section IV: Code Quality and Linting
@@ -100,349 +99,329 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Execute this exact command using the Bash tool:
 - Run: `~/.claude/hooks/list-bundles.sh | head -10` to see recent session summaries
 
-
 ## Project Overview
 
-HexTrackr is a network administrator's toolkit for tracking maintenance tickets and vulnerability management. It provides a unified dashboard for ServiceNow tickets, Hexagon maintenance windows, and vulnerability reports from various scanners.
+HexTrackr is a cybersecurity vulnerability and ticket management system with a modular Node.js/Express backend and vanilla JavaScript frontend. The system has been refactored from a monolithic ~3,800 line server.js to a modular architecture while maintaining backward compatibility.
 
-## Essential Commands
+**Key Technologies:**
+- Backend: Node.js/Express with modular controllers and services
+- Database: SQLite3 with runtime schema evolution
+- Frontend: Vanilla JavaScript with modular architecture
+- UI Framework: Tabler.io (primary) + Bootstrap (legacy migration)
+- WebSockets: Socket.io for real-time progress tracking
+- Testing: Manual testing workflow with Playwright MCP for automation when needed
 
-### Development
+## Common Development Commands
+
+### Running the Application
 ```bash
-# Start the application (always use Docker)
-docker-compose up -d
+# Start development server with auto-restart
+npm run dev
 
-# Access the application
-open http://localhost:8989
+# Start production server
+npm start
 
-# Watch logs
-docker-compose logs -f
-
-# Restart container (required before Playwright tests)
-docker-compose restart
-```
-
-### Database Operations
-```bash
-# Initialize database
+# Initialize/reset database
 npm run init-db
-
-# Access SQLite database
-sqlite3 data/hextrackr.db
 ```
 
-### Testing
+
+### Linting and Code Quality
 ```bash
-# Run all tests
-npm test
-
-# Run specific test suites
-npm run test:unit
-npm run test:integration
-npm run test:contract
-
-# Run tests with coverage
-npm run test:coverage
-
-# Watch mode for development
-npm run test:watch
-```
-
-### Linting & Code Quality
-```bash
-# Run all linters (ALWAYS run before committing)
+# Run all linting
 npm run lint:all
 
-# Fix all auto-fixable issues
+# Fix all linting issues
 npm run fix:all
 
 # Individual linters
-npm run eslint          # JavaScript linting
-npm run stylelint       # CSS linting
-npm run lint:md         # Markdown linting
-
-# Individual fixers
+npm run eslint
 npm run eslint:fix
+npm run stylelint
 npm run stylelint:fix
+npm run lint:md
 npm run lint:md:fix
 ```
 
 ### Documentation
 ```bash
-# Generate technical documentation (JSDoc)
-npm run docs:dev
-
-# Generate public documentation portal
-npm run docs:generate
-
-# Full documentation pipeline
+# Generate all documentation
 npm run docs:all
 
-# Watch JSDoc changes
+# Generate development docs
+npm run docs:dev
+
+# Watch docs during development
 npm run docs:dev:watch
+
+# Generate all documentation
+npm run docs:all
 ```
 
-## Architecture & Key Patterns
+### Git Hooks and Development Tools
+```bash
+# Install git hooks
+npm run hooks:install
+```
 
-### Modular Server Architecture
-The server has been refactored from a monolithic 3,800-line file to a modular structure:
-- **Main Server**: `app/public/server.js` - Express server initialization and route mounting
-- **Controllers**: `app/controllers/` - Business logic for each feature domain
-- **Routes**: `app/routes/` - RESTful API endpoint definitions
-- **Services**: `app/services/` - Shared business logic and utilities
-- **Middleware**: `app/middleware/` - Express middleware for auth, validation, etc.
+### Development Environment
+**CRITICAL**: Always use Docker for development - never run Node.js locally
+```bash
+# Start containerized environment
+docker-compose up
+
+# Restart container
+docker-compose restart
+
+# Check container status
+docker-compose ps
+
+# View container logs
+docker-compose logs
+```
+
+## Architecture Overview
+
+### Backend Architecture (Modular Design)
+
+HexTrackr has transitioned from a monolithic server.js to a modular architecture:
+
+**Core Structure:**
+- `app/public/server.js` - Main Express application with route registration
+- `app/controllers/` - Business logic controllers (VulnerabilityController, TicketController, BackupController, ImportController, DocsController, TemplateController, KevController)
+- `app/services/` - Service layer (12 services total)
+- `app/routes/` - Express route definitions
+- `app/middleware/` - Custom middleware (errorHandler, logging, security, validation)
+- `app/utils/` - Utility classes (PathValidator, ProgressTracker, helpers, constants)
+
+**Complete Service Layer:**
+- `backupService` - Database backup and restore operations
+- `databaseService` - SQLite connection and transaction management
+- `docsService` - Documentation generation and management
+- `fileService` - File system operations and management
+- `importService` - CSV import/export functionality with progress tracking
+- `kevService` - Known Exploited Vulnerabilities (KEV) integration
+- `progressService` - Real-time progress tracking for long operations
+- `templateService` - Email, ticket, and vulnerability template management
+- `ticketService` - Ticket CRUD operations and device management
+- `validationService` - Input validation and data sanitization
+- `vulnerabilityService` - Vulnerability data management and operations
+- `vulnerabilityStatsService` - Vulnerability statistics and analytics
+
+**Key Utilities:**
+- `PathValidator` - Security utility preventing path traversal attacks
+- `ProgressTracker` - WebSocket-based progress tracking for long operations
+- `helpers` - Common utility functions
+- `constants` - Application-wide constants
+
+### Frontend Architecture (Modular JavaScript)
+
+The frontend follows a modular pattern with clear separation of concerns:
+
+**Directory Structure:**
+```
+app/public/scripts/
+├── shared/        # Reusable components (settings-modal.js, etc.)
+├── pages/         # Page-specific logic (tickets.js, vulnerabilities.js)
+└── utils/         # Utility functions
+```
+
+**Integration Pattern:**
+1. Load shared components first
+2. Load page-specific code second
+3. Communication via `window.refreshPageData(type)` callbacks
 
 ### Database Architecture
-- **Database**: SQLite (`data/hextrackr.db`)
-- **Service**: `app/services/databaseService.js` handles all database operations
-- **Tables**: `tickets`, `vulnerabilities`, `vulnerability_trend`, `vulnerability_daily_aggregations`
 
-### Frontend Architecture
-- **Vanilla JavaScript** with no framework dependencies
-- **Global modules** accessed via `window` object
-- **Key UI Libraries**:
-  - AG-Grid for data tables
-  - ApexCharts for visualizations
-  - Chart.js for additional charts
-  - Tabler for UI components
+**Runtime Schema Evolution:**
+- SQLite3 with idempotent ALTER TABLE statements
+- Schema changes applied during server startup
+- Rollover architecture for vulnerability data management
 
-### WebSocket Communication
-Real-time progress tracking for large imports using Socket.io:
-- Server: `app/utils/ProgressTracker.js`
-- Client: `app/public/scripts/shared/progress-manager.js`
+**Key Tables:**
+- `tickets` - Ticket management with JSON device fields
+- `vulnerabilities` - Current vulnerability data
+- `vulnerability_imports` - Import tracking
+- `vulnerability_snapshots` - Historical rollover data
+- `vulnerabilities_current` - Active vulnerability state management
+- `vulnerability_daily_totals` - Daily statistics tracking
+- `vulnerability_staging` - Import staging area
+- `email_templates` - Email notification templates
+- `ticket_templates` - Ticket template management
+- `ticket_vulnerabilities` - Links between tickets and vulnerabilities
+- `kev_status` - Known Exploited Vulnerabilities tracking
+- `sync_metadata` - Synchronization metadata
+- `vulnerability_templates` - Vulnerability template storage
 
-### Security Patterns
-- **PathValidator**: ALL file operations must use `app/services/PathValidator.js`
-- **Input Sanitization**: All user inputs sanitized before processing
-- **Rate Limiting**: Applied to all API endpoints
-- **CORS**: Configured in `app/config/middleware.js`
+## Coding Standards
 
-## Critical Development Rules
+### JavaScript Style (Enforced by ESLint)
+- **Quotes**: Always use double quotes ("")
+- **Semicolons**: Required at end of statements
+- **Variables**: Use `const` by default, `let` when reassignment needed
+- **Equality**: Always use strict equality (`===` and `!==`)
+- **Braces**: Always use curly braces for control structures
 
-### Constitutional Requirements (MUST FOLLOW)
-1. **NEVER run HTTP/HTTPS locally** - Always use Docker container on port 8989
-2. **NEVER fix lint issues by adding underscores** to function names
-3. **ALWAYS use PathValidator** for file operations
-4. **ALWAYS maintain JSDoc comments** for all functions in `/app/` directory
-5. **ALWAYS run linters** before committing: `npm run lint:all`
-6. **ALWAYS use Codacy** for code quality checks
-7. **Development branch is 'copilot'** - never push directly to main
+### Security Requirements
+- Always use `PathValidator.validatePath()` for file operations
+- Sanitize user inputs with DOMPurify for HTML rendering
+- Use parameterized queries for database operations
+- Set security headers on all API responses
 
-### Testing Requirements
-1. **Restart Docker before Playwright tests**: `docker-compose restart`
-2. **Write contract tests** for all new API endpoints
-3. **Test critical functionality** before merging
+### Module Patterns
 
-### Documentation Pipeline
-1. Maintain JSDoc comments during development
-2. Generate docs with `npm run docs:dev`
-3. Extract public content to `app/public/docs-source/`
-4. Generate HTML portal with `npm run docs:generate`
-
-## Working with Features
-
-### Ticket Management
-- **Main Controller**: `app/controllers/ticketController.js`
-- **Routes**: `app/routes/tickets.js`
-- **Frontend**: `app/public/scripts/pages/tickets-manager.js`
-- **Features**: Drag-and-drop ordering, XT# generation, CSV/PDF export
-
-### Vulnerability Management
-- **Core Module**: `app/public/scripts/shared/vulnerability-core.js` (ES6 modules)
-- **Controller**: `app/controllers/vulnerabilityController.js`
-- **Routes**: `app/routes/vulnerabilities.js`
-- **Features**: CSV import, deduplication, VPR scoring, CISA KEV tracking
-
-### Import Processing
-- **Controller**: `app/controllers/importController.js`
-- **Progress Tracking**: WebSocket-based real-time updates
-- **File Uploads**: Handled via `multer` to `app/uploads/`
-
-## MCP Tool Integration
-
-### Claude-Context
-- **ALWAYS index before searching**: Check index status first
-- Use for codebase searches and understanding architecture
-
-### Memento (Primary Knowledge Graph)
-
-#### Efficient Search Patterns
-- **NEVER use `read_graph`** - Will fail with 200K+ tokens
-- **ALWAYS use semantic search first** for best results
-- **Include temporal markers** for recent work discovery
-
-#### Two-Search Pattern for Context Loading
+**Backend Controllers:**
 ```javascript
-// Search 1: Last 48 Hours (captures recent handoffs, sessions, insights)
-mcp__memento__search_nodes({
-  query: "[YESTERDAY] [TODAY] week-[WEEK#]-[YEAR] handoff session insight completed in-progress",
-  mode: "semantic",
-  topK: 10,
-  threshold: 0.35
-})
+class ExampleController {
+    static initialize(db, progressTracker) {
+        this.db = db;
+        this.progressTracker = progressTracker;
+    }
 
-// Search 2: Keyword-Driven (captures patterns and breakthroughs)
-mcp__memento__search_nodes({
-  query: "project:hextrackr [relevant keywords]",
-  mode: "hybrid",
-  topK: 5
-})
+    static async handleRequest(req, res) {
+        try {
+            // Business logic here
+            res.json({ success: true, data: result });
+        } catch (error) {
+            console.error("Operation failed:", error);
+            res.status(500).json({
+                success: false,
+                error: "Operation failed",
+                details: error.message
+            });
+        }
+    }
+}
 ```
 
-#### Entity Naming Convention
-- Pattern: `PROJECT:DOMAIN:TYPE`
-- PROJECT: `HEXTRACKR`, `PROJECT`, `SYSTEM`, `MEMENTO`, `SPEC-KIT`
-- DOMAIN: `DEVELOPMENT`, `ARCHITECTURE`, `FRONTEND`, `BACKEND`, `DATABASE`, `DOCUMENTATION`
-- TYPE: `SESSION`, `HANDOFF`, `INSIGHT`, `PATTERN`, `BREAKTHROUGH`, `ISSUE`
-
-#### Required Observations (In Order)
-1. `TIMESTAMP: ISO 8601 format` - When created
-2. `ABSTRACT: One-line summary` - Quick overview
-3. `SUMMARY: Detailed description` - Full context
-4. `[TYPE]_ID: Unique identifier` - SESSION_ID, HANDOFF_ID, etc.
-
-#### Tag Taxonomy (from /memento/TAXONOMY.md)
-
-**Project Tags** (Required):
-- `project:hextrackr`, `project:zen`, `project:claude-tools`
-
-**Temporal Tags**:
-- `week-XX-YYYY` (e.g., `week-38-2025`)
-- `YYYY-MM-DD` for specific dates
-- `sprint-X`, `vX.X.X`, `qX-YYYY`
-
-**Status Tags**:
-- `completed`, `in-progress`, `blocked`
-- `handoff`, `needs-review`, `archived`
-
-**Learning Tags**:
-- `lesson-learned`, `pattern`, `breakthrough`
-- `pain-point`, `best-practice`, `anti-pattern`
-- `reusable` for cross-project applicable
-
-**Category Tags**:
-- `frontend`, `backend`, `database`
-- `documentation`, `testing`, `infrastructure`
-
-#### Expected Entity Types
-- **SESSION entities**: Work sessions from /save-conversations.md
-- **HANDOFF entities**: Transition packages from /save-handoff.md
-- **INSIGHT entities**: Learned patterns from /save-insights.md
-- **PATTERN entities**: Reusable solutions
-- **BREAKTHROUGH entities**: Major discoveries
-
-#### Search Strategy Examples
+**Frontend Page Integration:**
 ```javascript
-// Find recent work
-"2025-09-20 week-38-2025 handoff"
+// Required integration functions for pages
+window.refreshPageData = function(type) {
+    // Refresh page data when shared components complete operations
+};
 
-// Find specific spec work
-"spec:001 backend completed"
-
-// Find cross-project insights
-"reusable pattern testing"
-
-// Find active development
-"in-progress project:hextrackr frontend"
+window.showToast = function(message, type) {
+    // Show notifications using page's toast system
+};
 ```
 
-### Context7
-- Verify framework documentation accuracy
-- Download framework docs to `/dev-docs/frameworks/`
+## Development Workflow
 
-### the-brain Agent (Project-Aware Research Specialist)
-- **Primary Use**: Delegate ALL research tasks to save main session tokens
-- **Capabilities**: Sequential Thinking + Claude-Context + Context7 + Brave Search + Memento persistence
-- **Project Context**: Understands HexTrackr's architecture, tech stack, and constraints
-- **Research Flow**: Context → Internal → External → Synthesis (always checks codebase first)
+### Docker-Only Development
+- Never run Node.js locally - always use Docker
+- Use `docker-compose up` for development
+- Restart container with `docker-compose restart` before running Playwright tests
+- All testing and development must happen in containerized environment
 
-#### Agent-Powered Research Pattern (Token-Saving Strategy)
+### Testing Strategy
+**Note: Manual testing workflow with optional AI automation**
+- Manual testing preferred for UI validation and bug discovery
+- Stagehand available for AI-powered browser automation using natural language
+- Playwright MCP available for traditional browser automation when needed
+- Screenshots and visual testing for UI verification
+- Focus on functional testing through actual usage
 
-**Core Principle**: Use the-brain for background research while you focus on implementation in the main session.
-
-**When to Use the-brain**:
-- Framework/library compatibility research (AG-Grid, ApexCharts, Socket.io)
-- Error investigation and debugging
-- Best practice research for specific implementations
-- Performance optimization strategies
-- Security vulnerability research
-- Any research that would consume 5-10K tokens in main session
-
-**Usage Pattern**:
-```javascript
-// Step 1: Launch the-brain for research (runs on separate token budget)
-Task tool → the-brain → "Research WebSocket authentication best practices for HexTrackr"
-
-// Step 2: Continue implementation work in main session
-// (Focus high-value tokens on coding, testing, debugging)
-
-// Step 3: Retrieve research findings when needed (100-200 tokens)
-mcp__memento__search_nodes({
-  query: "research-websocket authentication week-38-2025",
-  mode: "semantic"
-})
-```
-
-**Example Parallel Workflow**:
-- **Main Session**: "I'll implement the user management UI while the-brain researches session handling best practices"
-- **the-brain**: Analyzes current auth.js, researches Express session patterns, provides HexTrackr-specific integration plan
-- **Result**: Implementation proceeds while research happens in background, then integrate findings
-
-**Research Retrieval Patterns**:
-```javascript
-// Find today's research
-"research-* week-38-2025"
-
-// Find specific topic research
-"research-websocket", "research-cors", "research-performance"
-
-// Find integration-ready solutions
-"integration-ready codebase-analyzed"
-
-// Find critical security research
-"research:security-review critical"
-
-// Find implementation guides
-"research:implementation-guide verified"
-```
-
-**Token Savings**:
-- Research tasks: 5-10K tokens → Delegated to the-brain
-- Main session: Focus on implementation (high-value token usage)
-- Retrieval: 100-200 tokens when findings needed
-- **Result**: 95% token efficiency improvement for research-heavy tasks
-
-**Quick Reference Commands**:
+#### Stagehand AI Testing (Optional)
 ```bash
-# Launch the-brain for research
-Task tool with subagent_type: "the-brain"
+# Install Stagehand dependencies (if needed)
+npm install
 
-# Retrieve research findings
-mcp__memento__search_nodes with query: "research-[topic] week-XX-YYYY"
-
-# Check what research is available
-mcp__memento__search_nodes with query: "research-* project:hextrackr"
+# Run AI-powered tests
+npm run test:stagehand
 ```
 
-### Playwright
-- Test UI changes before and after modifications
-- Restart Docker before running: `docker-compose restart`
+**Stagehand Benefits:**
+- Natural language test descriptions instead of brittle CSS selectors
+- AI adapts automatically when UI changes
+- Perfect bridge between manual testing and automation
+- Local development support without cloud dependencies
 
-## Common Troubleshooting
+### File Operations Security
+All file system operations must use the PathValidator class:
+```javascript
+try {
+    const validatedPath = PathValidator.validatePath(filePath);
+    const content = PathValidator.safeReadFileSync(validatedPath);
+} catch (error) {
+    console.error("File operation failed:", error);
+    // Handle error appropriately
+}
+```
 
-### Port Conflicts
-- Application runs on external port 8989, internal port 8080
-- Check for conflicts: `lsof -i :8989`
+### Database Operations
+Use the DatabaseService for all database interactions:
+```javascript
+const query = "SELECT * FROM table WHERE id = ?";
+databaseService.db.all(query, [id], (err, rows) => {
+    if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ error: "Database operation failed" });
+    }
+    res.json({ success: true, data: rows });
+});
+```
 
-### Database Issues
-- Database location: `data/hextrackr.db`
-- Reset database: `npm run init-db`
+## Project-Specific Patterns
 
-### Module Loading Issues
-- Vulnerability modules use ES6 syntax but loaded as regular scripts
-- Access via `window` object in browser context
+### Progress Tracking
+For long-running operations, use the ProgressTracker with WebSocket communication:
+```javascript
+const sessionId = progressTracker.createSession();
+progressTracker.updateProgress(sessionId, 50, "Processing...");
+// WebSocket clients automatically receive updates
+```
 
-### Docker Issues
-- Always use `docker-compose` commands, not direct Docker
-- Logs: `docker-compose logs -f`
-- Full restart: `docker-compose down && docker-compose up -d`
+### Vulnerability Data Management
+- Vulnerability imports create snapshots for historical tracking
+- Rollover functionality manages data retention
+- CSV import/export via Papa Parse library with 100MB file limits
+
+### KEV (Known Exploited Vulnerabilities) Integration
+- Automated synchronization with CISA's Known Exploited Vulnerabilities catalog
+- KEV status tracking for vulnerabilities (Active/Not Active)
+- Sync metadata management for tracking last update times
+- REST API endpoints for KEV status queries and manual sync triggers
+
+### Template System
+- **Email Templates**: Customizable email notifications with variable substitution
+- **Ticket Templates**: Pre-configured ticket creation templates with markdown support
+- **Vulnerability Templates**: Standardized vulnerability reporting templates
+- **Variable System**: Dynamic content insertion using `{{variable}}` syntax
+- **Markdown Editor**: Full-featured markdown editor with live preview for template editing
+- **Database Storage**: Templates stored in dedicated database tables (email_templates, ticket_templates, vulnerability_templates)
+
+### Modular Frontend Architecture
+- Shared components are loaded first in HTML
+- Page-specific JavaScript loaded second
+- Communication between modules via window object callbacks
+- No build process - direct script loading
+
+## Important Files and Locations
+
+**Configuration:**
+- `eslint.config.mjs` - ESLint configuration
+- `.markdownlint.json` - Markdown linting rules
+- `package.json` - Dependencies and scripts
+- `docker-compose.yml` - Containerization setup
+- Note: .cursorrules file not present (development rules in CLAUDE.md instead)
+
+**Core Application:**
+- `app/public/server.js` - Main Express server
+- `app/services/databaseService.js` - Database abstraction layer
+- `app/utils/PathValidator.js` - Security utility for file operations
+- `app/public/scripts/shared/settings-modal.js` - Global settings component
+
+**Database:**
+- `app/public/data/hextrackr.db` - SQLite database file
+- `app/public/scripts/init-database.js` - Database initialization
+
+**Testing:**
+- Manual testing workflow with visual verification
+- Playwright MCP for browser automation when needed
+
+## Port and Environment
+- Application runs on internal port 8080 (Docker container)
+- External Docker port mapping: 8989 → 8080 (prevents test conflicts)
+- Always use `http://localhost:8989` for testing and development when using Docker
+- Docker-only environment - no local Node.js execution allowed
