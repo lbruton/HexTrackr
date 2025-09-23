@@ -196,6 +196,91 @@ class BackupController {
             });
         }
     }
+
+
+    /**
+     * Export complete backup as ZIP file
+     * NEW: Enhanced ZIP backup with all tables
+     */
+    static async exportAllAsZip(req, res) {
+        try {
+            const controller = BackupController.getInstance();
+            const zipBuffer = await controller.backupService.exportAllAsZip();
+
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `hextrackr_complete_backup_${timestamp}.zip`;
+
+            res.setHeader('Content-Type', 'application/zip');
+            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+            res.setHeader('Content-Length', zipBuffer.length);
+
+            res.send(zipBuffer);
+
+        } catch (error) {
+            console.error("Error creating ZIP backup:", error);
+            res.status(500).json({
+                success: false,
+                error: "ZIP backup failed",
+                details: error.message
+            });
+        }
+    }
+
+    /**
+     * Export vulnerabilities as ZIP file
+     * NEW: Vulnerability-focused ZIP backup
+     */
+    static async exportVulnerabilitiesAsZip(req, res) {
+        try {
+            const controller = BackupController.getInstance();
+            const zipBuffer = await controller.backupService.exportVulnerabilitiesAsZip();
+
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `hextrackr_vulnerabilities_backup_${timestamp}.zip`;
+
+            res.setHeader('Content-Type', 'application/zip');
+            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+            res.setHeader('Content-Length', zipBuffer.length);
+
+            res.send(zipBuffer);
+
+        } catch (error) {
+            console.error("Error creating vulnerabilities ZIP:", error);
+            res.status(500).json({
+                success: false,
+                error: "Vulnerabilities ZIP backup failed",
+                details: error.message
+            });
+        }
+    }
+
+    /**
+     * Export tickets as ZIP file
+     * NEW: Ticket-focused ZIP backup
+     */
+    static async exportTicketsAsZip(req, res) {
+        try {
+            const controller = BackupController.getInstance();
+            const zipBuffer = await controller.backupService.exportTicketsAsZip();
+
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `hextrackr_tickets_backup_${timestamp}.zip`;
+
+            res.setHeader('Content-Type', 'application/zip');
+            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+            res.setHeader('Content-Length', zipBuffer.length);
+
+            res.send(zipBuffer);
+
+        } catch (error) {
+            console.error("Error creating tickets ZIP:", error);
+            res.status(500).json({
+                success: false,
+                error: "Tickets ZIP backup failed",
+                details: error.message
+            });
+        }
+    }
 }
 
 module.exports = BackupController;
