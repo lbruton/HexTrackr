@@ -207,12 +207,12 @@ class BackupController {
             const controller = BackupController.getInstance();
             const zipBuffer = await controller.backupService.exportAllAsZip();
 
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
             const filename = `hextrackr_complete_backup_${timestamp}.zip`;
 
-            res.setHeader('Content-Type', 'application/zip');
-            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-            res.setHeader('Content-Length', zipBuffer.length);
+            res.setHeader("Content-Type", "application/zip");
+            res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+            res.setHeader("Content-Length", zipBuffer.length);
 
             res.send(zipBuffer);
 
@@ -235,12 +235,12 @@ class BackupController {
             const controller = BackupController.getInstance();
             const zipBuffer = await controller.backupService.exportVulnerabilitiesAsZip();
 
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
             const filename = `hextrackr_vulnerabilities_backup_${timestamp}.zip`;
 
-            res.setHeader('Content-Type', 'application/zip');
-            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-            res.setHeader('Content-Length', zipBuffer.length);
+            res.setHeader("Content-Type", "application/zip");
+            res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+            res.setHeader("Content-Length", zipBuffer.length);
 
             res.send(zipBuffer);
 
@@ -263,12 +263,12 @@ class BackupController {
             const controller = BackupController.getInstance();
             const zipBuffer = await controller.backupService.exportTicketsAsZip();
 
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
             const filename = `hextrackr_tickets_backup_${timestamp}.zip`;
 
-            res.setHeader('Content-Type', 'application/zip');
-            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-            res.setHeader('Content-Length', zipBuffer.length);
+            res.setHeader("Content-Type", "application/zip");
+            res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+            res.setHeader("Content-Length", zipBuffer.length);
 
             res.send(zipBuffer);
 

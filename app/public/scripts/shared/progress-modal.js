@@ -716,7 +716,7 @@ class ProgressModal {
 
             // Update button text if import summary is present
             if (this.progressData.importSummary) {
-                closeBtn.innerHTML = '<i class="fas fa-check me-1"></i>OK - Refresh Page';
+                closeBtn.innerHTML = "<i class=\"fas fa-check me-1\"></i>OK - Refresh Page";
                 closeBtn.classList.add("btn-pulse");
             }
         }
@@ -776,12 +776,12 @@ class ProgressModal {
             const exportBtn = document.getElementById("progressExportBtn");
             if (exportBtn) {
                 const originalText = exportBtn.innerHTML;
-                exportBtn.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Failed!';
+                exportBtn.innerHTML = "<i class=\"fas fa-exclamation-triangle me-1\"></i>Failed!";
                 exportBtn.classList.add("btn-outline-danger");
                 exportBtn.classList.remove("btn-outline-info");
 
                 setTimeout(() => {
-                    exportBtn.innerHTML = '<i class="fas fa-download me-1"></i>Download Report';
+                    exportBtn.innerHTML = "<i class=\"fas fa-download me-1\"></i>Download Report";
                     exportBtn.classList.remove("btn-outline-danger");
                     exportBtn.classList.add("btn-outline-info");
                     exportBtn.disabled = false;
@@ -991,7 +991,7 @@ ${embeddedCSS}
             // Show loading state using the export button
             if (exportBtn) {
                 exportBtn.disabled = true;
-                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Generating...';
+                exportBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin me-1\"></i>Generating...";
             }
 
             // Generate complete HTML report
@@ -1018,7 +1018,7 @@ ${embeddedCSS}
 
             // Show success state
             if (exportBtn) {
-                exportBtn.innerHTML = '<i class="fas fa-check me-1"></i>Downloaded!';
+                exportBtn.innerHTML = "<i class=\"fas fa-check me-1\"></i>Downloaded!";
                 setTimeout(() => {
                     exportBtn.disabled = false;
                     exportBtn.innerHTML = originalBtnText;
