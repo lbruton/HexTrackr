@@ -1113,8 +1113,8 @@ class HexagonTicketsManager {
             // Display in the markdown view modal
             document.getElementById("markdownContent").textContent = markdownContent;
         }).catch(error => {
-            console.error('Error generating ticket markdown:', error);
-            document.getElementById("markdownContent").textContent = 'Error loading ticket details';
+            console.error("Error generating ticket markdown:", error);
+            document.getElementById("markdownContent").textContent = "Error loading ticket details";
         });
         document.getElementById("viewTicketModal").setAttribute("data-ticket-id", id);
 
@@ -1131,22 +1131,22 @@ class HexagonTicketsManager {
         const vulnContent = document.getElementById("vulnerabilityMarkdownContent");
         const vulnLoading = document.getElementById("vulnerabilityLoadingMessage");
         if (vulnContent) {
-            vulnContent.textContent = '';
-            vulnContent.style.display = 'none';
+            vulnContent.textContent = "";
+            vulnContent.style.display = "none";
         }
         if (vulnLoading) {
-            vulnLoading.style.display = 'block';
+            vulnLoading.style.display = "block";
         }
 
         // Clear email markdown content initially
         const emailContent = document.getElementById("emailMarkdownContent");
         const emailLoading = document.getElementById("emailLoadingMessage");
         if (emailContent) {
-            emailContent.textContent = '';
-            emailContent.style.display = 'none';
+            emailContent.textContent = "";
+            emailContent.style.display = "none";
         }
         if (emailLoading) {
-            emailLoading.style.display = 'block';
+            emailLoading.style.display = "block";
         }
 
         // Load vulnerability data when the tab is clicked
@@ -1156,7 +1156,7 @@ class HexagonTicketsManager {
             const newVulnTabBtn = vulnTabBtn.cloneNode(true);
             vulnTabBtn.parentNode.replaceChild(newVulnTabBtn, vulnTabBtn);
 
-            newVulnTabBtn.addEventListener('shown.bs.tab', async () => {
+            newVulnTabBtn.addEventListener("shown.bs.tab", async () => {
                 await this.loadVulnerabilityMarkdownForModal();
             });
         }
@@ -1168,7 +1168,7 @@ class HexagonTicketsManager {
             const newEmailTabBtn = emailTabBtn.cloneNode(true);
             emailTabBtn.parentNode.replaceChild(newEmailTabBtn, emailTabBtn);
 
-            newEmailTabBtn.addEventListener('shown.bs.tab', async () => {
+            newEmailTabBtn.addEventListener("shown.bs.tab", async () => {
                 await this.loadEmailMarkdownForModal();
             });
         }
@@ -1213,7 +1213,7 @@ class HexagonTicketsManager {
         const ticket = this.getTicketById(ticketId);
 
         if (!ticket) {
-            console.error('[VulnModal] No ticket found for vulnerability loading');
+            console.error("[VulnModal] No ticket found for vulnerability loading");
             return;
         }
 
@@ -1224,29 +1224,29 @@ class HexagonTicketsManager {
             // Check if ticket has devices
             if (!ticket.devices || ticket.devices.length === 0) {
                 if (vulnContent) {
-                    vulnContent.textContent = `# No Devices Found\n\nThis ticket has no devices associated with it.`;
-                    vulnContent.style.display = 'block';
+                    vulnContent.textContent = "# No Devices Found\n\nThis ticket has no devices associated with it.";
+                    vulnContent.style.display = "block";
                 }
                 if (vulnLoading) {
-                    vulnLoading.style.display = 'none';
+                    vulnLoading.style.display = "none";
                 }
                 return;
             }
 
             // Fetch vulnerabilities for this ticket's devices
-            console.log('[VulnModal] Fetching vulnerabilities for devices:', ticket.devices);
+            console.log("[VulnModal] Fetching vulnerabilities for devices:", ticket.devices);
             const vulnerabilities = await this.fetchVulnerabilitiesForDevices(ticket.devices);
-            console.log('[VulnModal] Fetched vulnerabilities:', vulnerabilities?.length || 0);
+            console.log("[VulnModal] Fetched vulnerabilities:", vulnerabilities?.length || 0);
 
             if (!vulnerabilities || vulnerabilities.length === 0) {
                 // No vulnerabilities found
                 if (vulnContent) {
-                    const deviceList = ticket.devices.join(', ');
+                    const deviceList = ticket.devices.join(", ");
                     vulnContent.textContent = `# No Vulnerabilities Found\n\nNo vulnerability data found for the devices in this ticket:\n${deviceList}`;
-                    vulnContent.style.display = 'block';
+                    vulnContent.style.display = "block";
                 }
                 if (vulnLoading) {
-                    vulnLoading.style.display = 'none';
+                    vulnLoading.style.display = "none";
                 }
                 return;
             }
@@ -1256,23 +1256,23 @@ class HexagonTicketsManager {
 
             // Display the markdown
             if (vulnContent) {
-                vulnContent.textContent = markdownReport || 'No vulnerability data available';
-                vulnContent.style.display = 'block';
+                vulnContent.textContent = markdownReport || "No vulnerability data available";
+                vulnContent.style.display = "block";
             }
             if (vulnLoading) {
-                vulnLoading.style.display = 'none';
+                vulnLoading.style.display = "none";
             }
 
-            console.log('[VulnModal] Vulnerability markdown loaded successfully');
+            console.log("[VulnModal] Vulnerability markdown loaded successfully");
 
         } catch (error) {
-            console.error('[VulnModal] Error loading vulnerability markdown:', error);
+            console.error("[VulnModal] Error loading vulnerability markdown:", error);
             if (vulnContent) {
-                vulnContent.textContent = `# Error Loading Vulnerabilities\n\nFailed to load vulnerability data. Please try again.`;
-                vulnContent.style.display = 'block';
+                vulnContent.textContent = "# Error Loading Vulnerabilities\n\nFailed to load vulnerability data. Please try again.";
+                vulnContent.style.display = "block";
             }
             if (vulnLoading) {
-                vulnLoading.style.display = 'none';
+                vulnLoading.style.display = "none";
             }
         }
     }
@@ -1963,7 +1963,7 @@ class HexagonTicketsManager {
 
     // Simple hostname matching - case-insensitive only
     hostnameMatches(hostname1, hostname2) {
-        if (!hostname1 || !hostname2) return false;
+        if (!hostname1 || !hostname2) {return false;}
 
         // Simple case-insensitive match
         return hostname1.toLowerCase().trim() === hostname2.toLowerCase().trim();
@@ -1971,17 +1971,17 @@ class HexagonTicketsManager {
 
     // Fetch vulnerabilities for matched devices
     async fetchVulnerabilitiesForDevices(devices) {
-        if (!devices || devices.length === 0) return [];
+        if (!devices || devices.length === 0) {return [];}
 
         try {
             // Fetch vulnerabilities from the API
-            const response = await fetch('/api/vulnerabilities?' + new URLSearchParams({
-                limit: '10000',  // Get all vulnerabilities for these devices
-                sort: 'severity'
+            const response = await fetch("/api/vulnerabilities?" + new URLSearchParams({
+                limit: "10000",  // Get all vulnerabilities for these devices
+                sort: "severity"
             }));
 
             if (!response.ok) {
-                console.error('[VulnBundle] Failed to fetch vulnerabilities:', response.status);
+                console.error("[VulnBundle] Failed to fetch vulnerabilities:", response.status);
                 return [];
             }
 
@@ -1989,7 +1989,7 @@ class HexagonTicketsManager {
 
             // Check if we got the expected data structure
             if (!data || !data.data || !Array.isArray(data.data)) {
-                console.error('[VulnBundle] Unexpected API response structure');
+                console.error("[VulnBundle] Unexpected API response structure");
                 return [];
             }
 
@@ -2008,7 +2008,7 @@ class HexagonTicketsManager {
 
             return matchedVulns;
         } catch (error) {
-            console.error('[VulnBundle] Error fetching vulnerabilities:', error);
+            console.error("[VulnBundle] Error fetching vulnerabilities:", error);
             return [];
         }
     }
@@ -2021,19 +2021,19 @@ class HexagonTicketsManager {
 
         try {
             // Try to fetch template from database first
-            const template = await this.fetchTemplateFromDB('default_vulnerability');
+            const template = await this.fetchTemplateFromDB("default_vulnerability");
 
             if (template) {
                 // Use database template with variable substitution
                 const variableMap = this.buildVariableMap(ticket, vulnerabilities);
                 return this.processTemplateWithVariables(template, variableMap);
             } else {
-                console.warn('Vulnerability template not found in database, using fallback');
+                console.warn("Vulnerability template not found in database, using fallback");
                 // Fallback to hardcoded template
                 return this.generateVulnerabilityMarkdownFallback(ticket, vulnerabilities);
             }
         } catch (error) {
-            console.error('Error generating vulnerability markdown from template:', error);
+            console.error("Error generating vulnerability markdown from template:", error);
             // Use fallback on any error
             return this.generateVulnerabilityMarkdownFallback(ticket, vulnerabilities);
         }
@@ -2048,7 +2048,7 @@ class HexagonTicketsManager {
         // Group vulnerabilities by device
         const vulnsByDevice = {};
         vulnerabilities.forEach(vuln => {
-            const hostname = vuln.hostname || 'Unknown Device';
+            const hostname = vuln.hostname || "Unknown Device";
             if (!vulnsByDevice[hostname]) {
                 vulnsByDevice[hostname] = [];
             }
@@ -2056,19 +2056,19 @@ class HexagonTicketsManager {
         });
 
         // Build the markdown report
-        let markdown = `# Vulnerability Report for ${ticket.location || ticket.site || 'Unknown Location'}\n\n`;
-        markdown += `**XT#:** ${ticket.xtNumber || ticket.xt_number || 'N/A'}\n`;
-        markdown += `**Hexagon#:** ${ticket.hexagonTicket || 'N/A'}\n`;
-        markdown += `**ServiceNow#:** ${ticket.serviceNowTicket || 'N/A'}\n\n`;
+        let markdown = `# Vulnerability Report for ${ticket.location || ticket.site || "Unknown Location"}\n\n`;
+        markdown += `**XT#:** ${ticket.xtNumber || ticket.xt_number || "N/A"}\n`;
+        markdown += `**Hexagon#:** ${ticket.hexagonTicket || "N/A"}\n`;
+        markdown += `**ServiceNow#:** ${ticket.serviceNowTicket || "N/A"}\n\n`;
         markdown += `Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n\n`;
-        markdown += `## Summary\n`;
+        markdown += "## Summary\n";
         markdown += `- Total Vulnerabilities: ${vulnerabilities.length}\n`;
         markdown += `- Affected Devices: ${Object.keys(vulnsByDevice).length}\n`;
 
         // Count by severity
         const severityCounts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
         vulnerabilities.forEach(v => {
-            const sev = (v.severity || 'LOW').toUpperCase();
+            const sev = (v.severity || "LOW").toUpperCase();
             if (severityCounts[sev] !== undefined) {
                 severityCounts[sev]++;
             }
@@ -2088,21 +2088,21 @@ class HexagonTicketsManager {
             });
 
             // Create table
-            markdown += `| CVE/Plugin | Description | Severity | VPR | First Seen | Last Seen |\n`;
-            markdown += `|------------|-------------|----------|-----|------------|-------------||\n`;
+            markdown += "| CVE/Plugin | Description | Severity | VPR | First Seen | Last Seen |\n";
+            markdown += "|------------|-------------|----------|-----|------------|-------------||\n";
 
             deviceVulns.forEach(vuln => {
-                const id = vuln.cve || vuln.plugin_id || 'N/A';
-                const desc = (vuln.plugin_name || vuln.description || 'N/A').substring(0, 50);
-                const severity = vuln.severity || 'N/A';
-                const vpr = vuln.vpr_score ? vuln.vpr_score.toFixed(1) : 'N/A';
-                const firstSeen = vuln.first_seen ? new Date(vuln.first_seen).toLocaleDateString() : 'N/A';
-                const lastSeen = vuln.last_seen ? new Date(vuln.last_seen).toLocaleDateString() : 'N/A';
+                const id = vuln.cve || vuln.plugin_id || "N/A";
+                const desc = (vuln.plugin_name || vuln.description || "N/A").substring(0, 50);
+                const severity = vuln.severity || "N/A";
+                const vpr = vuln.vpr_score ? vuln.vpr_score.toFixed(1) : "N/A";
+                const firstSeen = vuln.first_seen ? new Date(vuln.first_seen).toLocaleDateString() : "N/A";
+                const lastSeen = vuln.last_seen ? new Date(vuln.last_seen).toLocaleDateString() : "N/A";
 
                 markdown += `| ${id} | ${desc} | ${severity} | ${vpr} | ${firstSeen} | ${lastSeen} |\n`;
             });
 
-            markdown += '\n';
+            markdown += "\n";
         });
 
         // Add devices with no vulnerabilities
@@ -2114,17 +2114,17 @@ class HexagonTicketsManager {
             });
 
             if (devicesWithoutVulns.length > 0) {
-                markdown += `---\n\n`;
-                markdown += `## Devices with No Vulnerabilities Found\n`;
+                markdown += "---\n\n";
+                markdown += "## Devices with No Vulnerabilities Found\n";
                 devicesWithoutVulns.forEach(device => {
                     markdown += `- ${device}\n`;
                 });
-                markdown += '\n';
+                markdown += "\n";
             }
         }
 
-        markdown += `---\n`;
-        markdown += `*This report was automatically generated based on matching device hostnames.*\n`;
+        markdown += "---\n";
+        markdown += "*This report was automatically generated based on matching device hostnames.*\n";
 
         return markdown;
     }
@@ -2163,17 +2163,17 @@ class HexagonTicketsManager {
                 yPosition += lineHeight;
             });
 
-            const sanitizedSite = (ticket.site || ticket.location || 'UNKNOWN')
-                .replace(/\s+/g, '')
-                .replace(/[^a-zA-Z0-9_-]/g, '');
-            const dateStr = (ticket.dateSubmitted || new Date().toISOString().split('T')[0]).replace(/-/g, '');
-            const hexagonId = (ticket.hexagonTicket || 'TICKET').replace(/[^a-zA-Z0-9_-]/g, '');
+            const sanitizedSite = (ticket.site || ticket.location || "UNKNOWN")
+                .replace(/\s+/g, "")
+                .replace(/[^a-zA-Z0-9_-]/g, "");
+            const dateStr = (ticket.dateSubmitted || new Date().toISOString().split("T")[0]).replace(/-/g, "");
+            const hexagonId = (ticket.hexagonTicket || "TICKET").replace(/[^a-zA-Z0-9_-]/g, "");
             const baseFilename = `${sanitizedSite}_${dateStr}_${hexagonId}`;
 
-            const pdfBlob = doc.output('blob');
+            const pdfBlob = doc.output("blob");
             zip.file(`${baseFilename}.pdf`, pdfBlob);
 
-            const markdownBlob = new Blob([ticketMarkdown], { type: 'text/markdown' });
+            const markdownBlob = new Blob([ticketMarkdown], { type: "text/markdown" });
             zip.file(`${baseFilename}.md`, markdownBlob);
 
             // Automatically fetch and include vulnerabilities if devices are present
@@ -2181,11 +2181,11 @@ class HexagonTicketsManager {
                 try {
                     // Ensure devices is an array (sometimes it might be a string from the database)
                     let deviceArray = ticket.devices;
-                    if (typeof deviceArray === 'string') {
+                    if (typeof deviceArray === "string") {
                         try {
                             deviceArray = JSON.parse(deviceArray);
                         } catch (e) {
-                            console.error('[VulnBundle] Failed to parse devices string:', e);
+                            console.error("[VulnBundle] Failed to parse devices string:", e);
                             deviceArray = [];
                         }
                     }
@@ -2195,7 +2195,7 @@ class HexagonTicketsManager {
                     }
 
                     // Check if vulnerability feature is available
-                    const statsResponse = await fetch('/api/vulnerabilities/stats');
+                    const statsResponse = await fetch("/api/vulnerabilities/stats");
 
                     if (statsResponse.ok) {
                         const stats = await statsResponse.json();
@@ -2215,13 +2215,13 @@ class HexagonTicketsManager {
                                 if (vulnMarkdown) {
                                     const vulnBlob = new Blob([vulnMarkdown], { type: "text/markdown" });
                                     zip.file(`${baseFilename}_vulnerabilities.md`, vulnBlob);
-                                    console.log('[VulnBundle] ✅ Vulnerability report added to bundle');
+                                    console.log("[VulnBundle] ✅ Vulnerability report added to bundle");
                                 }
                             }
                         }
                     }
                 } catch (error) {
-                    console.error('[VulnBundle] Error during vulnerability processing:', error);
+                    console.error("[VulnBundle] Error during vulnerability processing:", error);
                     // Continue without vulnerability report - don't fail the whole bundle
                 }
             }
@@ -2516,7 +2516,7 @@ class HexagonTicketsManager {
         }
 
         // Dispose of any existing tooltip to avoid stale data
-        let existingTooltip = bootstrap.Tooltip.getInstance(btn);
+        const existingTooltip = bootstrap.Tooltip.getInstance(btn);
         if (existingTooltip) {
             existingTooltip.dispose();
         }
@@ -2524,8 +2524,8 @@ class HexagonTicketsManager {
         // Create fresh tooltip instance
         const tooltipInstance = new bootstrap.Tooltip(btn, {
             html: true,
-            placement: 'bottom',
-            trigger: 'hover'
+            placement: "bottom",
+            trigger: "hover"
         });
 
         if (this.sharedDocumentation && this.sharedDocumentation.length > 0) {
@@ -2533,12 +2533,12 @@ class HexagonTicketsManager {
             const fileList = this.sharedDocumentation.map(doc => {
                 const sizeKB = (doc.size / 1024).toFixed(1);
                 return `• ${doc.name} (${sizeKB} KB)`;
-            }).join('<br>');
+            }).join("<br>");
 
             const tooltipContent = `<strong>Attached Documentation:</strong><br>${fileList}<br><br><small><em>Shift+Click or Right-Click to clear</em></small>`;
 
             // Update tooltip content
-            tooltipInstance.setContent({ '.tooltip-inner': tooltipContent });
+            tooltipInstance.setContent({ ".tooltip-inner": tooltipContent });
 
             // Update button appearance
             btn.classList.remove("btn-outline-secondary");
@@ -2551,7 +2551,7 @@ class HexagonTicketsManager {
             }
         } else {
             // No files attached
-            tooltipInstance.setContent({ '.tooltip-inner': 'No documentation attached' });
+            tooltipInstance.setContent({ ".tooltip-inner": "No documentation attached" });
 
             // Reset button appearance
             btn.classList.remove("btn-outline-primary");
@@ -2613,28 +2613,28 @@ class HexagonTicketsManager {
     buildVariableMap(ticket, vulnerabilitiesOrType = null) {
         const deviceCount = ticket.devices ? ticket.devices.length : 0;
         const deviceList = ticket.devices && ticket.devices.length > 0
-            ? ticket.devices.map((device, index) => `${index + 1}. ${device}`).join('\n')
-            : 'Device list to be confirmed';
+            ? ticket.devices.map((device, index) => `${index + 1}. ${device}`).join("\n")
+            : "Device list to be confirmed";
 
         const variables = {
-            '[HEXAGON_TICKET]': ticket.hexagonTicket || 'N/A',
-            '[HEXAGON_NUM]': ticket.hexagonTicket || 'N/A',
-            '[SERVICENOW_TICKET]': ticket.serviceNowTicket || 'N/A',
-            '[SERVICENOW_NUM]': ticket.serviceNowTicket || 'N/A',
-            '[XT_NUMBER]': ticket.xt_number || `XT#${ticket.id}`,
-            '[SITE]': ticket.site || 'N/A',
-            '[SITE_NAME]': ticket.site || 'N/A',
-            '[LOCATION]': ticket.location || 'N/A',
-            '[STATUS]': ticket.status || 'N/A',
-            '[DATE_SUBMITTED]': this.formatDate(ticket.dateSubmitted),
-            '[DATE_DUE]': this.formatDate(ticket.dateDue),
-            '[DEVICE_COUNT]': deviceCount.toString(),
-            '[DEVICE_LIST]': deviceList,
-            '[SUPERVISOR]': ticket.supervisor || 'N/A',
-            '[TECHNICIAN]': ticket.technician || 'N/A',
-            '[NOTES]': ticket.notes || 'N/A',
-            '[GENERATED_TIME]': new Date().toLocaleString(),
-            '[GREETING]': this.getSupervisorGreeting(ticket.supervisor)
+            "[HEXAGON_TICKET]": ticket.hexagonTicket || "N/A",
+            "[HEXAGON_NUM]": ticket.hexagonTicket || "N/A",
+            "[SERVICENOW_TICKET]": ticket.serviceNowTicket || "N/A",
+            "[SERVICENOW_NUM]": ticket.serviceNowTicket || "N/A",
+            "[XT_NUMBER]": ticket.xt_number || `XT#${ticket.id}`,
+            "[SITE]": ticket.site || "N/A",
+            "[SITE_NAME]": ticket.site || "N/A",
+            "[LOCATION]": ticket.location || "N/A",
+            "[STATUS]": ticket.status || "N/A",
+            "[DATE_SUBMITTED]": this.formatDate(ticket.dateSubmitted),
+            "[DATE_DUE]": this.formatDate(ticket.dateDue),
+            "[DEVICE_COUNT]": deviceCount.toString(),
+            "[DEVICE_LIST]": deviceList,
+            "[SUPERVISOR]": ticket.supervisor || "N/A",
+            "[TECHNICIAN]": ticket.technician || "N/A",
+            "[NOTES]": ticket.notes || "N/A",
+            "[GENERATED_TIME]": new Date().toLocaleString(),
+            "[GREETING]": this.getSupervisorGreeting(ticket.supervisor)
         };
 
         // Handle vulnerabilities array (backward compatibility)
@@ -2642,28 +2642,28 @@ class HexagonTicketsManager {
             const vulnerabilities = vulnerabilitiesOrType;
             const severityCounts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
             vulnerabilities.forEach(v => {
-                const sev = (v.severity || 'LOW').toUpperCase();
+                const sev = (v.severity || "LOW").toUpperCase();
                 if (severityCounts[sev] !== undefined) {
                     severityCounts[sev]++;
                 }
             });
 
-            variables['[TOTAL_VULNERABILITIES]'] = vulnerabilities.length.toString();
-            variables['[CRITICAL_COUNT]'] = severityCounts.CRITICAL.toString();
-            variables['[HIGH_COUNT]'] = severityCounts.HIGH.toString();
-            variables['[MEDIUM_COUNT]'] = severityCounts.MEDIUM.toString();
-            variables['[LOW_COUNT]'] = severityCounts.LOW.toString();
-            variables['[DEVICE_COUNT]'] = Object.keys(this.groupVulnerabilitiesByDevice(vulnerabilities)).length.toString();
-            variables['[VULNERABILITY_DETAILS]'] = this.buildVulnerabilityDetails(vulnerabilities);
+            variables["[TOTAL_VULNERABILITIES]"] = vulnerabilities.length.toString();
+            variables["[CRITICAL_COUNT]"] = severityCounts.CRITICAL.toString();
+            variables["[HIGH_COUNT]"] = severityCounts.HIGH.toString();
+            variables["[MEDIUM_COUNT]"] = severityCounts.MEDIUM.toString();
+            variables["[LOW_COUNT]"] = severityCounts.LOW.toString();
+            variables["[DEVICE_COUNT]"] = Object.keys(this.groupVulnerabilitiesByDevice(vulnerabilities)).length.toString();
+            variables["[VULNERABILITY_DETAILS]"] = this.buildVulnerabilityDetails(vulnerabilities);
         }
 
         // Add template-specific variables
-        if (vulnerabilitiesOrType === 'email') {
+        if (vulnerabilitiesOrType === "email") {
             // Email-specific variables can be added here if needed
             // Currently using common variables which should work for email templates
-        } else if (vulnerabilitiesOrType === 'ticket') {
+        } else if (vulnerabilitiesOrType === "ticket") {
             // Ticket-specific variables can be added here if needed
-        } else if (vulnerabilitiesOrType === 'vulnerability') {
+        } else if (vulnerabilitiesOrType === "vulnerability") {
             // Vulnerability-specific variables can be added here if needed
         }
 
@@ -2673,7 +2673,7 @@ class HexagonTicketsManager {
     groupVulnerabilitiesByDevice(vulnerabilities) {
         const vulnsByDevice = {};
         vulnerabilities.forEach(vuln => {
-            const hostname = vuln.hostname || 'Unknown Device';
+            const hostname = vuln.hostname || "Unknown Device";
             if (!vulnsByDevice[hostname]) {
                 vulnsByDevice[hostname] = [];
             }
@@ -2684,7 +2684,7 @@ class HexagonTicketsManager {
 
     buildVulnerabilityDetails(vulnerabilities) {
         const vulnsByDevice = this.groupVulnerabilitiesByDevice(vulnerabilities);
-        let details = '';
+        let details = "";
 
         Object.keys(vulnsByDevice).sort().forEach(hostname => {
             const deviceVulns = vulnsByDevice[hostname];
@@ -2694,18 +2694,18 @@ class HexagonTicketsManager {
             // Sort by VPR score (highest to lowest)
             deviceVulns.sort((a, b) => (b.vpr_score || 0) - (a.vpr_score || 0));
 
-            details += '| CVE | Severity | VPR | Description |\n';
-            details += '|-----|----------|-----|-------------|\n';
+            details += "| CVE | Severity | VPR | Description |\n";
+            details += "|-----|----------|-----|-------------|\n";
 
             deviceVulns.slice(0, 10).forEach(vuln => { // Limit to top 10 per device
-                const cve = vuln.cve || 'N/A';
-                const severity = vuln.severity || 'Unknown';
-                const vpr = vuln.vpr_score || 'N/A';
-                const desc = (vuln.description || 'No description').substring(0, 50) + '...';
+                const cve = vuln.cve || "N/A";
+                const severity = vuln.severity || "Unknown";
+                const vpr = vuln.vpr_score || "N/A";
+                const desc = (vuln.description || "No description").substring(0, 50) + "...";
                 details += `| ${cve} | ${severity} | ${vpr} | ${desc} |\n`;
             });
 
-            details += '\n';
+            details += "\n";
         });
 
         return details;
@@ -2731,9 +2731,9 @@ class HexagonTicketsManager {
 
         // Replace all variables in the template
         Object.keys(variables).forEach(variable => {
-            const value = variables[variable] || '';
+            const value = variables[variable] || "";
             // Use global replace to handle multiple occurrences
-            processedTemplate = processedTemplate.replace(new RegExp(variable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), value);
+            processedTemplate = processedTemplate.replace(new RegExp(variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), value);
         });
 
         return processedTemplate;
@@ -2744,15 +2744,15 @@ class HexagonTicketsManager {
     async generateMarkdown(ticket) {
         try {
             // Try to fetch template from database
-            const template = await this.fetchTemplateFromDB('default_ticket');
+            const template = await this.fetchTemplateFromDB("default_ticket");
 
             if (template) {
                 // Use template system
-                const variables = this.buildVariableMap(ticket, 'ticket');
+                const variables = this.buildVariableMap(ticket, "ticket");
                 return this.processTemplateWithVariables(template, variables);
             }
         } catch (error) {
-            console.error('Error using ticket template:', error);
+            console.error("Error using ticket template:", error);
         }
 
         // Fallback to hardcoded template if database fails
@@ -2829,7 +2829,7 @@ class HexagonTicketsManager {
             if (matchedDevice) {
                 const key = matchedDevice.toUpperCase();
                 if (deviceVulnMap[key]) {
-                    const severity = vuln.severity?.toLowerCase() || 'low';
+                    const severity = vuln.severity?.toLowerCase() || "low";
                     if (deviceVulnMap[key][severity] !== undefined) {
                         deviceVulnMap[key][severity]++;
                     }
@@ -2850,15 +2850,15 @@ class HexagonTicketsManager {
 
                 // Add severity breakdown if there are vulnerabilities
                 const severityBreakdown = [];
-                if (counts.critical > 0) severityBreakdown.push(`${counts.critical} critical`);
-                if (counts.high > 0) severityBreakdown.push(`${counts.high} high`);
-                if (counts.medium > 0) severityBreakdown.push(`${counts.medium} medium`);
-                if (counts.low > 0) severityBreakdown.push(`${counts.low} low`);
+                if (counts.critical > 0) {severityBreakdown.push(`${counts.critical} critical`);}
+                if (counts.high > 0) {severityBreakdown.push(`${counts.high} high`);}
+                if (counts.medium > 0) {severityBreakdown.push(`${counts.medium} medium`);}
+                if (counts.low > 0) {severityBreakdown.push(`${counts.low} low`);}
 
                 if (severityBreakdown.length > 0) {
-                    summary += ` (${severityBreakdown.join(', ')})`;
+                    summary += ` (${severityBreakdown.join(", ")})`;
                 }
-                summary += '\n';
+                summary += "\n";
             }
         });
 
@@ -2875,21 +2875,21 @@ class HexagonTicketsManager {
 
         // Check for multiple supervisors (semicolon, ampersand, or multiple commas)
         const commaCount = (trimmed.match(/,/g) || []).length;
-        if (trimmed.includes(';') || trimmed.includes('&') || commaCount > 1) {
+        if (trimmed.includes(";") || trimmed.includes("&") || commaCount > 1) {
             return "Team";
         }
 
         // Handle "Last, First" format (single comma)
         if (commaCount === 1) {
-            const parts = trimmed.split(',');
+            const parts = trimmed.split(",");
             if (parts.length >= 2) {
-                const firstName = parts[1].trim().split(' ')[0];
-                if (firstName) return firstName;
+                const firstName = parts[1].trim().split(" ")[0];
+                if (firstName) {return firstName;}
             }
         }
 
         // Handle "First Last" or "First Middle Last" format
-        const parts = trimmed.split(' ');
+        const parts = trimmed.split(" ");
         if (parts.length > 0 && parts[0]) {
             return parts[0];
         }
@@ -2901,19 +2901,19 @@ class HexagonTicketsManager {
     async generateEmailMarkdown(ticket) {
         try {
             // Try to fetch template from database first
-            const template = await this.fetchTemplateFromDB('default_email');
+            const template = await this.fetchTemplateFromDB("default_email");
 
             if (template) {
                 // Use database template with variable substitution
-                const variableMap = this.buildVariableMap(ticket, 'email');
+                const variableMap = this.buildVariableMap(ticket, "email");
                 return this.processTemplateWithVariables(template, variableMap);
             } else {
-                console.warn('Email template not found in database, using fallback');
+                console.warn("Email template not found in database, using fallback");
                 // Fallback to hardcoded template
                 return this.generateEmailMarkdownFallback(ticket);
             }
         } catch (error) {
-            console.error('Error generating email markdown from template:', error);
+            console.error("Error generating email markdown from template:", error);
             // Use fallback on any error
             return this.generateEmailMarkdownFallback(ticket);
         }
@@ -2952,7 +2952,7 @@ class HexagonTicketsManager {
 
         email += "**AFFECTED SYSTEMS:**\n";
         if (deviceCount > 0) {
-            email += `${deviceCount} device${deviceCount > 1 ? 's' : ''} require security patches and will need to be rebooted:\n`;
+            email += `${deviceCount} device${deviceCount > 1 ? "s" : ""} require security patches and will need to be rebooted:\n`;
             ticket.devices.forEach((device, index) => {
                 email += `${index + 1}. ${device}\n`;
             });
@@ -2998,14 +2998,14 @@ class HexagonTicketsManager {
         // First ensure we have the vulnerability markdown loaded
         const vulnContent = document.getElementById("vulnerabilityMarkdownContent");
 
-        if (!vulnContent || !vulnContent.textContent || vulnContent.textContent.trim() === '') {
+        if (!vulnContent || !vulnContent.textContent || vulnContent.textContent.trim() === "") {
             // If not loaded, generate it first
             await this.loadVulnerabilityMarkdownForModal();
         }
 
         const content = document.getElementById("vulnerabilityMarkdownContent").textContent;
 
-        if (!content || content.trim() === '') {
+        if (!content || content.trim() === "") {
             this.showToast("No vulnerability data available for this ticket", "warning");
             return;
         }
@@ -3023,14 +3023,14 @@ class HexagonTicketsManager {
         // First ensure we have the email markdown loaded
         const emailContent = document.getElementById("emailMarkdownContent");
 
-        if (!emailContent || !emailContent.textContent || emailContent.textContent.trim() === '') {
+        if (!emailContent || !emailContent.textContent || emailContent.textContent.trim() === "") {
             // If not loaded, generate it first
             await this.loadEmailMarkdownForModal();
         }
 
         const content = document.getElementById("emailMarkdownContent").textContent;
 
-        if (!content || content.trim() === '') {
+        if (!content || content.trim() === "") {
             this.showToast("No email template available for this ticket", "warning");
             return;
         }
@@ -3051,8 +3051,8 @@ class HexagonTicketsManager {
         if (!ticket) {
             console.error("[EmailTemplate] Ticket not found:", ticketId);
             document.getElementById("emailMarkdownContent").textContent = "# Error Loading Email Template\n\nTicket not found.";
-            document.getElementById("emailMarkdownContent").style.display = 'block';
-            document.getElementById("emailLoadingMessage").style.display = 'none';
+            document.getElementById("emailMarkdownContent").style.display = "block";
+            document.getElementById("emailLoadingMessage").style.display = "none";
             return;
         }
 
@@ -3060,7 +3060,7 @@ class HexagonTicketsManager {
             // Generate the base email markdown
             let emailMarkdown = await this.generateEmailMarkdown(ticket);
 
-            let summaryBlock = '';
+            let summaryBlock = "";
 
             if (ticket.devices && ticket.devices.length > 0) {
                 document.getElementById("emailLoadingMessage").textContent = "Generating email template with vulnerability summary...";
@@ -3072,14 +3072,14 @@ class HexagonTicketsManager {
                         summaryBlock = this.generateVulnerabilitySummaryForEmail(ticket, vulnerabilities || []);
                     }
                 } catch (vulnError) {
-                    console.error('[EmailTemplate] Error fetching vulnerabilities:', vulnError);
+                    console.error("[EmailTemplate] Error fetching vulnerabilities:", vulnError);
                     summaryBlock = "**VULNERABILITY SUMMARY:**\n\nUnable to fetch vulnerability data.";
                 }
             }
 
-            const summaryReplacement = summaryBlock && summaryBlock.trim() ? `${summaryBlock.trim()}\n\n` : '';
+            const summaryReplacement = summaryBlock && summaryBlock.trim() ? `${summaryBlock.trim()}\n\n` : "";
 
-            if (emailMarkdown.includes('[VULNERABILITY_SUMMARY]')) {
+            if (emailMarkdown.includes("[VULNERABILITY_SUMMARY]")) {
                 emailMarkdown = emailMarkdown.replace(/\[VULNERABILITY_SUMMARY\]/g, summaryReplacement);
             } else if (summaryReplacement) {
                 const confirmReceiptIndex = emailMarkdown.indexOf("\nPlease confirm receipt");
@@ -3094,15 +3094,15 @@ class HexagonTicketsManager {
 
             // Display the complete email markdown
             document.getElementById("emailMarkdownContent").textContent = emailMarkdown;
-            document.getElementById("emailMarkdownContent").style.display = 'block';
-            document.getElementById("emailLoadingMessage").style.display = 'none';
+            document.getElementById("emailMarkdownContent").style.display = "block";
+            document.getElementById("emailLoadingMessage").style.display = "none";
 
-            console.log('[EmailTemplate] Email template generated for ticket:', ticketId);
+            console.log("[EmailTemplate] Email template generated for ticket:", ticketId);
         } catch (error) {
-            console.error('[EmailTemplate] Error generating email template:', error);
+            console.error("[EmailTemplate] Error generating email template:", error);
             document.getElementById("emailMarkdownContent").textContent = "# Error Loading Email Template\n\nFailed to generate email template. Please try again.";
-            document.getElementById("emailMarkdownContent").style.display = 'block';
-            document.getElementById("emailLoadingMessage").style.display = 'none';
+            document.getElementById("emailMarkdownContent").style.display = "block";
+            document.getElementById("emailLoadingMessage").style.display = "none";
         }
     }
 
@@ -3526,35 +3526,35 @@ document.addEventListener("DOMContentLoaded", function() {
     window.ticketManager = new HexagonTicketsManager();
 
     // Check if we're coming from vulnerability page with a device to create a ticket for
-    const autoOpen = sessionStorage.getItem('autoOpenModal');
-    const deviceHostname = sessionStorage.getItem('createTicketDevice');
+    const autoOpen = sessionStorage.getItem("autoOpenModal");
+    const deviceHostname = sessionStorage.getItem("createTicketDevice");
 
-    if (autoOpen === 'true' && deviceHostname) {
+    if (autoOpen === "true" && deviceHostname) {
         // Clear the flags immediately to prevent issues with multiple tabs
-        sessionStorage.removeItem('autoOpenModal');
-        sessionStorage.removeItem('createTicketDevice');
+        sessionStorage.removeItem("autoOpenModal");
+        sessionStorage.removeItem("createTicketDevice");
 
         // Wait a moment for everything to initialize, then open modal
         setTimeout(() => {
             // Open the ticket modal using Bootstrap
-            const ticketModal = document.getElementById('ticketModal');
+            const ticketModal = document.getElementById("ticketModal");
             if (ticketModal) {
                 const modal = new bootstrap.Modal(ticketModal);
                 modal.show();
 
                 // Wait for modal to be fully shown, then populate the device
-                ticketModal.addEventListener('shown.bs.modal', function onModalShown() {
+                ticketModal.addEventListener("shown.bs.modal", function onModalShown() {
                     // Remove the event listener to avoid multiple calls
-                    ticketModal.removeEventListener('shown.bs.modal', onModalShown);
+                    ticketModal.removeEventListener("shown.bs.modal", onModalShown);
 
                     // Populate the device field
                     setTimeout(() => {
                         // Find the first device input field (there's usually one by default)
-                        const firstDeviceInput = document.querySelector('#devicesContainer .device-input');
+                        const firstDeviceInput = document.querySelector("#devicesContainer .device-input");
 
                         if (firstDeviceInput) {
                             // If first device field is empty, use it
-                            if (!firstDeviceInput.value || firstDeviceInput.value.trim() === '') {
+                            if (!firstDeviceInput.value || firstDeviceInput.value.trim() === "") {
                                 firstDeviceInput.value = deviceHostname;
                                 firstDeviceInput.focus();
                             } else {
@@ -3563,7 +3563,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                                 // Then find the newly added input
                                 setTimeout(() => {
-                                    const deviceInputs = document.querySelectorAll('#devicesContainer .device-input');
+                                    const deviceInputs = document.querySelectorAll("#devicesContainer .device-input");
                                     if (deviceInputs.length > 0) {
                                         const lastInput = deviceInputs[deviceInputs.length - 1];
                                         lastInput.value = deviceHostname;
@@ -3574,7 +3574,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         }
 
                         // Show a helpful message
-                        window.ticketManager.showToast(`Creating ticket for ${deviceHostname}`, 'info');
+                        window.ticketManager.showToast(`Creating ticket for ${deviceHostname}`, "info");
                     }, 100);
                 }, { once: true });
             }

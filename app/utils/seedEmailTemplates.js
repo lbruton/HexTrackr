@@ -162,9 +162,9 @@ const vulnerabilityTemplateVariables = [
  * @returns {Promise<void>}
  */
 const templateSignatures = {
-    email: ['Subject: Hexagon Work Order', '[DEVICE_LIST]'],
-    ticket: ['# Hexagon Work Request', 'Generated:'],
-    vulnerability: ['# Vulnerability Report', '[VULNERABILITY_DETAILS]', '[TOTAL_VULNERABILITIES]']
+    email: ["Subject: Hexagon Work Order", "[DEVICE_LIST]"],
+    ticket: ["# Hexagon Work Request", "Generated:"],
+    vulnerability: ["# Vulnerability Report", "[VULNERABILITY_DETAILS]", "[TOTAL_VULNERABILITIES]"]
 };
 
 function contentLooksMismatched(content, category) {
@@ -172,7 +172,7 @@ function contentLooksMismatched(content, category) {
         return true;
     }
 
-    const normalizedCategory = (category || '').toLowerCase();
+    const normalizedCategory = (category || "").toLowerCase();
     const expectedTokens = templateSignatures[normalizedCategory] || [];
     const foreignTokens = Object.entries(templateSignatures)
         .filter(([key]) => key !== normalizedCategory)
@@ -203,7 +203,7 @@ async function seedTemplate(db, { table, name, description, defaultContent, vari
                 }
 
                 if (row) {
-                    const storedCategory = (row.category || '').toLowerCase();
+                    const storedCategory = (row.category || "").toLowerCase();
                     const needsRepair = storedCategory !== category
                         || contentLooksMismatched(row.template_content, category)
                         || contentLooksMismatched(row.default_content, category);
@@ -281,34 +281,34 @@ async function seedTemplate(db, { table, name, description, defaultContent, vari
 
 async function seedEmailTemplates(db) {
     await seedTemplate(db, {
-        table: 'email_templates',
-        name: 'default_email',
-        description: 'Default email template for supervisor notifications',
+        table: "email_templates",
+        name: "default_email",
+        description: "Default email template for supervisor notifications",
         defaultContent: defaultEmailTemplate,
         variables: emailTemplateVariables,
-        category: 'email'
+        category: "email"
     });
 }
 
 async function seedTicketTemplates(db) {
     await seedTemplate(db, {
-        table: 'ticket_templates',
-        name: 'default_ticket',
-        description: 'Default ticket markdown template',
+        table: "ticket_templates",
+        name: "default_ticket",
+        description: "Default ticket markdown template",
         defaultContent: defaultTicketTemplate,
         variables: ticketTemplateVariables,
-        category: 'ticket'
+        category: "ticket"
     });
 }
 
 async function seedVulnerabilityTemplates(db) {
     await seedTemplate(db, {
-        table: 'vulnerability_templates',
-        name: 'default_vulnerability',
-        description: 'Default vulnerability report template',
+        table: "vulnerability_templates",
+        name: "default_vulnerability",
+        description: "Default vulnerability report template",
         defaultContent: defaultVulnerabilityTemplate,
         variables: vulnerabilityTemplateVariables,
-        category: 'vulnerability'
+        category: "vulnerability"
     });
 }
 

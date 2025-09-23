@@ -610,7 +610,7 @@ async function syncKevData() {
     // Disable button and show loading state
     if (syncButton) {
         syncButton.disabled = true;
-        syncButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Syncing...';
+        syncButton.innerHTML = "<i class=\"fas fa-spinner fa-spin me-2\"></i>Syncing...";
     }
 
     if (statusBadge) {
@@ -648,7 +648,7 @@ async function syncKevData() {
         // Re-enable button
         if (syncButton) {
             syncButton.disabled = false;
-            syncButton.innerHTML = '<i class="fas fa-sync me-2"></i>Sync Now';
+            syncButton.innerHTML = "<i class=\"fas fa-sync me-2\"></i>Sync Now";
         }
     }
 }
@@ -662,7 +662,7 @@ function toggleKevAutoSync() {
     const autoSyncCheckbox = document.getElementById("kevAutoSync");
     if (autoSyncCheckbox) {
         localStorage.setItem("kevAutoSyncEnabled", autoSyncCheckbox.checked);
-        showNotification(`KEV auto-sync ${autoSyncCheckbox.checked ? 'enabled' : 'disabled'}`, "info");
+        showNotification(`KEV auto-sync ${autoSyncCheckbox.checked ? "enabled" : "disabled"}`, "info");
     }
 }
 
