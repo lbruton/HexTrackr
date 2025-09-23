@@ -34,15 +34,21 @@ const upload = multer({
 // Backup statistics endpoint
 router.get("/stats", BackupController.getBackupStats);
 
-// Export endpoints
+// Export endpoints (JSON)
 router.get("/vulnerabilities", BackupController.exportVulnerabilities);
 router.get("/tickets", BackupController.exportTickets);
 router.get("/all", BackupController.exportAll);
+
+// Export endpoints (ZIP)
+router.get("/export/vulnerabilities", BackupController.exportVulnerabilitiesAsZip);
+router.get("/export/tickets", BackupController.exportTicketsAsZip);
+router.get("/export/all", BackupController.exportAllAsZip);
 
 // Data management endpoints
 router.delete("/clear/:type", BackupController.clearData);
 
 // Restore endpoint
 router.post("/restore", upload.single("file"), BackupController.restoreBackup);
+
 
 module.exports = router;
