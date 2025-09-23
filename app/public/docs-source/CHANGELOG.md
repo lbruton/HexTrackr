@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed - NPM Scripts Cleanup
+
+#### Development Workflow Improvements
+
+- **Removed Broken Scripts**: Eliminated NPM scripts that referenced non-existent files
+  - Removed `npm run roadmap` (scripts/generate-roadmap-portal.js missing)
+  - Removed `npm run docs:review` (app/public/scripts/gemini-docs-generator.js missing)
+  - Removed `npm run docs:analyze` (app/public/scripts/generate-architecture-analysis.js missing)
+
+- **Fixed Test Scripts**: Updated test commands to handle missing test directories gracefully
+  - Added `--passWithNoTests` flag to test:unit, test:integration, test:contract
+  - Scripts now pass without error when no test files exist
+  - Clear warnings added in NPMGUIDE.md about directory status
+
+#### Documentation Updates
+
+- **Updated NPMGUIDE.md**: Moved to root directory and cleaned up outdated script references
+  - Removed documentation for broken scripts
+  - Added status warnings for placeholder test commands
+  - Updated workflow examples to use working commands
+
+- **CLAUDE.md Corrections**: Removed references to broken scripts in development commands
+  - Simplified documentation section to show only working scripts
+  - Added reference to NPMGUIDE.md location
+
+#### Impact
+
+- All documented NPM scripts now function correctly
+- No more confusion about missing script files
+- Clear guidance on test infrastructure development status
+- Improved developer onboarding experience
+
+### Removed - Testing Infrastructure Cleanup
+
+#### Development Simplification
+
+- **Removed Jest Testing Framework**: Eliminated unused Jest test infrastructure
+  - Removed 8 testing devDependencies (@jest/globals, jest, jest-environment-jsdom, etc.)
+  - Removed 6 test-related NPM scripts (test, test:watch, test:coverage, etc.)
+  - Kept only templateService.test.js as reference example
+
+- **Removed Playwright Testing Framework**: Eliminated unused Playwright E2E testing
+  - Removed @playwright/test and playwright packages
+  - Removed supertest dependency
+  - Simplified to manual testing workflow
+
+#### Rationale
+
+- **Workflow Alignment**: Manual testing with screenshots preferred by development team
+- **Playwright MCP Available**: Browser automation available through MCP when needed
+- **Complexity Reduction**: Removed 750MB+ of testing dependencies and tooling
+- **Faster Development**: Simplified npm install and reduced cognitive overhead
+
+#### Impact
+
+- Package size reduced significantly (Jest + Playwright = ~750MB dependencies)
+- Faster npm install times
+- Cleaner package.json with focus on actual workflow
+- Manual testing remains primary validation method
+- Playwright MCP provides automation capabilities when needed
+
 ## [1.0.23] - 2025-09-22
 
 ### Added - Interactive Statistics Card Filtering
