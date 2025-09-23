@@ -26,17 +26,20 @@
 ## Current Implementation Analysis
 
 ### Existing Email Template Location
+
 - File: `app/public/scripts/pages/tickets.js`
 - Function: `generateEmailMarkdown(ticket)` (lines 2669-2724)
 - Pattern: Hardcoded template with variable insertion
 - Integration: Called from `loadEmailMarkdownForModal()`
 
 ### Variable Extraction Sources
+
 - `getSupervisorGreeting()` - Handles name parsing logic
 - `formatDate()` - Date formatting utility
 - `generateVulnerabilitySummaryForEmail()` - Dynamic vulnerability content
 
 ### Database Integration Points
+
 - Service: `app/services/databaseService.js` - Add table creation
 - Pattern: Follow existing controller/service/route structure
 - Consistency: Use same patterns as vulnerability/ticket APIs
@@ -44,15 +47,18 @@
 ## UI/UX Considerations
 
 ### Modal Structure (tickets2.html:612-614)
+
 ```html
 <button type="button" class="btn btn-outline-primary btn-sm" disabled title="Template editing coming in v1.0.21">
     <i class="fas fa-edit me-1"></i>Edit
 </button>
 ```
+
 - Current: Disabled stub button ready for activation
 - Future: Toggle between view/edit modes in same modal
 
 ### Tab Integration
+
 - Existing: Bootstrap tabs (Ticket Details, Vulnerabilities, Email Template)
 - Enhancement: Email tab transforms into edit mode when Edit clicked
 - Pattern: Similar to lazy-loading vulnerability data
@@ -66,16 +72,19 @@
 ## Technical Architecture
 
 ### Storage Strategy
+
 1. **Primary**: SQLite database for persistence
 2. **Cache**: localStorage for performance (1-hour expiry)
 3. **Fallback**: Hardcoded template if all else fails
 
 ### API Design
+
 - RESTful endpoints following existing patterns
 - Consistent error handling
 - Version-aware template management
 
 ### Frontend Architecture
+
 - ES6 module for template editor functionality
 - Global window access for modal integration
 - Event-driven mode switching

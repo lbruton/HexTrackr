@@ -1,102 +1,114 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # HexTrackr Constitutional Framework
 
- ## Preamble
+## Preamble
 
- This constitutional framework governs the core ***NON-NEOTIABLE*** operating principals mandated for AI agents working on the the HexTrackr project. 
+ This constitutional framework governs the core ***NON-NEOTIABLE*** operating principals mandated for AI agents working on the the HexTrackr project.
 
- ## Article I: Developmet Practices
+## Article I: Developmet Practices
 
- ### Section I: Context Accuracy
- 
+### Section I: Context Accuracy
+
     - Context MUST be gathered before starting any work
         - Session Logs SHALL be stored as context bundles (See Article II, Section VI)
       - Project Knowledge SHALL be retained in ***Memento*** (See Article II, Section II)
       - Codebase SHALL be indexed and searchable in ***Claude-Context*** (See Article II, Section VIII)
       - Context7 SHALL be used to verify framework documentation accuracy
 
- ### Section III: Documentation Pipeline & Standards
+### Section III: Documentation Pipeline & Standards
 
-   - All files in /app/ directory SHALL maintain  JSDoc comment coverage
-   - All JavaScript functions SHALL include complete JSDoc comments with:
-     - @description - Clear explanation of function purpose
-     - @param - All parameters with types and descriptions
-     - @returns - Return value type and description
-     - @throws - Exceptions that may be thrown
-     - @example - Usage examples for public APIs
-     - @since - Version when feature was added
-     - @module - Module identification for organization
-   - Technical documentation SHALL reside in app/dev-docs-html/
-   - Public documentation SHALL reside in app/public/docs-source/ (markdown) and app/public/docs-html/ (HTML)
-   - Context7 SHALL be used to verify framework documentation accuracy
-   - Documentation SHALL be regenerated after every feature completion
-   - All NPM Scripts SHALL be documented in NPMGUIDE.md (see root directory)
-   - JSDoc coverage reports SHALL be reviewed weekly
+- All files in /app/ directory SHALL maintain  JSDoc comment coverage
+- All JavaScript functions SHALL include complete JSDoc comments with:
+  - @description - Clear explanation of function purpose
+  - @param - All parameters with types and descriptions
+  - @returns - Return value type and description
+  - @throws - Exceptions that may be thrown
+  - @example - Usage examples for public APIs
+  - @since - Version when feature was added
+  - @module - Module identification for organization
+- Technical documentation SHALL reside in app/dev-docs-html/
+- Public documentation SHALL reside in app/public/docs-source/ (markdown) and app/public/docs-html/ (HTML)
+- Context7 SHALL be used to verify framework documentation accuracy
+- Documentation SHALL be regenerated after every feature completion
+- All NPM Scripts SHALL be documented in NPMGUIDE.md (see root directory)
+- JSDoc coverage reports SHALL be reviewed weekly
 
- ### Section IV: Code Quality and Linting
+### Section IV: Code Quality and Linting
 
-   - All new features, changes, and code updates SHALL pass Codacy quality checks
-   - All new features, changes, and code updates SHALL pass Markdownlint
-   - All new features, changes, and code updates SHALL pass ESlint9+
-   - All Framework code must be reviewed against Context7 to ensure accuracy. 
-
+- All new features, changes, and code updates SHALL pass Codacy quality checks
+- All new features, changes, and code updates SHALL pass Markdownlint
+- All new features, changes, and code updates SHALL pass ESlint9+
+- All Framework code must be reviewed against Context7 to ensure accuracy.
 
 ### Section V: Backups and Branch Discipline
 
-   - All development work SHALL be sourced from the 'copilot' branch
-   - Protected branches SHALL use Pull Requests for merging, never direct pushes
+- All development work SHALL be sourced from the 'copilot' branch
+- Protected branches SHALL use Pull Requests for merging, never direct pushes
 
 ### Section VI: Docker Principles
 
-   - All Testing and Development SHALL use the docker container (8989)
-   - NEVER run http/https locally, ALWAYS use the docker container.
+- All Testing and Development SHALL use the docker container (8989)
+- NEVER run http/https locally, ALWAYS use the docker container.
 
 # Article II: Tool Usage
 
 ### Section I: Memento
-   - Memento MCP SHALL be used as the primary knowledge graph for the project
-   - All Searches SHALL be Semantic (with hybrid and keyword as alternatives)
-   - Entities SHALL Use PROJECT:DOMAIN:TYPE classification pattern
-   - Entities SHALL Contain TIMESTAMP in ISO 8601 format as first observation
-   - Entities SHALL Contain an ABSTRACT (second) and SUMMARY (third) observation
-   - All entities SHALL be tagged per `/memento/TAXONOMY.md` requirements
-   - Tag taxonomy and conventions defined in `/memento/TAXONOMY.md` SHALL be followed
+
+- Memento MCP SHALL be used as the primary knowledge graph for the project
+- All Searches SHALL be Semantic (with hybrid and keyword as alternatives)
+- Entities SHALL Use PROJECT:DOMAIN:TYPE classification pattern
+- Entities SHALL Contain TIMESTAMP in ISO 8601 format as first observation
+- Entities SHALL Contain an ABSTRACT (second) and SUMMARY (third) observation
+- All entities SHALL be tagged per `/memento/TAXONOMY.md` requirements
+- Tag taxonomy and conventions defined in `/memento/TAXONOMY.md` SHALL be followed
 
 ### Section II: Context 7
-   - Context7 SHALL be used for all code changes to ensure full framework compatability.
-   - All Framework SHALL be downloaded in markdown format to the /dev-docs/frameworks/ folder
+
+- Context7 SHALL be used for all code changes to ensure full framework compatability.
+- All Framework SHALL be downloaded in markdown format to the /dev-docs/frameworks/ folder
 
 ### Section III: Brave Search
-   - Web searches SHALL be completed using the brave-search MCP if available and should use the summerizer option to get the best results.
+
+- Web searches SHALL be completed using the brave-search MCP if available and should use the summerizer option to get the best results.
 
 ### Section IV: Codacy
-   - All code must pass Codacy Quality Checks
+
+- All code must pass Codacy Quality Checks
 
 ### Section V: Playwright
-   - Playwright Testing SHALL be performed before and after any UI changes.
+
+- Playwright Testing SHALL be performed before and after any UI changes.
 
 ### Section VI: Sequential Thinking
-   - All tasks SHALL be broken down with Sequential Thinking 
+
+- All tasks SHALL be broken down with Sequential Thinking
 
 ### Section VII: Zen
-   - If Available, Zen tools may be used at the users request only.
+
+- If Available, Zen tools may be used at the users request only.
 
 ### Section VIII: Claude-Context
-   - Claude-Context MUST be used when searching the code base
-   - Always verify the Index is current beore searches. 
+
+- Claude-Context MUST be used when searching the code base
+- Always verify the Index is current beore searches.
 
 ## Artivle IV: Gemini CLI Tools
-   - Gemini CLI may be used for coplext tasks at the users request only. 
-   - All tools SHALL be documented in ~/docs/GEMINICLITOOLS.md
+
+- Gemini CLI may be used for coplext tasks at the users request only.
+- All tools SHALL be documented in ~/docs/GEMINICLITOOLS.md
 
 ## Article V: Codex CLI Tools
-   - Codex CLI Tools may be used for complext tasks at the users request only. 
-   - All tools SHALL be documented in ~/docs/CODEXCLITOOLS.md
+
+- Codex CLI Tools may be used for complext tasks at the users request only.
+- All tools SHALL be documented in ~/docs/CODEXCLITOOLS.md
 
 ## Article V: Custom Context Bundles
+
 Execute this exact command using the Bash tool:
+
 - Run: `~/.claude/hooks/list-bundles.sh | head -10` to see recent session summaries
 
 ## Project Overview
@@ -104,6 +116,7 @@ Execute this exact command using the Bash tool:
 HexTrackr is a cybersecurity vulnerability and ticket management system with a modular Node.js/Express backend and vanilla JavaScript frontend. The system has been refactored from a monolithic ~3,800 line server.js to a modular architecture while maintaining backward compatibility.
 
 **Key Technologies:**
+
 - Backend: Node.js/Express with modular controllers and services
 - Database: SQLite3 with runtime schema evolution
 - Frontend: Vanilla JavaScript with modular architecture
@@ -114,6 +127,7 @@ HexTrackr is a cybersecurity vulnerability and ticket management system with a m
 ## Common Development Commands
 
 ### Running the Application
+
 ```bash
 # Start development server with auto-restart
 npm run dev
@@ -125,8 +139,8 @@ npm start
 npm run init-db
 ```
 
-
 ### Linting and Code Quality
+
 ```bash
 # Run all linting
 npm run lint:all
@@ -144,6 +158,7 @@ npm run lint:md:fix
 ```
 
 ### Documentation
+
 ```bash
 # Generate all documentation
 npm run docs:all
@@ -159,13 +174,16 @@ npm run docs:all
 ```
 
 ### Git Hooks and Development Tools
+
 ```bash
 # Install git hooks
 npm run hooks:install
 ```
 
 ### Development Environment
+
 **CRITICAL**: Always use Docker for development - never run Node.js locally
+
 ```bash
 # Start containerized environment
 docker-compose up
@@ -187,6 +205,7 @@ docker-compose logs
 HexTrackr has transitioned from a monolithic server.js to a modular architecture:
 
 **Core Structure:**
+
 - `app/public/server.js` - Main Express application with route registration
 - `app/controllers/` - Business logic controllers (VulnerabilityController, TicketController, BackupController, ImportController, DocsController, TemplateController, KevController)
 - `app/services/` - Service layer (12 services total)
@@ -195,6 +214,7 @@ HexTrackr has transitioned from a monolithic server.js to a modular architecture
 - `app/utils/` - Utility classes (PathValidator, ProgressTracker, helpers, constants)
 
 **Complete Service Layer:**
+
 - `backupService` - Database backup and restore operations
 - `databaseService` - SQLite connection and transaction management
 - `docsService` - Documentation generation and management
@@ -209,6 +229,7 @@ HexTrackr has transitioned from a monolithic server.js to a modular architecture
 - `vulnerabilityStatsService` - Vulnerability statistics and analytics
 
 **Key Utilities:**
+
 - `PathValidator` - Security utility preventing path traversal attacks
 - `ProgressTracker` - WebSocket-based progress tracking for long operations
 - `helpers` - Common utility functions
@@ -219,6 +240,7 @@ HexTrackr has transitioned from a monolithic server.js to a modular architecture
 The frontend follows a modular pattern with clear separation of concerns:
 
 **Directory Structure:**
+
 ```
 app/public/scripts/
 ├── shared/        # Reusable components (settings-modal.js, etc.)
@@ -227,6 +249,7 @@ app/public/scripts/
 ```
 
 **Integration Pattern:**
+
 1. Load shared components first
 2. Load page-specific code second
 3. Communication via `window.refreshPageData(type)` callbacks
@@ -234,11 +257,13 @@ app/public/scripts/
 ### Database Architecture
 
 **Runtime Schema Evolution:**
+
 - SQLite3 with idempotent ALTER TABLE statements
 - Schema changes applied during server startup
 - Rollover architecture for vulnerability data management
 
 **Key Tables:**
+
 - `tickets` - Ticket management with JSON device fields
 - `vulnerabilities` - Current vulnerability data
 - `vulnerability_imports` - Import tracking
@@ -256,6 +281,7 @@ app/public/scripts/
 ## Coding Standards
 
 ### JavaScript Style (Enforced by ESLint)
+
 - **Quotes**: Always use double quotes ("")
 - **Semicolons**: Required at end of statements
 - **Variables**: Use `const` by default, `let` when reassignment needed
@@ -263,6 +289,7 @@ app/public/scripts/
 - **Braces**: Always use curly braces for control structures
 
 ### Security Requirements
+
 - Always use `PathValidator.validatePath()` for file operations
 - Sanitize user inputs with DOMPurify for HTML rendering
 - Use parameterized queries for database operations
@@ -271,6 +298,7 @@ app/public/scripts/
 ### Module Patterns
 
 **Backend Controllers:**
+
 ```javascript
 class ExampleController {
     static initialize(db, progressTracker) {
@@ -295,6 +323,7 @@ class ExampleController {
 ```
 
 **Frontend Page Integration:**
+
 ```javascript
 // Required integration functions for pages
 window.refreshPageData = function(type) {
@@ -309,13 +338,16 @@ window.showToast = function(message, type) {
 ## Development Workflow
 
 ### Docker-Only Development
+
 - Never run Node.js locally - always use Docker
 - Use `docker-compose up` for development
 - Restart container with `docker-compose restart` before running Playwright tests
 - All testing and development must happen in containerized environment
 
 ### Testing Strategy
+
 **Note: Manual testing workflow with optional AI automation**
+
 - Manual testing preferred for UI validation and bug discovery
 - Stagehand available for AI-powered browser automation using natural language
 - Playwright MCP available for traditional browser automation when needed
@@ -323,6 +355,7 @@ window.showToast = function(message, type) {
 - Focus on functional testing through actual usage
 
 #### Stagehand AI Testing (Optional)
+
 ```bash
 # Install Stagehand dependencies (if needed)
 npm install
@@ -332,13 +365,16 @@ npm run test:stagehand
 ```
 
 **Stagehand Benefits:**
+
 - Natural language test descriptions instead of brittle CSS selectors
 - AI adapts automatically when UI changes
 - Perfect bridge between manual testing and automation
 - Local development support without cloud dependencies
 
 ### File Operations Security
+
 All file system operations must use the PathValidator class:
+
 ```javascript
 try {
     const validatedPath = PathValidator.validatePath(filePath);
@@ -350,7 +386,9 @@ try {
 ```
 
 ### Database Operations
+
 Use the DatabaseService for all database interactions:
+
 ```javascript
 const query = "SELECT * FROM table WHERE id = ?";
 databaseService.db.all(query, [id], (err, rows) => {
@@ -365,7 +403,9 @@ databaseService.db.all(query, [id], (err, rows) => {
 ## Project-Specific Patterns
 
 ### Progress Tracking
+
 For long-running operations, use the ProgressTracker with WebSocket communication:
+
 ```javascript
 const sessionId = progressTracker.createSession();
 progressTracker.updateProgress(sessionId, 50, "Processing...");
@@ -373,17 +413,20 @@ progressTracker.updateProgress(sessionId, 50, "Processing...");
 ```
 
 ### Vulnerability Data Management
+
 - Vulnerability imports create snapshots for historical tracking
 - Rollover functionality manages data retention
 - CSV import/export via Papa Parse library with 100MB file limits
 
 ### KEV (Known Exploited Vulnerabilities) Integration
+
 - Automated synchronization with CISA's Known Exploited Vulnerabilities catalog
 - KEV status tracking for vulnerabilities (Active/Not Active)
 - Sync metadata management for tracking last update times
 - REST API endpoints for KEV status queries and manual sync triggers
 
 ### Template System
+
 - **Email Templates**: Customizable email notifications with variable substitution
 - **Ticket Templates**: Pre-configured ticket creation templates with markdown support
 - **Vulnerability Templates**: Standardized vulnerability reporting templates
@@ -392,6 +435,7 @@ progressTracker.updateProgress(sessionId, 50, "Processing...");
 - **Database Storage**: Templates stored in dedicated database tables (email_templates, ticket_templates, vulnerability_templates)
 
 ### Modular Frontend Architecture
+
 - Shared components are loaded first in HTML
 - Page-specific JavaScript loaded second
 - Communication between modules via window object callbacks
@@ -400,6 +444,7 @@ progressTracker.updateProgress(sessionId, 50, "Processing...");
 ## Important Files and Locations
 
 **Configuration:**
+
 - `eslint.config.mjs` - ESLint configuration
 - `.markdownlint.json` - Markdown linting rules
 - `package.json` - Dependencies and scripts
@@ -407,20 +452,24 @@ progressTracker.updateProgress(sessionId, 50, "Processing...");
 - Note: .cursorrules file not present (development rules in CLAUDE.md instead)
 
 **Core Application:**
+
 - `app/public/server.js` - Main Express server
 - `app/services/databaseService.js` - Database abstraction layer
 - `app/utils/PathValidator.js` - Security utility for file operations
 - `app/public/scripts/shared/settings-modal.js` - Global settings component
 
 **Database:**
+
 - `app/public/data/hextrackr.db` - SQLite database file
 - `app/public/scripts/init-database.js` - Database initialization
 
 **Testing:**
+
 - Manual testing workflow with visual verification
 - Playwright MCP for browser automation when needed
 
 ## Port and Environment
+
 - Application runs on internal port 8080 (Docker container)
 - External Docker port mapping: 8989 → 8080 (prevents test conflicts)
 - Always use `http://localhost:8989` for testing and development when using Docker
