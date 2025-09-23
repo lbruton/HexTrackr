@@ -16,6 +16,7 @@ Quick reference guide to all available project management templates in HexTrackr
 ## 🚀 Quick Start Commands
 
 ### Copy a Template
+
 ```bash
 # Navigate to your working directory
 cd /path/to/your/work
@@ -25,6 +26,7 @@ cp /Volumes/DATA/GitHub/HexTrackr/planning/templates/[template-name].md ./
 ```
 
 ### Create from Template (with date)
+
 ```bash
 # Sprint planning
 cp templates/sprint-planning-template.md sprint-$(date +%Y%m%d)-planning.md
@@ -39,20 +41,24 @@ cp templates/daily-standup-template.md standup-$(date +%Y%m%d).md
 ## 📋 Template Categories
 
 ### 🏃‍♂️ Agile Workflow
+
 - **Sprint Planning** - Backlog management and sprint goals
 - **Daily Standup** - Quick daily progress and blockers
 - **Retrospective** - Continuous improvement and lessons learned
 
 ### 📊 Product Management  
+
 - **Feature Specification** - Detailed feature requirements and design
 - **Release Notes** - Version changes and user communication
 
 ### 🔄 Session Management
+
 - **Session Handoff** - Knowledge transfer between work sessions
 
 ## 🏷️ Template Tags Reference
 
 ### Required Tags (Every Template)
+
 ```
 project:hextrackr          # Project identification
 week-XX-YYYY              # Temporal tracking
@@ -61,6 +67,7 @@ week-XX-YYYY              # Temporal tracking
 ```
 
 ### Common Category Tags
+
 - `frontend` - UI/UX, client-side work
 - `backend` - Server, API, business logic  
 - `database` - Schema, queries, data work
@@ -69,6 +76,7 @@ week-XX-YYYY              # Temporal tracking
 - `infrastructure` - DevOps, deployment
 
 ### Workflow Tags
+
 - `draft` - Initial creation
 - `in-progress` - Active work
 - `blocked` - Waiting on dependencies
@@ -79,6 +87,7 @@ week-XX-YYYY              # Temporal tracking
 ## 🔍 Finding the Right Template
 
 ### By Work Type
+
 | Work Type | Primary Template | Secondary Templates |
 |-----------|-----------------|-------------------|
 | **New Feature** | Feature Specification | Sprint Planning, Session Handoff |
@@ -89,6 +98,7 @@ week-XX-YYYY              # Temporal tracking
 | **Project Review** | Retrospective | Release Notes, Session Handoff |
 
 ### By Timeline
+
 | Timeline | Template | Purpose |
 |----------|----------|---------|
 | **Daily** | Daily Standup | Progress tracking |
@@ -101,6 +111,7 @@ week-XX-YYYY              # Temporal tracking
 ## 🤖 AI Integration Patterns
 
 ### Claude Desktop Prompts
+
 ```markdown
 # Starting a new sprint
 "Help me plan sprint X using the sprint planning template. 
@@ -121,6 +132,7 @@ today's priorities from the current sprint plan."
 ```
 
 ### Memento Search Patterns
+
 ```javascript
 // Find similar work for reference
 mcp__memento__search_nodes({
@@ -144,12 +156,14 @@ mcp__memento__search_nodes({
 ## 📊 Template Effectiveness Tracking
 
 ### Success Metrics
+
 - **Usage Frequency** - How often each template is used
 - **Time Savings** - Reduction in documentation time
 - **Knowledge Retention** - Successful session handoffs
 - **Quality Improvement** - Better specifications and planning
 
 ### Continuous Improvement
+
 - **Weekly Review** - Which templates work best?
 - **Monthly Update** - Add new sections or templates
 - **Quarterly Assessment** - Major template revisions
@@ -158,6 +172,7 @@ mcp__memento__search_nodes({
 ## 🔧 Customization Guidelines
 
 ### Adapting Templates
+
 1. **Start with the base template**
 2. **Remove irrelevant sections**
 3. **Add project-specific fields**
@@ -165,6 +180,7 @@ mcp__memento__search_nodes({
 5. **Test with real work**
 
 ### Creating New Templates
+
 1. **Identify recurring workflow**
 2. **Document current ad-hoc process**
 3. **Structure into reusable template**
@@ -172,6 +188,7 @@ mcp__memento__search_nodes({
 5. **Test with team members**
 
 ### Version Control
+
 - **Track changes** in template headers
 - **Document rationale** for modifications  
 - **Test before rolling out** to team
@@ -180,17 +197,20 @@ mcp__memento__search_nodes({
 ## 📞 Support & Updates
 
 ### Template Issues
+
 - **Missing Information** - Add to template and update version
 - **Confusing Sections** - Clarify with examples
 - **Process Changes** - Update workflow sections
 
 ### Requesting New Templates  
+
 1. **Describe the workflow** that needs templating
 2. **Explain the frequency** of use
 3. **Identify key information** to capture
 4. **Consider Memento integration** needs
 
 ### Contributing Improvements
+
 - **File issues** for template problems
 - **Suggest enhancements** with specific use cases
 - **Share successful customizations**

@@ -5,6 +5,7 @@ Welcome to the HexTrackr project management system! This directory contains all 
 ## 🎯 Overview
 
 HexTrackr uses a sophisticated project management approach that combines:
+
 - **Specification-driven development** with `spec:XXX` identifiers
 - **Memento MCP knowledge graph** for session memory and handoffs
 - **Structured templates** for consistent documentation
@@ -32,6 +33,7 @@ planning/
 ### Setting Up a New Sprint
 
 1. **Copy the sprint planning template:**
+
    ```bash
    cp templates/sprint-planning-template.md sprint-X-planning.md
    ```
@@ -43,6 +45,7 @@ planning/
    - Risk assessment
 
 3. **Create Memento entries for tracking:**
+
    ```javascript
    // Use Claude Desktop's Memento integration
    mcp__memento__create_entities([{
@@ -55,12 +58,14 @@ planning/
 ### Creating Feature Specifications
 
 1. **Get the next spec number:**
+
    ```bash
    # Check existing specs to find next available number
    find . -name "*.md" -exec grep -l "spec:" {} \; | sort
    ```
 
 2. **Copy and customize the template:**
+
    ```bash
    cp templates/feature-spec-template.md spec-XXX-feature-name.md
    ```
@@ -73,6 +78,7 @@ planning/
 ### Managing Session Handoffs
 
 1. **Before ending your session:**
+
    ```bash
    cp templates/session-handoff-template.md handoff-[YYYYMMDD]-[HHMMSS].md
    ```
@@ -84,6 +90,7 @@ planning/
    - Testing status
 
 3. **Create Memento handoff entity:**
+
    ```javascript
    // Essential for AI project manager continuity
    mcp__memento__create_entities([{
@@ -95,40 +102,50 @@ planning/
 ## 📋 Template Usage Guide
 
 ### Sprint Planning Template
+
 **When to use:** Beginning of each sprint, sprint planning meetings
-**Key sections:** 
+**Key sections:**
+
 - Sprint backlog with priorities
 - Risk assessment and mitigation
 - Definition of done criteria
 - Memento tagging strategy
 
 ### Feature Specification Template  
+
 **When to use:** Before starting any significant feature work
 **Key sections:**
+
 - Problem statement and success criteria
 - Technical design and implementation plan
 - Testing strategy and security considerations
 - Deployment and rollback plans
 
 ### Session Handoff Template
+
 **When to use:** End of every development session
 **Key sections:**
+
 - Current state and work in progress
 - Immediate next steps with priorities
 - Technical context and known issues
 - Testing and environment notes
 
 ### Retrospective Template
+
 **When to use:** End of sprints, major milestones, project phases
 **Key sections:**
+
 - What went well and what could improve
 - Action items with owners and dates
 - Experiments to try next sprint
 - Lessons learned for future work
 
 ### Release Notes Template
+
 **When to use:** Before every version release
 **Key sections:**
+
 - User-facing changes and benefits
 - Breaking changes and migration guides
 - Technical changes and dependencies
@@ -137,6 +154,7 @@ planning/
 ## 🏷️ Tagging Strategy
 
 ### Required Tags (Every Entity)
+
 ```
 project:hextrackr           # Project identification
 spec:XXX                   # Specification reference (if applicable)  
@@ -146,6 +164,7 @@ week-XX-YYYY              # Temporal tracking
 ```
 
 ### Category Tags
+
 - `frontend` - UI/UX, client-side JavaScript, CSS
 - `backend` - Server, API, business logic
 - `database` - Schema, queries, migrations
@@ -154,6 +173,7 @@ week-XX-YYYY              # Temporal tracking
 - `infrastructure` - Docker, deployment, CI/CD
 
 ### Impact Tags
+
 - `breaking-change` - Backwards incompatible changes
 - `critical-bug` - System-breaking issues
 - `enhancement` - Improvements to existing features
@@ -162,6 +182,7 @@ week-XX-YYYY              # Temporal tracking
 - `security-fix` - Security patches
 
 ### Learning Tags
+
 - `lesson-learned` - Mistakes to avoid
 - `pattern` - Repeatable solutions
 - `breakthrough` - Major discoveries
@@ -171,6 +192,7 @@ week-XX-YYYY              # Temporal tracking
 ## 🔍 Search & Discovery
 
 ### Finding Relevant Work
+
 ```javascript
 // Search for current sprint work
 mcp__memento__search_nodes({
@@ -193,6 +215,7 @@ mcp__memento__search_nodes({
 ```
 
 ### Common Search Patterns
+
 - **Current work:** `"in-progress week-XX-2025"`
 - **Blocked items:** `"blocked project:hextrackr"`
 - **Completed features:** `"completed feature vX.X.X"`
@@ -202,6 +225,7 @@ mcp__memento__search_nodes({
 ## 🤖 AI Project Manager Integration
 
 ### Claude Desktop Workflow
+
 1. **Session Start:**
    - Claude searches Memento for recent work
    - Reviews relevant specifications and handoffs
@@ -218,6 +242,7 @@ mcp__memento__search_nodes({
    - Prepares context for next session
 
 ### Effective AI Collaboration
+
 ```markdown
 # Example prompt for Claude Desktop:
 "I'm starting work on spec:025 for the ticket filter feature. 
@@ -229,16 +254,19 @@ Create a handoff when we're done."
 ## 🔄 Process Workflows
 
 ### Specification Workflow
+
 ```
 spec:draft → Review & Refine → spec:active → Implementation → Testing → spec:complete
 ```
 
 ### Sprint Workflow
+
 ```
 Planning → Daily Standups → Development → Review → Retrospective → Next Sprint
 ```
 
 ### Release Workflow
+
 ```
 Feature Complete → Testing → Release Notes → Deployment → Monitoring → Post-Release Review
 ```
@@ -246,6 +274,7 @@ Feature Complete → Testing → Release Notes → Deployment → Monitoring →
 ## 📊 Project Metrics
 
 ### Track These KPIs
+
 - **Sprint Velocity:** Story points or hours completed per sprint
 - **Specification Completion Rate:** % of specs completed on time
 - **Quality Metrics:** Bug count, test coverage, rework time
@@ -253,6 +282,7 @@ Feature Complete → Testing → Release Notes → Deployment → Monitoring →
 - **AI Effectiveness:** Time saved with AI assistance
 
 ### Weekly Reviews
+
 - **Monday:** Sprint planning and goal setting
 - **Wednesday:** Mid-sprint checkpoint and blockers
 - **Friday:** Session handoffs and week retrospective
@@ -260,18 +290,21 @@ Feature Complete → Testing → Release Notes → Deployment → Monitoring →
 ## 🎓 Best Practices
 
 ### Documentation Excellence
+
 - **Write for your future self:** Assume you'll forget context
 - **Be specific:** Include exact commands, file paths, error messages
 - **Link everything:** Connect specifications, sessions, and decisions
 - **Update promptly:** Document decisions when they're made
 
 ### AI Collaboration
+
 - **Provide context:** Share relevant specifications and recent work
 - **Ask specific questions:** "How should I implement X in Y context?"
 - **Request handoffs:** Always end sessions with handoff documentation
 - **Review AI suggestions:** AI is assistant, human makes final decisions
 
 ### Knowledge Management
+
 - **Tag consistently:** Follow the taxonomy religiously
 - **Search before creating:** Avoid duplicate work and learning
 - **Share insights:** Mark useful patterns as `reusable`
@@ -280,12 +313,14 @@ Feature Complete → Testing → Release Notes → Deployment → Monitoring →
 ## 🛠️ Tools & Integrations
 
 ### Required Tools
+
 - **Claude Desktop** - AI project manager and coding assistant
 - **Memento MCP** - Knowledge graph and session memory
 - **Git** - Version control and change tracking
 - **VS Code/Cursor** - Development environment
 
 ### Optional Tools
+
 - **GitHub Projects** - Visual project tracking
 - **Linear** - Issue and bug tracking  
 - **Slack** - Team communication
@@ -296,21 +331,25 @@ Feature Complete → Testing → Release Notes → Deployment → Monitoring →
 ### Common Issues
 
 **"I can't find my previous work"**
+
 - Search Memento with broader terms
 - Check different tag combinations
 - Look for handoff entities from recent sessions
 
 **"The AI doesn't understand my context"**
+
 - Provide recent handoff documents
 - Reference specific spec numbers
 - Include relevant tag searches
 
 **"Templates feel too heavyweight"**
+
 - Use only relevant sections
 - Adapt templates to your workflow
 - Focus on Memento integration over perfect formatting
 
 ### Getting Help
+
 - **Documentation:** Check this README and template comments
 - **Search:** Look for similar issues in Memento
 - **Ask AI:** Claude Desktop can help troubleshoot workflows
@@ -318,15 +357,18 @@ Feature Complete → Testing → Release Notes → Deployment → Monitoring →
 ## 🔄 Template Updates
 
 ### Version History
+
 - **v1.0** (Current) - Initial template set with Memento integration
 
 ### Updating Templates
+
 1. **Test changes** in a feature branch
 2. **Update version numbers** in template headers
 3. **Document changes** in this README
 4. **Create Memento entries** for template evolution
 
 ### Contributing Improvements
+
 - **File issues** for template problems
 - **Suggest enhancements** based on usage
 - **Share patterns** that work well in practice

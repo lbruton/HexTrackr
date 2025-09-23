@@ -36,6 +36,7 @@ echo "Your prompt" | codex exec -
 ## Execution Modes
 
 ### Sandbox Options
+
 ```bash
 # Read-only (default, safest)
 codex -s read-only exec "Analyze code" -
@@ -48,6 +49,7 @@ codex -s full exec "Complete system access" -
 ```
 
 ### Model Selection
+
 ```bash
 # Use GPT-5-Codex (default)
 codex -m gpt-5-codex exec "Generate code" -
@@ -62,6 +64,7 @@ codex --oss exec "Local model task" -
 ## Code Generation Commands
 
 ### Function Generation
+
 ```bash
 # Generate a specific function
 echo "Create a TypeScript function that validates credit card numbers using Luhn algorithm" | codex exec -
@@ -74,6 +77,7 @@ cat requirements.txt | codex exec "Generate Python code that implements these re
 ```
 
 ### Class Generation
+
 ```bash
 # Generate a class
 echo "Create a JavaScript class for managing WebSocket connections with auto-reconnect and event handling" | codex exec -
@@ -86,6 +90,7 @@ cat interface.ts | codex exec "Generate a class that implements this interface w
 ```
 
 ### Test Generation
+
 ```bash
 # Generate Jest tests
 cat app/services/vulnerabilityService.js | codex exec "Generate comprehensive Jest tests with mocks and edge cases" -
@@ -100,6 +105,7 @@ cat api-spec.yaml | codex exec "Generate integration tests for these API endpoin
 ## Code Refactoring Commands
 
 ### Modernization
+
 ```bash
 # ES6+ conversion
 cat old-code.js | codex exec "Refactor to modern ES6+ with async/await, destructuring, and arrow functions" -
@@ -112,6 +118,7 @@ cat class-component.jsx | codex exec "Convert this React class component to func
 ```
 
 ### Performance Optimization
+
 ```bash
 # Algorithm optimization
 cat slow-function.js | codex exec "Optimize this algorithm for better time complexity" -
@@ -124,6 +131,7 @@ cat memory-heavy.js | codex exec "Refactor to reduce memory usage and prevent le
 ```
 
 ### Code Cleanup
+
 ```bash
 # Remove duplication
 cat module.js | codex exec "Identify and refactor duplicate code into reusable functions" -
@@ -138,6 +146,7 @@ cat large-function.js | codex exec "Break this into smaller, focused functions" 
 ## Bug Fixing Commands
 
 ### Debug Analysis
+
 ```bash
 # Analyze error
 echo "Error: Cannot read property 'map' of undefined at line 45" | codex exec "Debug and fix this error" -
@@ -150,6 +159,7 @@ cat code.js | codex exec "Identify potential memory leaks and fix them" -
 ```
 
 ### Security Fixes
+
 ```bash
 # Security audit
 cat api-endpoint.js | codex exec "Identify and fix security vulnerabilities" -
@@ -164,6 +174,7 @@ cat frontend-code.js | codex exec "Add XSS protection to user inputs" -
 ## Code Review Commands
 
 ### Quality Review
+
 ```bash
 # General review
 cat changes.diff | codex exec "Review these changes for code quality issues" -
@@ -176,6 +187,7 @@ cat structure.txt | codex exec "Review this architecture for scalability issues"
 ```
 
 ### Security Review
+
 ```bash
 # Security focused review
 cat new-feature.js | codex exec "Security review focusing on OWASP top 10" -
@@ -190,6 +202,7 @@ cat data-processor.js | codex exec "Review data handling for privacy and securit
 ## Documentation Generation
 
 ### Code Documentation
+
 ```bash
 # Generate JSDoc
 cat module.js | codex exec "Add comprehensive JSDoc comments" -
@@ -202,6 +215,7 @@ cat routes.js | codex exec "Generate OpenAPI/Swagger documentation" -
 ```
 
 ### Usage Examples
+
 ```bash
 # Generate examples
 cat library.js | codex exec "Generate usage examples for all exported functions" -
@@ -216,6 +230,7 @@ echo "Old version: 1.0, New version: 2.0" | codex exec "Generate a migration gui
 ## HexTrackr-Specific Commands
 
 ### Vulnerability Management
+
 ```bash
 # Analyze vulnerability processing
 cat app/services/vulnerabilityService.js | codex exec "Suggest performance improvements for vulnerability processing" -
@@ -228,6 +243,7 @@ cat app/services/vulnerabilityStatsService.js | codex exec "Optimize VPR score c
 ```
 
 ### Import Pipeline
+
 ```bash
 # Optimize CSV processing
 cat app/services/importService.js | codex exec "Optimize CSV import for 100MB+ files" -
@@ -240,6 +256,7 @@ cat app/controllers/importController.js | codex exec "Improve error handling and
 ```
 
 ### Database Operations
+
 ```bash
 # Query optimization
 cat database-queries.sql | codex exec "Optimize these SQLite queries for large datasets" -
@@ -252,6 +269,7 @@ cat schema.sql | codex exec "Recommend indexes for better query performance" -
 ```
 
 ### Frontend Enhancements
+
 ```bash
 # Chart improvements
 cat app/public/scripts/utils/chart-theme-adapter.js | codex exec "Add new chart type for vulnerability trends" -
@@ -266,6 +284,7 @@ cat app/public/scripts/shared/theme-controller.js | codex exec "Add high contras
 ## Advanced Patterns
 
 ### Multi-File Analysis
+
 ```bash
 # Combine multiple files
 cat file1.js file2.js | codex exec "Analyze relationships and suggest refactoring" -
@@ -278,6 +297,7 @@ cat package.json yarn.lock | codex exec "Analyze and optimize dependencies" -
 ```
 
 ### Code Transformation
+
 ```bash
 # API versioning
 cat api-v1.js | codex exec "Transform to support v1 and v2 simultaneously" -
@@ -290,6 +310,7 @@ cat mongoose-models.js | codex exec "Convert from MongoDB to PostgreSQL" -
 ```
 
 ### Architecture Tasks
+
 ```bash
 # Microservices extraction
 cat monolith.js | codex exec "Identify and extract microservices" -
@@ -304,6 +325,7 @@ cat data-service.js | codex exec "Add Redis caching layer" -
 ## Integration with Other Tools
 
 ### With Git
+
 ```bash
 # Pre-commit review
 git diff --cached | codex exec "Review staged changes for issues" -
@@ -316,6 +338,7 @@ git diff main..feature | codex exec "Generate pull request description" -
 ```
 
 ### With Testing
+
 ```bash
 # Test coverage analysis
 cat coverage.json | codex exec "Identify untested code paths" -
@@ -328,6 +351,7 @@ cat snapshot-diff.txt | codex exec "Review Jest snapshot changes" -
 ```
 
 ### With Documentation
+
 ```bash
 # Sync code and docs
 echo "Code: $(cat module.js) Docs: $(cat module.md)" | codex exec "Update docs to match code" -
@@ -342,6 +366,7 @@ cat openapi.yaml | codex exec "Generate code examples for each endpoint" -
 ## Workflow Integration
 
 ### Development Workflow
+
 ```bash
 # Feature implementation
 echo "Feature: Add dark mode toggle to settings" | codex exec "Generate implementation plan and code" -
@@ -354,6 +379,7 @@ git diff | codex exec "Self-review and fix obvious issues" -
 ```
 
 ### CI/CD Integration
+
 ```bash
 # Build optimization
 cat build-log.txt | codex exec "Analyze and optimize build process" -
@@ -368,18 +394,21 @@ cat deployment.yaml | codex exec "Generate deployment verification checklist" -
 ## Best Practices
 
 ### Effective Prompting
+
 1. **Be Specific**: Include language, framework, and requirements
 2. **Provide Context**: Include relevant code or specifications
 3. **Set Constraints**: Specify performance, security, or style requirements
 4. **Request Format**: Specify output format (code, markdown, JSON, etc.)
 
 ### Safety Considerations
+
 1. **Use Read-Only Mode**: Default for analysis tasks
 2. **Review Output**: Always review generated code before execution
 3. **Test Generated Code**: Run tests on generated code
 4. **Version Control**: Commit before applying major changes
 
 ### Performance Tips
+
 1. **Batch Operations**: Process multiple files together
 2. **Use Piping**: More efficient than interactive mode
 3. **Cache Results**: Save outputs for reuse
@@ -388,14 +417,17 @@ cat deployment.yaml | codex exec "Generate deployment verification checklist" -
 ## Comparison with Other Tools
 
 ### Codex vs Gemini CLI
+
 - **Codex**: Better for code generation, transformation, fixing
 - **Gemini**: Better for large-scale analysis (1M tokens)
 
 ### Codex vs Claude
+
 - **Codex**: Specialized for code, faster for specific tasks
 - **Claude**: Better for complex reasoning, documentation
 
 ### When to Use Codex
+
 - Code generation from specifications
 - Refactoring and modernization
 - Bug fixing and debugging

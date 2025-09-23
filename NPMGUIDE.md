@@ -5,6 +5,7 @@ This guide provides a comprehensive overview of all npm scripts available in the
 **📝 Last Updated**: 2025-09-22 - Removed testing infrastructure and cleaned up broken script references
 
 ## Table of Contents
+
 - [Development](#development)
 - [Documentation](#documentation)
 - [Linting & Code Quality](#linting--code-quality)
@@ -17,12 +18,14 @@ This guide provides a comprehensive overview of all npm scripts available in the
 ## Development
 
 ### `npm start`
+
 - **Purpose**: Starts the HexTrackr application server
 - **Command**: `node app/public/server.js`
 - **When to use**: Starting the application locally (though Docker is preferred)
 - **Note**: Always prefer `docker-compose up` instead of running locally
 
 ### `npm run dev`
+
 - **Purpose**: Starts the application in development mode with auto-reload
 - **Command**: `nodemon app/public/server.js`
 - **When to use**: During active development when you need hot-reloading
@@ -35,12 +38,14 @@ This guide provides a comprehensive overview of all npm scripts available in the
 ### Core Documentation Scripts
 
 #### `npm run docs:generate`
+
 - **Purpose**: Converts markdown documentation to HTML for the portal
 - **Command**: `node app/public/docs-html/html-content-updater.js`
 - **When to use**: After editing any markdown files in `app/public/docs-source/`
 - **Output**: HTML files in `app/public/docs-html/`
 
 #### `npm run docs:pipeline` 🆕
+
 - **Purpose**: Runs the unified documentation pipeline (JSDoc extraction + markdown generation)
 - **Command**: `node app/public/scripts/unified-docs-pipeline.js`
 - **When to use**: To extract JSDoc comments and generate API documentation
@@ -48,14 +53,15 @@ This guide provides a comprehensive overview of all npm scripts available in the
 
 ### Combination Scripts
 
-
 #### `npm run docs:sync` 🆕
+
 - **Purpose**: Syncs JSDoc to markdown AND generates HTML
 - **Command**: `npm run docs:jsdoc-md && npm run docs:generate`
 - **When to use**: Complete JSDoc to HTML pipeline
 - **Note**: Runs pipeline then HTML generation
 
 #### `npm run docs:full` 🆕
+
 - **Purpose**: Complete documentation regeneration with architecture analysis
 - **Command**: `npm run docs:pipeline && npm run docs:analyze`
 - **When to use**: Major documentation updates or releases
@@ -64,6 +70,7 @@ This guide provides a comprehensive overview of all npm scripts available in the
 ### Specialized Documentation
 
 #### `npm run docs:jsdoc` 🆕
+
 - **Purpose**: Generates JSDoc HTML documentation
 - **Command**: `npx jsdoc -c jsdoc.config.json`
 - **When to use**: To generate standalone JSDoc HTML docs
@@ -71,11 +78,10 @@ This guide provides a comprehensive overview of all npm scripts available in the
 - **Note**: Currently has dependency issues (tslib)
 
 #### `npm run docs:jsdoc-md` 🆕
+
 - **Purpose**: Alias for docs:pipeline
 - **Command**: `node app/public/scripts/unified-docs-pipeline.js`
 - **Note**: Redundant with `docs:pipeline`
-
-
 
 ---
 
@@ -84,12 +90,14 @@ This guide provides a comprehensive overview of all npm scripts available in the
 ### JavaScript Linting
 
 #### `npm run eslint`
+
 - **Purpose**: Checks JavaScript files for ESLint violations
 - **Command**: `eslint '**/*.js' --ignore-pattern '**/*.min.js' --config eslint.config.mjs`
 - **When to use**: Before commits to check code quality
 - **Note**: Ignores minified files
 
 #### `npm run eslint:fix`
+
 - **Purpose**: Auto-fixes ESLint violations where possible
 - **Command**: `eslint '**/*.js' --ignore-pattern '**/*.min.js' --config eslint.config.mjs --fix`
 - **When to use**: To automatically fix formatting and simple issues
@@ -98,12 +106,14 @@ This guide provides a comprehensive overview of all npm scripts available in the
 ### CSS Linting
 
 #### `npm run stylelint`
+
 - **Purpose**: Checks CSS files for style violations
 - **Command**: `stylelint '**/*.css'`
 - **When to use**: Before commits to ensure CSS consistency
 - **Config**: Uses `.stylelintrc.json`
 
 #### `npm run stylelint:fix`
+
 - **Purpose**: Auto-fixes CSS style violations
 - **Command**: `stylelint '**/*.css' --fix`
 - **When to use**: To automatically fix CSS formatting
@@ -112,12 +122,14 @@ This guide provides a comprehensive overview of all npm scripts available in the
 ### Markdown Linting
 
 #### `npm run lint:md`
+
 - **Purpose**: Checks markdown files for formatting issues
 - **Command**: `markdownlint --config .markdownlint.json --ignore-path .markdownlintignore '**/*.md'`
 - **When to use**: Before documentation updates
 - **Config**: Uses `.markdownlint.json`
 
 #### `npm run lint:md:fix`
+
 - **Purpose**: Auto-fixes markdown formatting issues
 - **Command**: `node app/public/scripts/fix-markdown.js`
 - **When to use**: To fix markdown link and formatting issues
@@ -126,12 +138,14 @@ This guide provides a comprehensive overview of all npm scripts available in the
 ### Combined Linting
 
 #### `npm run lint:all`
+
 - **Purpose**: Runs ALL linters (markdown, JavaScript, CSS)
 - **Command**: `npm run lint:md && npm run eslint && npm run stylelint`
 - **When to use**: Comprehensive code quality check
 - **Note**: Fails fast on first error
 
 #### `npm run fix:all`
+
 - **Purpose**: Auto-fixes ALL linting issues
 - **Command**: `npm run lint:md:fix && npm run eslint:fix && npm run stylelint:fix`
 - **When to use**: Quick cleanup of all auto-fixable issues
@@ -139,10 +153,10 @@ This guide provides a comprehensive overview of all npm scripts available in the
 
 ---
 
-
 ## Database & Setup
 
 #### `npm run init-db`
+
 - **Purpose**: Initializes the SQLite database
 - **Command**: `node app/public/scripts/init-database.js`
 - **When to use**: First-time setup or database reset
@@ -154,6 +168,7 @@ This guide provides a comprehensive overview of all npm scripts available in the
 ## Git Hooks
 
 #### `npm run hooks:install`
+
 - **Purpose**: Configures Git to use custom hooks
 - **Command**: `git config core.hooksPath .githooks`
 - **When to use**: After cloning the repository
@@ -165,6 +180,7 @@ This guide provides a comprehensive overview of all npm scripts available in the
 ## Quick Reference
 
 ### Most Used Commands
+
 ```bash
 # Development
 docker-compose up        # Start with Docker (preferred)
@@ -187,6 +203,7 @@ npm run test:stagehand    # AI-powered browser automation tests
 ```
 
 ### Workflow Combinations
+
 ```bash
 # Before committing
 npm run lint:all
@@ -225,6 +242,7 @@ npm run lint:all && npm run docs:all
 ## Testing
 
 ### `npm run test:stagehand` 🆕
+
 - **Purpose**: Runs AI-powered browser automation tests using natural language
 - **Command**: `node tests/stagehand-examples.js`
 - **When to use**: Optional testing with AI automation instead of manual clicking
@@ -236,6 +254,7 @@ npm run lint:all && npm run docs:all
   - Local development without cloud dependencies
 
 **Example Test Scenarios:**
+
 - Ticket creation workflow
 - Vulnerability import process
 - Settings modal functionality
@@ -248,6 +267,7 @@ npm run lint:all && npm run docs:all
 ## Missing/Potential Scripts
 
 Consider adding:
+
 - `precommit`: Combined linting checks
 - `build`: Production build process
 - `clean`: Remove generated files

@@ -25,17 +25,20 @@ The card filtering feature integrates with HexTrackr's existing ticket managemen
 ### Core Components
 
 #### 1. Statistics Cards (UI Layer)
+
 **Location**: `/app/public/tickets2.html` (lines 362-446)
 
 **Responsibility**: User interaction surface for filter selection
 
 **Key Features**:
+
 - Click event handlers
 - Visual feedback (hover, active states)
 - Accessibility attributes (ARIA, keyboard support)
 - Theme-aware styling
 
 **Structure**:
+
 ```html
 <div class="card stats-card"
      data-filter-type="filterType"
@@ -46,11 +49,13 @@ The card filtering feature integrates with HexTrackr's existing ticket managemen
 ```
 
 #### 2. HexagonTicketsManager (Logic Layer)
+
 **Location**: `/app/public/scripts/pages/tickets.js`
 
 **Responsibility**: Filter state management and business logic
 
 **Key Methods**:
+
 - `applyCardFilter(filterType)` - Primary filter application
 - `applyCardFilterLogic(ticket)` - Individual ticket filtering logic
 - `getFilteredTickets()` - Master filter chain processor
@@ -58,11 +63,13 @@ The card filtering feature integrates with HexTrackr's existing ticket managemen
 - `updateStatistics()` - Statistics calculation
 
 #### 3. AG-Grid Integration (View Layer)
+
 **Location**: `/app/public/scripts/pages/tickets-aggrid.js`
 
 **Responsibility**: Grid display and data synchronization
 
 **Integration Points**:
+
 - Uses `getFilteredTickets()` for data source
 - Handles pagination reset on filter changes
 - Manages empty state display
@@ -226,6 +233,7 @@ updateStatistics() {
 ### Optimization Strategies
 
 #### 1. Debounced Filter Operations
+
 ```javascript
 applyCardFilter(filterType) {
     if (this.filterDebounceTimer) {
@@ -239,6 +247,7 @@ applyCardFilter(filterType) {
 ```
 
 #### 2. Filter Result Caching
+
 ```javascript
 getFilteredTickets() {
     const currentFilters = {
@@ -264,6 +273,7 @@ getFilteredTickets() {
 ```
 
 #### 3. Minimal DOM Updates
+
 - Only update changed elements
 - Use `requestAnimationFrame` for visual updates
 - Batch style changes
@@ -293,11 +303,13 @@ applyCardFilter(filterType) {
 ```
 
 ### XSS Prevention
+
 - No user input directly processed
 - All display values escaped through existing mechanisms
 - Filter operations use predefined logic only
 
 ### Data Access Control
+
 - Feature only filters existing ticket data
 - No new data exposure or privilege escalation
 - Maintains existing access control patterns

@@ -580,4 +580,37 @@
     min-height: 320px; /* Reduced from 380px */
 }
 
+/* KEV badge positioning and styling */
+.vulnerability-card .kev-indicator {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    cursor: pointer;
+}
 
+.vulnerability-card .kev-indicator:focus-visible {
+    outline: 2px solid var(--hextrackr-primary);
+    outline-offset: 2px;
+}
+
+.kev-badge {
+    background: #dc2626;
+    color: #ffffff;
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+[data-bs-theme="dark"] .kev-badge {
+    background: rgba(239, 68, 68, 0.9);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+}
