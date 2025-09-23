@@ -7,6 +7,7 @@
 ## Sprint Backlog
 
 ### High Priority (Must Complete)
+
 - [ ] **[Feature/Bug]** - [Description]
   - **Specification:** `spec:XXX`
   - **Estimate:** [X hours/days]
@@ -14,6 +15,7 @@
   - **Dependencies:** [List any blockers]
 
 ### Medium Priority (Should Complete)
+
 - [ ] **[Feature/Bug]** - [Description]
   - **Specification:** `spec:XXX`
   - **Estimate:** [X hours/days]
@@ -21,6 +23,7 @@
   - **Dependencies:** [List any blockers]
 
 ### Low Priority (Nice to Have)
+
 - [ ] **[Feature/Bug]** - [Description]
   - **Specification:** `spec:XXX`
   - **Estimate:** [X hours/days]
@@ -28,6 +31,7 @@
   - **Dependencies:** [List any blockers]
 
 ## Technical Debt Items
+
 - [ ] **[Tech Debt]** - [Description]
   - **Impact:** [High/Medium/Low]
   - **Effort:** [X hours/days]
@@ -35,12 +39,14 @@
 ## Sprint Risks & Mitigation
 
 ### Identified Risks
+
 1. **[Risk Description]**
    - **Probability:** [High/Medium/Low]
    - **Impact:** [High/Medium/Low]
    - **Mitigation:** [Strategy to address]
 
 ### Dependencies
+
 - **External:** [Third-party dependencies, APIs, etc.]
 - **Internal:** [Other team dependencies]
 - **Technical:** [Infrastructure, tools, etc.]
@@ -60,16 +66,19 @@
 ## Sprint Ceremonies
 
 ### Daily Standup Format
+
 - **What did you complete yesterday?**
 - **What will you work on today?**
 - **Any blockers or impediments?**
 
 ### Sprint Review
+
 - **Date:** [Date]
 - **Attendees:** [List participants]
 - **Demo Items:** [Features to demonstrate]
 
 ### Sprint Retrospective
+
 - **Date:** [Date]
 - **Format:** [Mad/Sad/Glad, Start/Stop/Continue, etc.]
 
