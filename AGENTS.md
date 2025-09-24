@@ -1,14 +1,17 @@
 # AGENTS.md - HexTrackr AI Agent Quick Guide
 
-## 🚨 CRITICAL: Development Workflow
+## 🚨 CRITICAL: Three-Mode Development Workflow
 
-### NEVER code without a plan! Follow this workflow:
-1. **Create Linear Issue** → 2. **Create SESSION_PLAN.md** → 3. **Research** → 4. **Implement** → 5. **Test** → 6. **Document**
+When user says **"Hey Claude, we need to fix X"**, respond:
+1. **"Let me enter PLANNING_MODE"** → Create Linear issue with breakdown
+2. **"Let me enter RESEARCH_MODE"** → Investigate and document findings
+3. **"Let me enter IMPLEMENT_MODE"** → Execute phase by phase
 
-### For detailed workflow see:
-- **Full Workflow**: `/dev-docs/planning/HEXTRACKR_LINEAR_WORKFLOW.md`
-- **Quick Reference**: `/dev-docs/planning/QUICK_REFERENCE.md`
-- **Agent Handoff**: `/dev-docs/planning/AGENT_HANDOFF_PROTOCOL.md`
+### Workflow Instructions:
+- **Main Guide**: `/dev-docs/planning/README.md`
+- **Planning Mode**: `/dev-docs/planning/modes/PLANNING_MODE.md`
+- **Research Mode**: `/dev-docs/planning/modes/RESEARCH_MODE.md`
+- **Implement Mode**: `/dev-docs/planning/modes/IMPLEMENT_MODE.md`
 
 ## 🎯 Starting New Work
 
@@ -142,7 +145,7 @@ cat /dev-docs/planning/active/*/SESSION_PLAN.md | head -100
 ## 📁 Project Structure Quick Reference
 
 ### Planning & Documentation
-```
+```text
 /dev-docs/planning/
 ├── templates/          # SESSION_PLAN.md, BUG_REPORT.md, FEATURE_REQUEST.md
 ├── active/            # Current work in progress
@@ -150,7 +153,7 @@ cat /dev-docs/planning/active/*/SESSION_PLAN.md | head -100
 ```
 
 ### Application Code
-```
+```text
 /app/
 ├── controllers/       # Route handlers
 ├── services/         # Business logic
