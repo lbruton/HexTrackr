@@ -192,11 +192,11 @@ class BackupService {
 
             // Calculate total record counts for logging
             const totalVulnRecords = Object.keys(vulnerabilityData)
-                .filter(key => key !== 'type' && key !== 'exported_at')
+                .filter(key => key !== "type" && key !== "exported_at")
                 .reduce((sum, key) => sum + (vulnerabilityData[key]?.count || 0), 0);
 
             const totalTicketRecords = Object.keys(ticketData)
-                .filter(key => key !== 'type' && key !== 'exported_at')
+                .filter(key => key !== "type" && key !== "exported_at")
                 .reduce((sum, key) => sum + (ticketData[key]?.count || 0), 0);
 
             console.log(`✅ Backup complete: ${totalVulnRecords} vulnerability records, ${totalTicketRecords} ticket/template records`);
@@ -550,7 +550,7 @@ class BackupService {
 
             // Add individual tables
             Object.keys(vulnData).forEach(key => {
-                if (key !== 'type' && key !== 'exported_at' && vulnData[key].data) {
+                if (key !== "type" && key !== "exported_at" && vulnData[key].data) {
                     zip.file(`${key}.json`, JSON.stringify(vulnData[key], null, 2));
                 }
             });
@@ -583,7 +583,7 @@ class BackupService {
 
             // Add individual tables
             Object.keys(ticketData).forEach(key => {
-                if (key !== 'type' && key !== 'exported_at' && ticketData[key].data) {
+                if (key !== "type" && key !== "exported_at" && ticketData[key].data) {
                     zip.file(`${key}.json`, JSON.stringify(ticketData[key], null, 2));
                 }
             });
