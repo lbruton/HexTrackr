@@ -4,13 +4,17 @@ services:
       context: .
       dockerfile: Dockerfile.node
     ports:
-      - "8080:8080"
+      - "8989:8080"  # External port 8989 -> Internal port 8080 (prevents test conflicts)
     volumes:
-      # Mount source files for development but exclude node_modules
-      - .:/app
+      # Mount entire application for modular architecture
+      - ./app:/app
       - /app/node_modules
+      # Mount package.json for version info
+      - ./package.json:/app/package.json
       # Mount database for persistence
       - ./data:/app/data
     environment:
       - NODE_ENV=development
+      - HEXTRACKR_VERSION=1.0.22
+      - PORT=8080
     restart: unless-stopped

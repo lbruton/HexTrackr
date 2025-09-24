@@ -1,0 +1,551 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>CSS Customization Guide</h1><p>This guide provides comprehensive information on customizing the HexTrackr interface while maintaining theme consistency and avoiding conflicts with the centralized theme system.</p>
+<h2>Understanding the CSS Architecture</h2><p>HexTrackr uses a <strong>4-layer CSS architecture</strong> designed for maintainability and theme consistency:</p>
+<ol>
+<li><strong>Foundation Layer</strong>: CSS variables and base styles</li>
+<li><strong>Shared Layer</strong>: Reusable component styles</li>
+<li><strong>Page Layer</strong>: Page-specific customizations</li>
+<li><strong>Override Layer</strong>: Component-specific fixes (AG-Grid, third-party)</li>
+</ol>
+<hr>
+<h2>CSS File Organization</h2><h3>📁 `/styles/` Directory Structure</h3><pre><code class="language-">styles/
+├── css-variables.css          # Global CSS variables (theme colors)
+├── ag-grid-overrides.css      # AG-Grid theme fixes
+├── shared/                    # Reusable component styles
+│   ├── base.css              # Core typography and base styles
+│   ├── dark-theme.css        # Dark mode color overrides
+│   ├── light-theme.css       # Light mode color overrides
+│   ├── header.css            # Navigation header
+│   ├── modals.css            # Modal dialogs
+│   ├── cards.css             # Card components
+│   ├── tables.css            # Bootstrap tables
+│   ├── badges.css            # Status badges and pills
+│   ├── animations.css        # CSS animations
+│   └── layouts.css           # Layout and grid system
+├── pages/                     # Page-specific styles
+│   ├── vulnerabilities.css   # Vulnerability dashboard
+│   ├── tickets.css           # Original tickets page
+│   └── tickets2.css          # AG-Grid tickets prototype
+└── utils/                     # Utility styles
+    └── responsive.css         # Media queries and breakpoints</code></pre><hr>
+<h2>Customization Patterns</h2><h3>✅ Recommended Approach: CSS Variables First</h3><p>Always start with CSS variables for consistent theming:</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ✅ GOOD: Use theme variables */</span>
+<span class="hljs-selector-class">.custom-component</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-primary);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--hextrackr-border-color);
+}
+
+<span class="hljs-comment">/* ❌ AVOID: Hardcoded colors break theme switching */</span>
+<span class="hljs-selector-class">.custom-component</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-number">#ffffff</span>;
+  <span class="hljs-attribute">color</span>: <span class="hljs-number">#2d3748</span>;
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-number">#e2e8f0</span>;
+}</code></pre><h3>Available CSS Variables</h3><h4>Core Theme Variables</h4><pre><code class="language-css"><span class="hljs-comment">/* Background Colors */</span>
+<span class="hljs-attr">--hextrackr-bg-primary</span>        <span class="hljs-comment">/* Main page background */</span>
+<span class="hljs-attr">--hextrackr-bg-secondary</span>      <span class="hljs-comment">/* Secondary background */</span>
+<span class="hljs-attr">--hextrackr-surface-base</span>      <span class="hljs-comment">/* Card/modal background */</span>
+
+<span class="hljs-comment">/* Text Colors */</span>
+<span class="hljs-attr">--hextrackr-text-primary</span>      <span class="hljs-comment">/* Main text color */</span>
+<span class="hljs-attr">--hextrackr-text-secondary</span>    <span class="hljs-comment">/* Secondary text */</span>
+<span class="hljs-attr">--hextrackr-text-muted</span>        <span class="hljs-comment">/* Muted/disabled text */</span>
+
+<span class="hljs-comment">/* Border Colors */</span>
+<span class="hljs-attr">--hextrackr-border-color</span>      <span class="hljs-comment">/* Standard border color */</span>
+<span class="hljs-attr">--hextrackr-border-light</span>      <span class="hljs-comment">/* Light border variant */</span>
+
+<span class="hljs-comment">/* Interactive Colors */</span>
+<span class="hljs-attr">--hextrackr-link-color</span>        <span class="hljs-comment">/* Standard link color */</span>
+<span class="hljs-attr">--hextrackr-grid-link</span>         <span class="hljs-comment">/* AG-Grid link color */</span></code></pre><h4>VPR Severity Variables</h4><pre><code class="language-css"><span class="hljs-attr">--vpr-critical</span>                <span class="hljs-comment">/* Critical vulnerability color */</span>
+<span class="hljs-attr">--vpr-high</span>                    <span class="hljs-comment">/* High severity color */</span>
+<span class="hljs-attr">--vpr-medium</span>                  <span class="hljs-comment">/* Medium severity color */</span>
+<span class="hljs-attr">--vpr-low</span>                     <span class="hljs-comment">/* Low severity color */</span>
+<span class="hljs-attr">--vpr-info</span>                    <span class="hljs-comment">/* Informational color */</span></code></pre><h4>AG-Grid Specific Variables</h4><pre><code class="language-css"><span class="hljs-attr">--hextrackr-grid-header</span>       <span class="hljs-comment">/* AG-Grid header background */</span>
+<span class="hljs-attr">--hextrackr-grid-chrome</span>       <span class="hljs-comment">/* AG-Grid chrome areas */</span>
+<span class="hljs-attr">--hextrackr-grid-selection</span>    <span class="hljs-comment">/* Selected row background */</span></code></pre><hr>
+<h2>Page-Specific Customizations</h2><h3>Adding Custom Styles to Existing Pages</h3><p><strong>1. Create page-specific CSS file:</strong></p>
+<pre><code class="language-css"><span class="hljs-comment">/* styles/pages/my-custom-page.css */</span>
+<span class="hljs-selector-class">.my-custom-component</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">1rem</span>;
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">0.5rem</span>;
+  <span class="hljs-attribute">margin-bottom</span>: <span class="hljs-number">1rem</span>;
+}
+
+<span class="hljs-selector-class">.my-custom-card</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--hextrackr-border-color);
+  <span class="hljs-attribute">transition</span>: box-shadow <span class="hljs-number">0.2s</span> ease;
+}
+
+<span class="hljs-selector-class">.my-custom-card</span><span class="hljs-selector-pseudo">:hover</span> {
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">4px</span> <span class="hljs-number">8px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.1</span>);
+}</code></pre><p><strong>2. Include in HTML file:</strong></p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;styles/pages/my-custom-page.css&quot;</span>&gt;</span></code></pre><h3>Extending Existing Pages</h3><p><strong>Vulnerabilities page customization:</strong></p>
+<pre><code class="language-css"><span class="hljs-comment">/* styles/pages/vulnerabilities.css - Add to existing file */</span>
+<span class="hljs-selector-class">.vulnerability-dashboard</span> <span class="hljs-selector-class">.custom-section</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">border-left</span>: <span class="hljs-number">4px</span> solid <span class="hljs-built_in">var</span>(--vpr-high);
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">1rem</span>;
+  <span class="hljs-attribute">margin</span>: <span class="hljs-number">1rem</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-selector-class">.custom-severity-indicator</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--vpr-critical);
+  <span class="hljs-attribute">color</span>: white;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">0.25rem</span> <span class="hljs-number">0.5rem</span>;
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">0.25rem</span>;
+  <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.75rem</span>;
+  <span class="hljs-attribute">font-weight</span>: bold;
+  <span class="hljs-attribute">text-transform</span>: uppercase;
+}</code></pre><hr>
+<h2>Component Customization</h2><h3>Creating Theme-Aware Components</h3><p><strong>Basic Card Component:</strong></p>
+<pre><code class="language-css"><span class="hljs-selector-class">.custom-info-card</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--hextrackr-border-color);
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">0.5rem</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">1.5rem</span>;
+  <span class="hljs-attribute">margin-bottom</span>: <span class="hljs-number">1rem</span>;
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">2px</span> <span class="hljs-number">4px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.05</span>);
+  <span class="hljs-attribute">transition</span>: all <span class="hljs-number">0.2s</span> ease;
+}
+
+<span class="hljs-selector-class">.custom-info-card</span><span class="hljs-selector-pseudo">:hover</span> {
+  <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">2px</span>);
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">4px</span> <span class="hljs-number">8px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.1</span>);
+}
+
+<span class="hljs-selector-class">.custom-info-card</span> <span class="hljs-selector-class">.title</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-primary);
+  <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.125rem</span>;
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">600</span>;
+  <span class="hljs-attribute">margin-bottom</span>: <span class="hljs-number">0.5rem</span>;
+}
+
+<span class="hljs-selector-class">.custom-info-card</span> <span class="hljs-selector-class">.description</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-secondary);
+  <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.5</span>;
+}</code></pre><p><strong>Status Badge Component:</strong></p>
+<pre><code class="language-css"><span class="hljs-selector-class">.custom-status-badge</span> {
+  <span class="hljs-attribute">display</span>: inline-flex;
+  <span class="hljs-attribute">align-items</span>: center;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">0.25rem</span> <span class="hljs-number">0.75rem</span>;
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">9999px</span>;
+  <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.75rem</span>;
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">500</span>;
+  <span class="hljs-attribute">text-transform</span>: uppercase;
+  <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.05em</span>;
+}
+
+<span class="hljs-selector-class">.custom-status-badge</span><span class="hljs-selector-class">.success</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--vpr-low);
+  <span class="hljs-attribute">color</span>: white;
+}
+
+<span class="hljs-selector-class">.custom-status-badge</span><span class="hljs-selector-class">.warning</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--vpr-high);
+  <span class="hljs-attribute">color</span>: white;
+}
+
+<span class="hljs-selector-class">.custom-status-badge</span><span class="hljs-selector-class">.danger</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--vpr-critical);
+  <span class="hljs-attribute">color</span>: white;
+}</code></pre><hr>
+<h2>AG-Grid Customizations</h2><h3>Custom Cell Renderers</h3><p>When creating custom cell renderers, always use theme-aware classes:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ✅ GOOD: Theme-aware cell renderer</span>
+<span class="hljs-attr">cellRenderer</span>: <span class="hljs-function">(<span class="hljs-params">params</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> severity = params.<span class="hljs-property">value</span>.<span class="hljs-title function_">toLowerCase</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;span class=&quot;badge severity-<span class="hljs-subst">${severity}</span>&quot;&gt;<span class="hljs-subst">${params.value}</span>&lt;/span&gt;`</span>;
+}
+
+<span class="hljs-comment">// CSS for the badge</span>
+.<span class="hljs-property">severity</span>-critical {
+  <span class="hljs-attr">background</span>: <span class="hljs-title function_">var</span>(--vpr-critical);
+  <span class="hljs-attr">color</span>: white;
+}</code></pre><h3>Custom AG-Grid Column Styling</h3><pre><code class="language-css"><span class="hljs-comment">/* Custom column header styling */</span>
+<span class="hljs-selector-class">.ag-theme-quartz</span> <span class="hljs-selector-class">.ag-header-cell</span><span class="hljs-selector-attr">[col-id=<span class="hljs-string">&quot;custom-column&quot;</span>]</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-grid-header) <span class="hljs-meta">!important</span>;
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">600</span>;
+}
+
+<span class="hljs-comment">/* Custom cell styling */</span>
+<span class="hljs-selector-class">.ag-theme-quartz</span> <span class="hljs-selector-class">.ag-cell</span><span class="hljs-selector-attr">[col-id=<span class="hljs-string">&quot;status&quot;</span>]</span> {
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">0.5rem</span>;
+}
+
+<span class="hljs-selector-class">.ag-theme-quartz</span> <span class="hljs-selector-class">.ag-cell</span><span class="hljs-selector-attr">[col-id=<span class="hljs-string">&quot;status&quot;</span>]</span> <span class="hljs-selector-class">.status-indicator</span> {
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">8px</span>;
+  <span class="hljs-attribute">height</span>: <span class="hljs-number">8px</span>;
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">50%</span>;
+  <span class="hljs-attribute">display</span>: inline-block;
+  <span class="hljs-attribute">margin-right</span>: <span class="hljs-number">0.5rem</span>;
+}</code></pre><hr>
+<h2>Dark Mode Considerations</h2><h3>Ensuring Dark Mode Compatibility</h3><p><strong>1. Always test in both themes:</strong></p>
+<pre><code class="language-css"><span class="hljs-comment">/* This works in both light and dark modes */</span>
+<span class="hljs-selector-class">.custom-component</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-primary);
+}
+
+<span class="hljs-comment">/* Avoid theme-specific styling unless necessary */</span>
+<span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;dark&quot;</span>]</span> <span class="hljs-selector-class">.custom-component</span> {
+  <span class="hljs-comment">/* Only add if the component needs dark-mode specific tweaks */</span>
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">2px</span> <span class="hljs-number">4px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">255</span>, <span class="hljs-number">255</span>, <span class="hljs-number">255</span>, <span class="hljs-number">0.05</span>);
+}</code></pre><p><strong>2. Handle transparency carefully:</strong></p>
+<pre><code class="language-css"><span class="hljs-selector-class">.custom-overlay</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.5</span>); <span class="hljs-comment">/* Works in light mode */</span>
+}
+
+<span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;dark&quot;</span>]</span> <span class="hljs-selector-class">.custom-overlay</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.7</span>); <span class="hljs-comment">/* Adjust for dark mode visibility */</span>
+}</code></pre><p><strong>3. Use semantic color variables:</strong></p>
+<pre><code class="language-css"><span class="hljs-selector-class">.success-message</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--vpr-low);   <span class="hljs-comment">/* Auto-adjusts for theme */</span>
+  <span class="hljs-attribute">color</span>: white;                 <span class="hljs-comment">/* Safe in both themes */</span>
+}</code></pre><hr>
+<h2>Animation and Interaction</h2><h3>CSS Animations</h3><p><strong>Loading Animations:</strong></p>
+<pre><code class="language-css"><span class="hljs-keyword">@keyframes</span> customPulse {
+  <span class="hljs-number">0%</span>, <span class="hljs-number">100%</span> { <span class="hljs-attribute">opacity</span>: <span class="hljs-number">1</span>; }
+  <span class="hljs-number">50%</span> { <span class="hljs-attribute">opacity</span>: <span class="hljs-number">0.5</span>; }
+}
+
+<span class="hljs-selector-class">.custom-loading</span> {
+  <span class="hljs-attribute">animation</span>: customPulse <span class="hljs-number">2s</span> infinite;
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+}</code></pre><p><strong>Hover Effects:</strong></p>
+<pre><code class="language-css"><span class="hljs-selector-class">.custom-interactive</span> {
+  <span class="hljs-attribute">transition</span>: all <span class="hljs-number">0.2s</span> ease;
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--hextrackr-border-color);
+}
+
+<span class="hljs-selector-class">.custom-interactive</span><span class="hljs-selector-pseudo">:hover</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-bg-secondary);
+  <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">1px</span>);
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">4px</span> <span class="hljs-number">8px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.1</span>);
+}</code></pre><hr>
+<h2>Responsive Design</h2><h3>Mobile-First Approach</h3><pre><code class="language-css"><span class="hljs-comment">/* Mobile-first base styles */</span>
+<span class="hljs-selector-class">.custom-grid</span> {
+  <span class="hljs-attribute">display</span>: grid;
+  <span class="hljs-attribute">grid-template-columns</span>: <span class="hljs-number">1</span>fr;
+  <span class="hljs-attribute">gap</span>: <span class="hljs-number">1rem</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">1rem</span>;
+}
+
+<span class="hljs-comment">/* Tablet and up */</span>
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width</span>: <span class="hljs-number">768px</span>) {
+  <span class="hljs-selector-class">.custom-grid</span> {
+    <span class="hljs-attribute">grid-template-columns</span>: <span class="hljs-built_in">repeat</span>(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>fr);
+    <span class="hljs-attribute">padding</span>: <span class="hljs-number">1.5rem</span>;
+  }
+}
+
+<span class="hljs-comment">/* Desktop and up */</span>
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width</span>: <span class="hljs-number">1024px</span>) {
+  <span class="hljs-selector-class">.custom-grid</span> {
+    <span class="hljs-attribute">grid-template-columns</span>: <span class="hljs-built_in">repeat</span>(<span class="hljs-number">3</span>, <span class="hljs-number">1</span>fr);
+    <span class="hljs-attribute">padding</span>: <span class="hljs-number">2rem</span>;
+  }
+}</code></pre><h3>Responsive Typography</h3><pre><code class="language-css"><span class="hljs-selector-class">.custom-title</span> {
+  <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.25rem</span>;
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-primary);
+  <span class="hljs-attribute">margin-bottom</span>: <span class="hljs-number">1rem</span>;
+}
+
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width</span>: <span class="hljs-number">768px</span>) {
+  <span class="hljs-selector-class">.custom-title</span> {
+    <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.5rem</span>;
+  }
+}
+
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width</span>: <span class="hljs-number">1024px</span>) {
+  <span class="hljs-selector-class">.custom-title</span> {
+    <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.75rem</span>;
+  }
+}</code></pre><hr>
+<h2>Common Customization Patterns</h2><h3>1. Custom Dashboard Widgets</h3><pre><code class="language-css"><span class="hljs-selector-class">.dashboard-widget</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--hextrackr-border-color);
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">0.75rem</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">1.5rem</span>;
+  <span class="hljs-attribute">margin-bottom</span>: <span class="hljs-number">1.5rem</span>;
+  <span class="hljs-attribute">position</span>: relative;
+  <span class="hljs-attribute">overflow</span>: hidden;
+}
+
+<span class="hljs-selector-class">.dashboard-widget</span><span class="hljs-selector-pseudo">::before</span> {
+  <span class="hljs-attribute">content</span>: <span class="hljs-string">&#x27;&#x27;</span>;
+  <span class="hljs-attribute">position</span>: absolute;
+  <span class="hljs-attribute">top</span>: <span class="hljs-number">0</span>;
+  <span class="hljs-attribute">left</span>: <span class="hljs-number">0</span>;
+  <span class="hljs-attribute">right</span>: <span class="hljs-number">0</span>;
+  <span class="hljs-attribute">height</span>: <span class="hljs-number">4px</span>;
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">linear-gradient</span>(<span class="hljs-number">90deg</span>, <span class="hljs-built_in">var</span>(--vpr-low), <span class="hljs-built_in">var</span>(--vpr-high));
+}
+
+<span class="hljs-selector-class">.widget-title</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-primary);
+  <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.125rem</span>;
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">600</span>;
+  <span class="hljs-attribute">margin-bottom</span>: <span class="hljs-number">1rem</span>;
+}
+
+<span class="hljs-selector-class">.widget-content</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-secondary);
+}</code></pre><h3>2. Custom Form Styling</h3><pre><code class="language-css"><span class="hljs-selector-class">.custom-form-group</span> {
+  <span class="hljs-attribute">margin-bottom</span>: <span class="hljs-number">1.5rem</span>;
+}
+
+<span class="hljs-selector-class">.custom-label</span> {
+  <span class="hljs-attribute">display</span>: block;
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-primary);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">500</span>;
+  <span class="hljs-attribute">margin-bottom</span>: <span class="hljs-number">0.5rem</span>;
+}
+
+<span class="hljs-selector-class">.custom-input</span> {
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">0.75rem</span>;
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--hextrackr-border-color);
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-primary);
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">0.375rem</span>;
+  <span class="hljs-attribute">transition</span>: border-color <span class="hljs-number">0.2s</span> ease;
+}
+
+<span class="hljs-selector-class">.custom-input</span><span class="hljs-selector-pseudo">:focus</span> {
+  <span class="hljs-attribute">outline</span>: none;
+  <span class="hljs-attribute">border-color</span>: <span class="hljs-built_in">var</span>(--hextrackr-link-color);
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">3px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">59</span>, <span class="hljs-number">130</span>, <span class="hljs-number">246</span>, <span class="hljs-number">0.1</span>);
+}</code></pre><h3>3. Custom Navigation Elements</h3><pre><code class="language-css"><span class="hljs-selector-class">.custom-nav-item</span> {
+  <span class="hljs-attribute">display</span>: inline-flex;
+  <span class="hljs-attribute">align-items</span>: center;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">0.5rem</span> <span class="hljs-number">1rem</span>;
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-secondary);
+  <span class="hljs-attribute">text-decoration</span>: none;
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">0.375rem</span>;
+  <span class="hljs-attribute">transition</span>: all <span class="hljs-number">0.2s</span> ease;
+}
+
+<span class="hljs-selector-class">.custom-nav-item</span><span class="hljs-selector-pseudo">:hover</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-bg-secondary);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-primary);
+}
+
+<span class="hljs-selector-class">.custom-nav-item</span><span class="hljs-selector-class">.active</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-link-color);
+  <span class="hljs-attribute">color</span>: white;
+}</code></pre><hr>
+<h2>Performance Best Practices</h2><h3>1. CSS Loading Strategy</h3><p><strong>Optimal loading order:</strong></p>
+<pre><code class="language-html"><span class="hljs-comment">&lt;!-- 1. Critical CSS first --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;styles/css-variables.css&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;styles/shared/base.css&quot;</span>&gt;</span>
+
+<span class="hljs-comment">&lt;!-- 2. Theme CSS --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;styles/shared/light-theme.css&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;styles/shared/dark-theme.css&quot;</span>&gt;</span>
+
+<span class="hljs-comment">&lt;!-- 3. Component CSS --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;styles/shared/cards.css&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;styles/shared/modals.css&quot;</span>&gt;</span>
+
+<span class="hljs-comment">&lt;!-- 4. Page-specific CSS --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;styles/pages/vulnerabilities.css&quot;</span>&gt;</span>
+
+<span class="hljs-comment">&lt;!-- 5. Override CSS last --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;styles/ag-grid-overrides.css&quot;</span>&gt;</span></code></pre><h3>2. Minimize CSS Specificity</h3><pre><code class="language-css"><span class="hljs-comment">/* ✅ GOOD: Low specificity */</span>
+<span class="hljs-selector-class">.card</span> { <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base); }
+
+<span class="hljs-comment">/* ❌ AVOID: High specificity */</span>
+<span class="hljs-selector-class">.page</span> <span class="hljs-selector-class">.section</span> <span class="hljs-selector-class">.card</span><span class="hljs-selector-class">.custom</span> { <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base); }</code></pre><h3>3. Use CSS Custom Properties for Dynamic Styles</h3><pre><code class="language-css"><span class="hljs-selector-class">.dynamic-component</span> {
+  <span class="hljs-attr">--custom-accent</span>: <span class="hljs-built_in">var</span>(--vpr-medium);
+  <span class="hljs-attribute">border-left</span>: <span class="hljs-number">4px</span> solid <span class="hljs-built_in">var</span>(--custom-accent);
+}
+
+<span class="hljs-selector-class">.dynamic-component</span><span class="hljs-selector-class">.critical</span> {
+  <span class="hljs-attr">--custom-accent</span>: <span class="hljs-built_in">var</span>(--vpr-critical);
+}</code></pre><hr>
+<h2>Troubleshooting</h2><h3>Common Issues and Solutions</h3><p><strong>Issue</strong>: Styles not applying in dark mode</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ❌ Problem: Hardcoded colors */</span>
+<span class="hljs-selector-class">.component</span> { <span class="hljs-attribute">background</span>: <span class="hljs-number">#ffffff</span>; }
+
+<span class="hljs-comment">/* ✅ Solution: Use CSS variables */</span>
+<span class="hljs-selector-class">.component</span> { <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base); }</code></pre><p><strong>Issue</strong>: AG-Grid cells not styled correctly</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ✅ Use theme-aware classes in cell renderers */</span>
+cellRenderer: (params) =&gt; {
+  return `&lt;<span class="hljs-selector-tag">span</span> class=&quot;ag-<span class="hljs-attribute">grid</span>-link&quot;&gt;${params<span class="hljs-selector-class">.value</span>}&lt;/<span class="hljs-selector-tag">span</span>&gt;`;
+  // NOT: class=<span class="hljs-string">&quot;text-dark&quot;</span>
+}</code></pre><p><strong>Issue</strong>: Custom components break theme switching</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ✅ Ensure all colors use CSS variables */</span>
+<span class="hljs-selector-class">.custom-component</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-primary);
+  <span class="hljs-comment">/* Never hardcode: background: #fff; color: #000; */</span>
+}</code></pre><p><strong>Issue</strong>: Modal components not inheriting theme properly</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ❌ Problem: Modal not using theme-aware selectors */</span>
+<span class="hljs-selector-class">.modal-content</span> { <span class="hljs-attribute">background</span>: <span class="hljs-number">#ffffff</span>; <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-number">#e2e8f0</span>; }
+
+<span class="hljs-comment">/* ✅ Solution: Use data-bs-theme selector and CSS variables */</span>
+<span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;dark&quot;</span>]</span> <span class="hljs-selector-class">.modal-content</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-modal-bg);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--hextrackr-border);
+}</code></pre><p><strong>Issue</strong>: Card borders inconsistent between light and dark themes</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ❌ Problem: Hard-coded border values */</span>
+<span class="hljs-selector-class">.device-card</span> { <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-number">#e2e8f0</span>; }
+
+<span class="hljs-comment">/* ✅ Solution: Use theme-responsive border hierarchy */</span>
+<span class="hljs-selector-class">.device-card</span> {
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--hextrackr-border-subtle);
+  <span class="hljs-comment">/* Automatically adapts: rgba(0,0,0,0.08) light, rgba(255,255,255,0.08) dark */</span>
+}</code></pre><p><strong>Issue</strong>: VPR score colors not readable in dark mode</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ❌ Problem: Light mode colors used in dark theme */</span>
+<span class="hljs-selector-class">.vpr-critical</span> { <span class="hljs-attribute">color</span>: <span class="hljs-number">#dc2626</span>; } <span class="hljs-comment">/* Too dark for dark backgrounds */</span>
+
+<span class="hljs-comment">/* ✅ Solution: Use VPR variables that adapt per theme */</span>
+<span class="hljs-selector-class">.vpr-critical</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--vpr-critical);
+  <span class="hljs-comment">/* #dc2626 in light mode, #f87171 in dark mode */</span>
+}</code></pre><p><strong>Issue</strong>: Ticket accent colors have poor contrast</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ❌ Problem: Same colors used for light and dark backgrounds */</span>
+<span class="hljs-selector-class">.ticket-blue</span> { <span class="hljs-attribute">color</span>: <span class="hljs-number">#3b82f6</span>; } <span class="hljs-comment">/* Poor contrast on dark backgrounds */</span>
+
+<span class="hljs-comment">/* ✅ Solution: Use theme-specific ticket accent variables */</span>
+<span class="hljs-selector-class">.ticket-blue</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--ticket-accent-blue);
+  <span class="hljs-comment">/* #2563eb (light), #60a5fa (dark) - both WCAG AA compliant */</span>
+}</code></pre><p><strong>Issue</strong>: CSS transitions causing performance issues</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ❌ Problem: Transitioning all properties */</span>
+<span class="hljs-selector-class">.card</span> { <span class="hljs-attribute">transition</span>: all <span class="hljs-number">250ms</span> ease; }
+
+<span class="hljs-comment">/* ✅ Solution: Only transition properties that change */</span>
+<span class="hljs-selector-class">.card</span> {
+  <span class="hljs-attribute">transition</span>: background-color <span class="hljs-built_in">var</span>(--hextrackr-transition-fast) <span class="hljs-built_in">var</span>(--hextrackr-ease-out),
+              border-color <span class="hljs-built_in">var</span>(--hextrackr-transition-fast) <span class="hljs-built_in">var</span>(--hextrackr-ease-out);
+}</code></pre><p><strong>Issue</strong>: AG-Grid theme not switching properly</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ❌ Problem: Not registering grid with theme manager</span>
+<span class="hljs-keyword">const</span> gridApi = <span class="hljs-title function_">createGrid</span>(gridDiv, gridOptions);
+
+<span class="hljs-comment">// ✅ Solution: Register with AGGridThemeManager</span>
+<span class="hljs-keyword">const</span> gridApi = <span class="hljs-title function_">createGrid</span>(gridDiv, gridOptions);
+<span class="hljs-keyword">if</span> (<span class="hljs-variable language_">window</span>.<span class="hljs-property">agGridThemeManager</span>) {
+  <span class="hljs-variable language_">window</span>.<span class="hljs-property">agGridThemeManager</span>.<span class="hljs-title function_">registerGrid</span>(<span class="hljs-string">&#x27;myGrid&#x27;</span>, gridApi, gridDiv);
+}</code></pre><hr>
+<h2>Tools and Validation</h2><h3>CSS Variable Inspector</h3><p>Use browser Developer Tools to inspect CSS variables:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Console command to check current theme variables</span>
+<span class="hljs-keyword">const</span> style = <span class="hljs-title function_">getComputedStyle</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Primary background:&#x27;</span>, style.<span class="hljs-title function_">getPropertyValue</span>(<span class="hljs-string">&#x27;--hextrackr-bg-primary&#x27;</span>));
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Text color:&#x27;</span>, style.<span class="hljs-title function_">getPropertyValue</span>(<span class="hljs-string">&#x27;--hextrackr-text-primary&#x27;</span>));</code></pre><h3>Theme Testing Checklist</h3><ul>
+<li><input disabled="" type="checkbox"> Component looks correct in light mode</li>
+<li><input disabled="" type="checkbox"> Component looks correct in dark mode</li>
+<li><input disabled="" type="checkbox"> No hardcoded colors used</li>
+<li><input disabled="" type="checkbox"> Hover states work in both themes</li>
+<li><input disabled="" type="checkbox"> Text remains readable in both themes</li>
+<li><input disabled="" type="checkbox"> Animations don&#39;t conflict with theme switching</li>
+</ul>
+<hr>
+<h2>Performance Optimization</h2><h3>CSS Performance Best Practices</h3><h4>1. CSS Variable Optimization</h4><pre><code class="language-css"><span class="hljs-comment">/* ✅ GOOD: Use CSS custom properties for efficient theme switching */</span>
+<span class="hljs-selector-class">.component</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text-primary);
+  <span class="hljs-comment">/* Browser can optimize variable lookups */</span>
+}
+
+<span class="hljs-comment">/* ❌ AVOID: Excessive calculations in CSS variables */</span>
+<span class="hljs-selector-class">.component</span> {
+  <span class="hljs-comment">/* Avoid complex calc() expressions that run on every paint */</span>
+  <span class="hljs-attribute">width</span>: <span class="hljs-built_in">calc</span>(<span class="hljs-built_in">var</span>(--hextrackr-space-<span class="hljs-number">4</span>) * <span class="hljs-number">3.5</span> + <span class="hljs-built_in">var</span>(--hextrackr-space-<span class="hljs-number">2</span>) / <span class="hljs-number">2</span>);
+}</code></pre><h4>2. Selector Performance</h4><pre><code class="language-css"><span class="hljs-comment">/* ✅ GOOD: Low specificity, efficient selectors */</span>
+<span class="hljs-selector-class">.device-card</span> { }
+<span class="hljs-selector-class">.vpr-mini-card</span> { }
+
+<span class="hljs-comment">/* ❌ AVOID: Complex selectors that impact performance */</span>
+<span class="hljs-selector-class">.page</span> <span class="hljs-selector-class">.container</span> <span class="hljs-selector-class">.row</span> <span class="hljs-selector-class">.col</span> <span class="hljs-selector-class">.card</span> <span class="hljs-selector-class">.device-card</span> <span class="hljs-selector-class">.vpr-mini-card</span> { }</code></pre><h4>3. CSS Containment</h4><pre><code class="language-css"><span class="hljs-comment">/* ✅ GOOD: Use CSS containment for large card grids */</span>
+<span class="hljs-selector-class">.device-cards-container</span> {
+  <span class="hljs-attribute">contain</span>: layout style paint;
+  <span class="hljs-comment">/* Isolates layout changes within container */</span>
+}
+
+<span class="hljs-selector-class">.vulnerability-cards-container</span> {
+  <span class="hljs-attribute">contain</span>: layout style;
+  <span class="hljs-comment">/* Prevents style recalculation cascading */</span>
+}</code></pre><h4>4. Theme Switching Performance</h4><pre><code class="language-css"><span class="hljs-comment">/* ✅ GOOD: Efficient theme transitions */</span>
+<span class="hljs-selector-class">.card</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-base);
+  <span class="hljs-attribute">transition</span>: background-color <span class="hljs-built_in">var</span>(--hextrackr-transition-fast) <span class="hljs-built_in">var</span>(--hextrackr-ease-out);
+  <span class="hljs-comment">/* Only animate properties that change between themes */</span>
+}
+
+<span class="hljs-comment">/* ❌ AVOID: Transition all properties */</span>
+<span class="hljs-selector-class">.card</span> {
+  <span class="hljs-attribute">transition</span>: all <span class="hljs-number">250ms</span> ease; <span class="hljs-comment">/* Can cause layout thrashing */</span>
+}</code></pre><h3>Performance Monitoring</h3><h4>CSS Variable Inspector</h4><p>Use browser Developer Tools to monitor CSS variable performance:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Console command to check CSS variable usage</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">getAllCSSVariables</span> = (<span class="hljs-params"></span>) =&gt; {
+  <span class="hljs-keyword">const</span> style = <span class="hljs-title function_">getComputedStyle</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>);
+  <span class="hljs-keyword">const</span> variables = {};
+
+  <span class="hljs-comment">// Check HexTrackr variables</span>
+  [<span class="hljs-string">&#x27;--hextrackr-primary&#x27;</span>, <span class="hljs-string">&#x27;--hextrackr-surface-base&#x27;</span>, <span class="hljs-string">&#x27;--vpr-critical&#x27;</span>].<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">prop</span> =&gt;</span> {
+    variables[prop] = style.<span class="hljs-title function_">getPropertyValue</span>(prop);
+  });
+
+  <span class="hljs-keyword">return</span> variables;
+};
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">table</span>(<span class="hljs-title function_">getAllCSSVariables</span>());</code></pre><h4>Performance Checklist</h4><ul>
+<li><input disabled="" type="checkbox"> <strong>CSS containment</strong> applied to card containers</li>
+<li><input disabled="" type="checkbox"> <strong>Transition properties</strong> limited to changing values only</li>
+<li><input disabled="" type="checkbox"> <strong>Selector specificity</strong> kept under 3 levels deep</li>
+<li><input disabled="" type="checkbox"> <strong>Variable calculations</strong> minimized in frequently updated components</li>
+<li><input disabled="" type="checkbox"> <strong>Theme switching</strong> completes under 16ms for 60fps</li>
+<li><input disabled="" type="checkbox"> <strong>Large lists</strong> (50+ items) use <code>contain: layout style paint</code></li>
+</ul>
+<h3>CSS Containment Strategies</h3><h4>Layout Containment</h4><pre><code class="language-css"><span class="hljs-comment">/* Isolate layout changes within card grids */</span>
+<span class="hljs-selector-class">.ag-grid-theme-container</span> {
+  <span class="hljs-attribute">contain</span>: layout;
+  <span class="hljs-comment">/* Prevents AG-Grid layout changes from affecting parent */</span>
+}
+
+<span class="hljs-selector-class">.modal-content</span> {
+  <span class="hljs-attribute">contain</span>: layout style;
+  <span class="hljs-comment">/* Isolates modal content for better scrolling performance */</span>
+}</code></pre><h4>Paint Containment</h4><pre><code class="language-css"><span class="hljs-comment">/* Optimize rendering for frequently updated components */</span>
+<span class="hljs-selector-class">.vpr-score-indicator</span> {
+  <span class="hljs-attribute">contain</span>: paint;
+  <span class="hljs-comment">/* Changes to VPR scores don&#x27;t repaint surrounding elements */</span>
+}
+
+<span class="hljs-selector-class">.sortable-ghost</span> {
+  <span class="hljs-attribute">contain</span>: layout paint;
+  <span class="hljs-comment">/* Dragging animations stay contained */</span>
+}</code></pre><h4>Style Containment</h4><pre><code class="language-css"><span class="hljs-comment">/* Prevent style recalculation cascading */</span>
+<span class="hljs-selector-class">.device-security-modal</span> <span class="hljs-selector-class">.card</span> {
+  <span class="hljs-attribute">contain</span>: style;
+  <span class="hljs-comment">/* Modal-specific styling doesn&#x27;t affect page styles */</span>
+}</code></pre><h3>Memory Optimization</h3><h4>CSS Custom Property Cleanup</h4><pre><code class="language-javascript"><span class="hljs-comment">// Remove unused CSS variables on page unload</span>
+<span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;beforeunload&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-comment">// Clear any dynamically created CSS variables</span>
+  <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">window</span>.<span class="hljs-property">vulnModalData</span>) {
+    <span class="hljs-keyword">delete</span> <span class="hljs-variable language_">window</span>.<span class="hljs-property">vulnModalData</span>;
+  }
+});</code></pre><h4>Theme Asset Loading</h4><pre><code class="language-css"><span class="hljs-comment">/* Preload critical theme assets */</span>
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">prefers-color-scheme</span>: dark) {
+  <span class="hljs-comment">/* Dark theme assets are only loaded when needed */</span>
+  <span class="hljs-selector-class">.ag-theme-quartz-dark</span> {
+    <span class="hljs-comment">/* Dark theme styles */</span>
+  }
+}</code></pre><hr>
+<h2>Related Documentation</h2><ul>
+<li><a href="#architecture/theme-architecture">Theme Architecture</a> - Technical theme system details</li>
+<li><a href="#architecture/frontend">Frontend Architecture</a> - Component integration patterns</li>
+<li><a href="#reference/performance">Performance Reference</a> - CSS performance guidelines</li>
+</ul>
+<hr>
+<p><em>Last Updated: 2025-09-20 | Centralized Theme System v2.0</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
