@@ -428,10 +428,13 @@
 <p><strong>Enhanced Navigation</strong>: You can click on hostname links within vulnerability modals to seamlessly navigate to device details. The modal system now properly transitions between views, ensuring a smooth user experience without layering issues.</p>
 <h3>3. Vulnerabilities View</h3><p>This view groups all findings by vulnerability identifier (CVE, Cisco SA, or plugin ID). Each card represents a unique vulnerability and shows:</p>
 <ul>
-<li>The number of devices affected by it.</li>
-<li>The total VPR score it contributes across all devices.</li>
-<li>A breakdown of the severity of the findings.</li>
-<li><strong>Enhanced Display</strong>: Vulnerability identifiers are now shown in a dedicated &quot;Vulnerability&quot; column with appropriate linking:<ul>
+<li>The number of devices affected by it (v1.0.24+ with enhanced display)</li>
+<li>The total VPR score it contributes across all devices</li>
+<li>The severity level prominently displayed alongside the vulnerability identifier</li>
+<li><strong>Streamlined Card Layout (v1.0.24+)</strong>: Removed redundant VPR mini-cards to focus on key information</li>
+<li><strong>Enhanced Device Display</strong>: Larger, more prominent device count with improved visual hierarchy</li>
+<li><strong>KEV Indicator</strong>: Red KEV badge in the top-right corner for Known Exploited Vulnerabilities</li>
+<li><strong>Enhanced Display</strong>: Vulnerability identifiers are now shown with appropriate linking:<ul>
 <li><strong>CVE identifiers</strong> link to the MITRE CVE database</li>
 <li><strong>Cisco SA identifiers</strong> link to Cisco&#39;s security advisory portal</li>
 <li><strong>Plugin IDs</strong> are styled for easy identification when CVE/SA data is unavailable</li>
