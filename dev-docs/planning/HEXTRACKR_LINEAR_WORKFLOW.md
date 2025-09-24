@@ -21,7 +21,7 @@ When identifying a new feature or bug:
 
 2. **Create Planning Folder**:
    ```
-   /dev-docs/planning/v1.0.XX-[feature-name]/
+   /dev-docs/planning/active/v1.0.XX-[feature-name]/
    ├── SESSION_PLAN.md      # Main planning document
    ├── research/            # Research findings
    └── implementation/      # Code snippets and notes
@@ -56,7 +56,7 @@ Each coding session (2 hours):
 1. **Session Start**:
    ```bash
    # Review the plan
-   cat /dev-docs/planning/v1.0.XX-feature/SESSION_PLAN.md
+   cat /dev-docs/planning/active/v1.0.XX-feature/SESSION_PLAN.md
 
    # Move Linear issue to "In Progress"
    # Pick up from last completed checkbox
