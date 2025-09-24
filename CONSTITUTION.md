@@ -2,7 +2,7 @@
 
 ## Preamble
 
- This constitutional framework governs the core ***NON-NEOTIABLE*** operating principals mandated for AI agents working on the the HexTrackr project.
+ This constitutional framework governs the core ***MANDATORY*** operating principals mandated for AI agents working on the the HexTrackr project.
 
 ## Article I: Developmet Practices
 
@@ -90,16 +90,6 @@
 
 - Claude-Context MUST be used when searching the code base
 - Always verify the Index is current beore searches.
-
-## Artivle IV: Gemini CLI Tools
-
-- Gemini CLI may be used for coplext tasks at the users request only.
-- All tools SHALL be documented in ~/docs/GEMINICLITOOLS.md
-
-## Article V: Codex CLI Tools
-
-- Codex CLI Tools may be used for complext tasks at the users request only.
-- All tools SHALL be documented in ~/docs/CODEXCLITOOLS.md
 
 ## Article V: Custom Context Bundles
 
