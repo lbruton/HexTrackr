@@ -64,14 +64,14 @@ rules:
 
 # Include community rules
 include:
-  - p/security-audit
-  - p/javascript
-  - p/typescript
-  - p/python
-  - p/java
-  - p/docker
-  - p/nginx
-  - p/sql
+  - r/generic
+  - r/javascript
+  - r/typescript
+  - r/python
+  - r/java
+  - r/docker
+  - r/nginx
+  - r/sql
 
 # Exclude patterns
 exclude:

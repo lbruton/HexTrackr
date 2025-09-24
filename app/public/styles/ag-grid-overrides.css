@@ -1,0 +1,93 @@
+/**
+ * AG-Grid Theme Overrides for HexTrackr
+ *
+ * This file contains CSS overrides to ensure AG-Grid uses exact colors
+ * without internal color transformations or mixing functions.
+ *
+ * @fileoverview Fixes AG-Grid color issues in dark mode
+ * @version 1.0.0
+ * @since 2025-09-20
+ */
+
+/* ===========================
+   Dark Mode Overrides
+   =========================== */
+
+/* Force exact header colors in dark mode for all AG-Grid instances */
+[data-bs-theme="dark"] .ag-theme-quartz-dark .ag-header,
+[data-bs-theme="dark"] .ag-theme-quartz-dark .ag-header-viewport,
+[data-bs-theme="dark"] .ag-theme-quartz-dark .ag-header-container,
+[data-bs-theme="dark"] .ag-theme-quartz .ag-header,
+[data-bs-theme="dark"] .ag-theme-quartz .ag-header-viewport,
+[data-bs-theme="dark"] .ag-theme-quartz .ag-header-container,
+[data-bs-theme="dark"] .hextrackr-tickets-grid .ag-header {
+    background-color: #202c3f !important;
+}
+
+/* Override AG-Grid's color-mix function for all dark mode grids */
+[data-bs-theme="dark"] .ag-theme-quartz-dark,
+[data-bs-theme="dark"] .ag-theme-quartz {
+    --ag-header-background-color: #202c3f !important;
+    --ag-chrome-background-color: #202c3f !important;
+}
+
+/* Ensure header cells also use correct background */
+[data-bs-theme="dark"] .ag-theme-quartz-dark .ag-header-cell,
+[data-bs-theme="dark"] .ag-theme-quartz-dark .ag-header-group-cell {
+    background-color: transparent !important;
+}
+
+/* Header text color for better contrast */
+[data-bs-theme="dark"] .ag-theme-quartz-dark .ag-header-cell-label,
+[data-bs-theme="dark"] .ag-theme-quartz-dark .ag-header-group-cell-label {
+    color: #ffffff !important;
+}
+
+/* ===========================
+   Light Mode Overrides (if needed)
+   =========================== */
+
+/* Ensure light mode also uses exact colors */
+.ag-theme-quartz .ag-header,
+.ag-theme-quartz .ag-header-viewport,
+.ag-theme-quartz .ag-header-container {
+    background-color: #edf2f7 !important;
+}
+
+.ag-theme-quartz {
+    --ag-header-background-color: #edf2f7 !important;
+    --ag-chrome-background-color: #f7fafc !important;
+}
+
+/* ===========================
+   Link Styles for Grid Cells
+   =========================== */
+
+/* Ensure links in grid cells are visible in both themes */
+.ag-theme-quartz .ag-grid-link,
+.ag-theme-quartz .link-primary {
+    color: var(--hextrackr-grid-link);
+}
+
+.ag-theme-quartz .ag-grid-link:hover,
+.ag-theme-quartz .link-primary:hover {
+    color: var(--hextrackr-grid-link-hover);
+    text-decoration: underline;
+}
+
+.ag-theme-quartz-dark .ag-grid-link,
+.ag-theme-quartz-dark .link-primary {
+    color: var(--hextrackr-grid-link);
+}
+
+.ag-theme-quartz-dark .ag-grid-link:hover,
+.ag-theme-quartz-dark .link-primary:hover {
+    color: var(--hextrackr-grid-link-hover);
+    text-decoration: underline;
+}
+
+/* Muted text in both themes */
+.ag-theme-quartz .text-muted-var,
+.ag-theme-quartz-dark .text-muted-var {
+    color: var(--hextrackr-text-muted);
+}

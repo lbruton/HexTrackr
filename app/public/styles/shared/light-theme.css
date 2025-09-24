@@ -1,0 +1,63 @@
+/**
+ * HexTrackr Light Theme Variables
+ *
+ * @spec 002-vpr-chart-colors
+ * @version 1.0.0
+ * @description Light theme CSS custom properties for HexTrackr application
+ * Including vulnerability-specific chart colors for proper severity mapping
+ */
+
+/* Apply light theme when data-bs-theme="light" or body has class .theme-light */
+[data-bs-theme="light"],
+.theme-light {
+    /* ===========================================
+     * APEXCHARTS DATA VISUALIZATION - LIGHT THEME
+     * =========================================== */
+
+    /* Chart Color Palette - Professional Light Theme */
+    --chart-color-1: #3b82f6;                 /* Primary blue */
+    --chart-color-2: #10b981;                 /* Success green */
+    --chart-color-3: #f59e0b;                 /* Warning amber */
+    --chart-color-4: #ef4444;                 /* Danger red */
+    --chart-color-5: #8b5cf6;                 /* Purple */
+    --chart-color-6: #06b6d4;                 /* Cyan */
+    --chart-color-7: #84cc16;                 /* Lime green */
+    --chart-color-8: #f97316;                 /* Orange */
+
+    /* Vulnerability Chart Specific Colors - Severity Mapping */
+    --chart-vuln-critical-color: #dc2626;     /* Critical: Red */
+    --chart-vuln-high-color: #ea580c;         /* High: Orange */
+    --chart-vuln-medium-color: #2563eb;       /* Medium: Blue */
+    --chart-vuln-low-color: #16a34a;          /* Low: Green */
+
+    /* Chart Background and Grid - Light Theme */
+    --chart-background: #ffffff;              /* Chart background */
+    --chart-grid-color: #e5e7eb;              /* Grid lines */
+    --chart-text-color: #6b7280;              /* Chart text */
+    --chart-title-color: #111827;             /* Chart titles */
+    --chart-axis-color: #9ca3af;              /* Axis lines and labels */
+
+    /* ===========================================
+     * AG-GRID THEMING - LIGHT MODE
+     * =========================================== */
+
+    /* AG-Grid Quartz Theme Variables for Light Mode */
+    --ag-background-color: #ffffff;
+    --ag-foreground-color: #000000;
+    --ag-border-color: #dde2e6;
+    --ag-header-background-color: #f8f9fa;
+    --ag-header-foreground-color: #000000;
+    --ag-row-hover-color: #f1f3f5;
+    --ag-selected-row-background-color: #e9ecef;
+
+    /* ===========================================
+     * HEXTRACKR SURFACES - LIGHT MODE
+     * =========================================== */
+
+    /* Surface elevation hierarchy for light mode */
+    --hextrackr-surface-base: #f8f9fa;        /* Page background */
+    --hextrackr-surface-1: #ffffff;           /* Cards */
+    --hextrackr-surface-2: #ffffff;           /* Tables */
+    --hextrackr-surface-3: #ffffff;           /* Modals */
+    --hextrackr-surface-4: #f8f9fa;           /* Modal containers */
+}

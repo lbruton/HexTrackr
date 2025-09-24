@@ -1,0 +1,65 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Technical Reference</h1><blockquote>
+<p>In-depth technical specifications and operational guides</p>
+</blockquote>
+<h2>Reference Documentation</h2><h3>[Security Implementation](./security.md)</h3><p>Comprehensive security documentation covering:</p>
+<ul>
+<li>Authentication &amp; authorization architecture</li>
+<li>Security middleware configuration</li>
+<li>Path validation and input sanitization</li>
+<li>Rate limiting and DDoS protection</li>
+<li>Security best practices</li>
+</ul>
+<h3>[WebSocket Protocol](./websocket.md)</h3><p>Real-time communication specifications:</p>
+<ul>
+<li>WebSocket event definitions</li>
+<li>Progress tracking protocol</li>
+<li>Import status notifications</li>
+<li>Connection management</li>
+<li>Fallback mechanisms</li>
+</ul>
+<h3>[Performance Guidelines](./performance.md)</h3><p>Performance requirements and optimization:</p>
+<ul>
+<li>Constitutional performance benchmarks</li>
+<li>Response time standards</li>
+<li>Resource constraints</li>
+<li>Optimization techniques</li>
+<li>Monitoring and metrics</li>
+</ul>
+<h3>[Troubleshooting Guide](./troubleshooting.md)</h3><p>Common issues and solutions:</p>
+<ul>
+<li>Docker &amp; environment issues</li>
+<li>Database troubleshooting</li>
+<li>Import/export problems</li>
+<li>Frontend issues</li>
+<li>API &amp; WebSocket debugging</li>
+<li>Performance diagnostics</li>
+</ul>
+<h2>Quick Reference</h2><h3>Performance Benchmarks</h3><ul>
+<li>Page loads: &lt; 2 seconds</li>
+<li>API responses: &lt; 500ms</li>
+<li>Database queries: &lt; 100ms</li>
+<li>WebSocket messages: &lt; 50ms</li>
+<li>CSV processing: &gt; 1000 rows/second</li>
+</ul>
+<h3>Debug Mode</h3><p>Enable detailed logging:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-property">hextrackr_debug</span> = <span class="hljs-string">&quot;true&quot;</span>;
+location.<span class="hljs-title function_">reload</span>();</code></pre><h3>Key Paths</h3><ul>
+<li>Database: <code>data/hextrackr.db</code></li>
+<li>Backups: <code>backups/</code></li>
+<li>Uploads: <code>uploads/</code></li>
+<li>Documentation: <code>app/public/docs-html/</code></li>
+</ul>
+<h2>Related Documentation</h2><ul>
+<li><a href="#api-reference/index">API Reference</a> - Auto-generated API documentation</li>
+<li><a href="#architecture/index">Architecture</a> - System design and patterns</li>
+<li><a href="#guides/index">User Guides</a> - End-user documentation</li>
+</ul>
+<hr>
+<p><em>All performance requirements are defined in the <a href="#../.specify/memory/constitution">HexTrackr Constitution</a></em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

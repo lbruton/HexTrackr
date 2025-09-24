@@ -1,0 +1,1257 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Changelog</h1><p>All notable changes to HexTrackr will be documented in this file.</p>
+<p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/" target="_blank" title="Keep a Changelog" class="me-2">
+                        <img src="https://img.shields.io/badge/changelog-Keep%20a%20Changelog-orange?style=flat&logo=markdown&logoColor=white" 
+                             alt="Keep a Changelog" style="height: 24px;" class="img-fluid"/>
+                    </a>,<br>and this project adheres to <a href="https://semver.org/spec/v2.0.0.html" target="_blank" title="Semantic Versioning" class="me-2">
+                        <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
+                             alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
+                    </a>.</p>
+<h2>[Unreleased]</h2><h3>Fixed - NPM Scripts Cleanup</h3><h4>Development Workflow Improvements</h4><ul>
+<li><p><strong>Removed Broken Scripts</strong>: Eliminated NPM scripts that referenced non-existent files</p>
+<ul>
+<li>Removed <code>npm run roadmap</code> (scripts/generate-roadmap-portal.js missing)</li>
+<li>Removed <code>npm run docs:review</code> (app/public/scripts/gemini-docs-generator.js missing)</li>
+<li>Removed <code>npm run docs:analyze</code> (app/public/scripts/generate-architecture-analysis.js missing)</li>
+</ul>
+</li>
+<li><p><strong>Fixed Test Scripts</strong>: Updated test commands to handle missing test directories gracefully</p>
+<ul>
+<li>Added <code>--passWithNoTests</code> flag to test:unit, test:integration, test:contract</li>
+<li>Scripts now pass without error when no test files exist</li>
+<li>Clear warnings added in NPMGUIDE.md about directory status</li>
+</ul>
+</li>
+</ul>
+<h4>Documentation Updates</h4><ul>
+<li><p><strong>Updated NPMGUIDE.md</strong>: Moved to root directory and cleaned up outdated script references</p>
+<ul>
+<li>Removed documentation for broken scripts</li>
+<li>Added status warnings for placeholder test commands</li>
+<li>Updated workflow examples to use working commands</li>
+</ul>
+</li>
+<li><p><strong>CLAUDE.md Corrections</strong>: Removed references to broken scripts in development commands</p>
+<ul>
+<li>Simplified documentation section to show only working scripts</li>
+<li>Added reference to NPMGUIDE.md location</li>
+</ul>
+</li>
+</ul>
+<h4>Impact</h4><ul>
+<li>All documented NPM scripts now function correctly</li>
+<li>No more confusion about missing script files</li>
+<li>Clear guidance on test infrastructure development status</li>
+<li>Improved developer onboarding experience</li>
+</ul>
+<h3>Removed - Testing Infrastructure Cleanup</h3><h4>Development Simplification</h4><ul>
+<li><p><strong>Removed Jest Testing Framework</strong>: Eliminated unused Jest test infrastructure</p>
+<ul>
+<li>Removed 8 testing devDependencies (@jest/globals, jest, jest-environment-jsdom, etc.)</li>
+<li>Removed 6 test-related NPM scripts (test, test:watch, test:coverage, etc.)</li>
+<li>Kept only templateService.test.js as reference example</li>
+</ul>
+</li>
+<li><p><strong>Removed Playwright Testing Framework</strong>: Eliminated unused Playwright E2E testing</p>
+<ul>
+<li>Removed @playwright/test and playwright packages</li>
+<li>Removed supertest dependency</li>
+<li>Simplified to manual testing workflow</li>
+</ul>
+</li>
+</ul>
+<h4>Rationale</h4><ul>
+<li><strong>Workflow Alignment</strong>: Manual testing with screenshots preferred by development team</li>
+<li><strong>Playwright MCP Available</strong>: Browser automation available through MCP when needed</li>
+<li><strong>Complexity Reduction</strong>: Removed 750MB+ of testing dependencies and tooling</li>
+<li><strong>Faster Development</strong>: Simplified npm install and reduced cognitive overhead</li>
+</ul>
+<h4>Impact</h4><ul>
+<li>Package size reduced significantly (Jest + Playwright = ~750MB dependencies)</li>
+<li>Faster npm install times</li>
+<li>Cleaner package.json with focus on actual workflow</li>
+<li>Manual testing remains primary validation method</li>
+<li>Playwright MCP provides automation capabilities when needed</li>
+</ul>
+<h2>[1.0.23] - 2025-09-22</h2><h3>Added - Interactive Statistics Card Filtering</h3><h4>Enhanced Ticket Management User Experience</h4><ul>
+<li><strong>Clickable Statistics Cards</strong>: Transformed passive statistics displays into interactive filter controls<ul>
+<li><strong>Total Tickets Card</strong>: Shows all tickets, acts as filter reset button</li>
+<li><strong>Open Tickets Card</strong>: Filters to active tickets (excludes Closed, Completed, Failed statuses)</li>
+<li><strong>Overdue Card</strong>: Shows urgent tickets requiring immediate attention (Overdue + Failed statuses)</li>
+<li><strong>Completed Card</strong>: Displays finished work (Completed + Closed statuses)</li>
+</ul>
+</li>
+</ul>
+<h4>Technical Implementation</h4><ul>
+<li><p><strong>Smart Filter Integration</strong>: Card filters integrate seamlessly with existing search and location filters</p>
+<ul>
+<li>Mutual exclusivity with status dropdown to prevent filter conflicts</li>
+<li>Automatic pagination reset when filters are applied</li>
+<li>Preserves existing filter chain architecture for backward compatibility</li>
+</ul>
+</li>
+<li><p><strong>Statistics Logic Fix</strong>: Corrected &quot;Open Tickets&quot; calculation to include all non-terminal statuses</p>
+<ul>
+<li>Previous logic only counted &quot;Open&quot; and &quot;In Progress&quot; statuses</li>
+<li>New logic excludes terminal statuses (Closed, Completed, Failed) for more accurate representation</li>
+<li>Statistics now align perfectly with filter behavior for consistency</li>
+</ul>
+</li>
+</ul>
+<h4>User Interface Enhancements</h4><ul>
+<li><p><strong>Visual Feedback System</strong>: Added comprehensive visual indicators for interactive elements</p>
+<ul>
+<li>Hover effects with theme-aware shadows and subtle lift animations</li>
+<li>Active card highlighting with distinct border and background styling</li>
+<li>Smooth 200ms transitions for professional feel</li>
+<li>Pointer cursor indication for clickability</li>
+</ul>
+</li>
+<li><p><strong>Theme Compatibility</strong>: Full support for both light and dark themes</p>
+<ul>
+<li>Dynamic shadow effects adapted for each theme</li>
+<li>Proper contrast ratios maintained across all visual states</li>
+<li>Consistent styling with existing HexTrackr design system</li>
+</ul>
+</li>
+</ul>
+<h4>Accessibility Excellence</h4><ul>
+<li><p><strong>Screen Reader Support</strong>: Complete accessibility implementation for all users</p>
+<ul>
+<li>ARIA button roles with pressed/unpressed state announcements</li>
+<li>Live region announcements for filter changes (&quot;Showing open tickets only&quot;, etc.)</li>
+<li>Unique descriptive labels for each card&#39;s functionality</li>
+</ul>
+</li>
+<li><p><strong>Keyboard Navigation</strong>: Full keyboard accessibility support</p>
+<ul>
+<li>Tab navigation through all statistics cards</li>
+<li>Enter and Space key activation matching mouse click behavior</li>
+<li>Focus indicators meeting WCAG AA contrast requirements</li>
+<li>Logical tab order for intuitive navigation</li>
+</ul>
+</li>
+</ul>
+<h4>Performance Optimizations</h4><ul>
+<li><strong>Efficient Filter Processing</strong>: Optimized filter operations for large datasets<ul>
+<li>Sub-100ms filter response times for datasets up to 1000+ tickets</li>
+<li>No AG-Grid re-initialization during filter changes</li>
+<li>Preserved existing performance characteristics</li>
+</ul>
+</li>
+</ul>
+<h3>Technical Notes</h3><ul>
+<li><strong>Architecture</strong>: Extends existing <code>HexagonTicketsManager</code> class with minimal code changes</li>
+<li><strong>Integration</strong>: Works seamlessly with AG-Grid v33 and existing filter infrastructure</li>
+<li><strong>Compatibility</strong>: Maintains full backward compatibility with existing workflows</li>
+<li><strong>Testing</strong>: Comprehensive functionality verified across all supported browsers</li>
+</ul>
+<h2>[1.0.22] - 2025-09-21</h2><h3>Enhanced - KEV (Known Exploited Vulnerabilities) Integration</h3><h4>AG-Grid Table Improvements</h4><ul>
+<li><p><strong>Filterable KEV Column</strong>: Replaced fire emoji (🔥) with filterable YES/NO pills in KEV column</p>
+<ul>
+<li>Red badge for &quot;YES&quot; (vulnerability is in KEV catalog)</li>
+<li>Blue badge for &quot;NO&quot; (not in KEV catalog)</li>
+<li>Follows same design pattern as severity and VPR columns for consistency</li>
+<li>Enables proper filtering using AG-Grid&#39;s built-in text-based filter system</li>
+</ul>
+</li>
+<li><p><strong>KEV Column Filtering Fix</strong>: Fixed KEV column filtering to work with AG-Grid&#39;s filtering system</p>
+<ul>
+<li>Changed database query to return &#39;Yes&#39;/&#39;No&#39; text values instead of 1/0 boolean</li>
+<li>Updated column renderer to parse text values for proper filtering compatibility</li>
+<li>Made KEV badges clickable to open detailed KEV modal for vulnerability information</li>
+</ul>
+</li>
+</ul>
+<h4>KEV Modal Enhancements</h4><ul>
+<li><p><strong>CVE Details Integration</strong>: Added &quot;View CVE Details&quot; button in KEV modal</p>
+<ul>
+<li>Opens vulnerability details modal for comprehensive CVE information</li>
+<li>Provides seamless navigation between KEV catalog info and full vulnerability details</li>
+<li>Uses existing <code>showVulnerabilityDetailsByCVE()</code> function for consistency</li>
+</ul>
+</li>
+<li><p><strong>NIST NVD Integration</strong>: Replaced CISA KEV Catalog link with NIST NVD link</p>
+<ul>
+<li>Uses pattern <code>https://nvd.nist.gov/vuln/detail/${cveId}</code> for direct CVE lookup</li>
+<li>Provides more comprehensive vulnerability information from authoritative source</li>
+<li>Both modal buttons now use consistent primary button style for better UI cohesion</li>
+</ul>
+</li>
+<li><p><strong>Clickable Links in Notes</strong>: Made all HTTPS links in KEV additional notes clickable</p>
+<ul>
+<li>Links open in 1200x1200px popup windows for consistency with rest of application</li>
+<li>Automatic regex replacement converts plain URLs to clickable links</li>
+<li>Preserves existing text while enhancing usability</li>
+</ul>
+</li>
+</ul>
+<h4>Filter Dropdown Improvements</h4><ul>
+<li><p><strong>Filter Option Cleanup</strong>: Removed fire emoji from KEV filter option in severity dropdown</p>
+<ul>
+<li>Changed dropdown option from &quot;🔥 KEV&quot; to simply &quot;KEV&quot; for cleaner interface</li>
+<li>Maintains clear identification of KEV filtering without emoji clutter</li>
+</ul>
+</li>
+<li><p><strong>KEV Filter Logic Fix</strong>: Fixed KEV filter to properly match vulnerabilities</p>
+<ul>
+<li>Added special handling in filter logic to distinguish KEV from severity filtering</li>
+<li>Fixed filter matching to properly check <code>isKev === &quot;Yes&quot;</code> when KEV filter selected</li>
+<li>Ensures consistent filtering behavior across grid, cards, and modal contexts</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed - KEV Data Handling</h3><ul>
+<li><p><strong>Database Service Updates</strong>: Updated vulnerability service to return text-based KEV values</p>
+<ul>
+<li>Changed database query from returning 1/0 to &#39;Yes&#39;/&#39;No&#39; text values</li>
+<li>Ensures compatibility with AG-Grid&#39;s text-based filtering system</li>
+<li>Maintains data integrity while improving UI functionality</li>
+</ul>
+</li>
+<li><p><strong>Component Consistency</strong>: Fixed KEV handling across all vulnerability components</p>
+<ul>
+<li>Updated vulnerability cards to check for text value &quot;Yes&quot; instead of boolean</li>
+<li>Ensured consistent KEV data interpretation in grid, cards, modals, and filters</li>
+<li>Eliminated discrepancies between different UI components</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.21] - 2025-09-21</h2><h3>Added</h3><h4>Unified Template Variable System</h4><ul>
+<li><p><strong>Centralized Variable Configuration</strong>: Created <code>template-variables.js</code> with unified variable definitions</p>
+<ul>
+<li>Consistent naming conventions across all template types ([HEXAGON_TICKET], [SERVICENOW_TICKET], etc.)</li>
+<li>Categorized variables by function: Ticket Info, Location, Dates, Devices, Personnel, Content, Counts</li>
+<li>Universal variable access for maximum flexibility across ticket, email, and vulnerability templates</li>
+<li>Backward compatibility maintained for existing templates</li>
+</ul>
+</li>
+<li><p><strong>Dropdown Variable Interface</strong>: Transformed bulky 300px variable panels into compact Bootstrap dropdowns</p>
+<ul>
+<li><strong>87% space reduction</strong>: From 300px fixed panels to 38px dropdown buttons in editor headers</li>
+<li>Organized variable categories with descriptive icons (📋 Ticket Info, 📍 Location, 📅 Dates, etc.)</li>
+<li>Click-to-insert functionality with cursor position preservation</li>
+<li>Auto-close behavior and success notifications for smooth user experience</li>
+<li>Comprehensive dark theme support with proper contrast and hover states</li>
+</ul>
+</li>
+</ul>
+<h4>Template Editing Enhancements</h4><ul>
+<li><p><strong>Enhanced Template Editors</strong>: Improved all three template editors (ticket, email, vulnerability)</p>
+<ul>
+<li>Consistent dropdown-based variable selection across all editors</li>
+<li>Better visual organization with category headers and variable descriptions</li>
+<li>Required vs optional variable highlighting (orange for required, blue for optional)</li>
+<li>Monospace font for variable names with clear descriptions</li>
+</ul>
+</li>
+<li><p><strong>Improved Space Utilization</strong>: Maximized editing area by eliminating horizontal panels</p>
+<ul>
+<li>More screen real estate for template content editing</li>
+<li>Professional appearance with header-integrated dropdown controls</li>
+<li>Responsive design that adapts to container constraints</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed</h3><h4>Template System Bug Resolutions</h4><ul>
+<li><p><strong>Template Cross-Contamination</strong>: Fixed cache key collisions between template types</p>
+<ul>
+<li>Eliminated issue where editing one template would affect another</li>
+<li>Proper isolation between ticket, email, and vulnerability template caches</li>
+<li>Enhanced cache management with template-specific keys</li>
+</ul>
+</li>
+<li><p><strong>Validation System Issues</strong>: Resolved aggressive validation triggering unwanted restoration</p>
+<ul>
+<li>Temporarily disabled overly strict template validation that interfered with user edits</li>
+<li>Improved validation logic to allow user content loading for editing</li>
+<li>Better error handling and user feedback for template operations</li>
+</ul>
+</li>
+<li><p><strong>ForceRefresh Logic</strong>: Fixed template reloading after reset operations</p>
+<ul>
+<li>Corrected conditional statements that prevented proper API calls</li>
+<li>Ensured templates properly reload from server when force refresh is requested</li>
+<li>Enhanced debugging with comprehensive logging for template operations</li>
+</ul>
+</li>
+</ul>
+<h3>Changed</h3><h4>User Interface Improvements</h4><ul>
+<li><p><strong>Variable Selection UI</strong>: Transformed from horizontal panels to dropdown interface</p>
+<ul>
+<li>Replaced space-consuming variable panels with compact dropdown buttons</li>
+<li>Improved workflow with faster variable selection and insertion</li>
+<li>Better visual hierarchy with organized categories and clear descriptions</li>
+</ul>
+</li>
+<li><p><strong>Template Editor Layout</strong>: Optimized modal space utilization</p>
+<ul>
+<li>Removed bulky reference panels below editors</li>
+<li>Integrated variable access directly into editor toolbars</li>
+<li>Cleaner, more professional appearance throughout template editing interface</li>
+</ul>
+</li>
+</ul>
+<h4>Technical Improvements</h4><ul>
+<li><strong>Variable System Architecture</strong>: Unified variable management across all components<ul>
+<li>Centralized variable definitions eliminate duplication and inconsistencies</li>
+<li>Standardized variable naming improves maintainability</li>
+<li>Prepared foundation for future config builder tools and custom template types</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.20] - 2025-09-21</h2><h3>Added</h3><h4>Email Template Generation for Tickets</h4><ul>
+<li><p><strong>Third Tab in Ticket Modal</strong>: Added &quot;Email Template&quot; tab alongside existing &quot;Ticket Details&quot; and &quot;Vulnerabilities&quot; tabs</p>
+<ul>
+<li>Professional email template automatically generated from ticket data</li>
+<li>Includes subject line suggestion with site name and Hexagon ticket number</li>
+<li>Formatted with clear sections: Maintenance Details, Affected Systems, Action Required, Timeline</li>
+<li>Automatic device list formatting with enumeration</li>
+</ul>
+</li>
+<li><p><strong>Email Copy Button</strong>: New dedicated copy button for email template</p>
+<ul>
+<li>Icon uses envelope symbol for clear identification</li>
+<li>Copies formatted email template to clipboard</li>
+<li>Toast notification confirms successful copy</li>
+<li>Lazy loading only generates template when tab is clicked</li>
+</ul>
+</li>
+<li><p><strong>Template Edit Button Stub</strong>: Placeholder for future v1.0.21 template editing feature</p>
+<ul>
+<li>Disabled button with tooltip indicating &quot;Template editing coming in v1.0.21&quot;</li>
+<li>Positioned alongside copy buttons for consistent UI</li>
+<li>Prepares interface for upcoming customizable templates</li>
+</ul>
+</li>
+<li><p><strong>Enhanced Workflow</strong>: Email template streamlines communication process</p>
+<ul>
+<li>Pre-formatted professional communication ready for sending</li>
+<li>Includes all critical ticket information in email-friendly format</li>
+<li>Consistent messaging across team communications</li>
+<li>Reduces time spent composing maintenance notifications</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.19] - 2025-09-21</h2><h3>Added</h3><h4>Enhanced Ticket Modal with Vulnerability Integration</h4><ul>
+<li><p><strong>Dual Copy Buttons</strong>: Ticket modal now features two separate copy buttons</p>
+<ul>
+<li>&quot;Ticket&quot; button: Copies ticket markdown to clipboard (existing functionality)</li>
+<li>&quot;Vulnerabilities&quot; button: Copies vulnerability report markdown without requiring bundle download</li>
+</ul>
+</li>
+<li><p><strong>Tabbed Interface</strong>: New Bootstrap tabs in ticket modal for better information organization</p>
+<ul>
+<li>&quot;Ticket Details&quot; tab: Shows existing ticket markdown view</li>
+<li>&quot;Vulnerabilities&quot; tab: Displays vulnerability report for all devices in the ticket</li>
+<li>Lazy loading: Vulnerability data only fetched when tab is clicked</li>
+<li>Fuzzy hostname matching using Levenshtein distance for flexible device matching</li>
+</ul>
+</li>
+<li><p><strong>Improved Workflow</strong>: Users can now quickly access and copy vulnerability data directly from the ticket modal without needing to download the full bundle</p>
+</li>
+</ul>
+<h3>Changed</h3><ul>
+<li><strong>Repository Cleanup</strong>: Removed deprecated files and development artifacts<ul>
+<li>Cleaned up .claude/, .specify/, and .context7/ directories</li>
+<li>Removed test files, backups, and temporary uploads</li>
+<li>Streamlined repository structure for better maintainability</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.18] - 2025-09-20</h2><h3>Added</h3><h4>UI/UX Enhancements</h4><ul>
+<li><strong>Attachment Visibility for Tickets</strong>: Added comprehensive tooltip functionality for &quot;Attach Documentation&quot; button on tickets2.html<ul>
+<li>Displays list of currently attached files with sizes on hover</li>
+<li>Shows file count badge when documents are attached (e.g., &quot;(3)&quot;)</li>
+<li>Button changes from gray outline to blue when files are present</li>
+<li>Tooltips persist across page refreshes using localStorage</li>
+<li>Added Shift+Click and Right-Click functionality to clear all attachments with confirmation</li>
+<li>Smooth animations and visual feedback for improved user experience</li>
+<li>Resolves issue where users had no visibility of attached files until downloading bundles</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed</h3><h4>Bug Fixes</h4><ul>
+<li><p><strong>Attachment Tooltip Navigation Bug</strong>: Fixed issue where tooltip displayed empty content after navigating between pages</p>
+<ul>
+<li>Root cause: Bootstrap tooltip wasn&#39;t properly reinitializing when returning to tickets page</li>
+<li>Solution: Dispose old tooltip instances and create fresh ones with proper data on page load</li>
+<li>Added 100ms delay to ensure DOM readiness when navigating between pages</li>
+</ul>
+</li>
+<li><p><strong>Version Display in Health Endpoint</strong>: Fixed incorrect version reporting in <code>/health</code> API endpoint</p>
+<ul>
+<li>Corrected package.json path in server.js from <code>./package.json</code> to <code>../package.json</code> for Docker container</li>
+<li>Updated docker-compose.yml HEXTRACKR_VERSION environment variable to match package.json</li>
+<li>Health endpoint now correctly reports version 1.0.18 instead of falling back to old versions</li>
+</ul>
+</li>
+</ul>
+<h4>Documentation</h4><ul>
+<li><strong>JSDoc Dark Mode Restoration</strong>: Fixed missing dark mode support in developer documentation<ul>
+<li>Ran <code>inject-jsdoc-theme.js</code> script to inject theme synchronization into 96 JSDoc HTML files</li>
+<li>Dark mode now properly syncs with main application theme preference</li>
+<li>Restored proper styling with dark backgrounds (#0f172a) and light text in dark mode</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.17] - 2025-09-19</h2><h3>Added</h3><h4>UI/UX Enhancements</h4><ul>
+<li><strong>tickets2.html Beta Implementation</strong>: Introduced beta version of redesigned tickets page with AG-Grid integration<ul>
+<li>Advanced table with column filtering, sorting, resizing, and responsive design</li>
+<li>SITE and LOCATION columns with ticket accent colors for visual categorization</li>
+<li>Enhanced user experience with modern data table interface</li>
+<li>Maintains backward compatibility with existing tickets.html</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed</h3><h4>Theme Engine & Visual Improvements</h4><ul>
+<li><p><strong>Card Border Visibility</strong>: Fixed critical card border issue where vulnerability and device cards blended into page background</p>
+<ul>
+<li>Root cause: CSS specificity conflicts with <code>border-color: transparent !important</code> overrides in dark theme</li>
+<li>Solution: Standardized border variables from <code>--tblr-border-color</code> to <code>--hextrackr-border-subtle</code></li>
+<li>Enhanced border opacity from 0.08 to 0.15 for better visibility across both light and dark modes</li>
+<li>Applied Five Whys root cause analysis to identify true underlying issues</li>
+</ul>
+</li>
+<li><p><strong>AG-Grid Dark Mode Contrast</strong>: Fixed poor contrast for SITE and LOCATION ticket accent colors in dark mode</p>
+<ul>
+<li>Moved ticket accent colors from <code>.ag-theme-quartz</code> scope to global <code>[data-bs-theme=&quot;dark&quot;]</code> scope</li>
+<li>Optimized colors for WCAG AA compliance with enhanced contrast ratios:<ul>
+<li>Teal: #2dd4bf → #5eead4 (9.5:1 contrast ratio)</li>
+<li>Amber: #fbbf24 → #fcd34d (11.2:1 contrast ratio)</li>
+<li>Slate: #94a3b8 → #cbd5e1 (10.2:1 contrast ratio)</li>
+</ul>
+</li>
+<li>All ticket accent colors now meet accessibility standards for dark backgrounds</li>
+</ul>
+</li>
+<li><p><strong>CSS Variable Consolidation</strong>: Comprehensive cleanup of CSS variable architecture</p>
+<ul>
+<li>Fixed Stylelint duplicate variable warnings by creating properly namespaced versions</li>
+<li>Implemented standard and <code>-contrast</code> variants for VPR (Vulnerability Priority Rating) colors</li>
+<li>Consolidated shadow variables with theme-specific opacity values</li>
+<li>Created single source of truth for all color definitions across light/dark themes</li>
+</ul>
+</li>
+<li><p><strong>Device Card Interactivity</strong>: Enhanced device cards with click functionality matching vulnerability cards</p>
+<ul>
+<li>Made device cards clickable with proper cursor styling and modal integration</li>
+<li>Unified user experience patterns between vulnerability and device card interactions</li>
+<li>Added comprehensive JSDoc documentation for improved code maintainability</li>
+</ul>
+</li>
+</ul>
+<h4>CSV Import Pipeline</h4><ul>
+<li><p><strong>Daily Totals Calculation</strong>: Fixed critical bug where <code>calculateAndStoreDailyTotalsEnhanced</code> was missing scan_date filter</p>
+<ul>
+<li>Root cause: Spec 001 backend refactoring removed the WHERE clause filtering by specific scan date</li>
+<li>Impact: Each import would overwrite all previous daily totals instead of updating only the current date</li>
+<li>Solution: Restored <code>WHERE scan_date = ?</code> filter in importService.js line 985</li>
+</ul>
+</li>
+<li><p><strong>Batch Processing Restoration</strong>: Re-implemented <code>processStagingToFinalTables</code> function with proper lifecycle management</p>
+<ul>
+<li>Restored grace period handling for vulnerability state transitions</li>
+<li>Fixed batch processing with 1000-record chunks for performance</li>
+<li>Ensured atomic imports via staging table approach</li>
+</ul>
+</li>
+<li><p><strong>API Response Format</strong>: Fixed /api/vulnerabilities/stats returning array instead of expected object format</p>
+<ul>
+<li>Frontend expected severity-keyed object but received array after modularization</li>
+<li>Restored legacy response contract to maintain backward compatibility</li>
+</ul>
+</li>
+</ul>
+<h3>Documentation</h3><ul>
+<li><p><strong>CSS Theme Architecture</strong>: Added comprehensive documentation for theme system architecture</p>
+<ul>
+<li>Documented CSS variable hierarchy and naming conventions</li>
+<li>Added WCAG contrast guidelines and accessibility best practices</li>
+<li>Provided CSS customization guide for theme modifications</li>
+</ul>
+</li>
+<li><p><strong>Developer Documentation Link</strong>: Fixed broken dev docs link in documentation portal</p>
+<ul>
+<li>Changed from <code>/dev-docs/</code> to <code>/dev-docs-html/</code> to match actual directory structure</li>
+</ul>
+</li>
+<li><p><strong>JSDoc Regeneration</strong>: Updated developer documentation with all recent fixes</p>
+<ul>
+<li>Documented new import service functions and batch processing</li>
+<li>Added comprehensive function descriptions for ImportService</li>
+<li>Enhanced vulnerability-cards.js with detailed JSDoc comments</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.16] - 2025-09-18</h2><h3>Fixed</h3><h4>Documentation Navigation State Management</h4><ul>
+<li><strong>Navigation State Persistence Issue</strong>: Fixed dual highlighting of menu sections when navigating to documentation from external pages<ul>
+<li>Root cause: Saved navigation state from localStorage was restored even when accessing docs from tickets/vulnerabilities pages</li>
+<li>Solution: Detect external navigation via <code>document.referrer</code> and clear saved state for clean entry</li>
+<li>Added exclusive menu expansion to prevent multiple sections appearing active simultaneously</li>
+<li>Overview page now always starts with all menus collapsed for consistent presentation</li>
+</ul>
+</li>
+</ul>
+<h4>Version Consistency</h4><ul>
+<li><strong>Health API Version Mismatch</strong>: Fixed health endpoint reporting outdated version (1.0.13 instead of 1.0.15)<ul>
+<li>Root cause: Hardcoded <code>HEXTRACKR_VERSION=1.0.13</code> in docker-compose.yml overriding code defaults</li>
+<li>Solution: Enhanced docs generation script to automatically sync version across all files</li>
+</ul>
+</li>
+</ul>
+<h3>Changed</h3><h4>Version Management System</h4><ul>
+<li><strong>Centralized Version Updates</strong>: Enhanced html-content-updater.js with comprehensive version synchronization<ul>
+<li>Single source of truth: <code>app/public/package.json</code></li>
+<li>Automatically updates: footer.html, docker-compose.yml, root package.json, and server.js fallback</li>
+<li>Runs during <code>npm run docs:generate</code> to maintain version consistency project-wide</li>
+<li>Prevents version drift across multiple hardcoded locations</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.15] - 2025-09-17</h2><h3>Changed</h3><h4>Backend Modularization Complete</h4><ul>
+<li><strong>Monolithic Refactor Achievement</strong>: Successfully modularized 3,805-line monolithic server.js<ul>
+<li>Reduced main server.js to ~205 lines (94.6% reduction)</li>
+<li>Extracted into 5 controllers, 4 services, 5 routes, 3 config modules, and 3 utilities</li>
+<li>Implemented singleton pattern for controllers with dependency injection</li>
+<li>Maintained 100% backward compatibility with all existing APIs</li>
+</ul>
+</li>
+<li><strong>Module Organization</strong>:<ul>
+<li><code>/app/controllers/</code> - Business logic with singleton pattern (5 controllers)</li>
+<li><code>/app/services/</code> - Data access layer (4 services)</li>
+<li><code>/app/routes/</code> - Express route definitions (5 route modules)</li>
+<li><code>/app/config/</code> - Configuration modules (database, middleware, websocket)</li>
+<li><code>/app/utils/</code> - Utility classes (PathValidator, ProgressTracker, helpers)</li>
+</ul>
+</li>
+<li><strong>Critical Initialization Sequence</strong>: Established proper dependency injection order<ul>
+<li>Database initialization → Controller initialization → Route imports → Server start</li>
+<li>Fixed initialization timing issues that caused &quot;Controller not initialized&quot; errors</li>
+</ul>
+</li>
+</ul>
+<h3>Added</h3><ul>
+<li><strong>Documentation Updates</strong>:<ul>
+<li>Module dependency diagram with ASCII visualization</li>
+<li>Migration rollback procedure for emergency recovery</li>
+<li>Updated CLAUDE.md with modular patterns and initialization sequence</li>
+<li>Comprehensive architecture documentation reflecting new structure</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed</h3><ul>
+<li><strong>Controller Reference Pattern</strong>: Fixed class vs instance pattern in all route files</li>
+<li><strong>Route Mounting</strong>: Corrected path concatenation issues (e.g., /api/imports/imports)</li>
+<li><strong>File Name Case Sensitivity</strong>: Standardized on lowercase controller filenames</li>
+</ul>
+<h3>Technical Debt Resolved</h3><ul>
+<li><strong>T053 Backend Modularization</strong>: Completed full extraction from monolithic architecture</li>
+<li><strong>Maintainability</strong>: Improved code organization from single 3,805-line file to 15+ focused modules</li>
+<li><strong>Testability</strong>: Enabled unit testing through dependency injection and service separation</li>
+</ul>
+<h2>[1.0.14] - 2025-09-14</h2><h3>Added</h3><h4>Documentation Portal Enhancements</h4><ul>
+<li><strong>AG-Grid Community Integration</strong>: Advanced data tables for interactive documentation<ul>
+<li>Interactive table converter for markdown tables to AG-Grid format</li>
+<li>Roadmap table sorting functionality with real-time filtering</li>
+<li>Responsive AG-Grid tables optimized for mobile devices</li>
+<li>Dark mode AG-Grid theme integration with proper color schemes</li>
+</ul>
+</li>
+<li><strong>Enhanced Navigation System</strong>: Improved user experience and accessibility<ul>
+<li>Back-to-top button with smooth scroll behavior and visual feedback</li>
+<li>Enhanced breadcrumb navigation system with proper spacing</li>
+<li>Loading spinner for content transitions</li>
+<li>Responsive documentation layout with mobile optimization</li>
+</ul>
+</li>
+<li><strong>UI/UX Improvements</strong>: Professional navigation and interaction patterns<ul>
+<li>Enhanced navigation with visual feedback and hover effects</li>
+<li>Improved sub-navigation styling with transform animations</li>
+<li>Avatar styling enhancements in navigation components</li>
+<li>Collapse icon rotation animations for expandable sections</li>
+</ul>
+</li>
+<li><strong>Mermaid Diagram Support</strong>: Interactive diagram rendering for documentation<ul>
+<li>Client-side Mermaid.js integration for rendering diagrams from markdown</li>
+<li>Theme-aware diagram rendering with automatic dark/light mode switching</li>
+<li>Custom CSS styling for consistent diagram appearance across themes</li>
+<li>Support for flowcharts, sequence diagrams, state diagrams, and more</li>
+<li>Foundation for future network topology and vulnerability mapping features</li>
+</ul>
+</li>
+</ul>
+<h4>Architecture Review System</h4><ul>
+<li><strong>Comprehensive Architecture Assessment</strong>: Complete technical review using 5 specialized expert agents<ul>
+<li>Node.js backend architecture analysis (3,809-line monolithic server assessment)</li>
+<li>SQLite database schema and performance evaluation (15 tables, 31 indexes)</li>
+<li>OWASP Top 10 security vulnerability assessment</li>
+<li>JavaScript frontend architecture review (17,951 lines across 46 files)</li>
+<li>WebSocket real-time communication analysis (Socket.io implementation)</li>
+</ul>
+</li>
+<li><strong>Expert Agent System</strong>: 138+ specialized domain expert agents for technical analysis</li>
+<li><strong>Roadmap Management</strong>: Enhanced project planning with semantic versioning and changelog automation</li>
+</ul>
+<h3>Fixed</h3><h4>Vulnerability VPR Aggregation (Totals & Trends)</h4><ul>
+<li>Fixed inflated per‑severity VPR totals caused by multi‑CVE split rows each carrying the full VPR score<ul>
+<li>Root Cause: Daily totals used <code>SUM(vpr_score)</code> over <code>vulnerabilities_current</code>, multiplying VPR when a single plugin row listed multiple CVEs</li>
+<li>Solution: Enhanced daily totals now aggregate VPR by a deduplicated key and sum once per vulnerability entity per host<ul>
+<li>Aggregation key preference: <code>plugin_id + host</code> → fallback <code>plugin_name + host</code> → fallback <code>host + description</code></li>
+<li>Counts remain row-based (each CVE row counts); only VPR totals are deduplicated</li>
+</ul>
+</li>
+<li>Impact: Stat cards and trend chart now align; Medium spike resolved without altering per‑row VPR in tables</li>
+<li>Files: <code>app/public/server.js</code> (calculateAndStoreDailyTotalsEnhanced)</li>
+</ul>
+</li>
+</ul>
+<h4>Trend Badge Wiring and Casing</h4><ul>
+<li>Fixed trend badges (+/−%) stuck at 0% due to trends not being wired and key casing mismatch<ul>
+<li>Wire: Orchestrator now sets trends on <code>VulnerabilityStatisticsManager</code> before UI update</li>
+<li>Casing: Use capitalized severity keys from <code>/recent-trends</code> and robust fallback to data manager trends</li>
+<li>Files: <code>app/public/scripts/shared/vulnerability-core.js</code>, <code>app/public/scripts/shared/vulnerability-statistics.js</code></li>
+</ul>
+</li>
+</ul>
+<h4>Dark Mode Accessibility Critical Fixes (WCAG Compliance)</h4><ul>
+<li><strong>Navigation Contrast Violation Resolution</strong>: Fixed critical WCAG AA compliance issue<ul>
+<li><strong>Root Cause</strong>: Selected navigation items had white text on white background (1:1 contrast ratio)</li>
+<li><strong>Solution</strong>: Implemented proper dark mode color hierarchy using HexTrackr surface variables<ul>
+<li>Active states: <code>#2a3f54</code> background with <code>#e2e8f0</code> text (high contrast)</li>
+<li>Hover states: <code>#1e293b</code> background with consistent readable text</li>
+<li>Sub-navigation: <code>#94a3b8</code> muted text with <code>#243447</code> hover background</li>
+</ul>
+</li>
+<li><strong>Impact</strong>: Ensures accessibility compliance for visually impaired users</li>
+<li><strong>Validation</strong>: Tested across documentation portal, tickets, and vulnerabilities pages</li>
+</ul>
+</li>
+</ul>
+<h4>Documentation Portal Specific Fixes</h4><ul>
+<li><strong>Header Spacing Issue Resolution</strong>: Eliminated unwanted space above documentation portal header<ul>
+<li><strong>Root Cause</strong>: CSS rule <code>.navbar { margin-top: 1rem; }</code> in docs-tabler.css pushing header down</li>
+<li><strong>Solution</strong>: Commented out problematic CSS rule (lines 13-17 in docs-tabler.css)</li>
+<li><strong>Impact</strong>: Documentation portal header now aligns consistently with tickets/vulnerabilities pages</li>
+<li><strong>Method</strong>: Systematic investigation using sequential thinking and user feedback</li>
+</ul>
+</li>
+<li><strong>Breadcrumb and Layout Improvements</strong>: Enhanced documentation page structure<ul>
+<li>Fixed breadcrumb spacing to prevent cramped appearance above menu items</li>
+<li>Resolved page header positioning conflicts</li>
+<li>Enhanced documentation content area scroll behavior</li>
+<li>Improved loading spinner visibility and positioning</li>
+</ul>
+</li>
+</ul>
+<h4>Modal and Component Accessibility Fixes</h4><ul>
+<li><strong>Modal Contrast Improvements</strong>: Enhanced readability across light and dark themes<ul>
+<li>Improved modal contrast and text readability</li>
+<li>Fixed table styling in both light and dark modes with proper variable usage</li>
+<li>Enhanced blockquote styling with theme-aware background colors</li>
+<li>Resolved loading spinner visibility issues in modal contexts</li>
+</ul>
+</li>
+</ul>
+<h3>Changed</h3><h4>CSS Architecture Improvements</h4><ul>
+<li><strong>Modularized Documentation CSS</strong>: Created dedicated docs-tabler.css for portal-specific styling<ul>
+<li>Separated documentation portal styles from main application CSS</li>
+<li>Enhanced table styling with proper Bootstrap variable integration</li>
+<li>Improved dark mode table support with enhanced border and background colors</li>
+<li>Streamlined navigation styling with consistent active states</li>
+</ul>
+</li>
+<li><strong>Theme System Enhancements</strong>: Better CSS variable usage for consistency<ul>
+<li>Standardized HexTrackr surface hierarchy variables across components</li>
+<li>Enhanced CSS custom property usage for maintainable theming</li>
+<li>Improved color consistency between documentation portal and main application</li>
+<li>Better separation of concerns between shared and page-specific styles</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.13] - 2025-09-13</h2><h3>Added</h3><h4>Dark Mode Theme System (Spec 005)</h4><ul>
+<li><strong>Complete Dark/Light Theme Implementation</strong>: Full theme switching system with accessibility focus<ul>
+<li>System preference detection using <code>prefers-color-scheme</code> media query</li>
+<li>Manual theme toggle with persistent localStorage storage (sessionStorage fallback for private browsing)</li>
+<li>Smooth CSS transitions between light and dark themes</li>
+<li>WCAG AA compliance with automated contrast ratio validation</li>
+<li>Screen reader announcements for theme changes via accessibility API</li>
+<li>Cross-tab synchronization of theme preferences</li>
+</ul>
+</li>
+<li><strong>Component Integration</strong>: Seamless theming across all UI components<ul>
+<li>AG-Grid theme integration with custom dark/light variants</li>
+<li>ApexCharts automatic theme adaptation</li>
+<li>Tabler framework theme variables override system</li>
+<li>Modal and overlay components with theme-aware styling</li>
+</ul>
+</li>
+<li><strong>Developer Features</strong>: Comprehensive theme development tools<ul>
+<li>Theme validation utilities with contrast checking</li>
+<li>Debugging tools for theme state management</li>
+<li>Performance optimizations for theme switching</li>
+<li>Extensible architecture for future theme variants</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed</h3><h4>Card Border Consistency (Dark Mode)</h4><ul>
+<li><strong>Card Border Styling</strong>: Fixed inconsistent border appearance between device cards and vulnerability cards in dark mode<ul>
+<li>Resolved thick white borders on device cards that didn&#39;t match the thin dark borders on vulnerability cards</li>
+<li>Updated <code>.device-card, .vuln-card</code> CSS rule in <code>vulnerabilities.html</code> to use theme-aware CSS variables</li>
+<li>Changed hard-coded values to CSS variables for proper theme adaptation:<ul>
+<li><code>background: white</code> → <code>background: var(--tblr-bg-surface)</code></li>
+<li><code>border: 1px solid #e2e8f0</code> → <code>border: 1px solid var(--tblr-border-color)</code></li>
+</ul>
+</li>
+<li>Both card types now display consistent borders across light and dark themes</li>
+<li><strong>Engineering Insight</strong>: Hard-coded CSS values prevented proper theme adaptation despite external stylesheet rules</li>
+<li><strong>Resolution Method</strong>: Systematic investigation using sequential thinking and disciplined Memento documentation</li>
+</ul>
+</li>
+</ul>
+<h4>AG-Grid Table Container Overflow (Spec 004)</h4><ul>
+<li>Fixed AG-Grid table overflow causing excessive white space in Vulnerability Data Workspace</li>
+<li>Removed problematic grid-height-manager.js calculations and vulnerability-table-fix.css</li>
+<li>Implemented clean flexbox solution for natural container sizing:<ul>
+<li><code>.card-body.p-2</code> uses <code>display: flex</code> with consistent minimum height</li>
+<li><code>.view-content</code> with <code>flex-grow: 1</code> for proper space distribution</li>
+<li><code>#vulnGrid</code> with <code>height: 100%; flex-grow: 1</code> for natural expansion</li>
+</ul>
+</li>
+<li>Table now properly expands for 10, 25, 50, 200 items without overflow or excessive padding</li>
+<li><strong>Engineering Insight</strong>: Simple CSS flexbox approach solved what complex JavaScript calculations could not</li>
+<li><strong>Lesson Learned</strong>: Elegant solutions often emerge from removing complexity rather than adding it</li>
+</ul>
+<h2>[1.0.12](https://github.com/Lonnie-Bruton/HexTrackr/releases/tag/v1.0.12) - 2025-09-09</h2><h3>Completed Tasks</h3><h4>Javascript Module Extraction (Spec 001)</h4><ul>
+<li>vulnerability-statistics.js (364 lines) - Task 1.2 ✅ COMPLETED</li>
+<li>vulnerability-data.js (571 lines) - Task 1.1 ✅ COMPLETED</li>
+<li>vulnerability-chart-manager.js (590 lines) - Task 2.2 ✅ COMPLETED</li>
+<li>vulnerability-details-modal.js (935 lines) - Task 3.3 ✅ COMPLETED</li>
+<li>device-security-modal.js (637 lines) - Additional modal ✅ COMPLETED</li>
+<li>progress-modal.js (649 lines) - Additional modal ✅ COMPLETED</li>
+<li>settings-modal.js (1,296 lines) - Settings management ✅ COMPLETED</li>
+<li>ag-grid-responsive-config.js (356 lines) - Grid configuration ✅ COMPLETED</li>
+<li>vulnerability-search.js (268 lines) - Task 2.1 ✅ COMPLETED (Sept 8)</li>
+<li>vulnerability-grid.js (195 lines) - Task 3.1 ✅ COMPLETED (Sept 8)</li>
+<li>vulnerability-cards.js (345 lines) - Task 3.2 ✅ COMPLETED (Sept 8)</li>
+<li>vulnerability-core.js (571 lines) - T004 ✅ COMPLETED (Sept 8)</li>
+<li>T001 Extract vulnerability-search.js ✅ COMPLETED</li>
+<li>T002 Extract vulnerability-grid.js ✅ COMPLETED</li>
+<li>T003 Extract vulnerability-cards.js ✅ COMPLETED</li>
+<li>T004 Create vulnerability-core.js ✅ COMPLETED</li>
+</ul>
+<h2>[1.0.11] - 2025-09-08 (Pre-Release)</h2><h3>Completed - Sprint T001-T006: JavaScript Modularization Success</h3><ul>
+<li><p><strong>Extraordinary Sprint Achievement</strong>: 4-week sprint completed in 1 day with 95.1% code reduction</p>
+<ul>
+<li><strong>11 Specialized Modules Created</strong>: Complete modular architecture from 2,429-line monolith</li>
+<li><strong>Orchestrator Pattern Implementation</strong>: vulnerability-manager.js reduced to 120-line coordinator</li>
+<li><strong>Zero Functionality Regression</strong>: All features preserved and validated through comprehensive testing</li>
+<li><strong>Widget Architecture Foundation</strong>: Complete foundation established for dashboard platform</li>
+</ul>
+</li>
+<li><p><strong>Module Extraction Achievement</strong>: Comprehensive code organization and maintainability improvements</p>
+<ul>
+<li><strong>vulnerability-data.js</strong> (571 lines): Central data management and caching</li>
+<li><strong>vulnerability-statistics.js</strong> (364 lines): VPR calculations and metrics generation</li>
+<li><strong>vulnerability-search.js</strong> (348 lines): Advanced search and filtering functionality  </li>
+<li><strong>vulnerability-grid.js</strong> (529 lines): AG Grid table interface management</li>
+<li><strong>vulnerability-cards.js</strong> (395 lines): Card-based responsive layouts</li>
+<li><strong>vulnerability-chart-manager.js</strong> (590 lines): ApexCharts visualization management</li>
+<li><strong>vulnerability-details-modal.js</strong> (935 lines): Modal system and detail views</li>
+<li><strong>vulnerability-core.js</strong> (338 lines): Module orchestration and coordination</li>
+<li><strong>Additional supporting modules</strong>: Enhanced architecture with specialized utilities</li>
+</ul>
+</li>
+<li><p><strong>Integration Testing Success</strong>: Comprehensive validation ensuring production readiness</p>
+<ul>
+<li><strong>Playwright Browser Testing</strong>: Full UI functionality validation across browsers</li>
+<li><strong>Performance Benchmarking</strong>: Maintained sub-2s load times and sub-500ms table rendering</li>
+<li><strong>Code Quality Validation</strong>: ESLint compliance and improved complexity scores</li>
+<li><strong>Memory Management</strong>: No memory leaks detected in continuous usage testing</li>
+</ul>
+</li>
+</ul>
+<h3>Completed - Code Quality Excellence</h3><ul>
+<li><strong>Markdownlint Configuration Mastery</strong>: Achieved 92% reduction in false positives (157→13 issues)<ul>
+<li><strong>Directory Exclusion Strategy</strong>: Comprehensive ignore patterns eliminating node_modules and test artifacts</li>
+<li><strong>Clean PR Achievement</strong>: Pull Request #32 with zero markdown issues through proper configuration</li>
+<li><strong>Quality Gate Success</strong>: Focused validation on documentation files only, excluding build artifacts</li>
+</ul>
+</li>
+<li><strong>Code Quality Pipeline Enhancement</strong>: Systematic approach to quality tool configuration<ul>
+<li><strong>False Positive Elimination</strong>: Strategic directory exclusion patterns for accurate analysis</li>
+<li><strong>Documentation Standards</strong>: Maintained high documentation quality without tool noise</li>
+<li><strong>Development Velocity</strong>: Reduced quality checking overhead through intelligent exclusions</li>
+</ul>
+</li>
+</ul>
+<h3>Completed - Sprint Task Achievement</h3><ul>
+<li><strong>Task 1.2 Extraction Complete</strong>: vulnerability-statistics.js successfully modularized (Sep 8, 2025)<ul>
+<li><strong>VPRStatistics Widget</strong>: Created 300-line statistics calculation module</li>
+<li><strong>Modular Architecture</strong>: Established pattern for remaining 6 widget extractions</li>
+<li><strong>Widget Foundation</strong>: Prepared statistics component for future dashboard integration</li>
+</ul>
+</li>
+<li><strong>Development Milestone</strong>: First major component extraction from ModernVulnManager complete<ul>
+<li><strong>Code Organization</strong>: Statistical calculations now properly separated and reusable</li>
+<li><strong>Interface Standardization</strong>: Created consistent API patterns for inter-widget communication</li>
+<li><strong>Quality Validation</strong>: Comprehensive testing ensures zero functionality regression</li>
+</ul>
+</li>
+</ul>
+<h3>Strategic - Project Structure Analysis</h3><ul>
+<li><strong>Critical Structure Assessment</strong>: Identified 39 root directory items requiring organization<ul>
+<li><strong>Docker Conflict Risk</strong>: Accidental Node.js startups causing container conflicts</li>
+<li><strong>Path Reference Impact</strong>: 20+ HTML files requiring updates after folder restructure</li>
+<li><strong>Git Strategy Planning</strong>: Submodule approach for clean public repo with dev backup</li>
+</ul>
+</li>
+<li><strong>Architecture Planning</strong>: /app/public/ migration strategy developed<ul>
+<li><strong>Container Isolation</strong>: Ensure Docker-only Node.js execution</li>
+<li><strong>Clean Repository Structure</strong>: &lt;10 root items for improved navigation</li>
+<li><strong>Development File Separation</strong>: Distinguish app code from development tools</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.10] - 2025-09-07</h2><h3>Fixed - Real-Time Progress Tracking</h3><ul>
+<li><strong>WebSocket Progress Updates</strong>: Fixed CSV import progress modal hanging at 95% with spinning loading circle<ul>
+<li><strong>Session ID Synchronization</strong>: Resolved frontend/backend session ID mismatch preventing real-time updates<ul>
+<li>Frontend generating: <code>import_1757226509515_1rd7p4qpd</code></li>
+<li>Backend generating: <code>cb92e1d6-42fa-4e8b-a01f-4ca6533011d3</code></li>
+<li>Fixed by modifying server.js to use frontend&#39;s sessionId instead of UUID generation</li>
+</ul>
+</li>
+<li><strong>Progress Complete Event Handling</strong>: Added missing <code>progress-complete</code> event listener in WebSocket client<ul>
+<li>Server was emitting <code>progress-complete</code> but frontend only listened for <code>progress-update</code></li>
+<li>Added proper completion handler in <code>websocket-client.js</code> and <code>progress-modal.js</code></li>
+<li>Fixed JavaScript error: <code>this.updateProgressBar is not a function</code> → changed to <code>this.updateUI()</code></li>
+</ul>
+</li>
+<li><strong>Page Refresh Integration</strong>: Fixed modal closing without refreshing underlying data<ul>
+<li>Added <code>window.refreshPageData</code> function to <code>vulnerability-manager.js</code></li>
+<li>Progress modal now properly triggers data refresh after successful import completion</li>
+<li>Eliminates blank page state on first upload after modal close</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Enhanced - User Experience Improvements</h3><ul>
+<li><strong>Progress Modal Cleanup</strong>: Hidden hardcoded Current/Total/ETA display elements<ul>
+<li>Added <code>d-none</code> class to progress details section showing &quot;0 0 --&quot; placeholder values</li>
+<li>Server already tracks current/total/eta internally for future enhancement implementation</li>
+<li>Clean modal interface focusing on percentage progress and success messaging</li>
+</ul>
+</li>
+</ul>
+<h3>Performance - Import Processing Validation</h3><ul>
+<li><strong>CSV Import Speed</strong>: Confirmed excellent import performance at ~6.8 seconds for 10,000 rows<ul>
+<li>User-reported &quot;hanging at 95%&quot; was UI issue, not performance problem</li>
+<li>Bulk SQLite operations with transaction batching maintaining optimal throughput</li>
+<li>WebSocket progress updates now properly display real-time progress from 5% → 95% → completion</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.9] - 2025-09-07</h2><h3>Code Quality - Comprehensive Codacy Resolution</h3><ul>
+<li><strong>320 Issues Resolved</strong>: Systematic code quality review resolved comprehensive issues<ul>
+<li><strong>SQL Schema Compliance</strong>: Fixed critical syntax errors in <code>data/schema.sql</code><ul>
+<li>Corrected comment formatting and positioning for SQLite compatibility</li>
+<li>Fixed AUTOINCREMENT syntax errors preventing proper table creation</li>
+<li>Resolved OR clause syntax issues in constraint definitions</li>
+</ul>
+</li>
+<li><strong>JavaScript Architecture Analysis</strong>: Complete server.js complexity assessment and refactoring roadmap<ul>
+<li>Identified complexity score of 116 requiring modular architecture approach</li>
+<li>Created comprehensive refactoring plan targeting &lt;12 complexity per module</li>
+<li>Established modular structure: services/, routes/, utils/, middleware/ organization</li>
+</ul>
+</li>
+<li><strong>CSS Standards Compliance</strong>: Achieved full color notation standardization<ul>
+<li>Fixed rgba/rgb color format compliance across all stylesheets</li>
+<li>Eliminated deprecated color notation patterns for browser compatibility</li>
+<li>Enhanced CSS maintainability with consistent color standards</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Development Infrastructure</h3><ul>
+<li><strong>Code Quality Pipeline</strong>: Enhanced automated quality assurance workflow<ul>
+<li><strong>Configuration Management</strong>: Optimized <code>.codacy/codacy.yaml</code> exclusion patterns<ul>
+<li>Updated file exclusion rules for more accurate analysis</li>
+<li>Improved configuration for JavaScript and CSS quality gates</li>
+<li>Enhanced markdown linting integration with development workflow</li>
+</ul>
+</li>
+<li><strong>Pre-commit Enhancement</strong>: Strengthened markdown processing validation<ul>
+<li>Improved formatting consistency across documentation files</li>
+<li>Enhanced link validation and structure checking</li>
+<li>Integrated quality gates with development workflow</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Technical Documentation</h3><ul>
+<li><strong>Architecture Documentation</strong>: Comprehensive refactoring strategy documentation<ul>
+<li><strong>Modular Architecture Plan</strong>: Detailed server.js refactoring roadmap in <code>/dev-docs/architecture/refactoring-plan.md</code><ul>
+<li>4-week implementation timeline with weekly milestones</li>
+<li>Service layer extraction strategy with complexity targets</li>
+<li>Risk mitigation and success metrics for architectural transition</li>
+</ul>
+</li>
+<li><strong>Development Workflow</strong>: Enhanced development documentation with quality improvements section<ul>
+<li>Updated <code>/dev-docs/development/index.md</code> with code quality standards</li>
+<li>Documented recent quality improvement achievements and methodologies</li>
+<li>Integrated quality assurance practices with development best practices</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.8] - 2025-09-06</h2><h3>Security Enhancements</h3><ul>
+<li><strong>XSS Protection</strong>: Fixed critical AG Grid cell renderer vulnerability by replacing dangerous inline onclick handlers with secure event system<ul>
+<li>Removed vulnerable <code>onclick=&quot;vulnManager.viewDeviceDetails(&#39;${hostname}&#39;)&quot;</code> pattern susceptible to code injection</li>
+<li>Implemented secure <code>onCellClicked</code> event handler with proper parameter validation</li>
+<li>Prevents hostname values containing quotes or special characters from breaking HTML structure</li>
+</ul>
+</li>
+<li><strong>CORS Security Hardening</strong>: Restricted unrestricted CORS policy to secure localhost-only origins<ul>
+<li>Changed from wide-open <code>cors()</code> to specific <code>origin: [&#39;http://localhost:8080&#39;, &#39;http://127.0.0.1:8080&#39;]</code></li>
+<li>Added explicit HTTP methods and headers whitelist for enhanced security posture</li>
+<li>Enables credentials for future authentication integration</li>
+</ul>
+</li>
+<li><strong>DoS Protection</strong>: Implemented express-rate-limit middleware to prevent denial-of-service attacks<ul>
+<li>Limits each IP to 100 requests per 15-minute window on all /api/ endpoints</li>
+<li>Provides standardized rate limiting headers for client awareness</li>
+<li>Protects import/export endpoints from API flooding attacks</li>
+</ul>
+</li>
+</ul>
+<h3>Performance Improvements</h3><ul>
+<li><strong>CSV Import Performance</strong>: Achieved 11-13x speed improvement through staging table optimization<ul>
+<li>Large CSV files now import in 8-12 seconds instead of 45-60 seconds (10,000 rows tested)</li>
+<li>Switched frontend from <code>/api/vulnerabilities/import</code> to high-performance <code>/api/vulnerabilities/import-staging</code></li>
+<li>Utilizes bulk database operations with transaction batching for optimal throughput</li>
+<li>Maintains full rollover deduplication logic while dramatically improving user experience</li>
+</ul>
+</li>
+</ul>
+<h3>Development Infrastructure (2)</h3><ul>
+<li><strong>Comprehensive Security Audit</strong>: Systematic code quality assessment with detailed vulnerability analysis<ul>
+<li>Conducted thorough security review identifying 6 vulnerabilities and architectural improvements</li>
+<li>Generated detailed audit reports documenting security issues and remediation recommendations</li>
+<li>Created comprehensive technical documentation structure in dev-docs/ for ref.tools indexing</li>
+</ul>
+</li>
+<li><strong>Technical Documentation</strong>: Established development documentation architecture<ul>
+<li>Comprehensive AG Grid responsive patterns, database schema evolution, and testing strategies</li>
+<li>Created keyword-indexed technical documentation for enhanced searchability via ref.tools</li>
+<li>Separated technical docs (dev-docs/) from user documentation (docs-source/) for clarity</li>
+</ul>
+</li>
+<li><strong>Version Management</strong>: Improved version reference strategy for reduced maintenance burden<ul>
+<li>Implemented generic version references in technical documentation to prevent version drift</li>
+<li>Maintained specific versions only where semantically necessary (package.json, CHANGELOG, ROADMAP)</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.6] - 2025-09-06</h2><h3>Fixed</h3><ul>
+<li><strong>Critical Modal Aggregation System</strong>: Resolved major user-facing issues with modal data display<ul>
+<li>Fixed vulnerability modal showing only 1 device instead of properly aggregating all affected devices (now shows 24 devices for CVE-2017-3881)</li>
+<li>Fixed device modal showing only 1 vulnerability instead of properly aggregating all vulnerabilities per device (now shows 12 vulnerabilities for grimesnswan03)</li>
+<li>Implemented universal aggregation key using description field for consistent data grouping</li>
+<li>Enhanced modal layering with proper Bootstrap Modal.getInstance() management</li>
+</ul>
+</li>
+</ul>
+<h3>Enhanced</h3><ul>
+<li><strong>Modal Architecture and User Experience</strong><ul>
+<li>Implemented description-field-based universal aggregation system for consistent data relationships</li>
+<li>Enhanced testing strategy with comprehensive Playwright browser automation for modal workflows</li>
+<li>Validated import/export pipeline performance with 10,000+ record handling</li>
+<li>Improved modal transition workflow: vulnerability modal → closes → device modal opens seamlessly</li>
+</ul>
+</li>
+</ul>
+<h3>Technical Improvements</h3><ul>
+<li><strong>Testing and Validation Infrastructure</strong><ul>
+<li>Added comprehensive Playwright test coverage for modal aggregation functionality</li>
+<li>Implemented automated UI testing for vulnerability and device modal interactions</li>
+<li>Enhanced data validation pipeline for large dataset imports and aggregation accuracy</li>
+<li>Improved modal state management with proper Bootstrap integration</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.7] - 2025-09-06</h2><h3>Enhanced - Documentation Infrastructure</h3><ul>
+<li><strong>Documentation Infrastructure</strong>: Comprehensive documentation update with modal architecture patterns<ul>
+<li>Documented modal aggregation system using description field as universal matching key</li>
+<li>Enhanced testing documentation with Playwright browser automation integration</li>
+<li>Updated user guides with detailed modal interaction workflows and functionality</li>
+<li>Improved architecture documentation covering Bootstrap modal layering and state management</li>
+</ul>
+</li>
+</ul>
+<h3>Technical Improvements - Knowledge Management</h3><ul>
+<li><strong>Knowledge Management Integration</strong>: Enhanced development workflow with persistent knowledge systems<ul>
+<li>Implemented pattern recognition system for development consistency</li>
+<li>Documented modal aggregation architecture patterns for future development consistency</li>
+<li>Enhanced testing strategy documentation with comprehensive Playwright validation workflows</li>
+<li>Updated development guides with modern browser automation testing approaches</li>
+</ul>
+</li>
+</ul>
+<h3>Planned - v1.0.8</h3><ul>
+<li><strong>Dashboard Implementation</strong>: Begin widget-based customizable dashboard development</li>
+<li><strong>Ticket System Modularization</strong>: Apply lessons learned to tickets.js refactoring</li>
+<li><strong>Advanced Modal Features</strong>: Implement export and reporting functionality from modal views</li>
+</ul>
+<h2>[1.0.5] - 2025-09-05</h2><h3>Added</h3><ul>
+<li><p><strong>JavaScript Modularization Architecture</strong>: Established foundation for widget-based dashboard development</p>
+<ul>
+<li>Created <code>/dev-docs/architecture/</code> documentation system with symbol tables and module boundaries</li>
+<li>Established unified development workflow with enhanced pattern management</li>
+<li>Designed comprehensive dashboard vision for drag-drop widget customization</li>
+</ul>
+</li>
+<li><p><strong>PaginationController Module</strong>: Successfully extracted first reusable component (216 lines)</p>
+<ul>
+<li>Reduced vulnerability-manager.js from 2,614 to 2,429 lines (185 line reduction)</li>
+<li>Established modularization patterns for future extractions</li>
+<li>Validated zero-regression refactoring process</li>
+</ul>
+</li>
+</ul>
+<h3>Enhanced - Development Workflow</h3><ul>
+<li><p><strong>Development Workflow</strong>: Standardized development documentation and processes</p>
+<ul>
+<li>Updated development guides and instruction files with consistent patterns</li>
+<li>Implemented systematic development handoff procedures</li>
+<li>Created architectural documentation for coordinated development</li>
+</ul>
+</li>
+<li><p><strong>Project Documentation</strong>: Updated roadmap and sprint priorities to reflect modularization focus</p>
+<ul>
+<li>Moved JavaScript refactoring to top priority status</li>
+<li>Deferred documentation sprint until modularization completion</li>
+<li>Established 4-week Phase 2 timeline for ModernVulnManager splitting</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.4] - 2025-09-05</h2><h3>Added - Agent Enhancements</h3><ul>
+<li><strong>UI Testing Enhancement</strong>: Integrated Playwright for live browser testing and visual validation<ul>
+<li>Enhanced testing capabilities with real-time browser automation for design verification</li>
+<li>Added comprehensive visual testing for UI improvements and changes</li>
+<li>Implemented before/after screenshot comparison for design changes</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed - Version & Modal Issues</h3><ul>
+<li><p><strong>Version Badge Synchronization</strong>: Fixed version inconsistency across application components</p>
+<ul>
+<li>Resolved version badge displaying v1.0.1 while package.json showed v1.0.3</li>
+<li>Enhanced version-manager.js to include footer badge URL synchronization</li>
+<li>Added automated version sync command: <code>node scripts/version-manager.js &lt;new-version&gt;</code></li>
+<li>Implemented production safety with timestamped backups and comprehensive file manifest</li>
+</ul>
+</li>
+<li><p><strong>Modal Layering Bug</strong>: Fixed critical modal interaction issue in vulnerability management</p>
+<ul>
+<li>Resolved hostname links within vulnerability modal opening device modal behind existing modal</li>
+<li>Added proper Bootstrap Modal.getInstance() check to close existing modals before opening new ones</li>
+<li>Implemented clean modal transitions: vulnerability modal → closes → device modal opens</li>
+<li>Comprehensive Playwright testing confirms smooth modal workflows without layering issues</li>
+</ul>
+</li>
+<li><p><strong>Table Resizing and Pagination</strong>: Implemented working table resizing and card pagination system</p>
+<ul>
+<li>Added responsive table column resizing functionality</li>
+<li>Implemented complete pagination system with 6-card default for optimal viewing</li>
+<li>Fixed incomplete pagination code that previously broke card display functionality</li>
+<li>Restored comprehensive card functionality across all views</li>
+</ul>
+</li>
+</ul>
+<h3>Enhanced - User Experience</h3><ul>
+<li><strong>User Experience Improvements</strong><ul>
+<li>Professional modal behavior with proper state management</li>
+<li>Improved visual consistency with synchronized version badges across all components</li>
+<li>Enhanced table interaction with responsive design and pagination controls</li>
+<li>Streamlined vulnerability-to-device navigation workflow</li>
+</ul>
+</li>
+</ul>
+<h3>Technical Improvements - Agent Architecture</h3><ul>
+<li><p><strong>Testing Architecture</strong>: Enhanced documentation and testing infrastructure with advanced integrations</p>
+<ul>
+<li>Added Playwright for live browser validation of UI changes</li>
+<li>Integrated persistent knowledge management across development sessions</li>
+<li>Improved documentation pipeline with automated visual verification</li>
+</ul>
+</li>
+<li><p><strong>Version Management</strong>: Comprehensive version synchronization system</p>
+<ul>
+<li>Enhanced version-manager.js with footer badge support and backup safety</li>
+<li>Added regex pattern matching for badge URL updates: <code>/HexTrackr-v[\\d.]+(-blue\\?style=flat)/g</code></li>
+<li>Implemented automated backup system with timestamps and rollback capabilities</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.3] - 2025-09-03</h2><h3>Fixed - Documentation Accuracy</h3><ul>
+<li><strong>Documentation Accuracy</strong>: Comprehensive documentation review and fixes<ul>
+<li>Updated API reference to include missing <code>/api/restore</code> endpoint</li>
+<li>Clarified difference between <code>/api/vulnerabilities/import</code> and <code>/api/import/vulnerabilities</code> endpoints</li>
+<li>Fixed formatting and consistency issues across documentation</li>
+<li>Ensured all user guides are complete and accurate</li>
+</ul>
+</li>
+</ul>
+<h3>Enhanced - Documentation Improvements</h3><ul>
+<li><strong>Documentation Improvements</strong>:<ul>
+<li>Added explanatory section on import API options</li>
+<li>Expanded backup and restore documentation with clearer examples</li>
+<li>Improved navigation and cross-references between related documentation</li>
+</ul>
+</li>
+</ul>
+<h3>Enhanced (Infrastructure)</h3><ul>
+<li><p><strong>Documentation Infrastructure</strong>: Enhanced automation and quality assurance</p>
+<ul>
+<li>Improved documentation generation pipeline with automated analysis</li>
+<li>Added comprehensive documentation review standards and metrics</li>
+<li>Enhanced cross-reference validation and content accuracy checking</li>
+</ul>
+</li>
+<li><p>Docs: Dynamic overview statistics loaded from new <code>/api/docs/stats</code> endpoint; falls back to existing static counts</p>
+<p>if API unavailable</p>
+</li>
+<li><p>Ticket modal enhancements (v1.1.0)</p>
+<ul>
+<li>XT# read-only field display</li>
+<li>Site/location separation and validation</li>
+<li>Status workflow updates (remove In-Progress, add Staged/Failed/Overdue)</li>
+<li>Drag-drop UX improvements with accessibility features</li>
+<li>Auto-status updates for overdue tickets</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.1] - 2025-08-27</h2><h3>Fixed - Device Management UI</h3><ul>
+<li><strong>Device Management UI</strong>: Fixed button order from + - to - + for consistent positioning<ul>
+<li>Resolved button position switching that caused UX friction during rapid clicking</li>
+<li>Updated both initial template (tickets.html) and dynamic generation (tickets.js)</li>
+<li>Enables efficient &quot;tap tap tap&quot; workflow without mouse repositioning</li>
+</ul>
+</li>
+</ul>
+<h3>Improved</h3><ul>
+<li><strong>Drag-and-Drop System</strong>: Comprehensive bug fixes for device reordering<ul>
+<li>Fixed drag-to-top insertion logic to work repeatedly</li>
+<li>Preserved reverse button visibility during drag operations</li>
+<li>Fixed reverse toggle functionality to properly toggle state</li>
+<li>Enhanced feedback system to maintain UI consistency during operations</li>
+</ul>
+</li>
+</ul>
+<h2>[1.0.0] - 2025-08-27</h2><h3>Summary</h3><p>Stable baseline release of HexTrackr cybersecurity ticket and vulnerability management system.</p>
+<h3>Features</h3><ul>
+<li><p><strong>Dual-Purpose Management System</strong></p>
+<ul>
+<li>Ticket management with full CRUD operations</li>
+<li>Vulnerability tracking and analysis</li>
+<li>Real-time statistics dashboard</li>
+</ul>
+</li>
+<li><p><strong>Database Management</strong></p>
+<ul>
+<li>SQLite backend with 17 tickets and 100,553+ vulnerabilities</li>
+<li>Comprehensive backup/restore system (ZIP format)</li>
+<li>CSV import/export functionality</li>
+<li>Web-based data management (no technical knowledge required)</li>
+</ul>
+</li>
+<li><p><strong>ServiceNow Integration</strong></p>
+<ul>
+<li>Configurable ServiceNow instance URL</li>
+<li>Clickable ticket number links</li>
+<li>Settings modal configuration</li>
+</ul>
+</li>
+<li><p><strong>User Interface</strong></p>
+<ul>
+<li>Bootstrap 5 (tickets) + Tabler.io (vulnerabilities) frameworks</li>
+<li>Responsive design with modular CSS architecture</li>
+<li>Dark/light theme support</li>
+<li>Settings modal with tabbed interface</li>
+</ul>
+</li>
+<li><p><strong>Development Infrastructure</strong></p>
+<ul>
+<li>Docker-only deployment with Docker Compose</li>
+<li>Modular JavaScript architecture (shared/pages separation)</li>
+<li>Comprehensive documentation system</li>
+<li>Git-based version control with systematic backups</li>
+</ul>
+</li>
+</ul>
+<h3>Technical Stack</h3><ul>
+<li><strong>Backend</strong>: Node.js/Express with SQLite database</li>
+<li><strong>Frontend</strong>: HTML5, JavaScript (ES6+), Bootstrap 5, Tabler.io</li>
+<li><strong>Deployment</strong>: Docker + Docker Compose</li>
+<li><strong>Storage</strong>: SQLite with localStorage fallback</li>
+<li><strong>Port</strong>: localhost:8080</li>
+</ul>
+<h3>Recent Fixes (Leading to v1.0.0)</h3><ul>
+<li>✅ <strong>Field Mapping Fix</strong>: Resolved backend/frontend field mapping preventing ticket saves</li>
+<li>✅ <strong>ServiceNow Integration Restoration</strong>: Fixed ID mismatches and exposed global functions</li>
+<li>✅ <strong>Modular CSS Architecture</strong>: Eliminated font inconsistencies with proper CSS organization</li>
+<li>✅ <strong>Settings Modal Enhancement</strong>: Added Papa Parse 5.4.1 and JSZip 3.10.1 for robust file handling</li>
+</ul>
+<h3>Database Statistics (v1.0.0)</h3><ul>
+<li>Tickets: 17 total (9 open, 5 overdue, 8 completed)</li>
+<li>Vulnerabilities: 100,553 total</li>
+<li>Total Records: 100,570</li>
+</ul>
+<h3>Known Limitations</h3><ul>
+<li>Manual XT# assignment (auto-generation planned for v1.1.0)</li>
+<li>Basic drag-drop interface (accessibility improvements planned)</li>
+<li>Status workflow needs refinement (updates planned for v1.1.0)</li>
+</ul>
+<hr>
+<h2>Version History Notes</h2><h3>Pre-v1.0.0 Development</h3><ul>
+<li>Extensive data recovery and restoration work</li>
+<li>Multiple architecture improvements and bug fixes</li>
+<li>Database corruption recovery with complete data restoration</li>
+<li>Progressive enhancement of import/export functionality</li>
+</ul>
+<h3>Development Methodology</h3><ul>
+<li>Git-based development with systematic backup commits</li>
+<li>Docker-only deployment strategy</li>
+<li>Modular code organization (scripts/shared/, scripts/pages/)</li>
+<li>Comprehensive documentation maintenance</li>
+</ul>
+<hr>
+<h2>Release Process</h2><h3>Version Numbering</h3><ul>
+<li><strong>Major (X.0.0)</strong>: Breaking changes or major architectural updates</li>
+<li><strong>Minor (1.X.0)</strong>: New features and enhancements (backward compatible)</li>
+<li><strong>Patch (1.1.X)</strong>: Bug fixes and minor improvements</li>
+</ul>
+<h3>Release Cycle</h3><ol>
+<li>Feature development on main branch with backup commits</li>
+<li>Version tag creation with comprehensive release notes</li>
+<li>Docker image updates with version tags</li>
+<li>Documentation updates and roadmap adjustments</li>
+<li>GitHub release with change summary</li>
+</ol>
+<h3>Development Workflow</h3><ul>
+<li>All changes documented with descriptive commit messages</li>
+<li>Pre-work backup commits for safety</li>
+<li>Step-by-step implementation with verification</li>
+<li>Comprehensive testing before version tags</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

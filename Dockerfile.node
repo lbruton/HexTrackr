@@ -13,18 +13,10 @@ COPY package*.json ./
 RUN npm install
 RUN npm rebuild
 
-# Copy application files (but not node_modules)
-COPY *.html ./
-COPY *.js ./
-COPY *.css ./
+# Copy entire application structure for modular architecture
+COPY app/ ./
 COPY *.json ./
 COPY eslint.config.mjs ./
-
-# Copy scripts directory
-COPY scripts/ ./scripts/
-
-# Copy documentation portal
-COPY docs-html/ ./docs-html/
 
 # Create necessary directories
 RUN mkdir -p ./data/ ./roadmaps/ ./uploads/ ./docs/ ./audit/
@@ -33,4 +25,4 @@ RUN mkdir -p ./data/ ./roadmaps/ ./uploads/ ./docs/ ./audit/
 EXPOSE 8080
 
 # Start the application
-CMD ["node", "server.js"]
+CMD ["node", "public/server.js"]

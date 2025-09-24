@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr - Modern Vulnerability Management</title>
+    
+    <!-- Tabler.io CSS Framework -->
+    <link href="/vendor/tabler/css/tabler.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AG Grid CSS -->
+    <link rel="stylesheet" href="/vendor/ag-grid/ag-theme-quartz.css">
+    
+    <!-- Modular HexTrackr CSS -->
+    <link rel="stylesheet" href="styles/shared/base.css">
+    <link rel="stylesheet" href="styles/shared/header.css">
+    <link rel="stylesheet" href="styles/shared/tables.css">
+    <link rel="stylesheet" href="styles/pages/vulnerabilities.css">
+    <link rel="stylesheet" href="styles/utils/responsive.css">
+    
+    <!-- Theme Support - T032 / S002 -->
+    <link rel="stylesheet" href="styles/shared/light-theme.css">
+    <link rel="stylesheet" href="styles/shared/dark-theme.css">
+    <link rel="stylesheet" href="styles/css-variables.css">
+    <link rel="stylesheet" href="styles/ag-grid-overrides.css">
+    
+    <!-- Chart.js for mini-charts - using local files -->
+    <!-- Chart.js CSS is embedded in the library -->
+
+    <!-- Shared modular styles (NEW) -->
+    <link rel="stylesheet" href="styles/shared/modals.css">
+    <link rel="stylesheet" href="styles/shared/cards.css">
+    <link rel="stylesheet" href="styles/shared/badges.css">
+    <link rel="stylesheet" href="styles/shared/animations.css">
+    <link rel="stylesheet" href="styles/shared/layouts.css">
+
+</head>
+<body>
+    <!-- Header component auto-injected here -->
+    <div id="headerContainer"></div>
+
+    <div class="page">
+        <div class="page-wrapper">
+            <!-- Page header -->
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <h2 class="page-title">
+                                <i class="fas fa-shield-virus me-2 text-primary"></i>
+                                Vulnerability Management Dashboard
+                            </h2>
+                            <div class="page-pretitle">
+                                Modern security vulnerability tracking and analysis
+                            </div>
+                        </div>
+                        <!-- Header actions removed - functionality moved to user dropdown menu -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Page body -->
+            <div class="page-body">
+                <div class="container-xl">
+                    <!-- Enhanced VPR Statistics Cards with Tabler.io Design -->
+                    <div class="row row-deck row-cards mb-4">
+                        <!-- Critical Severity Card -->
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card card-sm stat-card-enhanced" data-severity="critical" onclick="vulnManager.flipStatCards()">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <span class="bg-red text-white avatar" style="background-color: var(--vpr-critical) !important;">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </span>
+                                        </div>
+                                        <div class="col">
+                                            <div class="card-back">
+                                                <div class="font-weight-medium h2 mb-1" id="criticalCount">0</div>
+                                                <div class="text-muted small">Critical Vulnerabilities</div>
+                                                <div class="text-vpr-critical small fw-bold mt-1" id="criticalVPR">0.0 VPR</div>
+                                            </div>
+                                            <div class="card-front">
+                                                <div class="font-weight-medium h2 mb-1" id="criticalTotalVPR">0.0</div>
+                                                <div class="text-muted small">Total VPR Score</div>
+                                                <div class="text-vpr-critical small fw-bold mt-1" id="criticalAvgVPR">0.0 avg</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="text-vpr-critical" id="criticalTrend">
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <i class="ti ti-trending-up fs-3"></i>
+                                                    <span class="badge bg-vpr-critical text-vpr-critical trend-value">+0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- High Severity Card -->
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card card-sm stat-card-enhanced" data-severity="high" onclick="vulnManager.flipStatCards()">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <span class="bg-orange text-white avatar" style="background-color: var(--vpr-high) !important;">
+                                                <i class="fas fa-exclamation"></i>
+                                            </span>
+                                        </div>
+                                        <div class="col">
+                                            <div class="card-back">
+                                                <div class="font-weight-medium h2 mb-1" id="highCount">0</div>
+                                                <div class="text-muted small">High Vulnerabilities</div>
+                                                <div class="text-vpr-high small fw-bold mt-1" id="highVPR">0.0 VPR</div>
+                                            </div>
+                                            <div class="card-front">
+                                                <div class="font-weight-medium h2 mb-1" id="highTotalVPR">0.0</div>
+                                                <div class="text-muted small">Total VPR Score</div>
+                                                <div class="text-vpr-high small fw-bold mt-1" id="highAvgVPR">0.0 avg</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="text-vpr-high" id="highTrend">
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <i class="ti ti-trending-up fs-3"></i>
+                                                    <span class="badge bg-vpr-high text-vpr-high trend-value">+0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Medium Severity Card -->
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card card-sm stat-card-enhanced" data-severity="medium" onclick="vulnManager.flipStatCards()">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <span class="bg-blue text-white avatar" style="background-color: var(--vpr-medium) !important;">
+                                                <i class="fas fa-minus"></i>
+                                            </span>
+                                        </div>
+                                        <div class="col">
+                                            <div class="card-back">
+                                                <div class="font-weight-medium h2 mb-1" id="mediumCount">0</div>
+                                                <div class="text-muted small">Medium Vulnerabilities</div>
+                                                <div class="text-vpr-medium small fw-bold mt-1" id="mediumVPR">0.0 VPR</div>
+                                            </div>
+                                            <div class="card-front">
+                                                <div class="font-weight-medium h2 mb-1" id="mediumTotalVPR">0.0</div>
+                                                <div class="text-muted small">Total VPR Score</div>
+                                                <div class="text-vpr-medium small fw-bold mt-1" id="mediumAvgVPR">0.0 avg</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="text-vpr-medium" id="mediumTrend">
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <i class="ti ti-trending-up fs-3"></i>
+                                                    <span class="badge bg-vpr-medium text-vpr-medium trend-value">+0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Low Severity Card -->
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card card-sm stat-card-enhanced" data-severity="low" onclick="vulnManager.flipStatCards()">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <span class="bg-green text-white avatar" style="background-color: var(--vpr-low) !important;">
+                                                <i class="fas fa-info"></i>
+                                            </span>
+                                        </div>
+                                        <div class="col">
+                                            <div class="card-back">
+                                                <div class="font-weight-medium h2 mb-1" id="lowCount">0</div>
+                                                <div class="text-muted small">Low Vulnerabilities</div>
+                                                <div class="text-vpr-low small fw-bold mt-1" id="lowVPR">0.0 VPR</div>
+                                            </div>
+                                            <div class="card-front">
+                                                <div class="font-weight-medium h2 mb-1" id="lowTotalVPR">0.0</div>
+                                                <div class="text-muted small">Total VPR Score</div>
+                                                <div class="text-vpr-low small fw-bold mt-1" id="lowAvgVPR">0.0 avg</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="text-vpr-low" id="lowTrend">
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <i class="ti ti-trending-down fs-3"></i>
+                                                    <span class="badge bg-vpr-low text-vpr-low trend-value">-0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Card Flip Instructions -->
+                    </div>
+                    
+                    <!-- Historical Chart Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line me-2 text-primary"></i>
+                                Historical VPR Trends (Last 14 Days)
+                            </h3>
+                            <div class="card-actions">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <div class="btn-group" role="group" aria-label="Chart metric switcher">
+                                        <input type="radio" class="btn-check" name="chart-metric" id="chart-count" autocomplete="off">
+                                        <label class="btn btn-outline-primary" for="chart-count" data-metric="count">
+                                            <i class="fas fa-hashtag me-1"></i>Vulnerability Count
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="chart-metric" id="chart-vpr" autocomplete="off" checked>
+                                        <label class="btn btn-outline-primary" for="chart-vpr" data-metric="vpr">
+                                            <i class="fas fa-chart-bar me-1"></i>VPR Score Sum
+                                        </label>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="vulnerability-chart" class="chart-height"></div>
+                        </div>
+                    </div>
+
+                    <!-- Search and Filters Section -->
+                    <div class="card mb-4 search-filters-card">
+                        <div class="card-body py-2">
+                            <div class="row g-3">
+                                <!-- First row: Search and primary filters -->
+                                <div class="col-12">
+                                    <div class="d-flex gap-3 align-items-center">
+                                        <!-- Left side: Search input (auto-sizes) -->
+                                        <div class="input-group flex-grow-1">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                            <input type="text" class="form-control" id="searchInput" 
+                                                   placeholder="Search vulnerabilities, CVEs, or hostnames..." 
+                                                   autocomplete="off">
+                                        </div>
+                                        
+                                        <!-- Middle: Severity filter -->
+                                        <div class="flex-shrink-0">
+                                            <select class="form-select severity-filter" id="severityFilter" aria-label="Filter by severity">
+                                                <option value="">All Severities</option>
+                                                <option value="KEV">KEV</option>
+                                                <option value="Critical">Critical</option>
+                                                <option value="High">High</option>
+                                                <option value="Medium">Medium</option>
+                                                <option value="Low">Low</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Right side: Vendor filter and Import button -->
+                                        <div class="d-flex gap-2">
+                                            <select class="form-select vendor-filter" id="vendorFilter" aria-label="Filter by vendor">
+                                                <option value="">All Vendors</option>
+                                                <option value="CISCO">CISCO</option>
+                                                <option value="Palo Alto">Palo Alto</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                            <button class="btn btn-outline-success" id="importCsvBtn" title="Import CSV vulnerabilities">
+                                                <i class="fas fa-upload me-1"></i>Import
+                                            </button>
+                                            <button class="btn btn-outline-secondary" id="refreshBtn" title="Refresh data">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Workspace Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-database me-2"></i>
+                                Vulnerability Data Workspace
+                            </h3>
+                            <div class="card-actions">
+                                <div class="btn-group" role="group" aria-label="View switcher">
+                                    <input type="radio" class="btn-check" name="view-options" id="view-table" autocomplete="off" checked>
+                                    <label class="btn btn-outline-primary" for="view-table" data-view="table">
+                                        <i class="fas fa-table me-1"></i>Table
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="view-options" id="view-devices" autocomplete="off">
+                                    <label class="btn btn-outline-primary" for="view-devices" data-view="devices">
+                                        <i class="fas fa-server me-1"></i>Devices
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="view-options" id="view-vulnerabilities" autocomplete="off">
+                                    <label class="btn btn-outline-primary" for="view-vulnerabilities" data-view="vulnerabilities">
+                                        <i class="fas fa-bug me-1"></i>Vulnerabilities
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-2">
+                            <!-- Table View -->
+                            <div id="tableView" class="view-content">
+                                <div id="vulnGrid" class="ag-theme-quartz" style="width: 100%;"></div>
+                                <!-- AG-Grid handles its own pagination controls -->
+                            </div>
+                            
+                            <!-- Device Cards View -->
+                            <div id="devicesView" class="view-content d-none">
+                                <div class="p-3">
+                                    <div class="row row-cards" id="deviceCards">
+                                        <!-- Device cards will be populated here -->
+                                    </div>
+                                    <div id="devicePaginationControls" class="d-flex justify-content-center mt-4">
+                                        <!-- Device pagination controls will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Vulnerability Cards View -->
+                            <div id="vulnerabilitiesView" class="view-content d-none">
+                                <div class="p-3">
+                                    <div class="row row-cards" id="vulnerabilityCards">
+                                        <!-- Vulnerability cards will be populated here -->
+                                    </div>
+                                    <div id="vulnerabilityPaginationControls" class="d-flex justify-content-center mt-4">
+                                        <!-- Vulnerability pagination controls will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Device Details Modal with Tabler.io Styling -->
+    <div class="modal modal-blur fade" id="deviceModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-server me-2 text-primary"></i>
+                        Device Security Overview
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- Device Summary Card -->
+                        <div class="col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Device Information
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="deviceInfo" class="space-y-3">
+                                        <!-- Device info will be populated here -->
+                                    </div>
+                                    
+                                    <!-- VPR Summary Mini-Cards -->
+                                    <div class="mt-4">
+                                        <h4 class="h6 mb-3">VPR Risk Breakdown</h4>
+                                        <div class="row g-2" id="deviceVprSummary">
+                                            <!-- VPR mini-cards will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Vulnerabilities Grid -->
+                        <div class="col-lg-8">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-bug me-2"></i>
+                                        Active Vulnerabilities
+                                    </h3>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div id="device-vuln-grid" class="ag-theme-quartz modal-grid-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="exportDeviceData">
+                        <i class="fas fa-file-csv me-2"></i>
+                        Export CSV
+                    </button>
+                    <button type="button" class="btn btn-primary" id="generateDeviceReport">
+                        <i class="ti ti-file-text me-2"></i>
+                        Generate Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Focused Vulnerability Details Modal - Network Admin Friendly -->
+    <div class="modal modal-blur fade" id="vulnDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-shield-alt me-2 text-danger"></i>
+                        Vulnerability Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- Vulnerability Information Card -->
+                        <div class="col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Vulnerability Information
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="vulnInfo" class="space-y-3">
+                                        <!-- Vulnerability info will be populated here -->
+                                    </div>
+                                    
+                                    <!-- Risk Summary Mini-Cards -->
+                                    <div class="mt-4">
+                                        <h4 class="h6 mb-3">Risk Summary</h4>
+                                        <div class="row g-2" id="vulnRiskSummary">
+                                            <!-- Risk mini-cards will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Affected Assets Grid -->
+                        <div class="col-lg-8">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-server me-2"></i>
+                                        Affected Assets
+                                    </h3>
+                                    <div class="card-subtitle text-muted">
+                                        <span id="affectedAssetsCount">0</span> devices affected
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div id="vuln-affected-assets-grid" class="ag-theme-quartz modal-grid-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="exportVulnCSV">
+                        <i class="fas fa-file-csv me-2"></i>
+                        Export CSV
+                    </button>
+                    <button type="button" class="btn btn-primary" id="generateVulnReport">
+                        <i class="ti ti-file-text me-2"></i>
+                        Generate Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legacy Vulnerability Modal (for backward compatibility) -->
+    <div class="modal modal-blur fade" id="vulnerabilityModal" tabindex="-1" style="display: none;">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-bug me-2"></i>
+                        Vulnerability Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Vulnerability Information -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Vulnerability Information
+                                    </h6>
+                                </div>
+                                <div class="card-body" id="vulnerabilityInfo">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- VPR and Risk Summary -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-chart-line me-2"></i>
+                                        Risk Analysis
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row" id="vulnerabilityRiskSummary">
+                                        <!-- Populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Affected Assets -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-server me-2"></i>
+                                        Affected Assets
+                                    </h6>
+                                    <span class="badge bg-secondary" id="affectedAssetsCount">0 assets</span>
+                                </div>
+                                <div class="card-body">
+                                    <div id="vulnerabilityAssetsGrid" class="ag-theme-quartz modal-grid-sm"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="vulnManager.exportVulnerabilityReport()">
+                        <i class="fas fa-download me-2"></i>
+                        Export Report
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="vulnManager.generateVulnerabilityPDF()">
+                        <i class="fas fa-file-pdf me-2"></i>
+                        Generate PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Vulnerability Modal -->
+    <div class="modal fade" id="editVulnModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2"></i>Edit Vulnerability
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editVulnForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editHostname" class="form-label">Hostname</label>
+                                    <input type="text" class="form-control" id="editHostname" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editIpAddress" class="form-label">IP Address</label>
+                                    <input type="text" class="form-control" id="editIpAddress" 
+                                           pattern="^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                                           title="Please enter a valid IP address">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editSeverity" class="form-label">Severity</label>
+                                    <select class="form-select" id="editSeverity">
+                                        <option value="Critical">Critical</option>
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                        <option value="Info">Info</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editState" class="form-label">State</label>
+                                    <select class="form-select" id="editState">
+                                        <option value="open">Open</option>
+                                        <option value="resolved">Resolved</option>
+                                        <option value="verified">Verified</option>
+                                        <option value="closed">Closed</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="editNotes" rows="4" 
+                                      placeholder="Add any notes or comments about this vulnerability..."></textarea>
+                        </div>
+                        <input type="hidden" id="editVulnId">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveVulnEdit">
+                        <i class="fas fa-save me-2"></i>Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div class="loading-spinner">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <h5 class="mt-3" id="loadingMessage">Processing data...</h5>
+                    <div class="progress-modern mt-3">
+                        <div class="progress-bar progress-init" role="progressbar" id="loadingProgress" aria-label="Loading progress"></div>
+                    </div>
+                    <small class="text-muted" id="loadingDetails">Please wait...</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Selection Modal for CSV Import -->
+    <div class="modal modal-blur fade" id="scanDateModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-alt me-2"></i>Set Scan Date
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">
+                        Please specify the scan date for this vulnerability data. This date will be used for trending analysis.
+                    </p>
+                    <div class="mb-3">
+                        <label for="scanDateInput" class="form-label">Scan Date</label>
+                        <input type="date" class="form-control" id="scanDateInput" required>
+                        <div class="form-text">Choose the date when this vulnerability scan was performed.</div>
+                    </div>
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Tip:</strong> For trending analysis, use the actual scan date from your vulnerability management system.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confirmScanDate">
+                        <i class="fas fa-upload me-1"></i>Import with Date
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Input (Hidden) -->
+    <input type="file" id="csvFileInput" accept=".csv" class="hidden-input">
+
+    <!-- External Libraries -->
+    <!-- Settings Modal Container - Auto-injected by shared/settings-modal.js -->
+    <div id="settingsModalContainer"></div>
+
+    <!-- Shared Footer Container -->
+    <div id="footerContainer"></div>
+
+    <!-- Tabler.io JS -->
+    <script src="/vendor/tabler/js/tabler.min.js"></script>
+    
+    <!-- SortableJS for drag and drop -->
+    <script src="/vendor/sortablejs/Sortable.min.js"></script>
+    
+    <!-- AG Grid Community -->
+    <script src="/vendor/ag-grid/ag-grid-community.min.js"></script>
+    
+    <!-- ApexCharts -->
+    <script src="/vendor/apexcharts/apexcharts.min.js"></script>
+    
+    <!-- PapaParse for CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <!-- JSZip for ZIP file creation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <!-- Security: DOMPurify for XSS protection -->
+    <script src="/vendor/dompurify/purify.min.js"></script>
+
+    <!-- Socket.io for real-time progress tracking -->
+    <script src="/vendor/socket.io/socket.io.min.js"></script>
+
+    <!-- HexTrackr Modular JavaScript Architecture -->
+    <!-- Core Utilities (loaded first) -->
+    <script src="scripts/shared/config-loader.js"></script>
+    <script src="scripts/shared/header-loader.js"></script>
+    <script src="scripts/shared/footer-loader.js"></script>
+    <script src="scripts/shared/settings-modal.js"></script>
+    <script src="scripts/shared/websocket-client.js"></script>
+    <script src="scripts/shared/progress-modal.js"></script>
+    <script src="scripts/shared/toast-manager.js"></script>
+    <script src="scripts/shared/cve-utilities.js"></script>
+    
+    <!-- Theme and Grid Utilities (dependencies for modules) -->
+    <script src="scripts/utils/chart-theme-adapter.js"></script>
+    <script src="scripts/shared/ag-grid-theme-manager.js"></script>
+    <script src="scripts/shared/ag-grid-responsive-config.js"></script>
+    <script src="scripts/shared/pagination-controller.js"></script>
+    
+    <!-- Data and UI Components -->
+    <script src="scripts/shared/vulnerability-data.js"></script>
+    <script src="scripts/shared/vulnerability-statistics.js"></script>
+    <script src="scripts/shared/vulnerability-search.js"></script>
+    <script src="scripts/shared/vulnerability-grid.js"></script>
+    <script src="scripts/shared/vulnerability-cards.js"></script>
+    <script src="scripts/shared/device-security-modal.js"></script>
+    <script src="scripts/shared/vulnerability-details-modal.js"></script>
+    
+    <!-- Module Scripts (loaded last, in dependency order) -->
+    <script type="module" src="scripts/shared/vulnerability-chart-manager.js"></script>
+    <script type="module" src="scripts/shared/vulnerability-core.js"></script>
+    <script type="module" src="scripts/pages/vulnerabilities.js"></script>
+
+    <!-- KEV Details Modal Script -->
+    <script>
+        /**
+         * Show KEV details modal for a specific CVE
+         * @param {string} cveId - CVE identifier
+         */
+        async function showKevDetails(cveId) {
+            if (!cveId) {
+                console.warn('No CVE ID provided for KEV details');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/kev/${cveId}`);
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        showNotification(`${cveId} is not in the CISA KEV catalog`, 'warning');
+                    } else {
+                        throw new Error(`Failed to fetch KEV data: ${response.statusText}`);
+                    }
+                    return;
+                }
+
+                const kevData = await response.json();
+
+                // Create modal content
+                const modalContent = `
+                    <div class="modal fade" id="kevDetailsModal" tabindex="-1" aria-labelledby="kevDetailsModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title" id="kevDetailsModalLabel">
+                                        🔥 Known Exploited Vulnerability: ${cveId}
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="alert alert-danger" role="alert">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <strong>Critical:</strong> This vulnerability is actively being exploited in the wild according to CISA.
+                                    </div>
+
+                                    <h6 class="fw-bold">Vulnerability Details</h6>
+                                    <div class="mb-3">
+                                        <strong>Name:</strong> ${kevData.vulnerability_name || 'N/A'}<br>
+                                        <strong>Vendor/Project:</strong> ${kevData.vendor_project || 'N/A'}<br>
+                                        <strong>Product:</strong> ${kevData.product || 'N/A'}<br>
+                                        <strong>Date Added to KEV:</strong> ${kevData.date_added ? new Date(kevData.date_added).toLocaleDateString() : 'N/A'}
+                                    </div>
+
+                                    <h6 class="fw-bold">Remediation Requirements</h6>
+                                    <div class="mb-3">
+                                        <strong>Required Action:</strong><br>
+                                        <div class="alert alert-warning">
+                                            ${kevData.required_action || 'No specific action documented'}
+                                        </div>
+                                        <strong>Due Date:</strong> ${kevData.due_date ? new Date(kevData.due_date).toLocaleDateString() : 'Not specified'}
+                                    </div>
+
+                                    ${kevData.known_ransomware_use ? `
+                                    <div class="alert alert-danger" role="alert">
+                                        <i class="fas fa-skull-crossbones me-2"></i>
+                                        <strong>Ransomware Campaign:</strong> This vulnerability has been used in ransomware campaigns.
+                                    </div>
+                                    ` : ''}
+
+                                    ${kevData.notes ? `
+                                    <h6 class="fw-bold">Additional Notes</h6>
+                                    <p>${kevData.notes.replace(
+                                        /(https?:\/\/[^\s]+)/g,
+                                        '<a href="$1" onclick="window.open(\'$1\', \'kev_popup\', \'width=1200,height=1200,scrollbars=yes,resizable=yes\'); return false;" style="color: #007bff; text-decoration: underline;">$1</a>'
+                                    )}</p>
+                                    ` : ''}
+
+                                    <div class="text-muted small">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Data source: CISA Known Exploited Vulnerabilities Catalog
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" onclick="showVulnerabilityDetailsByCVE('${cveId}')">
+                                        <i class="fas fa-info-circle me-2"></i>View CVE Details
+                                    </button>
+                                    <a href="https://nvd.nist.gov/vuln/detail/${cveId}" target="_blank" class="btn btn-primary">
+                                        <i class="fas fa-external-link-alt me-2"></i>NIST NVD
+                                    </a>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Remove existing modal if present
+                const existingModal = document.getElementById('kevDetailsModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+
+                // Add modal to DOM
+                document.body.insertAdjacentHTML('beforeend', modalContent);
+
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('kevDetailsModal'));
+                modal.show();
+
+                // Clean up modal when hidden
+                document.getElementById('kevDetailsModal').addEventListener('hidden.bs.modal', function() {
+                    this.remove();
+                }, { once: true });
+
+            } catch (error) {
+                console.error('Error showing KEV details:', error);
+                showNotification('Failed to load KEV details: ' + error.message, 'error');
+            }
+        }
+
+        // Make function globally available
+        window.showKevDetails = showKevDetails;
+    </script>
+
+</body>
+</html>

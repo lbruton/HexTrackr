@@ -1,0 +1,156 @@
+{
+  "generated": "2025-09-23T02:04:47.514Z",
+  "sections": {
+    "api-reference": {
+      "title": "Api Reference",
+      "icon": "fas fa-code",
+      "indexFile": "api-reference/index",
+      "children": {
+        "backend-api": {
+          "file": "api-reference/backend-api",
+          "title": "Backend Api",
+          "path": "api-reference/backend-api.html"
+        },
+        "frontend-api": {
+          "file": "api-reference/frontend-api",
+          "title": "Frontend Api",
+          "path": "api-reference/frontend-api.html"
+        },
+        "middleware-config": {
+          "file": "api-reference/middleware-config",
+          "title": "Middleware Config",
+          "path": "api-reference/middleware-config.html"
+        },
+        "utilities": {
+          "file": "api-reference/utilities",
+          "title": "Utilities",
+          "path": "api-reference/utilities.html"
+        }
+      }
+    },
+    "architecture": {
+      "title": "Architecture",
+      "icon": "fas fa-building",
+      "indexFile": "architecture/index",
+      "children": {
+        "backend": {
+          "file": "architecture/backend",
+          "title": "Backend",
+          "path": "architecture/backend.html"
+        },
+        "data-model": {
+          "file": "architecture/data-model",
+          "title": "Data Model",
+          "path": "architecture/data-model.html"
+        },
+        "database": {
+          "file": "architecture/database",
+          "title": "Database",
+          "path": "architecture/database.html"
+        },
+        "frontend": {
+          "file": "architecture/frontend",
+          "title": "Frontend",
+          "path": "architecture/frontend.html"
+        },
+        "technology-stack": {
+          "file": "architecture/technology-stack",
+          "title": "Technology Stack",
+          "path": "architecture/technology-stack.html"
+        },
+        "theme-architecture": {
+          "file": "architecture/theme-architecture",
+          "title": "Theme Architecture",
+          "path": "architecture/theme-architecture.html"
+        }
+      }
+    },
+    "features": {
+      "title": "Features",
+      "icon": "fas fa-file-alt",
+      "indexFile": "features/index",
+      "children": {
+        "kev-integration": {
+          "file": "features/kev-integration",
+          "title": "Kev Integration",
+          "path": "features/kev-integration.html"
+        }
+      }
+    },
+    "guides": {
+      "title": "Guides",
+      "icon": "fas fa-file-alt",
+      "indexFile": "guides/index",
+      "children": {
+        "css-customization": {
+          "file": "guides/css-customization",
+          "title": "Css Customization",
+          "path": "guides/css-customization.html"
+        },
+        "getting-started": {
+          "file": "guides/getting-started",
+          "title": "Getting Started",
+          "path": "guides/getting-started.html"
+        },
+        "user-guide": {
+          "file": "guides/user-guide",
+          "title": "User Guide",
+          "path": "guides/user-guide.html"
+        }
+      }
+    },
+    "reference": {
+      "title": "Reference",
+      "icon": "fas fa-file-alt",
+      "indexFile": "reference/index",
+      "children": {
+        "known-issues": {
+          "file": "reference/known-issues",
+          "title": "Known Issues",
+          "path": "reference/known-issues.html"
+        },
+        "performance": {
+          "file": "reference/performance",
+          "title": "Performance",
+          "path": "reference/performance.html"
+        },
+        "security": {
+          "file": "reference/security",
+          "title": "Security",
+          "path": "reference/security.html"
+        },
+        "troubleshooting": {
+          "file": "reference/troubleshooting",
+          "title": "Troubleshooting",
+          "path": "reference/troubleshooting.html"
+        },
+        "websocket": {
+          "file": "reference/websocket",
+          "title": "Websocket",
+          "path": "reference/websocket.html"
+        }
+      }
+    }
+  },
+  "specialFiles": {
+    "changelog": {
+      "file": "CHANGELOG",
+      "title": "Changelog",
+      "type": "special",
+      "path": "CHANGELOG.html"
+    },
+    "roadmap": {
+      "file": "ROADMAP",
+      "title": "Roadmap",
+      "type": "special",
+      "path": "ROADMAP.html"
+    },
+    "overview": {
+      "file": "overview",
+      "title": "Overview",
+      "type": "special",
+      "path": "overview.html"
+    }
+  },
+  "totalFiles": 27
+}
