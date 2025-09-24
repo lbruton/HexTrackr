@@ -12,8 +12,8 @@ Labels: [Bug/Feature/Enhancement] + [High/Medium/Low]
 
 ### 2. Create Planning Structure
 ```bash
-mkdir -p /dev-docs/planning/v1.0.XX-feature-name/{research,implementation}
-cp /dev-docs/planning/templates/SESSION_PLAN.md /dev-docs/planning/v1.0.XX-feature-name/
+mkdir -p /dev-docs/planning/active/v1.0.XX-feature-name/{research,implementation}
+cp /dev-docs/planning/templates/SESSION_PLAN.md /dev-docs/planning/active/v1.0.XX-feature-name/
 ```
 
 ### 3. Research Phase (Plan Mode)
