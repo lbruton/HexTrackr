@@ -135,10 +135,18 @@
 <h3>6. VulnerabilityCardsManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-cards.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
-<li>Card-based view rendering</li>
-<li>Pagination for card layouts</li>
+<li>Card-based view rendering with distinct device and vulnerability card types</li>
+<li>Pagination for card layouts (6 cards per page default)</li>
 <li>Device grouping and organization</li>
-<li>Interactive card actions</li>
+<li>Interactive card actions with modal integration</li>
+<li><strong>v1.0.24 Enhancements</strong>:<ul>
+<li>Streamlined vulnerability cards without redundant VPR mini-cards</li>
+<li>Enhanced device display component with larger icons and text</li>
+<li>KEV (Known Exploited Vulnerabilities) indicator badges</li>
+<li>Theme-aware styling with CSS variable integration</li>
+<li>Improved visual hierarchy and reduced DOM complexity (40% element reduction)</li>
+</ul>
+</li>
 </ul>
 <hr>
 <h2>Real-time Communication</h2><h3>WebSocketClient Architecture</h3><p><strong>Location</strong>: <code>/scripts/shared/websocket-client.js</code></p>
