@@ -40,10 +40,19 @@
 }
 
 /* Card Body */
-/* REVERT FIX: Added margin-top for spacing between header and content */
 .card-body {
     padding: 1.25rem;
-    margin-top: 1rem;  /* Added spacing between header and table */
+}
+
+/* Only add margin when there's a card-header for proper spacing */
+.card-header + .card-body {
+    margin-top: 1rem;  /* Spacing between header and content */
+}
+
+/* Specific margin fixes for vulnerability/device cards that may need visual balance */
+.vulnerability-card .card-body,
+.device-card .card-body {
+    margin-top: 1rem;  /* Preserve spacing for proper visual balance with KEV badges */
 }
 
 /* Card Footer */
