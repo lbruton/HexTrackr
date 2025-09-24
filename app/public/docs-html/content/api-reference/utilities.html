@@ -1,0 +1,614 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Utilities Reference</h1><blockquote>
+<p>Core utility classes and helper functions for HexTrackr</p>
+</blockquote>
+<h2>Overview</h2><p>HexTrackr&#39;s utility layer provides essential helper functions, security validators, and progress tracking capabilities used throughout the application.</p>
+<hr>
+<h2 id="utilities">Core Utilities</h2><h3>PathValidator</h3><p><strong>Location:</strong> <code>app/utils/PathValidator.js</code></p>
+<p>Critical security utility for validating and sanitizing file paths to prevent directory traversal attacks.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Path normalization and resolution</li>
+<li>Directory traversal prevention</li>
+<li>Symlink validation</li>
+<li>Whitelist/blacklist support</li>
+<li>Cross-platform compatibility</li>
+</ul>
+<p><strong>Main Methods:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Purpose</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>validatePath(inputPath, options)</code></td>
+<td>Validates and sanitizes a file path</td>
+<td>Safe path or throws error</td>
+</tr>
+<tr>
+<td><code>isPathSafe(inputPath)</code></td>
+<td>Checks if path is safe without throwing</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>normalizeP ath(inputPath)</code></td>
+<td>Normalizes path separators</td>
+<td>Normalized path string</td>
+</tr>
+<tr>
+<td><code>isWithinBase(path, basePath)</code></td>
+<td>Checks if path is within base directory</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>checkSymlinks(path)</code></td>
+<td>Validates symlink safety</td>
+<td>Boolean</td>
+</tr>
+</tbody></table>
+<p><strong>Usage Example:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">PathValidator</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/PathValidator&#x27;</span>);
+
+<span class="hljs-comment">// Validate user-provided file path</span>
+<span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> safePath = <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">validatePath</span>(userInput, {
+        <span class="hljs-attr">basePath</span>: <span class="hljs-string">&#x27;/app/uploads&#x27;</span>,
+        <span class="hljs-attr">allowSymlinks</span>: <span class="hljs-literal">false</span>,
+        <span class="hljs-attr">blacklist</span>: [<span class="hljs-string">&#x27;../secrets&#x27;</span>, <span class="hljs-string">&#x27;/etc&#x27;</span>]
+    });
+    <span class="hljs-comment">// Safe to use safePath</span>
+} <span class="hljs-keyword">catch</span> (error) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Invalid path:&#x27;</span>, error.<span class="hljs-property">message</span>);
+}</code></pre><p><strong>Security Patterns Blocked:</strong></p>
+<ul>
+<li><code>../../../etc/passwd</code> - Directory traversal</li>
+<li><code>/etc/shadow</code> - Absolute path escape</li>
+<li><code>uploads/../../../</code> - Relative path escape</li>
+<li>Symlink attacks</li>
+<li>Null byte injection</li>
+</ul>
+<h3>ProgressTracker</h3><p><strong>Location:</strong> <code>app/utils/ProgressTracker.js</code></p>
+<p>Manages progress tracking for long-running operations with WebSocket integration.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Multi-operation tracking</li>
+<li>Real-time progress updates</li>
+<li>ETA calculations</li>
+<li>WebSocket event emission</li>
+<li>Memory-efficient circular buffer</li>
+</ul>
+<p><strong>Main Methods:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Purpose</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>createOperation(id, total)</code></td>
+<td>Start tracking new operation</td>
+<td>Operation object</td>
+</tr>
+<tr>
+<td><code>updateProgress(id, current)</code></td>
+<td>Update operation progress</td>
+<td>Progress percentage</td>
+</tr>
+<tr>
+<td><code>completeOperation(id)</code></td>
+<td>Mark operation as complete</td>
+<td>Final stats</td>
+</tr>
+<tr>
+<td><code>getProgress(id)</code></td>
+<td>Get current progress</td>
+<td>Progress object</td>
+</tr>
+<tr>
+<td><code>calculateETA(id)</code></td>
+<td>Estimate time remaining</td>
+<td>ETA in seconds</td>
+</tr>
+</tbody></table>
+<p><strong>Progress Object Structure:</strong></p>
+<pre><code class="language-javascript">{
+    <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;import-123&#x27;</span>,
+    <span class="hljs-attr">total</span>: <span class="hljs-number">1000</span>,
+    <span class="hljs-attr">current</span>: <span class="hljs-number">450</span>,
+    <span class="hljs-attr">percentage</span>: <span class="hljs-number">45</span>,
+    <span class="hljs-attr">startTime</span>: <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>(),
+    <span class="hljs-attr">eta</span>: <span class="hljs-number">65</span>, <span class="hljs-comment">// seconds</span>
+    <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;processing&#x27;</span>,
+    <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Processing row 450 of 1000&#x27;</span>
+}</code></pre><p><strong>Usage with WebSocket:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> progressTracker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ProgressTracker</span>(io);
+
+<span class="hljs-comment">// Start operation</span>
+<span class="hljs-keyword">const</span> op = progressTracker.<span class="hljs-title function_">createOperation</span>(<span class="hljs-string">&#x27;import-123&#x27;</span>, totalRows);
+
+<span class="hljs-comment">// Update progress</span>
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; totalRows; i++) {
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">processRow</span>(data[i]);
+    progressTracker.<span class="hljs-title function_">updateProgress</span>(<span class="hljs-string">&#x27;import-123&#x27;</span>, i + <span class="hljs-number">1</span>);
+    <span class="hljs-comment">// Automatically emits WebSocket event</span>
+}
+
+<span class="hljs-comment">// Complete</span>
+progressTracker.<span class="hljs-title function_">completeOperation</span>(<span class="hljs-string">&#x27;import-123&#x27;</span>);</code></pre><h3>DataHelpers</h3><p><strong>Location:</strong> <code>app/utils/helpers.js</code></p>
+<p>Collection of data manipulation and formatting utilities.</p>
+<p><strong>Key Functions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>formatBytes(bytes)</code></td>
+<td>Human-readable file sizes</td>
+<td><code>1024</code> → <code>&quot;1 KB&quot;</code></td>
+</tr>
+<tr>
+<td><code>formatDate(date)</code></td>
+<td>Consistent date formatting</td>
+<td>ISO → <code>&quot;Jan 15, 2024&quot;</code></td>
+</tr>
+<tr>
+<td><code>truncateText(text, length)</code></td>
+<td>Smart text truncation</td>
+<td>Adds ellipsis</td>
+</tr>
+<tr>
+<td><code>parseCSV(text)</code></td>
+<td>CSV parsing wrapper</td>
+<td>Returns array of objects</td>
+</tr>
+<tr>
+<td><code>escapeHtml(text)</code></td>
+<td>XSS prevention</td>
+<td>Escapes HTML entities</td>
+</tr>
+<tr>
+<td><code>generateId()</code></td>
+<td>Unique ID generation</td>
+<td>Returns UUID</td>
+</tr>
+<tr>
+<td><code>deepClone(obj)</code></td>
+<td>Deep object cloning</td>
+<td>Handles circular refs</td>
+</tr>
+<tr>
+<td><code>debounce(fn, delay)</code></td>
+<td>Function debouncing</td>
+<td>Delays execution</td>
+</tr>
+<tr>
+<td><code>throttle(fn, limit)</code></td>
+<td>Function throttling</td>
+<td>Limits execution rate</td>
+</tr>
+</tbody></table>
+<p><strong>Formatting Examples:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> helpers = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/helpers&#x27;</span>);
+
+<span class="hljs-comment">// File size formatting</span>
+helpers.<span class="hljs-title function_">formatBytes</span>(<span class="hljs-number">1536</span>); <span class="hljs-comment">// &quot;1.5 KB&quot;</span>
+helpers.<span class="hljs-title function_">formatBytes</span>(<span class="hljs-number">1048576</span>); <span class="hljs-comment">// &quot;1 MB&quot;</span>
+
+<span class="hljs-comment">// Date formatting</span>
+helpers.<span class="hljs-title function_">formatDate</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>()); <span class="hljs-comment">// &quot;Jan 15, 2024 10:30 AM&quot;</span>
+helpers.<span class="hljs-title function_">formatDate</span>(<span class="hljs-string">&#x27;2024-01-15T10:30:00Z&#x27;</span>); <span class="hljs-comment">// &quot;Jan 15, 2024&quot;</span>
+
+<span class="hljs-comment">// Text truncation</span>
+helpers.<span class="hljs-title function_">truncateText</span>(<span class="hljs-string">&#x27;Long text here...&#x27;</span>, <span class="hljs-number">10</span>); <span class="hljs-comment">// &quot;Long te...&quot;</span></code></pre><h3>CryptoHelpers</h3><p><strong>Location:</strong> <code>app/utils/crypto.js</code></p>
+<p>Cryptographic utilities for hashing and encryption.</p>
+<p><strong>Functions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Purpose</th>
+<th>Algorithm</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>hashPassword(password)</code></td>
+<td>Password hashing</td>
+<td>bcrypt with salt</td>
+</tr>
+<tr>
+<td><code>verifyPassword(password, hash)</code></td>
+<td>Password verification</td>
+<td>bcrypt compare</td>
+</tr>
+<tr>
+<td><code>generateToken()</code></td>
+<td>Secure token generation</td>
+<td>crypto.randomBytes</td>
+</tr>
+<tr>
+<td><code>hashFile(filePath)</code></td>
+<td>File integrity hashing</td>
+<td>SHA-256</td>
+</tr>
+<tr>
+<td><code>encrypt(data, key)</code></td>
+<td>Data encryption</td>
+<td>AES-256-GCM</td>
+</tr>
+<tr>
+<td><code>decrypt(encrypted, key)</code></td>
+<td>Data decryption</td>
+<td>AES-256-GCM</td>
+</tr>
+</tbody></table>
+<p><strong>Security Example:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> crypto = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/crypto&#x27;</span>);
+
+<span class="hljs-comment">// Password hashing</span>
+<span class="hljs-keyword">const</span> hash = <span class="hljs-keyword">await</span> crypto.<span class="hljs-title function_">hashPassword</span>(<span class="hljs-string">&#x27;user_password&#x27;</span>);
+<span class="hljs-keyword">const</span> isValid = <span class="hljs-keyword">await</span> crypto.<span class="hljs-title function_">verifyPassword</span>(<span class="hljs-string">&#x27;user_password&#x27;</span>, hash);
+
+<span class="hljs-comment">// Token generation</span>
+<span class="hljs-keyword">const</span> token = crypto.<span class="hljs-title function_">generateToken</span>(); <span class="hljs-comment">// 32-byte hex string</span>
+
+<span class="hljs-comment">// File integrity</span>
+<span class="hljs-keyword">const</span> fileHash = <span class="hljs-keyword">await</span> crypto.<span class="hljs-title function_">hashFile</span>(<span class="hljs-string">&#x27;/path/to/file.csv&#x27;</span>);</code></pre><h3>ValidationHelpers</h3><p><strong>Location:</strong> <code>app/utils/validation.js</code></p>
+<p>Input validation utilities for common data types.</p>
+<p><strong>Validators:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Purpose</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>isEmail(email)</code></td>
+<td>Email format validation</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>isURL(url)</code></td>
+<td>URL format validation</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>isIPAddress(ip)</code></td>
+<td>IP address validation</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>isCVE(cve)</code></td>
+<td>CVE ID format</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>isPort(port)</code></td>
+<td>Port number validation</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>isMACAddress(mac)</code></td>
+<td>MAC address format</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>isUUID(uuid)</code></td>
+<td>UUID validation</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>sanitizeInput(input)</code></td>
+<td>General input sanitization</td>
+<td>Clean string</td>
+</tr>
+</tbody></table>
+<p><strong>Validation Patterns:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> validators = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/validation&#x27;</span>);
+
+<span class="hljs-comment">// Email validation</span>
+validators.<span class="hljs-title function_">isEmail</span>(<span class="hljs-string">&#x27;user@example.com&#x27;</span>); <span class="hljs-comment">// true</span>
+validators.<span class="hljs-title function_">isEmail</span>(<span class="hljs-string">&#x27;invalid.email&#x27;</span>); <span class="hljs-comment">// false</span>
+
+<span class="hljs-comment">// CVE validation</span>
+validators.<span class="hljs-title function_">isCVE</span>(<span class="hljs-string">&#x27;CVE-2024-12345&#x27;</span>); <span class="hljs-comment">// true</span>
+validators.<span class="hljs-title function_">isCVE</span>(<span class="hljs-string">&#x27;CVE-24-123&#x27;</span>); <span class="hljs-comment">// false</span>
+
+<span class="hljs-comment">// IP validation (supports IPv4 and IPv6)</span>
+validators.<span class="hljs-title function_">isIPAddress</span>(<span class="hljs-string">&#x27;192.168.1.1&#x27;</span>); <span class="hljs-comment">// true</span>
+validators.<span class="hljs-title function_">isIPAddress</span>(<span class="hljs-string">&#x27;2001:db8::1&#x27;</span>); <span class="hljs-comment">// true</span></code></pre><h3>FileHelpers</h3><p><strong>Location:</strong> <code>app/utils/file-helpers.js</code></p>
+<p>File system operation utilities.</p>
+<p><strong>Functions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Purpose</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ensureDir(path)</code></td>
+<td>Create directory if not exists</td>
+<td>Promise</td>
+</tr>
+<tr>
+<td><code>cleanTempFiles(dir, age)</code></td>
+<td>Remove old temp files</td>
+<td>Files deleted count</td>
+</tr>
+<tr>
+<td><code>getFileExtension(filename)</code></td>
+<td>Extract file extension</td>
+<td>Extension string</td>
+</tr>
+<tr>
+<td><code>getMimeType(filename)</code></td>
+<td>Determine MIME type</td>
+<td>MIME string</td>
+</tr>
+<tr>
+<td><code>isFileTypeAllowed(filename, types)</code></td>
+<td>Check allowed file types</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>readJSONFile(path)</code></td>
+<td>Safe JSON file reading</td>
+<td>Parsed object</td>
+</tr>
+<tr>
+<td><code>writeJSONFile(path, data)</code></td>
+<td>Safe JSON file writing</td>
+<td>Promise</td>
+</tr>
+</tbody></table>
+<p><strong>File Operations Example:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> fileHelpers = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/file-helpers&#x27;</span>);
+
+<span class="hljs-comment">// Ensure directory exists</span>
+<span class="hljs-keyword">await</span> fileHelpers.<span class="hljs-title function_">ensureDir</span>(<span class="hljs-string">&#x27;/app/uploads/temp&#x27;</span>);
+
+<span class="hljs-comment">// Clean old temp files (older than 1 hour)</span>
+<span class="hljs-keyword">const</span> cleaned = <span class="hljs-keyword">await</span> fileHelpers.<span class="hljs-title function_">cleanTempFiles</span>(<span class="hljs-string">&#x27;/tmp&#x27;</span>, <span class="hljs-number">3600000</span>);
+
+<span class="hljs-comment">// Check file type</span>
+<span class="hljs-keyword">if</span> (fileHelpers.<span class="hljs-title function_">isFileTypeAllowed</span>(<span class="hljs-string">&#x27;data.csv&#x27;</span>, [<span class="hljs-string">&#x27;csv&#x27;</span>, <span class="hljs-string">&#x27;json&#x27;</span>])) {
+    <span class="hljs-comment">// Process file</span>
+}</code></pre><h3>DatabaseHelpers</h3><p><strong>Location:</strong> <code>app/utils/db-helpers.js</code></p>
+<p>Database operation utilities for SQLite.</p>
+<p><strong>Functions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Purpose</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>runMigration(db, sql)</code></td>
+<td>Execute migration safely</td>
+<td>Promise</td>
+</tr>
+<tr>
+<td><code>createIndex(db, table, column)</code></td>
+<td>Create database index</td>
+<td>Promise</td>
+</tr>
+<tr>
+<td><code>tableExists(db, table)</code></td>
+<td>Check if table exists</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>getTableSchema(db, table)</code></td>
+<td>Get table structure</td>
+<td>Schema object</td>
+</tr>
+<tr>
+<td><code>vacuum(db)</code></td>
+<td>Optimize database</td>
+<td>Promise</td>
+</tr>
+<tr>
+<td><code>backup(db, path)</code></td>
+<td>Create database backup</td>
+<td>Promise</td>
+</tr>
+</tbody></table>
+<p><strong>Database Operations:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> dbHelpers = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/db-helpers&#x27;</span>);
+
+<span class="hljs-comment">// Check table existence</span>
+<span class="hljs-keyword">if</span> (<span class="hljs-keyword">await</span> dbHelpers.<span class="hljs-title function_">tableExists</span>(db, <span class="hljs-string">&#x27;vulnerabilities&#x27;</span>)) {
+    <span class="hljs-comment">// Table operations</span>
+}
+
+<span class="hljs-comment">// Create index for performance</span>
+<span class="hljs-keyword">await</span> dbHelpers.<span class="hljs-title function_">createIndex</span>(db, <span class="hljs-string">&#x27;vulnerabilities&#x27;</span>, <span class="hljs-string">&#x27;scan_date&#x27;</span>);
+
+<span class="hljs-comment">// Optimize database</span>
+<span class="hljs-keyword">await</span> dbHelpers.<span class="hljs-title function_">vacuum</span>(db);</code></pre><hr>
+<h2 id="error-handling">Error Handling Utilities</h2><h3>CustomErrors</h3><p><strong>Location:</strong> <code>app/utils/errors.js</code></p>
+<p>Custom error classes for better error handling.</p>
+<p><strong>Error Classes:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Purpose</th>
+<th>Status Code</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ValidationError</code></td>
+<td>Input validation failures</td>
+<td>400</td>
+</tr>
+<tr>
+<td><code>AuthenticationError</code></td>
+<td>Auth failures</td>
+<td>401</td>
+</tr>
+<tr>
+<td><code>AuthorizationError</code></td>
+<td>Permission denied</td>
+<td>403</td>
+</tr>
+<tr>
+<td><code>NotFoundError</code></td>
+<td>Resource not found</td>
+<td>404</td>
+</tr>
+<tr>
+<td><code>ConflictError</code></td>
+<td>Resource conflicts</td>
+<td>409</td>
+</tr>
+<tr>
+<td><code>RateLimitError</code></td>
+<td>Too many requests</td>
+<td>429</td>
+</tr>
+<tr>
+<td><code>ServerError</code></td>
+<td>Internal errors</td>
+<td>500</td>
+</tr>
+</tbody></table>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">ValidationError</span>, <span class="hljs-title class_">NotFoundError</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/errors&#x27;</span>);
+
+<span class="hljs-comment">// Throw custom error</span>
+<span class="hljs-keyword">if</span> (!isValid) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ValidationError</span>(<span class="hljs-string">&#x27;Invalid input format&#x27;</span>);
+}
+
+<span class="hljs-comment">// Handle in middleware</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-function">(<span class="hljs-params">err, req, res, next</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (err <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">ValidationError</span>) {
+        res.<span class="hljs-title function_">status</span>(err.<span class="hljs-property">statusCode</span>).<span class="hljs-title function_">json</span>({
+            <span class="hljs-attr">error</span>: err.<span class="hljs-property">message</span>,
+            <span class="hljs-attr">field</span>: err.<span class="hljs-property">field</span>
+        });
+    }
+});</code></pre><hr>
+<h2 id="performance">Performance Utilities</h2><h3>CacheManager</h3><p><strong>Location:</strong> <code>app/utils/cache.js</code></p>
+<p>In-memory caching with TTL support.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>TTL-based expiration</li>
+<li>LRU eviction policy</li>
+<li>Size limits</li>
+<li>Hit/miss statistics</li>
+</ul>
+<p><strong>Methods:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> cache = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CacheManager</span>({
+    <span class="hljs-attr">maxSize</span>: <span class="hljs-number">100</span>,
+    <span class="hljs-attr">defaultTTL</span>: <span class="hljs-number">300000</span> <span class="hljs-comment">// 5 minutes</span>
+});
+
+<span class="hljs-comment">// Set with TTL</span>
+cache.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;key&#x27;</span>, value, <span class="hljs-number">60000</span>); <span class="hljs-comment">// 1 minute TTL</span>
+
+<span class="hljs-comment">// Get value</span>
+<span class="hljs-keyword">const</span> value = cache.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;key&#x27;</span>);
+
+<span class="hljs-comment">// Check existence</span>
+<span class="hljs-keyword">if</span> (cache.<span class="hljs-title function_">has</span>(<span class="hljs-string">&#x27;key&#x27;</span>)) {
+    <span class="hljs-comment">// Use cached value</span>
+}
+
+<span class="hljs-comment">// Clear cache</span>
+cache.<span class="hljs-title function_">clear</span>();</code></pre><h3>RateLimiter</h3><p><strong>Location:</strong> <code>app/utils/rate-limiter.js</code></p>
+<p>Custom rate limiting implementation.</p>
+<p><strong>Configuration:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> limiter = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RateLimiter</span>({
+    <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>, <span class="hljs-comment">// 15 minutes</span>
+    <span class="hljs-attr">maxRequests</span>: <span class="hljs-number">100</span>,
+    <span class="hljs-attr">keyGenerator</span>: <span class="hljs-function">(<span class="hljs-params">req</span>) =&gt;</span> req.<span class="hljs-property">ip</span>
+});
+
+<span class="hljs-comment">// Check limit</span>
+<span class="hljs-keyword">if</span> (limiter.<span class="hljs-title function_">isLimited</span>(key)) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RateLimitError</span>(<span class="hljs-string">&#x27;Too many requests&#x27;</span>);
+}
+
+<span class="hljs-comment">// Track request</span>
+limiter.<span class="hljs-title function_">track</span>(key);</code></pre><hr>
+<h2 id="logging">Logging Utilities</h2><h3>Logger</h3><p><strong>Location:</strong> <code>app/utils/logger.js</code></p>
+<p>Structured logging with multiple transports.</p>
+<p><strong>Log Levels:</strong></p>
+<ul>
+<li><code>error</code> - Error conditions</li>
+<li><code>warn</code> - Warning conditions</li>
+<li><code>info</code> - Informational messages</li>
+<li><code>debug</code> - Debug messages</li>
+<li><code>verbose</code> - Verbose debug info</li>
+</ul>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> logger = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/logger&#x27;</span>);
+
+<span class="hljs-comment">// Log with metadata</span>
+logger.<span class="hljs-title function_">info</span>(<span class="hljs-string">&#x27;Operation completed&#x27;</span>, {
+    <span class="hljs-attr">operation</span>: <span class="hljs-string">&#x27;import&#x27;</span>,
+    <span class="hljs-attr">duration</span>: <span class="hljs-number">1523</span>,
+    <span class="hljs-attr">records</span>: <span class="hljs-number">1000</span>
+});
+
+<span class="hljs-comment">// Log errors with stack</span>
+logger.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Operation failed&#x27;</span>, {
+    <span class="hljs-attr">error</span>: err.<span class="hljs-property">message</span>,
+    <span class="hljs-attr">stack</span>: err.<span class="hljs-property">stack</span>,
+    <span class="hljs-attr">context</span>: { userId, operation }
+});</code></pre><hr>
+<h2 id="testing">Testing Utilities</h2><h3>TestHelpers</h3><p><strong>Location:</strong> <code>app/utils/test-helpers.js</code></p>
+<p>Utilities for testing.</p>
+<p><strong>Functions:</strong></p>
+<ul>
+<li><code>createTestDatabase()</code> - In-memory test DB</li>
+<li><code>seedTestData(db)</code> - Populate test data</li>
+<li><code>cleanupTest()</code> - Clean test artifacts</li>
+<li><code>mockWebSocket()</code> - WebSocket mock</li>
+<li><code>generateTestCSV()</code> - Test CSV generation</li>
+</ul>
+<hr>
+<h2 id="constants">Constants</h2><h3>ApplicationConstants</h3><p><strong>Location:</strong> <code>app/utils/constants.js</code></p>
+<p>Application-wide constants.</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = {
+    <span class="hljs-comment">// File limits</span>
+    <span class="hljs-attr">MAX_FILE_SIZE</span>: <span class="hljs-number">100</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>, <span class="hljs-comment">// 100MB</span>
+    <span class="hljs-attr">ALLOWED_EXTENSIONS</span>: [<span class="hljs-string">&#x27;.csv&#x27;</span>, <span class="hljs-string">&#x27;.json&#x27;</span>, <span class="hljs-string">&#x27;.xml&#x27;</span>],
+
+    <span class="hljs-comment">// Pagination</span>
+    <span class="hljs-attr">DEFAULT_PAGE_SIZE</span>: <span class="hljs-number">50</span>,
+    <span class="hljs-attr">MAX_PAGE_SIZE</span>: <span class="hljs-number">1000</span>,
+
+    <span class="hljs-comment">// Timeouts</span>
+    <span class="hljs-attr">REQUEST_TIMEOUT</span>: <span class="hljs-number">30000</span>, <span class="hljs-comment">// 30 seconds</span>
+    <span class="hljs-attr">IMPORT_TIMEOUT</span>: <span class="hljs-number">600000</span>, <span class="hljs-comment">// 10 minutes</span>
+
+    <span class="hljs-comment">// Security</span>
+    <span class="hljs-attr">MAX_LOGIN_ATTEMPTS</span>: <span class="hljs-number">5</span>,
+    <span class="hljs-attr">LOCKOUT_DURATION</span>: <span class="hljs-number">900000</span>, <span class="hljs-comment">// 15 minutes</span>
+
+    <span class="hljs-comment">// Cache</span>
+    <span class="hljs-attr">CACHE_TTL</span>: <span class="hljs-number">300000</span>, <span class="hljs-comment">// 5 minutes</span>
+    <span class="hljs-attr">MAX_CACHE_SIZE</span>: <span class="hljs-number">100</span>
+};</code></pre>
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
