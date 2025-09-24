@@ -10,6 +10,30 @@ HexTrackr is a vulnerability management system for tracking security vulnerabili
 
 When working on this project the AI Agent SHALL follow the CONSTITUTION.md
 
+## Development Workflow (MANDATORY)
+
+### Linear Integration & Planning
+HexTrackr uses Linear for issue tracking with a structured planning workflow:
+
+1. **NEVER implement without a plan** - Always create SESSION_PLAN.md first
+2. **Research before coding** - Use Claude-Context and Context7 MCP tools
+3. **Document everything** - Session logs, decisions, blockers
+4. **Maintain continuity** - Enable seamless agent handoffs
+
+### Key Workflow Documents
+- **Complete Workflow**: `/dev-docs/planning/HEXTRACKR_LINEAR_WORKFLOW.md`
+- **Quick Reference**: `/dev-docs/planning/QUICK_REFERENCE.md`
+- **Agent Handoff**: `/dev-docs/planning/AGENT_HANDOFF_PROTOCOL.md`
+- **Templates**: `/dev-docs/planning/templates/`
+
+### Linear Issue Format
+```
+Title: v1.0.XX: [Feature/Bug Name]
+Team: HexTrackr
+Status: Backlog → Todo → In Progress → In Review → Done
+Labels: [Type: Bug/Feature/Enhancement] + [Priority: High/Medium/Low]
+```
+
 ## Essential Commands
 
 ### Development
@@ -180,9 +204,11 @@ The system uses a sophisticated rollover pipeline:
    - Public docs in `app/public/docs-source/` (markdown) and `app/public/docs-html/` (HTML)
 
 4. **Branch Management**:
-   - Development work sourced from 'copilot' branch
-   - Main branch is 'main'
-   - Protected branches require Pull Requests (no direct pushes)
+   - Development work branches from 'main' (NOT copilot)
+   - Main branch is protected with Codacy checks
+   - Feature branches: `feature/v1.0.XX-feature-name`
+   - Bug fix branches: `fix/v1.0.XX-bug-name`
+   - All changes to main require Pull Requests
 
 5. **Testing Requirements**:
    - Playwright testing before/after UI changes
@@ -222,6 +248,40 @@ The system uses a sophisticated rollover pipeline:
 
 ## Common Development Tasks
 
+### Starting a New Feature (REQUIRED WORKFLOW)
+1. **Create Linear Issue**:
+   ```bash
+   # Use Linear MCP to create issue
+   Title: "v1.0.XX: Feature Name"
+   Description: "Brief description, links to SESSION_PLAN.md"
+   ```
+
+2. **Set Up Planning**:
+   ```bash
+   mkdir -p /dev-docs/planning/active/v1.0.XX-feature/{research,implementation}
+   cp /dev-docs/planning/templates/SESSION_PLAN.md /dev-docs/planning/active/v1.0.XX-feature/
+   ```
+
+3. **Research Phase**:
+   - Use Claude-Context to search codebase
+   - Use Context7 for framework docs
+   - Document findings in SESSION_PLAN.md
+   - Identify affected files and dependencies
+
+4. **Implementation**:
+   ```bash
+   git checkout main && git pull
+   git checkout -b feature/v1.0.XX-feature
+   # Work through SESSION_PLAN.md checkboxes
+   # Commit after each completed task
+   ```
+
+5. **Testing & Completion**:
+   - Test in Docker (port 8989)
+   - Run linters: `npm run lint:all`
+   - Update Linear to "Done"
+   - Create PR to main branch
+
 ### Adding a New API Endpoint
 1. Create controller in `app/controllers/`
 2. Define routes in `app/routes/`
@@ -244,6 +304,50 @@ The system uses a sophisticated rollover pipeline:
    - `window.refreshPageData(type)` - Refresh data after operations
    - `window.showToast(message, type)` - Display notifications
 5. Test in Docker container on port 8989
+
+## Session Management & Agent Handoffs
+
+### Session Structure (2-hour blocks)
+1. **Start**: Review SESSION_PLAN.md, check Linear, pull latest code
+2. **Work**: Complete checkboxes sequentially, commit frequently
+3. **End**: Update session log, push changes, update Linear
+
+### Required Session Documentation
+Each session MUST update SESSION_PLAN.md with:
+- Completed tasks (✅ with details)
+- In-progress items (🔄 with exact status)
+- Blockers or discoveries (⚠️)
+- Next priority (🎯)
+- Commit hash
+
+### Agent Handoff Checklist
+**Outgoing Agent**:
+- [ ] SESSION_PLAN.md updated with session log
+- [ ] All changes committed with descriptive messages
+- [ ] Linear issue updated with progress
+- [ ] Next steps clearly documented
+- [ ] Memento entity created if significant progress
+
+**Incoming Agent**:
+- [ ] Read SESSION_PLAN.md (5 minutes max)
+- [ ] Check git status and recent commits
+- [ ] Review Linear issue for updates
+- [ ] Understand next priority before starting
+
+### Planning Folder Structure
+```
+/dev-docs/planning/
+├── templates/              # Reusable templates
+│   ├── SESSION_PLAN.md    # Main planning document
+│   ├── BUG_REPORT.md      # Bug tracking template
+│   └── FEATURE_REQUEST.md # Feature specification
+├── active/                # Current work
+│   └── v1.0.XX-feature/   # Active feature folder
+│       ├── SESSION_PLAN.md
+│       ├── research/      # Research findings
+│       └── implementation/# Code snippets
+└── completed/             # Archived completed work
+```
 
 ## Environment Configuration
 
@@ -273,6 +377,22 @@ See `.env.example` for complete configuration options.
 
 ## Additional Notes
 
+### Linear MCP Integration
+The project uses Linear MCP tools for issue tracking:
+- `linear_create_issue`: Create new tickets
+- `linear_update_issue`: Update status and details
+- `linear_search_issues`: Find existing issues
+- `linear_add_comment`: Add progress updates
+- Always link SESSION_PLAN.md in issue descriptions
+
+### Development Philosophy
+- **Plan First**: Never code without SESSION_PLAN.md
+- **Research Thoroughly**: Use Claude-Context and Context7
+- **Document Everything**: Enable seamless handoffs
+- **Test Continuously**: Docker container on port 8989
+- **Commit Frequently**: Checkpoint after each task
+
+### Technical Architecture
 - The system follows a migration from monolithic to modular architecture
 - Controllers use singleton pattern for consistency
 - Services use functional exports for stateless operations
