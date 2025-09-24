@@ -1,0 +1,53 @@
+{
+  "source": {
+    "include": [
+      "app/controllers/",
+      "app/services/",
+      "app/routes/",
+      "app/utils/",
+      "app/middleware/",
+      "app/config/",
+      "app/public/server.js",
+      "app/public/scripts/pages/",
+      "app/public/scripts/shared/",
+      "app/public/scripts/utils/"
+    ],
+    "includePattern": "\\.js$",
+    "exclude": [
+      "node_modules/",
+      "**/*.min.js",
+      "**/*test*.js",
+      "**/*spec*.js"
+    ]
+  },
+  "opts": {
+    "destination": "./app/dev-docs-html/",
+    "recurse": true,
+    "readme": "./README.md"
+  },
+  "plugins": [
+    "plugins/markdown"
+  ],
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": true,
+    "default": {
+      "outputSourceFiles": true,
+      "includeDate": true,
+      "useLongnameInNav": true,
+      "staticFiles": {
+        "include": [
+          "./app/dev-docs-html/scripts/"
+        ]
+      }
+    }
+  },
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc", "closure"]
+  },
+  "metadata": {
+    "title": "HexTrackr Developer Documentation",
+    "description": "Internal API reference for HexTrackr developers"
+  }
+}

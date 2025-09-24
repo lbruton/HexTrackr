@@ -1,0 +1,553 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Frontend API Reference</h1><blockquote>
+<p>Complete documentation for HexTrackr&#39;s frontend architecture, including page managers, shared components, and utilities</p>
+</blockquote>
+<h2>Overview</h2><p>HexTrackr&#39;s frontend uses vanilla JavaScript with a modular, class-based architecture. Components follow a consistent pattern using ES6 modules, with clear separation between page-specific logic, shared components, and utilities.</p>
+<p><strong>Core Technologies:</strong></p>
+<ul>
+<li>Vanilla JavaScript (ES6+)</li>
+<li>AG-Grid for data tables</li>
+<li>ApexCharts for visualizations</li>
+<li>Tabler.io CSS framework</li>
+<li>WebSocket for real-time updates</li>
+</ul>
+<hr>
+<h2 id="page-components">Page Components</h2><p>Page components manage the main functionality for each application page.</p>
+<h3>VulnerabilitiesPage</h3><p><strong>Location:</strong> <code>app/public/scripts/pages/vulnerabilities.js</code></p>
+<p>The main vulnerability management interface.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Real-time vulnerability grid with AG-Grid</li>
+<li>Interactive charts and statistics</li>
+<li>CSV import with progress tracking</li>
+<li>Advanced filtering and search</li>
+<li>WebSocket integration for live updates</li>
+</ul>
+<p><strong>Main Components:</strong></p>
+<ul>
+<li><code>ModernVulnManager</code> - Main orchestrator class</li>
+<li><code>VulnerabilityDataManager</code> - Data operations</li>
+<li><code>VulnerabilityGridManager</code> - AG-Grid integration</li>
+<li><code>VulnerabilityChartManager</code> - ApexCharts visualizations</li>
+</ul>
+<p><strong>Initialization:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Auto-initializes on DOMContentLoaded</span>
+<span class="hljs-keyword">const</span> vulnManager = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ModernVulnManager</span>();</code></pre><p><strong>Key Methods:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>init()</code></td>
+<td>Initialize all components and load data</td>
+</tr>
+<tr>
+<td><code>loadVulnerabilities()</code></td>
+<td>Fetch and display vulnerability data</td>
+</tr>
+<tr>
+<td><code>setupEventListeners()</code></td>
+<td>Configure UI interactions</td>
+</tr>
+<tr>
+<td><code>handleImport()</code></td>
+<td>Manage CSV import process</td>
+</tr>
+<tr>
+<td><code>applyFilters()</code></td>
+<td>Apply search and filter criteria</td>
+</tr>
+<tr>
+<td><code>exportData()</code></td>
+<td>Export filtered data to CSV</td>
+</tr>
+</tbody></table>
+<h3>TicketsPage</h3><p><strong>Location:</strong> <code>app/public/scripts/pages/tickets.js</code></p>
+<p>Support ticket management interface.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Ticket CRUD operations</li>
+<li>Device association management</li>
+<li>Status workflow visualization</li>
+<li>Priority-based sorting</li>
+<li>Real-time updates</li>
+</ul>
+<p><strong>Main Components:</strong></p>
+<ul>
+<li><code>TicketManager</code> - Main ticket controller</li>
+<li><code>TicketGrid</code> - AG-Grid configuration</li>
+<li><code>DeviceModal</code> - Device management</li>
+</ul>
+<p><strong>Key Methods:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>init()</code></td>
+<td>Initialize ticket interface</td>
+</tr>
+<tr>
+<td><code>loadTickets()</code></td>
+<td>Fetch and display tickets</td>
+</tr>
+<tr>
+<td><code>createTicket()</code></td>
+<td>Open new ticket modal</td>
+</tr>
+<tr>
+<td><code>updateTicket()</code></td>
+<td>Edit existing ticket</td>
+</tr>
+<tr>
+<td><code>updateDevices()</code></td>
+<td>Manage associated devices</td>
+</tr>
+<tr>
+<td><code>deleteTicket()</code></td>
+<td>Remove ticket with confirmation</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="shared-components">Shared Components</h2><p>Reusable components used across multiple pages.</p>
+<h3>ThemeController</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/theme-controller.js</code></p>
+<p>Manages light/dark theme switching with CSS variable updates.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Persistent theme preference (localStorage)</li>
+<li>Smooth transitions</li>
+<li>Dynamic CSS variable updates</li>
+<li>AG-Grid theme synchronization</li>
+<li>Chart theme adaptation</li>
+</ul>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> themeController = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ThemeController</span>();
+themeController.<span class="hljs-title function_">initializeToggle</span>();</code></pre><h3>AGGridResponsiveConfig</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/ag-grid-responsive-config.js</code></p>
+<p>Provides responsive AG-Grid configuration with theme support.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Automatic theme detection</li>
+<li>Responsive column sizing</li>
+<li>Custom cell renderers</li>
+<li>Export functionality</li>
+<li>Pagination controls</li>
+</ul>
+<p><strong>Configuration Example:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> gridOptions = <span class="hljs-title class_">AGGridResponsiveConfig</span>.<span class="hljs-title function_">getDefaultGridOptions</span>({
+    <span class="hljs-attr">columnDefs</span>: [...],
+    <span class="hljs-attr">rowData</span>: [...],
+    <span class="hljs-attr">onGridReady</span>: <span class="hljs-function">(<span class="hljs-params">params</span>) =&gt;</span> {...}
+});</code></pre><h3>VulnerabilityDataManager</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-data.js</code></p>
+<p>Core data management for vulnerabilities.</p>
+<p><strong>Responsibilities:</strong></p>
+<ul>
+<li>API communication</li>
+<li>Data caching</li>
+<li>Filter application</li>
+<li>Sort operations</li>
+<li>Export preparation</li>
+</ul>
+<p><strong>Key Methods:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>fetchVulnerabilities()</code></td>
+<td>Load data from API</td>
+</tr>
+<tr>
+<td><code>filterData()</code></td>
+<td>Apply client-side filters</td>
+</tr>
+<tr>
+<td><code>sortData()</code></td>
+<td>Sort by various criteria</td>
+</tr>
+<tr>
+<td><code>exportToCSV()</code></td>
+<td>Generate CSV export</td>
+</tr>
+<tr>
+<td><code>getCachedData()</code></td>
+<td>Retrieve cached results</td>
+</tr>
+</tbody></table>
+<h3>WebSocketClient</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/websocket-client.js</code></p>
+<p>Real-time communication handler.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Auto-reconnection</li>
+<li>Event-based messaging</li>
+<li>Progress tracking</li>
+<li>Error recovery</li>
+<li>Connection state management</li>
+</ul>
+<p><strong>Events:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>import-progress</code></td>
+<td>CSV import updates</td>
+</tr>
+<tr>
+<td><code>vulnerability-added</code></td>
+<td>New vulnerability notification</td>
+</tr>
+<tr>
+<td><code>ticket-updated</code></td>
+<td>Ticket status change</td>
+</tr>
+<tr>
+<td><code>connection-status</code></td>
+<td>Connection state changes</td>
+</tr>
+</tbody></table>
+<h3>ModalManager Classes</h3><p>Multiple modal components for different purposes:</p>
+<h4>VulnerabilityDetailsModal</h4><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-details-modal.js</code></p>
+<p>Displays detailed vulnerability information.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>CVE links and references</li>
+<li>CVSS score breakdown</li>
+<li>Remediation guidance</li>
+<li>Plugin output display</li>
+<li>Related vulnerabilities</li>
+</ul>
+<h4>ProgressModal</h4><p><strong>Location:</strong> <code>app/public/scripts/shared/progress-modal.js</code></p>
+<p>Shows progress for long-running operations.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Real-time percentage updates</li>
+<li>ETA calculation</li>
+<li>Cancel capability</li>
+<li>WebSocket integration</li>
+</ul>
+<h4>SettingsModal</h4><p><strong>Location:</strong> <code>app/public/scripts/shared/settings-modal.js</code></p>
+<p>Global application settings interface.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Theme preferences</li>
+<li>Grid configuration</li>
+<li>Export settings</li>
+<li>Data management operations</li>
+<li>Backup/restore functionality</li>
+</ul>
+<h4>DeviceSecurityModal</h4><p><strong>Location:</strong> <code>app/public/scripts/shared/device-security-modal.js</code></p>
+<p>Device management for tickets.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Device list editing</li>
+<li>Bulk operations</li>
+<li>Validation</li>
+<li>Auto-save</li>
+</ul>
+<h3>ChartManager Components</h3><h4>VulnerabilityChartManager</h4><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-chart-manager.js</code></p>
+<p>Manages ApexCharts visualizations.</p>
+<p><strong>Charts:</strong></p>
+<ul>
+<li>Severity distribution (donut)</li>
+<li>Trend analysis (line)</li>
+<li>Top vulnerabilities (bar)</li>
+<li>Risk matrix (heatmap)</li>
+</ul>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Dynamic theme adaptation</li>
+<li>Responsive sizing</li>
+<li>Interactive tooltips</li>
+<li>Export to image</li>
+</ul>
+<h4>VulnerabilityStatistics</h4><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-statistics.js</code></p>
+<p>Statistical calculations and displays.</p>
+<p><strong>Metrics:</strong></p>
+<ul>
+<li>Total vulnerabilities</li>
+<li>Critical/High/Medium/Low counts</li>
+<li>Average CVSS score</li>
+<li>VPR distribution</li>
+<li>Remediation progress</li>
+</ul>
+<h3>ToastManager</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/toast-manager.js</code></p>
+<p>Notification system for user feedback.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Multiple severity levels</li>
+<li>Auto-dismiss</li>
+<li>Action buttons</li>
+<li>Queue management</li>
+<li>Accessibility support</li>
+</ul>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">ToastManager</span>.<span class="hljs-title function_">show</span>(<span class="hljs-string">&#x27;Operation successful&#x27;</span>, <span class="hljs-string">&#x27;success&#x27;</span>);
+<span class="hljs-title class_">ToastManager</span>.<span class="hljs-title function_">show</span>(<span class="hljs-string">&#x27;Error occurred&#x27;</span>, <span class="hljs-string">&#x27;error&#x27;</span>, { <span class="hljs-attr">duration</span>: <span class="hljs-number">5000</span> });</code></pre><h3>HeaderManager</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/header.js</code></p>
+<p>Dynamic header with theme toggle and user menu.</p>
+<p><strong>Components:</strong></p>
+<ul>
+<li>Theme toggle button</li>
+<li>User dropdown</li>
+<li>Navigation state</li>
+<li>Notification badges</li>
+</ul>
+<hr>
+<h2 id="utilities">Utilities</h2><p>Helper functions and security utilities.</p>
+<h3>Security Module</h3><p><strong>Location:</strong> <code>app/public/scripts/utils/security.js</code></p>
+<p>Security utilities for input validation and sanitization.</p>
+<p><strong>Functions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>escapeHtml()</code></td>
+<td>Prevent XSS attacks</td>
+</tr>
+<tr>
+<td><code>sanitizeInput()</code></td>
+<td>Clean user input</td>
+</tr>
+<tr>
+<td><code>validatePath()</code></td>
+<td>Prevent path traversal</td>
+</tr>
+<tr>
+<td><code>sanitizeCSV()</code></td>
+<td>Clean CSV data</td>
+</tr>
+</tbody></table>
+<h3>AccessibilityAnnouncer</h3><p><strong>Location:</strong> <code>app/public/scripts/utils/accessibility-announcer.js</code></p>
+<p>ARIA live region management for screen readers.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Dynamic announcements</li>
+<li>Priority levels</li>
+<li>Queue management</li>
+<li>Automatic cleanup</li>
+</ul>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-title class_">AccessibilityAnnouncer</span>.<span class="hljs-title function_">announce</span>(<span class="hljs-string">&#x27;Data loaded&#x27;</span>, <span class="hljs-string">&#x27;polite&#x27;</span>);
+<span class="hljs-title class_">AccessibilityAnnouncer</span>.<span class="hljs-title function_">announce</span>(<span class="hljs-string">&#x27;Error occurred&#x27;</span>, <span class="hljs-string">&#x27;assertive&#x27;</span>);</code></pre><h3>WCAGContrastValidator</h3><p><strong>Location:</strong> <code>app/public/scripts/utils/wcag-contrast-validator.js</code></p>
+<p>Validates color contrast for WCAG compliance.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>AA/AAA level checking</li>
+<li>Dynamic theme validation</li>
+<li>Suggestion generation</li>
+<li>Batch validation</li>
+</ul>
+<h3>ChartThemeAdapter</h3><p><strong>Location:</strong> <code>app/public/scripts/utils/chart-theme-adapter.js</code></p>
+<p>Adapts chart colors to current theme.</p>
+<p><strong>Responsibilities:</strong></p>
+<ul>
+<li>Color palette management</li>
+<li>Dynamic theme switching</li>
+<li>Contrast optimization</li>
+<li>ApexCharts configuration</li>
+</ul>
+<h3>ValidationUtils</h3><p><strong>Location:</strong> <code>app/public/scripts/validation-utils.js</code></p>
+<p>Form and data validation utilities.</p>
+<p><strong>Functions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>validateEmail()</code></td>
+<td>Email format validation</td>
+</tr>
+<tr>
+<td><code>validateURL()</code></td>
+<td>URL format checking</td>
+</tr>
+<tr>
+<td><code>validateIPAddress()</code></td>
+<td>IP address validation</td>
+</tr>
+<tr>
+<td><code>validateCVE()</code></td>
+<td>CVE ID format validation</td>
+</tr>
+<tr>
+<td><code>validateDate()</code></td>
+<td>Date format and range</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="constants">Constants and Configuration</h2><h3>VulnerabilityConstants</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-constants.js</code></p>
+<p>Central configuration for vulnerability features.</p>
+<p><strong>Includes:</strong></p>
+<ul>
+<li>Severity levels and colors</li>
+<li>Risk thresholds</li>
+<li>API endpoints</li>
+<li>Grid column definitions</li>
+<li>Chart configurations</li>
+</ul>
+<h3>ConfigLoader</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/config-loader.js</code></p>
+<p>Loads and manages application configuration.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Environment-based config</li>
+<li>Default fallbacks</li>
+<li>Runtime updates</li>
+<li>Validation</li>
+</ul>
+<hr>
+<h2 id="initialization">Initialization Scripts</h2><h3>Database Initializer</h3><p><strong>Location:</strong> <code>app/public/scripts/init-database.js</code></p>
+<p>Sets up initial database schema and data.</p>
+<p><strong>Operations:</strong></p>
+<ul>
+<li>Schema creation</li>
+<li>Index setup</li>
+<li>Default data insertion</li>
+<li>Migration running</li>
+</ul>
+<hr>
+<h2>Module Loading Pattern</h2><p>All modules follow a consistent loading pattern:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Module definition</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">ComponentName</span> {
+    <span class="hljs-title function_">constructor</span>(<span class="hljs-params">options = {}</span>) {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">options</span> = { ...<span class="hljs-variable language_">this</span>.<span class="hljs-property">defaultOptions</span>, ...options };
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">init</span>();
+    }
+
+    <span class="hljs-title function_">init</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">setupDOM</span>();
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">attachEventListeners</span>();
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">loadData</span>();
+    }
+
+    <span class="hljs-title function_">setupDOM</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-comment">// DOM references</span>
+    }
+
+    <span class="hljs-title function_">attachEventListeners</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-comment">// Event bindings</span>
+    }
+
+    <span class="hljs-title function_">loadData</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-comment">// Initial data load</span>
+    }
+
+    <span class="hljs-title function_">destroy</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-comment">// Cleanup</span>
+    }
+}
+
+<span class="hljs-comment">// Auto-initialization</span>
+<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;DOMContentLoaded&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-variable language_">window</span>.<span class="hljs-property">component</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComponentName</span>();
+});
+
+<span class="hljs-comment">// Export for module use</span>
+<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-variable language_">module</span> !== <span class="hljs-string">&#x27;undefined&#x27;</span> &amp;&amp; <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span>) {
+    <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-title class_">ComponentName</span>;
+}</code></pre><hr>
+<h2>Event System</h2><h3>Custom Events</h3><p>The application uses custom events for component communication:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Triggered When</th>
+<th>Data</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>theme-changed</code></td>
+<td>Theme toggles</td>
+<td>`{ theme: &#39;light&#39;</td>
+</tr>
+<tr>
+<td><code>data-refresh</code></td>
+<td>Data needs reload</td>
+<td>`{ type: &#39;vulnerabilities&#39;</td>
+</tr>
+<tr>
+<td><code>filter-applied</code></td>
+<td>Filters change</td>
+<td><code>{ filters: {...} }</code></td>
+</tr>
+<tr>
+<td><code>grid-ready</code></td>
+<td>AG-Grid initializes</td>
+<td><code>{ gridApi: api }</code></td>
+</tr>
+</tbody></table>
+<h3>Global Functions</h3><p>Available on <code>window</code> object:</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>refreshPageData(type)</code></td>
+<td>Trigger data refresh</td>
+</tr>
+<tr>
+<td><code>showNotification(msg, type)</code></td>
+<td>Display notification</td>
+</tr>
+<tr>
+<td><code>exportCurrentView()</code></td>
+<td>Export visible data</td>
+</tr>
+<tr>
+<td><code>toggleTheme()</code></td>
+<td>Switch theme</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>CSS Custom Properties</h2><p>The frontend relies on CSS custom properties for theming:</p>
+<pre><code class="language-css"><span class="hljs-comment">/* Surface hierarchy for dark mode */</span>
+<span class="hljs-attr">--hextrackr-surface-base</span>: <span class="hljs-number">#0f172a</span>;  <span class="hljs-comment">/* Background */</span>
+<span class="hljs-attr">--hextrackr-surface-1</span>: <span class="hljs-number">#1a2332</span>;     <span class="hljs-comment">/* Cards */</span>
+<span class="hljs-attr">--hextrackr-surface-2</span>: <span class="hljs-number">#253241</span>;     <span class="hljs-comment">/* Tables */</span>
+<span class="hljs-attr">--hextrackr-surface-3</span>: <span class="hljs-number">#2f3f50</span>;     <span class="hljs-comment">/* Modals */</span>
+<span class="hljs-attr">--hextrackr-surface-4</span>: <span class="hljs-number">#526880</span>;     <span class="hljs-comment">/* Overlays */</span>
+
+<span class="hljs-comment">/* Severity colors */</span>
+<span class="hljs-attr">--hextrackr-critical</span>: <span class="hljs-number">#d63939</span>;
+<span class="hljs-attr">--hextrackr-high</span>: <span class="hljs-number">#f76707</span>;
+<span class="hljs-attr">--hextrackr-medium</span>: <span class="hljs-number">#f59f00</span>;
+<span class="hljs-attr">--hextrackr-low</span>: <span class="hljs-number">#74b816</span>;</code></pre><hr>
+<h2>Performance Considerations</h2><h3>Optimization Strategies</h3><ol>
+<li><strong>Lazy Loading</strong>: Components load on demand</li>
+<li><strong>Virtual Scrolling</strong>: AG-Grid handles large datasets</li>
+<li><strong>Debouncing</strong>: Search and filter inputs are debounced</li>
+<li><strong>Caching</strong>: API responses cached for 5 minutes</li>
+<li><strong>Web Workers</strong>: CSV parsing in background (large files)</li>
+</ol>
+<h3>Memory Management</h3><ul>
+<li>Event listeners cleaned up on component destroy</li>
+<li>WebSocket connections properly closed</li>
+<li>Chart instances disposed when not needed</li>
+<li>Grid data virtualized for large datasets</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

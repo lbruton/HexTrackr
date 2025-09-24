@@ -1,0 +1,383 @@
+/**
+ * @fileoverview Shared layout styles for HexTrackr
+ * @description Common layout patterns and utilities
+ * @version 1.0.0
+ */
+
+/* ===========================
+   Ultrawide Screen Constraints
+   =========================== */
+
+/* Center content on ultrawide displays */
+.page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-wrapper {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.page-wrapper .container-xl {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Progressive width constraints for different screen sizes */
+@media (min-width: 1600px) {
+    .page-wrapper {
+        max-width: 1300px;
+    }
+}
+
+@media (min-width: 2000px) {
+    .page-wrapper {
+        max-width: 1200px;
+    }
+}
+
+@media (min-width: 2560px) {
+    .page-wrapper {
+        max-width: 1400px; /* Allow a bit more room on very large displays */
+    }
+}
+
+/* ===========================
+   Empty States
+   =========================== */
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 2rem;
+    min-height: 400px;
+}
+
+.empty-state-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgb(37, 99, 235, 0.1);
+    color: var(--hextrackr-primary);
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--tblr-dark);
+}
+
+.empty-state-subtitle {
+    color: var(--tblr-muted);
+    margin-bottom: 1.5rem;
+}
+
+[data-bs-theme="dark"] .empty-state-title {
+    color: var(--tblr-body-color);
+}
+
+/* Grid-specific empty state */
+.grid-empty-state {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+    border: 1px dashed var(--tblr-border-color);
+    border-radius: 12px;
+    background: rgb(248, 250, 252, 0.8);
+    pointer-events: none;
+    z-index: 2;
+}
+
+[data-bs-theme="dark"] .grid-empty-state {
+    background: rgb(15, 23, 42, 0.5);
+}
+
+.grid-empty-state.active {
+    display: flex;
+}
+
+/* ===========================
+   Terminal/Console Output
+   =========================== */
+
+.terminal-content {
+    background-color: #0d1117 !important;
+    color: #00ff00 !important;
+    font-family: Consolas, Monaco, 'Courier New', monospace !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    border: 1px solid #30363d !important;
+    border-radius: 6px !important;
+    box-shadow: inset 0 0 10px rgb(0, 0, 0, 0.5) !important;
+    padding: 16px !important;
+    max-height: 500px !important;
+    overflow-y: auto !important;
+    white-space: pre-wrap !important;
+}
+
+.terminal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.terminal-content::-webkit-scrollbar-track {
+    background: #161b22;
+    border-radius: 4px;
+}
+
+.terminal-content::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 4px;
+}
+
+.terminal-content::-webkit-scrollbar-thumb:hover {
+    background: #484f58;
+}
+
+/* ===========================
+   View Switcher
+   =========================== */
+
+.view-switcher {
+    background: white;
+    border-radius: 8px;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    display: inline-flex;
+    gap: 0.25rem;
+}
+
+[data-bs-theme="dark"] .view-switcher {
+    background: var(--tblr-bg-surface);
+}
+
+.view-btn {
+    background: transparent;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    color: var(--hextrackr-secondary);
+    cursor: pointer;
+}
+
+.view-btn:hover {
+    background: rgb(37, 99, 235, 0.1);
+}
+
+.view-btn.active {
+    background: var(--hextrackr-primary);
+    color: white;
+    box-shadow: 0 1px 3px rgb(32, 107, 196, 0.3);
+}
+
+/* ===========================
+   Hidden Elements
+   =========================== */
+
+/* Hidden file inputs */
+.hidden-input {
+    display: none !important;
+}
+
+input[type="file"].hidden-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ===========================
+   Group Controls
+   =========================== */
+
+/* Group-by controls */
+.group-controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.group-controls .btn {
+    display: none;
+}
+
+.group-controls.has-grouping .btn {
+    display: inline-block;
+}
+
+/* ===========================
+   Mini Chart Container
+   =========================== */
+
+.mini-chart {
+    height: 40px;
+    width: 100%;
+}
+
+/* ===========================
+   Sidebar Layouts
+   =========================== */
+
+.sidebar-layout {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.sidebar-layout .sidebar {
+    flex: 0 0 300px;
+    min-width: 0;
+}
+
+.sidebar-layout .main-content {
+    flex: 1;
+    min-width: 0;
+}
+
+@media (max-width: 991px) {
+    .sidebar-layout {
+        flex-direction: column;
+    }
+
+    .sidebar-layout .sidebar {
+        flex: 1;
+    }
+}
+
+/* ===========================
+   Grid Layouts
+   =========================== */
+
+.grid-2-col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.grid-3-col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.grid-4-col {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+/* Responsive grid */
+.grid-responsive {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .grid-2-col,
+    .grid-3-col,
+    .grid-4-col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===========================
+   Spacing Utilities
+   =========================== */
+
+.space-y-1 > * + * { margin-top: 0.25rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+.space-y-5 > * + * { margin-top: 1.25rem; }
+
+.space-x-1 > * + * { margin-left: 0.25rem; }
+.space-x-2 > * + * { margin-left: 0.5rem; }
+.space-x-3 > * + * { margin-left: 0.75rem; }
+.space-x-4 > * + * { margin-left: 1rem; }
+.space-x-5 > * + * { margin-left: 1.25rem; }
+
+/* ===========================
+   Utility Classes
+   =========================== */
+
+/* Full height sections */
+.full-height {
+    min-height: calc(100vh - 4rem);
+}
+
+/* Sticky elements */
+.sticky-top-offset {
+    position: sticky;
+    top: 5rem;
+    z-index: 10;
+}
+
+/* Overflow utilities */
+.overflow-x-auto {
+    overflow-x: auto;
+}
+
+.overflow-y-auto {
+    overflow-y: auto;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+/* Scroll shadows for overflow containers */
+.scroll-shadow {
+    position: relative;
+}
+
+.scroll-shadow::before,
+.scroll-shadow::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1rem;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.scroll-shadow::before {
+    top: 0;
+    background: linear-gradient(to bottom, rgb(255, 255, 255, 1) 0%, rgb(255, 255, 255, 0) 100%);
+}
+
+.scroll-shadow::after {
+    bottom: 0;
+    background: linear-gradient(to top, rgb(255, 255, 255, 1) 0%, rgb(255, 255, 255, 0) 100%);
+}
+
+[data-bs-theme="dark"] .scroll-shadow::before {
+    background: linear-gradient(to bottom, var(--tblr-bg-surface) 0%, transparent 100%);
+}
+
+[data-bs-theme="dark"] .scroll-shadow::after {
+    background: linear-gradient(to top, var(--tblr-bg-surface) 0%, transparent 100%);
+}

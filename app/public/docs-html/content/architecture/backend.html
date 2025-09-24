@@ -1,0 +1,929 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Backend Architecture</h1><p>The backend is a modular Node.js/Express application providing REST endpoints, rollover ingestion, documentation delivery, and SQLite persistence. It serves the static frontend pages (<code>tickets.html</code>, <code>vulnerabilities.html</code>) and the generated documentation portal (<code>/docs-html</code>).</p>
+<hr>
+<h2>Key Characteristics</h2><ul>
+<li><strong>Modular Architecture</strong>: <code>server.js</code> (~205 lines) orchestrates modular components across multiple directories.</li>
+<li><strong>Separation of Concerns</strong>: Controllers, services, routes, and configuration are cleanly separated.</li>
+<li><strong>Unified Delivery</strong>: API + static assets + docs from one process.</li>
+<li><strong>Embedded DB</strong>: Single SQLite file (<code>data/hextrackr.db</code>). No external service dependency.</li>
+<li><strong>Security Utilities</strong>: Extracted <code>PathValidator</code> class for safe file operations + security headers.</li>
+</ul>
+<hr>
+<h2>Core Components</h2><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>server.js</code></td>
+<td>Main application runtime (orchestration + initialization)</td>
+<td><code>/app/public/</code></td>
+</tr>
+<tr>
+<td><strong>Controllers</strong></td>
+<td>Business logic (mixed patterns - see Controller Patterns section)</td>
+<td><code>/app/controllers/</code></td>
+</tr>
+<tr>
+<td><strong>Services</strong></td>
+<td>Data access and business services</td>
+<td><code>/app/services/</code></td>
+</tr>
+<tr>
+<td><strong>Routes</strong></td>
+<td>Express route definitions</td>
+<td><code>/app/routes/</code></td>
+</tr>
+<tr>
+<td><strong>Configuration</strong></td>
+<td>Database, middleware, websocket configs</td>
+<td><code>/app/config/</code></td>
+</tr>
+<tr>
+<td><strong>Utilities</strong></td>
+<td>PathValidator, ProgressTracker, helpers</td>
+<td><code>/app/utils/</code></td>
+</tr>
+<tr>
+<td><code>init-database.js</code></td>
+<td>Bootstrap base schema &amp; indexes</td>
+<td><code>/app/public/scripts/</code></td>
+</tr>
+<tr>
+<td>Rate Limiting</td>
+<td>IP-based request throttling (100 req/15min)</td>
+<td>Express middleware</td>
+</tr>
+</tbody></table>
+<h3>Module Organization</h3><table>
+<thead>
+<tr>
+<th>Directory</th>
+<th>Contents</th>
+<th>Pattern</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/app/controllers/</code></td>
+<td>5 controller modules</td>
+<td>Mixed (3 singleton, 2 functional)</td>
+</tr>
+<tr>
+<td><code>/app/services/</code></td>
+<td>10 service modules</td>
+<td>Functional exports</td>
+</tr>
+<tr>
+<td><code>/app/routes/</code></td>
+<td>5 route definition files</td>
+<td>Express router pattern</td>
+</tr>
+<tr>
+<td><code>/app/config/</code></td>
+<td>4 configuration modules</td>
+<td>Module exports</td>
+</tr>
+<tr>
+<td><code>/app/middleware/</code></td>
+<td>4 middleware modules</td>
+<td>Express middleware pattern</td>
+</tr>
+<tr>
+<td><code>/app/utils/</code></td>
+<td>4 utility modules</td>
+<td>Static class methods</td>
+</tr>
+</tbody></table>
+<h3>Controller Files</h3><table>
+<thead>
+<tr>
+<th>Controller</th>
+<th>Pattern</th>
+<th>Methods</th>
+<th>Dependency Injection</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>vulnerabilityController.js</code></td>
+<td>Singleton</td>
+<td>14 static methods</td>
+<td><code>initialize(db, progressTracker)</code></td>
+</tr>
+<tr>
+<td><code>ticketController.js</code></td>
+<td>Singleton</td>
+<td>7 static methods</td>
+<td><code>initialize(db)</code></td>
+</tr>
+<tr>
+<td><code>backupController.js</code></td>
+<td>Singleton</td>
+<td>6 static methods</td>
+<td><code>initialize(db)</code></td>
+</tr>
+<tr>
+<td><code>importController.js</code></td>
+<td>Functional</td>
+<td>6 exported functions</td>
+<td><code>setProgressTracker(tracker)</code></td>
+</tr>
+<tr>
+<td><code>docsController.js</code></td>
+<td>Instance</td>
+<td>2 wrapped methods</td>
+<td>Direct instantiation</td>
+</tr>
+</tbody></table>
+<h3>Service Files</h3><table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Purpose</th>
+<th>Key Methods</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>databaseService.js</code></td>
+<td>Core database operations</td>
+<td><code>getDb()</code>, <code>runQuery()</code>, <code>transaction()</code></td>
+</tr>
+<tr>
+<td><code>vulnerabilityService.js</code></td>
+<td>Vulnerability CRUD operations</td>
+<td><code>getVulnerabilities()</code>, <code>createVulnerability()</code></td>
+</tr>
+<tr>
+<td><code>vulnerabilityStatsService.js</code></td>
+<td>Statistics and aggregations</td>
+<td><code>getStats()</code>, <code>getTrends()</code></td>
+</tr>
+<tr>
+<td><code>ticketService.js</code></td>
+<td>Ticket CRUD operations</td>
+<td><code>getTickets()</code>, <code>createTicket()</code></td>
+</tr>
+<tr>
+<td><code>importService.js</code></td>
+<td>Import business logic</td>
+<td><code>processVulnerabilitiesWithLifecycle()</code>, <code>bulkLoadToStagingTable()</code></td>
+</tr>
+<tr>
+<td><code>backupService.js</code></td>
+<td>Backup/restore operations</td>
+<td><code>getBackupStats()</code>, <code>restoreBackup()</code></td>
+</tr>
+<tr>
+<td><code>docsService.js</code></td>
+<td>Documentation statistics</td>
+<td><code>computeStats()</code>, <code>computeApiEndpoints()</code></td>
+</tr>
+<tr>
+<td><code>fileService.js</code></td>
+<td>File system operations</td>
+<td><code>readFile()</code>, <code>writeFile()</code></td>
+</tr>
+<tr>
+<td><code>progressService.js</code></td>
+<td>WebSocket progress tracking</td>
+<td><code>createSession()</code>, <code>updateProgress()</code></td>
+</tr>
+<tr>
+<td><code>validationService.js</code></td>
+<td>Input validation and sanitization</td>
+<td><code>validateVulnerability()</code>, <code>sanitizeInput()</code></td>
+</tr>
+<tr>
+<td><code>kevService.js</code> <em>(v1.0.22+)</em></td>
+<td>CISA KEV integration</td>
+<td><code>syncKevData()</code>, <code>getSyncStatus()</code>, <code>getKevByCve()</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Controller Patterns</h2><p>The backend uses two distinct controller patterns, with ongoing migration toward singleton pattern for consistency:</p>
+<h3>Singleton Pattern Controllers</h3><p>Three controllers (<code>VulnerabilityController</code>, <code>TicketController</code>, <code>BackupController</code>) implement the singleton pattern:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityController</span> {
+    <span class="hljs-keyword">static</span> instance = <span class="hljs-literal">null</span>;
+
+    <span class="hljs-keyword">static</span> <span class="hljs-title function_">initialize</span>(<span class="hljs-params">database, progressTracker</span>) {
+        <span class="hljs-keyword">if</span> (!<span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-property">instance</span>) {
+            <span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-property">instance</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">VulnerabilityController</span>();
+        }
+        <span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-property">instance</span>.<span class="hljs-property">db</span> = database;
+        <span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-property">instance</span>.<span class="hljs-property">progressTracker</span> = progressTracker;
+        <span class="hljs-keyword">return</span> <span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-property">instance</span>;
+    }
+
+    <span class="hljs-keyword">static</span> <span class="hljs-title function_">getInstance</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-keyword">if</span> (!<span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-property">instance</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Controller not initialized. Call initialize() first.&quot;</span>);
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-property">instance</span>;
+    }
+
+    <span class="hljs-comment">// All route methods are static and use getInstance()</span>
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">async</span> <span class="hljs-title function_">getStats</span>(<span class="hljs-params">req, res</span>) {
+        <span class="hljs-keyword">const</span> controller = <span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-title function_">getInstance</span>();
+        <span class="hljs-comment">// Implementation...</span>
+    }
+}</code></pre><p><strong>Characteristics:</strong></p>
+<ul>
+<li>Static <code>initialize()</code> method for dependency injection</li>
+<li>Static <code>getInstance()</code> method for retrieving singleton</li>
+<li>All route methods are static</li>
+<li>Throws error if accessed before initialization</li>
+</ul>
+<h3>Functional Pattern Controllers</h3><p>Two controllers (<code>ImportController</code>, <code>DocsController</code>) use different patterns:</p>
+<p><strong>ImportController (Functional exports):</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">let</span> progressTracker = <span class="hljs-literal">null</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">setProgressTracker</span>(<span class="hljs-params">tracker</span>) {
+    progressTracker = tracker;
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">importVulnerabilities</span>(<span class="hljs-params">req, res</span>) {
+    <span class="hljs-comment">// Direct function implementation</span>
+}
+
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = {
+    setProgressTracker,
+    importVulnerabilities,
+    <span class="hljs-comment">// Other functions...</span>
+};</code></pre><p><strong>DocsController (Instance-based):</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">DocsController</span> {
+    <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-comment">// Direct instantiation</span>
+    }
+
+    <span class="hljs-keyword">async</span> <span class="hljs-title function_">getStats</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-comment">// Instance method</span>
+    }
+}
+
+<span class="hljs-keyword">const</span> docsController = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DocsController</span>();
+
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = {
+    <span class="hljs-attr">getStats</span>: <span class="hljs-function">() =&gt;</span> docsController.<span class="hljs-title function_">getStats</span>(),
+    <span class="hljs-comment">// Wrapped methods...</span>
+};</code></pre><h3>Migration Status</h3><table>
+<thead>
+<tr>
+<th>Controller</th>
+<th>Current Pattern</th>
+<th>Target Pattern</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ImportController</td>
+<td>Functional</td>
+<td>Singleton</td>
+<td>High - Complex dependencies</td>
+</tr>
+<tr>
+<td>DocsController</td>
+<td>Instance</td>
+<td>Singleton</td>
+<td>Low - Simple controller</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Initialization Sequence</h2><p><strong>CRITICAL</strong>: The initialization order is crucial for proper dependency injection. Controllers must be initialized BEFORE routes are imported.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">startServer</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-comment">// 1. Initialize database FIRST</span>
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">initDb</span>();
+    <span class="hljs-keyword">const</span> db = <span class="hljs-title function_">getDatabase</span>();
+
+    <span class="hljs-comment">// 2. Initialize utilities</span>
+    <span class="hljs-keyword">const</span> progressTracker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ProgressTracker</span>(io);
+
+    <span class="hljs-comment">// 3. Initialize ALL controllers with dependencies</span>
+    <span class="hljs-comment">// ORDER MATTERS - initialize before importing routes!</span>
+    <span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-title function_">initialize</span>(db, progressTracker);
+    <span class="hljs-title class_">TicketController</span>.<span class="hljs-title function_">initialize</span>(db);
+    <span class="hljs-title class_">BackupController</span>.<span class="hljs-title function_">initialize</span>(db);
+
+    <span class="hljs-comment">// For functional controllers</span>
+    <span class="hljs-title class_">ImportController</span>.<span class="hljs-title function_">setProgressTracker</span>(progressTracker);
+
+    <span class="hljs-comment">// 4. NOW import routes (after controllers are ready)</span>
+    <span class="hljs-keyword">const</span> vulnerabilityRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/vulnerabilities&quot;</span>);
+    <span class="hljs-keyword">const</span> ticketRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/tickets&quot;</span>);
+    <span class="hljs-keyword">const</span> backupRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/backup&quot;</span>);
+    <span class="hljs-keyword">const</span> importRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/imports&quot;</span>);
+    <span class="hljs-keyword">const</span> docsRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/docs&quot;</span>);
+
+    <span class="hljs-comment">// 5. Mount routes on Express app</span>
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/vulnerabilities&quot;</span>, vulnerabilityRoutes);
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/tickets&quot;</span>, ticketRoutes);
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/backup&quot;</span>, backupRoutes);
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api&quot;</span>, importRoutes);  <span class="hljs-comment">// Import routes at root API level</span>
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/docs&quot;</span>, docsRoutes);
+
+    <span class="hljs-comment">// 6. Start server</span>
+    server.<span class="hljs-title function_">listen</span>(<span class="hljs-variable constant_">PORT</span>, <span class="hljs-function">() =&gt;</span> {
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Server running on port <span class="hljs-subst">${PORT}</span>`</span>);
+    });
+}</code></pre><h3>Common Initialization Errors</h3><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&quot;Controller not initialized&quot;</td>
+<td>Routes imported before controller initialization</td>
+<td>Follow initialization sequence</td>
+</tr>
+<tr>
+<td>&quot;Cannot read property &#39;db&#39; of undefined&quot;</td>
+<td>Controller accessed before <code>initialize()</code> called</td>
+<td>Ensure <code>initialize()</code> called first</td>
+</tr>
+<tr>
+<td>&quot;progressTracker is null&quot;</td>
+<td>ImportController used before <code>setProgressTracker()</code></td>
+<td>Call <code>setProgressTracker()</code> during init</td>
+</tr>
+<tr>
+<td>Empty API responses</td>
+<td>Database not initialized before controllers</td>
+<td>Await database initialization</td>
+</tr>
+</tbody></table>
+<h3>PathValidator Security Class</h3><pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">PathValidator</span> {
+  <span class="hljs-keyword">static</span> <span class="hljs-title function_">validatePath</span>(<span class="hljs-params">filePath</span>) {
+    <span class="hljs-comment">// Path normalization</span>
+    <span class="hljs-keyword">const</span> normalizedPath = path.<span class="hljs-title function_">normalize</span>(filePath);
+
+    <span class="hljs-comment">// Traversal attack prevention</span>
+    <span class="hljs-keyword">if</span> (normalizedPath.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&quot;../&quot;</span>) || normalizedPath.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&quot;..\\&quot;</span>)) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Path traversal detected&quot;</span>);
+    }
+
+    <span class="hljs-comment">// Component validation</span>
+    <span class="hljs-keyword">const</span> pathComponents = normalizedPath.<span class="hljs-title function_">split</span>(path.<span class="hljs-property">sep</span>);
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> component <span class="hljs-keyword">of</span> pathComponents) {
+      <span class="hljs-keyword">if</span> (component === <span class="hljs-string">&quot;..&quot;</span> || (component === <span class="hljs-string">&quot;.&quot;</span> &amp;&amp; pathComponents.<span class="hljs-property">length</span> &gt; <span class="hljs-number">1</span>)) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Invalid path component&quot;</span>);
+      }
+    }
+
+    <span class="hljs-keyword">return</span> normalizedPath;
+  }
+}</code></pre><p><strong>Security Features</strong>:</p>
+<ul>
+<li>Path normalization before validation</li>
+<li>Directory traversal attack prevention</li>
+<li>Component-level validation</li>
+<li>Safe file operation wrappers</li>
+<li>Exception-based error handling</li>
+</ul>
+<hr>
+<h2>Middleware & Infrastructure</h2><table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CORS</td>
+<td><code>cors()</code> (open by default)</td>
+</tr>
+<tr>
+<td>Compression</td>
+<td><code>compression()</code></td>
+</tr>
+<tr>
+<td>Parsing</td>
+<td><code>express.json</code> &amp; <code>express.urlencoded</code> (100MB limit)</td>
+</tr>
+<tr>
+<td>Uploads</td>
+<td><code>multer</code> (CSV import; 100 MB cap)</td>
+</tr>
+<tr>
+<td>Security Headers</td>
+<td><code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, <code>X-XSS-Protection</code></td>
+</tr>
+<tr>
+<td>Static Assets</td>
+<td><code>express.static</code> (root + <code>docs-html/</code>)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Persistence & Schema Evolution</h2><ul>
+<li><strong>Initialization</strong>: If DB missing, runs <code>scripts/init-database.js</code>.</li>
+<li><strong>Runtime Evolution</strong>: Idempotent <code>ALTER TABLE</code> adds new columns (<code>vendor</code>, <code>vulnerability_date</code>, <code>state</code>, <code>import_date</code>, etc.) to legacy tables for backward compatibility.</li>
+<li><strong>Rollover Tables</strong>: Created on startup if absent (<code>vulnerability_snapshots</code>, <code>vulnerabilities_current</code>, <code>vulnerability_daily_totals</code>).</li>
+</ul>
+<p>See: <a href="#architecture/data-model">Data Model</a> for exhaustive schema &amp; index inventory.</p>
+<hr>
+<h2>Vulnerability Rollover Workflow</h2><p>Purpose: Maintain real-time deduplicated active set + full historical timeline + fast daily aggregates.</p>
+<h3>CSV Import (Rollover Path)</h3><div class="mermaid">sequenceDiagram
+    participant User
+    participant API as server.js
+    participant DB as SQLite
+
+    User-&gt;&gt;API: POST /api/vulnerabilities/import (multipart/form-data + optional scanDate)
+    API-&gt;&gt;API: Parse CSV (PapaParse, filter empty rows)
+    API-&gt;&gt;DB: INSERT vulnerability_imports
+    API-&gt;&gt;DB: UPDATE vulnerabilities_current (mark potentially stale)
+    loop Each row (sequential to prevent race conditions)
+        API-&gt;&gt;API: Map + generate unique_key
+        API-&gt;&gt;DB: INSERT vulnerability_snapshots
+        API-&gt;&gt;DB: INSERT or UPDATE vulnerabilities_current
+    end
+    API-&gt;&gt;DB: DELETE stale rows (not seen in this scan)
+    API-&gt;&gt;DB: INSERT OR REPLACE vulnerability_daily_totals
+    API--&gt;&gt;User: { importId, insertCount, updateCount, removedStale, scanDate, performanceMetrics }</div><blockquote>
+<p><strong>Staging importer</strong>: <code>POST /api/vulnerabilities/import-staging</code> follows the same steps but first bulk loads data into <code>vulnerability_staging</code> and streams <code>ProgressTracker</code> events (<code>progress-update</code>, <code>progress-complete</code>, <code>progress-error</code>).</p>
+</blockquote>
+<h3>Enhanced Deduplication System</h3><p>HexTrackr implements a sophisticated 4-tier unique key generation strategy:</p>
+<p><strong>Tier 1: Asset ID + Plugin ID</strong> (Highest Reliability)</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">if</span> (mapped.<span class="hljs-property">assetId</span> &amp;&amp; mapped.<span class="hljs-property">pluginId</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`asset:<span class="hljs-subst">${mapped.assetId}</span>|plugin:<span class="hljs-subst">${mapped.pluginId}</span>`</span>;
+}</code></pre><p><strong>Tier 2: CVE + Hostname/IP</strong> (CVE-based)</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">if</span> (mapped.<span class="hljs-property">cve</span> &amp;&amp; mapped.<span class="hljs-property">cve</span>.<span class="hljs-title function_">trim</span>()) {
+  <span class="hljs-keyword">const</span> hostIdentifier = normalizedIP || normalizedHostname;
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`cve:<span class="hljs-subst">${mapped.cve.trim()}</span>|host:<span class="hljs-subst">${hostIdentifier}</span>`</span>;
+}</code></pre><p><strong>Tier 3: Plugin ID + Hostname/IP + Vendor</strong> (User-requested approach)</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">if</span> (mapped.<span class="hljs-property">pluginId</span> &amp;&amp; mapped.<span class="hljs-property">pluginId</span>.<span class="hljs-title function_">trim</span>()) {
+  <span class="hljs-keyword">const</span> hostIdentifier = normalizedIP || normalizedHostname;
+  <span class="hljs-keyword">const</span> vendor = mapped.<span class="hljs-property">vendor</span> || <span class="hljs-string">&quot;unknown&quot;</span>;
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`plugin:<span class="hljs-subst">${mapped.pluginId.trim()}</span>|host:<span class="hljs-subst">${hostIdentifier}</span>|vendor:<span class="hljs-subst">${vendor}</span>`</span>;
+}</code></pre><p><strong>Tier 4: Description Hash + Hostname/IP</strong> (Fallback)</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> descriptionHash = <span class="hljs-title function_">createDescriptionHash</span>(mapped.<span class="hljs-property">description</span>);
+<span class="hljs-keyword">const</span> hostIdentifier = normalizedIP || normalizedHostname;
+<span class="hljs-keyword">return</span> <span class="hljs-string">`desc:<span class="hljs-subst">${descriptionHash}</span>|host:<span class="hljs-subst">${hostIdentifier}</span>`</span>;</code></pre><h3>Key Safeguards</h3><table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Row duplication in batch</td>
+<td>In-memory <code>Set</code> of processed unique_keys</td>
+</tr>
+<tr>
+<td>Race conditions</td>
+<td>Explicit sequential loop with <code>processNextRow(index)</code> pattern</td>
+</tr>
+<tr>
+<td>Data drift</td>
+<td>Historical record preserved in snapshots before updates</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td>Indexes on <code>unique_key</code>, <code>scan_date</code>, severities</td>
+</tr>
+<tr>
+<td><strong>Key conflicts</strong></td>
+<td><strong>4-tier unique key generation with reliability scoring</strong></td>
+</tr>
+<tr>
+<td><strong>Memory leaks</strong></td>
+<td><strong>Session-based processing with automatic cleanup</strong></td>
+</tr>
+<tr>
+<td><strong>Hostname variations</strong></td>
+<td><strong>Hostname normalization (domain stripping, case insensitive)</strong></td>
+</tr>
+<tr>
+<td><strong>IP address formats</strong></td>
+<td><strong>IP normalization and validation</strong></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>API Surface (High-Level)</h2><table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Endpoints</th>
+<th>Documentation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Health</td>
+<td><code>GET /health</code></td>
+<td>System health check</td>
+</tr>
+<tr>
+<td>Vulnerabilities</td>
+<td>14 endpoints for CRUD, stats, trends</td>
+<td><a href="../api-reference/backend-api.md#vulnerabilities">Backend API</a></td>
+</tr>
+<tr>
+<td>Imports</td>
+<td>6 endpoints for CSV/JSON imports</td>
+<td><a href="../api-reference/backend-api.md#imports">Backend API</a></td>
+</tr>
+<tr>
+<td>Tickets</td>
+<td>7 endpoints for CRUD and migration</td>
+<td><a href="../api-reference/backend-api.md#tickets">Backend API</a></td>
+</tr>
+<tr>
+<td>Backup/Restore</td>
+<td>6 endpoints for backup operations</td>
+<td><a href="../api-reference/backend-api.md#backup">Backend API</a></td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td>Stats and portal delivery</td>
+<td><a href="../api-reference/complete-reference.md#documentation">Docs API</a></td>
+</tr>
+<tr>
+<td>Reference</td>
+<td>Sites and locations lookup</td>
+<td><a href="../api-reference/complete-reference.md#reference-data">Reference Data</a></td>
+</tr>
+</tbody></table>
+<h3>API Endpoint Summary</h3><ul>
+<li><strong>Total Endpoints</strong>: ~45 REST endpoints</li>
+<li><strong>Import System</strong>: 6 dedicated import endpoints (see <a href="../api-reference/backend-api.md#imports">Backend API</a>)</li>
+<li><strong>WebSocket</strong>: Separate progress tracking on port 8988</li>
+<li><strong>Rate Limited</strong>: 100 requests per 15 minutes per IP</li>
+</ul>
+<hr>
+<h2>Real-time Communication (WebSocket)</h2><h3>ProgressTracker Architecture</h3><p>HexTrackr implements a sophisticated WebSocket-based progress tracking system through the <code>ProgressTracker</code> class:</p>
+<ul>
+<li><strong>Port</strong>: 8988 (separate from REST API)</li>
+<li><strong>Library</strong>: Socket.io with enhanced session management</li>
+<li><strong>Session Management</strong>: UUID-based sessions with metadata tracking</li>
+<li><strong>Throttling</strong>: 100ms minimum interval between progress events</li>
+<li><strong>Auto-cleanup</strong>: 30-minute session timeout with automatic garbage collection</li>
+</ul>
+<h3>ProgressTracker Features</h3><pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ProgressTracker</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">io</span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">sessions</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">eventThrottle</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">THROTTLE_INTERVAL</span> = <span class="hljs-number">100</span>;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">SESSION_CLEANUP_INTERVAL</span> = <span class="hljs-number">30</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>;
+  }
+}</code></pre><p><strong>Key Capabilities</strong>:</p>
+<ul>
+<li>Session-based progress tracking with unique identifiers</li>
+<li>Throttled event emission to prevent client overload</li>
+<li>Metadata persistence for operation context</li>
+<li>Automatic session cleanup for memory management</li>
+<li>Error handling with graceful degradation</li>
+</ul>
+<h3>WebSocket Events</h3><table>
+<thead>
+<tr>
+<th>Event Type</th>
+<th>Purpose</th>
+<th>Throttled</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>import_progress</code></td>
+<td>CSV import progress updates</td>
+<td>Yes (100ms)</td>
+</tr>
+<tr>
+<td><code>import_complete</code></td>
+<td>Import operation completion</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>import_error</code></td>
+<td>Import operation errors</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>session_created</code></td>
+<td>New session establishment</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>session_cleanup</code></td>
+<td>Session removal notification</td>
+<td>No</td>
+</tr>
+</tbody></table>
+<h3>Session Lifecycle</h3><div class="mermaid">sequenceDiagram
+    participant Client
+    participant ProgressTracker
+    participant Import as Import Process
+
+    Client-&gt;&gt;ProgressTracker: Connect to WebSocket
+    ProgressTracker-&gt;&gt;ProgressTracker: createSession(metadata)
+    ProgressTracker--&gt;&gt;Client: session_created event
+
+    Import-&gt;&gt;ProgressTracker: updateProgress(sessionId, progress)
+    ProgressTracker-&gt;&gt;ProgressTracker: throttleCheck()
+    alt Progress not throttled
+        ProgressTracker--&gt;&gt;Client: import_progress event
+    end
+
+    Import-&gt;&gt;ProgressTracker: completeSession(sessionId)
+    ProgressTracker--&gt;&gt;Client: import_complete event
+    ProgressTracker-&gt;&gt;ProgressTracker: cleanup(sessionId)</div><p>For more details, see the <a href="#reference/websocket">WebSocket Protocol documentation</a>.</p>
+<hr>
+<h2>Pagination Flow (Current Vulnerabilities)</h2><div class="mermaid">sequenceDiagram
+    participant UI
+    participant API as server.js
+    participant DB as SQLite
+    UI-&gt;&gt;API: GET /api/vulnerabilities?page=1&limit=50
+    API-&gt;&gt;DB: SELECT filtered rows FROM vulnerabilities_current LIMIT/OFFSET
+    DB--&gt;&gt;API: Row batch
+    API-&gt;&gt;DB: SELECT COUNT(*) (same filters)
+    DB--&gt;&gt;API: Total
+    API--&gt;&gt;UI: { data, pagination }</div><hr>
+<h2>Legacy vs Rollover Paths</h2><table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Legacy <code>vulnerabilities</code></th>
+<th>Rollover Tables</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Purpose</td>
+<td>Early ingestion &amp; export</td>
+<td>Current production analytics</td>
+</tr>
+<tr>
+<td>Dedupe</td>
+<td>Unique per (hostname, cve, import_date) index</td>
+<td>Algorithmic unique_key with hostname normalization</td>
+</tr>
+<tr>
+<td>History</td>
+<td>Implicit (one row per scan)</td>
+<td>Explicit snapshots + daily aggregates</td>
+</tr>
+<tr>
+<td>Future</td>
+<td>To be deprecated</td>
+<td>Strategic direction</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Utility Endpoints</h2><ul>
+<li><strong><code>GET /health</code></strong>: <code>{ status, version, db, uptime }</code></li>
+<li><strong><code>GET /api/docs/stats</code></strong>: Counts routes + approximates function definitions.</li>
+<li><strong>Backup</strong>: Returns structured JSON (vulnerabilities legacy + tickets) or combined.</li>
+</ul>
+<hr>
+<h2>Security & Hardening</h2><h3>Current Security Implementations</h3><table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Implementation</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Path Traversal</strong></td>
+<td><code>PathValidator</code> class</td>
+<td>Comprehensive path validation and safe file operations</td>
+</tr>
+<tr>
+<td><strong>Rate Limiting</strong></td>
+<td>Express rate limit middleware</td>
+<td>100 requests per 15-minute window per IP</td>
+</tr>
+<tr>
+<td><strong>Upload Security</strong></td>
+<td>Multer with size limits</td>
+<td>50MB cap with file type validation</td>
+</tr>
+<tr>
+<td><strong>XSS Prevention</strong></td>
+<td>Security headers</td>
+<td><code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, <code>X-XSS-Protection</code></td>
+</tr>
+<tr>
+<td><strong>SQL Injection</strong></td>
+<td>Parameterized queries</td>
+<td>All database operations use prepared statements</td>
+</tr>
+<tr>
+<td><strong>CORS Protection</strong></td>
+<td>Configurable CORS</td>
+<td>Default: all origins (configurable for production)</td>
+</tr>
+<tr>
+<td><strong>Input Sanitization</strong></td>
+<td>DOMPurify integration</td>
+<td>Client-side XSS prevention</td>
+</tr>
+</tbody></table>
+<h3>PathValidator Security Features</h3><pre><code class="language-javascript"><span class="hljs-comment">// Safe file operations with built-in validation</span>
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeReadFileSync</span>(filePath, options)
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeWriteFileSync</span>(filePath, data, options)
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeReaddirSync</span>(dirPath, options)
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeStatSync</span>(filePath)
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeExistsSync</span>(filePath)
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeUnlinkSync</span>(filePath)</code></pre><p><strong>Protection Mechanisms</strong>:</p>
+<ul>
+<li>Path normalization before validation</li>
+<li>Directory traversal detection (<code>../</code>, <code>..\\</code>)</li>
+<li>Component-level path validation</li>
+<li>Exception-based error handling</li>
+<li>Graceful fallbacks for invalid paths</li>
+</ul>
+<h3>Rate Limiting Configuration</h3><pre><code class="language-javascript"><span class="hljs-keyword">const</span> limiter = <span class="hljs-title function_">rateLimit</span>({
+  <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>, <span class="hljs-comment">// 15 minutes</span>
+  <span class="hljs-attr">max</span>: <span class="hljs-number">100</span>, <span class="hljs-comment">// Limit each IP to 100 requests per windowMs</span>
+  <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Too many requests from this IP&#x27;</span>,
+  <span class="hljs-attr">standardHeaders</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">legacyHeaders</span>: <span class="hljs-literal">false</span>
+});</code></pre><h3>Future Security Enhancements</h3><table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Planned</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Authentication</td>
+<td>JWT-based authentication with role-based access control</td>
+</tr>
+<tr>
+<td>API Security</td>
+<td>API key authentication for external integrations</td>
+</tr>
+<tr>
+<td>Audit Logging</td>
+<td>Central audit logging of security events and rejections</td>
+</tr>
+<tr>
+<td>TLS</td>
+<td>Built-in HTTPS support with automatic certificate management</td>
+</tr>
+<tr>
+<td>Input Validation</td>
+<td>JSON schema (Ajv) enforcement for all API endpoints</td>
+</tr>
+<tr>
+<td>Structured Logging</td>
+<td>Structured JSON logging with request IDs and correlation</td>
+</tr>
+<tr>
+<td>Vulnerability Scanning</td>
+<td>Automated dependency vulnerability scanning</td>
+</tr>
+<tr>
+<td>Secret Management</td>
+<td>Environment-based secret management with rotation</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Planned Enhancements</h2><h3>Observability & Monitoring</h3><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Enhancement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Metrics</strong></td>
+<td>Prometheus metrics (import latency, row counts, session tracking)</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Tracing</strong></td>
+<td>OpenTelemetry integration for distributed tracing</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Health Checks</strong></td>
+<td>Enhanced health endpoints with dependency checking</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Performance</strong></td>
+<td>APM integration for bottleneck identification</td>
+<td>Medium</td>
+</tr>
+</tbody></table>
+<h3>Architecture & Modularity</h3><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Enhancement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Modularization</strong></td>
+<td>Extract ProgressTracker, PathValidator, and rollover modules</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Microservices</strong></td>
+<td>Split WebSocket server into separate service</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Database</strong></td>
+<td>PostgreSQL migration for scalability</td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Caching</strong></td>
+<td>Redis integration for session and data caching</td>
+<td>Medium</td>
+</tr>
+</tbody></table>
+<h3>Data Quality & Validation</h3><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Enhancement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Schema Validation</strong></td>
+<td>JSON schema (Ajv) enforcement for all API endpoints</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>CVE Validation</strong></td>
+<td>Real-time CVE format and existence validation</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Severity Normalization</strong></td>
+<td>Automatic severity enumeration mapping</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Data Quality Scoring</strong></td>
+<td>Automated data quality metrics and reporting</td>
+<td>Medium</td>
+</tr>
+</tbody></table>
+<h3>Legacy Migration</h3><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Enhancement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Legacy Deprecation</strong></td>
+<td>Retire legacy vulnerabilities table and endpoints</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Data Migration</strong></td>
+<td>Automated migration from legacy to rollover architecture</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>API Versioning</strong></td>
+<td>Implement API versioning for backward compatibility</td>
+<td>Medium</td>
+</tr>
+</tbody></table>
+<h3>Testing & Quality Assurance</h3><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Enhancement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>E2E Testing</strong></td>
+<td>Playwright integration tests for all major workflows</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>API Contract Testing</strong></td>
+<td>OpenAPI-based contract validation</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Load Testing</strong></td>
+<td>Automated performance testing with realistic data volumes</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Security Testing</strong></td>
+<td>Automated security scanning and penetration testing</td>
+<td>High</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Summary</h2><p>The backend favors simplicity (single process, embedded DB) while implementing a robust rollover pipeline for vulnerability lifecycle tracking. Incremental improvements will focus on modularity, observability, and deprecating legacy ingestion paths.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

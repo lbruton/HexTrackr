@@ -1,0 +1,142 @@
+/* HexTrackr Responsive Utilities - Mobile First */
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    /* Grid adjustments */
+    #vulnGrid {
+        height: 500px;
+        font-size: 0.9em;
+    }
+
+    /* Chart responsiveness */
+    .chart-container {
+        height: 300px !important;
+    }
+
+    /* Stack metric cards on mobile */
+    .vulnerability-stats .col-md-3 {
+        margin-bottom: 1rem;
+    }
+
+    /* Button groups on mobile */
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .btn-group .btn {
+        border-radius: 4px !important;
+        font-size: 0.8em;
+        padding: 0.25rem 0.5rem;
+    }
+
+    /* Search bar improvements */
+    .search-container {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .search-container .form-control,
+    .search-container .form-select {
+        width: 100% !important;
+        min-width: auto;
+    }
+
+    /* Table responsive behavior */
+    .table-responsive {
+        font-size: 0.9em;
+    }
+
+    /* AG Grid responsive adjustments */
+    .ag-theme-alpine {
+        --ag-font-size: 13px;
+        --ag-row-height: 38px;
+    }
+
+    .ag-header-cell-text {
+        font-size: 0.85em;
+        font-weight: 600;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Further grid optimizations */
+    #vulnGrid {
+        height: 400px;
+        font-size: 0.85em;
+    }
+
+    /* Smaller charts on tiny screens */
+    .chart-container {
+        height: 250px !important;
+    }
+
+    /* Navigation optimizations */
+    .navbar-nav .nav-link {
+        padding: 0.75rem 1rem;
+        text-align: center;
+    }
+
+    /* Severity badges optimization */
+    .severity-badge {
+        font-size: 0.75em;
+        padding: 0.25em 0.5em;
+    }
+
+    /* Action buttons layout */
+    .btn-group .btn {
+        min-width: 35px;
+        padding: 0.2rem 0.4rem;
+    }
+
+    /* AG Grid smallest screens */
+    .ag-theme-alpine {
+        --ag-font-size: 12px;
+        --ag-row-height: 36px;
+    }
+
+    .ag-paging-panel {
+        font-size: 0.8em;
+    }
+
+    /* Modal adjustments */
+    .modal-xl {
+        max-width: 95%;
+        margin: 0.5rem;
+    }
+}
+
+/* Ensure charts are always responsive */
+.apexcharts-canvas {
+    max-width: 100% !important;
+}
+
+/* Table responsive wrapper */
+.table-responsive {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgb(0, 0, 0, 0.1);
+}
+
+/* Print styles */
+@media print {
+    .d-print-none {
+        display: none !important;
+    }
+
+    .card {
+        border: 1px solid #dddddd !important;
+        box-shadow: none !important;
+    }
+
+    .table {
+        font-size: 0.8em;
+    }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .ag-theme-alpine {
+        --ag-font-size: 13px;
+    }
+}

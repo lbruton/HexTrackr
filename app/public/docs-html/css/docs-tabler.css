@@ -1,0 +1,320 @@
+/* HexTrackr Documentation Portal Theme Integration */
+
+/* Smooth scroll behavior for all scroll events */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bs-body-bg, #f5f7fb);
+}
+
+/* Add spacing above navigation and body cards */
+/* Removed .navbar margin-top rule to eliminate unwanted space above header
+.navbar {
+  margin-top: 1rem;
+}
+*/
+
+.page-body {
+  margin-top: 1rem;
+}
+
+/* Fix breadcrumb spacing - prevent cramped appearance above menu items */
+.breadcrumb {
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+}
+
+/* Ensure proper spacing between breadcrumb and page header */
+.page-header {
+  margin-top: 0.5rem;
+}
+
+/* Add breathing room for navigation elements */
+nav.breadcrumb {
+  margin-bottom: 2rem;
+}
+
+/* Documentation content area - natural page flow */
+.docs-content {
+  scroll-behavior: smooth;
+}
+
+/* Specific breadcrumb link spacing */
+.breadcrumb-item + .breadcrumb-item::before {
+  margin-right: 0.75rem;
+  margin-left: 0.75rem;
+}
+
+.loading-spinner {
+  display: none;
+}
+
+table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--bs-body-color, #212529);
+    border-collapse: collapse;
+    background-color: var(--bs-body-bg, #ffffff);
+}
+
+table th,
+table td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+    color: var(--bs-body-color, #212529);
+}
+
+table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid var(--bs-border-color, #dee2e6);
+    background-color: var(--hextrackr-surface-2, #f8f9fa);
+    color: var(--bs-emphasis-color, #212529);
+    font-weight: 600;
+}
+
+/* Enhanced dark mode table support */
+[data-bs-theme="dark"] table {
+    background-color: var(--bs-body-bg, #1e293b);
+    color: var(--bs-body-color, #e2e8f0);
+}
+
+[data-bs-theme="dark"] table th,
+[data-bs-theme="dark"] table td {
+    color: var(--bs-body-color, #e2e8f0);
+    border-color: var(--bs-border-color, #374151);
+}
+
+[data-bs-theme="dark"] table thead th {
+    background-color: var(--hextrackr-surface-2, #374151);
+    color: var(--bs-emphasis-color, #f1f5f9);
+}
+
+.blockquote {
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    border-left: 5px solid var(--bs-primary, #206bc4);
+    background-color: var(--hextrackr-surface-1, #f1f5f9);
+}
+
+/* Documentation Navigation Improvements */
+.list-group-item-action {
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent !important;
+}
+
+.list-group-item-action.active,
+.list-group-item-action[aria-expanded="true"] {
+    background-color: var(--hextrackr-surface-2, rgb(32, 107, 196, 0.1)) !important;
+    border-left-color: var(--bs-primary, #206bc4) !important;
+    color: var(--bs-emphasis-color, inherit) !important;
+}
+
+.list-group-item-action:hover {
+    background-color: var(--hextrackr-surface-1, rgb(0, 0, 0, 0.05)) !important;
+    color: var(--bs-emphasis-color, inherit) !important;
+}
+
+/* Sub-navigation items styling */
+.sub-nav-item {
+    font-size: 0.9rem;
+}
+
+.sub-nav-item:hover {
+    transform: translateX(2px);
+}
+
+.collapse-icon {
+    transition: transform 0.2s ease;
+}
+
+/* Collapse icon rotation */
+.list-group-item-action[aria-expanded="true"] .collapse-icon {
+    transform: rotate(180deg);
+    transition: transform 0.2s ease;
+}
+
+/* Avatar styling for navigation */
+.list-group-item-action .avatar {
+    flex-shrink: 0;
+}
+
+.list-group-item-action:hover .avatar {
+    background-color: var(--bs-primary, #206bc4) !important;
+    color: white !important;
+}
+
+/* Back to Top Button Styling */
+.back-to-top {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(1rem);
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--hextrackr-shadow-md, 0 4px 12px rgb(0, 0, 0, 0.15));
+    background-color: var(--bs-primary, #206bc4);
+    border-color: var(--bs-primary, #206bc4);
+}
+
+.back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top:hover {
+    transform: translateY(-0.25rem);
+    box-shadow: var(--hextrackr-shadow-lg, 0 8px 24px rgb(0, 0, 0, 0.2));
+}
+
+.back-to-top:focus {
+    box-shadow: var(--hextrackr-shadow-md, 0 4px 12px rgb(0, 0, 0, 0.15)),
+                0 0 0 0.25rem rgb(var(--bs-primary-rgb, 32, 107, 196), 0.25);
+}
+
+/* AG-Grid Documentation Integration */
+.docs-grid {
+    margin: 1.5rem 0;
+    border-radius: var(--bs-border-radius);
+    overflow: hidden;
+    box-shadow: var(--hextrackr-shadow-sm, 0 1px 3px rgb(0, 0, 0, 0.1));
+}
+
+.docs-grid .ag-header {
+    background-color: var(--hextrackr-surface-2, #f8f9fa);
+    border-bottom: 2px solid var(--bs-border-color, #dee2e6);
+}
+
+.docs-grid .ag-row {
+    border-color: var(--bs-border-color, #dee2e6);
+}
+
+.docs-grid .ag-cell {
+    color: var(--bs-body-color, #212529);
+    font-size: 0.875rem;
+}
+
+/* Dark mode AG-Grid adjustments */
+[data-bs-theme="dark"] .docs-grid .ag-header {
+    background-color: var(--hextrackr-surface-2, #374151);
+}
+
+[data-bs-theme="dark"] .docs-grid .ag-row {
+    border-color: var(--bs-border-color, #374151);
+}
+
+[data-bs-theme="dark"] .docs-grid .ag-cell {
+    color: var(--bs-body-color, #e2e8f0);
+}
+
+/* Responsive AG-Grid */
+@media (max-width: 768px) {
+    .docs-grid {
+        font-size: 0.8rem;
+    }
+}
+
+/* ========================================
+   DARK MODE NAVIGATION ACCESSIBILITY FIXES
+   ========================================
+   Fix for critical WCAG violation where selected navigation items
+   had white text on white background in dark mode (1:1 contrast ratio)
+*/
+
+/* Dark mode navigation active states - Fix white-on-white accessibility violation */
+[data-bs-theme="dark"] .list-group-item-action.active,
+[data-bs-theme="dark"] .list-group-item-action[aria-expanded="true"] {
+    background-color: #2a3f54 !important;   /* surface-4 from HexTrackr hierarchy */
+    color: #e2e8f0 !important;              /* high contrast readable text */
+    border-left-color: #206bc4 !important;  /* maintain primary accent color */
+}
+
+/* Dark mode navigation hover states */
+[data-bs-theme="dark"] .list-group-item-action:hover {
+    background-color: #1e293b !important;   /* surface-2 for subtle elevation */
+    color: #e2e8f0 !important;              /* consistent readable text */
+}
+
+/* Dark mode sub-navigation items for proper hierarchy */
+[data-bs-theme="dark"] .sub-nav-item {
+    color: #94a3b8;                         /* muted text for visual hierarchy */
+}
+
+[data-bs-theme="dark"] .sub-nav-item:hover {
+    color: #e2e8f0;                         /* brighter text on hover */
+    background-color: #243447 !important;   /* surface-3 for intermediate elevation */
+}
+
+/* Dark mode avatar styling consistency */
+[data-bs-theme="dark"] .list-group-item-action:hover .avatar {
+    background-color: #206bc4 !important;   /* primary color */
+    color: #ffffff !important;              /* high contrast white text */
+}
+
+/* ========================================
+   MERMAID DIAGRAM STYLING
+   ========================================
+   Styles for Mermaid.js diagrams in documentation
+*/
+
+/* Mermaid diagram container */
+.mermaid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    background-color: var(--hextrackr-surface-1, #f8f9fa);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: var(--bs-border-radius, 0.375rem);
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+/* Ensure Mermaid SVGs are responsive */
+.mermaid svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Dark mode Mermaid container */
+[data-bs-theme="dark"] .mermaid {
+    background-color: var(--hextrackr-surface-2, #1e293b);
+    border-color: var(--bs-border-color, #374151);
+}
+
+/* Mermaid diagram text should be readable */
+.mermaid text {
+    font-family: var(--bs-font-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+    fill: var(--bs-body-color, #212529);
+}
+
+[data-bs-theme="dark"] .mermaid text {
+    fill: var(--bs-body-color, #e2e8f0);
+}
+
+/* Loading state for Mermaid diagrams */
+.mermaid:empty::before {
+    content: "Loading diagram...";
+    color: var(--bs-secondary-color, #6c757d);
+    font-style: italic;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .mermaid {
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+}
