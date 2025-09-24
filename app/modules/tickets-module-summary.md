@@ -4,7 +4,7 @@
 
 The Tickets Module has been successfully extracted from server.js into a modular architecture:
 
-```
+```text
 app/
 ├── routes/tickets.js         # Route definitions and request routing
 ├── controllers/ticketController.js  # HTTP request handling and response formatting
