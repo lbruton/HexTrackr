@@ -1,91 +1,74 @@
-# HexTrackr Linear Planning System
+# HexTrackr Three-Mode Development Workflow
 
-This directory contains the formal workflow system for HexTrackr development using Linear for issue tracking and structured planning.
+## Quick Start Pattern
 
-## Core Philosophy
+**User**: "Hey Claude, we need to fix X"
 
-**Plan → Document → Implement**
+**Claude Response**:
+1. "Let me enter PLANNING_MODE" → Creates Linear issue with breakdown
+2. "Let me enter RESEARCH_MODE" → Investigates and documents findings
+3. "Let me enter IMPLEMENT_MODE" → Executes phase by phase
 
-Never start coding without a complete plan. Always document every change before implementing. This ensures any Claude agent can pick up exactly where another left off.
+## The Three Modes
+
+### 🎯 PLANNING_MODE
+**Purpose**: Break down any request into actionable 1-2 hour sessions
+**Output**: Linear issue with clear phases and checkboxes
+**No coding allowed**: Only planning and breakdown
+
+### 🔍 RESEARCH_MODE
+**Purpose**: Investigate codebase and document findings
+**Output**: Linear comments with research findings
+**No coding allowed**: Only discovery and documentation
+
+### ⚙️ IMPLEMENT_MODE
+**Purpose**: Execute the plan created in planning mode
+**Output**: Code changes following Linear checkboxes
+**Focus**: Implementation only, no planning changes
+
+## Mode Instructions
+
+Each mode has its own instruction file with specific steps:
+
+- [`modes/PLANNING_MODE.md`](modes/PLANNING_MODE.md) - How to create plans
+- [`modes/RESEARCH_MODE.md`](modes/RESEARCH_MODE.md) - How to research effectively
+- [`modes/IMPLEMENT_MODE.md`](modes/IMPLEMENT_MODE.md) - How to execute plans
+
+## Linear as Single Source of Truth
+
+- **Planning**: Issue description contains the breakdown
+- **Research**: Comments contain all findings
+- **Implementation**: Checkboxes track progress
+- **No duplicate files**: Linear contains everything
 
 ## Directory Structure
 
 ```
 /dev-docs/planning/
-├── README.md                           # This file
-├── HEXTRACKR_LINEAR_WORKFLOW.md        # Complete workflow documentation
-├── QUICK_REFERENCE.md                  # Quick commands and checklists
-├── AGENT_HANDOFF_PROTOCOL.md           # Agent continuity procedures
-├── ENFORCEMENT_CHECKLIST.md            # Mandatory workflow validation
-├── structured-vibe-coding-workflow.md  # Original research document
-├── templates/                          # Reusable templates
-│   ├── SESSION_PLAN.md                 # Main planning template
-│   ├── BUG_REPORT.md                   # Bug issue template
-│   ├── FEATURE_REQUEST.md              # Feature issue template
-│   └── KICKSTART_PROMPT.md             # Workflow initiation templates
-├── active/                             # Current work in progress
-│   └── v1.0.XX-feature-name/
-│       ├── SESSION_PLAN.md
-│       ├── research/
-│       └── implementation/
-└── completed/                          # Archived completed work
-    └── v1.0.XX-feature-name/
+├── README.md                # This file
+├── modes/                   # Mode instruction files
+│   ├── PLANNING_MODE.md    # Planning instructions
+│   ├── RESEARCH_MODE.md    # Research instructions
+│   └── IMPLEMENT_MODE.md   # Implementation instructions
+├── templates/              # Reusable templates (for reference)
+└── archive/                # Old workflow docs (for reference)
 ```
 
-## Quick Start
+## Key Benefits
 
-### New Feature or Bug
-1. Create Linear issue with appropriate template
-2. Copy SESSION_PLAN.md template to new planning folder
-3. Complete research phase (Plan Mode)
-4. Document implementation plan
-5. Begin implementation following session pattern
-
-### Continuing Existing Work
-1. Review SESSION_PLAN.md in active folder
-2. Check Linear issue status
-3. Pick up from last completed checkbox
-4. Update session logs as you work
-
-### Agent Handoff
-1. Follow AGENT_HANDOFF_PROTOCOL.md procedures
-2. Update SESSION_PLAN.md with detailed handoff notes
-3. Commit all changes with descriptive messages
-
-## Key Files
-
-| File | Purpose |
-|------|---------|
-| `HEXTRACKR_LINEAR_WORKFLOW.md` | Complete workflow documentation |
-| `QUICK_REFERENCE.md` | Commands and checklists for daily use |
-| `AGENT_HANDOFF_PROTOCOL.md` | Ensuring continuity between agents |
-| `ENFORCEMENT_CHECKLIST.md` | Mandatory workflow validation checklist |
-| `templates/SESSION_PLAN.md` | Main planning document template |
-| `templates/KICKSTART_PROMPT.md` | Workflow initiation prompt templates |
-
-## Success Criteria
-
-- **Context Preservation**: Next agent can start within 5 minutes
-- **Progress Visibility**: Clear checkbox completion tracking
-- **Implementation Quality**: Another developer could implement from plans
-- **Session Efficiency**: 80% of planned tasks completed per session
-
-## Integration with HexTrackr
-
-This workflow integrates with:
-- **CONSTITUTION.md**: Follows all project requirements
-- **CLAUDE.md**: Maintains architectural patterns
-- **Linear MCP**: Issue tracking and project management
-- **Claude-Context MCP**: Codebase research and discovery
-- **Memento MCP**: Knowledge graph and session summaries
+- **Simple**: Three clear modes instead of complex nested processes
+- **Consistent**: Same pattern every time regardless of task size
+- **Linear-focused**: Single source of truth, no duplicate tracking
+- **Flexible**: Works for 1-hour fixes or multi-day features
+- **Trackable**: Progress always visible in Linear
 
 ## Getting Started
 
-1. **Read**: `HEXTRACKR_LINEAR_WORKFLOW.md` for complete understanding
-2. **Bookmark**: `QUICK_REFERENCE.md` for daily development
-3. **Practice**: Create your first issue using the templates
-4. **Refine**: Adapt the workflow to your preferences over time
+1. Read the mode instructions that match your current task
+2. Follow the pattern: Planning → Research → Implement
+3. Use Linear for all tracking and documentation
+4. Each mode has clear boundaries and deliverables
 
 ---
 
-*This system enables consistent, documented development that maintains context across agents and sessions while preserving the flexibility of "vibe coding" for solo developers.*
+*This simplified workflow eliminates SESSION_PLAN.md maintenance while keeping all the benefits of structured development through Linear's built-in features.*
