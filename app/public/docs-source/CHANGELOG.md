@@ -7,6 +7,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [1.0.28] - 2025-09-24
+
+### Fixed - KEV Badge Modal Issue on Device Cards
+
+#### Bug Resolution
+
+- **Fixed Modal Behavior**: KEV badges on device cards now correctly open the KEV details modal instead of the device security modal
+  - **Root Cause**: Incorrect onclick handler was calling `vulnManager.viewDeviceDetails()` instead of `showKevDetails()`
+  - **User Impact**: Security teams can now quickly access KEV vulnerability details directly from device cards
+  - **Consistency Restored**: KEV badge behavior is now uniform across vulnerability cards and device cards
+
+#### Technical Implementation
+
+- **Device Aggregation Enhancement**: Extended `getFilteredDevices()` in `vulnerability-data.js` to track first KEV CVE per device
+  - Added `kevCve: null` property to device object initialization
+  - Implemented KEV CVE tracking: `if (!device.kevCve) { device.kevCve = vuln.cve; }`
+- **Event Handler Correction**: Fixed onclick handler in `vulnerability-cards.js` line 93
+  - **Before**: `onclick="event.stopPropagation(); vulnManager.viewDeviceDetails('${device.hostname}')"`
+  - **After**: `onclick="event.stopPropagation(); showKevDetails('${device.kevCve}')"`
+  - Also updated onkeydown handler for accessibility consistency
+
+#### Files Modified
+- `app/public/scripts/shared/vulnerability-data.js` - Device aggregation logic for KEV CVE tracking
+- `app/public/scripts/shared/vulnerability-cards.js` - KEV badge event handlers
+
+## [1.0.27] - 2025-09-24
+
+### Added - KEV Badge on Device Cards
+
+#### Enhanced Risk Visibility
+
+- **Consistent UI Indicators**: Added KEV (Known Exploited Vulnerabilities) badges to device cards, creating visual consistency with vulnerability cards
+  - **Badge Appearance**: Red KEV badge displays in upper right corner when ANY vulnerability on that device is in CISA's KEV catalog
+  - **Risk Assessment**: Users can now instantly identify high-risk devices requiring immediate attention
+  - **Click Functionality**: Clicking KEV badge opens device details modal to view all vulnerabilities affecting that device
+
+#### Technical Implementation
+
+- **Backend Enhancement**: Extended device aggregation logic to track KEV status across all vulnerabilities per device
+  - Modified `getFilteredDevices()` in `vulnerability-data.js` to include `hasKev` property
+  - Added KEV tracking during vulnerability iteration: `if (vuln.isKev === "Yes") { device.hasKev = true; }`
+- **Frontend Integration**: Enhanced device card generation to display KEV badges
+  - Updated `generateDeviceCardsHTML()` in `vulnerability-cards.js` with KEV badge HTML
+  - Used identical badge structure as vulnerability cards for UI consistency
+- **Styling Consistency**: Extended existing KEV CSS styles to support device cards
+  - Added `.device-card .kev-indicator` selectors to match vulnerability card styling
+  - Maintained responsive design and accessibility features
+
+#### User Experience Improvements
+
+- **Immediate Risk Recognition**: Security teams can quickly scan device cards to identify compromised systems
+- **Operational Efficiency**: Faster prioritization of remediation efforts based on visual KEV indicators
+- **UI Consistency**: Uniform KEV badge appearance across all card types (vulnerability cards and device cards)
+- **Accessibility**: Full keyboard navigation support with ARIA labels and focus indicators
+
+#### Files Modified
+- `app/public/scripts/shared/vulnerability-data.js`: Device aggregation logic for KEV tracking
+- `app/public/scripts/shared/vulnerability-cards.js`: Device card HTML generation with KEV badges
+- `app/public/styles/pages/vulnerabilities.css`: Extended KEV indicator styles for device cards
+
+#### Linear Issue
+- **HEX-10**: v1.0.27: Feature - Add KEV Badge to Device Cards (Completed)
+
 ## [1.0.26] - 2025-09-23
 
 ### Fixed - Low Severity Vulnerability Visibility
