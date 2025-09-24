@@ -20,6 +20,13 @@ temp/
 tmp/
 logs/
 
+# Project documentation files (focus on app code documentation only)
+AGENTS.md
+CLAUDE.md
+CONSTITUTION.md
+opencode-migration-guide.md
+memento/
+
 # Test and coverage directories  
 __tests__/
 coverage/
