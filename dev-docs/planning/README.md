@@ -16,11 +16,13 @@ Never start coding without a complete plan. Always document every change before 
 ├── HEXTRACKR_LINEAR_WORKFLOW.md        # Complete workflow documentation
 ├── QUICK_REFERENCE.md                  # Quick commands and checklists
 ├── AGENT_HANDOFF_PROTOCOL.md           # Agent continuity procedures
+├── ENFORCEMENT_CHECKLIST.md            # Mandatory workflow validation
 ├── structured-vibe-coding-workflow.md  # Original research document
 ├── templates/                          # Reusable templates
 │   ├── SESSION_PLAN.md                 # Main planning template
 │   ├── BUG_REPORT.md                   # Bug issue template
-│   └── FEATURE_REQUEST.md              # Feature issue template
+│   ├── FEATURE_REQUEST.md              # Feature issue template
+│   └── KICKSTART_PROMPT.md             # Workflow initiation templates
 ├── active/                             # Current work in progress
 │   └── v1.0.XX-feature-name/
 │       ├── SESSION_PLAN.md
@@ -57,7 +59,9 @@ Never start coding without a complete plan. Always document every change before 
 | `HEXTRACKR_LINEAR_WORKFLOW.md` | Complete workflow documentation |
 | `QUICK_REFERENCE.md` | Commands and checklists for daily use |
 | `AGENT_HANDOFF_PROTOCOL.md` | Ensuring continuity between agents |
+| `ENFORCEMENT_CHECKLIST.md` | Mandatory workflow validation checklist |
 | `templates/SESSION_PLAN.md` | Main planning document template |
+| `templates/KICKSTART_PROMPT.md` | Workflow initiation prompt templates |
 
 ## Success Criteria
 
