@@ -1,0 +1,97 @@
+Extract and save high-value insights to Memento with PROJECT:DOMAIN:TYPE classification: $ARGUMENTS
+
+**Action**: Create a selective Memento entity focusing on the most valuable technical and workflow discoveries from current session.
+
+**Target Insights:**
+- Technical patterns and architectural decisions
+- Workflow optimizations and process improvements  
+- Code quality discoveries and best practices
+- Tool configurations and integration patterns
+- Performance optimizations and debugging techniques
+- Security considerations and implementation approaches
+
+**Entity Details:**
+- **Classification**: Use PROJECT:DOMAIN:TYPE (e.g., SYSTEM:WORKFLOW:PATTERN, HEXTRACKR:SECURITY:INSIGHT)
+- **Name**: Specific, searchable title describing the core insight
+- **Observations**: Concrete, actionable knowledge applicable to future projects
+- **Relations**: Connect to relevant technologies, frameworks, or project patterns
+
+**Insight ID Generation:**
+```javascript
+// Auto-generate insight ID: PROJECT-INSIGHT-YYYYMMDD-HHMMSS
+const generateInsightID = (project = "HEXTRACKR") => {
+  const now = new Date();
+  const date = now.toISOString().slice(0,10).replace(/-/g, "");
+  const time = now.toTimeString().slice(0,8).replace(/:/g, "");
+  return `${project}-INSIGHT-${date}-${time}`;
+};
+
+// Example: "HEXTRACKR-INSIGHT-20250907-143045"
+```
+
+**Memory Tools:**
+```javascript
+// Step 1: Create the insight entity
+mcp__memento__create_entities([{
+  name: "Insight: [GENERATED_INSIGHT_ID]",
+  entityType: "PROJECT:DOMAIN:TYPE",
+  observations: [
+    `TIMESTAMP: ${new Date().toISOString()}`,                    // ALWAYS FIRST
+    `ABSTRACT: [One-line summary of the key insight]`,          // ALWAYS SECOND
+    `SUMMARY: [Detailed description: what was discovered, why it matters, how to implement, and when to apply this knowledge]`, // ALWAYS THIRD
+    "INSIGHT_ID: [GENERATED_INSIGHT_ID]",
+    "actionable knowledge",
+    "implementation details",
+    "best practices"
+  ]
+}])
+
+// Step 2: Add insight-specific tags per TAXONOMY.md
+mcp__memento__add_tags({
+  entityName: "Insight: [GENERATED_INSIGHT_ID]",
+  tags: [
+    "project:[PROJECT_NAME]",        // Required: Can be multiple for cross-project insights
+    "spec:[SPEC_NUMBER]",            // If insight emerged from spec work
+    "[CATEGORY]",                    // Domain: frontend, backend, testing, etc.
+    "[LEARNING_TYPE]",               // Required: breakthrough, pattern, lesson-learned, best-practice
+    "reusable",                      // Add if applicable across projects
+    "[QUALITY_TAG]",                 // Optional: tech-debt, optimization, refactor
+    `week-${getWeekNumber()}-${new Date().getFullYear()}`,  // Temporal tag
+    "[IMPACT]"                       // Optional: performance, security-fix, etc.
+  ]
+})
+
+// Step 3: Create relations if derived from other work
+mcp__memento__create_relations([{
+  from: "Insight: [GENERATED_INSIGHT_ID]",
+  to: "Related Entity",
+  relationType: "IMPLEMENTS" // or DEPENDS_ON, SOLVES, etc.
+}])
+
+// Helper function for week number
+const getWeekNumber = () => {
+  const d = new Date();
+  const onejan = new Date(d.getFullYear(), 0, 1);
+  return Math.ceil((((d.getTime() - onejan.getTime()) / 86400000) + onejan.getDay() + 1) / 7);
+};
+```
+
+**Selection Criteria**: Save only insights with broad applicability or significant project impact. Avoid session-specific details - focus on reusable knowledge.
+
+**Instructions**:
+1. **Generate Insight ID**: Create unique ID using PROJECT-INSIGHT-DATE-TIME format
+2. **Extract Key Insight**: Identify the most valuable reusable knowledge from the session
+3. **Apply Classification**: Use appropriate PROJECT:DOMAIN:TYPE entity type
+4. **Include Insight ID**: Add insight ID as observation for easy recall
+5. **Return Insight ID**: Display generated insight ID to user after saving
+
+**Output After Saving:**
+```
+✅ Insight saved successfully!
+📋 Insight ID: [GENERATED_INSIGHT_ID]
+🔍 Use: /recall-insight id:[INSIGHT_ID] to retrieve this insight
+```
+
+If $ARGUMENTS provided, use as insight category or specific focus area. Create entity capturing the gems worth preserving for future development work.
+
+Now identify and save the key insights from this session using proper classification.
