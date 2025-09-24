@@ -12,19 +12,18 @@ When working on this project the AI Agent SHALL follow the CONSTITUTION.md
 
 ## Development Workflow (MANDATORY)
 
-### Linear Integration & Planning
-HexTrackr uses Linear for issue tracking with a structured planning workflow:
+### Three-Mode Development Pattern
+HexTrackr uses a simplified three-mode workflow with Linear as the single source of truth:
 
-1. **NEVER implement without a plan** - Always create SESSION_PLAN.md first
-2. **Research before coding** - Use Claude-Context and Context7 MCP tools
-3. **Document everything** - Session logs, decisions, blockers
-4. **Maintain continuity** - Enable seamless agent handoffs
+1. **PLANNING_MODE**: Break down requests into actionable 1-2 hour sessions
+2. **RESEARCH_MODE**: Investigate codebase and document findings
+3. **IMPLEMENT_MODE**: Execute plans following Linear checkboxes
 
-### Key Workflow Documents
-- **Complete Workflow**: `/dev-docs/planning/HEXTRACKR_LINEAR_WORKFLOW.md`
-- **Quick Reference**: `/dev-docs/planning/QUICK_REFERENCE.md`
-- **Agent Handoff**: `/dev-docs/planning/AGENT_HANDOFF_PROTOCOL.md`
-- **Templates**: `/dev-docs/planning/templates/`
+### Workflow Instructions
+- **Main Guide**: `/dev-docs/planning/README.md`
+- **Planning Mode**: `/dev-docs/planning/modes/PLANNING_MODE.md`
+- **Research Mode**: `/dev-docs/planning/modes/RESEARCH_MODE.md`
+- **Implement Mode**: `/dev-docs/planning/modes/IMPLEMENT_MODE.md`
 
 ### Linear Issue Format
 ```
