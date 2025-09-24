@@ -84,7 +84,7 @@
 
 ### Section VII: Linear MCP
 
-- Linear MCP SHALL be used in conjunction with /dev-docs/planning/ for all planning and project management. 
+- Linear MCP SHALL be used in conjunction with /dev-docs/planning/README.md for all planning and project management. 
 
 ### Section VIII: Claude-Context
 

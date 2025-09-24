@@ -79,7 +79,7 @@ app.use(morgan(':method :url :status :response-time ms - :res[content-length]', 
 
 **Log Output Format:**
 
-```
+```text
 [2024-01-15 10:30:45] INFO: GET /api/vulnerabilities 200 45ms - 2048
 [2024-01-15 10:30:46] ERROR: POST /api/import 500 1523ms - Error: File too large
 ```
@@ -281,7 +281,7 @@ Express server setup and initialization.
 
 ### Request Flow
 
-```
+```text
 Client Request
     ↓
 [Compression Middleware]
