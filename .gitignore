@@ -17,9 +17,19 @@ data/*.sqlite
 logs/
 *.log
 
+# Agent logs (preserved locally but not committed)
+/hextrackr-specs/data/agentlogs/
+
+# Developer documentation (auto-generated)
+app/dev-docs-html/
+
 # Temporary files
 tmp/
 temp/
+
+# Playwright test artifacts
+.playwright-mcp/
+test-results/
 
 # CSV uploads (keep sample files)
 uploads/*.csv
@@ -60,6 +70,32 @@ FileScopeMCP-*.json
 FileScopeMCP-*.html
 FileScopeMCP-*.png
 
+# Test artifacts and coverage reports
+__tests__/coverage/
+__tests__/test-results/
+__tests__/playwright-report/
+__tests__/test-results.json
+**/*.lcov
+
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 .rMemory
+
+# Stooge analysis reports (temporary outputs)
+stooges/
+
+# Athena's Library of Sacred Scrolls
+# Keep the directory structure but not the actual conversation logs
+claudelogs/sessions/*.md
+!claudelogs/sessions/.gitkeep
+
+# Athena tracking file (preserve to avoid reprocessing)
+# scripts/.athena-processed-scrolls.json
+
+# Memento shared database
+memento/
+-e 
+# OpenCode configuration (may contain API keys)
+opencode.json
+broken_opencode.json
+.opencode.json

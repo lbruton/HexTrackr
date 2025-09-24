@@ -1,0 +1,625 @@
+/* Vulnerabilities Page Specific Styles */
+
+/* VPR Severity Color System - Single Source of Truth */
+:root {
+    /* Primary severity colors for light mode */
+    --vpr-critical: #dc2626;
+    --vpr-high: #d97706;     /* Adjusted for WCAG AA compliance */
+    --vpr-medium: #2563eb;
+    --vpr-low: #16a34a;
+
+    /* RGB values for alpha transparency */
+    --vpr-critical-rgb: 220, 38, 38;
+    --vpr-high-rgb: 217, 119, 6;
+    --vpr-medium-rgb: 37, 99, 235;
+    --vpr-low-rgb: 22, 163, 74;
+
+    /* Background colors with opacity */
+    --vpr-critical-bg: rgb(var(--vpr-critical-rgb), 0.1);
+    --vpr-high-bg: rgb(var(--vpr-high-rgb), 0.1);
+    --vpr-medium-bg: rgb(var(--vpr-medium-rgb), 0.1);
+    --vpr-low-bg: rgb(var(--vpr-low-rgb), 0.1);
+}
+
+/* Dark mode color overrides for better visibility */
+[data-theme="dark"] {
+    /* Adjusted colors for dark mode visibility */
+    --vpr-critical: #ef4444;
+    --vpr-high: #f97316;
+    --vpr-medium: #3b82f6;
+    --vpr-low: #22c55e;
+
+    /* RGB values for dark mode */
+    --vpr-critical-rgb: 239, 68, 68;
+    --vpr-high-rgb: 249, 115, 22;
+    --vpr-medium-rgb: 59, 130, 246;
+    --vpr-low-rgb: 34, 197, 94;
+}
+
+/* VPR Utility Classes - Text Colors */
+.text-vpr-critical {
+    color: var(--vpr-critical) !important;
+}
+
+.text-vpr-high {
+    color: var(--vpr-high) !important;
+}
+
+.text-vpr-medium {
+    color: var(--vpr-medium) !important;
+}
+
+.text-vpr-low {
+    color: var(--vpr-low) !important;
+}
+
+/* VPR Utility Classes - Background Colors */
+.bg-vpr-critical {
+    background-color: var(--vpr-critical-bg) !important;
+}
+
+.bg-vpr-high {
+    background-color: var(--vpr-high-bg) !important;
+}
+
+.bg-vpr-medium {
+    background-color: var(--vpr-medium-bg) !important;
+}
+
+.bg-vpr-low {
+    background-color: var(--vpr-low-bg) !important;
+}
+
+/* VPR Utility Classes - Border Colors */
+.border-vpr-critical {
+    border-color: var(--vpr-critical) !important;
+}
+
+.border-vpr-high {
+    border-color: var(--vpr-high) !important;
+}
+
+.border-vpr-medium {
+    border-color: var(--vpr-medium) !important;
+}
+
+.border-vpr-low {
+    border-color: var(--vpr-low) !important;
+}
+
+/* Enhanced Card System - Dark Mode Surface Hierarchy - P001 */
+.card {
+    background-color: var(--hextrackr-surface-1);
+    border: 1px solid var(--hextrackr-border-subtle);
+    box-shadow: var(--hextrackr-shadow-sm);
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    border-color: var(--hextrackr-border-muted);
+    box-shadow: var(--hextrackr-shadow-md);
+}
+
+.card .card-body {
+    background-color: transparent;
+}
+
+/* Modal Enhancement - Using modal-specific variables */
+.modal-content {
+    background-color: var(--hextrackr-modal-bg);
+    border: 1px solid var(--hextrackr-border);
+    box-shadow: var(--hextrackr-shadow-lg);
+}
+
+.modal-content .card {
+    background-color: var(--hextrackr-surface-2); /* Darker than modal background */
+    border-color: var(--hextrackr-border-subtle);
+}
+
+/* Unified Card Hover Effects - Theme-aware colors with background change */
+.device-card:hover,
+.vulnerability-card:hover {
+    background-color: var(--tblr-bg-surface-secondary);
+    border-color: var(--hextrackr-primary);
+    box-shadow: 0 4px 12px var(--hextrackr-primary-shadow, rgb(32, 107, 196, 0.15));
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+}
+
+/* VPR severity color scheme - T035 Enhanced with dark mode support */
+.severity-critical {
+    background-color: var(--vpr-critical, #dc3545) !important;
+    color: white !important;
+    border: 1px solid var(--vpr-critical, #dc3545);
+}
+
+.severity-high {
+    background-color: var(--vpr-high, #fd7e14) !important;
+    color: white !important;
+    border: 1px solid var(--vpr-high, #fd7e14);
+}
+
+.severity-medium {
+    background-color: var(--vpr-medium, #ffc107) !important;
+    color: var(--bs-body-color, black) !important;
+    border: 1px solid var(--vpr-medium, #ffc107);
+}
+
+.severity-low {
+    background-color: var(--vpr-low, #28a745) !important;
+    color: white !important;
+    border: 1px solid var(--vpr-low, #28a745);
+}
+
+.severity-info {
+    background-color: var(--vpr-info, #17a2b8) !important;
+    color: white !important;
+    border: 1px solid var(--vpr-info, #17a2b8);
+}
+
+/* VPR score styling - T035 Theme-responsive with CSS variables */
+.vpr-critical { 
+    color: var(--vpr-critical, #dc3545); 
+    font-weight: bold;
+    background-color: var(--vpr-critical-bg, rgb(220, 38, 38, 0.1));
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+}
+
+.vpr-high { 
+    color: var(--vpr-high, #fd7e14); 
+    font-weight: bold;
+    background-color: var(--vpr-high-bg, rgb(234, 88, 12, 0.1));
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+}
+
+.vpr-medium { 
+    color: var(--vpr-medium, #ffc107); 
+    font-weight: bold;
+    background-color: var(--vpr-medium-bg, rgb(217, 119, 6, 0.1));
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+}
+
+.vpr-low { 
+    color: var(--vpr-low, #28a745); 
+    font-weight: bold;
+    background-color: var(--vpr-low-bg, rgb(22, 163, 74, 0.1));
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+}
+
+/* Enhanced Statistics Cards */
+.stat-card-enhanced {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stat-card-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgb(0, 0, 0, 0.1);
+}
+
+.card-back {
+    display: none;
+}
+
+.card-flip-animation {
+    animation: flip-card 0.6s ease-in-out;
+}
+
+@keyframes flip-card {
+    0% { transform: rotateY(0deg); }
+    50% { transform: rotateY(90deg); }
+    100% { transform: rotateY(0deg); }
+}
+
+/* Trend indicators */
+.trend-value {
+    font-size: 0.75rem;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* Chart and grid containers */
+.card-body.p-2 {
+    display: flex;
+    flex-direction: column;
+    min-height: 600px; /* Ensure a minimum height for the workspace */
+}
+
+.view-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#tableView {
+    height: 100%;
+}
+
+#vulnGrid {
+    width: 100%;
+    height: 100%; /* Fill the container */
+    flex-grow: 1;
+    contain: layout style paint;
+    isolation: isolate;
+}
+
+/* T037: CSS containment for chart redraw isolation during theme transitions */
+#historicalChart {
+    height: 300px;
+    contain: layout style paint;
+    isolation: isolate;
+}
+
+#device-vuln-grid {
+    height: 500px;
+    width: 100%;
+    contain: layout style paint;
+    isolation: isolate;
+}
+
+#vulnerabilityAssetsGrid {
+    height: 300px;
+    width: 100%;
+    contain: layout style paint;
+    isolation: isolate;
+}
+
+.chart-container {
+    height: 350px;
+    contain: layout style paint;
+    isolation: isolate;
+}
+
+/* Vulnerability stats cards */
+.vulnerability-stats .card-sm {
+    transition: transform 0.2s ease-in-out;
+}
+
+.vulnerability-stats .card-sm:hover {
+    transform: translateY(-2px);
+}
+
+/* Search and filter controls */
+.search-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-container .form-control,
+.search-container .form-select {
+    min-width: 200px;
+}
+
+/* Severity badges */
+.severity-badge {
+    font-size: 0.8em;
+    padding: 0.4em 0.8em;
+    border-radius: 20px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Progress bars for VPR trends */
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* Modal enhancements */
+.modal-xl {
+    max-width: 90%;
+}
+
+.vulnerability-details .card {
+    margin-bottom: 1rem;
+}
+
+.vulnerability-details .card-header {
+    background-color: var(--hextrackr-primary);
+    color: white;
+    font-weight: 600;
+}
+
+/* ===========================
+   AG-Grid Styles
+   ===========================
+   Common AG-Grid styles are now in shared/tables.css
+   This includes:
+   - Container setup and responsive heights
+   - Link styling with WCAG AAA contrast
+   - Cell focus and keyboard navigation
+   - Row states and highlighting
+   - Button and tooltip styles
+   - Scrollbar customization
+   - Print styles
+
+   Only page-specific AG-Grid customizations should be added here.
+   The app uses AG-Grid Quartz theme (not Alpine).
+   Theme switching is handled by AGGridThemeManager.
+   =========================== */
+
+/* Vulnerabilities-specific grid configurations */
+#vulnGrid {
+    /* Inherits base styles from shared/tables.css */
+    /* Add any vulnerabilities-specific overrides here */
+}
+
+/* Force single-line display for vulnerability grid cells */
+#vulnGrid .ag-cell {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: normal !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+/* Ensure vulnerability descriptions don't wrap */
+#vulnGrid .ag-cell-value,
+#vulnGrid .vulnerability-description {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+}
+
+/* Fix severity badge stretching - keep them compact */
+#vulnGrid .severity-badge {
+    display: inline-block !important;
+    align-self: center;
+    line-height: 1.2 !important;
+    vertical-align: middle;
+}
+
+/* Compact row height for vulnerabilities table */
+#vulnGrid .ag-row {
+    min-height: 42px !important;
+    max-height: 42px !important;
+}
+
+/* Override the wrap text class if it exists */
+#vulnGrid .ag-cell-wrap-text {
+    white-space: nowrap !important;
+}
+
+/* Apply same single-line rules to other grids on vulnerabilities page */
+#device-vuln-grid .ag-cell,
+#vuln-affected-assets-grid .ag-cell,
+#vulnerabilityAssetsGrid .ag-cell {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Export buttons */
+.export-controls .btn {
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Device analysis specific */
+.device-analysis .progress {
+    height: 8px;
+    border-radius: 4px;
+}
+
+.device-analysis .progress-bar {
+    border-radius: 4px;
+}
+
+/* Search and filter layout */
+.severity-filter {
+    min-width: 140px;
+}
+
+.vendor-filter {
+    min-width: 120px;
+}
+
+/* Search bar card should have no margin-top for symmetric spacing */
+.search-filters-card .card-body {
+    margin-top: 0;
+}
+
+/* Group-by controls */
+#expandAllGroups,
+#collapseAllGroups {
+    display: none;
+}
+
+#groupByField:not(:empty) ~ #expandAllGroups,
+#groupByField:not(:empty) ~ #collapseAllGroups {
+    display: inline-block;
+}
+
+/* Group-by filter styling */
+#groupByField {
+    transition: all 0.2s ease;
+}
+
+#groupByField:focus {
+    border-color: var(--hextrackr-primary);
+    box-shadow: 0 0 0 0.2rem rgb(32, 107, 196, 0.25);
+}
+
+/* ApexCharts Tooltip Color Indicators */
+.tooltip-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+    gap: 8px;
+}
+
+.color-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px rgb(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.severity-name {
+    font-size: 13px;
+    color: #4b5563;
+    font-weight: 500;
+    flex: 1;
+}
+
+.severity-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* ===========================
+   v1.0.24 - Vulnerability Card UI Improvements
+   =========================== */
+
+/* VPR Mini-Cards - ONLY for device cards where they show useful information */
+.device-card .vpr-mini-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.device-card .vpr-mini-card {
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius);
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    position: relative;
+    min-height: 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.device-card .vpr-mini-card:hover {
+    border-color: var(--hextrackr-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(32, 107, 196, 0.15);
+}
+
+.device-card .vpr-mini-card.critical {
+    border-left: 3px solid var(--vpr-critical);
+}
+
+.device-card .vpr-mini-card.high {
+    border-left: 3px solid var(--vpr-high);
+}
+
+.device-card .vpr-mini-card.medium {
+    border-left: 3px solid var(--vpr-medium);
+}
+
+.device-card .vpr-mini-card.low {
+    border-left: 3px solid var(--vpr-low);
+}
+
+.device-card .vpr-mini-card .vpr-count {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.device-card .vpr-mini-card .vpr-label {
+    font-size: 0.75rem;
+    color: var(--tblr-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-bottom: 0.25rem;
+}
+
+.device-card .vpr-mini-card .vpr-sum {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--hextrackr-primary);
+}
+
+/* Enhanced device display for vulnerability cards */
+.device-display-enhanced {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--tblr-bg-surface-secondary);
+    border-radius: var(--tblr-border-radius);
+    margin-top: 1rem;
+    transition: all 0.2s ease;
+}
+
+.device-display-enhanced:hover {
+    background: var(--hextrackr-bg-secondary);
+    transform: translateY(-1px);
+}
+
+.device-count-large {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--hextrackr-text-primary);
+}
+
+/* Vulnerability identifier alignment */
+.vulnerability-identifiers {
+    display: flex;
+    align-items: center;
+}
+
+.vulnerability-identifiers .badge {
+    font-size: 0.7rem;
+    padding: 0.3em 0.6em;
+}
+
+/* Card height optimization for vulnerability cards */
+.vulnerability-card,
+.vuln-card {
+    min-height: 320px; /* Reduced from 380px */
+}
+
+/* KEV badge positioning and styling */
+.vulnerability-card .kev-indicator {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.vulnerability-card .kev-indicator:focus-visible {
+    outline: 2px solid var(--hextrackr-primary);
+    outline-offset: 2px;
+}
+
+.kev-badge {
+    background: #dc2626;
+    color: #ffffff;
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+[data-bs-theme="dark"] .kev-badge {
+    background: rgba(239, 68, 68, 0.9);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+}

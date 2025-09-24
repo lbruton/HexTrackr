@@ -1,0 +1,131 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Troubleshooting Guide</h1><h2>Common Issues & Solutions</h2><h3>Docker & Environment Issues</h3><h4>Container Won't Start</h4><p><strong>Problem</strong>: Docker container fails to start or immediately exits</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li>Check Docker daemon is running: <code>docker info</code></li>
+<li>Verify port 8989 is not in use: <code>lsof -i :8989</code></li>
+<li>Check container logs: <code>docker-compose logs hextrackr</code></li>
+<li>Rebuild container: <code>docker-compose build --no-cache</code></li>
+</ol>
+<h4>Port Already in Use</h4><p><strong>Problem</strong>: Error &quot;bind: address already in use&quot;</p>
+<p><strong>Solution</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Find process using port 8989</span>
+lsof -i :8989
+<span class="hljs-comment"># Kill the process</span>
+<span class="hljs-built_in">kill</span> -9 &lt;PID&gt;
+<span class="hljs-comment"># Restart Docker</span>
+docker-compose restart</code></pre><h3>Database Issues</h3><h4>Database Locked Error</h4><p><strong>Problem</strong>: &quot;SQLITE_BUSY: database is locked&quot;</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li>Check for long-running transactions</li>
+<li>Restart the application: <code>docker-compose restart</code></li>
+<li>Verify file permissions: <code>ls -la data/hextrackr.db</code></li>
+</ol>
+<h4>Missing Data After Import</h4><p><strong>Problem</strong>: Imported data doesn&#39;t appear in dashboard</p>
+<p><strong>Checklist</strong>:</p>
+<ol>
+<li>Verify import completed successfully (check logs)</li>
+<li>Check lifecycle_state filtering (resolved items are hidden)</li>
+<li>Verify scan date was set correctly</li>
+<li>Check for duplicate detection removing entries</li>
+</ol>
+<h3>Import/Export Issues</h3><h4>CSV Import Fails</h4><p><strong>Problem</strong>: CSV import returns error or no data imported</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li>Verify CSV format matches supported columns</li>
+<li>Check file encoding (UTF-8 required)</li>
+<li>Remove special characters from headers</li>
+<li>Verify file size (large files may need staging import)</li>
+</ol>
+<h4>Export Generates Empty File</h4><p><strong>Problem</strong>: Export buttons create empty or corrupted files</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li>Verify data exists in current view</li>
+<li>Check browser console for errors</li>
+<li>Clear browser cache and retry</li>
+<li>Try different export format</li>
+</ol>
+<h3>Frontend Issues</h3><h4>Blank Page or Loading Forever</h4><p><strong>Problem</strong>: Application shows blank page or infinite loading</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li>Check browser console for JavaScript errors</li>
+<li>Clear browser cache and cookies</li>
+<li>Verify WebSocket connection: Check Network tab</li>
+<li>Try incognito/private browsing mode</li>
+</ol>
+<h4>Theme Not Switching</h4><p><strong>Problem</strong>: Dark/light theme toggle not working</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li>Clear localStorage: <code>localStorage.clear()</code></li>
+<li>Check for CSS conflicts in browser inspector</li>
+<li>Verify theme CSS variables are defined</li>
+<li>Refresh page after theme change</li>
+</ol>
+<h3>API & WebSocket Issues</h3><h4>WebSocket Connection Failed</h4><p><strong>Problem</strong>: Real-time updates not working</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li>Check WebSocket URL in browser console</li>
+<li>Verify firewall/proxy allows WebSocket</li>
+<li>Enable debug mode: <code>localStorage.hextrackr_debug = &quot;true&quot;</code></li>
+<li>Check Docker logs for Socket.io errors</li>
+</ol>
+<h4>API Returns 404</h4><p><strong>Problem</strong>: API calls return 404 errors</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li>Verify API base URL is correct (/api)</li>
+<li>Check route exists in server.js</li>
+<li>Verify Docker container is running</li>
+<li>Check for typos in API endpoint</li>
+</ol>
+<h3>Performance Issues</h3><h4>Slow Dashboard Loading</h4><p><strong>Problem</strong>: Dashboard takes too long to load</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li>Check vulnerability count (paginate if &gt; 10000)</li>
+<li>Clear browser cache</li>
+<li>Verify database indexes exist</li>
+<li>Monitor Docker container resources</li>
+</ol>
+<h4>Import Takes Forever</h4><p><strong>Problem</strong>: CSV import appears stuck</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li>Check file size (large files process server-side)</li>
+<li>Monitor progress in browser console</li>
+<li>Check Docker logs for processing status</li>
+<li>Consider using staging import for large files</li>
+</ol>
+<h2>Debug Mode</h2><p>Enable debug mode for detailed logging:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// In browser console</span>
+<span class="hljs-variable language_">localStorage</span>.<span class="hljs-property">hextrackr_debug</span> = <span class="hljs-string">&quot;true&quot;</span>;
+location.<span class="hljs-title function_">reload</span>();</code></pre><p>This enables:</p>
+<ul>
+<li>Verbose WebSocket logging</li>
+<li>Detailed API request/response logging</li>
+<li>Import processing details</li>
+<li>Theme switching diagnostics</li>
+</ul>
+<h2>Log Locations</h2><ul>
+<li><strong>Application logs</strong>: <code>docker-compose logs hextrackr</code></li>
+<li><strong>Real-time logs</strong>: <code>docker-compose logs -f hextrackr</code></li>
+<li><strong>Browser console</strong>: F12 → Console tab</li>
+<li><strong>Network traffic</strong>: F12 → Network tab</li>
+</ul>
+<h2>Getting Help</h2><p>If issues persist after trying these solutions:</p>
+<ol>
+<li>Check the GitHub issues: <a href="https://github.com/HexTrackr/HexTrackr/issues">https://github.com/HexTrackr/HexTrackr/issues</a></li>
+<li>Gather diagnostic information:<ul>
+<li>Docker logs</li>
+<li>Browser console errors</li>
+<li>Screenshot of the issue</li>
+<li>Steps to reproduce</li>
+</ul>
+</li>
+<li>Create a detailed issue report</li>
+</ol>
+<hr>
+<p><em>For performance-related issues, see <a href="#reference/performance">Performance Guidelines</a></em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

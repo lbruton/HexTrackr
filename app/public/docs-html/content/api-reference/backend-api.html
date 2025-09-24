@@ -1,0 +1,727 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Backend API Reference</h1><blockquote>
+<p>Complete reference for HexTrackr&#39;s backend architecture, including controllers, services, routes, and server configuration</p>
+</blockquote>
+<h2>Overview</h2><p>HexTrackr&#39;s backend follows a modular Express.js architecture with clear separation of concerns:</p>
+<ul>
+<li><strong>Controllers</strong> handle HTTP requests and responses</li>
+<li><strong>Services</strong> contain business logic and data access</li>
+<li><strong>Routes</strong> define API endpoints and middleware</li>
+<li><strong>Server</strong> orchestrates initialization and dependency injection</li>
+</ul>
+<p>All components use the singleton pattern for consistent state management across the application.</p>
+<hr>
+<h2 id="controllers">Controllers</h2><p>Controllers handle incoming HTTP requests, validate input, coordinate with services, and return responses. Each controller follows the singleton pattern for dependency injection.</p>
+<h3>VulnerabilityController</h3><p><strong>Location:</strong> <code>app/controllers/vulnerabilityController.js</code></p>
+<p>The primary controller for vulnerability management, handling everything from CRUD operations to complex CSV imports and statistical analysis.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Full CRUD operations for vulnerability records</li>
+<li>CSV import with progress tracking (supports Tenable, Qualys formats)</li>
+<li>Real-time statistics and VPR score calculations</li>
+<li>Bulk operations for data management</li>
+<li>Integration with WebSocket for live updates</li>
+</ul>
+<p><strong>Main Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td><code>/api/vulnerabilities/stats</code></td>
+<td>Returns comprehensive statistics including severity distribution and trends</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/vulnerabilities</code></td>
+<td>Lists vulnerabilities with filtering, sorting, and pagination</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/vulnerabilities</code></td>
+<td>Creates new vulnerability record</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/vulnerabilities/:id</code></td>
+<td>Updates existing vulnerability</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/vulnerabilities/:id</code></td>
+<td>Deletes specific vulnerability</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/vulnerabilities/import</code></td>
+<td>Imports CSV file with progress tracking</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/vulnerabilities/all</code></td>
+<td>Clears all vulnerability data</td>
+</tr>
+</tbody></table>
+<h3>TicketController</h3><p><strong>Location:</strong> <code>app/controllers/ticketController.js</code></p>
+<p>Manages support tickets and associated device tracking.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Complete ticket lifecycle management</li>
+<li>Device association tracking (stored as JSON)</li>
+<li>Status workflow (Open → In Progress → Closed)</li>
+<li>Priority-based sorting and filtering</li>
+</ul>
+<p><strong>Main Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td><code>/api/tickets</code></td>
+<td>Lists all tickets with device information</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/tickets/:id</code></td>
+<td>Gets specific ticket details</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/tickets</code></td>
+<td>Creates new ticket</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/tickets/:id</code></td>
+<td>Updates ticket information</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/tickets/:id/devices</code></td>
+<td>Updates associated devices</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/tickets/:id</code></td>
+<td>Deletes ticket</td>
+</tr>
+</tbody></table>
+<h3>ImportController</h3><p><strong>Location:</strong> <code>app/controllers/importController.js</code></p>
+<p>Handles CSV file imports from vulnerability scanners.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Multi-format CSV support (Tenable, Qualys, Rapid7)</li>
+<li>Automatic scan date extraction from filenames</li>
+<li>Progress tracking via WebSocket</li>
+<li>Staging mode for large files (&gt;10,000 rows)</li>
+<li>Duplicate detection and merging</li>
+</ul>
+<p><strong>Main Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>POST</td>
+<td><code>/api/import/vulnerabilities</code></td>
+<td>Standard vulnerability import</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/import/staging</code></td>
+<td>Staged import for large files</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/import/progress/:id</code></td>
+<td>Real-time import progress</td>
+</tr>
+</tbody></table>
+<h3>BackupController</h3><p><strong>Location:</strong> <code>app/controllers/backupController.js</code></p>
+<p>Database backup and restoration management.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Timestamped backup creation</li>
+<li>Compression support for large databases</li>
+<li>Backup rotation and cleanup</li>
+<li>Validation before restoration</li>
+</ul>
+<p><strong>Main Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>POST</td>
+<td><code>/api/backup/create</code></td>
+<td>Creates new backup</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/backup/list</code></td>
+<td>Lists available backups</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/backup/restore</code></td>
+<td>Restores from backup</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/backup/:filename</code></td>
+<td>Deletes backup file</td>
+</tr>
+</tbody></table>
+<h3>DocsController</h3><p><strong>Location:</strong> <code>app/controllers/docsController.js</code></p>
+<p>Serves documentation portal and API documentation.</p>
+<p><strong>Main Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td><code>/api/docs/stats</code></td>
+<td>Documentation coverage statistics</td>
+</tr>
+</tbody></table>
+<h3>KevController</h3><p><strong>Location:</strong> <code>app/controllers/kevController.js</code><br><strong>Since:</strong> v1.0.22</p>
+<p>Manages CISA Known Exploited Vulnerabilities (KEV) integration and synchronization.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Automatic daily synchronization with CISA KEV catalog</li>
+<li>Conflict detection and resolution for concurrent sync requests</li>
+<li>Comprehensive error handling and retry logic</li>
+<li>Real-time sync status tracking</li>
+<li>Integration with vulnerability matching system</li>
+</ul>
+<p><strong>Main Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>POST</td>
+<td><code>/api/kev/sync</code></td>
+<td>Trigger manual KEV synchronization from CISA</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/kev/status</code></td>
+<td>Get current sync status and statistics</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/kev/vulnerability/:cveId</code></td>
+<td>Get KEV details for specific CVE</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="services">Services</h2><p>Services encapsulate business logic and data access. They are injected into controllers during initialization.</p>
+<h3>VulnerabilityService</h3><p><strong>Location:</strong> <code>app/services/vulnerabilityService.js</code></p>
+<p>Core service for vulnerability data operations.</p>
+<p><strong>Responsibilities:</strong></p>
+<ul>
+<li>Database CRUD operations</li>
+<li>CSV parsing and field mapping</li>
+<li>Data validation and sanitization</li>
+<li>Batch processing for imports</li>
+<li>Snapshot creation for historical tracking</li>
+</ul>
+<p><strong>Key Methods:</strong></p>
+<ul>
+<li><code>getAll()</code> - Retrieve vulnerabilities with filters</li>
+<li><code>create()</code> - Add new vulnerability</li>
+<li><code>update()</code> - Modify existing record</li>
+<li><code>delete()</code> - Remove vulnerability</li>
+<li><code>importBatch()</code> - Process CSV data in chunks</li>
+<li><code>createSnapshot()</code> - Save point-in-time state</li>
+</ul>
+<h3>VulnerabilityStatsService</h3><p><strong>Location:</strong> <code>app/services/vulnerabilityStatsService.js</code></p>
+<p>Analytics and reporting for vulnerability data.</p>
+<p><strong>Capabilities:</strong></p>
+<ul>
+<li>VPR (Vulnerability Priority Rating) calculation</li>
+<li>Severity distribution analysis</li>
+<li>Trend analysis over time periods</li>
+<li>Top vulnerabilities by risk</li>
+<li>Plugin family categorization</li>
+<li>Host-based vulnerability grouping</li>
+</ul>
+<h3>TicketService</h3><p><strong>Location:</strong> <code>app/services/ticketService.js</code></p>
+<p>Ticket management and device tracking.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Full ticket CRUD operations</li>
+<li>Device list management (JSON storage)</li>
+<li>Status transition validation</li>
+<li>Priority-based operations</li>
+<li>Automatic timestamp management</li>
+</ul>
+<h3>ImportService</h3><p><strong>Location:</strong> <code>app/services/importService.js</code></p>
+<p>Vendor CSV import processing with lifecycle management and batch operations.</p>
+<p><strong>Capabilities:</strong></p>
+<ul>
+<li>CSV parsing with PapaParse</li>
+<li>Field mapping and transformation</li>
+<li>Data type conversion and validation</li>
+<li>Batch processing with configurable size (1000 records)</li>
+<li>Vulnerability lifecycle management (active, grace_period, resolved)</li>
+<li>Deduplication using hostname and plugin_id</li>
+<li>Daily totals calculation with VPR aggregation</li>
+<li>Staging table for atomic imports</li>
+<li>Progress tracking with WebSocket integration</li>
+<li>Multi-vendor support (Tenable, Cisco, Qualys)</li>
+</ul>
+<p><strong>Key Functions:</strong></p>
+<ul>
+<li><code>processStagingToFinalTables()</code> - Batch processes staged data to production tables</li>
+<li><code>calculateAndStoreDailyTotalsEnhanced()</code> - Calculates per-scan-date statistics with VPR</li>
+<li><code>bulkLoadToStagingTable()</code> - High-performance bulk import to staging</li>
+<li><code>extractDateFromFilename()</code> - Smart date extraction from various filename formats</li>
+</ul>
+<h3>BackupService</h3><p><strong>Location:</strong> <code>app/services/backupService.js</code></p>
+<p>Database backup and restore operations.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>SQLite database copying</li>
+<li>Timestamp-based naming</li>
+<li>Compression with zlib</li>
+<li>Integrity validation</li>
+<li>Restore rollback on failure</li>
+</ul>
+<h3>ProgressService</h3><p><strong>Location:</strong> <code>app/services/progressService.js</code></p>
+<p>Real-time progress tracking for long operations.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Operation registration and tracking</li>
+<li>Percentage calculation</li>
+<li>ETA estimation</li>
+<li>WebSocket event emission</li>
+<li>Multi-operation support</li>
+</ul>
+<h3>DatabaseService</h3><p><strong>Location:</strong> <code>app/services/databaseService.js</code></p>
+<p>Database connection and query management.</p>
+<p><strong>Responsibilities:</strong></p>
+<ul>
+<li>Connection pooling</li>
+<li>Query execution</li>
+<li>Transaction management</li>
+<li>Schema migrations</li>
+<li>Error handling and retry logic</li>
+</ul>
+<h3>ValidationService</h3><p><strong>Location:</strong> <code>app/services/validationService.js</code></p>
+<p>Input validation and sanitization.</p>
+<p><strong>Security Features:</strong></p>
+<ul>
+<li>SQL injection prevention</li>
+<li>XSS protection</li>
+<li>Path traversal blocking</li>
+<li>Type validation</li>
+<li>Range checking</li>
+</ul>
+<h3>FileService</h3><p><strong>Location:</strong> <code>app/services/fileService.js</code></p>
+<p>Secure file operations.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Upload handling with Multer</li>
+<li>File type verification</li>
+<li>Size limit enforcement</li>
+<li>Temporary file cleanup</li>
+<li>Path validation</li>
+</ul>
+<h3>KevService</h3><p><strong>Location:</strong> <code>app/services/kevService.js</code><br><strong>Since:</strong> v1.0.22</p>
+<p>CISA Known Exploited Vulnerabilities data management and synchronization.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Daily automatic synchronization with CISA KEV API</li>
+<li>CVE-based vulnerability matching and flagging</li>
+<li>Sync status tracking and error handling</li>
+<li>Local KEV catalog caching for performance</li>
+<li>Integration with vulnerability database</li>
+</ul>
+<p><strong>Core Methods:</strong></p>
+<ul>
+<li><code>syncKevData()</code> - Fetch and process CISA KEV catalog</li>
+<li><code>getSyncStatus()</code> - Current synchronization status</li>
+<li><code>getKevByCve(cveId)</code> - Retrieve KEV details for specific CVE</li>
+<li><code>matchVulnerabilities()</code> - Update vulnerability KEV flags</li>
+<li><code>scheduleAutoSync()</code> - Configure automatic sync intervals</li>
+</ul>
+<hr>
+<h2 id="routes">Routes</h2><p>Route modules define API endpoints and apply middleware.</p>
+<h3>Vulnerability Routes</h3><p><strong>File:</strong> <code>app/routes/vulnerabilities.js</code><br><strong>Base Path:</strong> <code>/api/vulnerabilities</code></p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">GET</span>    /stats                 <span class="hljs-comment">// Statistics dashboard data</span>
+<span class="hljs-variable constant_">GET</span>    /                      <span class="hljs-comment">// List vulnerabilities</span>
+<span class="hljs-variable constant_">POST</span>   /                      <span class="hljs-comment">// Create vulnerability</span>
+<span class="hljs-variable constant_">PUT</span>    /:id                   <span class="hljs-comment">// Update vulnerability</span>
+<span class="hljs-variable constant_">DELETE</span> /:id                   <span class="hljs-comment">// Delete vulnerability</span>
+<span class="hljs-variable constant_">POST</span>   /<span class="hljs-keyword">import</span>                <span class="hljs-comment">// Import CSV</span>
+<span class="hljs-variable constant_">POST</span>   /<span class="hljs-keyword">import</span>/staging        <span class="hljs-comment">// Staged import</span>
+<span class="hljs-variable constant_">GET</span>    /<span class="hljs-keyword">import</span>/progress/:id   <span class="hljs-comment">// Import progress</span>
+<span class="hljs-variable constant_">DELETE</span> /all                   <span class="hljs-comment">// Clear all data</span></code></pre><h3>Ticket Routes</h3><p><strong>File:</strong> <code>app/routes/tickets.js</code><br><strong>Base Path:</strong> <code>/api/tickets</code></p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">GET</span>    /                      <span class="hljs-comment">// List tickets</span>
+<span class="hljs-variable constant_">GET</span>    /:id                   <span class="hljs-comment">// Get ticket</span>
+<span class="hljs-variable constant_">POST</span>   /                      <span class="hljs-comment">// Create ticket</span>
+<span class="hljs-variable constant_">PUT</span>    /:id                   <span class="hljs-comment">// Update ticket</span>
+<span class="hljs-variable constant_">PUT</span>    /:id/devices           <span class="hljs-comment">// Update devices</span>
+<span class="hljs-variable constant_">DELETE</span> /:id                   <span class="hljs-comment">// Delete ticket</span></code></pre><h3>Import Routes</h3><p><strong>File:</strong> <code>app/routes/imports.js</code><br><strong>Base Path:</strong> <code>/api/import</code></p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">POST</span>   /vulnerabilities       <span class="hljs-comment">// Import vulnerabilities</span>
+<span class="hljs-variable constant_">GET</span>    /progress/:id          <span class="hljs-comment">// Check progress</span></code></pre><h3>Backup Routes</h3><p><strong>File:</strong> <code>app/routes/backup.js</code><br><strong>Base Path:</strong> <code>/api/backup</code></p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">POST</span>   /create                <span class="hljs-comment">// Create backup</span>
+<span class="hljs-variable constant_">GET</span>    /list                  <span class="hljs-comment">// List backups</span>
+<span class="hljs-variable constant_">POST</span>   /restore               <span class="hljs-comment">// Restore backup</span>
+<span class="hljs-variable constant_">DELETE</span> /:filename             <span class="hljs-comment">// Delete backup</span></code></pre><h3>KEV Routes</h3><p><strong>File:</strong> <code>app/routes/kev.js</code><br><strong>Base Path:</strong> <code>/api/kev</code><br><strong>Since:</strong> v1.0.22</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">POST</span>   /sync                  <span class="hljs-comment">// Manual KEV synchronization</span>
+<span class="hljs-variable constant_">GET</span>    /status                <span class="hljs-comment">// Sync status and statistics</span>
+<span class="hljs-variable constant_">GET</span>    /vulnerability/:cveId  <span class="hljs-comment">// KEV details for specific CVE</span></code></pre><hr>
+<h2 id="server">Server Configuration</h2><h3>Main Server</h3><p><strong>File:</strong> <code>app/public/server.js</code></p>
+<p>The main server file orchestrates the entire application using a modular initialization sequence.</p>
+<p><strong>Initialization Order:</strong></p>
+<ol>
+<li>Environment configuration loading</li>
+<li>Database connection establishment</li>
+<li>Controller initialization with dependencies</li>
+<li>Service layer configuration</li>
+<li>Route registration</li>
+<li>WebSocket server setup</li>
+<li>Static file serving</li>
+<li>Error handling middleware</li>
+</ol>
+<p><strong>Core Configuration:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Server settings</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">PORT</span> = process.<span class="hljs-property">env</span>.<span class="hljs-property">PORT</span> || <span class="hljs-number">8080</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">HOST</span> = <span class="hljs-string">&quot;0.0.0.0&quot;</span>;
+
+<span class="hljs-comment">// Security middleware</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">helmet</span>());
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">compression</span>());
+app.<span class="hljs-title function_">use</span>(express.<span class="hljs-title function_">json</span>({ <span class="hljs-attr">limit</span>: <span class="hljs-string">&quot;50mb&quot;</span> }));
+
+<span class="hljs-comment">// CORS configuration</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">cors</span>({
+    <span class="hljs-attr">origin</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">ALLOWED_ORIGINS</span>?.<span class="hljs-title function_">split</span>(<span class="hljs-string">&quot;,&quot;</span>) || [<span class="hljs-string">&quot;http://localhost:8080&quot;</span>],
+    <span class="hljs-attr">credentials</span>: <span class="hljs-literal">true</span>
+}));
+
+<span class="hljs-comment">// Rate limiting</span>
+<span class="hljs-keyword">const</span> limiter = <span class="hljs-title function_">rateLimit</span>({
+    <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>, <span class="hljs-comment">// 15 minutes</span>
+    <span class="hljs-attr">max</span>: <span class="hljs-number">100</span> <span class="hljs-comment">// limit each IP to 100 requests</span>
+});</code></pre><h3>WebSocket Integration</h3><p>Real-time communication for progress updates and live data.</p>
+<p><strong>Events:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Direction</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>import-progress</code></td>
+<td>Server→Client</td>
+<td>Import progress updates</td>
+</tr>
+<tr>
+<td><code>vulnerability-added</code></td>
+<td>Server→Client</td>
+<td>New vulnerability notification</td>
+</tr>
+<tr>
+<td><code>operation-complete</code></td>
+<td>Server→Client</td>
+<td>Operation completion</td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td>Server→Client</td>
+<td>Error notifications</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="database">Database Schema</h2><h3>Tables</h3><h4>vulnerabilities</h4><p>Primary table for vulnerability data.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td>plugin_id</td>
+<td>TEXT</td>
+<td>Scanner plugin identifier</td>
+</tr>
+<tr>
+<td>cve</td>
+<td>TEXT</td>
+<td>CVE identifier</td>
+</tr>
+<tr>
+<td>cvss</td>
+<td>REAL</td>
+<td>CVSS score</td>
+</tr>
+<tr>
+<td>risk</td>
+<td>TEXT</td>
+<td>Risk level (Critical/High/Medium/Low)</td>
+</tr>
+<tr>
+<td>host</td>
+<td>TEXT</td>
+<td>Affected host</td>
+</tr>
+<tr>
+<td>protocol</td>
+<td>TEXT</td>
+<td>Network protocol</td>
+</tr>
+<tr>
+<td>port</td>
+<td>INTEGER</td>
+<td>Port number</td>
+</tr>
+<tr>
+<td>name</td>
+<td>TEXT</td>
+<td>Vulnerability name</td>
+</tr>
+<tr>
+<td>synopsis</td>
+<td>TEXT</td>
+<td>Brief description</td>
+</tr>
+<tr>
+<td>description</td>
+<td>TEXT</td>
+<td>Full description</td>
+</tr>
+<tr>
+<td>solution</td>
+<td>TEXT</td>
+<td>Remediation steps</td>
+</tr>
+<tr>
+<td>plugin_output</td>
+<td>TEXT</td>
+<td>Scanner output</td>
+</tr>
+<tr>
+<td>vpr_score</td>
+<td>REAL</td>
+<td>VPR score</td>
+</tr>
+<tr>
+<td>scan_date</td>
+<td>TEXT</td>
+<td>Scan timestamp</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TEXT</td>
+<td>Record creation</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TEXT</td>
+<td>Last modification</td>
+</tr>
+</tbody></table>
+<h4>tickets</h4><p>Support ticket tracking.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td>title</td>
+<td>TEXT</td>
+<td>Ticket title</td>
+</tr>
+<tr>
+<td>description</td>
+<td>TEXT</td>
+<td>Full description</td>
+</tr>
+<tr>
+<td>status</td>
+<td>TEXT</td>
+<td>Open/In Progress/Closed</td>
+</tr>
+<tr>
+<td>priority</td>
+<td>TEXT</td>
+<td>Low/Medium/High/Critical</td>
+</tr>
+<tr>
+<td>devices</td>
+<td>TEXT</td>
+<td>JSON array of devices</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TEXT</td>
+<td>Creation timestamp</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TEXT</td>
+<td>Last update</td>
+</tr>
+<tr>
+<td>closed_at</td>
+<td>TEXT</td>
+<td>Closure timestamp</td>
+</tr>
+</tbody></table>
+<h4>vulnerability_imports</h4><p>Import operation tracking.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Import ID</td>
+</tr>
+<tr>
+<td>filename</td>
+<td>TEXT</td>
+<td>Source filename</td>
+</tr>
+<tr>
+<td>scan_date</td>
+<td>TEXT</td>
+<td>Scan date</td>
+</tr>
+<tr>
+<td>total_items</td>
+<td>INTEGER</td>
+<td>Total records</td>
+</tr>
+<tr>
+<td>processed_items</td>
+<td>INTEGER</td>
+<td>Processed count</td>
+</tr>
+<tr>
+<td>status</td>
+<td>TEXT</td>
+<td>pending/processing/completed/failed</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TEXT</td>
+<td>Start time</td>
+</tr>
+<tr>
+<td>completed_at</td>
+<td>TEXT</td>
+<td>End time</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Error Handling</h2><p>Consistent error handling across all endpoints:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Success response</span>
+{
+    <span class="hljs-string">&quot;success&quot;</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-string">&quot;data&quot;</span>: { <span class="hljs-comment">/* response data */</span> },
+    <span class="hljs-string">&quot;message&quot;</span>: <span class="hljs-string">&quot;Operation completed&quot;</span>
+}
+
+<span class="hljs-comment">// Error response</span>
+{
+    <span class="hljs-string">&quot;success&quot;</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-string">&quot;error&quot;</span>: <span class="hljs-string">&quot;Error message&quot;</span>,
+    <span class="hljs-string">&quot;details&quot;</span>: <span class="hljs-string">&quot;Detailed error information (dev mode only)&quot;</span>
+}</code></pre><p><strong>HTTP Status Codes:</strong></p>
+<ul>
+<li><code>200</code> - Success</li>
+<li><code>201</code> - Created</li>
+<li><code>400</code> - Bad request</li>
+<li><code>401</code> - Unauthorized</li>
+<li><code>404</code> - Not found</li>
+<li><code>500</code> - Server error</li>
+</ul>
+<hr>
+<h2>Security</h2><h3>Authentication</h3><p>Currently using session-based authentication with planned JWT migration.</p>
+<h3>Input Validation</h3><ul>
+<li>All file paths validated with PathValidator</li>
+<li>SQL queries use parameterized statements</li>
+<li>HTML content escaped before storage</li>
+<li>File uploads restricted by type and size</li>
+</ul>
+<h3>Rate Limiting</h3><p>Configurable per-endpoint limits to prevent abuse.</p>
+<h3>CORS Policy</h3><p>Whitelist-based origin control with credentials support.</p>
+<hr>
+<h2>Environment Variables</h2><pre><code class="language-bash"><span class="hljs-comment"># Server Configuration</span>
+PORT=8080
+HOST=0.0.0.0
+NODE_ENV=production
+
+<span class="hljs-comment"># Database</span>
+DATABASE_PATH=data/hextrackr.db
+
+<span class="hljs-comment"># Security</span>
+ALLOWED_ORIGINS=http://localhost:8080
+SESSION_SECRET=your-secret-key
+
+<span class="hljs-comment"># File Handling</span>
+MAX_FILE_SIZE=100MB
+UPLOAD_DIR=uploads
+BACKUP_DIR=backups
+
+<span class="hljs-comment"># Features</span>
+ENABLE_WEBSOCKET=<span class="hljs-literal">true</span>
+ENABLE_COMPRESSION=<span class="hljs-literal">true</span></code></pre>
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
