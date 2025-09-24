@@ -417,6 +417,15 @@
     min-width: 140px;
 }
 
+.vendor-filter {
+    min-width: 120px;
+}
+
+/* Search bar card should have no margin-top for symmetric spacing */
+.search-filters-card .card-body {
+    margin-top: 0;
+}
+
 /* Group-by controls */
 #expandAllGroups,
 #collapseAllGroups {

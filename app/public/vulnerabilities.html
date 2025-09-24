@@ -241,8 +241,8 @@
                     </div>
 
                     <!-- Search and Filters Section -->
-                    <div class="card mb-4">
-                        <div class="card-body">
+                    <div class="card mb-4 search-filters-card">
+                        <div class="card-body py-2">
                             <div class="row g-3">
                                 <!-- First row: Search and primary filters -->
                                 <div class="col-12">
@@ -269,13 +269,16 @@
                                             </select>
                                         </div>
                                         
-                                        <!-- Right side: Action buttons -->
+                                        <!-- Right side: Vendor filter and Import button -->
                                         <div class="d-flex gap-2">
+                                            <select class="form-select vendor-filter" id="vendorFilter" aria-label="Filter by vendor">
+                                                <option value="">All Vendors</option>
+                                                <option value="CISCO">CISCO</option>
+                                                <option value="Palo Alto">Palo Alto</option>
+                                                <option value="Other">Other</option>
+                                            </select>
                                             <button class="btn btn-outline-success" id="importCsvBtn" title="Import CSV vulnerabilities">
                                                 <i class="fas fa-upload me-1"></i>Import
-                                            </button>
-                                            <button class="btn btn-outline-primary" id="exportBtn">
-                                                <i class="fas fa-download me-1"></i>Export
                                             </button>
                                             <button class="btn btn-outline-secondary" id="refreshBtn" title="Refresh data">
                                                 <i class="fas fa-sync-alt"></i>
