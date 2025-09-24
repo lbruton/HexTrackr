@@ -146,7 +146,7 @@ function createFallbackFooter(container) {
     codacyA.target = "_blank";
     codacyA.title = "Code Quality Grade A";
     const codacyImg = document.createElement("img");
-    codacyImg.src = "https://app.codacy.com/project/badge/Grade/1ba09700c14c4926a696073a2f495189";
+    codacyImg.src = "https://app.codacy.com/project/badge/Grade/b3f731f8d8244dabafabb39339014886";
     codacyImg.alt = "Codacy Grade A";
     codacyImg.style.height = "20px";
     codacyImg.className = "img-fluid";
