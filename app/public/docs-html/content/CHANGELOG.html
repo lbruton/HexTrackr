@@ -8,71 +8,211 @@
                         <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
                              alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
                     </a>.</p>
-<h2>[Unreleased]</h2><h3>Fixed - NPM Scripts Cleanup</h3><h4>Development Workflow Improvements</h4><ul>
-<li><p><strong>Removed Broken Scripts</strong>: Eliminated NPM scripts that referenced non-existent files</p>
-<ul>
-<li>Removed <code>npm run roadmap</code> (scripts/generate-roadmap-portal.js missing)</li>
-<li>Removed <code>npm run docs:review</code> (app/public/scripts/gemini-docs-generator.js missing)</li>
-<li>Removed <code>npm run docs:analyze</code> (app/public/scripts/generate-architecture-analysis.js missing)</li>
-</ul>
-</li>
-<li><p><strong>Fixed Test Scripts</strong>: Updated test commands to handle missing test directories gracefully</p>
-<ul>
-<li>Added <code>--passWithNoTests</code> flag to test:unit, test:integration, test:contract</li>
-<li>Scripts now pass without error when no test files exist</li>
-<li>Clear warnings added in NPMGUIDE.md about directory status</li>
+<h2>[1.0.28] - 2025-09-24</h2><h3>Fixed - KEV Badge Modal Issue on Device Cards</h3><h4>Bug Resolution</h4><ul>
+<li><strong>Fixed Modal Behavior</strong>: KEV badges on device cards now correctly open the KEV details modal instead of the device security modal<ul>
+<li><strong>Root Cause</strong>: Incorrect onclick handler was calling <code>vulnManager.viewDeviceDetails()</code> instead of <code>showKevDetails()</code></li>
+<li><strong>User Impact</strong>: Security teams can now quickly access KEV vulnerability details directly from device cards</li>
+<li><strong>Consistency Restored</strong>: KEV badge behavior is now uniform across vulnerability cards and device cards</li>
 </ul>
 </li>
 </ul>
-<h4>Documentation Updates</h4><ul>
-<li><p><strong>Updated NPMGUIDE.md</strong>: Moved to root directory and cleaned up outdated script references</p>
-<ul>
-<li>Removed documentation for broken scripts</li>
-<li>Added status warnings for placeholder test commands</li>
-<li>Updated workflow examples to use working commands</li>
+<h4>Technical Implementation</h4><ul>
+<li><strong>Device Aggregation Enhancement</strong>: Extended <code>getFilteredDevices()</code> in <code>vulnerability-data.js</code> to track first KEV CVE per device<ul>
+<li>Added <code>kevCve: null</code> property to device object initialization</li>
+<li>Implemented KEV CVE tracking: <code>if (!device.kevCve) { device.kevCve = vuln.cve; }</code></li>
 </ul>
 </li>
-<li><p><strong>CLAUDE.md Corrections</strong>: Removed references to broken scripts in development commands</p>
-<ul>
-<li>Simplified documentation section to show only working scripts</li>
-<li>Added reference to NPMGUIDE.md location</li>
+<li><strong>Event Handler Correction</strong>: Fixed onclick handler in <code>vulnerability-cards.js</code> line 93<ul>
+<li><strong>Before</strong>: <code>onclick=&quot;event.stopPropagation(); vulnManager.viewDeviceDetails(&#39;${device.hostname}&#39;)&quot;</code></li>
+<li><strong>After</strong>: <code>onclick=&quot;event.stopPropagation(); showKevDetails(&#39;${device.kevCve}&#39;)&quot;</code></li>
+<li>Also updated onkeydown handler for accessibility consistency</li>
 </ul>
 </li>
 </ul>
-<h4>Impact</h4><ul>
-<li>All documented NPM scripts now function correctly</li>
-<li>No more confusion about missing script files</li>
-<li>Clear guidance on test infrastructure development status</li>
-<li>Improved developer onboarding experience</li>
+<h4>Files Modified</h4><ul>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code> - Device aggregation logic for KEV CVE tracking</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - KEV badge event handlers</li>
 </ul>
-<h3>Removed - Testing Infrastructure Cleanup</h3><h4>Development Simplification</h4><ul>
-<li><p><strong>Removed Jest Testing Framework</strong>: Eliminated unused Jest test infrastructure</p>
-<ul>
-<li>Removed 8 testing devDependencies (@jest/globals, jest, jest-environment-jsdom, etc.)</li>
-<li>Removed 6 test-related NPM scripts (test, test:watch, test:coverage, etc.)</li>
-<li>Kept only templateService.test.js as reference example</li>
-</ul>
-</li>
-<li><p><strong>Removed Playwright Testing Framework</strong>: Eliminated unused Playwright E2E testing</p>
-<ul>
-<li>Removed @playwright/test and playwright packages</li>
-<li>Removed supertest dependency</li>
-<li>Simplified to manual testing workflow</li>
+<h2>[1.0.27] - 2025-09-24</h2><h3>Added - KEV Badge on Device Cards</h3><h4>Enhanced Risk Visibility</h4><ul>
+<li><strong>Consistent UI Indicators</strong>: Added KEV (Known Exploited Vulnerabilities) badges to device cards, creating visual consistency with vulnerability cards<ul>
+<li><strong>Badge Appearance</strong>: Red KEV badge displays in upper right corner when ANY vulnerability on that device is in CISA&#39;s KEV catalog</li>
+<li><strong>Risk Assessment</strong>: Users can now instantly identify high-risk devices requiring immediate attention</li>
+<li><strong>Click Functionality</strong>: Clicking KEV badge opens device details modal to view all vulnerabilities affecting that device</li>
 </ul>
 </li>
 </ul>
-<h4>Rationale</h4><ul>
-<li><strong>Workflow Alignment</strong>: Manual testing with screenshots preferred by development team</li>
-<li><strong>Playwright MCP Available</strong>: Browser automation available through MCP when needed</li>
-<li><strong>Complexity Reduction</strong>: Removed 750MB+ of testing dependencies and tooling</li>
-<li><strong>Faster Development</strong>: Simplified npm install and reduced cognitive overhead</li>
+<h4>Technical Implementation</h4><ul>
+<li><strong>Backend Enhancement</strong>: Extended device aggregation logic to track KEV status across all vulnerabilities per device<ul>
+<li>Modified <code>getFilteredDevices()</code> in <code>vulnerability-data.js</code> to include <code>hasKev</code> property</li>
+<li>Added KEV tracking during vulnerability iteration: <code>if (vuln.isKev === &quot;Yes&quot;) { device.hasKev = true; }</code></li>
 </ul>
-<h4>Impact</h4><ul>
-<li>Package size reduced significantly (Jest + Playwright = ~750MB dependencies)</li>
-<li>Faster npm install times</li>
-<li>Cleaner package.json with focus on actual workflow</li>
-<li>Manual testing remains primary validation method</li>
-<li>Playwright MCP provides automation capabilities when needed</li>
+</li>
+<li><strong>Frontend Integration</strong>: Enhanced device card generation to display KEV badges<ul>
+<li>Updated <code>generateDeviceCardsHTML()</code> in <code>vulnerability-cards.js</code> with KEV badge HTML</li>
+<li>Used identical badge structure as vulnerability cards for UI consistency</li>
+</ul>
+</li>
+<li><strong>Styling Consistency</strong>: Extended existing KEV CSS styles to support device cards<ul>
+<li>Added <code>.device-card .kev-indicator</code> selectors to match vulnerability card styling</li>
+<li>Maintained responsive design and accessibility features</li>
+</ul>
+</li>
+</ul>
+<h4>User Experience Improvements</h4><ul>
+<li><strong>Immediate Risk Recognition</strong>: Security teams can quickly scan device cards to identify compromised systems</li>
+<li><strong>Operational Efficiency</strong>: Faster prioritization of remediation efforts based on visual KEV indicators</li>
+<li><strong>UI Consistency</strong>: Uniform KEV badge appearance across all card types (vulnerability cards and device cards)</li>
+<li><strong>Accessibility</strong>: Full keyboard navigation support with ARIA labels and focus indicators</li>
+</ul>
+<h4>Files Modified</h4><ul>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code>: Device aggregation logic for KEV tracking</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code>: Device card HTML generation with KEV badges</li>
+<li><code>app/public/styles/pages/vulnerabilities.css</code>: Extended KEV indicator styles for device cards</li>
+</ul>
+<h4>Linear Issue</h4><ul>
+<li><strong>HEX-10</strong>: v1.0.27: Feature - Add KEV Badge to Device Cards (Completed)</li>
+</ul>
+<h2>[1.0.26] - 2025-09-23</h2><h3>Fixed - Low Severity Vulnerability Visibility</h3><h4>Critical Bug Resolution</h4><ul>
+<li><strong>Complete Visibility Restored</strong>: Fixed critical issue where 3,314 Low severity vulnerabilities were completely hidden from users<ul>
+<li><strong>Root Cause</strong>: VPR-based sorting combined with 10K frontend limit pushed Low severity items (VPR 1.4-5.1) beyond visible range</li>
+<li><strong>Impact</strong>: Users could not filter, view, or access any Low severity vulnerabilities despite their presence in database</li>
+<li><strong>Severity</strong>: Critical - affected core vulnerability management functionality</li>
+</ul>
+</li>
+</ul>
+<h4>Backend Sorting Optimization</h4><ul>
+<li><strong>Severity-Balanced Algorithm</strong>: Implemented intelligent sorting to ensure all severity levels remain visible<pre><code class="language-sql"><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> isKev <span class="hljs-keyword">DESC</span>,
+         <span class="hljs-keyword">CASE</span> severity
+           <span class="hljs-keyword">WHEN</span> <span class="hljs-string">&#x27;Critical&#x27;</span> <span class="hljs-keyword">THEN</span> <span class="hljs-number">1</span>
+           <span class="hljs-keyword">WHEN</span> <span class="hljs-string">&#x27;High&#x27;</span> <span class="hljs-keyword">THEN</span> <span class="hljs-number">2</span>
+           <span class="hljs-keyword">WHEN</span> <span class="hljs-string">&#x27;Medium&#x27;</span> <span class="hljs-keyword">THEN</span> <span class="hljs-number">3</span>
+           <span class="hljs-keyword">WHEN</span> <span class="hljs-string">&#x27;Low&#x27;</span> <span class="hljs-keyword">THEN</span> <span class="hljs-number">4</span>
+         <span class="hljs-keyword">END</span> <span class="hljs-keyword">ASC</span>,
+         vpr_score <span class="hljs-keyword">DESC</span>,
+         last_seen <span class="hljs-keyword">DESC</span></code></pre><ul>
+<li><strong>KEV Priority Maintained</strong>: Known Exploited Vulnerabilities still appear first</li>
+<li><strong>VPR Sorting Preserved</strong>: Within each severity level, VPR scores determine order</li>
+<li><strong>Distribution Guarantee</strong>: All severity levels now appear in first 10K-30K results</li>
+</ul>
+</li>
+</ul>
+<h4>Frontend Performance Optimization</h4><ul>
+<li><p><strong>Async Processing Implementation</strong>: Resolved UI freezing when loading large vulnerability datasets</p>
+<ul>
+<li><strong>Chunked Processing</strong>: 24,660 vulnerabilities processed in 1000-item chunks using <code>requestIdleCallback()</code></li>
+<li><strong>Non-Blocking UI</strong>: Browser remains responsive during data processing</li>
+<li><strong>Progress Feedback</strong>: Real-time loading indicators (&quot;Processing vulnerabilities... 5000/24660&quot;)</li>
+<li><strong>Fallback Support</strong>: <code>setTimeout()</code> fallback for browsers without <code>requestIdleCallback()</code></li>
+</ul>
+</li>
+<li><p><strong>Data Capacity Increase</strong>: Frontend limit increased from 10K to 30K to accommodate all vulnerabilities</p>
+<ul>
+<li><strong>Complete Dataset</strong>: All 24,660 current vulnerabilities now loaded for comprehensive filtering</li>
+<li><strong>Compressed Transfer</strong>: GZIP compression maintains efficient 614KB payload (vs 21MB uncompressed)</li>
+<li><strong>Completeness Monitoring</strong>: Added automatic warnings when approaching 90% of data limits</li>
+</ul>
+</li>
+</ul>
+<h4>Technical Performance Metrics</h4><ul>
+<li><strong>Network Efficiency</strong>: 614KB compressed transfer with 97% compression ratio</li>
+<li><strong>Processing Speed</strong>: 1000 items per chunk with idle callback scheduling</li>
+<li><strong>UI Responsiveness</strong>: Sub-2-second load times maintained with progress feedback</li>
+<li><strong>Memory Management</strong>: Incremental processing prevents browser memory spikes</li>
+<li><strong>Data Integrity</strong>: All 3,314 Low severity items now accessible through filtering</li>
+</ul>
+<h4>User Experience Improvements</h4><ul>
+<li><strong>Filtering Functionality</strong>: Low severity filter now returns all 3,314 items (previously 0)</li>
+<li><strong>Complete Visibility</strong>: Users can access full vulnerability dataset across all severity levels</li>
+<li><strong>Loading Feedback</strong>: Progressive loading messages prevent perceived application freezing</li>
+<li><strong>Responsive Interface</strong>: UI remains interactive during background data processing</li>
+</ul>
+<h3>Technical Implementation</h3><ul>
+<li><strong>Files Modified</strong>:<ul>
+<li><code>vulnerabilityService.js</code>: Backend sorting algorithm</li>
+<li><code>vulnerability-data.js</code>: Async processing with chunking and progress events</li>
+</ul>
+</li>
+<li><strong>Commits</strong>: <code>e0538ec</code> (backend sorting), <code>2faa0cb</code> (async processing)</li>
+<li><strong>Performance Strategy</strong>: Balanced approach maintaining filtering capability while optimizing browser performance</li>
+</ul>
+<h2>[1.0.25] - 2025-09-23</h2><h3>Added - Import Summary HTML Export</h3><h4>Professional Report Generation</h4><ul>
+<li><strong>Standalone HTML Reports</strong>: Added ability to download import summaries as complete HTML documents with embedded CSS styling<ul>
+<li><strong>Export Button</strong>: New &quot;Download Report&quot; button appears in progress modal when CVE import summaries are available</li>
+<li><strong>Self-Contained Files</strong>: Reports include all necessary CSS (Tabler.io framework, HexTrackr variables, component styles) embedded inline</li>
+<li><strong>Professional Formatting</strong>: Complete document structure with metadata headers, generation timestamps, and HexTrackr branding</li>
+<li><strong>Print-Friendly Styling</strong>: Optimized CSS for both screen viewing and professional printing</li>
+</ul>
+</li>
+</ul>
+<h4>Technical Implementation</h4><ul>
+<li><strong>CSS Extraction Engine</strong>: Automated system fetches and combines 7 key stylesheets into single embedded block<ul>
+<li>Tabler.io framework, CSS custom properties, modal styles, badges, cards, tables, and base styles</li>
+<li>Font Awesome icons via CDN import for universal compatibility</li>
+<li>Custom print media queries for professional output</li>
+</ul>
+</li>
+<li><strong>Dynamic File Naming</strong>: Descriptive filenames using pattern <code>HexTrackr_Import_Report_YYYY-MM-DD_[source-filename].html</code></li>
+<li><strong>Blob Download Pattern</strong>: Follows established file export approach with proper MIME types and browser compatibility</li>
+</ul>
+<h4>User Experience Enhancements</h4><ul>
+<li><strong>Visual Feedback System</strong>: Export button provides clear state indicators<ul>
+<li>Loading state with spinner and &quot;Generating...&quot; text</li>
+<li>Success confirmation with checkmark and &quot;Downloaded!&quot; message</li>
+<li>Error handling with warning icon and failure notification</li>
+</ul>
+</li>
+<li><strong>Conditional Visibility</strong>: Export option only appears when import summaries contain meaningful CVE discovery data</li>
+<li><strong>Non-Disruptive Integration</strong>: Feature seamlessly extends existing import workflow without affecting standard operations</li>
+</ul>
+<h3>Fixed - Import Modal State Persistence</h3><h4>Clean Loading States</h4><ul>
+<li><strong>Resolved Stale Data Display</strong>: Fixed issue where previous import summaries appeared during new import loading phases<ul>
+<li><strong>Root Cause</strong>: <code>resetProgressState()</code> function didn&#39;t clear <code>importSummary</code> data or associated DOM elements</li>
+<li><strong>Solution</strong>: Added explicit <code>importSummary: null</code> reset and summary container cleanup</li>
+</ul>
+</li>
+<li><strong>Complete State Reset</strong>: Enhanced modal initialization to properly clear all previous session data<ul>
+<li>Hide and clear <code>progressSummary</code> container content during reset</li>
+<li>Reset export button visibility to prevent stale UI states</li>
+<li>Ensure clean slate for each new import operation</li>
+</ul>
+</li>
+</ul>
+<h4>Technical Improvements</h4><ul>
+<li><strong>Data Lifecycle Management</strong>: Improved progress modal data handling to prevent state leakage between sessions</li>
+<li><strong>DOM Cleanup</strong>: Systematic clearing of dynamically created summary content and UI elements</li>
+<li><strong>ESLint Compliance</strong>: All code modifications passed linting validation with zero errors</li>
+</ul>
+<h2>[1.0.24] - 2025-09-23</h2><h3>Enhanced - Vulnerability Card Polish</h3><h4>Card Layout Simplification</h4><ul>
+<li><strong>Streamlined Card Body</strong>: Removed the redundant criticality subcards from vulnerability cards to focus on the key summary details and reduce visual noise.</li>
+<li><strong>Consistent Spacing</strong>: Tweaked card padding to accommodate the simplified layout without affecting existing content hierarchy.</li>
+</ul>
+<h4>KEV Indicator Improvements</h4><ul>
+<li><p><strong>Accessible Badge Placement</strong>: Replaced the inline flame icon with an accessible red KEV pill badge anchored to the top-right corner of each vulnerability card.</p>
+</li>
+<li><p><strong>Improved Visual Priority</strong>: Updated the indicator styling and keyboard handling so KEV status remains prominent while staying aligned with the HexTrackr design system.</p>
+</li>
+<li><p><strong>Vulnerability Cards UI Enhancement</strong>: Removed redundant VPR mini-cards from vulnerability cards to reduce visual clutter</p>
+</li>
+<li><p><strong>CSS Architecture</strong>: Migrated inline styles to external CSS files for better maintainability</p>
+</li>
+<li><p><strong>Enhanced Device Display</strong>: Improved device information presentation in vulnerability cards with theme-aware styling</p>
+</li>
+<li><p><strong>Responsive Design</strong>: Enhanced mobile and tablet layout for vulnerability cards</p>
+</li>
+</ul>
+<h3>Technical Details</h3><ul>
+<li>Added page-specific CSS file (<code>vulnerabilities.css</code>) for vulnerability page styling</li>
+<li>Updated <code>cards.css</code> with enhanced device display component</li>
+<li>Removed VPR mini-cards HTML generation from <code>VulnerabilityCardsManager</code></li>
+<li>Preserved VPR mini-cards functionality in device cards where they remain relevant</li>
+<li>Implemented CSS selector specificity to target only vulnerability cards</li>
+<li>Added theme support with light/dark mode transitions</li>
+</ul>
+<h3>Files Modified</h3><ul>
+<li><code>app/public/styles/pages/vulnerabilities.css</code> (created)</li>
+<li><code>app/public/styles/shared/cards.css</code> (enhanced)</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> (modified)</li>
+<li><code>app/public/pages/vulnerabilities.html</code> (updated CSS references)</li>
 </ul>
 <h2>[1.0.23] - 2025-09-22</h2><h3>Added - Interactive Statistics Card Filtering</h3><h4>Enhanced Ticket Management User Experience</h4><ul>
 <li><strong>Clickable Statistics Cards</strong>: Transformed passive statistics displays into interactive filter controls<ul>
