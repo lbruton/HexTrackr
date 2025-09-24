@@ -18,7 +18,7 @@
 
 - All files in /app/ directory SHALL maintain  JSDoc comment coverage
 - All JavaScript functions SHALL include complete JSDoc comments with:
-  - @description - Clear explanation of function purpose
+  - @description - Clear explanation of function purpose 
   - @param - All parameters with types and descriptions
   - @returns - Return value type and description
   - @throws - Exceptions that may be thrown
@@ -41,7 +41,7 @@
 
 ### Section V: Backups and Branch Discipline
 
-- All development work SHALL be sourced from the 'copilot' branch
+- All development work SHALL be sourced from the 'main' branch
 - Protected branches SHALL use Pull Requests for merging, never direct pushes
 
 ### Section VI: Docker Principles
@@ -82,9 +82,9 @@
 
 - All tasks SHALL be broken down with Sequential Thinking
 
-### Section VII: Zen
+### Section VII: Linear MCP
 
-- If Available, Zen tools may be used at the users request only.
+- Linear MCP SHALL be used in conjunction with /dev-docs/planning/ for all planning and project management. 
 
 ### Section VIII: Claude-Context
 

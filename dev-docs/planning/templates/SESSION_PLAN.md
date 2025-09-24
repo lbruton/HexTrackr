@@ -57,7 +57,7 @@
 ### Phase 1: Foundation Setup
 **Estimated Time**: 30 minutes
 
-- [ ] Create feature branch from `copilot`
+- [ ] Create feature branch from `main`
 - [ ] Set up test file at `test/[feature].test.js`
 - [ ] Create backup commit point
 - [ ] Verify Docker container running on port 8989
