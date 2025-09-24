@@ -145,7 +145,7 @@ cat /dev-docs/planning/active/*/SESSION_PLAN.md | head -100
 ## 📁 Project Structure Quick Reference
 
 ### Planning & Documentation
-```
+```text
 /dev-docs/planning/
 ├── templates/          # SESSION_PLAN.md, BUG_REPORT.md, FEATURE_REQUEST.md
 ├── active/            # Current work in progress
@@ -153,7 +153,7 @@ cat /dev-docs/planning/active/*/SESSION_PLAN.md | head -100
 ```
 
 ### Application Code
-```
+```text
 /app/
 ├── controllers/       # Route handlers
 ├── services/         # Business logic
