@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 HexTrackr is a vulnerability management system for tracking security vulnerabilities, tickets, and Known Exploited Vulnerabilities (KEV). The system uses a modular Node.js/Express backend with SQLite database and vanilla JavaScript frontend.
 
+## Project Constitution
+
+When working on this project the AI Agent SHALL follow the CONSTITUTION.md
+
 ## Essential Commands
 
 ### Development
