@@ -162,6 +162,19 @@ cat /dev-docs/planning/active/*/SESSION_PLAN.md | head -100
 └── routes/          # API endpoints
 ```
 
+## ⛔ WORKFLOW ENFORCEMENT
+
+**MANDATORY: Before any code changes, verify:**
+
+- [ ] SESSION_PLAN.md exists and is complete
+- [ ] Agent is in Plan Mode during research phase
+- [ ] ExitPlanMode called and user approved plan
+- [ ] All research sections documented with findings
+
+**STOP if any of these are missing!**
+
+See `/dev-docs/planning/ENFORCEMENT_CHECKLIST.md` for complete validation checklist.
+
 ## ⚠️ Critical Rules
 
 1. **NEVER** start coding without SESSION_PLAN.md
@@ -187,8 +200,8 @@ cat /dev-docs/planning/active/*/SESSION_PLAN.md | head -100
 ```bash
 # 1. Create Linear issue (use Linear MCP)
 # 2. Set up planning
-mkdir -p /dev-docs/planning/active/v1.0.XX-feature/
-cp /dev-docs/planning/templates/SESSION_PLAN.md /dev-docs/planning/active/v1.0.XX-feature/
+mkdir -p /dev-docs/planning/active/v1.0.XX-feature-name/{research,implementation}
+cp /dev-docs/planning/templates/SESSION_PLAN.md /dev-docs/planning/active/v1.0.XX-feature-name/
 
 # 3. Research and plan (fill out SESSION_PLAN.md)
 # 4. Create feature branch
