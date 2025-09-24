@@ -1,0 +1,426 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Middleware & Configuration Reference</h1><blockquote>
+<p>Complete documentation for HexTrackr&#39;s middleware pipeline and configuration modules</p>
+</blockquote>
+<h2>Overview</h2><p>HexTrackr&#39;s middleware layer provides security, logging, and request processing capabilities. Configuration modules handle environment settings, database connections, and WebSocket setup.</p>
+<hr>
+<h2 id="middleware">Middleware Components</h2><h3>Security Middleware</h3><p><strong>Location:</strong> <code>app/middleware/security.js</code></p>
+<p>Comprehensive security middleware implementing defense-in-depth strategies.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li><strong>Helmet.js Integration</strong>: Sets security headers (CSP, HSTS, X-Frame-Options)</li>
+<li><strong>CORS Management</strong>: Configurable cross-origin resource sharing</li>
+<li><strong>Rate Limiting</strong>: Prevents abuse and DDoS attacks</li>
+<li><strong>Input Sanitization</strong>: XSS and SQL injection protection</li>
+<li><strong>Path Validation</strong>: Prevents directory traversal attacks</li>
+</ul>
+<p><strong>Configuration:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> securityMiddleware = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./middleware/security&#x27;</span>);
+
+<span class="hljs-comment">// Apply to Express app</span>
+app.<span class="hljs-title function_">use</span>(securityMiddleware.<span class="hljs-title function_">helmet</span>());
+app.<span class="hljs-title function_">use</span>(securityMiddleware.<span class="hljs-title function_">cors</span>({
+    <span class="hljs-attr">origin</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">ALLOWED_ORIGINS</span>?.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>),
+    <span class="hljs-attr">credentials</span>: <span class="hljs-literal">true</span>
+}));
+app.<span class="hljs-title function_">use</span>(securityMiddleware.<span class="hljs-title function_">rateLimiter</span>({
+    <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>,  <span class="hljs-comment">// 15 minutes</span>
+    <span class="hljs-attr">max</span>: <span class="hljs-number">100</span>                    <span class="hljs-comment">// limit each IP to 100 requests</span>
+}));</code></pre><p><strong>Security Headers Applied:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Header</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Content-Security-Policy</code></td>
+<td>Prevents XSS attacks</td>
+</tr>
+<tr>
+<td><code>X-Frame-Options</code></td>
+<td>Prevents clickjacking</td>
+</tr>
+<tr>
+<td><code>X-Content-Type-Options</code></td>
+<td>Prevents MIME sniffing</td>
+</tr>
+<tr>
+<td><code>Strict-Transport-Security</code></td>
+<td>Forces HTTPS</td>
+</tr>
+<tr>
+<td><code>X-XSS-Protection</code></td>
+<td>Legacy XSS protection</td>
+</tr>
+</tbody></table>
+<h3>Logging Middleware</h3><p><strong>Location:</strong> <code>app/middleware/logging.js</code></p>
+<p>Request/response logging with performance monitoring.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li><strong>Morgan Integration</strong>: HTTP request logging</li>
+<li><strong>Custom Formatters</strong>: Structured log output</li>
+<li><strong>Performance Metrics</strong>: Response time tracking</li>
+<li><strong>Error Logging</strong>: Detailed error capture</li>
+<li><strong>Log Rotation</strong>: Automatic file management</li>
+</ul>
+<p><strong>Log Levels:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Development</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">morgan</span>(<span class="hljs-string">&#x27;dev&#x27;</span>));
+
+<span class="hljs-comment">// Production with custom format</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">morgan</span>(<span class="hljs-string">&#x27;:method :url :status :response-time ms - :res[content-length]&#x27;</span>, {
+    <span class="hljs-attr">stream</span>: logStream,
+    <span class="hljs-attr">skip</span>: <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> res.<span class="hljs-property">statusCode</span> &lt; <span class="hljs-number">400</span>  <span class="hljs-comment">// Only log errors in production</span>
+}));</code></pre><p><strong>Log Output Format:</strong></p>
+<pre><code class="language-">[2024-01-15 10:30:45] INFO: GET /api/vulnerabilities 200 45ms - 2048
+[2024-01-15 10:30:46] ERROR: POST /api/import 500 1523ms - Error: File too large</code></pre><hr>
+<h2 id="configuration">Configuration Modules</h2><h3>Database Configuration</h3><p><strong>Location:</strong> <code>app/config/database.js</code></p>
+<p>SQLite database initialization and connection management.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li><strong>Connection Pooling</strong>: Efficient connection reuse</li>
+<li><strong>Schema Migration</strong>: Automatic database updates</li>
+<li><strong>Transaction Support</strong>: ACID compliance</li>
+<li><strong>Backup Integration</strong>: Scheduled backup support</li>
+</ul>
+<p><strong>Initialization:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> dbConfig = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./config/database&#x27;</span>);
+
+<span class="hljs-comment">// Initialize database</span>
+<span class="hljs-keyword">const</span> db = <span class="hljs-keyword">await</span> dbConfig.<span class="hljs-title function_">initialize</span>({
+    <span class="hljs-attr">path</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_PATH</span> || <span class="hljs-string">&#x27;data/hextrackr.db&#x27;</span>,
+    <span class="hljs-attr">verbose</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> === <span class="hljs-string">&#x27;development&#x27;</span>
+});</code></pre><p><strong>Schema Management:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Automatic schema creation/update</span>
+<span class="hljs-keyword">await</span> dbConfig.<span class="hljs-title function_">runMigrations</span>(db);
+
+<span class="hljs-comment">// Manual schema operations</span>
+<span class="hljs-keyword">await</span> dbConfig.<span class="hljs-title function_">createTable</span>(db, <span class="hljs-string">&#x27;table_name&#x27;</span>, schema);
+<span class="hljs-keyword">await</span> dbConfig.<span class="hljs-title function_">addIndex</span>(db, <span class="hljs-string">&#x27;table_name&#x27;</span>, <span class="hljs-string">&#x27;column_name&#x27;</span>);</code></pre><h3>Middleware Configuration</h3><p><strong>Location:</strong> <code>app/config/middleware.js</code></p>
+<p>Central middleware configuration and ordering.</p>
+<p><strong>Middleware Stack (in order):</strong></p>
+<ol>
+<li><strong>Compression</strong>: gzip/deflate for responses</li>
+<li><strong>Body Parsing</strong>: JSON and URL-encoded</li>
+<li><strong>Cookie Parser</strong>: Session management</li>
+<li><strong>Security Headers</strong>: Helmet.js</li>
+<li><strong>CORS</strong>: Cross-origin configuration</li>
+<li><strong>Rate Limiting</strong>: Request throttling</li>
+<li><strong>Logging</strong>: Morgan integration</li>
+<li><strong>Static Files</strong>: Public directory serving</li>
+<li><strong>Session</strong>: Express-session</li>
+<li><strong>Custom Middleware</strong>: Application-specific</li>
+</ol>
+<p><strong>Configuration Example:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> middlewareConfig = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./config/middleware&#x27;</span>);
+
+<span class="hljs-comment">// Apply all middleware</span>
+middlewareConfig.<span class="hljs-title function_">setupMiddleware</span>(app, {
+    <span class="hljs-attr">compression</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">bodyLimit</span>: <span class="hljs-string">&#x27;50mb&#x27;</span>,
+    <span class="hljs-attr">sessionSecret</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">SESSION_SECRET</span>,
+    <span class="hljs-attr">corsOrigins</span>: [<span class="hljs-string">&#x27;http://localhost:8080&#x27;</span>],
+    <span class="hljs-attr">rateLimit</span>: {
+        <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>,
+        <span class="hljs-attr">max</span>: <span class="hljs-number">100</span>
+    }
+});</code></pre><h3>WebSocket Configuration</h3><p><strong>Location:</strong> <code>app/config/websocket.js</code></p>
+<p>Socket.io configuration for real-time features.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li><strong>Connection Management</strong>: Auto-reconnection</li>
+<li><strong>Room Support</strong>: Channel-based messaging</li>
+<li><strong>Authentication</strong>: Session-based auth</li>
+<li><strong>Event Namespacing</strong>: Organized event structure</li>
+</ul>
+<p><strong>Setup:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> websocketConfig = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./config/websocket&#x27;</span>);
+
+<span class="hljs-keyword">const</span> io = websocketConfig.<span class="hljs-title function_">initialize</span>(server, {
+    <span class="hljs-attr">cors</span>: {
+        <span class="hljs-attr">origin</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">ALLOWED_ORIGINS</span>?.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>),
+        <span class="hljs-attr">credentials</span>: <span class="hljs-literal">true</span>
+    }
+});
+
+<span class="hljs-comment">// Event handlers</span>
+websocketConfig.<span class="hljs-title function_">setupEventHandlers</span>(io);</code></pre><p><strong>Event Structure:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Namespaced events</span>
+io.<span class="hljs-title function_">of</span>(<span class="hljs-string">&#x27;/vulnerabilities&#x27;</span>).<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;connection&#x27;</span>, <span class="hljs-function"><span class="hljs-params">socket</span> =&gt;</span> {
+    socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;import-start&#x27;</span>, <span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> {...});
+    socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;filter-change&#x27;</span>, <span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> {...});
+});
+
+io.<span class="hljs-title function_">of</span>(<span class="hljs-string">&#x27;/tickets&#x27;</span>).<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;connection&#x27;</span>, <span class="hljs-function"><span class="hljs-params">socket</span> =&gt;</span> {
+    socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;ticket-update&#x27;</span>, <span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> {...});
+    socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;device-change&#x27;</span>, <span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> {...});
+});</code></pre><h3>Server Configuration</h3><p><strong>Location:</strong> <code>app/config/server.js</code></p>
+<p>Express server setup and initialization.</p>
+<p><strong>Configuration Options:</strong></p>
+<pre><code class="language-javascript">{
+    <span class="hljs-attr">port</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">PORT</span> || <span class="hljs-number">8080</span>,
+    <span class="hljs-attr">host</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">HOST</span> || <span class="hljs-string">&#x27;0.0.0.0&#x27;</span>,
+    <span class="hljs-attr">env</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> || <span class="hljs-string">&#x27;production&#x27;</span>,
+    <span class="hljs-attr">trustProxy</span>: <span class="hljs-literal">true</span>,
+
+    <span class="hljs-comment">// Performance</span>
+    <span class="hljs-attr">compression</span>: {
+        <span class="hljs-attr">level</span>: <span class="hljs-number">6</span>,
+        <span class="hljs-attr">threshold</span>: <span class="hljs-number">1024</span>
+    },
+
+    <span class="hljs-comment">// Security</span>
+    <span class="hljs-attr">helmet</span>: {
+        <span class="hljs-attr">contentSecurityPolicy</span>: {
+            <span class="hljs-attr">directives</span>: {
+                <span class="hljs-attr">defaultSrc</span>: [<span class="hljs-string">&quot;&#x27;self&#x27;&quot;</span>],
+                <span class="hljs-attr">scriptSrc</span>: [<span class="hljs-string">&quot;&#x27;self&#x27;&quot;</span>, <span class="hljs-string">&quot;&#x27;unsafe-inline&#x27;&quot;</span>],
+                <span class="hljs-attr">styleSrc</span>: [<span class="hljs-string">&quot;&#x27;self&#x27;&quot;</span>, <span class="hljs-string">&quot;&#x27;unsafe-inline&#x27;&quot;</span>],
+                <span class="hljs-attr">imgSrc</span>: [<span class="hljs-string">&quot;&#x27;self&#x27;&quot;</span>, <span class="hljs-string">&quot;data:&quot;</span>, <span class="hljs-string">&quot;https:&quot;</span>]
+            }
+        }
+    },
+
+    <span class="hljs-comment">// File handling</span>
+    <span class="hljs-attr">upload</span>: {
+        <span class="hljs-attr">maxFileSize</span>: <span class="hljs-number">100</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>,  <span class="hljs-comment">// 100MB</span>
+        <span class="hljs-attr">allowedTypes</span>: [<span class="hljs-string">&#x27;text/csv&#x27;</span>, <span class="hljs-string">&#x27;application/json&#x27;</span>],
+        <span class="hljs-attr">tempDir</span>: <span class="hljs-string">&#x27;uploads/temp&#x27;</span>
+    }
+}</code></pre><hr>
+<h2 id="environment">Environment Variables</h2><h3>Required Variables</h3><table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>PORT</code></td>
+<td>Server port</td>
+<td><code>8080</code></td>
+</tr>
+<tr>
+<td><code>HOST</code></td>
+<td>Bind address</td>
+<td><code>0.0.0.0</code></td>
+</tr>
+<tr>
+<td><code>DATABASE_PATH</code></td>
+<td>SQLite file path</td>
+<td><code>data/hextrackr.db</code></td>
+</tr>
+<tr>
+<td><code>SESSION_SECRET</code></td>
+<td>Session encryption key</td>
+<td>(must be set)</td>
+</tr>
+</tbody></table>
+<h3>Optional Variables</h3><table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>NODE_ENV</code></td>
+<td>Environment mode</td>
+<td><code>production</code></td>
+</tr>
+<tr>
+<td><code>ALLOWED_ORIGINS</code></td>
+<td>CORS whitelist (comma-separated)</td>
+<td><code>http://localhost:8080</code></td>
+</tr>
+<tr>
+<td><code>LOG_LEVEL</code></td>
+<td>Logging verbosity</td>
+<td><code>info</code></td>
+</tr>
+<tr>
+<td><code>MAX_FILE_SIZE</code></td>
+<td>Upload size limit</td>
+<td><code>100MB</code></td>
+</tr>
+<tr>
+<td><code>RATE_LIMIT_WINDOW</code></td>
+<td>Rate limit window (ms)</td>
+<td><code>900000</code></td>
+</tr>
+<tr>
+<td><code>RATE_LIMIT_MAX</code></td>
+<td>Max requests per window</td>
+<td><code>100</code></td>
+</tr>
+<tr>
+<td><code>ENABLE_COMPRESSION</code></td>
+<td>Enable gzip</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>ENABLE_WEBSOCKET</code></td>
+<td>Enable Socket.io</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>BACKUP_DIR</code></td>
+<td>Backup storage path</td>
+<td><code>backups</code></td>
+</tr>
+<tr>
+<td><code>UPLOAD_DIR</code></td>
+<td>Upload storage path</td>
+<td><code>uploads</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="pipeline">Request Pipeline</h2><h3>Request Flow</h3><pre><code class="language-">Client Request
+    ↓
+[Compression Middleware]
+    ↓
+[Security Headers (Helmet)]
+    ↓
+[CORS Check]
+    ↓
+[Rate Limiting]
+    ↓
+[Request Logging]
+    ↓
+[Body Parsing]
+    ↓
+[Session Management]
+    ↓
+[Authentication Check]
+    ↓
+[Route Handler]
+    ↓
+[Business Logic]
+    ↓
+[Response Formatting]
+    ↓
+[Error Handling]
+    ↓
+Client Response</code></pre><h3>Error Handling Pipeline</h3><p>All errors flow through a centralized error handler:</p>
+<pre><code class="language-javascript">app.<span class="hljs-title function_">use</span>(<span class="hljs-function">(<span class="hljs-params">err, req, res, next</span>) =&gt;</span> {
+    <span class="hljs-comment">// Log error</span>
+    logger.<span class="hljs-title function_">error</span>({
+        <span class="hljs-attr">message</span>: err.<span class="hljs-property">message</span>,
+        <span class="hljs-attr">stack</span>: err.<span class="hljs-property">stack</span>,
+        <span class="hljs-attr">url</span>: req.<span class="hljs-property">url</span>,
+        <span class="hljs-attr">method</span>: req.<span class="hljs-property">method</span>,
+        <span class="hljs-attr">ip</span>: req.<span class="hljs-property">ip</span>
+    });
+
+    <span class="hljs-comment">// Determine status code</span>
+    <span class="hljs-keyword">const</span> status = err.<span class="hljs-property">status</span> || <span class="hljs-number">500</span>;
+
+    <span class="hljs-comment">// Send response</span>
+    res.<span class="hljs-title function_">status</span>(status).<span class="hljs-title function_">json</span>({
+        <span class="hljs-attr">success</span>: <span class="hljs-literal">false</span>,
+        <span class="hljs-attr">error</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> === <span class="hljs-string">&#x27;production&#x27;</span>
+            ? <span class="hljs-string">&#x27;An error occurred&#x27;</span>
+            : err.<span class="hljs-property">message</span>,
+        <span class="hljs-attr">requestId</span>: req.<span class="hljs-property">id</span>
+    });
+});</code></pre><hr>
+<h2 id="multer">Multer Configuration</h2><h3>File Upload Settings</h3><p><strong>Location:</strong> Configured in middleware setup</p>
+<p><strong>Configuration:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> multer = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;multer&#x27;</span>);
+
+<span class="hljs-keyword">const</span> storage = multer.<span class="hljs-title function_">diskStorage</span>({
+    <span class="hljs-attr">destination</span>: <span class="hljs-function">(<span class="hljs-params">req, file, cb</span>) =&gt;</span> {
+        <span class="hljs-title function_">cb</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">&#x27;uploads/temp&#x27;</span>);
+    },
+    <span class="hljs-attr">filename</span>: <span class="hljs-function">(<span class="hljs-params">req, file, cb</span>) =&gt;</span> {
+        <span class="hljs-keyword">const</span> uniqueName = <span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-built_in">Date</span>.now()}</span>-<span class="hljs-subst">${<span class="hljs-built_in">Math</span>.round(<span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">1E9</span>)}</span>`</span>;
+        <span class="hljs-title function_">cb</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">`<span class="hljs-subst">${uniqueName}</span>-<span class="hljs-subst">${file.originalname}</span>`</span>);
+    }
+});
+
+<span class="hljs-keyword">const</span> upload = <span class="hljs-title function_">multer</span>({
+    <span class="hljs-attr">storage</span>: storage,
+    <span class="hljs-attr">limits</span>: {
+        <span class="hljs-attr">fileSize</span>: <span class="hljs-number">100</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>  <span class="hljs-comment">// 100MB</span>
+    },
+    <span class="hljs-attr">fileFilter</span>: <span class="hljs-function">(<span class="hljs-params">req, file, cb</span>) =&gt;</span> {
+        <span class="hljs-keyword">const</span> allowedTypes = [<span class="hljs-string">&#x27;text/csv&#x27;</span>, <span class="hljs-string">&#x27;application/json&#x27;</span>];
+        <span class="hljs-keyword">if</span> (allowedTypes.<span class="hljs-title function_">includes</span>(file.<span class="hljs-property">mimetype</span>)) {
+            <span class="hljs-title function_">cb</span>(<span class="hljs-literal">null</span>, <span class="hljs-literal">true</span>);
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-title function_">cb</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;Invalid file type&#x27;</span>));
+        }
+    }
+});</code></pre><hr>
+<h2 id="sessions">Session Management</h2><h3>Express-Session Configuration</h3><p><strong>Features:</strong></p>
+<ul>
+<li><strong>Memory Store</strong>: Development mode</li>
+<li><strong>Redis Store</strong>: Production mode (optional)</li>
+<li><strong>Cookie Security</strong>: httpOnly, secure, sameSite</li>
+<li><strong>Session Rotation</strong>: Prevents fixation attacks</li>
+</ul>
+<p><strong>Configuration:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> session = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express-session&#x27;</span>);
+
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">session</span>({
+    <span class="hljs-attr">secret</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">SESSION_SECRET</span>,
+    <span class="hljs-attr">resave</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">saveUninitialized</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">cookie</span>: {
+        <span class="hljs-attr">secure</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> === <span class="hljs-string">&#x27;production&#x27;</span>,
+        <span class="hljs-attr">httpOnly</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-attr">maxAge</span>: <span class="hljs-number">24</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>,  <span class="hljs-comment">// 24 hours</span>
+        <span class="hljs-attr">sameSite</span>: <span class="hljs-string">&#x27;strict&#x27;</span>
+    },
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;hextrackr.sid&#x27;</span>
+}));</code></pre><hr>
+<h2 id="performance">Performance Optimizations</h2><h3>Compression Settings</h3><pre><code class="language-javascript"><span class="hljs-keyword">const</span> compression = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;compression&#x27;</span>);
+
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">compression</span>({
+    <span class="hljs-attr">level</span>: <span class="hljs-number">6</span>,  <span class="hljs-comment">// Compression level (0-9)</span>
+    <span class="hljs-attr">threshold</span>: <span class="hljs-number">1024</span>,  <span class="hljs-comment">// Only compress responses &gt; 1KB</span>
+    <span class="hljs-attr">filter</span>: <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+        <span class="hljs-comment">// Don&#x27;t compress EventSource responses</span>
+        <span class="hljs-keyword">if</span> (res.<span class="hljs-title function_">getHeader</span>(<span class="hljs-string">&#x27;Content-Type&#x27;</span>) === <span class="hljs-string">&#x27;text/event-stream&#x27;</span>) {
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+        }
+        <span class="hljs-keyword">return</span> compression.<span class="hljs-title function_">filter</span>(req, res);
+    }
+}));</code></pre><h3>Caching Strategy</h3><p><strong>Static Assets:</strong></p>
+<pre><code class="language-javascript">app.<span class="hljs-title function_">use</span>(express.<span class="hljs-title function_">static</span>(<span class="hljs-string">&#x27;public&#x27;</span>, {
+    <span class="hljs-attr">maxAge</span>: <span class="hljs-string">&#x27;1d&#x27;</span>,  <span class="hljs-comment">// Cache static files for 1 day</span>
+    <span class="hljs-attr">etag</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">lastModified</span>: <span class="hljs-literal">true</span>
+}));</code></pre><p><strong>API Responses:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Cache vulnerability stats for 5 minutes</span>
+res.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;Cache-Control&#x27;</span>, <span class="hljs-string">&#x27;private, max-age=300&#x27;</span>);</code></pre><hr>
+<h2 id="security-practices">Security Best Practices</h2><h3>Input Validation</h3><p>All user input is validated using multiple layers:</p>
+<ol>
+<li><strong>Type Checking</strong>: Ensure correct data types</li>
+<li><strong>Range Validation</strong>: Check numeric ranges</li>
+<li><strong>Pattern Matching</strong>: Regex for formats (email, URL, etc.)</li>
+<li><strong>Sanitization</strong>: Remove/escape dangerous characters</li>
+<li><strong>Length Limits</strong>: Prevent buffer overflows</li>
+</ol>
+<h3>Path Traversal Prevention</h3><pre><code class="language-javascript"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;path&#x27;</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">PathValidator</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;../utils/PathValidator&#x27;</span>);
+
+<span class="hljs-comment">// Always validate file paths</span>
+<span class="hljs-keyword">const</span> safePath = <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">validatePath</span>(userInput, {
+    <span class="hljs-attr">basePath</span>: <span class="hljs-string">&#x27;/allowed/directory&#x27;</span>,
+    <span class="hljs-attr">allowSymlinks</span>: <span class="hljs-literal">false</span>
+});</code></pre><h3>SQL Injection Prevention</h3><p>All database queries use parameterized statements:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Safe query</span>
+db.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;SELECT * FROM users WHERE id = ?&#x27;</span>, [userId]);
+
+<span class="hljs-comment">// Never use string concatenation</span>
+<span class="hljs-comment">// db.get(&#x27;SELECT * FROM users WHERE id = &#x27; + userId);  // DANGEROUS!</span></code></pre>
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

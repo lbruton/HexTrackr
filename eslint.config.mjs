@@ -1,5 +1,13 @@
 import stylistic from '@stylistic/eslint-plugin';
 
+// ESLint Configuration for HexTrackr
+//
+// DEPENDENCY NOTES:
+// - Vulnerability management modules (vulnerability-*.js) use ES6 import/export syntax
+// - These files are configured as sourceType: "module" to support import/export
+// - Files are loaded as ES6 modules but reference globals via window object for compatibility
+// - ModernVulnManager export class is preserved for proper module functionality
+
 export default [
   {
     // Comprehensive ignore patterns  
@@ -13,6 +21,10 @@ export default [
       // Version control and OS files
       ".git/**",
       ".DS_Store",
+      
+      // Legacy ESLint configuration (avoid conflicts)
+      ".eslintrc.js",
+      ".eslintrc.json",
       
       // Python virtual environments (all possible patterns)
       ".venv/**/*",
@@ -192,7 +204,10 @@ export default [
   {
     // Configuration for browser scripts - specific patterns
     files: [
-      "scripts/pages/*.js", 
+      "app/public/scripts/pages/*.js",
+      "app/public/scripts/shared/*.js",
+      "app/public/scripts/utils/*.js",
+      "scripts/pages/*.js",
       "scripts/shared/*.js",
       "scripts/utils/*.js"
     ],
@@ -230,10 +245,20 @@ export default [
         Intl: "readonly",
         Blob: "readonly",
         URL: "readonly",
+        getComputedStyle: "readonly",
+        performance: "readonly",
         // Third-party library globals
         bootstrap: "readonly",
         agGrid: "readonly",
-        DOMPurify: "readonly"
+        DOMPurify: "readonly",
+        ApexCharts: "readonly",
+        Papa: "readonly",
+        Sortable: "readonly",
+        // Project-specific globals
+        createVulnerabilityGridOptions: "readonly",
+        PaginationController: "readonly", 
+        VulnerabilityDataManager: "readonly",
+        ModernVulnManager: "readonly"
       }
     },
     plugins: {
@@ -308,6 +333,81 @@ export default [
       "eqeqeq": ["error", "always"],
       "no-var": "error",
       "prefer-const": "error"
+    }
+  },
+  {
+    // Configuration for ES6 module files - vulnerability management system (MUST BE LAST for proper precedence)
+    files: [
+      "**/vulnerabilities.js",
+      "**/vulnerability-*.js",
+      "**/normalization.js",
+      "**/theme-contrast-tester.js",
+      "**/wcag-contrast-validator.js",
+      "**/accessibility-announcer.js"
+    ],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module", // ES6 modules with import/export
+      globals: {
+        // Browser environment globals
+        window: "readonly",
+        document: "readonly",
+        navigator: "readonly",
+        localStorage: "readonly",
+        sessionStorage: "readonly",
+        XMLHttpRequest: "readonly",
+        fetch: "readonly",
+        console: "readonly",
+        alert: "readonly",
+        confirm: "readonly",
+        prompt: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
+        // Browser API globals
+        MutationObserver: "readonly",
+        ResizeObserver: "readonly",
+        Event: "readonly",
+        EventTarget: "readonly",
+        FormData: "readonly",
+        DOMParser: "readonly",
+        atob: "readonly",
+        btoa: "readonly",
+        Intl: "readonly",
+        Blob: "readonly",
+        URL: "readonly",
+        getComputedStyle: "readonly",
+        performance: "readonly",
+        // Third-party library globals
+        bootstrap: "readonly",
+        agGrid: "readonly",
+        DOMPurify: "readonly",
+        ApexCharts: "readonly",
+        Papa: "readonly",
+        Sortable: "readonly",
+        // Project-specific globals
+        createVulnerabilityGridOptions: "readonly",
+        PaginationController: "readonly",
+        // Dual module system support
+        module: "readonly",
+        exports: "readonly"
+      }
+    },
+    plugins: {
+      '@stylistic': stylistic
+    },
+    rules: {
+      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/semi": ["error", "always"],
+      "curly": ["error", "all"],
+      "no-lone-blocks": "error",
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-console": "off",
+      "eqeqeq": ["error", "always"],
+      "no-var": "error",
+      "prefer-const": "error",
+      "no-undef": "error"
     }
   }
 ];
