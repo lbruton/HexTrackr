@@ -72,6 +72,19 @@ export default [
       "docs-html/**/*.html",
       "docs-html/**/*.css",
       "docs-html/**/*.js",
+
+      // Documentation library files (third-party, don't lint)
+      "app/dev-docs-html/prettify/**/*.js",
+      "**/prettify.js",
+
+      // Project documentation files (focus on app code only)
+      "AGENTS.md",
+      "CLAUDE.md",
+      "CONSTITUTION.md",
+      "*.md",
+      "dev-docs/**",
+      "memento/**",
+      "opencode-migration-guide.md",
       
       // Database and data files
       "data/**/*.db",
@@ -233,7 +246,7 @@ export default [
         clearInterval: "readonly",
         // Browser API globals
         MutationObserver: "readonly",
-        ResizeObserver: "readonly", 
+        ResizeObserver: "readonly",
         OffscreenCanvas: "readonly",
         Path2D: "readonly",
         Event: "readonly",
@@ -247,6 +260,8 @@ export default [
         URL: "readonly",
         getComputedStyle: "readonly",
         performance: "readonly",
+        requestIdleCallback: "readonly",
+        cancelIdleCallback: "readonly",
         // Third-party library globals
         bootstrap: "readonly",
         agGrid: "readonly",
@@ -256,8 +271,9 @@ export default [
         Sortable: "readonly",
         // Project-specific globals
         createVulnerabilityGridOptions: "readonly",
-        PaginationController: "readonly", 
+        PaginationController: "readonly",
         VulnerabilityDataManager: "readonly",
+        VulnerabilityCardsManager: "readonly",
         ModernVulnManager: "readonly"
       }
     },
@@ -307,6 +323,51 @@ export default [
       "eqeqeq": ["error", "always"],
       "no-var": "error",
       "prefer-const": "error"
+    }
+  },
+  {
+    // Configuration for controller files with relaxed unused-vars rules
+    files: [
+      "app/controllers/*.js",
+      "**/controllers/*.js"
+    ],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "commonjs",
+      globals: {
+        // Node.js environment globals
+        require: "readonly",
+        module: "readonly",
+        exports: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        process: "readonly",
+        Buffer: "readonly",
+        global: "readonly",
+        console: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
+        setImmediate: "readonly",
+        clearImmediate: "readonly"
+      }
+    },
+    plugins: {
+      '@stylistic': stylistic
+    },
+    rules: {
+      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/semi": ["error", "always"],
+      "curly": ["error", "all"],
+      "no-lone-blocks": "error",
+      // Relaxed unused-vars for controllers (imports used dynamically)
+      "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-console": "off",
+      "eqeqeq": ["error", "always"],
+      "no-var": "error",
+      "prefer-const": "error",
+      "no-undef": "error"
     }
   },
   {
@@ -403,6 +464,80 @@ export default [
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
       "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-console": "off",
+      "eqeqeq": ["error", "always"],
+      "no-var": "error",
+      "prefer-const": "error",
+      "no-undef": "error"
+    }
+  },
+  {
+    // Configuration for class definition files that export to global scope (MUST BE ABSOLUTE LAST)
+    files: [
+      "app/public/scripts/shared/vulnerability-cards.js",
+      "app/public/scripts/shared/vulnerability-data.js"
+    ],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "script",
+      globals: {
+        // Browser environment globals
+        window: "readonly",
+        document: "readonly",
+        navigator: "readonly",
+        localStorage: "readonly",
+        sessionStorage: "readonly",
+        XMLHttpRequest: "readonly",
+        fetch: "readonly",
+        console: "readonly",
+        alert: "readonly",
+        confirm: "readonly",
+        prompt: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
+        // Browser API globals
+        MutationObserver: "readonly",
+        ResizeObserver: "readonly",
+        Event: "readonly",
+        EventTarget: "readonly",
+        FormData: "readonly",
+        DOMParser: "readonly",
+        atob: "readonly",
+        btoa: "readonly",
+        Intl: "readonly",
+        Blob: "readonly",
+        URL: "readonly",
+        getComputedStyle: "readonly",
+        performance: "readonly",
+        requestIdleCallback: "readonly",
+        cancelIdleCallback: "readonly",
+        // Third-party library globals
+        bootstrap: "readonly",
+        agGrid: "readonly",
+        DOMPurify: "readonly",
+        ApexCharts: "readonly",
+        Papa: "readonly",
+        Sortable: "readonly",
+        // Project-specific globals
+        createVulnerabilityGridOptions: "readonly",
+        PaginationController: "readonly",
+        VulnerabilityDataManager: "readonly",
+        VulnerabilityCardsManager: "readonly",
+        ModernVulnManager: "readonly"
+      }
+    },
+    plugins: {
+      '@stylistic': stylistic
+    },
+    rules: {
+      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/semi": ["error", "always"],
+      "curly": ["error", "all"],
+      "no-lone-blocks": "error",
+      // Allow class definitions that are exported to global scope
+      "no-unused-vars": "off",
       "no-console": "off",
       "eqeqeq": ["error", "always"],
       "no-var": "error",
