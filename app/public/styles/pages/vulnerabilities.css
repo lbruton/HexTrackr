@@ -590,7 +590,8 @@
 }
 
 /* KEV badge positioning and styling */
-.vulnerability-card .kev-indicator {
+.vulnerability-card .kev-indicator,
+.device-card .kev-indicator {
     position: absolute;
     top: 0.75rem;
     right: 0.75rem;
@@ -598,7 +599,8 @@
     cursor: pointer;
 }
 
-.vulnerability-card .kev-indicator:focus-visible {
+.vulnerability-card .kev-indicator:focus-visible,
+.device-card .kev-indicator:focus-visible {
     outline: 2px solid var(--hextrackr-primary);
     outline-offset: 2px;
 }
