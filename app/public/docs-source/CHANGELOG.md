@@ -5,6 +5,37 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.31] - 2025-09-24
+
+### Security Fixes
+
+#### Critical: Cryptographically Weak Random Number Generators
+
+**HEX-14**: Fixed multiple Math.random() vulnerabilities
+- `app/public/scripts/shared/vulnerability-cards.js` - Added `generateSecureVulnId()` method using `crypto.getRandomValues()`
+- `app/services/ticketService.js` - Updated to use `crypto.randomBytes()` for ticket ID generation
+- `app/services/fileService.js` - Updated to use `crypto.randomBytes()` for secure file naming
+- **Impact**: Eliminated predictability vulnerability in ID generation, increased entropy from ~2^32 to 2^48 bits
+
+**HEX-15**: Fixed session ID vulnerability in CSV imports
+- `app/public/scripts/shared/vulnerability-core.js` - Replaced Math.random() with `window.crypto.getRandomValues()` for session IDs
+- **Impact**: Import session IDs are now cryptographically secure, preventing session hijacking during CSV operations
+
+**HEX-16**: Fixed toast notification ID vulnerability
+- `app/public/scripts/shared/toast-manager.js` - Secure ID generation for toast notifications using `crypto.getRandomValues()`
+- **Impact**: Toast notification IDs are now unpredictable, preventing potential ID collision attacks
+
+**HEX-17**: Fixed modal operation tracking vulnerability
+- `app/public/scripts/shared/modal-monitoring.js` - Secure operation ID generation for modal lifecycle tracking
+- **Impact**: Modal operation IDs now use cryptographic randomness, eliminating tracking manipulation risks
+
+#### Technical Details
+- All fixes maintain backward compatibility with existing ID formats
+- Browser implementations use `window.crypto.getRandomValues()`
+- Node.js implementations use `crypto.randomBytes()`
+- No breaking changes to application functionality
+- All fixes validated with ESLint and tested in Docker environment
+
 ## [1.0.30] - 2025-09-24
 
 ### Enhanced
