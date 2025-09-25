@@ -5,6 +5,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const multer = require("multer");
 const Papa = require("papaparse");
 const PathValidator = require("../utils/PathValidator");
@@ -358,7 +359,7 @@ class FileService {
      */
     getTempFilePath(prefix = "temp", extension = "tmp") {
         const timestamp = Date.now();
-        const random = Math.random().toString(36).substring(2);
+        const random = crypto.randomBytes(6).toString("hex");
         const fileName = `${prefix}-${timestamp}-${random}.${extension}`;
         return path.join("uploads", fileName);
     }
