@@ -5,7 +5,76 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.31] - 2025-09-24
 
+### Security Fixes
+
+#### Critical: Cryptographically Weak Random Number Generators
+
+**HEX-14**: Fixed multiple Math.random() vulnerabilities
+- `app/public/scripts/shared/vulnerability-cards.js` - Added `generateSecureVulnId()` method using `crypto.getRandomValues()`
+- `app/services/ticketService.js` - Updated to use `crypto.randomBytes()` for ticket ID generation
+- `app/services/fileService.js` - Updated to use `crypto.randomBytes()` for secure file naming
+- **Impact**: Eliminated predictability vulnerability in ID generation, increased entropy from ~2^32 to 2^48 bits
+
+**HEX-15**: Fixed session ID vulnerability in CSV imports
+- `app/public/scripts/shared/vulnerability-core.js` - Replaced Math.random() with `window.crypto.getRandomValues()` for session IDs
+- **Impact**: Import session IDs are now cryptographically secure, preventing session hijacking during CSV operations
+
+**HEX-16**: Fixed toast notification ID vulnerability
+- `app/public/scripts/shared/toast-manager.js` - Secure ID generation for toast notifications using `crypto.getRandomValues()`
+- **Impact**: Toast notification IDs are now unpredictable, preventing potential ID collision attacks
+
+**HEX-17**: Fixed modal operation tracking vulnerability
+- `app/public/scripts/shared/modal-monitoring.js` - Secure operation ID generation for modal lifecycle tracking
+- **Impact**: Modal operation IDs now use cryptographic randomness, eliminating tracking manipulation risks
+
+#### Technical Details
+- All fixes maintain backward compatibility with existing ID formats
+- Browser implementations use `window.crypto.getRandomValues()`
+- Node.js implementations use `crypto.randomBytes()`
+- No breaking changes to application functionality
+- All fixes validated with ESLint and tested in Docker environment
+
+### Fixed
+
+#### P1: Crypto API Fallbacks for Non-HTTPS Environments
+
+**Issue**: Security fixes introduced breaking changes in environments without Web Crypto API support (HTTP, WebViews, older browsers)
+
+**Resolution**: Added feature detection and graceful fallbacks to maintain functionality across all environments
+
+**Files Updated**:
+- `app/public/scripts/shared/vulnerability-core.js` - CSV import session IDs now fallback to timestamp-based IDs when crypto unavailable
+- `app/public/scripts/shared/toast-manager.js` - Toast notifications maintain functionality with performance.now() fallback
+- `app/public/scripts/shared/modal-monitoring.js` - Modal operations use timestamp fallback to prevent complete failure
+
+**Impact**:
+- Maintains cryptographic security in HTTPS environments
+- Prevents complete feature failure in non-HTTPS environments
+- Console warnings inform developers when running in degraded mode
+- No breaking changes - all features work in all environments
+
+### Refactored
+
+#### Code Optimization: Eliminated Crypto Fallback Duplication
+
+**Issue**: Codacy detected code clones from repeated crypto fallback patterns
+
+**Resolution**: Created shared `crypto-utils.js` utility module to centralize ID generation logic
+
+**Implementation**:
+- New file: `app/public/scripts/shared/crypto-utils.js` - Shared utility with `generateSecureId()` function
+- Refactored: `vulnerability-core.js` - Uses utility for CSV import session IDs
+- Refactored: `toast-manager.js` - Uses utility for toast notification IDs
+- Refactored: `modal-monitoring.js` - Uses utility for modal operation IDs
+- Updated: `vulnerabilities.html` - Added script reference to load utility
+
+**Impact**:
+- Eliminated 2 code clones detected by Codacy
+- Reduced total code by ~30 lines
+- Single source of truth for secure ID generation
+- Improved maintainability and testability
 
 ## [1.0.30] - 2025-09-24
 
@@ -32,6 +101,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Files Modified
 - `app/public/scripts/shared/vulnerability-details-modal.js` - Added updateKevBadge() method
+
+### Security
+
+#### Removed Dead Code with Cryptographic Weakness
+
+**HEX-18 through HEX-22**: Eliminated unused `updateTrendIndicators()` function
+- **File**: `app/public/scripts/shared/vulnerability-statistics.js`
+- **Lines Removed**: 126-177 (52 lines of dead code)
+- **Issues Resolved**: 5 Math.random() vulnerabilities in lines 155, 156, 157, 158, 166
+- **Impact**: Removed unused function that was never called, eliminating false positive security warnings
+- **Codacy IDs**:
+  - HEX-18: `efc9a590-06bf-42c9-a50a-176ff3bfd242`
+  - HEX-19: `9622b92c-5833-4bd9-8a0c-3ce15a08e119`
+  - HEX-20: `72166284-86ca-4aa5-9b07-cf6021fc972d`
+  - HEX-21: `e151151a-eb9c-4893-b3ba-54fcd82686b2`
+  - HEX-22: `15801a4e-a946-4756-8160-b88022efcea3`
+
+**HEX-23**: Documented as false positive (no fix needed)
+- **File**: `app/public/scripts/shared/vulnerability-details-modal.js` line 1067
+- **Usage**: UI operation tracking for race condition prevention (`Date.now() + Math.random()`)
+- **Status**: Marked for Codacy suppression - legitimate non-cryptographic use for modal operation IDs
+- **Codacy ID**: `2811f086-463f-4309-a01a-3a53e2d89149`
+
+**HEX-24 & HEX-25**: Added defense-in-depth length validation to RegExp operations
+- **File**: `app/public/scripts/pages/tickets.js`
+- **Functions Modified**:
+  - `highlightSearch()` (line 1573): Added 100 character limit for search terms
+  - `processTemplateWithVariables()` (line 2735): Added 50 character limit for template variables
+- **Security Enhancement**: Prevents potential ReDoS attacks through excessive input length
+- **Impact**: No functional changes - existing RegExp escaping already prevents attacks, this adds extra protection
+- **Codacy IDs**:
+  - HEX-24: `f27d6346-7894-4545-aae9-d8560ff0a9f6`
+  - HEX-25: Duplicate of HEX-24
 
 ## [1.0.28] - 2025-09-24
 

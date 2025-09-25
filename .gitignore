@@ -100,3 +100,7 @@ opencode.json
 opencode-config-update.json
 broken_opencode.json
 .opencode.json
+
+
+#Ignore cursor AI rules
+.cursor/rules/codacy.mdc

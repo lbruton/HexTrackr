@@ -22,8 +22,7 @@
   },
   "opts": {
     "destination": "./app/dev-docs-html/",
-    "recurse": true,
-    "readme": "./dev-docs/planning/README.md"
+    "recurse": true
   },
   "plugins": [
     "plugins/markdown"

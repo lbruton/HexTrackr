@@ -9,7 +9,7 @@
  * @author Shemp (Production-ready monitoring framework)
  */
 
-/* global console, performance, window, document */
+/* global console, performance, window, document, generateSecureId */
 
 (function(global) {
     "use strict";
@@ -642,8 +642,9 @@
             }
 
             this.modal[methodName] = (...args) => {
-                const operationId = `${operationType}-${Date.now()}-${Math.random()}`;
-                
+                // Generate secure operation ID using shared utility
+                const operationId = generateSecureId(operationType, 1);
+
                 // Track operation start
                 this.monitor.trackModalOperationStart(operationId, operationType, {
                     method: methodName,
