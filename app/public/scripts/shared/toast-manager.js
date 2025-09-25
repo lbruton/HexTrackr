@@ -9,7 +9,7 @@
  * @author Curly (with creative enhancements!)
  */
 
-/* global bootstrap */
+/* global bootstrap, generateSecureId */
 
 (function(global) {
     "use strict";
