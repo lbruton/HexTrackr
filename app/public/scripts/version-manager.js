@@ -53,12 +53,21 @@ const _VERSION_FILES = [
     "hextrackr-specs/roadmap.json"
 ];
 
+/**
+ * Gets the current version from package.json
+ * @returns {string} The current version number from package.json
+ */
 function getCurrentVersion() {
     const packagePath = path.join(__dirname, "..", "package.json");
     const packageContent = JSON.parse(PathValidator.safeReadFileSync(packagePath, "utf8"));
     return packageContent.version;
 }
 
+/**
+ * Updates the version number across all application files
+ * @param {string} newVersion - The new semantic version number (e.g., "1.2.3")
+ * @description Updates version in package.json, HTML files, footer badge, CLAUDE.md, and roadmap.json
+ */
 function updateVersion(newVersion) {
     console.log(`🔧 Updating HexTrackr to version ${newVersion}`);
     
@@ -117,6 +126,12 @@ function updateVersion(newVersion) {
     console.log(`🎉 Version update complete: v${newVersion}`);
 }
 
+/**
+ * Validates if a string is a valid semantic version
+ * @param {string} version - The version string to validate
+ * @returns {boolean} True if version follows semantic versioning format (X.Y.Z), false otherwise
+ * @description Checks if the version string matches the pattern X.Y.Z where X, Y, Z are integers
+ */
 function validateVersion(version) {
     const semverRegex = /^\d+\.\d+\.\d+$/;
     return semverRegex.test(version);

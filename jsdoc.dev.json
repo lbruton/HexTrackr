@@ -23,7 +23,7 @@
   "opts": {
     "destination": "./app/dev-docs-html/",
     "recurse": true,
-    "readme": "./README.md"
+    "readme": "./dev-docs/planning/README.md"
   },
   "plugins": [
     "plugins/markdown"
