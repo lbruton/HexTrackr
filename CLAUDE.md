@@ -298,6 +298,36 @@ The project uses Linear MCP tools for issue tracking:
 - `linear_search_issues`: Find existing issues
 - `linear_add_comment`: Add progress updates
 
+### Linear Issue Creation Guidelines
+
+When creating Linear issues, please follow these practices for better organization:
+
+1. **Project Assignment**: Always assign issues to the "HexTrackr" team/project
+   - This ensures all work is properly tracked within the project scope
+   - For future non-HexTrackr work, update this guidance accordingly
+
+2. **Label Usage**: Apply at least one type label to every issue
+
+   **Team-Specific Labels** (HexTrackr team):
+   - **Security** (red): Security vulnerabilities, Codacy issues, crypto improvements
+   - **Enhancement** (purple): UI polish, UX improvements, non-critical enhancements
+
+   **Workspace-Inherited Labels**:
+   - **Bug**: Defects, errors, or unexpected behavior
+   - **Feature**: New functionality or major capabilities
+   - **Improvement**: Enhancements to existing functionality (similar to Enhancement)
+
+3. **Priority Labels**: Consider adding priority when relevant
+   - High: Critical issues blocking work or affecting users
+   - Medium: Important but not blocking
+   - Low: Nice-to-have improvements
+
+4. **Issue Title Format**: Continue using `v1.0.XX: [Description]` format
+   - Helps track which version includes the change
+   - Makes changelog generation easier
+
+**Note**: This is guidance, not constitutional law. Adapt as needed for different projects or contexts, but maintaining consistent project assignment and labeling helps with issue discovery and tracking.
+
 ## Environment Configuration
 
 Required `.env` variables:
