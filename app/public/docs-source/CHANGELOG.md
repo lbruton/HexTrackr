@@ -36,6 +36,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No breaking changes to application functionality
 - All fixes validated with ESLint and tested in Docker environment
 
+### Fixed
+
+#### P1: Crypto API Fallbacks for Non-HTTPS Environments
+
+**Issue**: Security fixes introduced breaking changes in environments without Web Crypto API support (HTTP, WebViews, older browsers)
+
+**Resolution**: Added feature detection and graceful fallbacks to maintain functionality across all environments
+
+**Files Updated**:
+- `app/public/scripts/shared/vulnerability-core.js` - CSV import session IDs now fallback to timestamp-based IDs when crypto unavailable
+- `app/public/scripts/shared/toast-manager.js` - Toast notifications maintain functionality with performance.now() fallback
+- `app/public/scripts/shared/modal-monitoring.js` - Modal operations use timestamp fallback to prevent complete failure
+
+**Impact**:
+- Maintains cryptographic security in HTTPS environments
+- Prevents complete feature failure in non-HTTPS environments
+- Console warnings inform developers when running in degraded mode
+- No breaking changes - all features work in all environments
+
 ## [1.0.30] - 2025-09-24
 
 ### Enhanced
