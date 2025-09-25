@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [1.0.30] - 2025-09-24
+
+### Enhanced
+
+#### KEV Badge Added to Vulnerability Details Modal
+
+- **Visual Consistency**: Added KEV badge to Vulnerability Details Modal header for immediate KEV status visibility
+  - Badge appears on the right side of "Vulnerability Information" card header
+  - Only displays for vulnerabilities in CISA's KEV catalog (isKev === "Yes")
+  - Maintains exact same appearance as KEV badges on vulnerability and device cards
+
+- **Implementation Details**:
+  - Reuses existing `.kev-badge` CSS class for consistency
+  - Dynamically inserts badge using JavaScript in `updateKevBadge()` method
+  - Uses flexbox layout for proper positioning within card header
+  - Includes full accessibility support with keyboard navigation
+
+- **User Experience**:
+  - Immediate visual indication of KEV status when viewing vulnerability details
+  - Clicking badge opens KEV details modal (same behavior as card badges)
+  - Consistent UI patterns across all vulnerability displays
+  - No additional CSS required - leverages existing badge styles
+
+#### Files Modified
+- `app/public/scripts/shared/vulnerability-details-modal.js` - Added updateKevBadge() method
+
 ## [1.0.28] - 2025-09-24
 
 ### Fixed - KEV Badge Modal Issue on Device Cards
