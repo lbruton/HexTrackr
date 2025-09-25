@@ -328,6 +328,25 @@ When creating Linear issues, please follow these practices for better organizati
 
 **Note**: This is guidance, not constitutional law. Adapt as needed for different projects or contexts, but maintaining consistent project assignment and labeling helps with issue discovery and tracking.
 
+### Issue Templates
+
+**Template Repository**: HEX-62 contains our evolving issue templates as Linear comments:
+- Universal Metadata Template
+- Security Issue Template
+- Feature Request Template
+- Bug Report Template
+- Enhancement Template
+
+To use templates:
+1. Copy from HEX-62 comments (preserves Linear formatting)
+2. Paste into new issue description
+3. Fill in placeholders
+
+To update templates:
+- Add new comment to HEX-62 with revised version
+- Previous versions remain in comment history for reference
+- Once patterns solidify, templates can be promoted to Linear UI
+
 ## Environment Configuration
 
 Required `.env` variables:
