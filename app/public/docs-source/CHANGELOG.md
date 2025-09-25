@@ -55,6 +55,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Console warnings inform developers when running in degraded mode
 - No breaking changes - all features work in all environments
 
+### Refactored
+
+#### Code Optimization: Eliminated Crypto Fallback Duplication
+
+**Issue**: Codacy detected code clones from repeated crypto fallback patterns
+
+**Resolution**: Created shared `crypto-utils.js` utility module to centralize ID generation logic
+
+**Implementation**:
+- New file: `app/public/scripts/shared/crypto-utils.js` - Shared utility with `generateSecureId()` function
+- Refactored: `vulnerability-core.js` - Uses utility for CSV import session IDs
+- Refactored: `toast-manager.js` - Uses utility for toast notification IDs
+- Refactored: `modal-monitoring.js` - Uses utility for modal operation IDs
+- Updated: `vulnerabilities.html` - Added script reference to load utility
+
+**Impact**:
+- Eliminated 2 code clones detected by Codacy
+- Reduced total code by ~30 lines
+- Single source of truth for secure ID generation
+- Improved maintainability and testability
+
 ## [1.0.30] - 2025-09-24
 
 ### Enhanced
