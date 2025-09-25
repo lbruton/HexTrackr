@@ -399,6 +399,28 @@ gridApi.<span class="hljs-title function_">setGridOption</span>(<span class="hlj
 <li>Test across all pages and components</li>
 </ol>
 <hr>
+<h2>Documentation Theme Synchronization (v1.0.29)</h2><h3>JSDoc Dark Mode Integration</h3><p>HexTrackr&#39;s JSDoc developer documentation (<code>/app/dev-docs-html/</code>) includes automatic theme synchronization with the main application:</p>
+<p><strong>Implementation</strong>:</p>
+<ul>
+<li><code>inject-jsdoc-theme.js</code> - Node script that injects theme detection code into generated JSDoc HTML</li>
+<li><code>inject-jsdoc-theme-wrapper.sh</code> - Shell wrapper for reliable execution during build</li>
+<li>Theme script reads from localStorage and applies <code>jsdoc-dark-theme</code> class</li>
+</ul>
+<p><strong>Build Process</strong>:</p>
+<ol>
+<li>JSDoc generates HTML documentation files</li>
+<li>Injection script processes all HTML files (121 files as of v1.0.29)</li>
+<li>Theme detection code is inserted into each file</li>
+<li>Documentation respects user&#39;s theme preference</li>
+</ol>
+<p><strong>Fixed in v1.0.29</strong>:</p>
+<ul>
+<li>Resolved issue where only 6 of 121 files had theme injection</li>
+<li>Added progress logging and error handling</li>
+<li>Ensured idempotent operation (safe to run multiple times)</li>
+<li>Fixed JSON parsing for modern localStorage format</li>
+</ul>
+<hr>
 <h2>Related Documentation</h2><ul>
 <li><a href="#architecture/frontend">Frontend Architecture</a> - Theme system integration</li>
 <li><a href="#architecture/technology-stack">Technology Stack</a> - CSS framework details</li>
