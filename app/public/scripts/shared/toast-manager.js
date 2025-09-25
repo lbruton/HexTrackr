@@ -70,21 +70,8 @@
             };
 
             const settings = Object.assign({}, defaults, options);
-            // Generate toast ID with crypto API fallback for non-HTTPS environments
-            let toastId;
-            if (window.crypto?.getRandomValues) {
-                // Secure: Use crypto API when available (HTTPS)
-                const randomArray = new Uint32Array(2);
-                window.crypto.getRandomValues(randomArray);
-                const randomString = randomArray[0].toString(36) + randomArray[1].toString(36);
-                toastId = `toast-${Date.now()}-${randomString.substr(0, 9)}`;
-            } else {
-                // Fallback: Use timestamp + performance for non-HTTPS environments
-                console.warn("crypto.getRandomValues not available, using timestamp fallback for toast ID");
-                const timestamp = Date.now();
-                const random = performance.now().toString(36).replace(".", "");
-                toastId = `toast-${timestamp}-${random.substr(0, 9)}`;
-            }
+            // Generate secure toast ID using shared utility
+            const toastId = generateSecureId("toast", 2);
 
             // Check if we need to queue this toast
             if (this.activeToasts.size >= this.maxToasts && !options.priority) {
