@@ -14,7 +14,7 @@
     "stylelint": "stylelint '**/*.css'",
     "stylelint:fix": "stylelint '**/*.css' --fix",
     "docs:generate": "node app/public/docs-html/html-content-updater.js",
-    "docs:dev": "jsdoc -c jsdoc.dev.json && bash app/scripts/inject-jsdoc-theme-wrapper.sh",
+    "docs:dev": "jsdoc -c jsdoc.dev.json; bash app/scripts/inject-jsdoc-theme-wrapper.sh",
     "docs:dev:watch": "nodemon --watch app --ext js --exec 'npm run docs:dev'",
     "docs:all": "npm run docs:dev && npm run docs:generate",
     "lint:md": "markdownlint --config .markdownlint.json --ignore-path .markdownlintignore '**/*.md'",
