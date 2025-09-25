@@ -64,6 +64,29 @@ The ticket list can be quickly filtered to find what you need.
 - **Status Filter**: Use the dropdown to show tickets with a specific status (e.g., "Open", "Overdue").
 - **Location Filter**: This dropdown is dynamically populated with all unique locations from the tickets in the database, allowing you to easily filter by a specific location.
 
+### Additional Features (v1.0.23-v1.0.25)
+
+#### Interactive Statistics Filtering (v1.0.23)
+
+The ticket statistics cards at the top of the page are now interactive:
+
+- **Click Total Tickets**: Reset all filters and show all tickets
+- **Click Open Tickets**: Filter to show only active tickets (excludes Closed, Completed, Failed)
+- **Click Overdue**: Show urgent tickets requiring immediate attention
+- **Click Completed**: Display finished work (Completed + Closed statuses)
+- **Visual Feedback**: Active cards are highlighted with borders and shadows
+- **Accessibility**: Full keyboard navigation and screen reader support
+
+#### Import Summary HTML Export (v1.0.25)
+
+After importing vulnerabilities, you can now export professional reports:
+
+- **Download Report Button**: Appears in progress modal when import summaries are available
+- **Professional HTML**: Complete standalone HTML documents with embedded CSS styling
+- **Self-Contained**: Reports include all necessary styling (Tabler.io, HexTrackr themes)
+- **Print-Friendly**: Optimized for both screen viewing and professional printing
+- **Descriptive Naming**: Files named as `HexTrackr_Import_Report_YYYY-MM-DD_[source].html`
+
 ## Importing Ticket Data
 
 - **CSV Import Button**: Selecting **Import CSV** opens a file picker and routes the file through PapaParse in the browser. The parser trims whitespace, normalizes device lists (arrays, commas, or semicolons), and generates ticket numbers when the column is missing.
@@ -99,8 +122,11 @@ KEV vulnerabilities are marked throughout the interface with clear visual indica
 - **KEV Column**: In the vulnerability table, a dedicated KEV column shows YES/NO badges
   - **Red "YES" badge**: Vulnerability is in CISA's KEV catalog (high priority)
   - **Blue "NO" badge**: Vulnerability is not in KEV catalog (standard priority)
+- **Vulnerability Cards**: KEV badges appear in the upper-right corner of vulnerability cards
+- **Device Cards** (v1.0.27): KEV badges display when ANY vulnerability on that device is a known KEV
+- **Vulnerability Details Modal** (v1.0.30): KEV badge appears in the modal header for KEV vulnerabilities
 - **Filterable**: Use the KEV column filter to quickly view only exploited vulnerabilities
-- **Clickable**: Click any KEV badge to open detailed vulnerability information
+- **Clickable**: Click any KEV badge to open detailed KEV information (fixed in v1.0.28)
 
 #### KEV Modal and Details
 
@@ -108,9 +134,10 @@ When you click on a KEV badge or vulnerability with KEV status, you'll see:
 
 - **KEV Information Panel**: Shows if the vulnerability is in the CISA catalog
 - **NIST NVD Integration**: Direct links to authoritative CVE information
-- **CVE Details Navigation**: Seamless transition to full vulnerability details
+- **CVE Details Navigation**: "View CVE Details" button for seamless transition to full vulnerability details
 - **Additional Notes**: Any special guidance or context from CISA
-- **Clickable External Links**: All HTTPS links in KEV notes open in popup windows
+- **Clickable External Links**: All HTTPS links in KEV notes open in 1200x1200px popup windows
+- **Consistent Behavior**: KEV badges on all card types (vulnerability, device) open the KEV details modal
 
 #### Filtering and Searching KEV Vulnerabilities
 

@@ -33,7 +33,28 @@
 <li><strong>Search Integration</strong>: KEV status included in all vulnerability searches</li>
 </ul>
 <hr>
-<h2>User Interface Elements</h2><h3>KEV Column Indicators</h3><table>
+<h2>User Interface Elements</h2><h3>KEV Badge Locations (v1.0.22-v1.0.30)</h3><p>KEV badges appear consistently across multiple UI components:</p>
+<h4>1. Vulnerability Table (v1.0.22)</h4><ul>
+<li>Dedicated KEV column with filterable YES/NO badges</li>
+<li>Click badges to open KEV details modal</li>
+</ul>
+<h4>2. Vulnerability Cards (v1.0.22)</h4><ul>
+<li>Red KEV badge in upper-right corner</li>
+<li>Appears when vulnerability is in CISA catalog</li>
+<li>Click opens KEV details modal</li>
+</ul>
+<h4>3. Device Cards (v1.0.27)</h4><ul>
+<li>KEV badge displays when ANY vulnerability on device is KEV</li>
+<li>Same visual style as vulnerability cards</li>
+<li>Click opens KEV modal with first KEV vulnerability details</li>
+<li>Fixed in v1.0.28 to open correct modal</li>
+</ul>
+<h4>4. Vulnerability Details Modal (v1.0.30)</h4><ul>
+<li>KEV badge in modal header next to &quot;Vulnerability Information&quot;</li>
+<li>Only appears for KEV vulnerabilities</li>
+<li>Maintains visual consistency across all badge locations</li>
+</ul>
+<h3>KEV Column Indicators</h3><table>
 <thead>
 <tr>
 <th>Badge</th>
@@ -52,13 +73,14 @@
 <td>Standard prioritization applies</td>
 </tr>
 </tbody></table>
-<h3>KEV Modal Features</h3><p>When clicking on a KEV indicator, you&#39;ll access:</p>
+<h3>KEV Modal Features (Enhanced in v1.0.22)</h3><p>When clicking on a KEV indicator, you&#39;ll access:</p>
 <ul>
 <li><strong>KEV Status Confirmation</strong>: Clear indication of exploitation status</li>
 <li><strong>CISA Context</strong>: Additional notes and guidance from CISA</li>
-<li><strong>NIST NVD Links</strong>: Direct access to authoritative vulnerability information</li>
-<li><strong>CVE Navigation</strong>: Seamless transition to full vulnerability details</li>
-<li><strong>External Resources</strong>: Clickable links to additional security resources</li>
+<li><strong>NIST NVD Links</strong>: Direct access to authoritative vulnerability information (replaced CISA catalog link)</li>
+<li><strong>CVE Navigation</strong>: &quot;View CVE Details&quot; button for seamless transition to full vulnerability details</li>
+<li><strong>External Resources</strong>: All HTTPS links in KEV notes open in 1200x1200px popup windows</li>
+<li><strong>Consistent Behavior</strong>: All KEV badges across different views open the same modal (fixed in v1.0.28)</li>
 </ul>
 <h3>Filter Integration</h3><p>KEV filtering is available in multiple locations:</p>
 <ol>
@@ -68,7 +90,22 @@
 <li><strong>Combined Filters</strong>: Use KEV with other filters for precise targeting</li>
 </ol>
 <hr>
-<h2>Technical Implementation</h2><h3>Data Synchronization</h3><div class="mermaid">graph TD
+<h2>Technical Implementation</h2><h3>Recent Enhancements (v1.0.27-v1.0.30)</h3><h4>Device Card KEV Tracking (v1.0.27)</h4><ul>
+<li>Modified <code>getFilteredDevices()</code> to track <code>hasKev</code> property</li>
+<li>Device aggregation includes KEV status from all vulnerabilities</li>
+<li>Badge displays when ANY vulnerability is KEV</li>
+</ul>
+<h4>Modal Fix (v1.0.28)</h4><ul>
+<li>Corrected event handlers on device card KEV badges</li>
+<li>Fixed onclick from <code>viewDeviceDetails()</code> to <code>showKevDetails()</code></li>
+<li>Tracks first KEV CVE per device for modal display</li>
+</ul>
+<h4>Vulnerability Details Modal Badge (v1.0.30)</h4><ul>
+<li>Added <code>updateKevBadge()</code> method to modal component</li>
+<li>Dynamic badge insertion in card header</li>
+<li>Reuses existing <code>.kev-badge</code> CSS classes</li>
+</ul>
+<h3>Data Synchronization</h3><div class="mermaid">graph TD
     A[CISA KEV API] --&gt;|Daily Sync| B[HexTrackr KEV Service]
     B --&gt;|Process & Store| C[Local KEV Database]
     C --&gt;|Match CVEs| D[Vulnerability Database]
