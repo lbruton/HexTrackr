@@ -70,7 +70,11 @@
             };
 
             const settings = Object.assign({}, defaults, options);
-            const toastId = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            // Generate cryptographically secure toast ID
+            const randomArray = new Uint32Array(2);
+            window.crypto.getRandomValues(randomArray);
+            const randomString = randomArray[0].toString(36) + randomArray[1].toString(36);
+            const toastId = `toast-${Date.now()}-${randomString.substr(0, 9)}`;
 
             // Check if we need to queue this toast
             if (this.activeToasts.size >= this.maxToasts && !options.priority) {
