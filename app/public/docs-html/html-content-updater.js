@@ -417,10 +417,10 @@ class HtmlContentUpdater {
                 // If we were processing a previous version, close it
                 if (inVersionSection && versionHeader) {
                     const versionHtml = this.marked.parse(currentVersionContent);
-                    const isRecent = versionCount < 3;
-                    const collapseClass = isRecent ? 'show' : '';
-                    const buttonClass = isRecent ? '' : 'collapsed';
-                    const ariaExpanded = isRecent ? 'true' : 'false';
+                    const isFirstVersion = versionCount === 1;
+                    const collapseClass = isFirstVersion ? 'show' : '';
+                    const buttonClass = isFirstVersion ? '' : 'collapsed';
+                    const ariaExpanded = isFirstVersion ? 'true' : 'false';
 
                     result += `
                     <div class="accordion-item">
@@ -465,10 +465,10 @@ class HtmlContentUpdater {
         // Handle the last version if there is one
         if (inVersionSection && versionHeader) {
             const versionHtml = this.marked.parse(currentVersionContent);
-            const isRecent = versionCount <= 3;
-            const collapseClass = isRecent ? 'show' : '';
-            const buttonClass = isRecent ? '' : 'collapsed';
-            const ariaExpanded = isRecent ? 'true' : 'false';
+            const isFirstVersion = versionCount === 1;
+            const collapseClass = isFirstVersion ? 'show' : '';
+            const buttonClass = isFirstVersion ? '' : 'collapsed';
+            const ariaExpanded = isFirstVersion ? 'true' : 'false';
 
             result += `
             <div class="accordion-item">
