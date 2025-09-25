@@ -84,6 +84,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Status**: Marked for Codacy suppression - legitimate non-cryptographic use for modal operation IDs
 - **Codacy ID**: `2811f086-463f-4309-a01a-3a53e2d89149`
 
+**HEX-24 & HEX-25**: Added defense-in-depth length validation to RegExp operations
+- **File**: `app/public/scripts/pages/tickets.js`
+- **Functions Modified**:
+  - `highlightSearch()` (line 1573): Added 100 character limit for search terms
+  - `processTemplateWithVariables()` (line 2735): Added 50 character limit for template variables
+- **Security Enhancement**: Prevents potential ReDoS attacks through excessive input length
+- **Impact**: No functional changes - existing RegExp escaping already prevents attacks, this adds extra protection
+- **Codacy IDs**:
+  - HEX-24: `f27d6346-7894-4545-aae9-d8560ff0a9f6`
+  - HEX-25: Duplicate of HEX-24
+
 ## [1.0.28] - 2025-09-24
 
 ### Fixed - KEV Badge Modal Issue on Device Cards
