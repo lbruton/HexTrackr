@@ -9,7 +9,7 @@
  * @author Curly (with creative enhancements!)
  */
 
-/* global bootstrap */
+/* global bootstrap, generateSecureId */
 
 (function(global) {
     "use strict";
@@ -70,7 +70,8 @@
             };
 
             const settings = Object.assign({}, defaults, options);
-            const toastId = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            // Generate secure toast ID using shared utility
+            const toastId = generateSecureId("toast", 2);
 
             // Check if we need to queue this toast
             if (this.activeToasts.size >= this.maxToasts && !options.priority) {

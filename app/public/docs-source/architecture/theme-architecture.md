@@ -469,6 +469,31 @@ cellRenderer: (params) => {
 
 ---
 
+## Documentation Theme Synchronization (v1.0.29)
+
+### JSDoc Dark Mode Integration
+
+HexTrackr's JSDoc developer documentation (`/app/dev-docs-html/`) includes automatic theme synchronization with the main application:
+
+**Implementation**:
+- `inject-jsdoc-theme.js` - Node script that injects theme detection code into generated JSDoc HTML
+- `inject-jsdoc-theme-wrapper.sh` - Shell wrapper for reliable execution during build
+- Theme script reads from localStorage and applies `jsdoc-dark-theme` class
+
+**Build Process**:
+1. JSDoc generates HTML documentation files
+2. Injection script processes all HTML files (121 files as of v1.0.29)
+3. Theme detection code is inserted into each file
+4. Documentation respects user's theme preference
+
+**Fixed in v1.0.29**:
+- Resolved issue where only 6 of 121 files had theme injection
+- Added progress logging and error handling
+- Ensured idempotent operation (safe to run multiple times)
+- Fixed JSON parsing for modern localStorage format
+
+---
+
 ## Related Documentation
 
 - [Frontend Architecture](./frontend.md) - Theme system integration

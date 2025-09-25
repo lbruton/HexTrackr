@@ -1571,8 +1571,14 @@ class HexagonTicketsManager {
     }
 
     highlightSearch(text) {
-        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        let searchTerm = document.getElementById("searchInput").value.toLowerCase();
         if (!searchTerm || !text) {return text;}
+
+        // Defense-in-depth: Length limit to prevent excessive processing
+        if (searchTerm.length > 100) {
+            console.warn("[Security] Search term too long, truncating from", searchTerm.length, "to 100 chars");
+            searchTerm = searchTerm.substring(0, 100);
+        }
 
         // Security: Use split/join with escaped search term to prevent DoS attacks
         const parts = text.split(new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi"));
@@ -2731,6 +2737,12 @@ class HexagonTicketsManager {
 
         // Replace all variables in the template
         Object.keys(variables).forEach(variable => {
+            // Defense-in-depth: Length validation for variable names
+            if (variable.length > 50) {
+                console.warn("[Security] Variable name too long, skipping:", variable.substring(0, 20) + "...");
+                return; // Skip this variable
+            }
+
             const value = variables[variable] || "";
             // Use global replace to handle multiple occurrences
             processedTemplate = processedTemplate.replace(new RegExp(variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), value);
