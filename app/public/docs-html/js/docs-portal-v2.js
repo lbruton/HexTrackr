@@ -992,8 +992,8 @@ class DocumentationPortalV2 {
      * @param {string} currentTarget - The collapse target ID to keep open
      */
     collapseOtherMenus(currentTarget) {
-        // Find all collapse elements that are currently expanded
-        const allCollapses = document.querySelectorAll(".collapse.show");
+        // Find navigation collapse elements only (not content accordions)
+        const allCollapses = document.querySelectorAll(".list-group .collapse.show");
 
         allCollapses.forEach(collapse => {
             const collapseId = `#${collapse.id}`;
@@ -1432,8 +1432,8 @@ class DocumentationPortalV2 {
      * Update active navigation state
      */
     updateActiveNavigation(section) {
-        // First, collapse ALL expanded menus to ensure clean state
-        document.querySelectorAll(".collapse.show").forEach(collapse => {
+        // First, collapse navigation menus only (not content accordions like changelog)
+        document.querySelectorAll(".list-group .collapse.show").forEach(collapse => {
             const bsCollapse = new bootstrap.Collapse(collapse, { toggle: false });
             bsCollapse.hide();
         });
