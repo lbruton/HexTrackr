@@ -642,8 +642,11 @@
             }
 
             this.modal[methodName] = (...args) => {
-                const operationId = `${operationType}-${Date.now()}-${Math.random()}`;
-                
+                // Generate cryptographically secure operation ID
+                const randomArray = new Uint32Array(1);
+                window.crypto.getRandomValues(randomArray);
+                const operationId = `${operationType}-${Date.now()}-${randomArray[0].toString(36)}`;
+
                 // Track operation start
                 this.monitor.trackModalOperationStart(operationId, operationType, {
                     method: methodName,
