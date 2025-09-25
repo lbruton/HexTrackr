@@ -6,7 +6,41 @@
 
 HexTrackr is an enterprise vulnerability management platform that helps organizations track, prioritize, and remediate security vulnerabilities across their infrastructure. This roadmap provides visibility into planned features and improvements.
 
+**Current Version**: v1.0.30 (September 2025)
 **Current Focus**: Security hardening and enterprise-grade authentication
+
+---
+
+## ✅ Recently Completed (v1.0.22-v1.0.30)
+
+### KEV Integration Suite (v1.0.22-v1.0.30)
+
+**Comprehensive CISA Known Exploited Vulnerabilities integration across all UI components**
+
+- ✅ Filterable YES/NO badges in vulnerability table (v1.0.22)
+- ✅ KEV modal with NIST NVD integration and CVE details navigation (v1.0.22)
+- ✅ KEV filter in severity dropdown without emoji clutter (v1.0.22)
+- ✅ Clickable HTTPS links in KEV notes with popup windows (v1.0.22)
+- ✅ KEV badges on device cards when any vulnerability is KEV (v1.0.27)
+- ✅ Fixed KEV badge click handlers on device cards (v1.0.28)
+- ✅ KEV badge in vulnerability details modal header (v1.0.30)
+
+### UI Enhancements (v1.0.23-v1.0.25)
+
+**Improved user experience and data accessibility**
+
+- ✅ Interactive statistics filtering for ticket management (v1.0.23)
+- ✅ Vulnerability card UI polish with streamlined layout (v1.0.24)
+- ✅ Import summary HTML export for professional reporting (v1.0.25)
+- ✅ Accessibility improvements with keyboard navigation and ARIA labels
+
+### Critical Fixes (v1.0.26, v1.0.29)
+
+**Essential bug fixes for core functionality**
+
+- ✅ Fixed Low severity vulnerability visibility issue affecting 3,314 items (v1.0.26)
+- ✅ Fixed JSDoc dark mode theme injection for all 121 documentation files (v1.0.29)
+- ✅ Improved async processing for large datasets (24,660+ vulnerabilities)
 
 ---
 
