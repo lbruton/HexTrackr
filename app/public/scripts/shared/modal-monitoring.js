@@ -642,20 +642,8 @@
             }
 
             this.modal[methodName] = (...args) => {
-                // Generate operation ID with crypto API fallback for non-HTTPS environments
-                let operationId;
-                if (window.crypto?.getRandomValues) {
-                    // Secure: Use crypto API when available (HTTPS)
-                    const randomArray = new Uint32Array(1);
-                    window.crypto.getRandomValues(randomArray);
-                    operationId = `${operationType}-${Date.now()}-${randomArray[0].toString(36)}`;
-                } else {
-                    // Fallback: Use timestamp + performance for non-HTTPS environments
-                    console.warn("crypto.getRandomValues not available, using timestamp fallback for modal operation ID");
-                    const timestamp = Date.now();
-                    const random = performance.now().toString(36).replace(".", "");
-                    operationId = `${operationType}-${timestamp}-${random}`;
-                }
+                // Generate secure operation ID using shared utility
+                const operationId = generateSecureId(operationType, 1);
 
                 // Track operation start
                 this.monitor.trackModalOperationStart(operationId, operationType, {
