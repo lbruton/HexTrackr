@@ -56,6 +56,23 @@
 <li><strong>Status Filter</strong>: Use the dropdown to show tickets with a specific status (e.g., &quot;Open&quot;, &quot;Overdue&quot;).</li>
 <li><strong>Location Filter</strong>: This dropdown is dynamically populated with all unique locations from the tickets in the database, allowing you to easily filter by a specific location.</li>
 </ul>
+<h3>Additional Features (v1.0.23-v1.0.25)</h3><h4>Interactive Statistics Filtering (v1.0.23)</h4><p>The ticket statistics cards at the top of the page are now interactive:</p>
+<ul>
+<li><strong>Click Total Tickets</strong>: Reset all filters and show all tickets</li>
+<li><strong>Click Open Tickets</strong>: Filter to show only active tickets (excludes Closed, Completed, Failed)</li>
+<li><strong>Click Overdue</strong>: Show urgent tickets requiring immediate attention</li>
+<li><strong>Click Completed</strong>: Display finished work (Completed + Closed statuses)</li>
+<li><strong>Visual Feedback</strong>: Active cards are highlighted with borders and shadows</li>
+<li><strong>Accessibility</strong>: Full keyboard navigation and screen reader support</li>
+</ul>
+<h4>Import Summary HTML Export (v1.0.25)</h4><p>After importing vulnerabilities, you can now export professional reports:</p>
+<ul>
+<li><strong>Download Report Button</strong>: Appears in progress modal when import summaries are available</li>
+<li><strong>Professional HTML</strong>: Complete standalone HTML documents with embedded CSS styling</li>
+<li><strong>Self-Contained</strong>: Reports include all necessary styling (Tabler.io, HexTrackr themes)</li>
+<li><strong>Print-Friendly</strong>: Optimized for both screen viewing and professional printing</li>
+<li><strong>Descriptive Naming</strong>: Files named as <code>HexTrackr_Import_Report_YYYY-MM-DD_[source].html</code></li>
+</ul>
 <h2>Importing Ticket Data</h2><ul>
 <li><strong>CSV Import Button</strong>: Selecting <strong>Import CSV</strong> opens a file picker and routes the file through PapaParse in the browser. The parser trims whitespace, normalizes device lists (arrays, commas, or semicolons), and generates ticket numbers when the column is missing.</li>
 <li><strong>Mode Selection</strong>: When the database already contains tickets, the importer prompts for <strong>Replace All Data</strong> (clears the table before importing) or <strong>Add to Existing Data</strong> (upsert into the current dataset). Both options call <code>POST /api/tickets/migrate</code> with a <code>mode</code> flag.</li>
@@ -78,16 +95,20 @@
 <li><strong>Blue &quot;NO&quot; badge</strong>: Vulnerability is not in KEV catalog (standard priority)</li>
 </ul>
 </li>
+<li><strong>Vulnerability Cards</strong>: KEV badges appear in the upper-right corner of vulnerability cards</li>
+<li><strong>Device Cards</strong> (v1.0.27): KEV badges display when ANY vulnerability on that device is a known KEV</li>
+<li><strong>Vulnerability Details Modal</strong> (v1.0.30): KEV badge appears in the modal header for KEV vulnerabilities</li>
 <li><strong>Filterable</strong>: Use the KEV column filter to quickly view only exploited vulnerabilities</li>
-<li><strong>Clickable</strong>: Click any KEV badge to open detailed vulnerability information</li>
+<li><strong>Clickable</strong>: Click any KEV badge to open detailed KEV information (fixed in v1.0.28)</li>
 </ul>
 <h4>KEV Modal and Details</h4><p>When you click on a KEV badge or vulnerability with KEV status, you&#39;ll see:</p>
 <ul>
 <li><strong>KEV Information Panel</strong>: Shows if the vulnerability is in the CISA catalog</li>
 <li><strong>NIST NVD Integration</strong>: Direct links to authoritative CVE information</li>
-<li><strong>CVE Details Navigation</strong>: Seamless transition to full vulnerability details</li>
+<li><strong>CVE Details Navigation</strong>: &quot;View CVE Details&quot; button for seamless transition to full vulnerability details</li>
 <li><strong>Additional Notes</strong>: Any special guidance or context from CISA</li>
-<li><strong>Clickable External Links</strong>: All HTTPS links in KEV notes open in popup windows</li>
+<li><strong>Clickable External Links</strong>: All HTTPS links in KEV notes open in 1200x1200px popup windows</li>
+<li><strong>Consistent Behavior</strong>: KEV badges on all card types (vulnerability, device) open the KEV details modal</li>
 </ul>
 <h4>Filtering and Searching KEV Vulnerabilities</h4><p>Several ways to focus on exploited vulnerabilities:</p>
 <ol>
