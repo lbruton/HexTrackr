@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const { normalizeXtNumber } = require("../utils/helpers");
 
 /**
@@ -244,7 +245,7 @@ class TicketService {
                         }
 
                         const mappedTicket = {
-                            id: ticket.id || Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                            id: ticket.id || Date.now().toString() + crypto.randomBytes(6).toString("hex"),
                             dateSubmitted: ticket.date_submitted || ticket.dateSubmitted,
                             dateDue: ticket.date_due || ticket.dateDue,
                             hexagonTicket: ticket.hexagon_ticket || ticket.hexagonTicket || "",
