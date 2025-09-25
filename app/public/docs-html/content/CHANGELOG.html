@@ -8,6 +8,97 @@
                         <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
                              alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
                     </a>.</p>
+<h2>[1.0.31] - 2025-09-25</h2><h3>Security Fixes</h3><h4>Critical: Cryptographically Weak Random Number Generators</h4><p><strong>HEX-14</strong>: Fixed multiple Math.random() vulnerabilities</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - Added <code>generateSecureVulnId()</code> method using <code>crypto.getRandomValues()</code></li>
+<li><code>app/services/ticketService.js</code> - Updated to use <code>crypto.randomBytes()</code> for ticket ID generation</li>
+<li><code>app/services/fileService.js</code> - Updated to use <code>crypto.randomBytes()</code> for secure file naming</li>
+<li><strong>Impact</strong>: Eliminated predictability vulnerability in ID generation, increased entropy from ~2^32 to 2^48 bits</li>
+</ul>
+<p><strong>HEX-15</strong>: Fixed session ID vulnerability in CSV imports</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-core.js</code> - Replaced Math.random() with <code>window.crypto.getRandomValues()</code> for session IDs</li>
+<li><strong>Impact</strong>: Import session IDs are now cryptographically secure, preventing session hijacking during CSV operations</li>
+</ul>
+<p><strong>HEX-16</strong>: Fixed toast notification ID vulnerability</p>
+<ul>
+<li><code>app/public/scripts/shared/toast-manager.js</code> - Secure ID generation for toast notifications using <code>crypto.getRandomValues()</code></li>
+<li><strong>Impact</strong>: Toast notification IDs are now unpredictable, preventing potential ID collision attacks</li>
+</ul>
+<p><strong>HEX-17</strong>: Fixed modal operation tracking vulnerability</p>
+<ul>
+<li><code>app/public/scripts/shared/modal-monitoring.js</code> - Secure operation ID generation for modal lifecycle tracking</li>
+<li><strong>Impact</strong>: Modal operation IDs now use cryptographic randomness, eliminating tracking manipulation risks</li>
+</ul>
+<h4>Technical Details</h4><ul>
+<li>All fixes maintain backward compatibility with existing ID formats</li>
+<li>Browser implementations use <code>window.crypto.getRandomValues()</code></li>
+<li>Node.js implementations use <code>crypto.randomBytes()</code></li>
+<li>No breaking changes to application functionality</li>
+<li>All fixes validated with ESLint and tested in Docker environment</li>
+</ul>
+<h3>Fixed</h3><h4>P1: Crypto API Fallbacks for Non-HTTPS Environments</h4><p><strong>Issue</strong>: Security fixes introduced breaking changes in environments without Web Crypto API support (HTTP, WebViews, older browsers)</p>
+<p><strong>Resolution</strong>: Added feature detection and graceful fallbacks to maintain functionality across all environments</p>
+<p><strong>Files Updated</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-core.js</code> - CSV import session IDs now fallback to timestamp-based IDs when crypto unavailable</li>
+<li><code>app/public/scripts/shared/toast-manager.js</code> - Toast notifications maintain functionality with performance.now() fallback</li>
+<li><code>app/public/scripts/shared/modal-monitoring.js</code> - Modal operations use timestamp fallback to prevent complete failure</li>
+</ul>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li>Maintains cryptographic security in HTTPS environments</li>
+<li>Prevents complete feature failure in non-HTTPS environments</li>
+<li>Console warnings inform developers when running in degraded mode</li>
+<li>No breaking changes - all features work in all environments</li>
+</ul>
+<h3>Refactored</h3><h4>Code Optimization: Eliminated Crypto Fallback Duplication</h4><p><strong>Issue</strong>: Codacy detected code clones from repeated crypto fallback patterns</p>
+<p><strong>Resolution</strong>: Created shared <code>crypto-utils.js</code> utility module to centralize ID generation logic</p>
+<p><strong>Implementation</strong>:</p>
+<ul>
+<li>New file: <code>app/public/scripts/shared/crypto-utils.js</code> - Shared utility with <code>generateSecureId()</code> function</li>
+<li>Refactored: <code>vulnerability-core.js</code> - Uses utility for CSV import session IDs</li>
+<li>Refactored: <code>toast-manager.js</code> - Uses utility for toast notification IDs</li>
+<li>Refactored: <code>modal-monitoring.js</code> - Uses utility for modal operation IDs</li>
+<li>Updated: <code>vulnerabilities.html</code> - Added script reference to load utility</li>
+</ul>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li>Eliminated 2 code clones detected by Codacy</li>
+<li>Reduced total code by ~30 lines</li>
+<li>Single source of truth for secure ID generation</li>
+<li>Improved maintainability and testability</li>
+</ul>
+<h3>Fixed</h3><h4>ESLint no-undef Errors in Crypto Implementation (HEX-61)</h4><p><strong>Issue</strong>: The crypto-utils.js refactoring introduced 4 ESLint no-undef errors due to module compatibility issues</p>
+<p><strong>Resolution</strong>: Fixed browser/Node.js compatibility in crypto-utils module</p>
+<p><strong>Errors Fixed</strong>:</p>
+<ul>
+<li><code>crypto-utils.js</code> lines 66-67: &#39;module&#39; is not defined - Added module to ESLint globals</li>
+<li><code>toast-manager.js</code> line 74: &#39;generateSecureId&#39; is not defined - Added global directive</li>
+<li><code>modal-monitoring.js</code> line 646: &#39;generateSecureId&#39; is not defined - Added global directive</li>
+</ul>
+<p><strong>Implementation</strong>:</p>
+<ul>
+<li>Added proper module detection and browser window export in crypto-utils.js</li>
+<li>Added ESLint global directives for generateSecureId in consuming files</li>
+<li>Maintains compatibility with both browser and Node.js environments</li>
+</ul>
+<h3>Configuration</h3><h4>Codacy Tool Configuration Cleanup</h4><p><strong>Issue</strong>: PMD and Semgrep tools causing analysis errors for JavaScript project</p>
+<p><strong>Resolution</strong>: Removed Java-specific and proprietary tools from Codacy configuration</p>
+<p><strong>Changes</strong>:</p>
+<ul>
+<li>Removed PMD tool (Java analyzer not applicable to JavaScript project)</li>
+<li>Removed Semgrep tool (proprietary extension errors)</li>
+<li>Deleted <code>ruleset.xml</code> containing Java PMD rules</li>
+<li>Updated <code>.codacy/codacy.yaml</code> to include only relevant tools (ESLint, Lizard, Trivy, Pylint)</li>
+<li>Cleaned <code>.codacy/tools-configs/languages-config.yaml</code> to remove PMD and Semgrep entries</li>
+</ul>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li>Eliminated all PMD Java ruleset errors</li>
+<li>Resolved Semgrep proprietary extension failures</li>
+<li>Clean Codacy analysis with 0 configuration errors</li>
+</ul>
 <h2>[1.0.30] - 2025-09-24</h2><h3>Enhanced</h3><h4>KEV Badge Added to Vulnerability Details Modal</h4><ul>
 <li><p><strong>Visual Consistency</strong>: Added KEV badge to Vulnerability Details Modal header for immediate KEV status visibility</p>
 <ul>
@@ -35,6 +126,44 @@
 </ul>
 <h4>Files Modified</h4><ul>
 <li><code>app/public/scripts/shared/vulnerability-details-modal.js</code> - Added updateKevBadge() method</li>
+</ul>
+<h3>Security</h3><h4>Removed Dead Code with Cryptographic Weakness</h4><p><strong>HEX-18 through HEX-22</strong>: Eliminated unused <code>updateTrendIndicators()</code> function</p>
+<ul>
+<li><strong>File</strong>: <code>app/public/scripts/shared/vulnerability-statistics.js</code></li>
+<li><strong>Lines Removed</strong>: 126-177 (52 lines of dead code)</li>
+<li><strong>Issues Resolved</strong>: 5 Math.random() vulnerabilities in lines 155, 156, 157, 158, 166</li>
+<li><strong>Impact</strong>: Removed unused function that was never called, eliminating false positive security warnings</li>
+<li><strong>Codacy IDs</strong>:<ul>
+<li>HEX-18: <code>efc9a590-06bf-42c9-a50a-176ff3bfd242</code></li>
+<li>HEX-19: <code>9622b92c-5833-4bd9-8a0c-3ce15a08e119</code></li>
+<li>HEX-20: <code>72166284-86ca-4aa5-9b07-cf6021fc972d</code></li>
+<li>HEX-21: <code>e151151a-eb9c-4893-b3ba-54fcd82686b2</code></li>
+<li>HEX-22: <code>15801a4e-a946-4756-8160-b88022efcea3</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>HEX-23</strong>: Documented as false positive (no fix needed)</p>
+<ul>
+<li><strong>File</strong>: <code>app/public/scripts/shared/vulnerability-details-modal.js</code> line 1067</li>
+<li><strong>Usage</strong>: UI operation tracking for race condition prevention (<code>Date.now() + Math.random()</code>)</li>
+<li><strong>Status</strong>: Marked for Codacy suppression - legitimate non-cryptographic use for modal operation IDs</li>
+<li><strong>Codacy ID</strong>: <code>2811f086-463f-4309-a01a-3a53e2d89149</code></li>
+</ul>
+<p><strong>HEX-24 &amp; HEX-25</strong>: Added defense-in-depth length validation to RegExp operations</p>
+<ul>
+<li><strong>File</strong>: <code>app/public/scripts/pages/tickets.js</code></li>
+<li><strong>Functions Modified</strong>:<ul>
+<li><code>highlightSearch()</code> (line 1573): Added 100 character limit for search terms</li>
+<li><code>processTemplateWithVariables()</code> (line 2735): Added 50 character limit for template variables</li>
+</ul>
+</li>
+<li><strong>Security Enhancement</strong>: Prevents potential ReDoS attacks through excessive input length</li>
+<li><strong>Impact</strong>: No functional changes - existing RegExp escaping already prevents attacks, this adds extra protection</li>
+<li><strong>Codacy IDs</strong>:<ul>
+<li>HEX-24: <code>f27d6346-7894-4545-aae9-d8560ff0a9f6</code></li>
+<li>HEX-25: Duplicate of HEX-24</li>
+</ul>
+</li>
 </ul>
 <h2>[1.0.28] - 2025-09-24</h2><h3>Fixed - KEV Badge Modal Issue on Device Cards</h3><h4>Bug Resolution</h4><ul>
 <li><strong>Fixed Modal Behavior</strong>: KEV badges on device cards now correctly open the KEV details modal instead of the device security modal<ul>
