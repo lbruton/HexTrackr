@@ -94,8 +94,9 @@ claudelogs/sessions/*.md
 
 # Memento shared database
 memento/
--e 
+
 # OpenCode configuration (may contain API keys)
 opencode.json
+opencode-config-update.json
 broken_opencode.json
 .opencode.json

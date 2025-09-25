@@ -75,7 +75,7 @@ app.<span class="hljs-title function_">use</span>(<span class="hljs-title functi
     <span class="hljs-attr">stream</span>: logStream,
     <span class="hljs-attr">skip</span>: <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> res.<span class="hljs-property">statusCode</span> &lt; <span class="hljs-number">400</span>  <span class="hljs-comment">// Only log errors in production</span>
 }));</code></pre><p><strong>Log Output Format:</strong></p>
-<pre><code class="language-">[2024-01-15 10:30:45] INFO: GET /api/vulnerabilities 200 45ms - 2048
+<pre><code class="language-text">[2024-01-15 10:30:45] INFO: GET /api/vulnerabilities 200 45ms - 2048
 [2024-01-15 10:30:46] ERROR: POST /api/import 500 1523ms - Error: File too large</code></pre><hr>
 <h2 id="configuration">Configuration Modules</h2><h3>Database Configuration</h3><p><strong>Location:</strong> <code>app/config/database.js</code></p>
 <p>SQLite database initialization and connection management.</p>
@@ -280,7 +280,7 @@ io.<span class="hljs-title function_">of</span>(<span class="hljs-string">&#x27;
 </tr>
 </tbody></table>
 <hr>
-<h2 id="pipeline">Request Pipeline</h2><h3>Request Flow</h3><pre><code class="language-">Client Request
+<h2 id="pipeline">Request Pipeline</h2><h3>Request Flow</h3><pre><code class="language-text">Client Request
     ↓
 [Compression Middleware]
     ↓

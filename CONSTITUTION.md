@@ -84,7 +84,9 @@
 
 ### Section VII: Linear MCP
 
-- Linear MCP SHALL be used in conjunction with /dev-docs/planning/README.md for all planning and project management. 
+- Linear MCP MUST be used for all planning and project management workflows
+- All task tracking, research findings, and progress updates SHALL be maintained in Linear
+- SESSION_PLAN.md files are deprecated - Linear is the single source of truth 
 
 ### Section VIII: Claude-Context
 
