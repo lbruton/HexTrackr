@@ -9,7 +9,7 @@
  * @author Shemp (Production-ready monitoring framework)
  */
 
-/* global console, performance, window, document */
+/* global console, performance, window, document, generateSecureId */
 
 (function(global) {
     "use strict";
