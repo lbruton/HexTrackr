@@ -8,6 +8,34 @@
                         <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
                              alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
                     </a>.</p>
+<h2>[1.0.30] - 2025-09-24</h2><h3>Enhanced</h3><h4>KEV Badge Added to Vulnerability Details Modal</h4><ul>
+<li><p><strong>Visual Consistency</strong>: Added KEV badge to Vulnerability Details Modal header for immediate KEV status visibility</p>
+<ul>
+<li>Badge appears on the right side of &quot;Vulnerability Information&quot; card header</li>
+<li>Only displays for vulnerabilities in CISA&#39;s KEV catalog (isKev === &quot;Yes&quot;)</li>
+<li>Maintains exact same appearance as KEV badges on vulnerability and device cards</li>
+</ul>
+</li>
+<li><p><strong>Implementation Details</strong>:</p>
+<ul>
+<li>Reuses existing <code>.kev-badge</code> CSS class for consistency</li>
+<li>Dynamically inserts badge using JavaScript in <code>updateKevBadge()</code> method</li>
+<li>Uses flexbox layout for proper positioning within card header</li>
+<li>Includes full accessibility support with keyboard navigation</li>
+</ul>
+</li>
+<li><p><strong>User Experience</strong>:</p>
+<ul>
+<li>Immediate visual indication of KEV status when viewing vulnerability details</li>
+<li>Clicking badge opens KEV details modal (same behavior as card badges)</li>
+<li>Consistent UI patterns across all vulnerability displays</li>
+<li>No additional CSS required - leverages existing badge styles</li>
+</ul>
+</li>
+</ul>
+<h4>Files Modified</h4><ul>
+<li><code>app/public/scripts/shared/vulnerability-details-modal.js</code> - Added updateKevBadge() method</li>
+</ul>
 <h2>[1.0.28] - 2025-09-24</h2><h3>Fixed - KEV Badge Modal Issue on Device Cards</h3><h4>Bug Resolution</h4><ul>
 <li><strong>Fixed Modal Behavior</strong>: KEV badges on device cards now correctly open the KEV details modal instead of the device security modal<ul>
 <li><strong>Root Cause</strong>: Incorrect onclick handler was calling <code>vulnManager.viewDeviceDetails()</code> instead of <code>showKevDetails()</code></li>
