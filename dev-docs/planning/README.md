@@ -1,74 +1,51 @@
-# HexTrackr Three-Mode Development Workflow
+# HexTrackr Simplified Development Workflow
 
-## Quick Start Pattern
+## Overview
+HexTrackr uses a streamlined Linear-only workflow that eliminates bureaucracy while maintaining quality standards.
 
-**User**: "Hey Claude, we need to fix X"
+## How It Works
 
-**Claude Response**:
-1. "Let me enter PLANNING_MODE" → Creates Linear issue with breakdown
-2. "Let me enter RESEARCH_MODE" → Investigates and documents findings
-3. "Let me enter IMPLEMENT_MODE" → Executes phase by phase
+### Simple Pattern
+1. **User Request**: "We need to fix/build [something]"
+2. **Linear Issue**: Create or update issue with brief task breakdown
+3. **Natural Work**: Implement with progress updates in Linear comments
+4. **Complete**: Update Linear status, run quality checks, commit
 
-## The Three Modes
+### Key Benefits
+- **No Dual Tracking**: Linear is the single source of truth
+- **Natural Flow**: Work conversationally without rigid modes
+- **Quality Maintained**: Still use linting, testing, JSDoc standards
+- **Context Preserved**: All research and decisions in Linear comments
 
-### 🎯 PLANNING_MODE
-**Purpose**: Break down any request into actionable 1-2 hour sessions
-**Output**: Linear issue with clear phases and checkboxes
-**No coding allowed**: Only planning and breakdown
+## Linear MCP Tools
+- `mcp__linear__create_issue` - Create new tickets
+- `mcp__linear__update_issue` - Update status and details
+- `mcp__linear__add_comment` - Add progress notes
+- `mcp__linear__list_issues` - Find existing work
 
-### 🔍 RESEARCH_MODE
-**Purpose**: Investigate codebase and document findings
-**Output**: Linear comments with research findings
-**No coding allowed**: Only discovery and documentation
+## Quality Standards (Still Required)
+- Test in Docker container (port 8989)
+- Run `npm run lint:all` before commits
+- Complete JSDoc documentation for functions
+- Follow existing code patterns
+- Create PRs for main branch merges
 
-### ⚙️ IMPLEMENT_MODE
-**Purpose**: Execute the plan created in planning mode
-**Output**: Code changes following Linear checkboxes
-**Focus**: Implementation only, no planning changes
+## What We Removed
+- SESSION_PLAN.md files
+- Complex three-mode workflow (PLANNING_MODE, RESEARCH_MODE, IMPLEMENT_MODE)
+- Duplicate markdown documentation
+- Rigid phase boundaries
 
-## Mode Instructions
+## What We Kept
+- Linear issue tracking
+- Code quality checks
+- Git workflow with feature branches
+- JSDoc documentation requirements
+- Docker testing requirement
 
-Each mode has its own instruction file with specific steps:
-
-- [`modes/PLANNING_MODE.md`](modes/PLANNING_MODE.md) - How to create plans
-- [`modes/RESEARCH_MODE.md`](modes/RESEARCH_MODE.md) - How to research effectively
-- [`modes/IMPLEMENT_MODE.md`](modes/IMPLEMENT_MODE.md) - How to execute plans
-
-## Linear as Single Source of Truth
-
-- **Planning**: Issue description contains the breakdown
-- **Research**: Comments contain all findings
-- **Implementation**: Checkboxes track progress
-- **No duplicate files**: Linear contains everything
-
-## Directory Structure
-
-```
-/dev-docs/planning/
-├── README.md                # This file
-├── modes/                   # Mode instruction files
-│   ├── PLANNING_MODE.md    # Planning instructions
-│   ├── RESEARCH_MODE.md    # Research instructions
-│   └── IMPLEMENT_MODE.md   # Implementation instructions
-├── templates/              # Reusable templates (for reference)
-└── archive/                # Old workflow docs (for reference)
-```
-
-## Key Benefits
-
-- **Simple**: Three clear modes instead of complex nested processes
-- **Consistent**: Same pattern every time regardless of task size
-- **Linear-focused**: Single source of truth, no duplicate tracking
-- **Flexible**: Works for 1-hour fixes or multi-day features
-- **Trackable**: Progress always visible in Linear
-
-## Getting Started
-
-1. Read the mode instructions that match your current task
-2. Follow the pattern: Planning → Research → Implement
-3. Use Linear for all tracking and documentation
-4. Each mode has clear boundaries and deliverables
+## Archive
+The old complex workflow files are preserved in `/archive/old-three-mode-system/` for reference.
 
 ---
 
-*This simplified workflow eliminates SESSION_PLAN.md maintenance while keeping all the benefits of structured development through Linear's built-in features.*
+*This simplified approach maintains all quality benefits while removing workflow friction.*
