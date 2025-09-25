@@ -62,6 +62,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Files Modified
 - `app/public/scripts/shared/vulnerability-details-modal.js` - Added updateKevBadge() method
 
+### Security
+
+#### Removed Dead Code with Cryptographic Weakness
+
+**HEX-18 through HEX-22**: Eliminated unused `updateTrendIndicators()` function
+- **File**: `app/public/scripts/shared/vulnerability-statistics.js`
+- **Lines Removed**: 126-177 (52 lines of dead code)
+- **Issues Resolved**: 5 Math.random() vulnerabilities in lines 155, 156, 157, 158, 166
+- **Impact**: Removed unused function that was never called, eliminating false positive security warnings
+- **Codacy IDs**:
+  - HEX-18: `efc9a590-06bf-42c9-a50a-176ff3bfd242`
+  - HEX-19: `9622b92c-5833-4bd9-8a0c-3ce15a08e119`
+  - HEX-20: `72166284-86ca-4aa5-9b07-cf6021fc972d`
+  - HEX-21: `e151151a-eb9c-4893-b3ba-54fcd82686b2`
+  - HEX-22: `15801a4e-a946-4756-8160-b88022efcea3`
+
+**HEX-23**: Documented as false positive (no fix needed)
+- **File**: `app/public/scripts/shared/vulnerability-details-modal.js` line 1067
+- **Usage**: UI operation tracking for race condition prevention (`Date.now() + Math.random()`)
+- **Status**: Marked for Codacy suppression - legitimate non-cryptographic use for modal operation IDs
+- **Codacy ID**: `2811f086-463f-4309-a01a-3a53e2d89149`
+
 ## [1.0.28] - 2025-09-24
 
 ### Fixed - KEV Badge Modal Issue on Device Cards
