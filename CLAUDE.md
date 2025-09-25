@@ -10,20 +10,21 @@ HexTrackr is a vulnerability management system for tracking security vulnerabili
 
 When working on this project the AI Agent SHALL follow the CONSTITUTION.md
 
-## Development Workflow (MANDATORY)
+## Development Workflow (SIMPLIFIED)
 
-### Three-Mode Development Pattern
-HexTrackr uses a simplified three-mode workflow with Linear as the single source of truth:
+### Linear-Only Workflow
+HexTrackr uses a simplified workflow with Linear as the single source of truth:
 
-1. **PLANNING_MODE**: Break down requests into actionable 1-2 hour sessions
-2. **RESEARCH_MODE**: Investigate codebase and document findings
-3. **IMPLEMENT_MODE**: Execute plans following Linear checkboxes
+1. **Work Assignment**: User describes what needs to be done
+2. **Linear Issue**: Create/update Linear issue with task breakdown
+3. **Implementation**: Execute work with progress updates in Linear comments
+4. **Completion**: Update Linear status and commit changes
 
-### Workflow Instructions
-- **Main Guide**: `/dev-docs/planning/README.md`
-- **Planning Mode**: `/dev-docs/planning/modes/PLANNING_MODE.md`
-- **Research Mode**: `/dev-docs/planning/modes/RESEARCH_MODE.md`
-- **Implement Mode**: `/dev-docs/planning/modes/IMPLEMENT_MODE.md`
+### Key Principles
+- **Casual Approach**: Natural conversation flow, no rigid modes
+- **Linear-Centric**: All planning, research, and progress tracking in Linear
+- **Quality Focus**: Maintain code quality standards without bureaucracy
+- **No Dual Tracking**: Eliminate markdown planning files
 
 ### Linear Issue Format
 ```
@@ -247,39 +248,17 @@ The system uses a sophisticated rollover pipeline:
 
 ## Common Development Tasks
 
-### Starting a New Feature (REQUIRED WORKFLOW)
-1. **Create Linear Issue**:
-   ```bash
-   # Use Linear MCP to create issue
-   Title: "v1.0.XX: Feature Name"
-   Description: "Brief description, links to SESSION_PLAN.md"
-   ```
-
-2. **Set Up Planning**:
-   ```bash
-   mkdir -p /dev-docs/planning/active/v1.0.XX-feature/{research,implementation}
-   cp /dev-docs/planning/templates/SESSION_PLAN.md /dev-docs/planning/active/v1.0.XX-feature/
-   ```
-
-3. **Research Phase**:
-   - Use Claude-Context to search codebase
-   - Use Context7 for framework docs
-   - Document findings in SESSION_PLAN.md
-   - Identify affected files and dependencies
-
-4. **Implementation**:
+### Starting a New Feature (SIMPLIFIED WORKFLOW)
+1. **Discuss with User**: Understand what needs to be built/fixed
+2. **Create/Update Linear Issue**: Brief description with task breakdown in comments
+3. **Create Branch**:
    ```bash
    git checkout main && git pull
-   git checkout -b feature/v1.0.XX-feature
-   # Work through SESSION_PLAN.md checkboxes
-   # Commit after each completed task
+   git checkout -b feature/v1.0.XX-feature-name
    ```
-
-5. **Testing & Completion**:
-   - Test in Docker (port 8989)
-   - Run linters: `npm run lint:all`
-   - Update Linear to "Done"
-   - Create PR to main branch
+4. **Implement**: Work naturally with progress updates in Linear comments
+5. **Quality Check**: Test in Docker (port 8989), run `npm run lint:all`
+6. **Complete**: Update Linear status, create PR, merge to main
 
 ### Adding a New API Endpoint
 1. Create controller in `app/controllers/`
@@ -304,49 +283,20 @@ The system uses a sophisticated rollover pipeline:
    - `window.showToast(message, type)` - Display notifications
 5. Test in Docker container on port 8989
 
-## Session Management & Agent Handoffs
+## Linear Integration & Progress Tracking
 
-### Session Structure (2-hour blocks)
-1. **Start**: Review SESSION_PLAN.md, check Linear, pull latest code
-2. **Work**: Complete checkboxes sequentially, commit frequently
-3. **End**: Update session log, push changes, update Linear
+### Simple Progress Pattern
+1. **Work Updates**: Add comments to Linear issues as work progresses
+2. **Status Changes**: Update Linear status (Todo → In Progress → Done)
+3. **Context Preservation**: Use Linear comments for research findings and decisions
+4. **Handoff Ready**: All context lives in Linear - no separate files to maintain
 
-### Required Session Documentation
-Each session MUST update SESSION_PLAN.md with:
-- Completed tasks (✅ with details)
-- In-progress items (🔄 with exact status)
-- Blockers or discoveries (⚠️)
-- Next priority (🎯)
-- Commit hash
-
-### Agent Handoff Checklist
-**Outgoing Agent**:
-- [ ] SESSION_PLAN.md updated with session log
-- [ ] All changes committed with descriptive messages
-- [ ] Linear issue updated with progress
-- [ ] Next steps clearly documented
-- [ ] Memento entity created if significant progress
-
-**Incoming Agent**:
-- [ ] Read SESSION_PLAN.md (5 minutes max)
-- [ ] Check git status and recent commits
-- [ ] Review Linear issue for updates
-- [ ] Understand next priority before starting
-
-### Planning Folder Structure
-```
-/dev-docs/planning/
-├── templates/              # Reusable templates
-│   ├── SESSION_PLAN.md    # Main planning document
-│   ├── BUG_REPORT.md      # Bug tracking template
-│   └── FEATURE_REQUEST.md # Feature specification
-├── active/                # Current work
-│   └── v1.0.XX-feature/   # Active feature folder
-│       ├── SESSION_PLAN.md
-│       ├── research/      # Research findings
-│       └── implementation/# Code snippets
-└── completed/             # Archived completed work
-```
+### Linear MCP Integration
+The project uses Linear MCP tools for issue tracking:
+- `linear_create_issue`: Create new tickets
+- `linear_update_issue`: Update status and details
+- `linear_search_issues`: Find existing issues
+- `linear_add_comment`: Add progress updates
 
 ## Environment Configuration
 
@@ -376,20 +326,12 @@ See `.env.example` for complete configuration options.
 
 ## Additional Notes
 
-### Linear MCP Integration
-The project uses Linear MCP tools for issue tracking:
-- `linear_create_issue`: Create new tickets
-- `linear_update_issue`: Update status and details
-- `linear_search_issues`: Find existing issues
-- `linear_add_comment`: Add progress updates
-- Always link SESSION_PLAN.md in issue descriptions
-
 ### Development Philosophy
-- **Plan First**: Never code without SESSION_PLAN.md
-- **Research Thoroughly**: Use Claude-Context and Context7
-- **Document Everything**: Enable seamless handoffs
+- **Keep It Simple**: Linear for tracking, natural conversation for planning
+- **Quality First**: Maintain code standards without bureaucratic overhead
+- **Research Thoroughly**: Use Claude-Context and Context7 when needed
 - **Test Continuously**: Docker container on port 8989
-- **Commit Frequently**: Checkpoint after each task
+- **Document in Code**: JSDoc comments and Linear comments for context
 
 ### Technical Architecture
 - The system follows a migration from monolithic to modular architecture
