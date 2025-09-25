@@ -307,11 +307,15 @@ When creating Linear issues, please follow these practices for better organizati
    - For future non-HexTrackr work, update this guidance accordingly
 
 2. **Label Usage**: Apply at least one type label to every issue
+
+   **Team-Specific Labels** (HexTrackr team):
+   - **Security** (red): Security vulnerabilities, Codacy issues, crypto improvements
+   - **Enhancement** (purple): UI polish, UX improvements, non-critical enhancements
+
+   **Workspace-Inherited Labels**:
    - **Bug**: Defects, errors, or unexpected behavior
-   - **Feature**: New functionality or capabilities
-   - **Improvement**: Enhancements to existing functionality
-   - **Security**: Security-related issues (create if needed)
-   - **Enhancement**: Alternative to "Improvement" (create if preferred)
+   - **Feature**: New functionality or major capabilities
+   - **Improvement**: Enhancements to existing functionality (similar to Enhancement)
 
 3. **Priority Labels**: Consider adding priority when relevant
    - High: Critical issues blocking work or affecting users
