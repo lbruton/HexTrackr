@@ -8,7 +8,7 @@
  */
 
 /* eslint-env browser */
-/* global performance */
+/* global performance, module */
 
 "use strict";
 
@@ -62,7 +62,11 @@ function generateSecureId(prefix, randomBytes = 2) {
     }
 }
 
-// Export for use in other modules (CommonJS compatibility for potential future use)
+// Export for use in other modules
 if (typeof module !== "undefined" && module.exports) {
+    // Node.js environment (CommonJS compatibility for potential future use)
     module.exports = { generateSecureId };
+} else if (typeof window !== "undefined") {
+    // Browser environment - make function globally available
+    window.generateSecureId = generateSecureId;
 }
