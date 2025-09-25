@@ -5,7 +5,7 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.31] - 2025-09-24
+## [1.0.31] - 2025-09-25
 
 ### Security Fixes
 
@@ -75,6 +75,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduced total code by ~30 lines
 - Single source of truth for secure ID generation
 - Improved maintainability and testability
+
+### Fixed
+
+#### ESLint no-undef Errors in Crypto Implementation (HEX-61)
+
+**Issue**: The crypto-utils.js refactoring introduced 4 ESLint no-undef errors due to module compatibility issues
+
+**Resolution**: Fixed browser/Node.js compatibility in crypto-utils module
+
+**Errors Fixed**:
+- `crypto-utils.js` lines 66-67: 'module' is not defined - Added module to ESLint globals
+- `toast-manager.js` line 74: 'generateSecureId' is not defined - Added global directive
+- `modal-monitoring.js` line 646: 'generateSecureId' is not defined - Added global directive
+
+**Implementation**:
+- Added proper module detection and browser window export in crypto-utils.js
+- Added ESLint global directives for generateSecureId in consuming files
+- Maintains compatibility with both browser and Node.js environments
+
+### Configuration
+
+#### Codacy Tool Configuration Cleanup
+
+**Issue**: PMD and Semgrep tools causing analysis errors for JavaScript project
+
+**Resolution**: Removed Java-specific and proprietary tools from Codacy configuration
+
+**Changes**:
+- Removed PMD tool (Java analyzer not applicable to JavaScript project)
+- Removed Semgrep tool (proprietary extension errors)
+- Deleted `ruleset.xml` containing Java PMD rules
+- Updated `.codacy/codacy.yaml` to include only relevant tools (ESLint, Lizard, Trivy, Pylint)
+- Cleaned `.codacy/tools-configs/languages-config.yaml` to remove PMD and Semgrep entries
+
+**Impact**:
+- Eliminated all PMD Java ruleset errors
+- Resolved Semgrep proprietary extension failures
+- Clean Codacy analysis with 0 configuration errors
 
 ## [1.0.30] - 2025-09-24
 
