@@ -859,9 +859,16 @@ export class ThemeController {
           return;
         }
 
+        // HEX-65: Check if theme is already applied by inline script (FOUC prevention)
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+        if (currentTheme === safeTheme) {
+          // Theme already applied by inline script, just update classes
+          console.debug(`Theme '${safeTheme}' already applied by inline script, syncing classes`);
+        }
+
         // T030: XSS-safe attribute setting using HexTrackr security patterns
         const sanitizedTheme = window.escapeHtml ? window.escapeHtml(safeTheme) : safeTheme;
-        
+
         // Update Bootstrap 5.3+ data-bs-theme attribute for Tabler.io compatibility
         document.documentElement.setAttribute('data-bs-theme', sanitizedTheme);
         
