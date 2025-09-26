@@ -1885,6 +1885,18 @@ export class ThemeController {
       // Update internal state to match pre-applied theme without DOM manipulation
       this.currentTheme = validatedTheme;
 
+      // Store the theme preference to ensure consistency
+      try {
+        const themeData = {
+          theme: validatedTheme,
+          timestamp: new Date().toISOString(),
+          source: 'pre-applied'
+        };
+        this.storage.setItem('hextrackr-theme', JSON.stringify(themeData));
+      } catch (e) {
+        console.warn('Could not update stored theme preference:', e);
+      }
+
       // Notify listeners that theme is already set (skip DOM application)
       this.notifyListeners(validatedTheme, 'pre-applied');
 
