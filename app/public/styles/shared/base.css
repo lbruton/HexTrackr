@@ -79,6 +79,21 @@ body {
     transform: translateY(-2px);
 }
 
+/* HEX-65: Critical dark theme card styles for immediate application */
+[data-bs-theme="dark"] .card {
+    background-color: #1a2234 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .card-body {
+    background-color: transparent !important;
+}
+
+[data-bs-theme="dark"] .card-header {
+    background-color: #202c3f !important;
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
 /* Loading and animation base styles */
 .loading-pulse {
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
