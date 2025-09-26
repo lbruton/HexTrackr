@@ -47,6 +47,56 @@ nav.breadcrumb {
   margin-left: 0.75rem;
 }
 
+/* Changelog accordion styling for improved UX */
+#changelogAccordion .accordion-button {
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 1rem 1.25rem;
+}
+
+#changelogAccordion .accordion-body {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+#changelogAccordion .accordion-item {
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+}
+
+#changelogAccordion .accordion-header {
+  margin-bottom: 0;
+}
+
+/* Version badge styling for better visual hierarchy */
+.changelog-version-badge {
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Ensure proper spacing between changelog sections */
+#changelogAccordion .accordion-body h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+#changelogAccordion .accordion-body h4 {
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Dark mode adjustments for changelog accordion */
+[data-bs-theme="dark"] #changelogAccordion .accordion-item {
+  background-color: var(--bs-dark);
+  border-color: var(--bs-border-color-translucent);
+}
+
+[data-bs-theme="dark"] #changelogAccordion .accordion-button {
+  background-color: var(--bs-dark);
+  border-color: var(--bs-border-color-translucent);
+}
+
 .loading-spinner {
   display: none;
 }
