@@ -1,14 +1,31 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>Changelog</h1><p>All notable changes to HexTrackr will be documented in this file.</p>
+    <div class="accordion" id="changelogAccordion"><h1>Changelog</h1><p>All notable changes to HexTrackr will be documented in this file.</p>
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/" target="_blank" title="Keep a Changelog" class="me-2">
                         <img src="https://img.shields.io/badge/changelog-Keep%20a%20Changelog-orange?style=flat&logo=markdown&logoColor=white" 
                              alt="Keep a Changelog" style="height: 24px;" class="img-fluid"/>
-                    </a>,<br>and this project adheres to <a href="https://semver.org/spec/v2.0.0.html" target="_blank" title="Semantic Versioning" class="me-2">
+                    </a>,</p>
+<p>and this project adheres to <a href="https://semver.org/spec/v2.0.0.html" target="_blank" title="Semantic Versioning" class="me-2">
                         <img src="https://img.shields.io/badge/versioning-Semantic%20Versioning-blue?style=flat&logo=semver&logoColor=white" 
                              alt="Semantic Versioning" style="height: 24px;" class="img-fluid"/>
                     </a>.</p>
-<h2>[1.0.31] - 2025-09-25</h2><h3>Security Fixes</h3><h4>Critical: Cryptographically Weak Random Number Generators</h4><p><strong>HEX-14</strong>: Fixed multiple Math.random() vulnerabilities</p>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button "
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-31"
+                                    aria-expanded="true"
+                                    aria-controls="version-1-0-31">
+                                [1.0.31] - 2025-09-25
+                            </button>
+                        </h2>
+                        <div id="version-1-0-31"
+                             class="accordion-collapse collapse show"
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Security Fixes</h3><h4>Critical: Cryptographically Weak Random Number Generators</h4><p><strong>HEX-14</strong>: Fixed multiple Math.random() vulnerabilities</p>
 <ul>
 <li><code>app/public/scripts/shared/vulnerability-cards.js</code> - Added <code>generateSecureVulnId()</code> method using <code>crypto.getRandomValues()</code></li>
 <li><code>app/services/ticketService.js</code> - Updated to use <code>crypto.randomBytes()</code> for ticket ID generation</li>
@@ -99,7 +116,26 @@
 <li>Resolved Semgrep proprietary extension failures</li>
 <li>Clean Codacy analysis with 0 configuration errors</li>
 </ul>
-<h2>[1.0.30] - 2025-09-24</h2><h3>Enhanced</h3><h4>KEV Badge Added to Vulnerability Details Modal</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-30"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-30">
+                                [1.0.30] - 2025-09-24
+                            </button>
+                        </h2>
+                        <div id="version-1-0-30"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Enhanced</h3><h4>KEV Badge Added to Vulnerability Details Modal</h4><ul>
 <li><p><strong>Visual Consistency</strong>: Added KEV badge to Vulnerability Details Modal header for immediate KEV status visibility</p>
 <ul>
 <li>Badge appears on the right side of &quot;Vulnerability Information&quot; card header</li>
@@ -165,7 +201,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.28] - 2025-09-24</h2><h3>Fixed - KEV Badge Modal Issue on Device Cards</h3><h4>Bug Resolution</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-28"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-28">
+                                [1.0.28] - 2025-09-24
+                            </button>
+                        </h2>
+                        <div id="version-1-0-28"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed - KEV Badge Modal Issue on Device Cards</h3><h4>Bug Resolution</h4><ul>
 <li><strong>Fixed Modal Behavior</strong>: KEV badges on device cards now correctly open the KEV details modal instead of the device security modal<ul>
 <li><strong>Root Cause</strong>: Incorrect onclick handler was calling <code>vulnManager.viewDeviceDetails()</code> instead of <code>showKevDetails()</code></li>
 <li><strong>User Impact</strong>: Security teams can now quickly access KEV vulnerability details directly from device cards</li>
@@ -190,7 +245,26 @@
 <li><code>app/public/scripts/shared/vulnerability-data.js</code> - Device aggregation logic for KEV CVE tracking</li>
 <li><code>app/public/scripts/shared/vulnerability-cards.js</code> - KEV badge event handlers</li>
 </ul>
-<h2>[1.0.27] - 2025-09-24</h2><h3>Added - KEV Badge on Device Cards</h3><h4>Enhanced Risk Visibility</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-27"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-27">
+                                [1.0.27] - 2025-09-24
+                            </button>
+                        </h2>
+                        <div id="version-1-0-27"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added - KEV Badge on Device Cards</h3><h4>Enhanced Risk Visibility</h4><ul>
 <li><strong>Consistent UI Indicators</strong>: Added KEV (Known Exploited Vulnerabilities) badges to device cards, creating visual consistency with vulnerability cards<ul>
 <li><strong>Badge Appearance</strong>: Red KEV badge displays in upper right corner when ANY vulnerability on that device is in CISA&#39;s KEV catalog</li>
 <li><strong>Risk Assessment</strong>: Users can now instantly identify high-risk devices requiring immediate attention</li>
@@ -229,7 +303,26 @@
 <h4>Linear Issue</h4><ul>
 <li><strong>HEX-10</strong>: v1.0.27: Feature - Add KEV Badge to Device Cards (Completed)</li>
 </ul>
-<h2>[1.0.26] - 2025-09-23</h2><h3>Fixed - Low Severity Vulnerability Visibility</h3><h4>Critical Bug Resolution</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-26"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-26">
+                                [1.0.26] - 2025-09-23
+                            </button>
+                        </h2>
+                        <div id="version-1-0-26"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed - Low Severity Vulnerability Visibility</h3><h4>Critical Bug Resolution</h4><ul>
 <li><strong>Complete Visibility Restored</strong>: Fixed critical issue where 3,314 Low severity vulnerabilities were completely hidden from users<ul>
 <li><strong>Root Cause</strong>: VPR-based sorting combined with 10K frontend limit pushed Low severity items (VPR 1.4-5.1) beyond visible range</li>
 <li><strong>Impact</strong>: Users could not filter, view, or access any Low severity vulnerabilities despite their presence in database</li>
@@ -292,7 +385,26 @@
 <li><strong>Commits</strong>: <code>e0538ec</code> (backend sorting), <code>2faa0cb</code> (async processing)</li>
 <li><strong>Performance Strategy</strong>: Balanced approach maintaining filtering capability while optimizing browser performance</li>
 </ul>
-<h2>[1.0.25] - 2025-09-23</h2><h3>Added - Import Summary HTML Export</h3><h4>Professional Report Generation</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-25"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-25">
+                                [1.0.25] - 2025-09-23
+                            </button>
+                        </h2>
+                        <div id="version-1-0-25"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added - Import Summary HTML Export</h3><h4>Professional Report Generation</h4><ul>
 <li><strong>Standalone HTML Reports</strong>: Added ability to download import summaries as complete HTML documents with embedded CSS styling<ul>
 <li><strong>Export Button</strong>: New &quot;Download Report&quot; button appears in progress modal when CVE import summaries are available</li>
 <li><strong>Self-Contained Files</strong>: Reports include all necessary CSS (Tabler.io framework, HexTrackr variables, component styles) embedded inline</li>
@@ -339,7 +451,26 @@
 <li><strong>DOM Cleanup</strong>: Systematic clearing of dynamically created summary content and UI elements</li>
 <li><strong>ESLint Compliance</strong>: All code modifications passed linting validation with zero errors</li>
 </ul>
-<h2>[1.0.24] - 2025-09-23</h2><h3>Enhanced - Vulnerability Card Polish</h3><h4>Card Layout Simplification</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-24"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-24">
+                                [1.0.24] - 2025-09-23
+                            </button>
+                        </h2>
+                        <div id="version-1-0-24"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Enhanced - Vulnerability Card Polish</h3><h4>Card Layout Simplification</h4><ul>
 <li><strong>Streamlined Card Body</strong>: Removed the redundant criticality subcards from vulnerability cards to focus on the key summary details and reduce visual noise.</li>
 <li><strong>Consistent Spacing</strong>: Tweaked card padding to accommodate the simplified layout without affecting existing content hierarchy.</li>
 </ul>
@@ -371,7 +502,26 @@
 <li><code>app/public/scripts/shared/vulnerability-cards.js</code> (modified)</li>
 <li><code>app/public/pages/vulnerabilities.html</code> (updated CSS references)</li>
 </ul>
-<h2>[1.0.23] - 2025-09-22</h2><h3>Added - Interactive Statistics Card Filtering</h3><h4>Enhanced Ticket Management User Experience</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-23"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-23">
+                                [1.0.23] - 2025-09-22
+                            </button>
+                        </h2>
+                        <div id="version-1-0-23"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added - Interactive Statistics Card Filtering</h3><h4>Enhanced Ticket Management User Experience</h4><ul>
 <li><strong>Clickable Statistics Cards</strong>: Transformed passive statistics displays into interactive filter controls<ul>
 <li><strong>Total Tickets Card</strong>: Shows all tickets, acts as filter reset button</li>
 <li><strong>Open Tickets Card</strong>: Filters to active tickets (excludes Closed, Completed, Failed statuses)</li>
@@ -444,7 +594,26 @@
 <li><strong>Compatibility</strong>: Maintains full backward compatibility with existing workflows</li>
 <li><strong>Testing</strong>: Comprehensive functionality verified across all supported browsers</li>
 </ul>
-<h2>[1.0.22] - 2025-09-21</h2><h3>Enhanced - KEV (Known Exploited Vulnerabilities) Integration</h3><h4>AG-Grid Table Improvements</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-22"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-22">
+                                [1.0.22] - 2025-09-21
+                            </button>
+                        </h2>
+                        <div id="version-1-0-22"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Enhanced - KEV (Known Exploited Vulnerabilities) Integration</h3><h4>AG-Grid Table Improvements</h4><ul>
 <li><p><strong>Filterable KEV Column</strong>: Replaced fire emoji (🔥) with filterable YES/NO pills in KEV column</p>
 <ul>
 <li>Red badge for &quot;YES&quot; (vulnerability is in KEV catalog)</li>
@@ -515,7 +684,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.21] - 2025-09-21</h2><h3>Added</h3><h4>Unified Template Variable System</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-21"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-21">
+                                [1.0.21] - 2025-09-21
+                            </button>
+                        </h2>
+                        <div id="version-1-0-21"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added</h3><h4>Unified Template Variable System</h4><ul>
 <li><p><strong>Centralized Variable Configuration</strong>: Created <code>template-variables.js</code> with unified variable definitions</p>
 <ul>
 <li>Consistent naming conventions across all template types ([HEXAGON_TICKET], [SERVICENOW_TICKET], etc.)</li>
@@ -598,7 +786,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.20] - 2025-09-21</h2><h3>Added</h3><h4>Email Template Generation for Tickets</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-20"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-20">
+                                [1.0.20] - 2025-09-21
+                            </button>
+                        </h2>
+                        <div id="version-1-0-20"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added</h3><h4>Email Template Generation for Tickets</h4><ul>
 <li><p><strong>Third Tab in Ticket Modal</strong>: Added &quot;Email Template&quot; tab alongside existing &quot;Ticket Details&quot; and &quot;Vulnerabilities&quot; tabs</p>
 <ul>
 <li>Professional email template automatically generated from ticket data</li>
@@ -631,7 +838,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.19] - 2025-09-21</h2><h3>Added</h3><h4>Enhanced Ticket Modal with Vulnerability Integration</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-19"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-19">
+                                [1.0.19] - 2025-09-21
+                            </button>
+                        </h2>
+                        <div id="version-1-0-19"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added</h3><h4>Enhanced Ticket Modal with Vulnerability Integration</h4><ul>
 <li><p><strong>Dual Copy Buttons</strong>: Ticket modal now features two separate copy buttons</p>
 <ul>
 <li>&quot;Ticket&quot; button: Copies ticket markdown to clipboard (existing functionality)</li>
@@ -657,7 +883,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.18] - 2025-09-20</h2><h3>Added</h3><h4>UI/UX Enhancements</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-18"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-18">
+                                [1.0.18] - 2025-09-20
+                            </button>
+                        </h2>
+                        <div id="version-1-0-18"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added</h3><h4>UI/UX Enhancements</h4><ul>
 <li><strong>Attachment Visibility for Tickets</strong>: Added comprehensive tooltip functionality for &quot;Attach Documentation&quot; button on tickets2.html<ul>
 <li>Displays list of currently attached files with sizes on hover</li>
 <li>Shows file count badge when documents are attached (e.g., &quot;(3)&quot;)</li>
@@ -693,7 +938,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.17] - 2025-09-19</h2><h3>Added</h3><h4>UI/UX Enhancements</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-17"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-17">
+                                [1.0.17] - 2025-09-19
+                            </button>
+                        </h2>
+                        <div id="version-1-0-17"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added</h3><h4>UI/UX Enhancements</h4><ul>
 <li><strong>tickets2.html Beta Implementation</strong>: Introduced beta version of redesigned tickets page with AG-Grid integration<ul>
 <li>Advanced table with column filtering, sorting, resizing, and responsive design</li>
 <li>SITE and LOCATION columns with ticket accent colors for visual categorization</li>
@@ -782,7 +1046,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.16] - 2025-09-18</h2><h3>Fixed</h3><h4>Documentation Navigation State Management</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-16"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-16">
+                                [1.0.16] - 2025-09-18
+                            </button>
+                        </h2>
+                        <div id="version-1-0-16"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed</h3><h4>Documentation Navigation State Management</h4><ul>
 <li><strong>Navigation State Persistence Issue</strong>: Fixed dual highlighting of menu sections when navigating to documentation from external pages<ul>
 <li>Root cause: Saved navigation state from localStorage was restored even when accessing docs from tickets/vulnerabilities pages</li>
 <li>Solution: Detect external navigation via <code>document.referrer</code> and clear saved state for clean entry</li>
@@ -807,7 +1090,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.15] - 2025-09-17</h2><h3>Changed</h3><h4>Backend Modularization Complete</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-15"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-15">
+                                [1.0.15] - 2025-09-17
+                            </button>
+                        </h2>
+                        <div id="version-1-0-15"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Changed</h3><h4>Backend Modularization Complete</h4><ul>
 <li><strong>Monolithic Refactor Achievement</strong>: Successfully modularized 3,805-line monolithic server.js<ul>
 <li>Reduced main server.js to ~205 lines (94.6% reduction)</li>
 <li>Extracted into 5 controllers, 4 services, 5 routes, 3 config modules, and 3 utilities</li>
@@ -848,7 +1150,26 @@
 <li><strong>Maintainability</strong>: Improved code organization from single 3,805-line file to 15+ focused modules</li>
 <li><strong>Testability</strong>: Enabled unit testing through dependency injection and service separation</li>
 </ul>
-<h2>[1.0.14] - 2025-09-14</h2><h3>Added</h3><h4>Documentation Portal Enhancements</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-14"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-14">
+                                [1.0.14] - 2025-09-14
+                            </button>
+                        </h2>
+                        <div id="version-1-0-14"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added</h3><h4>Documentation Portal Enhancements</h4><ul>
 <li><strong>AG-Grid Community Integration</strong>: Advanced data tables for interactive documentation<ul>
 <li>Interactive table converter for markdown tables to AG-Grid format</li>
 <li>Roadmap table sorting functionality with real-time filtering</li>
@@ -967,7 +1288,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.13] - 2025-09-13</h2><h3>Added</h3><h4>Dark Mode Theme System (Spec 005)</h4><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-13"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-13">
+                                [1.0.13] - 2025-09-13
+                            </button>
+                        </h2>
+                        <div id="version-1-0-13"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added</h3><h4>Dark Mode Theme System (Spec 005)</h4><ul>
 <li><strong>Complete Dark/Light Theme Implementation</strong>: Full theme switching system with accessibility focus<ul>
 <li>System preference detection using <code>prefers-color-scheme</code> media query</li>
 <li>Manual theme toggle with persistent localStorage storage (sessionStorage fallback for private browsing)</li>
@@ -1038,7 +1378,26 @@
 <li>T003 Extract vulnerability-cards.js ✅ COMPLETED</li>
 <li>T004 Create vulnerability-core.js ✅ COMPLETED</li>
 </ul>
-<h2>[1.0.11] - 2025-09-08 (Pre-Release)</h2><h3>Completed - Sprint T001-T006: JavaScript Modularization Success</h3><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-11"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-11">
+                                [1.0.11] - 2025-09-08 (Pre-Release)
+                            </button>
+                        </h2>
+                        <div id="version-1-0-11"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Completed - Sprint T001-T006: JavaScript Modularization Success</h3><ul>
 <li><p><strong>Extraordinary Sprint Achievement</strong>: 4-week sprint completed in 1 day with 95.1% code reduction</p>
 <ul>
 <li><strong>11 Specialized Modules Created</strong>: Complete modular architecture from 2,429-line monolith</li>
@@ -1111,7 +1470,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.10] - 2025-09-07</h2><h3>Fixed - Real-Time Progress Tracking</h3><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-10"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-10">
+                                [1.0.10] - 2025-09-07
+                            </button>
+                        </h2>
+                        <div id="version-1-0-10"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed - Real-Time Progress Tracking</h3><ul>
 <li><strong>WebSocket Progress Updates</strong>: Fixed CSV import progress modal hanging at 95% with spinning loading circle<ul>
 <li><strong>Session ID Synchronization</strong>: Resolved frontend/backend session ID mismatch preventing real-time updates<ul>
 <li>Frontend generating: <code>import_1757226509515_1rd7p4qpd</code></li>
@@ -1150,7 +1528,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.9] - 2025-09-07</h2><h3>Code Quality - Comprehensive Codacy Resolution</h3><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-9"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-9">
+                                [1.0.9] - 2025-09-07
+                            </button>
+                        </h2>
+                        <div id="version-1-0-9"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Code Quality - Comprehensive Codacy Resolution</h3><ul>
 <li><strong>320 Issues Resolved</strong>: Systematic code quality review resolved comprehensive issues<ul>
 <li><strong>SQL Schema Compliance</strong>: Fixed critical syntax errors in <code>data/schema.sql</code><ul>
 <li>Corrected comment formatting and positioning for SQLite compatibility</li>
@@ -1207,7 +1604,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.8] - 2025-09-06</h2><h3>Security Enhancements</h3><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-8"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-8">
+                                [1.0.8] - 2025-09-06
+                            </button>
+                        </h2>
+                        <div id="version-1-0-8"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Security Enhancements</h3><ul>
 <li><strong>XSS Protection</strong>: Fixed critical AG Grid cell renderer vulnerability by replacing dangerous inline onclick handlers with secure event system<ul>
 <li>Removed vulnerable <code>onclick=&quot;vulnManager.viewDeviceDetails(&#39;${hostname}&#39;)&quot;</code> pattern susceptible to code injection</li>
 <li>Implemented secure <code>onCellClicked</code> event handler with proper parameter validation</li>
@@ -1255,7 +1671,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.6] - 2025-09-06</h2><h3>Fixed</h3><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-6"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-6">
+                                [1.0.6] - 2025-09-06
+                            </button>
+                        </h2>
+                        <div id="version-1-0-6"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed</h3><ul>
 <li><strong>Critical Modal Aggregation System</strong>: Resolved major user-facing issues with modal data display<ul>
 <li>Fixed vulnerability modal showing only 1 device instead of properly aggregating all affected devices (now shows 24 devices for CVE-2017-3881)</li>
 <li>Fixed device modal showing only 1 vulnerability instead of properly aggregating all vulnerabilities per device (now shows 12 vulnerabilities for grimesnswan03)</li>
@@ -1282,7 +1717,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.7] - 2025-09-06</h2><h3>Enhanced - Documentation Infrastructure</h3><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-7"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-7">
+                                [1.0.7] - 2025-09-06
+                            </button>
+                        </h2>
+                        <div id="version-1-0-7"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Enhanced - Documentation Infrastructure</h3><ul>
 <li><strong>Documentation Infrastructure</strong>: Comprehensive documentation update with modal architecture patterns<ul>
 <li>Documented modal aggregation system using description field as universal matching key</li>
 <li>Enhanced testing documentation with Playwright browser automation integration</li>
@@ -1305,7 +1759,26 @@
 <li><strong>Ticket System Modularization</strong>: Apply lessons learned to tickets.js refactoring</li>
 <li><strong>Advanced Modal Features</strong>: Implement export and reporting functionality from modal views</li>
 </ul>
-<h2>[1.0.5] - 2025-09-05</h2><h3>Added</h3><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-5"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-5">
+                                [1.0.5] - 2025-09-05
+                            </button>
+                        </h2>
+                        <div id="version-1-0-5"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added</h3><ul>
 <li><p><strong>JavaScript Modularization Architecture</strong>: Established foundation for widget-based dashboard development</p>
 <ul>
 <li>Created <code>/dev-docs/architecture/</code> documentation system with symbol tables and module boundaries</li>
@@ -1337,7 +1810,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.4] - 2025-09-05</h2><h3>Added - Agent Enhancements</h3><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-4"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-4">
+                                [1.0.4] - 2025-09-05
+                            </button>
+                        </h2>
+                        <div id="version-1-0-4"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added - Agent Enhancements</h3><ul>
 <li><strong>UI Testing Enhancement</strong>: Integrated Playwright for live browser testing and visual validation<ul>
 <li>Enhanced testing capabilities with real-time browser automation for design verification</li>
 <li>Added comprehensive visual testing for UI improvements and changes</li>
@@ -1396,7 +1888,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.3] - 2025-09-03</h2><h3>Fixed - Documentation Accuracy</h3><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-3"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-3">
+                                [1.0.3] - 2025-09-03
+                            </button>
+                        </h2>
+                        <div id="version-1-0-3"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed - Documentation Accuracy</h3><ul>
 <li><strong>Documentation Accuracy</strong>: Comprehensive documentation review and fixes<ul>
 <li>Updated API reference to include missing <code>/api/restore</code> endpoint</li>
 <li>Clarified difference between <code>/api/vulnerabilities/import</code> and <code>/api/import/vulnerabilities</code> endpoints</li>
@@ -1434,7 +1945,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.1] - 2025-08-27</h2><h3>Fixed - Device Management UI</h3><ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-1"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-1">
+                                [1.0.1] - 2025-08-27
+                            </button>
+                        </h2>
+                        <div id="version-1-0-1"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed - Device Management UI</h3><ul>
 <li><strong>Device Management UI</strong>: Fixed button order from + - to - + for consistent positioning<ul>
 <li>Resolved button position switching that caused UX friction during rapid clicking</li>
 <li>Updated both initial template (tickets.html) and dynamic generation (tickets.js)</li>
@@ -1451,7 +1981,26 @@
 </ul>
 </li>
 </ul>
-<h2>[1.0.0] - 2025-08-27</h2><h3>Summary</h3><p>Stable baseline release of HexTrackr cybersecurity ticket and vulnerability management system.</p>
+
+                            </div>
+                        </div>
+                    </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#version-1-0-0"
+                            aria-expanded="false"
+                            aria-controls="version-1-0-0">
+                        [1.0.0] - 2025-08-27
+                    </button>
+                </h2>
+                <div id="version-1-0-0"
+                     class="accordion-collapse collapse "
+                     data-bs-parent="#changelogAccordion">
+                    <div class="accordion-body">
+                        <h3>Summary</h3><p>Stable baseline release of HexTrackr cybersecurity ticket and vulnerability management system.</p>
 <h3>Features</h3><ul>
 <li><p><strong>Dual-Purpose Management System</strong></p>
 <ul>
@@ -1548,6 +2097,9 @@
 <li>Comprehensive testing before version tags</li>
 </ul>
 
+                    </div>
+                </div>
+            </div></div>
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
              fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->

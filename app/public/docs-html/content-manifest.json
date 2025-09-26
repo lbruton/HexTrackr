@@ -1,5 +1,5 @@
 {
-  "generated": "2025-09-25T18:10:36.013Z",
+  "generated": "2025-09-25T21:28:39.612Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -65,18 +65,6 @@
         }
       }
     },
-    "features": {
-      "title": "Features",
-      "icon": "fas fa-file-alt",
-      "indexFile": "features/index",
-      "children": {
-        "kev-integration": {
-          "file": "features/kev-integration",
-          "title": "Kev Integration",
-          "path": "features/kev-integration.html"
-        }
-      }
-    },
     "guides": {
       "title": "Guides",
       "icon": "fas fa-file-alt",
@@ -91,6 +79,11 @@
           "file": "guides/getting-started",
           "title": "Getting Started",
           "path": "guides/getting-started.html"
+        },
+        "kev-integration": {
+          "file": "guides/kev-integration",
+          "title": "Kev Integration",
+          "path": "guides/kev-integration.html"
         },
         "user-guide": {
           "file": "guides/user-guide",
