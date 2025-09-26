@@ -21,6 +21,39 @@
     color: var(--ag-foreground-color) !important;
 }
 
+/* Bootstrap Card Dark Mode Styling */
+[data-bs-theme="dark"] .card {
+    background-color: var(--hextrackr-surface-1, #1a2332);
+    border-color: var(--hextrackr-border-subtle, rgba(255, 255, 255, 0.15));
+    color: var(--bs-body-color, #e2e8f0);
+}
+
+[data-bs-theme="dark"] .card-header {
+    background-color: var(--hextrackr-surface-base, #0f172a);
+    border-bottom-color: var(--hextrackr-border-subtle, rgba(255, 255, 255, 0.15));
+    color: var(--bs-emphasis-color, #f8fafc);
+}
+
+[data-bs-theme="dark"] .card-body {
+    background-color: var(--hextrackr-surface-1, #1a2332);
+    color: var(--bs-body-color, #e2e8f0);
+}
+
+[data-bs-theme="dark"] .card-title {
+    color: var(--bs-emphasis-color, #f8fafc);
+}
+
+/* Statistics Cards Dark Mode */
+[data-bs-theme="dark"] .stats-card {
+    background-color: var(--hextrackr-surface-1, #1a2332);
+    border-color: var(--hextrackr-border-subtle, rgba(255, 255, 255, 0.15));
+}
+
+[data-bs-theme="dark"] .stats-card:hover {
+    border-color: var(--hextrackr-border-muted, rgba(255, 255, 255, 0.20));
+    box-shadow: var(--hextrackr-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.4));
+}
+
 /* Global Dark Mode Theme Variables - Moved to css-variables.css for consolidation */
 
 [data-bs-theme="dark"] .ag-theme-quartz {
