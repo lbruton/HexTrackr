@@ -44,6 +44,13 @@
                 container.style.overflowY = "auto";
                 container.setAttribute("aria-live", "polite");
                 container.setAttribute("aria-atomic", "true");
+
+                // HEX-65: Apply current theme to toast container to prevent white flash
+                const currentTheme = document.documentElement.getAttribute("data-bs-theme");
+                if (currentTheme) {
+                    container.setAttribute("data-bs-theme", currentTheme);
+                }
+
                 document.body.appendChild(container);
             }
             this.container = container;
@@ -121,6 +128,12 @@
             toast.setAttribute("role", "alert");
             toast.setAttribute("aria-live", "assertive");
             toast.setAttribute("aria-atomic", "true");
+
+            // HEX-65: Apply current theme to individual toast to prevent white flash
+            const currentTheme = document.documentElement.getAttribute("data-bs-theme");
+            if (currentTheme) {
+                toast.setAttribute("data-bs-theme", currentTheme);
+            }
 
             // Set background color based on type
             const bgClass = this.getBackgroundClass(type);
