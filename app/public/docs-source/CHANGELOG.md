@@ -5,6 +5,42 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.32] - 2025-09-26
+
+### Fixed
+
+#### HEX-65: Dark Mode White Flash Elimination
+
+**Issue**: White flash occurring when navigating between pages in dark mode, particularly noticeable in Firefox
+
+**Resolution**: Implemented multi-layered theme application system to eliminate flash of unstyled content (FOUC)
+
+**Technical Implementation**:
+- Added inline theme detection script in HTML `<head>` that executes before CSS loads
+- Implemented fallback chain: localStorage → sessionStorage → OS preference → light theme
+- Added critical dark theme styles to `base.css` for immediate card theming
+- Commented out unnecessary loading toast that caused additional flash
+- Enhanced toast manager to detect and apply current theme to containers
+- Updated component initialization to detect pre-applied themes
+
+**Files Modified**:
+- `app/public/vulnerabilities.html` - Added inline theme detection script
+- `app/public/tickets2.html` - Added inline theme detection script
+- `app/public/styles/shared/base.css` - Added critical dark theme card styles (lines 82-95)
+- `app/public/scripts/shared/vulnerability-core.js` - Disabled loading toast on page load (line 296)
+- `app/public/scripts/shared/toast-manager.js` - Added theme detection for toast containers
+
+**Performance Impact**:
+- Zero white flash during navigation
+- No additional latency
+- Smooth transitions between pages
+- Maintains architectural principles (modular CSS structure)
+
+**Browser Compatibility**:
+- Tested in Firefox, Chrome, Safari, Edge
+- Supports private browsing mode via sessionStorage fallback
+- Handles legacy storage formats (both JSON and plain string)
+
 ## [1.0.31] - 2025-09-25
 
 ### Security Fixes

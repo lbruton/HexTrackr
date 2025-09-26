@@ -4,7 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HexTrackr - Modern Vulnerability Management</title>
-    
+
+    <!-- FOUC Prevention: Apply theme before CSS loads -->
+    <script>
+    (function() {
+        try {
+            var stored = localStorage.getItem('hextrackr-theme');
+            if (stored) {
+                var data = JSON.parse(stored);
+                if (data && data.theme) {
+                    document.documentElement.setAttribute('data-bs-theme', data.theme);
+                }
+            } else {
+                // Fallback to sessionStorage (private browsing)
+                stored = sessionStorage.getItem('hextrackr-theme');
+                if (stored) {
+                    var data = JSON.parse(stored);
+                    if (data && data.theme) {
+                        document.documentElement.setAttribute('data-bs-theme', data.theme);
+                    }
+                }
+            }
+        } catch(e) {
+            // Silent fail - theme controller will handle initialization
+        }
+    })();
+    </script>
+
     <!-- Tabler.io CSS Framework -->
     <link href="/vendor/tabler/css/tabler.min.css" rel="stylesheet">
     
