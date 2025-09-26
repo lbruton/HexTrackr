@@ -103,16 +103,28 @@ export class HeaderThemeManager {
 
   /**
    * Apply initial theme on page load
-   * 
+   * Detects pre-applied theme from synchronous pre-loader to avoid redundant application
+   *
    * @returns {void}
    */
   applyInitialTheme() {
     try {
-      const currentTheme = this.themeController.getTheme();
-      
-      // Apply theme and update visibility (no system preference resolution needed)
-      this.themeController.setTheme(currentTheme, 'initial');
-      this.updateToggleVisibility(currentTheme);
+      // Check if theme was already applied by pre-loader script
+      const preAppliedTheme = document.documentElement.getAttribute('data-bs-theme');
+      const storedTheme = this.themeController.getTheme();
+
+      if (preAppliedTheme) {
+        // Theme already pre-applied, just sync UI state without re-applying
+        console.log(`Theme pre-applied: ${preAppliedTheme}, syncing UI state only`);
+        this.updateToggleVisibility(preAppliedTheme);
+
+        // Notify theme controller that theme is already applied
+        this.themeController.syncWithPreAppliedTheme(preAppliedTheme);
+      } else {
+        // No pre-applied theme, apply normally
+        this.themeController.setTheme(storedTheme, 'initial');
+        this.updateToggleVisibility(storedTheme);
+      }
     } catch (error) {
       console.error('Error applying initial theme:', error);
     }
