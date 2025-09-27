@@ -1,0 +1,30 @@
+# Ignore database files
+app/public/data/*.db
+app/public/data/*.db-*
+app/public/data/backups/
+app/public/data/corrupt-backup-*
+
+# Ignore node modules (will be installed in container)
+node_modules/
+*/node_modules/
+
+# Ignore temp directory
+temp/
+
+# Ignore git
+.git/
+.gitignore
+
+# Ignore development files
+*.log
+.env
+.DS_Store
+
+# Ignore backup files
+*.backup
+*.old
+*.bak
+
+# Ignore IDE files
+.vscode/
+.idea/
