@@ -1395,7 +1395,7 @@ async function restoreData(type) {
                 formData.append("type", type);
                 
                 // Send to backend for processing
-                const response = await fetch("/api/restore", {
+                const response = await fetch("/api/backup/restore", {
                     method: "POST",
                     body: formData
                 });

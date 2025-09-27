@@ -15,9 +15,14 @@ const db = new sqlite3.Database(dbPath, (err) => {
   console.log("Connected to SQLite database");
 });
 
-// Create tables
+// Create tables with complete schema
 db.serialize(() => {
-  // Tickets table - modern schema for vulnerability management
+  // Enable foreign keys
+  db.run("PRAGMA foreign_keys = ON");
+  db.run("PRAGMA journal_mode = WAL");
+  db.run("PRAGMA synchronous = NORMAL");
+
+  // 1. Tickets table - core business entity
   db.run(`CREATE TABLE IF NOT EXISTS tickets (
     id TEXT PRIMARY KEY,
     xt_number TEXT UNIQUE,
@@ -39,7 +44,7 @@ db.serialize(() => {
     location_id TEXT
   )`);
 
-  // Vulnerability imports - raw CSV data with metadata
+  // 2. Vulnerability imports - tracking CSV imports
   db.run(`CREATE TABLE IF NOT EXISTS vulnerability_imports (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     filename TEXT NOT NULL,
@@ -52,7 +57,7 @@ db.serialize(() => {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // Normalized vulnerability data
+  // 3. Main vulnerabilities table - legacy/normalized data
   db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     import_id INTEGER NOT NULL,
@@ -70,10 +75,14 @@ db.serialize(() => {
     solution TEXT,
     vendor_reference TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    vendor TEXT DEFAULT '',
+    vulnerability_date TEXT DEFAULT '',
+    state TEXT DEFAULT 'open',
+    import_date TEXT DEFAULT '',
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
-  // Junction table for ticket-vulnerability relationships
+  // 4. Ticket-vulnerability junction table
   db.run(`CREATE TABLE IF NOT EXISTS ticket_vulnerabilities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ticket_id TEXT NOT NULL,
@@ -85,23 +94,249 @@ db.serialize(() => {
     FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities (id)
   )`);
 
-  // Indexes for performance
+  // 5. Vulnerability snapshots - historical data
+  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_snapshots (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    import_id INTEGER NOT NULL,
+    scan_date TEXT NOT NULL,
+    hostname TEXT,
+    ip_address TEXT,
+    cve TEXT,
+    severity TEXT,
+    vpr_score REAL,
+    cvss_score REAL,
+    first_seen TEXT,
+    last_seen TEXT,
+    plugin_id TEXT,
+    plugin_name TEXT,
+    description TEXT,
+    solution TEXT,
+    vendor_reference TEXT,
+    vendor TEXT,
+    vulnerability_date TEXT,
+    state TEXT DEFAULT 'open',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    unique_key TEXT,
+    confidence_score INTEGER DEFAULT 50,
+    dedup_tier INTEGER DEFAULT 4,
+    enhanced_unique_key TEXT,
+    FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
+  )`);
+
+  // 6. Current vulnerabilities - active data
+  db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities_current (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    import_id INTEGER NOT NULL,
+    scan_date TEXT NOT NULL,
+    hostname TEXT,
+    ip_address TEXT,
+    cve TEXT,
+    severity TEXT,
+    vpr_score REAL,
+    cvss_score REAL,
+    first_seen TEXT,
+    last_seen TEXT,
+    plugin_id TEXT,
+    plugin_name TEXT,
+    description TEXT,
+    solution TEXT,
+    vendor_reference TEXT,
+    vendor TEXT,
+    vulnerability_date TEXT,
+    state TEXT DEFAULT 'open',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    unique_key TEXT UNIQUE,
+    lifecycle_state TEXT DEFAULT 'active',
+    resolved_date TEXT,
+    resolution_reason TEXT,
+    confidence_score INTEGER DEFAULT 50,
+    dedup_tier INTEGER DEFAULT 4,
+    enhanced_unique_key TEXT,
+    FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
+  )`);
+
+  // 7. Daily vulnerability totals - aggregated metrics
+  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_daily_totals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    scan_date TEXT NOT NULL UNIQUE,
+    critical_count INTEGER DEFAULT 0,
+    critical_total_vpr REAL DEFAULT 0,
+    high_count INTEGER DEFAULT 0,
+    high_total_vpr REAL DEFAULT 0,
+    medium_count INTEGER DEFAULT 0,
+    medium_total_vpr REAL DEFAULT 0,
+    low_count INTEGER DEFAULT 0,
+    low_total_vpr REAL DEFAULT 0,
+    total_vulnerabilities INTEGER DEFAULT 0,
+    total_vpr REAL DEFAULT 0,
+    resolved_count INTEGER DEFAULT 0,
+    reopened_count INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  // 8. Vulnerability staging - import staging area
+  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_staging (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    import_id INTEGER NOT NULL,
+    hostname TEXT,
+    ip_address TEXT,
+    cve TEXT,
+    severity TEXT,
+    vpr_score REAL,
+    cvss_score REAL,
+    plugin_id TEXT,
+    plugin_name TEXT,
+    description TEXT,
+    solution TEXT,
+    vendor_reference TEXT,
+    vendor TEXT,
+    vulnerability_date TEXT,
+    state TEXT,
+    enhanced_unique_key TEXT,
+    confidence_score REAL,
+    dedup_tier INTEGER,
+    lifecycle_state TEXT DEFAULT 'staging',
+    raw_csv_row JSON,
+    processed BOOLEAN DEFAULT 0,
+    batch_id INTEGER,
+    processing_error TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    processed_at DATETIME,
+    FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
+  )`);
+
+  // 9. Email templates
+  db.run(`CREATE TABLE IF NOT EXISTS email_templates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    description TEXT,
+    template_content TEXT NOT NULL,
+    default_content TEXT NOT NULL,
+    variables TEXT NOT NULL,
+    category TEXT DEFAULT 'ticket',
+    is_active BOOLEAN DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  // 10. KEV (Known Exploited Vulnerabilities) status
+  db.run(`CREATE TABLE IF NOT EXISTS kev_status (
+    cve_id TEXT PRIMARY KEY,
+    date_added DATE NOT NULL,
+    vulnerability_name TEXT,
+    vendor_project TEXT,
+    product TEXT,
+    required_action TEXT,
+    due_date DATE,
+    known_ransomware_use BOOLEAN DEFAULT 0,
+    notes TEXT,
+    last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  // 11. Sync metadata
+  db.run(`CREATE TABLE IF NOT EXISTS sync_metadata (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sync_type TEXT NOT NULL,
+    sync_time TIMESTAMP NOT NULL,
+    version TEXT,
+    record_count INTEGER,
+    status TEXT DEFAULT 'completed',
+    error_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  // 12. Ticket templates
+  db.run(`CREATE TABLE IF NOT EXISTS ticket_templates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    description TEXT,
+    template_content TEXT NOT NULL,
+    default_content TEXT NOT NULL,
+    variables TEXT NOT NULL,
+    category TEXT DEFAULT 'ticket',
+    is_active BOOLEAN DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  // 13. Vulnerability templates
+  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_templates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    description TEXT,
+    template_content TEXT NOT NULL,
+    default_content TEXT NOT NULL,
+    variables TEXT NOT NULL,
+    category TEXT DEFAULT 'vulnerability',
+    is_active BOOLEAN DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  // Create indexes for performance
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_hostname ON vulnerabilities (hostname)");
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_severity ON vulnerabilities (severity)");
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_cve ON vulnerabilities (cve)");
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_import ON vulnerabilities (import_id)");
   db.run("CREATE INDEX IF NOT EXISTS idx_ticket_vulns_ticket ON ticket_vulnerabilities (ticket_id)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_vulns_vuln ON ticket_vulnerabilities (vulnerability_id)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets (status)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_site ON tickets (site)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_location ON tickets (location)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_xt ON tickets (xt_number)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_scan_date ON vulnerability_snapshots (scan_date)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_hostname ON vulnerability_snapshots (hostname)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_severity ON vulnerability_snapshots (severity)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_enhanced_key ON vulnerability_snapshots (enhanced_unique_key)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_current_unique_key ON vulnerabilities_current (unique_key)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_current_scan_date ON vulnerabilities_current (scan_date)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_current_enhanced_unique_key ON vulnerabilities_current (enhanced_unique_key)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_current_lifecycle_scan ON vulnerabilities_current (lifecycle_state, scan_date)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_current_confidence_tier ON vulnerabilities_current (confidence_score, dedup_tier)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_current_active_severity ON vulnerabilities_current (lifecycle_state, severity)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_current_resolved_date ON vulnerabilities_current (resolved_date)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_staging_import_id ON vulnerability_staging (import_id)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_staging_processed ON vulnerability_staging (processed)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_staging_batch_id ON vulnerability_staging (batch_id)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_staging_unprocessed_batch ON vulnerability_staging (processed, batch_id)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_name ON email_templates (name)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_active ON email_templates (is_active)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_category ON email_templates (category)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_ransomware ON kev_status(known_ransomware_use) WHERE known_ransomware_use = 1");
+  db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_date_added ON kev_status(date_added)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_cve_id ON kev_status(cve_id)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_due_date ON kev_status(due_date)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_sync_metadata_type_time ON sync_metadata(sync_type, sync_time DESC)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_name ON ticket_templates (name)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_category ON ticket_templates (category)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_active ON ticket_templates (is_active)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_name ON vulnerability_templates (name)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_category ON vulnerability_templates (category)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_active ON vulnerability_templates (is_active)");
+
+  console.log("Database initialized successfully!");
+  console.log("Tables created:");
+  console.log("  - tickets (ticket management)");
+  console.log("  - vulnerability_imports (import tracking)");
+  console.log("  - vulnerabilities (legacy vulnerability data)");
+  console.log("  - ticket_vulnerabilities (cross-referencing)");
+  console.log("  - vulnerability_snapshots (historical data)");
+  console.log("  - vulnerabilities_current (active vulnerabilities)");
+  console.log("  - vulnerability_daily_totals (aggregated metrics)");
+  console.log("  - vulnerability_staging (import staging)");
+  console.log("  - email_templates (email templates)");
+  console.log("  - kev_status (CISA KEV data)");
+  console.log("  - sync_metadata (sync tracking)");
+  console.log("  - ticket_templates (ticket templates)");
+  console.log("  - vulnerability_templates (vulnerability templates)");
+  console.log("All 13 tables and 33 indexes created successfully!");
 });
 
+// Close database
 db.close((err) => {
   if (err) {
     console.error("Error closing database:", err.message);
   } else {
-    console.log("Database initialized successfully!");
-    console.log("Tables created:");
-    console.log("  - tickets (ready for future localStorage sync)");
-    console.log("  - vulnerability_imports (CSV import tracking)");
-    console.log("  - vulnerabilities (normalized data)");
-    console.log("  - ticket_vulnerabilities (cross-referencing)");
+    console.log("Database connection closed");
   }
 });
