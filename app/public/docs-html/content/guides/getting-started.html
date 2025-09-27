@@ -2,32 +2,70 @@
 <section class="doc-fragment">
     <h1>Getting Started with HexTrackr</h1><p>This guide provides everything you need to get HexTrackr up and running, whether for a production-like environment using Docker or for local development.</p>
 <hr>
+<h2>Key Features</h2><p>HexTrackr is a comprehensive vulnerability management system featuring:</p>
+<ul>
+<li><strong>AG-Grid Powered Interface</strong>: Modern, high-performance data grid for tickets management</li>
+<li><strong>Template System</strong>: Reusable templates for tickets and vulnerability reports</li>
+<li><strong>Backup/Restore</strong>: ZIP-based backup with cross-platform support</li>
+<li><strong>KEV Integration</strong>: CISA Known Exploited Vulnerabilities tracking</li>
+<li><strong>Cross-Platform Docker</strong>: Unified setup for macOS, Linux, and Ubuntu</li>
+</ul>
+<hr>
 <h2>Recommended Setup: Docker & Docker Compose</h2><p>The most reliable and consistent way to run HexTrackr is by using Docker. This method encapsulates the application and its dependencies, avoiding potential conflicts with your local environment.</p>
 <h3>Prerequisites</h3><ul>
 <li><a href="https://docs.docker.com/get-docker/">Docker</a></li>
 <li><a href="https://docs.docker.com/compose/install/">Docker Compose</a></li>
 </ul>
-<h3>Running the Application</h3><ol>
+<h3>Quick Start with Install Script (Recommended)</h3><p>HexTrackr includes an automated installation script that detects your platform and configures everything automatically.</p>
+<ol>
 <li><p><strong>Clone the Repository</strong></p>
 <pre><code class="language-bash">git <span class="hljs-built_in">clone</span> https://github.com/Lonnie-Bruton/HexTrackr.git
 <span class="hljs-built_in">cd</span> HexTrackr</code></pre></li>
-<li><p><strong>Start the Services</strong></p>
-<p> Use Docker Compose to build the image and run the application in detached mode.</p>
-<pre><code class="language-bash">docker-compose up -d --build</code></pre></li>
+<li><p><strong>Run the Installation Script</strong></p>
+<pre><code class="language-bash"><span class="hljs-built_in">chmod</span> +x install.sh
+./install.sh</code></pre><p> The script will:</p>
+<ul>
+<li>Detect your platform (macOS/Linux)</li>
+<li>Check Docker prerequisites</li>
+<li>Create necessary directories</li>
+<li>Build and start the container</li>
+<li>Verify the installation</li>
+</ul>
+</li>
 <li><p><strong>Access HexTrackr</strong></p>
 <p> The application will be available at <code>http://localhost:8989</code>.</p>
 <ul>
-<li><strong>Tickets Management</strong>: <code>http://localhost:8989/tickets.html</code></li>
+<li><strong>Tickets Management</strong>: <code>http://localhost:8989/tickets.html</code> (AG-Grid interface)</li>
 <li><strong>Vulnerabilities Management</strong>: <code>http://localhost:8989/vulnerabilities.html</code></li>
 <li><strong>Documentation Portal</strong>: <code>http://localhost:8989/docs-html/</code></li>
 </ul>
 </li>
-<li><p><strong>Stopping the Application</strong></p>
+</ol>
+<h3>Using Helper Scripts</h3><p>HexTrackr includes convenient helper scripts for Docker management:</p>
+<ul>
+<li><p><strong>Start the Application</strong>:</p>
+<pre><code class="language-bash">./docker-start.sh</code></pre><p>  Starts the container with health checks and status monitoring.</p>
+</li>
+<li><p><strong>Stop the Application</strong>:</p>
+<pre><code class="language-bash">./docker-stop.sh</code></pre><p>  Gracefully stops the container with proper cleanup.</p>
+</li>
+<li><p><strong>Rebuild the Container</strong>:</p>
+<pre><code class="language-bash">./docker-rebuild.sh</code></pre><p>  Rebuilds the Docker image and restarts with latest changes.</p>
+</li>
+<li><p><strong>View Logs</strong>:</p>
+<pre><code class="language-bash">./docker-logs.sh</code></pre><p>  Shows real-time container logs for troubleshooting.</p>
+</li>
+</ul>
+<h3>Manual Docker Setup</h3><p>If you prefer manual control over the Docker setup:</p>
+<ol>
+<li><p><strong>Build and Start Services</strong></p>
+<pre><code class="language-bash">docker-compose up -d --build</code></pre></li>
+<li><p><strong>Stop Services</strong></p>
 <pre><code class="language-bash">docker-compose down</code></pre></li>
 </ol>
 <hr>
 <h2>Local Development Setup (Without Docker)</h2><p>For developers who want to work on the HexTrackr source code directly.</p>
-<h3>Prerequisites (2)</h3><ul>
+<h3>Prerequisites</h3><ul>
 <li><strong>Node.js</strong>: v18.x or later</li>
 <li><strong>npm</strong>: v8.x or later (typically comes with Node.js)</li>
 </ul>
@@ -40,9 +78,9 @@
 <pre><code class="language-bash">npm install</code></pre></li>
 <li><p><strong>Initialize the Database</strong></p>
 <p> This script creates the <code>hextrackr.db</code> SQLite file in the <code>data/</code> directory and sets up the necessary tables.</p>
-<pre><code class="language-bash">node scripts/init-database.js</code></pre></li>
+<pre><code class="language-bash">npm run init-db</code></pre></li>
 <li><p><strong>Start the Development Server</strong></p>
-<pre><code class="language-bash">node server.js</code></pre><p> The server will start on port 8080 internally. When running locally without Docker, access the application at <code>http://localhost:8080</code>.</p>
+<pre><code class="language-bash">npm run dev</code></pre><p> The server will start on port 8080 internally. When running locally without Docker, access the application at <code>http://localhost:8080</code>.</p>
 <p> <strong>Note</strong>: When using Docker, the application is accessible at <code>http://localhost:8989</code> due to port mapping.</p>
 </li>
 </ol>
@@ -57,6 +95,44 @@
 <li><code>npm run docs:sync-specs</code>: Syncs specification tasks to the roadmap (part of docs:generate).</li>
 <li><code>npm run docs:sync-all</code>: Comprehensive documentation synchronization across all sources.</li>
 </ul>
+<hr>
+<h2>Troubleshooting</h2><h3>Backup and Restore Issues</h3><p>If you encounter issues with backup restoration:</p>
+<ol>
+<li><strong>Ensure the backup file is a valid ZIP</strong>: The system expects ZIP files containing JSON data</li>
+<li><strong>Check file permissions</strong>: Docker container needs write access to <code>/tmp/</code> directory</li>
+<li><strong>Verify data format</strong>: Backups support both legacy and new nested data structures</li>
+</ol>
+<h3>Cross-Platform Considerations</h3><h4>macOS</h4><ul>
+<li>Docker Desktop handles file permissions automatically</li>
+<li>Use the provided helper scripts for best experience</li>
+</ul>
+<h4>Linux/Ubuntu</h4><ul>
+<li>Ensure Docker daemon is running: <code>sudo systemctl status docker</code></li>
+<li>Add your user to docker group: <code>sudo usermod -aG docker $USER</code></li>
+<li>File permissions are handled automatically by the unified Dockerfile</li>
+</ul>
+<h3>Common Issues</h3><ol>
+<li><p><strong>Port 8989 Already in Use</strong></p>
+<pre><code class="language-bash">docker ps  <span class="hljs-comment"># Check for existing containers</span>
+docker stop $(docker ps -q)  <span class="hljs-comment"># Stop all containers</span></code></pre></li>
+<li><p><strong>Database Access Errors</strong></p>
+<ul>
+<li>The database is stored in <code>app/public/data/hextrackr.db</code></li>
+<li>Ensure proper permissions: <code>chmod 777 app/public/data</code></li>
+</ul>
+</li>
+<li><p><strong>Container Won&#39;t Start</strong></p>
+<pre><code class="language-bash">docker logs hextrackr-hextrackr-1  <span class="hljs-comment"># Check logs for errors</span>
+./docker-rebuild.sh  <span class="hljs-comment"># Rebuild from scratch</span></code></pre></li>
+</ol>
+<hr>
+<h2>Next Steps</h2><ul>
+<li>Review the <a href="#user-guide">User Guide</a> for detailed feature documentation</li>
+<li>Explore the <a href="#api-reference/overview">API Reference</a> for integration options</li>
+<li>Check the <a href="#architecture/overview">Architecture Guide</a> for system design details</li>
+</ul>
+<hr>
+<p>For additional support, please refer to the <a href="https://github.com/Lonnie-Bruton/HexTrackr">HexTrackr GitHub repository</a> or open an issue.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
