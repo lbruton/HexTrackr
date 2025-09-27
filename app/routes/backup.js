@@ -19,11 +19,21 @@ const router = express.Router();
 
 // Configure multer for file uploads (used by restore endpoint)
 const upload = multer({
-    dest: "uploads/",
+    dest: "/tmp/",
     limits: { fileSize: 100 * 1024 * 1024 }, // 100MB limit
     fileFilter: (req, file, cb) => {
-        const allowedTypes = ["application/json", "application/zip", "text/plain"];
-        if (allowedTypes.includes(file.mimetype) || file.originalname.endsWith(".json")) {
+        const allowedTypes = [
+            "application/json",
+            "application/zip",
+            "application/x-zip-compressed",
+            "application/octet-stream",
+            "multipart/x-zip",
+            "text/plain"
+        ];
+        const isAllowedExtension = file.originalname.endsWith(".json") ||
+                                   file.originalname.endsWith(".zip");
+
+        if (allowedTypes.includes(file.mimetype) || isAllowedExtension) {
             cb(null, true);
         } else {
             cb(new Error("Only JSON and ZIP files are allowed for backup restore"));
