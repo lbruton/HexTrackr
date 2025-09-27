@@ -1,5 +1,5 @@
 {
-  "generated": "2025-09-25T21:28:39.612Z",
+  "generated": "2025-09-27T09:08:56.413Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -97,11 +97,6 @@
       "icon": "fas fa-file-alt",
       "indexFile": "reference/index",
       "children": {
-        "known-issues": {
-          "file": "reference/known-issues",
-          "title": "Known Issues",
-          "path": "reference/known-issues.html"
-        },
         "performance": {
           "file": "reference/performance",
           "title": "Performance",
@@ -145,5 +140,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 27
+  "totalFiles": 26
 }

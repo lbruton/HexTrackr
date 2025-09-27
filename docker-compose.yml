@@ -17,7 +17,7 @@ services:
       - ./app/uploads:/app/app/uploads:rw
     environment:
       - NODE_ENV=${NODE_ENV:-development}
-      - HEXTRACKR_VERSION=1.0.32
+      - HEXTRACKR_VERSION=1.0.31
       - PORT=${PORT:-8080}
       - DATABASE_PATH=${DATABASE_PATH:-app/public/data/hextrackr.db}
     env_file:
