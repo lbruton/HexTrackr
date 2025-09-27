@@ -11,7 +11,7 @@
     - Context MUST be gathered before starting any work
         - Session Logs SHALL be stored as context bundles (See Article II, Section VI)
       - Project Knowledge SHALL be retained in ***Memento*** (See Article II, Section II)
-      - Codebase SHALL be indexed and searchable in ***Claude-Context*** (See Article II, Section VIII)
+      - Codebase SHALL be indexed and searchable in ***Code-Indexer-Ollama*** (See Article II, Section VIII)
       - Context7 SHALL be used to verify framework documentation accuracy
 
 ### Section III: Documentation Pipeline & Standards
@@ -88,10 +88,11 @@
 - All task tracking, research findings, and progress updates SHALL be maintained in Linear
 - SESSION_PLAN.md files are deprecated - Linear is the single source of truth 
 
-### Section VIII: Claude-Context
+### Section VIII: Code-Indexer-Ollama
 
-- Claude-Context MUST be used when searching the code base
-- Always verify the Index is current beore searches.
+- Code-Indexer-Ollama MUST be used when searching the code base
+- Uses local Ollama embeddings with AST-based code splitting for semantic search
+- Always verify the Index is current before searches
 
 ## Article V: Custom Context Bundles
 
