@@ -1,20 +1,37 @@
 services:
   hextrackr:
+    container_name: hextrackr-app
     build:
       context: .
-      dockerfile: Dockerfile.node
+      dockerfile: Dockerfile
     ports:
       - "8989:8080"  # External port 8989 -> Internal port 8080 (prevents test conflicts)
     volumes:
-      # Mount entire application for modular architecture
-      - ./app:/app
+      # Mount entire application for development hot-reload
+      - ./app:/app/app
+      # Exclude node_modules to use container's version
       - /app/node_modules
-      # Mount package.json for version info
-      - ./package.json:/app/package.json
-      # Mount database for persistence
-      - ./data:/app/data
+      # Mount database directory for persistence
+      - ./app/public/data:/app/app/public/data:rw
+      # Mount uploads directory for file persistence
+      - ./app/uploads:/app/app/uploads:rw
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=${NODE_ENV:-development}
       - HEXTRACKR_VERSION=1.0.31
-      - PORT=8080
+      - PORT=${PORT:-8080}
+      - DATABASE_PATH=${DATABASE_PATH:-app/public/data/hextrackr.db}
+    env_file:
+      - .env
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8080/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    networks:
+      - hextrackr-network
+
+networks:
+  hextrackr-network:
+    driver: bridge
