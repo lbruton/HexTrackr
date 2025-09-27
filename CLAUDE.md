@@ -187,7 +187,7 @@ The system uses a sophisticated rollover pipeline:
 ### From CONSTITUTION.md
 
 1. **Context Management**:
-   - Use Claude-Context for codebase searching (verify index is current)
+   - Use code-indexer-ollama MCP for codebase searching (uses Ollama for local embeddings with AST-based code splitting)
    - Use Memento MCP for project knowledge graph (semantic search preferred)
    - Context7 for framework documentation verification
 
@@ -378,7 +378,7 @@ See `.env.example` for complete configuration options.
 ### Development Philosophy
 - **Keep It Simple**: Linear for tracking, natural conversation for planning
 - **Quality First**: Maintain code standards without bureaucratic overhead
-- **Research Thoroughly**: Use Claude-Context and Context7 when needed
+- **Research Thoroughly**: Use code-indexer-ollama and Context7 when needed
 - **Test Continuously**: Docker container on port 8989
 - **Document in Code**: JSDoc comments and Linear comments for context
 
@@ -390,3 +390,4 @@ See `.env.example` for complete configuration options.
 - Database uses WAL mode for concurrent access
 - Frontend uses vanilla JavaScript (no framework dependencies)
 - Bootstrap 5 and Tabler.io for UI components
+- Code search uses code-indexer-ollama MCP for semantic search with local Ollama embeddings

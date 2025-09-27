@@ -1,5 +1,5 @@
 const path = require("path");
-const PathValidator = require("../utils/pathValidator");
+const PathValidator = require("../utils/PathValidator");
 
 /**
  * Documentation Service

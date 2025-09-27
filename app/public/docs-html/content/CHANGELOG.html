@@ -15,14 +15,65 @@
                             <button class="accordion-button "
                                     type="button"
                                     data-bs-toggle="collapse"
-                                    data-bs-target="#version-1-0-31"
+                                    data-bs-target="#version-1-0-32"
                                     aria-expanded="true"
+                                    aria-controls="version-1-0-32">
+                                [1.0.32] - 2025-09-26
+                            </button>
+                        </h2>
+                        <div id="version-1-0-32"
+                             class="accordion-collapse collapse show"
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed</h3><h4>HEX-65: Dark Mode White Flash Elimination</h4><p><strong>Issue</strong>: White flash occurring when navigating between pages in dark mode, particularly noticeable in Firefox</p>
+<p><strong>Resolution</strong>: Implemented multi-layered theme application system to eliminate flash of unstyled content (FOUC)</p>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li>Added inline theme detection script in HTML <code>&lt;head&gt;</code> that executes before CSS loads</li>
+<li>Implemented fallback chain: localStorage → sessionStorage → OS preference → light theme</li>
+<li>Added critical dark theme styles to <code>base.css</code> for immediate card theming</li>
+<li>Commented out unnecessary loading toast that caused additional flash</li>
+<li>Enhanced toast manager to detect and apply current theme to containers</li>
+<li>Updated component initialization to detect pre-applied themes</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/vulnerabilities.html</code> - Added inline theme detection script</li>
+<li><code>app/public/tickets2.html</code> - Added inline theme detection script</li>
+<li><code>app/public/styles/shared/base.css</code> - Added critical dark theme card styles (lines 82-95)</li>
+<li><code>app/public/scripts/shared/vulnerability-core.js</code> - Disabled loading toast on page load (line 296)</li>
+<li><code>app/public/scripts/shared/toast-manager.js</code> - Added theme detection for toast containers</li>
+</ul>
+<p><strong>Performance Impact</strong>:</p>
+<ul>
+<li>Zero white flash during navigation</li>
+<li>No additional latency</li>
+<li>Smooth transitions between pages</li>
+<li>Maintains architectural principles (modular CSS structure)</li>
+</ul>
+<p><strong>Browser Compatibility</strong>:</p>
+<ul>
+<li>Tested in Firefox, Chrome, Safari, Edge</li>
+<li>Supports private browsing mode via sessionStorage fallback</li>
+<li>Handles legacy storage formats (both JSON and plain string)</li>
+</ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-31"
+                                    aria-expanded="false"
                                     aria-controls="version-1-0-31">
                                 [1.0.31] - 2025-09-25
                             </button>
                         </h2>
                         <div id="version-1-0-31"
-                             class="accordion-collapse collapse show"
+                             class="accordion-collapse collapse "
                              data-bs-parent="#changelogAccordion">
                             <div class="accordion-body">
                                 <h3>Security Fixes</h3><h4>Critical: Cryptographically Weak Random Number Generators</h4><p><strong>HEX-14</strong>: Fixed multiple Math.random() vulnerabilities</p>
