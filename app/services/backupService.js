@@ -310,7 +310,7 @@ class BackupService {
         const { type, clearExisting, filePath } = options;
 
         try {
-            const fileData = PathValidator.safeReadFileSync(filePath);
+            const fileData = PathValidator.safeReadFileSync(filePath, null); // read as buffer
             let restoredCount = 0;
             const details = {};
 
@@ -325,14 +325,30 @@ class BackupService {
                     const ticketsJson = await zipContent.files["tickets.json"].async("string");
                     const ticketsData = JSON.parse(ticketsJson);
 
-                    if (ticketsData && ticketsData.data && Array.isArray(ticketsData.data)) {
+                    // Handle both old and new data formats
+                    let ticketsArray = [];
+                    if (ticketsData) {
+                        if (ticketsData.data && Array.isArray(ticketsData.data)) {
+                            // Old format: ticketsData.data
+                            ticketsArray = ticketsData.data;
+                        } else if (ticketsData.tickets && ticketsData.tickets.data &&
+                                   Array.isArray(ticketsData.tickets.data)) {
+                            // New format: ticketsData.tickets.data
+                            ticketsArray = ticketsData.tickets.data;
+                        } else if (Array.isArray(ticketsData)) {
+                            // Direct array format
+                            ticketsArray = ticketsData;
+                        }
+                    }
+
+                    if (ticketsArray.length > 0) {
                         // Clear existing tickets if requested
                         if (clearExisting) {
                             await this._executeQuery("DELETE FROM tickets");
                         }
 
                         // Insert tickets data
-                        const ticketValues = ticketsData.data.map(ticket => [
+                        const ticketValues = ticketsArray.map(ticket => [
                             ticket.xt_number || "",
                             ticket.date_submitted || "",
                             ticket.date_due || "",
@@ -369,7 +385,23 @@ class BackupService {
                     const vulnJson = await zipContent.files["vulnerabilities.json"].async("string");
                     const vulnData = JSON.parse(vulnJson);
 
-                    if (vulnData && vulnData.data && Array.isArray(vulnData.data)) {
+                    // Handle both old and new data formats
+                    let vulnArray = [];
+                    if (vulnData) {
+                        if (vulnData.data && Array.isArray(vulnData.data)) {
+                            // Old format: vulnData.data
+                            vulnArray = vulnData.data;
+                        } else if (vulnData.vulnerabilities && vulnData.vulnerabilities.data &&
+                                   Array.isArray(vulnData.vulnerabilities.data)) {
+                            // New format: vulnData.vulnerabilities.data
+                            vulnArray = vulnData.vulnerabilities.data;
+                        } else if (Array.isArray(vulnData)) {
+                            // Direct array format
+                            vulnArray = vulnData;
+                        }
+                    }
+
+                    if (vulnArray.length > 0) {
                         // Clear existing vulnerabilities if requested
                         if (clearExisting) {
                             await this._executeQuery("DELETE FROM vulnerability_snapshots");
@@ -378,7 +410,7 @@ class BackupService {
                         }
 
                         // Insert vulnerability data
-                        const vulnValues = vulnData.data.map(vuln => [
+                        const vulnValues = vulnArray.map(vuln => [
                             vuln.hostname || "",
                             vuln.ip_address || "",
                             vuln.cve || "",
