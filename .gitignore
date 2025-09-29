@@ -7,6 +7,13 @@ npm-debug.log*
 .env.local
 .env.production
 
+# SSL Certificates (security - never commit)
+certs/
+*.pem
+*.key
+*.crt
+*.cert
+
 # Database files
 data/*.db
 data/*.sqlite

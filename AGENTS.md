@@ -1,26 +1,31 @@
 # Repository Guidelines
 
-This guide summarizes the expectations for contributors working on HexTrackr. Read alongside `README.md`, `CLAUDE.md`, and the Linear templates to capture the full delivery checklist.
-
 ## Project Structure & Module Organization
-- `app/` holds the Express server: controllers orchestrate business logic, routes expose REST endpoints, services wrap SQLite access, middleware centralizes cross-cutting concerns, and `public/` serves the client bundle plus scripts.
-- `app/config/` and `app/utils/` contain reusable configuration helpers; prefer extending existing modules before adding new directories.
-- Root-level `data/` stores seed CSVs and backup assets, while `logs/` captures runtime output generated inside containers. Docker assets (`docker-compose.yml`, `Dockerfile.node`, `nginx.conf`) power the standard dev stack.
+- `app/` houses the Express server. Controllers orchestrate business logic, routes expose REST endpoints, services wrap SQLite access, and middleware centralizes auth/logging. Front-end assets live in `app/public/`, including `scripts/pages` for page controllers and `scripts/shared` for cross-page utilities.
+- Reusable helpers live under `app/config/` and `app/utils/`; extend these before introducing new directories. Seed CSVs and backup assets reside in `data/`, while runtime logs are written to `logs/` during container runs.
 
 ## Build, Test, and Development Commands
-Use Node 18+ with npm. Key commands:
-- `npm run dev` starts the hot-reloading server on port 8080; pair it with `docker-compose up -d` to mirror the production topology on 8989.
-- `npm start` runs the production build, while `npm run init-db` seeds or refreshes the SQLite database.
-- `npm run lint:all`, `npm run fix:all`, and `npm run docs:all` are mandatory before opening a PR; extend lint fixes locally until Codacy reports clean.
+- `npm run dev` — hot-reloading server on port 8080; pair with `docker-compose up -d` to mirror production on 8989.
+- `npm start` — serve the production bundle.
+- `npm run init-db` — seed or refresh the SQLite database at `app/public/data/hextrackr.db`.
+- `npm run lint:all`, `npm run fix:all`, `npm run docs:all` — required before any PR; keep lint clean locally.
+- `npm run test:stagehand` — execute automated smoke tests used in CI.
 
 ## Coding Style & Naming Conventions
-Follow the repository ESLint and Stylelint rulesets: four-space indentation, double-quoted strings, mandatory semicolons, and strict equality. Prefer `const` over `let`, avoid `var`, and name files/functions in camelCase, with PascalCase reserved for classes. Every function under `app/` requires JSDoc (`@description`, `@param`, `@returns`). Use CommonJS `require` except for the `vulnerability-*.js` ES module utilities.
+- JavaScript: four-space indentation, double-quoted strings, mandatory semicolons, strict equality. Prefer `const` over `let`; avoid `var`.
+- Every function under `app/` requires JSDoc (`@description`, `@param`, `@returns`).
+- Use CommonJS `require` for modules (ESM reserved for `vulnerability-*.js`). Name files and functions in camelCase; classes use PascalCase.
 
 ## Testing Guidelines
-Always verify inside Docker: `docker-compose up -d` then run smoke checks against port 8989. Execute `npm run lint:all` and `npm run test:stagehand` for automated validation. When introducing new coverage, co-locate tests beside the module (e.g., `app/modules/example/__tests__/example.test.js`) and name suites after the route or service they exercise.
+- Co-locate tests beside their modules (e.g., `app/modules/example/__tests__/example.test.js`). Name suites after the route or service they cover.
+- Always verify inside Docker: `docker-compose up -d`, then hit port 8989 for smoke checks.
+- Ensure new coverage integrates with `npm run test:stagehand`; document gaps in PRs.
 
 ## Commit & Pull Request Guidelines
-Commit messages follow Conventional Commits (`fix:`, `chore:`, `feat:`). Reference Linear issue IDs when available and keep changes focused. Pull requests must describe intent, list impacted endpoints or scripts, note database or config updates, and attach Docker verification steps or screenshots for UI-facing changes. Confirm Codacy status, lint results, and updated documentation before requesting review.
+- Follow Conventional Commits (`feat:`, `fix:`, `chore:`). Reference Linear IDs when available.
+- PRs must describe intent, list impacted endpoints or scripts, note config/database updates, and attach Docker verification steps or UI screenshots when applicable.
+- Confirm Codacy status, lint/test command results, and documentation updates before requesting review.
 
 ## Security & Configuration Tips
-Copy `.env.example` to `.env` and never commit secrets. Sanitize user input with the provided utilities, reuse centralized rate limiting, and log errors through existing middleware. For new integrations, update `app/config/middleware.js` rather than bypassing shared guards.
+- Clone `.env.example` to `.env`; never commit secrets. API keys now come from Keychain-backed wrappers—do not revert to plaintext env vars.
+- Sanitize user input with existing utilities, reuse centralized rate limiting, and extend `app/config/middleware.js` for new integrations rather than bypassing shared guards.
