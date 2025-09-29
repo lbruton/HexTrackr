@@ -6,12 +6,16 @@
 /* eslint-env node */
 /* global __dirname, require, console, process */
 
+// Load environment variables
+require("dotenv").config();
+
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const http = require("http");
+const https = require("https");
 const socketIo = require("socket.io");
 const fs = require("fs");
 
@@ -37,10 +41,23 @@ const docsRoutes = require("../routes/docs");
 const templateRoutes = require("../routes/templates");
 const kevRoutes = require("../routes/kev");
 
-// Express application & HTTP server
+// Express application & HTTP/HTTPS server
 const app = express();
 const PORT = process.env.PORT || 8080;
-const server = http.createServer(app);
+
+// HTTPS configuration
+const useHTTPS = process.env.USE_HTTPS === "true";
+let server;
+
+if (useHTTPS) {
+    const httpsOptions = {
+        key: fs.readFileSync(process.env.SSL_KEY_PATH || "./certs/key.pem"),
+        cert: fs.readFileSync(process.env.SSL_CERT_PATH || "./certs/cert.pem")
+    };
+    server = https.createServer(httpsOptions, app);
+} else {
+    server = http.createServer(app);
+}
 
 // WebSocket setup for progress tracking
 const io = socketIo(server, middlewareConfig.websocket);
@@ -243,13 +260,13 @@ async function initializeApplication() {
     });
 
     server.listen(PORT, "0.0.0.0", () => {
-        console.log(`🚀 HexTrackr server running on http://localhost:${PORT}`);
+        console.log(`🚀 HexTrackr server running on ${useHTTPS ? "https" : "http"}://localhost:${PORT}`);
         console.log("📊 Modular backend initialized");
         console.log("🔌 WebSocket progress tracking enabled");
         console.log("Available endpoints:");
-        console.log(`  - Tickets: http://localhost:${PORT}/tickets.html`);
-        console.log(`  - Vulnerabilities: http://localhost:${PORT}/vulnerabilities.html`);
-        console.log(`  - API Root: http://localhost:${PORT}/api`);
+        console.log(`  - Tickets: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/tickets.html`);
+        console.log(`  - Vulnerabilities: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/vulnerabilities.html`);
+        console.log(`  - API Root: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/api`);
     });
 }
 
