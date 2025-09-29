@@ -9,9 +9,9 @@
 ### Section I: Context Accuracy
 
     - Context MUST be gathered before starting any work
-        - Session Logs SHALL be stored as context bundles (See Article II, Section VI)
-      - Project Knowledge SHALL be retained in ***Memento*** (See Article II, Section II)
-      - Codebase SHALL be indexed and searchable in ***Code-Indexer-Ollama*** (See Article II, Section VIII)
+        - Session Logs SHALL be stored as context bundles (See Article V)
+      - Project Knowledge SHALL be retained in ***Memento*** (See Article II, Section I)
+      - Codebase SHALL be indexed and searchable in ***Claude-Context*** (See Article II, Section VIII)
       - Context7 SHALL be used to verify framework documentation accuracy
 
 ### Section III: Documentation Pipeline & Standards
@@ -58,8 +58,11 @@
 - Entities SHALL Use PROJECT:DOMAIN:TYPE classification pattern
 - Entities SHALL Contain TIMESTAMP in ISO 8601 format as first observation
 - Entities SHALL Contain an ABSTRACT (second) and SUMMARY (third) observation
-- All entities SHALL be tagged per `/memento/TAXONOMY.md` requirements
-- Tag taxonomy and conventions defined in `/memento/TAXONOMY.md` SHALL be followed
+- All entities SHALL be tagged per taxonomy requirements:
+  - **Primary Source**: Linear DOCS-14 (Memento Knowledge Graph Taxonomy & Conventions v1.1.0)
+  - **Fallback**: `/memento/TAXONOMY.md` if Linear is unavailable
+- Tags SHALL be added using `mcp__memento__add_observations` with "TAG: " prefix
+- NEVER use `read_graph` for large graphs - always use search functions
 
 ### Section II: Context 7
 
@@ -88,11 +91,21 @@
 - All task tracking, research findings, and progress updates SHALL be maintained in Linear
 - SESSION_PLAN.md files are deprecated - Linear is the single source of truth 
 
-### Section VIII: Code-Indexer-Ollama
+### Section VIII: Claude-Context MCP
 
-- Code-Indexer-Ollama MUST be used when searching the code base
-- Uses local Ollama embeddings with AST-based code splitting for semantic search
-- Always verify the Index is current before searches
+- Claude-Context MCP SHALL be the primary tool for semantic code search
+- Automatically indexes codebase with intelligent chunking (2000+ chunks typical)
+- Check index status with `mcp__claude-context__get_indexing_status` before searches
+- Re-index at session start if codebase has changed since last index
+- Supports natural language queries for finding code patterns, implementations, and documentation
+- Extension filtering available but not required for most searches
+- Returns ranked results with code snippets and exact file locations
+- Particularly effective for:
+  - Finding TODO/FIXME/HACK comments
+  - Locating JSDoc documentation patterns
+  - Security vulnerability searches (XSS, SQL injection patterns)
+  - Architecture and initialization code
+  - Import/export functionality
 
 ## Article V: Custom Context Bundles
 

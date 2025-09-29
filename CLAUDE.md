@@ -10,6 +10,137 @@ HexTrackr is a vulnerability management system for tracking security vulnerabili
 
 When working on this project the AI Agent SHALL follow the CONSTITUTION.md
 
+## Multi-Claude Development Architecture
+
+### Claude Instance Roles
+
+HexTrackr development uses three distinct Claude instances with specific responsibilities:
+
+1. **Claude (Desktop Mode)**
+   - **Role**: Project Management & Planning
+   - **Location**: Claude.ai web interface
+   - **Responsibilities**:
+     - High-level planning and architecture decisions
+     - Linear issue creation and task delegation
+     - Coordination between Claude-Dev and Claude-Prod
+     - Strategic workflow design
+   - **Tools**: Linear MCP, Memento, Web Search
+
+2. **Claude-Dev (Claude Code CLI on Mac)**
+   - **Role**: Primary Development
+   - **Location**: Mac M4 Mini development machine
+   - **Project Path**: `/Volumes/DATA/GitHub/HexTrackr/`
+   - **Responsibilities**:
+     - Active feature development and coding
+     - Managing private GitHub repository
+     - Docker development environment (port 8989)
+     - Testing and quality assurance
+   - **Works With**: Claude Desktop for task assignments
+
+3. **Claude-Prod (Claude Code CLI on Ubuntu)**
+   - **Role**: Production Management & Clean Releases
+   - **Location**: Ubuntu 24.04 LTS server (192.168.1.80)
+   - **Project Path**: `/home/lbruton/HexTrackr-Dev/`
+   - **Responsibilities**:
+     - Security fixes and hardening
+     - Linux-specific implementation and porting from Mac
+     - Test production environment before actual deployment
+     - Docker management and deployment optimization
+     - Production server management
+     - Neo4j database administration
+     - Clean public GitHub releases
+     - Final cleanup and production readiness
+   - **Works With**: Claude Desktop for coordination
+
+### Linear Teams Structure
+
+- **HexTrackr Team**: General development issues (Claude-Dev primary focus)
+- **HexTrackr-Prod Team**: Production-specific tasks (Claude-Prod primary focus)
+- **Documentation Team**: Shared project documentation (DOCS- prefix) accessible by all instances
+
+### Workflow Integration
+
+- **Task Flow**: Claude Desktop creates Linear issues → Delegates to Claude-Dev for implementation → Claude-Prod handles production deployment
+- **Shared Resources**:
+  - Linear teams (HexTrackr, HexTrackr-Prod, Documentation)
+  - Memento knowledge graph (Neo4j Enterprise 5.13 at 192.168.1.80)
+  - Claude-context codebase indexing (shared across all instances)
+  - Documentation team as shared knowledge repository
+- **Communication**: Reference instances by name ("Claude", "Claude-Dev", "Claude-Prod") for clarity
+
+### Communication Patterns
+
+- **Prime Boot Sequence**: Each instance loads context via Memento and Linear at session start
+- **Save/Recall Commands**: Use Memento to persist and retrieve session context
+- **Handoffs Between Instances**:
+  - Document decisions and context in Linear issues
+  - Use Linear comments for implementation details
+  - Tag relevant instance in Linear when handing off
+- **Linear as Communication Hub**: All inter-instance communication flows through Linear issues and comments
+- **Instance Naming**: Always specify which Claude instance when referencing work or decisions
+
+## Instance-Specific Guidelines
+
+### For Claude-Dev (This Instance)
+**Primary Responsibilities**:
+- Feature development and bug fixes on Mac environment
+- Managing private GitHub repository and branches
+- Docker development testing (port 8989)
+- Code quality and linting enforcement
+- Creating Pull Requests for main branch
+
+**When to Handoff**:
+- Production deployment readiness → Claude-Prod
+- High-level planning needed → Claude Desktop
+- Security hardening for Linux → Claude-Prod
+- Cross-platform compatibility issues → Claude-Prod
+
+**Best Practices**:
+- Always test in Docker container (port 8989)
+- Run `npm run lint:all` before committing
+- Document implementation details in Linear comments
+- Use Claude-Context MCP for code searches
+- Create feature branches following naming convention
+
+### For Claude Desktop
+**Primary Responsibilities**:
+- Strategic planning and architecture decisions
+- Linear issue creation and prioritization
+- Task delegation to Dev/Prod instances
+- Cross-instance coordination
+- High-level workflow design
+
+**When to Engage Other Instances**:
+- Implementation ready → Claude-Dev
+- Production deployment → Claude-Prod
+- Technical research needed → Claude-Dev or Claude-Prod
+
+**Best Practices**:
+- Create comprehensive Linear issues with clear requirements
+- Use Documentation team for shared knowledge
+- Maintain project roadmap and priorities
+- Coordinate releases between Dev and Prod
+
+### For Claude-Prod
+**Primary Responsibilities**:
+- Production environment management on Ubuntu
+- Security hardening and Linux-specific fixes
+- Test production deployment before going live
+- Docker optimization for production
+- Clean public releases to GitHub
+
+**When to Handoff**:
+- Development bugs found → Claude-Dev
+- Architecture decisions needed → Claude Desktop
+- Feature requests from production → Claude Desktop
+
+**Best Practices**:
+- Focus on HexTrackr-Prod team issues
+- Test thoroughly in production-like environment
+- Document Linux-specific solutions
+- Maintain production security standards
+- Coordinate with Claude-Dev for compatibility
+
 ## Development Workflow (SIMPLIFIED)
 
 ### Linear-Only Workflow
@@ -29,10 +160,15 @@ HexTrackr uses a simplified workflow with Linear as the single source of truth:
 ### Linear Issue Format
 ```
 Title: v1.0.XX: [Feature/Bug Name]
-Team: HexTrackr
+Team: [HexTrackr|HexTrackr-Prod|Documentation]
 Status: Backlog → Todo → In Progress → In Review → Done
 Labels: [Type: Bug/Feature/Enhancement] + [Priority: High/Medium/Low]
 ```
+
+**Team Selection Guidelines**:
+- **HexTrackr**: Development features, bug fixes, general enhancements
+- **HexTrackr-Prod**: Production deployment, security hardening, Linux-specific issues
+- **Documentation**: Shared knowledge, architecture decisions, cross-instance documentation
 
 ## Essential Commands
 
@@ -187,8 +323,10 @@ The system uses a sophisticated rollover pipeline:
 ### From CONSTITUTION.md
 
 1. **Context Management**:
-   - Use code-indexer-ollama MCP for codebase searching (uses Ollama for local embeddings with AST-based code splitting)
+   - Use Claude-Context MCP for codebase searching (high-performance semantic search with 2200+ chunks)
    - Use Memento MCP for project knowledge graph (semantic search preferred)
+     - **Primary Source**: Linear DOCS-14 for Memento taxonomy and conventions
+     - **Fallback**: `/memento/TAXONOMY.md` if Linear is unavailable
    - Context7 for framework documentation verification
 
 2. **Quality Standards**:
@@ -347,6 +485,113 @@ To update templates:
 - Previous versions remain in comment history for reference
 - Once patterns solidify, templates can be promoted to Linear UI
 
+## Claude-Context Code Search
+
+### Overview
+Claude-Context MCP provides high-performance semantic code search across the HexTrackr codebase with intelligent chunking and natural language query support.
+
+### Key Features
+- **Automatic Indexing**: 130+ files, 2200+ semantic chunks
+- **Natural Language Queries**: Search with concepts, not just keywords
+- **Ranked Results**: Returns most relevant code snippets first
+- **File Location Tracking**: Exact file paths and line numbers
+- **Multi-format Support**: JavaScript, HTML, CSS, Markdown, JSON
+
+### Best Practices for Claude-Context
+
+#### 1. Index Management
+```bash
+# Check index status at session start
+mcp__claude-context__get_indexing_status("/Volumes/DATA/GitHub/HexTrackr")
+
+# Re-index if needed (force=true for refresh)
+mcp__claude-context__index_codebase({
+  path: "/Volumes/DATA/GitHub/HexTrackr",
+  force: false
+})
+```
+
+#### 2. Effective Search Patterns
+
+#### Architecture & Initialization
+- Query: "Express server initialization middleware routes controllers"
+- Finds: Server setup, route configuration, controller initialization
+
+#### Security Patterns
+- Query: "XSS SQL injection CORS sanitize validate"
+- Finds: Security middleware, validation functions, sanitization code
+
+#### Documentation & TODOs
+- Query: "TODO FIXME BUG HACK"
+- Finds: Technical debt, known issues, temporary workarounds
+
+#### JSDoc Patterns
+- Query: "@param @returns @description @module"
+- Finds: Well-documented functions with complete JSDoc
+
+#### Feature Implementation
+- Query: "CSV import WebSocket progress staging"
+- Finds: Import pipeline, progress tracking, staging table logic
+
+#### 3. Search Tips
+- Use conceptual terms for semantic matching
+- Combine related keywords for focused results
+- Default limit is 10 results; adjust as needed
+- Extension filter available but rarely needed
+- Results include surrounding context for better understanding
+
+### Claude-Context vs Other Search Tools
+
+| Feature | Claude-Context | Grep/Glob | Code-Indexer-Ollama |
+|---------|---------------|-----------|---------------------|
+| Semantic Search | ✅ Excellent | ❌ No | ✅ Good |
+| Speed | ✅ Fast | ✅ Very Fast | ⚠️ Slower |
+| Natural Language | ✅ Yes | ❌ No | ✅ Yes |
+| Context Snippets | ✅ Yes | ⚠️ Limited | ✅ Yes |
+| Line Numbers | ✅ Exact | ✅ Yes | ✅ Yes |
+| Ranking | ✅ Intelligent | ❌ No | ✅ Good |
+| Index Required | ✅ Yes | ❌ No | ✅ Yes |
+
+### When to Use Claude-Context
+- **Primary Use**: All code searches during development
+- **Best For**: Finding implementations, patterns, TODOs, documentation
+- **Limitations**: Requires indexing; not for simple file existence checks
+
+## Memento Knowledge Graph
+
+### Taxonomy Source of Truth
+- **Primary Reference**: Linear DOCS-14 - Memento Knowledge Graph Taxonomy & Conventions v1.1.0
+- **Fallback**: `/memento/TAXONOMY.md` (local file if Linear unavailable)
+
+### Key Memento Updates (2025-09-27)
+- Tags are added using `mcp__memento__add_observations` with "TAG: " prefix
+- No separate add_tags function exists
+- Neo4j Enterprise 5.13 backend at 192.168.1.80
+- All entity naming follows PROJECT:DOMAIN:TYPE pattern
+- Required observations: TIMESTAMP, ABSTRACT, SUMMARY, ID (in that order)
+- Never use `read_graph` for large graphs - always use search functions
+
+### Quick Reference
+```javascript
+// Create entity
+mcp__memento__create_entities([{
+  name: "Session: PROJECT-TOPIC-YYYYMMDD-HHMMSS",
+  entityType: "PROJECT:DOMAIN:TYPE",
+  observations: [/* required observations */]
+}])
+
+// Add tags (using add_observations)
+mcp__memento__add_observations({
+  observations: [{
+    entityName: "Session: ...",
+    contents: ["TAG: project:name", "TAG: category", ...]
+  }]
+})
+
+// Search (preferred)
+mcp__memento__search_nodes({ query: "search terms" })
+```
+
 ## Environment Configuration
 
 Required `.env` variables:
@@ -378,7 +623,7 @@ See `.env.example` for complete configuration options.
 ### Development Philosophy
 - **Keep It Simple**: Linear for tracking, natural conversation for planning
 - **Quality First**: Maintain code standards without bureaucratic overhead
-- **Research Thoroughly**: Use code-indexer-ollama and Context7 when needed
+- **Research Thoroughly**: Use Claude-Context and Context7 when needed
 - **Test Continuously**: Docker container on port 8989
 - **Document in Code**: JSDoc comments and Linear comments for context
 
@@ -390,4 +635,4 @@ See `.env.example` for complete configuration options.
 - Database uses WAL mode for concurrent access
 - Frontend uses vanilla JavaScript (no framework dependencies)
 - Bootstrap 5 and Tabler.io for UI components
-- Code search uses code-indexer-ollama MCP for semantic search with local Ollama embeddings
+- Code search uses Claude-Context MCP for high-performance semantic search
