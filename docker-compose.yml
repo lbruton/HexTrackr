@@ -6,6 +6,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8989:8080"  # External port 8989 -> Internal port 8080 (prevents test conflicts)
+      - "8443:8443"  # HTTPS port
     volumes:
       # Mount entire application for development hot-reload
       - ./app:/app/app
@@ -15,16 +16,21 @@ services:
       - ./app/public/data:/app/app/public/data:rw
       # Mount uploads directory for file persistence
       - ./app/uploads:/app/app/uploads:rw
+      # Mount SSL certificates for HTTPS
+      - ./certs:/app/certs:ro
     environment:
       - NODE_ENV=${NODE_ENV:-development}
       - HEXTRACKR_VERSION=1.0.31
       - PORT=${PORT:-8080}
       - DATABASE_PATH=${DATABASE_PATH:-app/public/data/hextrackr.db}
+      - USE_HTTPS=${USE_HTTPS:-false}
+      - SSL_KEY_PATH=/app/certs/key.pem
+      - SSL_CERT_PATH=/app/certs/cert.pem
     env_file:
       - .env
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8080/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))"]
+      test: ["CMD", "node", "-e", "const protocol = process.env.USE_HTTPS === 'true' ? 'https' : 'http'; const https = require(protocol); const options = protocol === 'https' ? {rejectUnauthorized: false} : {}; https.get(protocol + '://localhost:' + (process.env.PORT || 8080) + '/health', options, (res) => process.exit(res.statusCode === 200 ? 0 : 1))"]
       interval: 30s
       timeout: 3s
       retries: 3
