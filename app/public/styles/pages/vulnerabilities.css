@@ -509,7 +509,7 @@
 .device-card .vpr-mini-card:hover {
     border-color: var(--hextrackr-primary);
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(32, 107, 196, 0.15);
+    box-shadow: 0 2px 8px rgb(32, 107, 196, 0.15);
 }
 
 .device-card .vpr-mini-card.critical {
@@ -617,11 +617,11 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    box-shadow: 0 4px 12px rgb(220, 38, 38, 0.25);
 }
 
 [data-bs-theme="dark"] .kev-badge {
-    background: rgba(239, 68, 68, 0.9);
+    background: rgb(239, 68, 68, 0.9);
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+    box-shadow: 0 4px 12px rgb(239, 68, 68, 0.35);
 }
