@@ -1326,14 +1326,36 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
                 FROM vulnerabilities_current
                 WHERE scan_date = ?
                   AND lifecycle_state IN ('active', 'reopened')
+                  AND cve IS NOT NULL
                   AND cve NOT IN (
                       SELECT DISTINCT cve
-                      FROM vulnerability_daily_totals prev
-                      JOIN vulnerabilities_current prev_vulns ON prev_vulns.scan_date < ?
-                      WHERE prev_vulns.cve IS NOT NULL
+                      FROM vulnerability_snapshots
+                      WHERE scan_date < ?
+                        AND cve IS NOT NULL
                   )
                 GROUP BY cve, severity
                 ORDER BY severity, hostCount DESC
+            `;
+
+            // Find CVEs that were REMOVED/RESOLVED in this scan (no longer present)
+            const resolvedCvesQuery = `
+                SELECT
+                    prev.cve,
+                    prev.severity,
+                    COUNT(DISTINCT prev.hostname) as hostCount,
+                    ROUND(SUM(prev.vpr_score), 2) as totalVpr,
+                    MAX(prev.scan_date) as lastSeen
+                FROM vulnerability_snapshots prev
+                WHERE prev.scan_date < ?
+                  AND prev.cve IS NOT NULL
+                  AND prev.cve NOT IN (
+                      SELECT DISTINCT cve
+                      FROM vulnerabilities_current
+                      WHERE scan_date = ?
+                        AND cve IS NOT NULL
+                  )
+                GROUP BY prev.cve, prev.severity
+                ORDER BY prev.severity, hostCount DESC
             `;
 
             db.all(newCvesQuery, [scanDate, scanDate], (cveErr, newCveRows) => {
@@ -1346,25 +1368,36 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
                 const totalNewVulnerabilities = newCves.reduce((sum, cve) => sum + cve.hostCount, 0);
                 const totalNewVpr = newCves.reduce((sum, cve) => sum + cve.totalVpr, 0);
 
-                // Calculate percentage changes
-                const totalPrevious = previousTotals.total_vulnerabilities || 0;
-                const totalCurrent = currentTotals.total_vulnerabilities || 0;
-                const percentageChange = totalPrevious > 0 ?
-                    ((totalCurrent - totalPrevious) / totalPrevious * 100) : 0;
-
-                // Get unique hosts affected
-                const hostsQuery = `
-                    SELECT COUNT(DISTINCT hostname) as uniqueHosts
-                    FROM vulnerabilities_current
-                    WHERE scan_date = ? AND lifecycle_state IN ('active', 'reopened')
-                `;
-
-                db.get(hostsQuery, [scanDate], (hostsErr, hostsResult) => {
-                    if (hostsErr) {
-                        console.error("Error counting unique hosts:", hostsErr);
+                // Query for resolved CVEs
+                db.all(resolvedCvesQuery, [scanDate, scanDate], (resolvedErr, resolvedCveRows) => {
+                    if (resolvedErr) {
+                        console.error("Error finding resolved CVEs:", resolvedErr);
+                        // Continue without resolved CVE data
                     }
 
-                    const uniqueHosts = hostsResult ? hostsResult.uniqueHosts : 0;
+                    const resolvedCves = resolvedCveRows || [];
+                    const totalResolvedVulnerabilities = resolvedCves.reduce((sum, cve) => sum + cve.hostCount, 0);
+                    const totalResolvedVpr = resolvedCves.reduce((sum, cve) => sum + cve.totalVpr, 0);
+
+                    // Calculate percentage changes
+                    const totalPrevious = previousTotals.total_vulnerabilities || 0;
+                    const totalCurrent = currentTotals.total_vulnerabilities || 0;
+                    const percentageChange = totalPrevious > 0 ?
+                        ((totalCurrent - totalPrevious) / totalPrevious * 100) : 0;
+
+                    // Get unique hosts affected
+                    const hostsQuery = `
+                        SELECT COUNT(DISTINCT hostname) as uniqueHosts
+                        FROM vulnerabilities_current
+                        WHERE scan_date = ? AND lifecycle_state IN ('active', 'reopened')
+                    `;
+
+                    db.get(hostsQuery, [scanDate], (hostsErr, hostsResult) => {
+                        if (hostsErr) {
+                            console.error("Error counting unique hosts:", hostsErr);
+                        }
+
+                        const uniqueHosts = hostsResult ? hostsResult.uniqueHosts : 0;
 
                     // Build comprehensive summary
                     const summary = {
@@ -1387,7 +1420,18 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
                             })),
                             totalNewCves: newCves.length,
                             totalNewVulnerabilities: totalNewVulnerabilities,
-                            totalNewVpr: Math.round(totalNewVpr * 100) / 100
+                            totalNewVpr: Math.round(totalNewVpr * 100) / 100,
+                            // Resolved/removed CVEs
+                            resolvedCves: resolvedCves.map(cve => ({
+                                cve: cve.cve,
+                                severity: cve.severity,
+                                hostCount: cve.hostCount,
+                                totalVpr: cve.totalVpr,
+                                lastSeen: cve.lastSeen
+                            })),
+                            totalResolvedCves: resolvedCves.length,
+                            totalResolvedVulnerabilities: totalResolvedVulnerabilities,
+                            totalResolvedVpr: Math.round(totalResolvedVpr * 100) / 100
                         },
                         severityImpact: severityImpact,
                         hostImpact: {
@@ -1409,11 +1453,13 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
 
                     console.log("✅ Import summary generated:", {
                         newCves: summary.cveDiscovery.totalNewCves,
+                        resolvedCves: summary.cveDiscovery.totalResolvedCves,
                         totalChange: summary.comparison.netChange,
                         percentChange: summary.comparison.percentageChange
                     });
 
                     resolve(summary);
+                    });
                 });
             });
         });
