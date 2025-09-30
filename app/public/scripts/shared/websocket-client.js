@@ -56,7 +56,7 @@ class WebSocketClient {
                 if (typeof io === "undefined") {
                     throw new Error("Socket.io library not loaded");
                 }
-                
+
                 // Use the same protocol as the current page to avoid mixed content errors
                 let protocol;
                 if (window.location.protocol === "https:") {
