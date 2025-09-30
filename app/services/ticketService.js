@@ -146,49 +146,74 @@ class TicketService {
     /**
      * Update existing ticket
      * Extracted from server.js line 3396-3422
+     * Modified to support partial updates by merging with existing ticket data
      */
     async updateTicket(ticketId, ticket) {
-        const normalizedXt = normalizeXtNumber(ticket.xt_number || ticket.xtNumber) || null;
-        const payload = {
-            ...ticket,
-            xt_number: normalizedXt,
-            xtNumber: normalizedXt
-        };
+        try {
+            // First, get the existing ticket data
+            const existingTicket = await this.getTicketById(ticketId);
+            if (!existingTicket) {
+                throw new Error(`Ticket with ID ${ticketId} not found`);
+            }
 
-        return new Promise((resolve, reject) => {
-            const sql = `UPDATE tickets SET
-                date_submitted = ?, date_due = ?, hexagon_ticket = ?, service_now_ticket = ?,
-                location = ?, devices = ?, supervisor = ?, tech = ?, status = ?, notes = ?,
-                attachments = ?, updated_at = ?, site = ?, xt_number = ?, site_id = ?, location_id = ?
-                WHERE id = ?`;
+            // Merge the updates with existing data, ensuring required fields are preserved
+            const normalizedXt = normalizeXtNumber(ticket.xt_number || ticket.xtNumber || existingTicket.xt_number) || null;
+            const payload = {
+                dateSubmitted: ticket.dateSubmitted || ticket.date_submitted || existingTicket.date_submitted,
+                dateDue: ticket.dateDue || ticket.date_due || existingTicket.date_due,
+                hexagonTicket: ticket.hexagonTicket || ticket.hexagon_ticket || existingTicket.hexagon_ticket,
+                serviceNowTicket: ticket.serviceNowTicket || ticket.service_now_ticket || existingTicket.service_now_ticket,
+                location: ticket.location || existingTicket.location,
+                devices: ticket.devices || existingTicket.devices,
+                supervisor: ticket.supervisor || existingTicket.supervisor,
+                tech: ticket.tech || existingTicket.tech,
+                status: ticket.status || existingTicket.status,
+                notes: ticket.notes || existingTicket.notes,
+                attachments: ticket.attachments || existingTicket.attachments,
+                updatedAt: ticket.updatedAt || ticket.updated_at || new Date().toISOString(),
+                site: ticket.site || existingTicket.site,
+                xt_number: normalizedXt,
+                site_id: ticket.site_id || existingTicket.site_id,
+                location_id: ticket.location_id || existingTicket.location_id
+            };
 
-            const params = [
-                payload.dateSubmitted,
-                payload.dateDue,
-                payload.hexagonTicket,
-                payload.serviceNowTicket,
-                payload.location,
-                JSON.stringify(payload.devices),
-                payload.supervisor,
-                payload.tech,
-                payload.status,
-                payload.notes,
-                JSON.stringify(payload.attachments || []),
-                payload.updatedAt,
-                payload.site,
-                payload.xt_number,
-                payload.site_id,
-                payload.location_id,
-                ticketId
-            ];
+            return new Promise((resolve, reject) => {
+                const sql = `UPDATE tickets SET
+                    date_submitted = ?, date_due = ?, hexagon_ticket = ?, service_now_ticket = ?,
+                    location = ?, devices = ?, supervisor = ?, tech = ?, status = ?, notes = ?,
+                    attachments = ?, updated_at = ?, site = ?, xt_number = ?, site_id = ?, location_id = ?
+                    WHERE id = ?`;
 
-            this.db.run(sql, params, function(err) {
-                if (err) {
-                    return reject(new Error("Failed to update ticket: " + err.message));
-                }
-                resolve({ id: ticketId });
+                const params = [
+                    payload.dateSubmitted,
+                    payload.dateDue,
+                    payload.hexagonTicket,
+                    payload.serviceNowTicket,
+                    payload.location,
+                    typeof payload.devices === "string" ? payload.devices : JSON.stringify(payload.devices || []),
+                    payload.supervisor,
+                    payload.tech,
+                    payload.status,
+                    payload.notes,
+                    typeof payload.attachments === "string" ? payload.attachments : JSON.stringify(payload.attachments || []),
+                    payload.updatedAt,
+                    payload.site,
+                    payload.xt_number,
+                    payload.site_id,
+                    payload.location_id,
+                    ticketId
+                ];
+
+                this.db.run(sql, params, function(err) {
+                    if (err) {
+                        return reject(new Error("Failed to update ticket: " + err.message));
+                    }
+                    resolve({ id: ticketId });
+                });
             });
-        });
+        } catch (error) {
+            throw new Error("Failed to update ticket: " + error.message, { cause: error });
+        }
     }
 
     /**
