@@ -385,7 +385,7 @@ class HtmlContentUpdater {
         this.currentSection = currentSection;
 
         // Special handling for CHANGELOG.md
-        if (sourcePath && sourcePath.toLowerCase().includes('changelog.md')) {
+        if (sourcePath && sourcePath.toLowerCase().includes("changelog.md")) {
             return this.processChangelogContent(markdownContent);
         }
 
@@ -399,13 +399,13 @@ class HtmlContentUpdater {
      */
     processChangelogContent(markdownContent) {
         // Split content into lines for processing
-        const lines = markdownContent.split('\n');
-        let result = '';
-        let currentVersionContent = '';
+        const lines = markdownContent.split("\n");
+        let result = "";
+        let currentVersionContent = "";
         let versionCount = 0;
         let inVersionSection = false;
-        let versionHeader = '';
-        let versionId = '';
+        let versionHeader = "";
+        let versionId = "";
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
@@ -418,9 +418,9 @@ class HtmlContentUpdater {
                 if (inVersionSection && versionHeader) {
                     const versionHtml = this.marked.parse(currentVersionContent);
                     const isFirstVersion = versionCount === 1;
-                    const collapseClass = isFirstVersion ? 'show' : '';
-                    const buttonClass = isFirstVersion ? '' : 'collapsed';
-                    const ariaExpanded = isFirstVersion ? 'true' : 'false';
+                    const collapseClass = isFirstVersion ? "show" : "";
+                    const buttonClass = isFirstVersion ? "" : "collapsed";
+                    const ariaExpanded = isFirstVersion ? "true" : "false";
 
                     result += `
                     <div class="accordion-item">
@@ -449,15 +449,15 @@ class HtmlContentUpdater {
                 const version = versionMatch[1];
                 const date = versionMatch[2];
                 versionHeader = `[${version}] - ${date}`;
-                versionId = `version-${version.replace(/\./g, '-')}`;
-                currentVersionContent = '';
+                versionId = `version-${version.replace(/\./g, "-")}`;
+                currentVersionContent = "";
                 inVersionSection = true;
             } else if (inVersionSection) {
                 // Add line to current version content
-                currentVersionContent += line + '\n';
+                currentVersionContent += line + "\n";
             } else if (!inVersionSection) {
                 // This is header content before any versions
-                const headerHtml = this.marked.parse(line + '\n');
+                const headerHtml = this.marked.parse(line + "\n");
                 result += headerHtml;
             }
         }
@@ -466,9 +466,9 @@ class HtmlContentUpdater {
         if (inVersionSection && versionHeader) {
             const versionHtml = this.marked.parse(currentVersionContent);
             const isFirstVersion = versionCount === 1;
-            const collapseClass = isFirstVersion ? 'show' : '';
-            const buttonClass = isFirstVersion ? '' : 'collapsed';
-            const ariaExpanded = isFirstVersion ? 'true' : 'false';
+            const collapseClass = isFirstVersion ? "show" : "";
+            const buttonClass = isFirstVersion ? "" : "collapsed";
+            const ariaExpanded = isFirstVersion ? "true" : "false";
 
             result += `
             <div class="accordion-item">

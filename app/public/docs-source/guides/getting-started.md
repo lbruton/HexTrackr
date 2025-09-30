@@ -58,6 +58,41 @@ HexTrackr includes an automated installation script that detects your platform a
     - **Vulnerabilities Management**: `http://localhost:8989/vulnerabilities.html`
     - **Documentation Portal**: `http://localhost:8989/docs-html/`
 
+---
+
+## HTTPS Configuration (Optional)
+
+HexTrackr v1.0.33+ includes built-in HTTPS support for secure deployment and authentication testing.
+
+### Quick HTTPS Setup
+
+The installation script includes an optional HTTPS configuration step, or you can set it up manually:
+
+```bash
+# Run the SSL setup script
+./scripts/setup-ssl.sh
+
+# Or configure during installation
+./install.sh  # Choose 'y' when prompted for HTTPS
+```
+
+### When You Need HTTPS
+
+- **Authentication**: Required for secure session cookies and login functionality
+- **Production Deployment**: Essential for any internet-facing deployment
+- **Development Testing**: Testing authentication features locally
+
+### Access with HTTPS
+
+Once configured, access your application via:
+
+- **HTTPS**: `https://localhost:8989` (with self-signed certificate warning)
+- **HTTP**: `http://localhost:8989` (still available)
+
+For complete HTTPS setup instructions, see the [HTTPS Setup Guide](./https-setup.md).
+
+---
+
 ### Using Helper Scripts
 
 HexTrackr includes convenient helper scripts for Docker management:
