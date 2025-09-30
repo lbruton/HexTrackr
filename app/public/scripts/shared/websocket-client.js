@@ -57,7 +57,24 @@ class WebSocketClient {
                     throw new Error("Socket.io library not loaded");
                 }
                 
-                const url = `http://${this.config.host}:${this.config.port}`;
+                // Use the same protocol as the current page to avoid mixed content errors
+                let protocol;
+                if (window.location.protocol === "https:") {
+                    protocol = "https:";
+                } else if (window.location.protocol === "http:") {
+                    protocol = "http:";
+                } else if (window.location.protocol === "file:") {
+                    // Warn and default to http
+                    this.debug("Detected 'file:' protocol. Defaulting WebSocket protocol to 'http:'.");
+                    protocol = "http:";
+                } else {
+                    // Unknown or unsupported protocol, throw an error instead of defaulting to http
+                    const errorMsg = `Unknown or unsupported protocol ('${window.location.protocol}'). Please configure the WebSocket protocol explicitly.`;
+                    this.debug(errorMsg);
+                    reject(new Error(errorMsg));
+                    return;
+                }
+                const url = `${protocol}//${this.config.host}:${this.config.port}`;
                 this.debug("Connecting to WebSocket server:", url);
                 
                 this.socket = io(url, {
