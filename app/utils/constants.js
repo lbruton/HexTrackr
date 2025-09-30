@@ -10,8 +10,19 @@
 const PORT = process.env.PORT || 8080;
 const WEBSOCKET_PORT = 8988; // Planned WebSocket port
 
-// CORS Origins
-const CORS_ORIGINS = ["http://localhost:8080", "http://127.0.0.1:8080"];
+// CORS Origins - Dynamic HTTPS-only configuration
+const CORS_ORIGINS = function(origin, callback) {
+    // Allow same-origin requests (no origin header)
+    if (!origin) return callback(null, true);
+
+    // Allow any HTTPS connection
+    if (origin.startsWith("https://")) {
+        return callback(null, true);
+    }
+
+    // Reject all HTTP connections
+    callback(new Error("Only HTTPS connections allowed"));
+};
 const CORS_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"];
 const CORS_HEADERS = ["Content-Type", "Authorization", "X-Requested-With"];
 

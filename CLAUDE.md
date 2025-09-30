@@ -10,6 +10,19 @@ HexTrackr is a vulnerability management system for tracking security vulnerabili
 
 When working on this project the AI Agent SHALL follow the CONSTITUTION.md
 
+## Documentation Hierarchy
+
+This project uses a multi-layered documentation system with clear precedence:
+
+1. **CONSTITUTION.md**: Authoritative requirements and mandates (MUST follow - constitutional law)
+2. **CLAUDE.md**: Project guidance, architecture overview, and development patterns (HOW to work)
+3. **prime.md**: Session initialization procedure (context loading at startup)
+4. **Linear DOCS-*** issues**: Shared knowledge accessible across all Claude instances (cross-instance documentation)
+
+**When in doubt**: CONSTITUTION.md takes precedence over all other documentation.
+
+**Anti-Duplication Policy**: Tool usage requirements, code quality standards, and MCP integration details are defined once in CONSTITUTION.md. This document references the constitution rather than duplicating requirements.
+
 ## Multi-Claude Development Architecture
 
 ### Claude Instance Roles
@@ -54,18 +67,18 @@ HexTrackr development uses three distinct Claude instances with specific respons
 
 ### Linear Teams Structure
 
-- **HexTrackr Team**: General development issues (Claude-Dev primary focus)
-- **HexTrackr-Prod Team**: Production-specific tasks (Claude-Prod primary focus)
-- **Documentation Team**: Shared project documentation (DOCS- prefix) accessible by all instances
+- **HexTrackr-Dev Team** (HEX-XX): General development issues (Claude-Dev primary focus)
+- **HexTrackr-Prod Team** (HEXP-XX): Production-specific tasks (Claude-Prod primary focus)
+- **HexTrackr-Docs Team** (DOCS-XX): Shared project documentation accessible by all instances
 
 ### Workflow Integration
 
 - **Task Flow**: Claude Desktop creates Linear issues → Delegates to Claude-Dev for implementation → Claude-Prod handles production deployment
 - **Shared Resources**:
-  - Linear teams (HexTrackr, HexTrackr-Prod, Documentation)
+  - Linear teams (HexTrackr-Dev, HexTrackr-Prod, HexTrackr-Docs)
   - Memento knowledge graph (Neo4j Enterprise 5.13 at 192.168.1.80)
   - Claude-context codebase indexing (shared across all instances)
-  - Documentation team as shared knowledge repository
+  - HexTrackr-Docs team as shared knowledge repository
 - **Communication**: Reference instances by name ("Claude", "Claude-Dev", "Claude-Prod") for clarity
 
 ### Communication Patterns
@@ -117,7 +130,7 @@ HexTrackr development uses three distinct Claude instances with specific respons
 
 **Best Practices**:
 - Create comprehensive Linear issues with clear requirements
-- Use Documentation team for shared knowledge
+- Use HexTrackr-Docs team for shared knowledge
 - Maintain project roadmap and priorities
 - Coordinate releases between Dev and Prod
 
@@ -152,23 +165,24 @@ HexTrackr uses a simplified workflow with Linear as the single source of truth:
 4. **Completion**: Update Linear status and commit changes
 
 ### Key Principles
-- **Casual Approach**: Natural conversation flow, no rigid modes
-- **Linear-Centric**: All planning, research, and progress tracking in Linear
-- **Quality Focus**: Maintain code quality standards without bureaucracy
-- **No Dual Tracking**: Eliminate markdown planning files
+- **Structured Initialization**: Use `/prime` command for comprehensive context loading at session start
+- **Casual Development**: Natural conversation flow after initialization completes
+- **Linear-Centric**: All planning, research, and progress tracking in Linear issues
+- **Quality Focus**: Maintain code quality standards without bureaucratic overhead
+- **No Session Plans**: Eliminate per-session markdown planning files (infrastructure command files like prime.md are acceptable)
 
 ### Linear Issue Format
 ```
 Title: v1.0.XX: [Feature/Bug Name]
-Team: [HexTrackr|HexTrackr-Prod|Documentation]
+Team: [HexTrackr-Dev|HexTrackr-Prod|HexTrackr-Docs]
 Status: Backlog → Todo → In Progress → In Review → Done
 Labels: [Type: Bug/Feature/Enhancement] + [Priority: High/Medium/Low]
 ```
 
 **Team Selection Guidelines**:
-- **HexTrackr**: Development features, bug fixes, general enhancements
-- **HexTrackr-Prod**: Production deployment, security hardening, Linux-specific issues
-- **Documentation**: Shared knowledge, architecture decisions, cross-instance documentation
+- **HexTrackr-Dev** (HEX-XX): Development features, bug fixes, general enhancements
+- **HexTrackr-Prod** (HEXP-XX): Production deployment, security hardening, Linux-specific issues
+- **HexTrackr-Docs** (DOCS-XX): Shared knowledge, architecture decisions, cross-instance documentation
 
 ## Essential Commands
 
@@ -348,6 +362,27 @@ The system uses a sophisticated rollover pipeline:
    - Bug fix branches: `fix/v1.0.XX-bug-name`
    - All changes to main require Pull Requests
 
+### CRITICAL: Protected Branch Workflow
+
+**GitHub main is protected** - You CANNOT push directly to main branch on GitHub.
+
+**Key Constraint**: Local main and GitHub main are NOT synchronized automatically.
+
+**Data Loss Prevention Pattern**:
+1. ✅ Commit ALL changes to local main FIRST
+2. ✅ Create feature branch FROM committed local main
+3. ✅ Feature branch inherits all commits (nothing lost)
+4. ✅ Push feature branch and create PR
+5. ✅ PR merges to GitHub main (Codacy approval)
+6. ✅ Pull from GitHub to sync local main
+
+**NEVER**:
+- ❌ Create feature branch from uncommitted changes (stash risks data loss)
+- ❌ Make changes directly to local main without creating feature branch
+- ❌ Attempt to push local main to GitHub (will fail)
+
+**Why This Matters**: Any work committed to local main that isn't in a feature branch will be orphaned when you pull from GitHub main after PR merge. Always: commit to local main → branch → PR → merge → pull.
+
 5. **Testing Requirements**:
    - Playwright testing before/after UI changes
    - All testing done via Docker container (port 8989)
@@ -430,11 +465,15 @@ The system uses a sophisticated rollover pipeline:
 4. **Handoff Ready**: All context lives in Linear - no separate files to maintain
 
 ### Linear MCP Integration
+
+**For Requirements**: See CONSTITUTION.md Article II Section VII
+
 The project uses Linear MCP tools for issue tracking:
-- `linear_create_issue`: Create new tickets
-- `linear_update_issue`: Update status and details
-- `linear_search_issues`: Find existing issues
-- `linear_add_comment`: Add progress updates
+- `mcp__linear__create_issue`: Create new tickets
+- `mcp__linear__update_issue`: Update status and details
+- `mcp__linear__list_issues`: Find and list existing issues
+- `mcp__linear__get_issue`: Get full issue details
+- `mcp__linear__create_comment`: Add progress updates and comments
 
 ### Linear Issue Creation Guidelines
 
@@ -446,7 +485,7 @@ When creating Linear issues, please follow these practices for better organizati
 
 2. **Label Usage**: Apply at least one type label to every issue
 
-   **Team-Specific Labels** (HexTrackr team):
+   **Team-Specific Labels** (HexTrackr-Dev team):
    - **Security** (red): Security vulnerabilities, Codacy issues, crypto improvements
    - **Enhancement** (purple): UI polish, UX improvements, non-critical enhancements
 
@@ -487,110 +526,22 @@ To update templates:
 
 ## Claude-Context Code Search
 
-### Overview
-Claude-Context MCP provides high-performance semantic code search across the HexTrackr codebase with intelligent chunking and natural language query support.
+HexTrackr uses Claude-Context MCP for high-performance semantic code search across the codebase with intelligent chunking and natural language query support.
 
-### Key Features
-- **Automatic Indexing**: 130+ files, 2200+ semantic chunks
-- **Natural Language Queries**: Search with concepts, not just keywords
-- **Ranked Results**: Returns most relevant code snippets first
-- **File Location Tracking**: Exact file paths and line numbers
-- **Multi-format Support**: JavaScript, HTML, CSS, Markdown, JSON
-
-### Best Practices for Claude-Context
-
-#### 1. Index Management
-```bash
-# Check index status at session start
-mcp__claude-context__get_indexing_status("/Volumes/DATA/GitHub/HexTrackr")
-
-# Re-index if needed (force=true for refresh)
-mcp__claude-context__index_codebase({
-  path: "/Volumes/DATA/GitHub/HexTrackr",
-  force: false
-})
-```
-
-#### 2. Effective Search Patterns
-
-#### Architecture & Initialization
-- Query: "Express server initialization middleware routes controllers"
-- Finds: Server setup, route configuration, controller initialization
-
-#### Security Patterns
-- Query: "XSS SQL injection CORS sanitize validate"
-- Finds: Security middleware, validation functions, sanitization code
-
-#### Documentation & TODOs
-- Query: "TODO FIXME BUG HACK"
-- Finds: Technical debt, known issues, temporary workarounds
-
-#### JSDoc Patterns
-- Query: "@param @returns @description @module"
-- Finds: Well-documented functions with complete JSDoc
-
-#### Feature Implementation
-- Query: "CSV import WebSocket progress staging"
-- Finds: Import pipeline, progress tracking, staging table logic
-
-#### 3. Search Tips
-- Use conceptual terms for semantic matching
-- Combine related keywords for focused results
-- Default limit is 10 results; adjust as needed
-- Extension filter available but rarely needed
-- Results include surrounding context for better understanding
-
-### Claude-Context vs Other Search Tools
-
-| Feature | Claude-Context | Grep/Glob | Code-Indexer-Ollama |
-|---------|---------------|-----------|---------------------|
-| Semantic Search | ✅ Excellent | ❌ No | ✅ Good |
-| Speed | ✅ Fast | ✅ Very Fast | ⚠️ Slower |
-| Natural Language | ✅ Yes | ❌ No | ✅ Yes |
-| Context Snippets | ✅ Yes | ⚠️ Limited | ✅ Yes |
-| Line Numbers | ✅ Exact | ✅ Yes | ✅ Yes |
-| Ranking | ✅ Intelligent | ❌ No | ✅ Good |
-| Index Required | ✅ Yes | ❌ No | ✅ Yes |
-
-### When to Use Claude-Context
-- **Primary Use**: All code searches during development
-- **Best For**: Finding implementations, patterns, TODOs, documentation
-- **Limitations**: Requires indexing; not for simple file existence checks
+**For Requirements**: See CONSTITUTION.md Article II Section VIII
+**For Execution**: See prime.md Phase 5 for index refresh and search patterns
+**Current Status**: 131 files, 2250 chunks indexed at session start
+**Primary Use**: All code searches during development (semantic search with natural language queries)
 
 ## Memento Knowledge Graph
 
-### Taxonomy Source of Truth
-- **Primary Reference**: Linear DOCS-14 - Memento Knowledge Graph Taxonomy & Conventions v1.1.0
-- **Fallback**: `/memento/TAXONOMY.md` (local file if Linear unavailable)
+HexTrackr uses Memento MCP as the primary knowledge graph for persistent project memory and cross-instance context sharing.
 
-### Key Memento Updates (2025-09-27)
-- Tags are added using `mcp__memento__add_observations` with "TAG: " prefix
-- No separate add_tags function exists
-- Neo4j Enterprise 5.13 backend at 192.168.1.80
-- All entity naming follows PROJECT:DOMAIN:TYPE pattern
-- Required observations: TIMESTAMP, ABSTRACT, SUMMARY, ID (in that order)
-- Never use `read_graph` for large graphs - always use search functions
-
-### Quick Reference
-```javascript
-// Create entity
-mcp__memento__create_entities([{
-  name: "Session: PROJECT-TOPIC-YYYYMMDD-HHMMSS",
-  entityType: "PROJECT:DOMAIN:TYPE",
-  observations: [/* required observations */]
-}])
-
-// Add tags (using add_observations)
-mcp__memento__add_observations({
-  observations: [{
-    entityName: "Session: ...",
-    contents: ["TAG: project:name", "TAG: category", ...]
-  }]
-})
-
-// Search (preferred)
-mcp__memento__search_nodes({ query: "search terms" })
-```
+**Taxonomy Source**: Linear DOCS-14 (Memento Knowledge Graph Taxonomy & Conventions v1.1.0)
+**Fallback**: `/memento/TAXONOMY.md` if Linear unavailable
+**For Requirements**: See CONSTITUTION.md Article II Section I
+**Backend**: Neo4j Enterprise 5.13 at 192.168.1.80
+**Shared Access**: All Claude instances (Desktop, Dev, Prod) share the same knowledge graph
 
 ## Environment Configuration
 

@@ -87,6 +87,40 @@ EOF
     echo ""
 }
 
+# Configure HTTPS (optional)
+setup_https() {
+    echo ""
+    echo -e "${YELLOW}🔒 HTTPS Configuration${NC}"
+    echo ""
+    echo "HexTrackr supports HTTPS with self-signed certificates for development"
+    echo "and testing. This is useful for:"
+    echo "  • Testing authentication features"
+    echo "  • Secure cookie functionality"
+    echo "  • Production-like development environment"
+    echo ""
+    read -p "Would you like to configure HTTPS now? (y/N): " -n 1 -r
+    echo ""
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo ""
+        echo "🔐 Running HTTPS setup script..."
+
+        if [ -f "scripts/setup-ssl.sh" ]; then
+            chmod +x scripts/setup-ssl.sh
+            ./scripts/setup-ssl.sh
+        else
+            echo -e "${RED}❌ HTTPS setup script not found at scripts/setup-ssl.sh${NC}"
+            echo "You can set up HTTPS manually later using the documentation:"
+            echo "  docs-source/guides/https-setup.md"
+        fi
+    else
+        echo "Skipping HTTPS setup. You can configure it later by running:"
+        echo "  ./scripts/setup-ssl.sh"
+        echo "Or follow the guide at: docs-source/guides/https-setup.md"
+    fi
+    echo ""
+}
+
 # Build and start containers
 start_hextrackr() {
     echo "🚀 Building HexTrackr Docker image..."
@@ -134,4 +168,5 @@ echo ""
 
 check_docker
 setup_env
+setup_https
 start_hextrackr

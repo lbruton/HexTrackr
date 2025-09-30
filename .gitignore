@@ -19,6 +19,8 @@ data/*.db
 data/*.sqlite
 *.db
 *.sqlite
+*.db-shm
+*.db-wal
 
 # Log files
 logs/
