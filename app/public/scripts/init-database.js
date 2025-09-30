@@ -288,6 +288,7 @@ db.serialize(() => {
   db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_hostname ON vulnerability_snapshots (hostname)");
   db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_severity ON vulnerability_snapshots (severity)");
   db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_enhanced_key ON vulnerability_snapshots (enhanced_unique_key)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_cve ON vulnerability_snapshots (cve)");
   db.run("CREATE INDEX IF NOT EXISTS idx_current_unique_key ON vulnerabilities_current (unique_key)");
   db.run("CREATE INDEX IF NOT EXISTS idx_current_scan_date ON vulnerabilities_current (scan_date)");
   db.run("CREATE INDEX IF NOT EXISTS idx_current_enhanced_unique_key ON vulnerabilities_current (enhanced_unique_key)");
@@ -295,6 +296,7 @@ db.serialize(() => {
   db.run("CREATE INDEX IF NOT EXISTS idx_current_confidence_tier ON vulnerabilities_current (confidence_score, dedup_tier)");
   db.run("CREATE INDEX IF NOT EXISTS idx_current_active_severity ON vulnerabilities_current (lifecycle_state, severity)");
   db.run("CREATE INDEX IF NOT EXISTS idx_current_resolved_date ON vulnerabilities_current (resolved_date)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_current_cve ON vulnerabilities_current (cve)");
   db.run("CREATE INDEX IF NOT EXISTS idx_staging_import_id ON vulnerability_staging (import_id)");
   db.run("CREATE INDEX IF NOT EXISTS idx_staging_processed ON vulnerability_staging (processed)");
   db.run("CREATE INDEX IF NOT EXISTS idx_staging_batch_id ON vulnerability_staging (batch_id)");
