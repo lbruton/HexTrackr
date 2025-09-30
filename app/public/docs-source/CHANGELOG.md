@@ -5,6 +5,96 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.40] - 2025-09-30
+
+### Added
+
+#### HEX-100: Resolved CVEs Tracking in Import Summaries
+
+**Feature**: Import summaries now show **both** new CVEs discovered AND CVEs resolved/removed between scans, providing complete vulnerability lifecycle visibility.
+
+**Problem**: Previous versions only tracked NEW CVEs, making it impossible to see remediation progress or validate patching efforts.
+
+**Solution Implemented**:
+- Backend: New SQL query identifies CVEs present in previous snapshots but missing from current scan
+- Frontend: Green "✅ Resolved CVEs" section showing resolved count, affected hosts, VPR reduction, and last seen date
+- Reports: Included in both modal display and downloadable HTML exports
+
+**Benefits for Security Teams**:
+- Track remediation progress: "3 CVEs resolved this week"
+- Validate patching efforts: "CVE-2024-12345 patched across 50 hosts"
+- Complete picture: Risk increases (new) + Risk reductions (resolved) = Net impact
+
+**Files Modified**:
+- `app/services/importService.js` - Added resolved CVE query and summary data
+- `app/public/scripts/shared/progress-modal.js` - Added resolved CVEs UI section
+
+## [1.0.39] - 2025-09-30
+
+### Fixed
+
+#### HEX-99: Clear Vulnerabilities Showing Stale Cached Data
+
+**Issue**: After clicking "Clear Vulnerabilities", the UI continued showing old data despite empty database. Required Docker restart to see empty state.
+
+**Root Cause**: Two-layer caching problem:
+1. Server correctly cleared application cache ✅
+2. Browser cached responses (60s TTL) served old data ❌
+3. Frontend didn't use cache-busting parameters when reloading
+
+**Solution**:
+- Added `bustCache=true` parameter to `clearAllData()` operation
+- Enhanced `refreshData()` to support optional cache busting
+- Cache-busting appends timestamps to API URLs forcing fresh requests
+
+**Impact**: "Clear Vulnerabilities" now immediately shows empty state without page refresh.
+
+**Files Modified**:
+- `app/public/scripts/shared/vulnerability-data.js`
+
+#### HEX-99 Enhancement: VACUUM After Clear Operations
+
+**Issue**: Database file showed 140.6 MB despite 0 records. SQLite DELETE operations don't shrink files - they mark pages as "free" for reuse.
+
+**Analysis**:
+- Total pages: 35,990 (141 MB)
+- Free pages: 28,754 (112 MB wasted space - 80%!)
+- Actual data: ~29 MB
+
+**Solution**: Added SQLite VACUUM command after clearing vulnerability data to rebuild database file and reclaim disk space.
+
+**Impact**: Database shrinks from ~141 MB to ~30 MB after clear operation.
+
+**Files Modified**:
+- `app/services/vulnerabilityService.js`
+
+## [1.0.38] - 2025-09-30
+
+### Fixed
+
+#### HEX-98: Broken CVE Discovery Query in Import Summaries
+
+**Critical Bug**: Duplicate CSV imports incorrectly showed 51-54 "new CVEs" instead of 0. Import summaries were completely unreliable for CVE discovery tracking.
+
+**Evidence**:
+- Import 1 (01:06 AM): 54 new CVEs affecting 1,556 vulnerabilities ❌
+- Import 2 (02:30 PM): 54 new CVEs affecting 1,556 vulnerabilities ❌
+- Import 3 (03:17 PM): 51 new CVEs affecting 442 vulnerabilities ❌
+- **Expected**: 0 new CVEs for duplicate imports
+
+**Root Cause**: SQL query attempted to join `vulnerability_daily_totals` (aggregated table) with `vulnerabilities_current` (detailed records) without proper join condition, creating cartesian product with non-deterministic results. Query would mark ancient CVEs (CVE-2017-12240, CVE-2018-0171) as "new" on every import.
+
+**Solution**:
+- Replaced broken query with correct `vulnerability_snapshots` lookup
+- Added database indexes on CVE columns for performance optimization
+- Reduced query complexity from O(n²) to O(n log n)
+
+**Verification**: Duplicate imports now correctly show 0 new CVEs.
+
+**Files Modified**:
+- `app/services/importService.js` - Fixed CVE discovery query
+- `app/public/scripts/init-database.js` - Added `idx_snapshots_cve` and `idx_current_cve` indexes
+
 ## [1.0.36] - 2025-09-30
 
 ### Performance
