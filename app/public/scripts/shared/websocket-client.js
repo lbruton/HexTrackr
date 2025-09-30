@@ -26,7 +26,7 @@ class WebSocketClient {
 
         this.config = {
             host: window.location.hostname || "localhost",
-            port: window.location.port || "8080",
+            port: window.location.port || "",
             autoReconnect: true,
             heartbeatInterval: 30000,
             maxReconnectAttempts: 5,
@@ -74,7 +74,7 @@ class WebSocketClient {
                     reject(new Error(errorMsg));
                     return;
                 }
-                const url = `${protocol}//${this.config.host}:${this.config.port}`;
+                const url = `${protocol}//${this.config.host}${this.config.port ? ":" + this.config.port : ""}`;
                 this.debug("Connecting to WebSocket server:", url);
                 
                 this.socket = io(url, {

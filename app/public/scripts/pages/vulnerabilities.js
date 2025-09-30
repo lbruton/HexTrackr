@@ -112,10 +112,10 @@ export class ModernVulnManager {
 }
 
 // Page-specific refresh function for Settings modal and Progress modal integration
-window.refreshPageData = function(type) {
+window.refreshPageData = function(type, bustCache = false) {
     if (type === "vulnerabilities" && window.modernVulnManager) {
         console.log("Refreshing vulnerability data after import completion");
-        window.modernVulnManager.loadData();
+        window.modernVulnManager.loadData(bustCache);
     }
 };
 
@@ -135,4 +135,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+});
+
+// Handle browser back/forward cache (bfcache) restoration
+// When users navigate back, browsers may restore from cache without firing DOMContentLoaded
+window.addEventListener("pageshow", (event) => {
+    if (event.persisted && window.modernVulnManager && window.modernVulnManager.chartManager) {
+        // Page was restored from bfcache, reload charts
+        console.log("Page restored from bfcache, reloading charts");
+        window.modernVulnManager.chartManager.update();
+    }
 });

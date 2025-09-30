@@ -15,14 +15,468 @@
                             <button class="accordion-button "
                                     type="button"
                                     data-bs-toggle="collapse"
-                                    data-bs-target="#version-1-0-32"
+                                    data-bs-target="#version-1-0-40"
                                     aria-expanded="true"
+                                    aria-controls="version-1-0-40">
+                                [1.0.40] - 2025-09-30
+                            </button>
+                        </h2>
+                        <div id="version-1-0-40"
+                             class="accordion-collapse collapse show"
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added</h3><h4>HEX-100: Resolved CVEs Tracking in Import Summaries</h4><p><strong>Feature</strong>: Import summaries now show <strong>both</strong> new CVEs discovered AND CVEs resolved/removed between scans, providing complete vulnerability lifecycle visibility.</p>
+<p><strong>Problem</strong>: Previous versions only tracked NEW CVEs, making it impossible to see remediation progress or validate patching efforts.</p>
+<p><strong>Solution Implemented</strong>:</p>
+<ul>
+<li>Backend: New SQL query identifies CVEs present in previous snapshots but missing from current scan</li>
+<li>Frontend: Green &quot;✅ Resolved CVEs&quot; section showing resolved count, affected hosts, VPR reduction, and last seen date</li>
+<li>Reports: Included in both modal display and downloadable HTML exports</li>
+</ul>
+<p><strong>Benefits for Security Teams</strong>:</p>
+<ul>
+<li>Track remediation progress: &quot;3 CVEs resolved this week&quot;</li>
+<li>Validate patching efforts: &quot;CVE-2024-12345 patched across 50 hosts&quot;</li>
+<li>Complete picture: Risk increases (new) + Risk reductions (resolved) = Net impact</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/importService.js</code> - Added resolved CVE query and summary data</li>
+<li><code>app/public/scripts/shared/progress-modal.js</code> - Added resolved CVEs UI section</li>
+</ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-39"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-39">
+                                [1.0.39] - 2025-09-30
+                            </button>
+                        </h2>
+                        <div id="version-1-0-39"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed</h3><h4>HEX-99: Clear Vulnerabilities Showing Stale Cached Data</h4><p><strong>Issue</strong>: After clicking &quot;Clear Vulnerabilities&quot;, the UI continued showing old data despite empty database. Required Docker restart to see empty state.</p>
+<p><strong>Root Cause</strong>: Two-layer caching problem:</p>
+<ol>
+<li>Server correctly cleared application cache ✅</li>
+<li>Browser cached responses (60s TTL) served old data ❌</li>
+<li>Frontend didn&#39;t use cache-busting parameters when reloading</li>
+</ol>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Added <code>bustCache=true</code> parameter to <code>clearAllData()</code> operation</li>
+<li>Enhanced <code>refreshData()</code> to support optional cache busting</li>
+<li>Cache-busting appends timestamps to API URLs forcing fresh requests</li>
+</ul>
+<p><strong>Impact</strong>: &quot;Clear Vulnerabilities&quot; now immediately shows empty state without page refresh.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code></li>
+</ul>
+<h4>HEX-99 Enhancement: VACUUM After Clear Operations</h4><p><strong>Issue</strong>: Database file showed 140.6 MB despite 0 records. SQLite DELETE operations don&#39;t shrink files - they mark pages as &quot;free&quot; for reuse.</p>
+<p><strong>Analysis</strong>:</p>
+<ul>
+<li>Total pages: 35,990 (141 MB)</li>
+<li>Free pages: 28,754 (112 MB wasted space - 80%!)</li>
+<li>Actual data: ~29 MB</li>
+</ul>
+<p><strong>Solution</strong>: Added SQLite VACUUM command after clearing vulnerability data to rebuild database file and reclaim disk space.</p>
+<p><strong>Impact</strong>: Database shrinks from ~141 MB to ~30 MB after clear operation.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/vulnerabilityService.js</code></li>
+</ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-38"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-38">
+                                [1.0.38] - 2025-09-30
+                            </button>
+                        </h2>
+                        <div id="version-1-0-38"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed</h3><h4>HEX-98: Broken CVE Discovery Query in Import Summaries</h4><p><strong>Critical Bug</strong>: Duplicate CSV imports incorrectly showed 51-54 &quot;new CVEs&quot; instead of 0. Import summaries were completely unreliable for CVE discovery tracking.</p>
+<p><strong>Evidence</strong>:</p>
+<ul>
+<li>Import 1 (01:06 AM): 54 new CVEs affecting 1,556 vulnerabilities ❌</li>
+<li>Import 2 (02:30 PM): 54 new CVEs affecting 1,556 vulnerabilities ❌</li>
+<li>Import 3 (03:17 PM): 51 new CVEs affecting 442 vulnerabilities ❌</li>
+<li><strong>Expected</strong>: 0 new CVEs for duplicate imports</li>
+</ul>
+<p><strong>Root Cause</strong>: SQL query attempted to join <code>vulnerability_daily_totals</code> (aggregated table) with <code>vulnerabilities_current</code> (detailed records) without proper join condition, creating cartesian product with non-deterministic results. Query would mark ancient CVEs (CVE-2017-12240, CVE-2018-0171) as &quot;new&quot; on every import.</p>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Replaced broken query with correct <code>vulnerability_snapshots</code> lookup</li>
+<li>Added database indexes on CVE columns for performance optimization</li>
+<li>Reduced query complexity from O(n²) to O(n log n)</li>
+</ul>
+<p><strong>Verification</strong>: Duplicate imports now correctly show 0 new CVEs.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/importService.js</code> - Fixed CVE discovery query</li>
+<li><code>app/public/scripts/init-database.js</code> - Added <code>idx_snapshots_cve</code> and <code>idx_current_cve</code> indexes</li>
+</ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-36"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-36">
+                                [1.0.36] - 2025-09-30
+                            </button>
+                        </h2>
+                        <div id="version-1-0-36"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Performance</h3><h4>HEX-91: Optimize HTTPS Performance - 3x Slowdown with 30K Vulnerability Records</h4><p><strong>Issue</strong>: After implementing HTTPS with nginx reverse proxy (HEXP-14), the vulnerabilities page loaded 3x slower than direct HTTPS in dev environment. Page load time increased from 2-4 seconds to 6-12 seconds when loading 30,000 vulnerability records.</p>
+<p><strong>Root Causes Identified</strong>:</p>
+<ol>
+<li><strong>Double Compression</strong>: Nginx gzip + Express compression middleware both compressing the same response</li>
+<li><strong>No Application Cache</strong>: Every request triggered fresh database query for 30K records</li>
+<li><strong>Aggressive Browser Cache</strong>: 10-minute browser TTL prevented fresh data after CSV imports</li>
+<li><strong>Missing Cache Headers</strong>: No Cache-Control headers for browser-side caching coordination</li>
+</ol>
+<p><strong>Solution - Two-Layer Caching Architecture</strong>:</p>
+<h5>Layer 1: Application-Level Caching (node-cache)</h5><ul>
+<li>Implemented aggressive server-side caching with 5-10 minute TTL</li>
+<li>Separate cache zones for statistics and trends data</li>
+<li>Memory footprint: ~5-10MB for 30K records</li>
+<li>Performance: 400-1000ms initial load → 2-5ms cached responses</li>
+</ul>
+<h5>Layer 2: Browser Cache Coordination (Cache-Control headers)</h5><ul>
+<li>Right-sized browser cache TTL: 30-60 seconds for fresh data visibility</li>
+<li>Automatic cache invalidation on CSV imports and KEV sync</li>
+<li>X-Cache headers (HIT/MISS) for monitoring and debugging</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/cacheService.js</code> - New caching service with dual-zone architecture (statistics + trends)</li>
+<li><code>app/controllers/vulnerabilityController.js</code> - Integrated caching for all stats and trends endpoints</li>
+<li><code>app/public/server.js</code> - Conditionally disabled Express compression when <code>TRUST_PROXY=true</code></li>
+</ul>
+<p><strong>Key Innovation - withCaching() Helper</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-title function_">withCaching</span>(<span class="hljs-params">res, cacheType, cacheKey, serverTTL, handler, browserTTL = <span class="hljs-literal">null</span></span>) {
+    <span class="hljs-comment">// Server cache: Aggressive (5-10min) for performance</span>
+    <span class="hljs-comment">// Browser cache: Light (30-60s) for freshness</span>
+}</code></pre><p><strong>Cache Configuration by Endpoint</strong>:</p>
+<ul>
+<li>Vulnerability Stats: 300s server / 60s browser</li>
+<li>Recent Trends: 600s server / 60s browser</li>
+<li>Historical Trends: 600s server / 60s browser</li>
+<li>Vulnerabilities List: 600s server / 30s browser (most critical for filtering)</li>
+</ul>
+<p><strong>Double Compression Fix</strong>:</p>
+<ul>
+<li>Added <code>TRUST_PROXY</code> environment variable check in <code>server.js:130</code></li>
+<li>Express compression disabled when nginx handles compression</li>
+<li>Eliminates wasted CPU cycles and response delays</li>
+</ul>
+<p><strong>Performance Results</strong>:</p>
+<ul>
+<li>Page load time: 6-12s → under 2s (80-85% improvement)</li>
+<li>Cached API responses: 2-5ms vs 400-1000ms uncached</li>
+<li>Cache hit rate: 61% improvement on vulnerabilities endpoint</li>
+<li>Fresh data visible: Within 30-60s after import without hard refresh</li>
+</ul>
+<p><strong>Code Quality</strong>:</p>
+<ul>
+<li>Refactored duplicate caching logic using withCaching() helper (Codacy fix)</li>
+<li>Eliminated 44 lines of duplicated code across controllers</li>
+<li>Single source of truth for cache TTL management</li>
+<li>X-Cache headers enable cache effectiveness monitoring</li>
+</ul>
+<p><strong>Production Impact</strong>:</p>
+<ul>
+<li>Maintains ability to filter across all 30,000 records</li>
+<li>Cache automatically cleared on KEV sync and CSV imports</li>
+<li>No breaking changes to existing functionality</li>
+<li>Ready for Claude-Prod deployment to Ubuntu production</li>
+</ul>
+<p><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-91">HEX-91</a></p>
+<hr>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-35"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-35">
+                                [1.0.35] - 2025-09-30
+                            </button>
+                        </h2>
+                        <div id="version-1-0-35"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed</h3><h4>HEX-90: Ticket Field Clearing Bug - Nullish Coalescing Operator Fix</h4><p><strong>Issue</strong>: Users could not clear optional ticket fields (notes, status, location, supervisor, tech, site) when updating tickets. Sending empty strings or null values silently kept the previous value in the database.</p>
+<p><strong>Root Cause</strong>: The <code>updateTicket</code> method in <code>ticketService.js</code> used the <code>||</code> (logical OR) operator for field merging:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ❌ BEFORE - || treats ANY falsy value as &quot;use fallback&quot;</span>
+<span class="hljs-keyword">const</span> payload = {
+    <span class="hljs-attr">notes</span>: ticket.<span class="hljs-property">notes</span> || existingTicket.<span class="hljs-property">notes</span>,
+    <span class="hljs-attr">status</span>: ticket.<span class="hljs-property">status</span> || existingTicket.<span class="hljs-property">status</span>,
+    <span class="hljs-comment">// ... empty strings (&quot;&quot;) kept old values</span>
+};</code></pre><p>The <code>||</code> operator treats ALL falsy values as &quot;use fallback&quot;:</p>
+<ul>
+<li>Empty string <code>&quot;&quot;</code> → falsy → uses old value ❌</li>
+<li><code>null</code> → falsy → uses old value ❌</li>
+<li><code>undefined</code> → falsy → uses old value ✅</li>
+<li><code>0</code> → falsy → uses old value ❌</li>
+<li><code>false</code> → falsy → uses old value ❌</li>
+</ul>
+<p><strong>Solution</strong>: Replaced <code>||</code> with <code>??</code> (nullish coalescing) for optional fields:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ✅ AFTER - ?? only falls back on null/undefined</span>
+<span class="hljs-keyword">const</span> payload = {
+    <span class="hljs-comment">// Optional fields - use ?? to allow clearing with empty strings</span>
+    <span class="hljs-attr">hexagonTicket</span>: ticket.<span class="hljs-property">hexagonTicket</span> ?? ticket.<span class="hljs-property">hexagon_ticket</span> ?? existingTicket.<span class="hljs-property">hexagon_ticket</span>,
+    <span class="hljs-attr">serviceNowTicket</span>: ticket.<span class="hljs-property">serviceNowTicket</span> ?? ticket.<span class="hljs-property">service_now_ticket</span> ?? existingTicket.<span class="hljs-property">service_now_ticket</span>,
+    <span class="hljs-attr">location</span>: ticket.<span class="hljs-property">location</span> ?? existingTicket.<span class="hljs-property">location</span>,
+    <span class="hljs-attr">supervisor</span>: ticket.<span class="hljs-property">supervisor</span> ?? existingTicket.<span class="hljs-property">supervisor</span>,
+    <span class="hljs-attr">tech</span>: ticket.<span class="hljs-property">tech</span> ?? existingTicket.<span class="hljs-property">tech</span>,
+    <span class="hljs-attr">status</span>: ticket.<span class="hljs-property">status</span> ?? existingTicket.<span class="hljs-property">status</span>,
+    <span class="hljs-attr">notes</span>: ticket.<span class="hljs-property">notes</span> ?? existingTicket.<span class="hljs-property">notes</span>,
+    <span class="hljs-attr">site</span>: ticket.<span class="hljs-property">site</span> ?? existingTicket.<span class="hljs-property">site</span>,
+    <span class="hljs-attr">site_id</span>: ticket.<span class="hljs-property">site_id</span> ?? existingTicket.<span class="hljs-property">site_id</span>,
+    <span class="hljs-attr">location_id</span>: ticket.<span class="hljs-property">location_id</span> ?? existingTicket.<span class="hljs-property">location_id</span>,
+
+    <span class="hljs-comment">// Required fields - keep || to prevent empty values</span>
+    <span class="hljs-attr">dateSubmitted</span>: ticket.<span class="hljs-property">dateSubmitted</span> || ticket.<span class="hljs-property">date_submitted</span> || existingTicket.<span class="hljs-property">date_submitted</span>,
+    <span class="hljs-attr">dateDue</span>: ticket.<span class="hljs-property">dateDue</span> || ticket.<span class="hljs-property">date_due</span> || existingTicket.<span class="hljs-property">date_due</span>,
+    <span class="hljs-attr">devices</span>: ticket.<span class="hljs-property">devices</span> || existingTicket.<span class="hljs-property">devices</span>,
+    <span class="hljs-attr">attachments</span>: ticket.<span class="hljs-property">attachments</span> || existingTicket.<span class="hljs-property">attachments</span>,
+};</code></pre><p><strong>Operator Comparison</strong>:</p>
+<ul>
+<li><code>||</code> (Logical OR): Falls back on ANY falsy value (prevents <code>&quot;&quot;</code>, <code>0</code>, <code>false</code>)</li>
+<li><code>??</code> (Nullish Coalescing): Falls back ONLY on <code>null</code> or <code>undefined</code> (allows <code>&quot;&quot;</code>, <code>0</code>, <code>false</code>)</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/ticketService.js</code> (lines 148-195) - Updated <code>updateTicket</code> method with ?? operators and comprehensive JSDoc</li>
+<li>Added JSDoc documentation explaining operator choice for future maintainers</li>
+</ul>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li>Users can now clear optional fields by sending empty strings</li>
+<li>UI shows cleared field and database reflects the change</li>
+<li>No breaking changes to required field validation</li>
+<li>Discovered during Codacy review of PR #59 (WebSocket CORS fix)</li>
+</ul>
+<p><strong>User Experience</strong>:</p>
+<ul>
+<li>Before: Silent failures when clearing fields (UI shows cleared, DB keeps old value)</li>
+<li>After: Fields clear successfully (UI and DB synchronized)</li>
+<li>No error messages needed - clearing now works as expected</li>
+</ul>
+<p><strong>Testing</strong>:</p>
+<ul>
+<li>All linters passed (ESLint, Stylelint, Markdownlint)</li>
+<li>Docker container tested and running on port 8989</li>
+<li>Verified field clearing for all 9 optional fields</li>
+</ul>
+<h3>Added</h3><h4>Trust Proxy Configuration for Nginx Reverse Proxy</h4><p><strong>Purpose</strong>: Enable proper client IP detection and rate limiting when running behind nginx reverse proxy</p>
+<p><strong>Implementation</strong>:</p>
+<ul>
+<li>Added <code>TRUST_PROXY</code> environment variable to configure Express trust proxy setting</li>
+<li>Updated <code>app/public/server.js</code> (lines 48-52) with conditional proxy trust configuration</li>
+<li>Updated <code>.env.example</code> with documentation for production deployment</li>
+</ul>
+<p><strong>Configuration</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Trust proxy when behind nginx (enables proper client IP detection)</span>
+<span class="hljs-keyword">if</span> (process.<span class="hljs-property">env</span>.<span class="hljs-property">TRUST_PROXY</span> === <span class="hljs-string">&quot;true&quot;</span>) {
+    app.<span class="hljs-title function_">set</span>(<span class="hljs-string">&quot;trust proxy&quot;</span>, <span class="hljs-number">1</span>);
+}</code></pre><p><strong>Benefits</strong>:</p>
+<ul>
+<li>Rate limiting works correctly with real client IPs (not nginx IP)</li>
+<li>Eliminates ValidationError logs from proxy forwarding</li>
+<li>Enables Cache-Control header optimization</li>
+<li>Ready for Claude-Prod to enable with <code>TRUST_PROXY=true</code></li>
+</ul>
+<p><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-90">HEX-90</a></p>
+<hr>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-34"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-34">
+                                [1.0.34] - 2025-09-29
+                            </button>
+                        </h2>
+                        <div id="version-1-0-34"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed</h3><h4>HEX-88: WebSocket Connection Fails in HTTPS Mode - CSV Import Progress Not Working</h4><p><strong>Issue</strong>: WebSocket connections failed when running HexTrackr in HTTPS mode, preventing CSV import progress tracking from working. The import would complete but users saw no progress updates and the UI didn&#39;t refresh.</p>
+<p><strong>Root Cause</strong>: CORS (Cross-Origin Resource Sharing) configuration in <code>/app/utils/constants.js</code> only allowed HTTP origins:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ❌ BEFORE - Only HTTP origins</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">CORS_ORIGINS</span> = [<span class="hljs-string">&quot;http://localhost:8080&quot;</span>, <span class="hljs-string">&quot;http://127.0.0.1:8080&quot;</span>];</code></pre><p>When running in HTTPS mode (enabled in v1.0.33), the browser connected via <code>https://localhost:8989</code>, but Socket.io&#39;s CORS configuration rejected this origin because it wasn&#39;t in the allowed list.</p>
+<p><strong>Solution</strong>: Implemented dynamic CORS function that detects environment and restricts to HTTPS-only in production:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ✅ AFTER - Dynamic HTTPS-only CORS</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getCorsOrigins</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">const</span> protocol = process.<span class="hljs-property">env</span>.<span class="hljs-property">USE_HTTPS</span> === <span class="hljs-string">&quot;true&quot;</span> ? <span class="hljs-string">&quot;https:&quot;</span> : <span class="hljs-string">&quot;http:&quot;</span>;
+    <span class="hljs-keyword">const</span> ports = [<span class="hljs-string">&quot;8080&quot;</span>, <span class="hljs-string">&quot;8989&quot;</span>, <span class="hljs-string">&quot;8443&quot;</span>];
+    <span class="hljs-keyword">const</span> hosts = [<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-string">&quot;127.0.0.1&quot;</span>];
+
+    <span class="hljs-keyword">const</span> origins = [];
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> host <span class="hljs-keyword">of</span> hosts) {
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> port <span class="hljs-keyword">of</span> ports) {
+            origins.<span class="hljs-title function_">push</span>(<span class="hljs-string">`<span class="hljs-subst">${protocol}</span>//<span class="hljs-subst">${host}</span>:<span class="hljs-subst">${port}</span>`</span>);
+        }
+    }
+    <span class="hljs-keyword">return</span> origins;
+}
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">CORS_ORIGINS</span> = <span class="hljs-title function_">getCorsOrigins</span>();</code></pre><p><strong>Why Dynamic Instead of Static</strong>:</p>
+<ol>
+<li><strong>Security</strong>: HTTPS-only in production (no HTTP fallback)</li>
+<li><strong>Flexibility</strong>: Adapts to USE_HTTPS environment variable</li>
+<li><strong>Port Coverage</strong>: Supports development (8080), Docker (8989), and HTTPS (8443)</li>
+<li><strong>DHCP Resilience</strong>: Works across environments without hardcoded IPs</li>
+</ol>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/utils/constants.js</code> - Replaced static CORS_ORIGINS array with getCorsOrigins() function</li>
+<li><code>app/public/scripts/shared/websocket-client.js</code> - Enhanced protocol detection with file:// handling</li>
+<li>Documentation updated to explain dynamic CORS strategy</li>
+</ul>
+<p><strong>Additional Fixes</strong>:</p>
+<ul>
+<li>Fixed ticket status update 500 errors (proper error handling)</li>
+<li>Removed temporary documentation files from repository</li>
+<li>Enhanced WebSocket client to handle file:// protocol for local testing</li>
+</ul>
+<p><strong>Technical Details</strong>:</p>
+<ul>
+<li>WebSocket client correctly detects HTTPS and tries to connect via <code>https://</code></li>
+<li>Server creates HTTPS server when <code>USE_HTTPS=true</code></li>
+<li>WebSocket inherits CORS origins that now include HTTPS URLs</li>
+<li>Mixed content errors eliminated with protocol-aware connection</li>
+</ul>
+<p><strong>Testing</strong>:</p>
+<ul>
+<li>Verified CSV import progress tracking works in HTTPS mode</li>
+<li>Confirmed WebSocket connections establish successfully</li>
+<li>Tested across Mac development (port 8989) and Ubuntu production environments</li>
+</ul>
+<p><strong>Security Impact</strong>:</p>
+<ul>
+<li>Production environments use HTTPS-only WebSocket connections</li>
+<li>No HTTP fallback in HTTPS mode (prevents downgrade attacks)</li>
+<li>CORS properly restricts origins to known safe hosts</li>
+</ul>
+<p><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-88">HEX-88</a></p>
+<hr>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-33"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-33">
+                                [1.0.33] - 2025-09-28
+                            </button>
+                        </h2>
+                        <div id="version-1-0-33"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Added</h3><h4>HEX-87: HTTPS Support with Self-Signed Certificates</h4><p><strong>Feature</strong>: Development environment HTTPS implementation using self-signed certificates</p>
+<p><strong>Purpose</strong>: Critical security foundation for upcoming authentication implementation (HEX-80/81)</p>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li>Generated 10-year self-signed SSL certificate for localhost development</li>
+<li>Enhanced Express server to support both HTTP and HTTPS modes via environment configuration</li>
+<li>Added dotenv configuration loading to server.js for environment variable support</li>
+<li>Implemented protocol-aware server creation maintaining Socket.io compatibility</li>
+<li>Updated Docker configuration to support HTTPS container deployment</li>
+<li>Enhanced health checks to work with both HTTP and HTTPS protocols</li>
+<li>Added certificate directory structure with proper .gitignore exclusions</li>
+</ul>
+<p><strong>Environment Configuration</strong>:</p>
+<ul>
+<li><code>USE_HTTPS=true</code> enables HTTPS mode</li>
+<li><code>SSL_KEY_PATH</code> and <code>SSL_CERT_PATH</code> for certificate locations</li>
+<li>Maintains backward compatibility with HTTP mode for testing</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/server.js</code> - Added HTTPS server creation and dotenv support</li>
+<li><code>docker-compose.yml</code> - Added HTTPS port mapping and certificate volume mounts</li>
+<li><code>Dockerfile</code> - Updated health check to support both protocols</li>
+<li><code>.env</code> - Added HTTPS configuration variables</li>
+<li><code>.gitignore</code> - Added certificate exclusions</li>
+<li><code>certs/</code> - New directory with self-signed certificate files</li>
+</ul>
+<p><strong>Security Impact</strong>:</p>
+<ul>
+<li>Enables secure cookie testing for authentication</li>
+<li>Provides foundation for session-based authentication</li>
+<li>Prepares development environment for production-like HTTPS workflows</li>
+<li>Browser certificate warnings expected and acceptable for development</li>
+</ul>
+<p><strong>Browser Access</strong>:</p>
+<ul>
+<li>HTTP: <code>http://localhost:8080</code> (development) / <code>http://localhost:8989</code> (Docker)</li>
+<li>HTTPS: <code>https://localhost:8080</code> (development) / <code>https://localhost:8989</code> (Docker)</li>
+</ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-32"
+                                    aria-expanded="false"
                                     aria-controls="version-1-0-32">
                                 [1.0.32] - 2025-09-26
                             </button>
                         </h2>
                         <div id="version-1-0-32"
-                             class="accordion-collapse collapse show"
+                             class="accordion-collapse collapse "
                              data-bs-parent="#changelogAccordion">
                             <div class="accordion-body">
                                 <h3>Fixed</h3><h4>HEX-65: Dark Mode White Flash Elimination</h4><p><strong>Issue</strong>: White flash occurring when navigating between pages in dark mode, particularly noticeable in Firefox</p>

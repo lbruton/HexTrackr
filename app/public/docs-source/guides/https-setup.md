@@ -237,6 +237,9 @@ server {
     ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
 
+    # Increase upload limit for large CSV imports (Tenable, etc.)
+    client_max_body_size 100M;
+
     location / {
         proxy_pass http://localhost:8080;
         proxy_set_header Host $host;
@@ -246,6 +249,8 @@ server {
     }
 }
 ```
+
+> **Production Note**: The default nginx upload limit is 1MB. For vulnerability CSV imports (especially large Tenable scans), increase `client_max_body_size` to 100MB or higher. The Express backend supports files up to 100MB via Multer configuration.
 
 ---
 
