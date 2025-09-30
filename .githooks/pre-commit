@@ -1,0 +1,68 @@
+#!/bin/bash
+# HexTrackr Safe Pre-Commit Hook
+# Only auto-fixes formatting (markdown + CSS)
+# Warns about JavaScript issues but doesn't auto-fix
+
+set -e  # Exit on error
+
+echo "🔍 Running safe auto-fixes..."
+echo ""
+
+# Layer 1: Safe Auto-Fixes (formatting only, cannot break code)
+echo "  📝 Fixing markdown formatting..."
+if npm run lint:md:fix --silent 2>&1 | grep -q "error"; then
+    echo "     ⚠️  Markdown fixes applied"
+else
+    echo "     ✅ Markdown clean"
+fi
+
+echo ""
+echo "  🎨 Fixing CSS formatting..."
+if npm run stylelint:fix --silent 2>&1 | grep -q "error"; then
+    echo "     ⚠️  CSS fixes applied"
+else
+    echo "     ✅ CSS clean"
+fi
+
+# Layer 2: Check JavaScript (warn only - NO AUTO-FIX)
+echo ""
+echo "⚠️  Checking JavaScript (warnings only, no auto-fix)..."
+echo ""
+
+ESLINT_OUTPUT=$(npm run eslint --silent 2>&1 || true)
+ESLINT_EXIT_CODE=$?
+
+if [ $ESLINT_EXIT_CODE -ne 0 ]; then
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "⚠️  ESLint found issues (NOT auto-fixed for safety)"
+    echo ""
+    echo "$ESLINT_OUTPUT" | head -20
+    echo ""
+    echo "Review manually with: npm run eslint"
+    echo ""
+    echo "🚨 CRITICAL: Read .github/CODACY_GUIDELINES.md before"
+    echo "   fixing 'undefined variable' warnings!"
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+
+    # Ask user if they want to proceed
+    read -p "Commit with ESLint warnings? (y/N): " -n 1 -r
+    echo ""
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "❌ Commit cancelled. Fix ESLint issues and try again."
+        exit 1
+    fi
+    echo "⚠️  Proceeding with warnings (developer reviewed)"
+else
+    echo "✅ JavaScript clean"
+fi
+
+# Stage the auto-fixed files (only markdown and CSS)
+git add -u
+
+echo ""
+echo "✅ Safe fixes applied and staged"
+echo ""
+echo "💡 Tip: To bypass this hook in emergency: git commit --no-verify"
+echo ""

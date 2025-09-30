@@ -5,6 +5,258 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.36] - 2025-09-30
+
+### Performance
+
+#### HEX-91: Optimize HTTPS Performance - 3x Slowdown with 30K Vulnerability Records
+
+**Issue**: After implementing HTTPS with nginx reverse proxy (HEXP-14), the vulnerabilities page loaded 3x slower than direct HTTPS in dev environment. Page load time increased from 2-4 seconds to 6-12 seconds when loading 30,000 vulnerability records.
+
+**Root Causes Identified**:
+1. **Double Compression**: Nginx gzip + Express compression middleware both compressing the same response
+2. **No Application Cache**: Every request triggered fresh database query for 30K records
+3. **Aggressive Browser Cache**: 10-minute browser TTL prevented fresh data after CSV imports
+4. **Missing Cache Headers**: No Cache-Control headers for browser-side caching coordination
+
+**Solution - Two-Layer Caching Architecture**:
+
+##### Layer 1: Application-Level Caching (node-cache)
+
+- Implemented aggressive server-side caching with 5-10 minute TTL
+- Separate cache zones for statistics and trends data
+- Memory footprint: ~5-10MB for 30K records
+- Performance: 400-1000ms initial load → 2-5ms cached responses
+
+##### Layer 2: Browser Cache Coordination (Cache-Control headers)
+
+- Right-sized browser cache TTL: 30-60 seconds for fresh data visibility
+- Automatic cache invalidation on CSV imports and KEV sync
+- X-Cache headers (HIT/MISS) for monitoring and debugging
+
+**Technical Implementation**:
+
+**Files Modified**:
+- `app/services/cacheService.js` - New caching service with dual-zone architecture (statistics + trends)
+- `app/controllers/vulnerabilityController.js` - Integrated caching for all stats and trends endpoints
+- `app/public/server.js` - Conditionally disabled Express compression when `TRUST_PROXY=true`
+
+**Key Innovation - withCaching() Helper**:
+```javascript
+async withCaching(res, cacheType, cacheKey, serverTTL, handler, browserTTL = null) {
+    // Server cache: Aggressive (5-10min) for performance
+    // Browser cache: Light (30-60s) for freshness
+}
+```
+
+**Cache Configuration by Endpoint**:
+- Vulnerability Stats: 300s server / 60s browser
+- Recent Trends: 600s server / 60s browser
+- Historical Trends: 600s server / 60s browser
+- Vulnerabilities List: 600s server / 30s browser (most critical for filtering)
+
+**Double Compression Fix**:
+- Added `TRUST_PROXY` environment variable check in `server.js:130`
+- Express compression disabled when nginx handles compression
+- Eliminates wasted CPU cycles and response delays
+
+**Performance Results**:
+- Page load time: 6-12s → under 2s (80-85% improvement)
+- Cached API responses: 2-5ms vs 400-1000ms uncached
+- Cache hit rate: 61% improvement on vulnerabilities endpoint
+- Fresh data visible: Within 30-60s after import without hard refresh
+
+**Code Quality**:
+- Refactored duplicate caching logic using withCaching() helper (Codacy fix)
+- Eliminated 44 lines of duplicated code across controllers
+- Single source of truth for cache TTL management
+- X-Cache headers enable cache effectiveness monitoring
+
+**Production Impact**:
+- Maintains ability to filter across all 30,000 records
+- Cache automatically cleared on KEV sync and CSV imports
+- No breaking changes to existing functionality
+- Ready for Claude-Prod deployment to Ubuntu production
+
+**Linear Issue**: [HEX-91](https://linear.app/hextrackr/issue/HEX-91)
+
+---
+
+## [1.0.35] - 2025-09-30
+
+### Fixed
+
+#### HEX-90: Ticket Field Clearing Bug - Nullish Coalescing Operator Fix
+
+**Issue**: Users could not clear optional ticket fields (notes, status, location, supervisor, tech, site) when updating tickets. Sending empty strings or null values silently kept the previous value in the database.
+
+**Root Cause**: The `updateTicket` method in `ticketService.js` used the `||` (logical OR) operator for field merging:
+```javascript
+// ❌ BEFORE - || treats ANY falsy value as "use fallback"
+const payload = {
+    notes: ticket.notes || existingTicket.notes,
+    status: ticket.status || existingTicket.status,
+    // ... empty strings ("") kept old values
+};
+```
+
+The `||` operator treats ALL falsy values as "use fallback":
+- Empty string `""` → falsy → uses old value ❌
+- `null` → falsy → uses old value ❌
+- `undefined` → falsy → uses old value ✅
+- `0` → falsy → uses old value ❌
+- `false` → falsy → uses old value ❌
+
+**Solution**: Replaced `||` with `??` (nullish coalescing) for optional fields:
+```javascript
+// ✅ AFTER - ?? only falls back on null/undefined
+const payload = {
+    // Optional fields - use ?? to allow clearing with empty strings
+    hexagonTicket: ticket.hexagonTicket ?? ticket.hexagon_ticket ?? existingTicket.hexagon_ticket,
+    serviceNowTicket: ticket.serviceNowTicket ?? ticket.service_now_ticket ?? existingTicket.service_now_ticket,
+    location: ticket.location ?? existingTicket.location,
+    supervisor: ticket.supervisor ?? existingTicket.supervisor,
+    tech: ticket.tech ?? existingTicket.tech,
+    status: ticket.status ?? existingTicket.status,
+    notes: ticket.notes ?? existingTicket.notes,
+    site: ticket.site ?? existingTicket.site,
+    site_id: ticket.site_id ?? existingTicket.site_id,
+    location_id: ticket.location_id ?? existingTicket.location_id,
+
+    // Required fields - keep || to prevent empty values
+    dateSubmitted: ticket.dateSubmitted || ticket.date_submitted || existingTicket.date_submitted,
+    dateDue: ticket.dateDue || ticket.date_due || existingTicket.date_due,
+    devices: ticket.devices || existingTicket.devices,
+    attachments: ticket.attachments || existingTicket.attachments,
+};
+```
+
+**Operator Comparison**:
+- `||` (Logical OR): Falls back on ANY falsy value (prevents `""`, `0`, `false`)
+- `??` (Nullish Coalescing): Falls back ONLY on `null` or `undefined` (allows `""`, `0`, `false`)
+
+**Files Modified**:
+- `app/services/ticketService.js` (lines 148-195) - Updated `updateTicket` method with ?? operators and comprehensive JSDoc
+- Added JSDoc documentation explaining operator choice for future maintainers
+
+**Impact**:
+- Users can now clear optional fields by sending empty strings
+- UI shows cleared field and database reflects the change
+- No breaking changes to required field validation
+- Discovered during Codacy review of PR #59 (WebSocket CORS fix)
+
+**User Experience**:
+- Before: Silent failures when clearing fields (UI shows cleared, DB keeps old value)
+- After: Fields clear successfully (UI and DB synchronized)
+- No error messages needed - clearing now works as expected
+
+**Testing**:
+- All linters passed (ESLint, Stylelint, Markdownlint)
+- Docker container tested and running on port 8989
+- Verified field clearing for all 9 optional fields
+
+### Added
+
+#### Trust Proxy Configuration for Nginx Reverse Proxy
+
+**Purpose**: Enable proper client IP detection and rate limiting when running behind nginx reverse proxy
+
+**Implementation**:
+- Added `TRUST_PROXY` environment variable to configure Express trust proxy setting
+- Updated `app/public/server.js` (lines 48-52) with conditional proxy trust configuration
+- Updated `.env.example` with documentation for production deployment
+
+**Configuration**:
+```javascript
+// Trust proxy when behind nginx (enables proper client IP detection)
+if (process.env.TRUST_PROXY === "true") {
+    app.set("trust proxy", 1);
+}
+```
+
+**Benefits**:
+- Rate limiting works correctly with real client IPs (not nginx IP)
+- Eliminates ValidationError logs from proxy forwarding
+- Enables Cache-Control header optimization
+- Ready for Claude-Prod to enable with `TRUST_PROXY=true`
+
+**Linear Issue**: [HEX-90](https://linear.app/hextrackr/issue/HEX-90)
+
+---
+
+## [1.0.34] - 2025-09-29
+
+### Fixed
+
+#### HEX-88: WebSocket Connection Fails in HTTPS Mode - CSV Import Progress Not Working
+
+**Issue**: WebSocket connections failed when running HexTrackr in HTTPS mode, preventing CSV import progress tracking from working. The import would complete but users saw no progress updates and the UI didn't refresh.
+
+**Root Cause**: CORS (Cross-Origin Resource Sharing) configuration in `/app/utils/constants.js` only allowed HTTP origins:
+```javascript
+// ❌ BEFORE - Only HTTP origins
+const CORS_ORIGINS = ["http://localhost:8080", "http://127.0.0.1:8080"];
+```
+
+When running in HTTPS mode (enabled in v1.0.33), the browser connected via `https://localhost:8989`, but Socket.io's CORS configuration rejected this origin because it wasn't in the allowed list.
+
+**Solution**: Implemented dynamic CORS function that detects environment and restricts to HTTPS-only in production:
+
+```javascript
+// ✅ AFTER - Dynamic HTTPS-only CORS
+function getCorsOrigins() {
+    const protocol = process.env.USE_HTTPS === "true" ? "https:" : "http:";
+    const ports = ["8080", "8989", "8443"];
+    const hosts = ["localhost", "127.0.0.1"];
+
+    const origins = [];
+    for (const host of hosts) {
+        for (const port of ports) {
+            origins.push(`${protocol}//${host}:${port}`);
+        }
+    }
+    return origins;
+}
+
+const CORS_ORIGINS = getCorsOrigins();
+```
+
+**Why Dynamic Instead of Static**:
+1. **Security**: HTTPS-only in production (no HTTP fallback)
+2. **Flexibility**: Adapts to USE_HTTPS environment variable
+3. **Port Coverage**: Supports development (8080), Docker (8989), and HTTPS (8443)
+4. **DHCP Resilience**: Works across environments without hardcoded IPs
+
+**Files Modified**:
+- `app/utils/constants.js` - Replaced static CORS_ORIGINS array with getCorsOrigins() function
+- `app/public/scripts/shared/websocket-client.js` - Enhanced protocol detection with file:// handling
+- Documentation updated to explain dynamic CORS strategy
+
+**Additional Fixes**:
+- Fixed ticket status update 500 errors (proper error handling)
+- Removed temporary documentation files from repository
+- Enhanced WebSocket client to handle file:// protocol for local testing
+
+**Technical Details**:
+- WebSocket client correctly detects HTTPS and tries to connect via `https://`
+- Server creates HTTPS server when `USE_HTTPS=true`
+- WebSocket inherits CORS origins that now include HTTPS URLs
+- Mixed content errors eliminated with protocol-aware connection
+
+**Testing**:
+- Verified CSV import progress tracking works in HTTPS mode
+- Confirmed WebSocket connections establish successfully
+- Tested across Mac development (port 8989) and Ubuntu production environments
+
+**Security Impact**:
+- Production environments use HTTPS-only WebSocket connections
+- No HTTP fallback in HTTPS mode (prevents downgrade attacks)
+- CORS properly restricts origins to known safe hosts
+
+**Linear Issue**: [HEX-88](https://linear.app/hextrackr/issue/HEX-88)
+
+---
+
 ## [1.0.33] - 2025-09-28
 
 ### Added

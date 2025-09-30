@@ -6,6 +6,11 @@
  */
 
 const KevService = require("../services/kevService");
+const CacheService = require("../services/cacheService");
+
+// Get singleton instance explicitly (prevents race conditions)
+const cacheService = CacheService.getInstance();
+
 // Use console.log for logging (consistent with other controllers)
 
 /**
@@ -46,6 +51,9 @@ class KevController {
             const result = await this.kevService.syncKevData();
 
             console.log(`✅ KEV sync completed: ${result.totalKevs} KEVs, ${result.matchedCount} matched`);
+
+            // Clear all caches after KEV sync (vulnerabilities may have new KEV flags)
+            cacheService.clearAll();
 
             res.json({
                 success: true,
