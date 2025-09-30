@@ -41,6 +41,25 @@
 </ul>
 </li>
 </ol>
+<hr>
+<h2>HTTPS Configuration (Optional)</h2><p>HexTrackr v1.0.33+ includes built-in HTTPS support for secure deployment and authentication testing.</p>
+<h3>Quick HTTPS Setup</h3><p>The installation script includes an optional HTTPS configuration step, or you can set it up manually:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Run the SSL setup script</span>
+./scripts/setup-ssl.sh
+
+<span class="hljs-comment"># Or configure during installation</span>
+./install.sh  <span class="hljs-comment"># Choose &#x27;y&#x27; when prompted for HTTPS</span></code></pre><h3>When You Need HTTPS</h3><ul>
+<li><strong>Authentication</strong>: Required for secure session cookies and login functionality</li>
+<li><strong>Production Deployment</strong>: Essential for any internet-facing deployment</li>
+<li><strong>Development Testing</strong>: Testing authentication features locally</li>
+</ul>
+<h3>Access with HTTPS</h3><p>Once configured, access your application via:</p>
+<ul>
+<li><strong>HTTPS</strong>: <code>https://localhost:8989</code> (with self-signed certificate warning)</li>
+<li><strong>HTTP</strong>: <code>http://localhost:8989</code> (still available)</li>
+</ul>
+<p>For complete HTTPS setup instructions, see the <a href="#guides/https-setup">HTTPS Setup Guide</a>.</p>
+<hr>
 <h3>Using Helper Scripts</h3><p>HexTrackr includes convenient helper scripts for Docker management:</p>
 <ul>
 <li><p><strong>Start the Application</strong>:</p>
