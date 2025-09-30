@@ -60,7 +60,7 @@
 - Entities SHALL Contain an ABSTRACT (second) and SUMMARY (third) observation
 - All entities SHALL be tagged per taxonomy requirements:
   - **Primary Source**: Linear DOCS-14 (Memento Knowledge Graph Taxonomy & Conventions v1.1.0)
-  - **Fallback**: `/memento/TAXONOMY.md` if Linear is unavailable
+  - **Fallback**: `TAXONOMY.md` if Linear is unavailable
 - Tags SHALL be added using `mcp__memento__add_observations` with "TAG: " prefix
 - NEVER use `read_graph` for large graphs - always use search functions
 

@@ -27,6 +27,9 @@ CONSTITUTION.md
 opencode-migration-guide.md
 memento/
 
+# GitHub documentation (guidelines and policies)
+.github/CODACY_GUIDELINES.md
+
 # Test and coverage directories  
 __tests__/
 coverage/
