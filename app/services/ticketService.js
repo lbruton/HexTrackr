@@ -147,6 +147,12 @@ class TicketService {
      * Update existing ticket
      * Extracted from server.js line 3396-3422
      * Modified to support partial updates by merging with existing ticket data
+     *
+     * @description Uses nullish coalescing (??) for optional fields to allow clearing with empty strings.
+     *              Uses logical OR (||) for required fields to prevent empty values.
+     *              - ?? only falls back on null/undefined (allows "", 0, false)
+     *              - || falls back on any falsy value (prevents "", 0, false)
+     * @see HEX-90 for bug details about field clearing
      */
     async updateTicket(ticketId, ticket) {
         try {
@@ -159,22 +165,25 @@ class TicketService {
             // Merge the updates with existing data, ensuring required fields are preserved
             const normalizedXt = normalizeXtNumber(ticket.xt_number || ticket.xtNumber || existingTicket.xt_number) || null;
             const payload = {
+                // Required fields - use || to prevent empty values
                 dateSubmitted: ticket.dateSubmitted || ticket.date_submitted || existingTicket.date_submitted,
                 dateDue: ticket.dateDue || ticket.date_due || existingTicket.date_due,
-                hexagonTicket: ticket.hexagonTicket || ticket.hexagon_ticket || existingTicket.hexagon_ticket,
-                serviceNowTicket: ticket.serviceNowTicket || ticket.service_now_ticket || existingTicket.service_now_ticket,
-                location: ticket.location || existingTicket.location,
                 devices: ticket.devices || existingTicket.devices,
-                supervisor: ticket.supervisor || existingTicket.supervisor,
-                tech: ticket.tech || existingTicket.tech,
-                status: ticket.status || existingTicket.status,
-                notes: ticket.notes || existingTicket.notes,
                 attachments: ticket.attachments || existingTicket.attachments,
                 updatedAt: ticket.updatedAt || ticket.updated_at || new Date().toISOString(),
-                site: ticket.site || existingTicket.site,
                 xt_number: normalizedXt,
-                site_id: ticket.site_id || existingTicket.site_id,
-                location_id: ticket.location_id || existingTicket.location_id
+
+                // Optional fields - use ?? to allow clearing with empty strings
+                hexagonTicket: ticket.hexagonTicket ?? ticket.hexagon_ticket ?? existingTicket.hexagon_ticket,
+                serviceNowTicket: ticket.serviceNowTicket ?? ticket.service_now_ticket ?? existingTicket.service_now_ticket,
+                location: ticket.location ?? existingTicket.location,
+                supervisor: ticket.supervisor ?? existingTicket.supervisor,
+                tech: ticket.tech ?? existingTicket.tech,
+                status: ticket.status ?? existingTicket.status,
+                notes: ticket.notes ?? existingTicket.notes,
+                site: ticket.site ?? existingTicket.site,
+                site_id: ticket.site_id ?? existingTicket.site_id,
+                location_id: ticket.location_id ?? existingTicket.location_id
             };
 
             return new Promise((resolve, reject) => {
@@ -183,7 +192,6 @@ class TicketService {
                     location = ?, devices = ?, supervisor = ?, tech = ?, status = ?, notes = ?,
                     attachments = ?, updated_at = ?, site = ?, xt_number = ?, site_id = ?, location_id = ?
                     WHERE id = ?`;
-
                 const params = [
                     payload.dateSubmitted,
                     payload.dateDue,
