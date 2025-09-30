@@ -1,5 +1,5 @@
 {
-  "generated": "2025-09-27T09:08:56.413Z",
+  "generated": "2025-09-30T21:14:41.341Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -80,6 +80,11 @@
           "title": "Getting Started",
           "path": "guides/getting-started.html"
         },
+        "https-setup": {
+          "file": "guides/https-setup",
+          "title": "Https Setup",
+          "path": "guides/https-setup.html"
+        },
         "kev-integration": {
           "file": "guides/kev-integration",
           "title": "Kev Integration",
@@ -140,5 +145,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 26
+  "totalFiles": 27
 }
