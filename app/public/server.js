@@ -129,7 +129,14 @@ async function initializeApplication() {
     // Apply middleware configuration
     app.use(cors(middlewareConfig.cors));
     app.use("/api/", rateLimit(middlewareConfig.rateLimit));
-    app.use(compression());
+
+    // Only use Express compression when NOT behind nginx reverse proxy
+    // When TRUST_PROXY=true, nginx handles compression (avoid double compression overhead)
+    // Double compression wastes CPU cycles and actually slows responses
+    if (process.env.TRUST_PROXY !== "true") {
+        app.use(compression());
+    }
+
     app.use(express.json(middlewareConfig.bodyParser.json));
     app.use(express.urlencoded(middlewareConfig.bodyParser.urlencoded));
 

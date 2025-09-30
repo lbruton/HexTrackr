@@ -10,6 +10,10 @@
 const Papa = require("papaparse");
 const PathValidator = require("../utils/PathValidator");
 const helpers = require("../utils/helpers");
+const CacheService = require("./cacheService");
+
+// Get singleton instance explicitly (prevents race conditions)
+const cacheService = CacheService.getInstance();
 
 /**
  * Extract scan date from filename using various patterns
@@ -940,6 +944,9 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                     console.log(`   - Updated in Current: ${batchStats.updatedInCurrent}`);
                     console.log(`   - Resolved: ${resolvedCount}`);
                     console.log(`   - Errors: ${batchStats.errors}`);
+
+                    // Clear all caches after successful import
+                    cacheService.clearAll();
 
                     // Generate import summary and complete progress tracking
                     if (progressTracker && progressTracker.completeSession) {
