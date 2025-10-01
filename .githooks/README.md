@@ -28,6 +28,60 @@ Our hooks use a **three-layer safety system**:
 - Asks user permission to commit with ESLint warnings
 - Stages auto-fixed files automatically
 
+### `safe-checkout.sh` (Data Loss Prevention)
+
+**Problem**: Git sometimes allows branch switching with uncommitted changes, leading to data loss.
+
+**Solution**: Use `safe-checkout.sh` wrapper script that blocks branch switching until changes are committed or stashed.
+
+**Usage Options**:
+
+1. **Direct usage**:
+   ```bash
+   ./.githooks/safe-checkout.sh main
+   ./.githooks/safe-checkout.sh feature/my-branch
+   ```
+
+2. **Shell alias** (recommended):
+   ```bash
+   # Add to ~/.zshrc or ~/.bashrc:
+   alias gco='/Volumes/DATA/GitHub/HexTrackr/.githooks/safe-checkout.sh'
+
+   # Then use:
+   gco main           # Safe checkout
+   gco feature/foo    # Safe checkout
+   ```
+
+3. **Git alias**:
+   ```bash
+   git config --global alias.sco '!bash /Volumes/DATA/GitHub/HexTrackr/.githooks/safe-checkout.sh'
+
+   # Then use:
+   git sco main       # Safe checkout
+   ```
+
+**What It Does**:
+- ⛔ Blocks checkout with uncommitted changes
+- 📝 Shows exactly what's uncommitted (staged and unstaged)
+- 💡 Provides clear options (commit, stash, force)
+- ✅ Allows checkout when working tree is clean
+
+**Example Output**:
+```
+⛔ CHECKOUT BLOCKED - Uncommitted changes detected
+
+✏️  Unstaged changes:
+   M	package.json
+   M	app/services/foo.js
+
+💡 Options:
+   1. Commit everything:  git add -A && git commit -m 'WIP: Save session'
+   2. Stash changes:      git stash save 'WIP: 2025-10-01-11:39'
+   3. Force checkout:     git checkout -f "main"  (⚠️  DISCARDS CHANGES)
+```
+
+**Why Not a Git Hook?**: Git doesn't support `pre-checkout` hooks natively. Script-based wrapper provides better UX.
+
 ## Installation
 
 Hooks are automatically installed via:
@@ -173,6 +227,11 @@ npm install
 - **CSS Config**: `.stylelintrc.json`
 
 ## Version History
+
+- **v1.1.0** (2025-10-01): Data loss prevention
+  - Added `safe-checkout.sh` script to prevent branch switching with uncommitted changes
+  - Protects against "forgot to commit" scenarios
+  - Three usage options: direct, shell alias, git alias
 
 - **v1.0.0** (2025-09-30): Initial safe hooks implementation
   - Safe auto-fixes for markdown and CSS

@@ -20,7 +20,7 @@
  * - VulnerabilityCoreOrchestrator: Inter-module coordination
  *
  * @version 2.0.0 - Modularized Architecture
- * @author Claude (Modularization), Original by Gemini
+ * @author HexTrackr Team
  * @date 2025-09-08
  *
  * @note ES6 Module Dependency: This file uses export class syntax for proper module

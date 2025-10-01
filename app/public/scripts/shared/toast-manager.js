@@ -6,7 +6,7 @@
  * @date 2025-09-10
  * @spec 004-cve-link-system-fix
  * @task T041 - Add user feedback for error states in modal displays
- * @author Curly (with creative enhancements!)
+ * @author HexTrackr Team
  */
 
 /* global bootstrap, generateSecureId */
