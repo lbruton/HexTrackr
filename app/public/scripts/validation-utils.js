@@ -4,9 +4,9 @@
  * normalize data, and handle errors gracefully across the application, particularly
  * for CSV imports and database operations.
  *
- * @version 1.0.0
- * @author GitHub Copilot
- * @date 2025-08-25
+ * @version 1.0.41
+ * @author HexTrackr Team
+ * @date 2025-10-01
  */
 
 /* global process, console, module */
