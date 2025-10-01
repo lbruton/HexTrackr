@@ -40,6 +40,7 @@ const backupRoutes = require("../routes/backup");
 const docsRoutes = require("../routes/docs");
 const templateRoutes = require("../routes/templates");
 const kevRoutes = require("../routes/kev");
+const deviceRoutes = require("../routes/devices"); // HEX-101: Device statistics endpoint
 
 // Express application & HTTP/HTTPS server
 const app = express();
@@ -178,6 +179,7 @@ async function initializeApplication() {
     app.use("/api/tickets", ticketRoutes);
     app.use("/api/templates", templateRoutes);
     app.use("/api/kev", kevRoutes(db));
+    app.use("/api/devices", deviceRoutes); // HEX-101: Device statistics endpoint
 
     // Legacy lightweight endpoints retained from monolith
     app.get("/api/sites", (req, res) => {

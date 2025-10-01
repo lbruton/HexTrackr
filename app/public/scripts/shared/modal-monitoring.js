@@ -6,7 +6,7 @@
  * @date 2025-09-10
  * @spec 004-cve-link-system-fix
  * @task T048 - Error tracking and performance monitoring instrumentation
- * @author Shemp (Production-ready monitoring framework)
+ * @author HexTrackr Team
  */
 
 /* global console, performance, window, document, generateSecureId */

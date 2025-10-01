@@ -115,49 +115,10 @@ HexTrackr development uses three distinct Claude instances with specific respons
 - Use Claude-Context MCP for code searches
 - Create feature branches following naming convention
 
-### For Claude Desktop
-**Primary Responsibilities**:
-- Strategic planning and architecture decisions
-- Linear issue creation and prioritization
-- Task delegation to Dev/Prod instances
-- Cross-instance coordination
-- High-level workflow design
-
-**When to Engage Other Instances**:
-- Implementation ready → Claude-Dev
-- Production deployment → Claude-Prod
-- Technical research needed → Claude-Dev or Claude-Prod
-
-**Best Practices**:
-- Create comprehensive Linear issues with clear requirements
-- Use HexTrackr-Docs team for shared knowledge
-- Maintain project roadmap and priorities
-- Coordinate releases between Dev and Prod
-
-### For Claude-Prod
-**Primary Responsibilities**:
-- Production environment management on Ubuntu
-- Security hardening and Linux-specific fixes
-- Test production deployment before going live
-- Docker optimization for production
-- Clean public releases to GitHub
-
-**When to Handoff**:
-- Development bugs found → Claude-Dev
-- Architecture decisions needed → Claude Desktop
-- Feature requests from production → Claude Desktop
-
-**Best Practices**:
-- Focus on HexTrackr-Prod team issues
-- Test thoroughly in production-like environment
-- Document Linux-specific solutions
-- Maintain production security standards
-- Coordinate with Claude-Dev for compatibility
-
 ## Development Workflow (SIMPLIFIED)
 
 ### Linear-Only Workflow
-HexTrackr uses a simplified workflow with Linear as the single source of truth:
+HexTrackr uses a simplified workflow with Linear as the primary source of truth:
 
 1. **Work Assignment**: User describes what needs to be done
 2. **Linear Issue**: Create/update Linear issue with task breakdown
@@ -340,7 +301,7 @@ The system uses a sophisticated rollover pipeline:
    - Use Claude-Context MCP for codebase searching (high-performance semantic search with 2200+ chunks)
    - Use Memento MCP for project knowledge graph (semantic search preferred)
      - **Primary Source**: Linear DOCS-14 for Memento taxonomy and conventions
-     - **Fallback**: `/memento/TAXONOMY.md` if Linear is unavailable
+     - **Fallback**: `/TAXONOMY.md` if Linear is unavailable
    - Context7 for framework documentation verification
 
 2. **Quality Standards**:
@@ -538,7 +499,7 @@ HexTrackr uses Claude-Context MCP for high-performance semantic code search acro
 HexTrackr uses Memento MCP as the primary knowledge graph for persistent project memory and cross-instance context sharing.
 
 **Taxonomy Source**: Linear DOCS-14 (Memento Knowledge Graph Taxonomy & Conventions v1.1.0)
-**Fallback**: `/memento/TAXONOMY.md` if Linear unavailable
+**Fallback**: `/TAXONOMY.md` if Linear unavailable
 **For Requirements**: See CONSTITUTION.md Article II Section I
 **Backend**: Neo4j Enterprise 5.13 at 192.168.1.80
 **Shared Access**: All Claude instances (Desktop, Dev, Prod) share the same knowledge graph
@@ -587,3 +548,9 @@ See `.env.example` for complete configuration options.
 - Frontend uses vanilla JavaScript (no framework dependencies)
 - Bootstrap 5 and Tabler.io for UI components
 - Code search uses Claude-Context MCP for high-performance semantic search
+- HexTrackr uses protected branch workflows with Codacy integration. The main branch cannot accept direct pushes - all changes must go
+through Pull Requests that pass Codacy's quality gates. This enforces code quality standards (complexity, duplication, security issues) and prevents technical debt accumulation.
+- 1. The Problem Pattern: Container appears healthy but returns "Empty reply from server"
+  2. The Root Cause: Protocol mismatch (testing HTTP when container serves HTTPS)
+  3. The Solution: Use curl -k https://localhost:[PORT] for local HTTPS testing
+  4. The Broader Application: Applies to any Dockerized service with SSL/TLS
