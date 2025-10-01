@@ -51,9 +51,20 @@ router.get("/stats", VulnerabilityController.getStats);
 router.get("/recent-trends", VulnerabilityController.getRecentTrends);
 router.get("/trends", VulnerabilityController.getTrends);
 
+// HEX-112 Phase 2: New endpoints for pagination migration
+router.get("/count", VulnerabilityController.getCount); // Filtered counts
+router.get("/kev-stats", VulnerabilityController.getKevStats); // KEV statistics
+router.get("/vendor-stats", VulnerabilityController.getVendorStats); // Vendor distribution
+router.get("/top-devices", VulnerabilityController.getTopDevices);
+router.get("/cvss-distribution", VulnerabilityController.getCvssDistribution);
+router.get("/severity-distribution", VulnerabilityController.getSeverityDistribution);
+router.get("/recent", VulnerabilityController.getRecentVulnerabilities);
+router.get("/export", VulnerabilityController.exportVulnerabilities); // Streaming export
+
 // Core CRUD Operations
 router.get("/", VulnerabilityController.getVulnerabilities); // Main listing with pagination/filters
 router.get("/resolved", VulnerabilityController.getResolvedVulnerabilities);
+router.get("/:id", VulnerabilityController.getVulnerabilityById); // Individual vulnerability fetch
 
 // Import Operations - REMOVED: These are now handled in imports.js
 router.post("/import", upload.single("csvFile"), VulnerabilityController.importCSV);
@@ -61,6 +72,7 @@ router.post("/import-staging", upload.single("csvFile"), VulnerabilityController
 
 // Data Management
 router.delete("/clear", VulnerabilityController.clearAllData);
+router.post("/bulk-delete", VulnerabilityController.bulkDelete); // HEX-112: Phase 2 bulk operations
 
 /**
  * T053 INTEGRATION NOTES:

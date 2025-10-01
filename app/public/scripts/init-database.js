@@ -297,6 +297,7 @@ db.serialize(() => {
   db.run("CREATE INDEX IF NOT EXISTS idx_current_active_severity ON vulnerabilities_current (lifecycle_state, severity)");
   db.run("CREATE INDEX IF NOT EXISTS idx_current_resolved_date ON vulnerabilities_current (resolved_date)");
   db.run("CREATE INDEX IF NOT EXISTS idx_current_cve ON vulnerabilities_current (cve)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_current_vendor ON vulnerabilities_current (vendor)"); // HEX-101 Blocking Issue #3
   db.run("CREATE INDEX IF NOT EXISTS idx_staging_import_id ON vulnerability_staging (import_id)");
   db.run("CREATE INDEX IF NOT EXISTS idx_staging_processed ON vulnerability_staging (processed)");
   db.run("CREATE INDEX IF NOT EXISTS idx_staging_batch_id ON vulnerability_staging (batch_id)");
