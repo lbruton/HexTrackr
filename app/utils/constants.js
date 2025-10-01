@@ -13,7 +13,7 @@ const WEBSOCKET_PORT = 8988; // Planned WebSocket port
 // CORS Origins - Dynamic HTTPS-only configuration
 const CORS_ORIGINS = function(origin, callback) {
     // Allow same-origin requests (no origin header)
-    if (!origin) return callback(null, true);
+    if (!origin) {return callback(null, true);}
 
     // Allow any HTTPS connection
     if (origin.startsWith("https://")) {
