@@ -923,6 +923,37 @@
 
         // Make function globally available
         window.showKevDetails = showKevDetails;
+
+        // HEX-120 Fix: Wrapper function for device modal that works before vulnManager is ready
+        window.openDeviceModal = function(hostname) {
+            if (window.vulnManager && typeof window.vulnManager.viewDeviceDetails === 'function') {
+                // VulnManager is ready, use it
+                window.vulnManager.viewDeviceDetails(hostname);
+            } else {
+                // VulnManager not ready yet, try to initialize it or wait
+                console.log('HEX-120: VulnManager not ready, attempting direct modal initialization');
+
+                // Check if the modal class exists
+                if (typeof DeviceSecurityModal !== 'undefined') {
+                    // Initialize modal if needed
+                    if (!window.deviceSecurityModal) {
+                        window.deviceSecurityModal = new DeviceSecurityModal();
+                    }
+
+                    // We need the dataManager, try to get it from modernVulnManager if it exists
+                    if (window.modernVulnManager && window.modernVulnManager.dataManager) {
+                        window.deviceSecurityModal.showDeviceDetails(hostname, window.modernVulnManager.dataManager);
+                    } else {
+                        // Last resort - create a temporary data manager or show error
+                        console.error('HEX-120: Cannot open device modal - data manager not available');
+                        alert('Please wait for the page to fully load before clicking on devices.');
+                    }
+                } else {
+                    console.error('HEX-120: DeviceSecurityModal class not loaded');
+                    alert('Please wait for the page to fully load before clicking on devices.');
+                }
+            }
+        };
     </script>
 
 </body>
