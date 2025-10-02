@@ -77,6 +77,10 @@ export default [
       "app/dev-docs-html/prettify/**/*.js",
       "**/prettify.js",
 
+      // JSDoc generated documentation (auto-generated, don't lint)
+      "app/dev-docs-html/**",
+      "app/public/docs-html/**",
+
       // Project documentation files (focus on app code only)
       "AGENTS.md",
       "CLAUDE.md",
@@ -137,7 +141,12 @@ export default [
       "@stylistic/quotes": ["error", "double"],
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
-      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-unused-vars": ["error", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
+        "caughtErrorsIgnorePattern": "^_",
+        "ignoreRestSiblings": true  // Allow unused destructured properties
+      }],
       "no-console": "off",
       "eqeqeq": ["error", "always"],
       "no-var": "error",
@@ -206,7 +215,12 @@ export default [
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
-      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-unused-vars": ["error", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
+        "caughtErrorsIgnorePattern": "^_",
+        "ignoreRestSiblings": true  // Allow unused destructured properties
+      }],
       "no-console": "off",
       "eqeqeq": ["error", "always"],
       "no-var": "error",
@@ -250,6 +264,7 @@ export default [
         OffscreenCanvas: "readonly",
         Path2D: "readonly",
         Event: "readonly",
+        CustomEvent: "readonly",
         EventTarget: "readonly",
         FormData: "readonly",
         DOMParser: "readonly",
@@ -258,10 +273,14 @@ export default [
         Intl: "readonly",
         Blob: "readonly",
         URL: "readonly",
+        URLSearchParams: "readonly",
+        AbortSignal: "readonly",
         getComputedStyle: "readonly",
         performance: "readonly",
         requestIdleCallback: "readonly",
         cancelIdleCallback: "readonly",
+        requestAnimationFrame: "readonly",
+        cancelAnimationFrame: "readonly",
         // Third-party library globals
         bootstrap: "readonly",
         agGrid: "readonly",
@@ -269,12 +288,21 @@ export default [
         ApexCharts: "readonly",
         Papa: "readonly",
         Sortable: "readonly",
-        // Project-specific globals
+        // UMD pattern globals (for browser/Node compatibility)
+        module: "readonly",
+        define: "readonly",
+        exports: "readonly",
+        global: "readonly",
+        require: "readonly",
+        // Project-specific globals (defined in separate script files)
         createVulnerabilityGridOptions: "readonly",
         PaginationController: "readonly",
         VulnerabilityDataManager: "readonly",
         VulnerabilityCardsManager: "readonly",
-        ModernVulnManager: "readonly"
+        ModernVulnManager: "readonly",
+        CVEUtilities: "readonly",
+        DeviceSecurityModal: "readonly",
+        VulnerabilityDetailsModal: "readonly"
       }
     },
     plugins: {
@@ -285,7 +313,12 @@ export default [
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
-      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-unused-vars": ["error", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
+        "caughtErrorsIgnorePattern": "^_",
+        "ignoreRestSiblings": true  // Allow unused destructured properties
+      }],
       "no-console": "off",
       "eqeqeq": ["error", "always"],
       "no-var": "error",
@@ -318,7 +351,12 @@ export default [
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
-      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-unused-vars": ["error", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
+        "caughtErrorsIgnorePattern": "^_",
+        "ignoreRestSiblings": true  // Allow unused destructured properties
+      }],
       "no-console": "off",
       "eqeqeq": ["error", "always"],
       "no-var": "error",
@@ -326,10 +364,12 @@ export default [
     }
   },
   {
-    // Configuration for controller files with relaxed unused-vars rules
+    // Configuration for controller and routes files with relaxed unused-vars rules
     files: [
       "app/controllers/*.js",
-      "**/controllers/*.js"
+      "**/controllers/*.js",
+      "app/routes/*.js",
+      "**/routes/*.js"
     ],
     languageOptions: {
       ecmaVersion: 2022,
@@ -361,8 +401,13 @@ export default [
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
-      // Relaxed unused-vars for controllers (imports used dynamically)
-      "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      // Relaxed unused-vars for controllers (imports used dynamically, dependency injection pattern)
+      "no-unused-vars": ["warn", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
+        "caughtErrorsIgnorePattern": "^_",
+        "ignoreRestSiblings": true  // Allow unused destructured properties
+      }],
       "no-console": "off",
       "eqeqeq": ["error", "always"],
       "no-var": "error",
@@ -389,7 +434,12 @@ export default [
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
-      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-unused-vars": ["error", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
+        "caughtErrorsIgnorePattern": "^_",
+        "ignoreRestSiblings": true  // Allow unused destructured properties
+      }],
       "no-console": "off",
       "eqeqeq": ["error", "always"],
       "no-var": "error",
@@ -404,7 +454,10 @@ export default [
       "**/normalization.js",
       "**/theme-contrast-tester.js",
       "**/wcag-contrast-validator.js",
-      "**/accessibility-announcer.js"
+      "**/accessibility-announcer.js",
+      "app/public/scripts/shared/header.js",
+      "app/public/scripts/shared/theme-config.js",
+      "app/public/scripts/shared/theme-controller.js"
     ],
     languageOptions: {
       ecmaVersion: 2022,
@@ -463,7 +516,12 @@ export default [
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
-      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+      "no-unused-vars": ["error", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
+        "caughtErrorsIgnorePattern": "^_",
+        "ignoreRestSiblings": true  // Allow unused destructured properties
+      }],
       "no-console": "off",
       "eqeqeq": ["error", "always"],
       "no-var": "error",

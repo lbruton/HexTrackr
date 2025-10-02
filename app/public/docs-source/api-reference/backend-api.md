@@ -302,6 +302,54 @@ Secure file operations.
 - Temporary file cleanup
 - Path validation
 
+### CacheService
+
+**Location:** `app/services/cacheService.js`
+**Since:** v1.0.42
+
+Multi-tier caching service for optimizing API response times and reducing database load.
+
+**Key Features:**
+
+- Three specialized cache zones with independent TTL configurations
+- Server-side caching (NodeCache) with configurable expiration
+- Browser cache control via HTTP headers
+- Cache hit/miss tracking for monitoring
+- Automatic cache invalidation on data changes
+- Clone-based storage to prevent cache mutations
+
+**Cache Zones:**
+
+| Zone | TTL | Use Case | Max Keys |
+|------|-----|----------|----------|
+| **Stats Cache** | 5 minutes | Severity counts, VPR totals, dashboard statistics | 100 |
+| **Trends Cache** | 10 minutes | Historical data, dashboard cards, trend analysis | 100 |
+| **Vulnerability Cache** | 10 minutes | Full vulnerability lists, device statistics | 50 |
+
+**Core Methods:**
+
+- `withCaching(res, cacheType, cacheKey, serverTTL, handler, browserTTL)` - Universal caching wrapper for route handlers
+- `getStats(key)` / `setStats(key, value, ttl)` - Stats cache operations
+- `getTrends(key)` / `setTrends(key, value, ttl)` - Trends cache operations
+- `getVulnerabilities(key)` / `setVulnerabilities(key, value, ttl)` - Vulnerability cache operations
+- `invalidate(zone)` - Clear specific cache zone on data changes
+- `getCacheStats()` - Retrieve hit/miss statistics for monitoring
+
+**Usage Example:**
+
+```javascript
+// In controller route handler
+await cacheService.withCaching(res, "stats", "device_statistics", 300, async () => {
+    return await vulnerabilityService.getDeviceStatistics();
+}, 60); // Server: 5min, Browser: 60s
+```
+
+**Cache Headers:**
+
+- `X-Cache: HIT` - Response served from cache
+- `X-Cache: MISS` - Response generated fresh, now cached
+- `Cache-Control: public, max-age=<browserTTL>, must-revalidate` - Browser caching directive
+
 ### KevService
 
 **Location:** `app/services/kevService.js`
@@ -395,6 +443,42 @@ POST   /sync                  // Manual KEV synchronization
 GET    /status                // Sync status and statistics
 GET    /vulnerability/:cveId  // KEV details for specific CVE
 ```
+
+### Device Routes
+
+**File:** `app/routes/devices.js`
+**Base Path:** `/api/devices`
+**Since:** v1.0.42
+
+```javascript
+GET    /stats                 // Aggregated device statistics with vulnerability counts
+```
+
+**Device Statistics Response Format:**
+
+```javascript
+{
+  success: true,
+  devices: [
+    {
+      hostname: "server01",
+      totalVulnerabilities: 245,
+      totalVpr: 1234.5,
+      severityCounts: { Critical: 12, High: 45, Medium: 88, Low: 100 },
+      hasKev: true
+    },
+    // ... more devices
+  ],
+  count: 42
+}
+```
+
+**Purpose:** Replaces client-side device processing that required loading all 30k+ vulnerabilities. Provides pre-calculated device statistics for efficient device card rendering. Server-side aggregation reduces client memory usage and improves performance.
+
+**Caching:**
+- Server cache: 5 minutes (300s) via CacheService stats zone
+- Browser cache: 60 seconds via Cache-Control headers
+- Cache headers: `X-Cache: HIT/MISS` for monitoring
 
 ---
 
