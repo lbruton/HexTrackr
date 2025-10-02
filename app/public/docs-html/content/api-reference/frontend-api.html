@@ -27,6 +27,7 @@
 <p><strong>Main Components:</strong></p>
 <ul>
 <li><code>ModernVulnManager</code> - Main orchestrator class</li>
+<li><code>VulnerabilityCoreOrchestrator</code> - Central module coordinator (Phase 2 modularization)</li>
 <li><code>VulnerabilityDataManager</code> - Data operations</li>
 <li><code>VulnerabilityGridManager</code> - AG-Grid integration</li>
 <li><code>VulnerabilityChartManager</code> - ApexCharts visualizations</li>
@@ -66,6 +67,93 @@
 <td>Export filtered data to CSV</td>
 </tr>
 </tbody></table>
+<h3>VulnerabilityCoreOrchestrator</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-core.js</code><br><strong>Since:</strong> Phase 2 Modularization (T004)</p>
+<p>Central coordination hub for the vulnerability management system. Implements the <strong>modular orchestrator pattern</strong> that provides clean separation of concerns and event-driven communication between specialized modules.</p>
+<p><strong>Key Responsibilities:</strong></p>
+<ul>
+<li><strong>Module Lifecycle Management</strong>: Creates and initializes all specialized managers</li>
+<li><strong>Inter-Module Communication</strong>: Coordinates data flow between modules via event system</li>
+<li><strong>State Synchronization</strong>: Ensures consistent state across all components</li>
+<li><strong>Cross-Cutting Concerns</strong>: Handles WebSocket integration, theme changes, error handling</li>
+<li><strong>Delegation Pattern</strong>: ModernVulnManager delegates all operations to orchestrator</li>
+</ul>
+<p><strong>Architecture Pattern:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ModernVulnManager creates orchestrator</span>
+<span class="hljs-variable language_">this</span>.<span class="hljs-property">coreOrchestrator</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">VulnerabilityCoreOrchestrator</span>();
+<span class="hljs-keyword">await</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">coreOrchestrator</span>.<span class="hljs-title function_">initializeAllModules</span>(<span class="hljs-variable language_">this</span>);
+
+<span class="hljs-comment">// All operations delegated to orchestrator</span>
+<span class="hljs-title function_">switchView</span>(<span class="hljs-params">view</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">coreOrchestrator</span>.<span class="hljs-title function_">switchView</span>(view);
+}</code></pre><p><strong>Managed Modules:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>VulnerabilityDataManager</code></td>
+<td>API communication, data caching</td>
+</tr>
+<tr>
+<td><code>VulnerabilityStatisticsManager</code></td>
+<td>Statistical calculations and analysis</td>
+</tr>
+<tr>
+<td><code>VulnerabilityChartManager</code></td>
+<td>ApexCharts visualization</td>
+</tr>
+<tr>
+<td><code>VulnerabilitySearchManager</code></td>
+<td>Search and filtering</td>
+</tr>
+<tr>
+<td><code>VulnerabilityGridManager</code></td>
+<td>AG-Grid table rendering</td>
+</tr>
+<tr>
+<td><code>VulnerabilityCardsManager</code></td>
+<td>Device card views</td>
+</tr>
+<tr>
+<td><code>WebSocketClient</code></td>
+<td>Real-time updates</td>
+</tr>
+<tr>
+<td><code>ProgressModal</code></td>
+<td>Long-running operation feedback</td>
+</tr>
+</tbody></table>
+<p><strong>Core Methods:</strong></p>
+<ul>
+<li><code>initializeAllModules(parentContext)</code> - Single initialization point for all modules</li>
+<li><code>setupDataManagerListeners()</code> - Coordinate cross-module data events</li>
+<li><code>setupThemeListeners()</code> - Synchronize theme changes across components</li>
+<li><code>switchView(view)</code> - Toggle between table and card views</li>
+<li><code>loadData()</code> - Orchestrate data loading across all modules</li>
+<li><code>viewDeviceDetails(hostname)</code> - Coordinate device detail modal</li>
+<li><code>exportVulnerabilityReport()</code> - Generate CSV exports</li>
+</ul>
+<p><strong>Event Coordination:</strong></p>
+<p>The orchestrator uses event-driven architecture to maintain loose coupling:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Data manager emits events</span>
+<span class="hljs-variable language_">this</span>.<span class="hljs-property">dataManager</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data-loaded&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">statisticsManager</span>.<span class="hljs-title function_">calculate</span>();
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">chartManager</span>.<span class="hljs-title function_">render</span>();
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">gridManager</span>.<span class="hljs-title function_">refresh</span>();
+});
+
+<span class="hljs-comment">// Theme changes propagate to all components</span>
+<span class="hljs-variable language_">this</span>.<span class="hljs-title function_">setupThemeListeners</span>(); <span class="hljs-comment">// Updates grid, charts, modals</span></code></pre><p><strong>Benefits:</strong></p>
+<ul>
+<li><strong>Maintainability</strong>: Each module has single responsibility</li>
+<li><strong>Testability</strong>: Modules can be tested independently</li>
+<li><strong>Scalability</strong>: Easy to add new modules without touching existing code</li>
+<li><strong>Debugging</strong>: Clear data flow and event tracking</li>
+<li><strong>Performance</strong>: Efficient coordination prevents redundant operations</li>
+</ul>
 <h3>TicketsPage</h3><p><strong>Location:</strong> <code>app/public/scripts/pages/tickets.js</code></p>
 <p>Support ticket management interface.</p>
 <p><strong>Key Features:</strong></p>

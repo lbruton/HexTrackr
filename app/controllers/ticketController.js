@@ -96,7 +96,7 @@ class TicketController {
             const ticketId = req.params.id;
             const ticket = req.body;
 
-            const result = await controller.ticketService.updateTicket(ticketId, ticket);
+            const _result = await controller.ticketService.updateTicket(ticketId, ticket);
             res.json({
                 success: true,
                 id: ticketId,

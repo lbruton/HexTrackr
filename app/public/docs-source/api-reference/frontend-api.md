@@ -37,6 +37,7 @@ The main vulnerability management interface.
 **Main Components:**
 
 - `ModernVulnManager` - Main orchestrator class
+- `VulnerabilityCoreOrchestrator` - Central module coordinator (Phase 2 modularization)
 - `VulnerabilityDataManager` - Data operations
 - `VulnerabilityGridManager` - AG-Grid integration
 - `VulnerabilityChartManager` - ApexCharts visualizations
@@ -57,6 +58,81 @@ const vulnManager = new ModernVulnManager();
 | `handleImport()` | Manage CSV import process |
 | `applyFilters()` | Apply search and filter criteria |
 | `exportData()` | Export filtered data to CSV |
+
+### VulnerabilityCoreOrchestrator
+
+**Location:** `app/public/scripts/shared/vulnerability-core.js`
+**Since:** Phase 2 Modularization (T004)
+
+Central coordination hub for the vulnerability management system. Implements the **modular orchestrator pattern** that provides clean separation of concerns and event-driven communication between specialized modules.
+
+**Key Responsibilities:**
+
+- **Module Lifecycle Management**: Creates and initializes all specialized managers
+- **Inter-Module Communication**: Coordinates data flow between modules via event system
+- **State Synchronization**: Ensures consistent state across all components
+- **Cross-Cutting Concerns**: Handles WebSocket integration, theme changes, error handling
+- **Delegation Pattern**: ModernVulnManager delegates all operations to orchestrator
+
+**Architecture Pattern:**
+
+```javascript
+// ModernVulnManager creates orchestrator
+this.coreOrchestrator = new VulnerabilityCoreOrchestrator();
+await this.coreOrchestrator.initializeAllModules(this);
+
+// All operations delegated to orchestrator
+switchView(view) {
+    return this.coreOrchestrator.switchView(view);
+}
+```
+
+**Managed Modules:**
+
+| Module | Responsibility |
+|--------|---------------|
+| `VulnerabilityDataManager` | API communication, data caching |
+| `VulnerabilityStatisticsManager` | Statistical calculations and analysis |
+| `VulnerabilityChartManager` | ApexCharts visualization |
+| `VulnerabilitySearchManager` | Search and filtering |
+| `VulnerabilityGridManager` | AG-Grid table rendering |
+| `VulnerabilityCardsManager` | Device card views |
+| `WebSocketClient` | Real-time updates |
+| `ProgressModal` | Long-running operation feedback |
+
+**Core Methods:**
+
+- `initializeAllModules(parentContext)` - Single initialization point for all modules
+- `setupDataManagerListeners()` - Coordinate cross-module data events
+- `setupThemeListeners()` - Synchronize theme changes across components
+- `switchView(view)` - Toggle between table and card views
+- `loadData()` - Orchestrate data loading across all modules
+- `viewDeviceDetails(hostname)` - Coordinate device detail modal
+- `exportVulnerabilityReport()` - Generate CSV exports
+
+**Event Coordination:**
+
+The orchestrator uses event-driven architecture to maintain loose coupling:
+
+```javascript
+// Data manager emits events
+this.dataManager.on('data-loaded', () => {
+    this.statisticsManager.calculate();
+    this.chartManager.render();
+    this.gridManager.refresh();
+});
+
+// Theme changes propagate to all components
+this.setupThemeListeners(); // Updates grid, charts, modals
+```
+
+**Benefits:**
+
+- **Maintainability**: Each module has single responsibility
+- **Testability**: Modules can be tested independently
+- **Scalability**: Easy to add new modules without touching existing code
+- **Debugging**: Clear data flow and event tracking
+- **Performance**: Efficient coordination prevents redundant operations
 
 ### TicketsPage
 
