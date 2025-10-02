@@ -22,6 +22,10 @@ data/*.sqlite
 *.db-shm
 *.db-wal
 
+# Application database directory (HEX-120)
+app/public/data/
+!app/public/data/.gitkeep
+
 # Log files
 logs/
 *.log
@@ -110,6 +114,15 @@ opencode-config-update.json
 broken_opencode.json
 .opencode.json
 
+# Claude Code MCP configuration (contains API keys)
+.mcp.json
+
 
 #Ignore cursor AI rules
 .cursor/rules/codacy.mdc
+# SSL certificates and private keys
+certs/*.pem
+certs/*.key
+
+# Secrets directory (Docker secrets, API keys)
+secrets/
