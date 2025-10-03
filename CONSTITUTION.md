@@ -37,7 +37,8 @@
 
 ### Section VI: Docker Principles
 
-- All Testing and Development SHALL use the docker container (nginx reverse proxy on localhost:80 (HTTP) and localhost:443 (HTTPS))
+- All Testing and Development SHALL use the docker container (nginx reverse proxy on localhost:443 (HTTPS))
+- Port 80 (HTTP) redirects to HTTPS in production; use HTTPS for all local testing
 
 # Article II: Tool Usage
 
