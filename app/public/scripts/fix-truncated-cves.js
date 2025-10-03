@@ -212,7 +212,7 @@ function detectTruncatedCVEs() {
 
 // Safe migration function
 function performMigration(dryRun = true) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
         if (!global.truncatedRecords || global.truncatedRecords.length === 0) {
             console.log("\n✅ No records to migrate");
             resolve();

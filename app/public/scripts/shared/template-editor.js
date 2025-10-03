@@ -714,7 +714,7 @@ class TemplateEditor {
      * @param {Object} ticket - Ticket data
      * @returns {string} Vulnerability summary
      */
-    generateVulnerabilitySummary(ticket) {
+    generateVulnerabilitySummary(_ticket) {
         return "";
     }
 
