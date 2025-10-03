@@ -6,7 +6,7 @@
 
 HexTrackr is an enterprise vulnerability management platform that helps organizations track, prioritize, and remediate security vulnerabilities across their infrastructure. This roadmap provides visibility into planned features and improvements.
 
-**Current Version**: v1.0.30 (September 2025)
+**Current Version**: v1.0.43 (October 2025)
 **Current Focus**: Security hardening and enterprise-grade authentication
 
 ---

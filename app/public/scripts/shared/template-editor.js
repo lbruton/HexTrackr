@@ -704,7 +704,7 @@ class TemplateEditor {
         if (!dateString) {return "N/A";}
         try {
             return new Date(dateString).toLocaleDateString();
-        } catch (error) {
+        } catch (_error) {
             return dateString;
         }
     }
@@ -714,7 +714,7 @@ class TemplateEditor {
      * @param {Object} ticket - Ticket data
      * @returns {string} Vulnerability summary
      */
-    generateVulnerabilitySummary(ticket) {
+    generateVulnerabilitySummary(_ticket) {
         return "";
     }
 
