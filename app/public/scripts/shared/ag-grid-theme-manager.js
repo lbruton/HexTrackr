@@ -85,7 +85,7 @@ class AGGridThemeManager {
         this.currentTheme = isDark ? "dark" : "light";
 
         // Update all registered grids
-        for (const [gridId, gridInfo] of this.grids) {
+        for (const [gridId, _gridInfo] of this.grids) {
             this.applyThemeToGrid(gridId, isDark);
         }
 
@@ -250,7 +250,7 @@ class AGGridThemeManager {
     setupGlobalThemeListener() {
         // Listen to HexTrackr's theme controller if available
         if (window.themeController) {
-            window.themeController.addThemeChangeListener((newTheme, source) => {
+            window.themeController.addThemeChangeListener((newTheme, _source) => {
                 this.updateTheme(newTheme === "dark");
             });
         }
