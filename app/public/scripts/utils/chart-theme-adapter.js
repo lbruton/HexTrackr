@@ -663,7 +663,7 @@ try {
   if (typeof exports !== "undefined") {
     exports.ChartThemeAdapter = ChartThemeAdapter;
   }
-} catch (error) {
+} catch (_error) {
   // Silently ignore if module system not available
   console.debug("Module export not available, using global window export");
 }
