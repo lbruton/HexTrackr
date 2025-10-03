@@ -159,6 +159,8 @@ git pull origin main          # Sync dev with merged changes
 
 **Why This Works**: `dev` branch stays synchronized with GitHub main via pull after each PR merge. Feature branches created from `dev` have the latest code. No drift, no conflicts, no data loss.
 
+**Permissions**: Git push commands are enabled in project `.claude/settings.json` to allow automatic pushes to dev branch. GitHub's branch protection on main provides the real safety net against accidental pushes to protected branches.
+
 ## Quality Gates (From CONSTITUTION.md)
 
 - All code MUST pass Codacy quality checks
