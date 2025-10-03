@@ -5,6 +5,94 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.44] - 2025-10-03
+
+### Enhanced
+
+#### HEX-121: ESLint 9+ Migration and Code Quality Improvements
+
+**Achievement**: Successfully migrated from ESLint 8 to ESLint 9 with flat config format and achieved complete code quality compliance across entire codebase.
+
+**Implementation**:
+- Migrated ESLint configuration from legacy `.eslintrc.json` to modern `eslint.config.mjs` flat config format
+- Updated all ESLint dependencies to version 9+ with proper plugin integrations
+- Added comprehensive JSDoc comments to all JavaScript functions (frontend and backend)
+- Fixed 32 unused variable warnings through systematic 5-phase incremental approach
+- Improved error handling and input validation across all modules
+- Enhanced code maintainability with proper documentation standards
+
+**Impact**:
+- **100% ESLint Compliance**: Zero linting errors across entire JavaScript codebase
+- **Enhanced Documentation**: Every function now has complete JSDoc comments for better developer experience
+- **Bug Fixes**: Discovered and fixed 1 functional bug (button state restoration in progress-modal.js)
+- **Code Quality**: Eliminated false positives with proper inline documentation
+- **Team Productivity**: Clean linting results enable faster development without tool noise
+
+**Files Modified** (20+ files across frontend and backend):
+- ESLint configuration: `eslint.config.mjs` (new flat config format)
+- Frontend modules: tickets.js, vulnerability components, modal managers, theme controllers
+- Backend services: templateService.js, ticketService.js, importService.js, progressService.js
+- Utilities: logging.js, docs.js, and various helper modules
+
+**Quality Metrics**:
+- Unused variables: 32 → 0 errors (100% reduction)
+- JSDoc coverage: 100% (all functions documented)
+- Code complexity: Improved through refactoring and documentation
+- False positives: Properly documented with explanations
+
+**Related Issues**: HEX-122 (theme color investigation), HEX-123 (CSV import fix)
+
+**Linear Issue**: [HEX-121](https://linear.app/hextrackr/issue/HEX-121)
+
+### Fixed
+
+#### HEX-123: CSV Import Bug - Nginx Body Size Limit
+
+**Issue**: CSV imports failed silently for files larger than 1MB with HTTP 413 (Payload Too Large) error. Users experienced import failures without clear error messages, making large dataset imports impossible.
+
+**Root Cause**:
+- **Nginx Default Limit**: `client_max_body_size 1m` (1MB default) was rejecting CSV uploads before they reached Express backend
+- **Express Configuration**: Backend was configured to accept up to 100MB (`body-parser` limit), but nginx reverse proxy rejected requests first
+- **Silent Failure**: HTTP 413 errors weren't properly surfaced to frontend, causing confusing "import failed" messages
+
+**Solution**:
+- Added `client_max_body_size 100m;` to nginx.conf http block to match Express 100MB limit
+- Enhanced nginx configuration with complete HTTP server block for development environment
+- Added proper error handling for HTTP error responses in frontend import code
+- Prevented JSON parse errors on non-JSON HTTP error responses
+
+**Technical Implementation**:
+```nginx
+http {
+    # Allow large CSV file uploads (matches Express body-parser limit)
+    client_max_body_size 100m;
+
+    # Additional production-ready nginx configuration
+    # (gzip compression, proxy headers, timeouts, etc.)
+}
+```
+
+**Testing**:
+- Successfully imported 3.7MB CSV file with 25,000+ vulnerabilities
+- Verified import progress tracking and completion
+- Confirmed data integrity and proper database updates
+
+**Impact**:
+- **Large Dataset Support**: CSV files up to 100MB now import successfully
+- **Better Error Handling**: Clear error messages for upload failures
+- **Production Ready**: nginx configuration matches Express backend limits
+- **User Experience**: Eliminates silent failures and confusing error messages
+
+**Files Modified**:
+- `docker/nginx/nginx.conf` - Added client_max_body_size directive
+- Frontend import handlers - Enhanced HTTP error response handling
+
+**Commit**: 72b0f29
+
+**Linear Issue**: [HEX-123](https://linear.app/hextrackr/issue/HEX-123)
+
+---
+
 ## [1.0.43] - 2025-10-03
 
 ### Fixed
