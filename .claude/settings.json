@@ -21,7 +21,6 @@
       "Read(logs/**)"
     ],
     "deny": [
-      "Bash(git push:*)",
       "Write(.env)",
       "Edit(.env)",
       "Bash(docker-compose down -v:*)"
