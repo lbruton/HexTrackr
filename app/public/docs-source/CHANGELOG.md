@@ -5,9 +5,45 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.43] - 2025-10-02
+## [1.0.43] - 2025-10-03
 
 ### Fixed
+
+#### HEX-121: ESLint Unused Variable Cleanup (32 → 0 Errors)
+
+**Issue**: 32 ESLint unused variable warnings after configuration improvements in DOCS-25 and DOCS-33. Mix of false positives, intentionally unused parameters, and genuine dead code.
+
+**Solution**:
+- Fixed 26 genuine unused variables/parameters via 5 incremental phases
+- Fixed 1 actual bug: progress-modal.js button restoration using hardcoded text instead of captured originalText
+- Documented 4 false positives with inline ESLint disable comments and explanations
+- Identified 1 function (getVPRContrastColorsFromCSS) for investigation with HEX-122 theme controller issue
+
+**Impact**:
+- 100% ESLint error reduction (32 → 0)
+- 1 functional bug fixed (button state restoration)
+- Codebase clarity improved with explicit intent signaling (underscore prefixes for intentionally unused)
+- Better developer experience with clean linting results
+
+**Incremental Testing Strategy**:
+- Phase 1: 8 catch block prefixes (32 → 24) - Zero functionality risk
+- Phase 2: 11 parameter prefixes (24 → 14) - Low-risk API contracts
+- Phase 3: 7 safe cleanups (14 → 7) - Dead code removal
+- Phase 4: 1 bug fix + 2 export fixes (7 → 4) - Button restoration
+- Phase 5: 3 false positive docs + 1 HEX-122 link (4 → 0) - Documentation
+
+**Files Modified** (20 files):
+- catch block error prefixes: tickets.js, ag-grid-theme-manager.js, modal-monitoring.js, template-editor.js, ticket-markdown-editor.js, chart-theme-adapter.js, theme-controller.js, templateService.js, ticketService.js
+- Parameter prefixes: fix-truncated-cves.js, header.js, vulnerability-grid.js, vulnerability-search.js, logging.js, docs.js, progressService.js
+- Export/global fixes: tickets-aggrid.js, theme-contrast-tester.js, modal-monitoring.js
+- Bug fix: progress-modal.js (button restoration)
+- False positive docs: importController.js, importService.js
+- HEX-122 investigation: vulnerability-constants.js
+
+**Related Issues**:
+- HEX-122: Theme color inconsistency (getVPRContrastColorsFromCSS investigation)
+- HEX-123: CSV import JSON parse error (discovered during testing)
+- DOCS-25, DOCS-33: ESLint configuration improvements
 
 #### HEX-120: Device Modal Reliability + Split Loading Disabled
 
