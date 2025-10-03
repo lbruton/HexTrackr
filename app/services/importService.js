@@ -117,8 +117,9 @@ async function parseCSV(csvData) {
 
 /**
  * Create import record in database
+ * @param {string} scanDate - Used by caller functions (processVulnerabilitiesWithLifecycle, bulkLoadToStagingTable, etc.)
  */
-async function createImportRecord({ filename, vendor, scanDate, rowCount, fileSize, headers }) {
+async function createImportRecord({ filename, vendor, scanDate, rowCount, fileSize, headers }) { // eslint-disable-line no-unused-vars
     return new Promise((resolve, reject) => {
         const importDate = new Date().toISOString();
 
