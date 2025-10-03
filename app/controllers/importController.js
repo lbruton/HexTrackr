@@ -42,7 +42,7 @@ async function importVulnerabilities(req, res) {
         return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const startTime = Date.now();
+    const startTime = Date.now(); // eslint-disable-line no-unused-vars -- Used in stagingImport call at line 180
 
     try {
         // Extract metadata from filename and request
