@@ -80,7 +80,7 @@ export class HeaderThemeManager {
       });
 
       // Add theme change listener to update visibility
-      this.themeController.addThemeChangeListener((newTheme, source) => {
+      this.themeController.addThemeChangeListener((newTheme, _source) => {
         this.updateToggleVisibility(newTheme);
         // Redraw the grid to apply theme changes
         if (window.modernVulnManager && window.modernVulnManager.gridManager) {
