@@ -1,9 +1,9 @@
 /**
  * Theme Contrast Testing Utility - T043
- * 
+ *
  * Tests HexTrackr dark theme colors against WCAG AA standards
  * Uses the WCAG contrast validator to identify compliance issues
- * 
+ *
  * @version 1.0.0
  * @spec 005-dark-mode-theme-system
  * @task T043 - WCAG AA contrast ratio validation for all dark mode elements
@@ -12,7 +12,6 @@
 import {
   validateColorCombination,
   batchValidateColors,
-  generateAccessibilityReport,
   WCAG_STANDARDS
 } from "./wcag-contrast-validator.js";
 
@@ -198,7 +197,6 @@ export function testDarkThemeCompliance(verbose = false) {
     if (verbose && passes.length > 0) {
       console.log("✅ PASSED COMBINATIONS:");
       passes.forEach((result, index) => {
-        const validation = result.validations["AA_normal"];
         console.log(`   ${index + 1}. ${result.label} (${result.ratio}:1)`);
       });
       console.log("");

@@ -3321,7 +3321,7 @@ class HexagonTicketsManager {
                             if (value.startsWith("[") && value.endsWith("]")) {
                                 try {
                                     ticket.devices = JSON.parse(value);
-                                } catch (e) {
+                                } catch (_e) {
                                     ticket.devices = value ? value.split(";").map(d => d.trim()).filter(d => d) : [];
                                 }
                             } else {

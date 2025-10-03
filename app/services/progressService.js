@@ -149,10 +149,10 @@ class ProgressService {
      * @param {number} currentBatch - Current batch number
      * @param {number} totalBatches - Total number of batches
      * @param {number} processedRows - Total rows processed so far
-     * @param {string} status - Processing status
+     * @param {string} _status - Processing status (unused, reserved for future metadata)
      * @returns {boolean} Success status
      */
-    updateImportBatchProgress(sessionId, currentBatch, totalBatches, processedRows, status = "processing") {
+    updateImportBatchProgress(sessionId, currentBatch, totalBatches, processedRows, _status = "processing") {
         const batchProgress = (currentBatch / totalBatches) * 100;
         const phaseConfig = this.IMPORT_PHASES.PROCESSING;
         const overallProgress = phaseConfig.start + (batchProgress * (phaseConfig.end - phaseConfig.start) / 100);
