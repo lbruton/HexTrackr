@@ -299,7 +299,7 @@ export class ThemeController {
       let themeData;
       try {
         themeData = JSON.parse(event.newValue);
-      } catch (parseError) {
+      } catch (_parseError) {
         // Handle legacy simple string format
         const legacyTheme = this.validateTheme(event.newValue);
         if (legacyTheme) {
@@ -578,7 +578,7 @@ export class ThemeController {
       let themeData;
       try {
         themeData = JSON.parse(storedData);
-      } catch (parseError) {
+      } catch (_parseError) {
         // If JSON parsing fails, treat as legacy simple string
         const legacyTheme = this.validateTheme(storedData);
         return legacyTheme || "light";
@@ -1174,11 +1174,11 @@ export class ThemeController {
 
   /**
    * Handle system preference changes with enhanced logic - T042
-   * 
-   * @param {MediaQueryListEvent} event - Media query change event
+   *
+   * @param {MediaQueryListEvent} _event - Media query change event (unused - detects via darkModeQuery.matches)
    * @returns {void}
    */
-  handleSystemPreferenceChange(event) {
+  handleSystemPreferenceChange(_event) {
     try {
       const now = Date.now();
       this.systemPreferences.changeCount++;
