@@ -15,17 +15,193 @@
                             <button class="accordion-button "
                                     type="button"
                                     data-bs-toggle="collapse"
-                                    data-bs-target="#version-1-0-43"
+                                    data-bs-target="#version-1-0-45"
                                     aria-expanded="true"
-                                    aria-controls="version-1-0-43">
-                                [1.0.43] - 2025-10-02
+                                    aria-controls="version-1-0-45">
+                                [1.0.45] - 2025-10-03
                             </button>
                         </h2>
-                        <div id="version-1-0-43"
+                        <div id="version-1-0-45"
                              class="accordion-collapse collapse show"
                              data-bs-parent="#changelogAccordion">
                             <div class="accordion-body">
-                                <h3>Fixed</h3><h4>HEX-120: Device Modal Reliability + Split Loading Disabled</h4><p><strong>Issue</strong>: Device vulnerability modal intermittently failed to open due to race conditions in split-loading architecture. Users clicked device cards but sometimes saw no response.</p>
+                                <h3>Security</h3><h4>HEX-124: Security Vulnerability Fix - tar-fs CVE-2025-59343</h4><p><strong>Achievement</strong>: Resolved HIGH severity vulnerability (CVE-2025-59343) in tar-fs dependency through npm overrides mechanism.</p>
+<p><strong>Implementation</strong>:</p>
+<ul>
+<li>Updated tar-fs from version 2.1.3 to 2.1.4 using npm overrides field</li>
+<li>tar-fs is a transitive dependency: sqlite3 → prebuild-install → tar-fs</li>
+<li>Added <code>&quot;overrides&quot;: { &quot;tar-fs&quot;: &quot;2.1.4&quot; }</code> to package.json to force version update</li>
+<li>Verified zero HIGH or CRITICAL vulnerabilities remain after fix</li>
+</ul>
+<p><strong>Vulnerability Details</strong>:</p>
+<ul>
+<li><strong>CVE</strong>: CVE-2025-59343</li>
+<li><strong>Severity</strong>: HIGH</li>
+<li><strong>Issue</strong>: Symlink validation bypass in <a href="mailto:tar-fs@2.1.3">tar-fs@2.1.3</a></li>
+<li><strong>Impact</strong>: HexTrackr does not directly use tar-fs, but vulnerability was present in dependency tree</li>
+<li><strong>Resolution</strong>: Patch version 2.1.4 fixes symlink validation vulnerability</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>npm audit shows zero HIGH vulnerabilities after fix</li>
+<li>All ESLint checks pass with no errors</li>
+<li>Docker container starts successfully with full functionality</li>
+<li>Application tested via nginx reverse proxy on localhost:80/443</li>
+</ul>
+<p><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-124">HEX-124</a></p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-44"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-44">
+                                [1.0.44] - 2025-10-03
+                            </button>
+                        </h2>
+                        <div id="version-1-0-44"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Enhanced</h3><h4>HEX-121: ESLint 9+ Migration and Code Quality Improvements</h4><p><strong>Achievement</strong>: Successfully migrated from ESLint 8 to ESLint 9 with flat config format and achieved complete code quality compliance across entire codebase.</p>
+<p><strong>Implementation</strong>:</p>
+<ul>
+<li>Migrated ESLint configuration from legacy <code>.eslintrc.json</code> to modern <code>eslint.config.mjs</code> flat config format</li>
+<li>Updated all ESLint dependencies to version 9+ with proper plugin integrations</li>
+<li>Added comprehensive JSDoc comments to all JavaScript functions (frontend and backend)</li>
+<li>Fixed 32 unused variable warnings through systematic 5-phase incremental approach</li>
+<li>Improved error handling and input validation across all modules</li>
+<li>Enhanced code maintainability with proper documentation standards</li>
+</ul>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li><strong>100% ESLint Compliance</strong>: Zero linting errors across entire JavaScript codebase</li>
+<li><strong>Enhanced Documentation</strong>: Every function now has complete JSDoc comments for better developer experience</li>
+<li><strong>Bug Fixes</strong>: Discovered and fixed 1 functional bug (button state restoration in progress-modal.js)</li>
+<li><strong>Code Quality</strong>: Eliminated false positives with proper inline documentation</li>
+<li><strong>Team Productivity</strong>: Clean linting results enable faster development without tool noise</li>
+</ul>
+<p><strong>Files Modified</strong> (20+ files across frontend and backend):</p>
+<ul>
+<li>ESLint configuration: <code>eslint.config.mjs</code> (new flat config format)</li>
+<li>Frontend modules: tickets.js, vulnerability components, modal managers, theme controllers</li>
+<li>Backend services: templateService.js, ticketService.js, importService.js, progressService.js</li>
+<li>Utilities: logging.js, docs.js, and various helper modules</li>
+</ul>
+<p><strong>Quality Metrics</strong>:</p>
+<ul>
+<li>Unused variables: 32 → 0 errors (100% reduction)</li>
+<li>JSDoc coverage: 100% (all functions documented)</li>
+<li>Code complexity: Improved through refactoring and documentation</li>
+<li>False positives: Properly documented with explanations</li>
+</ul>
+<p><strong>Related Issues</strong>: HEX-122 (theme color investigation), HEX-123 (CSV import fix)</p>
+<p><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-121">HEX-121</a></p>
+<h3>Fixed</h3><h4>HEX-123: CSV Import Bug - Nginx Body Size Limit</h4><p><strong>Issue</strong>: CSV imports failed silently for files larger than 1MB with HTTP 413 (Payload Too Large) error. Users experienced import failures without clear error messages, making large dataset imports impossible.</p>
+<p><strong>Root Cause</strong>:</p>
+<ul>
+<li><strong>Nginx Default Limit</strong>: <code>client_max_body_size 1m</code> (1MB default) was rejecting CSV uploads before they reached Express backend</li>
+<li><strong>Express Configuration</strong>: Backend was configured to accept up to 100MB (<code>body-parser</code> limit), but nginx reverse proxy rejected requests first</li>
+<li><strong>Silent Failure</strong>: HTTP 413 errors weren&#39;t properly surfaced to frontend, causing confusing &quot;import failed&quot; messages</li>
+</ul>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Added <code>client_max_body_size 100m;</code> to nginx.conf http block to match Express 100MB limit</li>
+<li>Enhanced nginx configuration with complete HTTP server block for development environment</li>
+<li>Added proper error handling for HTTP error responses in frontend import code</li>
+<li>Prevented JSON parse errors on non-JSON HTTP error responses</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<pre><code class="language-nginx"><span class="hljs-section">http</span> {
+    <span class="hljs-comment"># Allow large CSV file uploads (matches Express body-parser limit)</span>
+    <span class="hljs-attribute">client_max_body_size</span> <span class="hljs-number">100m</span>;
+
+    <span class="hljs-comment"># Additional production-ready nginx configuration</span>
+    <span class="hljs-comment"># (gzip compression, proxy headers, timeouts, etc.)</span>
+}</code></pre><p><strong>Testing</strong>:</p>
+<ul>
+<li>Successfully imported 3.7MB CSV file with 25,000+ vulnerabilities</li>
+<li>Verified import progress tracking and completion</li>
+<li>Confirmed data integrity and proper database updates</li>
+</ul>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li><strong>Large Dataset Support</strong>: CSV files up to 100MB now import successfully</li>
+<li><strong>Better Error Handling</strong>: Clear error messages for upload failures</li>
+<li><strong>Production Ready</strong>: nginx configuration matches Express backend limits</li>
+<li><strong>User Experience</strong>: Eliminates silent failures and confusing error messages</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>docker/nginx/nginx.conf</code> - Added client_max_body_size directive</li>
+<li>Frontend import handlers - Enhanced HTTP error response handling</li>
+</ul>
+<p><strong>Commit</strong>: 72b0f29</p>
+<p><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-123">HEX-123</a></p>
+<hr>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#version-1-0-43"
+                                    aria-expanded="false"
+                                    aria-controls="version-1-0-43">
+                                [1.0.43] - 2025-10-03
+                            </button>
+                        </h2>
+                        <div id="version-1-0-43"
+                             class="accordion-collapse collapse "
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                <h3>Fixed</h3><h4>HEX-121: ESLint Unused Variable Cleanup (32 → 0 Errors)</h4><p><strong>Issue</strong>: 32 ESLint unused variable warnings after configuration improvements in DOCS-25 and DOCS-33. Mix of false positives, intentionally unused parameters, and genuine dead code.</p>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Fixed 26 genuine unused variables/parameters via 5 incremental phases</li>
+<li>Fixed 1 actual bug: progress-modal.js button restoration using hardcoded text instead of captured originalText</li>
+<li>Documented 4 false positives with inline ESLint disable comments and explanations</li>
+<li>Identified 1 function (getVPRContrastColorsFromCSS) for investigation with HEX-122 theme controller issue</li>
+</ul>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li>100% ESLint error reduction (32 → 0)</li>
+<li>1 functional bug fixed (button state restoration)</li>
+<li>Codebase clarity improved with explicit intent signaling (underscore prefixes for intentionally unused)</li>
+<li>Better developer experience with clean linting results</li>
+</ul>
+<p><strong>Incremental Testing Strategy</strong>:</p>
+<ul>
+<li>Phase 1: 8 catch block prefixes (32 → 24) - Zero functionality risk</li>
+<li>Phase 2: 11 parameter prefixes (24 → 14) - Low-risk API contracts</li>
+<li>Phase 3: 7 safe cleanups (14 → 7) - Dead code removal</li>
+<li>Phase 4: 1 bug fix + 2 export fixes (7 → 4) - Button restoration</li>
+<li>Phase 5: 3 false positive docs + 1 HEX-122 link (4 → 0) - Documentation</li>
+</ul>
+<p><strong>Files Modified</strong> (20 files):</p>
+<ul>
+<li>catch block error prefixes: tickets.js, ag-grid-theme-manager.js, modal-monitoring.js, template-editor.js, ticket-markdown-editor.js, chart-theme-adapter.js, theme-controller.js, templateService.js, ticketService.js</li>
+<li>Parameter prefixes: fix-truncated-cves.js, header.js, vulnerability-grid.js, vulnerability-search.js, logging.js, docs.js, progressService.js</li>
+<li>Export/global fixes: tickets-aggrid.js, theme-contrast-tester.js, modal-monitoring.js</li>
+<li>Bug fix: progress-modal.js (button restoration)</li>
+<li>False positive docs: importController.js, importService.js</li>
+<li>HEX-122 investigation: vulnerability-constants.js</li>
+</ul>
+<p><strong>Related Issues</strong>:</p>
+<ul>
+<li>HEX-122: Theme color inconsistency (getVPRContrastColorsFromCSS investigation)</li>
+<li>HEX-123: CSV import JSON parse error (discovered during testing)</li>
+<li>DOCS-25, DOCS-33: ESLint configuration improvements</li>
+</ul>
+<h4>HEX-120: Device Modal Reliability + Split Loading Disabled</h4><p><strong>Issue</strong>: Device vulnerability modal intermittently failed to open due to race conditions in split-loading architecture. Users clicked device cards but sometimes saw no response.</p>
 <p><strong>Root Cause</strong>:</p>
 <ul>
 <li>Split loading architecture introduced timing issues between KEV-first load and background full dataset load</li>
