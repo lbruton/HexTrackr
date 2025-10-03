@@ -107,26 +107,57 @@ Labels: [Type: Bug/Feature/Enhancement] + [Priority: High/Medium/Low]
 - **HexTrackr-Prod** (HEXP-XX): Production deployment, security hardening, Linux-specific issues
 - **HexTrackr-Docs** (DOCS-XX): Shared knowledge, architecture decisions, cross-instance documentation
 
-## CRITICAL: Protected Branch Workflow
+## CRITICAL: Dev Branch Workflow (Integration Branch Pattern)
 
 **GitHub main is protected** - You CANNOT push directly to main branch on GitHub.
 
-**Key Constraint**: Local main and GitHub main are NOT synchronized automatically.
+**Solution**: Use `dev` branch as your working baseline instead of local `main`.
 
-**Data Loss Prevention Pattern**:
-1. ✅ Commit ALL changes to local main FIRST
-2. ✅ Create feature branch FROM committed local main
-3. ✅ Feature branch inherits all commits (nothing lost)
-4. ✅ Push feature branch and create PR
-5. ✅ PR merges to GitHub main (Codacy approval)
-6. ✅ Pull from GitHub to sync local main
+### The `dev` Branch Strategy
+
+**`dev` branch** = Your integration/development baseline
+- **Protected on GitHub**: Won't be deleted accidentally
+- **No Codacy restrictions**: Fast iteration, no review requirements
+- **Always current**: Sync with `git pull origin main` after each PR merge
+- **Purpose**: Replaces stale local main as branching point
+
+**Workflow Pattern**:
+```bash
+# Daily work (always from dev)
+git checkout dev
+git pull origin main          # Sync dev with GitHub main
+git checkout -b feature/hex-124-something  # Optional: for complex work
+# ... make changes, commit ...
+git checkout dev
+git merge feature/hex-124-something  # Optional: if using feature branch
+# OR just commit directly to dev for simple fixes
+git push origin dev
+
+# Create PR on GitHub: dev → main
+# After PR merges on GitHub:
+git checkout dev
+git pull origin main          # Sync dev with merged changes
+```
+
+**Key Benefits**:
+- ✅ No stale baseline (dev syncs with main after each PR)
+- ✅ No branch drift (always branch from current code)
+- ✅ No merge conflicts (clean baseline)
+- ✅ No data loss (clear branch hierarchy)
+- ✅ Local main can stay stale (never used for work)
+
+**Feature Branches** (Optional, for complex/multi-commit work):
+- Created from `dev` (not `main`)
+- Merged back to `dev` before PR
+- Deleted after merge (ephemeral)
+- **Simple fixes**: Commit directly to `dev`, skip feature branch
 
 **NEVER**:
-- ❌ Create feature branch from uncommitted changes (stash risks data loss)
-- ❌ Make changes directly to local main without creating feature branch
-- ❌ Attempt to push local main to GitHub (will fail)
+- ❌ Create branches from local `main` (it's stale!)
+- ❌ Push feature branches to GitHub without merging to `dev` first
+- ❌ Forget to sync `dev` with `git pull origin main` after PR merges
 
-**Why This Matters**: Any work committed to local main that isn't in a feature branch will be orphaned when you pull from GitHub main after PR merge. Always: commit to local main → branch → PR → merge → pull.
+**Why This Works**: `dev` branch stays synchronized with GitHub main via pull after each PR merge. Feature branches created from `dev` have the latest code. No drift, no conflicts, no data loss.
 
 ## Quality Gates (From CONSTITUTION.md)
 
@@ -475,17 +506,26 @@ docker-compose logs -f  # Follow container logs
 ## Git Workflow Cheat Sheet
 
 ```bash
-# Safe feature start
-git checkout main && git pull
-git add . && git commit -m "message"  # Commit to local main FIRST
+# Daily work pattern (dev branch workflow)
+git checkout dev
+git pull origin main              # Sync dev with GitHub main
+# ... make changes, test, commit to dev ...
+git push origin dev
+
+# Create PR on GitHub: dev → main
+
+# After PR merges on GitHub
+git checkout dev
+git pull origin main              # Sync dev with merged changes
+
+# Optional: Feature branch for complex work
+git checkout dev
 git checkout -b feature/v1.0.XX-name
-git push -u origin feature/v1.0.XX-name
-
-# Create PR (via gh cli or web)
-gh pr create --title "..." --body "..."
-
-# After PR merge
-git checkout main && git pull  # Sync with GitHub
+# ... work ...
+git checkout dev
+git merge feature/v1.0.XX-name
+git branch -d feature/v1.0.XX-name  # Clean up
+git push origin dev
 ```
 
 ## Where to Find What
