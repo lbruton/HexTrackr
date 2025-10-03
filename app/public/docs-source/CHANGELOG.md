@@ -5,6 +5,35 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.45] - 2025-10-03
+
+### Security
+
+#### HEX-124: Security Vulnerability Fix - tar-fs CVE-2025-59343
+
+**Achievement**: Resolved HIGH severity vulnerability (CVE-2025-59343) in tar-fs dependency through npm overrides mechanism.
+
+**Implementation**:
+- Updated tar-fs from version 2.1.3 to 2.1.4 using npm overrides field
+- tar-fs is a transitive dependency: sqlite3 → prebuild-install → tar-fs
+- Added `"overrides": { "tar-fs": "2.1.4" }` to package.json to force version update
+- Verified zero HIGH or CRITICAL vulnerabilities remain after fix
+
+**Vulnerability Details**:
+- **CVE**: CVE-2025-59343
+- **Severity**: HIGH
+- **Issue**: Symlink validation bypass in tar-fs@2.1.3
+- **Impact**: HexTrackr does not directly use tar-fs, but vulnerability was present in dependency tree
+- **Resolution**: Patch version 2.1.4 fixes symlink validation vulnerability
+
+**Validation**:
+- npm audit shows zero HIGH vulnerabilities after fix
+- All ESLint checks pass with no errors
+- Docker container starts successfully with full functionality
+- Application tested via nginx reverse proxy on localhost:80/443
+
+**Linear Issue**: [HEX-124](https://linear.app/hextrackr/issue/HEX-124)
+
 ## [1.0.44] - 2025-10-03
 
 ### Enhanced
