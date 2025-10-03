@@ -1,7 +1,7 @@
 /**
  * @fileoverview Production Modal Monitoring Instrumentation
  * T048: Error tracking and performance monitoring for modal operations
- * 
+ *
  * @version 1.0.0
  * @date 2025-09-10
  * @spec 004-cve-link-system-fix
@@ -10,6 +10,7 @@
  */
 
 /* global console, performance, window, document, generateSecureId */
+/* exported ModalMonitor, ModalMonitorIntegration */
 
 (function(global) {
     "use strict";
