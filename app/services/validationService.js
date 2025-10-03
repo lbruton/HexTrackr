@@ -4,7 +4,7 @@
  * Handles input validation, data type validation, format validation, and sanitization
  */
 
-const { isValidIPAddress, normalizeHostname, normalizeVendor, normalizeIPAddress } = require("../utils/helpers");
+const { isValidIPAddress, normalizeHostname, normalizeIPAddress } = require("../utils/helpers");
 
 class ValidationService {
 

@@ -1,7 +1,7 @@
 /**
  * @fileoverview Production Modal Monitoring Instrumentation
  * T048: Error tracking and performance monitoring for modal operations
- * 
+ *
  * @version 1.0.0
  * @date 2025-09-10
  * @spec 004-cve-link-system-fix
@@ -9,7 +9,8 @@
  * @author HexTrackr Team
  */
 
-/* global console, performance, window, document, generateSecureId */
+/* global generateSecureId */
+/* exported ModalMonitor, ModalMonitorIntegration */
 
 (function(global) {
     "use strict";
@@ -183,7 +184,7 @@
                 if (performance.measure && performance.mark) {
                     try {
                         performance.measure(name, startMark.name);
-                    } catch (e) {
+                    } catch (_e) {
                         // Ignore if marks don't exist
                     }
                 }

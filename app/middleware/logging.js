@@ -254,7 +254,7 @@ function requestLoggingMiddleware(req, res, next) {
  * Error logging middleware
  * Logs uncaught errors with request context
  */
-function errorLoggingMiddleware(err, req, res, next) {
+function errorLoggingMiddleware(err, req, res, _next) {
     const requestId = req.requestId || "unknown";
 
     logger.error("Unhandled request error", {
