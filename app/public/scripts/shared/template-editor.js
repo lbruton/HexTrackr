@@ -704,7 +704,7 @@ class TemplateEditor {
         if (!dateString) {return "N/A";}
         try {
             return new Date(dateString).toLocaleDateString();
-        } catch (error) {
+        } catch (_error) {
             return dateString;
         }
     }
