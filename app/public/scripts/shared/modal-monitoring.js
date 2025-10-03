@@ -9,7 +9,7 @@
  * @author HexTrackr Team
  */
 
-/* global console, performance, window, document, generateSecureId */
+/* global generateSecureId */
 /* exported ModalMonitor, ModalMonitorIntegration */
 
 (function(global) {

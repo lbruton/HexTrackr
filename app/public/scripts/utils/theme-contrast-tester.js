@@ -9,12 +9,9 @@
  * @task T043 - WCAG AA contrast ratio validation for all dark mode elements
  */
 
-/* exported generateAccessibilityReport */
-
 import {
   validateColorCombination,
   batchValidateColors,
-  generateAccessibilityReport,
   WCAG_STANDARDS
 } from "./wcag-contrast-validator.js";
 
