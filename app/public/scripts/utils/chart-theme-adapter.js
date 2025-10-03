@@ -497,7 +497,7 @@ class ChartThemeAdapter {
    * @param {string} gridId - Optional grid identifier for registry
    * @returns {boolean} True if theme applied successfully
    */
-  applyGridThemeLegacy(gridApi, theme, gridId = null) {
+  applyGridThemeLegacy(gridApi, theme, _gridId = null) {
     try {
       // Find the grid container element
       const gridElement = gridApi.getGridElement?.() || 
