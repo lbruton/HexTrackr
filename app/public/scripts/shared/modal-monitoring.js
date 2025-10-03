@@ -183,7 +183,7 @@
                 if (performance.measure && performance.mark) {
                     try {
                         performance.measure(name, startMark.name);
-                    } catch (e) {
+                    } catch (_e) {
                         // Ignore if marks don't exist
                     }
                 }
