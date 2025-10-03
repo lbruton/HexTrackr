@@ -268,7 +268,7 @@ class TicketService {
                             if (typeof ticket.devices === "string") {
                                 try {
                                     devicesArray = JSON.parse(ticket.devices);
-                                } catch (e) {
+                                } catch (_e) {
                                     // Not JSON, treat as single device or empty
                                     devicesArray = ticket.devices ? [ticket.devices] : [];
                                 }
