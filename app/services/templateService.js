@@ -891,7 +891,7 @@ Ticket ID: [XT_NUMBER]`;
         try {
             const date = new Date(dateString);
             return date.toLocaleDateString();
-        } catch (e) {
+        } catch (_e) {
             return dateString;
         }
     }

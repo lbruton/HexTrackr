@@ -18,7 +18,7 @@ router.get("/stats", async (req, res) => {
 });
 
 // Error handling middleware for docs API routes
-router.use((error, req, res, next) => {
+router.use((error, req, res, _next) => {
     console.error("Documentation API route error:", error);
     res.status(500).json({
         success: false,

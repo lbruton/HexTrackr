@@ -357,6 +357,65 @@
 <li>Temporary file cleanup</li>
 <li>Path validation</li>
 </ul>
+<h3>CacheService</h3><p><strong>Location:</strong> <code>app/services/cacheService.js</code><br><strong>Since:</strong> v1.0.42</p>
+<p>Multi-tier caching service for optimizing API response times and reducing database load.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Three specialized cache zones with independent TTL configurations</li>
+<li>Server-side caching (NodeCache) with configurable expiration</li>
+<li>Browser cache control via HTTP headers</li>
+<li>Cache hit/miss tracking for monitoring</li>
+<li>Automatic cache invalidation on data changes</li>
+<li>Clone-based storage to prevent cache mutations</li>
+</ul>
+<p><strong>Cache Zones:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>TTL</th>
+<th>Use Case</th>
+<th>Max Keys</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Stats Cache</strong></td>
+<td>5 minutes</td>
+<td>Severity counts, VPR totals, dashboard statistics</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Trends Cache</strong></td>
+<td>10 minutes</td>
+<td>Historical data, dashboard cards, trend analysis</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Vulnerability Cache</strong></td>
+<td>10 minutes</td>
+<td>Full vulnerability lists, device statistics</td>
+<td>50</td>
+</tr>
+</tbody></table>
+<p><strong>Core Methods:</strong></p>
+<ul>
+<li><code>withCaching(res, cacheType, cacheKey, serverTTL, handler, browserTTL)</code> - Universal caching wrapper for route handlers</li>
+<li><code>getStats(key)</code> / <code>setStats(key, value, ttl)</code> - Stats cache operations</li>
+<li><code>getTrends(key)</code> / <code>setTrends(key, value, ttl)</code> - Trends cache operations</li>
+<li><code>getVulnerabilities(key)</code> / <code>setVulnerabilities(key, value, ttl)</code> - Vulnerability cache operations</li>
+<li><code>invalidate(zone)</code> - Clear specific cache zone on data changes</li>
+<li><code>getCacheStats()</code> - Retrieve hit/miss statistics for monitoring</li>
+</ul>
+<p><strong>Usage Example:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// In controller route handler</span>
+<span class="hljs-keyword">await</span> cacheService.<span class="hljs-title function_">withCaching</span>(res, <span class="hljs-string">&quot;stats&quot;</span>, <span class="hljs-string">&quot;device_statistics&quot;</span>, <span class="hljs-number">300</span>, <span class="hljs-title function_">async</span> () =&gt; {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> vulnerabilityService.<span class="hljs-title function_">getDeviceStatistics</span>();
+}, <span class="hljs-number">60</span>); <span class="hljs-comment">// Server: 5min, Browser: 60s</span></code></pre><p><strong>Cache Headers:</strong></p>
+<ul>
+<li><code>X-Cache: HIT</code> - Response served from cache</li>
+<li><code>X-Cache: MISS</code> - Response generated fresh, now cached</li>
+<li><code>Cache-Control: public, max-age=&lt;browserTTL&gt;, must-revalidate</code> - Browser caching directive</li>
+</ul>
 <h3>KevService</h3><p><strong>Location:</strong> <code>app/services/kevService.js</code><br><strong>Since:</strong> v1.0.22</p>
 <p>CISA Known Exploited Vulnerabilities data management and synchronization.</p>
 <p><strong>Key Features:</strong></p>
@@ -401,7 +460,29 @@
 <span class="hljs-variable constant_">DELETE</span> /:filename             <span class="hljs-comment">// Delete backup</span></code></pre><h3>KEV Routes</h3><p><strong>File:</strong> <code>app/routes/kev.js</code><br><strong>Base Path:</strong> <code>/api/kev</code><br><strong>Since:</strong> v1.0.22</p>
 <pre><code class="language-javascript"><span class="hljs-variable constant_">POST</span>   /sync                  <span class="hljs-comment">// Manual KEV synchronization</span>
 <span class="hljs-variable constant_">GET</span>    /status                <span class="hljs-comment">// Sync status and statistics</span>
-<span class="hljs-variable constant_">GET</span>    /vulnerability/:cveId  <span class="hljs-comment">// KEV details for specific CVE</span></code></pre><hr>
+<span class="hljs-variable constant_">GET</span>    /vulnerability/:cveId  <span class="hljs-comment">// KEV details for specific CVE</span></code></pre><h3>Device Routes</h3><p><strong>File:</strong> <code>app/routes/devices.js</code><br><strong>Base Path:</strong> <code>/api/devices</code><br><strong>Since:</strong> v1.0.42</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">GET</span>    /stats                 <span class="hljs-comment">// Aggregated device statistics with vulnerability counts</span></code></pre><p><strong>Device Statistics Response Format:</strong></p>
+<pre><code class="language-javascript">{
+  <span class="hljs-attr">success</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">devices</span>: [
+    {
+      <span class="hljs-attr">hostname</span>: <span class="hljs-string">&quot;server01&quot;</span>,
+      <span class="hljs-attr">totalVulnerabilities</span>: <span class="hljs-number">245</span>,
+      <span class="hljs-attr">totalVpr</span>: <span class="hljs-number">1234.5</span>,
+      <span class="hljs-attr">severityCounts</span>: { <span class="hljs-title class_">Critical</span>: <span class="hljs-number">12</span>, <span class="hljs-title class_">High</span>: <span class="hljs-number">45</span>, <span class="hljs-title class_">Medium</span>: <span class="hljs-number">88</span>, <span class="hljs-title class_">Low</span>: <span class="hljs-number">100</span> },
+      <span class="hljs-attr">hasKev</span>: <span class="hljs-literal">true</span>
+    },
+    <span class="hljs-comment">// ... more devices</span>
+  ],
+  <span class="hljs-attr">count</span>: <span class="hljs-number">42</span>
+}</code></pre><p><strong>Purpose:</strong> Replaces client-side device processing that required loading all 30k+ vulnerabilities. Provides pre-calculated device statistics for efficient device card rendering. Server-side aggregation reduces client memory usage and improves performance.</p>
+<p><strong>Caching:</strong></p>
+<ul>
+<li>Server cache: 5 minutes (300s) via CacheService stats zone</li>
+<li>Browser cache: 60 seconds via Cache-Control headers</li>
+<li>Cache headers: <code>X-Cache: HIT/MISS</code> for monitoring</li>
+</ul>
+<hr>
 <h2 id="server">Server Configuration</h2><h3>Main Server</h3><p><strong>File:</strong> <code>app/public/server.js</code></p>
 <p>The main server file orchestrates the entire application using a modular initialization sequence.</p>
 <p><strong>Initialization Order:</strong></p>

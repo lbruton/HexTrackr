@@ -1,0 +1,74 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker-compose:*)",
+      "Bash(docker exec:*)",
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git fetch:*)",
+      "Bash(git reset:*)",
+      "Bash(gh api:*)",
+      "Bash(curl:*)",
+      "Bash(lsof:*)",
+      "Bash(mkdir:*)",
+      "Read(app/public/**)",
+      "Write(app/public/**)",
+      "Edit(app/public/**)",
+      "Read(.env)",
+      "Read(logs/**)"
+    ],
+    "deny": [
+      "Write(.env)",
+      "Edit(.env)",
+      "Bash(docker-compose down -v:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write(**/*.js)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run eslint:fix -- ${file} 2>&1 || true"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit(**/*.js)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run eslint:fix -- ${file} 2>&1 || true"
+          }
+        ]
+      },
+      {
+        "matcher": "Write(**/*.md)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run lint:md:fix -- ${file} 2>&1 || true"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit(**/*.md)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run lint:md:fix -- ${file} 2>&1 || true"
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "NODE_ENV": "development",
+    "DATABASE_PATH": "app/public/data/hextrackr.db",
+    "PRIME_LOG_PATH": "/Volumes/DATA/GitHub/HexTrackr/logs/prime"
+  }
+}

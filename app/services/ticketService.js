@@ -268,7 +268,7 @@ class TicketService {
                             if (typeof ticket.devices === "string") {
                                 try {
                                     devicesArray = JSON.parse(ticket.devices);
-                                } catch (e) {
+                                } catch (_e) {
                                     // Not JSON, treat as single device or empty
                                     devicesArray = ticket.devices ? [ticket.devices] : [];
                                 }
@@ -314,7 +314,7 @@ class TicketService {
      * Extracted from server.js line 3437-3479
      */
     async migrateTickets(tickets) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _reject) => {
             const sql = `INSERT OR REPLACE INTO tickets (
                 id, start_date, end_date, primary_number, incident_number, site_code,
                 affected_devices, assignee, notes, status, priority, linked_cves,

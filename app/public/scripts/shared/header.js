@@ -10,7 +10,7 @@
  * @task T023 - Theme toggle UI button in header navigation
  */
 
-import { ThemeController } from './theme-controller.js';
+import { ThemeController } from "./theme-controller.js";
 
 /**
  * Header Theme Manager - manages theme toggle UI in navigation header
@@ -42,13 +42,13 @@ export class HeaderThemeManager {
   init() {
     try {
       // Wait for DOM to be ready
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => this.initializeToggles());
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => this.initializeToggles());
       } else {
         this.initializeToggles();
       }
     } catch (error) {
-      console.error('Error initializing header theme manager:', error);
+      console.error("Error initializing header theme manager:", error);
     }
   }
 
@@ -60,27 +60,27 @@ export class HeaderThemeManager {
   initializeToggles() {
     try {
       // Find theme toggle elements in the header
-      this.darkToggle = document.querySelector('.hide-theme-dark');
-      this.lightToggle = document.querySelector('.hide-theme-light');
+      this.darkToggle = document.querySelector(".hide-theme-dark");
+      this.lightToggle = document.querySelector(".hide-theme-light");
 
       if (!this.darkToggle || !this.lightToggle) {
-        console.warn('Theme toggle elements not found in header');
+        console.warn("Theme toggle elements not found in header");
         return;
       }
 
       // Add click event listeners
-      this.darkToggle.addEventListener('click', (e) => {
+      this.darkToggle.addEventListener("click", (e) => {
         e.preventDefault();
         this.toggleToDark();
       });
 
-      this.lightToggle.addEventListener('click', (e) => {
+      this.lightToggle.addEventListener("click", (e) => {
         e.preventDefault();
         this.toggleToLight();
       });
 
       // Add theme change listener to update visibility
-      this.themeController.addThemeChangeListener((newTheme, source) => {
+      this.themeController.addThemeChangeListener((newTheme, _source) => {
         this.updateToggleVisibility(newTheme);
         // Redraw the grid to apply theme changes
         if (window.modernVulnManager && window.modernVulnManager.gridManager) {
@@ -97,7 +97,7 @@ export class HeaderThemeManager {
       
       this.initialized = true;
     } catch (error) {
-      console.error('Error initializing theme toggles:', error);
+      console.error("Error initializing theme toggles:", error);
     }
   }
 
@@ -111,10 +111,10 @@ export class HeaderThemeManager {
       const currentTheme = this.themeController.getTheme();
       
       // Apply theme and update visibility (no system preference resolution needed)
-      this.themeController.setTheme(currentTheme, 'initial');
+      this.themeController.setTheme(currentTheme, "initial");
       this.updateToggleVisibility(currentTheme);
     } catch (error) {
-      console.error('Error applying initial theme:', error);
+      console.error("Error applying initial theme:", error);
     }
   }
 
@@ -125,12 +125,12 @@ export class HeaderThemeManager {
    */
   toggleToDark() {
     try {
-      const success = this.themeController.setTheme('dark', 'user');
+      const success = this.themeController.setTheme("dark", "user");
       if (success) {
-        this.updateToggleVisibility('dark');
+        this.updateToggleVisibility("dark");
       }
     } catch (error) {
-      console.error('Error toggling to dark theme:', error);
+      console.error("Error toggling to dark theme:", error);
     }
   }
 
@@ -141,12 +141,12 @@ export class HeaderThemeManager {
    */
   toggleToLight() {
     try {
-      const success = this.themeController.setTheme('light', 'user');
+      const success = this.themeController.setTheme("light", "user");
       if (success) {
-        this.updateToggleVisibility('light');
+        this.updateToggleVisibility("light");
       }
     } catch (error) {
-      console.error('Error toggling to light theme:', error);
+      console.error("Error toggling to light theme:", error);
     }
   }
 
@@ -163,17 +163,17 @@ export class HeaderThemeManager {
         return;
       }
 
-      if (currentTheme === 'dark') {
+      if (currentTheme === "dark") {
         // In dark mode: hide dark toggle, show light toggle
-        this.darkToggle.style.display = 'none';
-        this.lightToggle.style.display = 'block';
+        this.darkToggle.style.display = "none";
+        this.lightToggle.style.display = "block";
       } else {
         // In light mode: show dark toggle, hide light toggle  
-        this.darkToggle.style.display = 'block';
-        this.lightToggle.style.display = 'none';
+        this.darkToggle.style.display = "block";
+        this.lightToggle.style.display = "none";
       }
     } catch (error) {
-      console.error('Error updating toggle visibility:', error);
+      console.error("Error updating toggle visibility:", error);
     }
   }
 
