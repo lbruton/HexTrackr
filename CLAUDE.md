@@ -1,30 +1,18 @@
 # CLAUDE.md
 
-> **IMPORTANT**: This is a FALLBACK document. The primary source of truth is **Linear DOCS-22**.
-> Only use this file if Linear is unavailable. Always check DOCS-22 first for the latest guidance.
-> **Last Updated**: 2025-10-02 | **Version**: 2.0.0 (DOCS-22 restructure)
-
----
-
 ## HexTrackr Overview
 
 HexTrackr is a vulnerability management system for tracking security vulnerabilities, tickets, and Known Exploited Vulnerabilities (KEV). The system uses a modular Node.js/Express backend with SQLite database and vanilla JavaScript frontend.
-
-**Current Version**: v1.0.43 (git reality) / v1.0.41 (package.json - needs sync)
 
 ## Documentation Hierarchy
 
 This project uses a multi-layered documentation system with clear precedence:
 
-1. **CONSTITUTION.md**: Authoritative requirements and mandates (MUST follow - constitutional law)
-2. **Linear DOCS-22**: This document's primary source (project guidance, patterns, workflows)
-3. **CLAUDE.md**: Fallback when Linear unavailable
-4. **prime.md**: Session initialization procedure (Prime v2.0 with agent delegation)
-5. **Linear DOCS-*** issues**: Shared knowledge accessible across all Claude instances
+**CONSTITUTION.md**: Authoritative requirements and mandates (MUST follow - constitutional law)
 
-**When in doubt**: CONSTITUTION.md takes precedence over all other documentation.
+**Linear DOCS-**: Shared knowledge accessible across all Claude instances
 
-**Anti-Duplication Policy**: Tool usage requirements, code quality standards, and MCP integration details are defined once in CONSTITUTION.md. This document references the constitution rather than duplicating requirements.
+**Memento MCP**: Shared Knowlaged accessable accross all Claude instances (Refer to /TAXONOMY.md) 
 
 ---
 
@@ -67,29 +55,22 @@ HexTrackr development uses three distinct Claude instances with specific respons
 
 ## Linear Teams Structure
 
-- **HexTrackr-Dev Team** (HEX-XX): General development issues (Claude-Dev primary focus)
+- **HexTrackr-Dev** (HEX-XX): General development issues (Claude-Dev primary focus) (This Session) 
 - **HexTrackr-Prod Team** (HEXP-XX): Production-specific tasks (Claude-Prod primary focus)
 - **HexTrackr-Docs Team** (DOCS-XX): Shared project documentation accessible by all instances
+- **Reports** (REP-XX): Shared project daily, weekly, and combined reports.
+- **StackTrackr** (STACK-XX): Sister Project, pet project of the developer (Lonnie Bruton), unrelated to hextrackr.
+- **Lonnie Bruton** (LDB-XX): Personal Notes for the Developer, unrelated to hextrackr
 
 ## Workflow Integration
 
-- **Task Flow**: Claude Desktop creates Linear issues → Claude-Dev implements → Claude-Prod deploys
 - **Shared Resources**:
   - Linear teams (HexTrackr-Dev, HexTrackr-Prod, HexTrackr-Docs)
-  - Memento knowledge graph (Neo4j Enterprise 5.13 at 192.168.1.80)
+  - Memento knowledge graph with semantic search capabilities
   - Claude-Context codebase indexing (shared across all instances)
-  - HexTrackr-Docs team as shared knowledge repository
-- **Communication**: All inter-instance communication flows through Linear issues and comments
+  - Linear MCP with organized teams for project management and as shared knowledge repository
 
-## Communication Patterns
-
-- **Prime Boot Sequence**: Each instance loads context via Prime v2.0 (agent delegation)
-- **Handoffs Between Instances**:
-  - Document decisions and context in Linear issues
-  - Use Linear comments for implementation details
-  - Tag relevant instance in Linear when handing off
-- **Linear as Communication Hub**: Primary coordination mechanism
-- **Instance Naming**: Always specify which Claude instance when referencing work
+- **Communication**: All inter-instance communication flows through Linear issues and comments and memento memory insights
 
 ---
 
@@ -101,12 +82,12 @@ HexTrackr uses a simplified workflow with Linear as the primary source of truth:
 
 1. **Work Assignment**: User describes what needs to be done
 2. **Linear Issue**: Create/update Linear issue with task breakdown
-3. **Implementation**: Execute work with progress updates in Linear comments
-4. **Completion**: Update Linear status and commit changes
+3. **Implementation**: Commit and open a new feature branch then execute work with checklists and progress updates in Linear comments
+4. **Completion**: Update project /app/public/docs-source/CHANGELOG.md, as well as the Linear status and commit changes
+5. **Test and Verify**: Consult user for final approval to push to GH for Codacy scans.
 
 ## Key Principles
 
-- **Structured Initialization**: Use `/prime` command for comprehensive context loading at session start (Prime v2.0)
 - **Casual Development**: Natural conversation flow after initialization completes
 - **Linear-Centric**: All planning, research, and progress tracking in Linear issues
 - **Quality Focus**: Maintain code quality standards without bureaucratic overhead
@@ -153,7 +134,7 @@ Labels: [Type: Bug/Feature/Enhancement] + [Priority: High/Medium/Low]
 - All code MUST pass ESLint 9+ checks
 - All markdown MUST pass Markdownlint
 - All JavaScript functions MUST have complete JSDoc comments
-- All testing done via Docker container (port 8989)
+- All testing done via Docker container nginx reverse proxy on localhost:80 (HTTP) and localhost:443 (HTTPS)
 - Never run HTTP/HTTPS locally
 
 ---
@@ -162,7 +143,7 @@ Labels: [Type: Bug/Feature/Enhancement] + [Priority: High/Medium/Low]
 
 ## Subagent Usage for Deep Dives
 
-When you need detailed context beyond Prime v2.0 initialization, use specialized agents:
+When you need detailed context beyond initialization, use specialized agents:
 
 ### codebase-navigator (Architecture & Code Analysis)
 
@@ -234,12 +215,89 @@ Task: "Understand authentication implementation status"
 → Start work with complete context
 ```
 
+### config-guardian (Configuration File Management)
+
+**When to Use**:
+- Before modifying any linting/quality configuration files
+- When adding new linting rules or configs
+- When debugging "why is this warning appearing?" questions
+- During project setup or config consolidation efforts
+- Periodically (monthly) to audit config drift
+- When you discover a config file without Linear documentation
+
+**What It Returns**:
+- Linear DOCS-XX issue tracking for each config file
+- Timestamped comments documenting config changes
+- Configuration audit reports with drift detection
+- Proper documentation preventing future confusion
+
+**Example**:
+```
+Task: "Add new ESLint rule for unused variables"
+→ Launch config-guardian to modify .eslintrc with Linear tracking
+→ Returns: Updated config with DOCS-XX issue comment explaining change
+→ Future debugging references Linear issue for context
+```
+
+### docs-guardian (Documentation Accuracy Audit)
+
+**When to Use**:
+- After significant feature additions or refactoring
+- Periodically (weekly/monthly) to detect documentation drift
+- Before major releases to ensure user-facing docs are current
+- When users report documentation inconsistencies
+- To identify missing documentation for new features
+- To find and remove orphaned documentation for deprecated features
+
+**What It Returns**:
+- Documentation accuracy audit report
+- Linear DOCS issues for discrepancies
+- Missing documentation identified
+- Orphaned documentation flagged
+- Prioritized recommendations for updates
+
+**Example**:
+```
+Task: "Finished refactoring vulnerability import service"
+→ Launch docs-guardian to verify API docs are still accurate
+→ Returns: 3 outdated endpoints, 1 missing feature, 2 orphaned sections
+→ Linear DOCS issues created for each discrepancy
+```
+
+### hextrackr-fullstack-dev (Complex Feature Implementation)
+
+**When to Use**:
+- Implementing complex features requiring deep architecture understanding
+- Refactoring code across multiple files/layers
+- Building new UI components with AG-Grid or Apex Charts
+- Creating new API endpoints with service layer integration
+- When transitioning from planning to implementation
+- Long-form coding tasks requiring 30+ minutes of focused work
+
+**What It Returns**:
+- Complete feature implementation with all layers (routes, services, frontend)
+- Code following HexTrackr patterns and conventions
+- Proper error handling and validation
+- JSDoc documentation for all functions
+- Testing recommendations
+
+**Example**:
+```
+Task: "Implement new dashboard page with AG-Grid and charts"
+→ Launch hextrackr-fullstack-dev with feature specification
+→ Returns: Complete implementation (routes, services, frontend, styles)
+→ All code follows project patterns, passes linters, ready for testing
+```
+
 ## Agent vs Direct Tool Decision Tree
 
 ```
 Need architecture understanding? → codebase-navigator
 Need historical context? → memento-oracle
 Need Linear deep dive? → linear-librarian
+Need config file changes? → config-guardian
+Need documentation audit? → docs-guardian
+Need complex feature implementation? → hextrackr-fullstack-dev
 Know exact file to read? → Read tool
 Know exact search term? → Grep tool
 Need quick Linear lookup? → mcp__linear-server__get_issue
@@ -268,6 +326,29 @@ Need quick Linear lookup? → mcp__linear-server__get_issue
 - **Tools**: `list_issues`, `get_issue`, `create_issue`, `update_issue`, `create_comment`
 - **Pattern**: Issues are source of truth, not markdown files
 - **Teams**: HexTrackr-Dev (HEX-XX), HexTrackr-Prod (HEXP-XX), HexTrackr-Docs (DOCS-XX)
+
+### Context7 (Library Documentation)
+- **Primary Use**: Up-to-date framework and library documentation
+- **Mandatory**: CONSTITUTION.md Article II Section II requires Context7 verification for all framework code
+- **Two-Step Process**:
+  1. **Resolve Library ID**: `mcp__context7__resolve-library-id` with library name (e.g., "express", "ag-grid")
+  2. **Get Documentation**: `mcp__context7__get-library-docs` with resolved library ID
+- **When to Use**:
+  - Before implementing features with Express, AG-Grid, ApexCharts, Socket.io
+  - When verifying API patterns and best practices
+  - When debugging framework-specific issues
+  - Before upgrading dependencies to check breaking changes
+- **Example**:
+  ```javascript
+  // Step 1: Resolve library ID
+  resolve-library-id("express") → Returns: /expressjs/express
+
+  // Step 2: Get docs for specific topic
+  get-library-docs("/expressjs/express", topic: "middleware")
+  → Returns: Current Express middleware patterns and examples
+  ```
+- **Trust Scores**: Prioritize libraries with scores 7-10 for production use
+- **Code Snippets**: Higher counts indicate better documentation coverage
 
 ---
 
@@ -351,58 +432,7 @@ git checkout main && git pull  # Sync with GitHub
 7. **Create PR** and merge to main
 8. **Update Linear** status to Done
 
-## Context Loading Strategy
-
-**Session Start**: Run `/prime` for Prime v2.0 initialization
-- Loads temporal/git context
-- Launches 3 agents in parallel (Linear, Memento, Codebase)
-- Returns ~56k token comprehensive context
-- Leaves 20-25k tokens free for work
-
-**During Work**: Just-in-time context loading
-- Launch subagents when you need deep dives
-- Read specific files when you know what you need
-- Use Claude-Context search for code patterns
-- Keep Linear updated for context preservation
-
 ---
 
-## Development Philosophy
 
-- **Keep It Simple**: Linear for tracking, natural conversation for planning
-- **Quality First**: Maintain code standards without bureaucratic overhead
-- **Research Thoroughly**: Use subagents and MCP tools when needed
-- **Test Continuously**: Docker container on port 8989
-- **Document in Code**: JSDoc comments and Linear comments for context
-- **Trust Subagents**: They burn tokens so you don't have to
 
----
-
-## Instance-Specific Guidance (Claude-Dev)
-
-**Primary Responsibilities**:
-- Feature development and bug fixes on Mac environment
-- Managing private GitHub repository and branches
-- Docker development testing (port 8989)
-- Code quality and linting enforcement
-- Creating Pull Requests for main branch
-
-**When to Handoff**:
-- Production deployment readiness → Claude-Prod (via Linear HEXP-XX issue)
-- High-level planning needed → Claude Desktop (via Linear comment)
-- Security hardening for Linux → Claude-Prod (via Linear HEXP-XX issue)
-- Cross-platform compatibility issues → Claude-Prod (via Linear comment)
-
-**Best Practices**:
-- Always test in Docker container (port 8989)
-- Run `npm run lint:all` before committing
-- Document implementation details in Linear comments
-- Use codebase-navigator for code discovery
-- Create feature branches following naming convention: `feature/v1.0.XX-name`
-- Launch memento-oracle when facing architectural decisions
-
----
-
-**For detailed implementation examples, code patterns, and architecture deep dives**: Launch the appropriate subagent or check Linear DOCS-22 comments.
-
-**Remember**: This file is a fallback. Linear DOCS-22 is the authoritative source.
