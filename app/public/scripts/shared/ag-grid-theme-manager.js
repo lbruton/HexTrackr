@@ -236,7 +236,7 @@ class AGGridThemeManager {
             if (storedTheme === "dark") {
                 return "dark";
             }
-        } catch (e) {
+        } catch (_e) {
             // localStorage might not be available
         }
 
