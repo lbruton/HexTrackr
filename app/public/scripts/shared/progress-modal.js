@@ -835,7 +835,7 @@ class ProgressModal {
                 exportBtn.classList.remove("btn-outline-info");
 
                 setTimeout(() => {
-                    exportBtn.innerHTML = "<i class=\"fas fa-download me-1\"></i>Download Report";
+                    exportBtn.innerHTML = originalText;
                     exportBtn.classList.remove("btn-outline-danger");
                     exportBtn.classList.add("btn-outline-info");
                     exportBtn.disabled = false;
