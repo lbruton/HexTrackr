@@ -37,7 +37,7 @@ HexTrackr development uses three distinct Claude instances with specific respons
 - **Responsibilities**:
   - Active feature development and coding
   - Managing private GitHub repository
-  - Docker development environment (port 8989)
+  - Docker development environment (nginx reverse proxy on localhost:80/443)
   - Testing and quality assurance
 - **Works With**: Claude Desktop for task assignments
 
@@ -289,15 +289,102 @@ Task: "Implement new dashboard page with AG-Grid and charts"
 → All code follows project patterns, passes linters, ready for testing
 ```
 
+### docker-restart (Docker Container Management)
+
+**When to Use**:
+- After modifying JavaScript files that require server restart
+- After updating environment variables in `.env` file
+- After installing new npm dependencies
+- After configuration changes that require container restart
+- When the development container becomes unresponsive
+- Proactively after completing code changes that modify server-side behavior
+
+**What It Returns**:
+- Container stop confirmation
+- Container restart status
+- Health check verification (nginx reverse proxy accessible on localhost:80/443)
+- Startup log analysis for errors
+- Ready-to-test confirmation
+
+**Example**:
+```
+Task: "Just finished updating vulnerability-chart-manager.js"
+→ Launch docker-restart to apply changes
+→ Returns: ✅ Container restarted, nginx accessible on localhost:80/443, no errors
+→ Changes are now live and ready for testing
+```
+
+**Model**: Uses Haiku (lightweight) for fast, cost-efficient operational tasks
+
+**Proactive Usage**: Invoke this agent automatically after:
+- Server-side JavaScript modifications
+- Environment variable changes
+- Dependency installations (npm install)
+- Configuration file updates requiring restart
+- Any changes to files in `/app/` that affect server behavior
+
+### the-brain (Expert Research & Intelligence Gathering)
+
+**When to Use**:
+- Need to research implementation patterns or best practices
+- Encountering errors that require external solution research
+- Verifying framework/library compatibility
+- Need to combine codebase analysis with web research
+- Require authoritative documentation verification
+- Performance optimization research
+- Security vulnerability analysis
+
+**What It Returns**:
+- Comprehensive intelligence report with executive summary
+- Project-aware recommendations specific to HexTrackr architecture
+- Integration strategies considering existing codebase patterns
+- Source citations (Brave Search, Context7, Claude-Context)
+- Confidence levels for all recommendations
+- Permanent research archive saved to Memento knowledge graph
+
+**Example**:
+```
+Task: "How do I implement WebSocket authentication in Node.js?"
+→ Launch the-brain for comprehensive research
+→ Returns:
+  • Current HexTrackr Socket.io implementation analysis
+  • Industry best practices from Brave Search
+  • Socket.io v4.7+ documentation from Context7
+  • Specific integration plan for HexTrackr's architecture
+  • Research saved to Memento for future reference
+```
+
+**Model**: Uses Opus (maximum intelligence) for comprehensive research and synthesis
+
+**Research Methodology** (4-Phase Approach):
+1. **Context** - Sequential Thinking to structure research plan
+2. **Internal** - Claude-Context to analyze current HexTrackr implementation
+3. **External** - Brave Search + Context7 for best practices and documentation
+4. **Synthesis** - Combine findings with Memento persistence for permanent knowledge archive
+
+**Proactive Usage**: Invoke when you need authoritative answers that combine:
+- Project-specific codebase context (what exists now)
+- Industry best practices (what should be done)
+- Framework-specific verification (how to do it correctly)
+- Permanent knowledge capture (save for future sessions)
+
+**Key MCP Integrations**:
+- Brave Search PRO (web, news, video, image, local search + summarizer)
+- Context7 (framework documentation verification)
+- Claude-Context (codebase semantic search)
+- Memento (permanent research archive with TAXONOMY.md v1.2.0+ compliance)
+
 ## Agent vs Direct Tool Decision Tree
 
 ```
+Need expert research combining web + codebase? → the-brain
 Need architecture understanding? → codebase-navigator
 Need historical context? → memento-oracle
 Need Linear deep dive? → linear-librarian
 Need config file changes? → config-guardian
 Need documentation audit? → docs-guardian
 Need complex feature implementation? → hextrackr-fullstack-dev
+Need Docker container restart? → docker-restart
 Know exact file to read? → Read tool
 Know exact search term? → Grep tool
 Need quick Linear lookup? → mcp__linear-server__get_issue
@@ -379,11 +466,11 @@ npm run docs:all     # Generate all documentation (JSDoc + HTML)
 
 ### Docker
 ```bash
-docker-compose up -d    # Start container (port 8989 HTTPS)
+docker-compose up -d    # Start container (nginx reverse proxy on localhost:80/443)
 docker-compose logs -f  # Follow container logs
 ```
 
-**IMPORTANT**: Always test in Docker container (port 8989). Never run HTTP/HTTPS locally.
+**IMPORTANT**: Always test via nginx reverse proxy (localhost:80 HTTP, localhost:443 HTTPS). Never run HTTP/HTTPS locally or access Docker ports directly.
 
 ## Git Workflow Cheat Sheet
 
@@ -428,7 +515,7 @@ git checkout main && git pull  # Sync with GitHub
    - linear-librarian for related issues
 4. **Create feature branch** (commit to local main first!)
 5. **Implement** with Linear comment updates
-6. **Quality check**: Docker test (port 8989), `npm run lint:all`
+6. **Quality check**: Docker test (nginx reverse proxy on localhost:80/443), `npm run lint:all`
 7. **Create PR** and merge to main
 8. **Update Linear** status to Done
 
