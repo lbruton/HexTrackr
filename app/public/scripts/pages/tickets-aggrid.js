@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* global agGrid, HexagonTicketsManager, escapeHtml */
+/* global agGrid, HexagonTicketsManager */
 
 /**
  * AG Grid integration layer for the tickets2.html demo page.
