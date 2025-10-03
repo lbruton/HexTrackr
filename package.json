@@ -1,6 +1,6 @@
 {
   "name": "hextrackr-server",
-  "version": "1.0.43",
+  "version": "1.0.45",
   "description": "HexTrackr with database backend",
   "main": "app/public/server.js",
   "type": "commonjs",
@@ -55,5 +55,8 @@
     "stylelint": "^16.23.1",
     "stylelint-config-standard": "^39.0.0",
     "zod": "^3.23.8"
+  },
+  "overrides": {
+    "tar-fs": "2.1.4"
   }
 }
