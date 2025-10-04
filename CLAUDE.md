@@ -418,6 +418,7 @@ Need config file changes? → config-guardian
 Need documentation audit? → docs-guardian
 Need complex feature implementation? → hextrackr-fullstack-dev
 Need Docker container restart? → docker-restart
+Need UI testing/screenshots/interaction testing? → mcp__chrome-devtools__* (direct)
 Know exact file to read? → Read tool
 Know exact search term? → Grep tool
 Need quick Linear lookup? → mcp__linear-server__get_issue
@@ -469,6 +470,158 @@ Need quick Linear lookup? → mcp__linear-server__get_issue
   ```
 - **Trust Scores**: Prioritize libraries with scores 7-10 for production use
 - **Code Snippets**: Higher counts indicate better documentation coverage
+
+### chrome-devtools (Browser Testing & Automation)
+- **Primary Use**: Browser-based testing, debugging, and UI verification
+- **Mandatory**: CONSTITUTION.md Article II Section V requires chrome-devtools testing before and after UI changes
+- **Available Tools**:
+  - **Page Management**: `list_pages`, `new_page`, `close_page`, `select_page`, `navigate_page`
+  - **Interaction**: `click`, `fill`, `fill_form`, `hover`, `drag`, `upload_file`
+  - **Inspection**: `take_snapshot`, `take_screenshot`, `list_console_messages`
+  - **Network**: `list_network_requests`, `get_network_request`
+  - **Performance**: `performance_start_trace`, `performance_stop_trace`, `performance_analyze_insight`
+  - **Emulation**: `emulate_cpu`, `emulate_network`, `resize_page`
+  - **Scripting**: `evaluate_script`, `wait_for`, `handle_dialog`
+
+- **When to Use**:
+  - Before and after any UI changes (mandatory)
+  - Testing user interactions and workflows
+  - Debugging frontend JavaScript errors
+  - Verifying responsive design and layout
+  - Performance profiling and Core Web Vitals measurement
+  - Network request inspection and API debugging
+  - Screenshot capture for documentation or bug reports
+  - Capturing UI baseline screenshots before major refactors
+
+- **Testing Environment**:
+  - ✅ **ALWAYS use HTTPS**: `https://localhost` (nginx reverse proxy on port 443)
+  - ❌ **NEVER use HTTP**: `http://localhost` returns empty API responses (pages load but no data)
+  - 🔒 **SSL Certificate Bypass**: Self-signed certificates require manual bypass
+
+- **SSL Certificate Warning Bypass**:
+  ```javascript
+  // Step 1: Navigate to HTTPS URL (will show certificate warning)
+  navigate_page("https://localhost/vulnerabilities.html")
+  // Error: net::ERR_CERT_AUTHORITY_INVALID
+
+  // Step 2: Click "Advanced" button to reveal proceed link
+  take_snapshot()  // Find "Advanced" button UID
+  click(uid: "X_Y")  // Click Advanced button
+
+  // Step 3: Click "Proceed to localhost (unsafe)" link
+  take_snapshot()  // Find proceed link UID
+  click(uid: "X_Y")  // Click proceed link
+
+  // Page now loads successfully with data
+  ```
+
+  **Alternative**: Type `thisisunsafe` on the certificate warning page (browser keyboard shortcut)
+
+- **Screenshot Best Practices**:
+  ```javascript
+  // Full-page screenshot (captures entire page including scroll area)
+  take_screenshot({
+    fullPage: true,
+    filePath: "/absolute/path/to/screenshot.png"
+  })
+
+  // Viewport screenshot (visible area only)
+  take_screenshot({
+    fullPage: false,
+    filePath: "/absolute/path/to/screenshot.png"
+  })
+
+  // Element screenshot (specific element only)
+  take_screenshot({
+    uid: "element_uid",
+    filePath: "/absolute/path/to/screenshot.png"
+  })
+  ```
+
+- **Snapshot Usage for Element Targeting**:
+  ```javascript
+  // Take snapshot to get accessibility tree with UIDs
+  take_snapshot()
+  // Returns: uid=5_4 link "Open user menu" (identifies interactive elements)
+
+  // Use UID to interact with specific element
+  click(uid: "5_4")  // Opens user menu
+
+  // Take another snapshot to see updated DOM
+  take_snapshot()  // Shows dropdown menu items with new UIDs
+  ```
+
+- **Practical Workflow Example** (HEX-130 UI Baseline):
+  ```javascript
+  // 1. Navigate to page (handle SSL warning first time)
+  navigate_page("https://localhost/vulnerabilities.html")
+
+  // 2. Wait for charts/data to load
+  Bash: sleep 3
+
+  // 3. Capture full-page baseline screenshot
+  take_screenshot({
+    fullPage: true,
+    filePath: "/path/to/screenshots/vulnerabilities-page.png"
+  })
+
+  // 4. Open dropdown menu for UI element capture
+  take_snapshot()  // Get user menu UID
+  click(uid: "4_4")  // Open settings dropdown
+
+  // 5. Capture dropdown state
+  take_screenshot({
+    filePath: "/path/to/screenshots/settings-dropdown.png"
+  })
+
+  // 6. Click modal trigger
+  click(uid: "5_19")  // Open settings modal
+
+  // 7. Capture modal state
+  take_screenshot({
+    filePath: "/path/to/screenshots/settings-modal.png"
+  })
+  ```
+
+- **Integration with Authentication UI Development**:
+  - **Before Implementation**: Capture baseline screenshots showing current navbar, user menu, settings modal
+  - **During Development**: Test login page rendering, session state changes, protected route redirects
+  - **After Implementation**: Capture comparison screenshots showing authenticated UI elements
+  - **Regression Testing**: Compare before/after screenshots to verify no unintended UI changes
+  - **Documentation**: Screenshot captures serve as visual PRD validation
+
+- **Common Patterns**:
+  ```javascript
+  // Pattern 1: Multi-page screenshot capture session
+  navigate_page("https://localhost/page1.html")
+  Bash: sleep 3
+  take_screenshot({ fullPage: true, filePath: "page1.png" })
+
+  navigate_page("https://localhost/page2.html")
+  Bash: sleep 3
+  take_screenshot({ fullPage: true, filePath: "page2.png" })
+
+  // Pattern 2: Interactive element testing
+  take_snapshot()  // Identify button UID
+  click(uid: "button_uid")
+  wait_for("Success message")
+  take_screenshot({ filePath: "after-click.png" })
+
+  // Pattern 3: Form filling and submission
+  take_snapshot()  // Get form field UIDs
+  fill(uid: "username_field", value: "admin")
+  fill(uid: "password_field", value: "secure_password")
+  click(uid: "submit_button")
+  wait_for("Dashboard")
+  take_screenshot({ fullPage: true, filePath: "logged-in.png" })
+  ```
+
+- **Troubleshooting**:
+  - **Empty data on page**: Using HTTP instead of HTTPS (API returns empty responses)
+  - **Certificate error persists**: Need to manually click "Advanced" → "Proceed to localhost (unsafe)"
+  - **Element not found**: Take fresh `take_snapshot()` after any DOM changes (UIDs update)
+  - **Screenshot too small**: Use `fullPage: true` to capture entire scrollable content
+  - **Timing issues**: Add `Bash: sleep 3` before screenshots to allow charts/async data to load
 
 ---
 
