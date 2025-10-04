@@ -1,31 +1,27 @@
-# Repository Guidelines
+# Agent Guidelines for HexTrackr
 
-## Project Structure & Module Organization
-- `app/` houses the Express server. Controllers orchestrate business logic, routes expose REST endpoints, services wrap SQLite access, and middleware centralizes auth/logging. Front-end assets live in `app/public/`, including `scripts/pages` for page controllers and `scripts/shared` for cross-page utilities.
-- Reusable helpers live under `app/config/` and `app/utils/`; extend these before introducing new directories. Seed CSVs and backup assets reside in `data/`, while runtime logs are written to `logs/` during container runs.
+This document provides essential guidelines for AI agents operating within the HexTrackr repository.
 
-## Build, Test, and Development Commands
-- `npm run dev` — hot-reloading server on port 8080; pair with `docker-compose up -d` to mirror production on 8989.
-- `npm start` — serve the production bundle.
-- `npm run init-db` — seed or refresh the SQLite database at `app/public/data/hextrackr.db`.
-- `npm run lint:all`, `npm run fix:all`, `npm run docs:all` — required before any PR; keep lint clean locally.
-- `npm run test:stagehand` — execute automated smoke tests used in CI.
+## Build, Lint, and Test Commands
 
-## Coding Style & Naming Conventions
-- JavaScript: four-space indentation, double-quoted strings, mandatory semicolons, strict equality. Prefer `const` over `let`; avoid `var`.
-- Every function under `app/` requires JSDoc (`@description`, `@param`, `@returns`).
-- Use CommonJS `require` for modules (ESM reserved for `vulnerability-*.js`). Name files and functions in camelCase; classes use PascalCase.
+- **Run Development Server**: `npm run dev`
+- **Run Production Server**: `npm start`
+- **Lint All Files**: `npm run lint:all`
+- **Fix All Lint Issues**: `npm run fix:all`
+- **Run Tests**: `npm run test:stagehand`
+- **Run a Single Test**: No specific command for single tests. Use `npm run test:stagehand` and review the output.
+- **Generate Documentation**: `npm run docs:all`
 
-## Testing Guidelines
-- Co-locate tests beside their modules (e.g., `app/modules/example/__tests__/example.test.js`). Name suites after the route or service they cover.
-- Always verify inside Docker: `docker-compose up -d`, then hit port 8989 for smoke checks.
-- Ensure new coverage integrates with `npm run test:stagehand`; document gaps in PRs.
+## Code Style and Conventions
 
-## Commit & Pull Request Guidelines
-- Follow Conventional Commits (`feat:`, `fix:`, `chore:`). Reference Linear IDs when available.
-- PRs must describe intent, list impacted endpoints or scripts, note config/database updates, and attach Docker verification steps or UI screenshots when applicable.
-- Confirm Codacy status, lint/test command results, and documentation updates before requesting review.
-
-## Security & Configuration Tips
-- Clone `.env.example` to `.env`; never commit secrets. API keys now come from Keychain-backed wrappers—do not revert to plaintext env vars.
-- Sanitize user input with existing utilities, reuse centralized rate limiting, and extend `app/config/middleware.js` for new integrations rather than bypassing shared guards.
+- **Formatting**: 4-space indentation. Use `npm run fix:all` to auto-format.
+- **Imports**: Use CommonJS (`require`) for backend modules. ES Modules (`import`/`export`) are used for frontend vulnerability management scripts (`vulnerability-*.js`).
+- **Naming**:
+  - `camelCase` for functions and variables.
+  - `PascalCase` for classes.
+- **Types**: JSDoc is required for all functions in the `app/` directory (`@description`, `@param`, `@returns`).
+- **Error Handling**: Use standard `try...catch` blocks for error handling.
+- **Strings**: Use double quotes (`"`).
+- **Variables**: Prefer `const` over `let`. Avoid `var`.
+- **Semicolons**: Mandatory.
+- **Equality**: Use strict equality (`===`).
