@@ -77,7 +77,7 @@ HexTrackr development uses three distinct Claude instances with specific respons
 
 ## Context Generation & Recovery
 
-### /prime-test
+### /prime
 **Purpose**: Full intelligence generation (60k internal tokens, 60s)
 **When to Use**:
 - Session start (especially after long breaks)
@@ -95,7 +95,7 @@ HexTrackr development uses three distinct Claude instances with specific respons
 
 ---
 
-### /quickprime-test
+### /quickprime
 **Purpose**: Fast context recovery (10k tokens, 5-10s)
 **When to Use**:
 - Post-auto-compact recovery (primary use case)
@@ -110,13 +110,13 @@ HexTrackr development uses three distinct Claude instances with specific respons
 
 **Output**: Prime context + delta summary showing what changed since prime run
 
-**Trade-off**: 85% faster than /prime-test, uses prime log age (not real-time), but adds git delta for recency
+**Trade-off**: 85% faster than /prime, uses prime log age (not real-time), but adds git delta for recency
 
 ---
 
-### /prime, /slowprime, /quickprime
+### /prime_old, /slowprime, /quickprime_old
 **Status**: Legacy/alternative implementations
-**Recommendation**: Use /prime-test and /quickprime-test instead (current production versions)
+**Recommendation**: Use /prime and /quickprime instead (current production versions)
 
 ---
 
@@ -700,7 +700,7 @@ Need quick Linear lookup? → mcp__linear-server__get_issue (direct)
 
 ## Prime Intelligence Entities
 
-When `/prime-test` runs, 4 specialized agents save FULL research to Memento:
+When `/prime` runs, 4 specialized agents save FULL research to Memento:
 
 **Entity Types Created**:
 - `Prime-Linear-[PROJECT]-[Timestamp]` → Linear activity intelligence
@@ -888,21 +888,21 @@ git push origin dev
 
 | What You Need | How to Get It |
 |---------------|---------------|
-| **Current project state** | `/prime-test` or `/quickprime-test` |
-| **Architecture details** | `/prime-test` → codebase-navigator output |
+| **Current project state** | `/prime` or `/quickprime` |
+| **Architecture details** | `/prime` → codebase-navigator output |
 | **Database schema** | `/search-code "database schema"` |
-| **Current version/dependencies** | `/prime-test` → project metadata |
-| **Framework stack** | `/prime-test` → technical baseline |
+| **Current version/dependencies** | `/prime` → project metadata |
+| **Framework stack** | `/prime` → technical baseline |
 | **Service descriptions** | `/search-code "service layer pattern"` |
-| **Active Linear issues** | `/prime-test` → linear-librarian output |
-| **Historical patterns** | `/prime-test` → memento-oracle output |
+| **Active Linear issues** | `/prime` → linear-librarian output |
+| **Historical patterns** | `/prime` → memento-oracle output |
 | **Code patterns/locations** | `mcp__claude-context__search_code` |
 | **API documentation** | Linear DOCS-12 or `/search-code "API endpoints"` |
-| **Recent changes** | `/quickprime-test` → git delta analysis |
+| **Recent changes** | `/quickprime` → git delta analysis |
 
 **Workflow**:
-1. **Session Start**: Run `/prime-test` to get complete current state
-2. **After Auto-Compact**: Run `/quickprime-test` to restore context
+1. **Session Start**: Run `/prime` to get complete current state
+2. **After Auto-Compact**: Run `/quickprime` to restore context
 3. **Find Code**: Use `/search-code` or `mcp__claude-context__search_code`
 4. **Understand Patterns**: Check prime output or launch `memento-oracle` agent
 
@@ -910,7 +910,7 @@ git push origin dev
 
 1. **Understand task** from user
 2. **Create Linear issue** with task breakdown (or update existing)
-3. **Get context** via `/prime-test` (if needed) or `/quickprime-test`
+3. **Get context** via `/prime` (if needed) or `/quickprime`
 4. **Launch subagents if needed**:
    - `codebase-navigator` for architecture context
    - `memento-oracle` for historical patterns
