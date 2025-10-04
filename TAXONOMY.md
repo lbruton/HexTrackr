@@ -335,6 +335,33 @@ mcp__memento__add_observations({
 });
 ```
 
+### Prime Intelligence Entities
+
+Prime intelligence entities preserve full agent research from `/prime-test` sessions:
+
+```javascript
+// All 4 types follow same tagging pattern
+mcp__memento__add_observations({
+  observations: [{
+    entityName: "Prime-Linear-HEXTRACKR-2025-10-04-11-47-30",
+    contents: [
+      "TAG: project:hextrackr",
+      "TAG: prime-intelligence",
+      "TAG: agent:linear-librarian",      // or memento-oracle, codebase-navigator
+      "TAG: linear-activity",              // domain-specific tag
+      "TAG: week-40-2025",
+      "TAG: session:prime-2025-10-04"
+    ]
+  }]
+});
+```
+
+**Entity Types & Domain Tags**:
+- Prime-Linear → `linear-activity`, `issue-tracking`
+- Prime-Memento → `memento-patterns`, `historical-insights`
+- Prime-Codebase → `codebase-architecture`, `integration-points`
+- Prime-Technical → `technical-baseline`, `development-environment`
+
 ## Query Patterns
 
 ### Find Work by Specification (use search_nodes)
