@@ -24,6 +24,9 @@ const middlewareConfig = require("../config/middleware");
 const ProgressTracker = require("../utils/ProgressTracker");
 const DatabaseService = require("../services/databaseService");
 
+// Authentication middleware
+const { sessionMiddleware } = require("../middleware/auth");
+
 // Controllers that require initialization
 const VulnerabilityController = require("../controllers/vulnerabilityController");
 const TicketController = require("../controllers/ticketController");
@@ -129,6 +132,7 @@ async function initializeApplication() {
 
     // Apply middleware configuration
     app.use(cors(middlewareConfig.cors));
+    app.use(sessionMiddleware); // Session management with SQLite store
     app.use("/api/", rateLimit(middlewareConfig.rateLimit));
 
     // Only use Express compression when NOT behind nginx reverse proxy
