@@ -26,6 +26,7 @@
 const express = require("express");
 const multer = require("multer");
 const VulnerabilityController = require("../controllers/vulnerabilityController");
+const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -47,32 +48,32 @@ const upload = multer({
 });
 
 // Statistics and Analytics Endpoints
-router.get("/stats", VulnerabilityController.getStats);
-router.get("/recent-trends", VulnerabilityController.getRecentTrends);
-router.get("/trends", VulnerabilityController.getTrends);
+router.get("/stats", requireAuth, VulnerabilityController.getStats);
+router.get("/recent-trends", requireAuth, VulnerabilityController.getRecentTrends);
+router.get("/trends", requireAuth, VulnerabilityController.getTrends);
 
 // HEX-112 Phase 2: New endpoints for pagination migration
-router.get("/count", VulnerabilityController.getCount); // Filtered counts
-router.get("/kev-stats", VulnerabilityController.getKevStats); // KEV statistics
-router.get("/vendor-stats", VulnerabilityController.getVendorStats); // Vendor distribution
-router.get("/top-devices", VulnerabilityController.getTopDevices);
-router.get("/cvss-distribution", VulnerabilityController.getCvssDistribution);
-router.get("/severity-distribution", VulnerabilityController.getSeverityDistribution);
-router.get("/recent", VulnerabilityController.getRecentVulnerabilities);
-router.get("/export", VulnerabilityController.exportVulnerabilities); // Streaming export
+router.get("/count", requireAuth, VulnerabilityController.getCount); // Filtered counts
+router.get("/kev-stats", requireAuth, VulnerabilityController.getKevStats); // KEV statistics
+router.get("/vendor-stats", requireAuth, VulnerabilityController.getVendorStats); // Vendor distribution
+router.get("/top-devices", requireAuth, VulnerabilityController.getTopDevices);
+router.get("/cvss-distribution", requireAuth, VulnerabilityController.getCvssDistribution);
+router.get("/severity-distribution", requireAuth, VulnerabilityController.getSeverityDistribution);
+router.get("/recent", requireAuth, VulnerabilityController.getRecentVulnerabilities);
+router.get("/export", requireAuth, VulnerabilityController.exportVulnerabilities); // Streaming export
 
 // Core CRUD Operations
-router.get("/", VulnerabilityController.getVulnerabilities); // Main listing with pagination/filters
-router.get("/resolved", VulnerabilityController.getResolvedVulnerabilities);
-router.get("/:id", VulnerabilityController.getVulnerabilityById); // Individual vulnerability fetch
+router.get("/", requireAuth, VulnerabilityController.getVulnerabilities); // Main listing with pagination/filters
+router.get("/resolved", requireAuth, VulnerabilityController.getResolvedVulnerabilities);
+router.get("/:id", requireAuth, VulnerabilityController.getVulnerabilityById); // Individual vulnerability fetch
 
 // Import Operations - REMOVED: These are now handled in imports.js
-router.post("/import", upload.single("csvFile"), VulnerabilityController.importCSV);
-router.post("/import-staging", upload.single("csvFile"), VulnerabilityController.importCsvStaging);
+router.post("/import", requireAuth, upload.single("csvFile"), VulnerabilityController.importCSV);
+router.post("/import-staging", requireAuth, upload.single("csvFile"), VulnerabilityController.importCsvStaging);
 
 // Data Management
-router.delete("/clear", VulnerabilityController.clearAllData);
-router.post("/bulk-delete", VulnerabilityController.bulkDelete); // HEX-112: Phase 2 bulk operations
+router.delete("/clear", requireAuth, VulnerabilityController.clearAllData);
+router.post("/bulk-delete", requireAuth, VulnerabilityController.bulkDelete); // HEX-112: Phase 2 bulk operations
 
 /**
  * T053 INTEGRATION NOTES:
