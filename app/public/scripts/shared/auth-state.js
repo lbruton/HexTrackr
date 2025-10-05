@@ -106,9 +106,9 @@ class AuthState {
                 return false;
             }
 
-            const data = await response.json();
-            this.authenticated = data.authenticated || false;
-            this.user = data.user || null;
+            const response_data = await response.json();
+            this.authenticated = response_data.data.authenticated || false;
+            this.user = response_data.data.user || null;
 
             if (!this.authenticated) {
                 this.handleUnauthenticated();
