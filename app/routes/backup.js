@@ -14,6 +14,7 @@
 const express = require("express");
 const multer = require("multer");
 const BackupController = require("../controllers/backupController");
+const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -42,23 +43,23 @@ const upload = multer({
 });
 
 // Backup statistics endpoint
-router.get("/stats", BackupController.getBackupStats);
+router.get("/stats", requireAuth, BackupController.getBackupStats);
 
 // Export endpoints (JSON)
-router.get("/vulnerabilities", BackupController.exportVulnerabilities);
-router.get("/tickets", BackupController.exportTickets);
-router.get("/all", BackupController.exportAll);
+router.get("/vulnerabilities", requireAuth, BackupController.exportVulnerabilities);
+router.get("/tickets", requireAuth, BackupController.exportTickets);
+router.get("/all", requireAuth, BackupController.exportAll);
 
 // Export endpoints (ZIP)
-router.get("/export/vulnerabilities", BackupController.exportVulnerabilitiesAsZip);
-router.get("/export/tickets", BackupController.exportTicketsAsZip);
-router.get("/export/all", BackupController.exportAllAsZip);
+router.get("/export/vulnerabilities", requireAuth, BackupController.exportVulnerabilitiesAsZip);
+router.get("/export/tickets", requireAuth, BackupController.exportTicketsAsZip);
+router.get("/export/all", requireAuth, BackupController.exportAllAsZip);
 
 // Data management endpoints
-router.delete("/clear/:type", BackupController.clearData);
+router.delete("/clear/:type", requireAuth, BackupController.clearData);
 
 // Restore endpoint
-router.post("/restore", upload.single("file"), BackupController.restoreBackup);
+router.post("/restore", requireAuth, upload.single("file"), BackupController.restoreBackup);
 
 
 module.exports = router;
