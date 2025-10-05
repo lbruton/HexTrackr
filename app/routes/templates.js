@@ -16,6 +16,7 @@
 
 const express = require("express");
 const TemplateController = require("../controllers/templateController");
+const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ const router = express.Router();
  * Get all templates
  * GET /api/templates
  */
-router.get("/", async (req, res) => {
+router.get("/", requireAuth, async (req, res) => {
     const controller = TemplateController.getInstance();
     await controller.getAllTemplates(req, res);
 });
@@ -32,7 +33,7 @@ router.get("/", async (req, res) => {
  * Create template
  * POST /api/templates
  */
-router.post("/", async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
     const controller = TemplateController.getInstance();
     await controller.createTemplate(req, res);
 });
@@ -41,7 +42,7 @@ router.post("/", async (req, res) => {
  * Get template by name (convenience endpoint for frontend)
  * GET /api/templates/by-name/:name
  */
-router.get("/by-name/:name", async (req, res) => {
+router.get("/by-name/:name", requireAuth, async (req, res) => {
     const controller = TemplateController.getInstance();
     await controller.getTemplateByName(req, res);
 });
@@ -50,7 +51,7 @@ router.get("/by-name/:name", async (req, res) => {
  * Get template by ID
  * GET /api/templates/:id
  */
-router.get("/:id", async (req, res) => {
+router.get("/:id", requireAuth, async (req, res) => {
     const controller = TemplateController.getInstance();
     await controller.getTemplateById(req, res);
 });
@@ -60,7 +61,7 @@ router.get("/:id", async (req, res) => {
  * PUT /api/templates/:id
  * Body: { template_content: string, description?: string }
  */
-router.put("/:id", async (req, res) => {
+router.put("/:id", requireAuth, async (req, res) => {
     const controller = TemplateController.getInstance();
     await controller.updateTemplate(req, res);
 });
@@ -69,7 +70,7 @@ router.put("/:id", async (req, res) => {
  * Reset template to default content
  * POST /api/templates/:id/reset
  */
-router.post("/:id/reset", async (req, res) => {
+router.post("/:id/reset", requireAuth, async (req, res) => {
     const controller = TemplateController.getInstance();
     await controller.resetTemplate(req, res);
 });
@@ -79,7 +80,7 @@ router.post("/:id/reset", async (req, res) => {
  * POST /api/templates/:id/preview
  * Body: { ticketData: object }
  */
-router.post("/:id/preview", async (req, res) => {
+router.post("/:id/preview", requireAuth, async (req, res) => {
     const controller = TemplateController.getInstance();
     await controller.previewTemplate(req, res);
 });
