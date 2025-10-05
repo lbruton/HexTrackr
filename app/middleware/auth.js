@@ -20,12 +20,12 @@ const sessionMiddleware = session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === "production", // HTTPS only in production
+        secure: true, // Required for HTTPS - browsers enforce this (HEX-128 Task 3.5)
         httpOnly: true,
         sameSite: "lax", // Allow cookies on top-level navigation (login redirect)
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     },
-    proxy: process.env.TRUST_PROXY === "true"
+    proxy: true // ALWAYS true - we always run behind nginx reverse proxy (HEX-128 CRITICAL FIX)
 });
 
 /**
