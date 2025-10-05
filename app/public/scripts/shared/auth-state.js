@@ -372,15 +372,26 @@ class AuthState {
     /**
      * Update user menu in navbar with authenticated user information
      *
-     * Finds the existing user dropdown in the navbar and replaces it with
-     * dynamic user data including username, avatar, and logout link.
+     * CRITICAL FIX: Preserves existing settings dropdown menu items and only
+     * updates the user display (avatar + username) and adds authentication
+     * options at the bottom. Does NOT destroy the settings menu.
+     *
+     * Updates:
+     * - User avatar with initials
+     * - Username display
+     * - Adds "Change Password" link
+     * - Adds "Sign Out" link
+     *
+     * Preserves:
+     * - All existing settings menu items (User Management, API Config, etc.)
+     *
      * Requires header.html to be loaded first.
      *
      * @returns {void}
      *
      * @example
      * authState.updateUserMenu();
-     * // Navbar user menu updated with current user data
+     * // Navbar user menu updated, settings menu preserved
      */
     updateUserMenu() {
         if (!this.user) {
@@ -395,6 +406,13 @@ class AuthState {
             return;
         }
 
+        // Find the dropdown trigger link (avatar + username)
+        const dropdownTrigger = userDropdown.querySelector("a[data-bs-toggle='dropdown']");
+        if (!dropdownTrigger) {
+            console.warn("Dropdown trigger not found");
+            return;
+        }
+
         // Create user initials for avatar
         const username = this.user.username || "User";
         const initials = username.substring(0, 2).toUpperCase();
@@ -402,35 +420,68 @@ class AuthState {
         // Create avatar URL
         const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=206bc4&color=fff`;
 
-        // Update dropdown HTML
-        userDropdown.innerHTML = `
-            <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
-                <span class="avatar avatar-sm" style="background-image: url(${avatarUrl})"></span>
-                <div class="d-none d-xl-block ps-2">
-                    <div>${username}</div>
-                    <div class="mt-1 small text-muted">Logged in</div>
-                </div>
-            </a>
-            <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <div class="dropdown-header">
-                    <small class="text-muted">Logged in as:</small>
-                    <div class="fw-bold">${username}</div>
-                </div>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item" id="changePasswordLink">
-                    <i class="ti ti-key me-2"></i>Change Password
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item text-danger" id="logoutLink">
-                    <i class="ti ti-logout me-2"></i>Sign Out
-                </a>
+        // Update ONLY the dropdown trigger (avatar + username display)
+        // This preserves the dropdown menu content
+        dropdownTrigger.innerHTML = `
+            <span class="avatar avatar-sm" style="background-image: url(${avatarUrl})"></span>
+            <div class="d-none d-xl-block ps-2">
+                <div>${username}</div>
+                <div class="mt-1 small text-muted">Logged in</div>
             </div>
         `;
 
-        // Add event listeners
+        // Find the dropdown menu container
+        const dropdownMenu = userDropdown.querySelector(".dropdown-menu");
+        if (!dropdownMenu) {
+            console.warn("Dropdown menu not found");
+            return;
+        }
+
+        // Check if authentication menu items already exist
+        if (document.getElementById("changePasswordLink")) {
+            // Already added, just update event listeners
+            this.attachMenuEventListeners();
+            console.log("✅ User menu updated (auth items already present)");
+            return;
+        }
+
+        // Add authentication-specific menu items AFTER existing settings items
+        const authMenuItems = `
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item" id="changePasswordLink">
+                <i class="ti ti-key me-2"></i>Change Password
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item text-danger" id="logoutLink">
+                <i class="ti ti-logout me-2"></i>Sign Out
+            </a>
+        `;
+
+        // Append to existing menu (preserves settings items from header.html)
+        dropdownMenu.insertAdjacentHTML("beforeend", authMenuItems);
+
+        // Attach event listeners
+        this.attachMenuEventListeners();
+
+        console.log("✅ User menu updated (settings preserved)");
+    }
+
+    /**
+     * Attach event listeners to authentication menu items
+     *
+     * Separated into its own method to avoid duplicate listeners when
+     * updateUserMenu() is called multiple times.
+     *
+     * @private
+     * @returns {void}
+     */
+    attachMenuEventListeners() {
         const changePasswordLink = document.getElementById("changePasswordLink");
         if (changePasswordLink) {
-            changePasswordLink.addEventListener("click", (e) => {
+            // Remove old listener if exists (prevent duplicates)
+            const newLink = changePasswordLink.cloneNode(true);
+            changePasswordLink.replaceWith(newLink);
+            newLink.addEventListener("click", (e) => {
                 e.preventDefault();
                 this.showChangePasswordModal();
             });
@@ -438,13 +489,14 @@ class AuthState {
 
         const logoutLink = document.getElementById("logoutLink");
         if (logoutLink) {
-            logoutLink.addEventListener("click", (e) => {
+            // Remove old listener if exists (prevent duplicates)
+            const newLink = logoutLink.cloneNode(true);
+            logoutLink.replaceWith(newLink);
+            newLink.addEventListener("click", (e) => {
                 e.preventDefault();
                 this.logout();
             });
         }
-
-        console.log("✅ User menu updated");
     }
 
     /**
