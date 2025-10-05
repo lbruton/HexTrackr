@@ -96,17 +96,28 @@ class AuthController {
                 extendSession(req);
             }
 
-            // Return success with user details (without password hash)
-            res.json({
-                success: true,
-                data: {
-                    user: {
-                        id: result.id,
-                        username: result.username,
-                        role: result.role,
-                        last_login: result.last_login
-                    }
+            // Save session before sending response (required for async stores)
+            req.session.save((err) => {
+                if (err) {
+                    console.error("Session save error:", err);
+                    return res.status(500).json({
+                        success: false,
+                        error: "Failed to create session"
+                    });
                 }
+
+                // Return success with user details (without password hash)
+                res.json({
+                    success: true,
+                    data: {
+                        user: {
+                            id: result.id,
+                            username: result.username,
+                            role: result.role,
+                            last_login: result.last_login
+                        }
+                    }
+                });
             });
 
         } catch (error) {

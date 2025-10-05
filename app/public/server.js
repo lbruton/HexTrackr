@@ -297,9 +297,10 @@ async function initializeApplication() {
         }
     }));
 
-    // Root fallback
+    // Root redirect handler (HEX-128 Task 3.5)
+    // Serves index.html which redirects based on authentication status
     app.get("/", (req, res) => {
-        res.sendFile(path.join(__dirname, "tickets.html"));
+        res.sendFile(path.join(__dirname, "index.html"));
     });
 
     // Global error handler
