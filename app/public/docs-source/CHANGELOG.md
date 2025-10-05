@@ -296,6 +296,102 @@ const response = await authState.authenticatedFetch('/api/vulnerabilities', {
 
 **Next Task**: Task 3.4 - Implement change password modal to replace auth-state.js placeholder
 
+#### HEX-128 Task 3.4: Change Password Modal Implementation
+
+**Achievement**: Replaced placeholder alert in auth-state.js with fully functional change password modal featuring password visibility toggles, client-side validation, and integrated backend API authentication flow.
+
+**Implementation**:
+
+**Files Modified** (1 file, ~150 lines added):
+
+1. **`app/public/scripts/shared/auth-state.js`** (added 4 methods)
+   - `showChangePasswordModal()` (lines 484-183) - Creates and displays Tabler.io modal
+   - `closeChangePasswordModal()` (lines 197-207) - Removes modal and backdrop from DOM
+   - `togglePasswordVisibility(fieldId)` (lines 223-239) - Toggle password field visibility
+   - `handlePasswordChange(event)` (lines 256-327) - Form submission with validation and API call
+
+**Features Implemented**:
+- Professional Tabler.io modal design (modal-blur, modal-sm, modal-dialog-centered)
+- Three password fields with Font Awesome icons:
+  * Current Password (fa-lock icon)
+  * New Password (fa-lock icon)
+  * Confirm Password (fa-lock icon)
+- Password visibility toggles on all three fields (fa-eye/fa-eye-slash icons)
+- Client-side validation:
+  * Password match verification (New Password === Confirm Password)
+  * 8-character minimum enforced on new password
+- API integration: POST `/api/auth/change-password` via `authenticatedFetch()`
+- Success flow: Display success alert, reset form, auto-close modal after 2 seconds
+- Error handling: Display backend error messages or generic fallback
+- Loading state: Disabled submit button with spinner during API call
+- Complete JSDoc documentation for all methods
+
+**Modal Structure**:
+```javascript
+// Modal HTML rendered via showChangePasswordModal()
+<div class="modal modal-blur fade show">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Change Password</h5>
+      </div>
+      <div class="modal-body">
+        <form id="change-password-form">
+          <div id="password-error" class="alert alert-danger"></div>
+          <div id="password-success" class="alert alert-success"></div>
+          <!-- Three password fields with visibility toggles -->
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn">Cancel</button>
+        <button type="submit" class="btn btn-primary">Change Password</button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+**API Endpoint Integration**:
+- Endpoint: POST `/api/auth/change-password` (implemented in Task 2.4)
+- Request body: `{currentPassword: string, newPassword: string}`
+- Success response: `{success: true}`
+- Error response: `{success: false, error: "message"}`
+- Backend validation: Argon2id password verification, 8-char minimum
+- No auto-logout after password change (user stays logged in)
+
+**Code Quality**:
+- ESLint 9+ compliant (0 errors, 0 warnings)
+- Complete JSDoc documentation following HexTrackr standards
+- Follows password visibility toggle pattern from login.html (fa-eye icons)
+- Professional light gray theme (no purple gradients per design feedback)
+- Tabler.io and Bootstrap 5 integration
+
+**Testing Notes**:
+- Chrome DevTools UI testing deferred to Task 3.5 post-checks
+- Reason: `auth-state.js` not yet integrated into HTML pages (Task 3.5 will add script tags)
+- Code implementation verified via ESLint and manual code review
+- Modal functionality can be fully tested after Task 3.5 completes HTML integration
+
+**User Flow**:
+1. User clicks "Change Password" link in user dropdown (added in Task 3.5)
+2. Modal appears with three password fields
+3. User enters current password, new password, confirm password
+4. User clicks eye icon to toggle password visibility (optional)
+5. User clicks "Change Password" button
+6. Client validates password match and minimum length
+7. API call to backend with Argon2id verification
+8. Success: Display success alert, reset form, auto-close after 2s
+9. Error: Display error message (invalid current password, weak password, etc.)
+
+**Security**:
+- Uses existing Argon2id password verification from Task 2.4
+- API endpoint protected by requireAuth middleware (Task 2.3)
+- Client-side validation prevents unnecessary API calls
+- Session remains active after password change (no forced logout)
+- No password displayed in console logs or error messages
+
+**Next Task**: Task 3.5 - Add protected route handling to all pages (HTML integration with auth-state.js)
+
 ## [1.0.46] - 2025-10-04
 
 ### Added
