@@ -376,6 +376,10 @@ class AuthState {
      * updates the user display (avatar + username) and adds authentication
      * options at the bottom. Does NOT destroy the settings menu.
      *
+     * RACE CONDITION FIX: Waits for header-loader.js to finish injecting
+     * header HTML before attempting to update menu. Retries automatically
+     * if header not ready yet.
+     *
      * Updates:
      * - User avatar with initials
      * - Username display
@@ -387,13 +391,14 @@ class AuthState {
      *
      * Requires header.html to be loaded first.
      *
+     * @param {number} retryCount - Internal retry counter (default: 0)
      * @returns {void}
      *
      * @example
      * authState.updateUserMenu();
      * // Navbar user menu updated, settings menu preserved
      */
-    updateUserMenu() {
+    updateUserMenu(retryCount = 0) {
         if (!this.user) {
             console.warn("Cannot update user menu: no user data");
             return;
@@ -402,8 +407,17 @@ class AuthState {
         // Find the user dropdown in navbar
         const userDropdown = document.querySelector(".navbar-nav .nav-item.dropdown");
         if (!userDropdown) {
-            console.warn("User dropdown not found in navbar");
-            return;
+            // Header not loaded yet - wait and retry (max 50 retries = 5 seconds)
+            if (retryCount < 50) {
+                setTimeout(() => this.updateUserMenu(retryCount + 1), 100);
+                if (retryCount === 0) {
+                    console.log("⏳ Waiting for header to load before updating user menu...");
+                }
+                return;
+            } else {
+                console.error("❌ User dropdown not found after 5 seconds - header may have failed to load");
+                return;
+            }
         }
 
         // Find the dropdown trigger link (avatar + username)
