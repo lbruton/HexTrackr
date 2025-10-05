@@ -273,8 +273,8 @@ class AuthState {
                     return;
                 }
 
-                const data = await response.json();
-                if (!data.authenticated) {
+                const result = await response.json();
+                if (!result.data?.authenticated) {
                     console.warn("Session expired");
                     this.showSessionExpiredModal();
                 }
