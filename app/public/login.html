@@ -299,9 +299,9 @@
                 const response = await fetch('/api/auth/status', {
                     credentials: 'include'  // Required to send session cookie
                 });
-                const data = await response.json();
+                const result = await response.json();
 
-                if (data.authenticated) {
+                if (result.data?.authenticated) {
                     // Already logged in - redirect to app
                     const urlParams = new URLSearchParams(window.location.search);
                     const returnUrl = urlParams.get('return') || '/vulnerabilities.html';
