@@ -449,10 +449,24 @@ mcp__context7__get-library-docs({
 **Purpose**: Browser automation, UI testing, performance profiling
 **Mandatory**: CONSTITUTION.md Article II Section V requires testing before and after UI changes
 
-**Testing Environment**:
-- ✅ **ALWAYS use HTTPS**: `https://localhost` (nginx reverse proxy on port 443)
+**Testing Environments**:
+- ✅ **Development**: `https://dev.hextrackr.com` (127.0.0.1 → Mac M4 local Docker)
+- ✅ **Production**: `https://hextrackr.com` (192.168.1.80 → Ubuntu server)
+- ✅ **Legacy Localhost**: `https://localhost` (also works, points to same dev Docker)
 - ❌ **NEVER use HTTP**: `http://localhost` returns empty API responses
-- 🔒 **SSL Bypass**: Type `thisisunsafe` on certificate warning page
+- 🔒 **SSL Bypass**: Type `thisisunsafe` on self-signed certificate warning
+
+**UI Development Workflow**:
+1. **Open Production Tab**: `navigate_page("https://hextrackr.com/vulnerabilities.html")`
+   - See current production state (reference for UI consistency)
+   - Capture "before" screenshots for documentation
+2. **Open Development Tab**: `new_page("https://dev.hextrackr.com/vulnerabilities.html")`
+   - Test your changes in dev environment
+   - Capture "after" screenshots for documentation
+3. **Side-by-Side Comparison**: Switch between tabs using `select_page(0)` and `select_page(1)`
+   - Visual regression testing
+   - Verify UI consistency between dev and prod
+   - Document changes with before/after screenshots
 
 **Key Tool Categories**:
 - **Page Management**: `list_pages`, `new_page`, `navigate_page`, `select_page`
@@ -461,15 +475,26 @@ mcp__context7__get-library-docs({
 - **Network**: `list_network_requests`, `get_network_request`
 - **Performance**: `performance_start_trace`, `performance_stop_trace`
 
-**Common Pattern**:
+**Common Patterns**:
 ```javascript
-// Navigate and capture screenshot
-navigate_page("https://localhost/vulnerabilities.html")
+// UI Change Documentation Pattern
+// 1. Capture production state (before)
+navigate_page("https://hextrackr.com/vulnerabilities.html")
 Bash: sleep 3  // Wait for data load
 take_screenshot({
   fullPage: true,
-  filePath: "/path/to/screenshot.png"
+  filePath: "/path/to/screenshots/prod-before.png"
 })
+
+// 2. Capture development state (after)
+new_page("https://dev.hextrackr.com/vulnerabilities.html")
+Bash: sleep 3  // Wait for data load
+take_screenshot({
+  fullPage: true,
+  filePath: "/path/to/screenshots/dev-after.png"
+})
+
+// 3. Compare side-by-side for regression testing
 ```
 
 ---
