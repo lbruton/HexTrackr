@@ -76,8 +76,38 @@ const io = socketIo(server, middlewareConfig.websocket);
 const progressTracker = new ProgressTracker(io);
 ImportController.setProgressTracker(progressTracker);
 
+// Secure WebSocket connections with session-based authentication
+// Only authenticate on handshake (when sid is undefined), not on subsequent polling requests
+io.engine.use((req, res, next) => {
+    const isHandshake = req._query.sid === undefined;
+    if (!isHandshake) {
+        return next();
+    }
+
+    // Apply session middleware during handshake
+    sessionMiddleware(req, res, (err) => {
+        if (err) {
+            console.error("❌ Socket session error:", err);
+            return next(err);
+        }
+
+        // Check if user is authenticated
+        if (!req.session || !req.session.userId) {
+            console.log("⚠️  Unauthenticated WebSocket connection attempt");
+            return next(new Error("Authentication required"));
+        }
+
+        console.log(`✅ Authenticated WebSocket handshake: ${req.session.username}`);
+        next();
+    });
+});
+
 io.on("connection", (socket) => {
-    console.log(`📡 WebSocket client connected: ${socket.id}`);
+    // Access session from socket handshake
+    const session = socket.request.session;
+    const username = session ? session.username : "Unknown";
+
+    console.log(`📡 WebSocket client connected: ${username} (${socket.id})`);
 
     socket.on("join-progress", (sessionId) => {
         if (sessionId && typeof sessionId === "string") {
@@ -105,7 +135,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", (reason) => {
-        console.log(`📡 WebSocket client disconnected: ${socket.id} (${reason})`);
+        console.log(`📡 WebSocket client disconnected: ${username} (${socket.id}) - ${reason}`);
     });
 });
 
