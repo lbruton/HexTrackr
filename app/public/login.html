@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - HexTrackr</title>
+
+    <!-- Tabler CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css" rel="stylesheet">
+
+    <!-- FontAwesome Icons (matching existing header) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Dark mode background */
+        body[data-bs-theme="dark"] {
+            background: #0F1C31; /* Match HexTrackr navy theme */
+        }
+
+        .login-card {
+            max-width: 440px;
+            width: 100%;
+        }
+
+        .brand-logo {
+            font-size: 3rem;
+            color: #2563eb; /* Match primary dark color */
+        }
+
+        body[data-bs-theme="dark"] .brand-logo {
+            color: #667eea;
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .theme-toggle-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle Button (top right) -->
+    <button class="btn btn-icon theme-toggle-btn" onclick="toggleTheme()" title="Toggle theme">
+        <i id="theme-icon" class="fas fa-moon"></i>
+    </button>
+
+    <div class="login-card">
+        <div class="card">
+            <div class="card-body p-4">
+                <!-- Logo & Title -->
+                <div class="text-center mb-4">
+                    <i class="fas fa-shield-alt brand-logo"></i>
+                    <h2 class="card-title mt-3 mb-1">HexTrackr</h2>
+                    <p class="text-muted">Vulnerability Management System</p>
+                </div>
+
+                <!-- Error Alert (hidden by default) -->
+                <div id="error-alert" class="alert alert-danger alert-dismissible" role="alert" style="display: none;">
+                    <div class="d-flex">
+                        <div>
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                        </div>
+                        <div>
+                            <h4 class="alert-title">Login Failed</h4>
+                            <div id="error-message" class="text-muted"></div>
+                        </div>
+                    </div>
+                    <a class="btn-close" onclick="hideError()"></a>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <!-- Username Field -->
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <div class="input-group input-group-flat">
+                            <span class="input-group-text">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input
+                                type="text"
+                                id="username"
+                                class="form-control"
+                                placeholder="Enter username"
+                                required
+                                autocomplete="username"
+                                autofocus
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <div class="input-group input-group-flat">
+                            <span class="input-group-text">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <input
+                                type="password"
+                                id="password"
+                                class="form-control"
+                                placeholder="Enter password"
+                                required
+                                autocomplete="current-password"
+                            >
+                            <span class="input-group-text cursor-pointer" onclick="togglePassword()" title="Toggle password visibility">
+                                <i id="password-toggle-icon" class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="mb-3">
+                        <label class="form-check">
+                            <input type="checkbox" id="remember-me" class="form-check-input">
+                            <span class="form-check-label">Remember me for 30 days</span>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-primary w-100" id="login-button">
+                            <span id="login-text">Sign in</span>
+                            <span id="login-spinner" class="spinner-border spinner-border-sm ms-2" style="display: none;"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Version Footer -->
+        <div class="text-center mt-3 text-white-50">
+            <small>HexTrackr v1.0.47 • Secure Authentication</small>
+        </div>
+    </div>
+
+    <!-- Tabler JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
+
+    <script>
+        /**
+         * Toggle password visibility
+         */
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            const icon = document.getElementById('password-toggle-icon');
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                passwordField.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        /**
+         * Show error message
+         * @param {string} message - Error message to display
+         */
+        function showError(message) {
+            const errorAlert = document.getElementById('error-alert');
+            const errorMessage = document.getElementById('error-message');
+            const card = document.querySelector('.card');
+
+            errorMessage.textContent = message;
+            errorAlert.style.display = 'block';
+
+            // Shake animation
+            card.classList.add('shake');
+            setTimeout(() => card.classList.remove('shake'), 500);
+        }
+
+        /**
+         * Hide error message
+         */
+        function hideError() {
+            document.getElementById('error-alert').style.display = 'none';
+        }
+
+        /**
+         * Handle login form submission
+         * @param {Event} event - Form submission event
+         */
+        async function handleLogin(event) {
+            event.preventDefault();
+            hideError();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('remember-me').checked;
+
+            // Show loading state
+            const loginButton = document.getElementById('login-button');
+            const loginText = document.getElementById('login-text');
+            const loginSpinner = document.getElementById('login-spinner');
+
+            loginButton.disabled = true;
+            loginText.textContent = 'Signing in...';
+            loginSpinner.style.display = 'inline-block';
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password, rememberMe })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Login successful - redirect to app
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const returnUrl = urlParams.get('return') || '/vulnerabilities.html';
+                    window.location.href = returnUrl;
+                } else {
+                    // Login failed - show error
+                    const errorMap = {
+                        401: 'Invalid username or password',
+                        423: 'Account locked. Too many failed attempts.',
+                        429: 'Too many login attempts. Please try again later.',
+                        500: 'Server error. Please try again.'
+                    };
+
+                    showError(errorMap[response.status] || data.error || 'Login failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Network error. Please check your connection.');
+            } finally {
+                // Reset button state
+                loginButton.disabled = false;
+                loginText.textContent = 'Sign in';
+                loginSpinner.style.display = 'none';
+            }
+        }
+
+        /**
+         * Toggle theme between light and dark
+         */
+        function toggleTheme() {
+            const html = document.documentElement;
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+
+            if (html.getAttribute('data-bs-theme') === 'dark') {
+                html.removeAttribute('data-bs-theme');
+                body.removeAttribute('data-bs-theme');
+                themeIcon.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-bs-theme', 'dark');
+                body.setAttribute('data-bs-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        /**
+         * Load saved theme preference on page load
+         */
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                document.body.setAttribute('data-bs-theme', 'dark');
+                document.getElementById('theme-icon').className = 'fas fa-sun';
+            }
+        }
+
+        /**
+         * Check if already logged in
+         */
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/status');
+                const data = await response.json();
+
+                if (data.authenticated) {
+                    // Already logged in - redirect to app
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const returnUrl = urlParams.get('return') || '/vulnerabilities.html';
+                    window.location.href = returnUrl;
+                }
+            } catch (error) {
+                console.log('Not authenticated');
+            }
+        }
+
+        // Initialize on page load
+        loadTheme();
+        checkAuth();
+    </script>
+</body>
+</html>
