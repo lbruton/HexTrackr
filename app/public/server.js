@@ -34,6 +34,7 @@ const BackupController = require("../controllers/backupController");
 const TemplateController = require("../controllers/templateController");
 const ImportController = require("../controllers/importController");
 const DocsController = require("../controllers/docsController");
+const AuthController = require("../controllers/authController");
 
 // Route modules
 const vulnerabilityRoutes = require("../routes/vulnerabilities");
@@ -44,6 +45,7 @@ const docsRoutes = require("../routes/docs");
 const templateRoutes = require("../routes/templates");
 const kevRoutes = require("../routes/kev");
 const deviceRoutes = require("../routes/devices"); // HEX-101: Device statistics endpoint
+const authRoutes = require("../routes/auth");
 
 // Express application & HTTP/HTTPS server
 const app = express();
@@ -121,6 +123,7 @@ async function initializeApplication() {
     TicketController.initialize(db);
     BackupController.initialize(db);
     TemplateController.initialize(db);
+    AuthController.initialize(db);
 
     // Seed email templates (v1.0.21 feature)
     const { seedAllTemplates } = require("../utils/seedEmailTemplates");
@@ -184,6 +187,7 @@ async function initializeApplication() {
     app.use("/api/templates", templateRoutes);
     app.use("/api/kev", kevRoutes(db));
     app.use("/api/devices", deviceRoutes); // HEX-101: Device statistics endpoint
+    app.use("/api/auth", authRoutes);
 
     // Legacy lightweight endpoints retained from monolith
     app.get("/api/sites", (req, res) => {
