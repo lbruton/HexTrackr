@@ -1,6 +1,6 @@
-const session = require('express-session');
-const SQLiteStore = require('better-sqlite3-session-store')(session);
-const Database = require('better-sqlite3');
+const session = require("express-session");
+const SQLiteStore = require("better-sqlite3-session-store")(session);
+const Database = require("better-sqlite3");
 
 /**
  * Session middleware configuration
@@ -9,23 +9,23 @@ const Database = require('better-sqlite3');
  */
 const sessionMiddleware = session({
     store: new SQLiteStore({
-        client: new Database('app/public/data/sessions.db'),
+        client: new Database("app/public/data/sessions.db"),
         expired: {
             clear: true,
             intervalMs: 900000 // Clean expired sessions every 15 minutes
         }
     }),
     secret: process.env.SESSION_SECRET,
-    name: 'hextrackr.sid',
+    name: "hextrackr.sid",
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+        secure: process.env.NODE_ENV === "production", // HTTPS only in production
         httpOnly: true,
-        sameSite: 'strict',
+        sameSite: "strict",
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     },
-    proxy: process.env.TRUST_PROXY === 'true'
+    proxy: process.env.TRUST_PROXY === "true"
 });
 
 /**
@@ -37,7 +37,7 @@ const sessionMiddleware = session({
 function requireAuth(req, res, next) {
     if (!req.session || !req.session.userId) {
         return res.status(401).json({
-            error: 'Authentication required',
+            error: "Authentication required",
             authenticated: false
         });
     }
