@@ -22,7 +22,7 @@ const sessionMiddleware = session({
     cookie: {
         secure: process.env.NODE_ENV === "production", // HTTPS only in production
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: "lax", // Allow cookies on top-level navigation (login redirect)
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     },
     proxy: process.env.TRUST_PROXY === "true"
