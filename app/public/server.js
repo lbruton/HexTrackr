@@ -52,10 +52,10 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 // Trust proxy configuration for nginx reverse proxy
-// Enable when behind nginx to allow Express to see real client IPs in X-Forwarded-* headers
-// Required for: rate limiting, logging, security headers
-// Set TRUST_PROXY=true in .env when behind nginx reverse proxy
-app.set("trust proxy", process.env.TRUST_PROXY === "true");
+// ALWAYS true - we always run behind nginx reverse proxy (HEX-128 CRITICAL FIX)
+// Required for Express to recognize HTTPS from X-Forwarded-Proto header
+// Without this, secure cookies won't work because Express sees connection as HTTP
+app.set("trust proxy", true);
 
 // HTTPS configuration
 const useHTTPS = process.env.USE_HTTPS === "true";

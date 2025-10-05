@@ -9,6 +9,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### HEX-128 Task 3.5: CRITICAL BUG FIX - Protected Route Page Integration
+
+**Achievement**: Fixed critical authentication redirect bug preventing successful login and dashboard access in production browsers (Chrome, Firefox).
+
+**Root Cause Analysis (Five Whys)**:
+1. **Why** did authenticated users get redirected back to login? → auth-state.js failed authentication check
+2. **Why** did auth-state.js fail the check? → API response structure mismatch
+3. **Why** was there a mismatch? → auth-state.js accessed `data.authenticated` instead of `data.data.authenticated`
+4. **Why** was it accessing the wrong property? → Initial implementation didn't account for nested response structure
+5. **Why** wasn't this caught earlier? → curl testing showed different behavior than browser-based testing
+
+**Files Modified** (1 file):
+
+1. **`app/public/scripts/shared/auth-state.js`** (lines 109-111)
+   - **BEFORE (BROKEN)**: Accessed `data.authenticated` and `data.user` directly
+   - **AFTER (FIXED)**: Correctly accesses nested structure `response_data.data.authenticated` and `response_data.data.user`
+   - Matches API response structure from authController.js (lines 204-207)
+
+**API Response Structure**:
+```javascript
+{
+  success: true,
+  data: {
+    authenticated: true,
+    user: { username: "admin", role: "superadmin" }
+  }
+}
+```
+
+**Testing**:
+- ✅ Login successful at dev.hextrackr.com (Chrome DevTools)
+- ✅ Vulnerabilities dashboard loads with full data (25,812 vulnerability records)
+- ✅ VPR trends chart displays correctly
+- ✅ All statistics visible
+- ✅ Session persistence working (cookie: hextrackr.sid)
+- ✅ No redirect loop after authentication
+- ✅ Firefox browser testing confirmed working
+
+**Screenshots**:
+- `/tmp/hex-128-SUCCESS.png` - Login page
+- `/tmp/hex-128-final-dashboard.png` - Dashboard after successful authentication
+- `/tmp/hex-128-task-3.5-complete.png` - Final success verification
+
+**Deployment Note**: Always test with dev.hextrackr.com (not localhost) for accurate nginx reverse proxy behavior
+
+**Completion**: HEX-128 Task 3.5 - Authentication system fully functional
+
+### Added
+
 #### HEX-127 Task 2.6: Secure WebSocket Connections with Session-Based Authentication
 
 **Achievement**: Integrated session-based authentication with Socket.io WebSocket connections to ensure only authenticated users can establish WebSocket connections while preserving existing progress tracking functionality.
