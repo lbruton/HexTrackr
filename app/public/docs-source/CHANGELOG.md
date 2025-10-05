@@ -60,7 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    - Exact theme color matching from theme-config.js:
      * Navy dark mode: #0F1C31 background
      * Primary blue: #2563eb for branding and buttons
-     * Gradient light mode: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+     * Light mode: #f7fafc clean light gray (professional, matches existing pages)
    - Tabler.io form components: input-group-flat, form-check, btn-primary, alert-danger
    - Theme toggle button (top right corner) with localStorage persistence
    - Username input with user icon (fa-user)
