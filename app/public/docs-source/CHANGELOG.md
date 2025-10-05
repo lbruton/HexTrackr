@@ -7,6 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.47] - 2025-10-05
 
+### Fixed
+
+#### HEX-128 CRITICAL REGRESSION FIX: Settings Menu Restoration
+
+**Achievement**: Fixed critical regression where auth-state.js destroyed the entire settings dropdown menu, removing all settings options.
+
+**Root Cause (Five Whys Analysis)**:
+1. **Why** did settings menu disappear? → `updateUserMenu()` replaced entire dropdown HTML
+2. **Why** did it replace entire dropdown? → Implementation designed for simple auth demo, not integrated with existing UI
+3. **Why** wasn't settings preserved? → Function targeted wrong element (settings dropdown instead of dedicated user menu)
+4. **Why** target settings dropdown? → No dedicated `#user-menu` container existed in HTML
+5. **Why** network error on page load? → settings-modal.js tried to initialize destroyed dropdown
+
+**The Bug**:
+- Settings dropdown (User Management, API Configuration, Data Management, Ticket Systems, System Configuration, Documentation Portal) completely removed
+- Replaced with simple user menu (only "Change Password" and "Sign Out")
+- Settings modal JavaScript failed to initialize, causing network errors
+
+**The Fix** (auth-state.js:396-500):
+- **BEFORE**: `userDropdown.innerHTML = ...` (destroyed entire dropdown)
+- **AFTER**:
+  - Only update dropdown trigger (avatar + username display)
+  - Append authentication menu items AFTER existing settings items
+  - Preserve all settings functionality
+
+**Files Modified** (1 file, 105 lines changed):
+
+1. **`app/public/scripts/shared/auth-state.js`**
+   - Refactored `updateUserMenu()` to preserve existing dropdown content
+   - New method: `attachMenuEventListeners()` to prevent duplicate listeners
+   - Updates only dropdown trigger HTML (avatar + username)
+   - Appends auth items (Change Password, Sign Out) at bottom
+   - Checks if auth items already exist before adding
+
+**Settings Menu Items Preserved**:
+- ✅ User Management
+- ✅ API Configuration
+- ✅ Data Management
+- ✅ Ticket Systems
+- ✅ System Configuration
+- ✅ Documentation Portal
+
+**Authentication Items Added**:
+- Change Password
+- Sign Out
+
+**Testing**:
+- ✅ Settings dropdown displays all original options
+- ✅ Authentication items appear at bottom
+- ✅ Settings modal initializes correctly (no network errors)
+- ✅ User avatar updates with authenticated username
+- ✅ No JavaScript console errors
+
+**Impact**: Regression introduced in HEX-128 Task 3.2 when auth-state.js was created. Fixed before production deployment.
+
+**Screenshot**: `/tmp/hex-128-settings-menu-RESTORED.png`
+
 ### Added
 
 #### HEX-128 Task 3.5: CRITICAL BUG FIX - Protected Route Page Integration
