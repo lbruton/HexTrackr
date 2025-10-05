@@ -452,7 +452,7 @@ async function seedInitialData(db) {
               console.log("═══════════════════════════════════════════════════════");
               console.log("🔐 INITIAL ADMIN CREDENTIALS (SAVE THESE!)");
               console.log("═══════════════════════════════════════════════════════");
-              console.log(`Username: admin`);
+              console.log("Username: admin");
               console.log(`Password: ${initialPassword}`);
               console.log("═══════════════════════════════════════════════════════");
               console.log("⚠️  CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!");
