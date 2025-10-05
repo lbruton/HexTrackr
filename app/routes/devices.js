@@ -14,6 +14,7 @@
 
 const express = require("express");
 const VulnerabilityController = require("../controllers/vulnerabilityController");
+const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -46,6 +47,6 @@ const router = express.Router();
  * - Server cache: 5 minutes (300s)
  * - Browser cache: 60 seconds
  */
-router.get("/stats", VulnerabilityController.getDeviceStatistics);
+router.get("/stats", requireAuth, VulnerabilityController.getDeviceStatistics);
 
 module.exports = router;
