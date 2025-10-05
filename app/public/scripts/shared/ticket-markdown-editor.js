@@ -9,7 +9,7 @@
  * @version 1.0.21
  */
 
-/* global fetch, bootstrap, DOMPurify */
+/* global authState, bootstrap, DOMPurify */
 
 /**
  * Ticket Markdown Editor Class
@@ -92,7 +92,7 @@ class TicketMarkdownEditor {
             // If forceRefresh is true, always fetch from API
             if (forceRefresh) {
                 console.log("[TicketMarkdownEditor] Force refresh requested, fetching from API");
-                const response = await fetch("/api/templates/by-name/default_ticket");
+                const response = await authState.authenticatedFetch("/api/templates/by-name/default_ticket");
                 if (response.ok) {
                     const result = await response.json();
                     if (result.success) {
@@ -108,7 +108,7 @@ class TicketMarkdownEditor {
                     this.currentTemplate = cached;
                     console.log("[TicketMarkdownEditor] Using cached template");
                 } else if (!this.currentTemplate) {
-                    const response = await fetch("/api/templates/by-name/default_ticket");
+                    const response = await authState.authenticatedFetch("/api/templates/by-name/default_ticket");
                     if (response.ok) {
                         const result = await response.json();
                         if (result.success) {
@@ -189,7 +189,7 @@ Generated: [GENERATED_TIME]`;
                 category: "ticket"
             };
 
-            const response = await fetch("/api/templates", {
+            const response = await authState.authenticatedFetch("/api/templates", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -198,7 +198,7 @@ Generated: [GENERATED_TIME]`;
             });
 
             if (response.status === 409) {
-                const existing = await fetch("/api/templates/by-name/default_ticket");
+                const existing = await authState.authenticatedFetch("/api/templates/by-name/default_ticket");
                 if (existing.ok) {
                     const existingResult = await existing.json();
                     if (existingResult.success) {
@@ -548,7 +548,7 @@ Generated: [GENERATED_TIME]`;
             console.log(`[TicketMarkdownEditor] Saving template with ID: ${this.currentTemplate.id}, category: 'ticket', name: 'default_ticket'`);
             console.log(`[TicketMarkdownEditor] Template content preview: ${templateContent.substring(0, 100)}...`);
 
-            const response = await fetch(`/api/templates/${this.currentTemplate.id}`, {
+            const response = await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
@@ -606,7 +606,7 @@ Generated: [GENERATED_TIME]`;
 
         this.isRestoring = true;
         try {
-            const response = await fetch(`/api/templates/${this.currentTemplate.id}/reset`, {
+            const response = await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/reset`, {
                 method: "POST"
             });
 
@@ -727,7 +727,7 @@ Generated: [GENERATED_TIME]`;
         this.isRestoring = true;
         try {
             if (this.currentTemplate?.id) {
-                await fetch(`/api/templates/${this.currentTemplate.id}/reset`, { method: "POST" });
+                await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/reset`, { method: "POST" });
             }
         } catch (resetError) {
             console.warn("Failed to reset ticket template on server:", resetError.message);
