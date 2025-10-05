@@ -225,6 +225,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
+                    credentials: 'include',  // Required for session cookie
                     body: JSON.stringify({ username, password, rememberMe })
                 });
 
@@ -295,7 +296,9 @@
          */
         async function checkAuth() {
             try {
-                const response = await fetch('/api/auth/status');
+                const response = await fetch('/api/auth/status', {
+                    credentials: 'include'  // Required to send session cookie
+                });
                 const data = await response.json();
 
                 if (data.authenticated) {
