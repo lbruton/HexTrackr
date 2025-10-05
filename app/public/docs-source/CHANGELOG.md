@@ -5,6 +5,47 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.47] - 2025-10-05
+
+### Added
+
+#### HEX-127 Task 2.6: Secure WebSocket Connections with Session-Based Authentication
+
+**Achievement**: Integrated session-based authentication with Socket.io WebSocket connections to ensure only authenticated users can establish WebSocket connections while preserving existing progress tracking functionality.
+
+**Implementation**:
+
+**Files Modified** (1 file):
+
+1. **`app/public/server.js`** (29 lines added)
+   - Added Engine.IO middleware for handshake-only authentication (lines 79-103)
+   - Handshake detection: `req._query.sid === undefined`
+   - Session middleware integration during WebSocket handshake
+   - Authentication verification: Checks `req.session.userId` presence
+   - Unauthenticated connections rejected with "Authentication required" error
+   - Enhanced connection logging with username from session
+   - Updated disconnect logging to show username
+   - Preserved all existing ProgressTracker functionality (no regression)
+
+**Security**:
+- WebSocket connections now require valid Express session cookie
+- Authentication check performed only during handshake (optimal performance)
+- Subsequent polling requests bypass auth check (not re-authenticated per message)
+- Clear server-side logging for auth success/failure
+- Session username accessible via `socket.request.session` in connection handler
+
+**Testing**:
+- ✅ Unauthenticated WebSocket connections properly rejected
+- ✅ Server logs show "⚠️ Unauthenticated WebSocket connection attempt"
+- ✅ Authenticated connections succeed after login (session cookie present)
+- ✅ Server logs show "✅ Authenticated WebSocket handshake: {username}"
+- ✅ Existing progress tracking functionality preserved (no regression)
+- ✅ ESLint 9+ compliance (0 errors)
+
+**Pattern**: Official Socket.io handshake authentication pattern from Context7 documentation
+
+**Completion**: HEX-130 Authentication Backend Sprint completed (Tasks 2.1-2.6)
+
 ## [1.0.46] - 2025-10-04
 
 ### Added
