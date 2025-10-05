@@ -1,6 +1,6 @@
 /* eslint-env browser */
  
-/* global console, document, window, fetch, setTimeout, localStorage, Blob, URL, FormData, Papa, JSZip, bootstrap, module, alert */
+/* global console, document, window, authState, setTimeout, localStorage, Blob, URL, FormData, Papa, JSZip, bootstrap, module, alert */
 
 /**
  * Escape HTML characters to prevent XSS attacks
@@ -201,7 +201,7 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
  */
 async function refreshStats() {
     try {
-        const response = await fetch("/api/backup/stats");
+        const response = await authState.authenticatedFetch("/api/backup/stats");
         const stats = await response.json();
         
         // Update counters
@@ -366,9 +366,9 @@ async function backupData(type) {
         if (type === "all") {
             // Fetch all data types
             const [ticketsRes, vulnsRes, statsRes] = await Promise.all([
-                fetch("/api/backup/tickets"),
-                fetch("/api/backup/vulnerabilities"),
-                fetch("/api/backup/stats")
+                authState.authenticatedFetch("/api/backup/tickets"),
+                authState.authenticatedFetch("/api/backup/vulnerabilities"),
+                authState.authenticatedFetch("/api/backup/stats")
             ]);
             
             if (ticketsRes.ok && vulnsRes.ok && statsRes.ok) {
@@ -390,7 +390,7 @@ async function backupData(type) {
             }
         } else {
             // Single data type backup
-            const response = await fetch(`/api/backup/${type}`);
+            const response = await authState.authenticatedFetch(`/api/backup/${type}`);
             if (response.ok) {
                 const data = await response.json();
                 zip.file(`${type}.json`, JSON.stringify(data, null, 2));
@@ -445,7 +445,7 @@ async function importData(type) {
             formData.append("file", file);
             formData.append("type", type);
             
-            const response = await fetch("/api/import", {
+            const response = await authState.authenticatedFetch("/api/import", {
                 method: "POST",
                 body: formData
             });
@@ -484,7 +484,7 @@ async function clearData(type) {
     if (!confirmed) {return;}
     
     try {
-        const response = await fetch(`/api/backup/clear/${type}`, {
+        const response = await authState.authenticatedFetch(`/api/backup/clear/${type}`, {
             method: "DELETE"
         });
         
@@ -619,7 +619,7 @@ async function syncKevData() {
     }
 
     try {
-        const response = await fetch("/api/kev/sync", {
+        const response = await authState.authenticatedFetch("/api/kev/sync", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -728,7 +728,7 @@ async function loadKevSyncStatus() {
         }
 
         // Fetch current status from server
-        const response = await fetch("/api/kev/status");
+        const response = await authState.authenticatedFetch("/api/kev/status");
         if (response.ok) {
             const status = await response.json();
             updateKevSyncStatus(status);
@@ -765,7 +765,7 @@ async function saveSettings() {
         
         // Try to save to server as well (if API is available)
         try {
-            const response = await fetch("/api/settings", {
+            const response = await authState.authenticatedFetch("/api/settings", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -1124,8 +1124,8 @@ async function exportAllDataAsCSV() {
         
         // Fetch all data
         const [ticketsRes, vulnsRes] = await Promise.all([
-            fetch("/api/backup/tickets"),
-            fetch("/api/backup/vulnerabilities")
+            authState.authenticatedFetch("/api/backup/tickets"),
+            authState.authenticatedFetch("/api/backup/vulnerabilities")
         ]);
         
         if (ticketsRes.ok && vulnsRes.ok) {
@@ -1205,7 +1205,7 @@ async function importCSV(type) {
                 }
                 
                 // Send to backend for import
-                const response = await fetch(`/api/import/${type}`, {
+                const response = await authState.authenticatedFetch(`/api/import/${type}`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -1395,7 +1395,7 @@ async function restoreData(type) {
                 formData.append("type", type);
                 
                 // Send to backend for processing
-                const response = await fetch("/api/backup/restore", {
+                const response = await authState.authenticatedFetch("/api/backup/restore", {
                     method: "POST",
                     body: formData
                 });
