@@ -450,18 +450,259 @@ class AuthState {
     /**
      * Show change password modal
      *
-     * Placeholder for Task 3.4 implementation. Currently displays an alert.
-     * Will be replaced with full password change modal in future task.
+     * Creates and displays a Tabler.io modal for changing the user's password.
+     * The modal includes three password fields (current, new, confirm) with
+     * visibility toggles, inline validation, and API integration.
      *
      * @returns {void}
      *
      * @example
      * authState.showChangePasswordModal();
-     * // Shows placeholder alert (will be modal in Task 3.4)
+     * // Displays the change password modal
      */
     showChangePasswordModal() {
-        // Placeholder for Task 3.4
-        window.alert("Change Password functionality will be implemented in Task 3.4");
+        const modalHtml = `
+            <div class="modal modal-blur fade show" id="change-password-modal" style="display: block;" tabindex="-1">
+                <div class="modal-dialog modal-sm modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Change Password</h5>
+                            <button type="button" class="btn-close" onclick="authState.closeChangePasswordModal()"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="change-password-form" onsubmit="authState.handlePasswordChange(event)">
+                                <!-- Error Alert (hidden by default) -->
+                                <div id="password-error" class="alert alert-danger" style="display: none;"></div>
+
+                                <!-- Success Alert (hidden by default) -->
+                                <div id="password-success" class="alert alert-success" style="display: none;">
+                                    Password changed successfully!
+                                </div>
+
+                                <!-- Current Password Field -->
+                                <div class="mb-3">
+                                    <label class="form-label">Current Password</label>
+                                    <div class="input-group input-group-flat">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-lock"></i>
+                                        </span>
+                                        <input
+                                            type="password"
+                                            id="current-password"
+                                            class="form-control"
+                                            placeholder="Enter current password"
+                                            required
+                                            autocomplete="current-password"
+                                        >
+                                        <span class="input-group-text cursor-pointer" onclick="authState.togglePasswordVisibility('current-password')" title="Toggle password visibility">
+                                            <i id="current-password-toggle-icon" class="fas fa-eye"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- New Password Field -->
+                                <div class="mb-3">
+                                    <label class="form-label">New Password</label>
+                                    <div class="input-group input-group-flat">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-lock"></i>
+                                        </span>
+                                        <input
+                                            type="password"
+                                            id="new-password"
+                                            class="form-control"
+                                            placeholder="Enter new password"
+                                            required
+                                            autocomplete="new-password"
+                                            minlength="8"
+                                        >
+                                        <span class="input-group-text cursor-pointer" onclick="authState.togglePasswordVisibility('new-password')" title="Toggle password visibility">
+                                            <i id="new-password-toggle-icon" class="fas fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <small class="form-hint">At least 8 characters</small>
+                                </div>
+
+                                <!-- Confirm Password Field -->
+                                <div class="mb-3">
+                                    <label class="form-label">Confirm New Password</label>
+                                    <div class="input-group input-group-flat">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-lock"></i>
+                                        </span>
+                                        <input
+                                            type="password"
+                                            id="confirm-password"
+                                            class="form-control"
+                                            placeholder="Confirm new password"
+                                            required
+                                            autocomplete="new-password"
+                                        >
+                                        <span class="input-group-text cursor-pointer" onclick="authState.togglePasswordVisibility('confirm-password')" title="Toggle password visibility">
+                                            <i id="confirm-password-toggle-icon" class="fas fa-eye"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn" onclick="authState.closeChangePasswordModal()">Cancel</button>
+                            <button type="submit" form="change-password-form" class="btn btn-primary" id="password-submit-btn">
+                                Change Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-backdrop fade show"></div>
+        `;
+
+        // Inject modal into DOM
+        document.body.insertAdjacentHTML("beforeend", modalHtml);
+    }
+
+    /**
+     * Close and cleanup change password modal
+     *
+     * Removes the change password modal and backdrop from the DOM,
+     * ensuring no memory leaks or DOM remnants.
+     *
+     * @returns {void}
+     *
+     * @example
+     * authState.closeChangePasswordModal();
+     * // Modal and backdrop removed from DOM
+     */
+    closeChangePasswordModal() {
+        const modal = document.getElementById("change-password-modal");
+        const backdrop = document.querySelector(".modal-backdrop");
+
+        if (modal) {
+            modal.remove();
+        }
+        if (backdrop) {
+            backdrop.remove();
+        }
+    }
+
+    /**
+     * Toggle password field visibility
+     *
+     * Toggles a password field between masked (password) and visible (text) states,
+     * updating the associated eye icon accordingly. Used for current, new, and
+     * confirm password fields in the change password modal.
+     *
+     * @param {string} fieldId - The ID of the password input field to toggle
+     * @returns {void}
+     *
+     * @example
+     * authState.togglePasswordVisibility('current-password');
+     * // Toggles current password field visibility
+     */
+    togglePasswordVisibility(fieldId) {
+        const passwordField = document.getElementById(fieldId);
+        const icon = document.getElementById(`${fieldId}-toggle-icon`);
+
+        if (!passwordField || !icon) {
+            console.warn(`Password field or icon not found for ID: ${fieldId}`);
+            return;
+        }
+
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            icon.className = "fas fa-eye-slash";
+        } else {
+            passwordField.type = "password";
+            icon.className = "fas fa-eye";
+        }
+    }
+
+    /**
+     * Handle password change form submission
+     *
+     * Validates password fields, calls the change password API endpoint,
+     * and handles success/error responses with appropriate UI feedback.
+     * Includes loading state management and auto-close on success.
+     *
+     * @async
+     * @param {Event} event - The form submit event
+     * @returns {Promise<void>}
+     *
+     * @example
+     * // Called automatically on form submit
+     * authState.handlePasswordChange(event);
+     */
+    async handlePasswordChange(event) {
+        event.preventDefault();
+
+        // Get form values
+        const currentPassword = document.getElementById("current-password").value;
+        const newPassword = document.getElementById("new-password").value;
+        const confirmPassword = document.getElementById("confirm-password").value;
+
+        // Get UI elements
+        const errorAlert = document.getElementById("password-error");
+        const successAlert = document.getElementById("password-success");
+        const submitBtn = document.getElementById("password-submit-btn");
+
+        // Hide previous alerts
+        errorAlert.style.display = "none";
+        successAlert.style.display = "none";
+
+        // Validate password match
+        if (newPassword !== confirmPassword) {
+            errorAlert.textContent = "New password and confirmation do not match";
+            errorAlert.style.display = "block";
+            return;
+        }
+
+        try {
+            // Set loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "<span class=\"spinner-border spinner-border-sm me-2\"></span>Changing...";
+
+            // Call API
+            const response = await this.authenticatedFetch("/api/auth/change-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    currentPassword,
+                    newPassword
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                // Show success message
+                successAlert.style.display = "block";
+
+                // Reset form
+                document.getElementById("change-password-form").reset();
+
+                // Auto-close after 2 seconds
+                setTimeout(() => {
+                    this.closeChangePasswordModal();
+                }, 2000);
+            } else {
+                // Show error message
+                errorAlert.textContent = data.error || "Failed to change password";
+                errorAlert.style.display = "block";
+            }
+        } catch (error) {
+            // Handle network or other errors
+            console.error("Password change error:", error);
+            errorAlert.textContent = error.message || "An error occurred while changing password";
+            errorAlert.style.display = "block";
+        } finally {
+            // Reset button state (only if modal still exists)
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = "Change Password";
+            }
+        }
     }
 
     /**
