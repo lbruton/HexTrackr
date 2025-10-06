@@ -9,16 +9,16 @@
  * Usage: node app/scripts/restore-from-backup.js
  */
 
-const Database = require('better-sqlite3');
-const argon2 = require('argon2');
-const path = require('path');
+const Database = require("better-sqlite3");
+const argon2 = require("argon2");
+const path = require("path");
 
-const BACKUP_DB = path.join(__dirname, '../../app/data/hextrackr-backup-20250929-235802.db');
-const TARGET_DB = path.join(__dirname, '../../app/data/hextrackr.db');
-const NEW_PASSWORD = '***REMOVED***';
+const BACKUP_DB = path.join(__dirname, "../../app/data/hextrackr-backup-20250929-235802.db");
+const TARGET_DB = path.join(__dirname, "../../app/data/hextrackr.db");
+const NEW_PASSWORD = "***REMOVED***";
 
 async function restoreDatabase() {
-    console.log('🔄 Starting database restoration...\n');
+    console.log("🔄 Starting database restoration...\n");
 
     // Open both databases
     const backup = new Database(BACKUP_DB, { readonly: true });
@@ -53,8 +53,8 @@ async function restoreDatabase() {
 
                 // Get column info
                 const columns = backup.prepare(`PRAGMA table_info(${name})`).all();
-                const columnNames = columns.map(c => c.name).join(', ');
-                const placeholders = columns.map(() => '?').join(', ');
+                const columnNames = columns.map(c => c.name).join(", ");
+                const placeholders = columns.map(() => "?").join(", ");
 
                 // Prepare insert statement
                 const insertStmt = target.prepare(`INSERT INTO ${name} (${columnNames}) VALUES (${placeholders})`);
@@ -85,7 +85,7 @@ async function restoreDatabase() {
             }
         }
 
-        console.log('\n🔐 Setting admin password to ***REMOVED***...\n');
+        console.log("\n🔐 Setting admin password to ***REMOVED***...\n");
 
         // Hash the new password with Argon2id
         const passwordHash = await argon2.hash(NEW_PASSWORD, {
@@ -105,33 +105,33 @@ async function restoreDatabase() {
         `).run(passwordHash);
 
         if (updateResult.changes > 0) {
-            console.log('✅ Admin password updated successfully!\n');
+            console.log("✅ Admin password updated successfully!\n");
         } else {
-            console.error('❌ Failed to update admin password - user not found\n');
+            console.error("❌ Failed to update admin password - user not found\n");
         }
 
         // Verify admin user
-        const admin = target.prepare('SELECT id, username, email, role FROM users WHERE username = ?').get('admin');
-        console.log('👤 Admin User Details:');
-        console.log('   ID:', admin.id);
-        console.log('   Username:', admin.username);
-        console.log('   Email:', admin.email);
-        console.log('   Role:', admin.role);
-        console.log('\n═══════════════════════════════════════════════════════');
-        console.log('🔑 NEW ADMIN CREDENTIALS');
-        console.log('═══════════════════════════════════════════════════════');
-        console.log('Username: admin');
-        console.log('Password: ***REMOVED***');
-        console.log('═══════════════════════════════════════════════════════\n');
+        const admin = target.prepare("SELECT id, username, email, role FROM users WHERE username = ?").get("admin");
+        console.log("👤 Admin User Details:");
+        console.log("   ID:", admin.id);
+        console.log("   Username:", admin.username);
+        console.log("   Email:", admin.email);
+        console.log("   Role:", admin.role);
+        console.log("\n═══════════════════════════════════════════════════════");
+        console.log("🔑 NEW ADMIN CREDENTIALS");
+        console.log("═══════════════════════════════════════════════════════");
+        console.log("Username: admin");
+        console.log("Password: ***REMOVED***");
+        console.log("═══════════════════════════════════════════════════════\n");
 
     } finally {
         backup.close();
         target.close();
-        console.log('✅ Database restoration completed!\n');
+        console.log("✅ Database restoration completed!\n");
     }
 }
 
 restoreDatabase().catch(error => {
-    console.error('❌ Restoration failed:', error);
+    console.error("❌ Restoration failed:", error);
     process.exit(1);
 });
