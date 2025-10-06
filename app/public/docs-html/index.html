@@ -128,6 +128,25 @@
     <script src="../scripts/shared/header-loader.js"></script>
     <!-- HEX-133 Task 1.5: Authentication state management for user menu -->
     <script src="../scripts/shared/auth-state.js?v=1.0.48-session-fix"></script>
+    <script>
+        /**
+         * Initialize authentication state and user menu (HEX-137)
+         * Checks session, updates user menu with Change Password/Sign Out when authenticated
+         * Docs portal is public - no redirect if unauthenticated
+         */
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isAuth = await authState.init();
+
+            if (isAuth) {
+                // Update user menu in shared header with authenticated options
+                authState.updateUserMenu();
+
+                console.log('✅ Authenticated as:', authState.getUser().username);
+            } else {
+                console.log('ℹ️ Viewing docs as guest (not authenticated)');
+            }
+        });
+    </script>
     <script src="../scripts/shared/footer-loader.js"></script>
     <script src="../scripts/shared/settings-modal.js"></script>
     <!-- Page-specific script -->
