@@ -1,8 +1,8 @@
 -- Database Restoration SQL Script
 -- Attach backup database and copy all tables except users
 
-.echo on
-.mode column
+-- .echo on (SQLite shell command - comment out for standard SQL compatibility)
+-- .mode column (SQLite shell command - comment out for standard SQL compatibility)
 
 -- Attach the backup database
 ATTACH DATABASE '/Volumes/DATA/GitHub/HexTrackr/app/data/hextrackr-backup-20250929-235802.db' AS backup;
@@ -104,7 +104,7 @@ SELECT '   ✅ Restored ' || COUNT(*) || ' vulnerability templates' FROM vulnera
 SELECT '';
 
 -- Detach backup
-DETACH DATABASE backup;
+DETACH backup;
 
 SELECT '';
 SELECT '═══════════════════════════════════════════════════════';
