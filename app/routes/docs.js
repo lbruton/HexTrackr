@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
+const { requireAuth } = require("../middleware/auth");
 
 const DocsController = require("../controllers/docsController");
 
 // Documentation statistics endpoint (used by docs portal homepage)
 // Computes API endpoints, JS function count, and framework statistics
 // Original: server.js lines 2624-2680
-router.get("/stats", async (req, res) => {
+router.get("/stats", requireAuth, async (req, res) => {
     try {
         // Will be delegated to DocsController.getStats in T029
         const stats = await DocsController.getStats();

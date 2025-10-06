@@ -3,20 +3,58 @@
 
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
+const { randomBytes } = require("crypto");
+const argon2 = require("argon2");
 
-const dbPath = path.join(__dirname, "..", "data", "hextrackr.db");
+const dbPath = path.join(__dirname, "..", "..", "data", "hextrackr.db");
 
-// Create database and tables
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error("Error opening database:", err.message);
-    return;
-  }
-  console.log("Connected to SQLite database");
-});
+/**
+ * Initialize database schema and seed initial data
+ * @returns {Promise<void>}
+ */
+async function initializeDatabase() {
+  return new Promise((resolve, reject) => {
+    // Create database and tables
+    const db = new sqlite3.Database(dbPath, async (err) => {
+      if (err) {
+        console.error("Error opening database:", err.message);
+        reject(err);
+        return;
+      }
+      console.log("Connected to SQLite database");
 
-// Create tables with complete schema
-db.serialize(() => {
+      try {
+        // Create tables with complete schema
+        await createTables(db);
+        await seedInitialData(db);
+
+        // Close database
+        db.close((closeErr) => {
+          if (closeErr) {
+            console.error("Error closing database:", closeErr.message);
+            reject(closeErr);
+          } else {
+            console.log("Database connection closed");
+            resolve();
+          }
+        });
+      } catch (error) {
+        console.error("Error during database initialization:", error);
+        db.close();
+        reject(error);
+      }
+    });
+  });
+}
+
+/**
+ * Create all database tables and indexes
+ * @param {sqlite3.Database} db - Database connection
+ * @returns {Promise<void>}
+ */
+function createTables(db) {
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
   // Enable foreign keys
   db.run("PRAGMA foreign_keys = ON");
   db.run("PRAGMA journal_mode = WAL");
@@ -273,6 +311,21 @@ db.serialize(() => {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
+  // 14. Users - Authentication and authorization
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    email TEXT,
+    password_hash TEXT NOT NULL,
+    role TEXT DEFAULT 'superadmin',
+    is_active INTEGER DEFAULT 1,
+    last_login DATETIME,
+    failed_attempts INTEGER DEFAULT 0,
+    failed_login_timestamp DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
   // Create indexes for performance
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_hostname ON vulnerabilities (hostname)");
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_severity ON vulnerabilities (severity)");
@@ -316,30 +369,119 @@ db.serialize(() => {
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_name ON vulnerability_templates (name)");
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_category ON vulnerability_templates (category)");
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_active ON vulnerability_templates (is_active)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_users_username ON users (username)");
 
-  console.log("Database initialized successfully!");
-  console.log("Tables created:");
-  console.log("  - tickets (ticket management)");
-  console.log("  - vulnerability_imports (import tracking)");
-  console.log("  - vulnerabilities (legacy vulnerability data)");
-  console.log("  - ticket_vulnerabilities (cross-referencing)");
-  console.log("  - vulnerability_snapshots (historical data)");
-  console.log("  - vulnerabilities_current (active vulnerabilities)");
-  console.log("  - vulnerability_daily_totals (aggregated metrics)");
-  console.log("  - vulnerability_staging (import staging)");
-  console.log("  - email_templates (email templates)");
-  console.log("  - kev_status (CISA KEV data)");
-  console.log("  - sync_metadata (sync tracking)");
-  console.log("  - ticket_templates (ticket templates)");
-  console.log("  - vulnerability_templates (vulnerability templates)");
-  console.log("All 13 tables and 33 indexes created successfully!");
-});
+  // Wait for the last index creation to complete before resolving
+  db.run("CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)", (err) => {
+    if (err) {
+      console.error("Error creating indexes:", err.message);
+      reject(err);
+      return;
+    }
 
-// Close database
-db.close((err) => {
-  if (err) {
-    console.error("Error closing database:", err.message);
-  } else {
-    console.log("Database connection closed");
-  }
-});
+    console.log("Database initialized successfully!");
+    console.log("Tables created:");
+    console.log("  - tickets (ticket management)");
+    console.log("  - vulnerability_imports (import tracking)");
+    console.log("  - vulnerabilities (legacy vulnerability data)");
+    console.log("  - ticket_vulnerabilities (cross-referencing)");
+    console.log("  - vulnerability_snapshots (historical data)");
+    console.log("  - vulnerabilities_current (active vulnerabilities)");
+    console.log("  - vulnerability_daily_totals (aggregated metrics)");
+    console.log("  - vulnerability_staging (import staging)");
+    console.log("  - email_templates (email templates)");
+    console.log("  - kev_status (CISA KEV data)");
+    console.log("  - sync_metadata (sync tracking)");
+    console.log("  - ticket_templates (ticket templates)");
+    console.log("  - vulnerability_templates (vulnerability templates)");
+    console.log("  - users (authentication and authorization)");
+    console.log("All 14 tables and 35 indexes created successfully!");
+
+    resolve();
+  });
+    });
+  });
+}
+
+/**
+ * Seed initial data into database
+ * @param {sqlite3.Database} db - Database connection
+ * @returns {Promise<void>}
+ */
+async function seedInitialData(db) {
+  return new Promise((resolve, reject) => {
+    db.get("SELECT COUNT(*) as count FROM users WHERE username = ?", ["admin"], async (err, row) => {
+      if (err) {
+        console.error("Error checking for admin user:", err.message);
+        reject(err);
+        return;
+      }
+
+      // Only seed admin if it doesn't exist
+      if (!row || row.count === 0) {
+        try {
+          // Generate cryptographically secure initial password
+          const initialPassword = randomBytes(16).toString("hex");
+
+          // Hash password with Argon2id
+          const passwordHash = await argon2.hash(initialPassword, {
+            type: argon2.argon2id,
+            memoryCost: 19456,
+            timeCost: 2,
+            parallelism: 1
+          });
+
+          // Insert admin user
+          db.run(
+            `INSERT INTO users (id, username, email, password_hash, role)
+             VALUES (?, ?, ?, ?, ?)`,
+            [
+              "00000000-0000-0000-0000-000000000001",
+              "admin",
+              "admin@hextrackr.local",
+              passwordHash,
+              "superadmin"
+            ],
+            (insertErr) => {
+              if (insertErr) {
+                console.error("Error creating admin user:", insertErr.message);
+                reject(insertErr);
+                return;
+              }
+
+              console.log("");
+              console.log("═══════════════════════════════════════════════════════");
+              console.log("🔐 INITIAL ADMIN CREDENTIALS (SAVE THESE!)");
+              console.log("═══════════════════════════════════════════════════════");
+              console.log("Username: admin");
+              console.log(`Password: ${initialPassword}`);
+              console.log("═══════════════════════════════════════════════════════");
+              console.log("⚠️  CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!");
+              console.log("═══════════════════════════════════════════════════════");
+              console.log("");
+
+              resolve();
+            }
+          );
+        } catch (hashError) {
+          console.error("Error hashing password:", hashError.message);
+          reject(hashError);
+        }
+      } else {
+        console.log("Admin user already exists - skipping seed");
+        resolve();
+      }
+    });
+  });
+}
+
+// Execute database initialization
+initializeDatabase()
+  .then(() => {
+    console.log("Database initialization completed successfully");
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error("Database initialization failed:", error);
+    process.exit(1);
+  });
