@@ -5,6 +5,40 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.49] - 2025-10-05
+
+### Fixed
+
+#### Dark Mode Card Background Colors and Rounded Corners (HEX-122)
+
+**Issue**: Cards in dark mode had two problems:
+1. Cards shared the same background color as the page background, eliminating visual hierarchy
+2. Card headers and bodies appeared as square elements floating on top of rounded containers
+
+**Root Cause**:
+1. September 25th revert (commit `e01b7dd`) removed 33 lines of Bootstrap card dark mode styling
+2. CSS load order issue - `cards.css` loads after `dark-theme.css`, and `.card-body` and `.card-header` lacked explicit `border-radius` values
+
+**Resolution**:
+
+**Dark Theme Colors** (`app/public/styles/shared/dark-theme.css`):
+- Cards now use `#1e293b` (lighter slate) background, visibly distinct from page background `#1a2234` (darker)
+- Card headers use `#1a2234` background matching page background for subtle hierarchy
+- Card bodies have consistent `#1e293b` background with proper text color (`#e2e8f0`)
+- Stats cards have enhanced hover effects with border color transitions
+
+**Border Radius Fix** (`app/public/styles/shared/cards.css`):
+- `.card-body` - Added `border-radius: 8px` to match parent `.card` (all corners rounded)
+- `.card-header` - Added `border-radius: 8px 8px 0 0 !important` (top corners only, requires `!important` to override Tabler.io)
+
+**Testing**: Verified in both light and dark modes via Chrome DevTools - cards now have proper visual hierarchy with lighter backgrounds and clean rounded corners throughout.
+
+**Files Modified**:
+- `app/public/styles/shared/dark-theme.css` - Lines 24-55 (Bootstrap Card Dark Mode Styling)
+- `app/public/styles/shared/cards.css` - Line 29 (card-header border-radius), Line 45 (card-body border-radius)
+
+---
+
 ## [1.0.48] - 2025-10-06
 
 ### Added - Authentication v1.0 🔐
