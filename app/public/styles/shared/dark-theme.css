@@ -21,6 +21,41 @@
     color: var(--ag-foreground-color) !important;
 }
 
+/* Bootstrap Card Dark Mode Styling - Tabler.io Override (HEX-122) */
+[data-bs-theme="dark"] .card {
+    background-color: #1e293b !important;
+    border-color: rgb(255, 255, 255, 0.15) !important;
+    color: #e2e8f0 !important;
+    box-shadow: none !important;
+}
+
+[data-bs-theme="dark"] .card-header {
+    background-color: #1a2234 !important;
+    border-bottom-color: rgb(255, 255, 255, 0.15) !important;
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .card-body {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-radius: 8px !important;
+}
+
+[data-bs-theme="dark"] .card-title {
+    color: #f8fafc !important;
+}
+
+/* Statistics Cards Dark Mode */
+[data-bs-theme="dark"] .stats-card {
+    background-color: #1e293b !important;
+    border-color: rgb(255, 255, 255, 0.15) !important;
+}
+
+[data-bs-theme="dark"] .stats-card:hover {
+    border-color: rgb(255, 255, 255, 0.20) !important;
+    box-shadow: 0 4px 12px rgb(0, 0, 0, 0.4) !important;
+}
+
 /* Global Dark Mode Theme Variables - Moved to css-variables.css for consolidation */
 
 [data-bs-theme="dark"] .ag-theme-quartz {
