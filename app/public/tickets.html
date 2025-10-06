@@ -1042,6 +1042,9 @@
     <script src="scripts/shared/header-loader.js"></script>
     <script src="scripts/shared/footer-loader.js"></script>
     <script src="scripts/shared/settings-modal.js"></script>
+
+    <!-- Authentication State Manager (HEX-128 Task 3.5) -->
+    <script src="scripts/shared/auth-state.js?v=1.0.48-session-fix"></script>
     <script src="/vendor/ag-grid/ag-grid-community.min.js"></script>
     <script src="scripts/shared/ag-grid-theme-manager.js"></script>
     <script src="scripts/shared/template-variables.js"></script>
@@ -1252,6 +1255,25 @@
             } else {
                 console.warn('⚠️ Some editors not available for unified mode');
             }
+        });
+    </script>
+
+    <!-- Authentication Initialization (HEX-128 Task 3.5) -->
+    <script>
+        /**
+         * Initialize authentication on page load
+         * Checks session, updates user menu, redirects if unauthenticated
+         */
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isAuth = await authState.init();
+
+            if (isAuth) {
+                // Update user menu in shared header
+                authState.updateUserMenu();
+
+                console.log('✅ Authenticated as:', authState.getUser().username);
+            }
+            // If not authenticated, authState.init() will auto-redirect to login.html
         });
     </script>
 </body>
