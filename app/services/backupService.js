@@ -53,7 +53,7 @@ class BackupService {
 
                     // Get database file size
                     try {
-                        const dbPath = path.join(__dirname, "..", "public", "data", "hextrackr.db");
+                        const dbPath = path.join(__dirname, "..", "data", "hextrackr.db");
                         const dbSize = PathValidator.safeStatSync(dbPath).size;
 
                         resolve({
