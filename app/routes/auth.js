@@ -20,10 +20,18 @@ const router = express.Router();
 router.post("/login", AuthController.login);
 router.get("/status", AuthController.status);
 
-// HEX-133: CSRF token endpoint (public - needed before state-changing requests)
+/**
+ * GET /api/auth/csrf - Get CSRF token for state-changing requests
+ * @route GET /api/auth/csrf
+ * @access Public - Required before any state-changing requests (POST, PUT, DELETE)
+ * @returns {Object} JSON response with CSRF token
+ * @returns {boolean} success - Always true
+ * @returns {string} csrfToken - CSRF token to include in request headers
+ * @description HEX-133: Generates CSRF token using csrf-sync's generateToken function.
+ *              Token is bound to the request (uses session or cookies).
+ *              Client must include this token in X-CSRF-Token header for all mutations.
+ */
 router.get("/csrf", (req, res) => {
-    // Generate CSRF token using csrf-sync's generateToken function
-    // The token is bound to the request (uses session or cookies)
     const csrfToken = req.app.locals.generateCsrfToken(req);
     res.json({ success: true, csrfToken });
 });
