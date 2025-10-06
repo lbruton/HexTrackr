@@ -1,6 +1,14 @@
 const session = require("express-session");
 const SQLiteStore = require("better-sqlite3-session-store")(session);
 const Database = require("better-sqlite3");
+const fs = require("fs");
+const path = require("path");
+
+// Ensure app/data directory exists before creating session database
+const dataDir = path.join(__dirname, "../data");
+if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+}
 
 /**
  * Session middleware configuration
