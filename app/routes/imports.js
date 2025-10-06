@@ -26,6 +26,7 @@
 const express = require("express");
 const multer = require("multer");
 const ImportController = require("../controllers/importController");
+const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -60,21 +61,21 @@ const upload = multer({
  * Standard vulnerability CSV import with enhanced lifecycle management
  * From server.js lines 2337-2399
  */
-router.post("/vulnerabilities/import", upload.single("csvFile"), ImportController.importVulnerabilities);
+router.post("/vulnerabilities/import", requireAuth, upload.single("csvFile"), ImportController.importVulnerabilities);
 
 /**
  * POST /api/vulnerabilities/import-staging
  * High-performance vulnerability import using staging table for batch processing
  * From server.js lines 2403-2531
  */
-router.post("/vulnerabilities/import-staging", upload.single("csvFile"), ImportController.importVulnerabilitiesStaging);
+router.post("/vulnerabilities/import-staging", requireAuth, upload.single("csvFile"), ImportController.importVulnerabilitiesStaging);
 
 /**
  * POST /api/import/vulnerabilities
  * JSON-based vulnerability import for frontend data upload
  * From server.js lines 3501-3604
  */
-router.post("/import/vulnerabilities", ImportController.importVulnerabilitiesJSON);
+router.post("/import/vulnerabilities", requireAuth, ImportController.importVulnerabilitiesJSON);
 
 // ===============================
 // GENERIC IMPORT ROUTE (for Settings Modal)
@@ -85,7 +86,7 @@ router.post("/import/vulnerabilities", ImportController.importVulnerabilitiesJSO
  * Generic import handler that routes based on 'type' parameter
  * Used by Settings Modal for CSV imports
  */
-router.post("/import", upload.single("file"), async (req, res) => {
+router.post("/import", requireAuth, upload.single("file"), async (req, res) => {
     const { type } = req.body;
     const file = req.file;
 
@@ -162,7 +163,7 @@ router.post("/import", upload.single("file"), async (req, res) => {
  * JSON-based ticket import for frontend data upload
  * From server.js lines 3482-3499
  */
-router.post("/import/tickets", ImportController.importTicketsJSON);
+router.post("/import/tickets", requireAuth, ImportController.importTicketsJSON);
 
 // ===============================
 // IMPORT HISTORY & PROGRESS
@@ -173,14 +174,14 @@ router.post("/import/tickets", ImportController.importTicketsJSON);
  * Get import history with vulnerability counts
  * From server.js lines 2534-2550
  */
-router.get("/imports", ImportController.getImportHistory);
+router.get("/imports", requireAuth, ImportController.getImportHistory);
 
 /**
  * GET /api/import/progress/:sessionId
  * Check import progress for a specific session
  * Progress tracking via WebSocket (ProgressTracker class)
  */
-router.get("/import/progress/:sessionId", ImportController.checkImportProgress);
+router.get("/import/progress/:sessionId", requireAuth, ImportController.checkImportProgress);
 
 // ===============================
 // SERVER.JS INTEGRATION SUMMARY

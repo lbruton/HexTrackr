@@ -9,6 +9,18 @@
 // Load environment variables
 require("dotenv").config();
 
+// HEX-133 Task 1.3: Validate SESSION_SECRET exists at boot time
+if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
+    console.error("\n❌ CRITICAL: SESSION_SECRET is missing or too short!");
+    console.error("📋 Session security requires a cryptographically random secret (32+ characters)");
+    console.error("\n🔧 To generate a secure SESSION_SECRET, run:");
+    console.error("   node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"");
+    console.error("\n📝 Add the generated value to your .env file:");
+    console.error("   SESSION_SECRET=<generated_secret_here>");
+    console.error("\n⚠️  Server startup aborted for security.\n");
+    process.exit(1);
+}
+
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
@@ -24,6 +36,10 @@ const middlewareConfig = require("../config/middleware");
 const ProgressTracker = require("../utils/ProgressTracker");
 const DatabaseService = require("../services/databaseService");
 
+// Authentication middleware
+const { sessionMiddleware } = require("../middleware/auth");
+const { csrfSync } = require("csrf-sync");
+
 // Controllers that require initialization
 const VulnerabilityController = require("../controllers/vulnerabilityController");
 const TicketController = require("../controllers/ticketController");
@@ -31,6 +47,7 @@ const BackupController = require("../controllers/backupController");
 const TemplateController = require("../controllers/templateController");
 const ImportController = require("../controllers/importController");
 const DocsController = require("../controllers/docsController");
+const AuthController = require("../controllers/authController");
 
 // Route modules
 const vulnerabilityRoutes = require("../routes/vulnerabilities");
@@ -41,16 +58,17 @@ const docsRoutes = require("../routes/docs");
 const templateRoutes = require("../routes/templates");
 const kevRoutes = require("../routes/kev");
 const deviceRoutes = require("../routes/devices"); // HEX-101: Device statistics endpoint
+const authRoutes = require("../routes/auth");
 
 // Express application & HTTP/HTTPS server
 const app = express();
 const PORT = process.env.PORT || 8080;
 
 // Trust proxy configuration for nginx reverse proxy
-// Enable when behind nginx to allow Express to see real client IPs in X-Forwarded-* headers
-// Required for: rate limiting, logging, security headers
-// Set TRUST_PROXY=true in .env when behind nginx reverse proxy
-app.set("trust proxy", process.env.TRUST_PROXY === "true");
+// ALWAYS true - we always run behind nginx reverse proxy (HEX-128 CRITICAL FIX)
+// Required for Express to recognize HTTPS from X-Forwarded-Proto header
+// Without this, secure cookies won't work because Express sees connection as HTTP
+app.set("trust proxy", true);
 
 // HTTPS configuration
 const useHTTPS = process.env.USE_HTTPS === "true";
@@ -71,8 +89,38 @@ const io = socketIo(server, middlewareConfig.websocket);
 const progressTracker = new ProgressTracker(io);
 ImportController.setProgressTracker(progressTracker);
 
+// Secure WebSocket connections with session-based authentication
+// Only authenticate on handshake (when sid is undefined), not on subsequent polling requests
+io.engine.use((req, res, next) => {
+    const isHandshake = req._query.sid === undefined;
+    if (!isHandshake) {
+        return next();
+    }
+
+    // Apply session middleware during handshake
+    sessionMiddleware(req, res, (err) => {
+        if (err) {
+            console.error("❌ Socket session error:", err);
+            return next(err);
+        }
+
+        // Check if user is authenticated
+        if (!req.session || !req.session.userId) {
+            console.log("⚠️  Unauthenticated WebSocket connection attempt");
+            return next(new Error("Authentication required"));
+        }
+
+        console.log(`✅ Authenticated WebSocket handshake: ${req.session.username}`);
+        next();
+    });
+});
+
 io.on("connection", (socket) => {
-    console.log(`📡 WebSocket client connected: ${socket.id}`);
+    // Access session from socket handshake
+    const session = socket.request.session;
+    const username = session ? session.username : "Unknown";
+
+    console.log(`📡 WebSocket client connected: ${username} (${socket.id})`);
 
     socket.on("join-progress", (sessionId) => {
         if (sessionId && typeof sessionId === "string") {
@@ -100,12 +148,13 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", (reason) => {
-        console.log(`📡 WebSocket client disconnected: ${socket.id} (${reason})`);
+        console.log(`📡 WebSocket client disconnected: ${username} (${socket.id}) - ${reason}`);
     });
 });
 
 // Database bootstrap using the extracted DatabaseService
-const dbPath = path.join(__dirname, "data", "hextrackr.db");
+// HEX-133: Database moved outside public root for security
+const dbPath = path.join(__dirname, "..", "data", "hextrackr.db");
 const databaseService = new DatabaseService(dbPath);
 
 async function initializeApplication() {
@@ -118,6 +167,7 @@ async function initializeApplication() {
     TicketController.initialize(db);
     BackupController.initialize(db);
     TemplateController.initialize(db);
+    AuthController.initialize(db);
 
     // Seed email templates (v1.0.21 feature)
     const { seedAllTemplates } = require("../utils/seedEmailTemplates");
@@ -129,6 +179,42 @@ async function initializeApplication() {
 
     // Apply middleware configuration
     app.use(cors(middlewareConfig.cors));
+    app.use(sessionMiddleware); // Session management with SQLite store
+
+    // HEX-133 Task 1.2: Body parser MUST come before CSRF middleware
+    // CRITICAL: CSRF middleware needs to read req.body._csrf, so body must be parsed first
+    app.use(express.json(middlewareConfig.bodyParser.json));
+    app.use(express.urlencoded(middlewareConfig.bodyParser.urlencoded));
+
+    // HEX-133 Task 1.2: CSRF protection (must be after session AND body-parser)
+    // CRITICAL: Login endpoint MUST be excluded from CSRF (can't get token before authenticating)
+    // csrf-sync uses Synchroniser Token Pattern - tokens stored in req.session (no secret needed)
+    const { csrfSynchronisedProtection, generateToken } = csrfSync({
+        getTokenFromRequest: (req) => {
+            // Check multiple locations for CSRF token (header, body, query)
+            return req.headers["x-csrf-token"] ||
+                   req.body?._csrf ||
+                   req.query?._csrf;
+        },
+        ignoredMethods: ["GET", "HEAD", "OPTIONS"],
+        // csrf-sync stores tokens in session, retrieves from req.session.csrfToken
+        getTokenFromState: (req) => req.session.csrfToken,
+        storeTokenInState: (req, token) => { req.session.csrfToken = token; },
+        size: 128 // Token size in bits
+    });
+
+    // Make generateToken available to routes via app.locals
+    app.locals.generateCsrfToken = generateToken;
+
+    // Apply CSRF protection to all routes EXCEPT login
+    app.use((req, res, next) => {
+        const publicAuthPaths = ["/api/auth/login", "/api/auth/csrf", "/api/auth/status"];
+        if (publicAuthPaths.includes(req.path)) {
+            return next(); // Skip CSRF for public auth endpoints
+        }
+        return csrfSynchronisedProtection(req, res, next);
+    });
+
     app.use("/api/", rateLimit(middlewareConfig.rateLimit));
 
     // Only use Express compression when NOT behind nginx reverse proxy
@@ -137,9 +223,6 @@ async function initializeApplication() {
     if (process.env.TRUST_PROXY !== "true") {
         app.use(compression());
     }
-
-    app.use(express.json(middlewareConfig.bodyParser.json));
-    app.use(express.urlencoded(middlewareConfig.bodyParser.urlencoded));
 
     // Security headers
     app.use((req, res, next) => {
@@ -180,6 +263,7 @@ async function initializeApplication() {
     app.use("/api/templates", templateRoutes);
     app.use("/api/kev", kevRoutes(db));
     app.use("/api/devices", deviceRoutes); // HEX-101: Device statistics endpoint
+    app.use("/api/auth", authRoutes);
 
     // Legacy lightweight endpoints retained from monolith
     app.get("/api/sites", (req, res) => {
@@ -251,6 +335,11 @@ async function initializeApplication() {
         }
     }));
 
+    // HEX-133: Block access to /data directory (databases moved outside public root)
+    app.use("/data", (req, res) => {
+        res.status(403).json({ error: "Forbidden" });
+    });
+
     app.use(express.static(__dirname, {
         setHeaders: (res, filePath) => {
             if (filePath.endsWith(".html")) {
@@ -259,9 +348,10 @@ async function initializeApplication() {
         }
     }));
 
-    // Root fallback
+    // Root redirect handler (HEX-128 Task 3.5)
+    // Serves index.html which redirects based on authentication status
     app.get("/", (req, res) => {
-        res.sendFile(path.join(__dirname, "tickets.html"));
+        res.sendFile(path.join(__dirname, "index.html"));
     });
 
     // Global error handler
@@ -282,6 +372,17 @@ async function initializeApplication() {
         console.log(`  - Tickets: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/tickets.html`);
         console.log(`  - Vulnerabilities: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/vulnerabilities.html`);
         console.log(`  - API Root: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/api`);
+
+        // HEX-133 Task 1.6: Warn about HTTPS requirement for authentication
+        if (!useHTTPS && process.env.NODE_ENV !== "test") {
+            console.log("\n⚠️  WARNING: Secure cookies enabled but server not using HTTPS!");
+            console.log("   Session cookies will be rejected by browsers over HTTP.");
+            console.log("   Login and authentication will NOT work without HTTPS.");
+            console.log("\n🔧 For local development, use Docker nginx reverse proxy:");
+            console.log("   docker-compose up -d");
+            console.log("   Access via https://localhost or https://dev.hextrackr.com");
+            console.log("   (Type 'thisisunsafe' to bypass self-signed cert warning)\n");
+        }
     });
 }
 
