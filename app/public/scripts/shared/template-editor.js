@@ -10,7 +10,7 @@
  * @version 1.0.21
  */
 
-/* global fetch, bootstrap, DOMPurify */
+/* global authState, bootstrap, DOMPurify */
 
 /**
  * Template Editor Class
@@ -94,7 +94,7 @@ class TemplateEditor {
             // If forceRefresh is true, always fetch from API
             if (forceRefresh) {
                 console.log("[TemplateEditor] Force refresh requested, fetching from API");
-                const response = await fetch("/api/templates/by-name/default_email");
+                const response = await authState.authenticatedFetch("/api/templates/by-name/default_email");
 
                 if (!response.ok) {
                     if (response.status === 404) {
@@ -120,7 +120,7 @@ class TemplateEditor {
                     this.currentTemplate = cachedTemplate;
                     console.log("[TemplateEditor] Using cached template");
                 } else if (!this.currentTemplate) {
-                    const response = await fetch("/api/templates/by-name/default_email");
+                    const response = await authState.authenticatedFetch("/api/templates/by-name/default_email");
 
                     if (!response.ok) {
                         if (response.status === 404) {
@@ -275,7 +275,7 @@ class TemplateEditor {
             // If we have a current template ID, try server-side processing
             if (this.currentTemplate?.id) {
                 try {
-                    const response = await fetch(`/api/templates/${this.currentTemplate.id}/preview`, {
+                    const response = await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/preview`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -386,7 +386,7 @@ class TemplateEditor {
             console.log(`[TemplateEditor] Saving template with ID: ${this.currentTemplate.id}, category: 'email', name: 'default_email'`);
             console.log(`[TemplateEditor] Template content preview: ${templateContent.substring(0, 100)}...`);
 
-            const response = await fetch(`/api/templates/${this.currentTemplate.id}`, {
+            const response = await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
@@ -437,7 +437,7 @@ class TemplateEditor {
 
         try {
             this.isRestoring = true;
-            const response = await fetch(`/api/templates/${this.currentTemplate.id}/reset`, {
+            const response = await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/reset`, {
                 method: "POST"
             });
 
@@ -827,7 +827,7 @@ class TemplateEditor {
         this.isRestoring = true;
         try {
             if (this.currentTemplate?.id) {
-                await fetch(`/api/templates/${this.currentTemplate.id}/reset`, { method: "POST" });
+                await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/reset`, { method: "POST" });
             }
         } catch (resetError) {
             console.warn("Failed to reset email template on server:", resetError.message);
@@ -891,7 +891,7 @@ Ticket ID: [XT_NUMBER]`;
                 category: "email"
             };
 
-            const response = await fetch("/api/templates", {
+            const response = await authState.authenticatedFetch("/api/templates", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

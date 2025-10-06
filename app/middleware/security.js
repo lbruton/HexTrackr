@@ -155,7 +155,10 @@ function createRateLimitMiddleware() {
         max: RATE_LIMIT_MAX_REQUESTS,
         message: RATE_LIMIT_MESSAGE,
         standardHeaders: true,
-        legacyHeaders: false
+        legacyHeaders: false,
+        // Trust proxy configuration for nginx reverse proxy
+        // Uses the rightmost IP from X-Forwarded-For header
+        trust: () => true
     });
 }
 
