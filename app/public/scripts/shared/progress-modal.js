@@ -1122,7 +1122,7 @@ ${embeddedCSS}
         // Reset UI elements
         const header = this.modal.querySelector(".modal-header");
         if (header) {
-            header.className = "modal-header bg-primary text-white";
+            header.className = "modal-header bg-dark text-white";
         }
         
         // Show spinner

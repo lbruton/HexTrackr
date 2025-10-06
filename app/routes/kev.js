@@ -8,6 +8,7 @@
 const express = require("express");
 const KevController = require("../controllers/kevController");
 const rateLimit = require("express-rate-limit");
+const { requireAuth } = require("../middleware/auth");
 
 /**
  * Create KEV router
@@ -37,7 +38,7 @@ function createKevRouter(db) {
      * @description Trigger manual KEV data sync
      * @returns {Object} Sync result with statistics
      */
-    router.post("/sync", syncLimiter, async (req, res) => {
+    router.post("/sync", requireAuth, syncLimiter, async (req, res) => {
         await kevController.syncKevData(req, res);
     });
 
@@ -46,7 +47,7 @@ function createKevRouter(db) {
      * @description Get current KEV sync status and statistics
      * @returns {Object} Status information
      */
-    router.get("/status", async (req, res) => {
+    router.get("/status", requireAuth, async (req, res) => {
         await kevController.getKevStatus(req, res);
     });
 
@@ -56,7 +57,7 @@ function createKevRouter(db) {
      * @query {number} hours - Hours threshold (default: 24)
      * @returns {Object} Auto-sync status
      */
-    router.get("/check-autosync", async (req, res) => {
+    router.get("/check-autosync", requireAuth, async (req, res) => {
         await kevController.checkAutoSync(req, res);
     });
 
@@ -65,7 +66,7 @@ function createKevRouter(db) {
      * @description Get KEV dashboard statistics
      * @returns {Object} Dashboard statistics
      */
-    router.get("/stats", async (req, res) => {
+    router.get("/stats", requireAuth, async (req, res) => {
         await kevController.getKevStats(req, res);
     });
 
@@ -74,7 +75,7 @@ function createKevRouter(db) {
      * @description Get all KEV vulnerabilities
      * @returns {Object} All KEV entries
      */
-    router.get("/all", async (req, res) => {
+    router.get("/all", requireAuth, async (req, res) => {
         await kevController.getAllKevs(req, res);
     });
 
@@ -84,7 +85,7 @@ function createKevRouter(db) {
      * @query {number} limit - Maximum results (default: 100)
      * @returns {Object} Matched vulnerabilities
      */
-    router.get("/matched", async (req, res) => {
+    router.get("/matched", requireAuth, async (req, res) => {
         await kevController.getMatchedKevs(req, res);
     });
 
@@ -94,7 +95,7 @@ function createKevRouter(db) {
      * @param {string} cveId - CVE identifier
      * @returns {Object} KEV metadata
      */
-    router.get("/:cveId", async (req, res) => {
+    router.get("/:cveId", requireAuth, async (req, res) => {
         await kevController.getKevByCve(req, res);
     });
 

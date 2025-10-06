@@ -14,17 +14,18 @@
 
 const express = require("express");
 const TicketController = require("../controllers/ticketController");
+const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
 // Core CRUD operations
-router.get("/", TicketController.getAllTickets);
-router.post("/", TicketController.createTicket);
-router.put("/:id", TicketController.updateTicket);
-router.delete("/:id", TicketController.deleteTicket);
+router.get("/", requireAuth, TicketController.getAllTickets);
+router.post("/", requireAuth, TicketController.createTicket);
+router.put("/:id", requireAuth, TicketController.updateTicket);
+router.delete("/:id", requireAuth, TicketController.deleteTicket);
 
 // Special operations
-router.post("/migrate", TicketController.migrateTickets);
+router.post("/migrate", requireAuth, TicketController.migrateTickets);
 
 /**
  * T053 INTEGRATION NOTES:

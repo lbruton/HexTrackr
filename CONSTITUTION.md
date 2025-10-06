@@ -58,9 +58,9 @@
 
 - All code must pass Codacy Quality Checks
 
-### Section V: Playwright
+### Section V: chrome-devtools
 
-- Playwright Testing SHALL be performed before and after any UI changes.
+- chrome-devtools Testing SHALL be performed before and after any UI changes.
 
 ### Section VI: Sequential Thinking
 
