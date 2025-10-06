@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* global console, localStorage, FileReader, JSZip, URL, XLSX, Blob, navigator, bootstrap, window, document, Tabler, fetch, setTimeout, alert, confirm, atob */
+/* global console, localStorage, FileReader, JSZip, URL, XLSX, Blob, navigator, bootstrap, window, document, Tabler, authState, setTimeout, alert, confirm, atob */
 
 /**
  * HexTrackr - Tickets Management System
@@ -153,7 +153,7 @@ class HexagonTicketsManager {
 
     async loadTicketsFromDB() {
         try {
-            const response = await fetch("/api/tickets");
+            const response = await authState.authenticatedFetch("/api/tickets");
             if (response.ok) {
                 const rawTickets = await response.json();
                 console.log("Raw tickets from DB:", rawTickets);
@@ -187,7 +187,7 @@ class HexagonTicketsManager {
             const method = ticket.id && this.tickets.find(t => t.id === ticket.id) ? "PUT" : "POST";
             const url = method === "PUT" ? `/api/tickets/${ticket.id}` : "/api/tickets";
             
-            const response = await fetch(url, {
+            const response = await authState.authenticatedFetch(url, {
                 method: method,
                 headers: {
                     "Content-Type": "application/json"
@@ -215,7 +215,7 @@ class HexagonTicketsManager {
     // Method to update ticket status to "Overdue" in the database
     async updateTicketStatusToOverdue(ticketId) {
         try {
-            const response = await fetch(`/api/tickets/${ticketId}`, {
+            const response = await authState.authenticatedFetch(`/api/tickets/${ticketId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
@@ -235,7 +235,7 @@ class HexagonTicketsManager {
 
     async deleteTicketFromDB(ticketId) {
         try {
-            const response = await fetch(`/api/tickets/${ticketId}`, {
+            const response = await authState.authenticatedFetch(`/api/tickets/${ticketId}`, {
                 method: "DELETE"
             });
 
@@ -270,7 +270,7 @@ class HexagonTicketsManager {
             console.log("Found", tickets.length, "tickets in localStorage, migrating to database...");
             this.showToast("Migrating tickets from localStorage to database...", "info");
 
-            const response = await fetch("/api/tickets/migrate", {
+            const response = await authState.authenticatedFetch("/api/tickets/migrate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -1981,7 +1981,7 @@ class HexagonTicketsManager {
 
         try {
             // Fetch vulnerabilities from the API
-            const response = await fetch("/api/vulnerabilities?" + new URLSearchParams({
+            const response = await authState.authenticatedFetch("/api/vulnerabilities?" + new URLSearchParams({
                 limit: "10000",  // Get all vulnerabilities for these devices
                 sort: "severity"
             }));
@@ -2201,7 +2201,7 @@ class HexagonTicketsManager {
                     }
 
                     // Check if vulnerability feature is available
-                    const statsResponse = await fetch("/api/vulnerabilities/stats");
+                    const statsResponse = await authState.authenticatedFetch("/api/vulnerabilities/stats");
 
                     if (statsResponse.ok) {
                         const stats = await statsResponse.json();
@@ -2588,7 +2588,7 @@ class HexagonTicketsManager {
      */
     async fetchTemplateFromDB(templateName) {
         try {
-            const response = await fetch(`/api/templates/by-name/${templateName}`);
+            const response = await authState.authenticatedFetch(`/api/templates/by-name/${templateName}`);
             if (!response.ok) {
                 console.warn(`Template ${templateName} not found in database, using fallback`);
                 return null;
@@ -3157,7 +3157,7 @@ class HexagonTicketsManager {
             }
 
             // Check if database has existing data
-            const statsResponse = await fetch("/api/backup/stats");
+            const statsResponse = await authState.authenticatedFetch("/api/backup/stats");
             const stats = await statsResponse.json();
             
             let mode = "check";
@@ -3172,7 +3172,7 @@ class HexagonTicketsManager {
             }
 
             // Use the migration API to import tickets to database
-            const response = await fetch("/api/tickets/migrate", {
+            const response = await authState.authenticatedFetch("/api/tickets/migrate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

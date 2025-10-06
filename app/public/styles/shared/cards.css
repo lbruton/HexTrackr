@@ -26,6 +26,7 @@
     background: var(--tblr-bg-surface-secondary);
     border-bottom: 1px solid var(--tblr-border-color);
     padding: 1rem 1.25rem;
+    border-radius: 8px 8px 0 0 !important;  /* Match parent .card top corners (HEX-122) */
 }
 
 .card-header .card-title {
@@ -42,6 +43,7 @@
 /* Card Body */
 .card-body {
     padding: 1.25rem;
+    border-radius: 8px;  /* Match parent .card border-radius (HEX-122) */
 }
 
 /* Only add margin when there's a card-header for proper spacing */
