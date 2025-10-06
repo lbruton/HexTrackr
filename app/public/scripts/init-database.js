@@ -6,7 +6,7 @@ const path = require("path");
 const { randomBytes } = require("crypto");
 const argon2 = require("argon2");
 
-const dbPath = path.join(__dirname, "..", "data", "hextrackr.db");
+const dbPath = path.join(__dirname, "..", "..", "data", "hextrackr.db");
 
 /**
  * Initialize database schema and seed initial data
@@ -321,6 +321,7 @@ function createTables(db) {
     is_active INTEGER DEFAULT 1,
     last_login DATETIME,
     failed_attempts INTEGER DEFAULT 0,
+    failed_login_timestamp DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
