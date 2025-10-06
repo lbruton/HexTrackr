@@ -19,7 +19,7 @@ const fs = require("fs");
 
 class DatabaseService {
     constructor(dbPath) {
-        this.dbPath = dbPath || path.join(__dirname, "..", "public", "data", "hextrackr.db");
+        this.dbPath = dbPath || path.join(__dirname, "..", "data", "hextrackr.db");
         this.db = null;
         this.isInitialized = false;
         this.activeTransactions = new Set();

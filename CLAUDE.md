@@ -40,7 +40,8 @@ Vulnerability management system for tracking security vulnerabilities, tickets, 
 ```bash
 npm start          # Start production server (port 8080)
 npm run dev        # Development server with nodemon
-npm run init-db    # Initialize SQLite database schema
+npm run init-db    # Initialize SQLite database schema (FRESH INSTALLS ONLY)
+npm run migrate    # Apply database migrations (schema changes on existing DB)
 ```
 
 ### Testing & Quality
@@ -69,6 +70,49 @@ docker-compose logs -f  # Follow container logs
 - **Error Handling**: Service layer returns `{success, data, error}` objects
 - **Security**: All user input validated, parameterized queries, CSRF protection
 - **Testing**: Docker nginx reverse proxy required for all testing
+
+## Database Schema Changes
+
+**⚠️ CRITICAL: NEVER run `npm run init-db` on existing databases with data**
+
+### The Safe Migration Pattern
+
+1. **Create Migration File**: `app/public/scripts/migrations/XXX-description.sql`
+   - Use incremental numbering (001, 002, 003...)
+   - SQL-only files for schema changes
+   - Test the migration on a backup first
+
+2. **Apply Migration**: `npm run migrate`
+   - Safely applies only new migrations
+   - Never touches existing data
+   - Tracks applied migrations in `schema_version` table
+
+3. **Update init-database.js**: Include the change for future fresh installs
+   - Ensures fresh installs have complete schema
+   - Keeps init-database.js as single source of truth
+
+4. **Test Fresh Install**: Verify `npm run init-db` still works on empty database
+
+### Why This Matters
+
+- `init-db` **DROPS ALL TABLES** and recreates from scratch
+- **DATA LOSS** occurs if run on production or development databases
+- Migrations are **ADDITIVE ONLY** - they never destroy data
+- Hook system blocks accidental `init-db` execution
+
+### Migration File Example
+
+```sql
+-- migrations/003-add-auth-tables.sql
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+```
 
 ## Development Workflow
 
