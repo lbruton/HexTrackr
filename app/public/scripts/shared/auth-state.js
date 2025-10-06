@@ -216,9 +216,9 @@ class AuthState {
      */
     async logout() {
         try {
-            const response = await fetch("/api/auth/logout", {
-                method: "POST",
-                credentials: "include"
+            // Use authenticatedFetch to include CSRF token
+            const response = await this.authenticatedFetch("/api/auth/logout", {
+                method: "POST"
             });
 
             if (!response.ok) {
@@ -734,7 +734,7 @@ class AuthState {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    currentPassword,
+                    oldPassword: currentPassword, // HEX-133 Task 1.4: Backend expects "oldPassword"
                     newPassword
                 })
             });
@@ -790,6 +790,24 @@ class AuthState {
      */
     async authenticatedFetch(url, options = {}) {
         try {
+            // HEX-133: Fetch CSRF token for state-changing requests
+            const method = (options.method || "GET").toUpperCase();
+            if (["POST", "PUT", "DELETE", "PATCH"].includes(method)) {
+                try {
+                    const tokenResponse = await fetch("/api/auth/csrf", { credentials: "include" });
+                    const tokenData = await tokenResponse.json();
+                    if (tokenData.success && tokenData.csrfToken) {
+                        options.headers = {
+                            ...options.headers,
+                            "X-CSRF-Token": tokenData.csrfToken
+                        };
+                    }
+                } catch (csrfError) {
+                    console.warn("Failed to fetch CSRF token:", csrfError);
+                    // Continue without CSRF token - let server reject if needed
+                }
+            }
+
             // Merge options with credentials
             const fetchOptions = {
                 ...options,

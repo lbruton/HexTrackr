@@ -9,6 +9,18 @@
 // Load environment variables
 require("dotenv").config();
 
+// HEX-133 Task 1.3: Validate SESSION_SECRET exists at boot time
+if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
+    console.error("\n❌ CRITICAL: SESSION_SECRET is missing or too short!");
+    console.error("📋 Session security requires a cryptographically random secret (32+ characters)");
+    console.error("\n🔧 To generate a secure SESSION_SECRET, run:");
+    console.error("   node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"");
+    console.error("\n📝 Add the generated value to your .env file:");
+    console.error("   SESSION_SECRET=<generated_secret_here>");
+    console.error("\n⚠️  Server startup aborted for security.\n");
+    process.exit(1);
+}
+
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
@@ -26,6 +38,7 @@ const DatabaseService = require("../services/databaseService");
 
 // Authentication middleware
 const { sessionMiddleware } = require("../middleware/auth");
+const { csrfSync } = require("csrf-sync");
 
 // Controllers that require initialization
 const VulnerabilityController = require("../controllers/vulnerabilityController");
@@ -140,7 +153,8 @@ io.on("connection", (socket) => {
 });
 
 // Database bootstrap using the extracted DatabaseService
-const dbPath = path.join(__dirname, "data", "hextrackr.db");
+// HEX-133: Database moved outside public root for security
+const dbPath = path.join(__dirname, "..", "data", "hextrackr.db");
 const databaseService = new DatabaseService(dbPath);
 
 async function initializeApplication() {
@@ -166,6 +180,41 @@ async function initializeApplication() {
     // Apply middleware configuration
     app.use(cors(middlewareConfig.cors));
     app.use(sessionMiddleware); // Session management with SQLite store
+
+    // HEX-133 Task 1.2: Body parser MUST come before CSRF middleware
+    // CRITICAL: CSRF middleware needs to read req.body._csrf, so body must be parsed first
+    app.use(express.json(middlewareConfig.bodyParser.json));
+    app.use(express.urlencoded(middlewareConfig.bodyParser.urlencoded));
+
+    // HEX-133 Task 1.2: CSRF protection (must be after session AND body-parser)
+    // CRITICAL: Login endpoint MUST be excluded from CSRF (can't get token before authenticating)
+    // csrf-sync uses Synchroniser Token Pattern - tokens stored in req.session (no secret needed)
+    const { csrfSynchronisedProtection, generateToken } = csrfSync({
+        getTokenFromRequest: (req) => {
+            // Check multiple locations for CSRF token (header, body, query)
+            return req.headers["x-csrf-token"] ||
+                   req.body?._csrf ||
+                   req.query?._csrf;
+        },
+        ignoredMethods: ["GET", "HEAD", "OPTIONS"],
+        // csrf-sync stores tokens in session, retrieves from req.session.csrfToken
+        getTokenFromState: (req) => req.session.csrfToken,
+        storeTokenInState: (req, token) => { req.session.csrfToken = token; },
+        size: 128 // Token size in bits
+    });
+
+    // Make generateToken available to routes via app.locals
+    app.locals.generateCsrfToken = generateToken;
+
+    // Apply CSRF protection to all routes EXCEPT login
+    app.use((req, res, next) => {
+        const publicAuthPaths = ["/api/auth/login", "/api/auth/csrf", "/api/auth/status"];
+        if (publicAuthPaths.includes(req.path)) {
+            return next(); // Skip CSRF for public auth endpoints
+        }
+        return csrfSynchronisedProtection(req, res, next);
+    });
+
     app.use("/api/", rateLimit(middlewareConfig.rateLimit));
 
     // Only use Express compression when NOT behind nginx reverse proxy
@@ -174,9 +223,6 @@ async function initializeApplication() {
     if (process.env.TRUST_PROXY !== "true") {
         app.use(compression());
     }
-
-    app.use(express.json(middlewareConfig.bodyParser.json));
-    app.use(express.urlencoded(middlewareConfig.bodyParser.urlencoded));
 
     // Security headers
     app.use((req, res, next) => {
@@ -289,6 +335,11 @@ async function initializeApplication() {
         }
     }));
 
+    // HEX-133: Block access to /data directory (databases moved outside public root)
+    app.use("/data", (req, res) => {
+        res.status(403).json({ error: "Forbidden" });
+    });
+
     app.use(express.static(__dirname, {
         setHeaders: (res, filePath) => {
             if (filePath.endsWith(".html")) {
@@ -321,6 +372,17 @@ async function initializeApplication() {
         console.log(`  - Tickets: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/tickets.html`);
         console.log(`  - Vulnerabilities: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/vulnerabilities.html`);
         console.log(`  - API Root: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/api`);
+
+        // HEX-133 Task 1.6: Warn about HTTPS requirement for authentication
+        if (!useHTTPS && process.env.NODE_ENV !== "test") {
+            console.log("\n⚠️  WARNING: Secure cookies enabled but server not using HTTPS!");
+            console.log("   Session cookies will be rejected by browsers over HTTP.");
+            console.log("   Login and authentication will NOT work without HTTPS.");
+            console.log("\n🔧 For local development, use Docker nginx reverse proxy:");
+            console.log("   docker-compose up -d");
+            console.log("   Access via https://localhost or https://dev.hextrackr.com");
+            console.log("   (Type 'thisisunsafe' to bypass self-signed cert warning)\n");
+        }
     });
 }
 

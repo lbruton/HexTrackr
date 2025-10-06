@@ -142,12 +142,17 @@ class AuthController {
             req.session.destroy((err) => {
                 if (err) {
                     console.error("Logout error:", err);
+                    // Even if session destroy fails, clear the cookie
+                    res.clearCookie("hextrackr.sid");
                     return res.status(500).json({
                         success: false,
                         error: "Logout failed",
                         details: err.message
                     });
                 }
+
+                // Clear session cookie to ensure complete logout
+                res.clearCookie("hextrackr.sid");
 
                 res.json({
                     success: true,
@@ -159,6 +164,8 @@ class AuthController {
 
         } catch (error) {
             console.error("Logout error:", error);
+            // Clear cookie even on error
+            res.clearCookie("hextrackr.sid");
             res.status(500).json({
                 success: false,
                 error: "Logout failed",
