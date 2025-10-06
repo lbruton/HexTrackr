@@ -143,7 +143,7 @@ module.exports = {
              * Maximum requests per window
              * @type {number}
              */
-            max: 100,
+            max: 1000, // Increased from 100 - allows ~33 requests/min (reasonable for single user + API calls)
 
             /**
              * Rate limit message
