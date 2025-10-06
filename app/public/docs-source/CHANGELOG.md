@@ -5,6 +5,40 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.50] - 2025-10-05
+
+### Fixed
+
+#### Documentation Portal Authentication Menu (HEX-137)
+
+**Issue**: Documentation portal user menu displayed static placeholder values ("HexTrackr User" / "Manager") instead of authenticated user information. Missing "Change Password" and "Sign Out" options when logged in.
+
+**Root Cause**: Documentation portal (`app/public/docs-html/index.html`) loaded `auth-state.js` but never called initialization code. Unlike protected pages (vulnerabilities.html, tickets.html), the docs portal had no `DOMContentLoaded` listener to invoke `authState.init()` and `authState.updateUserMenu()`.
+
+**Resolution**: Added authentication initialization script to docs portal HTML (lines 131-149):
+- Calls `authState.init()` on page load
+- Calls `authState.updateUserMenu()` when authenticated
+- Maintains public access (no redirect when unauthenticated)
+- Updates user menu to show authenticated username and options
+
+**Result**: Documentation portal now displays:
+- Authenticated username ("admin") instead of placeholder ("HexTrackr User")
+- Authentication status ("Logged in") instead of role ("Manager")
+- "Change Password" menu option with functional modal
+- "Sign Out" menu option with logout functionality
+- Identical user menu behavior across all pages (vulnerabilities, tickets, docs)
+
+**Testing**: Verified via Chrome DevTools:
+- User menu displays "admin" / "Logged in" when authenticated
+- Dropdown includes static menu items + "Change Password" + "Sign Out"
+- Change Password modal loads correctly
+- Preserves public access for unauthenticated users
+
+**Files Modified**:
+- `app/public/docs-html/index.html` - Lines 131-149 (Authentication initialization script)
+
+---
+
 ## [1.0.49] - 2025-10-05
 
 ### Fixed
