@@ -2,6 +2,9 @@
 
 Vulnerability management system for tracking security vulnerabilities, tickets, and Known Exploited Vulnerabilities (KEV). Modular Node.js/Express backend with SQLite database and vanilla JavaScript frontend.
 
+
+***mandatory*** YOU MUST USE claude-context when searching the code base. ALWAYS verify the index is current, RE-INDEX if necessary, and use the semantic search for codebase searches first. 
+
 ## Tech Stack
 
 - **Runtime**: Node.js 22.11.0 LTS
