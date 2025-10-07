@@ -124,13 +124,22 @@ class PreferencesSync {
 
                 console.log(`✅ Synced ${result.data.count} preferences from database to localStorage`);
 
-                // Apply theme if it was loaded from database
+                // Apply theme immediately if loaded from database (prevents FOUC in new browsers)
                 if (themePreference) {
-                    // Dispatch custom event for theme controller to listen for
+                    // Apply theme attribute directly to prevent white flash
+                    document.documentElement.setAttribute("data-bs-theme", themePreference);
+
+                    // Dispatch themeInitialized event for charts and other components
+                    document.dispatchEvent(new CustomEvent("themeInitialized", {
+                        detail: { theme: themePreference, source: "database" }
+                    }));
+
+                    // Also dispatch preferencesLoaded for other listeners
                     window.dispatchEvent(new CustomEvent("preferencesLoaded", {
                         detail: { theme: themePreference, source: "database" }
                     }));
-                    console.log(`🎨 Loaded theme from database: ${themePreference}`);
+
+                    console.log(`🎨 Applied theme from database: ${themePreference}`);
                 }
             }
 
