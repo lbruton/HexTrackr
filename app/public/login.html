@@ -9,10 +9,25 @@
     <script>
     (function() {
         try {
-            // Login page uses simple 'theme' key (not 'hextrackr-theme')
-            var theme = localStorage.getItem('theme');
-            if (theme && (theme === 'dark' || theme === 'light')) {
-                document.documentElement.setAttribute('data-bs-theme', theme);
+            // HEX-138: Handle both JSON format (theme-controller) and string format (database sync)
+            var stored = localStorage.getItem('hextrackr-theme');
+            if (stored) {
+                var theme = null;
+
+                // Try JSON format first
+                try {
+                    var data = JSON.parse(stored);
+                    theme = data && data.theme ? data.theme : null;
+                } catch (jsonError) {
+                    // Fallback to raw string format (from database sync)
+                    if (stored === 'dark' || stored === 'light') {
+                        theme = stored;
+                    }
+                }
+
+                if (theme) {
+                    document.documentElement.setAttribute('data-bs-theme', theme);
+                }
             }
         } catch(e) {
             // Silent fail - defaults to light theme
@@ -275,6 +290,7 @@
 
         /**
          * Toggle theme between light and dark
+         * HEX-138: Now writes to 'hextrackr-theme' JSON format (consistent with main app)
          */
         function toggleTheme() {
             const html = document.documentElement;
@@ -285,24 +301,54 @@
                 html.removeAttribute('data-bs-theme');
                 body.removeAttribute('data-bs-theme');
                 themeIcon.className = 'fas fa-moon';
-                localStorage.setItem('theme', 'light');
+                localStorage.setItem('hextrackr-theme', JSON.stringify({
+                    theme: 'light',
+                    timestamp: Date.now(),
+                    source: 'login-page',
+                    version: '1.0.0'
+                }));
             } else {
                 html.setAttribute('data-bs-theme', 'dark');
                 body.setAttribute('data-bs-theme', 'dark');
                 themeIcon.className = 'fas fa-sun';
-                localStorage.setItem('theme', 'dark');
+                localStorage.setItem('hextrackr-theme', JSON.stringify({
+                    theme: 'dark',
+                    timestamp: Date.now(),
+                    source: 'login-page',
+                    version: '1.0.0'
+                }));
             }
         }
 
         /**
          * Load saved theme preference on page load
+         * HEX-138: Handle both JSON format (theme-controller) and string format (database sync)
          */
         function loadTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-bs-theme', 'dark');
-                document.body.setAttribute('data-bs-theme', 'dark');
-                document.getElementById('theme-icon').className = 'fas fa-sun';
+            try {
+                const stored = localStorage.getItem('hextrackr-theme');
+                if (stored) {
+                    let theme = null;
+
+                    // Try JSON format first
+                    try {
+                        const data = JSON.parse(stored);
+                        theme = data && data.theme ? data.theme : null;
+                    } catch (jsonError) {
+                        // Fallback to raw string format (from database sync)
+                        if (stored === 'dark' || stored === 'light') {
+                            theme = stored;
+                        }
+                    }
+
+                    if (theme === 'dark') {
+                        document.documentElement.setAttribute('data-bs-theme', 'dark');
+                        document.body.setAttribute('data-bs-theme', 'dark');
+                        document.getElementById('theme-icon').className = 'fas fa-sun';
+                    }
+                }
+            } catch (e) {
+                // Silent fail - defaults handled by FOUC script
             }
         }
 
