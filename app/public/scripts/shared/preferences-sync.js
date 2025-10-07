@@ -189,7 +189,7 @@ class PreferencesSync {
             "theme": "hextrackr-theme",
             "markdown_template_ticket": "hextrackr-markdown-ticket",
             "markdown_template_vulnerability": "hextrackr-markdown-vulnerability",
-            "pagination_limit": "hextrackr-pagination-limit",
+            "pagination_enabled": "hextrackr_enablePagination",
             "kev_auto_refresh": "hextrackr-kev-refresh",
             "cisco_api_key": "hextrackr-cisco-key"
         };
@@ -246,22 +246,22 @@ class PreferencesSync {
     }
 
     /**
-     * Sync pagination limit to database
+     * Sync pagination enabled/disabled to database
      *
      * @async
-     * @param {number} limit - Items per page
+     * @param {boolean} enabled - Pagination enabled
      * @returns {Promise<void>}
      */
-    async syncPaginationLimit(limit) {
+    async syncPaginationEnabled(enabled) {
         if (!this.initialized || !this.prefsService) {
             return;
         }
 
         try {
-            this.queueSync("pagination_limit", limit);
+            this.queueSync("pagination_enabled", enabled);
 
         } catch (error) {
-            console.error("Error syncing pagination limit to database:", error);
+            console.error("Error syncing pagination enabled to database:", error);
         }
     }
 
