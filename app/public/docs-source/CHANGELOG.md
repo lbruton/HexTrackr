@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Resolved a race condition in `vulnerability-details-modal.js` that was clearing modal operations during KEV lookups, restoring the CVE handoff used by the Known Exploited Vulnerability modal.
 - Simplified the KEV modal in `vulnerabilities.html` by removing redundant "View CVE Details", "NIST NVD", and footer Close buttons to prevent stacked Bootstrap backdrops and duplicated entry points.
+- Enforced no-wrap styling on AG Grid headers to keep short labels (e.g., KEV) on a single line without expanding the table layout.
 
 ## [1.0.52] - 2025-10-07
 
