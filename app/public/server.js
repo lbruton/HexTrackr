@@ -48,6 +48,7 @@ const TemplateController = require("../controllers/templateController");
 const ImportController = require("../controllers/importController");
 const DocsController = require("../controllers/docsController");
 const AuthController = require("../controllers/authController");
+const PreferencesController = require("../controllers/preferencesController");
 
 // Route modules
 const vulnerabilityRoutes = require("../routes/vulnerabilities");
@@ -59,6 +60,7 @@ const templateRoutes = require("../routes/templates");
 const kevRoutes = require("../routes/kev");
 const deviceRoutes = require("../routes/devices"); // HEX-101: Device statistics endpoint
 const authRoutes = require("../routes/auth");
+const preferencesRoutes = require("../routes/preferences"); // HEX-138: User preferences API
 
 // Express application & HTTP/HTTPS server
 const app = express();
@@ -168,6 +170,7 @@ async function initializeApplication() {
     BackupController.initialize(db);
     TemplateController.initialize(db);
     AuthController.initialize(db);
+    PreferencesController.initialize(db); // HEX-138: User preferences
 
     // Seed email templates (v1.0.21 feature)
     const { seedAllTemplates } = require("../utils/seedEmailTemplates");
@@ -264,6 +267,7 @@ async function initializeApplication() {
     app.use("/api/kev", kevRoutes(db));
     app.use("/api/devices", deviceRoutes); // HEX-101: Device statistics endpoint
     app.use("/api/auth", authRoutes);
+    app.use("/api/preferences", preferencesRoutes); // HEX-138: User preferences
 
     // Legacy lightweight endpoints retained from monolith
     app.get("/api/sites", (req, res) => {
