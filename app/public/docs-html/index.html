@@ -4,6 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HexTrackr Documentation Portal</title>
+
+    <!-- FOUC Prevention: Apply theme before CSS loads -->
+    <script>
+    (function() {
+        try {
+            var stored = localStorage.getItem('hextrackr-theme');
+            if (stored) {
+                var data = JSON.parse(stored);
+                if (data && data.theme) {
+                    document.documentElement.setAttribute('data-bs-theme', data.theme);
+                }
+            } else {
+                // Fallback to sessionStorage (private browsing)
+                stored = sessionStorage.getItem('hextrackr-theme');
+                if (stored) {
+                    var data = JSON.parse(stored);
+                    if (data && data.theme) {
+                        document.documentElement.setAttribute('data-bs-theme', data.theme);
+                    }
+                }
+            }
+        } catch(e) {
+            // Silent fail - theme controller will handle initialization
+        }
+    })();
+    </script>
+
     <link href="../vendor/tabler/css/tabler.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
