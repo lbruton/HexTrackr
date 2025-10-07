@@ -11,17 +11,31 @@
         try {
             var stored = localStorage.getItem('hextrackr-theme');
             if (stored) {
-                var data = JSON.parse(stored);
-                if (data && data.theme) {
-                    document.documentElement.setAttribute('data-bs-theme', data.theme);
+                // FIX (HEX-140): Handle both JSON and simple string formats
+                var theme = null;
+                try {
+                    var data = JSON.parse(stored);
+                    theme = data.theme || data; // Handle {"theme":"dark"} or "dark"
+                } catch (parseError) {
+                    // Simple string format (backward compatibility)
+                    theme = stored;
+                }
+                if (theme === 'dark' || theme === 'light') {
+                    document.documentElement.setAttribute('data-bs-theme', theme);
                 }
             } else {
                 // Fallback to sessionStorage (private browsing)
                 stored = sessionStorage.getItem('hextrackr-theme');
                 if (stored) {
-                    var data = JSON.parse(stored);
-                    if (data && data.theme) {
-                        document.documentElement.setAttribute('data-bs-theme', data.theme);
+                    var theme = null;
+                    try {
+                        var data = JSON.parse(stored);
+                        theme = data.theme || data;
+                    } catch (parseError) {
+                        theme = stored;
+                    }
+                    if (theme === 'dark' || theme === 'light') {
+                        document.documentElement.setAttribute('data-bs-theme', theme);
                     }
                 }
             }

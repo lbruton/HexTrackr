@@ -26,10 +26,19 @@
             return themeAttr === "dark";
         }
 
+        // FIX (HEX-140): Use correct key "hextrackr-theme" and parse JSON format
         try {
-            const storedTheme = localStorage.getItem("theme");
-            if (storedTheme) {
-                return storedTheme === "dark";
+            const stored = localStorage.getItem("hextrackr-theme");
+            if (stored) {
+                // Try parsing as JSON first (new format)
+                try {
+                    const parsed = JSON.parse(stored);
+                    const theme = parsed.theme || parsed;
+                    return theme === "dark";
+                } catch {
+                    // Simple string format (backward compatibility)
+                    return stored === "dark";
+                }
             }
         } catch (error) {
             console.debug("Theme detection fallback:", error);
