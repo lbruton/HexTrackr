@@ -906,7 +906,7 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" onclick="showVulnerabilityDetailsByCVE('${cveId}')">
+                                    <button type="button" class="btn btn-primary" onclick="window.vulnManager.showVulnerabilityDetailsByCVE('${cveId}')">
                                         <i class="fas fa-info-circle me-2"></i>View CVE Details
                                     </button>
                                     <a href="https://nvd.nist.gov/vuln/detail/${cveId}" onclick="window.open(this.href, 'nvd_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;" class="btn btn-primary">
