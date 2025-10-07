@@ -190,7 +190,7 @@ class PreferencesSync {
             "markdown_template_ticket": "hextrackr-markdown-ticket",
             "markdown_template_vulnerability": "hextrackr-markdown-vulnerability",
             "pagination_enabled": "hextrackr_enablePagination",
-            "kev_auto_refresh": "hextrackr-kev-refresh",
+            "kev_auto_refresh": "kevAutoSyncEnabled",
             "cisco_api_key": "hextrackr-cisco-key"
         };
 

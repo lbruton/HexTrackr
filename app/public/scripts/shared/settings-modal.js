@@ -655,13 +655,21 @@ async function syncKevData() {
 
 /**
  * Toggle KEV auto-sync setting
+ * @async
  * @function toggleKevAutoSync
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function toggleKevAutoSync() {
+async function toggleKevAutoSync() {
     const autoSyncCheckbox = document.getElementById("kevAutoSync");
     if (autoSyncCheckbox) {
+        // Write to localStorage for immediate UI consistency
         localStorage.setItem("kevAutoSyncEnabled", autoSyncCheckbox.checked);
+
+        // HEX-138: Sync to database for cross-device persistence
+        if (window.preferencesSync) {
+            await window.preferencesSync.syncKevAutoRefresh(autoSyncCheckbox.checked);
+        }
+
         showNotification(`KEV auto-sync ${autoSyncCheckbox.checked ? "enabled" : "disabled"}`, "info");
     }
 }
