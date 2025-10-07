@@ -186,6 +186,26 @@ class DeviceSecurityModal {
                 }
             },
             {
+                headerName: "KEV",
+                field: "isKev",
+                width: 80,
+                comparator: (valueA, valueB) => {
+                    // Custom sort: Yes > No (KEVs first when descending)
+                    const kevOrder = { "Yes": 1, "No": 0 };
+                    return (kevOrder[valueA] || 0) - (kevOrder[valueB] || 0);
+                },
+                cellRenderer: (params) => {
+                    const kevStatus = params.value || "No";
+                    if (kevStatus === "Yes") {
+                        return "<span class=\"badge bg-danger\" style=\"cursor: pointer;\" title=\"Known Exploited Vulnerability\" onclick=\"showKevDetails('" + (params.data.cve || "") + "')\">YES</span>";
+                    }
+                    return "<span class=\"badge bg-primary\">NO</span>";
+                },
+                cellStyle: {
+                    textAlign: "center"
+                }
+            },
+            {
                 headerName: "VPR",
                 field: "vpr_score",
                 width: 80,
@@ -199,6 +219,13 @@ class DeviceSecurityModal {
                 headerName: "Severity",
                 field: "severity",
                 width: 100,
+                comparator: (valueA, valueB) => {
+                    // Custom sort: Critical > High > Medium > Low
+                    const severityOrder = { "Critical": 4, "High": 3, "Medium": 2, "Low": 1 };
+                    const orderA = severityOrder[valueA] || 0;
+                    const orderB = severityOrder[valueB] || 0;
+                    return orderB - orderA; // Descending order (highest first)
+                },
                 cellRenderer: (params) => {
                     const severity = params.value || "Low";
                     const className = `severity-${severity.toLowerCase()}`;
@@ -280,6 +307,17 @@ class DeviceSecurityModal {
             paginationPageSize: 25,
             paginationPageSizeSelector: false, // Remove page size dropdown for fixed-height modal
             animateRows: true,
+            // Default sort order: Last Seen (desc), Severity, VPR (desc), KEV (desc), Hostname
+            initialState: {
+                sort: {
+                    sortModel: [
+                        { colId: "last_seen", sort: "desc" },
+                        { colId: "severity", sort: "asc" },
+                        { colId: "vpr_score", sort: "desc" },
+                        { colId: "isKev", sort: "desc" }
+                    ]
+                }
+            },
             onGridReady: (params) => {
                 this.deviceGridApi = params.api;
 
