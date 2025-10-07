@@ -109,9 +109,9 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             field: "isKev",
             sortable: true,
             filter: true,
-            width: 70,
-            minWidth: 60,
-            maxWidth: 90,
+            width: 80,
+            minWidth: 80,
+            maxWidth: 100,
             resizable: true,
             cellRenderer: (params) => {
                 const kevStatus = params.value || "No";
@@ -170,8 +170,8 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             sortable: true,
             filter: true,
             width: 150,
-            minWidth: 110,
-            maxWidth: 180,
+            minWidth: 140,
+            maxWidth: 200,
             resizable: true,
             hide: isMobile,
             cellRenderer: (params) => {
@@ -296,15 +296,10 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             resizable: true,
             sortable: true,
             filter: true,
-            wrapHeaderText: true,
-            autoHeaderHeight: true,
+            wrapHeaderText: false,
+            autoHeaderHeight: false,
         },
         animateRows: true,
-        // AG-Grid v32.2+ API: Use object format for rowSelection
-        rowSelection: {
-            mode: "multiRow",
-            enableClickSelection: false  // Replaces suppressRowClickSelection
-        },
         // Pagination configuration - controlled by usePagination parameter
         pagination: usePagination,
         paginationPageSize: usePagination ? 10 : undefined,
