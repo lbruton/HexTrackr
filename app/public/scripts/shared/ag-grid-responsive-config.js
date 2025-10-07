@@ -300,8 +300,11 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             autoHeaderHeight: true,
         },
         animateRows: true,
-        rowSelection: "multiple",
-        suppressRowClickSelection: true,
+        // AG-Grid v32.2+ API: Use object format for rowSelection
+        rowSelection: {
+            mode: "multiRow",
+            enableClickSelection: false  // Replaces suppressRowClickSelection
+        },
         // Pagination configuration - controlled by usePagination parameter
         pagination: usePagination,
         paginationPageSize: usePagination ? 10 : undefined,
@@ -327,7 +330,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
         
         // Column sizing enhancements
         maintainColumnOrder: true,
-        enableColResize: true,
+        // Note: Column resizing controlled by defaultColDef.resizable (already set to true)
         suppressAutoSize: false,
         skipHeaderOnAutoSize: false,
         
