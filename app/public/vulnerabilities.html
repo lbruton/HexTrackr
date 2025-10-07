@@ -894,10 +894,10 @@
 
                                     ${kevData.notes ? `
                                     <h6 class="fw-bold">Additional Notes</h6>
-                                    <p>${kevData.notes.replace(
+                                    <div>${kevData.notes.replace(
                                         /(https?:\/\/[^\s]+)/g,
-                                        '<a href="$1" onclick="window.open(\'$1\', \'kev_popup\', \'width=1200,height=1200,scrollbars=yes,resizable=yes\'); return false;" style="color: #007bff; text-decoration: underline;">$1</a>'
-                                    )}</p>
+                                        '<div class="mb-2"><a href="$1" onclick="window.open(\'$1\', \'kev_popup\', \'width=1200,height=1200,scrollbars=yes,resizable=yes\'); return false;" style="color: #007bff; text-decoration: underline;">$1</a></div>'
+                                    )}</div>
                                     ` : ''}
 
                                     <div class="text-muted small">
