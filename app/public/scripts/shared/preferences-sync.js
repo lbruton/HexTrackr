@@ -111,11 +111,27 @@ class PreferencesSync {
 
             // Sync database preferences to localStorage cache
             if (result.data && result.data.preferences) {
+                let themePreference = null;
+
                 result.data.preferences.forEach(pref => {
                     this.updateLocalStorageCache(pref.key, pref.value);
+
+                    // Track theme preference for application after sync
+                    if (pref.key === "theme") {
+                        themePreference = pref.value;
+                    }
                 });
 
                 console.log(`✅ Synced ${result.data.count} preferences from database to localStorage`);
+
+                // Apply theme if it was loaded from database
+                if (themePreference) {
+                    // Dispatch custom event for theme controller to listen for
+                    window.dispatchEvent(new CustomEvent("preferencesLoaded", {
+                        detail: { theme: themePreference, source: "database" }
+                    }));
+                    console.log(`🎨 Loaded theme from database: ${themePreference}`);
+                }
             }
 
             this.initialized = true;

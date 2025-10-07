@@ -978,6 +978,11 @@
                 authState.updateUserMenu();
 
                 console.log('✅ Authenticated as:', authState.getUser().username);
+
+                // HEX-138: Load user preferences from database
+                if (window.preferencesSync) {
+                    await window.preferencesSync.initialize();
+                }
             }
             // If not authenticated, authState.init() will auto-redirect to login.html
         });

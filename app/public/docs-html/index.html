@@ -147,6 +147,11 @@
                 authState.updateUserMenu();
 
                 console.log('✅ Authenticated as:', authState.getUser().username);
+
+                // HEX-138: Load user preferences from database
+                if (window.preferencesSync) {
+                    await window.preferencesSync.initialize();
+                }
             } else {
                 console.log('ℹ️ Viewing docs as guest (not authenticated)');
             }
