@@ -150,6 +150,7 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
         const settingsModalElement = document.getElementById("settingsModal");
         if (settingsModalElement) {
             settingsModalElement.addEventListener("shown.bs.modal", loadKevSyncStatus);
+            settingsModalElement.addEventListener("shown.bs.modal", loadCiscoCredentials); // HEX-138
         }
         
         // Settings save button
@@ -580,6 +581,62 @@ function showClearConfirmationModal(type, confirmText) {
     });
 }
 
+/**
+ * Load Cisco credentials from database (HEX-138)
+ * Populates form fields with masked credentials if they exist
+ *
+ * @async
+ * @function loadCiscoCredentials
+ * @returns {Promise<void>}
+ */
+async function loadCiscoCredentials() {
+    if (!window.preferencesService) {
+        console.warn("PreferencesService not available - cannot load Cisco credentials");
+        return;
+    }
+
+    try {
+        const result = await window.preferencesService.getPreference("cisco_api_key");
+
+        if (result.success && result.data && result.data.value) {
+            // Split combined credential string
+            const [clientId, clientSecret] = result.data.value.split(":");
+
+            // Populate form fields (masked for security)
+            const clientIdField = document.getElementById("ciscoClientId");
+            const clientSecretField = document.getElementById("ciscoClientSecret");
+            const statusBadge = document.getElementById("ciscoStatus");
+
+            if (clientIdField && clientId) {
+                clientIdField.value = clientId;
+                clientIdField.placeholder = "••••••••"; // Masked display
+            }
+
+            if (clientSecretField && clientSecret) {
+                clientSecretField.value = clientSecret;
+                clientSecretField.placeholder = "••••••••"; // Masked display
+            }
+
+            // Update status badge
+            if (statusBadge) {
+                statusBadge.textContent = "Configured";
+                statusBadge.className = "badge bg-success";
+            }
+
+            console.log("✅ Cisco credentials loaded from database");
+        } else {
+            // No credentials configured
+            const statusBadge = document.getElementById("ciscoStatus");
+            if (statusBadge) {
+                statusBadge.textContent = "Not Configured";
+                statusBadge.className = "badge bg-secondary";
+            }
+        }
+    } catch (error) {
+        console.error("Error loading Cisco credentials:", error);
+    }
+}
+
 // API Test Functions (stubs for now)
 /**
  * Test Cisco PSIRT API connection
@@ -752,6 +809,22 @@ async function loadKevSyncStatus() {
  */
 async function saveSettings() {
     try {
+        // HEX-138 SECURITY: Handle Cisco credentials FIRST (database-only, never localStorage)
+        const ciscoClientId = document.getElementById("ciscoClientId")?.value?.trim() || "";
+        const ciscoClientSecret = document.getElementById("ciscoClientSecret")?.value?.trim() || "";
+
+        if (ciscoClientId && ciscoClientSecret) {
+            // Combine credentials into single secure string for database storage
+            const ciscoApiKey = `${ciscoClientId}:${ciscoClientSecret}`;
+
+            if (window.preferencesSync) {
+                await window.preferencesSync.syncCiscoCredentials(ciscoApiKey);
+                console.log("🔒 Cisco credentials securely saved to database (removed from localStorage)");
+            } else {
+                console.warn("⚠️ PreferencesSync not available - Cisco credentials NOT saved");
+            }
+        }
+
         // Collect all settings from the modal
         const settings = {
             // API Configuration
@@ -759,16 +832,16 @@ async function saveSettings() {
             refreshInterval: parseInt(document.getElementById("refreshInterval")?.value, 10) || 30,
             apiKey: document.getElementById("apiKey")?.value || "",
             enableApiAuth: document.getElementById("enableApiAuth")?.checked || false,
-            
+
             // ServiceNow Configuration
             enableServiceNow: document.getElementById("serviceNowEnabled")?.checked || false,
             serviceNowUrl: document.getElementById("serviceNowInstance")?.value || "",
-            
+
             // Save timestamp
             lastSaved: new Date().toISOString()
         };
 
-        // Save to localStorage
+        // Save to localStorage (NEVER includes Cisco credentials - security)
         localStorage.setItem("hextrackr-settings", JSON.stringify(settings));
         
         // Try to save to server as well (if API is available)
