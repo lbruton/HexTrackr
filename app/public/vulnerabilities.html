@@ -905,15 +905,6 @@
                                         Data source: CISA Known Exploited Vulnerabilities Catalog
                                     </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" onclick="window.vulnManager.showVulnerabilityDetailsByCVE('${cveId}')">
-                                        <i class="fas fa-info-circle me-2"></i>View CVE Details
-                                    </button>
-                                    <a href="https://nvd.nist.gov/vuln/detail/${cveId}" onclick="window.open(this.href, 'nvd_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;" class="btn btn-primary">
-                                        <i class="fas fa-external-link-alt me-2"></i>NIST NVD
-                                    </a>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -943,7 +934,7 @@
             }
         }
 
-        // Make function globally available
+        // Make KEV helper globally available
         window.showKevDetails = showKevDetails;
 
         // HEX-120 Fix: Wrapper function for device modal that works before vulnManager is ready
@@ -1004,3 +995,4 @@
 
 </body>
 </html>
+
