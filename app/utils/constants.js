@@ -52,7 +52,7 @@ const EXPRESS_URLENCODED_LIMIT = "100mb";
 // ================================
 
 // Development vs Production rate limits
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
 const RATE_LIMIT_WINDOW_MS = IS_PRODUCTION ? 15 * 60 * 1000 : 1 * 60 * 1000; // 15 min (prod) / 1 min (dev)
 const RATE_LIMIT_MAX_REQUESTS = IS_PRODUCTION ? 100 : 10000; // 100 (prod) / 10000 (dev)
 const RATE_LIMIT_MESSAGE = "Too many requests from this IP, please try again later.";
