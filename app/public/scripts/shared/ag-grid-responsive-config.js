@@ -109,9 +109,9 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             field: "isKev",
             sortable: true,
             filter: true,
-            width: 70,
-            minWidth: 60,
-            maxWidth: 90,
+            width: 110,
+            minWidth: 110,
+            maxWidth: 140,
             resizable: true,
             cellRenderer: (params) => {
                 const kevStatus = params.value || "No";
@@ -170,8 +170,8 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             sortable: true,
             filter: true,
             width: 150,
-            minWidth: 110,
-            maxWidth: 180,
+            minWidth: 140,
+            maxWidth: 200,
             resizable: true,
             hide: isMobile,
             cellRenderer: (params) => {
@@ -296,12 +296,10 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             resizable: true,
             sortable: true,
             filter: true,
-            wrapHeaderText: true,
-            autoHeaderHeight: true,
+            wrapHeaderText: false,
+            autoHeaderHeight: false,
         },
         animateRows: true,
-        rowSelection: "multiple",
-        suppressRowClickSelection: true,
         // Pagination configuration - controlled by usePagination parameter
         pagination: usePagination,
         paginationPageSize: usePagination ? 10 : undefined,
@@ -327,7 +325,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
         
         // Column sizing enhancements
         maintainColumnOrder: true,
-        enableColResize: true,
+        // Note: Column resizing controlled by defaultColDef.resizable (already set to true)
         suppressAutoSize: false,
         skipHeaderOnAutoSize: false,
         

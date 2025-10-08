@@ -7,6 +7,9 @@
  */
 
 const BackupService = require("../services/backupService");
+const CacheService = require("../services/cacheService");
+
+const cacheService = CacheService.getInstance();
 
 class BackupController {
     constructor() {
@@ -130,6 +133,10 @@ class BackupController {
 
             const controller = BackupController.getInstance();
             const result = await controller.backupService.clearData(type);
+
+            // Ensure API caches are invalidated after destructive actions
+            cacheService.clearAll();
+
             res.json({
                 success: true,
                 message: result.message,

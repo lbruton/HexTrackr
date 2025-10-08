@@ -5,6 +5,79 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Introduced `config/import.config.json`, allowing hostname and vendor-family rules to be configured outside the codebase for CSV imports (e.g., mapping `nfpan` to Palo Alto or `n[rs]wan` to Cisco) so each environment can extend device classification without code changes.
+
+### Fixed
+
+- Resolved a race condition in `vulnerability-details-modal.js` that was clearing modal operations during KEV lookups, restoring the CVE handoff used by the Known Exploited Vulnerability modal.
+- Simplified the KEV modal in `vulnerabilities.html` by removing redundant "View CVE Details", "NIST NVD", and footer Close buttons to prevent stacked Bootstrap backdrops and duplicated entry points.
+- Enforced no-wrap styling on AG Grid headers to keep short labels (e.g., KEV) on a single line without expanding the table layout.
+- Added configurable vendor override support (`config/import.config.json`) so hostname/family patterns like `nfpan` or `n[rs]wan` classify Palo Alto and Cisco devices correctly during CSV imports (server + client).
+- Reduced all API cache TTLs to 90 seconds and ensured explicit cache-bust flags (`_t`, `bustCache=true`) create bypass responses across stats, trends, vulnerabilities, and device endpoints.
+- Clearing vulnerability data now invalidates server caches and wipes front-end session caches immediately, keeping dashboards in sync after destructive operations.
+- CSV import UX now polls progress when WebSockets are unavailable, automatically clears stale sessionStorage metadata, and forces a cache-busting refresh when the progress modal completes.
+- Manual refresh button on the Vulnerabilities page and Settings modal clear actions now trigger full cache-busting reloads, eliminating multi-minute staleness after imports or data wipes.
+
+## [1.0.52] - 2025-10-07
+
+### Added
+
+#### Hidden Keyboard Shortcut: VPR Weekly Summary CSV Export (HEX-144)
+
+**Feature**: Power user feature for instant CSV export of weekly VPR totals via keyboard shortcut.
+
+**Usage**: Cmd+Shift+Click (Mac) or Ctrl+Shift+Click (Windows) on any of the 4 VPR summary cards (Critical, High, Medium, Low)
+
+**CSV Format**:
+- **Columns**: PERIOD, CRITICAL, HIGH, MEDIUM, LOW, TOTAL
+- **Rows**: PREV WEEK, THIS WEEK, CHANGE
+- **Filename**: `vpr-weekly-summary-YYYY-MM-DD.csv`
+- **Excel Compatible**: UTF-8 BOM encoding for proper character display
+
+**Security**:
+- Authentication required - feature only available to logged-in users
+- Early return with console warning if unauthenticated
+
+**Implementation Details**:
+- Extracts current VPR values from displayed stat cards
+- Reverse-calculates previous week values from percentage change badges
+- Formula: `prevWeek = thisWeek / (1 + percentChange/100)`
+- Automatically calculates TOTAL column across all severity levels
+- Prevents card flip behavior when export modifiers are active
+
+**Files Modified**:
+- `app/public/scripts/shared/vulnerability-statistics.js`: Added `setupVprExportShortcut()`, `exportVprWeeklySummary()`, `_handleCardClick()`, and `downloadCSV()` methods
+
+**Use Case**: Security managers can quickly export weekly VPR summaries for Slack/Teams communications and email reports without manual transcription.
+
+**Issue**: [HEX-144](https://linear.app/hextrackr/issue/HEX-144)
+
+### Changed
+
+#### Extended VPR Trends Chart Timeline (HEX-142)
+
+**Feature**: Expanded Historical VPR Trends chart from 14-day to 30-day view for better long-term trend analysis.
+
+**Changes**:
+- Updated chart default zoom to display 30 days of vulnerability trend data
+- Modified chart header text: "Last 14 Days" → "Last 30 Days"
+- No backend changes required - API already serves unlimited historical data
+
+**Files Modified**:
+- `app/public/scripts/shared/vulnerability-chart-manager.js`: Updated `zoomToRecentData()` default parameter and call site
+- `app/public/vulnerabilities.html`: Updated chart header text
+
+**Technical Notes**:
+- Backend `/api/vulnerabilities/trends` endpoint already supports flexible date ranges
+- Chart zoom was the only constraint limiting visibility to 14 days
+- Full historical dataset now visible by default while maintaining responsive performance
+
+**Issue**: [HEX-142](https://linear.app/hextrackr/issue/HEX-142)
+
 ## [1.0.51] - 2025-10-06
 
 ### Added

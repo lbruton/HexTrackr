@@ -222,7 +222,25 @@ class DocumentationPortalV2 {
                 // Handle Developer API specially (external link)
                 if (specialKey === "developer-api") {
                     // Get current theme to pass to popup
-                    const currentTheme = localStorage.getItem("hextrackr-theme") || "dark";
+                    // FIX (HEX-140): Parse JSON format from preferences-sync
+                    let currentTheme = "dark";
+                    try {
+                        const stored = localStorage.getItem("hextrackr-theme");
+                        if (stored) {
+                            // Try parsing as JSON first (new format)
+                            try {
+                                const parsed = JSON.parse(stored);
+                                currentTheme = parsed.theme || parsed;
+                            } catch {
+                                // Simple string format (backward compatibility)
+                                currentTheme = stored;
+                            }
+                        }
+                    } catch (e) {
+                        // Fallback to dark if any error
+                        currentTheme = "dark";
+                    }
+
                     this.navigationStructure["developer-api"] = {
                         title: "Dev Docs",
                         icon: "fas fa-code",
