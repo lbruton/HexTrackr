@@ -262,7 +262,7 @@ class PreferencesService {
     async deleteAllPreferences(userId) {
         return new Promise((resolve, reject) => {
             this.db.run(
-                `DELETE FROM user_preferences WHERE user_id = ?`,
+                "DELETE FROM user_preferences WHERE user_id = ?",
                 [userId],
                 function(err) {
                     if (err) {
@@ -308,7 +308,7 @@ class PreferencesService {
     async getPreferenceCount(userId) {
         return new Promise((resolve, reject) => {
             this.db.get(
-                `SELECT COUNT(*) as count FROM user_preferences WHERE user_id = ?`,
+                "SELECT COUNT(*) as count FROM user_preferences WHERE user_id = ?",
                 [userId],
                 (err, row) => {
                     if (err) {
