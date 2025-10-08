@@ -96,19 +96,62 @@ docker-compose restart   # Restart after code changes
 
 # RPI (Research → Plan → Implement) — Lightweight Workflow
 
-**Tool** The Linear MCP is the primary source of truth for the project planning. We use a 3 phase approach called RPI+, or (Research, Plan, Implement+Test)
-**Templates** When creating issues in Linear the RESEARCH template is opened by default, You must select the appropriate template for each phase when creating the issues. The templates are named RESEARCH, PLAN, and IMPLEMENT. 
-**Goal:** Make every change safe, explainable, and repeatable across tools (Claude Code, Codex CLI, Gemini CLI) using three tiny Markdown files per change.
+**Tool**: The Linear MCP is the primary source of truth for the project planning. We use a 3 phase approach called RPI+, or (Research, Plan, Implement+Test)
 
-## Issue structure (Linear)
+**Templates**: Linear MCP does not support templates via API. When creating issues, you MUST read and apply the template content programmatically:
+- **RESEARCH**: `/docs/TEMPLATE_RESEARCH.md`
+- **PLAN**: `/docs/TEMPLATE_PLAN.md`
+- **IMPLEMENT**: `/docs/TEMPLATE_IMPLEMENT.md`
+
+**Goal**: Make every change safe, explainable, and repeatable across tools (Claude Code, Codex CLI, Gemini CLI) using structured Linear issues.
+
+## Issue Creation Workflow
+
+**CRITICAL**: Always read the appropriate template file and use its content as the issue description.
+
+### Creating RESEARCH Issue (Parent):
+1. Read `/docs/TEMPLATE_RESEARCH.md`
+2. Replace placeholder values:
+   - `HEX-XXX` → actual issue ID (after creation)
+   - `<short name>` → descriptive name
+   - `<your name>` → assignee
+   - Date fields → current date
+3. Create issue with:
+   - Title: `RESEARCH: <short name>`
+   - Description: Template content with frontmatter + all sections
+   - Team: `HexTrackr-Dev`
+
+### Creating PLAN Issue (Child of Research):
+1. Read `/docs/TEMPLATE_PLAN.md`
+2. Replace placeholder values:
+   - `HEX-YYY` → new issue ID
+   - `HEX-XXX` → parent research issue ID
+   - `<same short name>` → same as research
+3. Create issue with:
+   - Title: `PLAN: <same short name>`
+   - Description: Template content
+   - Team: `HexTrackr-Dev`
+   - ParentId: Research issue ID
+
+### Creating IMPLEMENT Issue (Child of Plan):
+1. Read `/docs/TEMPLATE_IMPLEMENT.md`
+2. Replace placeholder values:
+   - `HEX-ZZZ` → new issue ID
+   - `HEX-YYY` → parent plan issue ID
+   - Branch name, dates, etc.
+3. Create issue with:
+   - Title: `IMPLEMENT: <same short name>`
+   - Description: Template content
+   - Team: `HexTrackr-Dev`
+   - ParentId: Plan issue ID
+
+## Issue Structure (Linear)
 - **Parent**: `RESEARCH: <short name>` → e.g. `HEX-123`
 - **Children**: 
-  - `PLAN: <same short name>` (child of research) — e.g. `HEX-124`
-  - `IMPLEMENT: <same short name>` (child of plan) — e.g. `HEX-125`
+  - `PLAN: <same short name>` (child of research) → e.g. `HEX-124`
+  - `IMPLEMENT: <same short name>` (child of plan) → e.g. `HEX-125`
 
-## File Naming (checked into repo alongside the feature branch)
-
- *Note: The Linear MCP auto assigns HEX-XXX numbers to each issue*
+*Note: The Linear MCP auto-assigns HEX-XXX numbers to each issue*
 
 ## Guardrails
 1. **Never edit code before a git checkpoint** (clean worktree; commit with a snapshot message).
@@ -118,9 +161,9 @@ docker-compose restart   # Restart after code changes
 5. If anything feels ambiguous: **pause, ask, and revise the doc** (don’t guess).
 
 ## Tooling Hints
-- **Linear MCP**: sync status/links; use the prebuilt Linear templates and keep titles prefixed (`RESEARCH:`, `PLAN:`, `IMPLEMENT:`).
+- **Linear MCP**: sync status/links; read template files from `/docs/TEMPLATE_*.md` and apply programmatically; keep titles prefixed (`RESEARCH:`, `PLAN:`, `IMPLEMENT:`).
 - **Memento MCP (Neo4j)**: pull past related work, decisions, and code notes for context.
-- **Claude-Context)**: enumerate impacted files, surfaces, and public APIs.
+- **Claude-Context**: enumerate impacted files, surfaces, and public APIs.
 - **Context7**: snapshot current framework/library standards relevant to this change.
 
 ---
