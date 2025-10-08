@@ -94,21 +94,43 @@ docker-compose restart   # Restart after code changes
 - **Security**: All user input validated, parameterized SQL queries, CSRF protection enabled
 - **Error Messages**: Descriptive error objects with context for debugging
 
-## Development Workflow
+# RPI (Research → Plan → Implement) — Lightweight Workflow
 
-**MANDATED PATTERN** - Required for all development work:
+**Tool** The Linear MCP is the primary source of truth for the project planning. We use a 3 phase approach called RPI+, or (Research, Plan, Implement+Test)
+**Templates** When creating issues in Linear the RESEARCH template is opened by default, You must select the appropriate template for each phase when creating the issues. The templates are named RESEARCH, PLAN, and IMPLEMENT. 
+**Goal:** Make every change safe, explainable, and repeatable across tools (Claude Code, Codex CLI, Gemini CLI) using three tiny Markdown files per change.
 
-1. **Planning**: Create Linear issue (HEX-XX) with task breakdown
-2. **Research** (major features): Use `the-brain`, `codebase-navigator`, `memento-oracle` agents
-3. **Git Checkpoint**: `git commit -m "checkpoint: Before Task X.Y"`
-4. **Implement**: ONE task at a time (never batch tasks)
-5. **Test**: Via Docker nginx reverse proxy (`https://localhost`)
-6. **Update Linear**: Add comment with progress/results
-7. **Update CHANGELOG**: `/app/public/docs-source/CHANGELOG.md`
-8. **Create Memento Memory**: Save breakthrough patterns (if applicable)
-9. **⏸️ PAUSE**: Wait for user approval before next task
+## Issue structure (Linear)
+- **Parent**: `RESEARCH: <short name>` → e.g. `HEX-123`
+- **Children**: 
+  - `PLAN: <same short name>` (child of research) — e.g. `HEX-124`
+  - `IMPLEMENT: <same short name>` (child of plan) — e.g. `HEX-125`
 
-**See `/docs/WORKFLOWS.md` for complete workflow documentation.**
+## File Naming (checked into repo alongside the feature branch)
+
+ *Note: The Linear MCP auto assigns HEX-XXX numbers to each issue*
+
+## Guardrails
+1. **Never edit code before a git checkpoint** (clean worktree; commit with a snapshot message).
+2. **Research Readiness Gate must be ✅** before creating/starting the Plan.
+3. **Plan Preflight must be ✅** before starting Implement.
+4. Commit every **1–5 tasks** (as defined in Plan) with clear messages and references to task IDs.
+5. If anything feels ambiguous: **pause, ask, and revise the doc** (don’t guess).
+
+## Tooling Hints
+- **Linear MCP**: sync status/links; use the prebuilt Linear templates and keep titles prefixed (`RESEARCH:`, `PLAN:`, `IMPLEMENT:`).
+- **Memento MCP (Neo4j)**: pull past related work, decisions, and code notes for context.
+- **Claude-Context)**: enumerate impacted files, surfaces, and public APIs.
+- **Context7**: snapshot current framework/library standards relevant to this change.
+
+---
+
+**Definition of Done (DoD) for a change**
+- Research: Readiness Gate ✅ with risks, rollback, test/validation notes.
+- Plan: Step-by-step tasks (1–2h chunks), explicit before/after code blocks, validation & backout.
+- Implement: All plan tasks checked ✅, tests pass, PR checklist completed, Linear issues updated.
+
+**See `/docs/RPI_PROCESS.md` for complete RPI workflow.**
 
 ## Git Workflow
 
