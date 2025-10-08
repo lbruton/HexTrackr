@@ -165,16 +165,9 @@ class DeviceSecurityModal {
 
         const deviceColumnDefs = [
             {
-                headerName: "First Seen",
-                field: "first_seen",
-                width: 120,
-                cellRenderer: (params) => {
-                    return params.value ? new Date(params.value).toLocaleDateString() : "N/A";
-                }
-            },
-            {
                 headerName: "Last Seen",
                 field: "last_seen",
+                colId: "last_seen",
                 width: 120,
                 cellRenderer: (params) => {
                     if (params.value && params.value.trim() !== "") {
@@ -186,9 +179,39 @@ class DeviceSecurityModal {
                 }
             },
             {
+                headerName: "Severity",
+                field: "severity",
+                colId: "severity",
+                width: 110,
+                comparator: (valueA, valueB) => {
+                    // Custom sort: Critical > High > Medium > Low
+                    const severityOrder = { "Critical": 4, "High": 3, "Medium": 2, "Low": 1 };
+                    const orderA = severityOrder[valueA] || 0;
+                    const orderB = severityOrder[valueB] || 0;
+                    return orderB - orderA; // Descending order (highest first)
+                },
+                cellRenderer: (params) => {
+                    const severity = params.value || "Low";
+                    const className = `severity-${severity.toLowerCase()}`;
+                    return `<span class="severity-badge ${className}">${severity}</span>`;
+                }
+            },
+            {
+                headerName: "VPR",
+                field: "vpr_score",
+                colId: "vpr_score",
+                width: 90,
+                cellRenderer: (params) => {
+                    const score = params.value || 0;
+                    const severityClass = this.getVprSeverityClass(score);
+                    return `<span class="severity-badge severity-${severityClass}">${score.toFixed(1)}</span>`;
+                }
+            },
+            {
                 headerName: "KEV",
                 field: "isKev",
-                width: 80,
+                colId: "isKev",
+                width: 110,
                 comparator: (valueA, valueB) => {
                     // Custom sort: Yes > No (KEVs first when descending)
                     const kevOrder = { "Yes": 1, "No": 0 };
@@ -206,35 +229,18 @@ class DeviceSecurityModal {
                 }
             },
             {
-                headerName: "VPR",
-                field: "vpr_score",
-                width: 80,
+                headerName: "First Seen",
+                field: "first_seen",
+                colId: "first_seen",
+                width: 120,
                 cellRenderer: (params) => {
-                    const score = params.value || 0;
-                    const severityClass = this.getVprSeverityClass(score);
-                    return `<span class="severity-badge severity-${severityClass}">${score.toFixed(1)}</span>`;
-                }
-            },
-            {
-                headerName: "Severity",
-                field: "severity",
-                width: 100,
-                comparator: (valueA, valueB) => {
-                    // Custom sort: Critical > High > Medium > Low
-                    const severityOrder = { "Critical": 4, "High": 3, "Medium": 2, "Low": 1 };
-                    const orderA = severityOrder[valueA] || 0;
-                    const orderB = severityOrder[valueB] || 0;
-                    return orderB - orderA; // Descending order (highest first)
-                },
-                cellRenderer: (params) => {
-                    const severity = params.value || "Low";
-                    const className = `severity-${severity.toLowerCase()}`;
-                    return `<span class="severity-badge ${className}">${severity}</span>`;
+                    return params.value ? new Date(params.value).toLocaleDateString() : "N/A";
                 }
             },
             {
                 headerName: "Vulnerability",
                 field: "cve",
+                colId: "cve",
                 width: 140,
                 cellRenderer: (params) => {
                     const cve = params.value;
@@ -269,7 +275,8 @@ class DeviceSecurityModal {
             },
             { 
                 headerName: "Vulnerability Description", 
-                field: "plugin_name", 
+                field: "plugin_name",
+                colId: "plugin_name",
                 flex: 1,
                 cellRenderer: (params) => {
                     const value = params.value || "-";
@@ -301,20 +308,20 @@ class DeviceSecurityModal {
             defaultColDef: {
                 resizable: true,
                 sortable: true,
-                filter: true
+                filter: true,
+                wrapHeaderText: false,
+                autoHeaderHeight: false
             },
             pagination: true,
             paginationPageSize: 25,
             paginationPageSizeSelector: false, // Remove page size dropdown for fixed-height modal
             animateRows: true,
-            // Default sort order: Last Seen (desc), Severity, VPR (desc), KEV (desc), Hostname
+            // Default sort: Last Seen descending (most recent first)
+            // AG-Grid will handle secondary sorting naturally
             initialState: {
                 sort: {
                     sortModel: [
-                        { colId: "last_seen", sort: "desc" },
-                        { colId: "severity", sort: "asc" },
-                        { colId: "vpr_score", sort: "desc" },
-                        { colId: "isKev", sort: "desc" }
+                        { colId: "last_seen", sort: "desc" }
                     ]
                 }
             },

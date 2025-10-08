@@ -7,11 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Introduced `config/import.config.json`, allowing hostname and vendor-family rules to be configured outside the codebase for CSV imports (e.g., mapping `nfpan` to Palo Alto or `n[rs]wan` to Cisco) so each environment can extend device classification without code changes.
+
 ### Fixed
 
 - Resolved a race condition in `vulnerability-details-modal.js` that was clearing modal operations during KEV lookups, restoring the CVE handoff used by the Known Exploited Vulnerability modal.
 - Simplified the KEV modal in `vulnerabilities.html` by removing redundant "View CVE Details", "NIST NVD", and footer Close buttons to prevent stacked Bootstrap backdrops and duplicated entry points.
 - Enforced no-wrap styling on AG Grid headers to keep short labels (e.g., KEV) on a single line without expanding the table layout.
+- Added configurable vendor override support (`config/import.config.json`) so hostname/family patterns like `nfpan` or `n[rs]wan` classify Palo Alto and Cisco devices correctly during CSV imports (server + client).
+- Reduced all API cache TTLs to 90 seconds and ensured explicit cache-bust flags (`_t`, `bustCache=true`) create bypass responses across stats, trends, vulnerabilities, and device endpoints.
+- Clearing vulnerability data now invalidates server caches and wipes front-end session caches immediately, keeping dashboards in sync after destructive operations.
+- CSV import UX now polls progress when WebSockets are unavailable, automatically clears stale sessionStorage metadata, and forces a cache-busting refresh when the progress modal completes.
+- Manual refresh button on the Vulnerabilities page and Settings modal clear actions now trigger full cache-busting reloads, eliminating multi-minute staleness after imports or data wipes.
 
 ## [1.0.52] - 2025-10-07
 

@@ -109,9 +109,9 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             field: "isKev",
             sortable: true,
             filter: true,
-            width: 80,
-            minWidth: 80,
-            maxWidth: 100,
+            width: 110,
+            minWidth: 110,
+            maxWidth: 140,
             resizable: true,
             cellRenderer: (params) => {
                 const kevStatus = params.value || "No";
