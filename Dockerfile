@@ -30,12 +30,13 @@ COPY package*.json ./
 
 # Copy entire application structure (excluding data files)
 COPY app/ ./app/
+COPY config/ ./config/
 COPY eslint.config.mjs ./
 
 # Create necessary directories with proper permissions
 # Note: Database files will be mounted via volumes, not copied
-RUN mkdir -p ./app/public/data ./app/roadmaps ./app/uploads ./app/public/docs ./app/audit && \
-    chmod 777 ./app/public/data ./app/uploads
+RUN mkdir -p ./app/public/data ./app/data ./app/roadmaps ./app/uploads ./app/public/docs ./app/audit && \
+    chmod 777 ./app/public/data ./app/data ./app/uploads
 
 # Note: Running as root in container for development
 # In production, use proper user/group mapping

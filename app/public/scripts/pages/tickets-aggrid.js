@@ -556,8 +556,8 @@
                 sortable: true,
                 filter: true,
                 minWidth: 80,
-                wrapHeaderText: true,
-                autoHeaderHeight: true
+                wrapHeaderText: false,
+                autoHeaderHeight: false
             },
             pagination: true,
             paginationPageSize: manager.rowsPerPage || 10,
