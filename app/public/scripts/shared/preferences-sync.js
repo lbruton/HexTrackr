@@ -114,11 +114,42 @@ class PreferencesSync {
                 let themePreference = null;
 
                 result.data.preferences.forEach(pref => {
-                    this.updateLocalStorageCache(pref.key, pref.value);
+                    // CRITICAL FIX: Check if localStorage has a fresher value before overwriting
+                    // This prevents stale database values from overwriting fresh user changes
+                    const storageKey = this.getStorageKey(pref.key);
+                    const existingValue = localStorage.getItem(storageKey);
+
+                    let shouldUpdate = true;
+
+                    if (existingValue && pref.key === "theme") {
+                        // Theme preferences have timestamps - preserve if VERY fresh (< 500ms old)
+                        // This prevents race conditions while allowing cross-browser sync
+                        // FIX (HEX-140): Reduced from 5000ms to 500ms to enable cross-browser sync
+                        try {
+                            const cached = JSON.parse(existingValue);
+                            if (cached && cached.timestamp) {
+                                const age = Date.now() - cached.timestamp;
+                                if (age < 500) {
+                                    // localStorage value is very fresh, preserve it (prevents race condition)
+                                    console.log(`🔒 Preserving fresh localStorage theme (${age}ms old): ${cached.theme}`);
+                                    shouldUpdate = false;
+                                } else {
+                                    // localStorage value is stale, use database value for cross-device sync
+                                    console.log(`🔄 Updating stale localStorage theme (${age}ms old) with database value`);
+                                }
+                            }
+                        } catch (e) {
+                            // Not JSON or no timestamp, safe to update
+                        }
+                    }
+
+                    if (shouldUpdate) {
+                        this.updateLocalStorageCache(pref.key, pref.value);
+                    }
 
                     // Track theme preference for application after sync
                     if (pref.key === "theme") {
-                        themePreference = pref.value;
+                        themePreference = shouldUpdate ? pref.value : (existingValue ? JSON.parse(existingValue).theme : pref.value);
                     }
                 });
 
@@ -165,7 +196,19 @@ class PreferencesSync {
             // Convert preference keys to localStorage format
             const storageKey = this.getStorageKey(key);
 
-            if (typeof value === "object") {
+            // CRITICAL FIX (HEX-140): Theme requires JSON format for FOUC prevention
+            // Database stores simple string "dark"/"light", but themeController expects
+            // JSON object {"theme":"dark","timestamp":...,"source":"database","version":"1.0.0"}
+            if (key === "theme") {
+                // Wrap theme in themeController's expected JSON format
+                const themeData = {
+                    theme: value,
+                    timestamp: Date.now(),
+                    source: "database",
+                    version: "1.0.0"
+                };
+                localStorage.setItem(storageKey, JSON.stringify(themeData));
+            } else if (typeof value === "object") {
                 localStorage.setItem(storageKey, JSON.stringify(value));
             } else {
                 localStorage.setItem(storageKey, String(value));
@@ -201,6 +244,9 @@ class PreferencesSync {
      * Sync theme preference to database
      * Called when theme changes in the UI
      *
+     * CRITICAL: Theme sync is IMMEDIATE (not debounced) because users expect
+     * theme to persist instantly when navigating between pages.
+     *
      * @async
      * @param {string} theme - Theme value ('light' or 'dark')
      * @returns {Promise<void>}
@@ -215,8 +261,17 @@ class PreferencesSync {
         }
 
         try {
-            // Queue the sync (debounced)
-            this.queueSync("theme", theme);
+            // CRITICAL: Sync theme immediately (bypass debounce queue)
+            // Theme is high-priority UX - users expect instant cross-page persistence
+            const result = await this.prefsService.setPreference("theme", theme);
+
+            if (result.success) {
+                // Update localStorage cache
+                this.updateLocalStorageCache("theme", theme);
+                console.log(`🎨 Theme synced to database immediately: ${theme}`);
+            } else {
+                console.warn("Failed to sync theme to database:", result.error);
+            }
 
         } catch (error) {
             console.error("Error syncing theme to database:", error);

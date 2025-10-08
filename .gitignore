@@ -40,6 +40,9 @@ app/dev-docs-html/
 tmp/
 temp/
 
+# Prime context handoff file (session-specific intelligence)
+prime_handoff.json
+
 # Playwright test artifacts
 .playwright-mcp/
 test-results/
@@ -127,3 +130,4 @@ certs/*.key
 # Secrets directory (Docker secrets, API keys)
 secrets/
 backups/
+/backups/commands/

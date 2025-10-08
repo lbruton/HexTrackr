@@ -3,6 +3,7 @@ app/public/data/*.db
 app/public/data/*.db-*
 app/public/data/backups/
 app/public/data/corrupt-backup-*
+app/data/
 
 # Ignore node modules (will be installed in container)
 node_modules/

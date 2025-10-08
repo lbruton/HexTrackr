@@ -488,17 +488,21 @@ async function clearData(type) {
         const response = await authState.authenticatedFetch(`/api/backup/clear/${type}`, {
             method: "DELETE"
         });
-        
+
         if (response.ok) {
             const result = await response.json();
             showNotification(result.message, "success");
             
+            // Clear client-side cache metadata
+            sessionStorage.removeItem("hextrackr_cache_metadata");
+            sessionStorage.removeItem("hextrackr_last_load");
+
             // Refresh statistics
             await refreshStats();
-            
-            // Trigger page-specific refresh if available
+
+            // Trigger page-specific refresh if available (always bust cache)
             if (window.refreshPageData) {
-                window.refreshPageData(type);
+                window.refreshPageData(type, true);
             }
         } else {
             throw new Error("Clear operation failed");

@@ -66,8 +66,8 @@ export class ModernVulnManager {
         return this.coreOrchestrator.switchView(view);
     }
 
-    async loadData() {
-        return this.coreOrchestrator.loadData();
+    async loadData(bustCache = false, options = {}) {
+        return this.coreOrchestrator.loadData(bustCache, options);
     }
 
     viewDeviceDetails(hostname) {
@@ -113,6 +113,9 @@ export class ModernVulnManager {
 
 // Page-specific refresh function for Settings modal and Progress modal integration
 window.refreshPageData = function(type, bustCache = false) {
+    if (type === "vulnerabilities" && bustCache === false) {
+        bustCache = true;
+    }
     if (type === "vulnerabilities" && window.modernVulnManager) {
         console.log("Refreshing vulnerability data after import completion");
         window.modernVulnManager.loadData(bustCache);

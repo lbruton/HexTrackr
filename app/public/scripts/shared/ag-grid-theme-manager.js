@@ -231,10 +231,23 @@ class AGGridThemeManager {
         }
 
         // Check localStorage for stored preference
+        // FIX (HEX-140): Use correct key "hextrackr-theme" and parse JSON format
         try {
-            const storedTheme = localStorage.getItem("theme");
-            if (storedTheme === "dark") {
-                return "dark";
+            const stored = localStorage.getItem("hextrackr-theme");
+            if (stored) {
+                // Try parsing as JSON first (new format)
+                try {
+                    const parsed = JSON.parse(stored);
+                    const theme = parsed.theme || parsed;
+                    if (theme === "dark") {
+                        return "dark";
+                    }
+                } catch {
+                    // Simple string format (backward compatibility)
+                    if (stored === "dark") {
+                        return "dark";
+                    }
+                }
             }
         } catch (_e) {
             // localStorage might not be available

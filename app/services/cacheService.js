@@ -5,9 +5,9 @@
  * and improve response times for frequently-accessed data.
  *
  * Usage Pattern:
- * - Vulnerability data changes only on Monday mornings (imports)
+ * - Vulnerability data changes primarily during imports
  * - Stats/trends are aggregated data (small payloads)
- * - Can cache aggressively with long TTLs
+ * - Default TTL is 90 seconds to keep UI responsive while reducing DB load
  *
  * Performance Impact:
  * - Uncached: 400-1000ms (database query + serialization + compression)
@@ -33,39 +33,39 @@ class CacheService {
 
         /**
          * Stats cache (severity counts, VPR totals)
-         * TTL: 5 minutes (data changes only on imports)
+         * TTL: 90 seconds (kept short for quick UI updates)
          *
          * @type {NodeCache}
          */
         this.statsCache = new NodeCache({
-            stdTTL: 300, // 5 minutes
-            checkperiod: 60, // Check for expired keys every 60s
+            stdTTL: 90, // 90 seconds
+            checkperiod: 30, // Check for expired keys every 30s
             useClones: true, // Return cloned objects to prevent mutations
             maxKeys: 100 // Safety limit
         });
 
         /**
          * Trends cache (dashboard cards, historical data)
-         * TTL: 10 minutes (historical data very stable)
+         * TTL: 90 seconds (kept short for quick UI updates)
          *
          * @type {NodeCache}
          */
         this.trendsCache = new NodeCache({
-            stdTTL: 600, // 10 minutes
-            checkperiod: 120, // Check for expired keys every 2min
+            stdTTL: 90, // 90 seconds
+            checkperiod: 30, // Check for expired keys every 30s
             useClones: true,
             maxKeys: 100
         });
 
         /**
          * Vulnerability data cache (full vulnerability lists)
-         * TTL: 10 minutes (data changes only on imports)
+         * TTL: 90 seconds (kept short for quick UI updates)
          *
          * @type {NodeCache}
          */
         this.vulnerabilityCache = new NodeCache({
-            stdTTL: 600, // 10 minutes (same as trends)
-            checkperiod: 120, // Check for expired keys every 2min
+            stdTTL: 90, // 90 seconds
+            checkperiod: 30, // Check for expired keys every 30s
             useClones: true,
             maxKeys: 50 // Fewer keys (larger payloads)
         });
