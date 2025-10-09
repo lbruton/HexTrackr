@@ -1,0 +1,48 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.10</h1><p><strong>Release Date</strong>: 2025-09-07</p>
+<hr>
+<h2>[1.0.10] - 2025-09-07</h2><h3>Fixed - Real-Time Progress Tracking</h3><ul>
+<li><strong>WebSocket Progress Updates</strong>: Fixed CSV import progress modal hanging at 95% with spinning loading circle<ul>
+<li><strong>Session ID Synchronization</strong>: Resolved frontend/backend session ID mismatch preventing real-time updates<ul>
+<li>Frontend generating: <code>import_1757226509515_1rd7p4qpd</code></li>
+<li>Backend generating: <code>cb92e1d6-42fa-4e8b-a01f-4ca6533011d3</code></li>
+<li>Fixed by modifying server.js to use frontend&#39;s sessionId instead of UUID generation</li>
+</ul>
+</li>
+<li><strong>Progress Complete Event Handling</strong>: Added missing <code>progress-complete</code> event listener in WebSocket client<ul>
+<li>Server was emitting <code>progress-complete</code> but frontend only listened for <code>progress-update</code></li>
+<li>Added proper completion handler in <code>websocket-client.js</code> and <code>progress-modal.js</code></li>
+<li>Fixed JavaScript error: <code>this.updateProgressBar is not a function</code> → changed to <code>this.updateUI()</code></li>
+</ul>
+</li>
+<li><strong>Page Refresh Integration</strong>: Fixed modal closing without refreshing underlying data<ul>
+<li>Added <code>window.refreshPageData</code> function to <code>vulnerability-manager.js</code></li>
+<li>Progress modal now properly triggers data refresh after successful import completion</li>
+<li>Eliminates blank page state on first upload after modal close</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Enhanced - User Experience Improvements</h3><ul>
+<li><strong>Progress Modal Cleanup</strong>: Hidden hardcoded Current/Total/ETA display elements<ul>
+<li>Added <code>d-none</code> class to progress details section showing &quot;0 0 --&quot; placeholder values</li>
+<li>Server already tracks current/total/eta internally for future enhancement implementation</li>
+<li>Clean modal interface focusing on percentage progress and success messaging</li>
+</ul>
+</li>
+</ul>
+<h3>Performance - Import Processing Validation</h3><ul>
+<li><strong>CSV Import Speed</strong>: Confirmed excellent import performance at ~6.8 seconds for 10,000 rows<ul>
+<li>User-reported &quot;hanging at 95%&quot; was UI issue, not performance problem</li>
+<li>Bulk SQLite operations with transaction batching maintaining optimal throughput</li>
+<li>WebSocket progress updates now properly display real-time progress from 5% → 95% → completion</li>
+</ul>
+</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

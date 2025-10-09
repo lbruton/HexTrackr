@@ -1,0 +1,41 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.24</h1><p><strong>Release Date</strong>: 2025-09-23</p>
+<hr>
+<h2>[1.0.24] - 2025-09-23</h2><h3>Enhanced - Vulnerability Card Polish</h3><h4>Card Layout Simplification</h4><ul>
+<li><strong>Streamlined Card Body</strong>: Removed the redundant criticality subcards from vulnerability cards to focus on the key summary details and reduce visual noise.</li>
+<li><strong>Consistent Spacing</strong>: Tweaked card padding to accommodate the simplified layout without affecting existing content hierarchy.</li>
+</ul>
+<h4>KEV Indicator Improvements</h4><ul>
+<li><p><strong>Accessible Badge Placement</strong>: Replaced the inline flame icon with an accessible red KEV pill badge anchored to the top-right corner of each vulnerability card.</p>
+</li>
+<li><p><strong>Improved Visual Priority</strong>: Updated the indicator styling and keyboard handling so KEV status remains prominent while staying aligned with the HexTrackr design system.</p>
+</li>
+<li><p><strong>Vulnerability Cards UI Enhancement</strong>: Removed redundant VPR mini-cards from vulnerability cards to reduce visual clutter</p>
+</li>
+<li><p><strong>CSS Architecture</strong>: Migrated inline styles to external CSS files for better maintainability</p>
+</li>
+<li><p><strong>Enhanced Device Display</strong>: Improved device information presentation in vulnerability cards with theme-aware styling</p>
+</li>
+<li><p><strong>Responsive Design</strong>: Enhanced mobile and tablet layout for vulnerability cards</p>
+</li>
+</ul>
+<h3>Technical Details (2)</h3><ul>
+<li>Added page-specific CSS file (<code>vulnerabilities.css</code>) for vulnerability page styling</li>
+<li>Updated <code>cards.css</code> with enhanced device display component</li>
+<li>Removed VPR mini-cards HTML generation from <code>VulnerabilityCardsManager</code></li>
+<li>Preserved VPR mini-cards functionality in device cards where they remain relevant</li>
+<li>Implemented CSS selector specificity to target only vulnerability cards</li>
+<li>Added theme support with light/dark mode transitions</li>
+</ul>
+<h3>Files Modified (4)</h3><ul>
+<li><code>app/public/styles/pages/vulnerabilities.css</code> (created)</li>
+<li><code>app/public/styles/shared/cards.css</code> (enhanced)</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> (modified)</li>
+<li><code>app/public/pages/vulnerabilities.html</code> (updated CSS references)</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

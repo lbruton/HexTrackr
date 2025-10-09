@@ -1,157 +1,174 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>Getting Started with HexTrackr</h1><p>This guide provides everything you need to get HexTrackr up and running, whether for a production-like environment using Docker or for local development.</p>
+    <h1>Getting Started with HexTrackr</h1><p>Welcome to HexTrackr! This guide will get you up and running quickly with Docker.</p>
 <hr>
-<h2>Key Features</h2><p>HexTrackr is a comprehensive vulnerability management system featuring:</p>
-<ul>
-<li><strong>AG-Grid Powered Interface</strong>: Modern, high-performance data grid for tickets management</li>
-<li><strong>Template System</strong>: Reusable templates for tickets and vulnerability reports</li>
-<li><strong>Backup/Restore</strong>: ZIP-based backup with cross-platform support</li>
-<li><strong>KEV Integration</strong>: CISA Known Exploited Vulnerabilities tracking</li>
-<li><strong>Cross-Platform Docker</strong>: Unified setup for macOS, Linux, and Ubuntu</li>
-</ul>
-<hr>
-<h2>Recommended Setup: Docker & Docker Compose</h2><p>The most reliable and consistent way to run HexTrackr is by using Docker. This method encapsulates the application and its dependencies, avoiding potential conflicts with your local environment.</p>
+<h2>Quick Start (Docker - Recommended)</h2><p>The fastest way to run HexTrackr is using Docker. This method works on macOS, Linux, and Windows.</p>
 <h3>Prerequisites</h3><ul>
-<li><a href="https://docs.docker.com/get-docker/">Docker</a></li>
-<li><a href="https://docs.docker.com/compose/install/">Docker Compose</a></li>
+<li><a href="https://docs.docker.com/get-docker/">Docker</a> installed</li>
+<li><a href="https://docs.docker.com/compose/install/">Docker Compose</a> installed</li>
+<li>Git installed</li>
 </ul>
-<h3>Quick Start with Install Script (Recommended)</h3><p>HexTrackr includes an automated installation script that detects your platform and configures everything automatically.</p>
-<ol>
+<h3>Installation (5 Minutes)</h3><ol>
 <li><p><strong>Clone the Repository</strong></p>
 <pre><code class="language-bash">git <span class="hljs-built_in">clone</span> https://github.com/Lonnie-Bruton/HexTrackr.git
 <span class="hljs-built_in">cd</span> HexTrackr</code></pre></li>
 <li><p><strong>Run the Installation Script</strong></p>
 <pre><code class="language-bash"><span class="hljs-built_in">chmod</span> +x install.sh
-./install.sh</code></pre><p> The script will:</p>
+./install.sh</code></pre><p>The script will:</p>
 <ul>
-<li>Detect your platform (macOS/Linux)</li>
-<li>Check Docker prerequisites</li>
-<li>Create necessary directories</li>
-<li>Build and start the container</li>
+<li>Check your system requirements</li>
+<li>Build the Docker container</li>
+<li>Start HexTrackr automatically</li>
 <li>Verify the installation</li>
 </ul>
 </li>
 <li><p><strong>Access HexTrackr</strong></p>
-<p> The application will be available at <code>http://localhost:8989</code>.</p>
+<p>Open your browser to:</p>
 <ul>
-<li><strong>Tickets Management</strong>: <code>http://localhost:8989/tickets.html</code> (AG-Grid interface)</li>
-<li><strong>Vulnerabilities Management</strong>: <code>http://localhost:8989/vulnerabilities.html</code></li>
-<li><strong>Documentation Portal</strong>: <code>http://localhost:8989/docs-html/</code></li>
+<li><strong>Main Application</strong>: <a href="http://localhost:8989">http://localhost:8989</a></li>
+<li><strong>Tickets Page</strong>: <a href="http://localhost:8989/tickets.html">http://localhost:8989/tickets.html</a></li>
+<li><strong>Vulnerabilities Page</strong>: <a href="http://localhost:8989/vulnerabilities.html">http://localhost:8989/vulnerabilities.html</a></li>
+<li><strong>Documentation</strong>: <a href="http://localhost:8989/docs-html/">http://localhost:8989/docs-html/</a></li>
 </ul>
 </li>
 </ol>
+<p>That&#39;s it! You&#39;re ready to start using HexTrackr.</p>
 <hr>
-<h2>HTTPS Configuration (Optional)</h2><p>HexTrackr v1.0.33+ includes built-in HTTPS support for secure deployment and authentication testing.</p>
-<h3>Quick HTTPS Setup</h3><p>The installation script includes an optional HTTPS configuration step, or you can set it up manually:</p>
-<pre><code class="language-bash"><span class="hljs-comment"># Run the SSL setup script</span>
-./scripts/setup-ssl.sh
-
-<span class="hljs-comment"># Or configure during installation</span>
-./install.sh  <span class="hljs-comment"># Choose &#x27;y&#x27; when prompted for HTTPS</span></code></pre><h3>When You Need HTTPS</h3><ul>
-<li><strong>Authentication</strong>: Required for secure session cookies and login functionality</li>
-<li><strong>Production Deployment</strong>: Essential for any internet-facing deployment</li>
-<li><strong>Development Testing</strong>: Testing authentication features locally</li>
-</ul>
-<h3>Access with HTTPS</h3><p>Once configured, access your application via:</p>
+<h2>HTTPS Setup (Optional)</h2><p>For secure deployment and authentication features, enable HTTPS:</p>
+<pre><code class="language-bash">./scripts/setup-ssl.sh</code></pre><p>Then access HexTrackr at:</p>
 <ul>
-<li><strong>HTTPS</strong>: <code>https://localhost:8989</code> (with self-signed certificate warning)</li>
-<li><strong>HTTP</strong>: <code>http://localhost:8989</code> (still available)</li>
+<li><strong>HTTPS URL</strong>: <a href="https://localhost:8989">https://localhost:8989</a></li>
 </ul>
-<p>For complete HTTPS setup instructions, see the <a href="#guides/https-setup">HTTPS Setup Guide</a>.</p>
+<blockquote>
+<p><strong>Note</strong>: You&#39;ll see a security warning for the self-signed certificate. This is normal for local development. Type <code>thisisunsafe</code> in Chrome to proceed, or add a security exception in other browsers.</p>
+</blockquote>
+<h3>When You Need HTTPS</h3><ul>
+<li><strong>Authentication</strong>: Required for user login features</li>
+<li><strong>Secure Deployment</strong>: Production environments</li>
+<li><strong>API Testing</strong>: Testing secure endpoints</li>
+<li><strong>Compliance</strong>: Security policy requirements</li>
+</ul>
+<p>See the <a href="https-setup.html">HTTPS Setup Guide</a> for advanced configuration.</p>
 <hr>
-<h3>Using Helper Scripts</h3><p>HexTrackr includes convenient helper scripts for Docker management:</p>
-<ul>
-<li><p><strong>Start the Application</strong>:</p>
-<pre><code class="language-bash">./docker-start.sh</code></pre><p>  Starts the container with health checks and status monitoring.</p>
-</li>
-<li><p><strong>Stop the Application</strong>:</p>
-<pre><code class="language-bash">./docker-stop.sh</code></pre><p>  Gracefully stops the container with proper cleanup.</p>
-</li>
-<li><p><strong>Rebuild the Container</strong>:</p>
-<pre><code class="language-bash">./docker-rebuild.sh</code></pre><p>  Rebuilds the Docker image and restarts with latest changes.</p>
-</li>
-<li><p><strong>View Logs</strong>:</p>
-<pre><code class="language-bash">./docker-logs.sh</code></pre><p>  Shows real-time container logs for troubleshooting.</p>
-</li>
-</ul>
-<h3>Manual Docker Setup</h3><p>If you prefer manual control over the Docker setup:</p>
+<h2>Managing HexTrackr</h2><h3>Starting HexTrackr</h3><pre><code class="language-bash">./docker-start.sh</code></pre><h3>Stopping HexTrackr</h3><pre><code class="language-bash">./docker-stop.sh</code></pre><h3>Viewing Logs</h3><pre><code class="language-bash">./docker-logs.sh</code></pre><h3>Rebuilding After Updates</h3><pre><code class="language-bash">./docker-rebuild.sh</code></pre><hr>
+<h2>First Steps</h2><p>Once HexTrackr is running, here&#39;s what to do next:</p>
+<h3>1. Import Your First Data</h3><p><strong>For Tickets:</strong></p>
 <ol>
-<li><p><strong>Build and Start Services</strong></p>
-<pre><code class="language-bash">docker-compose up -d --build</code></pre></li>
-<li><p><strong>Stop Services</strong></p>
-<pre><code class="language-bash">docker-compose down</code></pre></li>
+<li>Go to <a href="http://localhost:8989/tickets.html">http://localhost:8989/tickets.html</a></li>
+<li>Click <strong>Import CSV</strong></li>
+<li>Select your ticket CSV file</li>
+<li>Choose <strong>Add to Existing Data</strong></li>
 </ol>
-<hr>
-<h2>Local Development Setup (Without Docker)</h2><p>For developers who want to work on the HexTrackr source code directly.</p>
-<h3>Prerequisites</h3><ul>
-<li><strong>Node.js</strong>: v18.x or later</li>
-<li><strong>npm</strong>: v8.x or later (typically comes with Node.js)</li>
-</ul>
-<h3>Setup Instructions</h3><ol>
-<li><p><strong>Clone the Repository</strong> (if you haven&#39;t already)</p>
-<pre><code class="language-bash">git <span class="hljs-built_in">clone</span> https://github.com/Lonnie-Bruton/HexTrackr.git
-<span class="hljs-built_in">cd</span> HexTrackr</code></pre></li>
-<li><p><strong>Install Dependencies</strong></p>
-<p> Install the required Node.js packages.</p>
-<pre><code class="language-bash">npm install</code></pre></li>
-<li><p><strong>Initialize the Database</strong></p>
-<p> This script creates the <code>hextrackr.db</code> SQLite file in the <code>data/</code> directory and sets up the necessary tables.</p>
-<pre><code class="language-bash">npm run init-db</code></pre></li>
-<li><p><strong>Start the Development Server</strong></p>
-<pre><code class="language-bash">npm run dev</code></pre><p> The server will start on port 8080 internally. When running locally without Docker, access the application at <code>http://localhost:8080</code>.</p>
-<p> <strong>Note</strong>: When using Docker, the application is accessible at <code>http://localhost:8989</code> due to port mapping.</p>
-</li>
-</ol>
-<h3>Development Scripts</h3><p>The project includes several scripts in the <code>package.json</code> to aid development:</p>
-<ul>
-<li><code>npm start</code>: Starts the production server.</li>
-<li><code>npm run dev</code>: Starts the server with <code>nodemon</code> for automatic restarts on file changes.</li>
-<li><code>npm run init-db</code>: Initializes or re-initializes the database.</li>
-<li><code>npm run lint:all</code>: Runs all code quality checks (ESLint for JS, Stylelint for CSS, Markdownlint for docs).</li>
-<li><code>npm run fix:all</code>: Attempts to automatically fix all code quality issues.</li>
-<li><code>npm run docs:generate</code>: <strong>Regenerates the complete HTML documentation portal</strong>.</li>
-<li><code>npm run docs:sync-specs</code>: Syncs specification tasks to the roadmap (part of docs:generate).</li>
-<li><code>npm run docs:sync-all</code>: Comprehensive documentation synchronization across all sources.</li>
-</ul>
-<hr>
-<h2>Troubleshooting</h2><h3>Backup and Restore Issues</h3><p>If you encounter issues with backup restoration:</p>
+<p><strong>For Vulnerabilities:</strong></p>
 <ol>
-<li><strong>Ensure the backup file is a valid ZIP</strong>: The system expects ZIP files containing JSON data</li>
-<li><strong>Check file permissions</strong>: Docker container needs write access to <code>/tmp/</code> directory</li>
-<li><strong>Verify data format</strong>: Backups support both legacy and new nested data structures</li>
+<li>Go to <a href="http://localhost:8989/vulnerabilities.html">http://localhost:8989/vulnerabilities.html</a></li>
+<li>Click <strong>Import</strong></li>
+<li>Select a scan date</li>
+<li>Choose your vulnerability CSV file</li>
 </ol>
-<h3>Cross-Platform Considerations</h3><h4>macOS</h4><ul>
-<li>Docker Desktop handles file permissions automatically</li>
-<li>Use the provided helper scripts for best experience</li>
+<h3>2. Explore the Dashboard</h3><ul>
+<li><strong>View Statistics</strong>: Check the summary cards for quick insights</li>
+<li><strong>Filter Data</strong>: Use the search and filter options</li>
+<li><strong>View Details</strong>: Click on any row to see full details</li>
 </ul>
-<h4>Linux/Ubuntu</h4><ul>
-<li>Ensure Docker daemon is running: <code>sudo systemctl status docker</code></li>
-<li>Add your user to docker group: <code>sudo usermod -aG docker $USER</code></li>
-<li>File permissions are handled automatically by the unified Dockerfile</li>
+<h3>3. Export Reports</h3><ul>
+<li><strong>Tickets</strong>: Use the export toolbar for CSV, Excel, PDF, or HTML</li>
+<li><strong>Vulnerabilities</strong>: Try the hidden power feature - Cmd/Ctrl+Shift+Click on any VPR card for vendor breakdowns</li>
 </ul>
-<h3>Common Issues</h3><ol>
-<li><p><strong>Port 8989 Already in Use</strong></p>
-<pre><code class="language-bash">docker ps  <span class="hljs-comment"># Check for existing containers</span>
-docker stop $(docker ps -q)  <span class="hljs-comment"># Stop all containers</span></code></pre></li>
-<li><p><strong>Database Access Errors</strong></p>
+<h3>4. Configure Settings</h3><p>Click the Settings icon to:</p>
 <ul>
-<li>The database is stored in <code>app/public/data/hextrackr.db</code></li>
-<li>Ensure proper permissions: <code>chmod 777 app/public/data</code></li>
-</ul>
-</li>
-<li><p><strong>Container Won&#39;t Start</strong></p>
-<pre><code class="language-bash">docker logs hextrackr-hextrackr-1  <span class="hljs-comment"># Check logs for errors</span>
-./docker-rebuild.sh  <span class="hljs-comment"># Rebuild from scratch</span></code></pre></li>
-</ol>
-<hr>
-<h2>Next Steps</h2><ul>
-<li>Review the <a href="#user-guide">User Guide</a> for detailed feature documentation</li>
-<li>Explore the <a href="#api-reference/overview">API Reference</a> for integration options</li>
-<li>Check the <a href="#architecture/overview">Architecture Guide</a> for system design details</li>
+<li>Set up ServiceNow integration</li>
+<li>Configure KEV synchronization</li>
+<li>Customize your theme</li>
 </ul>
 <hr>
-<p>For additional support, please refer to the <a href="https://github.com/Lonnie-Bruton/HexTrackr">HexTrackr GitHub repository</a> or open an issue.</p>
+<h2>Next Steps</h2><h3>Learn More</h3><ul>
+<li><strong><a href="user-guide.html">User Guide</a></strong> - Complete feature walkthrough</li>
+<li><strong><a href="kev-integration.html">KEV Integration</a></strong> - CISA Known Exploited Vulnerabilities</li>
+<li><strong><a href="https-setup.html">HTTPS Setup</a></strong> - Secure deployment guide</li>
+</ul>
+<h3>Customize HexTrackr</h3><ul>
+<li><strong>Theme</strong>: Customize colors and appearance in Settings</li>
+<li><strong>Integration</strong>: Connect to ServiceNow</li>
+<li><strong>Automation</strong>: Use the JSON export for automated workflows</li>
+</ul>
+<h3>Get Help</h3><ul>
+<li><strong>Documentation Portal</strong>: Complete docs at <a href="http://localhost:8989/docs-html/">http://localhost:8989/docs-html/</a></li>
+<li><strong>Troubleshooting</strong>: Check the reference documentation for common issues</li>
+<li><strong>API Reference</strong>: For integrations and advanced usage</li>
+</ul>
+<hr>
+<h2>System Requirements</h2><ul>
+<li><strong>RAM</strong>: 2GB minimum, 4GB recommended</li>
+<li><strong>Storage</strong>: 1GB for application, additional space for data</li>
+<li><strong>Ports</strong>: 8989 (HTTP), 8443 (HTTPS if configured)</li>
+<li><strong>OS</strong>: macOS, Linux, Windows (with Docker)</li>
+</ul>
+<hr>
+<h2>Quick Reference</h2><h3>Common URLs</h3><table>
+<thead>
+<tr>
+<th>Page</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Main Dashboard</td>
+<td><a href="http://localhost:8989">http://localhost:8989</a></td>
+</tr>
+<tr>
+<td>Tickets</td>
+<td><a href="http://localhost:8989/tickets.html">http://localhost:8989/tickets.html</a></td>
+</tr>
+<tr>
+<td>Vulnerabilities</td>
+<td><a href="http://localhost:8989/vulnerabilities.html">http://localhost:8989/vulnerabilities.html</a></td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td><a href="http://localhost:8989/docs-html/">http://localhost:8989/docs-html/</a></td>
+</tr>
+<tr>
+<td>JSDoc (Dev)</td>
+<td><a href="http://localhost:8989/dev-docs-html/">http://localhost:8989/dev-docs-html/</a></td>
+</tr>
+</tbody></table>
+<h3>Common Commands</h3><table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Start</td>
+<td><code>./docker-start.sh</code></td>
+</tr>
+<tr>
+<td>Stop</td>
+<td><code>./docker-stop.sh</code></td>
+</tr>
+<tr>
+<td>Logs</td>
+<td><code>./docker-logs.sh</code></td>
+</tr>
+<tr>
+<td>Rebuild</td>
+<td><code>./docker-rebuild.sh</code></td>
+</tr>
+<tr>
+<td>HTTPS Setup</td>
+<td><code>./scripts/setup-ssl.sh</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Troubleshooting</h2><h3>Port Already in Use</h3><p>If port 8989 is already in use, stop HexTrackr and try again:</p>
+<pre><code class="language-bash">./docker-stop.sh
+./docker-start.sh</code></pre><h3>Container Won't Start</h3><p>Check the logs for errors:</p>
+<pre><code class="language-bash">./docker-logs.sh</code></pre><h3>Cannot Access Application</h3><p>Verify Docker is running:</p>
+<pre><code class="language-bash">docker ps</code></pre><p>You should see a container named <code>hextrackr</code> in the list.</p>
+<hr>
+<p>That&#39;s it! You&#39;re ready to start managing tickets and vulnerabilities with HexTrackr. Check the <a href="user-guide.html">User Guide</a> for detailed feature documentation.</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

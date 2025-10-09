@@ -1,0 +1,48 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.27</h1><p><strong>Release Date</strong>: 2025-09-24</p>
+<hr>
+<h2>[1.0.27] - 2025-09-24</h2><h3>Added - KEV Badge on Device Cards</h3><h4>Enhanced Risk Visibility</h4><ul>
+<li><strong>Consistent UI Indicators</strong>: Added KEV (Known Exploited Vulnerabilities) badges to device cards, creating visual consistency with vulnerability cards<ul>
+<li><strong>Badge Appearance</strong>: Red KEV badge displays in upper right corner when ANY vulnerability on that device is in CISA&#39;s KEV catalog</li>
+<li><strong>Risk Assessment</strong>: Users can now instantly identify high-risk devices requiring immediate attention</li>
+<li><strong>Click Functionality</strong>: Clicking KEV badge opens device details modal to view all vulnerabilities affecting that device</li>
+</ul>
+</li>
+</ul>
+<h4>Technical Implementation (2)</h4><ul>
+<li><strong>Backend Enhancement</strong>: Extended device aggregation logic to track KEV status across all vulnerabilities per device<ul>
+<li>Modified <code>getFilteredDevices()</code> in <code>vulnerability-data.js</code> to include <code>hasKev</code> property</li>
+<li>Added KEV tracking during vulnerability iteration: <code>if (vuln.isKev === &quot;Yes&quot;) { device.hasKev = true; }</code></li>
+</ul>
+</li>
+<li><strong>Frontend Integration</strong>: Enhanced device card generation to display KEV badges<ul>
+<li>Updated <code>generateDeviceCardsHTML()</code> in <code>vulnerability-cards.js</code> with KEV badge HTML</li>
+<li>Used identical badge structure as vulnerability cards for UI consistency</li>
+</ul>
+</li>
+<li><strong>Styling Consistency</strong>: Extended existing KEV CSS styles to support device cards<ul>
+<li>Added <code>.device-card .kev-indicator</code> selectors to match vulnerability card styling</li>
+<li>Maintained responsive design and accessibility features</li>
+</ul>
+</li>
+</ul>
+<h4>User Experience Improvements</h4><ul>
+<li><strong>Immediate Risk Recognition</strong>: Security teams can quickly scan device cards to identify compromised systems</li>
+<li><strong>Operational Efficiency</strong>: Faster prioritization of remediation efforts based on visual KEV indicators</li>
+<li><strong>UI Consistency</strong>: Uniform KEV badge appearance across all card types (vulnerability cards and device cards)</li>
+<li><strong>Accessibility</strong>: Full keyboard navigation support with ARIA labels and focus indicators</li>
+</ul>
+<h4>Files Modified (3)</h4><ul>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code>: Device aggregation logic for KEV tracking</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code>: Device card HTML generation with KEV badges</li>
+<li><code>app/public/styles/pages/vulnerabilities.css</code>: Extended KEV indicator styles for device cards</li>
+</ul>
+<h4>Linear Issue</h4><ul>
+<li><strong>HEX-10</strong>: v1.0.27: Feature - Add KEV Badge to Device Cards (Completed)</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
