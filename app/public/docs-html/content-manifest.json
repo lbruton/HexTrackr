@@ -1,5 +1,5 @@
 {
-  "generated": "2025-10-09T08:23:34.885Z",
+  "generated": "2025-10-09T20:55:38.679Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -70,6 +70,11 @@
       "icon": "fas fa-list",
       "indexFile": "changelog/index",
       "children": {
+        "1.0.55": {
+          "file": "changelog/versions/1.0.55",
+          "title": "1.0.55",
+          "path": "changelog/versions/1.0.55.html"
+        },
         "1.0.54": {
           "file": "changelog/versions/1.0.54",
           "title": "1.0.54",
@@ -359,15 +364,15 @@
       "icon": "fas fa-file-alt",
       "indexFile": "reference/index",
       "children": {
-        "performance": {
-          "file": "reference/performance",
-          "title": "Performance",
-          "path": "reference/performance.html"
-        },
         "security": {
           "file": "reference/security",
           "title": "Security",
           "path": "reference/security.html"
+        },
+        "system-requirements": {
+          "file": "reference/system-requirements",
+          "title": "System Requirements",
+          "path": "reference/system-requirements.html"
         },
         "troubleshooting": {
           "file": "reference/troubleshooting",
@@ -396,5 +401,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 77
+  "totalFiles": 78
 }
