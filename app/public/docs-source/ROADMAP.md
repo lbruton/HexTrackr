@@ -156,6 +156,32 @@ Extended REST API capabilities for integration with security tools and enterpris
 
 ## 🔌 Integrations & Analytics
 
+### Cisco PSIRT Integration Enhancements
+
+**Status**: Planned (HEX-141)
+**Priority**: High
+**Business Value**: Critical remediation intelligence for Cisco products
+
+Enhance the vulnerability details modal to display **Cisco fixed software versions** by utilizing the existing Cisco PSIRT API integration.
+
+**Current State**: Cisco API working but underutilized (shows basic alert with 4 fields)
+
+**Planned Features:**
+
+- Display Cisco fixed software versions in vulnerability details modal
+- Show affected product releases and versions
+- Link to full Cisco security advisories
+- Handle multiple fix versions across different platforms
+- Graceful fallback when no Cisco advisory exists
+
+**Implementation Approach** (3 phases):
+
+- **Phase 1 (MVP)**: Enhance modal with `firstFixed` field display (4-6 hours)
+- **Phase 2 (Performance)**: Add OAuth token caching and credential security (8-10 hours)
+- **Phase 3 (Enterprise)**: Backend proxy pattern with database caching (16-20 hours)
+
+**Why This Matters**: Security teams need immediate access to patch information. Currently, users must manually look up Cisco advisories - this integration brings remediation guidance directly into the vulnerability workflow.
+
 ### Advanced Reporting
 
 Enhanced reporting capabilities for security teams and management dashboards.
