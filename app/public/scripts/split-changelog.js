@@ -117,7 +117,7 @@ function main() {
         console.log(`   ${VERSIONS_DIR}`);
 
         // Summary
-        console.log(`\n📋 Version Range:`);
+        console.log("\n📋 Version Range:");
         console.log(`   Newest: ${versions[0].version}`);
         console.log(`   Oldest: ${versions[versions.length - 1].version}`);
 

@@ -129,12 +129,26 @@ document.addEventListener("DOMContentLoaded", () => {
     window.vulnManager = window.modernVulnManager;
 });
 
+/**
+ * Get currently selected vendor from radio buttons
+ * @returns {string} Current vendor ("", "CISCO", "Palo Alto", or "Other")
+ */
+function getCurrentVendor() {
+    const checkedRadio = document.querySelector("input[name=\"vendor-filter\"]:checked");
+    if (!checkedRadio) {return "";} // Default to "All Vendors"
+
+    const label = document.querySelector(`label[for="${checkedRadio.id}"]`);
+    return label ? (label.dataset.vendor || "") : "";
+}
+
 // Add event listener for chart metric toggle
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("input[name=\"chart-metric\"]").forEach(radio => {
         radio.addEventListener("change", () => {
             if (window.modernVulnManager && window.modernVulnManager.chartManager) {
-                window.modernVulnManager.chartManager.update();
+                // Get current vendor selection and pass it to chart update
+                const vendor = getCurrentVendor();
+                window.modernVulnManager.chartManager.update(false, vendor);
             }
         });
     });
@@ -220,8 +234,9 @@ document.addEventListener("DOMContentLoaded", () => {
 // When users navigate back, browsers may restore from cache without firing DOMContentLoaded
 window.addEventListener("pageshow", (event) => {
     if (event.persisted && window.modernVulnManager && window.modernVulnManager.chartManager) {
-        // Page was restored from bfcache, reload charts
+        // Page was restored from bfcache, reload charts with current vendor selection
         console.log("Page restored from bfcache, reloading charts");
-        window.modernVulnManager.chartManager.update();
+        const vendor = getCurrentVendor();
+        window.modernVulnManager.chartManager.update(false, vendor);
     }
 });
