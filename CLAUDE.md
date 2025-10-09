@@ -160,34 +160,28 @@ Task({
 // Direct cost: ~10-15K tokens | Via Task: ~2K tokens
 ```
 
-**`/save-conversation`** - Archive session to Memento
-```javascript
-Task({
-  subagent_type: "general-purpose",
-  prompt: "/save-conversation"
-})
-// Extracts session highlights, creates Memento entities
-// Direct cost: ~15-20K tokens | Via Task: ~1K tokens
+**`/save-conversation`** - Archive THIS session to Memento
+```bash
+/save-conversation
+# MUST run directly - needs this session's actual context
+# Cost: ~15-20K tokens | Creates SESSION entity with conversation highlights
+# Use before: Context limit, session end, major milestone
 ```
 
-**`/save-insights`** - Extract and save learnings to Memento
-```javascript
-Task({
-  subagent_type: "general-purpose",
-  prompt: "/save-insights"
-})
-// Creates breakthrough/lesson-learned entities
-// Direct cost: ~10-15K tokens | Via Task: ~1K tokens
+**`/save-insights`** - Extract learnings from THIS session
+```bash
+/save-insights
+# MUST run directly - extracts from current conversation
+# Cost: ~10-15K tokens | Creates INSIGHT/BREAKTHROUGH entities
+# Use after: Completing major work, discovering patterns
 ```
 
-**`/save-handoff`** - Generate handoff document
-```javascript
-Task({
-  subagent_type: "general-purpose",
-  prompt: "/save-handoff"
-})
-// Compiles current state, pending tasks, critical context
-// Direct cost: ~15-20K tokens | Via Task: ~2K tokens
+**`/save-handoff`** - Generate handoff from THIS session
+```bash
+/save-handoff
+# MUST run directly - documents current session state
+# Cost: ~15-20K tokens | Creates HANDOFF entity with pending tasks
+# Use for: Session transition, cross-instance coordination
 ```
 
 **`/create-report`** - Full standup report
