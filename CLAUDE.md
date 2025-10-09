@@ -57,7 +57,7 @@ docker-compose restart   # Restart after code changes
 
 ## Changelog & Version Management
 
-**Current Version**: v1.0.54 (tracked in `app/public/docs-source/ROADMAP.md`)
+**Current Version**: v1.0.56
 
 ### Changelog Structure
 
@@ -161,13 +161,34 @@ Update `app/public/docs-source/changelog/index.md`:
 ...
 ```
 
-**3. Update Version References**
+**3. Run Automated Release Workflow**
 
-After creating changelog entry, update these files:
+The version automation system (HEX-171) handles all file updates automatically:
 
-- **ROADMAP.md**: `**Current Version**: vX.Y.Z`
-- **package.json**: `"version": "X.Y.Z"` (use `npm version patch|minor|major`)
-- **README.md**: Version badge reference
+```bash
+# Update root package.json version
+vim package.json  # Change "version": "X.Y.Z"
+
+# Run unified release command
+npm run release
+```
+
+**What the automation does**:
+- ✅ Syncs version to 5 files: app/public/package.json, footer.html, README.md, docker-compose.yml, server.js
+- ✅ Generates 79 markdown → HTML documentation files
+- ✅ Generates JSDoc HTML API reference
+- ✅ Creates update report in logs/docs-source/
+
+**Source of Truth**: Root `package.json` is authoritative (updated by `npm version` commands or manual edit)
+
+**Files Auto-Updated**:
+1. `app/public/package.json` - Application package version
+2. `app/public/scripts/shared/footer.html` - Version badge on all pages
+3. `README.md` - Header version text and badge
+4. `docker-compose.yml` - HEXTRACKR_VERSION environment variable
+5. `app/public/server.js` - Reads from docker-compose.yml env var (dynamic)
+
+**⚠️ Important**: Never manually edit the 5 auto-updated files above. Always update root `package.json` and run `npm run release`.
 
 **4. Link Format**
 
