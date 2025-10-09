@@ -6,8 +6,8 @@
 
 HexTrackr is an enterprise vulnerability management platform that helps organizations track, prioritize, and remediate security vulnerabilities across their infrastructure. This roadmap provides visibility into planned features and improvements.
 
-**Current Version**: v1.0.43 (October 2025)
-**Current Focus**: Security hardening and enterprise-grade authentication
+**Current Version**: v1.0.54 (October 2025)
+**Current Focus**: Enhanced reporting and vendor analytics
 
 ---
 
@@ -44,29 +44,67 @@ HexTrackr is an enterprise vulnerability management platform that helps organiza
 
 ---
 
+## ✅ Recently Completed (v1.0.44-v1.0.54)
+
+### Authentication System (v1.0.46-v1.0.50)
+
+**Complete enterprise-grade authentication infrastructure**
+
+- ✅ Argon2id password hashing with timing-safe comparison (v1.0.46)
+- ✅ Session management with SQLite session store (v1.0.46)
+- ✅ Failed login tracking with account lockout protection (5 attempts in 15 minutes) (v1.0.46)
+- ✅ Authentication service layer with login/logout/password management (v1.0.46)
+- ✅ API route protection across 46 endpoints with requireAuth middleware (v1.0.46)
+- ✅ Trust proxy configuration for nginx reverse proxy support (v1.0.48)
+- ✅ HTTP security headers with Helmet.js (HSTS, Referrer Policy, CSP) (v1.0.49)
+- ✅ CSRF protection for all forms (v1.0.49)
+- ✅ Documentation portal authentication menu integration (v1.0.50)
+
+### Dashboard & Reporting (v1.0.44-v1.0.54)
+
+**Advanced vulnerability analytics and export capabilities**
+
+- ✅ Dashboard VPR cards with interactive statistics (v1.0.46)
+- ✅ Vulnerability trends with historical data tracking (v1.0.45)
+- ✅ AG-Grid performance optimizations for large datasets (v1.0.47)
+- ✅ VPR weekly summary CSV export via keyboard shortcut (v1.0.52)
+- ✅ Vendor breakdown CSV export with side-by-side VPR/Count tables (v1.0.53-v1.0.54)
+- ✅ Vendor filter UI synchronization between radio buttons and dropdown (v1.0.54)
+- ✅ Backend API integration for vendor-specific metrics (v1.0.54)
+
+### KEV Integration Enhancements (v1.0.44, v1.0.51)
+
+**Extended Known Exploited Vulnerabilities capabilities**
+
+- ✅ KEV modal system with NIST NVD integration (v1.0.44)
+- ✅ KEV modal enhancements with improved UX (v1.0.51)
+- ✅ CSV import UX improvements with progress polling (v1.0.51)
+
+---
+
 ## 🛡️ Security & Authentication
 
-### User Management System
+### User Management Enhancements
 
-Comprehensive user authentication and role-based access control to secure vulnerability data and provide proper audit trails.
+Extended user management capabilities for multi-user deployments.
 
 **Features:**
 
-- User registration and secure login
+- User registration and self-service account creation
 - Role-based permissions (Admin, Security Analyst, Viewer)
-- Session management and secure cookies
-- Password security with industry standards
+- User account management interface
+- Audit logging for authentication events
 
 ### Advanced Security Hardening
 
-Enterprise-grade security measures to protect sensitive vulnerability data and ensure compliance with security frameworks.
+Additional security measures for enterprise deployments.
 
 **Features:**
 
-- CSRF protection for all forms
-- Content Security Policy (CSP) implementation
-- HTTP security headers (HSTS, Referrer Policy)
-- Real-time connection security and rate limiting
+- WebSocket connection authentication and authorization
+- API rate limiting per user/endpoint
+- Real-time intrusion detection
+- Enhanced Content Security Policy (CSP) refinements
 
 ## 🎨 User Interface & Experience
 
