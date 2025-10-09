@@ -443,12 +443,12 @@ class HtmlContentUpdater {
         // Process regular sectioned files
         for (const source of sources) {
             const parts = source.relativePath.split("/");
-            
+
             // Handle root-level special files
             if (parts.length === 1) {
                 const fileName = parts[0].replace(".md", "");
                 const upperFileName = fileName.toUpperCase();
-                
+
                 // Special root files (CHANGELOG, ROADMAP, etc.)
                 if (["CHANGELOG", "ROADMAP", "SPRINT", "OVERVIEW"].includes(upperFileName)) {
                     manifest.specialFiles[fileName.toLowerCase()] = {
@@ -461,10 +461,10 @@ class HtmlContentUpdater {
                 continue;
             }
 
-            // Handle sectioned files
+            // Handle sectioned files (supports nested folders like changelog/versions/*)
             const sectionName = parts[0];
-            const fileName = parts[1].replace(".md", "");
-            
+
+            // Initialize section if it doesn't exist
             if (!manifest.sections[sectionName]) {
                 manifest.sections[sectionName] = {
                     title: this.sanitizeTitle(sectionName),
@@ -474,12 +474,33 @@ class HtmlContentUpdater {
                 };
             }
 
-            // Skip index files as they're handled at section level
-            if (fileName !== "index") {
+            // Handle 2-part paths: section/file.md
+            if (parts.length === 2) {
+                const fileName = parts[1].replace(".md", "");
+
+                // Skip index files as they're handled at section level
+                if (fileName !== "index") {
+                    manifest.sections[sectionName].children[fileName] = {
+                        file: `${sectionName}/${fileName}`,
+                        title: this.sanitizeTitle(fileName),
+                        path: `${sectionName}/${fileName}.html`
+                    };
+                }
+            }
+
+            // Handle 3+ part paths (nested folders): section/subfolder/file.md
+            // Example: changelog/versions/1.0.54.md
+            if (parts.length >= 3) {
+                const subPath = parts.slice(1, -1).join("/");  // "versions"
+                const fileName = parts[parts.length - 1].replace(".md", "");  // "1.0.54"
+                const fullPath = `${sectionName}/${subPath}/${fileName}`;  // "changelog/versions/1.0.54"
+
+                // Use just the filename as the key for cleaner navigation
+                // This makes version files appear as direct children of the changelog section
                 manifest.sections[sectionName].children[fileName] = {
-                    file: `${sectionName}/${fileName}`,
+                    file: fullPath,
                     title: this.sanitizeTitle(fileName),
-                    path: `${sectionName}/${fileName}.html`
+                    path: `${fullPath}.html`
                 };
             }
         }
