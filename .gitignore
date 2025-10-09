@@ -131,3 +131,7 @@ certs/*.key
 secrets/
 backups/
 /backups/commands/
+
+# Utility scripts with potential secrets (use npm scripts instead)
+app/scripts/
+!app/scripts/.gitkeep
