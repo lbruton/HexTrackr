@@ -4,9 +4,9 @@
  * Database Restoration Script
  *
  * Restores data from backup database to fresh database, excluding users table.
- * Then sets admin password to ***REMOVED***
+ * Then sets admin password using ADMIN_PASSWORD environment variable.
  *
- * Usage: node app/scripts/restore-from-backup.js
+ * Usage: ADMIN_PASSWORD="your-password" node app/scripts/restore-from-backup.js
  */
 
 const Database = require("better-sqlite3");
@@ -15,7 +15,14 @@ const path = require("path");
 
 const BACKUP_DB = path.join(__dirname, "../../app/data/hextrackr-backup-20250929-235802.db");
 const TARGET_DB = path.join(__dirname, "../../app/data/hextrackr.db");
-const NEW_PASSWORD = "***REMOVED***";
+// SECURITY: Password must be provided via environment variable
+const NEW_PASSWORD = process.env.ADMIN_PASSWORD || null;
+
+if (!NEW_PASSWORD) {
+    console.error('❌ ERROR: ADMIN_PASSWORD environment variable not set');
+    console.error('Usage: ADMIN_PASSWORD="your-password" node app/scripts/restore-from-backup.js');
+    process.exit(1);
+}
 
 async function restoreDatabase() {
     console.log("🔄 Starting database restoration...\n");
