@@ -85,112 +85,139 @@ git pull origin main  # Sync dev branch
 
 **Purpose**: Efficient workflow shortcuts that wrap MCP tools with consistent parameters.
 
-### Codebase Analysis
+**CRITICAL Token Efficiency Pattern**:
+- **Lightweight commands**: Run directly (small token cost)
+- **Heavy commands**: Run via `general-purpose` Task tool (isolates token consumption)
+
+### Lightweight Commands (Run Directly)
 
 **`/status-code`** - Check claude-context indexing status
 ```bash
 /status-code
-# Returns: Index status, progress %, last update timestamp
-# Wraps: mcp__claude-context__get_indexing_status
+# Cost: ~200 tokens | Returns: Index status, progress %, timestamp
 ```
-
-**`/search-code [natural language query]`** - Semantic codebase search
-```bash
-/search-code authentication middleware patterns
-# Returns: Top 10 relevant code snippets with file paths and line numbers
-# Wraps: mcp__claude-context__search_code with path + limit defaults
-```
-
-**`/index-code`** - Index or re-index codebase
-```bash
-/index-code
-# Wraps: mcp__claude-context__index_codebase with splitter: "ast"
-```
-
-### Git & Status
 
 **`/load-git`** - Get current git context
 ```bash
 /load-git
-# Returns: Current time, last 3 commits, status, branch
-# Wraps: Multiple Bash commands (date, git log, git status, git branch)
+# Cost: ~500 tokens | Returns: Time, last 3 commits, status, branch
 ```
 
-### Security
+**`/search-code [query]`** - Semantic codebase search
+```bash
+/search-code authentication middleware patterns
+# Cost: ~2-5K tokens | Returns: Top 10 snippets with file:line references
+```
 
-**`/sec-scan`** - Full security vulnerability scan
+**`/sec-scan`** - Security vulnerability scan
 ```bash
 /sec-scan
-# Invokes: hextrackr-fullstack-dev agent
-# Scans: SQL injection, XSS, exposed credentials, insecure configs
-# Returns: Comprehensive security audit report with severity ratings
+# Cost: ~5-10K tokens | Uses: hextrackr-fullstack-dev agent
+# Returns: Comprehensive security audit with severity ratings
 ```
 
-### Problem Analysis
+### Heavy Commands (Use via Task Tool)
 
-**`/why [question or problem]`** - Five Whys root cause analysis
-```bash
-# Use general-purpose Task tool to invoke:
+**Token Isolation Pattern**:
+```javascript
+// Instead of running /command directly, wrap in Task:
+Task({
+  subagent_type: "general-purpose",
+  prompt: "/command-name [args]"
+})
+// Agent does heavy lifting, returns only final report
+// Saves 15-30K tokens per command
+```
+
+**`/recall-insights`** - 7-day insights report from Memento
+```javascript
+Task({
+  subagent_type: "general-purpose",
+  prompt: "/recall-insights"
+})
+// Direct cost: ~20-30K tokens (Memento queries + semantic search)
+// Via Task: ~2-3K tokens (final report only)
+// Savings: 90%
+```
+
+**`/prime`** - Full context loading (comprehensive)
+```javascript
+Task({
+  subagent_type: "general-purpose",
+  prompt: "/prime"
+})
+// Phases: Git → Index → Linear → Memento → Codebase → Docs
+// Direct cost: 40-60K tokens | Via Task: ~5K tokens
+```
+
+**`/quickprime`** - Fast context from Linear prime logs
+```javascript
+Task({
+  subagent_type: "general-purpose",
+  prompt: "/quickprime"
+})
+// Loads most recent prime log + git delta
+// Direct cost: ~10-15K tokens | Via Task: ~2K tokens
+```
+
+**`/save-conversation`** - Archive session to Memento
+```javascript
+Task({
+  subagent_type: "general-purpose",
+  prompt: "/save-conversation"
+})
+// Extracts session highlights, creates Memento entities
+// Direct cost: ~15-20K tokens | Via Task: ~1K tokens
+```
+
+**`/save-insights`** - Extract and save learnings to Memento
+```javascript
+Task({
+  subagent_type: "general-purpose",
+  prompt: "/save-insights"
+})
+// Creates breakthrough/lesson-learned entities
+// Direct cost: ~10-15K tokens | Via Task: ~1K tokens
+```
+
+**`/save-handoff`** - Generate handoff document
+```javascript
+Task({
+  subagent_type: "general-purpose",
+  prompt: "/save-handoff"
+})
+// Compiles current state, pending tasks, critical context
+// Direct cost: ~15-20K tokens | Via Task: ~2K tokens
+```
+
+**`/create-report`** - Full standup report
+```javascript
+Task({
+  subagent_type: "general-purpose",
+  prompt: "/create-report"
+})
+// Aggregates Linear + git + Memento
+// Direct cost: ~20-25K tokens | Via Task: ~3K tokens
+```
+
+**`/compare-reports`** - Dev/Prod team comparison
+```javascript
+Task({
+  subagent_type: "general-purpose",
+  prompt: "/compare-reports"
+})
+// Analyzes multiple team standups
+// Direct cost: ~25-30K tokens | Via Task: ~3K tokens
+```
+
+**`/why [question]`** - Five Whys root cause analysis
+```javascript
 Task({
   subagent_type: "general-purpose",
   prompt: "/why Why is the session cookie not being set?"
 })
-# Returns: Iterative root cause analysis using 5 Whys methodology
-```
-
-**`/think`** - Sequential thinking for complex problems
-```bash
-# Prompts subagent to use sequential-thinking MCP
-# Use for: Multi-step analysis, design decisions, debugging
-```
-
-### Knowledge Management
-
-**`/save-insights`** - Save important insights to Memento
-```bash
-/save-insights
-# Extracts key learnings from session
-# Creates Memento entities with proper taxonomy
-# Tags: breakthrough, lesson-learned, best-practice
-```
-
-**`/save-handoff`** - Generate handoff for new session
-```bash
-/save-handoff
-# Creates comprehensive handoff document
-# Includes: Current state, pending tasks, critical context
-# Saves to Memento with HANDOFF entity type
-```
-
-**`/save-conversation`** - Save session key details before compact
-```bash
-/save-conversation
-# Archives complete session context to Memento
-# Use before: Context limit, session transition, major milestone
-```
-
-### Reporting
-
-**`/report-insights`** - Save 7-day insights report to Linear
-```bash
-/report-insights
-# Queries Memento for last 7 days
-# Generates summary report
-# Creates Linear issue in Reports team
-```
-
-**`/create-report`** - Generate full standup report for team
-```bash
-/create-report
-# Compiles: Completed work, in-progress, blockers
-# Sources: Linear issues, git commits, Memento sessions
-```
-
-**`/compare-reports`** - Compare dev/prod standups
-```bash
-/compare-reports
-# Compares: HexTrackr-Dev vs HexTrackr-Prod team status
-# Returns: Overall project health, handoff opportunities
+// Iterative analysis with sequential thinking
+// Direct cost: ~5-10K tokens | Via Task: ~2K tokens
 ```
 
 ## Three-Agent Architecture
