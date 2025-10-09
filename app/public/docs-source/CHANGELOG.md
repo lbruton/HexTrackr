@@ -9,6 +9,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Vendor CSV Export Enhancements (HEX-148/149/150) - 2025-10-09
+
+**Enhancement 1: Side-by-Side Vulnerability Count Tables**
+
+Extended the vendor breakdown CSV export (originally added in v1.0.53) to include vulnerability COUNT tables alongside VPR tables for comprehensive weekly reporting.
+
+**CSV Structure** (Enhanced):
+- VPR tables on the left (risk priority metrics)
+- COUNT tables on the right (workload volume metrics)
+- 2-cell spacing between table pairs for clean spreadsheet formatting
+- Four vendor breakdowns: Overall, CISCO, Palo Alto, Other
+
+Each table pair includes both VPR and Count metrics with:
+- PREV WEEK: Historical values (calculated from backend trends API)
+- THIS WEEK: Current period totals by severity
+- CHANGE: Difference between periods
+- TOTAL: Row sum across all severity levels
+
+**Data Source**: Backend API integration via `/api/vulnerabilities/trends?vendor=X` for vendor-specific percentage changes and historical data (replaces DOM scraping for improved accuracy).
+
+**Use Case**: Weekly supervisor meetings requiring both risk assessment (VPR) and resource planning (counts) in a single export.
+
+**Files Modified**:
+- `app/public/scripts/shared/vulnerability-statistics.js`: Added count aggregation, backend API integration, side-by-side table formatting
+
+**Enhancement 2: Vendor Filter UI Synchronization**
+
+Implemented bidirectional synchronization between vendor radio buttons (dashboard stats/charts) and vendor dropdown (search/filter area) to maintain consistent UI state.
+
+**Behavior**:
+- Radio button selection → updates dropdown → filters table/cards → updates stats/charts
+- Dropdown selection → updates radio button → triggers stats/chart refresh → filters data views
+- Infinite loop protection via value checking before event triggering
+- Seamless user experience with single source of truth for vendor filter state
+
+**Technical Implementation**:
+- `setupVendorToggle()`: Radio button listeners with dropdown sync
+- `setupVendorDropdownSync()`: Dropdown listeners with radio button sync
+- Event dispatching with loop prevention (`value !== newValue` check)
+
+**Use Case**: Eliminates user confusion from desynchronized filter controls, ensures stats/charts always match filtered data views.
+
+**Files Modified**:
+- `app/public/scripts/pages/vulnerabilities.js`: Dual event listeners with bidirectional sync logic
+
+**Enhancement 3: KEV Table Cleanup**
+
+Removed KEV summary table from CSV export based on user feedback indicating column structure mismatch with reporting needs.
+
+**Rationale**:
+- KEV columns (vulnerability name, vendor/project, date added, due date, ransomware flag) didn't align with existing reporting workflow
+- Deferred to future feature with dedicated table/card view and similar keyboard shortcut pattern
+- Keeps CSV export focused on VPR and Count metrics for current use case
+
+**Result**: Clean CSV formatting without KEV interference, focused on vendor breakdown metrics.
+
+**Files Modified**:
+- `app/public/scripts/shared/vulnerability-statistics.js`: Removed KEV data fetching and table generation code
+
+**Validation**:
+- ✅ Side-by-side VPR and Count tables export successfully
+- ✅ Vendor filter sync works bidirectionally (tested on dev.hextrackr.com)
+- ✅ No infinite loops or desync issues
+- ✅ Arithmetic validation passes (vendor subtables sum to overall totals)
+- ✅ Clean CSV formatting without KEV table interference
+
+**Issues**:
+- [HEX-148](https://linear.app/hextrackr/issue/HEX-148) - RESEARCH: Vendor Breakdown Enhancements
+- [HEX-149](https://linear.app/hextrackr/issue/HEX-149) - PLAN: Vendor Breakdown Enhancements
+- [HEX-150](https://linear.app/hextrackr/issue/HEX-150) - IMPLEMENT: Vendor Breakdown Enhancements
+
+---
+
 - Introduced `config/import.config.json`, allowing hostname and vendor-family rules to be configured outside the codebase for CSV imports (e.g., mapping `nfpan` to Palo Alto or `n[rs]wan` to Cisco) so each environment can extend device classification without code changes.
 
 ### Fixed
