@@ -171,9 +171,10 @@ npm run docs:generate  <span class="hljs-comment"># Regenerate HTML documentatio
 <span class="hljs-comment"># Stop conflicting service or change HexTrackr&#x27;s port in docker-compose.yml</span></code></pre><h3>Database Errors</h3><p><strong>Symptom</strong>: Cannot read/write vulnerabilities or tickets</p>
 <p><strong>Solution</strong>:</p>
 <ol>
-<li>Check database file exists: <code>ls -la app/public/data/hextrackr.db</code></li>
-<li>Verify permissions: <code>chmod 666 app/public/data/hextrackr.db</code></li>
-<li>Check container logs: <code>docker-compose logs hextrackr</code></li>
+<li>Check database file exists: <code>ls -la app/data/hextrackr.db</code></li>
+<li>Verify Docker volume is mounted: <code>docker inspect hextrackr-app | grep data</code></li>
+<li>Check container logs: <code>docker logs hextrackr-app</code></li>
+<li>Restart container: <code>docker-compose restart hextrackr</code></li>
 </ol>
 <h3>Container Won't Start</h3><p><strong>Symptom</strong>: <code>docker-compose up</code> fails immediately</p>
 <p><strong>Solution</strong>:</p>

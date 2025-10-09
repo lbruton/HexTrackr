@@ -318,9 +318,10 @@ sudo lsof -i :443
 **Symptom**: Cannot read/write vulnerabilities or tickets
 
 **Solution**:
-1. Check database file exists: `ls -la app/public/data/hextrackr.db`
-2. Verify permissions: `chmod 666 app/public/data/hextrackr.db`
-3. Check container logs: `docker-compose logs hextrackr`
+1. Check database file exists: `ls -la app/data/hextrackr.db`
+2. Verify Docker volume is mounted: `docker inspect hextrackr-app | grep data`
+3. Check container logs: `docker logs hextrackr-app`
+4. Restart container: `docker-compose restart hextrackr`
 
 ### Container Won't Start
 
