@@ -25,20 +25,8 @@
                 "vulnerability-scanning", "backup-restore"
             ];
 
-            // Special case: For development section, include CHANGELOG
-            if (section === "development") {
-                try {
-                    const changelogResponse = await fetch(this.getContentUrl("CHANGELOG.html"));
-                    if (changelogResponse.ok) {
-                        children["changelog"] = {
-                            title: "Changelog",
-                            file: "CHANGELOG"
-                        };
-                    }
-                } catch (_error) {
-                    // CHANGELOG doesn't exist, skip it
-                }
-            }
+            // Note: CHANGELOG is now a folder (changelog/) with individual version files
+            // It will be auto-discovered like other folders - no special handling needed
  * - Mobile responsive
  * 
  * Framework: Enhanced Tabler.io with custom navigation components

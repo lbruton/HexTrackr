@@ -1,0 +1,91 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.54</h1><hr>
+<h2>[1.0.54]</h2><h3>Added</h3><h4>Vendor CSV Export Enhancements (HEX-148/149/150) - 2025-10-09</h4><p><strong>Enhancement 1: Side-by-Side Vulnerability Count Tables</strong></p>
+<p>Extended the vendor breakdown CSV export (originally added in v1.0.53) to include vulnerability COUNT tables alongside VPR tables for comprehensive weekly reporting.</p>
+<p><strong>CSV Structure</strong> (Enhanced):</p>
+<ul>
+<li>VPR tables on the left (risk priority metrics)</li>
+<li>COUNT tables on the right (workload volume metrics)</li>
+<li>2-cell spacing between table pairs for clean spreadsheet formatting</li>
+<li>Four vendor breakdowns: Overall, CISCO, Palo Alto, Other</li>
+</ul>
+<p>Each table pair includes both VPR and Count metrics with:</p>
+<ul>
+<li>PREV WEEK: Historical values (calculated from backend trends API)</li>
+<li>THIS WEEK: Current period totals by severity</li>
+<li>CHANGE: Difference between periods</li>
+<li>TOTAL: Row sum across all severity levels</li>
+</ul>
+<p><strong>Data Source</strong>: Backend API integration via <code>/api/vulnerabilities/trends?vendor=X</code> for vendor-specific percentage changes and historical data (replaces DOM scraping for improved accuracy).</p>
+<p><strong>Use Case</strong>: Weekly supervisor meetings requiring both risk assessment (VPR) and resource planning (counts) in a single export.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-statistics.js</code>: Added count aggregation, backend API integration, side-by-side table formatting</li>
+</ul>
+<p><strong>Enhancement 2: Vendor Filter UI Synchronization</strong></p>
+<p>Implemented bidirectional synchronization between vendor radio buttons (dashboard stats/charts) and vendor dropdown (search/filter area) to maintain consistent UI state.</p>
+<p><strong>Behavior</strong>:</p>
+<ul>
+<li>Radio button selection → updates dropdown → filters table/cards → updates stats/charts</li>
+<li>Dropdown selection → updates radio button → triggers stats/chart refresh → filters data views</li>
+<li>Infinite loop protection via value checking before event triggering</li>
+<li>Seamless user experience with single source of truth for vendor filter state</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li><code>setupVendorToggle()</code>: Radio button listeners with dropdown sync</li>
+<li><code>setupVendorDropdownSync()</code>: Dropdown listeners with radio button sync</li>
+<li>Event dispatching with loop prevention (<code>value !== newValue</code> check)</li>
+</ul>
+<p><strong>Use Case</strong>: Eliminates user confusion from desynchronized filter controls, ensures stats/charts always match filtered data views.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/pages/vulnerabilities.js</code>: Dual event listeners with bidirectional sync logic</li>
+</ul>
+<p><strong>Enhancement 3: KEV Table Cleanup</strong></p>
+<p>Removed KEV summary table from CSV export based on user feedback indicating column structure mismatch with reporting needs.</p>
+<p><strong>Rationale</strong>:</p>
+<ul>
+<li>KEV columns (vulnerability name, vendor/project, date added, due date, ransomware flag) didn&#39;t align with existing reporting workflow</li>
+<li>Deferred to future feature with dedicated table/card view and similar keyboard shortcut pattern</li>
+<li>Keeps CSV export focused on VPR and Count metrics for current use case</li>
+</ul>
+<p><strong>Result</strong>: Clean CSV formatting without KEV interference, focused on vendor breakdown metrics.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-statistics.js</code>: Removed KEV data fetching and table generation code</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Side-by-side VPR and Count tables export successfully</li>
+<li>✅ Vendor filter sync works bidirectionally (tested on dev.hextrackr.com)</li>
+<li>✅ No infinite loops or desync issues</li>
+<li>✅ Arithmetic validation passes (vendor subtables sum to overall totals)</li>
+<li>✅ Clean CSV formatting without KEV table interference</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-148">HEX-148</a> - RESEARCH: Vendor Breakdown Enhancements</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-149">HEX-149</a> - PLAN: Vendor Breakdown Enhancements</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-150">HEX-150</a> - IMPLEMENT: Vendor Breakdown Enhancements</li>
+</ul>
+<hr>
+<ul>
+<li>Introduced <code>config/import.config.json</code>, allowing hostname and vendor-family rules to be configured outside the codebase for CSV imports (e.g., mapping <code>nfpan</code> to Palo Alto or <code>n[rs]wan</code> to Cisco) so each environment can extend device classification without code changes.</li>
+</ul>
+<h3>Fixed</h3><ul>
+<li>Resolved a race condition in <code>vulnerability-details-modal.js</code> that was clearing modal operations during KEV lookups, restoring the CVE handoff used by the Known Exploited Vulnerability modal.</li>
+<li>Simplified the KEV modal in <code>vulnerabilities.html</code> by removing redundant &quot;View CVE Details&quot;, &quot;NIST NVD&quot;, and footer Close buttons to prevent stacked Bootstrap backdrops and duplicated entry points.</li>
+<li>Enforced no-wrap styling on AG Grid headers to keep short labels (e.g., KEV) on a single line without expanding the table layout.</li>
+<li>Added configurable vendor override support (<code>config/import.config.json</code>) so hostname/family patterns like <code>nfpan</code> or <code>n[rs]wan</code> classify Palo Alto and Cisco devices correctly during CSV imports (server + client).</li>
+<li>Reduced all API cache TTLs to 90 seconds and ensured explicit cache-bust flags (<code>_t</code>, <code>bustCache=true</code>) create bypass responses across stats, trends, vulnerabilities, and device endpoints.</li>
+<li>Clearing vulnerability data now invalidates server caches and wipes front-end session caches immediately, keeping dashboards in sync after destructive operations.</li>
+<li>CSV import UX now polls progress when WebSockets are unavailable, automatically clears stale sessionStorage metadata, and forces a cache-busting refresh when the progress modal completes.</li>
+<li>Manual refresh button on the Vulnerabilities page and Settings modal clear actions now trigger full cache-busting reloads, eliminating multi-minute staleness after imports or data wipes.</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

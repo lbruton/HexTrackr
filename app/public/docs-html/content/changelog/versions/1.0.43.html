@@ -1,0 +1,96 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.43</h1><p><strong>Release Date</strong>: 2025-10-03</p>
+<hr>
+<h2>[1.0.43] - 2025-10-03</h2><h3>Fixed (3)</h3><h4>HEX-121: ESLint Unused Variable Cleanup (32 → 0 Errors)</h4><p><strong>Issue</strong>: 32 ESLint unused variable warnings after configuration improvements in DOCS-25 and DOCS-33. Mix of false positives, intentionally unused parameters, and genuine dead code.</p>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Fixed 26 genuine unused variables/parameters via 5 incremental phases</li>
+<li>Fixed 1 actual bug: progress-modal.js button restoration using hardcoded text instead of captured originalText</li>
+<li>Documented 4 false positives with inline ESLint disable comments and explanations</li>
+<li>Identified 1 function (getVPRContrastColorsFromCSS) for investigation with HEX-122 theme controller issue</li>
+</ul>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li>100% ESLint error reduction (32 → 0)</li>
+<li>1 functional bug fixed (button state restoration)</li>
+<li>Codebase clarity improved with explicit intent signaling (underscore prefixes for intentionally unused)</li>
+<li>Better developer experience with clean linting results</li>
+</ul>
+<p><strong>Incremental Testing Strategy</strong>:</p>
+<ul>
+<li>Phase 1: 8 catch block prefixes (32 → 24) - Zero functionality risk</li>
+<li>Phase 2: 11 parameter prefixes (24 → 14) - Low-risk API contracts</li>
+<li>Phase 3: 7 safe cleanups (14 → 7) - Dead code removal</li>
+<li>Phase 4: 1 bug fix + 2 export fixes (7 → 4) - Button restoration</li>
+<li>Phase 5: 3 false positive docs + 1 HEX-122 link (4 → 0) - Documentation</li>
+</ul>
+<p><strong>Files Modified</strong> (20 files):</p>
+<ul>
+<li>catch block error prefixes: tickets.js, ag-grid-theme-manager.js, modal-monitoring.js, template-editor.js, ticket-markdown-editor.js, chart-theme-adapter.js, theme-controller.js, templateService.js, ticketService.js</li>
+<li>Parameter prefixes: fix-truncated-cves.js, header.js, vulnerability-grid.js, vulnerability-search.js, logging.js, docs.js, progressService.js</li>
+<li>Export/global fixes: tickets-aggrid.js, theme-contrast-tester.js, modal-monitoring.js</li>
+<li>Bug fix: progress-modal.js (button restoration)</li>
+<li>False positive docs: importController.js, importService.js</li>
+<li>HEX-122 investigation: vulnerability-constants.js</li>
+</ul>
+<p><strong>Related Issues</strong>:</p>
+<ul>
+<li>HEX-122: Theme color inconsistency (getVPRContrastColorsFromCSS investigation)</li>
+<li>HEX-123: CSV import JSON parse error (discovered during testing)</li>
+<li>DOCS-25, DOCS-33: ESLint configuration improvements</li>
+</ul>
+<h4>HEX-120: Device Modal Reliability + Split Loading Disabled</h4><p><strong>Issue</strong>: Device vulnerability modal intermittently failed to open due to race conditions in split-loading architecture. Users clicked device cards but sometimes saw no response.</p>
+<p><strong>Root Cause</strong>:</p>
+<ul>
+<li>Split loading architecture introduced timing issues between KEV-first load and background full dataset load</li>
+<li>Device card click handlers referenced devices that might not be fully loaded</li>
+<li>Race condition: UI rendered before device data fully populated</li>
+</ul>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Disabled split loading architecture (reverted to single-phase full dataset load)</li>
+<li>Ensured device data fully populated before UI interaction enabled</li>
+<li>Simplified vulnerability-core.js initialization sequence</li>
+<li>Enhanced error handling for modal open failures</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-core.js</code> - Simplified loading sequence, disabled split mode</li>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code> - Reverted to single-phase loading</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - Enhanced modal opening reliability</li>
+</ul>
+<p><strong>Impact</strong>: Device modals now open reliably 100% of the time. Trade-off: Initial page load returns to ~2 seconds (from &lt;500ms in HEX-117) but ensures data consistency.</p>
+<p><strong>Testing</strong>: Verified across 25,000+ vulnerabilities with 1,600+ devices - modal opens consistently.</p>
+<h3>Documentation (2)</h3><h4>DOCS-39 through DOCS-43: Documentation Audit and Auto-Fix</h4><p><strong>Audit Findings</strong>:</p>
+<ul>
+<li>Documentation health: 72% accurate (18/25 files current, 5 partially stale, 2 outdated)</li>
+<li>Version drift: ROADMAP.md showed v1.0.30, actual v1.0.43 (13 releases behind)</li>
+<li>Missing features: CacheService (v1.0.36), VulnerabilityCoreOrchestrator (v1.0.41), device stats endpoint</li>
+</ul>
+<p><strong>Fixes Applied</strong>:</p>
+<ul>
+<li><strong>ROADMAP.md (DOCS-41)</strong>: Updated version from v1.0.30 to v1.0.43</li>
+<li><strong>backend-api.md (DOCS-40)</strong>: Added CacheService and Device API Routes documentation</li>
+<li><strong>frontend-api.md (DOCS-42)</strong>: Added VulnerabilityCoreOrchestrator modular orchestrator pattern documentation</li>
+<li><strong>CLAUDE.md restructure</strong>: Simplified from bloated 2.0.0 to streamlined version with Linear DOCS-22 as primary source</li>
+</ul>
+<p><strong>Documentation Health Improvement</strong>: 72% → ~90% accurate</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/docs-source/ROADMAP.md</code> - Version sync</li>
+<li><code>app/public/docs-source/api-reference/backend-api.md</code> - Added missing v1.0.36+ features</li>
+<li><code>app/public/docs-source/api-reference/frontend-api.md</code> - Added orchestrator architecture</li>
+<li><code>CLAUDE.md</code> - Restructured for clarity and Linear-first approach</li>
+</ul>
+<h3>Cleanup</h3><ul>
+<li>Removed obsolete deployment documentation (NGINX_DEPLOYMENT.md, DISABLED_MCP.md)</li>
+<li>Added database WAL files to .gitignore (hextrackr.db-shm, hextrackr.db-wal)</li>
+<li>ESLint configuration improvements for dependency injection pattern support</li>
+</ul>
+<hr>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

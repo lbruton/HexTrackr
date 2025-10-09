@@ -1,0 +1,74 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.51</h1><p><strong>Release Date</strong>: 2025-10-06</p>
+<hr>
+<h2>[1.0.51] - 2025-10-06</h2><h3>Added</h3><h4>Browser Storage → Database Migration (HEX-138)</h4><p><strong>Feature</strong>: Hybrid caching architecture combining localStorage (fast synchronous cache) with database-backed persistence for cross-device preferences sync.</p>
+<p><strong>Architecture</strong>:</p>
+<ul>
+<li><strong>localStorage</strong>: Remains the fast synchronous cache for immediate UI responsiveness</li>
+<li><strong>Database</strong>: Provides persistent storage with cross-device synchronization</li>
+<li><strong>Sync Bridge</strong>: <code>preferences-sync.js</code> bidirectionally syncs between cache and database</li>
+<li><strong>Security</strong>: Sensitive credentials (Cisco API keys) bypass localStorage entirely</li>
+</ul>
+<p><strong>Implementation Phases</strong>:</p>
+<p><strong>Phase 1 - Backend Foundation</strong>:</p>
+<ul>
+<li>Created <code>user_preferences</code> table with foreign key to users table</li>
+<li>Implemented <code>preferences-service.js</code> backend with CRUD operations</li>
+<li>Added <code>/api/preferences</code> endpoints (GET, POST for single/bulk operations)</li>
+<li>Migration file: <code>006-user-preferences.sql</code></li>
+</ul>
+<p><strong>Phase 2 - Frontend Service</strong>:</p>
+<ul>
+<li>Created <code>preferences-service.js</code> frontend client with fetch API calls</li>
+<li>Implemented CSRF-protected API communication</li>
+<li>Added error handling and fallback to localStorage-only mode</li>
+</ul>
+<p><strong>Phase 3 - Preference Migration (6 Tasks)</strong>:</p>
+<ol>
+<li><strong>Theme Preferences</strong>: Dark/light mode synced across all pages</li>
+<li><strong>Markdown Templates</strong>: Ticket and vulnerability templates (persistent editing)</li>
+<li><strong>Pagination Settings</strong>: Enable/disable pagination preference</li>
+<li><strong>Global Settings</strong>: Skipped (incomplete legacy feature)</li>
+<li><strong>KEV Auto-Refresh</strong>: CISA KEV sync preference with debounced updates</li>
+<li><strong>Cisco Credentials</strong> (SECURITY PRIORITY): Client ID + Client Secret stored database-only</li>
+</ol>
+<p><strong>Phase 4 - Testing &amp; Documentation</strong>:</p>
+<ul>
+<li>Verified theme sync across login, docs portal, and main app pages</li>
+<li>Confirmed cross-device persistence via database storage</li>
+<li>Validated security: Cisco credentials never touch localStorage</li>
+</ul>
+<p><strong>Sync Mechanism</strong>:</p>
+<ul>
+<li>Debounced writes (1-second delay) to prevent API rate limiting</li>
+<li>Immediate sync for security-critical data (credentials)</li>
+<li>Auto-load preferences from database on app initialization</li>
+<li>Fallback to localStorage-only mode if database unavailable</li>
+</ul>
+<p><strong>Files Added/Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/init-database.js</code> - Added user_preferences table</li>
+<li><code>app/services/preferences-service.js</code> - Backend service layer (NEW)</li>
+<li><code>app/routes/preferences.js</code> - API endpoints (NEW)</li>
+<li><code>app/public/scripts/shared/preferences-service.js</code> - Frontend client (NEW)</li>
+<li><code>app/public/scripts/shared/preferences-sync.js</code> - Sync bridge (NEW)</li>
+<li><code>app/public/scripts/shared/settings-modal.js</code> - Enhanced with Cisco credential handling</li>
+</ul>
+<p><strong>Database Schema</strong>:</p>
+<pre><code class="language-sql"><span class="hljs-keyword">CREATE TABLE</span> user_preferences (
+  id <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">PRIMARY KEY</span> AUTOINCREMENT,
+  user_id TEXT <span class="hljs-keyword">NOT NULL</span>,
+  preference_key TEXT <span class="hljs-keyword">NOT NULL</span>,
+  preference_value TEXT <span class="hljs-keyword">NOT NULL</span>,
+  created_at DATETIME <span class="hljs-keyword">DEFAULT</span> <span class="hljs-built_in">CURRENT_TIMESTAMP</span>,
+  updated_at DATETIME <span class="hljs-keyword">DEFAULT</span> <span class="hljs-built_in">CURRENT_TIMESTAMP</span>,
+  <span class="hljs-keyword">FOREIGN KEY</span> (user_id) <span class="hljs-keyword">REFERENCES</span> users(id) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE,
+  <span class="hljs-keyword">UNIQUE</span>(user_id, preference_key)
+);</code></pre><p><strong>Result</strong>: Users now enjoy seamless preference synchronization across devices while maintaining fast UI performance through localStorage caching. Sensitive API credentials are securely stored in the database with proper isolation from browser storage.</p>
+<hr>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

@@ -1,0 +1,93 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.35</h1><p><strong>Release Date</strong>: 2025-09-30</p>
+<hr>
+<h2>[1.0.35] - 2025-09-30</h2><h3>Fixed (6)</h3><h4>HEX-90: Ticket Field Clearing Bug - Nullish Coalescing Operator Fix</h4><p><strong>Issue</strong>: Users could not clear optional ticket fields (notes, status, location, supervisor, tech, site) when updating tickets. Sending empty strings or null values silently kept the previous value in the database.</p>
+<p><strong>Root Cause</strong>: The <code>updateTicket</code> method in <code>ticketService.js</code> used the <code>||</code> (logical OR) operator for field merging:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ❌ BEFORE - || treats ANY falsy value as &quot;use fallback&quot;</span>
+<span class="hljs-keyword">const</span> payload = {
+    <span class="hljs-attr">notes</span>: ticket.<span class="hljs-property">notes</span> || existingTicket.<span class="hljs-property">notes</span>,
+    <span class="hljs-attr">status</span>: ticket.<span class="hljs-property">status</span> || existingTicket.<span class="hljs-property">status</span>,
+    <span class="hljs-comment">// ... empty strings (&quot;&quot;) kept old values</span>
+};</code></pre><p>The <code>||</code> operator treats ALL falsy values as &quot;use fallback&quot;:</p>
+<ul>
+<li>Empty string <code>&quot;&quot;</code> → falsy → uses old value ❌</li>
+<li><code>null</code> → falsy → uses old value ❌</li>
+<li><code>undefined</code> → falsy → uses old value ✅</li>
+<li><code>0</code> → falsy → uses old value ❌</li>
+<li><code>false</code> → falsy → uses old value ❌</li>
+</ul>
+<p><strong>Solution</strong>: Replaced <code>||</code> with <code>??</code> (nullish coalescing) for optional fields:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ✅ AFTER - ?? only falls back on null/undefined</span>
+<span class="hljs-keyword">const</span> payload = {
+    <span class="hljs-comment">// Optional fields - use ?? to allow clearing with empty strings</span>
+    <span class="hljs-attr">hexagonTicket</span>: ticket.<span class="hljs-property">hexagonTicket</span> ?? ticket.<span class="hljs-property">hexagon_ticket</span> ?? existingTicket.<span class="hljs-property">hexagon_ticket</span>,
+    <span class="hljs-attr">serviceNowTicket</span>: ticket.<span class="hljs-property">serviceNowTicket</span> ?? ticket.<span class="hljs-property">service_now_ticket</span> ?? existingTicket.<span class="hljs-property">service_now_ticket</span>,
+    <span class="hljs-attr">location</span>: ticket.<span class="hljs-property">location</span> ?? existingTicket.<span class="hljs-property">location</span>,
+    <span class="hljs-attr">supervisor</span>: ticket.<span class="hljs-property">supervisor</span> ?? existingTicket.<span class="hljs-property">supervisor</span>,
+    <span class="hljs-attr">tech</span>: ticket.<span class="hljs-property">tech</span> ?? existingTicket.<span class="hljs-property">tech</span>,
+    <span class="hljs-attr">status</span>: ticket.<span class="hljs-property">status</span> ?? existingTicket.<span class="hljs-property">status</span>,
+    <span class="hljs-attr">notes</span>: ticket.<span class="hljs-property">notes</span> ?? existingTicket.<span class="hljs-property">notes</span>,
+    <span class="hljs-attr">site</span>: ticket.<span class="hljs-property">site</span> ?? existingTicket.<span class="hljs-property">site</span>,
+    <span class="hljs-attr">site_id</span>: ticket.<span class="hljs-property">site_id</span> ?? existingTicket.<span class="hljs-property">site_id</span>,
+    <span class="hljs-attr">location_id</span>: ticket.<span class="hljs-property">location_id</span> ?? existingTicket.<span class="hljs-property">location_id</span>,
+
+    <span class="hljs-comment">// Required fields - keep || to prevent empty values</span>
+    <span class="hljs-attr">dateSubmitted</span>: ticket.<span class="hljs-property">dateSubmitted</span> || ticket.<span class="hljs-property">date_submitted</span> || existingTicket.<span class="hljs-property">date_submitted</span>,
+    <span class="hljs-attr">dateDue</span>: ticket.<span class="hljs-property">dateDue</span> || ticket.<span class="hljs-property">date_due</span> || existingTicket.<span class="hljs-property">date_due</span>,
+    <span class="hljs-attr">devices</span>: ticket.<span class="hljs-property">devices</span> || existingTicket.<span class="hljs-property">devices</span>,
+    <span class="hljs-attr">attachments</span>: ticket.<span class="hljs-property">attachments</span> || existingTicket.<span class="hljs-property">attachments</span>,
+};</code></pre><p><strong>Operator Comparison</strong>:</p>
+<ul>
+<li><code>||</code> (Logical OR): Falls back on ANY falsy value (prevents <code>&quot;&quot;</code>, <code>0</code>, <code>false</code>)</li>
+<li><code>??</code> (Nullish Coalescing): Falls back ONLY on <code>null</code> or <code>undefined</code> (allows <code>&quot;&quot;</code>, <code>0</code>, <code>false</code>)</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/ticketService.js</code> (lines 148-195) - Updated <code>updateTicket</code> method with ?? operators and comprehensive JSDoc</li>
+<li>Added JSDoc documentation explaining operator choice for future maintainers</li>
+</ul>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li>Users can now clear optional fields by sending empty strings</li>
+<li>UI shows cleared field and database reflects the change</li>
+<li>No breaking changes to required field validation</li>
+<li>Discovered during Codacy review of PR #59 (WebSocket CORS fix)</li>
+</ul>
+<p><strong>User Experience</strong>:</p>
+<ul>
+<li>Before: Silent failures when clearing fields (UI shows cleared, DB keeps old value)</li>
+<li>After: Fields clear successfully (UI and DB synchronized)</li>
+<li>No error messages needed - clearing now works as expected</li>
+</ul>
+<p><strong>Testing</strong>:</p>
+<ul>
+<li>All linters passed (ESLint, Stylelint, Markdownlint)</li>
+<li>Docker container tested and running on port 8989</li>
+<li>Verified field clearing for all 9 optional fields</li>
+</ul>
+<h3>Added (5)</h3><h4>Trust Proxy Configuration for Nginx Reverse Proxy</h4><p><strong>Purpose</strong>: Enable proper client IP detection and rate limiting when running behind nginx reverse proxy</p>
+<p><strong>Implementation</strong>:</p>
+<ul>
+<li>Added <code>TRUST_PROXY</code> environment variable to configure Express trust proxy setting</li>
+<li>Updated <code>app/public/server.js</code> (lines 48-52) with conditional proxy trust configuration</li>
+<li>Updated <code>.env.example</code> with documentation for production deployment</li>
+</ul>
+<p><strong>Configuration</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Trust proxy when behind nginx (enables proper client IP detection)</span>
+<span class="hljs-keyword">if</span> (process.<span class="hljs-property">env</span>.<span class="hljs-property">TRUST_PROXY</span> === <span class="hljs-string">&quot;true&quot;</span>) {
+    app.<span class="hljs-title function_">set</span>(<span class="hljs-string">&quot;trust proxy&quot;</span>, <span class="hljs-number">1</span>);
+}</code></pre><p><strong>Benefits</strong>:</p>
+<ul>
+<li>Rate limiting works correctly with real client IPs (not nginx IP)</li>
+<li>Eliminates ValidationError logs from proxy forwarding</li>
+<li>Enables Cache-Control header optimization</li>
+<li>Ready for Claude-Prod to enable with <code>TRUST_PROXY=true</code></li>
+</ul>
+<p><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-90">HEX-90</a></p>
+<hr>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
