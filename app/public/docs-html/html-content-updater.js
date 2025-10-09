@@ -505,6 +505,36 @@ class HtmlContentUpdater {
             }
         }
 
+        // Sort changelog versions (newest first) if changelog section exists
+        if (manifest.sections.changelog && manifest.sections.changelog.children) {
+            const sortedChildren = {};
+            const versionKeys = Object.keys(manifest.sections.changelog.children);
+
+            // Sort version numbers in descending order (newest first)
+            versionKeys.sort((a, b) => {
+                // Parse version numbers (e.g., "1.0.54" -> [1, 0, 54])
+                const aParts = a.split('.').map(Number);
+                const bParts = b.split('.').map(Number);
+
+                // Compare each part from left to right
+                for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+                    const aNum = aParts[i] || 0;
+                    const bNum = bParts[i] || 0;
+                    if (aNum !== bNum) {
+                        return bNum - aNum;  // Descending order (newest first)
+                    }
+                }
+                return 0;
+            });
+
+            // Rebuild children object in sorted order
+            versionKeys.forEach(key => {
+                sortedChildren[key] = manifest.sections.changelog.children[key];
+            });
+
+            manifest.sections.changelog.children = sortedChildren;
+        }
+
         // Write manifest file
         const manifestPath = path.join(process.cwd(), "app", "public", "docs-html", "content-manifest.json");
         await PathValidator.safeWriteFile(manifestPath, JSON.stringify(manifest, null, 2));
