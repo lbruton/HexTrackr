@@ -138,7 +138,7 @@ class PreferencesSync {
                                     console.log(`🔄 Updating stale localStorage theme (${age}ms old) with database value`);
                                 }
                             }
-                        } catch (e) {
+                        } catch (_e) {
                             // Not JSON or no timestamp, safe to update
                         }
                     }

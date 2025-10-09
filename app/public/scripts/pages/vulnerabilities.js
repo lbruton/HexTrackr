@@ -140,6 +140,42 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+/**
+ * Setup vendor toggle event listeners
+ * Updates dashboard stats cards and chart when vendor filter changes
+ */
+function setupVendorToggle() {
+    const vendorRadios = document.querySelectorAll("input[name=\"vendor-filter\"]");
+
+    vendorRadios.forEach(radio => {
+        radio.addEventListener("change", async (e) => {
+            if (!e.target.checked) {return;}
+
+            const label = document.querySelector(`label[for="${e.target.id}"]`);
+            const vendor = label.dataset.vendor; // "" = All, "CISCO", "Palo Alto", "Other"
+
+            console.log(`Vendor filter changed to: ${vendor || "All Vendors"}`);
+
+            try {
+                // Update stats cards
+                await window.modernVulnManager.statisticsManager.updateStatisticsDisplay(vendor);
+
+                // Update chart
+                await window.modernVulnManager.chartManager.update(false, vendor);
+
+            } catch (error) {
+                console.error("Failed to update vendor filter:", error);
+                // Error handling enhancement (loading states, toast) comes in Task 3.2
+            }
+        });
+    });
+}
+
+// Wire up vendor toggle on page load
+document.addEventListener("DOMContentLoaded", () => {
+    setupVendorToggle();
+});
+
 // Handle browser back/forward cache (bfcache) restoration
 // When users navigate back, browsers may restore from cache without firing DOMContentLoaded
 window.addEventListener("pageshow", (event) => {
